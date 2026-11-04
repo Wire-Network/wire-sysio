@@ -9,7 +9,6 @@
 
 namespace sysiosystem {
 
-   using sysio::current_time_point;
    using sysio::microseconds;
    using sysio::token;
 
@@ -23,12 +22,6 @@ namespace sysiosystem {
       static_assert( uint64_t{blocks_per_round} * sysio::block_timestamp::block_interval_ms
                         % milliseconds_per_second == 0,
                      "a round must last a whole number of seconds" );
-
-      /// Whole seconds from `from` to `to`; 0 unless `to` is later.
-      uint64_t seconds_between( const block_timestamp& from, const block_timestamp& to ) {
-         if( to.slot <= from.slot ) return 0;
-         return uint64_t{to.slot - from.slot} * sysio::block_timestamp::block_interval_ms / milliseconds_per_second;
-      }
    }
 
    void system_contract::onblock( ignore<block_header> ) {
@@ -46,10 +39,6 @@ namespace sysiosystem {
       // Add latest block information to blockinfo table.
       add_to_blockinfo_table(previous_block_id, timestamp);
 
-      if( _global.get().last_pervote_bucket_fill == time_point() )  /// start the presses
-         _global.modify( get_self(), []( auto& g ) { g.last_pervote_bucket_fill = current_time_point(); });
-
-
       /**
        * At startup the initial producer may not be one that is registered / elected
        * and therefore there may be no producer object for them.
@@ -58,18 +47,39 @@ namespace sysiosystem {
       // zeroes the count; a block this producer's slot did not deliver is simply never counted.
       // Only one round per rotation counts: a schedule switch can hand a producer a second round
       // in the same rotation, and paying it would let a reorder pay one producer twice.
+      //
+      // Seniority is credited for the same counted rounds: the scheduled time since the previously
+      // counted one, at most a rotation. The round index comes from this producer's own block, so a
+      // late successor takes nothing away, and a second round in one rotation is never counted.
       auto key = producer_key_t{producer.value};
       if ( _producers.contains(key) ) {
          const uint32_t round = timestamp.slot / blocks_per_round;
+         bool seniority_moved = false;
          _producers.modify( same_payer, key, [&]( auto& p ) {
             if( p.last_paid_round != round ) {
-               const auto rotation =
+               const uint32_t rotation =
                   std::max<uint32_t>( static_cast<uint32_t>( sysio::get_active_producers().size() ), 1 );
                if( p.last_paid_round != 0 && p.last_paid_round / rotation == round / rotation ) return;
+               // A row a termination or slash cleared accrues nothing until `regproducer` takes a
+               // new registration order.
+               if( p.registration_seq != 0 ) {
+                  const uint64_t rotation_sec = uint64_t{rotation} * round_duration_sec;
+                  const uint64_t rounds_since = round > p.last_paid_round ? round - p.last_paid_round : 0;
+                  const uint64_t credit_sec   = p.last_paid_round == 0
+                     ? rotation_sec
+                     : std::min( rotation_sec, rounds_since * round_duration_sec );
+                  const uint64_t before = producer_rank::seniority_credit( p.service_sec );
+                  p.service_sec = p.service_sec > std::numeric_limits<uint64_t>::max() - credit_sec
+                                     ? std::numeric_limits<uint64_t>::max()
+                                     : p.service_sec + credit_sec;
+                  seniority_moved = producer_rank::seniority_credit( p.service_sec ) != before;
+               }
                p.last_paid_round = round;
             }
             p.unpaid_blocks++;
          });
+         // The score reads seniority in whole hours, so only an hour crossed costs a rescore.
+         if( seniority_moved ) rescore_producer( producer );
       }
 
       // Attribute the rounds nobody produced. This must happen on every block: the count above
@@ -77,10 +87,10 @@ namespace sysiosystem {
       // all, so absence leaves no trace unless the schedule is walked explicitly.
       // The height is already implicit in `previous_block_id`, which is deserialized above, so this
       // costs four shifts rather than a table read.
-      record_round_participation( producer, block_info::block_height_from_id(previous_block_id) + 1, timestamp );
+      record_round_participation( producer, block_info::block_height_from_id(previous_block_id) + 1 );
 
       /// only update block producers once every minute, block_timestamp is in half seconds
-      if( timestamp.slot - _global.get().last_producer_schedule_update.slot > 120 ) {
+      if( timestamp.slot - _prodstate.get().last_producer_schedule_update.slot > 120 ) {
          // Drain any pending rescore BEFORE rebuilding, so the rebuild sees the freshest scores it
          // can. A sweep spans many ticks and the rebuild does NOT wait for it: ranking is allowed
          // to converge, and the alternative -- holding the schedule until the sweep finishes --
@@ -92,9 +102,8 @@ namespace sysiosystem {
    }
 
    void system_contract::record_round_participation( const name& current_producer,
-                                                     uint32_t block_height,
-                                                     const block_timestamp& block_time ) {
-      const auto& state = _global.get();
+                                                     uint32_t block_height ) {
+      const auto& state = _prodstate.get();
 
       // Mid-round: the same producer made the previous block, so no slot was skipped. Nothing is
       // scored here -- a round is judged once, at the transition where its block count is known,
@@ -122,10 +131,6 @@ namespace sysiosystem {
          observed_tbl.set( producer_rank::observed_schedule{ .producers = active_schedule }, get_self() );
       }
 
-      // A rotation is every scheduled producer's round once, so a served round credits the time
-      // until the producer's next one: a day in the schedule is a day of seniority at any size.
-      const uint64_t rotation_sec = active_schedule.size() * round_duration_sec;
-
       if( schedule_unchanged && state.last_producer.value != 0 ) {
          const auto previous = std::find( active_schedule.begin(), active_schedule.end(),
                                           state.last_producer );
@@ -144,7 +149,7 @@ namespace sysiosystem {
                if( slot == active_schedule.end() ) slot = active_schedule.begin();
                if( slot == current ) break;
                // Held a slot and delivered nothing.
-               record_round_outcome( *slot, /*blocks_delivered*/ 0, rotation_sec, block_time, weights );
+               record_round_outcome( *slot, /*blocks_delivered*/ 0, weights );
                ++slot;
             }
          }
@@ -158,18 +163,16 @@ namespace sysiosystem {
           && block_height > state.round_start_block ) {
          producer_rank::producer_score_config_t weights_tbl( get_self() );
          const auto weights = weights_tbl.get_or_default( producer_rank::producer_score_config{} );
-         record_round_outcome( state.last_producer, block_height - state.round_start_block, rotation_sec,
-                               block_time, weights );
+         record_round_outcome( state.last_producer, block_height - state.round_start_block, weights );
       }
 
-      _global.modify( get_self(), [&]( auto& g ) {
+      _prodstate.modify( get_self(), [&]( auto& g ) {
          g.last_producer     = current_producer;
          g.round_start_block = block_height;
       });
    }
 
-   void system_contract::record_round_outcome( const name& producer, uint32_t blocks_delivered, uint64_t rotation_sec,
-                                               const block_timestamp& block_time,
+   void system_contract::record_round_outcome( const name& producer, uint32_t blocks_delivered,
                                                const producer_rank::producer_score_config& weights ) {
       auto key = producer_key_t{producer.value};
       if( !_producers.contains(key) ) return;
@@ -192,22 +195,12 @@ namespace sysiosystem {
             // schedule -- so without this it would produce indefinitely for nothing.
             p.consecutive_missed_rounds = 0;
             p.is_demoted                = false;
-            // Seniority is service as a registered producer: a row whose registration a
-            // termination or slash cleared accrues nothing until `regproducer` takes a new order.
-            if( p.registration_seq == 0 ) return;
-            // At most the time since the last credit: a reorder or a size change that hands this
-            // producer a second round within one rotation cannot credit that rotation twice.
-            const uint64_t credit_sec = p.last_service_credit == block_timestamp{}
-               ? rotation_sec
-               : std::min( rotation_sec, seconds_between( p.last_service_credit, block_time ) );
-            p.service_sec = p.service_sec > std::numeric_limits<uint64_t>::max() - credit_sec
-                               ? std::numeric_limits<uint64_t>::max()
-                               : p.service_sec + credit_sec;
-            p.last_service_credit = block_time;
             return;
          }
 
          p.consecutive_missed_rounds++;
+         // A round that began with blocks was credited when pay counted it; the penalty applies
+         // on top of that credit.
          p.service_sec -= std::min<uint64_t>( p.service_sec, weights.miss_penalty_sec );
          // Categorical: a tier no score climbs out of. Back via `regproducer`, or by serving a
          // round while still scheduled.
@@ -226,7 +219,7 @@ namespace sysiosystem {
    }
 
    void system_contract::drain_rescore_cursor() {
-      const auto& state = _global.get();
+      const auto& state = _prodstate.get();
       if( !state.rescore_pending ) return;
 
       // Bounded per tick, mirroring opreg's MAX_WTDW_FLUSH_PER_EPOCH: the producers table is
@@ -267,7 +260,7 @@ namespace sysiosystem {
          rescore_producer( producer );
       }
 
-      _global.modify( get_self(), [&]( auto& g ) {
+      _prodstate.modify( get_self(), [&]( auto& g ) {
          g.rescore_cursor  = done ? 0 : cursor;
          g.rescore_pending = !done;
       });

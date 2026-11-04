@@ -454,20 +454,7 @@ public:
    }
 
 protected:
-   /// Selects the minimal construction path used by sysio_fresh_deploy_tester below.
-   struct deploy_only_t {};
-
-   /// Deploy sysio.system and bind its ABI, and do nothing else -- in particular produce no block
-   /// and push no action, so `onblock` has never run against this code and the contract's `global`
-   /// row has never been written. Everything the full fixture does past this point (init, the
-   /// token/roa/opreg/epoch bootstrap, produce_blocks) would persist that row, because each action
-   /// constructs a fresh system_contract whose deferred write lands at end of action.
-   explicit sysio_emissions_tester( deploy_only_t ) {
-      deploy_system_contract();
-      bind_system_abi();
-   }
-
-   /// Put sysio.system on chain. Shared by both construction paths so they cannot drift.
+   /// Put sysio.system on chain.
    void deploy_system_contract() {
       produce_blocks(2);
 
@@ -577,8 +564,8 @@ public:
       return setemitcfg(signer, default_emit_cfg(cadence));
    }
 
-   /// The default emission config payload, split out so a caller that must push it through a
-   /// different transport (see push_system_action_no_block) does not restate twenty fields.
+   /// The default emission config payload, split out so a caller pushing `setemitcfg` directly does
+   /// not restate twenty fields.
    fc::variant_object default_emit_cfg( uint16_t cadence,
                                         int64_t annual_max_emission = ANNUAL_MAX_EMISSION,
                                         uint32_t epoch_log_retention_count = 8640 ) {
@@ -1188,40 +1175,6 @@ protected:
       return base_tester::push_action( std::move(act), signer.to_uint64_t() );
    }
 
-   /// Push a sysio.system action WITHOUT crossing a block boundary.
-   ///
-   /// base_tester::push_action(action&&, uint64_t) calls produce_block() once the transaction
-   /// lands. That is invisible to most tests and fatal to the absent-`global`-row one: the next
-   /// block's onblock stamps last_pervote_bucket_fill on a fresh chain, creating the very row that
-   /// test needs to stay missing. Pushing straight into the open block keeps onblock from ever
-   /// running against sysio.system code. Error handling mirrors push_action so action_result
-   /// comparisons (success(), wasm_assert_msg()) read the same at the call site.
-   action_result push_system_action_no_block( const account_name& signer,
-                                              const action_name& act_name,
-                                              const variant_object& data ) {
-      action act;
-      act.account       = config::system_account_name;
-      act.name          = act_name;
-      act.authorization = vector<permission_level>{
-         { signer, config::sysio_payer_name },
-         { signer, config::active_name } };
-      act.data = sysio_abi_ser.variant_to_binary(
-         sysio_abi_ser.get_action_type(act_name), data,
-         fixture_abi_yield_function());
-
-      signed_transaction trx;
-      trx.actions.emplace_back( std::move(act) );
-      set_transaction_headers(trx);
-      trx.sign( get_private_key(signer, "active"), control->get_chain_id() );
-
-      try {
-         push_transaction(trx);
-      } catch (const fc::exception& ex) {
-         return error(ex.top_message());
-      }
-      return success();
-   }
-
    transaction_trace_ptr push_system_action_trace( const account_name& signer,
                                                   const action_name& name,
                                                   const variant_object& data ) {
@@ -1396,18 +1349,6 @@ protected:
    abi_serializer token_abi_ser;
    abi_serializer opreg_abi_ser;
    abi_serializer epoch_abi_ser;
-};
-
-/// sysio.system deployed onto a chain where its `global` row has never been written.
-///
-/// The full fixture cannot reach this state: it produces blocks after the deploy, and the first
-/// onblock to run against sysio.system code stamps last_pervote_bucket_fill on a fresh chain, so
-/// the row is always present by the time a test body runs. Once the row exists, seeding it and
-/// merely reading it are indistinguishable -- which is why the absent-row path needs its own
-/// fixture. Inherits every helper from the full fixture; only the constructor differs.
-class sysio_fresh_deploy_tester : public sysio_emissions_tester {
-public:
-   sysio_fresh_deploy_tester() : sysio_emissions_tester( deploy_only_t{} ) {}
 };
 
 BOOST_AUTO_TEST_SUITE(sysio_emissions_tests)
@@ -2412,9 +2353,9 @@ BOOST_FIXTURE_TEST_CASE( viewnodedist_readonly_reports_its_own_error, sysio_emis
 /// The missing-row half of the same regression: the global must not reach storage until an action
 /// genuinely mutates it.
 ///
-/// view_actions_execute_in_readonly_transaction cannot reach this state. Its fixture has produced
-/// post-deploy blocks, so onblock has already persisted `global`, and once the row exists every
-/// way of materializing defaults looks alike. The behaviour only has teeth while the row is absent.
+/// Only `setram` and `setparams` write `global`, and the fixture calls neither, so the row is still
+/// absent here although the fixture has produced blocks: `onblock` keeps its state in `prodstate`.
+/// The behaviour only has teeth while the row is absent.
 ///
 /// What this pins, and what it does not. The write-suppression SEMANTICS -- that materializing a
 /// default leaves the handle clean, so a pure read owes no kv_set -- belong to kv::cached_value and
@@ -2426,23 +2367,20 @@ BOOST_FIXTURE_TEST_CASE( viewnodedist_readonly_reports_its_own_error, sysio_emis
 ///
 /// Order is load-bearing. Each action constructs its own system_contract and flushes on return, so
 /// an action that persisted the row early would mask everything after it. setemitcfg is the probe
-/// because it succeeds without touching the global at all -- the only mutators are onblock, setram,
-/// setparams, the ranking updates and payepoch -- so the row must still be absent afterwards.
-BOOST_FIXTURE_TEST_CASE( seeded_global_defaults_owe_no_write, sysio_fresh_deploy_tester ) try {
+/// because it succeeds without touching the global at all, and every push here also crosses a
+/// block boundary, so `onblock` runs between them and must leave the row absent too.
+BOOST_FIXTURE_TEST_CASE( seeded_global_defaults_owe_no_write, sysio_emissions_tester ) try {
    // sysio_global_state::max_ram_size's in-contract default. Mirrored rather than included because
    // the tests link against the chain, not the contract.
    constexpr uint64_t DEFAULT_MAX_RAM_SIZE = 64ll*1024*1024*1024;
 
-   // Every push below goes through push_system_action_no_block: crossing a block boundary would
-   // run onblock, which writes the global itself and would mask what is being measured.
-
-   // Nothing has written the singleton on this chain.
+   // Nothing has written the singleton on this chain, though blocks have run `onblock`.
    BOOST_REQUIRE( !global_row_exists() );
 
    // An action that succeeds without mutating the global must not bring the row into existence.
    BOOST_REQUIRE_EQUAL( success(),
-                        push_system_action_no_block( config::system_account_name, "setemitcfg"_n,
-                                                     mvo()("cfg", default_emit_cfg(1)) ) );
+                        push_system_action( config::system_account_name, "setemitcfg"_n,
+                                            mvo()("cfg", default_emit_cfg(1)) ) );
    BOOST_REQUIRE( !global_row_exists() );
 
    // The read-only query runs with the row still missing -- the case that used to fail outright --
@@ -2457,21 +2395,21 @@ BOOST_FIXTURE_TEST_CASE( seeded_global_defaults_owe_no_write, sysio_fresh_deploy
    // Seeded means the defaults are what the contract reads, not a zero-initialized struct: 64GiB
    // is already the max, so a decrease is rejected. Against a zeroed cache this would succeed.
    BOOST_REQUIRE_EQUAL( wasm_assert_msg("ram may only be increased"),
-                        push_system_action_no_block( config::system_account_name, "setram"_n,
-                                                     mvo()("max_ram_size", DEFAULT_MAX_RAM_SIZE - 1) ) );
+                        push_system_action( config::system_account_name, "setram"_n,
+                                            mvo()("max_ram_size", DEFAULT_MAX_RAM_SIZE - 1) ) );
    BOOST_REQUIRE( !global_row_exists() );
 
    // The first genuine mutation is what persists the row.
    BOOST_REQUIRE_EQUAL( success(),
-                        push_system_action_no_block( config::system_account_name, "setram"_n,
-                                                     mvo()("max_ram_size", DEFAULT_MAX_RAM_SIZE + 1024) ) );
+                        push_system_action( config::system_account_name, "setram"_n,
+                                            mvo()("max_ram_size", DEFAULT_MAX_RAM_SIZE + 1024) ) );
    BOOST_REQUIRE( global_row_exists() );
 
    // And what landed carries the mutation on top of the seeded defaults -- a value above the
    // default but below what was just stored has to be rejected on the stored value.
    BOOST_REQUIRE_EQUAL( wasm_assert_msg("ram may only be increased"),
-                        push_system_action_no_block( config::system_account_name, "setram"_n,
-                                                     mvo()("max_ram_size", DEFAULT_MAX_RAM_SIZE + 512) ) );
+                        push_system_action( config::system_account_name, "setram"_n,
+                                            mvo()("max_ram_size", DEFAULT_MAX_RAM_SIZE + 512) ) );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( viewemitcfg_reflects_update, sysio_emissions_tester ) try {
@@ -6112,12 +6050,17 @@ struct producer_score_tester : public producer_eligibility_tester {
       return info["registration_seq"].as<uint64_t>();
    }
 
-   /// The block slot of the producer's last seniority credit, `producer_info::last_service_credit`;
-   /// 0 for never.
-   uint32_t last_service_credit_slot_of(account_name producer) {
+   /// The round pay last counted for the producer, `producer_info::last_paid_round`; seniority is
+   /// credited for the same rounds.
+   uint32_t last_paid_round_of(account_name producer) {
       auto info = get_producer_info(producer);
       BOOST_REQUIRE_MESSAGE(!info.is_null(), "no producers row for " << producer.to_string());
-      return info["last_service_credit"].as<block_timestamp_type>().slot;
+      return info["last_paid_round"].as<uint32_t>();
+   }
+
+   /// The scheduled round index of the head block (slot / `slots_per_producer`).
+   uint32_t head_round() {
+      return control->head().header().timestamp.slot / slots_per_producer;
    }
 
    /// Push `regproducer` for `producer` with its fixture key at location 0.
@@ -6131,24 +6074,25 @@ struct producer_score_tester : public producer_eligibility_tester {
       return uint64_t{to_slot - from_slot} * config::block_interval_ms / milliseconds_per_second;
    }
 
-   /// The sysio.system global singleton, which carries the rescore cursor.
-   fc::variant get_global_state() {
+   /// The sysio.system `prodstate` singleton: round cursor, schedule-rebuild stamp, rescore cursor
+   /// and registration counter.
+   fc::variant get_producer_state() {
       auto data = get_row_by_account(config::system_account_name, config::system_account_name,
-                                     "global"_n, "global"_n);
+                                     "prodstate"_n, "prodstate"_n);
       if (data.empty()) return fc::variant();
-      return sysio_abi_ser.binary_to_variant("sysio_global_state", data,
+      return sysio_abi_ser.binary_to_variant("producer_runtime_state", data,
          fixture_abi_yield_function());
    }
 
    bool rescore_pending() {
-      auto g = get_global_state();
+      auto g = get_producer_state();
       BOOST_REQUIRE(!g.is_null());
       return g["rescore_pending"].as<bool>();
    }
 
    /// The last registration order the global counter assigned.
    uint64_t last_registration_seq() {
-      auto g = get_global_state();
+      auto g = get_producer_state();
       BOOST_REQUIRE(!g.is_null());
       return g["last_registration_seq"].as<uint64_t>();
    }
@@ -7226,10 +7170,11 @@ BOOST_FIXTURE_TEST_CASE( seniority_accrues_wall_clock_time_on_a_full_schedule, p
 } FC_LOG_AND_RETHROW()
 
 // A membership change that also reverses the retained order hands the producers late in the old
-// rotation a second round early in the new one. Each credit is bounded by the time since the
-// producer's last one, so no rotation is credited twice: every credit is exactly the smaller of a
-// rotation and that gap, some gaps are shorter than a rotation, and no retained producer gains more
-// than the wall-clock time since its last credit before the change.
+// rotation a second round early in the new one. Seniority is credited only when pay counts a round,
+// for the scheduled time since the previously counted one, so no rotation is credited twice: every
+// credit lands with a newly counted round and is exactly the smaller of a rotation and that gap, the
+// second rounds are produced but never counted, and no retained producer gains more than the
+// scheduled time since the round counted before the change.
 BOOST_FIXTURE_TEST_CASE( a_reorder_never_credits_a_rotation_twice, producer_score_tester ) try {
    constexpr uint32_t scheduled_count = 21;   // max_producers
    auto names = setup_ranked_producers(scheduled_count + 1);
@@ -7254,32 +7199,39 @@ BOOST_FIXTURE_TEST_CASE( a_reorder_never_credits_a_rotation_twice, producer_scor
    }
 
    const uint64_t rotation_sec = scheduled_count * round_sec;
-   std::map<account_name, uint32_t> start_slot;
+   std::map<account_name, uint32_t> start_round;
    std::map<account_name, uint64_t> start_service;
-   std::map<account_name, uint32_t> credit_slot;
+   std::map<account_name, uint32_t> credit_round;
    std::map<account_name, uint64_t> service;
    for (const auto& p : retained) {
-      start_slot[p]    = credit_slot[p] = last_service_credit_slot_of(p);
-      start_service[p] = service[p]     = service_sec_of(p);
-      BOOST_REQUIRE_GT( start_slot[p], 0u );
+      start_round[p]   = credit_round[p] = last_paid_round_of(p);
+      start_service[p] = service[p]      = service_sec_of(p);
+      BOOST_REQUIRE_GT( start_round[p], 0u );
    }
-   uint32_t short_gaps = 0;
+   std::map<account_name, uint32_t> seen_round = credit_round;
+   uint32_t uncounted_rounds = 0;
    // At most one credit per producer lands between two checks, so each is checked on its own.
    const auto check_credits = [&] {
       for (const auto& p : retained) {
          const fc::variant info     = get_producer_info(p);
-         const uint32_t slot        = info["last_service_credit"].as<block_timestamp_type>().slot;
+         const uint32_t round       = info["last_paid_round"].as<uint32_t>();
          const uint64_t now_service = info["service_sec"].as<uint64_t>();
-         if (slot == credit_slot[p]) {
+         if (round == credit_round[p]) {
             BOOST_REQUIRE_EQUAL( service[p], now_service );
             continue;
          }
-         const uint64_t gap = elapsed_sec(credit_slot[p], slot);
+         const uint64_t gap = uint64_t{round - credit_round[p]} * round_sec;
          BOOST_REQUIRE_MESSAGE( now_service - service[p] == std::min(rotation_sec, gap),
             p.to_string() << " was credited " << now_service - service[p] << " s after a " << gap << " s gap" );
-         if (gap < rotation_sec) ++short_gaps;
-         credit_slot[p] = slot;
-         service[p]     = now_service;
+         credit_round[p] = round;
+         service[p]      = now_service;
+      }
+      // A retained producer opening a round that pay did not count: a second round in one rotation.
+      const account_name head = control->head().header().producer;
+      const uint32_t round    = head_round();
+      if (seen_round.count(head) && seen_round[head] != round) {
+         seen_round[head] = round;
+         if (credit_round[head] != round) ++uncounted_rounds;
       }
    };
 
@@ -7297,12 +7249,83 @@ BOOST_FIXTURE_TEST_CASE( a_reorder_never_credits_a_rotation_twice, producer_scor
       check_credits();
    }
 
-   BOOST_REQUIRE_MESSAGE( short_gaps > 0, "the reorder never gave a retained producer two rounds in one rotation" );
-   const uint32_t end_slot = control->head().header().timestamp.slot;
+   BOOST_REQUIRE_MESSAGE( uncounted_rounds > 0, "the reorder never gave a retained producer two rounds in one rotation" );
+   const uint32_t end_round = head_round();
    for (const auto& p : retained) {
-      BOOST_REQUIRE_LE( service_sec_of(p) - start_service[p], elapsed_sec(start_slot[p], end_slot) );
+      BOOST_REQUIRE_LE( service_sec_of(p) - start_service[p], uint64_t{end_round - start_round[p]} * round_sec );
       BOOST_REQUIRE_EQUAL( 0u, missed_rounds_of(p) );
    }
+} FC_LOG_AND_RETHROW()
+
+// A credit is bounded by scheduled rounds, not by when the next producer's first block lands. Here
+// `successor` skips the first half of its round every other rotation and still serves it, so the
+// round of `steady` before it ends late on those rotations and early on the next. Seniority is
+// credited when pay counts a round, at the producer's own first block, so every producer, `steady`
+// included, still gains exactly a rotation per rotation, and nobody misses.
+BOOST_FIXTURE_TEST_CASE( a_late_successor_costs_no_seniority, producer_score_tester ) try {
+   constexpr uint32_t scheduled_count = 21;   // max_producers
+   constexpr uint32_t rotations       = 4;   // two skipped-and-on-time cycles
+   constexpr uint32_t skipped_slots   = slots_per_producer / 2;   // leaves min_blocks_per_round
+   auto names = setup_ranked_producers(scheduled_count);
+   trigger_reschedule();
+   wait_for_active_schedule_order(names);
+   produce_blocks(scheduled_count * slots_per_producer);   // every producer credited
+   const auto steady    = names[5];
+   const auto successor = names[6];
+
+   // Measured between the same point of two rotations: the last slot of `steady`'s round.
+   advance_to_round_before(successor);
+   BOOST_REQUIRE( control->head().header().producer == steady );
+   const uint32_t start_slot = control->head().header().timestamp.slot;
+   std::map<account_name, uint64_t> start_service;
+   for (const auto& p : names) start_service[p] = service_sec_of(p);
+
+   for (uint32_t rotation = 0; rotation < rotations; ++rotation) {
+      if (rotation % 2 == 0) {
+         // From `steady`'s last slot: +1 enters `successor`'s round, and the skipped slots follow.
+         produce_block(fc::milliseconds(int64_t(config::block_interval_ms) * (skipped_slots + 1)));
+         BOOST_REQUIRE( control->head().header().producer == successor );
+      }
+      produce_blocks(1);
+      advance_to_round_before(successor);
+   }
+
+   const uint64_t rotation_sec = scheduled_count * round_sec;
+   BOOST_REQUIRE_EQUAL( rotations * rotation_sec, elapsed_sec(start_slot, control->head().header().timestamp.slot) );
+   for (const auto& p : names) {
+      BOOST_REQUIRE_MESSAGE( service_sec_of(p) - start_service[p] == rotations * rotation_sec,
+         p.to_string() << " gained " << service_sec_of(p) - start_service[p] << " s in "
+                       << rotations * rotation_sec << " s" );
+      BOOST_REQUIRE_EQUAL( 0u, missed_rounds_of(p) );
+   }
+} FC_LOG_AND_RETHROW()
+
+// `onblock` keeps its round and ranking state in `prodstate`, so rounds and schedule rebuilds never
+// rewrite `global` and its blockchain parameters. `setram`, one of that row's own writers, creates it
+// first so there is a stored row to compare.
+BOOST_FIXTURE_TEST_CASE( rounds_never_rewrite_the_global_row, producer_score_tester ) try {
+   constexpr uint64_t raised_max_ram_size = 64ull * 1024 * 1024 * 1024 + 1024;   // above the default
+   auto names = setup_ranked_producers(5);
+   BOOST_REQUIRE_EQUAL( success(), push_system_action(config::system_account_name, "setram"_n, mvo()
+      ("max_ram_size", raised_max_ram_size)) );
+   const vector<char> global_before = global_row();
+   BOOST_REQUIRE( !global_before.empty() );
+   const fc::variant state_before = get_producer_state();
+   BOOST_REQUIRE( !state_before.is_null() );
+
+   trigger_reschedule();
+   wait_for_active_schedule_order(names);
+   produce_blocks(names.size() * slots_per_producer * 2);
+
+   BOOST_REQUIRE( global_row() == global_before );
+   const fc::variant state_after = get_producer_state();
+   BOOST_REQUIRE_GT( state_after["round_start_block"].as<uint32_t>(), state_before["round_start_block"].as<uint32_t>() );
+   BOOST_REQUIRE_GT( state_after["last_producer_schedule_update"].as<block_timestamp_type>().slot,
+                     state_before["last_producer_schedule_update"].as<block_timestamp_type>().slot );
+   BOOST_REQUIRE_EQUAL( names.size(), state_after["last_producer_schedule_size"].as<uint32_t>() );
+   const auto& schedule = control->active_producers().producers;
+   BOOST_REQUIRE( std::any_of(schedule.begin(), schedule.end(), [&](const auto& p) {
+      return p.producer_name == state_after["last_producer"].as<account_name>(); }) );
 } FC_LOG_AND_RETHROW()
 
 // An unserved round subtracts the penalty exactly and floors at zero. The first miss runs with the
@@ -7412,7 +7435,6 @@ BOOST_FIXTURE_TEST_CASE( termination_and_slash_reset_seniority_and_registration_
    for (const auto& p : {terminated, slashed}) {
       BOOST_REQUIRE_EQUAL( 0u, service_sec_of(p) );
       BOOST_REQUIRE_EQUAL( 0u, registration_seq_of(p) );
-      BOOST_REQUIRE_EQUAL( 0u, last_service_credit_slot_of(p) );
       BOOST_REQUIRE_EQUAL( tier_demoted, tier_of(rank_score_of(p)) );
    }
    for (uint32_t i = 0; i < 3; ++i) {

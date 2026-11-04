@@ -95,15 +95,27 @@ namespace sysiosystem {
    // in the base sysio::blockchain_parameters struct.
    using blockchain_parameters_t = sysio::blockchain_parameters;
 
-   // Defines new global state parameters.
+   /// Chain-wide RAM supply on top of the blockchain parameters. Only `setram` and `setparams` write it.
    struct [[sysio::table("global"), sysio::contract("sysio.system")]] sysio_global_state : sysio::blockchain_parameters {
       uint64_t free_ram()const { return max_ram_size - total_ram_bytes_reserved; }
 
+      /// RAM supply; `setram` only increases it.
       uint64_t             max_ram_size = 64ll*1024 * 1024 * 1024;
+      /// RAM reserved against `max_ram_size`.
       uint64_t             total_ram_bytes_reserved = 0;
 
-      block_timestamp      last_producer_schedule_update;
-      time_point           last_pervote_bucket_fill;
+      // explicit serialization macro is not necessary, used here only to improve compilation time
+      SYSLIB_SERIALIZE_DERIVED( sysio_global_state, sysio::blockchain_parameters,
+                                (max_ram_size)(total_ram_bytes_reserved) )
+   };
+
+   /// Producer round and ranking state that `onblock` and the producer actions maintain, kept out
+   /// of `global` so a round boundary or a schedule rebuild never rewrites the blockchain
+   /// parameters.
+   struct [[sysio::table("prodstate"), sysio::contract("sysio.system")]] producer_runtime_state {
+      /// Block time of the last schedule rebuild; `onblock` rebuilds at most once per 120 slots.
+      block_timestamp      last_producer_schedule_update{};
+      /// Size of the schedule the last successful proposal carried.
       uint16_t             last_producer_schedule_size = 0;
 
       /// Producer of the previous block -- the cursor `onblock` walks to attribute a MISSED round:
@@ -134,20 +146,17 @@ namespace sysiosystem {
 
       /// The last `producer_info::registration_seq` assigned, 0 before the first. Only increases.
       ///
-      /// DECLARED LAST, matching the tail of SYSLIB_SERIALIZE_DERIVED below. The ABI is generated
-      /// from the declarations while the wasm serializes in macro order, so a field inserted
-      /// anywhere but the end makes the two disagree silently.
+      /// DECLARED LAST, matching the tail of SYSLIB_SERIALIZE below. The ABI is generated from the
+      /// declarations while the wasm serializes in macro order, so a field inserted anywhere but
+      /// the end makes the two disagree silently.
       uint64_t             last_registration_seq = 0;
 
-      // explicit serialization macro is not necessary, used here only to improve compilation time
-      SYSLIB_SERIALIZE_DERIVED( sysio_global_state, sysio::blockchain_parameters,
-                                (max_ram_size)(total_ram_bytes_reserved)
-                                (last_producer_schedule_update)(last_pervote_bucket_fill)
-                                (last_producer_schedule_size)
-                                (last_producer)
-                                (rescore_cursor)(rescore_pending)
-                                (round_start_block)
-                                (last_registration_seq) )
+      SYSLIB_SERIALIZE( producer_runtime_state,
+                        (last_producer_schedule_update)(last_producer_schedule_size)
+                        (last_producer)
+                        (rescore_cursor)(rescore_pending)
+                        (round_start_block)
+                        (last_registration_seq) )
    };
 
    inline sysio::block_signing_authority convert_to_block_signing_authority( const sysio::public_key& producer_key ) {
@@ -208,26 +217,22 @@ namespace sysiosystem {
       /// the current size, so a size change, rare once the schedule reaches 21, can count a round
       /// more or less.
       uint32_t                                                 last_paid_round = 0;
-      /// Seniority in seconds. A served round adds the time since `last_service_credit`, at most
-      /// one rotation (schedule size times one round), so a day in the schedule credits a day at
-      /// any schedule size; an unserved round subtracts prodscorecfg's `miss_penalty_sec`, floored
-      /// at 0. Kept through park, standby and demotion, and accrues only in scheduled rounds while
-      /// `registration_seq` is assigned. Reset to 0 when the operator is terminated or slashed.
-      /// Scored in whole hours.
+      /// Seniority in seconds. Each round `onblock` counts toward pay credits the scheduled time
+      /// since the previously counted one (`last_paid_round`), at most one rotation (schedule size
+      /// times one round): a day in the schedule is a day of seniority at any size, no rotation is
+      /// credited twice, and the round index comes from this producer's own block, so a late
+      /// successor costs nothing. An unserved round still subtracts prodscorecfg's
+      /// `miss_penalty_sec`, floored at 0, on top of the credit it took when pay counted it. Kept
+      /// through park, standby and demotion; accrues only while `registration_seq` is assigned;
+      /// reset to 0 when the operator is terminated or slashed. Scored in whole hours.
       uint64_t                                                 service_sec = 0;
-      /// Registration order, from `sysio_global_state::last_registration_seq`: assigned when the
+      /// Registration order, from `producer_runtime_state::last_registration_seq`: assigned when the
       /// row is created, or on the next `regproducer` after a termination or slash cleared it.
       /// 0 is unassigned. Equal composites rank by ascending order, so the earlier registration
       /// ranks first.
-      uint64_t                                                 registration_seq = 0;
-      /// Block time of the served round that last credited `service_sec`; the default (slot 0)
-      /// for never. Seniority never grows by more than the wall-clock time between credits, so a
-      /// reorder or a size change that hands a producer two rounds in one rotation cannot credit
-      /// that rotation twice. A miss leaves it, so the round after a miss credits at most one
-      /// rotation. Reset with `service_sec`.
       ///
       /// DECLARED LAST, matching the tail of SYSLIB_SERIALIZE below.
-      block_timestamp                                          last_service_credit{};
+      uint64_t                                                 registration_seq = 0;
 
       uint64_t by_rank_score()const { return rank_score; }
       bool     active()const      { return is_active;                               }
@@ -240,8 +245,7 @@ namespace sysiosystem {
 
       SYSLIB_SERIALIZE( producer_info, (owner)(producer_key)(rank_score)(is_active)(url)(unpaid_blocks)(last_claim_time)(location)(producer_authority)
                          (consecutive_missed_rounds)(is_demoted)(snapshot_attestations)
-                         (snapshot_period)(last_paid_round)(service_sec)(registration_seq)
-                         (last_service_credit) )
+                         (snapshot_period)(last_paid_round)(service_sec)(registration_seq) )
    };
 
    using producers_table = sysio::kv::table< "producers"_n, producer_key_t, producer_info,
@@ -339,19 +343,21 @@ namespace sysiosystem {
     */
    sysio_global_state default_global_state();
 
-   // cached_global, not global: onblock reads this three times and mutates it twice, then calls
-   // update_ranked_producers which mutates it twice more, so caching collapses one action's worth
-   // of traffic into a single kv_get and a single kv_set. A plain global forced an unconditional
-   // write from ~system_contract(), which made EVERY action -- including the read-only view
-   // actions -- fail inside a read-only transaction with "cannot store a KV record when executing
-   // a readonly transaction".
-   //
-   // The defaults ride on the type. That is what lets the handle be a plain member with nothing to
-   // initialize in the constructor body: only five functions touch this singleton at all, and every
-   // other action now neither reads the row nor computes the defaults. An action that only reads it
-   // still owes no write.
+   // cached_global, not global: a plain global forced an unconditional write from
+   // ~system_contract(), which made EVERY action -- including the read-only view actions -- fail
+   // inside a read-only transaction with "cannot store a KV record when executing a readonly
+   // transaction". The defaults ride on the type, so an action that only reads the row owes no
+   // write.
    using global_state_singleton =
       sysio::kv::cached_global< "global"_n, sysio_global_state, &default_global_state >;
+
+   /// What the `prodstate` singleton reads as before its first write: the declared defaults.
+   inline producer_runtime_state default_producer_runtime_state() { return producer_runtime_state{}; }
+
+   // cached_global for the same reasons as `global`: onblock reads and writes this row several
+   // times per block, and caching collapses one action's traffic into a single kv_get and kv_set.
+   using producer_state_singleton =
+      sysio::kv::cached_global< "prodstate"_n, producer_runtime_state, &default_producer_runtime_state >;
 
    /**
     * The `sysio.system` smart contract is provided by `Wire.Network` as a sample system contract, and it defines the
@@ -374,6 +380,7 @@ namespace sysiosystem {
          std::optional<std::vector<finalizer_auth_info>> _last_prop_finalizers_cached;
          fin_key_id_gen_global    _fin_key_id_generator;
          global_state_singleton   _global;
+         producer_state_singleton _prodstate;
 
       public:
          static constexpr sysio::name active_permission{"active"_n};
@@ -545,7 +552,7 @@ namespace sysiosystem {
           * of 0 removes that factor's influence entirely, which is how `relay` / `api` / `benchmark`
           * ship until an attestation path exists for them. Weights and the miss penalty are not
           * bounded; every score term saturates instead. Changing the configuration invalidates every
-          * stored `rank_score`, so this flags a rescore sweep on the global and `onblock` drains the
+          * stored `rank_score`, so this flags a rescore sweep on `prodstate` and `onblock` drains the
           * cursor.
           *
           * @param weights - the weights, the demotion threshold and the miss penalty.
@@ -869,37 +876,32 @@ namespace sysiosystem {
          /// @param current_producer the producer of the block being processed.
          /// @param block_height     that block's height, used to measure the OUTGOING producer's
          ///                         round length. Derived from the block header already in hand.
-         /// @param block_time       that block's timestamp, which bounds a seniority credit.
-         void record_round_participation( const name& current_producer, uint32_t block_height,
-                                          const block_timestamp& block_time );
+         void record_round_participation( const name& current_producer, uint32_t block_height );
 
          /**
           * Record one scheduled round for `producer`, scored by how much of it was delivered.
           *
-          * A round counts as SERVED at `min_blocks_per_round` blocks or more: it clears the miss
-          * streak and adds the seconds since `producer_info::last_service_credit` to seniority, at
-          * most `rotation_sec`, which a first credit takes whole. Anything less -- including nothing
-          * at all -- increments the streak and subtracts `miss_penalty_sec`, floored at 0, and the
-          * streak reaching `max_consecutive_missed_rounds` demotes. ONE threshold, applied ONCE per
-          * round, at the transition where the block count is finally known.
+          * A round counts as SERVED at `min_blocks_per_round` blocks or more and clears the miss
+          * streak and the demotion. Anything less -- including nothing at all -- increments the
+          * streak and subtracts `miss_penalty_sec` of seniority, floored at 0, and the streak
+          * reaching `max_consecutive_missed_rounds` demotes. ONE threshold, applied ONCE per round,
+          * at the transition where the block count is finally known. Seniority is credited when pay
+          * counts the round, in `onblock`, not here.
           *
           * @param producer         the producer whose round this was.
           * @param blocks_delivered blocks it produced in that round.
-          * @param rotation_sec     seconds one rotation of the active schedule lasts.
-          * @param block_time       the current block's timestamp.
           * @param weights          the live score configuration.
           */
-         void record_round_outcome( const name& producer, uint32_t blocks_delivered, uint64_t rotation_sec,
-                                    const block_timestamp& block_time,
+         void record_round_outcome( const name& producer, uint32_t blocks_delivered,
                                     const producer_rank::producer_score_config& weights );
 
-         /// Take the next registration order from `sysio_global_state::last_registration_seq`.
+         /// Take the next registration order from `producer_runtime_state::last_registration_seq`.
          ///
          /// @return the assigned order, never 0.
          uint64_t next_registration_seq();
 
-         /// Clear `producer`'s seniority, its credit time and its registration order, the reset a
-         /// termination or slash applies. A name with no producers row is ignored.
+         /// Clear `producer`'s seniority and registration order, the reset a termination or slash
+         /// applies; pay state, including `last_paid_round`, is untouched. A name with no producers row is ignored.
          ///
          /// @param producer the producer whose operator was terminated or slashed.
          void reset_seniority( const name& producer );

@@ -183,7 +183,7 @@ arrive. Nobody has to vote them out, and there is no flag day.
 
 | Factor | What it adds |
 |---|---|
-| Seniority | Your time in the schedule, counted in whole hours. Each round you serve adds the time since your last credited round, up to one rotation of the schedule, so a day in the schedule is a day of seniority at any schedule size and a reordered schedule never credits a rotation twice. Each round you do not serve subtracts a penalty, seven days by default, down to zero, and the round you serve after it credits at most one rotation. |
+| Seniority | Your time in the schedule, counted in whole hours. Each round that pay counts adds the scheduled time since the last round it counted, up to one rotation of the schedule, so a day in the schedule is a day of seniority at any schedule size and a reordered schedule never credits a rotation twice. A round you do not serve still costs a penalty, seven days by default, down to zero. |
 | Snapshot service | Snapshot attestations that reached quorum in the current pay period, worth three days of seniority at full credit by default. It separates producers of similar seniority, and does not overtake one with more than three days more. |
 | Collateral | Your bond divided by the required minimum, taken as the **minimum** across every required token, times a weight in seconds per minimum bond. The weight is zero by default, so collateral is a requirement and not a factor. |
 

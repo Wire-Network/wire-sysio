@@ -145,7 +145,7 @@ namespace sysiosystem {
        * plus each factor term, where a weight is the seconds of seniority its factor is worth at full
        * credit. Adding a factor is a new weight defaulting to 0 plus a term in `compute`; the key's
        * layout never changes. A config change invalidates every stored score, which is what the
-       * rescore cursor on the global singleton drains.
+       * rescore cursor on the `prodstate` singleton drains.
        *
        * `relay` / `api` / `benchmark` ship at 0 deliberately. A `peerkeys` row proves registration,
        * not service, and nothing on chain observes an API node or a CPU benchmark at all; weighting
@@ -233,8 +233,8 @@ namespace sysiosystem {
        * There is no schedule-version intrinsic in CDT -- `get_active_producers()` returns only the
        * name list -- so the comparison is against this stored snapshot.
        *
-       * Kept in its OWN singleton rather than on `sysio_global_state` because the global is read and
-       * written on every block through a cached handle; a 21-name vector on it would widen every
+       * Kept in its OWN singleton rather than on `producer_runtime_state` because that row is read
+       * and written on every round through a cached handle; a 21-name vector on it would widen every
        * one of those reads. This row is read per block and written only when the schedule actually
        * changes.
        */

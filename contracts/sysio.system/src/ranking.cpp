@@ -109,7 +109,7 @@ namespace sysiosystem {
 
    uint64_t system_contract::next_registration_seq() {
       uint64_t seq = 0;
-      _global.modify( get_self(), [&]( auto& g ) {
+      _prodstate.modify( get_self(), [&]( auto& g ) {
          if( g.last_registration_seq < std::numeric_limits<uint64_t>::max() ) ++g.last_registration_seq;
          seq = g.last_registration_seq;
       });
@@ -119,12 +119,10 @@ namespace sysiosystem {
    void system_contract::reset_seniority( const name& producer ) {
       const auto key = producer_key_t{producer.value};
       const std::optional<producer_info> info = _producers.try_get(key);
-      if( !info || ( info->service_sec == 0 && info->registration_seq == 0
-                     && info->last_service_credit == block_timestamp{} ) ) return;
+      if( !info || ( info->service_sec == 0 && info->registration_seq == 0 ) ) return;
       _producers.modify( same_payer, key, []( producer_info& p ) {
-         p.service_sec         = 0;
-         p.registration_seq    = 0;
-         p.last_service_credit = block_timestamp{};
+         p.service_sec      = 0;
+         p.registration_seq = 0;
       });
    }
 
@@ -176,7 +174,7 @@ namespace sysiosystem {
    }
 
    void system_contract::open_rescore_sweep() {
-      _global.modify( get_self(), []( auto& g ) {
+      _prodstate.modify( get_self(), []( auto& g ) {
          g.rescore_cursor  = 0;
          g.rescore_pending = true;
       });
@@ -228,7 +226,7 @@ namespace sysiosystem {
       // large roster is rescored, during which a slashed, terminated or demoted producer would keep
       // its slot and its finality weight. A briefly mixed ordering is a far smaller harm than a
       // schedule that cannot be rebuilt at all.
-      _global.modify( get_self(), [&]( auto& g ) { g.last_producer_schedule_update = block_time; });
+      _prodstate.modify( get_self(), [&]( auto& g ) { g.last_producer_schedule_update = block_time; });
 
       auto idx = _producers.get_index<"prodrank"_n>();
 
@@ -300,7 +298,7 @@ namespace sysiosystem {
          producers.push_back( std::move(item.first) );
 
       if( set_proposed_producers( producers ) >= 0 ) {
-         _global.modify( get_self(), [&]( auto& g ) {
+         _prodstate.modify( get_self(), [&]( auto& g ) {
             g.last_producer_schedule_size = static_cast<decltype(g.last_producer_schedule_size)>( producers.size() );
          });
       }
