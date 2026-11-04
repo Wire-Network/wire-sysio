@@ -960,8 +960,8 @@ fc::variant contract_decode_data(const abi::contract& contract, const std::strin
    // If there's only one component, return it directly (not wrapped in an array)
    if (components.size() == 1) {
       const auto& comp = components[0];
-      // For dynamic or list components, we need to read the offset pointer first
-      if (comp.is_dynamic() || comp.is_list()) {
+      // Only ABI-dynamic components have an offset pointer; fixed arrays of static elements are inline.
+      if (comp.is_dynamic()) {
          size_t actual_offset = offset + read_abi_word_as_size(data, offset, data_size, "parameter offset");
          return decode_value(comp, data, data_size, actual_offset);
       }

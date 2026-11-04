@@ -73,6 +73,44 @@ std::string test_tx_01_result = "02f84e827a690d8477359400847737208083018c80945fb
                                 "a43fb5c1cb000000000000000000000000000000000000000000000000000000000000003cc0";
 
 constexpr std::string_view test_contract_abi_json_file_01 = "ethereum-abi-complex-types-01.json";
+
+namespace abi_decode_fixture {
+/// Independent ABI bytes, field names and expected values shared by the decoder regressions.
+constexpr size_t word_hex_size = 64;
+constexpr size_t pair_size = 2;
+constexpr size_t hex_chars_per_byte = 2;
+constexpr std::string_view hex_prefix = "0x";
+constexpr std::string_view selector = "12345678";
+constexpr char array_field[] = "values";
+constexpr char string_field[] = "label";
+constexpr std::string_view first_uint = "1";
+constexpr std::string_view second_uint = "2";
+constexpr std::string_view first_string = "a";
+constexpr std::string_view second_string = "b";
+constexpr std::string_view uint_pair =
+   "0000000000000000000000000000000000000000000000000000000000000001"
+   "0000000000000000000000000000000000000000000000000000000000000002";
+
+/** Build matching input/output array descriptors without using the ABI encoder. */
+eth::abi::contract array_contract(eth::abi::data_type element_type, size_t size) {
+   eth::abi::component_type component;
+   component.type = element_type;
+   component.list_config = {.is_list = true, .size = size};
+   eth::abi::contract contract{};
+   contract.inputs = {component};
+   contract.outputs = {component};
+   return contract;
+}
+
+/** Check the shape and ordered values returned for a two-element ABI array. */
+void check_pair(const fc::variant& decoded, std::string_view first, std::string_view second) {
+   BOOST_REQUIRE(decoded.is_array());
+   const auto& values = decoded.get_array();
+   BOOST_REQUIRE_EQUAL(values.size(), pair_size);
+   BOOST_CHECK_EQUAL(values[0].as_string(), first);
+   BOOST_CHECK_EQUAL(values[1].as_string(), second);
+}
+} // namespace abi_decode_fixture
 } // namespace
 
 BOOST_AUTO_TEST_SUITE(rlp_encoder)
@@ -379,6 +417,108 @@ BOOST_AUTO_TEST_CASE(decode_rejects_malicious_offsets_and_lengths) try {
          "0000000000000000000000000000000000000000000000000000000000000020"  // offset to array = 32
          "0000000000000000000000000000000000000000000000000000000000000040"; // array length = 64
       BOOST_CHECK_THROW(eth::contract_decode_data(orders_abi, encoded, true), fc::exception);
+   }
+}
+FC_LOG_AND_RETHROW();
+
+/** A static fixed array is inline, including after an input selector; partial words are rejected. */
+BOOST_AUTO_TEST_CASE(abi_decode_sole_static_array) try {
+   using namespace abi_decode_fixture;
+   const auto contract = array_contract(eth::abi::data_type::uint256, pair_size);
+   BOOST_CHECK(!contract.outputs[0].is_dynamic());
+   for (const bool inputs : {false, true}) {
+      const auto prefix = std::string(hex_prefix) + (inputs ? std::string(selector) : std::string{});
+      check_pair(eth::contract_decode_data(contract, prefix + std::string(uint_pair), inputs), first_uint, second_uint);
+      for (size_t length = 0; length < uint_pair.size(); length += hex_chars_per_byte) {
+         BOOST_CHECK_THROW(
+            eth::contract_decode_data(contract, prefix + std::string(uint_pair.substr(0, length)), inputs),
+            fc::exception);
+      }
+   }
+}
+FC_LOG_AND_RETHROW();
+
+/** A static array occupies two head words before a dynamic parameter's offset. */
+BOOST_AUTO_TEST_CASE(abi_decode_static_array_in_multiple_parameters) try {
+   using namespace abi_decode_fixture;
+   constexpr std::string_view string_tail =
+      "0000000000000000000000000000000000000000000000000000000000000060" // string offset
+      "0000000000000000000000000000000000000000000000000000000000000001" // string length
+      "6100000000000000000000000000000000000000000000000000000000000000"; // "a"
+   for (const bool named : {false, true}) {
+      auto contract = array_contract(eth::abi::data_type::uint256, pair_size);
+      contract.outputs[0].name = named ? array_field : std::string_view{};
+      contract.outputs.emplace_back(named ? std::string(string_field) : std::string{}, eth::abi::data_type::string);
+      contract.inputs = contract.outputs;
+      for (const bool inputs : {false, true}) {
+         const auto prefix = std::string(hex_prefix) + (inputs ? std::string(selector) : std::string{});
+         const auto decoded = eth::contract_decode_data(
+            contract, prefix + std::string(uint_pair) + std::string(string_tail), inputs);
+         if (named) {
+            BOOST_REQUIRE(decoded.is_object());
+            check_pair(decoded[array_field], first_uint, second_uint);
+            BOOST_CHECK_EQUAL(decoded[string_field].as_string(), first_string);
+         } else {
+            BOOST_REQUIRE(decoded.is_array());
+            BOOST_REQUIRE_EQUAL(decoded.get_array().size(), pair_size);
+            check_pair(decoded.get_array()[0], first_uint, second_uint);
+            BOOST_CHECK_EQUAL(decoded.get_array()[1].as_string(), first_string);
+         }
+      }
+   }
+}
+FC_LOG_AND_RETHROW();
+
+/** Fixed arrays of dynamic elements retain outer and element-relative offsets. */
+BOOST_AUTO_TEST_CASE(abi_decode_fixed_array_of_strings) try {
+   using namespace abi_decode_fixture;
+   constexpr std::string_view encoded =
+      "0000000000000000000000000000000000000000000000000000000000000020" // array offset
+      "0000000000000000000000000000000000000000000000000000000000000040" // first string offset
+      "0000000000000000000000000000000000000000000000000000000000000080" // second string offset
+      "0000000000000000000000000000000000000000000000000000000000000001"
+      "6100000000000000000000000000000000000000000000000000000000000000" // "a"
+      "0000000000000000000000000000000000000000000000000000000000000001"
+      "6200000000000000000000000000000000000000000000000000000000000000"; // "b"
+   const auto contract = array_contract(eth::abi::data_type::string, pair_size);
+   BOOST_CHECK(contract.outputs[0].is_dynamic());
+   for (const bool inputs : {false, true}) {
+      const auto prefix = std::string(hex_prefix) + (inputs ? std::string(selector) : std::string{});
+      check_pair(eth::contract_decode_data(contract, prefix + std::string(encoded), inputs), first_string,
+                 second_string);
+      BOOST_CHECK_THROW(
+         eth::contract_decode_data(contract, prefix + std::string(encoded.substr(0, word_hex_size)), inputs),
+         fc::exception);
+      auto invalid = std::string(encoded);
+      invalid.replace(word_hex_size, word_hex_size, word_hex_size, 'f'); // out-of-range first element offset
+      BOOST_CHECK_THROW(eth::contract_decode_data(contract, prefix + invalid, inputs), fc::exception);
+   }
+}
+FC_LOG_AND_RETHROW();
+
+/** Dynamic arrays still read the outer offset and length, including an empty array. */
+BOOST_AUTO_TEST_CASE(abi_decode_dynamic_uint_array) try {
+   using namespace abi_decode_fixture;
+   constexpr size_t dynamic_size = 0;
+   constexpr std::string_view head =
+      "0000000000000000000000000000000000000000000000000000000000000020";
+   constexpr std::string_view length =
+      "0000000000000000000000000000000000000000000000000000000000000002";
+   const auto contract = array_contract(eth::abi::data_type::uint256, dynamic_size);
+   BOOST_CHECK(contract.outputs[0].is_dynamic());
+   for (const bool inputs : {false, true}) {
+      const auto prefix = std::string(hex_prefix) + (inputs ? std::string(selector) : std::string{});
+      const auto encoded = prefix + std::string(head) + std::string(length) + std::string(uint_pair);
+      check_pair(eth::contract_decode_data(contract, encoded, inputs), first_uint, second_uint);
+      const auto empty = eth::contract_decode_data(
+         contract, prefix + std::string(head) + std::string(word_hex_size, '0'), inputs);
+      BOOST_REQUIRE(empty.is_array());
+      BOOST_CHECK(empty.get_array().empty());
+      BOOST_CHECK_THROW(
+         eth::contract_decode_data(contract, encoded.substr(0, encoded.size() - hex_chars_per_byte), inputs),
+         fc::exception);
+      BOOST_CHECK_THROW(eth::contract_decode_data(contract, prefix + std::string(word_hex_size, 'f'), inputs),
+                        fc::exception);
    }
 }
 FC_LOG_AND_RETHROW();
