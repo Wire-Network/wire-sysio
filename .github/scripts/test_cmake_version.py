@@ -33,10 +33,11 @@ project(example)
 """
 
 
-def run_script(*args: str) -> subprocess.CompletedProcess[str]:
+def run_script(*args: str, stdin: str = "") -> subprocess.CompletedProcess[str]:
     """Run the parser the way the workflows do, capturing its output."""
     return subprocess.run(
         [sys.executable, str(SCRIPT), *args],
+        input=stdin,
         capture_output=True,
         text=True,
         check=False,
@@ -108,6 +109,50 @@ class ValidateBranchTests(unittest.TestCase):
         ):
             with self.subTest(branch=branch), self.assertRaises(SystemExit):
                 cmake_version.validate_branch(branch, "1.1.0")
+
+
+class VersionKeyTests(unittest.TestCase):
+    """``version_key`` orders versions the way they ship."""
+
+    def test_orders_numerically_with_prereleases_first(self) -> None:
+        shipped = [
+            "0.9.9", "1.0.0-dev", "1.0.0-rc1", "1.0.0-rc2", "1.0.0-rc10", "1.0.0",
+            "1.0.1", "1.1.0", "1.9.0", "1.10.0", "2.0.0",
+        ]
+        self.assertEqual(sorted(reversed(shipped), key=cmake_version.version_key), shipped)
+
+
+class HighestTagTests(unittest.TestCase):
+    """``highest_tag`` picks within a version's line or an older one."""
+
+    TAGS = ["v1.0.0", "v1.0.1", "v1.1.0", "v1.1.2", "v1.2.0", "v2.0.0"]
+
+    def test_picks_the_highest_at_or_below_the_line(self) -> None:
+        for version, expected in (
+            ("1.1.5", "v1.1.2"),
+            ("1.1.0-rc1", "v1.1.2"),
+            ("1.0.4", "v1.0.1"),
+            ("1.3.0-dev", "v1.2.0"),
+            ("3.0.0", "v2.0.0"),
+        ):
+            with self.subTest(version=version):
+                self.assertEqual(cmake_version.highest_tag(self.TAGS, version), expected)
+
+    def test_returns_none_when_every_tag_is_on_a_newer_line(self) -> None:
+        self.assertIsNone(cmake_version.highest_tag(self.TAGS, "0.9.0"))
+        self.assertIsNone(cmake_version.highest_tag([], "1.0.0"))
+
+    def test_compares_lines_and_suffixes_numerically(self) -> None:
+        self.assertEqual(cmake_version.highest_tag(["v1.9.3", "v1.10.0"], "1.9.0"), "v1.9.3")
+        self.assertEqual(cmake_version.highest_tag(["v1.10.0", "v1.9.3"], "1.10.0"), "v1.10.0")
+        self.assertEqual(
+            cmake_version.highest_tag(["v1.1.0-rc2", "v1.1.0-rc10", "v1.1.0-dev"], "1.1.0-rc1"),
+            "v1.1.0-rc10",
+        )
+
+    def test_skips_tags_outside_the_grammar(self) -> None:
+        tags = ["latest", "v1.1", "1.1.0", "cdt-v1.1.0", "v9.9.9-rc-1", "v1.1.0.1", "", "v1.0.0"]
+        self.assertEqual(cmake_version.highest_tag(tags, "9.9.9"), "v1.0.0")
 
 
 class PrepBranchTests(unittest.TestCase):
@@ -205,6 +250,20 @@ class CommandLineTests(unittest.TestCase):
     def test_prep_branch_refuses_a_malformed_version(self) -> None:
         self.assertNotEqual(run_script("prep-branch", "1.1").returncode, 0)
         self.assertNotEqual(run_script("prep-branch").returncode, 0)
+
+    def test_highest_tag_reads_tags_from_stdin(self) -> None:
+        result = run_script("highest-tag", "1.1.3", stdin="v1.2.0\nv1.1.1\nv1.0.4\n")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, "v1.1.1\n")
+
+    def test_highest_tag_prints_nothing_when_no_tag_qualifies(self) -> None:
+        result = run_script("highest-tag", "1.0.0", stdin="v1.2.0\n")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, "")
+
+    def test_highest_tag_refuses_a_malformed_version(self) -> None:
+        self.assertNotEqual(run_script("highest-tag", "1.1", stdin="v1.0.0\n").returncode, 0)
+        self.assertNotEqual(run_script("highest-tag", stdin="v1.0.0\n").returncode, 0)
 
 
 class CheckPrCommandLineTests(unittest.TestCase):

@@ -8,8 +8,9 @@ name: "Prepare Release"
 # lands on: master, or the version's release/<major>.<minor> branch.
 #
 # Post-bump mode is the same dispatch: after a stable release lands, dispatch this
-# workflow again with the next `-dev` version to restore the development suffix on
-# master. The workflow labels the PR accordingly.
+# workflow again on the branch it shipped from to restore the development suffix:
+# master's next `-dev` version, or a release branch's next patch (1.1.0 ->
+# 1.1.1-dev). The workflow labels the PR accordingly.
 on:
   workflow_dispatch:
     inputs:
@@ -145,8 +146,9 @@ jobs:
       # NOTE: the former "Pin the latest published wire-cdt release" step (and
       # its .cicd/defaults.json pin file) is retired. The tag build's `v` job
       # now resolves the CDT release itself — an explicit `wire-cdt-release`
-      # dispatch input on tag-release.yaml/linux_amd64_build.yaml, or the latest
-      # published wire-cdt release in the version's channel — and the resolved
+      # dispatch input on tag-release.yaml/linux_amd64_build.yaml, or the highest
+      # published wire-cdt release in the version's channel at or below its
+      # <major>.<minor> line — and the resolved
       # value is recorded durably in the release's
       # wire-sysio-versions-<version>.json asset.
 
@@ -192,7 +194,8 @@ jobs:
             "- \`CMakeLists.txt\`: \`VERSION_*\` set to \`${VERSION}\`." \
             "" \
             "The tag build resolves the Wire CDT release itself (highest published" \
-            "version in this channel, or an explicit \`wire-cdt-release\` dispatch input);" \
+            "in this channel at or below this version's line, or an explicit" \
+            "\`wire-cdt-release\` dispatch input);" \
             "the resolved version is recorded in the release's" \
             "\`wire-sysio-versions-<version>.json\`. Tagging is a separate," \
             "approval-gated dispatch of \`tag-release.yaml\` with the same version" \

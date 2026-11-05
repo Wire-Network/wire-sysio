@@ -28,6 +28,10 @@ opens from ``prep-branch``'s branch changes the base branch's version. Every
 other PR, a forward merge from an older release branch included, leaves it as
 it is.
 
+``highest-tag`` reads release tags on stdin and prints the highest one in the
+version's ``<major>.<minor>`` line or an older one. wire-sysio's tag build picks
+its wire-cdt release with it, so a patch on an older line keeps that line's CDT.
+
 Usage::
 
     cmake-version.py read [--cmakelists PATH]
@@ -38,6 +42,7 @@ Usage::
     cmake-version.py prep-branch <version>
     cmake-version.py check-pr --base-branch BRANCH --head-branch BRANCH
                               --base-cmakelists PATH [--cmakelists PATH]
+    cmake-version.py highest-tag <version> < tags
 """
 
 from __future__ import annotations
@@ -45,6 +50,7 @@ from __future__ import annotations
 import argparse
 import re
 import sys
+from collections.abc import Iterable
 from pathlib import Path
 
 #: ``<major>.<minor>.<patch>`` with an optional ``-<suffix>`` of dot-separated
@@ -63,6 +69,10 @@ RELEASE_BRANCH_PREFIX = "release/"
 #: Prefix of the branch prepare-release.yaml opens a bump PR from,
 #: ``release/prep-v<version>``.
 PREP_BRANCH_PREFIX = f"{RELEASE_BRANCH_PREFIX}prep-v"
+
+#: Splits a version suffix into its digit and non-digit runs, so ``rc10`` sorts
+#: after ``rc2``.
+SUFFIX_RUN_RE = re.compile(r"(\d+)")
 
 
 def _field_re(name: str) -> re.Pattern[str]:
@@ -115,6 +125,41 @@ def validate_version(version: str, tag: bool = False) -> str:
             f"{prefix}<major>.<minor>.<patch>[-<suffix>]"
         )
     return bare
+
+
+def version_key(version: str) -> tuple[object, ...]:
+    """Return the key that orders versions the way they ship.
+
+    ``version`` must already have passed :func:`validate_version`. Major, minor
+    and patch compare as numbers, a prerelease sorts before the stable version it
+    leads to, and suffixes compare run by run with numbers compared numerically.
+    """
+    major, minor, patch, suffix = VERSION_RE.match(version).groups()
+    runs = tuple(
+        (0, int(run)) if run.isdigit() else (1, run)
+        for run in SUFFIX_RUN_RE.split(suffix or "")
+        if run
+    )
+    return (int(major), int(minor), int(patch), 0 if suffix else 1, runs)
+
+
+def highest_tag(tags: Iterable[str], version: str) -> str | None:
+    """Return the highest tag in ``tags`` whose ``<major>.<minor>`` line is ``version``'s or older.
+
+    ``version`` must already have passed :func:`validate_version`. Tags outside
+    the ``v<major>.<minor>.<patch>[-<suffix>]`` grammar are skipped. Returns
+    ``None`` when no tag qualifies.
+    """
+    line = version_key(version)[:2]
+    best: tuple[tuple[object, ...], str] | None = None
+    for tag in tags:
+        try:
+            key = version_key(validate_version(tag, tag=True))
+        except SystemExit:
+            continue
+        if key[:2] <= line and (best is None or key > best[0]):
+            best = (key, tag)
+    return best[1] if best else None
 
 
 def release_branch(version: str) -> str:
@@ -219,7 +264,15 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "mode",
-        choices=("read", "write", "validate", "release-branch", "prep-branch", "check-pr"),
+        choices=(
+            "read",
+            "write",
+            "validate",
+            "release-branch",
+            "prep-branch",
+            "check-pr",
+            "highest-tag",
+        ),
     )
     parser.add_argument(
         "version", nargs="?", help="version to write or validate"
@@ -284,6 +337,15 @@ def main() -> int:
         if not args.version:
             raise SystemExit("cmake-version: prep-branch mode requires a version argument")
         print(prep_branch(validate_version(args.version)))
+        return 0
+
+    # Prints nothing when no tag qualifies, so the caller reports the miss.
+    if args.mode == "highest-tag":
+        if not args.version:
+            raise SystemExit("cmake-version: highest-tag mode requires a version argument")
+        tag = highest_tag(sys.stdin.read().split(), validate_version(args.version))
+        if tag is not None:
+            print(tag)
         return 0
 
     text = args.cmakelists.read_text()

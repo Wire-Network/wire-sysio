@@ -25,7 +25,7 @@ on:
         required: true
         default: master
       wire-cdt-release:
-        description: "Optional wire-cdt RELEASE tag to build against (e.g. v1.0.1). When omitted, the build resolves the highest-versioned published wire-cdt release in the same channel as this version."
+        description: "Optional wire-cdt RELEASE tag to build against (e.g. v1.0.1). When omitted, the build resolves the highest published wire-cdt release in the same channel as this version, at or below its <major>.<minor> line."
         type: string
         required: false
         default: ""
@@ -199,8 +199,9 @@ jobs:
           # exactly as on a tag push.
           #
           # An explicit wire-cdt-release travels to the linux build (the only CDT
-          # consumer); when omitted, the build's `v` job resolves the
-          # highest-versioned published wire-cdt release in this version's channel.
+          # consumer); when omitted, the build's `v` job resolves the highest
+          # published wire-cdt release in this version's channel, at or below its
+          # <major>.<minor> line.
           linux_args=()
           if [[ -n "$WIRE_CDT_RELEASE" ]]; then
             linux_args+=(-f wire-cdt-release="$WIRE_CDT_RELEASE")

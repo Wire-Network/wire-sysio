@@ -17,7 +17,7 @@ on:
   workflow_dispatch:
     inputs:
       wire-cdt-release:
-        description: 'Explicit wire-cdt RELEASE tag to build against (e.g. v1.0.0-rc2). Its channel is then derived from the release itself. When omitted, a tag build resolves the latest published wire-cdt release in the same channel as the version being built.'
+        description: 'Explicit wire-cdt RELEASE tag to build against (e.g. v1.0.0-rc2). Its channel is then derived from the release itself. When omitted, a tag build resolves the highest published wire-cdt release in the same channel as the version being built, at or below its <major>.<minor> line.'
         type: string
 
 permissions:
@@ -194,8 +194,9 @@ jobs:
       # Wire CDT is acquired from a GitHub RELEASE asset, not from a CI
       # artifact: CI artifacts expire after 30 days, so an old tag could no longer
       # be rebuilt reproducibly. The release is resolved by the `v` job — an
-      # explicit `wire-cdt-release` dispatch input, or the latest published
-      # wire-cdt release in the same channel as the version being built. The
+      # explicit `wire-cdt-release` dispatch input, or the highest published
+      # wire-cdt release in the same channel as the version being built, at or
+      # below its <major>.<minor> line. The
       # resolved tag is recorded in build-metadata.json and, downstream, in the
       # release's wire-sysio-versions-<version>.json.
       #
@@ -567,8 +568,9 @@ jobs:
       # `cdt-release` / `cdt-channel` name the RELEASE whose asset a tag build
       # installs. The former `.cicd/defaults.json` pin is gone: an explicit
       # `wire-cdt-release` input wins (channel `derive`); otherwise a tag build
-      # resolves the LATEST PUBLISHED wire-cdt release in the SAME channel as
-      # the version being built. The resolved value is recorded in the build's
+      # resolves the HIGHEST PUBLISHED wire-cdt release in the SAME channel as
+      # the version being built, at or below its <major>.<minor> line. The
+      # resolved value is recorded in the build's
       # `build-metadata.json` artifact and lands in the release's
       # `wire-sysio-versions-<version>.json` — the durable record.
       cdt-release: ${{steps.versions.outputs.cdt-release}}
@@ -627,10 +629,11 @@ jobs:
           fi
 
           # The version's suffix IS the channel (same rule as everywhere on the
-          # Strategy-C path); resolve the highest-versioned PUBLISHED wire-cdt
-          # release in that channel. Version, not creation date: wire-cdt
-          # release branches publish patches to older lines after newer lines
-          # have shipped.
+          # Strategy-C path); resolve the highest PUBLISHED wire-cdt release in
+          # that channel whose <major>.<minor> is at or below this version's, so
+          # a patch on an older line keeps that line's CDT. Version, not creation
+          # date: wire-cdt release branches publish patches to older lines after
+          # newer lines have shipped.
           version="$(python3 .github/scripts/cmake-version.py read)"
           if [[ "$version" == *-* ]]; then
             channel="prerelease"
@@ -648,9 +651,9 @@ jobs:
             jq -r --argjson pre "$prerelease" '
               .[] | select(.draft == false and .prerelease == $pre) | .tag_name' <<<"$releases_json"
           )"
-          cdt_release="$(sort -V <<<"$cdt_tags" | tail -n1)"
+          cdt_release="$(python3 .github/scripts/cmake-version.py highest-tag "$version" <<<"$cdt_tags")"
           if [[ -z "$cdt_release" ]]; then
-            echo "::error::No published wire-cdt release found for channel ${channel} (version ${version}). Publish one, or dispatch with an explicit wire-cdt-release." >&2
+            echo "::error::No published wire-cdt release at or below ${version}'s <major>.<minor> found for channel ${channel}. Publish one, or dispatch with an explicit wire-cdt-release." >&2
             exit 1
           fi
 
@@ -658,7 +661,7 @@ jobs:
             echo "cdt-release=$cdt_release"
             echo "cdt-channel=$channel"
           } >> "$GITHUB_OUTPUT"
-          echo "Resolved wire-cdt ${cdt_release} (highest published in channel ${channel} for version ${version})"
+          echo "Resolved wire-cdt ${cdt_release} (highest published in channel ${channel} at or below version ${version}'s line)"
 
   verify-packages:
     name: Verify packages (S1-S6)

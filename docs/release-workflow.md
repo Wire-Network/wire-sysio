@@ -16,8 +16,9 @@ The properties that follow from that choice:
 - **Resolve at build, record at release.** The tag build's `v` job resolves the
   wire-cdt release itself: an explicit `wire-cdt-release` dispatch input (on
   `tag-release.yaml`, forwarded to `linux_amd64_build.yaml`) wins; otherwise the
-  highest-versioned **published** wire-cdt release in the same channel as the
-  version being built is used. The build downloads that release's
+  highest **published** wire-cdt release in the same channel as the version
+  being built, at or below its `<major>.<minor>` line, is used. The build
+  downloads that release's
   `wire-cdt_<version>_amd64.deb` asset, records the resolved tag in its
   `build-metadata.json` artifact, and `release.yaml` writes it durably into the
   release's `wire-sysio-versions-<version>.json` asset — the record of what the
@@ -72,16 +73,18 @@ resolve under the home.
 |---|---|---|
 | `prepare-release.yaml` | `workflow_dispatch(version, branch)` | Validates the version and branch, writes `VERSION_*` into the branch's `CMakeLists.txt`, opens the `release/prep-v<version>` PR against the branch. |
 | `tag-release.yaml` | `workflow_dispatch(version, branch, wire-cdt-release?)`, `environment: release` | Asserts the branch HEAD carries the version, creates the annotated tag (`POST /git/tags` then `POST /git/refs`), creates the DRAFT release with generated notes, dispatches both platform builds AND `opp-bundles.yaml` (with the version's channel) on the tag ref, dispatches `release.yaml`. |
-| `linux_amd64_build.yaml` | tag ref (dispatched or pushed) | Resolves the wire-cdt release (explicit input or highest published version in the channel), installs its deb, builds with system contracts ON, assembles deb + rpm + portable tgz, bundles the contracts, records `build-metadata.json`, uploads `wire-sysio-packages-amd64`. |
+| `linux_amd64_build.yaml` | tag ref (dispatched or pushed) | Resolves the wire-cdt release (explicit input, or the highest published in the channel at or below the version's line), installs its deb, builds with system contracts ON, assembles deb + rpm + portable tgz, bundles the contracts, records `build-metadata.json`, uploads `wire-sysio-packages-amd64`. |
 | `macos_arm64_build.yaml` | tag ref (dispatched or pushed) | Builds, tests, produces the portable tarball, verifies it in `--no-service` mode, uploads `wire-sysio-packages-macos-arm64`. |
 | `opp-bundles.yaml` | tag ref (dispatched, `channel` input) | Generates the OPP model bundles from the tag's protos, publishes `@wireio/opp-{typescript,solidity}-models` to npm and `wire-opp-solana-models` to the WIRE cargo registry (channel `dev` → `-dev` versions), uploads `opp-published-versions-<tag>`. |
 | `release.yaml` | `workflow_dispatch(tag)`; `release: published` as a manual fallback | Awaits both tag-ref builds, downloads both artifacts, verifies each one explicitly, resolves the tag's opp-bundles run, generates `wire-sysio-versions-<version>.json` + `wire-sysio-source-refs-<version>.json`, attaches assets + checksums, appends the component-version/source-ref tables to the notes, then flips the draft public (the `latest` label goes to the highest published stable version). |
 
 ### Post-bump
 
-After a **stable** release lands, dispatch `prepare-release.yaml` again with the
-next `-dev` version to restore the development suffix on master. It is the same
-workflow and the same inputs; the PR is labelled `post-bump`.
+After a **stable** release lands, dispatch `prepare-release.yaml` again on the
+branch it shipped from to restore the development suffix: master moves to its
+next `-dev` version, and a release branch to its next patch's (`1.1.0` →
+`1.1.1-dev`). It is the same workflow and the same inputs; the PR is labelled
+`post-bump`.
 
 ## Release branches
 
@@ -144,9 +147,11 @@ on it.
   release.
 - **The `latest` label.** It goes to the highest published stable version, so a
   `1.1.1` cut after `1.2.0` leaves `1.2.0` as latest.
-- **Wire CDT.** A tag build resolves the highest-versioned published wire-cdt
-  release in its channel. A patch on an older line that must stay on that line's
-  CDT passes `wire-cdt-release` to `tag-release.yaml`.
+- **Wire CDT.** A tag build resolves the highest published wire-cdt release in
+  its channel at or below its own `<major>.<minor>` line, so a `1.1.1` built
+  after wire-cdt `1.2.0` ships still uses the newest `1.1.x` wire-cdt (or older,
+  if wire-cdt has no `1.1` release). `wire-cdt-release` on `tag-release.yaml`
+  overrides it.
 
 ### Why the builds are dispatched explicitly
 
