@@ -233,9 +233,9 @@ namespace sysiosystem {
       /**
        * Compute a producer's packed `rank_score` from its on-chain standing.
        *
-       * The composite is seconds of seniority-equivalent: seniority in whole hours, plus the snapshot
-       * and collateral terms. Every term saturates, so the sum cannot wrap. Equal composites order
-       * by registration.
+       * The composite is `M x (seniority + snapshot credit + seniority base)`, M the collateral
+       * multiple; see `weighted_composite`. Every term saturates, so nothing wraps. Equal composites
+       * order by registration.
        *
        * @param producer the producer account being scored.
        * @param inputs   the per-producer counters read from `producer_info`.
@@ -314,13 +314,17 @@ namespace sysiosystem {
          const uint64_t collateral_ratio = collateral_factor(*op, opreg_cfg);
          if (!meets_live_producer_minimum(*op, collateral_ratio)) return unscored();
 
-         const uint64_t seniority  = seniority_credit(inputs.service_sec);
-         const uint64_t snapshot   =
+         // Bootstrapped operators hold no bond and are exempt from the minimum, so they score at 1x.
+         const uint64_t multiple_bps = op->is_bootstrapped ? score_scale : collateral_ratio;
+         const uint64_t snapshot     =
             scale_sat(snapshot_factor(inputs.snapshot_attestations, weights.snapshot_target_attestations),
                       weights.snapshot_weight);
-         const uint64_t collateral = scale_sat(collateral_ratio, weights.collateral_weight);
+         const uint64_t time_sec     =
+            add_sat(add_sat(seniority_credit(inputs.service_sec), snapshot), weights.seniority_base_sec);
 
-         const uint64_t composite = add_sat(add_sat(seniority, snapshot), collateral);
+         // Ranking by M x time orders producers exactly as stake share x time would: every producer
+         // divides by the same total, and skipping that spares a rescore of everyone on any bond change.
+         const uint64_t composite = weighted_composite(multiple_bps, time_sec);
          return pack(tier_for(inputs.is_demoted, op->is_bootstrapped), composite, inputs.registration_seq);
       }
 

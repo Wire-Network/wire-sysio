@@ -547,15 +547,15 @@ namespace sysiosystem {
          /**
           * Install the producer-score configuration.
           *
-          * The composite that orders the `prodrank` index is in seconds of seniority-equivalent:
-          * each weight is the seconds of seniority its factor is worth at full credit, and a weight
-          * of 0 removes that factor's influence entirely, which is how `relay` / `api` / `benchmark`
-          * ship until an attestation path exists for them. Weights and the miss penalty are not
-          * bounded; every score term saturates instead. Changing the configuration invalidates every
-          * stored `rank_score`, so this flags a rescore sweep on `prodstate` and `onblock` drains the
-          * cursor.
+          * The composite that orders the `prodrank` index is the collateral multiple times seniority
+          * plus snapshot credit plus `seniority_base_sec`. Each weight is the seconds of seniority its
+          * factor is worth at full credit, and a weight of 0 removes that factor's influence
+          * entirely, which is how `relay` / `api` / `benchmark` ship until an attestation path
+          * exists for them. Weights, the miss penalty and the seniority base are not bounded; every
+          * score term saturates instead. Changing the configuration invalidates every stored
+          * `rank_score`, so this flags a rescore sweep on `prodstate` and `onblock` drains the cursor.
           *
-          * @param weights - the weights, the demotion threshold and the miss penalty.
+          * @param weights - the weights, the demotion threshold, the miss penalty and the seniority base.
           *
           * @pre Require the authority of the contract itself
           */
@@ -675,7 +675,7 @@ namespace sysiosystem {
           *
           * `sysio.opreg::processprod` notifies this contract on every producer balance change --
           * not only on an eligibility transition -- because the collateral minimum gates the score
-          * and the posted bond can weigh in it. Slash and termination notify on the same channel;
+          * and the posted bond multiplies it. Slash and termination notify on the same channel;
           * an operator found SLASHED or TERMINATED also loses its seniority and registration order.
           * The handler recomputes from authoritative tables, so it needs no argument beyond the
           * account and asserts no authority of its own: `require_recipient` delivers it only from

@@ -1163,10 +1163,6 @@
             "base": "",
             "fields": [
                 {
-                    "name": "collateral_weight",
-                    "type": "uint32"
-                },
-                {
                     "name": "snapshot_weight",
                     "type": "uint32"
                 },
@@ -1196,6 +1192,10 @@
                 },
                 {
                     "name": "miss_penalty_sec",
+                    "type": "uint32"
+                },
+                {
+                    "name": "seniority_base_sec",
                     "type": "uint32"
                 }
             ]

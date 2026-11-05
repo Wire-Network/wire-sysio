@@ -5839,8 +5839,11 @@ struct producer_score_tester : public producer_eligibility_tester {
    /// Seconds one producer's round lasts.
    static constexpr uint64_t round_sec = slots_per_producer * config::block_interval_ms / milliseconds_per_second;
 
-   /// A collateral weight for the tests that rank on collateral: a day of seniority per minimum bond.
-   static constexpr uint32_t test_collateral_weight = 86'400;
+   /// The composite's collateral unit at exactly the minimum bond (1x).
+   static constexpr uint64_t one_x = sysiosystem::producer_rank::collateral_multiple_scale;
+
+   /// The default seniority base every producer's time term carries.
+   static constexpr uint64_t default_base_sec = sysiosystem::producer_rank::default_seniority_base_sec;
 
    /// Chain/token pair the collateral helpers use. Any pair works -- opreg stores slug names
    /// opaquely -- so these name a plausible outpost rather than carrying meaning.
@@ -5868,6 +5871,14 @@ struct producer_score_tester : public producer_eligibility_tester {
       using namespace sysiosystem::producer_rank;
       const uint64_t order = registration_seq == 0 ? registration_max : std::min(registration_seq, registration_max);
       return tier << tier_shift | (composite_max - std::min(composite, composite_max)) << registration_bits | order;
+   }
+
+   /// The composite `producer_rank::weighted_composite` builds: `multiple` hundredths of the minimum
+   /// bond times `time_sec` in whole hours, saturated.
+   static uint64_t expected_composite(uint64_t multiple, uint64_t time_sec) {
+      using namespace sysiosystem::producer_rank;
+      const unsigned __int128 product = static_cast<unsigned __int128>(multiple) * (time_sec / seniority_quantum_sec);
+      return product > composite_max ? composite_max : static_cast<uint64_t>(product);
    }
 
    /// `service_sec` floored to whole hours, mirroring `producer_rank::seniority_credit`.
@@ -5992,16 +6003,15 @@ struct producer_score_tester : public producer_eligibility_tester {
 
    /// Push `setscorecfg`. Defaults mirror the contract's own so a test names only the field it
    /// is exercising.
-   action_result set_score_config(uint32_t collateral_weight = 0,
-                                  uint32_t snapshot_weight   = sysiosystem::producer_rank::default_snapshot_weight_sec,
+   action_result set_score_config(uint32_t snapshot_weight = sysiosystem::producer_rank::default_snapshot_weight_sec,
                                   uint32_t max_consecutive_missed_rounds = 3,
                                   uint32_t snapshot_target_attestations  = 1,
                                   uint32_t min_blocks_per_round = 6,
                                   uint32_t miss_penalty_sec = sysiosystem::producer_rank::default_miss_penalty_sec,
+                                  uint32_t seniority_base_sec = sysiosystem::producer_rank::default_seniority_base_sec,
                                   uint32_t reserved_weight  = 0) {
       return push_system_action(config::system_account_name, "setscorecfg"_n, mvo()
          ("weights", mvo()
-            ("collateral_weight",             collateral_weight)
             ("snapshot_weight",               snapshot_weight)
             ("relay_weight",                  reserved_weight)
             ("api_weight",                    reserved_weight)
@@ -6009,12 +6019,18 @@ struct producer_score_tester : public producer_eligibility_tester {
             ("max_consecutive_missed_rounds", max_consecutive_missed_rounds)
             ("snapshot_target_attestations",  snapshot_target_attestations)
             ("min_blocks_per_round",          min_blocks_per_round)
-            ("miss_penalty_sec",              miss_penalty_sec)));
+            ("miss_penalty_sec",              miss_penalty_sec)
+            ("seniority_base_sec",            seniority_base_sec)));
    }
 
    /// Push `setscorecfg` with the default fields and the given miss penalty.
    action_result set_miss_penalty(uint32_t miss_penalty_sec) {
-      return set_score_config(0, sysiosystem::producer_rank::default_snapshot_weight_sec, 3, 1, 6, miss_penalty_sec);
+      return set_score_config(sysiosystem::producer_rank::default_snapshot_weight_sec, 3, 1, 6, miss_penalty_sec);
+   }
+
+   /// Push `setscorecfg` with the default thresholds and the given time-term values.
+   action_result set_time_terms(uint32_t snapshot_weight, uint32_t miss_penalty_sec, uint32_t seniority_base_sec) {
+      return set_score_config(snapshot_weight, 3, 1, 6, miss_penalty_sec, seniority_base_sec);
    }
 
    /// The packed sort key stored on a producer.
@@ -6432,7 +6448,7 @@ BOOST_FIXTURE_TEST_CASE( active_batch_operator_is_not_schedulable_as_producer,
    BOOST_REQUIRE_EQUAL(success(), terminate_operator(names[4]));
    BOOST_REQUIRE_EQUAL(
       success(), register_operator(names[4], OperatorType::OPERATOR_TYPE_BATCH, true));
-   BOOST_REQUIRE_EQUAL(success(), set_score_config(test_collateral_weight));
+   BOOST_REQUIRE_EQUAL(success(), set_score_config());
    BOOST_REQUIRE(rescore_pending());
    trigger_reschedule();
 
@@ -6446,33 +6462,33 @@ BOOST_FIXTURE_TEST_CASE( active_batch_operator_is_not_schedulable_as_producer,
 // Composite score
 // ---------------------------------------------------------------------------
 
-// At the default collateral weight of 0 collateral is a pure gate: more of it buys no rank, and a
-// producer below the live minimum is still unscored.
-BOOST_FIXTURE_TEST_CASE( collateral_is_a_pure_gate_at_the_default_weight, producer_score_tester ) try {
+// Collateral multiplies the time term: the composite is the multiple of the minimum, in hundredths,
+// times seniority plus the seniority base. Below the live minimum a producer is still unscored.
+BOOST_FIXTURE_TEST_CASE( collateral_multiplies_the_score, producer_score_tester ) try {
    auto names = setup_collateralized_producers(5);
-   const uint64_t before = rank_score_of(names[4]);
-   BOOST_REQUIRE_EQUAL( 5u, producer_rank_position(names[4]) );
+   for (const auto& p : names) {
+      BOOST_REQUIRE_EQUAL( expected_composite(one_x, default_base_sec), composite_of(rank_score_of(p)) );
+   }
 
    BOOST_REQUIRE_EQUAL( success(), credit_collateral(names[4], base_min_bond * 4) );
    produce_blocks(1);
-   BOOST_REQUIRE_EQUAL( before, rank_score_of(names[4]) );
-   BOOST_REQUIRE_EQUAL( 5u, producer_rank_position(names[4]) );
+   BOOST_REQUIRE_EQUAL( expected_composite(5 * one_x, default_base_sec), composite_of(rank_score_of(names[4])) );
+   BOOST_REQUIRE_EQUAL( 1u, producer_rank_position(names[4]) );
 
-   // A minimum raised above the base bond still sinks every producer holding only that.
+   // A minimum raised above the base bond sinks every producer holding only that, and halves the
+   // multiple of the one holding more.
    BOOST_REQUIRE_EQUAL( success(), set_single_pair_collateral(base_min_bond * 2) );
    trigger_reschedule();
    BOOST_REQUIRE_EQUAL( tier_demoted, tier_of(rank_score_of(names[0])) );
    BOOST_REQUIRE_EQUAL( tier_healthy, tier_of(rank_score_of(names[4])) );
+   BOOST_REQUIRE_EQUAL( expected_composite(5 * one_x / 2, default_base_sec), composite_of(rank_score_of(names[4])) );
 } FC_LOG_AND_RETHROW()
 
-// With a collateral weight, collateral is linear and uncapped, so a top-up strictly improves the
-// score and moves the producer up the index. It also covers the top-up seam: a deposit while already
-// ACTIVE changes no status, and only reaches sysio.system because producers dispatch `processprod`
-// on every balance change.
+// Collateral is linear and uncapped, so a top-up strictly improves the score and moves the producer
+// up the index. It also covers the top-up seam: a deposit while already ACTIVE changes no status, and
+// only reaches sysio.system because producers dispatch `processprod` on every balance change.
 BOOST_FIXTURE_TEST_CASE( collateral_topup_raises_score_and_position, producer_score_tester ) try {
    auto names = setup_collateralized_producers(5);
-   BOOST_REQUIRE_EQUAL( success(), set_score_config(test_collateral_weight) );
-   trigger_reschedule();
 
    // Equal bonds, so the composites are equal and the index falls through to registration order.
    const uint64_t before = rank_score_of(names[4]);
@@ -6486,6 +6502,65 @@ BOOST_FIXTURE_TEST_CASE( collateral_topup_raises_score_and_position, producer_sc
    BOOST_REQUIRE_LT( rank_score_of(names[4]), before );
    BOOST_REQUIRE_EQUAL( 1u, producer_rank_position(names[4]) );
    BOOST_REQUIRE_EQUAL( 2u, producer_rank_position(names[0]) );
+} FC_LOG_AND_RETHROW()
+
+// With no seniority the time term is the base alone, so producers rank by stake; equal stakes fall to
+// registration order.
+BOOST_FIXTURE_TEST_CASE( zero_seniority_producers_rank_by_stake, producer_score_tester ) try {
+   auto names = setup_collateralized_producers(5);
+   const std::vector<uint64_t> extra_bonds = { 0, 2, 1, 3, 0 };   // 1x, 3x, 2x, 4x, 1x
+   for (uint32_t i = 0; i < names.size(); ++i) {
+      if (extra_bonds[i] > 0) BOOST_REQUIRE_EQUAL( success(), credit_collateral(names[i], base_min_bond * extra_bonds[i]) );
+   }
+   produce_blocks(1);
+
+   for (uint32_t i = 0; i < names.size(); ++i) {
+      BOOST_REQUIRE_EQUAL( expected_composite((1 + extra_bonds[i]) * one_x, default_base_sec),
+                           composite_of(rank_score_of(names[i])) );
+   }
+   const std::vector<account_name> by_stake = { names[3], names[1], names[2], names[0], names[4] };
+   for (uint32_t i = 0; i < by_stake.size(); ++i) {
+      BOOST_REQUIRE_EQUAL( i + 1, producer_rank_position(by_stake[i]) );
+   }
+} FC_LOG_AND_RETHROW()
+
+// Stake moves a producer's rank, but a set that is already scheduled keeps both its membership and
+// its order: the rebuild republishes the same schedule.
+BOOST_FIXTURE_TEST_CASE( stake_reorders_ranks_without_changing_the_schedule, producer_score_tester ) try {
+   auto names = setup_collateralized_producers(5);
+   trigger_reschedule();
+   wait_for_active_schedule_order(names);
+   const auto version = control->active_producers().version;
+
+   BOOST_REQUIRE_EQUAL( success(), credit_collateral(names[4], base_min_bond * 4) );
+   produce_blocks(1);
+   BOOST_REQUIRE_EQUAL( 1u, producer_rank_position(names[4]) );
+
+   trigger_reschedule();
+   produce_blocks(3 * slots_per_producer);   // time for any proposal to activate
+   BOOST_REQUIRE_EQUAL( version, control->active_producers().version );
+   const auto schedule = active_schedule_names();
+   BOOST_REQUIRE_EQUAL_COLLECTIONS(schedule.begin(), schedule.end(), names.begin(), names.end());
+} FC_LOG_AND_RETHROW()
+
+// Snapshot credit sits inside the multiplied time term, so the same credit is worth twice as much at
+// twice the stake. An hour each of credit and base keeps the values small.
+BOOST_FIXTURE_TEST_CASE( snapshot_credit_scales_with_the_collateral_multiple, producer_score_tester ) try {
+   using sysiosystem::producer_rank::seniority_quantum_sec;
+   auto names = setup_collateralized_producers(2);
+   BOOST_REQUIRE_EQUAL( success(), credit_collateral(names[1], base_min_bond) );   // 2x
+   BOOST_REQUIRE_EQUAL( success(), set_time_terms(seniority_quantum_sec,
+                                                  sysiosystem::producer_rank::default_miss_penalty_sec,
+                                                  seniority_quantum_sec) );
+   trigger_reschedule();   // drains the sweep the config change opened
+   BOOST_REQUIRE_EQUAL( expected_composite(one_x, seniority_quantum_sec), composite_of(rank_score_of(names[0])) );
+   BOOST_REQUIRE_EQUAL( expected_composite(2 * one_x, seniority_quantum_sec), composite_of(rank_score_of(names[1])) );
+
+   credit_snapshot_attestation(names[0], "snapprova"_n);
+   credit_snapshot_attestation(names[1], "snapprovb"_n);
+   BOOST_REQUIRE_EQUAL( expected_composite(one_x, 2 * seniority_quantum_sec), composite_of(rank_score_of(names[0])) );
+   BOOST_REQUIRE_EQUAL( expected_composite(2 * one_x, 2 * seniority_quantum_sec),
+                        composite_of(rank_score_of(names[1])) );
 } FC_LOG_AND_RETHROW()
 
 // The collateral factor is the MINIMUM across the required pairs, with no sum term: posting extra
@@ -6506,8 +6581,7 @@ BOOST_FIXTURE_TEST_CASE( collateral_is_minimum_across_required_pairs, producer_s
          ("producer", p)("producer_key", get_public_key(p, "active"))("url", "")("location", 0)) );
    }
    register_finalizer_keys(names, 2);
-   BOOST_REQUIRE_EQUAL( success(), set_score_config(test_collateral_weight) );
-   trigger_reschedule();
+   produce_blocks(1);
    BOOST_REQUIRE_EQUAL( composite_of(rank_score_of(names[0])), composite_of(rank_score_of(names[1])) );
 
    // Ten times the bond on ONE pair leaves the minimum -- and so the score -- untouched.
@@ -6525,16 +6599,13 @@ BOOST_FIXTURE_TEST_CASE( collateral_is_minimum_across_required_pairs, producer_s
 // ship at weight 0 without disturbing any existing ordering.
 BOOST_FIXTURE_TEST_CASE( zero_weight_removes_factor_influence, producer_score_tester ) try {
    auto names = setup_collateralized_producers(3);
-   BOOST_REQUIRE_EQUAL( success(), set_score_config(test_collateral_weight) );
-   trigger_reschedule();
-   BOOST_REQUIRE_EQUAL( success(), credit_collateral(names[2], base_min_bond * 20) );
-   produce_blocks(1);
+   credit_snapshot_attestation(names[2], "snapprovc"_n);
    BOOST_REQUIRE_LT( rank_score_of(names[2]), rank_score_of(names[0]) );
 
-   BOOST_REQUIRE_EQUAL( success(), set_score_config(/*collateral_weight=*/0) );
+   BOOST_REQUIRE_EQUAL( success(), set_score_config(/*snapshot_weight=*/0) );
    trigger_reschedule();
 
-   // Twenty times the bond now buys nothing: every producer carries the same composite.
+   // The attestation now buys nothing: every producer carries the same composite.
    BOOST_REQUIRE_EQUAL( composite_of(rank_score_of(names[0])), composite_of(rank_score_of(names[2])) );
    BOOST_REQUIRE_EQUAL( composite_of(rank_score_of(names[1])), composite_of(rank_score_of(names[2])) );
    BOOST_REQUIRE_EQUAL( 3u, producer_rank_position(names[2]) );
@@ -6557,7 +6628,7 @@ BOOST_FIXTURE_TEST_CASE( rescore_sweep_drains_across_ticks, producer_score_teste
    trigger_reschedule();
    BOOST_REQUIRE( !rescore_pending() );
 
-   BOOST_REQUIRE_EQUAL( success(), set_score_config(test_collateral_weight) );
+   BOOST_REQUIRE_EQUAL( success(), set_score_config() );
    BOOST_REQUIRE( rescore_pending() );
 
    trigger_reschedule();
@@ -6574,7 +6645,6 @@ BOOST_FIXTURE_TEST_CASE( rescore_sweep_drains_across_ticks, producer_score_teste
 // has to notice a stamp -- so two changes inside one second cannot lose the second one.
 BOOST_FIXTURE_TEST_CASE( collateral_minimum_change_opens_rescore_sweep, producer_score_tester ) try {
    auto names = setup_collateralized_producers(3);
-   BOOST_REQUIRE_EQUAL( success(), set_score_config(test_collateral_weight) );
    trigger_reschedule();
    BOOST_REQUIRE( !rescore_pending() );
    const uint64_t before = rank_score_of(names[0]);
@@ -6673,7 +6743,6 @@ BOOST_FIXTURE_TEST_CASE( missed_round_is_charged_only_to_the_skipped_producer, p
 BOOST_FIXTURE_TEST_CASE( demotion_fires_at_threshold_and_outweighs_collateral, producer_score_tester ) try {
    auto names = setup_collateralized_producers(5);
    const auto target = names[2];
-   BOOST_REQUIRE_EQUAL( success(), set_score_config(test_collateral_weight) );
    trigger_reschedule();
    BOOST_REQUIRE_EQUAL( success(), credit_collateral(target, base_min_bond * 19) );
    produce_blocks(1);
@@ -6778,7 +6847,9 @@ BOOST_FIXTURE_TEST_CASE( regproducer_pardons_a_producer_the_schedule_dropped, pr
    BOOST_REQUIRE_EQUAL( 0u, missed_rounds_of(target) );
    BOOST_REQUIRE_EQUAL( remaining, service_sec_of(target) );
    BOOST_REQUIRE_EQUAL( registration_seq, registration_seq_of(target) );
-   BOOST_REQUIRE_EQUAL( expected_key(tier_bootstrapped, seniority_credit(remaining), registration_seq),
+   BOOST_REQUIRE_EQUAL( expected_key(tier_bootstrapped,
+                                     expected_composite(one_x, seniority_credit(remaining) + default_base_sec),
+                                     registration_seq),
                         rank_score_of(target) );
 } FC_LOG_AND_RETHROW()
 
@@ -6804,7 +6875,7 @@ BOOST_FIXTURE_TEST_CASE( a_raised_miss_threshold_reconciles_an_existing_demotion
    BOOST_REQUIRE_GE( frozen_streak, 3u );
    BOOST_REQUIRE( demoted(target) );
 
-   BOOST_REQUIRE_EQUAL( success(), set_score_config(0, sysiosystem::producer_rank::default_snapshot_weight_sec,
+   BOOST_REQUIRE_EQUAL( success(), set_score_config(sysiosystem::producer_rank::default_snapshot_weight_sec,
                                                     /*max_missed=*/frozen_streak + 1) );
    trigger_reschedule();   // drains the sweep the config change opened
 
@@ -6890,7 +6961,7 @@ BOOST_FIXTURE_TEST_CASE( a_short_round_counts_against_the_producer, producer_sco
    // Demote on two unserved rounds, and demand the full round to serve one, so the test can drive
    // the threshold without depending on how many blocks a partial round happens to land.
    BOOST_REQUIRE_EQUAL( success(), set_score_config(
-      /*collateral_weight=*/0, sysiosystem::producer_rank::default_snapshot_weight_sec,
+      sysiosystem::producer_rank::default_snapshot_weight_sec,
       /*max_consecutive_missed_rounds=*/2, /*snapshot_target_attestations=*/1,
       /*min_blocks_per_round=*/slots_per_producer) );
    trigger_reschedule();
@@ -6924,21 +6995,22 @@ BOOST_FIXTURE_TEST_CASE( setscorecfg_bounds_every_field_it_accepts, producer_sco
    // would count against the producer and the streak would demote the entire network.
    BOOST_REQUIRE_EQUAL(
       wasm_assert_msg("min_blocks_per_round cannot exceed the round size"),
-      set_score_config(0, snapshot_weight, 3, 1, /*min_blocks_per_round=*/13) );
+      set_score_config(snapshot_weight, 3, 1, /*min_blocks_per_round=*/13) );
    // The boundary and the disabled spelling are both accepted.
-   BOOST_REQUIRE_EQUAL( success(), set_score_config(0, snapshot_weight, 3, 1, 12) );
-   BOOST_REQUIRE_EQUAL( success(), set_score_config(0, snapshot_weight, 3, 1, 0) );
+   BOOST_REQUIRE_EQUAL( success(), set_score_config(snapshot_weight, 3, 1, 12) );
+   BOOST_REQUIRE_EQUAL( success(), set_score_config(snapshot_weight, 3, 1, 0) );
 
    // A zero target would divide by zero in the snapshot factor.
    BOOST_REQUIRE_EQUAL(
       wasm_assert_msg("snapshot_target_attestations must be positive"),
-      set_score_config(0, snapshot_weight, 3, /*snapshot_target=*/0) );
+      set_score_config(snapshot_weight, 3, /*snapshot_target=*/0) );
 
-   // Weights and the miss penalty are seconds with no ceiling: every term saturates instead.
-   BOOST_REQUIRE_EQUAL( success(),
-      set_score_config(any_value, any_value, 3, 1, 6, /*miss_penalty_sec=*/any_value, /*reserved_weight=*/any_value) );
-   // Zero disables the penalty.
-   BOOST_REQUIRE_EQUAL( success(), set_miss_penalty(0) );
+   // Weights, the miss penalty and the seniority base are seconds with no ceiling: every term
+   // saturates instead.
+   BOOST_REQUIRE_EQUAL( success(), set_score_config(any_value, 3, 1, 6, /*miss_penalty_sec=*/any_value,
+                                                    /*seniority_base_sec=*/any_value, /*reserved_weight=*/any_value) );
+   // Zero disables the penalty, and a zero base is accepted.
+   BOOST_REQUIRE_EQUAL( success(), set_time_terms(snapshot_weight, 0, 0) );
 } FC_LOG_AND_RETHROW()
 
 // `rmvproducer` performs the same deactivation `unregprod` does, and was the one is_active path
@@ -7077,7 +7149,7 @@ BOOST_FIXTURE_TEST_CASE( pruned_operator_row_stays_demoted_through_rescore_sweep
    BOOST_REQUIRE_EQUAL(success(), prune_operators());
    BOOST_REQUIRE(get_opreg_operator(target).is_null());
 
-   BOOST_REQUIRE_EQUAL(success(), set_score_config(test_collateral_weight));
+   BOOST_REQUIRE_EQUAL(success(), set_score_config());
    BOOST_REQUIRE(rescore_pending());
    trigger_reschedule();
 
@@ -7328,6 +7400,52 @@ BOOST_FIXTURE_TEST_CASE( rounds_never_rewrite_the_global_row, producer_score_tes
       return p.producer_name == state_after["last_producer"].as<account_name>(); }) );
 } FC_LOG_AND_RETHROW()
 
+// A standby at multiple k_s passes an incumbent at k_i with seniority S only when
+// k_s x B > k_i x (S + B). With an hour each of base and incumbent seniority at 1x the standby needs
+// more than 2x: 1.99x stays behind, 2.01x passes. A miss first shows the multiple scaling the penalty.
+BOOST_FIXTURE_TEST_CASE( a_standby_passes_an_incumbent_only_past_the_threshold, producer_score_tester ) try {
+   using sysiosystem::producer_rank::seniority_quantum_sec;
+   constexpr uint32_t base_sec     = seniority_quantum_sec;
+   constexpr uint32_t miss_penalty = seniority_quantum_sec;
+   constexpr uint64_t percent      = 100;
+
+   auto names = setup_collateralized_producers(6);
+   const std::vector<account_name> incumbents(names.begin(), names.begin() + 5);
+   const auto standby = names[5];
+   BOOST_REQUIRE_EQUAL( success(), push_system_action(standby, "unregprod"_n, mvo()("producer", standby)) );
+   BOOST_REQUIRE_EQUAL( success(), credit_collateral(incumbents[1], base_min_bond) );   // 2x
+   BOOST_REQUIRE_EQUAL( success(), set_time_terms(sysiosystem::producer_rank::default_snapshot_weight_sec,
+                                                  miss_penalty, base_sec) );
+   trigger_reschedule();
+   wait_for_active_schedule_order(incumbents);
+
+   const auto min_service = [&] {
+      uint64_t lowest = std::numeric_limits<uint64_t>::max();
+      for (const auto& p : incumbents) lowest = std::min(lowest, service_sec_of(p));
+      return lowest;
+   };
+   while (min_service() < seniority_quantum_sec) produce_blocks(incumbents.size() * slots_per_producer);
+   const uint64_t incumbent_composite = expected_composite(one_x, seniority_quantum_sec + base_sec);
+   BOOST_REQUIRE_EQUAL( incumbent_composite, composite_of(rank_score_of(incumbents[0])) );
+   BOOST_REQUIRE_EQUAL( expected_composite(2 * one_x, seniority_quantum_sec + base_sec),
+                        composite_of(rank_score_of(incumbents[1])) );
+
+   // A miss costs the multiple times the penalty: 2x one hour.
+   skip_round_of(incumbents[1]);
+   BOOST_REQUIRE_EQUAL( expected_composite(2 * one_x, base_sec), composite_of(rank_score_of(incumbents[1])) );
+
+   // The standby returns with no seniority at 1.99x: short of 2x, it stays behind.
+   BOOST_REQUIRE_EQUAL( success(), credit_collateral(standby, base_min_bond * 99 / percent) );
+   BOOST_REQUIRE_EQUAL( success(), push_regproducer(standby) );
+   BOOST_REQUIRE_EQUAL( expected_composite(199, base_sec), composite_of(rank_score_of(standby)) );
+   BOOST_REQUIRE_GT( rank_score_of(standby), rank_score_of(incumbents[0]) );
+
+   // At 2.01x it passes.
+   BOOST_REQUIRE_EQUAL( success(), credit_collateral(standby, base_min_bond * 2 / percent) );
+   BOOST_REQUIRE_EQUAL( expected_composite(201, base_sec), composite_of(rank_score_of(standby)) );
+   BOOST_REQUIRE_LT( rank_score_of(standby), rank_score_of(incumbents[0]) );
+} FC_LOG_AND_RETHROW()
+
 // An unserved round subtracts the penalty exactly and floors at zero. The first miss runs with the
 // penalty off, which pins the seniority the penalized misses start from.
 BOOST_FIXTURE_TEST_CASE( an_unserved_round_costs_the_miss_penalty_floored_at_zero, producer_score_tester ) try {
@@ -7363,7 +7481,8 @@ BOOST_FIXTURE_TEST_CASE( seniority_moves_the_key_only_at_whole_hours, producer_s
    const auto target = names[2];
    const uint64_t registration_seq = registration_seq_of(target);
    const uint64_t start_key = rank_score_of(target);
-   BOOST_REQUIRE_EQUAL( expected_key(tier_bootstrapped, 0, registration_seq), start_key );
+   BOOST_REQUIRE_EQUAL( expected_key(tier_bootstrapped, expected_composite(one_x, default_base_sec), registration_seq),
+                        start_key );
 
    const uint64_t rotation_sec = names.size() * round_sec;
    while (service_sec_of(target) + rotation_sec < seniority_quantum_sec) {
@@ -7374,7 +7493,9 @@ BOOST_FIXTURE_TEST_CASE( seniority_moves_the_key_only_at_whole_hours, producer_s
       BOOST_REQUIRE_EQUAL( start_key, rank_score_of(target) );
       produce_blocks(1);
    }
-   BOOST_REQUIRE_EQUAL( expected_key(tier_bootstrapped, seniority_quantum_sec, registration_seq),
+   BOOST_REQUIRE_EQUAL( expected_key(tier_bootstrapped,
+                                     expected_composite(one_x, seniority_quantum_sec + default_base_sec),
+                                     registration_seq),
                         rank_score_of(target) );
 
    // The default penalty is a week, so one miss takes the hour back.
@@ -7452,12 +7573,13 @@ BOOST_FIXTURE_TEST_CASE( termination_and_slash_reset_seniority_and_registration_
    BOOST_REQUIRE_EQUAL( 4u, producer_rank_position(terminated) );
 } FC_LOG_AND_RETHROW()
 
-// Full snapshot credit separates producers of equal seniority but does not outrank more seniority
-// than it is worth, and one miss costs more than it. Scaled down from the defaults (three days of
-// credit, a week of penalty) to half an hour and an hour, so an hour of real accrual shows it.
+// Full snapshot credit separates producers of equal seniority and does not overtake one with as much
+// more seniority as it is worth, and a miss costs the multiple times the penalty. Scaled down from the
+// defaults (three days of credit, a week of penalty) to an hour each, so an hour of accrual shows it;
+// these bootstrapped producers score at 1x.
 BOOST_FIXTURE_TEST_CASE( snapshot_credit_breaks_seniority_ties_but_not_more_seniority, producer_score_tester ) try {
    using sysiosystem::producer_rank::seniority_quantum_sec;
-   constexpr uint32_t snapshot_weight = seniority_quantum_sec / 2;
+   constexpr uint32_t snapshot_weight = seniority_quantum_sec;
    constexpr uint32_t miss_penalty    = seniority_quantum_sec;
 
    auto names = setup_ranked_producers(6);
@@ -7465,7 +7587,7 @@ BOOST_FIXTURE_TEST_CASE( snapshot_credit_breaks_seniority_ties_but_not_more_seni
    const auto newcomer = names[5];
    // Parked before any schedule is published, so it accrues nothing while the veterans serve.
    BOOST_REQUIRE_EQUAL( success(), push_system_action(newcomer, "unregprod"_n, mvo()("producer", newcomer)) );
-   BOOST_REQUIRE_EQUAL( success(), set_score_config(0, snapshot_weight, 3, 1, 6, miss_penalty) );
+   BOOST_REQUIRE_EQUAL( success(), set_time_terms(snapshot_weight, miss_penalty, default_base_sec) );
    trigger_reschedule();
    wait_for_active_schedule_order(veterans);
 
@@ -7475,29 +7597,28 @@ BOOST_FIXTURE_TEST_CASE( snapshot_credit_breaks_seniority_ties_but_not_more_seni
       return lowest;
    };
    while (min_service() < seniority_quantum_sec) produce_blocks(veterans.size() * slots_per_producer);
-   for (const auto& p : veterans) {
-      BOOST_REQUIRE_EQUAL( seniority_quantum_sec, composite_of(rank_score_of(p)) );
-   }
+   const uint64_t veteran_composite = expected_composite(one_x, seniority_quantum_sec + default_base_sec);
+   for (const auto& p : veterans) BOOST_REQUIRE_EQUAL( veteran_composite, composite_of(rank_score_of(p)) );
 
-   // The newcomer returns with no seniority. Full credit lifts it to half an hour: still behind
-   // every veteran.
+   // The newcomer returns with no seniority. Full credit brings it level with the veterans, who stay
+   // ahead on registration order.
    BOOST_REQUIRE_EQUAL( success(), push_regproducer(newcomer) );
    credit_snapshot_attestation(newcomer, "snapprovf"_n);
-   BOOST_REQUIRE_EQUAL( snapshot_weight, composite_of(rank_score_of(newcomer)) );
+   BOOST_REQUIRE_EQUAL( veteran_composite, composite_of(rank_score_of(newcomer)) );
    BOOST_REQUIRE_EQUAL( names.size(), producer_rank_position(newcomer) );
 
    // Among equal veterans, full credit moves the second registration ahead of the first.
    credit_snapshot_attestation(names[1], "snapprovb"_n);
-   BOOST_REQUIRE_EQUAL( seniority_quantum_sec + snapshot_weight, composite_of(rank_score_of(names[1])) );
+   const uint64_t credited = expected_composite(one_x, seniority_quantum_sec + snapshot_weight + default_base_sec);
+   BOOST_REQUIRE_EQUAL( credited, composite_of(rank_score_of(names[1])) );
    BOOST_REQUIRE_EQUAL( 1u, producer_rank_position(names[1]) );
    BOOST_REQUIRE_EQUAL( 2u, producer_rank_position(names[0]) );
 
-   // One miss costs the hour and keeps the credit: behind every other veteran, and ahead of the
-   // newcomer only on registration order.
+   // One miss costs 1x the hour penalty and keeps the credit.
    wait_for_active_schedule(newcomer);
    skip_round_of(names[1]);
-   BOOST_REQUIRE_EQUAL( snapshot_weight, composite_of(rank_score_of(names[1])) );
-   BOOST_REQUIRE_EQUAL( veterans.size(), producer_rank_position(names[1]) );
+   BOOST_REQUIRE_EQUAL( credited - expected_composite(one_x, miss_penalty), composite_of(rank_score_of(names[1])) );
+   BOOST_REQUIRE_EQUAL( 2u, producer_rank_position(names[1]) );
    BOOST_REQUIRE_EQUAL( names.size(), producer_rank_position(newcomer) );
 } FC_LOG_AND_RETHROW()
 
@@ -7627,13 +7748,12 @@ BOOST_FIXTURE_TEST_CASE( deposit_rejects_a_bootstrapped_operator, producer_score
 // outrank a producer at exactly the minimum.
 BOOST_FIXTURE_TEST_CASE( collateral_factor_saturates_at_the_bit_budget, producer_score_tester ) try {
    // A minimum bond of 1 makes the ratio the raw deposit times score_scale, so a deposit of 1e15
-   // is a factor of 1e19: at a day per minimum bond the term is ~8.6e19 seconds, far past the
-   // 2^40-second composite ceiling, and twice the deposit runs the factor itself past uint64.
+   // is a multiple of 1e17 hundredths: times the week-long base it is far past the 2^40 composite
+   // ceiling, and twice the deposit runs the ratio itself past uint64.
    constexpr uint64_t unit_min_bond   = 1;
    constexpr uint64_t saturating_bond = 1'000'000'000'000'000ULL;
 
    BOOST_REQUIRE_EQUAL( success(), set_single_pair_collateral(unit_min_bond) );
-   BOOST_REQUIRE_EQUAL( success(), set_score_config(test_collateral_weight) );
    produce_blocks(1);
 
    auto names = producer_names(3);
@@ -7659,10 +7779,22 @@ BOOST_FIXTURE_TEST_CASE( collateral_factor_saturates_at_the_bit_budget, producer
    BOOST_REQUIRE_EQUAL( sysiosystem::producer_rank::composite_max, composite_of(rank_score_of(names[0])) );
    BOOST_REQUIRE_EQUAL( sysiosystem::producer_rank::composite_max, composite_of(rank_score_of(names[1])) );
    // ...and neither wrapped: both still sort ahead of the producer at exactly the minimum.
-   BOOST_REQUIRE_EQUAL( test_collateral_weight, composite_of(rank_score_of(names[2])) );
+   BOOST_REQUIRE_EQUAL( expected_composite(one_x, default_base_sec), composite_of(rank_score_of(names[2])) );
    BOOST_REQUIRE_LT( rank_score_of(names[0]), rank_score_of(names[2]) );
    BOOST_REQUIRE_EQUAL( 1u, producer_rank_position(names[0]) );   // equal composites: registration order
    BOOST_REQUIRE_EQUAL( 2u, producer_rank_position(names[1]) );
+   BOOST_REQUIRE_EQUAL( 3u, producer_rank_position(names[2]) );
+
+   // An extreme time term, the largest seniority base, is exact at 1x and still saturates, without
+   // wrapping, at the extreme multiple.
+   constexpr uint32_t extreme_base_sec = std::numeric_limits<uint32_t>::max();
+   BOOST_REQUIRE_EQUAL( success(),
+      set_time_terms(sysiosystem::producer_rank::default_snapshot_weight_sec,
+                     sysiosystem::producer_rank::default_miss_penalty_sec, extreme_base_sec) );
+   trigger_reschedule();
+   BOOST_REQUIRE_EQUAL( expected_composite(one_x, extreme_base_sec), composite_of(rank_score_of(names[2])) );
+   BOOST_REQUIRE_EQUAL( sysiosystem::producer_rank::composite_max, composite_of(rank_score_of(names[0])) );
+   BOOST_REQUIRE_EQUAL( 1u, producer_rank_position(names[0]) );
    BOOST_REQUIRE_EQUAL( 3u, producer_rank_position(names[2]) );
 } FC_LOG_AND_RETHROW()
 

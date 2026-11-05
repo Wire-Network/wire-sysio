@@ -145,8 +145,8 @@ namespace sysiosystem {
    void system_contract::setscorecfg( const producer_rank::producer_score_config& weights ) {
       require_auth( get_self() );
 
-      // Weights and the miss penalty are seconds and take any value: every score term saturates,
-      // so none can wrap.
+      // Weights, the miss penalty and the seniority base are seconds and take any value: every score
+      // term saturates, so none can wrap.
 
       // A zero target would make the snapshot factor divide by zero.
       check( weights.snapshot_target_attestations > 0,

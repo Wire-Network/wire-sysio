@@ -68,9 +68,9 @@ When every required token is at or above its minimum, your operator status flips
 its own. No producer rank exists yet: the first score is written only after the producer row and
 active finalizer key are created in steps 4 and 5.
 
-Collateral is a gate. At the default score configuration, posting more than the minimum does not
-raise your rank. Once your producer row exists, every balance change rescores it, so falling below
-a minimum costs you your rank at once.
+You can top up at any time. Your bond multiplies your score, so collateral above the minimum raises
+your rank as soon as it lands. Once your producer row exists, every balance change rescores it, so
+falling below a minimum costs you your rank at once.
 
 ## Step 4 — Register your block-signing key
 
@@ -162,9 +162,8 @@ be picked back up.
 
 ## How your rank is scored
 
-The score is measured in **seconds of seniority**, and it orders producers **within a tier**. Tier
-always beats score, so no amount of seniority or collateral lifts a producer out of the tier it is
-in.
+A score orders producers **within a tier**. Tier always beats score, so no amount of seniority or
+collateral lifts a producer out of the tier it is in.
 
 There are three, and they sort in this order:
 
@@ -181,11 +180,33 @@ community producer that qualifies outranks all of them. They fill the schedule o
 too few community producers to fill it, and they yield those slots automatically as real producers
 arrive. Nobody has to vote them out, and there is no flag day.
 
-| Factor | What it adds |
+```
+score = M x (seniority + snapshot credit + base)
+```
+
+| Term | What it is |
 |---|---|
-| Seniority | Your time in the schedule, counted in whole hours. Each round that pay counts adds the scheduled time since the last round it counted, up to one rotation of the schedule, so a day in the schedule is a day of seniority at any schedule size and a reordered schedule never credits a rotation twice. A round you do not serve still costs a penalty, seven days by default, down to zero. |
-| Snapshot service | Snapshot attestations that reached quorum in the current pay period, worth three days of seniority at full credit by default. It separates producers of similar seniority, and does not overtake one with more than three days more. |
-| Collateral | Your bond divided by the required minimum, taken as the **minimum** across every required token, times a weight in seconds per minimum bond. The weight is zero by default, so collateral is a requirement and not a factor. |
+| M | Your bond divided by the required minimum, taken as the **minimum** across every required token, counted in hundredths. Linear and uncapped, so bonding above the minimum raises your rank; below 1x you hold no rank at all. Bootstrapped producers hold no bond and count as 1x. |
+| Seniority | Your time in the schedule, counted in whole hours. Each round that pay counts adds the scheduled time since the last round it counted, up to one rotation of the schedule, so a day in the schedule is a day of seniority at any schedule size and a reordered schedule never credits a rotation twice. A round you do not serve costs a penalty, seven days by default, down to zero. |
+| Snapshot credit | Snapshot attestations that reached quorum in the current pay period, worth three days at full credit by default. |
+| Base | Seven days by default, the same for everyone, so a producer with no seniority still scores and standbys rank by stake. |
+
+Everything in the parentheses is multiplied by M, so snapshot credit is worth more at a larger stake
+and a miss costs M times the penalty. Ranking by M gives the same order as ranking by each producer's
+share of the total stake, since every producer would be divided by the same total.
+
+A standby at k_s times the minimum overtakes an incumbent at k_i with seniority S only when
+k_s x base > k_i x (S + base). With the 7-day base, a standby needs this multiple of the
+incumbent's stake:
+
+| Incumbent seniority | Stake needed to overtake |
+|---|---|
+| 30 days | about 5.3x |
+| 1 year | about 53x |
+| 2 years | about 105x |
+
+Stake moving producers around inside the top 21 changes nothing: membership changes only when a
+producer crosses the 21st position, and a running schedule keeps its order.
 
 Equal scores rank by registration order, earliest first.
 
@@ -280,7 +301,8 @@ absent operator would simply run it on a timer and hold its slot without ever pr
 One subtlety worth planning around: even a single unserved round short of demotion costs the miss
 penalty, and if that drops you below the last scheduled position you stop being scheduled — without
 being demoted. Off the schedule you accrue nothing, so you return when your score again outranks
-the last scheduled producer: when one leaves or loses seniority, or when snapshot credit lifts you.
+the last scheduled producer: when one leaves or loses seniority, or when more collateral or snapshot
+credit lifts you.
 
 Changing either threshold re-derives every producer's standing as the rescore sweep drains, so a
 lowered limit binds on streaks that already breach it and a raised one releases the producers now
@@ -289,8 +311,8 @@ under it. It is not applied only to rounds missed from that point on.
 ## Leaving, voluntarily or otherwise
 
 - **Park** with `unregprod`. Your bond is untouched and your operator status stays `ACTIVE`; you
-  simply hold no schedule position. `regproducer` brings you back at the position your seniority
-  and registration order earn after rechecking current admission; a minimum raised while you were
+  simply hold no schedule position. `regproducer` brings you back at the position your bond,
+  seniority and registration order earn after rechecking current admission; a minimum raised while you were
   parked requires a top-up first. Parked time adds no seniority.
 - **Withdraw** with `sysio.opreg::withdraw(account, token_code, amount)`. The request is queued
   rather than immediate (`cancelwtdw` cancels it before it flushes); once it flushes at an epoch

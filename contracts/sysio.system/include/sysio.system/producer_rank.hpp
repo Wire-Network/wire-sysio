@@ -60,9 +60,6 @@ namespace sysiosystem {
       /**
        * One weighted factor term: `factor * weight / score_scale`, saturating.
        *
-       * The collateral factor is uncapped, so the product runs past uint64 on a large bond; the
-       * uint128 intermediate keeps it from wrapping a top-ranked producer to the bottom of the index.
-       *
        * @param factor a factor in basis points.
        * @param weight seconds of seniority the factor is worth at `score_scale`.
        * @return the term in seconds, clamped to `composite_max`.
@@ -74,6 +71,23 @@ namespace sysiosystem {
          return term > static_cast<unsigned __int128>(composite_max)
                    ? composite_max
                    : static_cast<uint64_t>(term);
+      }
+
+      /**
+       * The composite: the collateral multiple times the time term, in hundredths of the minimum bond
+       * times whole hours, saturating.
+       *
+       * @param multiple_bps the collateral multiple in basis points (`score_scale` is 1x); uncapped.
+       * @param time_sec     seniority plus snapshot credit plus the seniority base, in seconds.
+       * @return the composite, clamped to `composite_max`.
+       */
+      inline uint64_t weighted_composite(uint64_t multiple_bps, uint64_t time_sec) {
+         const unsigned __int128 product =
+            static_cast<unsigned __int128>(multiple_bps / ratio_per_multiple_unit)
+            * static_cast<unsigned __int128>(time_sec / seniority_quantum_sec);
+         return product > static_cast<unsigned __int128>(composite_max)
+                   ? composite_max
+                   : static_cast<uint64_t>(product);
       }
 
       /**
@@ -99,7 +113,7 @@ namespace sysiosystem {
        * Equal keys fall back to primary-key order (the account name value).
        *
        * @param tier             the producer's ordering tier.
-       * @param composite        the composite score in seconds, saturated to `composite_max`.
+       * @param composite        the composite score, saturated to `composite_max`.
        * @param registration_seq the producer's registration order; 0 (unassigned) sorts last.
        * @return the packed sort key stored as `producer_info::rank_score`.
        */
@@ -139,13 +153,14 @@ namespace sysiosystem {
       }
 
       /**
-       * Score configuration: the factor weights, the demotion threshold and the miss penalty.
+       * Score configuration: the snapshot weight, the seniority base, the demotion threshold and the
+       * miss penalty.
        *
-       * The composite is in SECONDS of seniority-equivalent: seniority (`service_sec` in whole hours)
-       * plus each factor term, where a weight is the seconds of seniority its factor is worth at full
-       * credit. Adding a factor is a new weight defaulting to 0 plus a term in `compute`; the key's
-       * layout never changes. A config change invalidates every stored score, which is what the
-       * rescore cursor on the `prodstate` singleton drains.
+       * The composite is `M x (seniority + snapshot credit + seniority_base_sec)`: M is the collateral
+       * multiple and the time term is in whole hours; a weight is the seconds of seniority its factor
+       * is worth at full credit. Adding a factor is a new weight defaulting to 0 plus a term in
+       * `compute`; the key's layout never changes. A config change invalidates every stored score,
+       * which is what the rescore cursor on the `prodstate` singleton drains.
        *
        * `relay` / `api` / `benchmark` ship at 0 deliberately. A `peerkeys` row proves registration,
        * not service, and nothing on chain observes an API node or a CPU benchmark at all; weighting
@@ -153,11 +168,8 @@ namespace sysiosystem {
        * exists.
        */
       struct [[sysio::table("prodscorecfg"), sysio::contract("sysio.system")]] producer_score_config {
-         /// Seconds of seniority one minimum bond is worth, scaled by the collateral ratio (linear,
-         /// uncapped, min across the required pairs). Zero makes collateral a pure gate: a producer
-         /// below the live minimum is still unscored, and more collateral buys no rank.
-         uint32_t collateral_weight    = 0;
-         /// Seconds of seniority full snapshot credit is worth, pro rata below the target.
+         /// Seconds of seniority full snapshot credit is worth, pro rata below the target; scaled by M
+         /// with the rest of the time term.
          uint32_t snapshot_weight      = default_snapshot_weight_sec;
          /// Reserved -- needs an attestation path before it can carry weight.
          uint32_t relay_weight         = 0;
@@ -191,16 +203,23 @@ namespace sysiosystem {
          /// model used.
          uint32_t min_blocks_per_round = 6;
 
-         /// Seconds of seniority an UNSERVED round costs, floored at zero. Zero disables the penalty.
-         ///
-         /// DECLARED LAST, matching the tail of SYSLIB_SERIALIZE below.
+         /// Seconds of seniority an UNSERVED round costs, floored at zero, so a miss costs M times
+         /// this in the composite. Zero disables the penalty.
          uint32_t miss_penalty_sec = default_miss_penalty_sec;
 
+         /// Seconds added to every producer's time term, so a producer with no seniority still
+         /// scores and standbys order by stake. A standby at multiple k_s passes an incumbent at k_i
+         /// with seniority S only when k_s x B > k_i x (S + B). Zero ranks unseasoned producers on
+         /// snapshot credit alone.
+         ///
+         /// DECLARED LAST, matching the tail of SYSLIB_SERIALIZE below.
+         uint32_t seniority_base_sec = default_seniority_base_sec;
+
          SYSLIB_SERIALIZE(producer_score_config,
-            (collateral_weight)(snapshot_weight)
+            (snapshot_weight)
             (relay_weight)(api_weight)(benchmark_weight)
             (max_consecutive_missed_rounds)(snapshot_target_attestations)
-            (min_blocks_per_round)(miss_penalty_sec))
+            (min_blocks_per_round)(miss_penalty_sec)(seniority_base_sec))
       };
 
       /// The `prodscorecfg` singleton. Mirrors `emitcfg_t`: absent until governance installs it, so
