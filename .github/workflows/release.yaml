@@ -311,6 +311,27 @@ jobs:
           } > body-next.md
           gh release edit "$TAG" --notes-file body-next.md
 
+  # Publishing and the `latest` label run in one queue shared by every tag. The
+  # workflow's concurrency group is per tag, so without it two releases could each
+  # pick the label from a list the other is about to change and leave it on the
+  # lower version. Only this job is serialized; verification and asset uploads
+  # stay per tag.
+  publish-release:
+    name: Publish the release
+    needs: [publish-assets]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: publish-releases
+      # FIFO: each waiting release publishes in turn instead of replacing the one
+      # queued before it.
+      queue: max
+    env:
+      GH_TOKEN: ${{ github.token }}
+      # No checkout in this job, so gh takes the repository from here.
+      GH_REPO: ${{ github.repository }}
+      TAG: ${{ inputs.tag || github.ref_name }}
+    steps:
       - name: Publish the release
         run: |
           # tag-release.yaml creates the release as a DRAFT so no half-populated

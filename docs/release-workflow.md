@@ -76,7 +76,7 @@ resolve under the home.
 | `linux_amd64_build.yaml` | tag ref (dispatched or pushed) | Resolves the wire-cdt release (explicit input, or the highest published in the channel at or below the version's line), installs its deb, builds with system contracts ON, assembles deb + rpm + portable tgz, bundles the contracts, records `build-metadata.json`, uploads `wire-sysio-packages-amd64`. |
 | `macos_arm64_build.yaml` | tag ref (dispatched or pushed) | Builds, tests, produces the portable tarball, verifies it in `--no-service` mode, uploads `wire-sysio-packages-macos-arm64`. |
 | `opp-bundles.yaml` | tag ref (dispatched, `channel` input) | Generates the OPP model bundles from the tag's protos, publishes `@wireio/opp-{typescript,solidity}-models` to npm and `wire-opp-solana-models` to the WIRE cargo registry (channel `dev` → `-dev` versions), uploads `opp-published-versions-<tag>`. |
-| `release.yaml` | `workflow_dispatch(tag)`; `release: published` as a manual fallback | Awaits both tag-ref builds, downloads both artifacts, verifies each one explicitly, resolves the tag's opp-bundles run, generates `wire-sysio-versions-<version>.json` + `wire-sysio-source-refs-<version>.json`, attaches assets + checksums, appends the component-version/source-ref tables to the notes, then flips the draft public (the `latest` label goes to the highest published stable version). |
+| `release.yaml` | `workflow_dispatch(tag)`; `release: published` as a manual fallback | Awaits both tag-ref builds, downloads both artifacts, verifies each one explicitly, resolves the tag's opp-bundles run, generates `wire-sysio-versions-<version>.json` + `wire-sysio-source-refs-<version>.json`, attaches assets + checksums, appends the component-version/source-ref tables to the notes. Its `publish-release` job, in one queue shared by every tag, then flips the draft public and gives the `latest` label to the highest published stable version. |
 
 ### Post-bump
 
@@ -146,7 +146,9 @@ on it.
   release-branch release publishes them through its tag dispatch, like every
   release.
 - **The `latest` label.** It goes to the highest published stable version, so a
-  `1.1.1` cut after `1.2.0` leaves `1.2.0` as latest.
+  `1.1.1` cut after `1.2.0` leaves `1.2.0` as latest. Releases publish one at a
+  time, in the `publish-releases` queue, so two published together cannot
+  leave it on the lower one.
 - **Wire CDT.** A tag build resolves the highest published wire-cdt release in
   its channel at or below its own `<major>.<minor>` line, so a `1.1.1` built
   after wire-cdt `1.2.0` ships still uses the newest `1.1.x` wire-cdt (or older,
