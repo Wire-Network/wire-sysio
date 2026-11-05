@@ -643,8 +643,11 @@ jobs:
             prerelease="false"
           fi
 
+          # Every page: newer lines' releases can push an older line's off the
+          # first one. --paginate prints one JSON array per page, and jq runs the
+          # filter over each.
           releases_json="$(
-            gh api "repos/Wire-Network/wire-cdt/releases?per_page=100" \
+            gh api --paginate "repos/Wire-Network/wire-cdt/releases?per_page=100" \
               -H "X-GitHub-Api-Version: 2022-11-28"
           )"
           cdt_tags="$(
