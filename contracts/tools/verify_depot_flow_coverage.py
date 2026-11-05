@@ -49,6 +49,7 @@ def validate(data, tests, enabled=None):
 
 
 def main():
+    """Check native references and identify whether sibling completeness was checked."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--tools-root", type=Path, help="wire-tools-ts checkout to compare enabled test scripts")
     parser.add_argument("--filter", action="store_true", help="print Boost --run_test value only")
@@ -64,8 +65,10 @@ def main():
         selected = validate(data, inventory(ROOT), enabled)
     except (ValueError, KeyError) as error:
         parser.exit(1, f"{error}\n")
+    scope = ("cross-repository completeness checked" if enabled is not None else
+             "standalone consistency only; tools flow completeness not checked")
     print(":".join(selected) if args.filter else
-          f"{len(data['flows'])} flows mapped to {len(selected)} native cases; references and boundaries valid")
+          f"{len(data['flows'])} flows mapped to {len(selected)} native cases; references and boundaries valid; {scope}")
 
 
 if __name__ == "__main__":

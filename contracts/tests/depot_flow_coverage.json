@@ -1,6 +1,6 @@
 {
-  "tools_branch": "feature/deprecated-cleanup",
-  "tools_head": "ed871bd7fa072ec273b896e0ab247072427cd37d",
+  "tools_branch": "master",
+  "tools_head": "c6960397b58fb925a94de9ec3aea1c26fa818607",
   "flows": [
     {
       "name": "flow-batch-operator-slashing",
@@ -63,6 +63,40 @@
         "sysio_dclaim_tests/importseed_linked_credits_pending_claims",
         "sysio_dclaim_tests/importseed_unlinked_parks_unmapped_then_linkswept",
         "sysio_dclaim_tests/linkswept_caps_combined_imports_without_aborting"
+      ]
+    },
+    {
+      "name": "flow-lco-import",
+      "wire_behavior": "Epoch-zero syndication imports park unlinked LIQ and credit linked holders; authenticated linking delivers parked principal and accrued yield. Funded imported WIRE credits move from unmapped to pending and pay the exact imported amount. Import finalization closes further ingestion; regliqpool seeds the shadow/WIRE yield pair from treasury.",
+      "cluster_only": "Frozen Ethereum/Solana export decoding, source-decimal conversion, holder key derivation, bootstrap replay of both exports, full pool-configuration comparison and the holder's end-to-end swap after import.",
+      "tests": [
+        "sysio_synd_tests/importsynd_parks_or_credits_and_importdone_closes",
+        "sysio_dclaim_tests/importseed_linked_credits_pending_claims",
+        "sysio_dclaim_tests/importseed_unlinked_parks_unmapped_then_linkswept",
+        "sysio_dclaim_tests/importdone_locks_subsequent_importseed",
+        "sysio_dispatch_tests/funded_import_claims_link_and_settle",
+        "sysio_liq_tests/queued_yield_sells_through_the_pool_and_pays_holders"
+      ]
+    },
+    {
+      "name": "flow-liq-kicker",
+      "wire_behavior": "Permissionless kicks pay a treasury-funded WIRE gift to LIQ holders using elapsed time, TWAP and checkpointed supply. Native cases cover authorization/configuration, warm-up and minimum intervals, daily and total budget limits, reserve protection, Andon holds, zero supply, partial catch-up and atomic payment failure.",
+      "cluster_only": "Bootstrap kicker configuration, irreversible transaction/trace observations and the live batch-operator kick crank, including feature availability and automatic cap exhaustion/recovery. Native contract tests do not establish daemon scheduling or liveness.",
+      "tests": [
+        "sysio_kicker_tests/skip_then_pay_and_pro_rata_claim",
+        "sysio_kicker_tests/twap_warmup_is_enforced",
+        "sysio_kicker_tests/twap_window_config_validation",
+        "sysio_kicker_tests/default_daily_cap_is_enforced",
+        "sysio_kicker_tests/budget_shortfall_then_refund",
+        "sysio_kicker_tests/reserve_guard_and_emissions_gate",
+        "sysio_kicker_tests/andon_hold_then_pay",
+        "sysio_kicker_tests/auth_validation_and_rmpool",
+        "sysio_kicker_tests/min_interval_and_same_block",
+        "sysio_kicker_tests/daily_cap_partial_catchup",
+        "sysio_kicker_tests/exact_budget_and_atomic_inline_failure",
+        "sysio_kicker_tests/partial_payment_keeps_priced_supply",
+        "sysio_kicker_tests/zero_snapshot_checkpoints_then_pays",
+        "sysio_kicker_tests/spot_deviation_threshold_is_inclusive"
       ]
     },
     {
@@ -133,6 +167,34 @@
         "sysio_synd_tests/challenge_charges_bond_plus_extra_and_holds",
         "sysio_synd_tests/bounty_comes_from_the_fee_pot_or_is_zero",
         "sysio_synd_tests/invalid_after_a_yield_release_keeps_the_supply_whole"
+      ]
+    },
+    {
+      "name": "flow-syndication-plugin-underwriting",
+      "wire_behavior": "Real bond acceptance makes held syndication releasable; release charges exact fees and credits linked or parked recipients. Approval waits for the challenge window and claims return principal plus bounty. These contract obligations are shared with manual underwriting.",
+      "cluster_only": "Batch-operator underwriter role discovery, outpost statement verification, competing operators' automatic accept/approve/claim calls, exposure accounting and live custody/relay observations. Native mappings do not prove plugin automation; transient pre-bond states are not required by this racing flow.",
+      "tests": [
+        "sysio_synd_tests/closeenv_issues_one_request_per_token",
+        "sysio_synd_tests/bonded_request_makes_the_envelope_releasable",
+        "sysio_synd_tests/release_pays_the_fee_and_credits_the_account",
+        "sysio_synd_tests/generic_parked_credit_yield_conversion_and_fee_rounded_return",
+        "sysio_synd_tests/createlink_sweeps_parked_from_synd",
+        "sysio_bond_tests/approve_refuses_before_the_window_and_when_unbonded",
+        "sysio_bond_tests/approved_returns_bonds_and_splits_the_bounty_by_stake"
+      ]
+    },
+    {
+      "name": "flow-syndication-plugin-underwriting-cap",
+      "wire_behavior": "An unbonded request retains its envelope; bonding permits release, window-gated approval and claiming return the provider's stake, and later requests can progress. Fees, parked release and authenticated linking use the same contract settlement paths as other syndication flows.",
+      "cluster_only": "The per-operator exposure cap is a batch-operator plugin policy, not a sysio.bond contract limit. Only the live flow proves the sole funded operator leaves the second issued request unbonded while the first stake is unpaid, resumes after repayment, never exceeds its cap and leaves unfunded operators idle; native tests below cover settlement prerequisites, not cap enforcement.",
+      "tests": [
+        "sysio_synd_tests/bonded_request_makes_the_envelope_releasable",
+        "sysio_synd_tests/second_envelope_waits_until_the_first_is_bonded",
+        "sysio_bond_tests/approve_refuses_before_the_window_and_when_unbonded",
+        "sysio_bond_tests/approved_returns_bonds_and_splits_the_bounty_by_stake",
+        "sysio_synd_tests/release_pays_the_fee_and_credits_the_account",
+        "sysio_synd_tests/generic_parked_credit_yield_conversion_and_fee_rounded_return",
+        "sysio_synd_tests/createlink_sweeps_parked_from_synd"
       ]
     },
     {

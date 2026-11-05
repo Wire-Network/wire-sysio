@@ -1,7 +1,7 @@
 # Depot flow coverage
 
 The reviewed coverage inventory is [depot_flow_coverage.json](depot_flow_coverage.json).
-It maps every enabled `wire-tools-ts` flow at the recorded feature-branch head to
+It maps every enabled `wire-tools-ts` flow at the recorded tools head to
 specific native contract cases, describes its WIRE obligations, and states the
 behaviors that still require a cluster. The map is a reviewable traceability
 record, not a line-coverage percentage or a proof that every possible sequence is covered.
@@ -105,6 +105,33 @@ different path). Flow enablement uses the same rule as `scripts/run-flow.mjs`: a
 disabled or renamed flows require a reviewed map update. Standalone sysio CI
 validates the committed map and native references without requiring a sibling repo.
 This check detects inventory drift; reviewers must still assess changed assertions.
+
+The verifier reports **standalone consistency only** when `--tools-root` is omitted;
+this is also what the existing `depot_flow_coverage_map` CTest entry checks. Supplying
+`--tools-root` additionally checks **cross-repository completeness** against that
+checkout's enabled packages. An invalid tools path fails rather than falling back
+to standalone validation. `--filter` continues to print only the Boost selector.
+
+The [Depot flow coverage workflow](../../.github/workflows/depot-flow-coverage.yaml)
+runs standalone consistency and verifier regressions separately from a coordinated
+completeness job. The coordinated job checks out `Wire-Network/wire-tools-ts` at
+`master`, records its resolved commit and passes its path explicitly as `--tools-root`.
+It runs on Sysio pull requests and master pushes, plus a weekly schedule to detect
+tools-only drift. A manual dispatch accepts `wire-tools-ref` to validate a selected
+tools branch, tag or commit. The private tools checkout uses `GH_TOKEN_DEV`; fork
+pull requests run the standalone job and skip the coordinated job because that
+secret is unavailable. No Node dependencies, contract rebuild or cluster is needed
+for these inventory checks.
+
+The inventory was reconciled against tools `master` at
+`c6960397b58fb925a94de9ec3aea1c26fa818607`. The LCO import mapping covers native
+import/link/claim and pool-seeding obligations; export conversion and the complete
+bootstrap journey remain cluster responsibilities. The kicker mapping covers
+contract payment policy, while its live crank remains a cluster responsibility.
+Both plugin-underwriting flows share native bond/syndication settlement coverage.
+In particular, **exposure-cap enforcement is plugin behavior**, so the cap flow's
+native mappings cover its settlement prerequisites, not the cap or its recovery
+automation. The inventory's `cluster_only` fields preserve those distinctions.
 
 Run the focused native mirror set:
 
