@@ -125,12 +125,15 @@ jobs:
             mode="release-prep"
           fi
 
+          # The parser names the bump branch, so the PR version check recognizes it.
+          prep_branch="$(python3 .github/scripts/cmake-version.py prep-branch "$VERSION")"
+
           {
             echo "previous=$previous"
             echo "channel=$channel"
             echo "prerelease=$prerelease"
             echo "mode=$mode"
-            echo "prep-branch=release/prep-v${VERSION}"
+            echo "prep-branch=$prep_branch"
           } >> "$GITHUB_OUTPUT"
 
           echo "Preparing ${previous} -> ${VERSION} on ${TARGET_BRANCH} (channel ${channel}, mode ${mode})"

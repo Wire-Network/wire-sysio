@@ -23,6 +23,11 @@ tag-release.yaml enforce: ``master`` carries any version, and a
 ``release-branch`` prints the branch of a version's line, so those workflows can
 also refuse master for a line whose release branch already exists.
 
+``check-pr`` is the pull-request check: only the bump PR prepare-release.yaml
+opens from ``prep-branch``'s branch changes the base branch's version. Every
+other PR, a forward merge from an older release branch included, leaves it as
+it is.
+
 Usage::
 
     cmake-version.py read [--cmakelists PATH]
@@ -30,6 +35,9 @@ Usage::
     cmake-version.py validate <version> [--branch BRANCH]
     cmake-version.py validate --tag <vversion>
     cmake-version.py release-branch <version>
+    cmake-version.py prep-branch <version>
+    cmake-version.py check-pr --base-branch BRANCH --head-branch BRANCH
+                              --base-cmakelists PATH [--cmakelists PATH]
 """
 
 from __future__ import annotations
@@ -52,6 +60,10 @@ DEVELOPMENT_BRANCH = "master"
 #: Prefix of a release branch, ``release/<major>.<minor>``.
 RELEASE_BRANCH_PREFIX = "release/"
 
+#: Prefix of the branch prepare-release.yaml opens a bump PR from,
+#: ``release/prep-v<version>``.
+PREP_BRANCH_PREFIX = f"{RELEASE_BRANCH_PREFIX}prep-v"
+
 
 def _field_re(name: str) -> re.Pattern[str]:
     """Build the anchored matcher for one ``set(<name> <value>)`` line.
@@ -63,6 +75,21 @@ def _field_re(name: str) -> re.Pattern[str]:
     preparation.
     """
     return re.compile(rf"^set\({name}\s+(.*)\)[ \t]*$", re.MULTILINE)
+
+
+def _single_field(text: str, name: str) -> re.Match[str] | None:
+    """Return the one ``set(<name> ...)`` line in ``text``, or ``None`` if there is none.
+
+    More than one is refused: a merge that left conflict markers in the version
+    block carries both sides' lines, and reading only the first would report one
+    side's version as the tree's.
+    """
+    matches = list(_field_re(name).finditer(text))
+    if len(matches) > 1:
+        raise SystemExit(
+            f"cmake-version: found {len(matches)} set({name} ...) lines, expected one"
+        )
+    return matches[0] if matches else None
 
 
 def validate_version(version: str, tag: bool = False) -> str:
@@ -116,11 +143,40 @@ def validate_branch(branch: str, version: str) -> None:
         )
 
 
+def prep_branch(version: str) -> str:
+    """Return the ``release/prep-v<version>`` branch of ``version``'s bump PR."""
+    return f"{PREP_BRANCH_PREFIX}{version}"
+
+
+def check_pr_version(
+    base_branch: str, head_branch: str, base_version: str, merged_version: str
+) -> None:
+    """Assert a PR from ``head_branch`` into ``base_branch`` changes the version only if it is a bump PR.
+
+    ``base_version`` is the base branch's version and ``merged_version`` the PR's
+    merge result's. A changed version passes only from the merged version's
+    :func:`prep_branch`, and only onto a branch :func:`validate_branch` lets carry
+    it. A forward merge is refused when it carries the source branch's version,
+    which git merges without a conflict when the two sides changed different
+    ``VERSION_*`` lines.
+    """
+    if merged_version == base_version:
+        return
+    if head_branch == prep_branch(merged_version):
+        validate_branch(base_branch, validate_version(merged_version))
+        return
+    raise SystemExit(
+        f"cmake-version: this PR changes {base_branch}'s version from {base_version} "
+        f"to {merged_version}. Only a prepare-release bump PR changes it; keep "
+        f"{base_branch}'s set(VERSION_*) lines."
+    )
+
+
 def read_version(text: str) -> str:
     """Return the ``VERSION_FULL`` string composed from the ``set(VERSION_*)`` lines."""
     parts = {}
     for name in ("VERSION_MAJOR", "VERSION_MINOR", "VERSION_PATCH", "VERSION_SUFFIX"):
-        match = _field_re(name).search(text)
+        match = _single_field(text, name)
         if match is None:
             if name == "VERSION_SUFFIX":
                 parts[name] = ""
@@ -152,16 +208,19 @@ def write_version(text: str, version: str) -> str:
         "VERSION_SUFFIX": suffix if suffix else '""',
     }
     for name, value in replacements.items():
-        text, count = _field_re(name).subn(f"set({name} {value})", text, count=1)
-        if count != 1:
+        if _single_field(text, name) is None:
             raise SystemExit(f"cmake-version: could not rewrite set({name} ...)")
+        text = _field_re(name).sub(f"set({name} {value})", text, count=1)
     return text
 
 
 def main() -> int:
-    """Parse arguments and dispatch to the read or write mode."""
+    """Parse arguments and dispatch to the requested mode."""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=("read", "write", "validate", "release-branch"))
+    parser.add_argument(
+        "mode",
+        choices=("read", "write", "validate", "release-branch", "prep-branch", "check-pr"),
+    )
     parser.add_argument(
         "version", nargs="?", help="version to write or validate"
     )
@@ -178,6 +237,18 @@ def main() -> int:
         "--branch",
         metavar="BRANCH",
         help="validate mode: also assert the version may be prepared and tagged on BRANCH",
+    )
+    parser.add_argument(
+        "--base-branch", metavar="BRANCH", help="check-pr mode: the branch the PR merges into"
+    )
+    parser.add_argument(
+        "--head-branch", metavar="BRANCH", help="check-pr mode: the branch the PR merges from"
+    )
+    parser.add_argument(
+        "--base-cmakelists",
+        type=Path,
+        metavar="PATH",
+        help="check-pr mode: the base branch's CMakeLists.txt (--cmakelists is the merge result's)",
     )
     parser.add_argument("--cmakelists", type=Path, default=DEFAULT_CMAKELISTS)
     args = parser.parse_args()
@@ -209,7 +280,27 @@ def main() -> int:
         print(release_branch(validate_version(args.version)))
         return 0
 
+    if args.mode == "prep-branch":
+        if not args.version:
+            raise SystemExit("cmake-version: prep-branch mode requires a version argument")
+        print(prep_branch(validate_version(args.version)))
+        return 0
+
     text = args.cmakelists.read_text()
+
+    if args.mode == "check-pr":
+        if None in (args.base_branch, args.head_branch, args.base_cmakelists):
+            raise SystemExit(
+                "cmake-version: check-pr mode requires --base-branch, --head-branch "
+                "and --base-cmakelists"
+            )
+        check_pr_version(
+            args.base_branch,
+            args.head_branch,
+            read_version(args.base_cmakelists.read_text()),
+            read_version(text),
+        )
+        return 0
 
     if args.mode == "read":
         print(read_version(text))

@@ -110,6 +110,51 @@ class ValidateBranchTests(unittest.TestCase):
                 cmake_version.validate_branch(branch, "1.1.0")
 
 
+class PrepBranchTests(unittest.TestCase):
+    """``prep_branch`` names a version's bump-PR branch."""
+
+    def test_names_the_bump_branch(self) -> None:
+        self.assertEqual(cmake_version.prep_branch("1.1.0-rc1"), "release/prep-v1.1.0-rc1")
+
+
+class CheckPrVersionTests(unittest.TestCase):
+    """Only a bump PR changes its base branch's version."""
+
+    FORWARD = "forward/release-1.1-to-master"
+
+    def test_unchanged_version_passes_from_any_branch(self) -> None:
+        for head in ("feature/fix", self.FORWARD, "release/1.1", "release/prep-v1.2.0-dev"):
+            with self.subTest(head=head):
+                cmake_version.check_pr_version("master", head, "1.2.0-dev", "1.2.0-dev")
+
+    def test_forward_merge_carrying_the_source_version_fails(self) -> None:
+        # 1.2.0 and 1.2.0-rc2 are what git merges silently when each side changed
+        # different VERSION_* lines; 1.1.0 is a conflict resolved the wrong way.
+        for merged in ("1.2.0", "1.2.0-rc2", "1.1.0"):
+            with self.subTest(merged=merged), self.assertRaises(SystemExit):
+                cmake_version.check_pr_version("master", self.FORWARD, "1.2.0-dev", merged)
+
+    def test_bump_pr_moves_its_base_to_its_version(self) -> None:
+        for base, base_version, version in (
+            ("master", "1.0.0", "1.2.0-dev"),
+            ("release/1.1", "1.0.0", "1.1.0-rc1"),
+            ("release/1.1", "1.1.0", "1.1.1-dev"),
+        ):
+            with self.subTest(base=base, version=version):
+                cmake_version.check_pr_version(base, f"release/prep-v{version}", base_version, version)
+
+    def test_bump_pr_refuses_a_branch_that_may_not_carry_its_version(self) -> None:
+        for base in ("release/1.1", "develop"):
+            with self.subTest(base=base), self.assertRaises(SystemExit):
+                cmake_version.check_pr_version(base, "release/prep-v1.2.0", "1.1.0", "1.2.0")
+
+    def test_bump_pr_refuses_a_version_other_than_its_own(self) -> None:
+        with self.assertRaises(SystemExit):
+            cmake_version.check_pr_version(
+                "release/1.1", "release/prep-v1.1.0-rc1", "1.0.0", "1.1.0-rc2"
+            )
+
+
 class CommandLineTests(unittest.TestCase):
     """``validate`` as the workflows invoke it."""
 
@@ -152,6 +197,66 @@ class CommandLineTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout.strip(), "1.1.0-rc1")
 
+    def test_prep_branch_prints_the_bump_branch(self) -> None:
+        result = run_script("prep-branch", "1.1.0-rc1")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout.strip(), "release/prep-v1.1.0-rc1")
+
+    def test_prep_branch_refuses_a_malformed_version(self) -> None:
+        self.assertNotEqual(run_script("prep-branch", "1.1").returncode, 0)
+        self.assertNotEqual(run_script("prep-branch").returncode, 0)
+
+
+class CheckPrCommandLineTests(unittest.TestCase):
+    """``check-pr`` as the PR workflows invoke it, against two CMakeLists.txt files."""
+
+    def setUp(self) -> None:
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        self.directory = Path(directory.name)
+
+    def cmakelists(self, name: str, version: str) -> Path:
+        """Write a CMakeLists.txt carrying ``version`` and return its path."""
+        path = self.directory / name
+        path.write_text(cmake_version.write_version(CMAKELISTS, version))
+        return path
+
+    def check_pr(self, head: str, base_version: str, merged_version: str) -> subprocess.CompletedProcess[str]:
+        """Run ``check-pr`` for a PR from ``head`` into master."""
+        return run_script(
+            "check-pr",
+            "--base-branch", "master",
+            "--head-branch", head,
+            "--base-cmakelists", str(self.cmakelists("base.txt", base_version)),
+            "--cmakelists", str(self.cmakelists("merged.txt", merged_version)),
+        )
+
+    def test_unchanged_version_passes_silently(self) -> None:
+        result = self.check_pr("feature/fix", "1.2.0-dev", "1.2.0-dev")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, "")
+
+    def test_changed_version_names_both_versions(self) -> None:
+        result = self.check_pr("forward/release-1.1-to-master", "1.2.0-dev", "1.2.0")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("from 1.2.0-dev to 1.2.0", result.stderr)
+
+    def test_bump_pr_passes(self) -> None:
+        result = self.check_pr("release/prep-v1.2.0", "1.2.0-dev", "1.2.0")
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_requires_both_branches_and_the_base_file(self) -> None:
+        base = str(self.cmakelists("base.txt", "1.0.0"))
+        for args in (
+            ("--head-branch", "x", "--base-cmakelists", base),
+            ("--base-branch", "master", "--base-cmakelists", base),
+            ("--base-branch", "master", "--head-branch", "x"),
+        ):
+            with self.subTest(args=args):
+                result = run_script("check-pr", *args, "--cmakelists", base)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("--base-cmakelists", result.stderr)
+
 
 class ReadWriteTests(unittest.TestCase):
     """``read`` / ``write`` against a CMakeLists.txt."""
@@ -181,6 +286,19 @@ class ReadWriteTests(unittest.TestCase):
         result = run_script("write", "1.1.0", "--cmakelists", str(self.cmakelists))
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn('set(VERSION_SUFFIX "")', self.cmakelists.read_text())
+
+    def test_read_and_write_refuse_an_unresolved_merge_conflict(self) -> None:
+        conflicted = CMAKELISTS.replace(
+            "set(VERSION_MINOR 0)\n",
+            "<<<<<<< HEAD\nset(VERSION_MINOR 2)\n=======\nset(VERSION_MINOR 1)\n>>>>>>> release/1.1\n",
+        )
+        self.cmakelists.write_text(conflicted)
+        for args in (("read",), ("write", "1.2.0")):
+            with self.subTest(mode=args[0]):
+                result = run_script(*args, "--cmakelists", str(self.cmakelists))
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("set(VERSION_MINOR ...)", result.stderr)
+                self.assertEqual(self.cmakelists.read_text(), conflicted)
 
 
 if __name__ == "__main__":

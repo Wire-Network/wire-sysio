@@ -89,8 +89,9 @@ A `release/<major>.<minor>` branch carries one line's releases (`1.1.0-rc1`,
 `1.1.0`, `1.1.1`, …) while master moves on. The same workflows prepare and tag
 on it.
 
-- **Cutting one.** Create `release/<major>.<minor>` from the master commit the
-  line starts at. Its first bump (say `1.1.0-rc1`) goes through
+- **Cutting one.** Create `release/<major>.<minor>` from master once master holds
+  everything the line ships. From then on a change reaches the line only through
+  a PR into the branch. Its first bump (say `1.1.0-rc1`) goes through
   `prepare-release.yaml` with `branch: release/1.1`. Master can then move to the
   next line's `-dev` version the same way, with `branch: master`.
 - **Preparing and tagging.** Dispatch `prepare-release.yaml` and then
@@ -105,6 +106,31 @@ on it.
   versions (`release/1.1` refuses `1.2.0`). Master takes any version whose line
   has no release branch yet: once `release/1.1` exists, `1.1.*` is refused on
   master.
+- **Forwarding.** Every PR merged into a release branch is merged forward through
+  each newer line to master: `release/1.1` into `release/1.2`, then
+  `release/1.2` into master. Nothing is merged the other way, so a release
+  branch never picks up a newer line's work.
+  - Branch from the target, outside `release/`, merge the source release branch
+    without committing, and open a PR into the target:
+
+    ```bash
+    git switch -c forward/release-1.1-to-master origin/master
+    git merge --no-ff --no-commit origin/release/1.1
+    # Resolve any conflicts, then confirm the version is still master's:
+    python3 .github/scripts/cmake-version.py read
+    git commit
+    ```
+
+  - The target keeps its own `VERSION_*` lines. A bump on the source does not
+    always conflict: when the two sides changed different lines, git merges them
+    silently (master at `1.2.0-dev` plus `release/1.1` going `1.1.0-dev` to
+    `1.1.0` merges to `1.2.0`). CI fails any PR that changes its base branch's
+    version, except the `release/prep-v<version>` bump PR for a version that
+    branch may carry.
+  - Merge the PR with a merge commit. A squash or rebase leaves the release
+    branch's commits unmerged, so every later forward merges them again.
+  - Never use GitHub's "Resolve conflicts" on a PR whose head is the release
+    branch: it commits the target into the release branch.
 - **Protection.** `tag-release.yaml` refuses a branch whose rules do not require
   a pull request: the bump PR shows only the version change, so every other
   commit on the branch must already have been reviewed. `release/*` gets the
