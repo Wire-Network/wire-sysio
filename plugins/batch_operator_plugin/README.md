@@ -76,6 +76,8 @@ permission then need not be linked for `sysio.kicker::kick`.
 | `--batch-underwriter-max-exposure` | none | Most the underwriter may have bonded at once in one shadow token, as an asset (`100.000000000 LIQETH`). Repeat per token; a token without one is not underwritten |
 | `--batch-kick-crank` | true | Push `sysio.kicker::kick` for every kicker pool that could pay. Off, the relay's permission need not authorize `kick` |
 | `--batch-kick-interval-ms` | 60000 | First wait before this operator retries a `sysio.kicker::kick` that did not pay (ms); doubles per unpaid attempt, up to an hour. Must be 1 to 3600000; startup fails otherwise |
+| `--batch-operator-explicit-payer` | false | The relay's account pays for its pushes instead of each action's contract (see [Who pays](#who-pays)) |
+| `--batch-underwriter-explicit-payer` | false | The underwriter's account pays for its pushes instead of each action's contract (see [Who pays](#who-pays)) |
 
 There is no separate enable flag: the relay runs when `--batch-operator-account`
 is configured, the way `producer_plugin` keys off `--producer-name`, and the
@@ -102,6 +104,20 @@ Signers are chosen once, at startup. Each poll the node checks that each role's 
 still satisfies its authorization; after `updateauth` rotates it, the role stops
 pushing (the underwriter) or logs (the relay) until the node is restarted with the
 new key.
+
+### Who pays
+
+By default each pushed action's contract pays for its CPU and NET. With
+`--batch-operator-explicit-payer` (the relay) or `--batch-underwriter-explicit-payer`
+(the underwriter), the role's own account pays instead: each action declares
+`{account, sysio.payer}` ahead of the role's permission, and the role's one signature
+covers both. The options are per role because the roles may run as different accounts.
+
+An account that pays needs CPU and NET of its own, from an ROA policy; a role whose
+account has none stops the node at startup. Size the policy for a day of pushes. The
+account pays for each action's whole execution, inline actions included (a `chkcons`
+that advances the epoch runs `sysio.epoch::advance`), and other nodes bill its failed
+pushes against the same limits.
 
 ### Outpost wiring
 
@@ -171,7 +187,8 @@ those lines is left to log tooling:
 ### Underwriter setup
 
 On the depot, the underwriter account holds the shadow LIQ it bonds, RAM for its
-bond rows, and CPU for a few pushes per poll. With a dedicated permission, link it to
+bond rows, and, with `--batch-underwriter-explicit-payer`, CPU and NET for a few pushes
+per poll. With a dedicated permission, link it to
 exactly the actions it pushes, so the node's key can move the inventory nowhere
 else: `sysio.bond::accept`, `approve`, `claim`, `prune` and `sysio.synd::crank`,
 `pruneenv`. The WIRE its bonds earn is withdrawn with `sysio.bond::claimwire`, which

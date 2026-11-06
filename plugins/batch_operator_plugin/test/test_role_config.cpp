@@ -86,4 +86,30 @@ BOOST_AUTO_TEST_CASE(a_disabled_crank_action_is_not_required_of_the_permission) 
    BOOST_CHECK_EQUAL(std::string("kick"), unlinked.front().action);
 }
 
+/// Off, a role declares only its permission and the contract pays. On, its account's `sysio.payer` marker comes
+/// first, paired with the same permission.
+BOOST_AUTO_TEST_CASE(a_role_declares_the_payer_marker_only_when_its_account_pays) {
+   const auto level = parse_permission_level("uw.acct@underwrite");
+
+   const auto contract_pays = declared_authorization(level, action_payer::contract);
+   BOOST_REQUIRE_EQUAL(1u, contract_pays.size());
+   BOOST_CHECK(level == contract_pays[0]);
+
+   const auto account_pays = declared_authorization(level, action_payer::account);
+   BOOST_REQUIRE_EQUAL(2u, account_pays.size());
+   BOOST_CHECK(account_pays[0] == (sysio::chain::permission_level{level.actor, sysio::chain::config::sysio_payer_name}));
+   BOOST_CHECK(level == account_pays[1]);
+}
+
+/// An account pays only with both CPU and NET; a negative weight is unlimited.
+BOOST_AUTO_TEST_CASE(an_account_has_its_own_resources_only_with_cpu_and_net) {
+   constexpr int64_t none = 0, some = 1, unlimited = -1;
+   BOOST_CHECK(has_own_resources(some, some));
+   BOOST_CHECK(has_own_resources(unlimited, unlimited));
+   BOOST_CHECK(has_own_resources(some, unlimited));
+   BOOST_CHECK(!has_own_resources(none, some));
+   BOOST_CHECK(!has_own_resources(some, none));
+   BOOST_CHECK(!has_own_resources(none, none));
+}
+
 BOOST_AUTO_TEST_SUITE_END()

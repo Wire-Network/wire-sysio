@@ -71,6 +71,9 @@ namespace {
    /// `--batch-kick-crank` default: on, like every other depot crank, which
    /// runs whenever its contract is deployed.
    constexpr bool KICK_CRANK_ENABLED = true;
+   /// `--batch-operator-explicit-payer` / `--batch-underwriter-explicit-payer` default: off, so each pushed action's
+   /// contract pays for it.
+   constexpr bool EXPLICIT_PAYER_ENABLED = false;
 
    /// Minimum private cron-service thread count even when 0 outposts are
    /// discovered at startup — keeps `epoch_tick` viable so a cold-sync node
@@ -256,11 +259,12 @@ namespace {
       fc::slug_name chain_code{};     ///< the outpost whose token it shadows
    };
 
-   /// The authorization a role declares on its depot actions and the signature provider whose key alone satisfies
-   /// it, resolved once the node is synced (`impl::resolve_signer`).
+   /// The authorization a role declares on its depot actions, the signature provider whose key alone satisfies it,
+   /// and who pays for the actions, resolved once the node is synced (`impl::resolve_signer`).
    struct signer {
-      chain::permission_level            auth;
-      fc::crypto::signature_provider_ptr provider;
+      chain::permission_level             auth;
+      fc::crypto::signature_provider_ptr  provider;
+      batch_operator_detail::action_payer payer = batch_operator_detail::action_payer::contract;
    };
 
    /// The descriptor of `chain_code` in `outposts`, or nullptr when it is not there.
@@ -278,6 +282,14 @@ namespace {
    bool runs_code(const chain::controller& controller, std::string_view account) {
       const chain::account_metadata_object* meta = controller.find_account_metadata(chain::name(account));
       return meta != nullptr && meta->code_hash != chain::digest_type();
+   }
+
+   /// Whether `account` exists and has CPU and NET of its own to pay with. Call from a read window.
+   bool can_pay_for_itself(const chain::controller& controller, chain::name account) {
+      if (controller.find_account_metadata(account) == nullptr) return false;
+      int64_t ram_bytes = 0, net_weight = 0, cpu_weight = 0;
+      controller.get_resource_limits_manager().get_account_limits(account, ram_bytes, net_weight, cpu_weight);
+      return batch_operator_detail::has_own_resources(net_weight, cpu_weight);
    }
 
    /// "request <id> (<chain> <token> epoch <n>)", or "request <id>" when its statement does not decode.
@@ -309,6 +321,9 @@ struct batch_operator_plugin::impl {
    bool                    underwriter_enabled = false;
    /// `batch-underwriter-max-exposure`, by shadow symbol code: the most the underwriter may have bonded at once.
    std::map<chain::symbol_code, chain::asset> underwriter_caps;
+   /// Who pays for each role's pushes (`batch-operator-explicit-payer`, `batch-underwriter-explicit-payer`).
+   batch_operator_detail::action_payer relay_payer       = batch_operator_detail::action_payer::contract;
+   batch_operator_detail::action_payer underwriter_payer = batch_operator_detail::action_payer::contract;
 
    /// The relay's and the underwriter's signers, resolved by `resolve_signers` once the node is synced.
    std::optional<signer> relay_signer;
@@ -1345,11 +1360,20 @@ struct batch_operator_plugin::impl {
 
    /// The signer of `role`, declaring `level`: the one operator-configured WIRE signature provider whose key alone
    /// satisfies `level` on chain. Nullopt, logged, when there is none, when there is more than one (the choice would
-   /// fall to provider order), when its signatures do not recover to its key, or when `level` may not declare one
-   /// of `actions`. Call on the main thread, after the sync gate.
+   /// fall to provider order), when its signatures do not recover to its key, when `level` may not declare one
+   /// of `actions`, or when `payer` is the account and it has no CPU or NET. Call on the main thread, after the
+   /// sync gate.
    std::optional<signer> resolve_signer(std::string_view role, const chain::permission_level& level,
-                                        std::span<const pushed_action> actions) {
+                                        std::span<const pushed_action> actions,
+                                        batch_operator_detail::action_payer payer) {
       const chain::controller& chain    = chain_plug->chain();
+      // An account without CPU or NET of its own would fail every push it pays for.
+      const bool can_pay =
+         payer == batch_operator_detail::action_payer::contract || can_pay_for_itself(chain, level.actor);
+      if (!can_pay) {
+         elog("batch_operator: {} pays for its pushes, but {} has no CPU or NET of its own: give it an ROA policy "
+              "or turn its explicit payer off", role, level.actor.to_string());
+      }
       const std::vector<pushed_action> unlinked = batch_operator_detail::unlinked_actions(
          actions, [&](const pushed_action& a) {
             return permission_satisfies_link(chain, level, chain::name(a.contract), chain::name(a.action));
@@ -1372,8 +1396,8 @@ struct batch_operator_plugin::impl {
               "{}@{}, found {}", role, level.actor.to_string(), level.permission.to_string(), choice.matches);
          return std::nullopt;
       }
-      if (!signs_for_its_key(role, **choice.chosen) || !linked) return std::nullopt;
-      return signer{.auth = level, .provider = *choice.chosen};
+      if (!signs_for_its_key(role, **choice.chosen) || !linked || !can_pay) return std::nullopt;
+      return signer{.auth = level, .provider = *choice.chosen, .payer = payer};
    }
 
    /// Whether `provider`'s signature over a probe digest recovers to its own key, which is how the chain checks a
@@ -1399,11 +1423,13 @@ struct batch_operator_plugin::impl {
          // A disabled crank's action is not required: its link cannot stop the node.
          const std::vector<pushed_action> relay_actions = batch_operator_detail::required_actions(
             RELAY_ACTIONS, std::array{batch_operator_detail::optional_action{KICK_ACTION, kick_crank_enabled}});
-         relay_signer = resolve_signer("the relay", {operator_account, chain::config::active_name}, relay_actions);
+         relay_signer = resolve_signer("the relay", {operator_account, chain::config::active_name}, relay_actions,
+                                       relay_payer);
          resolved     = relay_signer.has_value() && resolved;
       }
       if (underwriter_enabled) {
-         underwriter_signer = resolve_signer("the underwriter", underwriter_auth, UNDERWRITER_ACTIONS);
+         underwriter_signer =
+            resolve_signer("the underwriter", underwriter_auth, UNDERWRITER_ACTIONS, underwriter_payer);
          resolved           = underwriter_signer.has_value() && resolved;
       }
       return resolved;
@@ -1852,10 +1878,11 @@ struct batch_operator_plugin::impl {
       chain::digest_type        digest;
    };
 
-   /// `contract::action_name` declaring `auth`, unsigned, against the current head. Reads chain state (the ABI, the
-   /// head): call on the main thread or in a read window. Nullopt, logged, when it cannot be built.
+   /// `contract::action_name` declaring `authorization`, unsigned, against the current head. Reads chain state (the
+   /// ABI, the head): call on the main thread or in a read window. Nullopt, logged, when it cannot be built.
    std::optional<unsigned_trx> build_unsigned(const std::string& contract, const std::string& action_name,
-                                              const chain::permission_level& auth, const fc::variant_object& data) {
+                                              const std::vector<chain::permission_level>& authorization,
+                                              const fc::variant_object&                   data) {
       const chain::controller& chain = chain_plug->chain();
       try {
          auto resolver = make_resolver(chain, delivery_timeout, throw_on_yield::no);
@@ -1868,8 +1895,8 @@ struct batch_operator_plugin::impl {
          chain::bytes action_data = abis_opt->variant_to_binary(
             action_type, fc::variant(data), chain::abi_serializer::create_yield_function(delivery_timeout));
          unsigned_trx out;
-         out.trx.actions.emplace_back(std::vector<chain::permission_level>{auth}, chain::name(contract),
-                                      chain::name(action_name), std::move(action_data));
+         out.trx.actions.emplace_back(authorization, chain::name(contract), chain::name(action_name),
+                                      std::move(action_data));
          out.trx.set_reference_block(chain.head().id());
          out.trx.expiration = fc::time_point_sec(chain.head().block_time() + PUSH_EXPIRATION);
          out.digest         = out.trx.sig_digest(chain.get_chain_id(), out.trx.context_free_data);
@@ -1914,8 +1941,9 @@ struct batch_operator_plugin::impl {
       }
    }
 
-   /// Build, sign and submit a depot action, declaring `by.auth` and signed by `by.provider`. True when the node
-   /// accepted the transaction within `delivery_timeout`; a refusal is logged by the push callback.
+   /// Build, sign and submit a depot action, declaring `by.auth` (after its `sysio.payer` marker when `by.payer` is
+   /// the account) and signed by `by.provider`. True when the node accepted the transaction within
+   /// `delivery_timeout`; a refusal is logged by the push callback.
    ///
    /// Called from cron threads, which may not read chain state: the build runs in a read window and the submission
    /// on the main thread, while the signature, possibly a remote signer, stays here. The waits do not cancel
@@ -1927,22 +1955,25 @@ struct batch_operator_plugin::impl {
       if (shutting_down) return false;
       const fc::time_point deadline = fc::time_point::now() + delivery_timeout;
       const bool           on_main  = std::this_thread::get_id() == app().executor().get_main_thread_id();
+      std::vector<chain::permission_level> authorization =
+         batch_operator_detail::declared_authorization(by.auth, by.payer);
 
       std::optional<unsigned_trx> trx;
       if (on_main) {
-         trx = build_unsigned(contract, action_name, by.auth, data);
+         trx = build_unsigned(contract, action_name, authorization, data);
       } else {
          std::shared_ptr<std::promise<std::optional<unsigned_trx>>> built =
             std::make_shared<std::promise<std::optional<unsigned_trx>>>();
          std::future<std::optional<unsigned_trx>> built_future = built->get_future();
          // Shutdown is checked again when the task runs, since chain state may be going away by then.
          app().executor().post(appbase::priority::medium, appbase::exec_queue::read_only,
-                               [this, built, contract, action_name, auth = by.auth, data = fc::variant_object(data)] {
+                               [this, built, contract, action_name, authorization = std::move(authorization),
+                                data = fc::variant_object(data)] {
                                   if (shutting_down) {
                                      built->set_value(std::nullopt);
                                      return;
                                   }
-                                  built->set_value(build_unsigned(contract, action_name, auth, data));
+                                  built->set_value(build_unsigned(contract, action_name, authorization, data));
                                });
          if (!ready_by(built_future, deadline)) {
             if (shutting_down) wlog("batch_operator: push {}::{} abandoned on shutdown", contract, action_name);
@@ -2131,6 +2162,15 @@ void batch_operator_plugin::set_program_options(options_description& cli,
    opts("batch-underwriter-max-exposure", bpo::value<std::vector<std::string>>()->composing(),
         "Most the underwriter may have bonded at once in one shadow token, as an asset such as "
         "100.000000000 LIQETH. Repeat for each token; requests in a token without one are not bonded.");
+   // One option per role: the two roles may run as different accounts, and each account needs its own CPU and NET
+   // before it can pay.
+   opts("batch-operator-explicit-payer", bpo::value<bool>()->default_value(EXPLICIT_PAYER_ENABLED),
+        "The relay's account pays for its pushes from its own CPU and NET, through a sysio.payer authorization, "
+        "instead of each action's contract. The account needs CPU and NET of its own; the node stops otherwise.");
+   opts("batch-underwriter-explicit-payer", bpo::value<bool>()->default_value(EXPLICIT_PAYER_ENABLED),
+        "The underwriter's account pays for its pushes from its own CPU and NET, through a sysio.payer "
+        "authorization, instead of each action's contract. The account needs CPU and NET of its own; the node "
+        "stops otherwise.");
    opts("batch-kick-crank", bpo::value<bool>()->default_value(KICK_CRANK_ENABLED),
         "Push sysio.kicker::kick for every kicker pool that could pay");
    opts("batch-kick-interval-ms", bpo::value<uint32_t>()->default_value(whole_milliseconds(KICK_INTERVAL)),
@@ -2163,6 +2203,20 @@ void batch_operator_plugin::plugin_initialize(const variables_map& options) {
    }
    if (!_impl->underwriter_enabled && !_impl->underwriter_caps.empty()) {
       wlog("batch_operator_plugin: batch-underwriter-max-exposure has no effect without batch-underwriter-account");
+   }
+   const auto payer_of = [](bool explicit_payer) {
+      return explicit_payer ? batch_operator_detail::action_payer::account
+                            : batch_operator_detail::action_payer::contract;
+   };
+   const bool relay_explicit_payer       = options["batch-operator-explicit-payer"].as<bool>();
+   const bool underwriter_explicit_payer = options["batch-underwriter-explicit-payer"].as<bool>();
+   _impl->relay_payer       = payer_of(relay_explicit_payer);
+   _impl->underwriter_payer = payer_of(underwriter_explicit_payer);
+   if (relay_explicit_payer && !_impl->enabled) {
+      wlog("batch_operator_plugin: batch-operator-explicit-payer has no effect without batch-operator-account");
+   }
+   if (underwriter_explicit_payer && !_impl->underwriter_enabled) {
+      wlog("batch_operator_plugin: batch-underwriter-explicit-payer has no effect without batch-underwriter-account");
    }
    _impl->kick_crank_enabled = options["batch-kick-crank"].as<bool>();
    const uint32_t kick_interval_ms = options["batch-kick-interval-ms"].as<uint32_t>();
