@@ -3,8 +3,6 @@
 namespace sysio { namespace chain {
 
 const std::vector<const char*> genesis_intrinsics = {
-   "is_feature_active",
-   "activate_feature",
    "get_resource_limits",
    "set_resource_limits",
    "set_proposed_producers",
@@ -97,27 +95,25 @@ const std::vector<const char*> genesis_intrinsics = {
    "is_feature_activated",
    "set_finalizers",
    "kv_set",
-   "kv_get",
    "kv_erase",
-   "kv_contains",
+   "kv_get",
+   "kv_idx_store",
+   "kv_idx_update",
+   "kv_idx_erase",
    "kv_it_create",
-   "kv_it_destroy",
-   "kv_it_status",
    "kv_it_next",
    "kv_it_prev",
    "kv_it_lower_bound",
-   "kv_it_key",
-   "kv_it_value",
-   "kv_idx_store",
-   "kv_idx_remove",
-   "kv_idx_update",
-   "kv_idx_find_secondary",
-   "kv_idx_lower_bound",
+   "kv_it_read",
+   "kv_it_destroy",
+   "kv_idx_create",
    "kv_idx_next",
    "kv_idx_prev",
-   "kv_idx_key",
-   "kv_idx_primary_key",
-   "kv_idx_destroy"
+   "kv_idx_lower_bound",
+   "kv_idx_read",
+   "kv_idx_destroy",
+   "kv_idx_find",
+   "ed25519_verify"
 };
 
 } } // namespace sysio::chain

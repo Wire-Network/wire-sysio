@@ -4,6 +4,7 @@ add_executable( test_fc
         crypto/test_blake2.cpp
         crypto/test_bls.cpp
         crypto/test_cypher_suites.cpp
+        crypto/test_ed25519.cpp
         crypto/test_hash_functions.cpp
         crypto/test_k1_recover.cpp
         crypto/test_modular_arithmetic.cpp
@@ -23,6 +24,7 @@ add_executable( test_fc
         io/test_tracked_storage.cpp
         network/es/test_es_client.cpp
         network/ethereum/test_ethereum_client_and_rlp.cpp
+        network/ethereum/test_ethereum_client_requests.cpp
         network/ethereum/test_ethereum_transaction_policy.cpp
         network/test_http_client.cpp
         network/test_json_rpc_client.cpp
@@ -48,6 +50,7 @@ add_executable( test_fc
         test_bitset.cpp
         test_ordered_diff.cpp
         test_system_timer.cpp
+        test_time.cpp
         parallel/test_worker_task_queue.cpp
         parallel/test_batch_task_queue.cpp
         task/test_retry.cpp

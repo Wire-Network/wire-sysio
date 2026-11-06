@@ -255,11 +255,7 @@ namespace sysiosystem {
 
    void native::setabi( const name& acnt, const std::vector<char>& abi,
                         const binary_extension<std::string>& memo ) {
-      abi_hash_table table(get_self());
-      auto new_hash = sysio::sha256(const_cast<char*>(abi.data()), abi.size());
-      table.upsert( acnt, abihash_key{acnt.value},
-         abi_hash{acnt, new_hash},
-         [&]( auto& row ) { row.hash = new_hash; } );
+      record_abi( get_self(), acnt, abi );
    }
 
    void system_contract::init( unsigned_int version, const symbol& core ) {

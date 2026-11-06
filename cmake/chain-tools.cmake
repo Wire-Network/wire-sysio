@@ -22,7 +22,7 @@ macro(chain_target TARGET)
             prometheus_plugin
             resource_monitor_plugin
             state_history_plugin
-            status_monitor_plugin
+            alert_monitor_plugin
             query_engine_plugin
             signature_provider_manager_plugin
             outpost_client_plugin

@@ -16,12 +16,6 @@
 
 namespace sysio { namespace chain { namespace webassembly {
 
-   int interface::is_feature_active( int64_t feature_name ) const { return false; }
-
-   void interface::activate_feature( int64_t feature_name ) const {
-      SYS_ASSERT( false, unsupported_feature, "Unsupported Hardfork Detected" );
-   }
-
    void interface::preactivate_feature( aligned_ptr<const digest_type> feature_digest ) {
       SYS_ASSERT(!context.trx_context.is_read_only(), wasm_execution_error, "preactivate_feature not allowed in a readonly transaction");
       context.control.preactivate_feature( *feature_digest, context.trx_context.is_transient() );
@@ -78,18 +72,22 @@ namespace sysio { namespace chain { namespace webassembly {
                                                      std::move(candidate.proposer_schedule.producers) );
    }
 
+   /// The one wasm parameters layout the host reads and writes.
+   static constexpr uint32_t wasm_parameters_version = 0;
+
    uint32_t interface::get_wasm_parameters_packed( span<char> packed_parameters, uint32_t max_version ) const {
+      SYS_ASSERT(max_version == wasm_parameters_version, wasm_config_unknown_version,
+                 "get_wasm_parameters_packed: Unknown version: {}", max_version);
       auto& gpo = context.control.get_global_properties();
       auto& params = gpo.wasm_configuration;
-      uint32_t version = std::min( max_version, uint32_t(0) );
 
-      auto s = fc::raw::pack_size( version ) + fc::raw::pack_size( params );
+      auto s = fc::raw::pack_size( wasm_parameters_version ) + fc::raw::pack_size( params );
       if ( packed_parameters.size() == 0 )
          return s;
 
       if ( s <= packed_parameters.size() ) {
          fc::datastream<char*> ds( packed_parameters.data(), s );
-         fc::raw::pack(ds, version);
+         fc::raw::pack(ds, wasm_parameters_version);
          fc::raw::pack(ds, params);
       }
       return s;
@@ -100,8 +98,10 @@ namespace sysio { namespace chain { namespace webassembly {
       uint32_t version;
       chain::wasm_config cfg;
       fc::raw::unpack(ds, version);
-      SYS_ASSERT(version == 0, wasm_config_unknown_version, "set_wasm_parameters_packed: Unknown version: {}", version);
+      SYS_ASSERT(version == wasm_parameters_version, wasm_config_unknown_version,
+                 "set_wasm_parameters_packed: Unknown version: {}", version);
       fc::raw::unpack(ds, cfg);
+      assert_all_unpacked(ds, "set_wasm_parameters_packed");
       cfg.validate();
       context.db.modify( context.control.get_global_properties(),
          [&]( auto& gprops ) {
@@ -115,6 +115,7 @@ namespace sysio { namespace chain { namespace webassembly {
       std::vector<producer_authority> producers;
       std::vector<legacy::producer_key> old_version;
       fc::raw::unpack(ds, old_version);
+      assert_all_unpacked(ds, "set_proposed_producers");
 
       /*
        * Up-convert the producers
@@ -135,6 +136,7 @@ namespace sysio { namespace chain { namespace webassembly {
          vector<producer_authority> producers;
 
          fc::raw::unpack(ds, producers);
+         assert_all_unpacked(ds, "set_proposed_producers_ex");
          return set_proposed_producers_common( context, std::move(producers) );
       } else {
          SYS_THROW(wasm_execution_error, "Producer schedule is in an unknown format!");
@@ -162,6 +164,7 @@ namespace sysio { namespace chain { namespace webassembly {
       fc::datastream<const char*> ds( packed_finalizer_policy.data(), packed_finalizer_policy.size() );
       finalizer_policy abi_finpol;
       fc::raw::unpack(ds, abi_finpol);
+      assert_all_unpacked(ds, "set_finalizers");
 
       // Transform the ABI-provided payload into the chain-level finalizer_policy.
       // The per-key length check stays here because it is a wire-format guard on the
@@ -216,6 +219,7 @@ namespace sysio { namespace chain { namespace webassembly {
       fc::datastream<const char*> ds( packed_blockchain_parameters.data(), packed_blockchain_parameters.size() );
       chain::chain_config_v0 cfg;
       fc::raw::unpack(ds, cfg);
+      assert_all_unpacked(ds, "set_blockchain_parameters_packed");
       cfg.validate();
       context.db.modify( context.control.get_global_properties(),
          [&]( auto& gprops ) {
@@ -229,6 +233,7 @@ namespace sysio { namespace chain { namespace webassembly {
       chain::chain_config cfg = context.control.get_global_properties().configuration;
       std::vector<fc::unsigned_int> ids;
       fc::raw::unpack(ds_ids, ids);
+      assert_all_unpacked(ds_ids, "get_parameters_packed");
       const config_range config_range(cfg, std::move(ids), {context.control});
       
       auto size = fc::raw::pack_size( config_range );
@@ -251,7 +256,8 @@ namespace sysio { namespace chain { namespace webassembly {
       config_range config_range(cfg, {context.control});
 
       fc::raw::unpack(ds, config_range);
-      
+      assert_all_unpacked(ds, "set_parameters_packed");
+
       config_range.config.validate();
       context.db.modify( context.control.get_global_properties(),
          [&]( auto& gprops ) {

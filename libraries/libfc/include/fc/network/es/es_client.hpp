@@ -83,8 +83,7 @@ public:
 
    /// One connectivity check of the configured endpoint, for a producer to run at initialization: a single
    /// GET of the base URL's root, carrying the same auth header and User-Agent as a bulk request and bounded
-   /// by the same connect and request timeouts. Never retried -- an endpoint that does not answer while the
-   /// producer is starting is a configuration failure, not back-pressure to wait out.
+   /// by the same connect and request timeouts. Never retried; whether a failure is fatal is the caller's choice.
    /// Returns normally on a 2xx, and on a 403: the root is the cluster-info path, which OpenSearch
    /// fine-grained access control gates behind the cluster `monitor/main` permission, so a least-privilege
    /// credential that may only write to _bulk is answered with a 403. The endpoint answered and accepted the

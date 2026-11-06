@@ -1,6 +1,6 @@
 #include <sysio/chain/deep_mind.hpp>
 #include <sysio/chain/block_state.hpp>
-#include <sysio/chain/kv_table_objects.hpp>
+#include <sysio/chain/kv_store.hpp>
 #include <sysio/chain/resource_limits_private.hpp>
 #include <sysio/chain/permission_object.hpp>
 #include <sysio/chain/global_property_object.hpp>
@@ -38,7 +38,7 @@ namespace sysio::chain {
    void deep_mind_handler::on_startup(chainbase::database& db, uint32_t head_block_num)
    {
       // FIXME: We should probably feed that from CMake directly somehow ...
-      fc_dlog(_logger, "DEEP_MIND_VERSION wire_sysio 1 0");
+      fc_dlog(_logger, "DEEP_MIND_VERSION wire_sysio 1 1");
 
       fc_dlog(_logger, "ABIDUMP START {} {}", head_block_num, db.get<dynamic_global_property_object>().global_action_sequence);
       const auto& idx = db.get_index<account_metadata_index>();
@@ -152,30 +152,61 @@ namespace sysio::chain {
       fc_dlog(_logger, "CREATION_OP CFA_INLINE {}", _action_id);
    }
    // KV deep_mind hooks — unified KV_OP format with table_id
-   void deep_mind_handler::on_kv_set(const kv_object& obj, bool is_new, account_name old_payer, const char* old_value, std::size_t old_value_size)
+   void deep_mind_handler::on_kv_set(const kv_row& row, bool is_new, account_name old_payer, const char* old_value,
+                                     std::size_t old_value_size)
    {
       if (is_new) {
          fc_dlog(_logger, "KV_OP INS {} {} {} {} {} {}",
-            _action_id, obj.payer, obj.code, obj.table_id,
-            fc::to_hex(obj.key.data(), obj.key.size()),
-            fc::to_hex(obj.value.data(), obj.value.size())
+            _action_id, row.payer, row.code, row.table_id,
+            fc::to_hex(row.key.data(), row.key.size()),
+            fc::to_hex(row.value.data(), row.value.size())
          );
       } else {
          fc_dlog(_logger, "KV_OP UPD {} {}:{} {} {} {} {}:{}",
-            _action_id, old_payer, obj.payer, obj.code, obj.table_id,
-            fc::to_hex(obj.key.data(), obj.key.size()),
+            _action_id, old_payer, row.payer, row.code, row.table_id,
+            fc::to_hex(row.key.data(), row.key.size()),
             fc::to_hex(old_value, old_value_size),
-            fc::to_hex(obj.value.data(), obj.value.size())
+            fc::to_hex(row.value.data(), row.value.size())
          );
       }
    }
 
-   void deep_mind_handler::on_kv_erase(const kv_object& obj)
+   void deep_mind_handler::on_kv_erase(const kv_row& row)
    {
       fc_dlog(_logger, "KV_OP REM {} {} {} {} {} {}",
-         _action_id, obj.payer, obj.code, obj.table_id,
-         fc::to_hex(obj.key.data(), obj.key.size()),
-         fc::to_hex(obj.value.data(), obj.value.size())
+         _action_id, row.payer, row.code, row.table_id,
+         fc::to_hex(row.key.data(), row.key.size()),
+         fc::to_hex(row.value.data(), row.value.size())
+      );
+   }
+
+   // Index entries follow KV_OP, with the primary key in the key field and the secondary key in the value field.
+   void deep_mind_handler::on_kv_idx_store(const kv_index_entry& entry)
+   {
+      fc_dlog(_logger, "KV_IDX_OP INS {} {} {} {} {} {}",
+         _action_id, entry.payer, entry.code, entry.table_id,
+         fc::to_hex(entry.pri_key.data(), entry.pri_key.size()),
+         fc::to_hex(entry.sec_key.data(), entry.sec_key.size())
+      );
+   }
+
+   void deep_mind_handler::on_kv_idx_update(const kv_index_entry& entry, account_name old_payer,
+                                            std::string_view old_sec_key)
+   {
+      fc_dlog(_logger, "KV_IDX_OP UPD {} {}:{} {} {} {} {}:{}",
+         _action_id, old_payer, entry.payer, entry.code, entry.table_id,
+         fc::to_hex(entry.pri_key.data(), entry.pri_key.size()),
+         fc::to_hex(old_sec_key.data(), old_sec_key.size()),
+         fc::to_hex(entry.sec_key.data(), entry.sec_key.size())
+      );
+   }
+
+   void deep_mind_handler::on_kv_idx_erase(const kv_index_entry& entry)
+   {
+      fc_dlog(_logger, "KV_IDX_OP REM {} {} {} {} {} {}",
+         _action_id, entry.payer, entry.code, entry.table_id,
+         fc::to_hex(entry.pri_key.data(), entry.pri_key.size()),
+         fc::to_hex(entry.sec_key.data(), entry.sec_key.size())
       );
    }
    void deep_mind_handler::on_init_resource_limits(const resource_limits::resource_limits_config_object& config, const resource_limits::resource_limits_state_object& state)
@@ -266,6 +297,19 @@ namespace sysio::chain {
    void deep_mind_handler::on_ram_trace(std::string&& event_id, const char* family, const char* operation, const char* legacy_tag)
    {
       _ram_trace = ram_trace(std::move(event_id), family, operation, legacy_tag);
+   }
+   void deep_mind_handler::on_kv_ram_trace(const kv_ram_op& op, account_name code, const kv_ram_subject& subject)
+   {
+      std::string event_id = RAM_EVENT_ID("${code}:${table_id}:${key}",
+         ("code", code)
+         ("table_id", subject.table_id)
+         ("key", fc::to_hex(subject.key.data(), subject.key.size()))
+      );
+      if (!subject.sec_key.empty()) {
+         event_id += ':';
+         event_id += fc::to_hex(subject.sec_key.data(), subject.sec_key.size());
+      }
+      on_ram_trace(std::move(event_id), op.family, op.operation, op.legacy_tag);
    }
    void deep_mind_handler::on_ram_event(account_name account, uint64_t new_usage, int64_t delta)
    {

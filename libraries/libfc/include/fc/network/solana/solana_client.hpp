@@ -592,9 +592,13 @@ public:
 
    /**
     * @brief Get multiple accounts in a single request
+    * @param addresses Ordered account public keys.
+    * @param commitment Commitment level for the shared bank snapshot.
+    * @param slice Optional byte range of each account data; metadata is unaffected.
     */
-   std::vector<std::optional<account_info>> get_multiple_accounts(const std::vector<solana_public_key>& addresses,
-                                                                   commitment_t commitment = commitment_t::confirmed);
+   std::vector<std::optional<account_info>> get_multiple_accounts(
+      const std::vector<solana_public_key>& addresses, commitment_t commitment = commitment_t::confirmed,
+      const std::optional<data_slice>& slice = std::nullopt);
 
    //=========================================================================
    // Block Methods
@@ -832,9 +836,16 @@ public:
 
    /**
     * @brief Get all accounts owned by a program
+    *
+    * @param program_id  owning program
+    * @param filters     raw RPC filter objects (`{"memcmp": {...}}`, `{"dataSize": n}`), ANDed by the node
+    * @param commitment  read commitment
+    * @param slice       when set, each returned account carries only this window of its data
+    * @return the raw RPC result: an array of `{pubkey, account}` objects, `account.data` base64-encoded
     */
    fc::variant get_program_accounts(const pubkey_compat_t& program_id, const std::vector<fc::variant>& filters = {},
-                                    commitment_t commitment = commitment_t::confirmed);
+                                    commitment_t commitment = commitment_t::confirmed,
+                                    const std::optional<data_slice>& slice = std::nullopt);
 
    //=========================================================================
    // Vote Methods

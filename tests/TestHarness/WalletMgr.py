@@ -16,12 +16,11 @@ class WalletMgr(object):
     __walletDataDir=f"{Utils.DataPath}/test_wallet_0"
     __walletLogOutFile=f"{__walletDataDir}/test_kiod_out.log"
     __walletLogErrFile=f"{__walletDataDir}/test_kiod_err.log"
-    __MaxPort=9999
 
     # pylint: disable=too-many-arguments
     # walletd [True|False] True=Launch wallet(kiod) process; False=Manage launch process externally.
     def __init__(self, walletd, nodeopPort=None, nodeopHost="localhost", port=None, host="localhost", keepRunning=False, keepLogs=False):
-        """Create a wallet manager using sharded default ports when callers omit explicit ports."""
+        """Create a wallet manager using leased default ports when callers omit explicit ports."""
         atexit.register(self.shutdown)
         self.walletd=walletd
         self.nodeopPort=Utils.getPort(Utils.PortNodeHttp) if nodeopPort is None else nodeopPort
@@ -52,17 +51,11 @@ class WalletMgr(object):
         return self.host=="localhost" or self.host=="127.0.0.1"
 
     def findAvailablePort(self):
-        """Find an available wallet port within this test's shard."""
-        offset=Utils.getTestPortOffset()
-        shardLimit=(
-            Utils.getPort(Utils.PortWallet, Utils.WalletPortCount - 1)
-            if offset > 0 and self.usesDefaultWalletPort else 65535)
-        for i in range(WalletMgr.__MaxPort):
-            port=self.port+i  # pyright: ignore[reportOptionalOperand]
-            if port > shardLimit:
-                break
-            if offset == 0 and port > WalletMgr.__MaxPort:
-                port-=WalletMgr.__MaxPort
+        """Find an available wallet port among this test's leased wallet ports."""
+        candidates = (
+            [Utils.getPort(Utils.PortWallet, i) for i in range(Utils.WalletPortCount)]
+            if self.usesDefaultWalletPort else [self.port])
+        for port in candidates:
             if Utils.arePortsAvailable(port):
                 return port
             if Utils.Debug:

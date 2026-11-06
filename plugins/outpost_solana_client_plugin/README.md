@@ -8,6 +8,7 @@ The `outpost_solana_client_plugin` provides Solana JSON-RPC client integration f
 - [Class Diagrams](#class-diagrams)
 - [Inbound Dispatch Manifests](#inbound-dispatch-manifests)
 - [Outpost Cranks](#outpost-cranks)
+- [Envelope Chunk Cleanup](#envelope-chunk-cleanup)
 - [Client Architecture](#client-architecture)
 - [solana_client (RPC Client)](#solana_client-rpc-client)
 - [solana_program_data_client (Raw/Vanilla Programs)](#solana_program_data_client-rawvanilla-programs)
@@ -470,6 +471,27 @@ boot-checks the declarations it decodes (`EpochDeliveries`, `LatestOutboundEnvel
 `DistributionState` on a program that declares it) so a drifted IDL fails at startup rather
 than on the first drain.
 
+### Solana Transaction Budgets
+
+Envelope data chunks stay bare so the full 668-byte chunk remains within Solana's
+1,232-byte packet limit. The separate zero-data terminal `epoch_in` call and every
+`dispatch_attestations` round use the producer's ordered ComputeBudget preamble:
+
+1. request a 256,000-byte heap frame;
+2. set the compute-unit limit to 1,400,000; and
+3. invoke liqsol-core.
+
+The limit is an execution ceiling, not expected consumption. Terminal admission and
+dispatch share one budget definition and preamble builder, matching liqsol-core's
+capacity tests.
+
+`epoch_in_full_data_chunk_fits_packet_limit`,
+`epoch_in_terminal_budget_matches_producer_and_fits_packet_limit`, and
+`dispatch_attestations_full_manifest_fits_packet_limit` serialize the production
+instruction vectors. They pin the bare chunk behavior, exact heap/CU ordering, and
+packet size at the relay's full dynamic-account budget against the 1,232-byte limit.
+The tests report measured sizes for the current IDL and account layout.
+
 ## Outpost Cranks
 
 Once per epoch, right after this operator's envelope delivery lands, the outbound relay
@@ -488,6 +510,29 @@ every account of the instruction (`report_liq_yield_overrides`),
 signs with the operator's Solana key, and skips on a program that does not declare the
 instruction. A failed crank is logged by the job and retried with the next epoch's
 delivery.
+
+---
+
+## Envelope Chunk Cleanup
+
+The batch operator reaps its own settled `EnvelopeChunks` buffers after delivery,
+on delivery-path settled skips, and on idle inbound ticks. It calls
+`cleanup_envelope_chunks` only after the epoch
+has drained and its outbound envelope has been emitted, returning rent to the
+uploader. Sweeps close oldest buffers first within a five-second budget; failures
+and repeated deadline stops without progress back off before retrying.
+
+The RPC endpoint must allow `getProgramAccounts` with discriminator and operator
+`memcmp` filters and a header-only `dataSlice`, as well as `getMultipleAccounts`
+with a header-only `dataSlice` for both settlement gates in one `confirmed`
+snapshot. Cleanup uses `confirmed`; inbound envelope delivery still reads the full
+outbound account at `finalized`. A failed close is reconciled by a `getAccountInfo`
+absence read of that exact buffer at `processed`.
+
+The batch operator's loaded IDL must declare `cleanup_envelope_chunks`,
+`EnvelopeChunks`, `OutpostConfig` and `LatestOutboundEnvelope`. Boot validates the
+`EnvelopeChunks` epoch/operator offsets and both settlement cursor offsets against
+that IDL so header drift fails visibly at startup.
 
 ---
 

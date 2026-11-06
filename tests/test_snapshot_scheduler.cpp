@@ -7,6 +7,7 @@
 #include <fc/scoped_exit.hpp>
 
 #include <regex>
+#include <set>
 
 using namespace sysio;
 using namespace sysio::chain;
@@ -99,6 +100,29 @@ BOOST_AUTO_TEST_CASE(snapshot_scheduler_test) {
       BOOST_CHECK_EXCEPTION(scheduler.schedule_snapshot(sri_start_end, {}), invalid_snapshot_request, [](const fc::assert_exception& e) {
          return e.to_detail_string().find("End block number should be greater or equal to start block number") != std::string::npos;
       });
+
+      const auto max_block_num = std::numeric_limits<uint32_t>::max();
+      constexpr uint32_t boundary_spacing = 8;
+      snapshot_request_information sri_overflow = {
+         .block_spacing = boundary_spacing * 2,
+         .start_block_num = max_block_num - boundary_spacing,
+         .end_block_num = max_block_num,
+      };
+      BOOST_CHECK_EXCEPTION(
+         scheduler.schedule_snapshot(sri_overflow, {}), invalid_snapshot_request,
+         [](const fc::assert_exception& e) {
+            return e.to_detail_string().find("Block spacing exceeds defined by start and end range") !=
+                   std::string::npos;
+         });
+
+      snapshot_request_information sri_max_boundary = {
+         .block_spacing = boundary_spacing,
+         .start_block_num = max_block_num - boundary_spacing,
+         .end_block_num = max_block_num,
+      };
+      const auto max_boundary_request = scheduler.schedule_snapshot(sri_max_boundary, {});
+      BOOST_CHECK_EQUAL(max_boundary_request.block_spacing, boundary_spacing);
+      scheduler.unschedule_snapshot(max_boundary_request.snapshot_request_id);
    }
    {
       fc::temp_directory temp_dir;
@@ -227,6 +251,139 @@ BOOST_AUTO_TEST_CASE(snapshot_scheduler_test) {
    }
 }
 
+/** A restored scheduler allocates beyond persisted ids instead of silently colliding with them. */
+BOOST_AUTO_TEST_CASE(snapshot_scheduler_restored_request_ids_remain_unique) {
+   constexpr uint32_t first_spacing = 10;
+   constexpr uint32_t second_spacing = 15;
+   constexpr uint32_t new_spacing = 20;
+   constexpr uint32_t end_block = 100;
+   constexpr uint32_t high_id = 7;
+   constexpr auto first_description = "persisted manual schedule";
+   constexpr auto second_description = "second persisted manual schedule";
+   constexpr auto new_description = "new schedule";
+   fc::temp_directory temp_dir;
+   snapshot_scheduler::snapshot_db_json db;
+   db.set_path(temp_dir.path());
+
+   snapshot_scheduler::snapshot_schedule_information persisted;
+   persisted.snapshot_request_id = 0;
+   persisted.block_spacing = first_spacing;
+   persisted.start_block_num = first_spacing;
+   persisted.end_block_num = end_block;
+   persisted.snapshot_description = first_description;
+   auto persisted_high_id = persisted;
+   persisted_high_id.snapshot_request_id = high_id;
+   persisted_high_id.block_spacing = second_spacing;
+   persisted_high_id.start_block_num = second_spacing;
+   persisted_high_id.snapshot_description = second_description;
+   db << std::vector<snapshot_scheduler::snapshot_schedule_information>{
+      persisted_high_id, persisted};
+
+   snapshot_scheduler restored;
+   restored.set_db_path(temp_dir.path());
+   const auto added = restored.schedule_snapshot(
+      snapshot_request_information{
+         .block_spacing = new_spacing,
+         .start_block_num = new_spacing,
+         .end_block_num = end_block,
+         .snapshot_description = new_description,
+      },
+      {});
+
+   BOOST_CHECK_EQUAL(added.snapshot_request_id, high_id + 1);
+   const auto requests = restored.get_snapshot_requests().snapshot_requests;
+   BOOST_REQUIRE_EQUAL(requests.size(), 3u);
+   std::set<uint32_t> request_ids;
+   for (const auto& request : requests) {
+      request_ids.insert(request.snapshot_request_id);
+   }
+   BOOST_CHECK_EQUAL(request_ids.size(), requests.size());
+}
+
+/// Allocation wraps past the maximum id, skips occupied ids, and survives another reload.
+BOOST_AUTO_TEST_CASE(snapshot_scheduler_request_ids_wrap_without_collisions) {
+   constexpr uint32_t first_block = 10;
+   constexpr uint32_t second_block = 11;
+   constexpr uint32_t high_id_block = 12;
+   constexpr uint32_t max_id_block = 13;
+   constexpr uint32_t wrapped_id_block = 14;
+   constexpr uint32_t reloaded_id_block = 15;
+   fc::temp_directory temp_dir;
+   snapshot_scheduler::snapshot_db_json db;
+   db.set_path(temp_dir.path());
+
+   snapshot_scheduler::snapshot_schedule_information persisted;
+   persisted.snapshot_request_id = 0;
+   persisted.start_block_num = first_block;
+   persisted.end_block_num = first_block;
+   auto persisted_next = persisted;
+   persisted_next.snapshot_request_id = 1;
+   persisted_next.start_block_num = persisted_next.end_block_num = second_block;
+   auto persisted_high = persisted;
+   persisted_high.snapshot_request_id = std::numeric_limits<uint32_t>::max() - 1;
+   persisted_high.start_block_num = persisted_high.end_block_num = high_id_block;
+   db << std::vector<snapshot_scheduler::snapshot_schedule_information>{
+      persisted_high, persisted, persisted_next};
+
+   snapshot_scheduler restored;
+   restored.set_db_path(temp_dir.path());
+   const auto at_max = restored.schedule_snapshot({.start_block_num = max_id_block, .end_block_num = max_id_block}, {});
+   BOOST_CHECK_EQUAL(at_max.snapshot_request_id, std::numeric_limits<uint32_t>::max());
+   const auto after_wrap = restored.schedule_snapshot(
+      {.start_block_num = wrapped_id_block, .end_block_num = wrapped_id_block}, {});
+   BOOST_CHECK_EQUAL(after_wrap.snapshot_request_id, persisted_next.snapshot_request_id + 1);
+   BOOST_REQUIRE_EQUAL(restored.get_snapshot_requests().snapshot_requests.size(), 5u);
+
+   // Reloading this same scheduler must replace its requests and reset its allocation counter.
+   restored.set_db_path(temp_dir.path());
+   const auto after_reload = restored.schedule_snapshot(
+      {.start_block_num = reloaded_id_block, .end_block_num = reloaded_id_block}, {});
+   BOOST_CHECK_EQUAL(after_reload.snapshot_request_id, after_wrap.snapshot_request_id + 1);
+   const auto requests = restored.get_snapshot_requests().snapshot_requests;
+   BOOST_REQUIRE_EQUAL(requests.size(), 6u);
+   std::set<uint32_t> request_ids;
+   for (const auto& request : requests)
+      request_ids.insert(request.snapshot_request_id);
+   BOOST_CHECK_EQUAL(request_ids.size(), requests.size());
+   restored.unschedule_snapshot(after_wrap.snapshot_request_id);
+   BOOST_CHECK_EQUAL(restored.get_snapshot_requests().snapshot_requests.size(), 5u);
+}
+
+/// Duplicate persisted keys retain the first request and only accepted entries advance the counter.
+BOOST_AUTO_TEST_CASE(snapshot_scheduler_restored_duplicate_requests) {
+   constexpr uint32_t persisted_id = 7;
+   constexpr uint32_t first_block = 10;
+   constexpr uint32_t duplicate_id_block = 11;
+   constexpr uint32_t new_block = 12;
+   fc::temp_directory temp_dir;
+   snapshot_scheduler::snapshot_db_json db;
+   db.set_path(temp_dir.path());
+   snapshot_scheduler::snapshot_schedule_information persisted;
+   persisted.snapshot_request_id = persisted_id;
+   persisted.start_block_num = persisted.end_block_num = first_block;
+   auto duplicate_id = persisted;
+   duplicate_id.start_block_num = duplicate_id.end_block_num = duplicate_id_block;
+   auto duplicate_value = persisted;
+   duplicate_value.snapshot_request_id = std::numeric_limits<uint32_t>::max();
+   db << std::vector<snapshot_scheduler::snapshot_schedule_information>{
+      persisted, duplicate_id, duplicate_value};
+
+   snapshot_scheduler restored;
+   restored.set_db_path(temp_dir.path());
+   BOOST_REQUIRE_EQUAL(restored.get_snapshot_requests().snapshot_requests.size(), 1u);
+   const auto added = restored.schedule_snapshot({.start_block_num = new_block, .end_block_num = new_block}, {});
+   BOOST_CHECK_EQUAL(added.snapshot_request_id, persisted_id + 1);
+   BOOST_CHECK_EQUAL(restored.get_snapshot_requests().snapshot_requests.size(), 2u);
+
+   // A successfully read empty database clears both the requests and the recovered counter.
+   db << std::vector<snapshot_scheduler::snapshot_schedule_information>{};
+   restored.set_db_path(temp_dir.path());
+   BOOST_CHECK(restored.get_snapshot_requests().snapshot_requests.empty());
+   const auto after_empty_reload = restored.schedule_snapshot(
+      {.start_block_num = new_block, .end_block_num = new_block}, {});
+   BOOST_CHECK_EQUAL(after_empty_reload.snapshot_request_id, 0u);
+}
+
 //created via a schedule_snapshot with {"block_spacing":5,"snapshot_description":"banana"} on leap4
 static const std::string old_schedule_json = R"===(
 {
@@ -338,6 +495,28 @@ struct next_outcome {
 };
 
 } // anonymous namespace
+
+/// A one-time request at the largest block number must not fire at wrapped block-start height zero.
+BOOST_AUTO_TEST_CASE(snapshot_scheduler_max_block_does_not_fire_at_zero) {
+   testing::tester chain;
+   scheduler_callback_fixture f;
+   next_outcome next;
+   chain.produce_block();
+   chain.control->abort_block();
+   const auto max_block_num = std::numeric_limits<uint32_t>::max();
+   f.scheduler.schedule_snapshot({.start_block_num = max_block_num, .end_block_num = max_block_num},
+                                 next.recorder());
+   f.scheduler.on_start_block(0, *chain.control);
+   f.scheduler.on_start_block(1, *chain.control);
+   f.scheduler.on_start_block(max_block_num, *chain.control);
+   BOOST_CHECK_EQUAL(next.successes, 0u);
+   BOOST_CHECK_EQUAL(next.errors, 0u);
+   BOOST_CHECK_EQUAL(f.cb1_count, 0u);
+   BOOST_CHECK_EQUAL(f.cb2_count, 0u);
+   BOOST_REQUIRE_EQUAL(f.scheduler.get_snapshot_requests().snapshot_requests.size(), 1u);
+   BOOST_CHECK_EQUAL(std::distance(std::filesystem::directory_iterator(f.temp_dir.path()),
+                                   std::filesystem::directory_iterator()), 1);
+}
 
 // Scheduled snapshot with the chain NOT in irreversible read mode: the snapshot is pending
 // until its block becomes irreversible; each callback fires exactly once at promotion.

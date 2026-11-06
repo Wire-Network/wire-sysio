@@ -35,16 +35,6 @@ namespace sysio::chain {
             }
          }
 
-         template<typename Secondary, typename F>
-         static void walk_by( const chainbase::database& db, F function ) {
-            const auto& idx = db.get_index<Index, Secondary>();
-            const auto& first = idx.begin();
-            const auto& last = idx.end();
-            for (auto itr = first; itr != last; ++itr) {
-               function(*itr);
-            }
-         }
-
          template<typename Secondary, typename Key, typename F>
          static void walk_range( const chainbase::database& db, const Key& begin_key, const Key& end_key, F function ) {
             const auto& idx = db.get_index<Index, Secondary>();
@@ -155,7 +145,7 @@ namespace detail {
 
 // ---------------------------------------------------------------------------
 // BE key codec -- mirrors the CDT's be_key_stream encoding in kv_raw_table.hpp.
-// Used by get_table_rows API to decode/encode format=0 raw keys. The set of
+// Used by get_table_rows API to decode/encode raw keys. The set of
 // directly-supported scalar leaf types is the `key_leaf_kind` enum below
 // (struct keys are expanded field-by-field on top of those leaves).
 // ---------------------------------------------------------------------------

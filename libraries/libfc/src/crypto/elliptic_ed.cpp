@@ -18,6 +18,16 @@ namespace fc { namespace crypto { namespace ed {
       });
    }
 
+   bool verify_detached(std::span<const std::byte> signature, std::span<const std::byte> message,
+                        std::span<const std::byte> public_key) {
+      if (signature.size() != crypto_sign_BYTES || public_key.size() != crypto_sign_PUBLICKEYBYTES)
+         return false;
+      sodium_init_guard();
+      return crypto_sign_verify_detached(reinterpret_cast<const unsigned char*>(signature.data()),
+                                         reinterpret_cast<const unsigned char*>(message.data()), message.size(),
+                                         reinterpret_cast<const unsigned char*>(public_key.data())) == 0;
+   }
+
    private_key_shim private_key_shim::generate() {
       sodium_init_guard();
       unsigned char pk[crypto_sign_PUBLICKEYBYTES];
@@ -70,20 +80,12 @@ namespace fc { namespace crypto { namespace ed {
       return out;
    }
 
-   // Verify a 32‑byte digest signature
    bool signature_shim::verify(const sha256& digest, const public_key_shim& pub) const {
-      sodium_init_guard();
-
-      // 1) Convert raw digest to ASCII hex, added due to Phantom wallet limitations which doesn't allow signing raw binary data. Guard rails so users don't unknowingly sign malicious transactions.
+      // Preserve the ASCII-hex payload used by Phantom wallets for transaction signatures.
       const std::string hex = fc::to_hex(digest.data(), digest.data_size());
 
-      // 2) Verify signature on hex payload (sig starts at offset 32)
-      return crypto_sign_verify_detached(
-         _data.data() + crypto_sign_PUBLICKEYBYTES,
-         reinterpret_cast<const unsigned char*>(hex.data()),
-         hex.size(),
-         pub._data.data()
-      ) == 0; // returns 0 on success
+      return verify_detached(std::as_bytes(std::span{_data}.subspan(crypto_sign_PUBLICKEYBYTES)),
+                             std::as_bytes(std::span{hex}), std::as_bytes(std::span{pub._data}));
    }
 
    // Sign raw bytes directly (for Solana transaction signing)
@@ -126,15 +128,8 @@ namespace fc { namespace crypto { namespace ed {
 
    // Verify raw bytes directly (for Solana transaction verification)
    bool signature_shim::verify_solana(const uint8_t* data, size_t len, const public_key_shim& pub) const {
-      sodium_init_guard();
-
-      // Sig starts at offset 32
-      return crypto_sign_verify_detached(
-         _data.data() + crypto_sign_PUBLICKEYBYTES,
-         data,
-         len,
-         pub._data.data()
-      ) == 0;
+      return verify_detached(std::as_bytes(std::span{_data}.subspan(crypto_sign_PUBLICKEYBYTES)),
+                             std::as_bytes(std::span{data, len}), std::as_bytes(std::span{pub._data}));
    }
 
    bool is_zero(const public_key_shim& pk) {

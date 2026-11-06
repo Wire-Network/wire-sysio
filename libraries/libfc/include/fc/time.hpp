@@ -53,7 +53,9 @@ namespace fc {
         static constexpr time_point maximum() { return time_point( microseconds::maximum() ); }
         static constexpr time_point min() { return time_point();                      }
 
+        /// Serialize nonnegative instants in UTC, truncating fractional seconds to milliseconds.
         std::string to_iso_string()const;
+        /// Parse ISO time in UTC; truncate fractional digits beyond microseconds.
         static time_point from_iso_string( const std::string& s );
 
         // protect against overflow/underflow
@@ -136,6 +138,7 @@ namespace fc {
         std::string to_non_delimited_iso_string()const;
         std::string to_iso_string()const;
 
+        /// Parse ISO time in UTC, discarding fractional seconds through Boost.
         static time_point_sec from_iso_string( const std::string& s );
 
     private:

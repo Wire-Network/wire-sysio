@@ -32,8 +32,7 @@ sysio.authex::createlink(chain_kind, account, sig, pub_key, nonce)
 ```
 
 Sign this once per active outpost chain, with your Ethereum and Solana keys respectively.
-`regoperator` refuses an account that lacks a link for any active outpost chain, and the links are
-what the depot publishes for you in the `OPERATORS` roster it sends each outpost.
+`regoperator` refuses an account that lacks a link for any active outpost chain.
 
 The `nonce` is a millisecond timestamp and is rejected if it is more than ten minutes old, so
 generate it at signing time.

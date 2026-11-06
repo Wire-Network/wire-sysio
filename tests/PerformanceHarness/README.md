@@ -483,7 +483,7 @@ usage: PerformanceHarnessScenarioRunner.py findMax testBpOpMode overrideBasicTes
        [--genesis GENESIS] [--num-blocks-to-prune NUM_BLOCKS_TO_PRUNE]
        [--signature-cpu-billable-pct SIGNATURE_CPU_BILLABLE_PCT]
        [--chain-threads CHAIN_THREADS]
-       [--database-map-mode {mapped,heap,locked}]
+       [--database-map-mode {mapped,mapped_private,heap,locked}]
        [--cluster-log-lvl {all,debug,info,warn,error,off}]
        [--net-threads NET_THREADS]
        [--disable-subjective-billing DISABLE_SUBJECTIVE_BILLING]
@@ -547,9 +547,10 @@ Performance Test Basic Base:
                         Percentage of actual signature recovery cpu to bill. Whole number percentages, e.g. 50 for 50%
   --chain-threads CHAIN_THREADS
                         Number of worker threads in controller thread pool
-  --database-map-mode {mapped,heap,locked}
-                        Database map mode ("mapped", "heap", or "locked").
+  --database-map-mode {mapped,mapped_private,heap,locked}
+                        Database map mode ("mapped", "mapped_private", "heap", or "locked").
                         In "mapped" mode database is memory mapped as a file.
+                        In "mapped_private" mode database is memory mapped as a file using a private mapping (no disk writeback until program exit).
                         In "heap" mode database is preloaded in to swappable memory and will use huge pages if available.
                         In "locked" mode database is preloaded, locked in to memory, and will use huge pages if available.
   --cluster-log-lvl {all,debug,info,warn,error,off}
@@ -640,7 +641,7 @@ The following classes and scripts are typically used by the Performance Harness 
                                   [--num-blocks-to-prune NUM_BLOCKS_TO_PRUNE]
                                   [--signature-cpu-billable-pct SIGNATURE_CPU_BILLABLE_PCT]
                                   [--chain-threads CHAIN_THREADS]
-                                  [--database-map-mode {mapped,heap,locked}]
+                                  [--database-map-mode {mapped,mapped_private,heap,locked}]
                                   [--cluster-log-lvl {all,debug,info,warn,error,off}]
                                   [--net-threads NET_THREADS]
                                   [--disable-subjective-billing DISABLE_SUBJECTIVE_BILLING]
@@ -709,9 +710,10 @@ Performance Test Basic Base:
                         Percentage of actual signature recovery cpu to bill. Whole number percentages, e.g. 50 for 50% (default: 0)
   --chain-threads CHAIN_THREADS
                         Number of worker threads in controller thread pool (default: 2)
-  --database-map-mode {mapped,heap,locked}
-                        Database map mode ("mapped", "heap", or "locked").
+  --database-map-mode {mapped,mapped_private,heap,locked}
+                        Database map mode ("mapped", "mapped_private", "heap", or "locked").
                         In "mapped" mode database is memory mapped as a file.
+                        In "mapped_private" mode database is memory mapped as a file using a private mapping (no disk writeback until program exit).
                         In "heap" mode database is preloaded in to swappable memory and will use huge pages if available.
                         In "locked" mode database is preloaded, locked in to memory, and will use huge pages if available. (default: mapped)
   --cluster-log-lvl {all,debug,info,warn,error,off}

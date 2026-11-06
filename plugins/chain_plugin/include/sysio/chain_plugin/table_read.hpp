@@ -4,6 +4,7 @@
 #include <sysio/chain/abi_def.hpp>
 
 #include <functional>
+#include <limits>
 #include <optional>
 
 namespace sysio::chain {
@@ -33,14 +34,22 @@ struct primary_scan_request {
 };
 
 /// Shared across pages. Strict callers provide both callbacks, which throw on exhaustion.
-/// Compatibility callers omit them and retain the public API's post-row soft deadline.
+/// Compatibility callers omit them and retain the public API's post-row soft limits: the page ends, with a
+/// continuation, after the row that passes `deadline` or brings `bytes` to `max_bytes`.
 struct table_read_budget {
    fc::time_point deadline = fc::time_point::maximum();
+   uint64_t max_bytes = std::numeric_limits<uint64_t>::max();
    std::function<void()> check;
    std::function<void(uint64_t rows, uint64_t bytes)> before_copy;
    uint64_t rows = 0;
    uint64_t bytes = 0;
 };
+
+/// Bytes an owned_table_row with this key and value costs: both buffers plus two row slots, which cover a row
+/// vector's growth.
+inline uint64_t owned_table_row_bytes(size_t key_size, size_t value_size) {
+   return key_size + value_size + 2 * sizeof(owned_table_row);
+}
 
 /// Owned page plus continuation; strict budget exhaustion never returns partial success.
 struct primary_scan_page {

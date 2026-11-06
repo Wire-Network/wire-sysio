@@ -1,3 +1,5 @@
+#include <random>
+
 #include <boost/test/unit_test.hpp>
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/abi_serializer.hpp>
@@ -8,6 +10,7 @@
 #include <fc/variant_object.hpp>
 #include <fc/crypto/hex.hpp>
 #include <fc/crypto/keccak256.hpp>
+#include <fc/crypto/elliptic_ed.hpp>
 #include <fc/crypto/elliptic_em.hpp>
 #include <fc/crypto/signature.hpp>
 #include <fc/crypto/public_key.hpp>
@@ -15,6 +18,7 @@
 #include <fc/crypto/base58.hpp>
 #include <fc/crypto/ripemd160.hpp>
 #include <fc/crypto/ethereum/ethereum_types.hpp>
+#include <fc/io/raw.hpp>
 #include <sysio/opp/opp.hpp>     // FC_REFLECT_ENUM for sysio::opp::types::ChainKind
 #include "contract_test_support.hpp"
 #include <magic_enum/magic_enum.hpp>
@@ -31,6 +35,90 @@ using ChainKind = sysio::opp::types::ChainKind;
 
 using sysio_system::test_support::build_link_message;
 using sysio_system::test_support::sign_createlink;
+namespace secp256k1 = sysio_system::test_support::secp256k1;
+
+namespace {
+
+/// Raw ed25519 public-key bytes.
+using ed_key_bytes = fc::crypto::ed::public_key_shim::data_type;
+
+/// Bytes in a canonical EVM address.
+constexpr size_t evm_address_size = 20;
+
+/// What the host reports when an ed25519 signature does not verify against its embedded key.
+constexpr std::string_view ed_verification_failure = "ED25519 signature verification failed during recovery";
+
+secp256k1::coordinate zero_coordinate() { return {}; }
+
+fc::em::public_key_data em_key_bytes(const fc::crypto::public_key& key) {
+   return key.get<fc::em::public_key_shim>().serialize();
+}
+
+secp256k1::coordinate x_coordinate(const fc::em::public_key_data& key) {
+   secp256k1::coordinate x;
+   std::copy(key.begin() + 1, key.end(), x.begin());
+   return x;
+}
+
+/// Wrap raw EM bytes in the host key type without validating them, as a malformed attestation would.
+fc::crypto::public_key em_public_key(const fc::em::public_key_data& key) {
+   return fc::crypto::public_key{fc::crypto::public_key::storage_type{fc::em::public_key_shim{key}}};
+}
+
+std::vector<char> evm_address_of(const fc::crypto::public_key& key) {
+   const auto address = fc::crypto::ethereum::address_to_bytes(key);
+   return {address.begin(), address.end()};
+}
+
+/// Solana's `Pubkey::default()`.
+ed_key_bytes all_zero_ed_key() { return {}; }
+
+/// The ed25519 identity point (y = 1), the order-1 member of the small-order set.
+ed_key_bytes identity_ed_key() {
+   ed_key_bytes key{};
+   key[0] = 1;
+   return key;
+}
+
+fc::crypto::public_key ed_public_key(const ed_key_bytes& key) {
+   return fc::crypto::public_key{fc::crypto::public_key::storage_type{fc::crypto::ed::public_key_shim{key}}};
+}
+
+/// The ed25519 base point B, compressed (y = 4/5).
+ed_key_bytes base_point() {
+   ed_key_bytes b;
+   b.fill(0x66);
+   b[0] = 0x58;
+   return b;
+}
+
+/// A signature that satisfies the cofactorless equation [S]B = R + [k]A for the identity key A and
+/// every challenge k: R = B and S = 1, both canonical and R of full order. Only a verifier that
+/// refuses small-order public keys rejects it, which is what libsodium's verify does. fc embeds the
+/// claimed key ahead of R || S.
+fc::crypto::signature identity_key_forgery(const ed_key_bytes& key) {
+   fc::crypto::ed::signature_shim::data_type blob{};
+   std::copy(key.begin(), key.end(), blob.begin());
+   const auto r = base_point();
+   std::copy(r.begin(), r.end(), blob.begin() + key.size());
+   blob[key.size() + r.size()] = 1;   // S = 1, little-endian
+   return fc::crypto::signature{fc::crypto::signature::storage_type{fc::crypto::ed::signature_shim{blob}}};
+}
+
+// ChainKind's action ABI is int32; fc's reflected-enum packer uses int64, so these pack it by value.
+// Raw packing also carries keys the host's string renderer refuses.
+
+std::vector<char> pack_createlink(ChainKind chain_kind, name account, const fc::crypto::signature& sig,
+                                  const fc::crypto::public_key& pub_key, uint64_t nonce) {
+   return fc::raw::pack(std::make_tuple(magic_enum::enum_integer(chain_kind), account, sig, pub_key, nonce));
+}
+
+std::vector<char> pack_recordlink(name account, ChainKind chain_kind, const fc::crypto::public_key& pub_key,
+                                  const std::vector<char>& native_address) {
+   return fc::raw::pack(std::make_tuple(account, magic_enum::enum_integer(chain_kind), pub_key, native_address));
+}
+
+} // anonymous namespace
 
 // ——— Tester class ———
 class sysio_authex_tester : public tester {
@@ -86,14 +174,19 @@ public:
    action_result push_action( const account_name& signer, const action_name& name, const variant_object& data ) {
       string action_type_name = abi_ser.get_action_type(name);
 
-      action act;
-      act.account = AUTHEX;
-      act.name    = name;
-      act.data    = abi_ser.variant_to_binary(
+      return push_raw_action(signer, name, abi_ser.variant_to_binary(
          action_type_name, data,
          fixture_abi_yield_function()
-      );
+      ));
+   }
 
+   /// Submit wire bytes directly, including malformed keys the host's string renderer rejects.
+   action_result push_raw_action(const account_name& signer, const action_name& name,
+                                 const std::vector<char>& data) {
+      action act;
+      act.account = AUTHEX;
+      act.name = name;
+      act.data = data;
       return base_tester::push_action( std::move(act), signer.to_uint64_t() );
    }
 
@@ -215,6 +308,35 @@ BOOST_FIXTURE_TEST_CASE( createlink_rejects_mismatched_chain_and_key, sysio_auth
       createlink("alice"_n, ChainKind::CHAIN_KIND_SVM, "alice", link.sig, link.pub, link.nonce)
    );
    BOOST_REQUIRE(get_link(0).is_null());
+} FC_LOG_AND_RETHROW()
+
+/// A key that cannot sign never passes createlink: proof of possession is the guard. The identity
+/// key is offered the signature a cofactorless verifier accepts for it (R = B, S = 1), so the only
+/// thing that can refuse it is the small-order check on the key itself. Solana's all-zero
+/// `Pubkey::default()` (y = 0, a point of order 4) is refused as well.
+BOOST_FIXTURE_TEST_CASE( createlink_rejects_svm_keys_that_cannot_sign, sysio_authex_tester ) try {
+   deploy_dclaim();
+   for (const auto& key_bytes : {identity_ed_key(), all_zero_ed_key()}) {
+      const auto result = push_raw_action("alice"_n, "createlink"_n,
+         pack_createlink(ChainKind::CHAIN_KIND_SVM, "alice"_n, identity_key_forgery(key_bytes),
+                         ed_public_key(key_bytes), now_ms()));
+      BOOST_REQUIRE_MESSAGE(result.find(ed_verification_failure) != std::string::npos, result);
+      BOOST_REQUIRE(get_link(0).is_null());
+   }
+} FC_LOG_AND_RETHROW()
+
+/// EM bytes off the curve have no private key, so no signature recovers to their x-coordinate.
+BOOST_FIXTURE_TEST_CASE( createlink_rejects_evm_keys_that_cannot_sign, sysio_authex_tester ) try {
+   deploy_dclaim();
+   const auto signature = make_eth_link("alice", now_ms()).sig;
+   for (const auto& key_bytes :
+        {secp256k1::compressed_key(0x00, zero_coordinate()), secp256k1::compressed_key(0x02, zero_coordinate())}) {
+      BOOST_REQUIRE(!secp256k1::is_point(key_bytes));
+      const auto result = push_raw_action("alice"_n, "createlink"_n, pack_createlink(
+         ChainKind::CHAIN_KIND_EVM, "alice"_n, signature, em_public_key(key_bytes), now_ms()));
+      BOOST_REQUIRE_EQUAL(wasm_assert_msg("EM key recovery failed: x-coordinate mismatch"), result);
+      BOOST_REQUIRE(get_link(0).is_null());
+   }
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( createlink_rejects_k1_signature_for_em_key, sysio_authex_tester ) try {
@@ -373,6 +495,109 @@ BOOST_FIXTURE_TEST_CASE( createlink_svm_sweeps_prelink_dclaim_rewards, sysio_aut
    BOOST_REQUIRE_EQUAL(pending["balance"].as<asset>().get_amount(), 8000);
 } FC_LOG_AND_RETHROW()
 
+/// recordlink stores a link without a signature by its key, so every EM encoding that is not a
+/// secp256k1 point is dropped before insertion and before any DClaim sweep: no prefix, the
+/// uncompressed prefix, x = 0 (7 is not a square mod p), x = p, a valid point's x plus p (a
+/// non-canonical encoding of a real point), and an x no y completes.
+BOOST_FIXTURE_TEST_CASE( recordlink_drops_evm_keys_that_are_not_curve_points, sysio_authex_tester ) try {
+   deploy_dclaim();
+   const auto valid = em_key_bytes(fc::crypto::private_key::generate(
+      fc::crypto::private_key::key_type::em).get_public_key());
+   const auto address = evm_address_of(em_public_key(valid));
+   BOOST_REQUIRE_EQUAL(success(), import_credit(address, 7000));
+
+   const std::vector<fc::em::public_key_data> rejected = {
+      secp256k1::compressed_key(0x00, zero_coordinate()),
+      secp256k1::compressed_key(0x00, x_coordinate(valid)),
+      secp256k1::compressed_key(0x04, x_coordinate(valid)),
+      secp256k1::compressed_key(0x02, zero_coordinate()),
+      secp256k1::compressed_key(0x02, secp256k1::field_prime()),
+      secp256k1::compressed_key(0x02, secp256k1::plus_field_prime(secp256k1::smallest_x(true))),
+      secp256k1::compressed_key(0x03, secp256k1::smallest_x(false)),
+   };
+   for (const auto& key_bytes : rejected) {
+      BOOST_REQUIRE(!secp256k1::is_point(key_bytes));
+      BOOST_REQUIRE_EQUAL(error("missing authority of sysio.authex"), push_raw_action("carol"_n, "recordlink"_n,
+         pack_recordlink("carol"_n, ChainKind::CHAIN_KIND_EVM, em_public_key(key_bytes), address)));
+      BOOST_REQUIRE_EQUAL(success(), push_raw_action(AUTHEX, "recordlink"_n,
+         pack_recordlink("carol"_n, ChainKind::CHAIN_KIND_EVM, em_public_key(key_bytes), address)));
+      BOOST_REQUIRE(get_link(0).is_null());
+   }
+   const auto parked = get_dclaim_row("unmapped"_n, "unmapped_token", 1);
+   BOOST_REQUIRE(!parked.is_null());
+   BOOST_REQUIRE_EQUAL(parked["balance"].as<asset>().get_amount(), 7000);
+   BOOST_REQUIRE(get_dclaim_row("pclaims"_n, "pending_claim", "carol"_n.to_uint64_t()).is_null());
+
+   // A dropped key leaves the account/chain slot free: the real key then links and sweeps.
+   BOOST_REQUIRE_EQUAL(success(), recordlink(AUTHEX, "carol", em_public_key(valid), address));
+   BOOST_REQUIRE_EQUAL(get_link(0)["pub_key"].as<fc::crypto::public_key>(), em_public_key(valid));
+   BOOST_REQUIRE(get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
+   const auto pending = get_dclaim_row("pclaims"_n, "pending_claim", "carol"_n.to_uint64_t());
+   BOOST_REQUIRE(!pending.is_null());
+   BOOST_REQUIRE_EQUAL(pending["balance"].as<asset>().get_amount(), 7000);
+} FC_LOG_AND_RETHROW()
+
+/// Both parities of one x-coordinate are curve points (P and -P), so both prefixes are recorded.
+BOOST_FIXTURE_TEST_CASE( recordlink_accepts_both_parities_of_a_point, sysio_authex_tester ) try {
+   const auto x = x_coordinate(em_key_bytes(fc::crypto::private_key::generate(
+      fc::crypto::private_key::key_type::em).get_public_key()));
+   const auto even = secp256k1::compressed_key(0x02, x);
+   const auto odd = secp256k1::compressed_key(0x03, x);
+   BOOST_REQUIRE(secp256k1::is_point(even));
+   BOOST_REQUIRE(secp256k1::is_point(odd));
+   BOOST_REQUIRE_EQUAL(success(), recordlink(AUTHEX, "bob", em_public_key(even), evm_address_of(em_public_key(even))));
+   BOOST_REQUIRE_EQUAL(success(), recordlink(AUTHEX, "carol", em_public_key(odd), evm_address_of(em_public_key(odd))));
+   BOOST_REQUIRE_EQUAL(get_link(0)["pub_key"].as<fc::crypto::public_key>(), em_public_key(even));
+   BOOST_REQUIRE_EQUAL(get_link(1)["pub_key"].as<fc::crypto::public_key>(), em_public_key(odd));
+} FC_LOG_AND_RETHROW()
+
+/// The contract's curve check agrees with libsecp256k1 on arbitrary x-coordinates. About half of all
+/// x values have a point, so a fixed-seed sample exercises both verdicts many times over.
+BOOST_FIXTURE_TEST_CASE( recordlink_curve_check_matches_libsecp256k1, sysio_authex_tester ) try {
+   constexpr uint32_t sample_seed = 722;
+   constexpr size_t sample_count = 32;
+   std::mt19937 random(sample_seed);
+   size_t accepted = 0;
+   for (size_t i = 0; i < sample_count; ++i) {
+      fc::em::public_key_data key_bytes{};
+      key_bytes[0] = static_cast<char>(i % 2 == 0 ? 0x02 : 0x03);
+      for (size_t b = 1; b < key_bytes.size(); ++b) key_bytes[b] = static_cast<char>(random());
+      const auto account = name("acct" + std::string(1, static_cast<char>('a' + i / 5)) +
+                                std::string(1, static_cast<char>('a' + i % 5)));
+      BOOST_REQUIRE_EQUAL(success(), push_raw_action(AUTHEX, "recordlink"_n, pack_recordlink(
+         account, ChainKind::CHAIN_KIND_EVM, em_public_key(key_bytes), std::vector<char>(evm_address_size, char{0}))));
+      const bool linked = !get_link(accepted).is_null();
+      BOOST_REQUIRE_EQUAL(linked, secp256k1::is_point(key_bytes));
+      if (linked) {
+         BOOST_REQUIRE_EQUAL(get_link(accepted)["username"].as<name>(), account);
+         ++accepted;
+      }
+   }
+   BOOST_REQUIRE_GT(accepted, 0u);
+   BOOST_REQUIRE_LT(accepted, sample_count);
+} FC_LOG_AND_RETHROW()
+
+/// recordlink never records an SVM link: every SVM key reaches the OPERATORS roster through
+/// createlink's ed25519 verification, so a trusted caller cannot seat a key that cannot sign.
+BOOST_FIXTURE_TEST_CASE( recordlink_refuses_svm_links, sysio_authex_tester ) try {
+   deploy_dclaim();
+   const auto public_key = fc::crypto::private_key::generate(
+      fc::crypto::private_key::key_type::ed).get_public_key();
+   const auto raw_key = public_key.get<fc::crypto::ed::public_key_shim>().serialize();
+   const std::vector<char> native_address(raw_key.begin(), raw_key.end());
+   BOOST_REQUIRE_EQUAL(success(), import_credit(native_address, 8000, ChainKind::CHAIN_KIND_SVM));
+
+   BOOST_REQUIRE_EQUAL(success(), recordlink(AUTHEX, "carol", public_key, native_address, ChainKind::CHAIN_KIND_SVM));
+   const auto zero = all_zero_ed_key();
+   BOOST_REQUIRE_EQUAL(success(), push_raw_action(AUTHEX, "recordlink"_n, pack_recordlink(
+      "carol"_n, ChainKind::CHAIN_KIND_SVM, ed_public_key(zero), std::vector<char>(zero.begin(), zero.end()))));
+   BOOST_REQUIRE(get_link(0).is_null());
+   const auto parked = get_dclaim_row("unmapped"_n, "unmapped_token", 1);
+   BOOST_REQUIRE(!parked.is_null());
+   BOOST_REQUIRE_EQUAL(parked["balance"].as<asset>().get_amount(), 8000);
+   BOOST_REQUIRE(get_dclaim_row("pclaims"_n, "pending_claim", "carol"_n.to_uint64_t()).is_null());
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( recordlink_records_link_when_dclaim_is_missing, sysio_authex_tester ) try {
    const auto public_key = fc::crypto::private_key::generate(
       fc::crypto::private_key::key_type::em).get_public_key();
@@ -441,47 +666,6 @@ BOOST_FIXTURE_TEST_CASE( recordlink_eth_sweeps_prelink_dclaim_rewards, sysio_aut
    auto pending = get_dclaim_row("pclaims"_n, "pending_claim", "bob"_n.to_uint64_t());
    BOOST_REQUIRE(!pending.is_null());
    BOOST_REQUIRE_EQUAL(pending["balance"].as<asset>().get_amount(), 7000);
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( recordlink_svm_sweeps_prelink_dclaim_rewards, sysio_authex_tester ) try {
-   deploy_dclaim();
-   const auto public_key = fc::crypto::private_key::generate(
-      fc::crypto::private_key::key_type::ed).get_public_key();
-   const auto raw_key = public_key.get<fc::crypto::ed::public_key_shim>().serialize();
-   const std::vector<char> native_address(raw_key.begin(), raw_key.end());
-
-   BOOST_REQUIRE_EQUAL(success(), import_credit(
-      native_address, 8000, ChainKind::CHAIN_KIND_SVM));
-   BOOST_REQUIRE_EQUAL(success(), recordlink(
-      AUTHEX, "carol", public_key, native_address, ChainKind::CHAIN_KIND_SVM));
-   produce_blocks();
-
-   BOOST_REQUIRE(get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
-   auto pending = get_dclaim_row("pclaims"_n, "pending_claim", "carol"_n.to_uint64_t());
-   BOOST_REQUIRE(!pending.is_null());
-   BOOST_REQUIRE_EQUAL(pending["balance"].as<asset>().get_amount(), 8000);
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( recordlink_svm_mismatched_address_skips_sweep, sysio_authex_tester ) try {
-   deploy_dclaim();
-   const auto public_key = fc::crypto::private_key::generate(
-      fc::crypto::private_key::key_type::ed).get_public_key();
-   const auto raw_key = public_key.get<fc::crypto::ed::public_key_shim>().serialize();
-   std::vector<char> mismatched_address(raw_key.begin(), raw_key.end());
-   mismatched_address.front() ^= char{0x01};
-
-   BOOST_REQUIRE_EQUAL(success(), import_credit(
-      mismatched_address, 8500, ChainKind::CHAIN_KIND_SVM));
-   BOOST_REQUIRE_EQUAL(success(), recordlink(
-      AUTHEX, "carol", public_key, mismatched_address, ChainKind::CHAIN_KIND_SVM));
-   produce_blocks();
-
-   auto link = get_link(0);
-   BOOST_REQUIRE(!link.is_null());
-   BOOST_REQUIRE_EQUAL(link["pub_key"].as<fc::crypto::public_key>(), public_key);
-   BOOST_REQUIRE(!get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
-   BOOST_REQUIRE(get_dclaim_row(
-      "pclaims"_n, "pending_claim", "carol"_n.to_uint64_t()).is_null());
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( recordlink_identical_retry_resweeps_dclaim_rewards, sysio_authex_tester ) try {

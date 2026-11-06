@@ -92,10 +92,11 @@ fc::variant binding(Tester& tester, std::string_view chain_code, std::string_vie
    abi_serializer ser;
    load_account_abi(tester, tokens, ser);
    const auto table = compute_table_id(bindings_table.to_uint64_t());
-   const auto& index = tester.control->db().template get_index<kv_index, by_code_key>();
-   auto it = index.lower_bound(boost::make_tuple(tokens, table, std::string_view{}));
-   for (; it != index.end() && it->code == tokens && it->table_id == table; ++it) {
-      std::vector<char> raw(it->value.begin(), it->value.end());
+   auto cursor = tester.control->kv().open_row_cursor();
+   kv_row stored;
+   for (bool more = cursor->seek_lower({tokens, table}, stored);
+        more && stored.code == tokens && stored.table_id == table; more = cursor->next(stored)) {
+      const std::vector<char> raw(stored.value.begin(), stored.value.end());
       auto row = ser.binary_to_variant(binding_row_type, raw,
          Tester::fixture_abi_yield_function());
       if (row[field::chain_code].template as<fc::slug_name>() == fc::slug_name{chain_code} &&
@@ -146,12 +147,13 @@ void make_inactive(Tester& tester) {
                                       std::pair{tokens, tokens_table}, std::pair{tokens, bindings_table}}) {
       abi_serializer ser;
       load_account_abi(tester, account, ser);
-      auto& db = const_cast<chainbase::database&>(tester.control->db());
+      auto& store = const_cast<kv_store&>(tester.control->kv());
       const auto id = compute_table_id(table.to_uint64_t());
-      const auto& index = db.template get_index<kv_index, by_code_key>();
-      auto it = index.lower_bound(boost::make_tuple(account, id, std::string_view{}));
-      for (; it != index.end() && it->code == account && it->table_id == id; ++it) {
-         std::vector<char> raw(it->value.begin(), it->value.end());
+      auto cursor = store.open_row_cursor();
+      kv_row stored;
+      for (bool more = cursor->seek_lower({account, id}, stored);
+           more && stored.code == account && stored.table_id == id; more = cursor->next(stored)) {
+         const std::vector<char> raw(stored.value.begin(), stored.value.end());
          const auto row_type = ser.get_table_type(table.to_string());
          const auto row = ser.binary_to_variant(row_type, raw,
             Tester::fixture_abi_yield_function());
@@ -159,7 +161,7 @@ void make_inactive(Tester& tester) {
             (field::active, false)(field::activated_at_ms, uint64_t{0});
          const auto encoded = ser.variant_to_binary(row_type, inactive,
             Tester::fixture_abi_yield_function());
-         db.modify(*it, [&](auto& object) { object.value.assign(encoded.data(), encoded.size()); });
+         store.update_row(stored, stored.payer, {encoded.data(), encoded.size()});
       }
    }
 }

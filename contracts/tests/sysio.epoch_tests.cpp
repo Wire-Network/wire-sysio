@@ -175,52 +175,45 @@ BOOST_FIXTURE_TEST_CASE(setconfig_validates_total, sysio_epoch_tester) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(setconfig_rejects_excess_batch_op_groups, sysio_epoch_tester) { try {
-   // 255 groups (indices 0..254) stay clear of the batch_operator_plugin uint8
-   // group sentinel (255) and are accepted; 256 is rejected. minimum_active must
-   // equal operators_per_epoch * batch_op_groups, so 1 * 255 == 255 here.
-   BOOST_REQUIRE_EQUAL(success(), setconfig(360, 1, 255, 255));
+   // Solana seats at most 8 groups. minimum_active must equal
+   // operators_per_epoch * batch_op_groups, so 1 * 8 == 8 here.
+   BOOST_REQUIRE_EQUAL(success(), setconfig(360, 1, 8, 8));
    BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: batch_op_groups exceeds the uint8 group-index ceiling (255)"),
-      setconfig(360, 1, 256, 256)
+      error("assertion failure with message: batch_op_groups exceeds the outpost group ceiling (8)"),
+      setconfig(360, 1, 9, 9)
    );
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(setconfig_total_check_survives_uint32_wrap, sysio_epoch_tester) { try {
-   // 16'843'010 * 255 == 4'294'967'550, which wraps a uint32 multiply to 254. The
-   // widened uint64 product must reject a minimum_active of 254 rather than
+   // 536'870'913 * 8 == 4'294'967'304, which wraps a uint32 multiply to 8. The
+   // widened uint64 product must reject a minimum_active of 8 rather than
    // spuriously matching the wrapped value.
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: batch_operator_minimum_active must equal operators_per_epoch * batch_op_groups"),
-      setconfig(360, 16'843'010u, 254, 255)
+      setconfig(360, 536'870'913u, 8, 8)
    );
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(setconfig_rejects_oversized_operators_per_epoch, sysio_epoch_tester) { try {
    // Group size drives advance()'s per-epoch inline fanout and vector reserves,
-   // so it carries a magnitude bound independent of the product equality: a
-   // window of UINT32_MAX operators in one group is internally consistent
-   // (UINT32_MAX * 1 == UINT32_MAX) yet must be rejected. 100 is the ceiling.
-   BOOST_REQUIRE_EQUAL(success(), setconfig(360, 100, 100, 1));
+   // and Ethereum is sized for 7 per group, so it carries a bound independent of
+   // the product equality: a window of UINT32_MAX operators in one group is
+   // internally consistent (UINT32_MAX * 1 == UINT32_MAX) yet must be rejected.
+   BOOST_REQUIRE_EQUAL(success(), setconfig(360, 7, 7, 1));
    BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: operators_per_epoch exceeds the per-epoch schedule ceiling (100)"),
-      setconfig(360, 101, 101, 1)
+      error("assertion failure with message: operators_per_epoch exceeds the outpost group-size ceiling (7)"),
+      setconfig(360, 8, 8, 1)
    );
    BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: operators_per_epoch exceeds the per-epoch schedule ceiling (100)"),
+      error("assertion failure with message: operators_per_epoch exceeds the outpost group-size ceiling (7)"),
       setconfig(360, 0xFFFF'FFFFu, 0xFFFF'FFFFu, 1)
    );
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(setconfig_rejects_oversized_schedule_window, sysio_epoch_tester) { try {
-   // The window total (batch_operator_minimum_active == operators_per_epoch *
-   // batch_op_groups) is carried in the epochstate row and in every per-outpost
-   // BatchOperatorGroups attestation, so it has its own ceiling (1000) even when
-   // the per-group size and group count are individually acceptable.
-   BOOST_REQUIRE_EQUAL(success(), setconfig(360, 100, 1000, 10));
-   BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: batch_operator_minimum_active exceeds the schedule-window ceiling (1000)"),
-      setconfig(360, 100, 1100, 11)
-   );
+BOOST_FIXTURE_TEST_CASE(setconfig_accepts_the_largest_schedule_window, sysio_epoch_tester) { try {
+   // 8 groups of 7 is the largest window the outposts take. The two per-factor ceilings
+   // bound the window, so it needs none of its own.
+   BOOST_REQUIRE_EQUAL(success(), setconfig(360, 7, 56, 8));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(regchain_basic, sysio_epoch_tester) { try {

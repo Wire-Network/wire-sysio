@@ -11,6 +11,7 @@ gtest_discover_tests(DISCOVERY_MODE PRE_TEST) works for GoogleTest, so adding or
   RUNTIMES <runtime>...           One entry per unit per runtime, each run with `-- --<runtime>`.
   INCLUDE <regex>                 Register only the units that match.
   EXCLUDE <regex>                 Skip the units that match.
+  COMMAND_PREFIX <arg>...         Command and arguments placed before the Boost.Test executable.
   ARGS <arg>...                   Arguments after `--run_test=<unit>`.
   WORKING_DIRECTORY <dir>         Defaults to CMAKE_BINARY_DIR.
   PROPERTIES <name> <value>...    Single-valued test properties set on every entry.
@@ -25,12 +26,12 @@ set(_BOOST_TEST_DISCOVERY_IMPL "${CMAKE_CURRENT_LIST_DIR}/boost-test-discovery-i
 
 function(boost_test_discover_tests TARGET)
    cmake_parse_arguments(PARSE_ARGV 1 arg "" "NAME;INCLUDE;EXCLUDE;WORKING_DIRECTORY"
-                         "NAME_STRIP;RUNTIMES;ARGS;PROPERTIES;COST_BY_NAME")
+                         "NAME_STRIP;RUNTIMES;COMMAND_PREFIX;ARGS;PROPERTIES;COST_BY_NAME")
    if(NOT arg_NAME OR arg_UNPARSED_ARGUMENTS)
       message(FATAL_ERROR "boost_test_discover_tests(${TARGET}) needs NAME; unexpected: ${arg_UNPARSED_ARGUMENTS}")
    endif()
    # Lists reach the ctest-time implementation joined into single arguments, so no value may contain `;`.
-   foreach(option IN ITEMS NAME_STRIP RUNTIMES ARGS PROPERTIES COST_BY_NAME)
+   foreach(option IN ITEMS NAME_STRIP RUNTIMES COMMAND_PREFIX ARGS PROPERTIES COST_BY_NAME)
       foreach(value IN LISTS arg_${option})
          if(value MATCHES ";")
             message(FATAL_ERROR "boost_test_discover_tests(${TARGET}): ${option} values cannot contain `;`: ${value}")
@@ -87,6 +88,7 @@ function(boost_test_discover_tests TARGET)
       "      RUNTIMES [==[${arg_RUNTIMES}]==]\n"
       "      INCLUDE [==[${arg_INCLUDE}]==]\n"
       "      EXCLUDE [==[${arg_EXCLUDE}]==]\n"
+      "      COMMAND_PREFIX [==[${arg_COMMAND_PREFIX}]==]\n"
       "      ARGS [==[${arg_ARGS}]==]\n"
       "      PROPERTIES [==[${arg_PROPERTIES}]==]\n"
       "      COST_BY_NAME [==[${arg_COST_BY_NAME}]==])\n"

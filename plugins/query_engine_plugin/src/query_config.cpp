@@ -49,11 +49,12 @@ void add_options(boost::program_options::options_description& options) {
       boost::program_options::value<std::string>()->default_value(std::to_string(defaults::timeout.count())),
       "Query deadline in milliseconds, including queue time; HTTP timeout_ms may only lower it; C++ callers may "
       "opt out per call");
-   // No default: producer_plugin's read-only transaction budget governs unless an operator sets a
-   // tighter capture bound, and a configured value may never exceed that budget.
+   // No default: when the node has read-only threads, producer_plugin's read-only transaction budget governs
+   // unless an operator sets a tighter capture bound, and a configured value may never exceed that budget.
    options.add_options()(option::max_capture_ms, boost::program_options::value<std::string>(),
-                         "Maximum milliseconds in one chain read callback (ABI copy or data capture); defaults "
-                         "to producer_plugin's read-only transaction time and may not exceed it");
+                         "Maximum milliseconds in one chain read callback (ABI copy or data capture); with "
+                         "read-only threads, defaults to producer_plugin's read-only transaction time and may not "
+                         "exceed it");
    options.add_options()(
       option::max_abi_bytes,
       boost::program_options::value<std::string>()->default_value(std::to_string(defaults::max_abi_bytes)),
@@ -91,8 +92,8 @@ query_config parse_config(const boost::program_options::variables_map& options) 
    config.max_query_bytes = option_value(options, option::max_query_bytes, defaults::max_query_bytes);
    config.timeout = millisecond_option(options, option::timeout_ms, defaults::timeout);
    // An explicit capture bound stands as given. The built-in default is clamped to the request
-   // timeout, so a short timeout alone never fails validation; the plugin later replaces that default
-   // with producer_plugin's read-only transaction budget.
+   // timeout, so a short timeout alone never fails validation; when the node has read-only threads, the
+   // plugin later replaces that default with producer_plugin's read-only transaction budget.
    config.max_capture =
       options.count(option::max_capture_ms)
          ? std::chrono::microseconds(

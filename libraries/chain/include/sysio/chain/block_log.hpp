@@ -8,6 +8,38 @@ namespace sysio { namespace chain {
 
    namespace detail { struct block_log_impl; }
 
+   /**
+    * Byte budget for a batch block read. The first block is always admitted, so a reader makes progress; later blocks
+    * only while the total stays within `max_bytes`. Checked before a block is read, so an over-budget block is never read.
+    */
+   class serialized_block_batch_budget {
+      public:
+         /// No budget: every block is admitted.
+         static constexpr uint64_t unlimited = std::numeric_limits<uint64_t>::max();
+
+         explicit serialized_block_batch_budget(uint64_t max_bytes) : _max_bytes(max_bytes) {}
+
+         /// Returns true and records the block when a block of `block_size` bytes fits the budget.
+         bool admit(uint64_t block_size) {
+            if (_admitted != 0 && (_used > _max_bytes || block_size > _max_bytes - _used))
+               return false;
+            _used += block_size;
+            ++_admitted;
+            return true;
+         }
+
+         /// Total bytes of the blocks admitted so far.
+         uint64_t used() const { return _used; }
+
+         /// Number of blocks admitted so far.
+         uint32_t admitted() const { return _admitted; }
+
+      private:
+         uint64_t _max_bytes = unlimited;
+         uint64_t _used      = 0;
+         uint32_t _admitted  = 0;
+   };
+
    /* The block log is an external append only log of the blocks with a header. Blocks should only
     * be written to the log after they irreverisble as the log is append only. The log is a doubly
     * linked list of blocks. There is a secondary index file of only block positions that enables
@@ -55,7 +87,10 @@ namespace sysio { namespace chain {
 
          signed_block_ptr  read_block_by_num(uint32_t block_num)const;
          std::vector<char> read_serialized_block_by_num(uint32_t block_num)const;
-         std::vector<std::vector<char>> read_serialized_blocks_by_num(uint32_t first_block_num, uint32_t count)const;
+         /// Read up to `count` serialized blocks from `first_block_num`, within `max_bytes` (see serialized_block_batch_budget).
+         std::vector<std::vector<char>> read_serialized_blocks_by_num(
+            uint32_t first_block_num, uint32_t count,
+            uint64_t max_bytes = serialized_block_batch_budget::unlimited)const;
          std::optional<signed_block_header> read_block_header_by_num(uint32_t block_num)const;
          std::optional<block_id_type>       read_block_id_by_num(uint32_t block_num)const;
 

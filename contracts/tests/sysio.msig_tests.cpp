@@ -61,15 +61,14 @@ public:
       //return get_currency_balance( config::system_account_name, symbol(CORE_SYMBOL), act );
       //temporary code. current get_currency_balancy uses table name "accounts"_n from currency.h
       //generic_currency table name is "account"_n.
-      const auto& db  = control->db();
       share_type result = 0;
 
       auto key = sysio::chain::make_kv_scoped_key(act, symbol(CORE_SYM).to_symbol_code());
-      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-      auto it = kv_idx.find(boost::make_tuple("sysio.token"_n, sysio::chain::compute_table_id("accounts"_n.to_uint64_t()), key.to_string_view()));
-      if (it != kv_idx.end()) {
+      const auto table_id = sysio::chain::compute_table_id("accounts"_n.to_uint64_t());
+      const auto row      = control->kv().find_row("sysio.token"_n, table_id, key.to_string_view());
+      if (row) {
          // balance is the first field in the serialization
-         fc::datastream<const char *> ds(it->value.data(), it->value.size());
+         fc::datastream<const char *> ds(row->value.data(), row->value.size());
          fc::raw::unpack(ds, result);
       }
       return asset( result, symbol(CORE_SYM) );

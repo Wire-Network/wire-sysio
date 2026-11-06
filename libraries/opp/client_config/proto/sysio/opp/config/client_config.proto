@@ -18,12 +18,31 @@ message EvmTransactionPolicy {
   optional string max_total_native_cost_wei    = 4;
 }
 
+// The block tag an EVM read is made at.
+enum EvmReadBlockTag {
+  EVM_READ_BLOCK_TAG_UNSPECIFIED = 0;
+  EVM_READ_BLOCK_TAG_FINALIZED   = 1;
+  EVM_READ_BLOCK_TAG_SAFE        = 2;
+  EVM_READ_BLOCK_TAG_LATEST      = 3;
+}
+
+// How settled a block must be before the operator acts on outpost state read from it.
+// `LATEST` reads `confirmations` blocks deep, falling back to the finalized block while
+// the finalized block trails the head by more than `max_finality_lag_sec`. Omitted fields
+// take the defaults: `LATEST`, 12 confirmations, 1152 seconds.
+message EvmReadConfirmation {
+  optional EvmReadBlockTag block_tag            = 1;
+  optional uint32          confirmations        = 2;
+  optional uint32          max_finality_lag_sec = 3;
+}
+
 // One EVM signing client. Future keyless witness endpoints must use a distinct
 // endpoint message rather than overloading the signing ClientConnection.
 message EvmClientConfiguration {
   optional ClientConnection     connection         = 1;
   optional uint32               chain_id            = 2;
   optional EvmTransactionPolicy transaction_policy = 3;
+  optional EvmReadConfirmation  read_confirmation  = 4;
 }
 
 // Versioned Ethereum client configuration owned by the Ethereum outpost plugin.

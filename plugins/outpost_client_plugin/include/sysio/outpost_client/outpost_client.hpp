@@ -140,7 +140,9 @@ public:
    /**
     * @brief The digest of the envelope this outpost emitted for `epoch_index`, from the outpost's own write-once
     *        record of its emits: keccak256 of the canonical encoded envelope, which is the protocol's epoch digest
-    *        and what the next envelope carries as `previous_envelope_hash`. Read at finality.
+    *        and what the next envelope carries as `previous_envelope_hash`. Read at the client's settled
+    *        commitment, as `read_inbound_envelope` reads: Solana's `finalized`, Ethereum's configured read
+    *        confirmation.
     *
     * @return The digest, or nullopt when the outpost holds no final record for that epoch: nothing emitted for it
     *         yet, or the record has left the outpost's retention window.

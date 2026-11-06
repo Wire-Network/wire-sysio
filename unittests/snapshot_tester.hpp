@@ -43,7 +43,7 @@ public:
    enum config_file_handling { dont_copy_config_files, copy_config_files };
    snapshotted_tester(const controller::config& config, const snapshot_reader_ptr& snapshot, int ordinal,
    config_file_handling copy_files_from_config = config_file_handling::dont_copy_config_files,
-   std::optional<contract_action_matches> matches = {}) {
+   std::optional<contract_action_matches> matches = {}, std::optional<kv_engine> engine = {}) {
       FC_ASSERT(config.blocks_dir.filename().generic_string() != "."
                 && config.state_dir.filename().generic_string() != ".", "invalid path names in controller::config");
 
@@ -52,6 +52,10 @@ public:
 
       if (matches) {
          root_matches.emplace(std::move(*matches));
+      }
+
+      if (engine) {
+         _kv_engine = *engine;
       }
 
       BOOST_CHECK_GT(snapshot->total_row_count(), 0u);

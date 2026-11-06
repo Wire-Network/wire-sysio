@@ -6,14 +6,17 @@
 #include <sysio/chain/sysio_contract.hpp>
 #include <sysio/chain/kv_table_objects.hpp>
 #include <sysio/testing/bls_utils.hpp>
+#include <sysio/testing/kv_map_store.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 
 #include <fstream>
 #include <array>
+#include <cstdlib>
 #include <ranges>
 #include <filesystem>
+#include <string_view>
 
 #include <contracts.hpp>
 
@@ -27,6 +30,18 @@ using bls_private_key = fc::crypto::bls::private_key;
 using bls_public_key = fc::crypto::bls::public_key;
 
 namespace sysio::testing {
+
+namespace {
+   constexpr auto             kv_engine_env_name = "SYSIO_TEST_KV_ENGINE";
+   constexpr std::string_view kv_engine_map      = "map";
+   constexpr auto             state_file_name    = "shared_memory.bin";
+
+} // namespace
+
+   kv_engine default_kv_engine() {
+      const char* engine = std::getenv(kv_engine_env_name);
+      return engine && engine == kv_engine_map ? kv_engine::map : kv_engine::chainbase;
+   }
 
    fc::logger test_logger = fc::logger::default_logger();
 
@@ -318,7 +333,13 @@ namespace sysio::testing {
          }
       }
 
+      const bool state_exists = std::filesystem::exists(cfg.state_dir / state_file_name);
       control.reset( new controller(cfg, std::move(pfs), *expected_chain_id) );
+      if (_kv_engine == kv_engine::map) {
+         // Heap state outlives close() the way chainbase's file does, and only as long as that file.
+         if (!kv_map_store || !state_exists) kv_map_store = make_map_kv_store();
+         control->testing_set_kv_store(kv_map_store);
+      }
       if (root_matches) {
          control->initialize_root_extensions(std::move(*root_matches));
       }
@@ -1207,17 +1228,15 @@ namespace sysio::testing {
    asset base_tester::get_currency_balance( const account_name& code,
                                        const symbol&       asset_symbol,
                                        const account_name& account ) const {
-      const auto& db  = control->db();
       share_type result = 0;
 
       // KV storage: key = [scope(account):8B BE][pk(sym_code):8B BE], table_id from "accounts"
       auto key = make_kv_scoped_key(account, asset_symbol.to_symbol_code().value);
       auto table_id = compute_table_id("accounts"_n.to_uint64_t());
 
-      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-      auto kv_itr = kv_idx.find( boost::make_tuple( code, table_id, key.to_string_view() ) );
-      if ( kv_itr != kv_idx.end() ) {
-         fc::datastream<const char *> ds(kv_itr->value.data(), kv_itr->value.size());
+      const auto row = control->kv().find_row( code, table_id, key.to_string_view() );
+      if ( row ) {
+         fc::datastream<const char *> ds(row->value.data(), row->value.size());
          fc::raw::unpack(ds, result);
       }
 
@@ -1230,18 +1249,14 @@ namespace sysio::testing {
 
    vector<char> base_tester::get_row_by_id( name code, name scope, name table, uint64_t id ) const {
       vector<char> data;
-      const auto& db = control->db();
+      const auto& kv = control->kv();
       auto table_id = compute_table_id(table.to_uint64_t());
-      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
 
       // Try scoped key first: [scope:8B BE][pk:8B BE] (kv_multi_index / scoped_table)
       {
          auto key = make_kv_scoped_key(scope, id);
-         auto kv_itr = kv_idx.find( boost::make_tuple( code, table_id, key.to_string_view() ) );
-         if ( kv_itr != kv_idx.end() ) {
-            data.resize( kv_itr->value.size() );
-            if( !data.empty() )
-               memcpy( data.data(), kv_itr->value.data(), data.size() );
+         if ( const auto row = kv.find_row( code, table_id, key.to_string_view() ) ) {
+            data.assign( row->value.begin(), row->value.end() );
             return data;
          }
       }
@@ -1251,11 +1266,8 @@ namespace sysio::testing {
          char key_buf[kv_pri_key_size];
          kv_encode_be64(key_buf, id);
          std::string_view key_sv(key_buf, kv_pri_key_size);
-         auto kv_itr = kv_idx.find( boost::make_tuple( code, table_id, key_sv ) );
-         if ( kv_itr != kv_idx.end() ) {
-            data.resize( kv_itr->value.size() );
-            if( !data.empty() )
-               memcpy( data.data(), kv_itr->value.data(), data.size() );
+         if ( const auto row = kv.find_row( code, table_id, key_sv ) ) {
+            data.assign( row->value.begin(), row->value.end() );
             return data;
          }
       }

@@ -36,12 +36,14 @@ static constexpr auto by_block_num = "byblocknum"_n;
 // -------------------------------------------------------------------------------------------------
 // Snapshot attestation configuration (singleton)
 // -------------------------------------------------------------------------------------------------
-/** Governance-controlled quorum configuration. */
+/** Governance-controlled quorum and cadence configuration. */
 struct [[sysio::table("snapconfig"), sysio::contract("sysio.system")]] snap_config {
    /// Fixed number of distinct producer votes required; zero disables attestation.
    uint32_t min_providers = 0;
+   /// Configurable block interval; nodes must restart to adopt a changed value.
+   uint32_t block_spacing = snapshot_attestation::default_block_spacing;
 
-   SYSLIB_SERIALIZE(snap_config, (min_providers))
+   SYSLIB_SERIALIZE(snap_config, (min_providers)(block_spacing))
 };
 
 using snap_config_singleton = sysio::kv::global<"snapconfig"_n, snap_config>;
@@ -179,10 +181,11 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
     *
     * Votes aggregate per (block_num, block_id, snapshot_hash) and finalize when the current fixed
     * min_providers value is reached. Votes are monotonic, producer equivocation is rejected per
-    * height, and retrying the same tuple is idempotent. Snapshot heights must be exact multiples of
-    * snapshot_attestation::block_spacing. Rejects with snap_hash_disagreement_error when a final
-    * record at the height differs by block id or snapshot hash. A height without its own final record
-    * cannot be reopened below the latest attested height after pending rows have been purged.
+    * height, and retrying the same tuple is idempotent while its height remains eligible under the
+    * current cadence. Snapshot heights must be exact multiples of the configured block_spacing.
+    * Rejects with snap_hash_disagreement_error when a final record at
+    * the height differs by block id or snapshot hash. A height without its own final record cannot
+    * be reopened below the latest attested height after pending rows have been purged.
     *
     * A new vote, or a retry while the tuple is pending, requires live operator standing: an ACTIVE
     * PRODUCER in sysio.opreg that clears the live collateral minimum, bootstrapped exempt. Votes
@@ -195,14 +198,17 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
     * Update snapshot attestation configuration. Requires contract authority.
     *
     * @param min_providers fixed number of distinct producer voters required to attest (1..30).
+    * @param block_spacing Positive block interval; small values are for testing. Nodes restart to adopt changes.
     *
     * No attestation is permitted until this action stores a nonzero min_providers. Governance is
-    * responsible for choosing K with the desired security and liveness tradeoff. Configuration
-    * changes apply to pending heights; an exact vote retry, from a producer that still has operator
-    * standing, finalizes a tuple that already meets a newly lowered K.
+    * responsible for choosing K with the desired security and liveness tradeoff. K changes apply to
+    * pending heights; an exact vote retry, from a producer that still has operator standing,
+    * finalizes a tuple that already meets a newly lowered K. Cadence may change at any time;
+    * operators restart nodes to adopt it. Small intervals increase snapshot overhead and shorten
+    * verification grace; production should use much larger values. Grace is capped at 12,500 blocks.
     */
    [[sysio::action]]
-   void setsnpcfg(uint32_t min_providers);
+   void setsnpcfg(uint32_t min_providers, uint32_t block_spacing);
 
    /**
     * Read-only: return the attested snapshot record for a given block number.

@@ -182,5 +182,5 @@ removed, and the outbound-HTTP failure family has fixed label cardinality.
   and of the chain id in the `nodeop` info series.
 - [`http_client_plugin`](../http_client_plugin) -- registers the outbound transport options whose traffic the
   `nodeop_outbound_http_*` counters measure.
-- [`status_monitor_plugin`](../status_monitor_plugin) -- pushes `get_info` documents to OpenSearch/Elasticsearch;
+- [`alert_monitor_plugin`](../alert_monitor_plugin) -- pushes `get_info` documents to OpenSearch/Elasticsearch;
   a push-model complement to this plugin's scrape model.

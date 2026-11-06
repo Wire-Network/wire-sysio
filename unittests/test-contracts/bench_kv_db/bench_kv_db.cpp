@@ -1,5 +1,4 @@
 // Benchmark contract using KV intrinsics directly (hand-written extern "C" declarations).
-// This avoids dependency on CDT kv.h which isn't installed yet.
 
 #include <sysio/sysio.hpp>
 #include <cstring>
@@ -10,32 +9,25 @@ static constexpr uint32_t bench_table_id = 42;
 // aligned_span<T> maps to (ptr, size) pair in WASM ABI.
 extern "C" {
    __attribute__((sysio_wasm_import))
-   int64_t kv_set(uint32_t key_format, uint64_t payer, const void* key, uint32_t key_size, const void* value, uint32_t value_size);
+   int32_t kv_set(uint32_t table_id, uint64_t payer, const void* key, uint32_t key_size, const void* value, uint32_t value_size, uint32_t mode);
 
    __attribute__((sysio_wasm_import))
-   int32_t kv_get(uint32_t key_format, uint64_t code, const void* key, uint32_t key_size, void* value, uint32_t value_size);
+   int32_t kv_get(uint32_t table_id, uint64_t code, const void* key, uint32_t key_size, uint32_t offset, void* value, uint32_t value_size);
 
    __attribute__((sysio_wasm_import))
-   int64_t kv_erase(uint32_t key_format, const void* key, uint32_t key_size);
+   int32_t kv_erase(uint32_t table_id, const void* key, uint32_t key_size);
 
    __attribute__((sysio_wasm_import))
-   int32_t kv_contains(uint32_t key_format, uint64_t code, const void* key, uint32_t key_size);
+   int32_t kv_it_create(uint32_t table_id, uint64_t code, const void* prefix, uint32_t prefix_size, const void* seek, uint32_t seek_size);
 
    __attribute__((sysio_wasm_import))
-   uint32_t kv_it_create(uint32_t key_format, uint64_t code, const void* prefix, uint32_t prefix_size);
+   void kv_it_destroy(int32_t handle);
 
    __attribute__((sysio_wasm_import))
-   void kv_it_destroy(uint32_t handle);
-
-   __attribute__((sysio_wasm_import))
-   int32_t kv_it_next(uint32_t handle);
-
-   __attribute__((sysio_wasm_import))
-   int32_t kv_it_key(uint32_t handle, uint32_t offset, void* dest, uint32_t dest_size, uint32_t* actual_size);
-
-   __attribute__((sysio_wasm_import))
-   int32_t kv_it_value(uint32_t handle, uint32_t offset, void* dest, uint32_t dest_size, uint32_t* actual_size);
+   int32_t kv_it_next(int32_t handle, void* key, uint32_t key_capacity, void* value, uint32_t value_capacity, uint32_t* key_size, uint32_t* value_size);
 }
+
+static constexpr uint32_t kv_upsert = 0;
 
 using namespace sysio;
 
@@ -72,7 +64,7 @@ public:
          payload.value1 = count - i;
          payload.value2 = i * 7;
 
-         kv_set(0, get_self().value, key, 8, &payload, sizeof(payload));
+         (void)kv_set(bench_table_id, get_self().value, key, 8, &payload, sizeof(payload), kv_upsert);
       }
    }
 
@@ -84,7 +76,7 @@ public:
          encode_key(i, key);
 
          row_payload payload;
-         int32_t sz = kv_get(bench_table_id, code, key, 8, &payload, sizeof(payload));
+         int32_t sz = kv_get(bench_table_id, code, key, 8, 0, &payload, sizeof(payload));
          check(sz > 0, "row not found");
          check(payload.value2 == i * 7, "bad value");
       }
@@ -93,13 +85,14 @@ public:
    [[sysio::action]]
    void iterall() {
       const uint64_t code = get_self().value;
-      const uint32_t handle = kv_it_create(bench_table_id, code, nullptr, 0);
+      const int32_t handle = kv_it_create(bench_table_id, code, nullptr, 0, nullptr, 0);
 
       uint32_t count = 0;
-      int32_t status = kv_it_next(handle);
-      while (status == 0) { // 0 = iterator_ok
+      uint32_t key_size = 0, value_size = 0;
+      int32_t status = kv_it_next(handle, nullptr, 0, nullptr, 0, &key_size, &value_size);
+      while (status == 0) { // 0 = kv_status ok
          ++count;
-         status = kv_it_next(handle);
+         status = kv_it_next(handle, nullptr, 0, nullptr, 0, &key_size, &value_size);
       }
 
       kv_it_destroy(handle);
@@ -115,11 +108,11 @@ public:
 
          // Read existing
          row_payload payload;
-         kv_get(bench_table_id, code, key, 8, &payload, sizeof(payload));
+         kv_get(bench_table_id, code, key, 8, 0, &payload, sizeof(payload));
 
          // Modify and write back
          payload.value2 = i * 13;
-         kv_set(0, get_self().value, key, 8, &payload, sizeof(payload));
+         (void)kv_set(bench_table_id, get_self().value, key, 8, &payload, sizeof(payload), kv_upsert);
       }
    }
 
@@ -128,7 +121,7 @@ public:
       for (uint32_t i = 0; i < count; ++i) {
          char key[8];
          encode_key(i, key);
-         kv_erase(bench_table_id, key, 8);
+         (void)kv_erase(bench_table_id, key, 8);
       }
    }
 };

@@ -7,9 +7,11 @@ add_executable( test_net_plugin
         rate_limit_parse_unittest.cpp
         net_msg_wire_unittest.cpp
         peer_auth_unittest.cpp
+        peer_scoring_unittest.cpp
         queued_buffer_unittest.cpp
         subnet_mask_unittest.cpp
         main.cpp
 )
 target_link_libraries( test_net_plugin net_plugin sysio_testing sysio_chain_wrap )
-add_p_test(NAME test_net_plugin COMMAND plugins/net_plugin/test/test_net_plugin)
+target_include_directories( test_net_plugin PRIVATE ${CMAKE_SOURCE_DIR}/tests )
+add_p_test(NAME test_net_plugin PORT_LEASE COMMAND plugins/net_plugin/test/test_net_plugin)

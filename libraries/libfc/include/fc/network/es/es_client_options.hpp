@@ -7,7 +7,7 @@
 
 namespace fc::network::es {
 
-// Delivery defaults shared by every `_bulk` producer (es_sink, status_monitor_plugin). Batching cadence
+// Delivery defaults shared by every `_bulk` producer (es_sink, alert_monitor_plugin). Batching cadence
 // and queue depth are the producer's own concern; only the request-level values live here.
 
 /// NDJSON bulk-request body cap, in bytes.
@@ -28,7 +28,7 @@ inline constexpr uint32_t es_max_batch_bytes_ceiling = 16u * 1024 * 1024;
 /// Ceiling on the doubled retry backoff between attempts.
 inline constexpr std::chrono::milliseconds es_max_retry_backoff{2'000};
 
-/// @p duration as the whole milliseconds of a flat uint32 config field; es_sink_config and the status monitor options
+/// @p duration as the whole milliseconds of a flat uint32 config field; es_sink_config and the alert monitor options
 /// take their defaults through it.
 constexpr uint32_t to_config_ms(std::chrono::milliseconds duration) {
    return static_cast<uint32_t>(duration.count());

@@ -227,6 +227,11 @@ public:
       params_object(1_ui)(16_ui)(512_32).set();
       ASSERT_EQ(params_object(1_ui)(16_ui).get(),
                 params_object(1_ui)(16_ui)(512_32));
+
+      //max_kv_secondary_key_size
+      params_object(1_ui)(18_ui)(512_32).set();
+      ASSERT_EQ(params_object(1_ui)(18_ui).get(),
+                params_object(1_ui)(18_ui)(512_32));
    }
 
    [[sysio::action]] void setthrow1(){
@@ -242,6 +247,16 @@ public:
    [[sysio::action]] void setthrow3(){
       //passing argument that will fail validation
       params_object(1_ui)(1_ui)(200*100_32).set();
+   }
+
+   [[sysio::action]] void setthrow4(){
+      //max_kv_key_size one past config::max_kv_key_size_limit
+      params_object(1_ui)(16_ui)(513_32).set();
+   }
+
+   [[sysio::action]] void setthrow5(){
+      //max_kv_secondary_key_size one past config::max_kv_key_size_limit
+      params_object(1_ui)(18_ui)(513_32).set();
    }
 
    [[sysio::action]] void getthrow1(){
@@ -267,9 +282,9 @@ public:
       //this parameter is not active
       
       //max_kv_key_size
-      params_object(1_ui)(16_ui)(1024_32).set();
+      params_object(1_ui)(16_ui)(384_32).set();
       ASSERT_EQ(params_object(1_ui)(16_ui).get(),
-                params_object(1_ui)(16_ui)(1024_32));
+                params_object(1_ui)(16_ui)(384_32));
    }
 
    [[sysio::action]] void throwrvia2(){
@@ -277,6 +292,6 @@ public:
       
       //max_kv_key_size
       ASSERT_EQ(params_object(1_ui)(16_ui).get(),
-                params_object(1_ui)(16_ui)(1024_32));
+                params_object(1_ui)(16_ui)(384_32));
    }
 };

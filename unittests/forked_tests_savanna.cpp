@@ -1,6 +1,7 @@
 #include "savanna_cluster.hpp"
 
 #include "fork_test_utilities.hpp"
+#include "kv_write_driver.hpp"
 
 using namespace sysio::chain;
 using namespace sysio::testing;
@@ -534,6 +535,59 @@ BOOST_FIXTURE_TEST_CASE( split_and_rejoin, savanna_cluster::cluster_t ) try {
    BOOST_CHECK_EQUAL(lib2, lib0 + 12 + 7 );   // 12 when network was split, 7 just above (6 + 1)
    dlog("lib2 = {}", lib2); // 65
 
+} FC_LOG_AND_RETHROW()
+
+// ---------------------------- fork_switch_undoes_kv_writes ---------------------------------
+// A node that switches forks undoes the KV writes of the blocks it leaves, then applies those of the blocks it joins.
+BOOST_FIXTURE_TEST_CASE( fork_switch_undoes_kv_writes, savanna_cluster::cluster_t ) try {
+   using namespace kv_write_driver;
+   constexpr uint16_t rows = 1, entries = 2;
+   const account_name writer = "kvwriter"_n;
+   auto& A=_nodes[0]; auto& C=_nodes[2]; auto& D=_nodes[3];
+
+   A.create_accounts( {writer} );
+   A.set_code( writer, kv_write_wast );
+   push_kv_writes(A, writer, {set_row(rows, writer, "both", "base"), set_row(rows, writer, "erased", "base"),
+                              store_entry(entries, writer, "pk", "base")});
+   A.produce_blocks(3);
+   BOOST_REQUIRE_EQUAL(D.head().id(), A.head().id());
+   const auto base = kv_state_of(D, {writer});
+
+   set_partition( {&C, &D} );                 // simulate 2 disconnected partitions:  nodes {0, 1} and nodes {2, 3}
+   A.produce_block();                         // process in-flight QC
+   D.produce_block();
+
+   // Each side writes the same key and keys of its own. Neither side has a quorum, so the later timestamp will win.
+   push_kv_writes(A, writer, {set_row(rows, writer, "both", "side a", kv_set_mode::update), erase_row(rows, "erased"),
+                              set_row(rows, writer, "only a", "x"), update_entry(entries, writer, "pk", "base", "side a")});
+   A.produce_block();
+
+   D.produce_block(_block_interval_us * 10);
+   push_kv_writes(D, writer, {set_row(rows, writer, "both", "side d", kv_set_mode::update),
+                              set_row(rows, writer, "only d", "y"), store_entry(entries, writer, "pk2", "side d")});
+   const auto fork_tip = D.produce_block();
+
+   const auto joined = kv_state_of(D, {writer});
+   const auto left   = kv_state_of(A, {writer});
+   BOOST_REQUIRE(!(left == base));
+   BOOST_REQUIRE(!(left == joined));
+
+   push_blocks(3, 0, fork_tip->block_num() - 2);    // the blocks D produced after the split
+   BOOST_REQUIRE_EQUAL(A.head().id(), D.head().id());
+
+   // Everything side A wrote has gone, the row it erased is back, and what side D wrote has arrived.
+   check_same_kv_state(kv_state_of(A, {writer}), joined);
+   BOOST_REQUIRE_EQUAL(joined.rows.size(), 3u);
+   BOOST_CHECK_EQUAL(joined.rows[0].value, "side d");
+   BOOST_CHECK_EQUAL(joined.rows[1].key, "erased");
+   BOOST_CHECK_EQUAL(joined.rows[1].value, "base");
+   BOOST_CHECK_EQUAL(joined.rows[2].key, "only d");
+   BOOST_REQUIRE_EQUAL(joined.entries.size(), 2u);
+   BOOST_CHECK_EQUAL(joined.entries[0].sec_key, "base");
+
+   A.control->abort_block();
+   D.control->abort_block();
+   BOOST_CHECK_EQUAL(A.control->calculate_integrity_hash().str(), D.control->calculate_integrity_hash().str());
 } FC_LOG_AND_RETHROW()
 
 // ---------------------------- push_block_returns_forked_transactions_savanna ---------------------------------

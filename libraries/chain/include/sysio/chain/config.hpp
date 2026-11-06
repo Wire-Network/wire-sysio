@@ -109,16 +109,26 @@ namespace sysio::chain::config {
 
   static constexpr uint32_t   fixed_overhead_shared_vector_ram_bytes = 16; ///< overhead accounts for fixed portion of size of shared_vector field
   static constexpr uint32_t   overhead_per_row_per_index_ram_bytes = 32;    ///< overhead accounts for basic tracking structures in a row per index
+  /// RAM billed for one KV row on top of its key and value bytes. A protocol constant, not a measurement: the layout
+  /// of kv_object and the choice of storage engine can both change without moving this price. docs/kv-ram-billing.md
+  /// shows where it sits against what a row stores. It has to be a multiple of billable_alignment.
+  static constexpr uint32_t   kv_row_overhead_ram_bytes          = 112;
+  /// RAM billed for one KV secondary index entry on top of its secondary and primary key bytes. A protocol constant
+  /// for the same reason as kv_row_overhead_ram_bytes.
+  static constexpr uint32_t   kv_index_entry_overhead_ram_bytes  = 112;
   static constexpr uint32_t   setcode_ram_bytes_multiplier       = 10;     ///< multiplier on contract size to account for multiple copies and cached compilation
 
   static constexpr uint32_t   hashing_checktime_block_size       = 10*1024;  /// call checktime from hashing intrinsic once per this number of bytes
+
+  /// Consensus limit bounding one uninterrupted libsodium Ed25519 verification.
+  static constexpr uint32_t   max_ed25519_message_size          = 65'536;
 
   // KV default limits — on-chain consensus values are in chain_config
   static constexpr uint32_t   default_max_kv_key_size           = 256;       ///< maximum KV primary key size in bytes
   static constexpr uint32_t   default_max_kv_value_size         = 256*1024;  ///< maximum KV value size (256 KiB)
   static constexpr uint32_t   default_max_kv_secondary_key_size = 256;       ///< maximum KV secondary key size in bytes
   // KV absolute upper bounds (governance cannot exceed these)
-  static constexpr uint32_t   max_kv_key_size_limit             = 1024;      ///< absolute max for primary and secondary key sizes
+  static constexpr uint32_t   max_kv_key_size_limit             = 512;       ///< absolute max for primary and secondary key sizes
   static constexpr uint32_t   max_kv_value_size_limit           = 1024*1024; ///< absolute max for value size (1 MiB)
   // Iterator limit is hardcoded (ephemeral per-transaction, bounded by CPU)
   static constexpr uint32_t   max_kv_iterators                  = 1024;

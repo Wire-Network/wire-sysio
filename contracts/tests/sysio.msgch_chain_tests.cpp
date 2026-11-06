@@ -27,7 +27,6 @@
 #include <boost/test/unit_test.hpp>
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/abi_serializer.hpp>
-#include <sysio/chain/kv_table_objects.hpp>   // kv_index / kv_index_index for the envelopes retention walk
 #include <sysio/opp/opp.hpp>
 #include <sysio/opp/opp.pb.h>
 
@@ -39,6 +38,7 @@
 
 #include <functional>
 #include <map>
+#include <set>
 
 #include "contracts.hpp"
 #include "registry_test_support.hpp"
@@ -79,6 +79,10 @@ constexpr std::string_view THREE_TO_THREE_RIGHT_PAYLOAD = "three-to-three-right"
 constexpr uint32_t INBOUND_ENVELOPE_RETENTION_EPOCHS = 2;
 constexpr uint32_t ENVELOPE_PRUNE_BUDGET             = 4;
 
+/// Unbonded registrations the roster tests add: `UNBONDED_REGISTRANT_PREFIX` plus one letter each.
+constexpr std::string_view UNBONDED_REGISTRANT_PREFIX = "rosterop.";
+constexpr uint32_t         UNBONDED_REGISTRANTS       = 16;
+
 /// sysio.opreg action identifiers used by the WNS-16 fixture.
 namespace opreg_actions {
 constexpr name SET_CONFIG        = "setconfig"_n;
@@ -116,6 +120,14 @@ constexpr const char* CONSECUTIVE_MISS_TERMINATION_REASON = "rolling-window: >5 
 /// Payload of the envelopes BATCHOP delivers while the rotation fixture walks its duty epochs.
 constexpr std::string_view ROTATION_DELIVERY_PAYLOAD = "rotation-duty";
 
+/// Reason passed to the privileged `sysio.opreg::terminate` that removes a still-seated operator.
+constexpr std::string_view SEATED_TERMINATION_REASON = "removed while seated";
+
+/// `regoperator`'s refusal for an account the batch schedule still seats.
+constexpr const char* STILL_SEATED_REGISTRATION_ERROR =
+   "assertion failure with message: operator still holds a batch schedule seat: it may register again "
+   "once its seats have closed";
+
 /// sysio.opreg configuration ABI field identifiers used by the WNS-16 fixture.
 namespace opreg_config_fields {
 constexpr const char* MAX_AVAILABLE_PRODUCERS          = "max_available_producers";
@@ -137,6 +149,7 @@ constexpr name CHECK_CONSENSUS = "chkcons"_n;
 
 /// sysio.msgch table identifiers used by the WNS-16 fixture.
 namespace msgch_tables {
+constexpr name ATTESTATIONS       = "attestations"_n;
 constexpr name ENVELOPES          = "envelopes"_n;
 constexpr name OUTBOUND_ENVELOPES = "outenvelopes"_n;
 } // namespace msgch_tables
@@ -148,6 +161,7 @@ constexpr name BY_OUTPOST_EPOCH = "byoutepoch"_n;
 
 /// sysio.msgch ABI type identifiers used by the WNS-16 fixture.
 namespace msgch_abi_types {
+constexpr const char* ATTESTATION_ENTRY = "attestation_entry";
 constexpr const char* ENVELOPE_ENTRY    = "envelope_entry";
 constexpr const char* OUTBOUND_ENVELOPE = "outbound_envelope";
 } // namespace msgch_abi_types
@@ -162,6 +176,7 @@ constexpr const char* BATCH_OP_NAME = "batch_op_name";
 constexpr const char* WINNING_CHECKSUM = "winning_checksum";
 constexpr const char* CHECKSUM         = "checksum";
 constexpr const char* CONSENSUS_REACHED = "consensus_reached";
+constexpr const char* STATUS            = "status";
 } // namespace msgch_fields
 
 /// sysio.chalg table identifiers used by the split-consensus regressions.
@@ -401,8 +416,9 @@ public:
    }
 
    /// Configure one test cohort of up to six batch operators, the ETH/SOL outpost rows, its one-group
-   /// schedule, and the genesis advance. The configurable cohort supports even split regressions.
-   void bootstrap(uint32_t n_batch_ops = 1, bool batchop_is_bootstrapped = true) {
+   /// schedule, and the genesis advance. The configurable cohort supports even split regressions;
+   /// `build_schedule = false` skips `schbatchgps`, leaving the window empty.
+   void bootstrap(uint32_t n_batch_ops = 1, bool batchop_is_bootstrapped = true, bool build_schedule = true) {
       sysio_system::test_support::registry::seed_depot_pair(*this);
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
          "setconfig"_n, mvo()
@@ -462,8 +478,10 @@ public:
          BOOST_REQUIRE_EQUAL(success(), fund_and_bond(BATCHOP, BATCH_OPERATOR_MINIMUM_COLLATERAL));
       }
 
-      BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
-         "schbatchgps"_n, mvo()));
+      if (build_schedule) {
+         BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
+            "schbatchgps"_n, mvo()));
+      }
 
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
          "advance"_n, mvo()));
@@ -665,15 +683,15 @@ public:
    }
 
    /// Every row of `code`'s `table` in primary-key order, decoded as `abi_type`. Read straight from
-   /// chainbase so the walk does not depend on ids staying inside a fixed probe range.
+   /// the KV store so the walk does not depend on ids staying inside a fixed probe range.
    std::vector<fc::variant> table_rows(name code, name table, const abi_serializer& abi, const char* abi_type) {
-      const auto  table_id = compute_table_id(table.to_uint64_t());
-      const auto& kv_idx   = control->db().get_index<kv_index, by_code_key>();
+      const auto table_id = compute_table_id(table.to_uint64_t());
       std::vector<fc::variant> rows;
-      for (auto itr = kv_idx.lower_bound(boost::make_tuple(code, table_id, std::string_view{}));
-           itr != kv_idx.end() && itr->code == code && itr->table_id == table_id; ++itr) {
-         std::vector<char> raw(itr->value.size());
-         if (!raw.empty()) std::memcpy(raw.data(), itr->value.data(), raw.size());
+      auto cursor = control->kv().open_row_cursor();
+      chain::kv_row row;
+      for (bool more = cursor->seek_lower({code, table_id}, row);
+           more && row.code == code && row.table_id == table_id; more = cursor->next(row)) {
+         const std::vector<char> raw(row.value.begin(), row.value.end());
          rows.push_back(abi.binary_to_variant(abi_type, raw, fixture_abi_yield_function()));
       }
       return rows;
@@ -698,10 +716,11 @@ public:
    size_t envelope_index_entries() {
       const auto  table_id = compute_sec_table_id(msgch_tables::ENVELOPES.to_uint64_t(),
                                                   msgch_indexes::BY_OUTPOST_EPOCH.to_uint64_t());
-      const auto& idx = control->db().get_index<kv_index_index, by_code_table_id_seckey>();
       size_t n = 0;
-      for (auto itr = idx.lower_bound(boost::make_tuple(MSGCH_ACCOUNT, table_id));
-           itr != idx.end() && itr->code == MSGCH_ACCOUNT && itr->table_id == table_id; ++itr) {
+      auto cursor = control->kv().open_index_cursor();
+      chain::kv_index_entry entry;
+      for (bool more = cursor->seek_lower({MSGCH_ACCOUNT, table_id}, entry);
+           more && entry.code == MSGCH_ACCOUNT && entry.table_id == table_id; more = cursor->next(entry)) {
          ++n;
       }
       return n;
@@ -767,15 +786,31 @@ public:
       return n;
    }
 
+   /// Attestation rows for `chain_code` with `status`, over the whole table.
+   uint32_t attestation_status_count(uint64_t chain_code, opp::types::AttestationStatus status) {
+      uint32_t n = 0;
+      for (const auto& row : table_rows(MSGCH_ACCOUNT, msgch_tables::ATTESTATIONS, msgch_abi,
+                                        msgch_abi_types::ATTESTATION_ENTRY)) {
+         if (row[msgch_fields::CHAIN_CODE].as_uint64() == chain_code &&
+             row[msgch_fields::STATUS].as<opp::types::AttestationStatus>() == status) ++n;
+      }
+      return n;
+   }
+
    // -- Inbound envelope builder --
 
-   /// Encode a deliverable envelope carrying one OPERATORS roster echo (dispatch drops
-   /// the attestation silently; acceptance is still fully observable via `outpcons` and the
-   /// stored attestation row). The semantic header is derived per the spec — `apply_consensus`
-   /// drops envelopes whose header fields do not recompute or whose message does not continue the
-   /// per-outpost message chain. `prev` (previous_envelope_hash), `prev_message_id`, and
-   /// `env_hash` are raw 32-byte strings (or empty for stream genesis).
-   std::vector<char> encode_delivery(uint32_t epoch_index, const std::string& att_data,
+   /// One attestation of an inbound envelope.
+   struct inbound_attestation {
+      sysio::opp::types::AttestationType type;
+      std::string                        data;
+   };
+
+   /// Encode a deliverable envelope carrying `attestations` in one message. The semantic header is
+   /// derived per the spec — `apply_consensus` drops envelopes whose header fields do not recompute
+   /// or whose message does not continue the per-outpost message chain. `prev`
+   /// (previous_envelope_hash), `prev_message_id`, and `env_hash` are raw 32-byte strings (or empty
+   /// for stream genesis).
+   std::vector<char> encode_delivery(uint32_t epoch_index, const std::vector<inbound_attestation>& attestations,
                                      const std::string& prev = {},
                                      const std::string& prev_message_id = {},
                                      const std::string& env_hash = {}) {
@@ -785,14 +820,29 @@ public:
       env.set_epoch_timestamp(1'775'612'516'983ULL);
       if (!prev.empty()) env.set_previous_envelope_hash(prev);
       if (!env_hash.empty()) env.set_envelope_hash(env_hash);
-      auto* att = env.add_messages()->mutable_payload()->add_attestations();
-      att->set_type(sysio::opp::types::ATTESTATION_TYPE_OPERATORS);
-      att->set_data(att_data);
-      att->set_data_size(static_cast<uint32_t>(att_data.size()));
+      auto* payload = env.add_messages()->mutable_payload();
+      for (const auto& attestation : attestations) {
+         auto* att = payload->add_attestations();
+         att->set_type(attestation.type);
+         att->set_data(attestation.data);
+         att->set_data_size(static_cast<uint32_t>(attestation.data.size()));
+      }
       oracle::finalize_header(*env.mutable_messages(0), prev_message_id, 1'775'612'516'983ULL);
       std::vector<char> out(env.ByteSizeLong());
       env.SerializeToArray(out.data(), static_cast<int>(out.size()));
       return out;
+   }
+
+   /// Encode a deliverable envelope carrying one OPERATORS roster echo (dispatch drops
+   /// the attestation silently; acceptance is still fully observable via `outpcons` and the
+   /// stored attestation row).
+   std::vector<char> encode_delivery(uint32_t epoch_index, const std::string& att_data,
+                                     const std::string& prev = {},
+                                     const std::string& prev_message_id = {},
+                                     const std::string& env_hash = {}) {
+      const std::vector<inbound_attestation> attestations{
+         {sysio::opp::types::ATTESTATION_TYPE_OPERATORS, att_data}};
+      return encode_delivery(epoch_index, attestations, prev, prev_message_id, env_hash);
    }
 
    /// Decode the raw bytes back into the pb Envelope (asserts success).
@@ -812,8 +862,8 @@ public:
    /// `chain_code`. Read from the surviving `outenvelopes` row, NOT the msgch `attestations`
    /// working table — `advance` queues its schedule attestations via `queueout` and then fans out
    /// `buildenv` inline in the SAME transaction, and `buildenv` packs the READY rows into the
-   /// outbound envelope, marks them PROCESSED, and ERASES them before the transaction ends. The
-   /// packed envelope (one-deep per outpost) is therefore the only durable copy of what `advance`
+   /// outbound envelope and ERASES them before the transaction ends. The
+   /// newest `outenvelopes` row is therefore the only durable copy of what `advance`
    /// emitted; scanning `attestations` after an advance always finds zero rows.
    sysio::opp::attestations::BatchOperatorGroups shipped_batch_operator_groups(uint64_t chain_code) {
       auto row = find_outbound_envelope(chain_code);
@@ -842,36 +892,43 @@ public:
       return groups_attestation;
    }
 
-   /// Verify the actual same-epoch OPERATORS snapshot after inline mutations.
-   /// Existing schedule seats may persist until normal rotation removes them;
-   /// the authoritative status must nevertheless revoke them immediately.
-   void require_fresh_roster(uint64_t chain_code, name account,
-                             opp::types::OperatorStatus expected_status) {
+   /// The OPERATORS roster the most recent envelope for `chain_code` carries, checked against the
+   /// schedule after inline mutations: it lists exactly the window's members that have an opreg row,
+   /// each with its current status, ahead of BATCH_OPERATOR_GROUPS. Returns account name -> status.
+   std::map<std::string, opp::types::OperatorStatus> require_roster_is_window(uint64_t chain_code) {
       const auto row = find_outbound_envelope(chain_code);
       BOOST_REQUIRE(!row.is_null());
       const auto env = decode_envelope(row["raw_envelope"].as<std::vector<char>>());
       BOOST_REQUIRE_EQUAL(env.messages_size(), 1);
-      bool found_operator = false;
+      std::map<std::string, opp::types::OperatorStatus> roster;
       bool have_operators = false;
       for (const auto& att : env.messages(0).payload().attestations()) {
          if (att.type() == opp::types::ATTESTATION_TYPE_OPERATORS) {
-            opp::attestations::Operators roster;
-            BOOST_REQUIRE(roster.ParseFromString(att.data()));
+            opp::attestations::Operators operators;
+            BOOST_REQUIRE(operators.ParseFromString(att.data()));
             have_operators = true;
-            for (const auto& entry : roster.operators()) {
-               const auto registered = get_operator(name{entry.account().name()});
-               BOOST_REQUIRE(!registered.is_null());
-               BOOST_REQUIRE_EQUAL(entry.status(), registered["status"].as<opp::types::OperatorStatus>());
-               if (entry.account().name() == account.to_string()) {
-                  BOOST_REQUIRE_EQUAL(entry.status(), expected_status);
-                  found_operator = true;
-               }
-            }
+            roster.clear();
+            for (const auto& entry : operators.operators()) roster[entry.account().name()] = entry.status();
          } else if (att.type() == opp::types::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS) {
             BOOST_REQUIRE(have_operators);
          }
       }
-      BOOST_REQUIRE(found_operator);
+      BOOST_REQUIRE(have_operators);
+
+      // Held in a local: a range-for over a member of the temporary would read freed memory.
+      const auto state = read_epoch_state();
+      std::set<std::string> window;
+      for (const auto& group : state[epoch_fields::BATCH_OP_GROUPS].get_array()) {
+         for (const auto& member : group.get_array()) {
+            if (!get_operator(name{member.as_string()}).is_null()) window.insert(member.as_string());
+         }
+      }
+      BOOST_REQUIRE_EQUAL(roster.size(), window.size());
+      for (const auto& [account, status] : roster) {
+         BOOST_REQUIRE_MESSAGE(window.count(account), account << " is in the roster but not seated");
+         BOOST_REQUIRE_EQUAL(status, get_operator(name{account})["status"].as<opp::types::OperatorStatus>());
+      }
+      return roster;
    }
 
    /// How many BATCH_OPERATOR_GROUPS attestations the most recent `advance` shipped to
@@ -979,6 +1036,19 @@ public:
       if (cur >= groups.size()) return name{};
       auto members = groups[cur].get_array();
       return members.empty() ? name{} : name(members[0].as_string());
+   }
+
+   /// True while `account` holds a seat in any group of the schedule window.
+   bool holds_schedule_seat(name account) {
+      // Held in a local: a range-for over a member of the temporary would read freed memory.
+      const auto state = read_epoch_state();
+      if (state.is_null()) return false;
+      for (const auto& group : state[epoch_fields::BATCH_OP_GROUPS].get_array()) {
+         for (const auto& member : group.get_array()) {
+            if (member.as_string() == account.to_string()) return true;
+         }
+      }
+      return false;
    }
 
    /// Advance exactly one epoch, landing the advance at the fixed-cadence next_epoch_start. Because
@@ -1195,8 +1265,9 @@ public:
             // whereas termination + reason hold either way. BATCHOP reached every outpost exactly
             // once, so exactly one delivered row must remain.
             BOOST_REQUIRE_EQUAL(1u, delivered_dellog_count(BATCHOP));
+            // Its group expired in the same advance, so the roster no longer lists it.
             for (const uint64_t outpost : outposts) {
-               require_fresh_roster(outpost, BATCHOP, opp::types::OPERATOR_STATUS_TERMINATED);
+               BOOST_REQUIRE(!require_roster_is_window(outpost).count(BATCHOP.to_string()));
             }
          } else {
             // Still ACTIVE: BATCHOP must not terminate before its terminating duty.
@@ -1499,6 +1570,53 @@ BOOST_FIXTURE_TEST_CASE(buildenv_handles_unacknowledged_backlog, sysio_msgch_cha
    const uint32_t next_epoch = advance_one_epoch();
    BOOST_REQUIRE_EQUAL(1u, outbound_envelope_count(ETH_OUTPOST_ID));
    BOOST_REQUIRE(!outbound_envelope_for_epoch(ETH_OUTPOST_ID, next_epoch).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// ---------------------------------------------------------------------------
+//  Inbound cleanup: buildenv erases only its own outpost's dispatched rows.
+// ---------------------------------------------------------------------------
+
+/// WIRE-415: `evalcons` stores every inbound attestation PROCESSED, and `buildenv` erases the
+/// destination outpost's PROCESSED rows through the `byqueue` range for that outpost. Each envelope
+/// carries one attestation per lane, so a range that misses a lane or reads another status leaves a
+/// row behind. Another outpost's rows, PROCESSED or READY, survive until its own `buildenv`.
+BOOST_FIXTURE_TEST_CASE(buildenv_erases_only_its_outposts_processed_rows, sysio_msgch_chain_tester) { try {
+   constexpr auto processed = opp::types::AttestationStatus::ATTESTATION_STATUS_PROCESSED;
+   constexpr auto ready     = opp::types::AttestationStatus::ATTESTATION_STATUS_READY;
+   bootstrap();
+
+   // Each outpost's first envelope reaches consensus on the single bootstrapped operator's delivery.
+   // OPERATORS is a schedule-lane type and OPERATOR_ACTION a general-lane one; dispatch drops both.
+   const uint32_t epoch = current_epoch();
+   const std::vector<inbound_attestation> attestations{
+      {opp::types::ATTESTATION_TYPE_OPERATORS,       "schedule-lane"},
+      {opp::types::ATTESTATION_TYPE_OPERATOR_ACTION, "general-lane"}};
+   for (const uint64_t outpost : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
+      BOOST_REQUIRE_EQUAL(success(), deliver(outpost, encode_delivery(epoch, attestations)));
+   }
+   produce_blocks();
+   for (const uint64_t outpost : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
+      BOOST_REQUIRE_EQUAL(attestations.size(), attestation_status_count(outpost, processed));
+      // A READY row on each outpost: `buildenv` builds nothing without one.
+      BOOST_REQUIRE_EQUAL(success(), queueout(outpost, opp::types::ATTESTATION_TYPE_DESYNDICATE_LIQ,
+                                              std::vector<char>(8, '\x01')));
+   }
+   produce_blocks();
+
+   // ETH's build ships ETH's READY row and erases both of its inbound rows. SOL's are untouched.
+   BOOST_REQUIRE_EQUAL(success(), buildenv(ETH_OUTPOST_ID));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(0u, attestation_status_count(ETH_OUTPOST_ID, processed));
+   BOOST_REQUIRE_EQUAL(0u, attestation_status_count(ETH_OUTPOST_ID, ready));
+   BOOST_REQUIRE_EQUAL(attestations.size(), attestation_status_count(SOL_OUTPOST_ID, processed));
+   BOOST_REQUIRE_EQUAL(1u, attestation_status_count(SOL_OUTPOST_ID, ready));
+
+   // The real advance path builds SOL's envelope, which erases SOL's inbound rows in turn.
+   advance_one_epoch();
+   for (const uint64_t outpost : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
+      BOOST_REQUIRE_EQUAL(0u, attestation_status_count(outpost, processed));
+      BOOST_REQUIRE_EQUAL(0u, attestation_status_count(outpost, ready));
+   }
 } FC_LOG_AND_RETHROW() }
 
 // ---------------------------------------------------------------------------
@@ -2036,8 +2154,9 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_
                        slash_action_count(BATCHOP, SOL_OUTPOST_ID));
    BOOST_REQUIRE_EQUAL(epoch + kEpochAdvanceCount, current_epoch());
    BOOST_REQUIRE_EQUAL(kExpectedDeliveredLogCount, delivered_dellog_count(BATCHOP));
+   // The slide reseated the group without BATCHOP, so the roster no longer lists it.
    for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID})
-      require_fresh_roster(chain, BATCHOP, opp::types::OPERATOR_STATUS_SLASHED);
+      BOOST_REQUIRE(!require_roster_is_window(chain).count(BATCHOP.to_string()));
 } FC_LOG_AND_RETHROW() }
 
 /// With two active outposts, advance() writes exactly one delivery-log row per expiring-group member
@@ -2522,8 +2641,8 @@ BOOST_FIXTURE_TEST_CASE(advance_withholds_batch_operator_groups_when_next_group_
       "starved window never withheld BATCH_OPERATOR_GROUPS -- an empty active group was published");
 } FC_LOG_AND_RETHROW() }
 
-/// Same-epoch termination must be visible in both outposts' authoritative
-/// rosters and in normal tail selection. This does not repair existing seats.
+/// An operator terminated in the same epoch drops out of both outposts' rosters
+/// and out of normal tail selection. This does not repair existing seats.
 BOOST_FIXTURE_TEST_CASE(advance_roster_excludes_same_epoch_termination,
                         sysio_msgch_chain_tester) { try {
    bootstrap(/*n_batch_ops=*/3, /*batchop_is_bootstrapped=*/false);
@@ -2532,9 +2651,12 @@ BOOST_FIXTURE_TEST_CASE(advance_roster_excludes_same_epoch_termination,
          ("type", opp::types::OPERATOR_TYPE_BATCH)("is_bootstrapped", true)));
    produce_blocks();
    advance_to_next_epoch();
+   BOOST_REQUIRE(get_operator(BATCHOP)["status"].as<opp::types::OperatorStatus>() ==
+                 opp::types::OPERATOR_STATUS_TERMINATED);
    for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
-      require_fresh_roster(chain, BATCHOP, opp::types::OPERATOR_STATUS_TERMINATED);
-      require_fresh_roster(chain, BATCHOP_B, opp::types::OPERATOR_STATUS_ACTIVE);
+      const auto roster = require_roster_is_window(chain);
+      BOOST_REQUIRE(!roster.count(BATCHOP.to_string()));
+      BOOST_REQUIRE_EQUAL(roster.at(BATCHOP_B.to_string()), opp::types::OPERATOR_STATUS_ACTIVE);
       const auto groups = shipped_batch_operator_groups(chain);
       BOOST_REQUIRE_EQUAL(groups.groups_size(), 1);
       BOOST_REQUIRE_EQUAL(groups.groups(0).operators_size(), 3);
@@ -2546,6 +2668,134 @@ BOOST_FIXTURE_TEST_CASE(advance_roster_excludes_same_epoch_termination,
          if (member.address() == BATCHOP_D.to_string()) found_standby = true;
       }
       BOOST_REQUIRE(found_standby);
+   }
+} FC_LOG_AND_RETHROW() }
+
+/// `terminate` leaves the operator's later seats in place. A registration made before they close would
+/// take the miss the next one records, and with that one row in its sample the miss rate would
+/// terminate it again, so `regoperator` refuses the account until its last seat has closed.
+BOOST_FIXTURE_TEST_CASE(regoperator_refuses_account_still_seated, sysio_msgch_chain_tester) { try {
+   const auto outposts = bootstrap_rotation(ROTATION_WINDOW_MS);
+
+   // BATCHOP delivers on its epoch-1 duty, so it stays ACTIVE and the slide seats it again in the tail.
+   BOOST_REQUIRE_EQUAL(BATCHOP, duty_member());
+   for (const uint64_t outpost : outposts) {
+      BOOST_REQUIRE_EQUAL(success(),
+         deliver_as(BATCHOP, outpost, encode_chained_delivery(ROTATION_DELIVERY_PAYLOAD, {})));
+   }
+   produce_blocks();
+   advance_to_next_epoch();
+   BOOST_REQUIRE(duty_member() != BATCHOP);
+   BOOST_REQUIRE(holds_schedule_seat(BATCHOP));
+
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "terminate"_n,
+      mvo()("account", BATCHOP.to_string())("reason", std::string(SEATED_TERMINATION_REASON))));
+   produce_blocks(); // land it before the advance's epoch-length jump expires it
+   BOOST_REQUIRE(opp::types::OperatorStatus::OPERATOR_STATUS_TERMINATED ==
+                 get_operator(BATCHOP)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
+
+   const auto register_again = [&] {
+      return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n, mvo()
+         ("account", BATCHOP.to_string())("type", opp::types::OperatorType::OPERATOR_TYPE_BATCH)
+         ("is_bootstrapped", false));
+   };
+
+   // Refused on every epoch the leftover seat is still in the window, its own duty epoch included.
+   uint32_t leftover_duty_epoch = 0;
+   for (uint32_t step = 0; step < ROTATION_GROUPS && holds_schedule_seat(BATCHOP); ++step) {
+      BOOST_REQUIRE_EQUAL(error(STILL_SEATED_REGISTRATION_ERROR), register_again());
+      if (duty_member() == BATCHOP) leftover_duty_epoch = current_epoch();
+      advance_to_next_epoch();
+   }
+   BOOST_REQUIRE(!holds_schedule_seat(BATCHOP));
+   BOOST_REQUIRE_GT(leftover_duty_epoch, 0u);
+
+   // The closed seat recorded its miss against the terminated registration, which termcheck left alone.
+   const auto leftover_rows = dellog_rows(BATCHOP, leftover_duty_epoch);
+   BOOST_REQUIRE_EQUAL(1u, leftover_rows.size());
+   BOOST_REQUIRE(!leftover_rows.front()[opreg_fields::DELIVERED].as<bool>());
+   BOOST_REQUIRE_EQUAL(std::string(SEATED_TERMINATION_REASON),
+                       get_operator(BATCHOP)[opreg_fields::STATUS_REASON].as_string());
+
+   BOOST_REQUIRE_EQUAL(success(), register_again());
+   BOOST_REQUIRE(opp::types::OperatorStatus::OPERATOR_STATUS_UNKNOWN ==
+                 get_operator(BATCHOP)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
+} FC_LOG_AND_RETHROW() }
+
+/// WNS-56: the OPERATORS roster lists exactly the operators the window seats, so registrations cannot
+/// grow it. Unbonded registrations, an ACTIVE batch operator the window does not seat, and an ACTIVE
+/// challenger are all left out.
+BOOST_FIXTURE_TEST_CASE(advance_roster_lists_only_the_window, sysio_msgch_chain_tester) { try {
+   bootstrap(/*n_batch_ops=*/3);
+   // The one group of three seats batchop.a-c; batchop.d sorts after them, so it stays unseated.
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n,
+      mvo()("account", BATCHOP_D.to_string())("type", opp::types::OPERATOR_TYPE_BATCH)("is_bootstrapped", true)));
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n,
+      mvo()("account", BATCHOP_E.to_string())("type", opp::types::OPERATOR_TYPE_CHALLENGER)("is_bootstrapped", true)));
+   std::vector<name> registrants;
+   for (uint32_t i = 0; i < UNBONDED_REGISTRANTS; ++i) {
+      registrants.emplace_back(std::string(UNBONDED_REGISTRANT_PREFIX) + static_cast<char>('a' + i));
+   }
+   create_accounts(registrants);
+   for (const auto& registrant : registrants) {
+      BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n,
+         mvo()("account", registrant.to_string())("type", opp::types::OPERATOR_TYPE_BATCH)("is_bootstrapped", false)));
+   }
+   produce_blocks();
+   BOOST_REQUIRE(get_operator(BATCHOP_D)["status"].as<opp::types::OperatorStatus>() ==
+                 opp::types::OPERATOR_STATUS_ACTIVE);
+   BOOST_REQUIRE(get_operator(registrants.front())["status"].as<opp::types::OperatorStatus>() ==
+                 opp::types::OPERATOR_STATUS_UNKNOWN);
+
+   advance_to_next_epoch();
+   for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
+      const auto roster = require_roster_is_window(chain);
+      BOOST_REQUIRE_EQUAL(roster.size(), 3u);
+      BOOST_REQUIRE(!roster.count(BATCHOP_D.to_string()));
+      BOOST_REQUIRE(!roster.count(BATCHOP_E.to_string()));
+      for (const auto& registrant : registrants) BOOST_REQUIRE(!roster.count(registrant.to_string()));
+   }
+} FC_LOG_AND_RETHROW() }
+
+/// A slashed member keeps its roster entry, with SLASHED status, while the window still seats it, so
+/// Solana keeps refusing that window instead of seating a smaller group. It drops out once its group
+/// slides off.
+BOOST_FIXTURE_TEST_CASE(advance_roster_keeps_a_seated_slashed_member_until_it_leaves,
+                        sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kGroups = 3;
+   constexpr uint64_t kRotationWindowMs = 12ULL * kGroups * EPOCH_DURATION_SEC * 1000ULL;
+   bootstrap_rotation(kRotationWindowMs);
+   // A spare so the slide can refill the slashed member's seat.
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n,
+      mvo()("account", BATCHOP_D.to_string())("type", opp::types::OPERATOR_TYPE_BATCH)("is_bootstrapped", true)));
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, CHALG_ACCOUNT, "slash"_n,
+      mvo()("account", BATCHOP_C.to_string())("reason", std::string("seated slash"))));
+   produce_blocks();
+
+   // batchop.c sits in the last group, so it stays seated for two more slides.
+   bool listed_while_seated = false;
+   for (uint32_t round = 0; round < kGroups; ++round) {
+      advance_to_next_epoch();
+      const auto roster = require_roster_is_window(ETH_OUTPOST_ID);
+      const auto slashed = roster.find(BATCHOP_C.to_string());
+      if (slashed != roster.end()) {
+         BOOST_REQUIRE_EQUAL(slashed->second, opp::types::OPERATOR_STATUS_SLASHED);
+         listed_while_seated = true;
+      }
+   }
+   BOOST_REQUIRE(listed_while_seated);
+   BOOST_REQUIRE(!require_roster_is_window(ETH_OUTPOST_ID).count(BATCHOP_C.to_string()));
+} FC_LOG_AND_RETHROW() }
+
+/// An empty window has no members to resolve, and Solana skips an empty roster as an anomaly, so
+/// `advance` queues no OPERATORS attestation even with operators registered.
+BOOST_FIXTURE_TEST_CASE(advance_queues_no_roster_for_an_empty_window, sysio_msgch_chain_tester) { try {
+   bootstrap(/*n_batch_ops=*/1, /*batchop_is_bootstrapped=*/true, /*build_schedule=*/false);
+   BOOST_REQUIRE(!get_operator(BATCHOP).is_null());
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::BATCH_OP_GROUPS].get_array().empty());
+   // Nothing else was queued either, so neither outpost gets an envelope this epoch.
+   for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
+      BOOST_REQUIRE(find_outbound_envelope(chain).is_null());
    }
 } FC_LOG_AND_RETHROW() }
 

@@ -34,11 +34,23 @@ class AppArgs:
         self.args.append(arg)
 
 
+class _LeasedPort:
+    """Class attribute that looks up a leased port on first access, not at import.
+
+    Importing the harness, or running a test with --help, therefore takes no lease.
+    """
+    def __init__(self, category):
+        self.category = category
+
+    def __get__(self, instance, owner):
+        return Utils.getPort(self.category)
+
+
 # pylint: disable=too-many-instance-attributes
 class TestHelper(object):
     LOCAL_HOST="localhost"
-    DEFAULT_PORT=Utils.getPort(Utils.PortNodeHttp)
-    DEFAULT_WALLET_PORT=Utils.getPort(Utils.PortWallet)
+    DEFAULT_PORT=_LeasedPort(Utils.PortNodeHttp)
+    DEFAULT_WALLET_PORT=_LeasedPort(Utils.PortWallet)
 
     @staticmethod
     # pylint: disable=too-many-branches
@@ -82,14 +94,14 @@ class TestHelper(object):
             thGrp.add_argument("--host", type=str, help=argparse.SUPPRESS if suppressHelp else "%s host name" % (Utils.SysServerName),
                                      default=TestHelper.LOCAL_HOST)
         if "--port" in includeArgs:
-            thGrp.add_argument("--port", type=int, help=argparse.SUPPRESS if suppressHelp else "%s host port" % Utils.SysServerName,
-                                     default=TestHelper.DEFAULT_PORT)
+            thGrp.add_argument("--port", type=int, help=argparse.SUPPRESS if suppressHelp else "%s host port (default: this test's leased node HTTP port)" % Utils.SysServerName,
+                                     default=None)
         if "--wallet-host" in includeArgs:
             thGrp.add_argument("--wallet-host", type=str, help=argparse.SUPPRESS if suppressHelp else "%s host" % Utils.SysWalletName,
                                      default=TestHelper.LOCAL_HOST)
         if "--wallet-port" in includeArgs:
-            thGrp.add_argument("--wallet-port", type=int, help=argparse.SUPPRESS if suppressHelp else "%s port" % Utils.SysWalletName,
-                                     default=TestHelper.DEFAULT_WALLET_PORT)
+            thGrp.add_argument("--wallet-port", type=int, help=argparse.SUPPRESS if suppressHelp else "%s port (default: this test's leased wallet port)" % Utils.SysWalletName,
+                                     default=None)
         if "--prod-count" in includeArgs:
             thGrp.add_argument("-c", "--prod-count", type=int, help=argparse.SUPPRESS if suppressHelp else "Per node producer count", default=21)
         if "--defproducera_prvt_key" in includeArgs:
@@ -142,6 +154,11 @@ class TestHelper(object):
     def parse_args(includeArgs, applicationSpecificArgs=AppArgs()):
         parser = TestHelper.createArgumentParser(includeArgs=includeArgs, applicationSpecificArgs=applicationSpecificArgs)
         args = parser.parse_args()
+        # Port defaults are filled after parsing so --help takes no lease.
+        if "--port" in includeArgs and args.port is None:
+            args.port = TestHelper.DEFAULT_PORT
+        if "--wallet-port" in includeArgs and args.wallet_port is None:
+            args.wallet_port = TestHelper.DEFAULT_WALLET_PORT
         return args
 
     @staticmethod

@@ -103,20 +103,8 @@ namespace sysio {
                 : configured_timeout;
    }
 
-   /// Minimum decoder and request budget for a cold startup configuration read.
-   inline constexpr fc::microseconds snapshot_attestation_startup_minimum_table_read_timeout{
-      1'000'000};
-
    /// Maximum number of bounded attestation-table reads before the caller fails closed.
    inline constexpr uint32_t snapshot_attestation_table_read_attempts = 3;
-
-   /** Give a cold startup read more headroom than steady-state attestation polling. */
-   constexpr fc::microseconds snapshot_attestation_startup_table_read_timeout(
-      fc::microseconds configured_timeout) {
-      return configured_timeout < snapshot_attestation_startup_minimum_table_read_timeout
-                ? snapshot_attestation_startup_minimum_table_read_timeout
-                : configured_timeout;
-   }
 
    /** Retry transient attestation-table read failures while preserving a terminal empty result. */
    template <typename Read>
@@ -130,14 +118,40 @@ namespace sysio {
       return {};
    }
 
+   /** Decoded governance values consumed by native snapshot-attestation components. */
+   struct snapshot_attestation_config {
+      /// Fixed number of distinct provider votes required; zero means unconfigured.
+      uint32_t min_providers = 0;
+      /// Positive block-height interval between eligible snapshots.
+      uint32_t block_spacing = sysiosystem::snapshot_attestation::default_block_spacing;
+
+      /** Return whether governance has enabled snapshot attestation. */
+      constexpr bool enabled() const noexcept { return min_providers > 0; }
+   };
+
+   /** Return whether a finalized height is inside the capped post-snapshot verification grace. */
+   constexpr bool snapshot_attestation_within_grace(uint32_t snapshot_height,
+                                                     uint32_t current_height,
+                                                     uint32_t block_spacing) noexcept {
+      return sysiosystem::snapshot_attestation::is_valid_block_spacing(block_spacing)
+             && static_cast<uint64_t>(current_height)
+                   < static_cast<uint64_t>(snapshot_height)
+                        + sysiosystem::snapshot_attestation::snapshot_attestation_grace_blocks(
+                           block_spacing);
+   }
+
    /** Return whether an ABI declares the tables consumed during auto-fetched snapshot bootstrap. */
    bool has_required_snapshot_attestation_schema(const abi_def& abi);
 
-   /** Return whether one decoded snapconfig row enables snapshot attestation. */
-   bool snapshot_attestation_config_is_enabled(const fc::variants& rows);
+   /** Read the fixed two-uint32 snapconfig KV row directly; absence yields production defaults.
+    * Call only during startup or while the caller owns a controller read/write window.
+    */
+   snapshot_attestation_config read_snapshot_attestation_config(const chain::kv_store& store);
 
-   /** Return whether endpoint metadata identifies the loaded scheduled snapshot head exactly. */
-   bool snapshot_endpoint_block_matches(uint32_t advertised_block_num, uint32_t loaded_block_num);
+   /** Return whether endpoint metadata identifies the loaded configured-cadence head exactly. */
+   bool snapshot_endpoint_block_matches(uint32_t advertised_block_num,
+                                        uint32_t loaded_block_num,
+                                        uint32_t block_spacing);
 
    /** Return whether endpoint metadata honors an optional specifically requested block. */
    bool snapshot_endpoint_request_matches(const std::optional<uint32_t>& requested_block_num,
@@ -172,7 +186,7 @@ namespace sysio {
    /// when chain_plugin's plugin_initialize constructs it, and appbase runs that before any dependent plugin
    /// initializes.
    inline constexpr auto get_info_consumer_plugins =
-      std::to_array<std::string_view>({"sysio::chain_api_plugin", "sysio::status_monitor_plugin"});
+      std::to_array<std::string_view>({"sysio::chain_api_plugin", "sysio::alert_monitor_plugin"});
 
    /// True when any `plugin` option value names a get_info consumer. Substring match, because appbase lets
    /// one option value carry several plugin names; the option is a free-form list, so the match is
@@ -246,6 +260,8 @@ class read_write;
 class api_base {
 public:
    static constexpr uint32_t max_return_items = 1000;
+   /// Default of read_only's per-page byte limit for table queries; see read_only::set_max_return_bytes.
+   static constexpr uint64_t default_max_return_bytes = 8 * 1024 * 1024;
    static void handle_db_exhaustion();
    static void handle_bad_alloc();
 
@@ -270,6 +286,7 @@ class read_only : public api_base {
    const fc::microseconds abi_serializer_max_time;
    const fc::microseconds http_max_response_time;
    bool  shorten_abi_errors = true;
+   uint64_t max_return_bytes = default_max_return_bytes;
    const trx_finality_status_processing* trx_finality_status_proc;
    friend class api_base;
 
@@ -301,6 +318,10 @@ public:
    }
 
    void set_shorten_abi_errors( bool f ) { shorten_abi_errors = f; }
+
+   /// Bytes of rows one get_table_rows or get_table_by_scope page may copy, whatever the deadline. The page ends with
+   /// `more` after the row that reaches it, so a page always holds at least one row. `all_rows` calls are exempt.
+   void set_max_return_bytes( uint64_t bytes ) { max_return_bytes = bytes; }
 
    void set_tracked_votes_tracking_enabled( bool flag ) {
       if (last_tracked_votes) {
@@ -671,19 +692,17 @@ public:
    template<typename Function>
    void walk_key_value_table(const name& code, const name& scope, const name& table, Function f) const
    {
-      const auto& d = db.db();
-
       // KV storage: iterate [scope:8B BE] prefix within table_id partition
       const auto table_id = chain::compute_table_id(table.to_uint64_t());
       char scope_prefix[chain::kv_scope_prefix_size];
       chain::kv_encode_be64(scope_prefix, scope.to_uint64_t());
       std::string_view scope_sv(scope_prefix, chain::kv_scope_prefix_size);
 
-      const auto& kv_idx = d.get_index<chain::kv_index, chain::by_code_key>();
-      auto itr = kv_idx.lower_bound(boost::make_tuple(code, table_id, scope_sv));
-
-      while (itr != kv_idx.end() && itr->code == code && itr->table_id == table_id) {
-         auto kv = itr->key_view();
+      auto cursor = db.kv().open_row_cursor();
+      chain::kv_row stored;
+      for (bool more = cursor->seek_lower({code, table_id, scope_sv}, stored);
+           more && stored.code == code && stored.table_id == table_id; more = cursor->next(stored)) {
+         auto kv = stored.key;
          if (kv.size() != chain::kv_scoped_key_size ||
              memcmp(kv.data(), scope_prefix, chain::kv_scope_prefix_size) != 0) break;
 
@@ -696,12 +715,11 @@ public:
 
          kv_row_view row;
          row.primary_key = chain::kv_decode_be64(kv.data() + chain::kv_scope_prefix_size);
-         row.payer = itr->payer;
-         row.value._data = itr->value.data();
-         row.value._size = itr->value.size();
+         row.payer = stored.payer;
+         row.value._data = stored.value.data();
+         row.value._size = stored.value.size();
 
          if (!f(row)) break;
-         ++itr;
       }
    }
 
@@ -824,6 +842,9 @@ public:
                            fc::microseconds abi_serializer_timeout,
                            std::string log_prefix,
                            const std::atomic<bool>& shutdown_flag);
+
+   /** Return the immutable startup snapshot configuration; restart to adopt governance changes. */
+   const snapshot_attestation_config& get_snapshot_attestation_config() const;
 
    /** Run a table scan while preserving the legacy empty-result-on-failure behavior. */
    chain_apis::read_only::get_table_rows_result
