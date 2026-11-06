@@ -111,15 +111,15 @@ depot would believe remits landed when they had not. That is a worse defect than
 any this design fixes, and it is the single most important thing to get right in
 the split.
 
-Four things ride the draining call, all of them today gated the same way:
+Four effects depend on the draining call:
 
 1. `config.next_epoch_index` advances.
 2. `previous_epoch_hash` / `current_epoch_started_at` are stamped.
 3. `emit_outbound_inner` fires — the outpost→depot envelope.
-4. The chunk buffer self-closes (`epoch_in.rs:335-343`), already deliberately
-   gated on `next_epoch_index` moving past the epoch because a partially
-   dispatched envelope needs those bytes again. The crank reads the envelope from
-   that buffer, so it must stay open until drain.
+4. The chunk buffer becomes eligible for cleanup once `next_epoch_index` has
+   moved past its epoch and the outbound envelope has been emitted. It stays
+   open after drain until the relay calls `cleanup_envelope_chunks`, returning
+   rent to its uploader. The crank needs the buffered bytes until drain.
 
 Because the depot learns of resolution *only* via the outbound envelope, and that
 emit is gated on drain, the invariant "the OPP flow does not resolve until every

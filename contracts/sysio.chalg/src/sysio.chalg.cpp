@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <optional>
 
 namespace sysio {
 
@@ -23,6 +24,9 @@ namespace {
 constexpr const char* DISPUTE_REQUIRES_TWO_CANDIDATES =
    "a dispute requires at least two candidate envelope versions";
 
+/// Rejection text for a ballot on a dispute whose tally already has a winner.
+constexpr const char* DISPUTE_ALREADY_HAS_WINNER = "dispute already has a winner";
+
 /// Snapshot the Tier-1 electorate: the Tier-1 rows of `sysio.roa::nodeowners` for `network_gen`,
 /// walked via the `bytier` index (bounded by the Tier-1 registration cap). Shared by
 /// `opendispute` and `openuwchal` so both case types freeze eligibility and quorum from the SAME
@@ -37,6 +41,32 @@ std::vector<name> snapshot_t1_electorate(name roa_account, uint8_t network_gen) 
       electorate.push_back(it->owner);
    }
    return electorate;
+}
+
+/// The winning checksum of dispute `d`'s tally `votes`, if it has one. Fast path (any time): a
+/// checksum reaches the dispute's quorum Q. After the deadline: a quorum of cast votes AND a strict
+/// majority of cast votes. No plurality / tie-break -- an undecided tally waits for more votes.
+std::optional<checksum256> tally_winner(const chalg::dispute_entry& d, const chalg::disputevotes_t& votes) {
+   // Tally the cast votes by chosen checksum (parallel vectors; the set is <= 21).
+   std::vector<checksum256> seen;
+   std::vector<uint32_t>    counts;
+   uint32_t cast = 0;
+   for (auto it = votes.begin(); it != votes.end(); ++it) {
+      bool found = false;
+      for (size_t i = 0; i < seen.size(); ++i) {
+         if (seen[i] == it->chosen_checksum) { counts[i]++; found = true; break; }
+      }
+      if (!found) { seen.push_back(it->chosen_checksum); counts.push_back(1); }
+      ++cast;
+   }
+
+   const uint32_t Q             = d.quorum;
+   const bool     past_deadline = current_time_point() >= d.deadline;
+   for (size_t i = 0; i < seen.size(); ++i) {
+      if (counts[i] >= Q) return seen[i];
+      if (past_deadline && cast >= Q && 2 * counts[i] > cast) return seen[i];
+   }
+   return std::nullopt;
 }
 
 } // anonymous namespace
@@ -158,6 +188,10 @@ void chalg::votedispute(name owner, uint64_t dispute_id, checksum256 chosen_chec
    auto v_pk = dispute_vote_key{owner.value};
    check(!votes.contains(v_pk), "owner has already voted in this dispute");
 
+   // A tally with a winner takes no more ballots: past the deadline one more ballot for another
+   // checksum could break the winner's strict majority of cast votes before chkdispute records it.
+   check(!tally_winner(d, votes), DISPUTE_ALREADY_HAS_WINNER);
+
    votes.emplace(ram_payer, v_pk, dispute_vote{
       .owner           = owner,
       .chosen_checksum = chosen_checksum,
@@ -186,37 +220,13 @@ void chalg::chkdispute(uint64_t dispute_id) {
    const uint32_t Q = d.quorum;
    check(Q > 0 && Q <= N, "dispute has no electorate snapshot");
 
-   // Tally the cast votes by chosen checksum (parallel vectors; the set is <= 21).
    disputevotes_t votes(get_self(), dispute_id);
-   std::vector<checksum256> seen;
-   std::vector<uint32_t>    counts;
-   uint32_t cast = 0;
-   for (auto it = votes.begin(); it != votes.end(); ++it) {
-      bool found = false;
-      for (size_t i = 0; i < seen.size(); ++i) {
-         if (seen[i] == it->chosen_checksum) { counts[i]++; found = true; break; }
-      }
-      if (!found) { seen.push_back(it->chosen_checksum); counts.push_back(1); }
-      ++cast;
-   }
-
-   // Resolve per the tally rule. Fast path (any time): a checksum reaches a majority of the
-   // snapshotted electorate. After the deadline: a quorum of cast votes AND a strict majority of
-   // cast votes. No plurality / tie-break — an unresolved tally just keeps waiting for more votes.
-   const bool  past_deadline = current_time_point() >= d.deadline;
-   bool        resolved      = false;
-   checksum256 winner{};
-   for (size_t i = 0; i < seen.size(); ++i) {
-      if (counts[i] >= Q) { winner = seen[i]; resolved = true; break; }
-      if (past_deadline && cast >= Q && 2 * counts[i] > cast) {
-         winner = seen[i]; resolved = true; break;
-      }
-   }
-   if (!resolved) return;
+   const auto winner = tally_winner(d, votes);
+   if (!winner) return;
 
    disputes.modify(same_payer, d_pk, [&](auto& r) {
       r.status           = DisputeStatus::DISPUTE_STATUS_RESOLVED;
-      r.winning_checksum = winner;
+      r.winning_checksum = *winner;
    });
 
    // This dispute leaves OPEN: drop the open-dispute count. The decrement is guarded so a row
@@ -233,7 +243,7 @@ void chalg::chkdispute(uint64_t dispute_id) {
       permission_level{get_self(), "active"_n},
       MSGCH_ACCOUNT,
       "resolvedisp"_n,
-      std::make_tuple(d.chain_code, d.epoch_index, winner)
+      std::make_tuple(d.chain_code, d.epoch_index, *winner)
    ).send();
 
    // Release the epoch pause only when no other dispute remains open -- sysio.epoch::is_paused is

@@ -4,6 +4,7 @@
 #include <fc/network/ethereum/ethereum_rlp_encoder.hpp>
 #include <fc/time.hpp>
 #include <print>
+#include <thread>
 #include <sysio/chain/app.hpp>
 #include <sysio/outpost_client_plugin.hpp>
 #include <sysio/outpost_ethereum_client_plugin.hpp>
@@ -99,10 +100,19 @@ int main(int argc, char* argv[]) {
 
       // auto& sig_plug = app->get_plugin<sysio::signature_provider_manager_plugin>();
       auto& eth_plug = app().get_plugin<sysio::outpost_ethereum_client_plugin>();
-      // Clients are constructed at plugin_initialize (the signature-provider manager creates every provider at
-      // its own init, before this plugin initializes), so they are ready to read immediately after init -- no
-      // explicit startup of the plugin subtree is needed.
-      auto client_entry = eth_plug.get_clients()[0];
+      /// Start deferred discovery and bound this diagnostic tool's wait separately from daemon recovery.
+      constexpr auto discovery_wait = std::chrono::seconds(30);
+      constexpr auto discovery_poll = std::chrono::milliseconds(100);
+      eth_plug.startup();
+      const auto deadline = std::chrono::steady_clock::now() + discovery_wait;
+      auto entries = eth_plug.get_clients();
+      FC_ASSERT(!entries.empty(), "No Ethereum clients configured");
+      auto client_entry = entries.front();
+      while (!client_entry->client && !app().is_quiting() && std::chrono::steady_clock::now() < deadline) {
+         std::this_thread::sleep_for(discovery_poll);
+         client_entry = eth_plug.get_client(client_entry->id);
+      }
+      FC_ASSERT(client_entry->client, "Ethereum identity discovery is still pending; retry when RPC is available");
       auto& client = client_entry->client;
 
       auto protocol_version = client->get_network_version();

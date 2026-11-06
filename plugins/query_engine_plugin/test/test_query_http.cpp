@@ -32,6 +32,8 @@ constexpr auto table_route = "/v1/chain/get_table_rows";
 constexpr int http_version = 11;
 constexpr uint32_t default_read_threads = 2;
 constexpr auto write_window_option = "read-only-write-window-time-us";
+/// producer_plugin's option naming the producers this node signs for.
+constexpr auto producer_name_option = "producer-name";
 /// Real-clock request deadlines include read-window waits; a generous default keeps runs on a loaded
 /// host deterministic unless a test pins its own timeout.
 constexpr auto default_query_timeout = std::chrono::seconds(10);
@@ -324,19 +326,23 @@ BOOST_AUTO_TEST_CASE(query_http_plugin_disabled) {
    BOOST_CHECK(server.request(request_body(selected_sql)).result() == http::status::not_found);
 }
 
-/// Reject a configured producer during initialization, before workers or routes exist. Zero read
-/// threads keep producer_plugin's own producer/read-thread check out of the way, so the rejection is
-/// the query plugin's.
-BOOST_AUTO_TEST_CASE(query_http_rejects_producer) {
+/// The plugin starts on a configured producer like on any node. producer_plugin refuses read-only threads
+/// on a producer, so every query that parses fails with STATE_UNAVAILABLE naming read-only-threads. The
+/// harness never enables stale production, so the node is a configured producer that does not produce.
+BOOST_AUTO_TEST_CASE(query_http_accepts_producer) {
    constexpr uint32_t no_read_threads = 0;
-   const std::vector<std::string> producer = {"--producer-name", "sysio"};
-   {
-      // Control: the same node without the query plugin initializes, so the rejection below is ours.
-      http_application control;
-      BOOST_REQUIRE(control.initialize(false, no_read_threads, producer) == chain::exit_code::SUCCESS);
-   }
+   const std::vector<std::string> producer = {flag(producer_name_option),
+                                              chain::config::system_account_name.to_string()};
    http_application server;
-   BOOST_CHECK(server.initialize(true, no_read_threads, producer) != chain::exit_code::SUCCESS);
+   BOOST_REQUIRE(server.initialize(true, no_read_threads, producer) == chain::exit_code::SUCCESS);
+   server.start();
+   const auto response = fc::json::from_string(server.request(request_body(selected_sql)).body());
+   BOOST_REQUIRE_MESSAGE(response.get_object().contains("error"),
+                         fc::json::to_string(response, fc::time_point::maximum()));
+   BOOST_CHECK_EQUAL(response["error"]["code"].as_int64(), error_code(error_kind::STATE_UNAVAILABLE));
+   BOOST_CHECK_EQUAL(response["error"]["data"]["kind"].as_string(),
+                     std::string(magic_enum::enum_name(error_kind::STATE_UNAVAILABLE)));
+   BOOST_CHECK_EQUAL(response["error"]["data"]["limit"].as_string(), bound::read_only_threads);
 }
 
 /// Startup rejects speculative chain state independently of HTTP enablement.
@@ -346,11 +352,31 @@ BOOST_AUTO_TEST_CASE(query_http_startup_guards) {
    BOOST_CHECK(server.run_until_startup_fails() != chain::exit_code::SUCCESS);
 }
 
-/// Reads run on the read-exclusive queue, which only read-only threads drain: startup rejects a node without them.
-BOOST_AUTO_TEST_CASE(query_http_requires_read_only_threads) {
+/// Reads run on the read-exclusive queue, which only read-only threads drain: a node without them starts,
+/// and every query that parses fails at once with STATE_UNAVAILABLE naming read-only-threads, releasing its
+/// admission instead of queueing a read nothing would run.
+BOOST_AUTO_TEST_CASE(query_http_without_read_threads_fails_queries) {
+   constexpr uint32_t no_read_threads = 0;
+   constexpr uint64_t queries = 2;
+   static_assert(queries <= sysio::query_engine::defaults::max_in_flight,
+                 "the failed queries must fit the default admission even before any is released");
    http_application server;
-   BOOST_REQUIRE(server.initialize(true, 0) == chain::exit_code::SUCCESS);
-   BOOST_CHECK(server.run_until_startup_fails() != chain::exit_code::SUCCESS);
+   BOOST_REQUIRE(server.initialize(true, no_read_threads) == chain::exit_code::SUCCESS);
+   server.start();
+   const auto service = app().get_plugin<sysio::query_engine_plugin>().get_query_service();
+   BOOST_REQUIRE(service);
+   for (uint64_t call = 0; call < queries; ++call)
+      BOOST_CHECK_EXCEPTION(service->execute(selected_sql), query_error, [](const query_error& error) {
+         return error.kind == error_kind::STATE_UNAVAILABLE && error.limit == bound::read_only_threads;
+      });
+   const auto engine = std::dynamic_pointer_cast<sysio::query_engine::query_engine>(
+      app().get_plugin<sysio::query_engine_plugin>().get_query_service());
+   BOOST_REQUIRE(engine);
+   // Admission is released when a worker drops the failed task, after execute() has already returned.
+   await([&] { return engine->stats().in_flight == 0; });
+   const auto stats = engine->stats();
+   BOOST_CHECK_EQUAL(stats.failed[*magic_enum::enum_index(error_kind::STATE_UNAVAILABLE)], queries);
+   BOOST_CHECK_EQUAL(stats.rejected_busy, 0);
 }
 
 /// A configured capture bound may only tighten producer_plugin's read-only transaction budget: a value

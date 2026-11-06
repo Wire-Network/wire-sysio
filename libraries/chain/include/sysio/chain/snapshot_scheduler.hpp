@@ -3,6 +3,7 @@
 #include <sysio/chain/pending_snapshot.hpp>
 
 #include <fc/crypto/blake3.hpp>
+#include <fc/io/atomic_file.hpp>
 #include <fc/log/log_message.hpp>
 #include <sysio/chain/config.hpp>
 #include <sysio/chain/exceptions.hpp>
@@ -22,6 +23,7 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include <limits>
+#include <sstream>
 
 namespace sysio::chain {
 
@@ -151,10 +153,13 @@ public:
          root.push_back(std::make_pair("snapshot_requests", node_srs));
 
          try {
-            std::ofstream file(get_json_path().string());
-            file.exceptions(std::istream::failbit | std::istream::eofbit);
-            boost::property_tree::write_json(file, root);
-         } catch(std::ofstream::failure& e) {
+            std::ostringstream serialized;
+            boost::property_tree::write_json(serialized, root);
+            const auto data = serialized.str();
+            fc::io::atomic_file_writer file(get_json_path());
+            file.file().write(data.data(), data.size());
+            file.commit();
+         } catch(const std::exception& e) {
             elog("unable to store snapshots schedule to filesystem to {}, details: {}",
                  get_json_path().string(), e.what());
          }

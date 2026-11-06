@@ -53,6 +53,49 @@ static fc::time_point get_deadline() {
 
 static auto yield_fn() { return abi_serializer::create_yield_function( max_serialization_time ); }
 
+// Exercise the real fixture path, including account ABI lookup, validation,
+// action packing, and excessive input recursion rejection.
+BOOST_AUTO_TEST_CASE(fixture_action_serialization_preserves_recursion_guard)
+{ try {
+   const std::string abi_json = R"({
+      "version":"sysio::abi/1.0",
+      "structs":[{"name":"entry","base":"","fields":[{"name":"children","type":"entry[]"}]}],
+      "actions":[{"name":"visit","type":"entry","ricardian_contract":""}]
+   })";
+   testing::tester chain;
+   const auto account = "abifixture"_n;
+   chain.create_account(account);
+   chain.set_abi(account, abi_json);
+   const auto input = fc::json::from_string(R"({"children":[{"children":[]}]})");
+   const auto action = chain.get_action(account, "visit"_n, {{account, config::active_name}}, input.get_object());
+   BOOST_CHECK_EQUAL(action.account, account);
+   BOOST_CHECK_EQUAL(action.name, "visit"_n);
+   BOOST_CHECK_EQUAL(fc::to_hex(action.data), "0100");
+   abi_serializer serializer(fc::json::from_string(abi_json).as<abi_def>(),
+                             abi_serializer::create_depth_yield_function());
+   const auto decoded = serializer.binary_to_variant("entry", action.data,
+                                                     abi_serializer::create_depth_yield_function());
+   const auto& children = decoded.get_object()["children"].get_array();
+   BOOST_REQUIRE_EQUAL(children.size(), 1u);
+   BOOST_CHECK(children.front().get_object()["children"].get_array().empty());
+
+   fc::variant nested = fc::mutable_variant_object()("children", fc::variants{});
+   for (size_t depth = 0; depth <= abi_serializer::max_recursion_depth; ++depth)
+      nested = fc::mutable_variant_object()("children", fc::variants{std::move(nested)});
+   BOOST_CHECK_THROW(chain.get_action(account, "visit"_n, {{account, config::active_name}}, nested.get_object()),
+                     abi_recursion_depth_exception);
+} FC_LOG_AND_RETHROW() }
+
+BOOST_AUTO_TEST_CASE(abi_yield_guards_are_independent)
+{
+   auto depth_only = abi_serializer::create_depth_yield_function();
+   BOOST_CHECK_NO_THROW(depth_only(abi_serializer::max_recursion_depth - 1));
+   BOOST_CHECK_THROW(depth_only(abi_serializer::max_recursion_depth), abi_recursion_depth_exception);
+   // An expired production budget must still fail with the exact deadline error.
+   auto expired = abi_serializer::create_yield_function(fc::microseconds(0));
+   BOOST_CHECK_THROW(expired(0), abi_serialization_deadline_exception);
+}
+
 // verify that round trip conversion, via bytes, reproduces the exact same data
 fc::variant verify_byte_round_trip_conversion( const abi_serializer& abis, const type_name& type, const fc::variant& var )
 {

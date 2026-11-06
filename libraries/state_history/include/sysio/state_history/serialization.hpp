@@ -158,6 +158,13 @@ void history_pack_big_bytes(datastream<ST>& ds, const sysio::chain::shared_blob&
 }
 
 template <typename ST>
+void history_pack_big_bytes(datastream<ST>& ds, std::string_view v) {
+   history_pack_varuint64(ds, v.size());
+   if (!v.empty())
+      ds.write(v.data(), v.size());
+}
+
+template <typename ST>
 void history_pack_big_bytes(datastream<ST>& ds, const std::optional<sysio::chain::bytes>& v) {
    fc::raw::pack(ds, v.has_value());
    if (v)
@@ -235,29 +242,24 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stat
 // Clients resolve table_id → table name via contract ABI.
 
 template <typename ST>
-datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::kv_object>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::kv_row>& obj) {
    fc::raw::pack(ds, fc::unsigned_int(0)); // struct_version
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.code.to_uint64_t()));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.payer.to_uint64_t()));
    fc::raw::pack(ds, as_type<uint16_t>(obj.obj.table_id));
-   sysio::chain::bytes key_bytes(obj.obj.key.data(), obj.obj.key.data() + obj.obj.key.size());
-   history_pack_big_bytes(ds, key_bytes);
+   history_pack_big_bytes(ds, obj.obj.key);
    history_pack_big_bytes(ds, obj.obj.value);
    return ds;
 }
 
 template <typename ST>
-datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::kv_index_object>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::kv_index_entry>& obj) {
    fc::raw::pack(ds, fc::unsigned_int(0)); // struct_version
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.code.to_uint64_t()));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.payer.to_uint64_t()));
    fc::raw::pack(ds, as_type<uint16_t>(obj.obj.table_id));
-   history_pack_varuint64(ds, obj.obj.sec_key.size());
-   if (obj.obj.sec_key.size() > 0)
-      ds.write(obj.obj.sec_key.data(), obj.obj.sec_key.size());
-   history_pack_varuint64(ds, obj.obj.pri_key.size());
-   if (obj.obj.pri_key.size() > 0)
-      ds.write(obj.obj.pri_key.data(), obj.obj.pri_key.size());
+   history_pack_big_bytes(ds, obj.obj.sec_key);
+   history_pack_big_bytes(ds, obj.obj.pri_key);
    return ds;
 }
 

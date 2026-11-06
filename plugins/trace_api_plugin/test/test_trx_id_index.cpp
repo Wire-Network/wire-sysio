@@ -34,6 +34,25 @@ struct trx_id_index_fixture {
 
 BOOST_AUTO_TEST_SUITE(trx_id_index_tests)
 
+/// Rebuilding replaces existing bytes and ignores crash leftovers instead of appending stale index data.
+BOOST_FIXTURE_TEST_CASE(rewrite_with_stale_temporary, trx_id_index_fixture) {
+   const auto stale = index_path().string() + ".tmp";
+   trx_id_index_writer old;
+   old.add(make_trx_id(1), 10);
+   old.write(stale);
+   old.write(index_path());
+   trx_id_index_writer fresh;
+   fresh.add(make_trx_id(2), 20);
+   fresh.write(index_path());
+   trx_id_index_reader reader(index_path());
+   BOOST_REQUIRE(reader.valid());
+   BOOST_CHECK(!reader.lookup(make_trx_id(1)));
+   BOOST_REQUIRE(reader.lookup(make_trx_id(2)));
+   BOOST_CHECK_EQUAL(*reader.lookup(make_trx_id(2)), 20u);
+   BOOST_CHECK_EQUAL(std::distance(std::filesystem::directory_iterator(tempdir.path()),
+                                 std::filesystem::directory_iterator()), 2);
+}
+
 // ---------------------------------------------------------------------------
 // Writer / Reader round-trip
 // ---------------------------------------------------------------------------

@@ -5,6 +5,7 @@
 
 #include <fc/scoped_exit.hpp>
 #include <fc/io/json.hpp>
+#include <fc/io/atomic_file.hpp>
 
 #include <algorithm>
 #include <boost/assign/list_of.hpp>
@@ -699,17 +700,21 @@ Example protocol feature. No functionality is triggered by this protocol feature
                      file_path.string()
          );
 
-         if( fc::json::save_to_file( f, file_path ) ) {
+         const auto data = fc::json::to_pretty_string(f, fc::time_point::maximum(), fc::json::max_length_limit);
+         try {
+            fc::io::atomic_file_writer output(file_path);
+            output.file().write(data.data(), data.size());
+            output.commit();
             ilog( "Saved default specification for builtin protocol feature '{}' (with digest of '{}') to: {}",
                   builtin_protocol_feature_codename(f.get_codename()),
                   feature_digest,
                   file_path.string()
             );
-         } else {
-            elog( "Error occurred while writing default specification for builtin protocol feature '{}' (with digest of '{}') to: {}",
+         } catch (const std::exception& e) {
+            elog( "Error occurred while writing default specification for builtin protocol feature '{}' (with digest of '{}') to: {}: {}",
                   builtin_protocol_feature_codename(f.get_codename()),
                   feature_digest,
-                  file_path.string()
+                  file_path.string(), e.what()
             );
          }
       };

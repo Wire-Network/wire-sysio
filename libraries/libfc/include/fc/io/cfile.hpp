@@ -55,8 +55,7 @@ public:
    {}
 
    cfile(cfile&& other)
-     : _open(other._open)
-     , _file_path(std::move(other._file_path))
+     : _file_path(std::move(other._file_path))
      , _file_blk_size(other._file_blk_size)
      , _file(std::move(other._file))
    {}
@@ -80,10 +79,13 @@ public:
       return _file_path;
    }
 
-   bool is_open() const { return _open; }
+   bool is_open() const { return bool(_file); }
+
+   /// Report the sticky stdio error indicator, for callers that cannot recover from earlier I/O errors.
+   bool has_error() const { return ferror(checked_file()) != 0; }
 
    auto fileno() const {
-      int fd = ::fileno(_file.get());
+      int fd = ::fileno(checked_file());
       if( -1 == fd ) {
          throw std::ios_base::failure( "cfile: " + _file_path.generic_string() +
                                        " unable to convert file pointer to file descriptor, error: " +
@@ -111,7 +113,6 @@ public:
       if( fstat(fileno(), &st) == 0 )
          _file_blk_size = st.st_blksize;
 #endif
-      _open = true;
    }
 
    /**
@@ -149,7 +150,7 @@ public:
    }
 
    size_t tellp() const {
-      long result = ftell( _file.get() );
+      long result = ftell( checked_file() );
       if (result == -1)
          throw std::ios_base::failure("cfile: " + get_file_path().generic_string() +
                                       " unable to get the current position of the file, error: " + std::to_string( errno ));
@@ -157,7 +158,7 @@ public:
    }
 
    void seek( long loc ) {
-      if( 0 != fseek( _file.get(), loc, SEEK_SET ) ) {
+      if( 0 != fseek( checked_file(), loc, SEEK_SET ) ) {
          int err = ferror(_file.get());
          throw std::ios_base::failure( "cfile: " + _file_path.generic_string() +
                                        " unable to SEEK_SET to: " + std::to_string(loc) +
@@ -166,7 +167,7 @@ public:
    }
 
    void seek_end( long loc ) {
-      if( 0 != fseek( _file.get(), loc, SEEK_END ) ) {
+      if( 0 != fseek( checked_file(), loc, SEEK_END ) ) {
          int err = ferror(_file.get());
          throw std::ios_base::failure( "cfile: " + _file_path.generic_string() +
                                        " unable to SEEK_END to: " + std::to_string(loc) +
@@ -175,7 +176,7 @@ public:
    }
 
    void skip( long loc) {
-      if( 0 != fseek( _file.get(), loc, SEEK_CUR ) ) {
+      if( 0 != fseek( checked_file(), loc, SEEK_CUR ) ) {
          int err = ferror(_file.get());
          throw std::ios_base::failure( "cfile: " + _file_path.generic_string() +
                                        " unable to SEEK_CUR to: " + std::to_string(loc) +
@@ -184,7 +185,7 @@ public:
    }
 
    void read( char* d, size_t n ) {
-      size_t result = fread( d, 1, n, _file.get() );
+      size_t result = fread( d, 1, n, checked_file() );
       if( result != n ) {
          int err = ferror(_file.get());
          int eof = feof(_file.get());
@@ -197,7 +198,7 @@ public:
    }
 
    void write( const char* d, size_t n ) {
-      size_t result = fwrite( d, 1, n, _file.get() );
+      size_t result = fwrite( d, 1, n, checked_file() );
       if( result != n ) {
          throw std::ios_base::failure( "cfile: " + _file_path.generic_string() +
                                        " unable to write " + std::to_string( n ) + " bytes; only wrote " + std::to_string( result ) );
@@ -274,7 +275,7 @@ public:
    }
 
    void flush() {
-      if( 0 != fflush( _file.get() ) ) {
+      if( 0 != fflush( checked_file() ) ) {
          int err = ferror( _file.get() );
          throw std::ios_base::failure( "cfile: " + _file_path.generic_string() +
                                        " unable to flush file, ferror: " + std::to_string( err ) );
@@ -298,6 +299,7 @@ public:
    //rounds to filesystem block boundaries; e.g. punch_hole(5000, 14000) when blocksz=4096 punches from 8192 to 12288
    //end is not inclusive; eg punch_hole(4096, 8192) will punch 4096 bytes (assuming blocksz=4096)
    void punch_hole(size_t begin, size_t end) {
+      checked_file();
       if(begin % _file_blk_size) {
          begin &= ~(_file_blk_size-1);
          begin += _file_blk_size;
@@ -329,10 +331,10 @@ public:
 
    size_t filesystem_block_size() const { return _file_blk_size; }
 
-   bool eof() const { return feof(_file.get()) != 0; }
+   bool eof() const { return feof(checked_file()) != 0; }
 
    int getc() {
-      int ret = fgetc(_file.get());
+      int ret = fgetc(checked_file());
       if (ret == EOF) {
          throw std::ios_base::failure( "cfile: " + _file_path.generic_string() +
                                        " unable to read 1 byte");
@@ -342,7 +344,16 @@ public:
 
    void close() {
       _file.reset();
-      _open = false;
+   }
+
+   /// Close exactly once and report delayed I/O errors; the handle is closed even when this throws.
+   void close_checked() {
+      FILE* file = _file.release();
+      if (file && fclose(file) != 0) {
+         const int error = errno;
+         throw std::ios_base::failure("cfile unable to close: " + _file_path.generic_string(),
+                                      std::error_code(error, std::generic_category()));
+      }
    }
 
    boost::interprocess::mapping_handle_t get_mapping_handle() const {
@@ -354,14 +365,19 @@ public:
 
    friend void swap(cfile& lhs, cfile& rhs) {
       using std::swap;
-      swap(lhs._open, rhs._open);
       swap(lhs._file_path, rhs._file_path);
       swap(lhs._file_blk_size, rhs._file_blk_size);
       swap(lhs._file, rhs._file);
    }
 
 private:
-   bool                  _open = false;
+   /// Validate the handle before passing it to a C API, including on moved-from objects.
+   FILE* checked_file() const {
+      if (!_file)
+         throw std::ios_base::failure("cfile is not open: " + _file_path.generic_string());
+      return _file.get();
+   }
+
    std::filesystem::path _file_path;
    size_t                _file_blk_size = 4096;
    detail::unique_file   _file;
@@ -382,7 +398,6 @@ public:
          using namespace std::literals::string_literals;
          throw std::ios_base::failure( "cfile unable to open: "s +  tmp + " in mode: " + std::string( mode ) );
       }
-      _impl._open = true;
    }
    ~temp_cfile() {
       _impl.close();

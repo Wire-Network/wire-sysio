@@ -1,4 +1,6 @@
 #include <sysio/trace_api/compressed_file.hpp>
+#include <fc/io/atomic_file.hpp>
+#include <fc/scoped_exit.hpp>
 
 #include <zlib.h>
 
@@ -217,9 +219,8 @@ bool compressed_file::process( const std::filesystem::path& input_path, const st
    input_file.set_file_path(input_path);
    input_file.open("rb");
 
-   fc::cfile output_file;
-   output_file.set_file_path(output_path);
-   output_file.open("wb");
+   fc::io::atomic_file_writer output(output_path);
+   auto& output_file = output.file();
 
    z_stream strm;
    strm.zalloc = Z_NULL;
@@ -229,6 +230,7 @@ bool compressed_file::process( const std::filesystem::path& input_path, const st
    if (deflateInit2(&strm, Z_BEST_COMPRESSION, Z_DEFLATED, raw_zlib_window_bits, 8, Z_DEFAULT_STRATEGY) != Z_OK) {
       return false;
    }
+   auto cleanup = fc::make_scoped_exit([&]() { deflateEnd(&strm); });
 
    constexpr size_t buffer_size = 64*1024;
    auto input_buffer = std::vector<uint8_t>(buffer_size);
@@ -299,7 +301,6 @@ bool compressed_file::process( const std::filesystem::path& input_path, const st
       }
    }
 
-   deflateEnd(&strm);
    input_file.close();
 
    // write out the seek point table
@@ -310,7 +311,7 @@ bool compressed_file::process( const std::filesystem::path& input_path, const st
    // write out the seek point count
    output_file.write(reinterpret_cast<const char*>(&seek_point_count), sizeof(seek_point_count_type));
 
-   output_file.close();
+   output.commit();
    return true;
 }
 

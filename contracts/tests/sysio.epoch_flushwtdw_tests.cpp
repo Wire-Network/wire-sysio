@@ -124,7 +124,7 @@ public:
       abi_def parsed_abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, parsed_abi), true);
       out_ser.set_abi(std::move(parsed_abi),
-                      abi_serializer::create_yield_function(abi_serializer_max_time));
+                      fixture_abi_yield_function());
    }
 
    void deploy(name account, std::vector<uint8_t> wasm, std::vector<char> abi,
@@ -137,7 +137,7 @@ public:
       abi_def parsed_abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, parsed_abi), true);
       out_ser.set_abi(std::move(parsed_abi),
-                      abi_serializer::create_yield_function(abi_serializer_max_time));
+                      fixture_abi_yield_function());
    }
 
    static fc::slug_name cn(std::string_view s) { return fc::slug_name{s}; }
@@ -273,7 +273,7 @@ public:
                                      "epochstate"_n, "epochstate"_n);
       if (data.empty()) return 0;
       auto v = epoch_abi.binary_to_variant("epoch_state", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
       return v["current_epoch_index"].as<uint32_t>();
    }
 
@@ -296,7 +296,7 @@ public:
                                      "operators"_n, account);
       return data.empty() ? fc::variant() : opreg_abi.binary_to_variant(
          "operator_entry", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
    }
 
    fc::variant get_wtdw(uint64_t request_id) {
@@ -304,7 +304,7 @@ public:
                                 "wtdwqueue"_n, request_id);
       return data.empty() ? fc::variant() : opreg_abi.binary_to_variant(
          "withdraw_request", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
    }
 
    uint64_t balance_of(name account, std::string_view chain_code,
@@ -331,7 +331,7 @@ public:
                                    "attestations"_n, id);
          if (data.empty()) continue;
          auto row = msgch_abi.binary_to_variant("attestation_entry", data,
-            abi_serializer::create_yield_function(abi_serializer_max_time));
+            fixture_abi_yield_function());
          if (row["type"].as<sysio::opp::types::AttestationType>() == expected) ++n;
       }
       return n;

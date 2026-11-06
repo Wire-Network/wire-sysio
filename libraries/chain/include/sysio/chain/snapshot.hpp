@@ -427,6 +427,9 @@ namespace sysio { namespace chain {
          /// Returns the root hash (valid only after finalize()).
          fc::crypto::blake3 get_root_hash() const { return root_hash_; }
 
+         /// Close finalized output and report delayed I/O errors before external publication.
+         void close();
+
       protected:
          void write_start_section( const std::string& section_name ) override;
          void write_row( const detail::abstract_snapshot_row_writer& row_writer ) override;

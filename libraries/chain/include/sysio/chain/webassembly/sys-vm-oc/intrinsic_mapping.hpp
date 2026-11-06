@@ -25,8 +25,6 @@ inline constexpr auto get_intrinsic_table() {
       "sysvmoc_internal.depth_assert",
       "sysio_injection.call_depth_assert",  //now unused; left for purposes of not upsetting existing code mappings
       "sysio_injection.checktime",          //now unused; left for purposes of not upsetting existing code mappings
-      "env.is_feature_active",
-      "env.activate_feature",
       "env.get_resource_limits",
       "env.set_resource_limits",
       "env.set_proposed_producers",
@@ -178,27 +176,25 @@ inline constexpr auto get_intrinsic_table() {
       "sysvmoc_internal.check_memcpy_params",
       "env.get_permission_lower_bound",
       "env.kv_set",
-      "env.kv_get",
       "env.kv_erase",
-      "env.kv_contains",
+      "env.kv_get",
+      "env.kv_idx_store",
+      "env.kv_idx_update",
+      "env.kv_idx_erase",
       "env.kv_it_create",
-      "env.kv_it_destroy",
-      "env.kv_it_status",
       "env.kv_it_next",
       "env.kv_it_prev",
       "env.kv_it_lower_bound",
-      "env.kv_it_key",
-      "env.kv_it_value",
-      "env.kv_idx_store",
-      "env.kv_idx_remove",
-      "env.kv_idx_update",
-      "env.kv_idx_find_secondary",
-      "env.kv_idx_lower_bound",
+      "env.kv_it_read",
+      "env.kv_it_destroy",
+      "env.kv_idx_create",
       "env.kv_idx_next",
       "env.kv_idx_prev",
-      "env.kv_idx_key",
-      "env.kv_idx_primary_key",
-      "env.kv_idx_destroy"
+      "env.kv_idx_lower_bound",
+      "env.kv_idx_read",
+      "env.kv_idx_destroy",
+      "env.kv_idx_find",
+      "env.ed25519_verify"
    );
 }
 inline constexpr std::size_t find_intrinsic_index(std::string_view hf) {

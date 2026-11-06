@@ -332,14 +332,14 @@ public:
       auto data = get_row_by_id(COUNCL_ACCOUNT, name(generation), "flights"_n, seat);
       return data.empty() ? fc::variant{}
                           : councl_abi.binary_to_variant(
-                               "flight_row", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+                               "flight_row", data, fixture_abi_yield_function());
    }
    /// Read a public ballot row.
    fc::variant get_ballot(name voter, uint64_t generation = GEN0) {
       auto data = get_row_by_id(COUNCL_ACCOUNT, name(generation), "ballots"_n, voter.value);
       return data.empty() ? fc::variant{}
                           : councl_abi.binary_to_variant(
-                               "ballot_row", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+                               "ballot_row", data, fixture_abi_yield_function());
    }
    /// Finish nominations and automatic generation.
    void open_votes(uint32_t steps = 21) {
@@ -392,13 +392,13 @@ public:
       auto data = get_row_by_account(COUNCL_ACCOUNT, COUNCL_ACCOUNT, "state"_n, "state"_n);
       return data.empty() ? fc::variant()
                           : councl_abi.binary_to_variant(
-                               "election_state", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+                               "election_state", data, fixture_abi_yield_function());
    }
    fc::variant get_config() {
       auto data = get_row_by_account(COUNCL_ACCOUNT, COUNCL_ACCOUNT, "config"_n, "config"_n);
       return data.empty() ? fc::variant()
                           : councl_abi.binary_to_variant(
-                               "config_state", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+                               "config_state", data, fixture_abi_yield_function());
    }
    std::string phase() { return get_state()["phase"].as_string(); }
    std::string init_phase() { return get_config()["init_phase"].as_string(); }
@@ -415,7 +415,7 @@ public:
       if (data.empty())
          return fc::variant{};
       return councl_abi.binary_to_variant("council_row", data,
-                                          abi_serializer::create_yield_function(abi_serializer_max_time));
+                                          fixture_abi_yield_function());
    }
 
    /// Elected member for a filled seat, or the empty name if the seat row is absent.
@@ -442,7 +442,7 @@ public:
       if (data.empty())
          return name{};
       auto v = councl_abi.binary_to_variant("tier2_row", data,
-                                            abi_serializer::create_yield_function(abi_serializer_max_time));
+                                            fixture_abi_yield_function());
       return name(v["owner"].as_string());
    }
 
@@ -452,7 +452,7 @@ public:
       if (data.empty())
          return name{};
       auto v = councl_abi.binary_to_variant("tier3_row", data,
-                                            abi_serializer::create_yield_function(abi_serializer_max_time));
+                                            fixture_abi_yield_function());
       return name(v["owner"].as_string());
    }
 

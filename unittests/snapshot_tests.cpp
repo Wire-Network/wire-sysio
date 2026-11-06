@@ -7,6 +7,7 @@
 #include <sysio/chain/snapshot.hpp>
 #include <sysio/chain/s_root_extension.hpp>
 #include <sysio/chain/contract_table_objects.hpp>
+#include <sysio/chain/kv_table_objects.hpp>
 #include <sysio/testing/tester.hpp>
 #include "snapshot_suites.hpp"
 #include <snapshots.hpp>
@@ -18,6 +19,14 @@
 #include "test_wasts.hpp"
 
 #include <fc/filesystem.hpp>
+
+// Performance benchmarks at the end of this file. Uncomment to enable.
+//#define RUN_PERF_BENCHMARKS
+#ifdef RUN_PERF_BENCHMARKS
+#include <magic_enum/magic_enum.hpp>
+#include <sys/mman.h>
+#include <unistd.h>
+#endif
 
 using namespace sysio;
 using namespace testing;
@@ -548,6 +557,80 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_deep_permission_chain_in_snapshot, SNAPSHOT_S
    deep_permission_chain_in_snapshot_test<savanna_tester, SNAPSHOT_SUITE>();
 }
 
+// The producer schedule is in production order, which sysio.system sets by producer location rather
+// than by name. The sysio.prods authorities generated from it must still list their accounts in the
+// ascending order validate() requires, or a snapshot taken under that schedule fails to load.
+template<typename TESTER, typename SNAPSHOT_SUITE>
+void unsorted_producer_schedule_in_snapshot_test()
+{
+   TESTER chain;
+   const std::vector<account_name> producers = {"prodc"_n, "proda"_n, "prodb"_n};
+   chain.create_accounts(producers);
+   chain.set_producers(producers);
+
+   const auto active_names = [&] {
+      std::vector<account_name> names;
+      for (const auto& p : chain.control->active_producers().producers) names.push_back(p.producer_name);
+      return names;
+   };
+   constexpr uint32_t max_blocks = 200;
+   for (uint32_t produced = 0; produced < max_blocks && active_names() != producers; ++produced) {
+      chain.produce_block();
+   }
+   const auto schedule = active_names();
+   BOOST_REQUIRE_EQUAL_COLLECTIONS(schedule.begin(), schedule.end(), producers.begin(), producers.end());
+
+   for (const auto permission : {config::active_name, config::majority_producers_permission_name,
+                                 config::minority_producers_permission_name}) {
+      const auto auth = chain.control->get_authorization_manager()
+                           .get_permission(permission_level{config::producers_account_name, permission})
+                           .auth.to_authority();
+      BOOST_TEST(auth.accounts.size() == producers.size());
+      BOOST_REQUIRE_MESSAGE(validate(auth), "sysio.prods@" << permission << " is not a valid authority");
+   }
+
+   chain.control->abort_block();
+   auto writer = SNAPSHOT_SUITE::get_writer();
+   chain.control->write_snapshot(writer);
+   auto snapshot = SNAPSHOT_SUITE::finalize(writer);
+
+   snapshotted_tester snap_chain(chain.get_config(), SNAPSHOT_SUITE::get_reader(snapshot), 0);
+   verify_integrity_hash<SNAPSHOT_SUITE>(*chain.control, *snap_chain.control);
+}
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(test_kv_index_keys_in_snapshot, SNAPSHOT_SUITE, snapshot_suites)
+{
+   savanna_tester chain;
+   const account_name probe = "kvprobe"_n;
+   chain.create_account(probe);
+   chain.produce_block();
+   chain.set_code(probe, test_contracts::kv_intrinsic_probe_wasm());
+   chain.set_abi(probe, test_contracts::kv_intrinsic_probe_abi());
+   chain.produce_block();
+
+   // An entry with an empty key must never reach state: the snapshot writer refuses it.
+   BOOST_CHECK_THROW(chain.push_action(probe, "zseckey"_n, probe, mutable_variant_object()),
+                     kv_empty_key);
+   BOOST_CHECK_THROW(chain.push_action(probe, "zprikey"_n, probe, mutable_variant_object()), kv_empty_key);
+
+   chain.push_action(probe, "idxminkeep"_n, probe, mutable_variant_object());
+   chain.produce_block();
+   chain.control->abort_block();
+
+   auto writer = SNAPSHOT_SUITE::get_writer();
+   chain.control->write_snapshot(writer);
+   auto snapshot = SNAPSHOT_SUITE::finalize(writer);
+
+   int ordinal = 1;
+   snapshotted_tester snap_chain(chain.get_config(), SNAPSHOT_SUITE::get_reader(snapshot), ordinal++);
+   verify_integrity_hash<SNAPSHOT_SUITE>(*chain.control, *snap_chain.control);
+}
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(test_unsorted_producer_schedule_in_snapshot, SNAPSHOT_SUITE, snapshot_suites)
+{
+   unsorted_producer_schedule_in_snapshot_test<savanna_tester, SNAPSHOT_SUITE>();
+}
+
 // A permission row carrying a structurally invalid authority -- here a duplicated key entry,
 // which both breaks the strict key ordering updateauth enforces at creation and double-counts
 // that key's weight toward threshold -- must be rejected at snapshot load rather than silently
@@ -1011,6 +1094,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( json_snapshot_validity_test, TESTER, testers )
    verify_integrity_hash<variant_snapshot_suite>(*tester_json.control, *tester_bin.control);
 }
 
+/// Rows the jumborow contract stores, each just under the default value limit.
+static constexpr int64_t jumbo_row_count = 132;
+
 template<typename TESTER, typename SNAPSHOT_SUITE>
 void jumbo_row_test()
 {
@@ -1020,8 +1106,10 @@ void jumbo_row_test()
    TESTER chain(config.first, config.second);
    chain.execute_setup_policy(setup_policy::full);
 
-   chain.create_accounts({"jumbo"_n});
-   chain.set_code("jumbo"_n, set_jumbo_row_wast);
+   // The default policy buys about 10 MiB of RAM, and these rows need about 34 MiB.
+   chain.create_accounts({"jumbo"_n}, false, true, false);
+   chain.add_roa_policy(chain.NODE_DADDY, "jumbo"_n, "0.0010 SYS", "0.0010 SYS", "40.0000 SYS", 0, 0);
+   chain.set_code("jumbo"_n, test_contracts::jumborow_wasm());
    chain.produce_block();
 
    signed_transaction trx;
@@ -1043,6 +1131,25 @@ void jumbo_row_test()
    auto snapshot = SNAPSHOT_SUITE::finalize(writer);
 
    snapshotted_tester sst(chain.get_config(), SNAPSHOT_SUITE::get_reader(snapshot), 0);
+
+   // Every row comes back, and the state hashes match.
+   const auto row_count = [](const auto& c) {
+      const auto code   = "jumbo"_n;
+      const auto cursor = c.control->kv().open_row_cursor();
+      int64_t    count  = 0;
+      kv_row     row;
+      for (bool more = cursor->seek_lower({code}, row); more && row.code == code; more = cursor->next(row)) ++count;
+      return count;
+   };
+   BOOST_REQUIRE_EQUAL(row_count(chain), jumbo_row_count);
+   BOOST_REQUIRE_EQUAL(row_count(sst), jumbo_row_count);
+   verify_integrity_hash<SNAPSHOT_SUITE>(*chain.control, *sst.control);
+}
+
+// Rows near the value limit, adding up to more than half of a 64 MiB state database.
+BOOST_AUTO_TEST_CASE_TEMPLATE(test_jumbo_row, SNAPSHOT_SUITE, snapshot_suites)
+{
+   jumbo_row_test<savanna_tester, SNAPSHOT_SUITE>();
 }
 
 // Verify that two independently generated snapshots at the same block produce
@@ -1094,19 +1201,520 @@ BOOST_AUTO_TEST_CASE( snapshot_determinism_test )
    verify_integrity_hash<threaded_snapshot_suite>(*chain.control, *t1.control);
 }
 
+namespace {
+   /// A KV row as these tests write it down. The fields the snapshot order depends on, nothing else.
+   struct kv_row_spec {
+      account_name code;
+      uint16_t     table_id = 0;
+      std::string  key;
+
+      bool operator==(const kv_row_spec&) const = default;
+   };
+
+   /// A KV secondary index entry as these tests write it down.
+   struct kv_entry_spec {
+      account_name code;
+      uint16_t     table_id = 0;
+      std::string  sec_key;
+      std::string  pri_key;
+
+      bool operator==(const kv_entry_spec&) const = default;
+   };
+
+   /// Which way round insert_kv_rows inserts its rows.
+   enum class kv_insertion_order { key_order, reverse_key_order };
+
+   /// Rows in the order a snapshot must hold them, spelled out so a second storage engine has a literal to match.
+   std::vector<kv_row_spec> kv_rows_in_key_order() {
+      using namespace std::string_literals;
+      return {
+         {"alice"_n, 1, "\x01"s},                                 // a shorter key sorts before its extensions
+         {"alice"_n, 1, "\x01\x00\x00\x00\x00\x00\x00\x00"s},     // 8-byte keys take the integer fast path
+         {"alice"_n, 1, "\x01\x00\x00\x00\x00\x00\x00\x01"s},
+         {"alice"_n, 1, "\x01\x00\x00\x00\x00\x00\x00\x01\x00"s}, // 9 bytes: past the fast path
+         {"alice"_n, 1, "\x7f"s},
+         {"alice"_n, 1, "\x7f\xff\xff\xff\xff\xff\xff\xff"s},     // the fast path compares unsigned as well
+         {"alice"_n, 1, "\x80"s},                                 // key bytes compare unsigned
+         {"alice"_n, 1, "\x80\x00\x00\x00\x00\x00\x00\x00"s},
+         {"alice"_n, 1, "\xff"s},
+         {"alice"_n, 1, "\xff\xff\xff\xff\xff\xff\xff\xff"s},
+         {"alice"_n, 2, "\x00"s},                                 // table_id outranks key
+         {"bob"_n,   1, "\x00"s},                                 // code outranks table_id
+      };
+   }
+
+   /// Index entries in the order a snapshot must hold them.
+   std::vector<kv_entry_spec> kv_entries_in_key_order() {
+      using namespace std::string_literals;
+      return {
+         {"alice"_n, 1, "a"s,    "z"s}, // ("a", "z") sorts before ("ab", "a"): the pair compares, not the joined bytes
+         {"alice"_n, 1, "ab"s,   "a"s},
+         {"alice"_n, 1, "ab"s,   "b"s},
+         {"alice"_n, 1, "\x7f"s, "a"s},
+         {"alice"_n, 1, "\x7f\xff\xff\xff\xff\xff\xff\xff"s, "a"s}, // the fast path compares unsigned on sec_key
+         {"alice"_n, 1, "\x80"s, "a"s}, // key bytes compare unsigned
+         {"alice"_n, 1, "\x80\x00\x00\x00\x00\x00\x00\x00"s, "a"s},
+         {"alice"_n, 1, "\xff"s, "\x7f\xff\xff\xff\xff\xff\xff\xff"s}, // and on pri_key
+         {"alice"_n, 1, "\xff"s, "\x80\x00\x00\x00\x00\x00\x00\x00"s},
+         {"alice"_n, 1, "\xff"s, "\xff\xff\xff\xff\xff\xff\xff\xff"s},
+         {"alice"_n, 1, "\xff\xff\xff\xff\xff\xff\xff\xff"s, "a"s},
+         {"alice"_n, 2, "a"s,    "a"s}, // table_id outranks sec_key
+         {"bob"_n,   1, "a"s,    "a"s}, // code outranks table_id
+      };
+   }
+
+   /**
+    * Writes the fixture rows straight into chainbase, between blocks.
+    *
+    * Two chains can then differ in insertion order and nothing else. Transactions would change more: the integrity
+    * hash also covers the head block and the block summaries, so chains built from different transactions never match.
+    */
+   void insert_kv_rows(controller& control, kv_insertion_order order) {
+      auto& store = const_cast<kv_store&>(control.kv());
+      auto rows = kv_rows_in_key_order();
+      auto entries = kv_entries_in_key_order();
+      if (order == kv_insertion_order::reverse_key_order) {
+         std::ranges::reverse(rows);
+         std::ranges::reverse(entries);
+      }
+      for (const auto& row : rows) {
+         store.insert_row(row.code, row.table_id, row.code, row.key, {});
+      }
+      for (const auto& entry : entries) {
+         store.insert_index_entry(entry.code, entry.table_id, entry.code, entry.sec_key, entry.pri_key);
+      }
+   }
+
+   /// The rows of one section of a variant snapshot, in snapshot order.
+   template<typename Object>
+   fc::variants kv_section_rows(const fc::variant& snapshot) {
+      const auto section_name = sysio::chain::detail::snapshot_section_traits<Object>::section_name();
+      for (const auto& section : snapshot["sections"].get_array()) {
+         if (section["name"].as_string() == section_name) {
+            return section["rows"].get_array();
+         }
+      }
+      BOOST_FAIL("snapshot has no section " + section_name);
+      return {};
+   }
+
+   /// Builds a chain through real transactions, inserting its rows in the given order, and snapshots it.
+   fc::variant snapshot_of_kv_transactions(kv_insertion_order order) {
+      savanna_tester chain;
+      std::vector<account_name> contracts = {"snapshot"_n, "snapshot1"_n};
+      std::vector<uint64_t> ids = {1, 2, 3, 4, 5};
+
+      chain.create_accounts(contracts);
+      chain.produce_block();
+      for (const auto& contract : contracts) {
+         chain.set_code(contract, test_contracts::snapshot_test_wasm());
+         chain.set_abi(contract, test_contracts::snapshot_test_abi());
+      }
+      chain.produce_block();
+
+      if (order == kv_insertion_order::reverse_key_order) {
+         std::ranges::reverse(contracts);
+         std::ranges::reverse(ids);
+      }
+      for (const auto& contract : contracts) {
+         // increment writes a row with 5 secondary index entries, so both KV sections take rows here.
+         chain.push_action(contract, "increment"_n, contract, mutable_variant_object()("value", 1));
+         for (const uint64_t id : ids) {
+            chain.push_action(contract, "add"_n, contract, mutable_variant_object()
+               ("scope", "scope"_n)
+               ("id", id)
+               ("payload", fc::sha256::hash(std::to_string(id))));
+         }
+      }
+      chain.produce_block();
+      chain.control->abort_block();
+
+      auto writer = variant_snapshot_suite::get_writer();
+      chain.control->write_snapshot(writer);
+      return variant_snapshot_suite::finalize(writer);
+   }
+}
+
+// Two chains holding the same KV rows must hash the same however the rows got there. Otherwise attested hashes would
+// record insertion history, which a storage engine other than chainbase could not reproduce.
+BOOST_AUTO_TEST_CASE_TEMPLATE(test_kv_insertion_order_does_not_change_integrity_hash, SNAPSHOT_SUITE, snapshot_suites)
+{
+   savanna_tester chain;
+   chain.produce_block();
+   chain.control->abort_block();
+
+   auto writer = SNAPSHOT_SUITE::get_writer();
+   chain.control->write_snapshot(writer);
+   auto snapshot = SNAPSHOT_SUITE::finalize(writer);
+
+   // Two children of one snapshot differ only in what this test does to them next.
+   int ordinal = 0;
+   snapshotted_tester in_order(chain.get_config(), SNAPSHOT_SUITE::get_reader(snapshot), ordinal++);
+   snapshotted_tester reversed(chain.get_config(), SNAPSHOT_SUITE::get_reader(snapshot), ordinal++);
+   verify_integrity_hash<SNAPSHOT_SUITE>(*in_order.control, *reversed.control);
+
+   insert_kv_rows(*in_order.control, kv_insertion_order::key_order);
+   insert_kv_rows(*reversed.control, kv_insertion_order::reverse_key_order);
+   verify_integrity_hash<SNAPSHOT_SUITE>(*in_order.control, *reversed.control);
+
+   // Loading renumbers the rows in snapshot order; the hash must not notice.
+   auto reversed_writer = SNAPSHOT_SUITE::get_writer();
+   reversed.control->write_snapshot(reversed_writer);
+   auto reversed_snapshot = SNAPSHOT_SUITE::finalize(reversed_writer);
+   snapshotted_tester loaded(chain.get_config(), SNAPSHOT_SUITE::get_reader(reversed_snapshot), ordinal++);
+   verify_integrity_hash<SNAPSHOT_SUITE>(*in_order.control, *loaded.control);
+}
+
+// Pins the order itself, not just agreement between two chains: both chains could agree on a wrong order.
+BOOST_AUTO_TEST_CASE( kv_snapshot_sections_are_in_key_order )
+{
+   savanna_tester chain;
+   chain.produce_block();
+   chain.control->abort_block();
+   insert_kv_rows(*chain.control, kv_insertion_order::reverse_key_order);
+
+   auto writer = variant_snapshot_suite::get_writer();
+   chain.control->write_snapshot(writer);
+   const auto snapshot = variant_snapshot_suite::finalize(writer);
+
+   // The chain's own rows sit in the same sections; only the fixture's accounts are of interest here.
+   const auto from_fixture = [](account_name code) { return code == "alice"_n || code == "bob"_n; };
+
+   std::vector<kv_row_spec> rows;
+   for (const auto& v : kv_section_rows<kv_object>(snapshot)) {
+      const auto row = v.as<snapshot_kv_object>();
+      if (from_fixture(row.code)) {
+         rows.push_back({row.code, row.table_id, std::string(row.key.begin(), row.key.end())});
+      }
+   }
+   BOOST_TEST((rows == kv_rows_in_key_order()));
+
+   std::vector<kv_entry_spec> entries;
+   for (const auto& v : kv_section_rows<kv_index_object>(snapshot)) {
+      const auto entry = v.as<snapshot_kv_index_object>();
+      if (from_fixture(entry.code)) {
+         entries.push_back({entry.code, entry.table_id, std::string(entry.sec_key.begin(), entry.sec_key.end()),
+                            std::string(entry.pri_key.begin(), entry.pri_key.end())});
+      }
+   }
+   BOOST_TEST((entries == kv_entries_in_key_order()));
+}
+
+// The same property for rows that come out of kv_set and kv_idx_store on a live chain. The transactions differ, so the
+// blocks and the integrity hashes do too: compare the KV sections those hashes cover.
+BOOST_AUTO_TEST_CASE( kv_sections_do_not_depend_on_transaction_order )
+{
+   const auto in_order = snapshot_of_kv_transactions(kv_insertion_order::key_order);
+   const auto reversed = snapshot_of_kv_transactions(kv_insertion_order::reverse_key_order);
+
+   const auto rows = kv_section_rows<kv_object>(in_order);
+   const auto entries = kv_section_rows<kv_index_object>(in_order);
+   BOOST_REQUIRE(!rows.empty());
+   BOOST_REQUIRE(!entries.empty());
+
+   const auto as_text = [](const fc::variants& section) {
+      return fc::json::to_string(section, fc::time_point::maximum());
+   };
+   BOOST_TEST(as_text(rows) == as_text(kv_section_rows<kv_object>(reversed)));
+   BOOST_TEST(as_text(entries) == as_text(kv_section_rows<kv_index_object>(reversed)));
+}
+
+namespace {
+   /// `snapshot` with `row` appended to the section of `Object`.
+   template<typename Object>
+   fc::variant with_kv_row(const fc::variant& snapshot, const fc::variant& row) {
+      const auto section_name = sysio::chain::detail::snapshot_section_traits<Object>::section_name();
+      fc::variants sections = snapshot["sections"].get_array();
+      bool found = false;
+      for (auto& section : sections) {
+         if (section["name"].as_string() != section_name) continue;
+         fc::variants rows = section["rows"].get_array();
+         rows.push_back(row);
+         section = fc::mutable_variant_object(section)("rows", std::move(rows));
+         found = true;
+      }
+      BOOST_REQUIRE(found);
+      return fc::mutable_variant_object(snapshot)("sections", std::move(sections));
+   }
+
+   /// A hand-built KV row with keys and values of the given sizes, in the form a variant snapshot holds it.
+   fc::variant kv_row_of_size(size_t key_size, size_t value_size) {
+      fc::variant row;
+      fc::to_variant(snapshot_kv_object{.code = "alice"_n, .payer = "alice"_n, .key = std::vector<char>(key_size, 'k'),
+                                        .value = std::vector<char>(value_size, 'v'), .table_id = 1}, row);
+      return row;
+   }
+
+   /// A hand-built KV index entry with keys of the given sizes, in the form a variant snapshot holds it.
+   fc::variant kv_entry_of_size(size_t sec_key_size, size_t pri_key_size) {
+      fc::variant entry;
+      fc::to_variant(snapshot_kv_index_object{.code = "alice"_n, .payer = "alice"_n,
+                                              .sec_key = std::vector<char>(sec_key_size, 's'),
+                                              .pri_key = std::vector<char>(pri_key_size, 'p'), .table_id = 1}, entry);
+      return entry;
+   }
+}
+
+// A snapshot comes from outside the node, so the reader holds rows to the limits the intrinsics hold writes to. It uses
+// the absolute limits: the governance limits may have been higher when a row was written.
+BOOST_AUTO_TEST_CASE( kv_snapshot_reader_enforces_row_limits )
+{
+   savanna_tester chain;
+   chain.produce_block();
+   chain.control->abort_block();
+
+   auto writer = variant_snapshot_suite::get_writer();
+   chain.control->write_snapshot(writer);
+   const auto snapshot = variant_snapshot_suite::finalize(writer);
+
+   constexpr size_t max_key   = config::max_kv_key_size_limit;
+   constexpr size_t max_value = config::max_kv_value_size_limit;
+
+   int ordinal = 0;
+   const auto load = [&](const fc::variant& edited) {
+      snapshotted_tester loaded(chain.get_config(), variant_snapshot_suite::get_reader(edited), ordinal++);
+      const auto& kv = loaded.control->kv();
+      return std::make_pair(kv.row_count(), kv.index_entry_count());
+   };
+   const auto check_refused = [&](const fc::variant& edited, const std::string& reason) {
+      BOOST_CHECK_EXCEPTION(load(edited), snapshot_validation_exception, fc_exception_message_contains(reason));
+   };
+
+   // At the limits a hand-built row loads, so a refusal below comes from the row and not from the way it was built.
+   // These rows go in last and their code sorts first, so this also shows the reader does not require key order.
+   const auto rows_before    = kv_section_rows<kv_object>(snapshot).size();
+   const auto entries_before = kv_section_rows<kv_index_object>(snapshot).size();
+   BOOST_TEST(load(with_kv_row<kv_object>(snapshot, kv_row_of_size(max_key, max_value))).first == rows_before + 1);
+   BOOST_TEST(load(with_kv_row<kv_index_object>(snapshot, kv_entry_of_size(max_key, max_key))).second ==
+              entries_before + 1);
+
+   check_refused(with_kv_row<kv_object>(snapshot, kv_row_of_size(0, 1)), "kv_object has empty key");
+   check_refused(with_kv_row<kv_object>(snapshot, kv_row_of_size(max_key + 1, 1)), "kv_object key size");
+   check_refused(with_kv_row<kv_object>(snapshot, kv_row_of_size(1, max_value + 1)), "kv_object value size");
+
+   check_refused(with_kv_row<kv_index_object>(snapshot, kv_entry_of_size(0, 1)),
+                 "kv_index_object has empty secondary key");
+   check_refused(with_kv_row<kv_index_object>(snapshot, kv_entry_of_size(1, 0)),
+                 "kv_index_object has empty primary key");
+   check_refused(with_kv_row<kv_index_object>(snapshot, kv_entry_of_size(max_key + 1, 1)),
+                 "kv_index_object secondary key size");
+   check_refused(with_kv_row<kv_index_object>(snapshot, kv_entry_of_size(1, max_key + 1)),
+                 "kv_index_object primary key size");
+
+   // Two rows at one key cannot be held by any engine, so the reader refuses the second.
+   const auto row = kv_row_of_size(1, 1);
+   check_refused(with_kv_row<kv_object>(with_kv_row<kv_object>(snapshot, row), row), "kv_object key appears twice");
+   const auto entry = kv_entry_of_size(1, 1);
+   check_refused(with_kv_row<kv_index_object>(with_kv_row<kv_index_object>(snapshot, entry), entry),
+                 "kv_index_object position appears twice");
+}
+
+// N4: a file's rows need not be in key order. Loading one gives the same state, and a chain writes key order back.
+BOOST_AUTO_TEST_CASE( kv_snapshot_out_of_order_loads_to_the_same_state )
+{
+   savanna_tester chain;
+   chain.produce_block();
+   chain.control->abort_block();
+   insert_kv_rows(*chain.control, kv_insertion_order::key_order);
+
+   auto writer = variant_snapshot_suite::get_writer();
+   chain.control->write_snapshot(writer);
+   const auto in_order = variant_snapshot_suite::finalize(writer);
+
+   /// `snapshot` with the rows of the section of `Object` reversed.
+   const auto reversed_section = [](const fc::variant& snapshot, const std::string& section_name) {
+      fc::variants sections = snapshot["sections"].get_array();
+      for (auto& section : sections) {
+         if (section["name"].as_string() != section_name) continue;
+         fc::variants rows = section["rows"].get_array();
+         std::ranges::reverse(rows);
+         section = fc::mutable_variant_object(section)("rows", std::move(rows));
+      }
+      return fc::variant(fc::mutable_variant_object(snapshot)("sections", std::move(sections)));
+   };
+   using sysio::chain::detail::snapshot_section_traits;
+   const auto out_of_order = reversed_section(reversed_section(in_order, snapshot_section_traits<kv_object>::section_name()),
+                                              snapshot_section_traits<kv_index_object>::section_name());
+
+   // The edit changed what the file holds, so the rest of this means something.
+   const auto as_text = [](const fc::variants& section) { return fc::json::to_string(section, fc::time_point::maximum()); };
+   BOOST_REQUIRE(as_text(kv_section_rows<kv_object>(out_of_order)) != as_text(kv_section_rows<kv_object>(in_order)));
+   BOOST_REQUIRE(as_text(kv_section_rows<kv_index_object>(out_of_order)) !=
+                 as_text(kv_section_rows<kv_index_object>(in_order)));
+
+   int ordinal = 0;
+   snapshotted_tester from_order(chain.get_config(), variant_snapshot_suite::get_reader(in_order), ordinal++);
+   snapshotted_tester from_disorder(chain.get_config(), variant_snapshot_suite::get_reader(out_of_order), ordinal++);
+   verify_integrity_hash<variant_snapshot_suite>(*from_order.control, *from_disorder.control);
+
+   from_disorder.control->abort_block();
+   auto rewriter = variant_snapshot_suite::get_writer();
+   from_disorder.control->write_snapshot(rewriter);
+   const auto written_back = variant_snapshot_suite::finalize(rewriter);
+   BOOST_TEST(as_text(kv_section_rows<kv_object>(written_back)) == as_text(kv_section_rows<kv_object>(in_order)));
+   BOOST_TEST(as_text(kv_section_rows<kv_index_object>(written_back)) ==
+              as_text(kv_section_rows<kv_index_object>(in_order)));
+}
+
+namespace {
+   /// `size` bytes counting up from `seed`, wrapping at 256, as kv_intrinsic_probe's pattern() makes them.
+   std::string size_class_bytes(uint32_t seed, uint32_t size) {
+      std::string bytes(size, '\0');
+      for (uint32_t i = 0; i < size; ++i) bytes[i] = static_cast<char>(seed + i);
+      return bytes;
+   }
+}
+
+// A round trip of every size a length prefix treats differently, up to the caps: the 1, 2 and 3 byte varint boundaries,
+// the 64 KiB line, and rows at 1 MiB and keys at 512 bytes. 256 bytes or more hold every byte value.
+BOOST_AUTO_TEST_CASE_TEMPLATE(test_kv_size_classes, SNAPSHOT_SUITE, snapshot_suites)
+{
+   static constexpr uint16_t rows_table = 598, entries_table = 599; // tid_sizes and tid_sizes_sec in the contract
+   static constexpr std::array<uint32_t, 12> value_sizes = {0, 1, 127, 128, 255, 256, 16383, 16384, 65535, 65536, 262144,
+                                                            1048576};
+   static constexpr std::array<uint32_t, 5> key_sizes   = {1, 8, 9, 255, 512};
+   static constexpr std::array<uint32_t, 3> entry_sizes = {1, 8, 512};
+   static constexpr uint32_t key_seed = 100, entry_seed = 200; // keeps the keys of each group apart
+   const account_name contract = "kvsizes"_n;
+
+   fc::temp_directory tempdir;
+   auto cfg = tester::default_config(tempdir);
+   cfg.first.state_size = 64*1024*1024;
+   savanna_tester chain(cfg.first, cfg.second);
+   chain.execute_setup_policy(setup_policy::full);
+
+   auto params = chain.control->get_global_properties().configuration;
+   params.max_kv_key_size           = config::max_kv_key_size_limit;
+   params.max_kv_secondary_key_size = config::max_kv_key_size_limit;
+   params.max_kv_value_size         = config::max_kv_value_size_limit;
+   chain.push_action(config::system_account_name, "setparams"_n, config::system_account_name,
+                     mutable_variant_object()("params", params));
+   chain.create_accounts({contract}, false, true, false);
+   chain.add_roa_policy(chain.NODE_DADDY, contract, "0.0010 SYS", "0.0010 SYS", "10.0000 SYS", 0, 0);
+   chain.set_code(contract, test_contracts::kv_intrinsic_probe_wasm());
+   chain.set_abi(contract, test_contracts::kv_intrinsic_probe_abi().c_str());
+   chain.produce_block();
+
+   struct row   { std::string key, value; };
+   struct entry { std::string sec_key, pri_key; };
+   std::vector<row>   rows;
+   std::vector<entry> entries;
+   const auto write_row = [&](uint32_t seed, uint32_t key_size, uint32_t value_size) {
+      chain.push_action(contract, "sizerow"_n, contract,
+                        mutable_variant_object()("seed", seed)("key_size", key_size)("value_size", value_size));
+      rows.push_back({size_class_bytes(seed, key_size), size_class_bytes(seed, value_size)});
+   };
+   for (uint32_t i = 0; i < value_sizes.size(); ++i) write_row(i, sizeof(uint64_t), value_sizes[i]);
+   for (uint32_t i = 0; i < key_sizes.size(); ++i) write_row(key_seed + i, key_sizes[i], 1);
+   uint32_t seed = entry_seed;
+   for (uint32_t sec_size : entry_sizes) {
+      for (uint32_t pri_size : entry_sizes) {
+         chain.push_action(contract, "sizeentry"_n, contract,
+                           mutable_variant_object()("seed", seed)("sec_size", sec_size)("pri_size", pri_size));
+         entries.push_back({size_class_bytes(seed, sec_size), size_class_bytes(seed, pri_size)});
+         ++seed;
+      }
+   }
+   chain.produce_block();
+   chain.control->abort_block();
+
+   auto writer = SNAPSHOT_SUITE::get_writer();
+   chain.control->write_snapshot(writer);
+   auto snapshot = SNAPSHOT_SUITE::finalize(writer);
+
+   snapshotted_tester loaded(chain.get_config(), SNAPSHOT_SUITE::get_reader(snapshot), 0);
+   verify_integrity_hash<SNAPSHOT_SUITE>(*chain.control, *loaded.control);
+
+   // Both integrity hashes go through the same row writer, so a field it drops matches. Read the rows themselves.
+   const auto& kv = loaded.control->kv();
+   for (const auto& expected : rows) {
+      const auto found = kv.find_row(contract, rows_table, expected.key);
+      BOOST_REQUIRE(found.has_value());
+      BOOST_TEST((found->value == expected.value), "value of " << expected.value.size() << " bytes");
+      BOOST_TEST((found->payer == contract), "payer of a " << expected.key.size() << " byte key");
+   }
+   for (const auto& expected : entries) {
+      const auto found = kv.find_index_entry(contract, entries_table, expected.sec_key, expected.pri_key);
+      BOOST_REQUIRE_MESSAGE(found.has_value(),
+                            "entry of " << expected.sec_key.size() << " and " << expected.pri_key.size() << " bytes");
+      BOOST_TEST((found->payer == contract),
+                 "payer of an entry of " << expected.sec_key.size() << " and " << expected.pri_key.size() << " bytes");
+   }
+}
+
 //
 // Performance Tests. Enable via RUN_PERF_BENCHMARKS. Take too long for normal test runs.
 //
 
-//#define RUN_PERF_BENCHMARKS
 #ifdef RUN_PERF_BENCHMARKS
+namespace {
+   /// Deterministic pseudo-random numbers and bytes for benchmark rows.
+   struct bench_rng {
+      uint64_t seed = 0x12345678ABCDEF01ULL;
+
+      uint64_t next() {
+         seed ^= seed << 13;
+         seed ^= seed >> 7;
+         seed ^= seed << 17;
+         return seed;
+      }
+
+      void fill(char* data, std::size_t size) {
+         for (std::size_t i = 0; i < size; i += sizeof(uint64_t)) {
+            const uint64_t v = next();
+            std::memcpy(data + i, &v, std::min(sizeof(v), size - i));
+         }
+      }
+   };
+
+   /// How benchmark rows are laid out in memory relative to key order.
+   enum class bench_insertion_order {
+      sorted,      ///< keys ascend, so a walk by key matches allocation order
+      interleaved, ///< tables take turns, each appending ascending keys, as contract tables do on a live chain
+      random       ///< keys are unrelated to allocation order, the worst case for a walk by key
+   };
+
+   /// A numeric environment setting, or `fallback` when it is not set.
+   uint64_t bench_setting(const char* name, uint64_t fallback) {
+      const char* value = std::getenv(name);
+      return value ? std::stoull(value) : fallback;
+   }
+
+   /**
+    * Writes the state file back and drops it from the page cache, so the next walk reads every page from disk.
+    *
+    * This stands in for state bigger than RAM, and flatters it: a page read here stays cached for the rest of the
+    * walk, which would not hold under real memory pressure. Needs mapped state on a real disk, and reports how much
+    * of the state was actually evicted.
+    */
+   void bench_evict_state(chainbase::database& db) {
+      static const auto page_size = static_cast<uintptr_t>(sysconf(_SC_PAGESIZE));
+      const auto* segment = db.get_segment_manager();
+      const auto begin = reinterpret_cast<uintptr_t>(segment) & ~(page_size - 1);
+      const auto length = (reinterpret_cast<uintptr_t>(segment) + segment->get_size() - begin) & ~(page_size - 1);
+      auto* start = reinterpret_cast<void*>(begin);
+
+      BOOST_REQUIRE_EQUAL(msync(start, length, MS_SYNC), 0);
+      BOOST_REQUIRE_EQUAL(madvise(start, length, MADV_PAGEOUT), 0);
+
+      std::vector<unsigned char> resident(length / page_size);
+      BOOST_REQUIRE_EQUAL(mincore(start, length, resident.data()), 0);
+      const auto resident_pages = std::ranges::count_if(resident, [](unsigned char page) { return (page & 1) != 0; });
+      BOOST_TEST_MESSAGE(fmt::format("  state evicted: {} of {} pages still resident", resident_pages,
+                                     resident.size()));
+   }
+}
+
 // Performance benchmark: threaded (parallel) vs variant (sequential) snapshot write/read
 // Run with: ./unit_test --run_test=snapshot_part2_tests/snapshot_perf_benchmark -- --sys-vm
 BOOST_AUTO_TEST_CASE( snapshot_perf_benchmark )
 {
+   // It stores rows straight in chainbase, so on another engine it would time a snapshot without them.
+   if (default_kv_engine() != kv_engine::chainbase) return;
+
    // --- Configuration ---
-   constexpr uint32_t num_tables  = 1000;   // number of table_id entries
-   constexpr uint32_t rows_per_table = 1000; // key_value rows per table
+   constexpr uint32_t num_tables  = 1000;   // number of tables, one per code
+   constexpr uint32_t rows_per_table = 1000; // KV rows per table
    constexpr uint32_t value_size  = 512;    // bytes per row value
 
    const uint32_t total_rows = num_tables * rows_per_table;
@@ -1127,36 +1735,17 @@ BOOST_AUTO_TEST_CASE( snapshot_perf_benchmark )
       auto& db = const_cast<chainbase::database&>(chain.control->db());
 
       // Seed for deterministic pseudo-random data
-      uint64_t seed = 0x12345678ABCDEF01ULL;
-      auto next_seed = [&seed]() {
-         seed ^= seed << 13;
-         seed ^= seed >> 7;
-         seed ^= seed << 17;
-         return seed;
-      };
+      bench_rng rng;
 
       for (uint32_t tbl = 0; tbl < num_tables; tbl++) {
-         // Create a table_id_object
-         const auto& tid = db.create<table_id_object>([&](table_id_object& obj) {
-            obj.code  = account_name(tbl + 100); // unique code per table
-            obj.scope = name("benchmark");
-            obj.table = name("data");
-            obj.payer = config::system_account_name;
-            obj.count = rows_per_table;
-         });
-
-         // Create key_value rows for this table
+         // Create KV rows for this table
          for (uint32_t r = 0; r < rows_per_table; r++) {
-            db.create<key_value_object>([&](key_value_object& obj) {
-               obj.t_id = tid.id;
-               obj.primary_key = r;
+            const auto key = make_kv_scoped_key("benchmark"_n, r);
+            db.create<kv_object>([&](kv_object& obj) {
+               obj.code = account_name(tbl + 100); // unique code per table
                obj.payer = config::system_account_name;
-               obj.value.resize_and_fill(value_size, [&](char* data, std::size_t sz) {
-                  for (std::size_t i = 0; i < sz; i += 8) {
-                     uint64_t v = next_seed();
-                     std::memcpy(data + i, &v, std::min<std::size_t>(8, sz - i));
-                  }
-               });
+               obj.set_key(key.data, key.size);
+               obj.value.resize_and_fill(value_size, [&](char* data, std::size_t sz) { rng.fill(data, sz); });
             });
          }
       }
@@ -1165,7 +1754,7 @@ BOOST_AUTO_TEST_CASE( snapshot_perf_benchmark )
    chain.produce_block();
    chain.control->abort_block();
 
-   msg(fmt::format("Chain populated: {} key_value rows in {} tables", total_rows, num_tables));
+   msg(fmt::format("Chain populated: {} KV rows in {} tables", total_rows, num_tables));
 
    // --- Benchmark: Threaded (parallel) snapshot write ---
    auto tp0 = std::chrono::high_resolution_clock::now();
@@ -1223,49 +1812,54 @@ BOOST_AUTO_TEST_CASE( snapshot_perf_benchmark )
        read_thr_ms, read_var_ms, read_speedup));
 }
 
-// Large-scale snapshot benchmark (~40GB, mimicking EOS mainnet section distribution)
-// Run with: ./unit_test --run_test=snapshot_part2_tests/snapshot_large_benchmark -- --sys-vm
-// Requires ~60GB RAM. Skip variant (would need another 40GB+ for in-memory JSON).
+// Large-scale benchmark of the two KV sections, which hold nearly all contract state.
 //
-// EOS mainnet snapshot section distribution (from snapshot-2026-03-10-19-eos-v8):
+// Build with RUN_PERF_BENCHMARKS defined for this file, then run:
+//   TMPDIR=<dir on a real disk> ./unit_test --run_test=snapshot_part2_tests/snapshot_large_benchmark \
+//      --log_level=message -- --sys-vm
+//
+// TMPDIR holds the mapped state and the snapshot, so a tmpfs would hide the file I/O and rule out KV_SNAP_BENCH_COLD.
+//
+// Settings, from the environment:
+//   KV_SNAP_BENCH_ROWS     KV rows, default 10 million
+//   KV_SNAP_BENCH_ENTRIES  KV secondary index entries, default 14 million
+//   KV_SNAP_BENCH_ORDER    sorted, interleaved or random (default): see bench_insertion_order
+//   KV_SNAP_BENCH_COLD     1 evicts the state before each walk: see bench_evict_state
+//
+// The default counts keep the ratio of an EOS mainnet snapshot (snapshot-2026-03-10-19-eos-v8):
 //   key_value_object:  262M rows, 20.6 GB (50.7%)  ~82 bytes/row
 //   index256_object:   356M rows, 16.3 GB (40.0%)  ~48 bytes/row
-//   permission_object:  13M rows,  1.1 GB  (2.7%)
-//   table_id_object:    20M rows,  0.7 GB  (1.7%)
-//   account_metadata:    6M rows,  0.5 GB  (1.2%)
-//   remaining 20 sections: < 1 GB combined
-//
-// This benchmark populates key_value + index256 + index64 to match the two
-// dominant sections while keeping total data ~40GB.
+//   index64_object:     13M rows,  0.3 GB
+// Rows keep its sizes too: a 16-byte key and a 50-byte value, and a 32-byte secondary key with a 16-byte primary key.
 BOOST_AUTO_TEST_CASE( snapshot_large_benchmark )
 {
-   // Target: ~20.5 GB key_value + ~16 GB index256 + ~0.3 GB index64 ≈ ~37 GB
-   // key_value: 20000 tables × 13000 rows × 82 bytes/row ≈ 20 GB
-   // index256:  20000 tables × 18000 rows × 48 bytes/row ≈ 16 GB
-   // index64:   20000 tables × 650 rows  × 23 bytes/row  ≈ 0.3 GB
+   constexpr uint64_t default_rows        = 10'000'000;
+   constexpr uint64_t default_entries     = 14'000'000;
    constexpr uint32_t num_tables          = 20000;
-   constexpr uint32_t kv_rows_per_table   = 13000;
-   constexpr uint32_t kv_value_size       = 50;    // ~82 bytes packed with overhead
-   constexpr uint32_t i256_rows_per_table = 18000;
-   constexpr uint32_t i64_rows_per_table  = 650;
+   constexpr uint32_t kv_value_size       = 50;
+   constexpr uint32_t sec_key_size        = 32;
+   constexpr uint32_t sec_key_random_from = sizeof(uint64_t); // the leading bytes set the order, the rest are filler
+   constexpr uint16_t table_id            = 1;
+   constexpr uint64_t state_bytes_per_row = 320;              // generous: node, key allocation and value allocation
+   constexpr uint64_t state_base_mib      = 1024;
+   constexpr uint64_t mib                 = 1024 * 1024;      // chainbase takes a whole number of MiB
+   constexpr uint64_t progress_interval   = 5'000'000;
 
-   const uint64_t total_kv_rows   = uint64_t(num_tables) * kv_rows_per_table;
-   const uint64_t total_i256_rows = uint64_t(num_tables) * i256_rows_per_table;
-   const uint64_t total_i64_rows  = uint64_t(num_tables) * i64_rows_per_table;
-   const uint64_t total_rows      = total_kv_rows + total_i256_rows + total_i64_rows + num_tables;
-   const uint64_t est_kv_data     = total_kv_rows * 82;
-   const uint64_t est_i256_data   = total_i256_rows * 48;
-   const uint64_t est_i64_data    = total_i64_rows * 23;
-   const uint64_t estimated_data  = est_kv_data + est_i256_data + est_i64_data;
+   const uint64_t total_rows    = bench_setting("KV_SNAP_BENCH_ROWS", default_rows);
+   const uint64_t total_entries = bench_setting("KV_SNAP_BENCH_ENTRIES", default_entries);
+   const bool     cold          = bench_setting("KV_SNAP_BENCH_COLD", 0) != 0;
+   const char*    order_setting = std::getenv("KV_SNAP_BENCH_ORDER");
+   const auto     order = order_setting ? magic_enum::enum_cast<bench_insertion_order>(order_setting)
+                                        : std::optional{bench_insertion_order::random};
+   BOOST_REQUIRE(order.has_value());
 
    auto msg = [](const std::string& s) { BOOST_TEST_MESSAGE(s); };
-   msg(fmt::format("Large benchmark: {} tables, {} kv + {} i256 + {} i64 rows = ~{} GB estimated",
-       num_tables, total_kv_rows, total_i256_rows, total_i64_rows,
-       estimated_data / (1024*1024*1024)));
+   msg(fmt::format("Large benchmark: {} rows + {} index entries in {} tables, {} insertion, {} state",
+       total_rows, total_entries, num_tables, magic_enum::enum_name(*order), cold ? "cold" : "hot"));
 
    fc::temp_directory tempdir;
    auto cfg = tester::default_config(tempdir);
-   cfg.first.state_size = 96ull * 1024 * 1024 * 1024; // 96GB state
+   cfg.first.state_size = (state_base_mib + (total_rows + total_entries) * state_bytes_per_row / mib) * mib;
    savanna_tester chain(cfg.first, cfg.second);
    chain.produce_block();
 
@@ -1273,66 +1867,50 @@ BOOST_AUTO_TEST_CASE( snapshot_large_benchmark )
    auto pop_start = std::chrono::high_resolution_clock::now();
    {
       auto& db = const_cast<chainbase::database&>(chain.control->db());
+      bench_rng rng;
 
-      uint64_t seed = 0x12345678ABCDEF01ULL;
-      auto next_seed = [&seed]() {
-         seed ^= seed << 13;
-         seed ^= seed >> 7;
-         seed ^= seed << 17;
-         return seed;
+      // The table and the ordering number of the i-th of `count` rows.
+      struct placement { uint32_t table; uint64_t number; };
+      const auto place = [&](uint64_t i, uint64_t count) -> placement {
+         switch (*order) {
+            case bench_insertion_order::sorted:      return {static_cast<uint32_t>(i * num_tables / count), i};
+            case bench_insertion_order::interleaved: return {static_cast<uint32_t>(i % num_tables), i};
+            case bench_insertion_order::random:
+               return {static_cast<uint32_t>(rng.next() % num_tables), rng.next()};
+         }
+         BOOST_FAIL("unknown insertion order");
+         return {};
       };
 
-      for (uint32_t tbl = 0; tbl < num_tables; tbl++) {
-         const auto& tid = db.create<table_id_object>([&](table_id_object& obj) {
-            obj.code  = account_name(tbl + 100);
-            obj.scope = name("benchmark");
-            obj.table = name("data");
-            obj.payer = config::system_account_name;
-            obj.count = kv_rows_per_table;
+      for (uint64_t i = 0; i < total_rows; i++) {
+         const auto [tbl, number] = place(i, total_rows);
+         const auto key = make_kv_scoped_key("benchmark"_n, number);
+         db.create<kv_object>([&](kv_object& obj) {
+            obj.code     = account_name(tbl + 100);
+            obj.payer    = config::system_account_name;
+            obj.table_id = table_id;
+            obj.set_key(key.data, key.size);
+            obj.value.resize_and_fill(kv_value_size, [&](char* data, std::size_t sz) { rng.fill(data, sz); });
          });
+         if ((i + 1) % progress_interval == 0)
+            msg(fmt::format("  populated {}/{} rows...", i + 1, total_rows));
+      }
 
-         // key_value rows (~82 bytes each packed)
-         for (uint32_t r = 0; r < kv_rows_per_table; r++) {
-            db.create<key_value_object>([&](key_value_object& obj) {
-               obj.t_id = tid.id;
-               obj.primary_key = r;
-               obj.payer = config::system_account_name;
-               obj.value.resize_and_fill(kv_value_size, [&](char* data, std::size_t sz) {
-                  for (std::size_t i = 0; i < sz; i += 8) {
-                     uint64_t v = next_seed();
-                     std::memcpy(data + i, &v, std::min<std::size_t>(8, sz - i));
-                  }
-               });
-            });
-         }
-
-         // index256 rows (~48 bytes each packed)
-         for (uint32_t r = 0; r < i256_rows_per_table; r++) {
-            __uint128_t lo = next_seed(); lo |= __uint128_t(next_seed()) << 64;
-            __uint128_t hi = next_seed(); hi |= __uint128_t(next_seed()) << 64;
-            key256_t k256;
-            k256[0] = lo;
-            k256[1] = hi;
-            db.create<index256_object>([&](index256_object& obj) {
-               obj.t_id = tid.id;
-               obj.primary_key = r;
-               obj.payer = config::system_account_name;
-               obj.secondary_key = k256;
-            });
-         }
-
-         // index64 rows (~23 bytes each packed)
-         for (uint32_t r = 0; r < i64_rows_per_table; r++) {
-            db.create<index64_object>([&](index64_object& obj) {
-               obj.t_id = tid.id;
-               obj.primary_key = r;
-               obj.payer = config::system_account_name;
-               obj.secondary_key = next_seed();
-            });
-         }
-
-         if (tbl % 2000 == 0 && tbl > 0)
-            msg(fmt::format("  populated {}/{} tables...", tbl, num_tables));
+      for (uint64_t i = 0; i < total_entries; i++) {
+         const auto [tbl, number] = place(i, total_entries);
+         const auto pri_key = make_kv_scoped_key("benchmark"_n, i);
+         std::array<char, sec_key_size> sec_key;
+         kv_encode_be64(sec_key.data(), number);
+         rng.fill(sec_key.data() + sec_key_random_from, sec_key.size() - sec_key_random_from);
+         db.create<kv_index_object>([&](kv_index_object& obj) {
+            obj.code     = account_name(tbl + 100);
+            obj.payer    = config::system_account_name;
+            obj.table_id = table_id;
+            obj.set_sec_key(sec_key.data(), sec_key.size());
+            obj.set_pri_key(pri_key.data, pri_key.size);
+         });
+         if ((i + 1) % progress_interval == 0)
+            msg(fmt::format("  populated {}/{} index entries...", i + 1, total_entries));
       }
    }
 
@@ -1341,10 +1919,13 @@ BOOST_AUTO_TEST_CASE( snapshot_large_benchmark )
 
    auto pop_end = std::chrono::high_resolution_clock::now();
    auto pop_ms = std::chrono::duration_cast<std::chrono::milliseconds>(pop_end - pop_start).count();
-   msg(fmt::format("Chain populated: {} total rows ({} kv, {} i256, {} i64) in {} tables ({} ms)",
-       total_rows, total_kv_rows, total_i256_rows, total_i64_rows, num_tables, pop_ms));
+   msg(fmt::format("Chain populated: {} rows, {} index entries in {} tables ({} ms)",
+       total_rows, total_entries, num_tables, pop_ms));
+
+   auto& state_db = const_cast<chainbase::database&>(chain.control->db());
 
    // --- Integrity Hash (run first while state pages are hot) ---
+   if (cold) bench_evict_state(state_db);
    auto tp_ih0 = std::chrono::high_resolution_clock::now();
    auto integrity_hash = chain.control->calculate_integrity_hash();
    auto tp_ih1 = std::chrono::high_resolution_clock::now();
@@ -1353,6 +1934,7 @@ BOOST_AUTO_TEST_CASE( snapshot_large_benchmark )
    msg(fmt::format("Integrity HASH: {} ms (no I/O)", ihash_ms));
 
    // --- Threaded WRITE ---
+   if (cold) bench_evict_state(state_db);
    auto tp0 = std::chrono::high_resolution_clock::now();
    auto writer_thr = threaded_snapshot_suite::get_writer();
    chain.control->write_snapshot(writer_thr);
@@ -1377,19 +1959,27 @@ BOOST_AUTO_TEST_CASE( snapshot_large_benchmark )
 
    msg(fmt::format("Threaded READ:  {} ms, throughput: {:.0f} MB/s", read_ms, read_throughput));
 
-   // --- Verify ---
+   // --- Verify, timing the hash again: a loaded chain allocates its rows in snapshot order ---
+   auto tp_loaded0 = std::chrono::high_resolution_clock::now();
    auto snap_integrity_hash = snap_chain.control->calculate_integrity_hash();
+   auto tp_loaded1 = std::chrono::high_resolution_clock::now();
    BOOST_REQUIRE_EQUAL(integrity_hash.str(), snap_integrity_hash.str());
    msg("Integrity hash verified");
 
+   auto loaded_ihash_ms = std::chrono::duration_cast<std::chrono::milliseconds>(tp_loaded1 - tp_loaded0).count();
+
    // --- Summary ---
    msg("=== LARGE BENCHMARK SUMMARY ===");
-   msg(fmt::format("Snapshot: {:.2f} GB, {} total rows, {} tables",
-       (double)snap_size / (1024*1024*1024), total_rows, num_tables));
+   msg(fmt::format("Snapshot: {:.2f} GB, {} rows, {} index entries, {} tables",
+       (double)snap_size / (1024*1024*1024), total_rows, total_entries, num_tables));
    msg(fmt::format("Populate: {:.1f}s", (double)pop_ms / 1000));
    msg(fmt::format("IHash:    {:.1f}s (no I/O, serialization + BLAKE3 only)", (double)ihash_ms / 1000));
    msg(fmt::format("Write:    {:.1f}s ({:.0f} MB/s)", (double)write_ms / 1000, write_throughput));
    msg(fmt::format("Read:     {:.1f}s ({:.0f} MB/s)", (double)read_ms / 1000, read_throughput));
+   msg(fmt::format("IHash after load: {:.1f}s", (double)loaded_ihash_ms / 1000));
+   msg(fmt::format("RESULT order={} cold={} rows={} entries={} snapshot_bytes={} populate_ms={} ihash_ms={} "
+                   "write_ms={} read_ms={} loaded_ihash_ms={}", magic_enum::enum_name(*order), cold, total_rows,
+                   total_entries, snap_size, pop_ms, ihash_ms, write_ms, read_ms, loaded_ihash_ms));
 }
 
 // BLAKE3 encoder buffer bypass threshold benchmark

@@ -131,7 +131,7 @@ try:
                      "compression": "none"}]
     }
     # The jumbotime action writes a ~33MB row but normally completes well under max_transaction_cpu_usage.
-    # CPU is billed by wall-clock elapsed time, so under the concurrent NP/LR test sharding the nodeop thread
+    # CPU is billed by wall-clock elapsed time, so under concurrent NP/LR test runs the nodeop thread
     # can be descheduled mid-execution (CPU starvation) and trip the deadline anyway -- the trx is aborted
     # with tx_cpu_usage_exceeded the instant it crosses the limit, so the billed time only ever shows up just
     # over it and is not a true measure of the work. Raising the limit wouldn't reliably help (a bad enough
@@ -169,7 +169,7 @@ try:
     shipSocketAddress = f"127.0.0.1:{Utils.getPort(Utils.PortStateHistory)}"
 
     def makeShipStreamerCmd(startBlockNum, endBlockNum):
-        """Return a ship_streamer command targeting this test's sharded SHiP endpoint."""
+        """Return a ship_streamer command targeting this test's leased SHiP endpoint."""
         return (
             f"{shipClient} --socket-address {shipSocketAddress} "
             f"--start-block-num {startBlockNum} --end-block-num {endBlockNum} "

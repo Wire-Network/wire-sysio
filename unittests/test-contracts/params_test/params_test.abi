@@ -39,6 +39,16 @@
             "fields": []
         },
         {
+            "name": "setthrow4",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "setthrow5",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "throwrvia1",
             "base": "",
             "fields": []
@@ -83,6 +93,16 @@
         {
             "name": "setthrow3",
             "type": "setthrow3",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setthrow4",
+            "type": "setthrow4",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setthrow5",
+            "type": "setthrow5",
             "ricardian_contract": ""
         },
         {

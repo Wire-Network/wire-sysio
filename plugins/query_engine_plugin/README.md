@@ -22,11 +22,13 @@ registered but not initialized, or has no enabled `chain_ro` listener, the C++ s
 The query plugin adds no listener or port option.
 
 Every chain read runs on the executor's **read-exclusive** queue, which only `producer_plugin`'s
-read-only threads drain, inside a read window the application thread never enters. Startup
-therefore requires `read-only-threads` to be greater than zero: `producer_plugin` defaults it to 3
-only when `chain_api_plugin` is configured, so a node without `chain_api_plugin` sets it explicitly.
-It rejects configured `producer-name` values and speculative read mode. `irreversible` read mode is
-also supported. P2P synchronization remains the node's responsibility.
+read-only threads drain, inside a read window the application thread never enters. The plugin starts
+on any node it is configured on, producing or not. A node without read-only threads fails every query
+that parses with `STATE_UNAVAILABLE` (`data.limit = "read-only-threads"`) and queues nothing: that is
+every producing node, since `producer_plugin` refuses read-only threads there, and any node without
+`chain_api_plugin` that does not set `read-only-threads` (`producer_plugin` defaults it to 3 only when
+`chain_api_plugin` is configured). Speculative read mode is still rejected at startup. `irreversible`
+read mode is also supported. P2P synchronization remains the node's responsibility.
 
 ## C++ service
 
@@ -244,7 +246,7 @@ All options are immutable, positive integers available through CLI or config.ini
 | query-max-in-flight | 4 | Engine admissions including retained reads; also the independent HTTP ingress cap |
 | query-max-query-bytes | 16384 | SQL bytes before ANTLR |
 | query-timeout-ms | 1000 | Request deadline, including ingress/queue time; HTTP `timeout_ms` may only lower it; C++ callers may opt out per call |
-| query-max-capture-ms | producer_plugin's read-only transaction time | Each chain read callback (the ABI copy and the coherent data capture); unset, the smaller of that time and `query-timeout-ms`; a configured value may not exceed it |
+| query-max-capture-ms | producer_plugin's read-only transaction time (with read-only threads) | Each chain read callback (the ABI copy and the coherent data capture); unset, the smaller of that time and `query-timeout-ms`; with read-only threads, a configured value may not exceed it |
 | query-max-abi-bytes | 1048576 | ABI blob size per selected owner, checked before copy |
 | query-max-scan-rows | 100000 | Total candidate rows across owners |
 | query-max-raw-bytes | 67108864 | Copied ABI, raw rows, continuation and capture overhead |
@@ -255,18 +257,20 @@ All options are immutable, positive integers available through CLI or config.ini
 
 Additional bounds are 4096 tokens, depth 64, 2048 AST/ABI descriptor nodes, 64 owners and 512 rows
 per internal page; `error.data.limit` names them `sql-tokens`, `sql-depth`, `sql-nodes`,
-`sql-owners`, `abi-depth` and `abi-nodes`, distinct from the option names. Internal pages do not yield
+`sql-owners`, `abi-depth` and `abi-nodes`, distinct from the option names, and names
+`read-only-threads` for a query on a node without read-only threads. Internal pages do not yield
 to another chain state. The capture bound is producer_plugin's read-only transaction time — the
-smaller of `max-transaction-time` and the effective read-only read window less its minimum — and
-every check inside a read callback also honors the current read window's own end, so a capture that
-starts late in a window stops at the window's end instead of running its full budget past it and
-delaying the next write window; the read is then queued again for the next window, with the cut
-attempt's rows and bytes uncharged, while the request deadline allows. Only that deadline fails it,
-and a `QUERY_TIMEOUT` raised while a read the window cut short is waiting for, or running in, the
-next window names `read-only-read-window-time-us` as its limit; the `query` logger's shutdown
-counters include how many reads were cut. A configured
-`query-max-capture-ms` may only tighten the budget and cannot exceed the request timeout; unset, the
-built-in default is clamped to the request timeout. Raw memory cannot exceed total memory; aggregate
+smaller of `max-transaction-time` and the effective read-only read window less its minimum — on a
+node with read-only threads; otherwise it is the built-in default. Every check inside a read
+callback also honors the current read window's own end, so a capture that starts late in a window
+stops at the window's end instead of running its full budget past it and delaying the next write
+window; the read is then queued again for the next window, with the cut attempt's rows and bytes
+uncharged, while the request deadline allows. Only that deadline fails it, and a `QUERY_TIMEOUT`
+raised while a read the window cut short is waiting for, or running in, the next window names
+`read-only-read-window-time-us` as its limit; the `query` logger's shutdown counters include how
+many reads were cut. A configured `query-max-capture-ms` cannot exceed the request timeout and, on a
+node with read-only threads, may only tighten producer_plugin's budget; unset, the built-in default
+is clamped to the request timeout. Raw memory cannot exceed total memory; aggregate
 admitted-memory multiplication is checked.
 Default engine admission permits 512 MiB of accounted execution memory. When HTTP is enabled,
 its independent ingress/response admission can retain another 512 MiB; each HTTP request shares
@@ -284,7 +288,9 @@ callbacks retain their admission token until drained. Shutdown joins workers wit
 future app-thread work. Client disconnect does not provide immediate cancellation through the
 existing callback API; the configured HTTP deadline and shutdown still bound the work.
 
-The `query` logger reports startup limits, throttled unexpected failures, and shutdown counters.
+The `query` logger reports startup limits, a startup warning on a node without read-only threads
+(every query there fails with `STATE_UNAVAILABLE`), throttled unexpected failures, and shutdown
+counters.
 Engine counters count C++ execution outcomes and produced rows; HTTP envelope-size failures and
 HTTP ingress rejections belong to the adapter boundary. Normal logs do not include SQL or row values. SIGHUP rebinds the logger only.
 
@@ -311,7 +317,9 @@ HTTP ingress rejections belong to the adapter boundary. Normal logs do not inclu
 Error data always contains `kind`, `retryable`, `line`, `column`, and `limit`. Source positions are
 1-based when present. Retryability is advisory; the server never automatically retries. BUSY,
 SCHEMA_CHANGED, STATE_UNAVAILABLE, cancellation and timeout are retryable; unchanged syntax,
-semantic, value and limit failures are not.
+semantic, value and limit failures are not. A `STATE_UNAVAILABLE` whose `limit` is
+`read-only-threads` persists on that node for as long as it runs without read-only threads: retry
+it on another node.
 
 ## Build and validation
 

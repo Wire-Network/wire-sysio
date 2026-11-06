@@ -1,24 +1,128 @@
 #pragma once
 
+#include <algorithm>
+#include <functional>
+#include <mutex>
+#include <optional>
+#include <utility>
+#include <vector>
+
 #include <sysio/outpost_client_plugin.hpp>
 #include <sysio/outpost_client/outpost_client.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
+#include <fc/int256.hpp>
 #include <fc/network/ethereum/ethereum_abi.hpp>
 #include <fc/network/ethereum/ethereum_client.hpp>
+#include <fc/time.hpp>
 
 namespace sysio {
 using namespace fc::crypto::ethereum;
 using namespace fc::network::ethereum;
 
+/// The fees one EIP-1559 transaction pays per gas.
+struct ethereum_transaction_fees {
+   fc::uint256 max_priority_fee_per_gas;
+   fc::uint256 max_fee_per_gas;
+
+   bool operator==(const ethereum_transaction_fees&) const = default;
+};
+
+/// What a journaled transaction is for.
+enum class submission_purpose {
+   /// `OPPInbound.epochIn` for the submission's epoch.
+   epoch_in,
+   /// A zero-value transfer to the signer itself at a nonce this process holds no record of: it replaces a
+   /// pending transaction the relay cannot reprice, or fills a nonce nothing holds below one the relay
+   /// journaled, so the relay never queues behind something it cannot move.
+   cancel
+};
+
+/// Where a journaled transaction stood at the last check against the head.
+enum class submission_state {
+   /// None of its hashes has a receipt and its nonce is unused.
+   pending,
+   /// One of its hashes has a receipt, in `landed_at`.
+   landed,
+   /// Its nonce is used by a transaction none of its hashes match.
+   superseded
+};
+
+/// One signing of a journaled transaction at its nonce.
+struct submission_attempt {
+   /// The hash, computed from the signed bytes before they were sent.
+   std::string               tx_hash;
+   ethereum_transaction_fees fees;
+   /// The signed bytes, sent again as they are whenever these fees are: a signer whose signatures are not
+   /// deterministic (AWS KMS) would give the same call at the same fees another hash, which a node holding
+   /// the first refuses as an underpriced replacement.
+   std::string               raw_hex;
+};
+
+/// One transaction this relay signed, kept from just before its first send until its nonce is used at the
+/// client's read confirmation. Until then a reorg can put it back in the mempool, and the relay must still be
+/// able to sign it again at its nonce rather than queue a new call behind it.
+struct ethereum_submission {
+   submission_purpose purpose     = submission_purpose::epoch_in;
+   /// The epoch an `epochIn` delivers; zero for a cancel.
+   uint32_t           epoch_index = 0;
+   /// The transaction as signed, without its signature: nonce, recipient, gas limit and calldata. The fees
+   /// are each attempt's own.
+   eip1559_tx         transaction;
+   /// Every signing that may have reached a node, oldest first, each hash once and each fee pair signed
+   /// once. A refused one is kept too, since the node, or another behind the same endpoint, may hold it.
+   std::vector<submission_attempt> attempts;
+   submission_state                state = submission_state::pending;
+   /// The block holding it while `state` is `landed`.
+   std::optional<fc::uint256>      landed_at;
+};
+
+/// How long the relay waits on a nonce it has no record of before cancelling it: a pending transaction
+/// there, or nothing below one the relay journaled. A transaction priced to be included lands within a block
+/// or two; one still pending after five blocks is taken as stuck. Raising it delays recovery after a restart;
+/// lowering it cancels more transactions that would have landed on their own.
+inline constexpr fc::microseconds default_unaccounted_nonce_grace = fc::seconds(60);
+
+/// A nonce no submission accounts for, as the relay has seen it: the node holds a pending transaction there,
+/// or nothing at all below a nonce the relay journaled.
+struct unaccounted_nonce_record {
+   fc::uint256    nonce;
+   /// When the relay first saw it; it is cancelled once `unaccounted_nonce_grace` has passed.
+   fc::time_point first_seen;
+};
+
+/// Everything the relay signed with one client's signer that is not yet safe to forget, and what it saw of
+/// nonces it did not sign.
+struct ethereum_submission_journal {
+   /// Held for a whole delivery, so only one sender uses the signer's nonces at a time.
+   std::mutex                       mutex;
+   /// Ascending by nonce.
+   std::vector<ethereum_submission> submissions;
+   /// The lowest nonce no submission accounts for.
+   std::optional<unaccounted_nonce_record> unaccounted_nonce;
+   /// See `default_unaccounted_nonce_grace`.
+   fc::microseconds                 unaccounted_nonce_grace = default_unaccounted_nonce_grace;
+};
+
 struct ethereum_client_entry_t {
    std::string                        id;
    fc::crypto::signature_provider_ptr signature_provider;
+   /// Null while a three-field CLI client's chain ID is being discovered.
+   /// Entries are immutable snapshots: fetch again to observe readiness.
    ethereum_client_ptr                client;
-   /// Authoritative numeric EVM chain id. Lets the
+   /// Authoritative numeric EVM chain id (zero until discovery completes). Lets the
    /// batch operator auto-select the client for an outpost row by matching the
    /// row's `external_chain_id`, so multiple EVM outposts never share one
    /// remote endpoint.
    uint32_t                           chain_id;
+   /// How settled the outpost state this client reads must be before the
+   /// operator acts on it: the envelope the outpost emitted. See
+   /// `outpost_ethereum_client::read_settled_block` for what reading unlike the
+   /// rest of the group costs.
+   ethereum_read_confirmation         read_confirmation = ethereum_read_confirmation_defaults;
+   /// What the relay signed with this client's signer. The entry's one mutable part: every outpost client
+   /// built on the entry shares it, so it outlives a relay job the batch operator rebuilds. A restart loses
+   /// it, and the relay then cancels whatever the node still holds at a nonce it has no record of.
+   std::shared_ptr<ethereum_submission_journal> submissions = std::make_shared<ethereum_submission_journal>();
 };
 
 using ethereum_client_entry_ptr = std::shared_ptr<ethereum_client_entry_t>;
@@ -56,36 +160,244 @@ struct opp_contract_client : ethereum_contract_client {
                               : ethereum_contract_call_fn<fc::variant, uint32_t>{}) {}
 };
 
+/// EIP-7825's per-transaction gas cap (2^24) — the most any single `epochIn`
+/// can be funded with, whatever the client's policy allows.
+inline constexpr uint64_t EIP_7825_TX_GAS_CAP = 16'777'216;
+
+/**
+ * @brief The most gas any `epochIn` may be funded with under the policy's
+ *        static limit: `max_gas_limit`, bounded by EIP-7825's cap.
+ * @param policy The client's local expenditure policy.
+ * @return The ceiling, in gas.
+ */
+inline uint64_t delivery_gas_ceiling(const ethereum_transaction_policy& policy) {
+   const fc::uint256 cap{EIP_7825_TX_GAS_CAP};
+   return policy.max_gas_limit < cap ? policy.max_gas_limit.convert_to<uint64_t>() : EIP_7825_TX_GAS_CAP;
+}
+
+/**
+ * @brief The most gas any `epochIn` may be funded with at a given fee: the
+ *        static ceiling, further bounded by what `max_total_native_cost`
+ *        pays for at `max_fee_per_gas`.
+ *
+ * The policy refuses a transaction whose `gas_limit * max_fee_per_gas`
+ * exceeds `max_total_native_cost`, so a limit the static ceiling admits can
+ * still be a rejection at the fee the call is sent at. Sizing to this
+ * ceiling turns that late rejection into a smaller budget the contract
+ * spills across continuations instead.
+ *
+ * @param policy          The client's local expenditure policy.
+ * @param max_fee_per_gas The fee the call will be sent at.
+ * @return The ceiling, in gas; the static ceiling when the fee is zero.
+ */
+inline uint64_t delivery_gas_ceiling(const ethereum_transaction_policy& policy, const fc::uint256& max_fee_per_gas) {
+   const uint64_t static_ceiling = delivery_gas_ceiling(policy);
+   if (max_fee_per_gas == 0) return static_ceiling;
+   const fc::uint256 affordable = policy.max_total_native_cost / max_fee_per_gas;
+   return affordable < fc::uint256{static_ceiling} ? affordable.convert_to<uint64_t>() : static_ceiling;
+}
+
+/// Gas an `epochIn` pays before its dispatch loop, independent of size: the
+/// transaction base, the delivery record, and the consensus bookkeeping a tip
+/// adds. A ~700-byte tip reaches the loop at ~320k (wire-ethereum
+/// `OPPCapacity`, the under-funded probe); rounded up.
+inline constexpr uint64_t DELIVERY_FIXED_GAS = 500'000;
+/// Gas an `epochIn` pays per envelope byte: calldata (EIP-7623 floors a
+/// calldata-heavy transaction at 40 gas a byte), the linear decode (~50 gas
+/// a byte, measured at the cap) and the dispatch walk; rounded up.
+inline constexpr uint64_t DELIVERY_GAS_PER_BYTE = 120;
+/// Gas allowed per attestation still to dispatch. A remit is tens of
+/// thousands; a routine rotation seating seven unseen operators is ~1.15M.
+/// An attestation that costs more spills, and the next call escalates.
+inline constexpr uint64_t ATTESTATION_GAS_ALLOWANCE = 1'500'000;
+/// Gas left for the outbound emit the finishing call attempts:
+/// `OPPInbound.EmitAttemptGasFloor`, below which the contract defers it.
+inline constexpr uint64_t EMIT_GAS_ALLOWANCE = 4'000'000;
+
+/// The least static ceiling the relay accepts: what a full-cap envelope costs
+/// to deliver and tip, dispatch one attestation at its allowance, and emit.
+/// Under less, the largest envelope the platform allows cannot complete on
+/// this client, so the relay refuses to be built on it rather than discover
+/// that one epoch at a time.
+inline constexpr uint64_t DELIVERY_MINIMUM_GAS_CEILING = DELIVERY_FIXED_GAS +
+                                                        OPP_MAX_ENVELOPE_BYTES * DELIVERY_GAS_PER_BYTE +
+                                                        ATTESTATION_GAS_ALLOWANCE + EMIT_GAS_ALLOWANCE;
+
+/// What one `epochIn` has to carry, from which its gas budget is sized.
+struct delivery_gas_request {
+   /// Encoded envelope size.
+   uint64_t envelope_bytes = 0;
+   /// Attestations the outpost has not dispatched yet, or `std::nullopt`
+   /// when the envelope could not be read: the budget is then the ceiling.
+   std::optional<uint32_t> remaining_attestations;
+   /// Calls already sent for this epoch in this tick that spilled: each one
+   /// doubles the budget, so a run of attestations dearer than the allowance
+   /// costs at most a logarithmic number of extra calls.
+   uint32_t escalations = 0;
+   /// `delivery_gas_ceiling`.
+   uint64_t ceiling = 0;
+};
+
+/**
+ * @brief Gas one `epochIn` is funded with.
+ *
+ * Sized to what the call has left to do rather than to the node's estimate or
+ * to the ceiling. The estimate is systematically wrong for this call:
+ * `OPPInbound.epochIn` stops dispatching on a `gasleft()` watchdog and records
+ * where it stopped, so `eth_estimateGas` converges on the least gas at which
+ * the call SUCCEEDS — the tip plus one attestation — and funding to it would
+ * cost one transaction per attestation. The ceiling is wrong the other way:
+ * a node reserves `gas_limit * max_fee_per_gas` of the signer's balance
+ * whatever the call uses, so a small envelope funded to the cap is refused for
+ * balance at exactly the fee levels where delivery matters most.
+ *
+ * The contract spills what does not fit and the next call carries on, so an
+ * under-estimate costs a continuation, never the epoch.
+ *
+ * @param request What the call has to carry.
+ * @return The budget, in gas.
+ */
+inline uint64_t delivery_gas_budget(const delivery_gas_request& request) {
+   if (!request.remaining_attestations) return request.ceiling;
+   uint64_t budget = DELIVERY_FIXED_GAS + request.envelope_bytes * DELIVERY_GAS_PER_BYTE +
+                     uint64_t{*request.remaining_attestations} * ATTESTATION_GAS_ALLOWANCE +
+                     EMIT_GAS_ALLOWANCE;
+   for (uint32_t i = 0; i < request.escalations && budget < request.ceiling; ++i) budget *= 2;
+   return std::min(budget, request.ceiling);
+}
+
+/**
+ * @brief Confirmation options for one `epochIn`: funded to exactly
+ *        `gas_budget` (floor and cap both), its receipt awaited for
+ *        `receipt_wait`.
+ *
+ * The receipt wait replaces the library's default retry budget, which would
+ * otherwise cap every wait at its own 15 s however long the delivery was
+ * given: on a chain whose blocks come slower than that, raising
+ * `batch-delivery-timeout-ms` would not let a single wait outlast one block.
+ *
+ * @param gas_budget   The budget from `delivery_gas_budget`.
+ * @param receipt_wait How long to wait for the receipt.
+ * @return The options the call is sent with.
+ */
+inline ethereum_confirm_options delivery_confirm_options(uint64_t gas_budget, fc::microseconds receipt_wait) {
+   ethereum_confirm_options options = ethereum_confirm_option_defaults;
+   options.gas_limit_floor     = gas_budget;
+   options.gas_limit_cap       = gas_budget;
+   options.retry.total_timeout = receipt_wait;
+   return options;
+}
+
+/// `eth_getTransactionReceipt` field names the relay reads.
+namespace ethereum_receipt_field {
+inline constexpr auto block_number = "blockNumber";
+inline constexpr auto logs         = "logs";
+} // namespace ethereum_receipt_field
+
+/**
+ * @brief Send one signing of `submission` whose attempt is already recorded.
+ *
+ * The attempt stays recorded whatever the send does, a refusal included: the node may hold the bytes anyway
+ * (a refusal as already known), or another backend behind the same endpoint may, and the journal settles it
+ * from there. A node that reports a different hash for the bytes than the one computed from them is logged,
+ * and its hash is recorded too so every wait watches both.
+ *
+ * @param client     The client that signed it.
+ * @param signed_tx  The signed bytes and the hash recorded for them.
+ * @param submission The submission the attempt belongs to.
+ * @return The hash the node reported.
+ * @throws fc::network::json_rpc::json_rpc_error when the node refuses the transaction.
+ */
+std::string send_submission_attempt(ethereum_client& client, const signed_transaction& signed_tx,
+                                    ethereum_submission& submission);
+
+/// What one `epochIn` left on chain, read from its receipt once it confirmed.
+struct epoch_in_receipt {
+   /// The transaction's hash, for logs.
+   std::string  tx_hash;
+   /// The block that holds the transaction. Every read that decides the
+   /// relay's next move is pinned to it, so a backend lagging behind the block
+   /// that just confirmed cannot report the state from before the call.
+   fc::uint256  block_number;
+   /// The receipt's `logs`, as the node returned them: what the call did.
+   fc::variants logs;
+};
+
+/**
+ * @brief Read an `epoch_in_receipt` out of an `eth_getTransactionReceipt` result.
+ * @param tx_hash The confirmed transaction's hash.
+ * @param receipt The receipt object as `ethereum_client::wait_for_receipt` returned it.
+ * @return The block number and logs the relay acts on.
+ * @throws fc::exception when the receipt is not an object or carries no block number.
+ */
+inline epoch_in_receipt parse_epoch_in_receipt(std::string tx_hash, const fc::variant& receipt) {
+   FC_ASSERT(receipt.is_object(), "transaction receipt for {} is not an object", tx_hash);
+   const auto& object = receipt.get_object();
+   FC_ASSERT(object.contains(ethereum_receipt_field::block_number),
+             "transaction receipt for {} carries no blockNumber", tx_hash);
+   epoch_in_receipt parsed{.tx_hash      = std::move(tx_hash),
+                           .block_number = fc::to_uint256(object[ethereum_receipt_field::block_number]),
+                           .logs         = {}};
+   if (object.contains(ethereum_receipt_field::logs) && object[ethereum_receipt_field::logs].is_array()) {
+      parsed.logs = object[ethereum_receipt_field::logs].get_array();
+   }
+   return parsed;
+}
+
+/// ABI entry names of `OPPInbound.sol` the typed wrapper binds.
+namespace opp_inbound_abi_name {
+inline constexpr auto epoch_in                     = "epochIn";
+inline constexpr auto next_epoch_index             = "nextEpochIndex";
+inline constexpr auto dispatch_spill               = "dispatchSpill";
+inline constexpr auto epoch_deliveries             = "epochDeliveries";
+inline constexpr auto pending_epoch_hash           = "pendingEpochHash";
+inline constexpr auto pending_consensus_for_digest = "pendingConsensusForDigest";
+inline constexpr auto attestation_handlers         = "attestationHandlers";
+} // namespace opp_inbound_abi_name
+
 /// Typed contract client for OPPInbound.sol. Same confirmed-default
-/// policy as `opp_contract_client` for write paths.
+/// policy as `opp_contract_client` for the write path.
 struct opp_inbound_contract_client : ethereum_contract_client {
-   /// `epochIn(uint32 epochIndex, uint16 chunkIndex, uint16 totalChunks,
-   ///          uint32 totalBytes, bytes chunkData)` — ONE chunk of the
-   /// envelope. The contract stages every chunk but the last and finalizes
-   /// inline on the chunk that completes the envelope; there is no terminal
-   /// call and no crank. `chunkData` rides as a hex-encoded string because the
-   /// libfc ABI encoder takes `dt::bytes` that way (see
-   /// `ethereum_abi::encode_dynamic_data`).
+   /// `epochIn(uint32 epochIndex, bytes envelopeData)` — the WHOLE envelope in
+   /// ONE call. The call that reaches consensus dispatches as many attestations
+   /// as its gas allows and records where it stopped; a continuation is the
+   /// SAME call with the same arguments, resumed from the contract's cursor.
+   /// Not a plain `ethereum_contract_tx_fn`, which binds its options once at
+   /// construction: the gas budget (see `delivery_gas_budget`) and `deadline`
+   /// differ per call. Returns the confirmed receipt because the relay's next
+   /// move is decided from the block the call landed in. `envelopeData` rides
+   /// as a hex-encoded string because the libfc ABI encoder takes `dt::bytes`
+   /// that way (see `ethereum_abi::encode_dynamic_data`).
    ///
-   /// `ethereum_contract_tx_fn` binds every argument as a non-const lvalue
-   /// reference, so callers must materialize named locals for all five.
-   ethereum_contract_tx_fn<fc::variant, uint32_t, uint16_t, uint16_t, uint32_t, std::string> epoch_in;
-   /// `discardEnvelopeChunks()` — staged-owner-only recovery, resetting every
-   /// header this signer owns. Invoked by the relay when it finds a
-   /// CURRENT-epoch staging header whose shape belongs to a superseded
-   /// envelope; reverts (`OPP_ChunkBufferMissing`) when nothing is staged,
-   /// which the relay treats as "already clear".
-   ethereum_contract_tx_fn<fc::variant> discard_envelope_chunks;
+   /// The ABI arguments are bound as non-const lvalue references, so callers
+   /// must materialize named locals for both. `submission` is filled after
+   /// signing and before the send, with the hash computed from the signed
+   /// bytes, so a caller whose send or wait threw still knows the nonce, the
+   /// fees and the hash of the call it may have left in flight, a refused send
+   /// included.
+   std::function<epoch_in_receipt(uint32_t& epoch_index, std::string& envelope_hex, uint64_t gas_budget,
+                                  fc::time_point deadline, ethereum_submission& submission)>
+      epoch_in;
    /// `nextEpochIndex()` view — the epoch the outpost is currently accepting.
    ethereum_contract_call_fn<fc::variant> next_epoch_index;
-   /// `envelopeChunkState(address operator_)` view — the OWNER-BOUND staging
-   /// header, the relay's resume read. Block tag rides first per
-   /// `ethereum_contract_call_fn`; the address argument is a hex string.
-   /// Returns the raw `eth_call` hex — `create_call<fc::variant>` does not
-   /// auto-decode, so the caller pushes it back through `contract_decode_data`
-   /// against this ABI entry (the same shape `read_inbound_envelope` uses for
-   /// `getLatestOutboundEnvelope`).
-   ethereum_contract_call_fn<fc::variant, std::string> envelope_chunk_state;
+   /// `dispatchSpill(uint32 epochIndex)` view — where a tipped epoch's dispatch
+   /// stands: `(tipped, dispatched, complete, finalized)`. Block tag rides
+   /// first per `ethereum_contract_call_fn`. Returns the raw `eth_call` hex —
+   /// `create_call<fc::variant>` does not auto-decode, so the caller pushes it
+   /// back through `contract_decode_data` against this ABI entry.
+   ethereum_contract_call_fn<fc::variant, uint32_t> dispatch_spill;
+   /// `epochDeliveries(uint32 epochIndex, address operator_)` view — the digest
+   /// `operator_` delivered for the epoch, or zero when it has not delivered.
+   ethereum_contract_call_fn<fc::variant, uint32_t, std::string> epoch_deliveries;
+   /// `pendingEpochHash()` view — the digest consensus settled on for the epoch
+   /// the outpost is processing.
+   ethereum_contract_call_fn<fc::variant> pending_epoch_hash;
+   /// `pendingConsensusForDigest(bytes32 digest)` view — how close the current
+   /// epoch is to tipping on `digest`: `(nextEpoch, agreeing, groupSize,
+   /// currentEpochStartedAtTs, epochDurationSec_)`. The relay reads it before a
+   /// consensus retry, so a re-delivery is sent only when the contract's own
+   /// path-2 predicate would fire. The digest rides as `0x`-hex.
+   ethereum_contract_call_fn<fc::variant, std::string> pending_consensus_for_digest;
    /// `attestationHandlers(uint16 attestationType)` view — the outpost's own
    /// inbound routing table: the `IOPPReceiver` registered for one attestation
    /// type, `address(0)` when none is and `ATTESTATION_BLACKHOLE` when governance
@@ -99,13 +411,38 @@ struct opp_inbound_contract_client : ethereum_contract_client {
                                const address_compat_type& contract_address,
                                const std::vector<fc::network::ethereum::abi::contract>& contracts)
       : ethereum_contract_client(client, contract_address, contracts)
-      , epoch_in(create_tx_and_confirm<fc::variant, uint32_t, uint16_t, uint16_t, uint32_t, std::string>(
-           get_abi("epochIn")))
-      , discard_envelope_chunks(
-           create_tx_and_confirm<fc::variant>(get_abi("discardEnvelopeChunks")))
-      , next_epoch_index(create_call<fc::variant>(get_abi("nextEpochIndex")))
-      , envelope_chunk_state(create_call<fc::variant, std::string>(get_abi("envelopeChunkState")))
-      , attestation_handlers(create_call<fc::variant, uint16_t>(get_abi("attestationHandlers"))) {}
+      , epoch_in([this](uint32_t& epoch_index, std::string& envelope_hex, uint64_t gas_budget,
+                        fc::time_point deadline, ethereum_submission& submission) -> epoch_in_receipt {
+           const auto&                abi    = get_abi(opp_inbound_abi_name::epoch_in);
+           contract_invoke_data_items params = {epoch_index, envelope_hex};
+           auto tx = this->client->create_default_tx(this->contract_address, abi, params, gas_budget, gas_budget);
+           tx.data              = fc::from_hex(contract_encode_data(abi, params));
+           const auto signed_tx = this->client->sign_transaction(tx, abi.name);
+           submission           = ethereum_submission{
+                        .purpose     = submission_purpose::epoch_in,
+                        .epoch_index = epoch_index,
+                        .transaction = tx,
+                        .attempts    = {{.tx_hash = signed_tx.tx_hash,
+                                         .fees    = {.max_priority_fee_per_gas = tx.max_priority_fee_per_gas,
+                                                     .max_fee_per_gas          = tx.max_fee_per_gas},
+                                         .raw_hex = signed_tx.raw_hex}},
+                        .state       = submission_state::pending,
+                        .landed_at   = std::nullopt,
+           };
+           const auto tx_hash = send_submission_attempt(*this->client, signed_tx, submission);
+           // Measured after the send, so the wait gets exactly what is left.
+           const auto receipt_wait = std::max(fc::microseconds(), deadline - fc::time_point::now());
+           return parse_epoch_in_receipt(
+              tx_hash, this->client->wait_for_receipt(tx_hash, delivery_confirm_options(gas_budget, receipt_wait)));
+        })
+      , next_epoch_index(create_call<fc::variant>(get_abi(opp_inbound_abi_name::next_epoch_index)))
+      , dispatch_spill(create_call<fc::variant, uint32_t>(get_abi(opp_inbound_abi_name::dispatch_spill)))
+      , epoch_deliveries(
+           create_call<fc::variant, uint32_t, std::string>(get_abi(opp_inbound_abi_name::epoch_deliveries)))
+      , pending_epoch_hash(create_call<fc::variant>(get_abi(opp_inbound_abi_name::pending_epoch_hash)))
+      , pending_consensus_for_digest(
+           create_call<fc::variant, std::string>(get_abi(opp_inbound_abi_name::pending_consensus_for_digest)))
+      , attestation_handlers(create_call<fc::variant, uint16_t>(get_abi(opp_inbound_abi_name::attestation_handlers))) {}
 };
 
 /// Typed contract client for wire-ethereum's `SyndicationPool.sol`, the liq

@@ -74,7 +74,7 @@ public:
          BOOST_REQUIRE( accnt != nullptr );
          abi_def abi;
          BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
-         token_abi_ser.set_abi(abi, abi_serializer::create_yield_function(abi_serializer_max_time));
+         token_abi_ser.set_abi(abi, fixture_abi_yield_function());
       }
    }
 
@@ -101,7 +101,7 @@ public:
          BOOST_REQUIRE( accnt != nullptr );
          abi_def abi;
          BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
-         abi_ser.set_abi(abi, abi_serializer::create_yield_function(abi_serializer_max_time));
+         abi_ser.set_abi(abi, fixture_abi_yield_function());
       }
    }
 
@@ -162,7 +162,7 @@ public:
          action act;
          act.account = config::system_account_name;
          act.name = name;
-         act.data = abi_ser.variant_to_binary( action_type_name, data, abi_serializer::create_yield_function(abi_serializer_max_time) );
+         act.data = abi_ser.variant_to_binary( action_type_name, data, fixture_abi_yield_function() );
 
          return base_tester::push_contract_paid_action( std::move(act), (auth ? signer : signer == "bob111111111"_n ? "alice1111111"_n : "bob111111111"_n).to_uint64_t() );
    }
@@ -221,7 +221,7 @@ public:
 
    asset get_balance( const account_name& act, symbol balance_symbol = symbol{CORE_SYM} ) {
       vector<char> data = get_row_by_account( "sysio.token"_n, act, "accounts"_n, account_name(balance_symbol.to_symbol_code().value) );
-      return data.empty() ? asset(0, balance_symbol) : token_abi_ser.binary_to_variant("account", data, abi_serializer::create_yield_function(abi_serializer_max_time))["balance"].as<asset>();
+      return data.empty() ? asset(0, balance_symbol) : token_abi_ser.binary_to_variant("account", data, fixture_abi_yield_function())["balance"].as<asset>();
    }
 
    asset get_balance( std::string_view act, symbol balance_symbol = symbol{CORE_SYM} ) {
@@ -230,7 +230,7 @@ public:
 
    fc::variant get_producer_info( const account_name& act ) {
       vector<char> data = get_row_by_account( config::system_account_name, config::system_account_name, "producers"_n, act );
-      return abi_ser.binary_to_variant( "producer_info", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
+      return abi_ser.binary_to_variant( "producer_info", data, fixture_abi_yield_function() );
    }
    fc::variant get_producer_info( std::string_view act ) {
       return get_producer_info( account_name(act) );
@@ -324,7 +324,7 @@ public:
       auto symb = sysio::chain::symbol::from_string(symbolname);
       auto symbol_code = symb.to_symbol_code().value;
       vector<char> data = get_row_by_account( "sysio.token"_n, name(symbol_code), "stat"_n, account_name(symbol_code) );
-      return data.empty() ? fc::variant() : token_abi_ser.binary_to_variant( "currency_stats", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
+      return data.empty() ? fc::variant() : token_abi_ser.binary_to_variant( "currency_stats", data, fixture_abi_yield_function() );
    }
 
    asset get_token_supply() {
@@ -338,7 +338,7 @@ public:
    fc::variant get_global_state() {
       vector<char> data = get_row_by_account( config::system_account_name, config::system_account_name, "global"_n, "global"_n );
       if (data.empty()) std::cout << "\nData is empty\n" << std::endl;
-      return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "sysio_global_state", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "sysio_global_state", data, fixture_abi_yield_function() );
    }
 
    void initialize_multisig() {
@@ -354,7 +354,7 @@ public:
       BOOST_REQUIRE( accnt != nullptr );
       abi_def msig_abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, msig_abi), true);
-      msig_abi_ser.set_abi(msig_abi, abi_serializer::create_yield_function(abi_serializer_max_time));
+      msig_abi_ser.set_abi(msig_abi, fixture_abi_yield_function());
    }
 
    /// Compatibility spelling for activate_producers(). Producer registration itself now requires

@@ -195,7 +195,7 @@ public:
          fc_ilog(_log, "Placing initial state in block {}", block_num);
 
       chain_state_log->pack_and_write_entry(id, previous_id, [this, fresh](bio::filtering_ostreambuf& buf) {
-         pack_deltas(buf, chain_plug->chain().db(), fresh);
+         pack_deltas(buf, chain_plug->chain().db(), chain_plug->chain().kv(), fresh);
       });
    } // store_chain_state
 

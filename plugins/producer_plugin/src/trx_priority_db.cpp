@@ -2,7 +2,6 @@
 #include <cstring>
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/account_object.hpp>
-#include <sysio/chain/kv_table_objects.hpp>
 #include <sysio/chain/wasm_interface_private.hpp>
 #include <sysio/producer_plugin/trx_priority_db.hpp>
 #include <vector>
@@ -56,17 +55,15 @@ namespace {
 
 // Read a kv::global value — key is [Name:8B BE]
 std::vector<char> get_global_row(const controller& control, name code, name table_name) {
-   const auto& db = control.db();
    auto tid = compute_table_id(table_name.to_uint64_t());
    char key_buf[kv_pri_key_size];
    kv_encode_be64(key_buf, table_name.to_uint64_t());
    std::string_view key_sv(key_buf, kv_pri_key_size);
 
-   const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-   auto itr = kv_idx.find(boost::make_tuple(code, tid, key_sv));
-   if (itr == kv_idx.end())
+   const auto row = control.kv().find_row(code, tid, key_sv);
+   if (!row)
       return {};
-   return {itr->value.data(), itr->value.data() + itr->value.size()};
+   return {row->value.begin(), row->value.end()};
 }
 
 block_timestamp_type get_last_trx_priority_update(const controller& control) {
@@ -88,24 +85,21 @@ void trx_priority_db::load_trx_priority_map(const controller& control, trx_prior
    try {
       const fc::time_point deadline = fc::time_point::now() + serializer_max_time;
 
-      const auto& db = control.db();
-
       // trxpriority is kv::table (unscoped) — key is [priority:8B BE]
       auto trx_tid = compute_table_id("trxpriority"_n.to_uint64_t());
 
-      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
       // Start from beginning of this table_id — all-zero is the minimum BE uint64
       char min_key[kv_pri_key_size] = {};
-      auto itr = kv_idx.lower_bound(
-         boost::make_tuple(config::system_account_name, trx_tid, std::string_view(min_key, kv_pri_key_size)));
-
-      while (itr != kv_idx.end() && itr->code == config::system_account_name && itr->table_id == trx_tid) {
-         auto kv = itr->key_view();
-         if (kv.size() != kv_pri_key_size)
+      auto cursor = control.kv().open_row_cursor();
+      kv_row row;
+      const kv_position first{config::system_account_name, trx_tid, std::string_view(min_key, kv_pri_key_size)};
+      for (bool more = cursor->seek_lower(first, row);
+           more && row.code == config::system_account_name && row.table_id == trx_tid; more = cursor->next(row)) {
+         if (row.key.size() != kv_pri_key_size)
             break;
 
          trx_prio tmp;
-         datastream<const char*> ds(itr->value.data(), itr->value.size());
+         datastream<const char*> ds(row.value.data(), row.value.size());
          fc::raw::unpack(ds, tmp);
          m.insert({tmp.receiver, tmp});
 
@@ -114,7 +108,6 @@ void trx_priority_db::load_trx_priority_map(const controller& control, trx_prior
             _last_trx_priority_update = block_timestamp_type{}; // try again on next interval
             break;
          }
-         ++itr;
       }
    }
    FC_LOG_AND_DROP()

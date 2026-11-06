@@ -19,6 +19,7 @@
 
 #include <magic_enum/magic_enum.hpp>
 
+#include <array>
 #include <string>
 
 namespace sysio_system::test_support {
@@ -32,7 +33,21 @@ void load_account_abi(Tester& tester, name account, abi_serializer& out_ser) {
    BOOST_REQUIRE(metadata != nullptr);
    abi_def parsed;
    BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(metadata->abi, parsed), true);
-   out_ser.set_abi(std::move(parsed), abi_serializer::create_yield_function(Tester::abi_serializer_max_time));
+   out_ser.set_abi(std::move(parsed), Tester::fixture_abi_yield_function());
+}
+
+/// Store `encoded` as the kv row `id` of `code`'s `table` without going through the contract,
+/// for state no action can reach. A new row is billed to `sysio`.
+template <typename Tester>
+void write_kv_row(Tester& tester, name code, name table, uint64_t id, const std::vector<char>& encoded) {
+   char key[kv_pri_key_size];
+   kv_encode_be64(key, id);
+   auto& store = const_cast<kv_store&>(tester.control->kv());
+   const auto table_id = compute_table_id(table.value);
+   const std::string_view key_view(key, sizeof(key));
+   const std::string_view value(encoded.data(), encoded.size());
+   if (const auto row = store.find_row(code, table_id, key_view)) store.update_row(*row, row->payer, value);
+   else store.insert_row(code, table_id, config::system_account_name, key_view, value);
 }
 
 /// The authorization an action needs when an unprivileged contract bills RAM to `signer`
@@ -54,7 +69,7 @@ signed_transaction create_contract_action_transaction(Tester& tester, name contr
    act.name = action_name;
    act.data = serializer.variant_to_binary(
       serializer.get_action_type(action_name), data,
-      abi_serializer::create_yield_function(Tester::abi_serializer_max_time));
+      Tester::fixture_abi_yield_function());
    act.authorization = authorization.empty() ? std::vector<permission_level>{{signer, config::active_name}}
                                              : std::move(authorization);
 
@@ -210,17 +225,18 @@ inline constexpr auto table = "nodeowners"_n;
 /// Count authoritative owners in one generation, independently of the optional emissions mirror.
 template <typename Tester>
 uint32_t count(Tester& tester, abi_serializer& serializer, uint8_t tier, uint64_t generation = 0) {
-   const auto& index = tester.control->db().template get_index<kv_index, by_code_key>();
    const auto scope_start = make_kv_scoped_key(generation, uint64_t{0});
    const auto scope_end = make_kv_scoped_key(generation + 1, uint64_t{0});
    const auto table_id = compute_table_id(table.to_uint64_t());
-   auto it = index.lower_bound(boost::make_tuple(account, table_id, scope_start.to_string_view()));
-   const auto end = index.lower_bound(boost::make_tuple(account, table_id, scope_end.to_string_view()));
    uint32_t result = 0;
-   for (; it != end; ++it) {
-      const std::vector<char> bytes(it->value.begin(), it->value.end());
+   auto cursor = tester.control->kv().open_row_cursor();
+   kv_row stored;
+   for (bool more = cursor->seek_lower({account, table_id, scope_start.to_string_view()}, stored);
+        more && stored.code == account && stored.table_id == table_id && stored.key < scope_end.to_string_view();
+        more = cursor->next(stored)) {
+      const std::vector<char> bytes(stored.value.begin(), stored.value.end());
       const auto row = serializer.binary_to_variant(
-         "nodeowners", bytes, abi_serializer::create_yield_function(Tester::abi_serializer_max_time));
+         "nodeowners", bytes, Tester::fixture_abi_yield_function());
       if (row["tier"].template as<uint8_t>() == tier) ++result;
    }
    return result;
@@ -291,5 +307,67 @@ typename Tester::action_result clear(Tester& tester, abi_serializer& ser, name a
 inline constexpr const char* frozen_message = "the andon cord is pulled: funds cannot leave custody";
 
 } // namespace andon
+
+/// secp256k1 encodings for tests that feed the depot keys which are not curve points. libsecp256k1
+/// (through fc) is the oracle the contracts' own `mod_exp` arithmetic is checked against.
+namespace secp256k1 {
+
+/// One big-endian field element (an x or y coordinate).
+using coordinate = std::array<char, 32>;
+
+/// The field prime p = 2^256 - 2^32 - 977, big-endian.
+inline coordinate field_prime() {
+   coordinate p;
+   p.fill(char(0xff));
+   p[27] = char(0xfe);
+   p[30] = char(0xfc);
+   p[31] = char(0x2f);
+   return p;
+}
+
+/// x + p: a non-canonical spelling of x, which still fits in 32 bytes for any x < 2^32 + 977.
+inline coordinate plus_field_prime(const coordinate& x) {
+   const auto p = field_prime();
+   coordinate sum;
+   unsigned carry = 0;
+   for (size_t i = sum.size(); i-- > 0;) {
+      carry += static_cast<uint8_t>(x[i]) + static_cast<uint8_t>(p[i]);
+      sum[i] = static_cast<char>(carry & 0xffu);
+      carry >>= 8;
+   }
+   BOOST_REQUIRE_EQUAL(carry, 0u);
+   return sum;
+}
+
+/// A compressed SEC1 encoding from a prefix byte and an x-coordinate.
+inline fc::em::public_key_data compressed_key(uint8_t prefix, const coordinate& x) {
+   fc::em::public_key_data key{};
+   key[0] = static_cast<char>(prefix);
+   std::copy(x.begin(), x.end(), key.begin() + 1);
+   return key;
+}
+
+/// Whether libsecp256k1 parses the bytes as a compressed point.
+inline bool is_point(const fc::em::public_key_data& key) {
+   try {
+      fc::em::public_key::serialize_uncompressed(key);
+      return true;
+   } catch (const fc::exception&) {
+      return false;
+   }
+}
+
+/// The smallest x >= 1 that has a curve point, or (with `want_point` false) the smallest that has none.
+inline coordinate smallest_x(bool want_point) {
+   for (uint8_t candidate = 1; candidate != 0; ++candidate) {
+      coordinate x{};
+      x.back() = static_cast<char>(candidate);
+      if (is_point(compressed_key(0x02, x)) == want_point) return x;
+   }
+   BOOST_FAIL("no small x-coordinate found");
+   return {};
+}
+
+} // namespace secp256k1
 
 } // namespace sysio_system::test_support

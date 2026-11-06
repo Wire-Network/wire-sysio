@@ -70,19 +70,18 @@ get_last_prop_finalizers(sysio::testing::base_tester& t, sysio::chain::abi_seria
    char key_buf[kv_pri_key_size];
    kv_encode_be64(key_buf, "lastpropfins"_n.to_uint64_t());
    std::string_view key_sv(key_buf, kv_pri_key_size);
-   const auto& kv_idx = t.control->db().get_index<kv_index, by_code_key>();
-   auto it = kv_idx.find(boost::make_tuple(config::system_account_name,
-                                           compute_table_id("lastpropfins"_n.to_uint64_t()), key_sv));
-   if (it == kv_idx.end()) {
+   const auto row = t.control->kv().find_row(config::system_account_name,
+                                             compute_table_id("lastpropfins"_n.to_uint64_t()), key_sv);
+   if (!row) {
       return {};
    }
-   std::vector<char> data(it->value.data(), it->value.data() + it->value.size());
+   std::vector<char> data(row->value.begin(), row->value.end());
    if (data.empty()) {
       return {};
    }
    fc::variant fins_info = sys_abi.binary_to_variant(
       "last_prop_finalizers_info", data,
-      abi_serializer::create_yield_function(sysio::testing::base_tester::abi_serializer_max_time));
+      sysio::testing::base_tester::fixture_abi_yield_function());
    return fins_info["last_proposed_finalizers"].as<std::vector<finalizer_auth_info>>();
 }
 

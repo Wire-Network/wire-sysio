@@ -1,4 +1,5 @@
 #pragma once
+#include <fc/io/atomic_file.hpp>
 
 #include <boost/bloom.hpp>
 #include <boost/crc.hpp>
@@ -87,8 +88,7 @@ public:
    std::size_t receiver_count() const noexcept { return _receivers.size(); }
    std::size_t recv_action_count() const noexcept { return _recv_actions.size(); }
 
-   /// Writes to `path + ".tmp"` then renames over `path` to keep the sidecar crash-consistent: either the old file
-   /// remains intact or the new one is fully installed, never a partial file under the canonical name.
+   /// Atomically publish a checked, complete sidecar. Advisory data does not request crash durability.
    void finalize_and_write(const std::filesystem::path& path) const {
       const std::size_t n_recv = std::max<std::size_t>(_receivers.size(), bloom::min_capacity);
       const std::size_t n_recv_action = std::max<std::size_t>(_recv_actions.size(), bloom::min_capacity);
@@ -114,18 +114,13 @@ public:
       crc.process_bytes(ra_bits.data(), ra_bits.size());
       const uint32_t crc_v = crc.checksum();
 
-      const auto tmp = std::filesystem::path(path).concat(".tmp");
-      {
-         // fc::cfile throws std::ios_base::failure on open/write error; the store_provider append path swallows that
-         // (bloom is advisory) and bare file-system errors surface at the rename.  Scope the cfile so it closes (and
-         // flushes) before we rename, keeping the temp-then-rename atomicity guarantee intact.
-         fc::cfile out(tmp, fc::cfile::truncate_rw_mode);
-         out.write(reinterpret_cast<const char*>(&hdr),             sizeof(hdr));
-         out.write(reinterpret_cast<const char*>(recv_bits.data()), recv_bits.size());
-         out.write(reinterpret_cast<const char*>(ra_bits.data()),   ra_bits.size());
-         out.write(reinterpret_cast<const char*>(&crc_v),           sizeof(crc_v));
-      }
-      std::filesystem::rename(tmp, path);
+      fc::io::atomic_file_writer output(path);
+      auto& out = output.file();
+      out.write(reinterpret_cast<const char*>(&hdr), sizeof(hdr));
+      out.write(reinterpret_cast<const char*>(recv_bits.data()), recv_bits.size());
+      out.write(reinterpret_cast<const char*>(ra_bits.data()), ra_bits.size());
+      out.write(reinterpret_cast<const char*>(&crc_v), sizeof(crc_v));
+      output.commit();
    }
 
 private:

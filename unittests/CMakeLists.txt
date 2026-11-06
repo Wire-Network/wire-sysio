@@ -68,6 +68,8 @@ unittest_target(
 
 # snapshot_attest_fixture.hpp includes the snapshot-attestation constants owned by the sysio.system contract.
 target_include_directories(unit_test PRIVATE ${CMAKE_SOURCE_DIR}/contracts/sysio.system/include)
+# Share the frozen crypto vectors with test_fc without source-relative includes.
+target_include_directories(unit_test PRIVATE ${CMAKE_SOURCE_DIR}/libraries/libfc/test)
 
 # No pkg-config cflags; keep flags minimal & portable
 target_compile_options(unit_test PUBLIC -DDISABLE_SYSLIB_SERIALIZE)
@@ -103,6 +105,25 @@ if("sys-vm-oc" IN_LIST UNIT_TEST_RUNTIMES)
           ARGS --report_level=detailed --log_level=all --color_output
           PROPERTIES ENVIRONMENT SYSIO_DISABLE_FSGSBASE=1 COST 5000)
 endif()
+# The KV suites also run with the std::map KV engine under the chain. A validating_tester's validator stays on chainbase
+# and compares block ids, so a difference between the engines fails there only if it changes a block. kv_store_tests
+# holds both engines itself, compares their integrity hashes, and needs neither.
+boost_test_discover_tests(unit_test
+        NAME @NAME@_unit_test_@RUNTIME@-kv-map
+        NAME_STRIP "s$" "_test$"
+        RUNTIMES sys-vm
+        INCLUDE "^(deep_mind_tests|kv_tests|kv_(api|comprehensive|intrinsic_probe|limits|token)_tests|payer_choice_test|ram_tests|snapshot_part[12]_tests|test_state_history)$"
+        ARGS --report_level=detailed --log_level=all --color_output
+        PROPERTIES ENVIRONMENT SYSIO_TEST_KV_ENGINE=map)
+# This one test, not its cluster suite: it is what undoes several blocks through the controller on the map engine.
+add_p_test(NAME fork_switch_undoes_kv_writes_unit_test_sys-vm-kv-map
+           COMMAND unit_test --run_test=forked_tests_savanna/fork_switch_undoes_kv_writes
+                   --report_level=detailed --log_level=all --color_output -- --sys-vm
+           ENVIRONMENT SYSIO_TEST_KV_ENGINE=map)
+# The tests the KV docs cite have to exist. The name carries _unit_test_ so that every run of the unit tests includes it.
+add_test(NAME kv_doc_links_unit_test_check
+         COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/check_kv_doc_test_links.py --unit-test $<TARGET_FILE:unit_test>
+                 ${CMAKE_SOURCE_DIR}/docs/kv-behavior-spec.md ${CMAKE_SOURCE_DIR}/docs/kv-security-audit.md)
 set(ctest_tests "'_unit_test_|^protocol_feature_digest_unit_test' -LE wasm_spec_tests -j8") # every unit_test entry
 
 ### COVERAGE TESTING ###

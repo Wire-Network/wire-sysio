@@ -82,14 +82,6 @@
     ],
     "tables": [
         {
-            "name": "data",
-            "type": "data",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 30912
-        },
-        {
             "name": "tablea",
             "type": "data",
             "index_type": "i64",

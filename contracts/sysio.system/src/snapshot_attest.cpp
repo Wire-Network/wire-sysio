@@ -32,6 +32,7 @@ constexpr char historical_block_id_error[] = "snapshot block is older than lates
 constexpr char future_block_id_error[] = "snapshot block cannot be in the future";
 constexpr char min_providers_range_error[] = "min_providers must be at least 1";
 constexpr char min_providers_capacity_error[] = "min_providers exceeds the maximum registrable providers";
+constexpr char block_spacing_range_error[] = "block_spacing must be greater than 0";
 constexpr char snapshot_record_not_found_error[] = "no attested snapshot record for this block number";
 constexpr char stale_provider_prune_log_prefix[] = "regsnapprov: pruned stale mapping for producer ";
 constexpr char stale_provider_prune_log_infix[] = " and snapshot provider ";
@@ -294,12 +295,26 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
 
    const uint32_t block_num = block_info::block_height_from_id(block_id);
    check(block_num > 0, invalid_block_id_error);
-   check(snapshot_attestation::is_scheduled_block(block_num), unscheduled_block_id_error);
+
+   snap_config_singleton config_singleton(get_self());
+   const snap_config config = config_singleton.get_or_default(snap_config{});
+   check(config.min_providers > 0, snapshot_config_unset_error);
+   check(snapshot_attestation::is_scheduled_block(block_num, config.block_spacing),
+         unscheduled_block_id_error);
    check(block_num <= sysio::current_block_number(), future_block_id_error);
 
    snap_records_table records(get_self());
    const snap_record_key_t record_key{static_cast<uint64_t>(block_num)};
-   if (matches_final_snapshot_record(records, record_key, block_id, snapshot_hash)) {
+   // Matched before the provider check: a provider node shuts down on snap_hash_disagreement_error, so a
+   // mismatch is reported whether or not the account still holds a mapping.
+   const bool already_final = matches_final_snapshot_record(records, record_key, block_id, snapshot_hash);
+
+   // Checked before the already-final return, so only a registered provider's late vote succeeds.
+   snap_providers_table providers(get_self());
+   const auto provider_itr = providers.find(snap_provider_key_t{snap_account.value});
+   check(provider_itr != providers.end(), provider_not_registered_error);
+   // A late vote cannot count toward a quorum, so it skips the standing check below.
+   if (already_final) {
       return;
    }
    if (records.cbegin() != records.cend()) {
@@ -307,18 +322,11 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
       check(block_num > latest_record->block_num, historical_block_id_error);
    }
 
-   snap_providers_table providers(get_self());
-   const auto provider_itr = providers.find(snap_provider_key_t{snap_account.value});
-   check(provider_itr != providers.end(), provider_not_registered_error);
    const name producer = provider_itr->producer;
    // Each vote re-checks the producer's live operator standing: ACTIVE in sysio.opreg and clear of the live
    // collateral minimum, bootstrapped exempt. A slash, a termination or a withdrawal below the minimum ends it, and a
    // raised minimum takes effect at the next vote. Rank, parking and the finalizer key stay registration-time conditions.
    check(producer_rank::has_live_producer_standing(producer), producer_no_live_standing_error);
-
-   snap_config_singleton config_singleton(get_self());
-   const snap_config config = config_singleton.get_or_default(snap_config{});
-   check(config.min_providers > 0, snapshot_config_unset_error);
 
    snap_votes_table votes(get_self());
    auto             by_block_num = votes.get_index<snapshot_index::by_block_num>();
@@ -376,14 +384,15 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
 }
 
 // -------------------------------------------------------------------------------------------------
-void snapshot_attest::setsnpcfg(uint32_t min_providers) {
+void snapshot_attest::setsnpcfg(uint32_t min_providers, uint32_t block_spacing) {
    require_auth(get_self());
 
    check(min_providers > 0, min_providers_range_error);
    check(min_providers <= max_snap_providers, min_providers_capacity_error);
+   check(snapshot_attestation::is_valid_block_spacing(block_spacing), block_spacing_range_error);
 
    snap_config_singleton config_singleton(get_self());
-   config_singleton.set(snap_config{min_providers}, get_self());
+   config_singleton.set(snap_config{min_providers, block_spacing}, get_self());
 }
 
 // -------------------------------------------------------------------------------------------------

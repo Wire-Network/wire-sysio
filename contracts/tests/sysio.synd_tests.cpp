@@ -11,7 +11,6 @@
 #include <fc/crypto/base58.hpp>
 #include <fc/crypto/elliptic_ed.hpp>
 #include <fc/crypto/elliptic_em.hpp>
-#include <fc/crypto/ethereum/ethereum_types.hpp>
 #include <fc/crypto/hex.hpp>
 #include <fc/crypto/public_key.hpp>
 #include <fc/crypto/sha256.hpp>
@@ -26,6 +25,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <limits>
 #include <map>
 #include <sstream>
 #include <string>
@@ -96,14 +96,15 @@ constexpr std::string_view QUEUE_INVALID_BURNING =
 /// Console fragments of the queue step and `linkswept` while the andon cord is pulled.
 constexpr std::string_view QUEUE_FROZEN =
    "sysio.synd::queue: the andon cord is pulled; releases, deliveries and burns wait for the clear";
-constexpr std::string_view QUEUE_FROZEN_SHARE = "-- the challenger's hold share waits for the andon cord to clear";
 constexpr std::string_view QUEUE_FROZEN_BURN =
    "-- request ruled INVALID while the andon cord is pulled; the burn waits for the clear, the pair waits";
 constexpr std::string_view LINKSWEPT_FROZEN =
    "sysio.synd::linkswept: the andon cord is pulled; the parked balance waits for sweep after the clear";
-/// Console fragments of the solvency check (every verdict line carries one of the two words).
+/// Console fragments of the solvency check (each verdict identifies excess, tolerated loss or shortfall).
 constexpr std::string_view SHORTFALL       = ": SHORTFALL -- reported ";
 constexpr std::string_view EXCESS          = ": EXCESS -- reported ";
+/// A custody loss within the pair's configured allowance does not trigger an incident.
+constexpr std::string_view TOLERATED       = ": TOLERATED -- reported ";
 constexpr std::string_view CORD_PULLED     = ": CORD PULLED -- custody shortfall ";
 constexpr std::string_view CORD_ALREADY    = ": CORD ALREADY PULLED -- the shortfall is recorded";
 /// The intake paths as the verdicts name them.
@@ -135,6 +136,8 @@ std::string pull_reason(std::string_view chain_code, std::string_view token_code
 constexpr std::string_view CHALLENGE_TWICE     = "the envelope's request is already challenged";
 constexpr std::string_view CHALLENGE_STATE     = "only a REQUESTED, RELEASABLE or DONE envelope can be challenged";
 constexpr std::string_view CHALLENGE_ZERO      = "challenge charge is zero; configure challenge_extra";
+constexpr std::string_view CHALLENGE_UNBONDED  =
+   "the envelope's request is not fully bonded; it cannot be challenged yet";
 /// Refusal of `dropenv`.
 constexpr std::string_view DROPENV_STATE = "only an OPEN or WAITING envelope with no request issued can be dropped";
 constexpr std::string_view CHALLENGE_FINAL     = "the envelope's request is approved or ruled; it cannot be challenged";
@@ -156,17 +159,6 @@ constexpr uint32_t PRUNE_RETENTION_SEC = 604'800;
 
 /// The largest amount the depot accepts: `opp::safe::depot_amount_max`.
 constexpr uint64_t DEPOT_AMOUNT_MAX = (uint64_t{1} << 62) - 1;
-
-/// The chain-native address `sysio.authex::recordlink` carries beside a linked key. On SVM that is the
-/// ED key's own 32 bytes; on EVM it is the derived 20-byte address.
-std::vector<char> native_address_of(const fc::crypto::public_key& pub_key) {
-   if (pub_key.type() == fc::crypto::public_key::key_type::em) {
-      const auto address = fc::crypto::ethereum::address_to_bytes(pub_key);
-      return {address.begin(), address.end()};
-   }
-   const auto raw = pub_key.get<fc::crypto::ed::public_key_shim>().serialize();
-   return std::vector<char>(raw.begin(), raw.end());
-}
 
 /// The dev bootstrap config, parsed as strictly as the bootstrap tool parses it.
 sysio::opp::bootstrap::BootstrapPlatformConfig load_dev_config() {
@@ -314,9 +306,12 @@ public:
 
    static uint64_t slug_value(std::string_view s) { return fc::slug_name{s}.value; }
 
-   static fc::crypto::public_key ed_key() {
-      return fc::crypto::private_key::generate(fc::crypto::private_key::key_type::ed).get_public_key();
+   /// A fresh ed25519 wallet key: what an SVM user signs `createlink` with.
+   static fc::crypto::private_key ed_signer() {
+      return fc::crypto::private_key::generate(fc::crypto::private_key::key_type::ed);
    }
+   /// A fresh ed25519 public key nobody links.
+   static fc::crypto::public_key ed_key() { return ed_signer().get_public_key(); }
    static std::vector<char> ed_bytes(const fc::crypto::public_key& pk) {
       const auto raw = pk.get<fc::crypto::ed::public_key_shim>().serialize();
       return std::vector<char>(raw.begin(), raw.end());
@@ -372,11 +367,10 @@ public:
       return push(LIQ_ACCOUNT, liq_abi_ser, LIQ_ACCOUNT, "create"_n, mvo()
          ("sym", sym)("chain_code", codename_mvo(chain_code))("token_code", codename_mvo(token_code)));
    }
-   /// Link `account` to `key` on SVM through sysio.authex's trusted path.
-   action_result link_svm(name account, const fc::crypto::public_key& key) {
-      return push(AUTHEX_ACCOUNT, authex_abi_ser, AUTHEX_ACCOUNT, "recordlink"_n, mvo()
-         ("account", account)("chain_kind", ChainKind::CHAIN_KIND_SVM)("pub_key", key)
-         ("native_address", native_address_of(key)));
+   /// Link `account` to the SVM key behind `signer` through a user-signed `sysio.authex::createlink`, the
+   /// only path an SVM link exists by; whatever is parked for the key is delivered in the same transaction.
+   action_result link_svm(name account, const fc::crypto::private_key& signer) {
+      return createlink(account, signer, ChainKind::CHAIN_KIND_SVM);
    }
    /// Link `account` to the key behind `priv` through a user-signed `sysio.authex::createlink`,
    /// which sends `linkswept` to sysio.synd inline.
@@ -427,9 +421,31 @@ public:
       return push(SYND_ACCOUNT, synd_abi_ser, signer, "linkswept"_n, mvo()
          ("account", account)("chain_kind", kind)("pubkey", pubkey));
    }
-   action_result desyndicate(name holder, uint64_t amount, symbol sym = LIQSOL_SYM, name signer = name{}) {
+   /// Desyndicate with an explicit fee cap; existing cases allow any representable fee.
+   action_result desyndicate(name holder, uint64_t amount, symbol sym = LIQSOL_SYM, name signer = name{},
+                             uint64_t max_fee = std::numeric_limits<uint64_t>::max()) {
       return push(SYND_ACCOUNT, synd_abi_ser, signer == name{} ? holder : signer, "desyndicate"_n, mvo()
-         ("holder", holder)("quantity", asset(static_cast<int64_t>(amount), sym)));
+         ("holder", holder)("quantity", asset(static_cast<int64_t>(amount), sym))("max_fee", max_fee));
+   }
+   /// Query the fee path and retain its return trace, including refusal diagnostics.
+   action_result quotedesynd(std::string_view chain, std::string_view token, uint64_t quantity) {
+      return push(SYND_ACCOUNT, synd_abi_ser, SYND_ACCOUNT, "quotedesynd"_n, mvo()
+         ("chain_code", codename_mvo(chain))("token_code", codename_mvo(token))("quantity", quantity));
+   }
+   /// Decode the serialized fee/net pair returned by the last successful quote.
+   std::pair<uint64_t, uint64_t> desynd_quote() {
+      BOOST_REQUIRE(last_trace && !last_trace->action_traces.empty());
+      return fc::raw::unpack<std::pair<uint64_t, uint64_t>>(last_trace->action_traces.front().return_value);
+   }
+   /// Capture all KV rows plus the liquid ledger and request counter to detect quote/refusal writes.
+   auto desynd_state() {
+      std::vector<std::vector<char>> rows;
+      auto cursor = control->kv().open_row_cursor();
+      chain::kv_row row;
+      for (bool more = cursor->seek_lower({}, row); more; more = cursor->next(row))
+         rows.emplace_back(row.value.begin(), row.value.end());
+      return std::make_tuple(rows, liq_balance("alice"_n), liq_balance(SYND_ACCOUNT), supply(),
+         get_row_by_account(SYND_ACCOUNT, SYND_ACCOUNT, "syndcounters"_n, "syndcounters"_n));
    }
    static mvo credit(const std::vector<char>& pubkey, uint64_t amount) {
       return mvo()("pubkey", pubkey)("amount", amount);
@@ -457,6 +473,8 @@ public:
       uint64_t bounty          = 0;
       uint64_t challenge_extra = 0;
       uint64_t min_desyndicate = 1; ///< Permissive fixture floor for small-value edge cases.
+      uint64_t desynd_fee_flat = 0; ///< Flat desyndication fee, in base units, below `min_desyndicate`.
+      uint32_t custody_shortfall_bps = 0; ///< Strict backing unless this pair explicitly allows a loss.
    };
    action_result setconfig(std::string_view chain_code, std::string_view token_code, const pair_config& cfg,
                            name signer = SYSIO_ACCOUNT) {
@@ -464,8 +482,16 @@ public:
          ("chain_code", codename_mvo(chain_code))("token_code", codename_mvo(token_code))
          ("synd_fee_bps", cfg.synd_fee_bps)("desynd_fee_bps", cfg.desynd_fee_bps)("synd_burst", cfg.synd_burst)
          ("synd_refill", cfg.synd_refill)("desynd_burst", cfg.desynd_burst)("desynd_refill", cfg.desynd_refill)
-         ("window_sec", cfg.window_sec)("bounty", cfg.bounty)("challenge_extra", cfg.challenge_extra)("min_desyndicate", cfg.min_desyndicate);
+         ("window_sec", cfg.window_sec)("bounty", cfg.bounty)("challenge_extra", cfg.challenge_extra)("min_desyndicate", cfg.min_desyndicate)
+         ("desynd_fee_flat", cfg.desynd_fee_flat)("custody_shortfall_bps", cfg.custody_shortfall_bps);
       return push(SYND_ACCOUNT, synd_abi_ser, signer, "setconfig"_n, data);
+   }
+   /// Attest current custody to reconcile an incident without clearing the global cord.
+   action_result reconcile(name signer, uint64_t reported, std::string_view chain_code = SOLANA,
+                           std::string_view token_code = LIQSOL) {
+      return push(SYND_ACCOUNT, synd_abi_ser, signer, "reconcile"_n,
+         mvo()("chain_code", codename_mvo(chain_code))
+              ("token_code", codename_mvo(token_code))("reported", reported));
    }
    action_result dropenv(std::string_view chain_code, std::string_view token_code, uint32_t epoch,
                          name signer = SYSIO_ACCOUNT) {
@@ -657,7 +683,7 @@ public:
    fc::variant decode(abi_serializer& ser, const char* type, const std::vector<char>& data) {
       return data.empty()
                 ? fc::variant()
-                : ser.binary_to_variant(type, data, abi_serializer::create_yield_function(abi_serializer_max_time));
+                : ser.binary_to_variant(type, data, fixture_abi_yield_function());
    }
    /// Append `value` to a kv key as the big-endian word the CDT key serializer writes.
    static void append_key_word(std::string& key, uint64_t value) {
@@ -665,14 +691,14 @@ public:
    }
    /// sysio.synd's kv rows of `table` in key order whose key starts with `prefix`, as raw values.
    std::vector<std::vector<char>> kv_rows(name table, const std::string& prefix = {}) {
-      const auto&                    kv_idx   = control->db().get_index<kv_index, by_code_key>();
       const auto                     table_id = compute_table_id(table.to_uint64_t());
       std::vector<std::vector<char>> rows;
-      for (auto itr = kv_idx.lower_bound(boost::make_tuple(SYND_ACCOUNT, table_id, std::string_view(prefix)));
-           itr != kv_idx.end() && itr->code == SYND_ACCOUNT && itr->table_id == table_id &&
-           itr->key_view().starts_with(prefix);
-           ++itr)
-         rows.emplace_back(itr->value.data(), itr->value.data() + itr->value.size());
+      auto cursor = control->kv().open_row_cursor();
+      chain::kv_row row;
+      for (bool more = cursor->seek_lower({SYND_ACCOUNT, table_id, prefix}, row);
+           more && row.code == SYND_ACCOUNT && row.table_id == table_id && row.key.starts_with(prefix);
+           more = cursor->next(row))
+         rows.emplace_back(row.value.begin(), row.value.end());
       return rows;
    }
    /// The `envelopes` row of `(chain_code, token_code, epoch)`; null when there is none.
@@ -751,12 +777,9 @@ public:
       }
       key.push_back('\0');
       key.push_back('\0');
-      const auto& kv_idx = control->db().get_index<kv_index, by_code_key>();
-      const auto  itr    = kv_idx.find(boost::make_tuple(SYND_ACCOUNT, compute_table_id("parked"_n.to_uint64_t()),
-                                                         std::string_view(key)));
-      if (itr == kv_idx.end()) return fc::variant();
-      return decode(synd_abi_ser, "parked_row",
-                    std::vector<char>(itr->value.data(), itr->value.data() + itr->value.size()));
+      const auto row = control->kv().find_row(SYND_ACCOUNT, compute_table_id("parked"_n.to_uint64_t()), key);
+      if (!row) return fc::variant();
+      return decode(synd_abi_ser, "parked_row", std::vector<char>(row->value.begin(), row->value.end()));
    }
    uint64_t parked_balance(std::string_view token_code, ChainKind kind, const std::vector<char>& pubkey) {
       const auto row = parked_row(token_code, kind, pubkey);
@@ -842,6 +865,19 @@ public:
       });
    }
 
+   /// Decode authenticated self-receipt action payloads from the last successful transaction.
+   std::vector<fc::variant> receipts(name action_name) {
+      std::vector<fc::variant> result;
+      if (!last_trace)
+         return result;
+      for (const auto& at : last_trace->action_traces) {
+         if (at.receiver != SYND_ACCOUNT || at.act.account != SYND_ACCOUNT || at.act.name != action_name)
+            continue;
+         result.push_back(synd_abi_ser.binary_to_variant(synd_abi_ser.get_action_type(action_name), at.act.data,
+                                                         fixture_abi_yield_function())["receipt"]);
+      }
+      return result;
+   }
    abi_serializer synd_abi_ser, liq_abi_ser, token_abi_ser, tokens_abi_ser, chains_abi_ser, authex_abi_ser,
       dclaim_abi_ser, msgch_abi_ser, swap_abi_ser, bond_abi_ser, epoch_abi_ser, andon_abi_ser;
    transaction_trace_ptr last_trace;
@@ -868,10 +904,11 @@ BOOST_AUTO_TEST_SUITE(sysio_synd_tests)
 // pubkey, the shadow is minted into sysio.synd's own holder row, and no account is credited -- not
 // even the one the linked pubkey belongs to.
 BOOST_FIXTURE_TEST_CASE(onsynd_holds_linked_and_unlinked_alike, sysio_synd_tester) try {
-   const auto linked_key = ed_key();
+   const auto linked_signer = ed_signer();
+   const auto linked_key = linked_signer.get_public_key();
    const auto linked     = ed_bytes(linked_key);
    const auto unlinked   = ed_bytes(ed_key());
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, linked_key));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, linked_signer));
    const auto digest = digest_of("envelope-1");
 
    BOOST_REQUIRE_EQUAL(success(), onsynd(SOLANA, 1, digest, 1, ChainKind::CHAIN_KIND_SVM, linked, LIQSOL, 40 * UNIT));
@@ -1275,13 +1312,14 @@ BOOST_FIXTURE_TEST_CASE(liq_has_none_of_the_moved_actions, sysio_synd_tester) tr
 // The parked hold
 // ---------------------------------------------------------------------------
 
-// A parked row holds its balance in sysio.synd's own sysio.liq row and earns through its position. A
-// sweep for an existing link delivers the balance with a sysio.liq transfer and credits the banked WIRE,
-// out of the token's yield pool, to the account's own sysio.liq row -- exactly what the row earned,
-// claimable there; `linkswept` from sysio.authex does the same and returns quietly on what it cannot
-// deliver.
+// A parked row holds its balance in sysio.synd's own sysio.liq row and earns through its position. The
+// user-signed link sends `linkswept`, which delivers the balance with a sysio.liq transfer and credits the
+// banked WIRE, out of the token's yield pool, to the account's own sysio.liq row -- exactly what the row
+// earned, claimable there; a later `sweep` finds nothing left, and `linkswept` returns quietly on what it
+// cannot deliver.
 BOOST_FIXTURE_TEST_CASE(parked_rows_accrue_and_are_delivered_on_link, sysio_synd_tester) try {
-   const auto key    = ed_key();
+   const auto signer = ed_signer();
+   const auto key    = signer.get_public_key();
    const auto pubkey = ed_bytes(key);
    BOOST_REQUIRE_EQUAL(success(), liq_mint("bob"_n, LIQSOL, 50 * UNIT));
    // The import parks a position whose pubkey has no link yet.
@@ -1302,9 +1340,9 @@ BOOST_FIXTURE_TEST_CASE(parked_rows_accrue_and_are_delivered_on_link, sysio_synd
    // Nothing to sweep before the link exists.
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("account has no link for this chain"),
                        sweep("carol"_n, ChainKind::CHAIN_KIND_SVM));
-   BOOST_REQUIRE_EQUAL(success(), link_svm("carol"_n, key));
    const int64_t carol_wire = wire_balance("carol"_n);
-   BOOST_REQUIRE_EQUAL(success(), sweep("carol"_n, ChainKind::CHAIN_KIND_SVM));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("carol"_n, signer));
+   BOOST_REQUIRE(executed(SYND_ACCOUNT, "linkswept"_n));
    BOOST_REQUIRE(parked_row(LIQSOL, ChainKind::CHAIN_KIND_SVM, pubkey).is_null());
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(50 * UNIT), liq_balance("carol"_n));
    BOOST_REQUIRE_EQUAL(0, liq_balance(SYND_ACCOUNT));
@@ -1321,7 +1359,7 @@ BOOST_FIXTURE_TEST_CASE(parked_rows_accrue_and_are_delivered_on_link, sysio_synd
    BOOST_REQUIRE_EQUAL(5 * UNIT, pool_row(LIQSOL)["pool"]["credited"].as_uint64());
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(5 * UNIT), liq_owed("bob"_n));
 
-   // Sweeping again finds nothing.
+   // A sweep after the link finds nothing.
    BOOST_REQUIRE_EQUAL(success(), sweep("carol"_n, ChainKind::CHAIN_KIND_SVM));
    BOOST_REQUIRE_EQUAL(carol_wire + static_cast<int64_t>(5 * UNIT), wire_balance("carol"_n));
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(50 * UNIT), liq_balance("carol"_n));
@@ -1391,10 +1429,11 @@ BOOST_FIXTURE_TEST_CASE(liq_creditowed_banks_wire_for_the_holder_and_requires_sy
 } FC_LOG_AND_RETHROW()
 
 // WIRE a parked row banked that the pool cannot cover at delivery is not lost: the row stays at balance
-// 0 with it banked, and a later delivery pays it once the pool covers it. Here sysio.synd's own row is
-// claimed around the pool, so the first delivery finds the pool empty.
+// 0 with it banked, and a later `sweep` pays it once the pool covers it. Here sysio.synd's own row is
+// claimed around the pool, so the first delivery -- the link's own `linkswept` -- finds the pool empty.
 BOOST_FIXTURE_TEST_CASE(a_parked_delivery_keeps_what_the_pool_cannot_cover, sysio_synd_tester) try {
-   const auto key    = ed_key();
+   const auto signer = ed_signer();
+   const auto key    = signer.get_public_key();
    const auto pubkey = ed_bytes(key);
    const auto other  = ed_bytes(ed_key());
    BOOST_REQUIRE_EQUAL(success(), importsynd(SOLANA, LIQSOL, { credit(pubkey, 50 * UNIT), credit(other, 50 * UNIT) }));
@@ -1402,14 +1441,19 @@ BOOST_FIXTURE_TEST_CASE(a_parked_delivery_keeps_what_the_pool_cannot_cover, sysi
    BOOST_REQUIRE_EQUAL(success(), liq_claim(SYND_ACCOUNT));
    BOOST_REQUIRE_EQUAL(0, liq_owed(SYND_ACCOUNT));
 
-   BOOST_REQUIRE_EQUAL(success(), link_svm("dave"_n, key));
-   BOOST_REQUIRE_EQUAL(success(), sweep("dave"_n, ChainKind::CHAIN_KIND_SVM));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("dave"_n, signer));
+   BOOST_REQUIRE(executed(SYND_ACCOUNT, "linkswept"_n));
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(50 * UNIT), liq_balance("dave"_n));
    BOOST_REQUIRE_EQUAL(0, liq_owed("dave"_n));
    const auto kept = parked_row(LIQSOL, ChainKind::CHAIN_KIND_SVM, pubkey);
    BOOST_REQUIRE(!kept.is_null());
    BOOST_REQUIRE_EQUAL(0u, kept["balance"].as_uint64());
    BOOST_REQUIRE_EQUAL(5 * UNIT, kept["position"]["owed_wire"].as_uint64());
+   // A sweep while the pool is still empty leaves it banked.
+   BOOST_REQUIRE_EQUAL(success(), sweep("dave"_n, ChainKind::CHAIN_KIND_SVM));
+   BOOST_REQUIRE_EQUAL(5 * UNIT, parked_row(LIQSOL, ChainKind::CHAIN_KIND_SVM, pubkey)["position"]["owed_wire"]
+                                    .as_uint64());
+   BOOST_REQUIRE_EQUAL(0, liq_owed("dave"_n));
 
    // Yield the pool receives later covers it: the next sweep pays it and the row goes.
    BOOST_REQUIRE_EQUAL(success(), addyield("carol"_n, 20 * UNIT));
@@ -1427,7 +1471,8 @@ BOOST_FIXTURE_TEST_CASE(a_parked_delivery_keeps_what_the_pool_cannot_cover, sysi
 // token's outpost for the holder's linked pubkey with the next request id. The holder keeps the yield
 // its row earned before the burn.
 BOOST_FIXTURE_TEST_CASE(desyndicate_burns_and_queues_the_attestation, sysio_synd_tester) try {
-   const auto key    = ed_key();
+   const auto signer = ed_signer();
+   const auto key    = signer.get_public_key();
    const auto pubkey = ed_bytes(key);
    BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
    BOOST_REQUIRE_EQUAL(success(), liq_mint("bob"_n, LIQSOL, 100 * UNIT));
@@ -1436,7 +1481,7 @@ BOOST_FIXTURE_TEST_CASE(desyndicate_burns_and_queues_the_attestation, sysio_synd
 
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("holder is not AuthX-linked for the token's chain"),
                        desyndicate("alice"_n, 40 * UNIT));
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
    BOOST_REQUIRE(mentions(desyndicate("alice"_n, 40 * UNIT, LIQSOL_SYM, "bob"_n), "missing authority of alice"));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("quantity must be positive"), desyndicate("alice"_n, 0));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("shadow symbol does not exist"),
@@ -1472,11 +1517,37 @@ BOOST_FIXTURE_TEST_CASE(desyndicate_burns_and_queues_the_attestation, sysio_synd
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(150 * UNIT), supply());
 } FC_LOG_AND_RETHROW()
 
+// WIRE-415: once the outpost's outbound queue is full, `queueout` refuses the DESYNDICATE_LIQ and the
+// whole `desyndicate` reverts: the holder keeps the shadow, nothing burns, and no `returns` row is
+// written. The holder retries once `buildenv` frees a place.
+BOOST_FIXTURE_TEST_CASE(desyndicate_reverts_whole_when_the_outbound_queue_is_full, sysio_synd_tester) try {
+   constexpr uint32_t MAX_QUEUED_ATTESTATIONS = 512;   // mirrors sysio.msgch.hpp
+   constexpr uint32_t QUEUEOUTS_PER_BLOCK     = 20;
+   BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_signer()));
+
+   for (uint32_t i = 0; i < MAX_QUEUED_ATTESTATIONS; ++i) {
+      BOOST_REQUIRE_EQUAL(success(), push(MSGCH_ACCOUNT, msgch_abi_ser, MSGCH_ACCOUNT, "queueout"_n, mvo()
+         ("chain_code", slug_value(SOLANA))
+         ("attest_type", static_cast<uint32_t>(sysio::opp::types::ATTESTATION_TYPE_DESYNDICATE_LIQ))
+         ("data", std::vector<char>{static_cast<char>(i >> 8), static_cast<char>(i)})));
+      if ((i + 1) % QUEUEOUTS_PER_BLOCK == 0) produce_block();
+   }
+   produce_block();
+
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("sysio.msgch::queueout: outbound queue is full for this outpost"),
+                       desyndicate("alice"_n, 40 * UNIT));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(100 * UNIT), liq_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(100 * UNIT), supply());
+   BOOST_REQUIRE(return_row(1).is_null());
+} FC_LOG_AND_RETHROW()
+
 /// Outstanding returns retain the original beneficiary and exact obligation, without lifetime totals.
 BOOST_FIXTURE_TEST_CASE(outstanding_returns_record_the_original_obligation, sysio_synd_tester) try {
    BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
    BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQTWO, 100 * UNIT));
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_key()));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_signer()));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQTWO, {}));
 
@@ -1513,7 +1584,7 @@ BOOST_FIXTURE_TEST_CASE(outstanding_returns_record_the_original_obligation, sysi
 /// Both consume the pending record exactly once; fees stay charged and refund destinations are immutable.
 BOOST_FIXTURE_TEST_CASE(return_resolution_is_authorized_exact_and_once, sysio_synd_tester) try {
    BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_key()));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_signer()));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.desynd_fee_bps = 1000}));
    BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, 10 * UNIT));
    const auto resolve = [&](name signer, name action, uint64_t id) {
@@ -1540,7 +1611,7 @@ BOOST_FIXTURE_TEST_CASE(return_resolution_is_authorized_exact_and_once, sysio_sy
 /// A failed inline restoration leaves the outstanding record available for later recovery.
 BOOST_FIXTURE_TEST_CASE(return_refund_failure_preserves_obligation, sysio_synd_tester) try {
    BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 10 * UNIT));
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_key()));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_signer()));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
    BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, 10 * UNIT));
    BOOST_REQUIRE_EQUAL(success(), liq_mint("bob"_n, LIQSOL, static_cast<uint64_t>(asset::max_amount)));
@@ -1570,7 +1641,7 @@ BOOST_FIXTURE_TEST_CASE(desyndicate_carries_the_outstanding_shadow_after_its_bur
    BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
    BOOST_REQUIRE_EQUAL(success(), liq_mintyield(SOLANA, LIQSOL, 7 * UNIT));
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(7 * UNIT), pending());
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_key()));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_signer()));
    BOOST_REQUIRE_EQUAL(success(),
                        setconfig(SOLANA, LIQSOL, {.desynd_fee_bps = 250, .desynd_burst = 100 * UNIT}));
 
@@ -1601,7 +1672,7 @@ BOOST_FIXTURE_TEST_CASE(desyndicate_enforces_configured_minimum,
                         sysio_synd_tester) try {
    constexpr uint64_t minimum = 10 * UNIT;
    BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_key()));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_signer()));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL,
       {.desynd_fee_bps = 1000, .desynd_burst = 100 * UNIT, .min_desyndicate = minimum}));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("quantity is below the minimum desyndication"),
@@ -1638,7 +1709,7 @@ BOOST_FIXTURE_TEST_CASE(setconfig_validates_minimum_return, sysio_synd_tester) t
 // the whole quantity leaves nothing to release on the outpost and is refused.
 BOOST_FIXTURE_TEST_CASE(desyndicate_charges_the_fee_and_queues_the_net_amount, sysio_synd_tester) try {
    BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_key()));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_signer()));
    BOOST_REQUIRE_EQUAL(success(),
                        setconfig(SOLANA, LIQSOL, {.desynd_fee_bps = 250, .desynd_burst = 100 * UNIT}));
 
@@ -1678,7 +1749,7 @@ BOOST_FIXTURE_TEST_CASE(desyndicate_charges_the_fee_and_queues_the_net_amount, s
 // refused, however much the holder holds, and a refusal changes nothing.
 BOOST_FIXTURE_TEST_CASE(desyndicate_refuses_over_budget, sysio_synd_tester) try {
    BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_key()));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_signer()));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("desyndication budget is not configured"), desyndicate("alice"_n, UNIT));
 
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.desynd_burst = 10 * UNIT, .desynd_refill = 4 * UNIT}));
@@ -1703,7 +1774,7 @@ BOOST_FIXTURE_TEST_CASE(desyndicate_refuses_over_budget, sysio_synd_tester) try 
 // a desyndication moves, its fee included.
 BOOST_FIXTURE_TEST_CASE(passes_after_refill, sysio_synd_tester) try {
    BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_key()));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_signer()));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.desynd_fee_bps = 1000, .desynd_burst = 10 * UNIT,
                                                              .desynd_refill = 4 * UNIT}));
    BOOST_REQUIRE_EQUAL(success(), set_epoch(5));
@@ -1736,7 +1807,7 @@ BOOST_FIXTURE_TEST_CASE(desyndicate_fee_rounding_to_zero, sysio_synd_tester) try
    // 333 base units at 30 bps is 0.999 of a unit: the fee floors to 0.
    constexpr uint64_t quantity = 333;
    BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, UNIT));
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_key()));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_signer()));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.desynd_fee_bps = 30}));
    BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, quantity));
 
@@ -1753,14 +1824,204 @@ BOOST_FIXTURE_TEST_CASE(desyndicate_fee_rounding_to_zero, sysio_synd_tester) try
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(quantity), queued_desyndication(*this, 2).amount().amount());
 } FC_LOG_AND_RETHROW()
 
+/// Equal caps succeed, lower caps and stale quotes refuse without changing any ledger or bucket.
+BOOST_FIXTURE_TEST_CASE(desyndicate_caps_fee_before_movement, sysio_synd_tester) try {
+   constexpr uint64_t flat = UNIT / 1000;
+   constexpr uint64_t quantity = 10 * UNIT;
+   constexpr auto cap_message = "desyndication fee exceeds max_fee";
+   BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_signer()));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL,
+      {.min_desyndicate = UNIT, .desynd_fee_flat = flat}));
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, quantity, LIQSOL_SYM, name{}, flat));
+   BOOST_REQUIRE_EQUAL(success(), set_epoch(5));
+   const auto before = desynd_state();
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(cap_message),
+      desyndicate("alice"_n, quantity, LIQSOL_SYM, name{}, flat - 1));
+   BOOST_REQUIRE(before == desynd_state());
+   BOOST_REQUIRE_EQUAL(success(), quotedesynd(SOLANA, LIQSOL, quantity));
+   const auto quoted = desynd_quote();
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL,
+      {.min_desyndicate = UNIT, .desynd_fee_flat = flat + 1}));
+   const auto raised = desynd_state();
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(cap_message),
+      desyndicate("alice"_n, quantity, LIQSOL_SYM, name{}, quoted.first));
+   BOOST_REQUIRE(raised == desynd_state());
+} FC_LOG_AND_RETHROW()
+
+/// Flat, proportional and combined quotes match the fee pot and outbound net, without quote writes.
+BOOST_FIXTURE_TEST_CASE(quotedesynd_matches_execution_without_writes, sysio_synd_tester) try {
+   constexpr uint64_t flat = UNIT / 1000;
+   constexpr uint64_t quantity = 10 * UNIT + 333;
+   constexpr uint32_t bps = 30;
+   constexpr uint32_t bps_denominator = 10000;
+   BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_signer()));
+   uint64_t request = 0;
+   for (const auto& cfg : {pair_config{.min_desyndicate = UNIT, .desynd_fee_flat = flat},
+                           pair_config{.desynd_fee_bps = bps, .min_desyndicate = UNIT},
+                           pair_config{.desynd_fee_bps = bps, .min_desyndicate = UNIT, .desynd_fee_flat = flat}}) {
+      BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, cfg));
+      const auto before = desynd_state();
+      const auto pot = feepot_balance(LIQSOL);
+      BOOST_REQUIRE_EQUAL(success(), quotedesynd(SOLANA, LIQSOL, quantity));
+      const auto [fee, net] = desynd_quote();
+      BOOST_REQUIRE(before == desynd_state());
+      BOOST_REQUIRE_EQUAL(quantity * cfg.desynd_fee_bps / bps_denominator + cfg.desynd_fee_flat, fee);
+      BOOST_REQUIRE_EQUAL(quantity - fee, net);
+      BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, quantity, LIQSOL_SYM, name{}, fee));
+      BOOST_REQUIRE_EQUAL(pot + fee, feepot_balance(LIQSOL));
+      BOOST_REQUIRE_EQUAL(static_cast<int64_t>(net), queued_desyndication(*this, ++request).amount().amount());
+   }
+} FC_LOG_AND_RETHROW()
+
+/// Every fee-path refusal, including both unsigned range boundaries, leaves state untouched.
+BOOST_FIXTURE_TEST_CASE(quotedesynd_refuses_invalid_fee_path_without_writes, sysio_synd_tester) try {
+   constexpr auto range_message = "quantity must be positive";
+   constexpr uint32_t full_fee_bps = 10000;
+   const auto initial = desynd_state();
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("desyndication budget is not configured"), quotedesynd(SOLANA, LIQSOL, UNIT));
+   BOOST_REQUIRE(initial == desynd_state());
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.min_desyndicate = UNIT}));
+   const auto configured = desynd_state();
+   for (const auto quantity : {uint64_t{0}, static_cast<uint64_t>(asset::max_amount) + 1,
+                               std::numeric_limits<uint64_t>::max()}) {
+      BOOST_REQUIRE_EQUAL(wasm_assert_msg(range_message), quotedesynd(SOLANA, LIQSOL, quantity));
+      BOOST_REQUIRE(configured == desynd_state());
+   }
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("quantity is below the minimum desyndication"),
+      quotedesynd(SOLANA, LIQSOL, UNIT - 1));
+   BOOST_REQUIRE(configured == desynd_state());
+   // Asset's inclusive upper bound is quotable even without a holder, link or sufficient bucket.
+   BOOST_REQUIRE_EQUAL(success(), quotedesynd(SOLANA, LIQSOL, asset::max_amount));
+   const auto [fee, net] = desynd_quote();
+   BOOST_REQUIRE_EQUAL(0u, fee);
+   BOOST_REQUIRE_EQUAL(static_cast<uint64_t>(asset::max_amount), net);
+   BOOST_REQUIRE(configured == desynd_state());
+   for (const auto flat : {uint64_t{0}, uint64_t{1}}) {
+      BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL,
+         {.desynd_fee_bps = full_fee_bps, .min_desyndicate = UNIT, .desynd_fee_flat = flat}));
+      const auto before = desynd_state();
+      BOOST_REQUIRE_EQUAL(wasm_assert_msg("desyndication net of the fee must be positive"),
+         quotedesynd(SOLANA, LIQSOL, UNIT));
+      BOOST_REQUIRE(before == desynd_state());
+   }
+} FC_LOG_AND_RETHROW()
+
+// A flat desyndication fee alone: `desynd_fee_flat` base units stay in `feepot`, and the quantity net of
+// it is burned, queued, logged and summed. The bucket still drops by the whole quantity.
+BOOST_FIXTURE_TEST_CASE(desyndicate_charges_the_flat_fee, sysio_synd_tester) try {
+   constexpr uint64_t flat = UNIT / 1000;
+   BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_signer()));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.desynd_burst = 100 * UNIT, .min_desyndicate = UNIT,
+                                                             .desynd_fee_flat = flat}));
+
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, 10 * UNIT));
+   constexpr uint64_t net = 10 * UNIT - flat;
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(90 * UNIT), liq_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(flat, feepot_balance(LIQSOL));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(flat), liq_balance(SYND_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(100 * UNIT - net), supply());
+   const auto msg = queued_desyndication(*this, 1);
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(net), msg.amount().amount());
+   BOOST_REQUIRE_EQUAL(100 * UNIT - net, msg.total_syndicated());
+   BOOST_REQUIRE_EQUAL(net, return_row(1)["amount"].as_uint64());
+   BOOST_REQUIRE_EQUAL(90 * UNIT, desynd_bucket_row(SOLANA, LIQSOL)["level"].as_uint64());
+
+   // The flat part is charged again on every desyndication, whatever its size.
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, UNIT));
+   BOOST_REQUIRE_EQUAL(2 * flat, feepot_balance(LIQSOL));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(UNIT - flat), queued_desyndication(*this, 2).amount().amount());
+} FC_LOG_AND_RETHROW()
+
+// The basis-point part and the flat part add: 2.5% of 40 is 1, plus a flat 0.3, leaves 38.7 to burn and
+// queue. The total carried is the outstanding shadow after that burn.
+BOOST_FIXTURE_TEST_CASE(desyndicate_adds_the_flat_fee_to_the_bps_fee, sysio_synd_tester) try {
+   constexpr uint64_t flat = 3 * UNIT / 10;
+   BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_signer()));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.desynd_fee_bps = 250, .desynd_burst = 100 * UNIT,
+                                                             .min_desyndicate = UNIT, .desynd_fee_flat = flat}));
+
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, 40 * UNIT));
+   constexpr uint64_t fee = UNIT + flat;
+   constexpr uint64_t net = 40 * UNIT - fee;
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(60 * UNIT), liq_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(fee, feepot_balance(LIQSOL));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(fee), liq_balance(SYND_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(100 * UNIT - net), supply());
+   const auto msg = queued_desyndication(*this, 1);
+   BOOST_REQUIRE_EQUAL(slug_value(LIQSOL), msg.amount().token_code());
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(net), msg.amount().amount());
+   BOOST_REQUIRE_EQUAL(100 * UNIT - net, msg.total_syndicated());
+   BOOST_REQUIRE_EQUAL(net, return_row(1)["amount"].as_uint64());
+   BOOST_REQUIRE_EQUAL(60 * UNIT, desynd_bucket_row(SOLANA, LIQSOL)["level"].as_uint64());
+} FC_LOG_AND_RETHROW()
+
+// The largest flat fee `setconfig` admits is one base unit below `min_desyndicate`, so a minimum-size
+// desyndication at 0 bps nets exactly one base unit. Any basis-point rate on top makes the fee reach the
+// quantity, which is refused before anything moves.
+BOOST_FIXTURE_TEST_CASE(desyndicate_minimum_nets_one_unit_at_the_largest_flat_fee, sysio_synd_tester) try {
+   constexpr uint64_t minimum = UNIT / 1000;
+   constexpr uint64_t flat    = minimum - 1;
+   BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, UNIT));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_signer()));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.min_desyndicate = minimum, .desynd_fee_flat = flat}));
+
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, minimum));
+   BOOST_REQUIRE_EQUAL(1, queued_desyndication(*this, 1).amount().amount());
+   BOOST_REQUIRE_EQUAL(1u, return_row(1)["amount"].as_uint64());
+   BOOST_REQUIRE_EQUAL(flat, feepot_balance(LIQSOL));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(UNIT - 1), supply());
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(UNIT - minimum), liq_balance("alice"_n));
+
+   // One basis point on top: 100 more base units of fee push it past the quantity.
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.desynd_fee_bps = 1, .min_desyndicate = minimum,
+                                                             .desynd_fee_flat = flat}));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("desyndication net of the fee must be positive"),
+                       desyndicate("alice"_n, minimum));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(UNIT - minimum), liq_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(flat, feepot_balance(LIQSOL));
+   BOOST_REQUIRE_EQUAL(2u, counters_row()["next_request_id"].as_uint64());
+} FC_LOG_AND_RETHROW()
+
+// `setconfig` refuses a flat desyndication fee at or above `min_desyndicate` or outside the asset range,
+// leaving the row as it was, and the row carries an accepted flat fee back.
+BOOST_FIXTURE_TEST_CASE(setconfig_validates_and_stores_the_flat_fee, sysio_synd_tester) try {
+   constexpr auto     message = "flat desyndication fee must fit an asset and be below the minimum desyndication";
+   constexpr uint64_t range   = static_cast<uint64_t>(asset::max_amount);
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(message),
+                       setconfig(SOLANA, LIQSOL, {.min_desyndicate = UNIT, .desynd_fee_flat = UNIT}));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(message),
+                       setconfig(SOLANA, LIQSOL, {.min_desyndicate = UNIT, .desynd_fee_flat = UNIT + 1}));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(message), setconfig(SOLANA, LIQSOL,
+      {.desynd_burst = 0, .min_desyndicate = range, .desynd_fee_flat = range + 1}));
+   BOOST_REQUIRE(config_row(SOLANA, LIQSOL).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.min_desyndicate = UNIT, .desynd_fee_flat = UNIT - 1}));
+   BOOST_REQUIRE_EQUAL(UNIT - 1, config_row(SOLANA, LIQSOL)["desynd_fee_flat"].as_uint64());
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL,
+      {.desynd_burst = 0, .min_desyndicate = range, .desynd_fee_flat = range - 1}));
+   BOOST_REQUIRE_EQUAL(range - 1, config_row(SOLANA, LIQSOL)["desynd_fee_flat"].as_uint64());
+
+   // A refusal keeps the row the last accepted configuration wrote; the default is no flat fee.
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(message), setconfig(SOLANA, LIQSOL,
+      {.desynd_burst = 0, .min_desyndicate = range, .desynd_fee_flat = range}));
+   BOOST_REQUIRE_EQUAL(range - 1, config_row(SOLANA, LIQSOL)["desynd_fee_flat"].as_uint64());
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
+   BOOST_REQUIRE_EQUAL(0u, config_row(SOLANA, LIQSOL)["desynd_fee_flat"].as_uint64());
+} FC_LOG_AND_RETHROW()
+
 // Only a balance in the holder's own sysio.liq row can be desyndicated: a syndication held for the
 // holder's linked pubkey and a balance parked for another pubkey sit in sysio.synd's row and cannot be
 // drawn, and a refusal leaves both where they were.
 BOOST_FIXTURE_TEST_CASE(desyndicate_refuses_held_or_parked_funds, sysio_synd_tester) try {
-   const auto key    = ed_key();
+   const auto signer = ed_signer();
+   const auto key    = signer.get_public_key();
    const auto pubkey = ed_bytes(key);
    const auto parked_pubkey = ed_bytes(ed_key());
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
    BOOST_REQUIRE_EQUAL(success(), importsynd(SOLANA, LIQSOL, { credit(parked_pubkey, 20 * UNIT) }));
    syndicate_and_close(1, 1, pubkey, LIQSOL, 50 * UNIT);
@@ -1789,9 +2050,9 @@ BOOST_FIXTURE_TEST_CASE(desyndicate_refuses_held_or_parked_funds, sysio_synd_tes
 // ---------------------------------------------------------------------------
 
 BOOST_FIXTURE_TEST_CASE(importsynd_parks_or_credits_and_importdone_closes, sysio_synd_tester) try {
-   const auto key_a = ed_key(), key_b = ed_key(), key_c = ed_key();
-   const auto a = ed_bytes(key_a), b = ed_bytes(key_b), c = ed_bytes(key_c);
-   BOOST_REQUIRE_EQUAL(success(), link_svm("carol"_n, key_c));
+   const auto signer_a = ed_signer(), signer_c = ed_signer();
+   const auto a = ed_bytes(signer_a.get_public_key()), b = ed_bytes(ed_key()), c = ed_bytes(signer_c.get_public_key());
+   BOOST_REQUIRE_EQUAL(success(), link_svm("carol"_n, signer_c));
 
    BOOST_REQUIRE_EQUAL(success(), importsynd(SOLANA, LIQSOL, { credit(a, 30 * UNIT), credit(b, 70 * UNIT),
                                                                credit(c, 5 * UNIT) }));
@@ -1828,9 +2089,10 @@ BOOST_FIXTURE_TEST_CASE(importsynd_parks_or_credits_and_importdone_closes, sysio
 
    // The imported positions earn from the first distribution on.
    BOOST_REQUIRE_EQUAL(success(), addyield("carol"_n, 23 * UNIT));   // 115 supply: one WIRE per five shadow
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key_a));
    const int64_t alice_wire = wire_balance("alice"_n);
-   BOOST_REQUIRE_EQUAL(success(), sweep("alice"_n, ChainKind::CHAIN_KIND_SVM));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer_a));   // delivers a's row in the same transaction
+   BOOST_REQUIRE(executed(SYND_ACCOUNT, "linkswept"_n));
+   BOOST_REQUIRE(parked_row(LIQSOL, ChainKind::CHAIN_KIND_SVM, a).is_null());
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(40 * UNIT), liq_balance("alice"_n));
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(8 * UNIT), liq_owed("alice"_n));
    BOOST_REQUIRE_EQUAL(success(), liq_claim("alice"_n));
@@ -1942,13 +2204,14 @@ BOOST_FIXTURE_TEST_CASE(the_dev_config_replays_into_the_shadow_liq_system, sysio
 // each for its own statement and covering the token's syndicated plus yield total rounded UP to the bond
 // increment. Bonding one of them releases it while the other still waits, and neither blocks the other.
 BOOST_FIXTURE_TEST_CASE(closeenv_issues_one_request_per_token, sysio_synd_tester) try {
-   const auto     key    = ed_key();
+   const auto     signer = ed_signer();
+   const auto     key    = signer.get_public_key();
    const auto     pubkey = ed_bytes(key);
    const auto     digest = digest_of("envelope-1");
    constexpr auto SVM    = ChainKind::CHAIN_KIND_SVM;
    constexpr uint32_t LIQTWO_WINDOW_SEC = 3600;
    constexpr uint64_t INCREMENT         = 10'000'000;   // 0.01 token at precision 9
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQTWO, {.window_sec = LIQTWO_WINDOW_SEC}));
    BOOST_REQUIRE_EQUAL(success(), onsynd(SOLANA, 1, digest, 1, SVM, pubkey, LIQSOL, 10 * UNIT));
@@ -2073,9 +2336,10 @@ BOOST_FIXTURE_TEST_CASE(bonded_request_makes_the_envelope_releasable, sysio_synd
 // The bounty posted on a request is the configured one, or what the fee pot holds when that is less:
 // 0 while the pot is empty. sysio.bond pulls it out of sysio.synd's row, where the pot kept it.
 BOOST_FIXTURE_TEST_CASE(bounty_comes_from_the_fee_pot_or_is_zero, sysio_synd_tester) try {
-   const auto key    = ed_key();
+   const auto signer = ed_signer();
+   const auto key    = signer.get_public_key();
    const auto pubkey = ed_bytes(key);
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.synd_fee_bps = 1000, .bounty = UNIT}));
    syndicate_and_close(1, 1, pubkey, LIQSOL, 20 * UNIT);
    syndicate_and_close(2, 2, pubkey, LIQSOL, 10 * UNIT);
@@ -2110,9 +2374,10 @@ BOOST_FIXTURE_TEST_CASE(bounty_comes_from_the_fee_pot_or_is_zero, sysio_synd_tes
 // the WIRE the item earned while it was held to the account's own sysio.liq row; the item is erased,
 // the envelope is DONE and the pair's queue cursor moves past it.
 BOOST_FIXTURE_TEST_CASE(release_pays_the_fee_and_credits_the_account, sysio_synd_tester) try {
-   const auto key    = ed_key();
+   const auto signer = ed_signer();
+   const auto key    = signer.get_public_key();
    const auto pubkey = ed_bytes(key);
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.synd_fee_bps = 250}));
    BOOST_REQUIRE_EQUAL(success(), liq_mint("bob"_n, LIQSOL, 40 * UNIT));
    syndicate_and_close(1, 1, pubkey, LIQSOL, 40 * UNIT);
@@ -2144,7 +2409,8 @@ BOOST_FIXTURE_TEST_CASE(release_pays_the_fee_and_credits_the_account, sysio_synd
 // A syndication whose pubkey has no link at release goes into `parked`, with the WIRE it earned while
 // held; the link, when it comes, delivers both.
 BOOST_FIXTURE_TEST_CASE(release_parks_an_unlinked_pubkey, sysio_synd_tester) try {
-   const auto key    = ed_key();
+   const auto signer = ed_signer();
+   const auto key    = signer.get_public_key();
    const auto pubkey = ed_bytes(key);
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
    BOOST_REQUIRE_EQUAL(success(), liq_mint("bob"_n, LIQSOL, 30 * UNIT));
@@ -2163,9 +2429,10 @@ BOOST_FIXTURE_TEST_CASE(release_parks_an_unlinked_pubkey, sysio_synd_tester) try
    BOOST_REQUIRE_EQUAL(static_cast<uint64_t>(owed), parked["position"]["owed_wire"].as_uint64());
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(30 * UNIT), liq_balance(SYND_ACCOUNT));
 
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
    const int64_t alice_wire = wire_balance("alice"_n);
-   BOOST_REQUIRE_EQUAL(success(), sweep("alice"_n, ChainKind::CHAIN_KIND_SVM));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
+   BOOST_REQUIRE(executed(SYND_ACCOUNT, "linkswept"_n));
+   BOOST_REQUIRE(parked_row(LIQSOL, ChainKind::CHAIN_KIND_SVM, pubkey).is_null());
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(30 * UNIT), liq_balance("alice"_n));
    BOOST_REQUIRE_EQUAL(owed, liq_owed("alice"_n));
    BOOST_REQUIRE_EQUAL(0, liq_balance(SYND_ACCOUNT));
@@ -2176,11 +2443,12 @@ BOOST_FIXTURE_TEST_CASE(release_parks_an_unlinked_pubkey, sysio_synd_tester) try
 // Review Focus 1: the link is resolved at release, not at intake: a pubkey that gains its link while
 // its syndication is held is paid to the account, and nothing is parked.
 BOOST_FIXTURE_TEST_CASE(a_link_gained_while_held_releases_to_the_account, sysio_synd_tester) try {
-   const auto key    = ed_key();
+   const auto signer = ed_signer();
+   const auto key    = signer.get_public_key();
    const auto pubkey = ed_bytes(key);
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
    syndicate_and_close(1, 1, pubkey, LIQSOL, 12 * UNIT);
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
 
    underwrite_envelope(SOLANA, LIQSOL, 1);
    BOOST_REQUIRE_EQUAL(success(), crank());
@@ -2192,9 +2460,10 @@ BOOST_FIXTURE_TEST_CASE(a_link_gained_while_held_releases_to_the_account, sysio_
 
 // Linked contracts receive spendable LIQ without invoking their rejecting transfer handler.
 BOOST_FIXTURE_TEST_CASE(a_linked_contract_account_receives_without_notifications, sysio_synd_tester) try {
-   const auto key    = ed_key();
+   const auto signer = ed_signer();
+   const auto key    = signer.get_public_key();
    const auto pubkey = ed_bytes(key);
-   BOOST_REQUIRE_EQUAL(success(), link_svm("bob"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("bob"_n, signer));
    set_code("bob"_n, contracts::util::block_transfer_wasm());
    produce_blocks();
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
@@ -2212,10 +2481,11 @@ BOOST_FIXTURE_TEST_CASE(a_linked_contract_account_receives_without_notifications
 // burst, and a tranche is the smaller of an item's remainder and the level. Nothing refills within an
 // epoch.
 BOOST_FIXTURE_TEST_CASE(bucket_limits_a_tranche_and_refills_per_epoch, sysio_synd_tester) try {
-   const auto key    = ed_key();
+   const auto signer = ed_signer();
+   const auto key    = signer.get_public_key();
    const auto pubkey = ed_bytes(key);
    const auto digest = digest_of("envelope-1");
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.synd_burst = 10 * UNIT, .synd_refill = 4 * UNIT}));
    BOOST_REQUIRE_EQUAL(success(), set_epoch(5));
    BOOST_REQUIRE_EQUAL(success(), onsynd(SOLANA, 1, digest, 1, ChainKind::CHAIN_KIND_SVM, pubkey, LIQSOL, 8 * UNIT));
@@ -2259,9 +2529,10 @@ BOOST_FIXTURE_TEST_CASE(bucket_limits_a_tranche_and_refills_per_epoch, sysio_syn
 // bucketful per epoch, until it is gone.
 BOOST_FIXTURE_TEST_CASE(oversize_item_releases_in_tranches, sysio_synd_tester) try {
    constexpr uint64_t BURST = 3 * UNIT;
-   const auto         key    = ed_key();
+   const auto         signer = ed_signer();
+   const auto         key    = signer.get_public_key();
    const auto         pubkey = ed_bytes(key);
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.synd_burst = BURST, .synd_refill = BURST}));
    syndicate_and_close(1, 1, pubkey, LIQSOL, 10 * UNIT);
    underwrite_envelope(SOLANA, LIQSOL, 1);
@@ -2314,9 +2585,10 @@ BOOST_FIXTURE_TEST_CASE(yield_item_mints_pending_without_fee_or_budget, sysio_sy
 // With no `syndconfig` row the syndication bucket is unset: the step succeeds, prints why, and releases
 // nothing. A zero budget is a no-op. Once the pair is configured, the same item releases.
 BOOST_FIXTURE_TEST_CASE(crank_never_throws_on_an_unset_bucket, sysio_synd_tester) try {
-   const auto key    = ed_key();
+   const auto signer = ed_signer();
+   const auto key    = signer.get_public_key();
    const auto pubkey = ed_bytes(key);
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
    syndicate_and_close(1, 1, pubkey, LIQSOL, 10 * UNIT);
    underwrite_envelope(SOLANA, LIQSOL, 1);
 
@@ -2403,9 +2675,10 @@ BOOST_FIXTURE_TEST_CASE(sweepyield_pulls_what_the_contract_row_earned, sysio_syn
 // The fee pot is protocol revenue, and so is the WIRE it earns: `sweepyield` pays `sysio` what the pot's
 // position banked, out of the pool it has just pulled, and nothing is left owed to the pot.
 BOOST_FIXTURE_TEST_CASE(sweepyield_pays_the_fee_pot_yield_to_sysio, sysio_synd_tester) try {
-   const auto key    = ed_key();
+   const auto signer = ed_signer();
+   const auto key    = signer.get_public_key();
    const auto pubkey = ed_bytes(key);
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.synd_fee_bps = 1000}));
    syndicate_and_close(1, 1, pubkey, LIQSOL, 20 * UNIT);
    underwrite_envelope(SOLANA, LIQSOL, 1);
@@ -2433,10 +2706,11 @@ BOOST_FIXTURE_TEST_CASE(sweepyield_pays_the_fee_pot_yield_to_sysio, sysio_synd_t
 // The queue records a request's terminal outcome the first time it sees it and never reads the request
 // row again, so sysio.bond may prune the row once its ruling is old enough: the pair keeps releasing.
 BOOST_FIXTURE_TEST_CASE(a_pruned_request_keeps_its_pair_releasing, sysio_synd_tester) try {
-   const auto key    = ed_key();
+   const auto signer = ed_signer();
+   const auto key    = signer.get_public_key();
    const auto pubkey = ed_bytes(key);
    constexpr uint32_t window_sec = 3600;
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.synd_burst  = 4 * UNIT,
                                                              .synd_refill = 4 * UNIT,
                                                              .window_sec  = window_sec}));
@@ -2472,8 +2746,9 @@ BOOST_FIXTURE_TEST_CASE(a_pruned_request_keeps_its_pair_releasing, sysio_synd_te
 /// A DONE envelope still consumes a later ruling; a fully paid bond cannot prune that ruling before
 /// targeted synchronization, even after the ordinary retention deadline.
 BOOST_FIXTURE_TEST_CASE(done_envelope_durably_consumes_late_outcome, sysio_synd_tester) try {
-   const auto key = ed_key();
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   const auto signer = ed_signer();
+   const auto key = signer.get_public_key();
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.synd_burst = 10 * UNIT, .synd_refill = 10 * UNIT,
                                                           .window_sec = 1}));
    syndicate_and_close(1, 1, ed_bytes(key), LIQSOL, UNIT);
@@ -2498,8 +2773,9 @@ BOOST_FIXTURE_TEST_CASE(done_envelope_durably_consumes_late_outcome, sysio_synd_
 /// Governance may invalidate a fully released envelope without a prior challenge. Synchronization
 /// must rewind settlement so the forfeit covers the released amount exactly once.
 BOOST_FIXTURE_TEST_CASE(late_invalid_outcome_rewinds_done_envelope, sysio_synd_tester) try {
-   const auto key = ed_key();
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   const auto signer = ed_signer();
+   const auto key = signer.get_public_key();
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
    syndicate_and_close(1, 1, ed_bytes(key), LIQSOL, UNIT);
    const auto id = envelope_row(SOLANA, LIQSOL, 1)["request_id"].as_uint64();
@@ -2522,9 +2798,10 @@ BOOST_FIXTURE_TEST_CASE(late_invalid_outcome_rewinds_done_envelope, sysio_synd_t
 /// Fully released is not final. Pruning requires consumed finality, then retains a replay floor
 /// that rejects both old and fresh sequences at erased epochs, even with a different digest.
 BOOST_FIXTURE_TEST_CASE(prune_requires_finality_and_preserves_replay_floor, sysio_synd_tester) try {
-   const auto key = ed_key();
+   const auto signer = ed_signer();
+   const auto key = signer.get_public_key();
    const auto pubkey = ed_bytes(key);
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
    syndicate_and_close(1, 1, pubkey, LIQSOL, UNIT);
    const auto id = envelope_row(SOLANA, LIQSOL, 1)["request_id"].as_uint64();
@@ -2600,9 +2877,10 @@ BOOST_FIXTURE_TEST_CASE(small_sync_sweeps_progress_past_blocked_release, sysio_s
 // with no syndconfig row do not starve the other token of closeenv's small inline step, which still
 // requests it and, once bonded, releases it.
 BOOST_FIXTURE_TEST_CASE(a_stopped_pair_leaves_the_budget_to_the_others, sysio_synd_tester) try {
-   const auto key    = ed_key();
+   const auto signer = ed_signer();
+   const auto key    = signer.get_public_key();
    const auto pubkey = ed_bytes(key);
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQTWO, {}));
    const auto digest1 = digest_of("envelope-1");
    for (uint64_t sequence = 1; sequence <= 17; ++sequence) {
@@ -2632,9 +2910,10 @@ BOOST_FIXTURE_TEST_CASE(a_stopped_pair_leaves_the_budget_to_the_others, sysio_sy
 // envelopes, one syndication each and no yield, do not stop the same step requesting a LIQTWO envelope
 // and, once it is bonded, releasing it.
 BOOST_FIXTURE_TEST_CASE(envelopes_behind_an_empty_bucket_leave_closeenv_its_budget, sysio_synd_tester) try {
-   const auto key    = ed_key();
+   const auto signer = ed_signer();
+   const auto key    = signer.get_public_key();
    const auto pubkey = ed_bytes(key);
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.synd_burst = 0, .synd_refill = 0}));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQTWO, {}));
    constexpr uint32_t stuck = 17;
@@ -2670,9 +2949,10 @@ BOOST_FIXTURE_TEST_CASE(envelopes_behind_an_empty_bucket_leave_closeenv_its_budg
 // A blocked release pass retains its examination cap and cursor. Underwriting has an independent
 // budget and reaches a later pair immediately, even when release exhausts its own budget first.
 BOOST_FIXTURE_TEST_CASE(the_examination_cap_bounds_a_step_over_many_blocked_pairs, sysio_synd_tester) try {
-   const auto key    = ed_key();
+   const auto signer = ed_signer();
+   const auto key    = signer.get_public_key();
    const auto pubkey = ed_bytes(key);
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
    // In queue order: the four-letter shadows sort before every six-letter one, LIQTWO last.
    const std::vector<std::string> blocked{"LIQA", "LIQB", "LIQC", "LIQD", "LIQE", std::string(LIQSOL)};
    constexpr uint32_t             items = 16;
@@ -2726,9 +3006,10 @@ BOOST_FIXTURE_TEST_CASE(the_examination_cap_bounds_a_step_over_many_blocked_pair
 // look (LIQE, LIQETH, LIQSOL, LIQTWO) before it can look at the envelope, so the cursor stays on LIQTWO;
 // the third starts there and releases it (entry, envelope, item: three looks and the one unit).
 BOOST_FIXTURE_TEST_CASE(a_step_over_many_idle_pairs_stops_on_the_cap, sysio_synd_tester) try {
-   const auto key    = ed_key();
+   const auto signer = ed_signer();
+   const auto key    = signer.get_public_key();
    const auto pubkey = ed_bytes(key);
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
    const std::vector<std::string> idle{"LIQA", "LIQB", "LIQC", "LIQD", "LIQE"};
    for (size_t i = 0; i < idle.size(); ++i) {
       BOOST_REQUIRE_EQUAL(success(), regtoken(idle[i], 9, ChainKind::CHAIN_KIND_SVM, SOLANA,
@@ -2759,10 +3040,11 @@ BOOST_FIXTURE_TEST_CASE(a_step_over_many_idle_pairs_stops_on_the_cap, sysio_synd
 // full headroom -- still has a later envelope requested and its request's outcome recorded, so a prune of
 // the request cannot strand the envelope.
 BOOST_FIXTURE_TEST_CASE(a_pair_with_both_flows_stopped_records_a_later_outcome, sysio_synd_tester) try {
-   const auto key    = ed_key();
+   const auto signer = ed_signer();
+   const auto key    = signer.get_public_key();
    const auto pubkey = ed_bytes(key);
    constexpr uint32_t window_sec = 3600;
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.synd_burst = 0, .synd_refill = 0,
                                                              .window_sec = window_sec}));
    // Envelope 1: a syndication the empty bucket holds.
@@ -2808,9 +3090,10 @@ BOOST_FIXTURE_TEST_CASE(a_pair_with_both_flows_stopped_records_a_later_outcome, 
 // A HELD envelope whose request was fully bonded holds only itself: a later envelope of the pair is
 // requested and released past it, and the pair's queue cursor stays on the held one.
 BOOST_FIXTURE_TEST_CASE(a_held_envelope_is_skipped_while_a_later_one_releases, sysio_synd_tester) try {
-   const auto key    = ed_key();
+   const auto signer = ed_signer();
+   const auto key    = signer.get_public_key();
    const auto pubkey = ed_bytes(key);
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
    syndicate_and_close(1, 1, pubkey, LIQSOL, 10 * UNIT);
    const uint64_t first = envelope_row(SOLANA, LIQSOL, 1)["request_id"].as_uint64();
@@ -2878,6 +3161,16 @@ BOOST_FIXTURE_TEST_CASE(dropenv_burns_an_unrequested_envelope_and_the_queue_move
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("envelope not found"), dropenv(SOLANA, LIQSOL, 9));
 
    BOOST_REQUIRE_EQUAL(success(), dropenv(SOLANA, LIQSOL, 2));
+   const auto closed = receipts("logburn"_n);
+   BOOST_REQUIRE_EQUAL(closed.size(), 1u);
+   BOOST_REQUIRE_EQUAL(closed[0]["chain_code"].as_string(), SOLANA);
+   BOOST_REQUIRE_EQUAL(closed[0]["token_code"].as_string(), LIQSOL);
+   BOOST_REQUIRE_EQUAL(closed[0]["epoch_index"].as_uint64(), 2u);
+   BOOST_REQUIRE_EQUAL(closed[0]["digest"].as<fc::sha256>(), digest2);
+   BOOST_REQUIRE(mentions(push(SYND_ACCOUNT, synd_abi_ser, SYND_ACCOUNT, "logburn"_n, mvo()("receipt", closed[0])),
+                          "self inline action"));
+   BOOST_REQUIRE(mentions(push(SYND_ACCOUNT, synd_abi_ser, "alice"_n, "logburn"_n, mvo()("receipt", closed[0])),
+                          "missing authority"));
    auto envelope = envelope_row(SOLANA, LIQSOL, 2);
    BOOST_REQUIRE_EQUAL(STATE_INVALID, envelope["state"].as_string());
    BOOST_REQUIRE_EQUAL(4 * UNIT, envelope["burned"].as_uint64());
@@ -2907,12 +3200,14 @@ BOOST_FIXTURE_TEST_CASE(dropenv_burns_an_unrequested_envelope_and_the_queue_move
 
 // A challenge charges the challenger the request's hold bond plus the pair's extra: the extra stays in
 // the fee pot, sysio.bond pulls the hold bond back out of sysio.synd as the issuer's hold naming the
-// challenger, and the envelope is HELD. It is the challenger's own action, and one per request.
+// challenger, and the envelope is HELD. It is the challenger's own action, and one per request. Here the
+// bonded request is challenged before any step saw the bond, so nothing has been released.
 BOOST_FIXTURE_TEST_CASE(challenge_charges_bond_plus_extra_and_holds, sysio_synd_tester) try {
    const auto pubkey = ed_bytes(ed_key());
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.challenge_extra = 2 * UNIT}));
    syndicate_and_close(1, 1, pubkey, LIQSOL, 10 * UNIT);
    const uint64_t id = envelope_row(SOLANA, LIQSOL, 1)["request_id"].as_uint64();
+   underwrite_envelope(SOLANA, LIQSOL, 1);
    BOOST_REQUIRE_EQUAL(success(), liq_mint("carol"_n, LIQSOL, 5 * UNIT));
 
    BOOST_REQUIRE(mentions(challenge("carol"_n, SOLANA, LIQSOL, 1, "bob"_n), "missing authority of carol"));
@@ -2921,9 +3216,9 @@ BOOST_FIXTURE_TEST_CASE(challenge_charges_bond_plus_extra_and_holds, sysio_synd_
    const uint64_t hold_bond = 10 * UNIT * HOLD_BPS / BPS_DENOMINATOR;
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(5 * UNIT - hold_bond - 2 * UNIT), liq_balance("carol"_n));
    BOOST_REQUIRE_EQUAL(2 * UNIT, feepot_balance(LIQSOL));
-   // sysio.synd keeps the held syndication and the extra; sysio.bond holds the hold bond.
+   // sysio.synd keeps the held syndication and the extra; sysio.bond holds dave's bond and the hold bond.
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(12 * UNIT), liq_balance(SYND_ACCOUNT));
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(hold_bond), liq_balance(BOND_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(10 * UNIT + hold_bond), liq_balance(BOND_ACCOUNT));
    const auto req = bond_request(id);
    BOOST_REQUIRE_EQUAL(REQUEST_HELD, req["state"].as_string());
    BOOST_REQUIRE_EQUAL(hold_bond, req["hold_bond"].as_uint64());
@@ -2985,8 +3280,9 @@ BOOST_FIXTURE_TEST_CASE(a_frozen_request_can_be_held_or_ruled_invalid_after_its_
 /// The cord pauses releases, but approval after the deadline permanently closes challenges.
 BOOST_FIXTURE_TEST_CASE(a_freeze_does_not_extend_the_challenge_deadline, sysio_synd_tester) try {
    constexpr uint32_t window = 60;
-   const auto key = ed_key();
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   const auto signer = ed_signer();
+   const auto key = signer.get_public_key();
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.window_sec = window}));
    syndicate_and_close(1, 1, ed_bytes(key), LIQSOL, 10 * UNIT);
    const auto id = envelope_row(SOLANA, LIQSOL, 1)["request_id"].as_uint64();
@@ -3005,8 +3301,8 @@ BOOST_FIXTURE_TEST_CASE(a_freeze_does_not_extend_the_challenge_deadline, sysio_s
 } FC_LOG_AND_RETHROW()
 
 // Review Focus 4: an envelope with no request issued yet (WAITING behind an unbonded one), or with no
-// row at all, cannot be challenged; nor can sysio.synd, sysio.bond or an account with contract code
-// challenge.
+// row at all, cannot be challenged; nor can sysio.synd or sysio.bond challenge. An account with
+// contract code can.
 BOOST_FIXTURE_TEST_CASE(challenge_refused_on_an_unrequested_envelope, sysio_synd_tester) try {
    const auto pubkey = ed_bytes(ed_key());
    syndicate_and_close(1, 1, pubkey, LIQSOL, 10 * UNIT);
@@ -3017,6 +3313,7 @@ BOOST_FIXTURE_TEST_CASE(challenge_refused_on_an_unrequested_envelope, sysio_synd
    BOOST_REQUIRE(mentions(challenge("carol"_n, SOLANA, LIQSOL, 2), CHALLENGE_STATE));
    BOOST_REQUIRE(mentions(challenge("carol"_n, SOLANA, LIQSOL, 9), CHALLENGE_NO_ROW));
    BOOST_REQUIRE(mentions(challenge(SYND_ACCOUNT, SOLANA, LIQSOL, 1), CHALLENGE_ROLE));
+   underwrite_envelope(SOLANA, LIQSOL, 1);
    BOOST_REQUIRE_EQUAL(success(), liq_mint("bob"_n, LIQSOL, 5 * UNIT));
    set_code("bob"_n, contracts::util::block_transfer_wasm());
    produce_blocks();
@@ -3026,13 +3323,58 @@ BOOST_FIXTURE_TEST_CASE(challenge_refused_on_an_unrequested_envelope, sysio_synd
    BOOST_REQUIRE_EQUAL(0u, feepot_balance(LIQSOL));
 } FC_LOG_AND_RETHROW()
 
+// A request that is not fully bonded cannot be challenged, with nothing bonded or with part of it, and
+// nothing is charged: nothing has been released, and a held request takes no more bonds, so the hold
+// would stop the pair until sysio rules. Once fully bonded, a challenge holds only its own envelope: the
+// pair's next envelope is requested, and released once bonded.
+BOOST_FIXTURE_TEST_CASE(challenge_refused_until_the_request_is_fully_bonded, sysio_synd_tester) try {
+   const auto signer = ed_signer();
+   const auto key    = signer.get_public_key();
+   const auto pubkey = ed_bytes(key);
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.challenge_extra = UNIT}));
+   syndicate_and_close(1, 1, pubkey, LIQSOL, 10 * UNIT);
+   syndicate_and_close(2, 2, pubkey, LIQSOL, 4 * UNIT);
+   const uint64_t id = envelope_row(SOLANA, LIQSOL, 1)["request_id"].as_uint64();
+   BOOST_REQUIRE_EQUAL(success(), liq_mint("carol"_n, LIQSOL, 5 * UNIT));
+
+   // Nothing bonded, then 4 of the 10: refused each time.
+   BOOST_REQUIRE(mentions(challenge("carol"_n, SOLANA, LIQSOL, 1), CHALLENGE_UNBONDED));
+   BOOST_REQUIRE_EQUAL(success(), underwrite("dave"_n, id, 4 * UNIT, LIQSOL));
+   BOOST_REQUIRE_EQUAL(REQUEST_OPEN, bond_request(id)["state"].as_string());
+   BOOST_REQUIRE(mentions(challenge("carol"_n, SOLANA, LIQSOL, 1), CHALLENGE_UNBONDED));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(5 * UNIT), liq_balance("carol"_n));
+   BOOST_REQUIRE_EQUAL(0u, feepot_balance(LIQSOL));
+   BOOST_REQUIRE_EQUAL(STATE_REQUESTED, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
+
+   // Fully bonded: the challenge holds the request.
+   BOOST_REQUIRE_EQUAL(success(), underwrite("dave"_n, id, 6 * UNIT, LIQSOL));
+   BOOST_REQUIRE_EQUAL(REQUEST_BONDED, bond_request(id)["state"].as_string());
+   BOOST_REQUIRE_EQUAL(success(), challenge("carol"_n, SOLANA, LIQSOL, 1));
+   BOOST_REQUIRE_EQUAL(REQUEST_HELD, bond_request(id)["state"].as_string());
+
+   // The held envelope releases nothing, but the next one is requested...
+   BOOST_REQUIRE_EQUAL(success(), crank());
+   BOOST_REQUIRE_EQUAL(STATE_HELD, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
+   BOOST_REQUIRE_EQUAL(10 * UNIT, item_row(1)["remaining"].as_uint64());
+   BOOST_REQUIRE_EQUAL(STATE_REQUESTED, envelope_row(SOLANA, LIQSOL, 2)["state"].as_string());
+
+   // ...and released once bonded, while the first stays held.
+   underwrite_envelope(SOLANA, LIQSOL, 2);
+   BOOST_REQUIRE_EQUAL(success(), crank());
+   BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQSOL, 2)["state"].as_string());
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(4 * UNIT), liq_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(STATE_HELD, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
+} FC_LOG_AND_RETHROW()
+
 /// Half-released envelope: alice is linked, the bucket passes 4 per epoch, 10 are syndicated at epoch 1,
 /// bonded, and one step releases 4. Carol holds 5 to challenge with.
 struct sysio_synd_released_tester : sysio_synd_tester {
    sysio_synd_released_tester() {
-      const auto key = ed_key();
+      const auto signer = ed_signer();
+      const auto key = signer.get_public_key();
       pubkey         = ed_bytes(key);
-      BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+      BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
       BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.synd_burst = 4 * UNIT, .synd_refill = 4 * UNIT}));
       BOOST_REQUIRE_EQUAL(success(), set_epoch(1));
       syndicate_and_close(1, 1, pubkey, LIQSOL, 10 * UNIT);
@@ -3063,9 +3405,9 @@ BOOST_FIXTURE_TEST_CASE(a_challenge_after_partial_release_stops_further_release,
    BOOST_REQUIRE_EQUAL(4 * UNIT, envelope["released"].as_uint64());
 } FC_LOG_AND_RETHROW()
 
-// A VALID ruling on a challenged, fully bonded request makes the envelope RELEASABLE again: release
-// resumes where it stopped. Every bond covered the hold bond, so nothing is forwarded to the challenger
-// and nothing is claimed.
+// A VALID ruling on a challenged request makes the envelope RELEASABLE again: release resumes where it
+// stopped. sysio.synd claims nothing, and the challenger gets nothing back: dave's claim returns his bond
+// with the whole hold bond.
 BOOST_FIXTURE_TEST_CASE(valid_ruling_resumes_release, sysio_synd_released_tester) try {
    BOOST_REQUIRE_EQUAL(success(), challenge("carol"_n, SOLANA, LIQSOL, 1));
    const int64_t carol = liq_balance("carol"_n);
@@ -3083,6 +3425,10 @@ BOOST_FIXTURE_TEST_CASE(valid_ruling_resumes_release, sysio_synd_released_tester
    BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
    BOOST_REQUIRE_EQUAL(carol, liq_balance("carol"_n));
    BOOST_REQUIRE_EQUAL(0, liq_balance(SYND_ACCOUNT));
+
+   const uint64_t hold_bond = 10 * UNIT * HOLD_BPS / BPS_DENOMINATOR;
+   BOOST_REQUIRE_EQUAL(success(), bond_claim(id, "dave"_n));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(10 * UNIT + hold_bond), liq_balance("dave"_n));
 } FC_LOG_AND_RETHROW()
 
 // INVALID after 4 of 10 were released: the 6 still held are burned, the forfeit of 10 is pulled from
@@ -3202,6 +3548,7 @@ BOOST_FIXTURE_TEST_CASE(invalid_burn_spans_steps_within_the_budget, sysio_synd_t
    // One unit, for the first item: refreshing the envelope is free.
    BOOST_REQUIRE_EQUAL(success(), crank(1));
    BOOST_REQUIRE(console_has(QUEUE_INVALID_BURNING));
+   BOOST_REQUIRE(receipts("logburn"_n).empty());
    BOOST_REQUIRE(!executed(BOND_ACCOUNT, "claim"_n));
    BOOST_REQUIRE(item_row(1).is_null());
    BOOST_REQUIRE(!item_row(2).is_null());
@@ -3215,17 +3562,21 @@ BOOST_FIXTURE_TEST_CASE(invalid_burn_spans_steps_within_the_budget, sysio_synd_t
    BOOST_REQUIRE(executed(BOND_ACCOUNT, "claim"_n));
    envelope = envelope_row(SOLANA, LIQSOL, 1);
    BOOST_REQUIRE_EQUAL(STATE_INVALID, envelope["state"].as_string());
+   BOOST_REQUIRE_EQUAL(receipts("logburn"_n).size(), 1u);
    BOOST_REQUIRE_EQUAL(6 * UNIT, envelope["burned"].as_uint64());
    BOOST_REQUIRE_EQUAL(6 * UNIT, feepot_balance(LIQSOL));
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(6 * UNIT), supply());
+   BOOST_REQUIRE_EQUAL(success(), crank());
+   BOOST_REQUIRE(receipts("logburn"_n).empty());
 } FC_LOG_AND_RETHROW()
 
 // INVALID with no hold returns the bounty to the issuer: sysio.synd claims it with the forfeit and puts
 // it back into the fee pot it came from.
 BOOST_FIXTURE_TEST_CASE(invalid_without_a_hold_returns_the_bounty_to_the_fee_pot, sysio_synd_tester) try {
-   const auto key    = ed_key();
+   const auto signer = ed_signer();
+   const auto key    = signer.get_public_key();
    const auto pubkey = ed_bytes(key);
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.synd_fee_bps = 1000, .bounty = UNIT}));
    syndicate_and_close(1, 1, pubkey, LIQSOL, 20 * UNIT);
    underwrite_envelope(SOLANA, LIQSOL, 1);
@@ -3241,38 +3592,6 @@ BOOST_FIXTURE_TEST_CASE(invalid_without_a_hold_returns_the_bounty_to_the_fee_pot
    BOOST_REQUIRE_EQUAL(STATE_INVALID, envelope_row(SOLANA, LIQSOL, 2)["state"].as_string());
    BOOST_REQUIRE_EQUAL(2 * UNIT, feepot_balance(LIQSOL));
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(2 * UNIT), liq_balance(SYND_ACCOUNT));
-} FC_LOG_AND_RETHROW()
-
-// VALID after a challenge of a partly bonded request: sysio.bond awards the issuer the share of the hold
-// bond no bond covered; sysio.synd claims it and forwards it to the challenger, who paid it, once. The
-// envelope then releases.
-BOOST_FIXTURE_TEST_CASE(valid_after_challenge_forwards_the_unbonded_hold_share, sysio_synd_tester) try {
-   const auto key    = ed_key();
-   const auto pubkey = ed_bytes(key);
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
-   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
-   syndicate_and_close(1, 1, pubkey, LIQSOL, 10 * UNIT);
-   const uint64_t id = envelope_row(SOLANA, LIQSOL, 1)["request_id"].as_uint64();
-   BOOST_REQUIRE_EQUAL(success(), underwrite("dave"_n, id, 4 * UNIT, LIQSOL));
-   BOOST_REQUIRE_EQUAL(success(), liq_mint("carol"_n, LIQSOL, 5 * UNIT));
-   BOOST_REQUIRE_EQUAL(success(), challenge("carol"_n, SOLANA, LIQSOL, 1));
-   const uint64_t hold_bond = 10 * UNIT * HOLD_BPS / BPS_DENOMINATOR;
-   const uint64_t share     = hold_bond * 6 / 10;   // the 6 of 10 no bond covered
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(5 * UNIT - hold_bond), liq_balance("carol"_n));
-   BOOST_REQUIRE_EQUAL(success(), rule(id, true));
-
-   BOOST_REQUIRE_EQUAL(success(), crank());
-   BOOST_REQUIRE(executed(BOND_ACCOUNT, "claim"_n));
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(5 * UNIT - hold_bond + share), liq_balance("carol"_n));
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(10 * UNIT), liq_balance("alice"_n));
-   BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
-   BOOST_REQUIRE_EQUAL(0, liq_balance(SYND_ACCOUNT));
-
-   // Forwarded once; dave takes his bond and his stake's share of the hold bond.
-   BOOST_REQUIRE_EQUAL(success(), crank());
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(5 * UNIT - hold_bond + share), liq_balance("carol"_n));
-   BOOST_REQUIRE_EQUAL(success(), bond_claim(id, "dave"_n));
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(4 * UNIT + hold_bond - share), liq_balance("dave"_n));
 } FC_LOG_AND_RETHROW()
 
 // Anyone may claim sysio.synd's forfeit for it before a step sees the ruling: the forfeit is then already
@@ -3295,34 +3614,14 @@ BOOST_FIXTURE_TEST_CASE(invalid_accounts_for_a_forfeit_claimed_by_someone_else, 
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(15 * UNIT), supply());
 } FC_LOG_AND_RETHROW()
 
-// Contract challengers receive their refund directly without recipient execution.
-BOOST_FIXTURE_TEST_CASE(valid_after_challenge_credits_a_contract_challenger, sysio_synd_tester) try {
-   const auto pubkey = ed_bytes(ed_key());
-   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
-   syndicate_and_close(1, 1, pubkey, LIQSOL, 10 * UNIT);
-   const uint64_t id = envelope_row(SOLANA, LIQSOL, 1)["request_id"].as_uint64();
-   BOOST_REQUIRE_EQUAL(success(), liq_mint("bob"_n, LIQSOL, 5 * UNIT));
-   BOOST_REQUIRE_EQUAL(success(), challenge("bob"_n, SOLANA, LIQSOL, 1));
-   set_code("bob"_n, contracts::util::block_transfer_wasm());
-   produce_blocks();
-   BOOST_REQUIRE_EQUAL(success(), rule(id, true));
-
-   // Nothing was bonded: the whole hold bond is the issuer's award.
-   BOOST_REQUIRE_EQUAL(success(), crank());
-   for (const auto& trace : last_trace->action_traces) BOOST_REQUIRE(trace.receiver != "bob"_n);
-   BOOST_REQUIRE(executed(BOND_ACCOUNT, "claim"_n));
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(5 * UNIT), liq_balance("bob"_n));
-   BOOST_REQUIRE_EQUAL(0u, feepot_balance(LIQSOL));
-   BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
-} FC_LOG_AND_RETHROW()
-
 // An envelope released whole while its request is still only BONDED can be challenged: the bond exists
 // for exactly this. The challenge rewinds the pair's queue to it, and an INVALID ruling burns everything
 // it released out of the forfeit.
 BOOST_FIXTURE_TEST_CASE(invalid_after_done_challenge_burns_the_released_amount, sysio_synd_tester) try {
-   const auto key    = ed_key();
+   const auto signer = ed_signer();
+   const auto key    = signer.get_public_key();
    const auto pubkey = ed_bytes(key);
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
    syndicate_and_close(1, 1, pubkey, LIQSOL, 10 * UNIT);
    const uint64_t id = envelope_row(SOLANA, LIQSOL, 1)["request_id"].as_uint64();
@@ -3364,6 +3663,7 @@ BOOST_FIXTURE_TEST_CASE(a_challenge_of_zero_charge_is_refused, sysio_synd_tester
    // 5 base units cover a hold bond of 5 * 1000 / 10000 = 0.
    syndicate_and_close(1, 1, ed_bytes(ed_key()), LIQPT, 5);
    BOOST_REQUIRE_EQUAL(STATE_REQUESTED, envelope_row(SOLANA, LIQPT, 1)["state"].as_string());
+   underwrite_envelope(SOLANA, LIQPT, 1);
    BOOST_REQUIRE_EQUAL(success(), liq_mint("carol"_n, LIQPT, 100));
    BOOST_REQUIRE(mentions(challenge("carol"_n, SOLANA, LIQPT, 1), CHALLENGE_ZERO));
 
@@ -3372,32 +3672,6 @@ BOOST_FIXTURE_TEST_CASE(a_challenge_of_zero_charge_is_refused, sysio_synd_tester
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(99), liq_balance("carol"_n, LIQPT_SYM));
    BOOST_REQUIRE_EQUAL(1u, feepot_balance(LIQPT));
    BOOST_REQUIRE_EQUAL(STATE_HELD, envelope_row(SOLANA, LIQPT, 1)["state"].as_string());
-} FC_LOG_AND_RETHROW()
-
-// A third party may claim sysio.synd's award of the hold bond for it before a step sees the VALID
-// ruling: the share is then already in sysio.synd's row, the step sends no claim and still forwards it.
-BOOST_FIXTURE_TEST_CASE(valid_forwards_a_hold_share_someone_else_claimed_first, sysio_synd_tester) try {
-   const auto key    = ed_key();
-   const auto pubkey = ed_bytes(key);
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
-   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
-   syndicate_and_close(1, 1, pubkey, LIQSOL, 10 * UNIT);
-   const uint64_t id = envelope_row(SOLANA, LIQSOL, 1)["request_id"].as_uint64();
-   BOOST_REQUIRE_EQUAL(success(), underwrite("dave"_n, id, 4 * UNIT, LIQSOL));
-   BOOST_REQUIRE_EQUAL(success(), liq_mint("carol"_n, LIQSOL, 5 * UNIT));
-   BOOST_REQUIRE_EQUAL(success(), challenge("carol"_n, SOLANA, LIQSOL, 1));
-   const uint64_t hold_bond = 10 * UNIT * HOLD_BPS / BPS_DENOMINATOR;
-   const uint64_t share     = hold_bond * 6 / 10;   // the 6 of 10 no bond covered
-   BOOST_REQUIRE_EQUAL(success(), rule(id, true));
-   BOOST_REQUIRE_EQUAL(success(), push(BOND_ACCOUNT, bond_abi_ser, "bob"_n, "claim"_n, mvo()
-      ("request_id", id)("account", SYND_ACCOUNT)));
-
-   BOOST_REQUIRE_EQUAL(success(), crank());
-   BOOST_REQUIRE(!executed(BOND_ACCOUNT, "claim"_n));
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(5 * UNIT - hold_bond + share), liq_balance("carol"_n));
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(10 * UNIT), liq_balance("alice"_n));
-   BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
-   BOOST_REQUIRE_EQUAL(0, liq_balance(SYND_ACCOUNT));
 } FC_LOG_AND_RETHROW()
 
 // INVALID after the envelope's yield report was released: the yield sits in sysio.liq's pending balance,
@@ -3437,10 +3711,11 @@ BOOST_FIXTURE_TEST_CASE(invalid_after_a_yield_release_keeps_the_supply_whole, sy
 // spread over steps, a third party may claim both for sysio.synd and sysio.bond may prune the request in
 // between: the step that completes the burn sends no claim and pots them from the snapshot.
 BOOST_FIXTURE_TEST_CASE(invalid_completes_from_the_snapshot_after_a_claim_and_a_prune, sysio_synd_tester) try {
-   const auto key    = ed_key();
+   const auto signer = ed_signer();
+   const auto key    = signer.get_public_key();
    const auto pubkey = ed_bytes(key);
    const auto digest = digest_of("envelope-2");
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.synd_fee_bps = 1000, .bounty = UNIT}));
    // A first envelope fills the fee pot with 2 of fees.
    syndicate_and_close(1, 1, pubkey, LIQSOL, 20 * UNIT);
@@ -3519,9 +3794,10 @@ BOOST_FIXTURE_TEST_CASE(invalid_after_a_partial_park_burns_the_parked_part_out_o
 
 // Frozen queue steps move nothing. Clearing refills by elapsed epochs, capped at burst.
 BOOST_FIXTURE_TEST_CASE(a_freeze_stops_release_and_refill_is_capped_at_burst, sysio_synd_tester) try {
-   const auto key    = ed_key();
+   const auto signer = ed_signer();
+   const auto key    = signer.get_public_key();
    const auto pubkey = ed_bytes(key);
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.synd_burst = 20 * UNIT, .synd_refill = 4 * UNIT}));
    BOOST_REQUIRE_EQUAL(success(), set_epoch(1));
    syndicate_and_close(1, 1, pubkey, LIQSOL, 60 * UNIT);
@@ -3570,16 +3846,18 @@ BOOST_FIXTURE_TEST_CASE(a_freeze_stops_release_and_refill_is_capped_at_burst, sy
 // them is refused: desyndicate, sweep, sweepyield and dropenv. Intake still holds new syndications. After
 // the clear each refused action succeeds.
 BOOST_FIXTURE_TEST_CASE(a_freeze_admits_what_comes_in_and_refuses_what_leaves, sysio_synd_tester) try {
-   const auto key    = ed_key();
+   const auto signer = ed_signer();
+   const auto key    = signer.get_public_key();
    const auto pubkey = ed_bytes(key);
    constexpr auto SVM = ChainKind::CHAIN_KIND_SVM;
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.challenge_extra = UNIT}));
    BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 10 * UNIT));
    BOOST_REQUIRE_EQUAL(success(), liq_mint("carol"_n, LIQSOL, 5 * UNIT));
    syndicate_and_close(1, 1, pubkey, LIQSOL, 10 * UNIT);
    const uint64_t id = envelope_row(SOLANA, LIQSOL, 1)["request_id"].as_uint64();
-   BOOST_REQUIRE_EQUAL(REQUEST_OPEN, bond_request(id)["state"].as_string());
+   underwrite_envelope(SOLANA, LIQSOL, 1);
+   BOOST_REQUIRE_EQUAL(REQUEST_BONDED, bond_request(id)["state"].as_string());
 
    BOOST_REQUIRE_EQUAL(success(), andon_pull());
 
@@ -3627,6 +3905,7 @@ BOOST_FIXTURE_TEST_CASE(a_freeze_defers_the_parked_delivery_of_a_new_link, sysio
    BOOST_REQUIRE_EQUAL(success(), createlink("alice"_n, priv));
    BOOST_REQUIRE(executed(SYND_ACCOUNT, "linkswept"_n));
    BOOST_REQUIRE(console_has(LINKSWEPT_FROZEN));
+   BOOST_REQUIRE(receipts("logparked"_n).empty());
    BOOST_REQUIRE_EQUAL(30 * UNIT, parked_balance(LIQETH, ChainKind::CHAIN_KIND_EVM, pubkey));
    BOOST_REQUIRE_EQUAL(0, liq_balance("alice"_n, LIQETH_SYM));
    BOOST_REQUIRE_EQUAL(frozen(), sweep("alice"_n, ChainKind::CHAIN_KIND_EVM));
@@ -3634,6 +3913,7 @@ BOOST_FIXTURE_TEST_CASE(a_freeze_defers_the_parked_delivery_of_a_new_link, sysio
    BOOST_REQUIRE_EQUAL(success(), andon_clear());
    BOOST_REQUIRE_EQUAL(success(), sweep("alice"_n, ChainKind::CHAIN_KIND_EVM));
    BOOST_REQUIRE(parked_row(LIQETH, ChainKind::CHAIN_KIND_EVM, pubkey).is_null());
+   BOOST_REQUIRE_EQUAL(receipts("logparked"_n).size(), 1u);
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(30 * UNIT), liq_balance("alice"_n, LIQETH_SYM));
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(3 * UNIT), liq_owed("alice"_n, LIQETH_SYM));
 } FC_LOG_AND_RETHROW()
@@ -3648,6 +3928,7 @@ BOOST_FIXTURE_TEST_CASE(a_freeze_defers_the_invalid_burn, sysio_synd_released_te
 
    BOOST_REQUIRE_EQUAL(success(), crank());
    BOOST_REQUIRE(console_has(QUEUE_FROZEN_BURN));
+   BOOST_REQUIRE(receipts("logburn"_n).empty());
    BOOST_REQUIRE(!executed(BOND_ACCOUNT, "claim"_n));
    BOOST_REQUIRE(!executed(LIQ_ACCOUNT, "burn"_n));
    auto envelope = envelope_row(SOLANA, LIQSOL, 1);
@@ -3662,6 +3943,7 @@ BOOST_FIXTURE_TEST_CASE(a_freeze_defers_the_invalid_burn, sysio_synd_released_te
    BOOST_REQUIRE_EQUAL(success(), crank());
    BOOST_REQUIRE(executed(BOND_ACCOUNT, "claim"_n));
    BOOST_REQUIRE(console_has(QUEUE_INVALID_BURNED));
+   BOOST_REQUIRE_EQUAL(receipts("logburn"_n).size(), 1u);
    envelope = envelope_row(SOLANA, LIQSOL, 1);
    BOOST_REQUIRE_EQUAL(STATE_INVALID, envelope["state"].as_string());
    BOOST_REQUIRE_EQUAL(10 * UNIT, envelope["burned"].as_uint64());
@@ -3670,52 +3952,13 @@ BOOST_FIXTURE_TEST_CASE(a_freeze_defers_the_invalid_burn, sysio_synd_released_te
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(15 * UNIT), supply());
 } FC_LOG_AND_RETHROW()
 
-// A VALID ruling seen while the cord is pulled is recorded with the challenger's hold share snapshotted and
-// pending, but nothing is claimed or forwarded; the first step after the clear forwards the share once and
-// releases the envelope.
-BOOST_FIXTURE_TEST_CASE(a_freeze_defers_the_hold_share_of_a_valid_ruling, sysio_synd_tester) try {
-   const auto key    = ed_key();
-   const auto pubkey = ed_bytes(key);
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
-   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
-   syndicate_and_close(1, 1, pubkey, LIQSOL, 10 * UNIT);
-   const uint64_t id = envelope_row(SOLANA, LIQSOL, 1)["request_id"].as_uint64();
-   BOOST_REQUIRE_EQUAL(success(), underwrite("dave"_n, id, 4 * UNIT, LIQSOL));
-   BOOST_REQUIRE_EQUAL(success(), liq_mint("carol"_n, LIQSOL, 5 * UNIT));
-   BOOST_REQUIRE_EQUAL(success(), challenge("carol"_n, SOLANA, LIQSOL, 1));
-   const uint64_t hold_bond = 10 * UNIT * HOLD_BPS / BPS_DENOMINATOR;
-   const uint64_t share     = hold_bond * 6 / 10;   // the 6 of 10 no bond covered
-   BOOST_REQUIRE_EQUAL(success(), rule(id, true));
-   BOOST_REQUIRE_EQUAL(success(), andon_pull());
-
-   BOOST_REQUIRE_EQUAL(success(), crank());
-   BOOST_REQUIRE(console_has(QUEUE_FROZEN_SHARE));
-   BOOST_REQUIRE(!executed(BOND_ACCOUNT, "claim"_n));
-   auto envelope = envelope_row(SOLANA, LIQSOL, 1);
-   BOOST_REQUIRE_EQUAL("VALID", envelope["outcome"].as_string());
-   BOOST_REQUIRE_EQUAL(STATE_RELEASABLE, envelope["state"].as_string());
-   BOOST_REQUIRE_EQUAL(share, envelope["hold_share"].as_uint64());
-   BOOST_REQUIRE_EQUAL("carol"_n, envelope["hold_beneficiary"].as<name>());
-   BOOST_REQUIRE(envelope["share_pending"].as_bool());
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(5 * UNIT - hold_bond), liq_balance("carol"_n));
-   BOOST_REQUIRE_EQUAL(0, liq_balance("alice"_n));
-
-   BOOST_REQUIRE_EQUAL(success(), andon_clear());
-   BOOST_REQUIRE_EQUAL(success(), crank());
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(5 * UNIT - hold_bond + share), liq_balance("carol"_n));
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(10 * UNIT), liq_balance("alice"_n));
-   BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
-   BOOST_REQUIRE(!envelope_row(SOLANA, LIQSOL, 1)["share_pending"].as_bool());
-   BOOST_REQUIRE_EQUAL(success(), crank());
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(5 * UNIT - hold_bond + share), liq_balance("carol"_n));
-} FC_LOG_AND_RETHROW()
-
 // A request is still issued while the cord is pulled: closeenv requests the next envelope and a bond can be
 // placed on it -- the bond moves INTO sysio.bond -- while nothing releases until the clear.
 BOOST_FIXTURE_TEST_CASE(a_freeze_still_issues_requests_and_takes_bonds, sysio_synd_tester) try {
-   const auto key    = ed_key();
+   const auto signer = ed_signer();
+   const auto key    = signer.get_public_key();
    const auto pubkey = ed_bytes(key);
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
    BOOST_REQUIRE_EQUAL(success(), andon_pull());
 
@@ -3733,57 +3976,14 @@ BOOST_FIXTURE_TEST_CASE(a_freeze_still_issues_requests_and_takes_bonds, sysio_sy
    BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
 } FC_LOG_AND_RETHROW()
 
-// The forward survives a prune: every claim on a VALID request is made before the pull (the underwriter's,
-// and sysio.synd's award claimed for it by a bystander), the frozen step records VALID with its snapshot,
-// and sysio.bond prunes the request past its retention while the cord is still pulled. The first step after
-// the clear forwards the challenger's share from the snapshot, once, and releases the envelope.
-BOOST_FIXTURE_TEST_CASE(a_valid_forward_survives_a_prune_during_the_freeze, sysio_synd_tester) try {
-   const auto key    = ed_key();
-   const auto pubkey = ed_bytes(key);
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
-   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
-   syndicate_and_close(1, 1, pubkey, LIQSOL, 10 * UNIT);
-   const uint64_t id = envelope_row(SOLANA, LIQSOL, 1)["request_id"].as_uint64();
-   BOOST_REQUIRE_EQUAL(success(), underwrite("dave"_n, id, 4 * UNIT, LIQSOL));
-   BOOST_REQUIRE_EQUAL(success(), liq_mint("carol"_n, LIQSOL, 5 * UNIT));
-   BOOST_REQUIRE_EQUAL(success(), challenge("carol"_n, SOLANA, LIQSOL, 1));
-   const uint64_t hold_bond = 10 * UNIT * HOLD_BPS / BPS_DENOMINATOR;
-   const uint64_t share     = hold_bond * 6 / 10;   // the 6 of 10 no bond covered
-   BOOST_REQUIRE_EQUAL(success(), rule(id, true));
-   BOOST_REQUIRE_EQUAL(success(), bond_claim(id, "dave"_n));
-   BOOST_REQUIRE_EQUAL(success(), push(BOND_ACCOUNT, bond_abi_ser, "bob"_n, "claim"_n, mvo()
-      ("request_id", id)("account", SYND_ACCOUNT)));
-
-   BOOST_REQUIRE_EQUAL(success(), andon_pull());
-   BOOST_REQUIRE_EQUAL(success(), crank());
-   BOOST_REQUIRE_EQUAL("VALID", envelope_row(SOLANA, LIQSOL, 1)["outcome"].as_string());
-   BOOST_REQUIRE(envelope_row(SOLANA, LIQSOL, 1)["share_pending"].as_bool());
-
-   produce_block(fc::seconds(PRUNE_RETENTION_SEC + 1));
-   BOOST_REQUIRE_EQUAL(success(), bond_prune(id, 10));
-   BOOST_REQUIRE(bond_request(id).is_null());
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(5 * UNIT - hold_bond), liq_balance("carol"_n));
-
-   BOOST_REQUIRE_EQUAL(success(), andon_clear());
-   BOOST_REQUIRE_EQUAL(success(), crank());
-   BOOST_REQUIRE(!executed(BOND_ACCOUNT, "claim"_n));
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(5 * UNIT - hold_bond + share), liq_balance("carol"_n));
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(10 * UNIT), liq_balance("alice"_n));
-   const auto envelope = envelope_row(SOLANA, LIQSOL, 1);
-   BOOST_REQUIRE_EQUAL(STATE_DONE, envelope["state"].as_string());
-   BOOST_REQUIRE(!envelope["share_pending"].as_bool());
-   BOOST_REQUIRE_EQUAL(0, liq_balance(SYND_ACCOUNT));
-   BOOST_REQUIRE_EQUAL(success(), crank());
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(5 * UNIT - hold_bond + share), liq_balance("carol"_n));
-} FC_LOG_AND_RETHROW()
-
 // A bucket holding a positive level at the pull keeps it through a frozen crank -- nothing ticks and
 // nothing is spent. After clear, elapsed epochs refill the 40-unit burst before the queued 30
 // units are released, leaving 10 units of capacity.
 BOOST_FIXTURE_TEST_CASE(a_freeze_keeps_a_positive_bucket_level, sysio_synd_tester) try {
-   const auto key    = ed_key();
+   const auto signer = ed_signer();
+   const auto key    = signer.get_public_key();
    const auto pubkey = ed_bytes(key);
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.synd_burst = 40 * UNIT, .synd_refill = 2 * UNIT}));
    BOOST_REQUIRE_EQUAL(success(), set_epoch(1));
    syndicate_and_close(1, 1, pubkey, LIQSOL, 10 * UNIT);
@@ -3818,9 +4018,10 @@ BOOST_FIXTURE_TEST_CASE(a_freeze_keeps_a_positive_bucket_level, sysio_synd_teste
 
 // Repeated clears and pulls do not multiply capacity beyond the configured burst.
 BOOST_FIXTURE_TEST_CASE(repeated_freezes_do_not_exceed_the_burst_cap, sysio_synd_tester) try {
-   const auto key    = ed_key();
+   const auto signer = ed_signer();
+   const auto key    = signer.get_public_key();
    const auto pubkey = ed_bytes(key);
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.synd_burst = 20 * UNIT, .synd_refill = 4 * UNIT}));
    BOOST_REQUIRE_EQUAL(success(), set_epoch(1));
    syndicate_and_close(1, 1, pubkey, LIQSOL, 60 * UNIT);
@@ -3864,6 +4065,146 @@ BOOST_FIXTURE_TEST_CASE(custody_equal_to_the_outstanding_records_nothing, sysio_
    BOOST_REQUIRE(!console_has(EXCESS));
    require_no_shortfall();
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(10 * UNIT), supply());
+} FC_LOG_AND_RETHROW()
+
+/// LIQETH accepts losses up to 1% on both intake paths; a single base unit beyond pulls Andon.
+BOOST_FIXTURE_TEST_CASE(custody_tolerance_is_inclusive_on_syndication_and_yield, sysio_synd_tester) try {
+   constexpr uint32_t tolerance_bps = 100;
+   constexpr uint64_t outstanding = 100 * UNIT;
+   constexpr uint64_t loss = UNIT;
+   const auto digest = digest_of("eth-tolerance");
+   const auto pubkey = em_bytes(em_key());
+   BOOST_REQUIRE_EQUAL(success(), setconfig(ETH, LIQETH, {.custody_shortfall_bps = tolerance_bps}));
+   BOOST_REQUIRE_EQUAL(success(), onsynd(ETH, 1, digest, 1, ChainKind::CHAIN_KIND_EVM, pubkey,
+      LIQETH, outstanding, MSGCH_ACCOUNT, outstanding - loss));
+   BOOST_REQUIRE(console_has(TOLERATED));
+   require_no_shortfall();
+   BOOST_REQUIRE_EQUAL(success(), onyield(ETH, 1, digest, 2, 1, LIQETH, UNIT, MSGCH_ACCOUNT,
+      outstanding - loss + 1));
+   require_no_shortfall();
+   BOOST_REQUIRE_EQUAL(success(), onyield(ETH, 1, digest, 3, 1, LIQETH, UNIT, MSGCH_ACCOUNT,
+      outstanding - loss));
+   require_no_shortfall();
+   BOOST_REQUIRE_EQUAL(success(), onyield(ETH, 1, digest, 4, 1, LIQETH, UNIT, MSGCH_ACCOUNT,
+      outstanding - loss - 1));
+   BOOST_REQUIRE(cord_pulled());
+   const auto rows = mismatch_rows();
+   BOOST_REQUIRE_EQUAL(1u, rows.size());
+   require_mismatch(rows[0], ETH, LIQETH, 1, 4, MISMATCH_YIELD, outstanding - loss - 1, outstanding);
+} FC_LOG_AND_RETHROW()
+
+/// A configured token cannot lend its tolerance to another token, even on the same outpost.
+BOOST_FIXTURE_TEST_CASE(custody_tolerance_is_per_pair_and_can_be_disabled, sysio_synd_tester) try {
+   constexpr uint32_t tolerance_bps = 100;
+   constexpr uint64_t amount = 100 * UNIT;
+   const auto digest = digest_of("pair-tolerance");
+   const auto pubkey = ed_bytes(ed_key());
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.custody_shortfall_bps = tolerance_bps}));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQTWO, {}));
+   BOOST_REQUIRE_EQUAL(success(), onsynd(SOLANA, 1, digest, 1, ChainKind::CHAIN_KIND_SVM, pubkey,
+      LIQSOL, amount, MSGCH_ACCOUNT, amount - 1));
+   require_no_shortfall();
+   BOOST_REQUIRE_EQUAL(success(), onsynd(SOLANA, 1, digest, 2, ChainKind::CHAIN_KIND_SVM, pubkey,
+      LIQTWO, amount, MSGCH_ACCOUNT, amount - 1));
+   BOOST_REQUIRE(cord_pulled());
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
+   BOOST_REQUIRE_EQUAL(success(), onyield(SOLANA, 1, digest, 3, 1, LIQSOL, UNIT, MSGCH_ACCOUNT, amount - 1));
+   BOOST_REQUIRE_EQUAL(2u, mismatch_rows().size());
+} FC_LOG_AND_RETHROW()
+
+/// Increasing tolerance never erases existing evidence or permits reconciliation while underbacked.
+BOOST_FIXTURE_TEST_CASE(custody_tolerance_preserves_incidents_and_full_backing_reconciliation, sysio_synd_tester) try {
+   constexpr uint64_t amount = 100 * UNIT;
+   constexpr uint32_t tolerance_bps = 100;
+   const auto digest = digest_of("incident-tolerance");
+   BOOST_REQUIRE_EQUAL(success(), onsynd(SOLANA, 1, digest, 1, ChainKind::CHAIN_KIND_SVM, ed_bytes(ed_key()),
+      LIQSOL, amount, MSGCH_ACCOUNT, amount - 1));
+   BOOST_REQUIRE(cord_pulled());
+   const auto original = mismatch_rows();
+   BOOST_REQUIRE_EQUAL(1u, original.size());
+   require_mismatch(original[0], SOLANA, LIQSOL, 1, 1, MISMATCH_SYNDICATION, amount - 1, amount);
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.custody_shortfall_bps = tolerance_bps}));
+   BOOST_REQUIRE_EQUAL(success(), onyield(SOLANA, 1, digest, 2, 1, LIQSOL, UNIT, MSGCH_ACCOUNT, amount - 1));
+   const auto rows = mismatch_rows();
+   BOOST_REQUIRE_EQUAL(1u, rows.size());
+   BOOST_REQUIRE_EQUAL(1u, rows[0]["sequence"].as_uint64());
+   BOOST_REQUIRE_EQUAL(original[0]["at"].as<time_point_sec>(), rows[0]["at"].as<time_point_sec>());
+   BOOST_REQUIRE(cord_pulled());
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("custody still below outstanding"), reconcile(SYSIO_ACCOUNT, amount - 1));
+   BOOST_REQUIRE_EQUAL(success(), reconcile(SYSIO_ACCOUNT, amount));
+} FC_LOG_AND_RETHROW()
+
+/// Fractional-base-unit allowances round down; the ratio comparison stays exact at the asset limit.
+BOOST_FIXTURE_TEST_CASE(custody_tolerance_handles_dust_and_large_outstanding, sysio_synd_tester) try {
+   constexpr uint32_t tolerance_bps = 100;
+   // Leave mint headroom for yield intake and align the held amount with the bond increment.
+   constexpr uint64_t amount = (static_cast<uint64_t>(asset::max_amount) / UNIT - 1) * UNIT;
+   constexpr uint64_t percent_denominator = 100;
+   const auto digest = digest_of("large-tolerance");
+   BOOST_REQUIRE_EQUAL(success(), setconfig(ETH, LIQETH, {.custody_shortfall_bps = tolerance_bps}));
+   BOOST_REQUIRE_EQUAL(success(), onsynd(ETH, 1, digest, 1, ChainKind::CHAIN_KIND_EVM, em_bytes(em_key()),
+      LIQETH, amount, MSGCH_ACCOUNT, amount - amount / percent_denominator));
+   require_no_shortfall();
+   BOOST_REQUIRE_EQUAL(success(), onyield(ETH, 1, digest, 2, 1, LIQETH, 1, MSGCH_ACCOUNT,
+      amount - amount / percent_denominator - 1));
+   BOOST_REQUIRE(cord_pulled());
+   // Unlike the near-boundary readings, half backing distinguishes widened products from uint64
+   // wraparound: narrowing both products would tolerate this report and leave sequence 2's evidence.
+   constexpr uint64_t half_backed = amount / 2;
+   BOOST_REQUIRE_EQUAL(success(), onyield(ETH, 1, digest, 3, 1, LIQETH, 1, MSGCH_ACCOUNT, half_backed));
+   const auto large_incidents = mismatch_rows();
+   BOOST_REQUIRE_EQUAL(1u, large_incidents.size());
+   require_mismatch(large_incidents[0], ETH, LIQETH, 1, 3, MISMATCH_YIELD, half_backed, amount);
+   BOOST_REQUIRE_EQUAL(success(), onsynd(SOLANA, 1, digest, 1, ChainKind::CHAIN_KIND_SVM, ed_bytes(ed_key()),
+      LIQSOL, 1, MSGCH_ACCOUNT, 1));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.custody_shortfall_bps = tolerance_bps}));
+   BOOST_REQUIRE_EQUAL(success(), onyield(SOLANA, 1, digest, 2, 1, LIQSOL, 1, MSGCH_ACCOUNT, 0));
+   BOOST_REQUIRE(cord_pulled());
+   BOOST_REQUIRE_EQUAL(2u, mismatch_rows().size());
+} FC_LOG_AND_RETHROW()
+
+/// Configuration accepts the hardcoded 10% cap and rejects every value above it.
+BOOST_FIXTURE_TEST_CASE(custody_tolerance_configuration_is_bounded, sysio_synd_tester) try {
+   constexpr uint32_t maximum_bps = 1'000;
+   constexpr uint32_t full_loss_bps = 10'000;
+   constexpr std::string_view message = "custody shortfall tolerance must be at most 1000 basis points";
+   for (const uint32_t invalid : {maximum_bps + 1, full_loss_bps, std::numeric_limits<uint32_t>::max()}) {
+      BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(message)),
+         setconfig(ETH, LIQETH, {.custody_shortfall_bps = invalid}));
+      BOOST_REQUIRE(config_row(ETH, LIQETH).is_null());
+   }
+   BOOST_REQUIRE_EQUAL(success(), setconfig(ETH, LIQETH, {.custody_shortfall_bps = maximum_bps}));
+   BOOST_REQUIRE_EQUAL(maximum_bps, config_row(ETH, LIQETH)["custody_shortfall_bps"].as_uint64());
+   BOOST_REQUIRE_EQUAL(success(), onsynd(ETH, 1, digest_of("total-loss"), 1, ChainKind::CHAIN_KIND_EVM,
+      em_bytes(em_key()), LIQETH, UNIT, MSGCH_ACCOUNT, 0));
+   BOOST_REQUIRE(cord_pulled());
+} FC_LOG_AND_RETHROW()
+
+/// The allowance includes pending yield and syndication's imminent mint; the next unit of loss trips it.
+BOOST_FIXTURE_TEST_CASE(custody_tolerance_uses_all_outstanding_on_syndication, sysio_synd_tester) try {
+   constexpr uint32_t tolerance_bps = 100;
+   constexpr uint64_t initial = 50 * UNIT;
+   constexpr uint64_t pending_yield = 49 * UNIT;
+   constexpr uint64_t amount = UNIT;
+   constexpr uint64_t outstanding = initial + pending_yield + amount;
+   constexpr uint64_t loss = UNIT;
+   constexpr uint64_t percent_denominator = 100;
+   constexpr uint64_t next_reported = outstanding + amount - (outstanding + amount) / percent_denominator - 1;
+   const auto pubkey = ed_bytes(ed_key());
+   const auto digest = digest_of("pending-tolerance");
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.custody_shortfall_bps = tolerance_bps}));
+   BOOST_REQUIRE_EQUAL(success(), liq_mint(SYND_ACCOUNT, LIQSOL, initial));
+   BOOST_REQUIRE_EQUAL(success(), liq_mintyield(SOLANA, LIQSOL, pending_yield));
+   BOOST_REQUIRE_EQUAL(success(), onsynd(SOLANA, 1, digest, 1, ChainKind::CHAIN_KIND_SVM,
+      pubkey, LIQSOL, amount, MSGCH_ACCOUNT, outstanding - loss));
+   require_no_shortfall();
+   BOOST_REQUIRE_EQUAL(success(), onsynd(SOLANA, 1, digest, 2, ChainKind::CHAIN_KIND_SVM,
+      pubkey, LIQSOL, amount, MSGCH_ACCOUNT, next_reported));
+   BOOST_REQUIRE(cord_pulled());
+   const auto rows = mismatch_rows();
+   BOOST_REQUIRE_EQUAL(1u, rows.size());
+   require_mismatch(rows[0], SOLANA, LIQSOL, 1, 2, MISMATCH_SYNDICATION,
+      next_reported, outstanding + amount);
 } FC_LOG_AND_RETHROW()
 
 // Custody above the outstanding -- a donation to the custody account -- is normal: it is printed as EXCESS
@@ -3977,7 +4318,7 @@ BOOST_FIXTURE_TEST_CASE(a_desyndication_in_flight_leaves_the_check_passing, sysi
    const auto     pubkey = ed_bytes(ed_key());
    constexpr auto SVM    = ChainKind::CHAIN_KIND_SVM;
    BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));   // the released syndication
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_key()));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_signer()));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.desynd_burst = 100 * UNIT}));
    BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, 40 * UNIT));
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(60 * UNIT), supply());
@@ -4003,7 +4344,7 @@ BOOST_FIXTURE_TEST_CASE(a_desyndication_with_a_fee_in_flight_leaves_the_check_pa
    const auto     pubkey = ed_bytes(ed_key());
    constexpr auto SVM    = ChainKind::CHAIN_KIND_SVM;
    BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));   // the released syndication
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_key()));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_signer()));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.desynd_fee_bps = 250, .desynd_burst = 100 * UNIT}));
    BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, 40 * UNIT));
    BOOST_REQUIRE_EQUAL(UNIT, feepot_balance(LIQSOL));
@@ -4099,7 +4440,7 @@ BOOST_FIXTURE_TEST_CASE(a_return_refund_is_seen_by_the_next_comparison, sysio_sy
    const auto     pubkey = ed_bytes(ed_key());
    constexpr auto SVM    = ChainKind::CHAIN_KIND_SVM;
    BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 20 * UNIT));   // released: custody 20
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_key()));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_signer()));
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.desynd_burst = 100 * UNIT}));
    BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, 4 * UNIT));
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(16 * UNIT), supply());
@@ -4149,9 +4490,6 @@ BOOST_FIXTURE_TEST_CASE(incident_reconciliation_is_explicit_and_pair_local, sysi
    BOOST_REQUIRE_EQUAL(success(), onyield(SOLANA, 1, digest_of("one"), 2, 2, LIQSOL, UNIT,
                                          MSGCH_ACCOUNT, 10 * UNIT));
    BOOST_REQUIRE_EQUAL(1u, mismatch_rows().size());
-   const auto reconcile = [&](name signer, uint64_t reported) { return push(SYND_ACCOUNT, synd_abi_ser,
-      signer, "reconcile"_n, mvo()("chain_code", codename_mvo(SOLANA))
-      ("token_code", codename_mvo(LIQSOL))("reported", reported)); };
    BOOST_REQUIRE(mentions(reconcile("alice"_n, 10 * UNIT), "missing authority of sysio"));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("custody still below outstanding"), reconcile(SYSIO_ACCOUNT, 9 * UNIT));
    BOOST_REQUIRE_EQUAL(success(), reconcile(SYSIO_ACCOUNT, 10 * UNIT));
@@ -4239,11 +4577,12 @@ struct generic_synd_tester : sysio_synd_tester {
          BOOST_REQUIRE_EQUAL(success(), regtoken(a.token, a.kind, a.chain));
          BOOST_REQUIRE_EQUAL(success(), create_shadow(sym(i), a.chain, a.token));
          for (const name account : {"alice"_n, "carol"_n, "dave"_n}) {
-            const auto key = a.kind == ChainKind::CHAIN_KIND_EVM ? em_key() : ed_key();
+            // Linked before anything is parked, so the link delivers nothing.
+            const auto signer = fc::crypto::private_key::generate(a.kind == ChainKind::CHAIN_KIND_EVM
+               ? fc::crypto::private_key::key_type::em : fc::crypto::private_key::key_type::ed);
+            const auto key   = signer.get_public_key();
             const auto bytes = a.kind == ChainKind::CHAIN_KIND_EVM ? em_bytes(key) : ed_bytes(key);
-            BOOST_REQUIRE_EQUAL(success(), push(AUTHEX_ACCOUNT, authex_abi_ser, AUTHEX_ACCOUNT, "recordlink"_n,
-               mvo()("account", account)("chain_kind", a.kind)("pub_key", key)
-                  ("native_address", native_address_of(key))));
+            BOOST_REQUIRE_EQUAL(success(), createlink(account, signer, a.kind));
             if (account == "alice"_n) users[i] = bytes;
             else {
                outposts[i].donate(Bootstrap);
@@ -4380,7 +4719,9 @@ BOOST_FIXTURE_TEST_CASE(generic_parked_credit_yield_conversion_and_fee_rounded_r
    constexpr uint64_t Yield = 10 * UNIT;
    constexpr uint32_t FeeBps = 37;
    constexpr uint64_t PoolSeed = 1'000 * UNIT;
-   constexpr uint32_t Horizon = 86'400, DepthBps = 300;
+   constexpr int32_t PoolFee = 30;
+   // setyield caps a clip at the pair's fee.
+   constexpr uint32_t Horizon = 86'400, DepthBps = PoolFee;
    constexpr int64_t ClipFloor = 1000;
    for (size_t i = 0; i < outposts.size(); ++i) {
       BOOST_TEST_CONTEXT("chain=" << outposts[i].asset().chain) {
@@ -4390,7 +4731,7 @@ BOOST_FIXTURE_TEST_CASE(generic_parked_credit_yield_conversion_and_fee_rounded_r
          const auto pair = symbol::from_string(i == 0 ? "9,POOLA" : "9,POOLB");
          external.donate(PoolSeed);
          BOOST_REQUIRE_EQUAL(success(), create_pool(a.chain, a.token, pair, PoolSeed, PoolSeed,
-            30, 0, Horizon, DepthBps, ClipFloor));
+            PoolFee, 0, Horizon, DepthBps, ClipFloor));
          BOOST_REQUIRE_EQUAL(success(), setconfig(a.chain, a.token,
             {.synd_fee_bps = FeeBps, .desynd_fee_bps = FeeBps, .window_sec = Window}));
          const auto private_key = fc::crypto::private_key::generate(a.kind == ChainKind::CHAIN_KIND_EVM
@@ -4592,6 +4933,223 @@ BOOST_AUTO_TEST_CASE(generic_governance_and_provider_release_have_identical_sett
          }
       }
    }
+}
+
+/// Equal-value deposits have distinct admitted identities; replays and bad intake produce no receipt.
+BOOST_FIXTURE_TEST_CASE(receipts_bind_intakes_without_accepting_forged_logs, sysio_synd_tester) {
+   const auto bytes = ed_bytes(ed_key());
+   const auto digest = digest_of("receipt-envelope");
+   for (const uint64_t sequence : {1u, 2u}) {
+      BOOST_REQUIRE_EQUAL(success(),
+                          onsynd(SOLANA, 1, digest, sequence, ChainKind::CHAIN_KIND_SVM, bytes, LIQSOL, UNIT));
+      const auto logs = receipts("logintake"_n);
+      BOOST_REQUIRE_EQUAL(logs.size(), 1u);
+      const auto receipt = logs[0];
+      BOOST_REQUIRE_EQUAL(receipt["sequence"].as_uint64(), sequence);
+      BOOST_REQUIRE_EQUAL(receipt["item_id"].as_uint64(), sequence);
+      BOOST_REQUIRE_EQUAL(receipt["amount"].as_uint64(), UNIT);
+      BOOST_REQUIRE_EQUAL(receipt["digest"].as<fc::sha256>(), digest);
+      BOOST_REQUIRE(receipt["pubkey"].as<std::vector<char>>() == bytes);
+      BOOST_REQUIRE(mentions(push(SYND_ACCOUNT, synd_abi_ser, SYND_ACCOUNT, "logintake"_n, mvo()("receipt", receipt)),
+                             "self inline action"));
+      BOOST_REQUIRE(mentions(push(SYND_ACCOUNT, synd_abi_ser, "alice"_n, "logintake"_n, mvo()("receipt", receipt)),
+                             "missing authority"));
+   }
+   BOOST_REQUIRE_EQUAL(success(), onsynd(SOLANA, 1, digest, 2, ChainKind::CHAIN_KIND_SVM, bytes, LIQSOL, UNIT));
+   BOOST_REQUIRE(receipts("logintake"_n).empty());
+   BOOST_REQUIRE_EQUAL(success(), onsynd(SOLANA, 1, digest, 3, ChainKind::CHAIN_KIND_SVM, bytes, LIQNONE, UNIT));
+   BOOST_REQUIRE(receipts("logintake"_n).empty());
+   const auto evm_bytes = em_bytes(em_key());
+   BOOST_REQUIRE_EQUAL(success(), onsynd(ETH, 1, digest, 1, ChainKind::CHAIN_KIND_EVM, evm_bytes, LIQETH, UNIT));
+   const auto eth_log = receipts("logintake"_n);
+   BOOST_REQUIRE_EQUAL(eth_log.size(), 1u);
+   BOOST_REQUIRE_EQUAL(eth_log[0]["chain_code"].as_string(), ETH);
+   BOOST_REQUIRE_EQUAL(eth_log[0]["token_code"].as_string(), LIQETH);
+   BOOST_REQUIRE_EQUAL(eth_log[0]["item_id"].as_uint64(), 3u);
+}
+
+/// Each tranche records its fee, actual recipient and remaining principal before item erasure.
+BOOST_FIXTURE_TEST_CASE(receipts_correlate_partial_release_fee_and_item_erasure, sysio_synd_tester) {
+   const auto signer = ed_signer();
+   const auto bytes = ed_bytes(signer.get_public_key());
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
+   BOOST_REQUIRE_EQUAL(
+      success(), setconfig(SOLANA, LIQSOL, {.synd_fee_bps = 1000, .synd_burst = 4 * UNIT, .synd_refill = 4 * UNIT}));
+   syndicate_and_close(1, 1, bytes, LIQSOL, 10 * UNIT);
+   BOOST_REQUIRE(receipts("logrelease"_n).empty());
+   underwrite_envelope(SOLANA, LIQSOL, 1);
+   uint64_t released = 0;
+   uint64_t fees = 0;
+   for (uint32_t epoch = 1; epoch <= 3; ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(), set_epoch(epoch));
+      BOOST_REQUIRE_EQUAL(success(), crank());
+      const auto logs = receipts("logrelease"_n);
+      BOOST_REQUIRE_EQUAL(logs.size(), 1u);
+      const auto log = logs[0];
+      const auto gross = log["gross"].as_uint64();
+      const auto fee = log["fee"].as_uint64();
+      BOOST_REQUIRE_EQUAL(log["item_id"].as_uint64(), 1u);
+      BOOST_REQUIRE_EQUAL(log["destination"].as_string(), "ACCOUNT");
+      BOOST_REQUIRE_EQUAL(log["recipient"].as_string(), "alice");
+      BOOST_REQUIRE_EQUAL(log["parked_batch_id"].as_uint64(), 0u);
+      BOOST_REQUIRE_EQUAL(log["net"].as_uint64() + fee, gross);
+      released += gross;
+      fees += fee;
+      BOOST_REQUIRE_EQUAL(log["remaining"].as_uint64(), 10 * UNIT - released);
+      BOOST_REQUIRE_EQUAL(liq_balance("alice"_n), int64_t(released - fees));
+      BOOST_REQUIRE_EQUAL(feepot_balance(LIQSOL), fees);
+      BOOST_REQUIRE(mentions(push(SYND_ACCOUNT, synd_abi_ser, SYND_ACCOUNT, "logrelease"_n, mvo()("receipt", log)),
+                             "self inline action"));
+      BOOST_REQUIRE_EQUAL(success(), crank());
+      BOOST_REQUIRE(receipts("logrelease"_n).empty());
+   }
+   BOOST_REQUIRE(item_row(1).is_null());
+   BOOST_REQUIRE_EQUAL(released, 10 * UNIT);
+}
+
+/// One payout joins multiple live intakes without assigning imported principal to them.
+BOOST_FIXTURE_TEST_CASE(receipts_join_multiple_parked_items_and_preserve_unattributed_import, sysio_synd_tester) {
+   const auto signer = ed_signer();
+   const auto bytes = ed_bytes(signer.get_public_key());
+   BOOST_REQUIRE_EQUAL(success(), importsynd(SOLANA, LIQSOL, {credit(bytes, 2 * UNIT)}));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.synd_fee_bps = 1000}));
+   const auto digest = digest_of("parked-receipt-envelope");
+   for (const uint64_t sequence : {1u, 2u})
+      BOOST_REQUIRE_EQUAL(success(),
+                          onsynd(SOLANA, 1, digest, sequence, ChainKind::CHAIN_KIND_SVM, bytes, LIQSOL, 10 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), closeenv(SOLANA, 1, digest));
+   underwrite_envelope(SOLANA, LIQSOL, 1);
+   BOOST_REQUIRE_EQUAL(success(), crank());
+   const auto releases = receipts("logrelease"_n);
+   BOOST_REQUIRE_EQUAL(releases.size(), 2u);
+   const auto batch_id = releases[0]["parked_batch_id"].as_uint64();
+   BOOST_REQUIRE_GT(batch_id, 0u);
+   for (const auto& release : releases) {
+      BOOST_REQUIRE_EQUAL(release["destination"].as_string(), "PARKED");
+      BOOST_REQUIRE_EQUAL(release["parked_batch_id"].as_uint64(), batch_id);
+      BOOST_REQUIRE_EQUAL(release["net"].as_uint64(), 9 * UNIT);
+   }
+   BOOST_REQUIRE_EQUAL(parked_row(LIQSOL, ChainKind::CHAIN_KIND_SVM, bytes)["unattributed"].as_uint64(), 2 * UNIT);
+   BOOST_REQUIRE_EQUAL(success(), importsynd(SOLANA, LIQSOL, {credit(bytes, UNIT)}));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
+   const auto delivered = receipts("logparked"_n);
+   BOOST_REQUIRE_EQUAL(delivered.size(), 1u);
+   const auto log = delivered[0];
+   BOOST_REQUIRE_EQUAL(log["batch_id"].as_uint64(), batch_id);
+   BOOST_REQUIRE_EQUAL(log["amount"].as_uint64(), 21 * UNIT);
+   BOOST_REQUIRE_EQUAL(log["unattributed"].as_uint64(), 3 * UNIT);
+   BOOST_REQUIRE_EQUAL(log["recipient"].as_string(), "alice");
+   BOOST_REQUIRE_EQUAL(liq_balance("alice"_n), int64_t(21 * UNIT));
+   BOOST_REQUIRE(parked_row(LIQSOL, ChainKind::CHAIN_KIND_SVM, bytes).is_null());
+   BOOST_REQUIRE(mentions(push(SYND_ACCOUNT, synd_abi_ser, SYND_ACCOUNT, "logparked"_n, mvo()("receipt", log)),
+                          "self inline action"));
+   BOOST_REQUIRE_EQUAL(success(), sweep("alice"_n, ChainKind::CHAIN_KIND_SVM));
+   BOOST_REQUIRE(receipts("logparked"_n).empty());
+}
+
+/// Imported principal is payable, while a fee-only release never fabricates a wallet credit.
+BOOST_FIXTURE_TEST_CASE(receipts_distinguish_fee_only_release_and_import_payout, sysio_synd_tester) {
+   const auto signer = ed_signer();
+   const auto bytes = ed_bytes(signer.get_public_key());
+   BOOST_REQUIRE_EQUAL(success(), importsynd(SOLANA, LIQSOL, {credit(bytes, 2 * UNIT)}));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
+   const auto paid = receipts("logparked"_n);
+   BOOST_REQUIRE_EQUAL(paid.size(), 1u);
+   BOOST_REQUIRE_GT(paid[0]["batch_id"].as_uint64(), 0u);
+   BOOST_REQUIRE_EQUAL(paid[0]["unattributed"].as_uint64(), 2 * UNIT);
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.synd_fee_bps = 10000}));
+   syndicate_and_close(1, 1, bytes, LIQSOL, UNIT);
+   underwrite_envelope(SOLANA, LIQSOL, 1);
+   BOOST_REQUIRE_EQUAL(success(), crank());
+   const auto release = receipts("logrelease"_n);
+   BOOST_REQUIRE_EQUAL(release.size(), 1u);
+   BOOST_REQUIRE_EQUAL(release[0]["destination"].as_string(), "FEE_ONLY");
+   BOOST_REQUIRE_EQUAL(release[0]["net"].as_uint64(), 0u);
+   BOOST_REQUIRE_EQUAL(release[0]["gross"].as_uint64(), UNIT);
+   BOOST_REQUIRE_EQUAL(release[0]["fee"].as_uint64(), UNIT);
+   BOOST_REQUIRE_EQUAL(release[0]["remaining"].as_uint64(), 0u);
+   BOOST_REQUIRE_EQUAL(release[0]["recipient"].as_string(), "");
+   BOOST_REQUIRE_EQUAL(release[0]["parked_batch_id"].as_uint64(), 0u);
+   BOOST_REQUIRE_EQUAL(liq_balance("alice"_n), int64_t(2 * UNIT));
+   BOOST_REQUIRE(parked_row(LIQSOL, ChainKind::CHAIN_KIND_SVM, bytes).is_null());
+}
+
+/// Banking WIRE yield onto an existing principal batch must not link a fee-only tranche to its payout.
+BOOST_FIXTURE_TEST_CASE(receipts_fee_only_yield_does_not_reuse_a_parked_principal_identity, sysio_synd_tester) {
+   const auto bytes = ed_bytes(ed_key());
+   BOOST_REQUIRE_EQUAL(success(), importsynd(SOLANA, LIQSOL, {credit(bytes, UNIT)}));
+   const auto batch = parked_row(LIQSOL, ChainKind::CHAIN_KIND_SVM, bytes)["batch_id"].as_uint64();
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.synd_fee_bps = 10000}));
+   syndicate_and_close(1, 1, bytes, LIQSOL, UNIT);
+   underwrite_envelope(SOLANA, LIQSOL, 1);
+   BOOST_REQUIRE_EQUAL(success(), addyield("carol"_n, 3 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), crank());
+   const auto released = receipts("logrelease"_n);
+   BOOST_REQUIRE_EQUAL(released.size(), 1u);
+   BOOST_REQUIRE_EQUAL(released[0]["destination"].as_string(), "FEE_ONLY");
+   BOOST_REQUIRE_EQUAL(released[0]["parked_batch_id"].as_uint64(), 0u);
+   const auto parked = parked_row(LIQSOL, ChainKind::CHAIN_KIND_SVM, bytes);
+   BOOST_REQUIRE_EQUAL(parked["batch_id"].as_uint64(), batch);
+   BOOST_REQUIRE_EQUAL(parked["balance"].as_uint64(), UNIT);
+   BOOST_REQUIRE_EQUAL(parked["unattributed"].as_uint64(), UNIT);
+   BOOST_REQUIRE_GT(parked["position"]["owed_wire"].as_uint64(), 0u);
+}
+
+/// Principal identity is retired even if unpaid WIRE retains the parked row. New principal has a fresh batch.
+BOOST_FIXTURE_TEST_CASE(receipts_retire_principal_batches_independently_of_yield, sysio_synd_tester) {
+   const auto bytes = ed_bytes(ed_key());
+   const auto other = ed_bytes(ed_key());
+   BOOST_REQUIRE_EQUAL(success(), importsynd(SOLANA, LIQSOL, {credit(bytes, 50 * UNIT), credit(other, 50 * UNIT)}));
+   const auto old_id = parked_row(LIQSOL, ChainKind::CHAIN_KIND_SVM, bytes)["batch_id"].as_uint64();
+   BOOST_REQUIRE_EQUAL(success(), addyield("carol"_n, 10 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), liq_claim(SYND_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(success(), linkswept("alice"_n, ChainKind::CHAIN_KIND_SVM, bytes));
+   const auto first = receipts("logparked"_n);
+   BOOST_REQUIRE_EQUAL(first.size(), 1u);
+   BOOST_REQUIRE_EQUAL(first[0]["batch_id"].as_uint64(), old_id);
+   const auto retained = parked_row(LIQSOL, ChainKind::CHAIN_KIND_SVM, bytes);
+   BOOST_REQUIRE_EQUAL(retained["balance"].as_uint64(), 0u);
+   BOOST_REQUIRE_EQUAL(retained["batch_id"].as_uint64(), 0u);
+   BOOST_REQUIRE_EQUAL(retained["unattributed"].as_uint64(), 0u);
+   BOOST_REQUIRE_EQUAL(success(), importsynd(SOLANA, LIQSOL, {credit(bytes, UNIT)}));
+   const auto next_id = parked_row(LIQSOL, ChainKind::CHAIN_KIND_SVM, bytes)["batch_id"].as_uint64();
+   BOOST_REQUIRE_GT(next_id, old_id);
+   BOOST_REQUIRE_EQUAL(success(), linkswept("alice"_n, ChainKind::CHAIN_KIND_SVM, bytes));
+   const auto next = receipts("logparked"_n);
+   BOOST_REQUIRE_EQUAL(next.size(), 1u);
+   BOOST_REQUIRE_EQUAL(next[0]["batch_id"].as_uint64(), next_id);
+   BOOST_REQUIRE_EQUAL(next[0]["amount"].as_uint64(), UNIT);
+   const auto yield_only = parked_row(LIQSOL, ChainKind::CHAIN_KIND_SVM, bytes);
+   BOOST_REQUIRE_EQUAL(yield_only["balance"].as_uint64(), 0u);
+   BOOST_REQUIRE_EQUAL(yield_only["batch_id"].as_uint64(), 0u);
+   BOOST_REQUIRE_EQUAL(yield_only["unattributed"].as_uint64(), 0u);
+   BOOST_REQUIRE_EQUAL(yield_only["position"]["owed_wire"].as_uint64(), retained["position"]["owed_wire"].as_uint64());
+   BOOST_REQUIRE_GT(yield_only["position"]["owed_wire"].as_uint64(), 0u);
+   BOOST_REQUIRE_EQUAL(success(), linkswept("alice"_n, ChainKind::CHAIN_KIND_SVM, bytes));
+   BOOST_REQUIRE(receipts("logparked"_n).empty());
+}
+
+/// A terminal burn closes the unpaid remainder without undoing a verified earlier payment.
+BOOST_FIXTURE_TEST_CASE(receipts_close_partial_release_before_operational_pruning, sysio_synd_released_tester) {
+   const auto envelope = envelope_row(SOLANA, LIQSOL, 1);
+   BOOST_REQUIRE_EQUAL(6 * UNIT, item_row(1)["remaining"].as_uint64());
+   BOOST_REQUIRE_EQUAL(success(), rule(id, false));
+   BOOST_REQUIRE_EQUAL(success(), crank());
+   const auto closed = receipts("logburn"_n);
+   BOOST_REQUIRE_EQUAL(closed.size(), 1u);
+   BOOST_REQUIRE_EQUAL(closed[0]["chain_code"].as_string(), SOLANA);
+   BOOST_REQUIRE_EQUAL(closed[0]["token_code"].as_string(), LIQSOL);
+   BOOST_REQUIRE_EQUAL(closed[0]["epoch_index"].as_uint64(), 1u);
+   BOOST_REQUIRE_EQUAL(closed[0]["digest"].as<fc::sha256>(), envelope["digest"].as<fc::sha256>());
+   BOOST_REQUIRE(item_row(1).is_null());
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(4 * UNIT), liq_balance("alice"_n));
+   BOOST_REQUIRE(receipts("logrelease"_n).empty());
+   BOOST_REQUIRE_EQUAL(success(),
+                       push(SYND_ACCOUNT, synd_abi_ser, "carol"_n, "pruneenv"_n,
+                            mvo()("chain_code", codename_mvo(SOLANA))("token_code", codename_mvo(LIQSOL))("limit", 1)));
+   BOOST_REQUIRE(envelope_row(SOLANA, LIQSOL, 1).is_null());
+   BOOST_REQUIRE_EQUAL(success(), crank());
+   BOOST_REQUIRE(receipts("logburn"_n).empty());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

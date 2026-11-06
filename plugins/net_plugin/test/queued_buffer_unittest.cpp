@@ -1,4 +1,5 @@
 #include <boost/test/unit_test.hpp>
+#include <sysio/chain/block_log.hpp>
 #include <sysio/net_plugin/queued_buffer.hpp>
 
 using namespace sysio;
@@ -366,6 +367,45 @@ BOOST_AUTO_TEST_CASE(multiple_items_same_queue_drain_together) {
    BOOST_CHECK_EQUAL(bufs[1].size(), 20u);
    BOOST_CHECK_EQUAL(bufs[2].size(), 30u);
    BOOST_CHECK_EQUAL(qb.write_queue_size(), 0u);
+}
+
+// ---- Sync batch write-queue headroom ----
+
+BOOST_AUTO_TEST_CASE(sync_batch_never_defers_on_empty_queue) {
+   // With nothing queued no write completion would re-trigger sync, so an empty queue must always take a batch.
+   BOOST_CHECK(!sync_batch_must_defer(0));
+}
+
+BOOST_AUTO_TEST_CASE(sync_batch_defers_without_room_for_a_max_message) {
+   constexpr uint32_t defer_above = def_max_write_queue_size - def_max_queued_message_size;
+   BOOST_CHECK(!sync_batch_must_defer(1));
+   BOOST_CHECK(!sync_batch_must_defer(defer_above));
+   BOOST_CHECK(sync_batch_must_defer(defer_above + 1));
+   BOOST_CHECK(sync_batch_must_defer(def_max_write_queue_size));
+   BOOST_CHECK(sync_batch_must_defer(def_max_write_queue_size + 1)); // already past the cap
+}
+
+BOOST_AUTO_TEST_CASE(sync_batch_admitted_keeps_queue_under_cap) {
+   // Whenever a batch is admitted, the largest batch it can add (one maximum-size queued message) stays within the cap
+   // that start_read_message enforces.
+   constexpr uint32_t defer_above = def_max_write_queue_size - def_max_queued_message_size;
+   for (uint32_t queued : {0u, 1u, defer_above / 2, defer_above}) {
+      BOOST_REQUIRE(!sync_batch_must_defer(queued));
+      BOOST_CHECK_LE(uint64_t{queued} + def_max_queued_message_size, uint64_t{def_max_write_queue_size});
+   }
+}
+
+BOOST_AUTO_TEST_CASE(sync_batch_of_large_blocks_fits_write_queue) {
+   // The livelock this guards against: 32 blocks averaging 4,756,586 bytes queued as one batch is 152 MB, past the
+   // 80 MiB cap, so the connection closed on every resync. A byte-budgeted batch of the same blocks admits only what fits.
+   constexpr uint64_t block_size = 4'756'586;
+   serialized_block_batch_budget budget(def_sync_fetch_batch_max_bytes);
+   uint32_t                      admitted = 0;
+   while (admitted < def_sync_fetch_batch_size && budget.admit(block_size))
+      ++admitted;
+   BOOST_CHECK_EQUAL(admitted, 1u);
+   BOOST_CHECK_LE(budget.used(), uint64_t{def_max_write_queue_size});
+   BOOST_CHECK_GT(uint64_t{def_sync_fetch_batch_size} * block_size, uint64_t{def_max_write_queue_size});
 }
 
 BOOST_AUTO_TEST_SUITE_END()

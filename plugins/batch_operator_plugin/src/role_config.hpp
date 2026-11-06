@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <map>
 #include <optional>
+#include <span>
 #include <string>
 #include <vector>
 
@@ -42,6 +43,39 @@ inline std::map<chain::symbol_code, chain::asset> parse_exposure_caps(const std:
                 "exposure cap names {} more than once", cap.get_symbol().name());
    }
    return caps;
+}
+
+/// A depot action a role pushes.
+struct pushed_action {
+   const char* contract;
+   const char* action;
+};
+
+/// An action a role pushes only while one of its options is on.
+struct optional_action {
+   pushed_action action;
+   bool          enabled = false;
+};
+
+/// The actions a role's permission must be linked for: every action it always pushes, and each optional one only
+/// while enabled. An action the role never pushes cannot fail its startup.
+inline std::vector<pushed_action> required_actions(std::span<const pushed_action>   always,
+                                                   std::span<const optional_action> optional) {
+   std::vector<pushed_action> out(always.begin(), always.end());
+   for (const optional_action& o : optional) {
+      if (o.enabled) out.push_back(o.action);
+   }
+   return out;
+}
+
+/// The `actions` that `linked` refuses: those the role's permission may not declare, which fail the role's startup.
+template <typename Linked>
+std::vector<pushed_action> unlinked_actions(std::span<const pushed_action> actions, Linked&& linked) {
+   std::vector<pushed_action> out;
+   for (const pushed_action& a : actions) {
+      if (!linked(a)) out.push_back(a);
+   }
+   return out;
 }
 
 /// The provider a role signs with, and how many qualified.

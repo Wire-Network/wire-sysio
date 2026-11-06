@@ -51,6 +51,12 @@
 
 namespace sysio::chain {
 
+namespace {
+constexpr auto missing_database_header_message =
+   "State database has no version header: the launch that created it did not complete startup. "
+   "Rerun once with --delete-all-blocks.";
+}
+
 using resource_limits::resource_limits_manager;
 
 using controller_index_set = index_set<
@@ -65,7 +71,6 @@ using controller_index_set = index_set<
 >;
 
 // Legacy contract_database_index_set removed — all contract data uses kv_database_index_set.
-// SHiP "contract_table" deltas are synthesized from KV data in create_deltas.cpp.
 
 using kv_database_index_set = index_set<
    kv_index,
@@ -73,74 +78,54 @@ using kv_database_index_set = index_set<
 >;
 
 namespace detail {
-   // ------------------------------------------------------------------
-   // snapshot_row_traits for kv_object  (shared_blob → vector<char>)
-   // ------------------------------------------------------------------
-   template<>
-   struct snapshot_row_traits<kv_object> {
-      using value_type   = kv_object;
-      using snapshot_type = snapshot_kv_object;
+   /// The snapshot form of a KV row. A row with an empty key would write a snapshot that cannot be read back.
+   snapshot_kv_object to_snapshot_row(const kv_row& row) {
+      SYS_ASSERT(!row.key.empty(), snapshot_exception, "kv_object has empty key during snapshot write");
+      return {row.code,
+              row.payer,
+              {row.key.begin(), row.key.end()},
+              {row.value.begin(), row.value.end()},
+              row.table_id};
+   }
 
-      static snapshot_kv_object to_snapshot_row(const kv_object& obj, const chainbase::database&) {
-         snapshot_kv_object row;
-         row.code     = obj.code;
-         row.payer    = obj.payer;
-         row.table_id = obj.table_id;
-         SYS_ASSERT(obj.key.size() > 0, snapshot_exception, "kv_object has empty key during snapshot write");
-         row.key.assign(obj.key.data(), obj.key.data() + obj.key.size());
-         if (obj.value.size() > 0)
-            row.value.assign(obj.value.data(), obj.value.data() + obj.value.size());
-         return row;
-      }
+   snapshot_kv_index_object to_snapshot_row(const kv_index_entry& entry) {
+      SYS_ASSERT(!entry.sec_key.empty(), snapshot_exception,
+                 "kv_index_object has empty secondary key during snapshot write");
+      SYS_ASSERT(!entry.pri_key.empty(), snapshot_exception,
+                 "kv_index_object has empty primary key during snapshot write");
+      return {entry.code, entry.payer, {entry.sec_key.begin(), entry.sec_key.end()},
+              {entry.pri_key.begin(), entry.pri_key.end()}, entry.table_id};
+   }
 
-      static void from_snapshot_row(snapshot_kv_object&& row, kv_object& obj, chainbase::database&) {
-         SYS_ASSERT(!row.key.empty(), snapshot_validation_exception, "kv_object has empty key");
-         SYS_ASSERT(row.key.size() <= config::max_kv_key_size_limit, snapshot_validation_exception,
-                    "kv_object key size ({}) exceeds absolute limit ({})", row.key.size(), config::max_kv_key_size_limit);
-         SYS_ASSERT(row.value.size() <= config::max_kv_value_size_limit, snapshot_validation_exception,
-                    "kv_object value size ({}) exceeds absolute limit ({})", row.value.size(), config::max_kv_value_size_limit);
-         obj.code     = row.code;
-         obj.payer    = row.payer;
-         obj.table_id = row.table_id;
-         obj.key.assign(row.key.data(), row.key.size());
-         obj.value.assign(row.value.data(), row.value.size());
-      }
-   };
+   void store_snapshot_row(kv_store& store, const snapshot_kv_object& row) {
+      SYS_ASSERT(!row.key.empty(), snapshot_validation_exception, "kv_object has empty key");
+      SYS_ASSERT(row.key.size() <= config::max_kv_key_size_limit, snapshot_validation_exception,
+                 "kv_object key size ({}) exceeds absolute limit ({})", row.key.size(), config::max_kv_key_size_limit);
+      SYS_ASSERT(row.value.size() <= config::max_kv_value_size_limit, snapshot_validation_exception,
+                 "kv_object value size ({}) exceeds absolute limit ({})", row.value.size(),
+                 config::max_kv_value_size_limit);
+      const bool stored = store
+                             .insert_row(row.code, row.table_id, row.payer, {row.key.data(), row.key.size()},
+                                         {row.value.data(), row.value.size()})
+                             .has_value();
+      SYS_ASSERT(stored, snapshot_validation_exception, "kv_object key appears twice in table {}", row.table_id);
+   }
 
-   // ------------------------------------------------------------------
-   // snapshot_row_traits for kv_index_object  (shared_blob → vector<char>)
-   // ------------------------------------------------------------------
-   template<>
-   struct snapshot_row_traits<kv_index_object> {
-      using value_type   = kv_index_object;
-      using snapshot_type = snapshot_kv_index_object;
-
-      static snapshot_kv_index_object to_snapshot_row(const kv_index_object& obj, const chainbase::database&) {
-         snapshot_kv_index_object row;
-         row.code     = obj.code;
-         row.payer    = obj.payer;
-         row.table_id = obj.table_id;
-         SYS_ASSERT(obj.sec_key.size() > 0, snapshot_exception, "kv_index_object has empty secondary key during snapshot write");
-         SYS_ASSERT(obj.pri_key.size() > 0, snapshot_exception, "kv_index_object has empty primary key during snapshot write");
-         row.sec_key.assign(obj.sec_key.data(), obj.sec_key.data() + obj.sec_key.size());
-         row.pri_key.assign(obj.pri_key.data(), obj.pri_key.data() + obj.pri_key.size());
-         return row;
-      }
-
-      static void from_snapshot_row(snapshot_kv_index_object&& row, kv_index_object& obj, chainbase::database&) {
-         SYS_ASSERT(!row.sec_key.empty(), snapshot_validation_exception, "kv_index_object has empty secondary key");
-         SYS_ASSERT(!row.pri_key.empty(), snapshot_validation_exception, "kv_index_object has empty primary key");
-         SYS_ASSERT(row.sec_key.size() <= config::max_kv_key_size_limit, snapshot_validation_exception,
-                    "kv_index_object secondary key size ({}) exceeds absolute limit ({})", row.sec_key.size(), config::max_kv_key_size_limit);
-         SYS_ASSERT(row.pri_key.size() <= config::max_kv_key_size_limit, snapshot_validation_exception,
-                    "kv_index_object primary key size ({}) exceeds absolute limit ({})", row.pri_key.size(), config::max_kv_key_size_limit);
-         obj.code     = row.code;
-         obj.payer    = row.payer;
-         obj.table_id = row.table_id;
-         obj.sec_key.assign(row.sec_key.data(), row.sec_key.size());
-         obj.pri_key.assign(row.pri_key.data(), row.pri_key.size());
-      }
-   };
+   void store_snapshot_row(kv_store& store, const snapshot_kv_index_object& row) {
+      SYS_ASSERT(!row.sec_key.empty(), snapshot_validation_exception, "kv_index_object has empty secondary key");
+      SYS_ASSERT(!row.pri_key.empty(), snapshot_validation_exception, "kv_index_object has empty primary key");
+      SYS_ASSERT(row.sec_key.size() <= config::max_kv_key_size_limit, snapshot_validation_exception,
+                 "kv_index_object secondary key size ({}) exceeds absolute limit ({})", row.sec_key.size(),
+                 config::max_kv_key_size_limit);
+      SYS_ASSERT(row.pri_key.size() <= config::max_kv_key_size_limit, snapshot_validation_exception,
+                 "kv_index_object primary key size ({}) exceeds absolute limit ({})", row.pri_key.size(),
+                 config::max_kv_key_size_limit);
+      const bool stored = store.insert_index_entry(row.code, row.table_id, row.payer,
+                                                   {row.sec_key.data(), row.sec_key.size()},
+                                                   {row.pri_key.data(), row.pri_key.size()});
+      SYS_ASSERT(stored, snapshot_validation_exception, "kv_index_object position appears twice in table {}",
+                 row.table_id);
+   }
 } // namespace detail
 
 class maybe_session {
@@ -719,6 +704,7 @@ struct controller_impl {
    std::function<void()>           shutdown;
    std::function<bool()>           check_shutdown;
    chainbase::database             db;
+   std::shared_ptr<kv_store>       kv;
    block_log                       blog;
    std::optional<pending_state>    pending;
    block_handle                    chain_head;
@@ -740,7 +726,20 @@ struct controller_impl {
    // state_history_plugin::plugin_initialize before chain_plugin::plugin_startup runs -- must NOT
    // overwrite the previous good file with the still-empty revision-0 dedup.
    fc::scoped_exit<std::function<void()>> write_trx_dedup = [&]() {
-      if( okay_to_persist_dedup ) trx_dedup.write_to_file(conf.state_dir / config::transaction_dedup_filename);
+      if( !okay_to_persist_dedup ) return;
+      const auto path = conf.state_dir / config::transaction_dedup_filename;
+      try {
+         trx_dedup.write_to_file(path);
+      } catch (const fc::exception& e) {
+         elog("Unable to persist transaction dedup to {}: {}. Restore from a snapshot before restarting.",
+              path.string(), e.to_detail_string());
+      } catch (const std::exception& e) {
+         elog("Unable to persist transaction dedup to {}: {}. Restore from a snapshot before restarting.",
+              path.string(), e.what());
+      } catch (...) {
+         elog("Unable to persist transaction dedup to {}: unknown error. Restore from a snapshot before restarting.",
+              path.string());
+      }
    };
    const chain_id_type             chain_id; // read by thread_pool threads, value will not be changed
    std::atomic<bool>               replaying = false;
@@ -1014,6 +1013,7 @@ struct controller_impl {
     db( cfg.state_dir,
         cfg.read_only ? database::read_only : database::read_write,
         cfg.state_size, false, cfg.db_map_mode ),
+    kv( make_chainbase_kv_store(db) ),
     blog( cfg.blocks_dir, cfg.blog ),
     fork_db_(cfg.blocks_dir / config::reversible_blocks_dir_name),
     resource_limits( db, [&s](bool is_trx_transient) { return s.get_deep_mind_logger(is_trx_transient); }),
@@ -1441,7 +1441,19 @@ struct controller_impl {
       bool valid = chain_head.read(conf.state_dir / config::chain_head_filename);
       SYS_ASSERT( valid, database_exception, "No existing chain_head.dat file");
 
-      trx_dedup.read_from_file(conf.state_dir / config::transaction_dedup_filename);
+      const auto dedup_path = conf.state_dir / config::transaction_dedup_filename;
+      bool dedup_loaded = false;
+      try {
+         dedup_loaded = trx_dedup.read_from_file(dedup_path);
+      } catch (const fc::exception& e) {
+         SYS_THROW(database_exception, "Unable to read transaction dedup file {}: {}. Restore from a snapshot.",
+                   dedup_path.string(), e.to_detail_string());
+      } catch (const std::exception& e) {
+         SYS_THROW(database_exception, "Unable to read transaction dedup file {}: {}. Restore from a snapshot.",
+                   dedup_path.string(), e.what());
+      }
+      SYS_ASSERT(dedup_loaded, database_exception,
+                 "Missing or unreadable transaction dedup file {}. Restore from a snapshot.", dedup_path.string());
 
       SYS_ASSERT(db.revision() == chain_head.block_num(), database_exception,
                  "chain_head block num {} does not match chainbase revision {}",
@@ -1456,7 +1468,7 @@ struct controller_impl {
       const auto& header_idx = db.get_index<database_header_multi_index>().indices().get<by_id>();
 
       SYS_ASSERT(header_idx.begin() != header_idx.end(), bad_database_version_exception,
-                 "state database version pre-dates versioning, please restore from a compatible snapshot or replay!");
+                 missing_database_header_message);
 
       auto header_itr = header_idx.begin();
       header_itr->validate();
@@ -1503,35 +1515,21 @@ struct controller_impl {
       // align the dedup to it before registering:
       //  - genesis/snapshot loaded membership only (revision 0); a snapshot is an irreversible root,
       //    so the db has no reversible undo sessions and a plain set_revision matches it.
-      //  - existing_state restored the dedup's revision and undo stack from its on-disk file. That
-      //    file is a best-effort cache, NOT an authoritative store like chainbase's mmap'd segment:
-      //    it can legitimately be missing (first start after upgrading to dedup persistence), stale,
-      //    or empty at revision 0 (a startup that aborts before the chain loads -- e.g. a corrupt
-      //    SHiP log failing another plugin's initialize -- still runs the write-on-exit; the guard on
-      //    write_trx_dedup prevents most such clobbers, but an older build or external tooling could
-      //    still leave one). If the loaded range does not match the db exactly, discard it and
-      //    rebuild an empty undo stack aligned to the db: the node starts with degraded dedup memory
-      //    (self-healing as reversible blocks become irreversible) instead of refusing to start. A
-      //    clean restart matches and keeps the full set -- the fast path.
-      // add_undo_participant re-validates the range, so a logic error here still fails loud rather
-      // than registering a divergent participant.
+      //  - existing_state must restore the exact revision range and membership. Starting with an
+      //    empty or stale dedup would accept duplicate transactions and diverge from chain state.
       if (startup == startup_t::existing_state) {
          const auto db_range = db.undo_stack_revision_range();
-         if (trx_dedup.undo_stack_revision_range() != db_range) {
-            const auto dedup_range = trx_dedup.undo_stack_revision_range();
-            wlog( "transaction dedup file revision range [{},{}] does not match database [{},{}]; "
-                  "rebuilding empty dedup aligned to the database (dedup replay protection over the "
-                  "reversible window is rebuilt as those blocks become irreversible)",
-                  dedup_range.first, dedup_range.second, db_range.first, db_range.second );
-            trx_dedup.reset();
-            trx_dedup.set_revision( db_range.first );
-            for( uint64_t r = db_range.first; r < db_range.second; ++r )
-               trx_dedup.add_undo_session();
-         }
+         const auto dedup_range = trx_dedup.undo_stack_revision_range();
+         SYS_ASSERT(dedup_range == db_range, database_exception,
+                    "Transaction dedup file {} revision range [{},{}] does not match database [{},{}]. "
+                    "Restore from a snapshot.",
+                    (conf.state_dir / config::transaction_dedup_filename).string(),
+                    dedup_range.first, dedup_range.second, db_range.first, db_range.second);
       } else {
          trx_dedup.set_revision(static_cast<uint64_t>(db.revision()));
       }
       db.add_undo_participant(std::make_unique<dedup_undo_index>(trx_dedup));
+      kv->join_undo_sessions(db);
       // The dedup is now registered and consistent with the database; from here a clean shutdown (or
       // an abort after this point) may safely persist it. Before this point trx_dedup is empty at
       // revision 0 and must never be written over a good file.
@@ -1609,29 +1607,39 @@ struct controller_impl {
       db.undo_all();
    }
 
-   void add_kv_rows_to_snapshot( const snapshot_writer_ptr& snapshot, snapshot_written_row_counter& row_counter ) const {
-      kv_database_index_set::walk_indices([this, &snapshot, &row_counter]( auto utils ) {
-         using value_t = typename decltype(utils)::index_t::value_type;
-         snapshot->write_section<value_t>([this, &row_counter]( auto& section ) {
-            decltype(utils)::walk(db, [this, &section, &row_counter]( const auto& row ) {
-               section.add_row(row, db);
-               row_counter.progress();
-            });
-         });
+   /// Writes one KV section in key order, so that the hashes covering it do not depend on insertion history or on the
+   /// storage engine. A row's id only records that history: two chains can hold the same rows under different ids.
+   template<typename Object, typename Cursor>
+   void add_kv_section_to_snapshot( const snapshot_writer_ptr& snapshot, Cursor&& cursor,
+                                    snapshot_written_row_counter& row_counter ) const {
+      snapshot->write_section<Object>([&]( auto& section ) {
+         typename std::remove_cvref_t<decltype(*cursor)>::row_type row;
+         for (bool more = cursor->seek_lower({}, row); more; more = cursor->next(row)) {
+            section.add_row(detail::to_snapshot_row(row));
+            row_counter.progress();
+         }
       });
    }
 
+   void add_kv_rows_to_snapshot(const snapshot_writer_ptr& snapshot, snapshot_written_row_counter& row_counter) const {
+      add_kv_section_to_snapshot<kv_object>(snapshot, kv->open_row_cursor(), row_counter);
+      add_kv_section_to_snapshot<kv_index_object>(snapshot, kv->open_index_cursor(), row_counter);
+   }
+
+   /// Each section loads in its own task, so an engine must take row and index entry writes at once during a load.
    void read_kv_rows_from_snapshot( const snapshot_reader_ptr& snapshot, std::atomic_size_t& read_row_count, boost::asio::io_context& ctx ) {
       kv_database_index_set::walk_indices_via_post(ctx, [this, &snapshot, &read_row_count]( auto utils ) {
-         using utils_t = decltype(utils);
          using value_t = typename decltype(utils)::index_t::value_type;
+         using row_t =
+            std::conditional_t<std::is_same_v<value_t, kv_object>, snapshot_kv_object, snapshot_kv_index_object>;
          snapshot->read_section<value_t>([this, &read_row_count]( auto& section ) {
-            utils_t::preallocate(db, section.row_count());
+            if constexpr (std::is_same_v<value_t, kv_object>) kv->reserve_rows(section.row_count());
+            else                                              kv->reserve_index_entries(section.row_count());
             bool more = !section.empty();
             while (more) {
-               utils_t::create(db, [this, &section, &more](auto& row) {
-                  more = section.read_row(row, db);
-               });
+               row_t row;
+               more = section.read_row(row);
+               detail::store_snapshot_row(*kv, row);
                read_row_count.fetch_add(1u, std::memory_order_relaxed);
             }
          });
@@ -1644,9 +1652,7 @@ struct controller_impl {
       controller_index_set::walk_indices([this, &ret](auto utils){
          ret += db.get_index<typename decltype(utils)::index_t>().size();
       });
-      kv_database_index_set::walk_indices([this, &ret](auto utils) {
-         ret += db.get_index<typename decltype(utils)::index_t>().size();
-      });
+      ret += kv->row_count() + kv->index_entry_count();
 
       ret += authorization.expected_snapshot_row_count();
       ret += resource_limits.expected_snapshot_row_count();
@@ -3326,6 +3332,9 @@ struct controller_impl {
                1
             });
          }
+         // Schedule order is production order, not the ascending order validate() requires of an
+         // authority; snapshot load rejects an unsorted one.
+         auth.sort_fields();
 
          if (permission.auth != auth) {
             db.modify(permission, [&](auto& po) { po.auth = auth; });
@@ -3814,6 +3823,12 @@ void controller::startup(std::function<void()> shutdown, std::function<bool()> c
 
 const chainbase::database& controller::db()const { return my->db; }
 
+const kv_store& controller::kv()const { return *my->kv; }
+
+kv_store& controller::mutable_kv()const { return *my->kv; }
+
+void controller::testing_set_kv_store(std::shared_ptr<kv_store> store) { my->kv = std::move(store); }
+
 chainbase::database& controller::mutable_db()const { return my->db; }
 
 void controller::preactivate_feature( const digest_type& feature_digest, bool is_trx_transient ) {
@@ -4259,17 +4274,25 @@ std::vector<char> controller::fetch_serialized_block_by_number( uint32_t block_n
    return my->blog.read_serialized_block_by_num(block_num);
 } FC_CAPTURE_AND_RETHROW( "{}", block_num ) }
 
-std::vector<std::vector<char>> controller::fetch_serialized_blocks_by_number( uint32_t first_block_num, uint32_t count)const  { try {
-   auto result = my->blog.read_serialized_blocks_by_num(first_block_num, count);
+std::vector<std::vector<char>> controller::fetch_serialized_blocks_by_number( uint32_t first_block_num, uint32_t count,
+                                                                              uint64_t max_bytes )const  { try {
+   auto result = my->blog.read_serialized_blocks_by_num(first_block_num, count, max_bytes);
+   // Carry the block log's byte budget into the fork_db fill
+   serialized_block_batch_budget budget(max_bytes);
+   for (const auto& block : result)
+      budget.admit(block.size());
    // Fill remainder from fork_db (near-head blocks during catchup)
    for (uint32_t i = result.size(); i < count; ++i) {
-      if (signed_block_ptr b = my->fork_db_fetch_block_on_best_branch_by_num(first_block_num + i))
-         result.push_back(b->packed_signed_block());
-      else
+      signed_block_ptr b = my->fork_db_fetch_block_on_best_branch_by_num(first_block_num + i);
+      if (!b)
          break;
+      std::vector<char> packed = b->packed_signed_block();
+      if (!budget.admit(packed.size()))
+         break;
+      result.push_back(std::move(packed));
    }
    return result;
-} FC_CAPTURE_AND_RETHROW( "{}, {}", first_block_num, count ) }
+} FC_CAPTURE_AND_RETHROW( "{}, {}, {}", first_block_num, count, max_bytes ) }
 
 std::optional<signed_block_header> controller::fetch_block_header_by_number( uint32_t block_num )const  { try {
    auto b = my->fork_db_fetch_block_on_best_branch_by_num(block_num);

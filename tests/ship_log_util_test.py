@@ -94,6 +94,7 @@ try:
     specificExtraNodeopArgs = {
         prodNodeId: "--plugin sysio::producer_api_plugin",
         shipNodeId: "--plugin sysio::state_history_plugin --trace-history --chain-state-history "
+                    f"--state-history-endpoint 127.0.0.1:{Utils.getPort(Utils.PortStateHistory)} "
                     f"--finality-data-history --state-history-stride {shipStride} "
                     "--plugin sysio::net_api_plugin --plugin sysio::producer_api_plugin",
     }

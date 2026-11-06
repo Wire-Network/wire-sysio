@@ -1,0 +1,394 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "opemplace",
+            "base": "",
+            "fields": [
+                {
+                    "name": "begin",
+                    "type": "uint32"
+                },
+                {
+                    "name": "count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "total",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "operase",
+            "base": "",
+            "fields": [
+                {
+                    "name": "begin",
+                    "type": "uint32"
+                },
+                {
+                    "name": "count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "total",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "operasekey",
+            "base": "",
+            "fields": [
+                {
+                    "name": "begin",
+                    "type": "uint32"
+                },
+                {
+                    "name": "count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "total",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "opfind",
+            "base": "",
+            "fields": [
+                {
+                    "name": "begin",
+                    "type": "uint32"
+                },
+                {
+                    "name": "count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "total",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "opfindmod",
+            "base": "",
+            "fields": [
+                {
+                    "name": "begin",
+                    "type": "uint32"
+                },
+                {
+                    "name": "count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "total",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "opget",
+            "base": "",
+            "fields": [
+                {
+                    "name": "begin",
+                    "type": "uint32"
+                },
+                {
+                    "name": "count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "total",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "opglobalget",
+            "base": "",
+            "fields": [
+                {
+                    "name": "begin",
+                    "type": "uint32"
+                },
+                {
+                    "name": "count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "total",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "opmodkey",
+            "base": "",
+            "fields": [
+                {
+                    "name": "begin",
+                    "type": "uint32"
+                },
+                {
+                    "name": "count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "total",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "opscan",
+            "base": "",
+            "fields": [
+                {
+                    "name": "begin",
+                    "type": "uint32"
+                },
+                {
+                    "name": "count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "total",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "opscopescan",
+            "base": "",
+            "fields": [
+                {
+                    "name": "begin",
+                    "type": "uint32"
+                },
+                {
+                    "name": "count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "total",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "opsecscan",
+            "base": "",
+            "fields": [
+                {
+                    "name": "begin",
+                    "type": "uint32"
+                },
+                {
+                    "name": "count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "total",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "popscoped",
+            "base": "",
+            "fields": [
+                {
+                    "name": "begin",
+                    "type": "uint32"
+                },
+                {
+                    "name": "count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "total",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "populate",
+            "base": "",
+            "fields": [
+                {
+                    "name": "begin",
+                    "type": "uint32"
+                },
+                {
+                    "name": "count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "total",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "sec",
+                    "type": "uint64"
+                },
+                {
+                    "name": "counter",
+                    "type": "uint64"
+                },
+                {
+                    "name": "data",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "row_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "settings",
+            "base": "",
+            "fields": [
+                {
+                    "name": "total",
+                    "type": "uint64"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "opemplace",
+            "type": "opemplace",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "operase",
+            "type": "operase",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "operasekey",
+            "type": "operasekey",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "opfind",
+            "type": "opfind",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "opfindmod",
+            "type": "opfindmod",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "opget",
+            "type": "opget",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "opglobalget",
+            "type": "opglobalget",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "opmodkey",
+            "type": "opmodkey",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "opscan",
+            "type": "opscan",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "opscopescan",
+            "type": "opscopescan",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "opsecscan",
+            "type": "opsecscan",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "popscoped",
+            "type": "popscoped",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "populate",
+            "type": "populate",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "irows",
+            "type": "row",
+            "index_type": "i64",
+            "key_names": ["id"],
+            "key_types": ["uint64"],
+            "table_id": 16591,
+            "secondary_indexes": [
+                {
+                    "name": "bysec",
+                    "key_type": "uint64",
+                    "table_id": 52994
+                }
+            ]
+        },
+        {
+            "name": "rows",
+            "type": "row",
+            "index_type": "i64",
+            "key_names": ["id"],
+            "key_types": ["uint64"],
+            "table_id": 19355
+        },
+        {
+            "name": "settings",
+            "type": "settings",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 50902
+        },
+        {
+            "name": "srows",
+            "type": "row",
+            "index_type": "i64",
+            "key_names": ["scope","id"],
+            "key_types": ["name","uint64"],
+            "table_id": 50975
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": []
+}

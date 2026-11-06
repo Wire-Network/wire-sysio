@@ -66,6 +66,10 @@ constexpr std::string_view yield_remit_full_msg = "claim WIRE remit before colle
 /// Message of the `check` `sweepyield` raises for WIRE, which is not a shadow token.
 constexpr std::string_view wire_earns_no_yield_msg = "WIRE collateral earns no shadow yield";
 
+/// Message of the `check` `regoperator` raises for an account the batch schedule still seats.
+constexpr std::string_view still_seated_msg =
+   "operator still holds a batch schedule seat: it may register again once its seats have closed";
+
 /// Resolve a depot-native collateral `token_code` through the shared resolver, against this
 /// registry's custody contracts (`sysio.token` for WIRE, `sysio.liq` for a shadow LIQ symbol).
 ///
@@ -191,6 +195,17 @@ void preserve_yield_debt(name self, const opreg::operator_entry& op) {
       debt.owed_wire += owed;
       debts.upsert(ram_payer, key, debt);
    }
+}
+
+/// True while `account` holds a seat in any group of sysio.epoch's batch-operator schedule window.
+/// A seat stays until the window slides past it, whatever the operator's status in the meantime.
+bool holds_schedule_seat(name account) {
+   sysio::epoch::epochstate_t es(opreg::EPOCH_ACCOUNT);
+   if (!es.exists()) return false;
+   for (const auto& group : es.get().batch_op_groups) {
+      if (std::find(group.begin(), group.end(), account) != group.end()) return true;
+   }
+   return false;
 }
 
 } // anonymous namespace
@@ -330,6 +345,11 @@ void opreg::regoperator(name account,
       ops.erase(op_pk);
    }
 
+   // A seat left from an earlier registration would close against this one and record a miss for
+   // a duty it never received. `terminate` leaves the operator's later seats in place until the
+   // window slides past them.
+   check(!holds_schedule_seat(account), still_seated_msg);
+
    // Verify authex links exist for all active outpost chains.
    // Skip when: bootstrapped OR privileged caller (sysio.opreg registering on behalf)
    //
@@ -414,19 +434,12 @@ find_balance(const opreg::operator_entry& op,
    return nullptr;
 }
 
-/// Return true when the operator has entered a permanent punishment or
-/// removal state that collateral changes must never reverse.
-bool has_terminal_status(OperatorStatus status) {
-   return status == OperatorStatus::OPERATOR_STATUS_SLASHED ||
-          status == OperatorStatus::OPERATOR_STATUS_TERMINATED;
-}
-
 /// Compute available balance for a given (op, chain, token). The single
 /// rollup formula: balance - sum(pending withdraws),
 /// gated by status. Slashed / terminated operators read as zero.
 uint64_t available_inline(const opreg::operator_entry& op,
                           sysio::slug_name chain_code, sysio::slug_name token_code) {
-   if (has_terminal_status(op.status)) {
+   if (op.has_terminal_status()) {
       return 0;
    }
    const auto* bal = find_balance(op, chain_code, token_code);
@@ -1004,7 +1017,7 @@ void reevaluate_eligibility(opreg::operators_t& ops,
    opreg::opconfig_t cfg_tbl(self);
    auto cfg = cfg_tbl.get_or_default(opreg::op_config{});
    auto refreshed = ops.get(op_pk);
-   if (has_terminal_status(refreshed.status)) return;
+   if (refreshed.has_terminal_status()) return;
    bool was_eligible = (refreshed.status == OperatorStatus::OPERATOR_STATUS_ACTIVE);
    bool is_eligible  = meets_role_min(refreshed, cfg);
 
@@ -1210,7 +1223,7 @@ void process_eligibility_change(name self, name account,
    // The notification below is NOT gated on it: a producer's terminal
    // transition is exactly what sysio.system must hear about, and slash and
    // termination dispatch through here (`notify_producer_standing`) to say so.
-   const bool terminal = has_terminal_status(ops.get(op_pk).status);
+   const bool terminal = ops.get(op_pk).has_terminal_status();
 
    auto now = current_time_ms();
    if (!terminal && !was_eligible && is_eligible) {
@@ -1289,8 +1302,10 @@ void opreg::slash(name account, std::string reason) {
 
    // Record one SLASH entry per (chain_code, token_code) with non-zero slashable
    // in the operator's recent_actions log (success=true since the slash itself
-   // was applied). Nothing is sent to an outpost: they learn the SLASHED status
-   // from the next OPERATORS roster.
+   // was applied). Nothing is sent to an outpost: each OPERATORS roster lists the
+   // operator as SLASHED while the schedule window seats it and leaves it out once
+   // its group has left, which revokes it on each outpost that applies that roster
+   // (an empty window queues none).
    for (const auto& sp : to_slash) {
       auto slash_action = build_slash_action(op.account, op.type,
                                              sp.chain_code, sp.token_code, sp.amount,
@@ -1473,21 +1488,9 @@ void opreg::claimyield(name account, sysio::slug_name token_code) {
 void opreg::recorddel(name account, uint32_t epoch, bool delivered) {
    require_auth(EPOCH_ACCOUNT);
 
-   // A temporarily ineligible operator cannot submit deliveries because
-   // sysio.msgch requires ACTIVE status. Do not turn that expected downtime
-   // into termination misses after collateral is restored. Terminal-state
-   // observations remain durable audit records; termcheck already excludes
-   // those operators permanently.
-   operators_t ops(get_self());
-   auto op_pk = operator_key{account.value};
-   if (ops.contains(op_pk)) {
-      auto status = ops.get(op_pk).status;
-      if (status != OperatorStatus::OPERATOR_STATUS_ACTIVE &&
-          !has_terminal_status(status)) {
-         return;
-      }
-   }
-
+   // Recorded whatever the operator's status at close: the seat is the duty. A withdrawal below
+   // the minimum makes a seated operator UNKNOWN, unable to deliver, and a cancel restores ACTIVE,
+   // so skipping UNKNOWN members let an operator miss its epoch without a miss on record.
    uint64_t now_ms = current_time_ms();
 
    // On-write half of the dellog retention contract: sweep a bounded number
@@ -1514,7 +1517,9 @@ void opreg::termcheck(name account) {
    auto op_pk = operator_key{account.value};
    if (!ops.contains(op_pk)) return;
    auto op = ops.get(op_pk);
-   if (op.status != OperatorStatus::OPERATOR_STATUS_ACTIVE) return;
+   // UNKNOWN is evaluated too. This runs only when the operator's own duty epoch closes, and an
+   // operator that withdraws before each close and cancels after it is UNKNOWN every time.
+   if (op.has_terminal_status()) return;
    // Bootstrapped operators are the genesis / chain-of-trust seed set and
    // are NEVER subject to rolling-window termination — see
    // .claude/rules/bootstrapped-operator-invariants.md at the wire root. A
@@ -1544,8 +1549,13 @@ void opreg::termcheck(name account) {
    opconfig_t cfg_tbl(get_self());
    const auto cfg = cfg_tbl.get_or_default(op_config{});
 
+   // Both rails read only the current registration: a re-registered account's earlier rows stay
+   // in the log until they age out. They start after the registration's own second, because
+   // `current_time_ms` has second resolution and the block that terminated the previous
+   // registration can share it. A return to ACTIVE within a registration resets neither rail,
+   // so a cancelled withdrawal cannot clear the misses recorded while the operator was UNKNOWN.
    uint64_t now_ms      = current_time_ms();
-   uint64_t window_open = termination_window_open_ms(now_ms, cfg);
+   uint64_t window_open = std::max(termination_window_open_ms(now_ms, cfg), op.registered_at + 1);
 
    dellog_t log(get_self());
    auto idx = log.get_index<"byaccountts"_n>();
@@ -1560,14 +1570,6 @@ void opreg::termcheck(name account) {
       if (it->account != account) break;
       total_in_window++;
       if (!it->delivered) total_misses++;
-
-      // A transition back to ACTIVE starts a new duty interval. Earlier rows
-      // remain part of the rolling miss-rate sample, but must not join a
-      // consecutive run across time when the operator could not deliver.
-      if (it->ts_ms < op.available_at) {
-         consecutive_misses = 0;
-         continue;
-      }
 
       if (!it->delivered) {
          consecutive_misses++;

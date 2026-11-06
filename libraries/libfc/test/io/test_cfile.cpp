@@ -7,6 +7,67 @@
 using namespace fc;
 
 BOOST_AUTO_TEST_SUITE(cfile_test_suite)
+   /// Unopened, explicitly closed, and moved-from files report errors instead of entering libc with nullptr.
+   BOOST_AUTO_TEST_CASE(closed_file_operations_throw) {
+      auto check_closed = [](cfile& file) {
+         char byte = 0;
+         BOOST_CHECK(!file.is_open());
+         BOOST_CHECK_THROW(file.flush(), std::ios_base::failure);
+         BOOST_CHECK_THROW(file.sync(), std::ios_base::failure);
+         BOOST_CHECK_THROW(file.fileno(), std::ios_base::failure);
+         BOOST_CHECK_THROW(file.tellp(), std::ios_base::failure);
+         BOOST_CHECK_THROW(file.seek(0), std::ios_base::failure);
+         BOOST_CHECK_THROW(file.seek_end(0), std::ios_base::failure);
+         BOOST_CHECK_THROW(file.skip(0), std::ios_base::failure);
+         BOOST_CHECK_THROW(file.read(&byte, 1), std::ios_base::failure);
+         BOOST_CHECK_THROW(file.write(&byte, 1), std::ios_base::failure);
+         BOOST_CHECK_THROW(file.pread(&byte, 1, 0), std::ios_base::failure);
+         BOOST_CHECK_THROW(file.pwrite(&byte, 1, 0), std::ios_base::failure);
+         BOOST_CHECK_THROW(file.truncate(), std::ios_base::failure);
+         BOOST_CHECK_THROW(file.punch_hole(0, 0), std::ios_base::failure);
+         BOOST_CHECK_THROW(file.eof(), std::ios_base::failure);
+         BOOST_CHECK_THROW(file.getc(), std::ios_base::failure);
+         BOOST_CHECK_THROW(file.has_error(), std::ios_base::failure);
+         BOOST_CHECK_NO_THROW(file.close_checked());
+      };
+      cfile unopened;
+      check_closed(unopened);
+      temp_directory dir;
+      cfile original(dir.path() / "file");
+      cfile moved(std::move(original));
+      check_closed(original);
+      moved.close();
+      check_closed(moved);
+   }
+
+#ifdef __linux__
+   /// Long-lived safety files can rewrite and flush successfully after a transient write error.
+   BOOST_AUTO_TEST_CASE(flush_recovers_after_write_error) {
+      temp_cfile temporary("wb+");
+      auto& file = temporary.file();
+      const int saved = ::dup(file.fileno());
+      BOOST_REQUIRE(saved >= 0);
+      const int full = ::open("/dev/full", O_WRONLY);
+      BOOST_REQUIRE(full >= 0);
+      const int redirected = ::dup2(full, file.fileno());
+      ::close(full);
+      BOOST_REQUIRE(redirected >= 0);
+      const std::string data(64 * 1024, 'x');
+      BOOST_CHECK_THROW(file.write(data.data(), data.size()), std::ios_base::failure);
+      const int restored = ::dup2(saved, file.fileno());
+      ::close(saved);
+      BOOST_REQUIRE(restored >= 0);
+      BOOST_REQUIRE(file.has_error());
+      file.seek(0);
+      file.write("recovered", 9);
+      BOOST_REQUIRE_NO_THROW(file.flush());
+      file.seek(0);
+      std::string contents(9, '\0');
+      file.read(contents.data(), contents.size());
+      BOOST_CHECK_EQUAL(contents, "recovered");
+   }
+#endif
+
    BOOST_AUTO_TEST_CASE(test_simple)
    {
       fc::temp_directory tempdir;

@@ -52,20 +52,23 @@ jobs:
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # actions/checkout@v5
 
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # actions/setup-node@v4
-        with:
-          node-version: "24"
-
-      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # pnpm/action-setup@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4.3.0
         with:
           package_json_file: libraries/opp/tools/package.json
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
 
       - name: Install deps
         run: |
           # PR validation must not expose the npm publish token to dependency
           # install lifecycle scripts; publishing is scoped to the push-only step.
           cd ./libraries/opp/tools
-          pnpm install --frozen-lockfile --ignore-scripts
+          pnpm install --no-frozen-lockfile --ignore-scripts
 
       - name: Configure AWS credentials (CodeArtifact cargo publish)
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
@@ -104,17 +107,12 @@ jobs:
       - name: Generate & Publish OPP Bundles
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           CHANNEL: ${{ inputs.channel }}
           PACKAGE_VERSION: ${{ inputs.package-version }}
         run: |
-          # `npm publish` (invoked by wire-protobuf-bundler --publish) does NOT read a
-          # bare $NPM_TOKEN env var — it needs an _authToken line in .npmrc. Without
-          # this the publish fails ENEEDAUTH (regression from SEC-41, which scoped the
-          # token to this step but dropped the auth wiring). Writing ~/.npmrc here keeps
-          # the token confined to the push/dispatch publish step — it is never present
-          # during pull_request validation or the dependency install step.
-          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
+          # setup-node's registry configuration reads NODE_AUTH_TOKEN. Supply the
+          # secret only to this push/dispatch step, never to PR validation or the earlier install step.
           args=(--publish)
           # `channel` only exists on the dispatch path (empty on push); 'none'
           # keeps the legacy no-channel behavior byte-identical.

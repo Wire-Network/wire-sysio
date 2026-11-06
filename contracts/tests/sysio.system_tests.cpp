@@ -255,7 +255,7 @@ BOOST_FIXTURE_TEST_CASE(producers_upgrade_system_contract, sysio_system_tester) 
          action act;
          act.account = "sysio.msig"_n;
          act.name = name;
-         act.data = msig_abi_ser.variant_to_binary( action_type_name, data, abi_serializer::create_yield_function(abi_serializer_max_time) );
+         act.data = msig_abi_ser.variant_to_binary( action_type_name, data, fixture_abi_yield_function() );
 
          return base_tester::push_contract_paid_action( std::move(act), (auth ? signer : signer == "bob111111111"_n ? "alice1111111"_n : "bob111111111"_n).to_uint64_t() );
    };
@@ -294,7 +294,7 @@ BOOST_FIXTURE_TEST_CASE(producers_upgrade_system_contract, sysio_system_tester) 
                   )
                   })
          );
-      abi_serializer::from_variant(pretty_trx, trx, get_resolver(), abi_serializer::create_yield_function(abi_serializer_max_time));
+      abi_serializer::from_variant(pretty_trx, trx, get_resolver(), fixture_abi_yield_function());
    }
 
    BOOST_REQUIRE_EQUAL(success(), push_action_msig( "alice1111111"_n, "propose"_n, mvo()
@@ -387,7 +387,7 @@ BOOST_FIXTURE_TEST_CASE( setparams, sysio_system_tester ) try {
          action act;
          act.account = "sysio.msig"_n;
          act.name = name;
-         act.data = msig_abi_ser.variant_to_binary( action_type_name, data, abi_serializer::create_yield_function(abi_serializer_max_time) );
+         act.data = msig_abi_ser.variant_to_binary( action_type_name, data, fixture_abi_yield_function() );
 
          return base_tester::push_contract_paid_action( std::move(act), (auth ? signer : signer == "bob111111111"_n ? "alice1111111"_n : "bob111111111"_n).to_uint64_t() );
    };
@@ -423,7 +423,7 @@ BOOST_FIXTURE_TEST_CASE( setparams, sysio_system_tester ) try {
                   )
                   })
          );
-      abi_serializer::from_variant(pretty_trx, trx, get_resolver(), abi_serializer::create_yield_function(abi_serializer_max_time));
+      abi_serializer::from_variant(pretty_trx, trx, get_resolver(), fixture_abi_yield_function());
    }
 
    BOOST_REQUIRE_EQUAL(success(), push_action_msig( "alice1111111"_n, "propose"_n, mvo()
@@ -483,7 +483,7 @@ BOOST_FIXTURE_TEST_CASE( wasmcfg, sysio_system_tester ) try {
          action act;
          act.account = "sysio.msig"_n;
          act.name = name;
-         act.data = msig_abi_ser.variant_to_binary( action_type_name, data, abi_serializer::create_yield_function(abi_serializer_max_time) );
+         act.data = msig_abi_ser.variant_to_binary( action_type_name, data, fixture_abi_yield_function() );
 
          return base_tester::push_contract_paid_action( std::move(act), (auth ? signer : signer == "bob111111111"_n ? "alice1111111"_n : "bob111111111"_n).to_uint64_t() );
    };
@@ -513,7 +513,7 @@ BOOST_FIXTURE_TEST_CASE( wasmcfg, sysio_system_tester ) try {
                   )
                   })
          );
-      abi_serializer::from_variant(pretty_trx, trx, get_resolver(), abi_serializer::create_yield_function(abi_serializer_max_time));
+      abi_serializer::from_variant(pretty_trx, trx, get_resolver(), fixture_abi_yield_function());
    }
 
    BOOST_REQUIRE_EQUAL(success(), push_action_msig( "alice1111111"_n, "propose"_n, mvo()
@@ -563,7 +563,7 @@ BOOST_AUTO_TEST_CASE( setabi_bios ) try {
    validating_tester t( tempdir, true );
    t.execute_setup_policy( setup_policy::full );
 
-   abi_serializer abi_ser(fc::json::from_string( (const char*)contracts::bios_abi().data()).template as<abi_def>(), abi_serializer::create_yield_function(base_tester::abi_serializer_max_time));
+   abi_serializer abi_ser(fc::json::from_string( (const char*)contracts::bios_abi().data()).template as<abi_def>(), base_tester::fixture_abi_yield_function());
    // bios_wasm and bios_abi set by set execute_setup_policy full
    // t.set_code( config::system_account_name, contracts::bios_wasm() );
    // t.set_abi( config::system_account_name, contracts::bios_abi().data() );
@@ -572,8 +572,8 @@ BOOST_AUTO_TEST_CASE( setabi_bios ) try {
    {
       auto res = t.get_row_by_account( config::system_account_name, config::system_account_name, "abihash"_n, "sysio.token"_n );
       _abi_hash abi_hash;
-      auto abi_hash_var = abi_ser.binary_to_variant( "abi_hash", res, abi_serializer::create_yield_function(base_tester::abi_serializer_max_time) );
-      abi_serializer::from_variant( abi_hash_var, abi_hash, t.get_resolver(), abi_serializer::create_yield_function(base_tester::abi_serializer_max_time));
+      auto abi_hash_var = abi_ser.binary_to_variant( "abi_hash", res, base_tester::fixture_abi_yield_function() );
+      abi_serializer::from_variant( abi_hash_var, abi_hash, t.get_resolver(), base_tester::fixture_abi_yield_function());
       auto abi = fc::raw::pack(fc::json::from_string( (const char*)contracts::token_abi().data()).template as<abi_def>());
       auto result = fc::sha256::hash( (const char*)abi.data(), abi.size() );
 
@@ -584,8 +584,8 @@ BOOST_AUTO_TEST_CASE( setabi_bios ) try {
    {
       auto res = t.get_row_by_account( config::system_account_name, config::system_account_name, "abihash"_n, "sysio.token"_n );
       _abi_hash abi_hash;
-      auto abi_hash_var = abi_ser.binary_to_variant( "abi_hash", res, abi_serializer::create_yield_function(base_tester::abi_serializer_max_time) );
-      abi_serializer::from_variant( abi_hash_var, abi_hash, t.get_resolver(), abi_serializer::create_yield_function(base_tester::abi_serializer_max_time));
+      auto abi_hash_var = abi_ser.binary_to_variant( "abi_hash", res, base_tester::fixture_abi_yield_function() );
+      abi_serializer::from_variant( abi_hash_var, abi_hash, t.get_resolver(), base_tester::fixture_abi_yield_function());
       auto abi = fc::raw::pack(fc::json::from_string( (const char*)contracts::system_abi().data()).template as<abi_def>());
       auto result = fc::sha256::hash( (const char*)abi.data(), abi.size() );
 
@@ -598,8 +598,8 @@ BOOST_FIXTURE_TEST_CASE( setabi, sysio_system_tester ) try {
    {
       auto res = get_row_by_account( config::system_account_name, config::system_account_name, "abihash"_n, "sysio.token"_n );
       _abi_hash abi_hash;
-      auto abi_hash_var = abi_ser.binary_to_variant( "abi_hash", res, abi_serializer::create_yield_function(abi_serializer_max_time) );
-      abi_serializer::from_variant( abi_hash_var, abi_hash, get_resolver(), abi_serializer::create_yield_function(abi_serializer_max_time));
+      auto abi_hash_var = abi_ser.binary_to_variant( "abi_hash", res, fixture_abi_yield_function() );
+      abi_serializer::from_variant( abi_hash_var, abi_hash, get_resolver(), fixture_abi_yield_function());
       auto abi = fc::raw::pack(fc::json::from_string( (const char*)contracts::token_abi().data()).template as<abi_def>());
       auto result = fc::sha256::hash( (const char*)abi.data(), abi.size() );
 
@@ -610,8 +610,8 @@ BOOST_FIXTURE_TEST_CASE( setabi, sysio_system_tester ) try {
    {
       auto res = get_row_by_account( config::system_account_name, config::system_account_name, "abihash"_n, "sysio.token"_n );
       _abi_hash abi_hash;
-      auto abi_hash_var = abi_ser.binary_to_variant( "abi_hash", res, abi_serializer::create_yield_function(abi_serializer_max_time) );
-      abi_serializer::from_variant( abi_hash_var, abi_hash, get_resolver(), abi_serializer::create_yield_function(abi_serializer_max_time));
+      auto abi_hash_var = abi_ser.binary_to_variant( "abi_hash", res, fixture_abi_yield_function() );
+      abi_serializer::from_variant( abi_hash_var, abi_hash, get_resolver(), fixture_abi_yield_function());
       auto abi = fc::raw::pack(fc::json::from_string( (const char*)contracts::system_abi().data()).template as<abi_def>());
       auto result = fc::sha256::hash( (const char*)abi.data(), abi.size() );
 

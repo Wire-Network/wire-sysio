@@ -518,6 +518,17 @@ namespace chainbase {
              get_mutable_index<index_type>().modify( obj, m );
          }
 
+         /// Like modify, for a modifier that changes no indexed field.
+         template<typename ObjectType, typename Modifier>
+         void modify_unindexed( const ObjectType& obj, Modifier&& m )
+         {
+             if ( _read_only_mode ) {
+                BOOST_THROW_EXCEPTION( std::logic_error( "attempting to modify a record in read-only mode" ) );
+             }
+             typedef typename get_index_type<ObjectType>::type index_type;
+             get_mutable_index<index_type>().modify_unindexed( obj, m );
+         }
+
          template<typename ObjectType>
          void remove( const ObjectType& obj )
          {

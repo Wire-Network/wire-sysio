@@ -1,8 +1,10 @@
+#include <fstream>
 #include <sstream>
 
 #include <sysio/chain/block_log.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/snapshot.hpp>
+#include <sysio/chain/transaction_dedup.hpp>
 #include <sysio/testing/tester.hpp>
 
 #include <boost/mpl/list.hpp>
@@ -86,6 +88,97 @@ class replay_tester : public base_tester {
 };
 
 BOOST_AUTO_TEST_SUITE(restart_chain_tests)
+
+/** An interrupted initialization leaves a state database without a version header. */
+BOOST_AUTO_TEST_CASE(interrupted_initialization_reports_missing_database_header) {
+   tester reference;
+   auto cfg = reference.get_config();
+   fc::temp_directory directory;
+   cfg.state_dir = directory.path() / "state";
+   cfg.blocks_dir = directory.path() / "blocks";
+   cfg.finalizers_dir = directory.path() / "finalizers";
+   {
+      controller interrupted(cfg, reference.control->get_chain_id());
+      interrupted.add_indices();
+   }
+   BOOST_REQUIRE_EXCEPTION(controller::extract_chain_id_from_db(cfg.state_dir), bad_database_version_exception,
+                           [](const auto& ex) {
+                              return ex.top_message() ==
+                                     "State database has no version header: the launch that created it did not complete startup. "
+                                     "Rerun once with --delete-all-blocks.";
+                           });
+}
+
+/** A partially written active log still reports its original read failure. */
+BOOST_AUTO_TEST_CASE(restart_rejects_truncated_block_log) {
+   fc::temp_directory directory;
+   {
+      std::ofstream log(directory.path() / "blocks.log", std::ios::binary);
+      log.put('\0');
+   }
+   BOOST_CHECK_THROW(block_log::extract_chain_context(directory.path(), {}), std::ios_base::failure);
+}
+
+/// Existing chain state must never restart with missing, corrupt, unreadable, or mismatched replay protection.
+BOOST_AUTO_TEST_CASE(dedup_state_required_on_restart) {
+   for (const std::string damage : {"missing", "corrupt", "unreadable", "mismatched"}) {
+      BOOST_TEST_CONTEXT(damage) {
+         tester chain(setup_policy::none);
+         chain.produce_blocks(3);
+         const auto path = chain.get_config().state_dir / config::transaction_dedup_filename;
+         chain.close();
+         BOOST_REQUIRE(std::filesystem::is_regular_file(path));
+         if (damage == "missing") {
+            std::filesystem::remove(path);
+         } else if (damage == "corrupt") {
+            std::ofstream(path) << "invalid dedup data";
+         } else if (damage == "unreadable") {
+            std::filesystem::remove(path);
+            std::filesystem::create_symlink(path.filename(), path); // ELOOP, including for privileged test users
+         } else {
+            transaction_dedup empty;
+            empty.write_to_file(path);
+         }
+         BOOST_REQUIRE_EXCEPTION(chain.open(), database_exception, [](const auto& e) {
+            const auto message = e.to_detail_string();
+            return (message.find("transaction dedup") != std::string::npos ||
+                    message.find("Transaction dedup") != std::string::npos) &&
+                   message.find("Restore from a snapshot") != std::string::npos;
+         });
+         chain.close(); // Failed startup leaves a controller alive; it must not persist an empty replacement.
+         if (damage == "missing" || damage == "mismatched")
+            BOOST_CHECK(!std::filesystem::exists(path));
+         else if (damage == "unreadable")
+            BOOST_CHECK(std::filesystem::is_symlink(path));
+         else
+            BOOST_CHECK_EQUAL(std::filesystem::file_size(path), std::string("invalid dedup data").size());
+      }
+   }
+}
+
+/// A clean reopen retains transaction membership, and a pre-startup exception leaves its sidecar untouched.
+BOOST_AUTO_TEST_CASE(dedup_survives_restart_and_prestartup_failure) {
+   tester chain;
+   const auto trace = chain.create_account("deduptest"_n);
+   chain.produce_block();
+   BOOST_REQUIRE(chain.control->is_known_unexpired_transaction(trace->id));
+   const auto chain_id = chain.get_chain_id();
+   const auto path = chain.get_config().state_dir / config::transaction_dedup_filename;
+   chain.close();
+   auto read_file = [&]() {
+      std::ifstream file(path, std::ios::binary);
+      return std::string(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>());
+   };
+   const auto persisted = read_file();
+   BOOST_REQUIRE(!persisted.empty());
+   BOOST_REQUIRE_THROW(chain.open(make_protocol_feature_set(), chain_id, []() {
+      throw std::runtime_error("before startup");
+   }), std::runtime_error);
+   chain.close();
+   BOOST_CHECK(read_file() == persisted);
+   chain.open();
+   BOOST_CHECK(chain.control->is_known_unexpired_transaction(trace->id));
+}
 
 BOOST_AUTO_TEST_CASE_TEMPLATE( test_existing_state_without_block_log, T, testers ) {
    T chain;

@@ -3,13 +3,20 @@
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/webassembly/return_codes.hpp>
 
+#include <fc/crypto/hex.hpp>
 #include <fc/variant_object.hpp>
+#include <fmt/format.h>
 
 #include <boost/test/unit_test.hpp>
 
 #include <test_contracts.hpp>
 
 #include "fork_test_utilities.hpp"
+#include "test_utils.hpp"
+
+#include <string>
+#include <string_view>
+#include <vector>
 
 using namespace sysio::chain;
 using namespace sysio::testing;
@@ -23,6 +30,102 @@ bytes h2bin(const std::string& source) {
    fc::from_hex(source, output.data(), output.size());
    return output;
 }
+
+namespace {
+
+/// Where an output size contract keeps its abort message, its inputs and its output buffer.
+constexpr uint32_t message_offset = 8;
+constexpr uint32_t input_offset   = 1024;
+constexpr uint32_t output_offset  = 8192;
+
+constexpr auto wrong_return_code = "wrong return code";
+
+constexpr auto six_i32_params   = "(param i32 i32 i32 i32 i32 i32) (result i32)";
+constexpr auto eight_i32_params = "(param i32 i32 i32 i32 i32 i32 i32 i32) (result i32)";
+constexpr auto blake2_f_params  = "(param i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32) (result i32)";
+constexpr auto blake2_f_rounds  = "(i32.const 0)";
+constexpr auto blake2_f_final   = "(i32.const 1)";
+
+/// Hex digits of padding after the 3 bytes of the BLAKE2 message, which is 128 bytes.
+constexpr size_t blake2_f_message_zeros = 250;
+
+/// One call to a crypto intrinsic with valid inputs.
+struct output_size_case {
+   std::string_view         intrinsic;
+   std::string_view         signature;
+   std::string_view         before_inputs; ///< wast arguments ahead of the inputs
+   std::vector<std::string> inputs;        ///< hex, each passed as a pointer and a size
+   std::string_view         after_inputs;  ///< wast arguments between the inputs and the output
+   std::string              output;        ///< hex of the result, whose size is the only one a call may pass
+};
+
+/// The vectors come from the tests below. The mod_exp modulus is wider than its value, so the size asked for is the
+/// modulus's and not the result's.
+std::vector<output_size_case> output_size_cases() {
+   return {
+      {"alt_bn128_add", six_i32_params, "",
+       {"222480c9f95409bfa4ac6ae890b9c150bc88542b87b352e92950c340458b0c092976efd698cf23b414ea622b3f720dd9080d679042482ff3668cb2e32cad8ae2",
+        "1bd20beca3d8d28e536d2b5bd3bf36d76af68af5e6c96ca6e5519ba9ff8f53322a53edf6b48bcf5cb1c0b4ad1d36dfce06a79dcd6526f1c386a14d8ce4649844"},
+       "",
+       "16c7c4042e3a725ddbacf197c519c3dcad2bc87dfd9ac7e1e1631154ee0b7d9c19cd640dd28c9811ebaaa095a16b16190d08d6906c4f926fce581985fe35be0e"},
+      {"alt_bn128_mul", six_i32_params, "",
+       {"007c43fcd125b2b13e2521e395a81727710a46b34fe279adbf1b94c72f7f91360db2f980370fb8962751c6ff064f4516a6a93d563388518bb77ab9a6b30755be",
+        "0312ed43559cf8ecbab5221256a56e567aac5035308e3f1d54954d8b97cd1c9b"},
+       "",
+       "2d66cdeca5e1715896a5a924c50a149be87ddd2347b862150fbb0fd7d0b1833c11c76319ebefc5379f7aa6d85d40169a612597637242a4bbb39e5cd3b844becd"},
+      {"mod_exp", eight_i32_params, "", {"03", "02", "00000005"}, "", "00000004"},
+      {"blake2_f", blake2_f_params, blake2_f_rounds,
+       {"48c9bdf267e6096a3ba7ca8485ae67bb2bf894fe72f36e3cf1361d5f3af54fa5d182e6ad7f520e511f6c3e2b8c68059b6bbd41fbabd9831f79217e1319cde05b",
+        "616263" + std::string(blake2_f_message_zeros, '0'),
+        "0300000000000000", "0000000000000000"},
+       blake2_f_final,
+       "08c9bcf367e6096a3ba7ca8485ae67bb2bf894fe72f36e3cf1361d5f3af54fa5d282e6ad7f520e511f6c3e2b8c68059b9442be0454267ce079217e1319cde05b"},
+      {"k1_recover", six_i32_params, "",
+       {"1b174de755b55bd29026d626f7313a5560353dc5175f29c78d79d961b81a0c04360d833ca789bc16d4ee714a6d1a19461d890966e0ec5c074f67be67e631d33aa7",
+        "45fd65f6dd062fe7020f11d19fe5c35dc4d425e1479c0968c8e932c208f25399"},
+       "",
+       "0407521b8289ec7b603bd60b1d7efc5f7ad91cda280a6bebbe6d95d0ac96ef93fb12f99b751dba9238cd35e3c43b44b11474d2a6561afe331ec48c77cd287e438b"},
+   };
+}
+
+/**
+ * A contract that calls the intrinsic with an output buffer of `output_size` bytes, aborts unless the call returns
+ * `expected`, and returns the buffer as its action return value, so that a test sees what was written.
+ */
+std::string wast_with_output_size(const output_size_case& call, uint32_t output_size, int32_t expected) {
+   bytes       input;
+   std::string arguments{call.before_inputs};
+   for (const auto& hex : call.inputs) {
+      const bytes part = h2bin(hex);
+      arguments += fmt::format(" (i32.const {}) (i32.const {})", input_offset + input.size(), part.size());
+      input.insert(input.end(), part.begin(), part.end());
+   }
+   arguments += ' ';
+   arguments += call.after_inputs;
+   return fmt::format(R"=====(
+(module
+ (import "env" "sysio_assert" (func $assert (param i32 i32)))
+ (import "env" "set_action_return_value" (func $return_value (param i32 i32)))
+ (import "env" "{intrinsic}" (func $f {signature}))
+ (memory $0 1)
+ (data (i32.const {message}) "{wrong}\00")
+ (data (i32.const {input_at}) "{input}")
+ (export "apply" (func $apply))
+ (func $apply (param $0 i64) (param $1 i64) (param $2 i64)
+  (call $assert (i32.eq (call $f {arguments} (i32.const {output}) (i32.const {size})) (i32.const {expected}))
+                (i32.const {message}))
+  (call $return_value (i32.const {output}) (i32.const {size}))
+ )
+)
+)=====",
+                      fmt::arg("intrinsic", call.intrinsic), fmt::arg("signature", call.signature),
+                      fmt::arg("message", message_offset), fmt::arg("wrong", wrong_return_code),
+                      fmt::arg("input_at", input_offset),
+                      fmt::arg("input", sysio::test_utils::to_wast_string(input)), fmt::arg("arguments", arguments),
+                      fmt::arg("output", output_offset), fmt::arg("size", output_size), fmt::arg("expected", expected));
+}
+
+} // anonymous namespace
 
 BOOST_AUTO_TEST_SUITE(crypto_primitives_tests)
 
@@ -112,12 +215,12 @@ BOOST_AUTO_TEST_CASE( alt_bn128_add_test ) { try {
             "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         },
 
-        // test bigger result length
+        // test bigger result length, refused like a smaller one
         {
             "222480c9f95409bfa4ac6ae890b9c150bc88542b87b352e92950c340458b0c092976efd698cf23b414ea622b3f720dd9080d679042482ff3668cb2e32cad8ae2",
             "1bd20beca3d8d28e536d2b5bd3bf36d76af68af5e6c96ca6e5519ba9ff8f53322a53edf6b48bcf5cb1c0b4ad1d36dfce06a79dcd6526f1c386a14d8ce4649844",
-            return_code::success,
-            "16c7c4042e3a725ddbacf197c519c3dcad2bc87dfd9ac7e1e1631154ee0b7d9c19cd640dd28c9811ebaaa095a16b16190d08d6906c4f926fce581985fe35be0e00"
+            return_code::failure,
+            "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         },
    };
 
@@ -231,12 +334,12 @@ BOOST_AUTO_TEST_CASE( alt_bn128_mul_test ) { try {
             "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         },
 
-        //test bigger result length
+        //test bigger result length, refused like a smaller one
         {
             "007c43fcd125b2b13e2521e395a81727710a46b34fe279adbf1b94c72f7f91360db2f980370fb8962751c6ff064f4516a6a93d563388518bb77ab9a6b30755be",
             "0312ed43559cf8ecbab5221256a56e567aac5035308e3f1d54954d8b97cd1c9b",
-            return_code::success,
-            "2d66cdeca5e1715896a5a924c50a149be87ddd2347b862150fbb0fd7d0b1833c11c76319ebefc5379f7aa6d85d40169a612597637242a4bbb39e5cd3b844becd00"
+            return_code::failure,
+            "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         },
    };
 
@@ -807,6 +910,45 @@ BOOST_AUTO_TEST_CASE( k1_recover_test ) { try {
          ("expected_error", expected_error)
          ("expected_result", expected_result)
       );
+   }
+
+} FC_LOG_AND_RETHROW() }
+
+// A buffer of any size but the result's fails the call, and nothing is written to it. A larger buffer is refused too, so
+// that no contract comes to rely on one. These contracts are hand-written wast so that they can pass any size.
+BOOST_AUTO_TEST_CASE( output_size_is_exact_test ) { try {
+   tester c( setup_policy::full );
+
+   const auto& tester1_account = account_name("tester1");
+   c.create_accounts( {tester1_account} );
+   c.produce_block();
+
+   const auto buffer_after_call = [&]( const output_size_case& call, uint32_t output_size,
+                                       int32_t expected ) -> std::string {
+      c.set_code( tester1_account, wast_with_output_size(call, output_size, expected).c_str() );
+      c.produce_block();
+
+      signed_transaction trx;
+      trx.actions.emplace_back( vector<permission_level>{{tester1_account, config::active_name}}, tester1_account, ""_n, bytes{} );
+      c.set_transaction_headers( trx );
+      trx.sign( c.get_private_key(tester1_account, "active"), c.get_chain_id() );
+      try {
+         const auto trace = c.push_transaction( trx );
+         c.produce_block();
+         return fc::to_hex( trace->action_traces.front().return_value );
+      } catch( const sysio_assert_message_exception& ) {
+         return wrong_return_code;
+      }
+   };
+   const auto zeros = []( size_t size ) { return std::string(size * 2, '0'); };
+
+   for( const auto& call : output_size_cases() ) {
+      BOOST_TEST_CONTEXT( call.intrinsic ) {
+         const size_t exact = call.output.size() / 2;
+         BOOST_TEST( buffer_after_call(call, exact - 1, return_code::failure) == zeros(exact - 1) );
+         BOOST_TEST( buffer_after_call(call, exact, return_code::success) == call.output );
+         BOOST_TEST( buffer_after_call(call, exact + 1, return_code::failure) == zeros(exact + 1) );
+      }
    }
 
 } FC_LOG_AND_RETHROW() }

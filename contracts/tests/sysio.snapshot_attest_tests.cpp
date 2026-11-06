@@ -11,6 +11,9 @@
 #include <fc/exception/exception.hpp>
 #include <fc/variant_object.hpp>
 
+#include <array>
+#include <limits>
+
 #include "sysio.system_tester.hpp"
 #include "finalizer_test_keys.hpp"
 
@@ -21,6 +24,9 @@ using namespace sysio_system;
 // ---------------------------------------------------------------------------
 class snapshot_attest_tester : public sysio_system_tester {
 public:
+   /// Small configured cadence used by contract tests that need real scheduled heights.
+   static constexpr uint32_t test_block_spacing = 250;
+
    /// The five producers every test in this fixture delegates snapshot providers from.
    static std::vector<account_name> fixture_producers() {
       return {"producer1"_n, "producer2"_n, "producer3"_n, "producer4"_n, "producer5"_n};
@@ -32,9 +38,9 @@ public:
     * @param extra_producers producers a single test needs beyond the fixture's five. They are
     *   created HERE rather than in the test because every registered finalizer key has to be in
     *   the node's voting set from the start -- see `register_schedulable_finalizer_keys`.
-    * @param cadence_periods how many `block_spacing` periods of history to build before anything
+    * @param cadence_periods how many test-block-spacing periods of history to build before anything
     *   else. 0 -- the default -- costs nothing, and is what every registration test uses: it
-    *   deliberately does NOT advance, because the advance costs 25 000 blocks and permanently
+    *   deliberately does NOT advance, because the advance permanently
     *   forfeits the validating controller. 1 reaches the first attestable height
     *   (`snapshot_voting_tester`); 2 reaches the second, for the purging tests that need two
     *   scheduled heights live at once (`snapshot_multi_height_tester`). A test pays for the
@@ -50,8 +56,8 @@ public:
       // attestable height with only `sysio.bios` on the system account. bios declares no
       // `onblock`, so those blocks execute no contract code at all — where under `sysio.system`
       // every one of them runs the interpreted `onblock` (blockinfo write, round attribution,
-      // and a schedule rebuild every 120 slots). That difference, times `block_spacing`
-      // (25 000) blocks times two dozen tests, is the whole cost of this suite.
+      // and a schedule rebuild every 120 slots). Keeping that work on the cheap side of deployment
+      // still matters even with the deliberately small test cadence.
       : sysio_system_tester(cadence_periods > 0 ? setup_level::core_token : setup_level::full) {
       if (cadence_periods > 0) {
          advance_to_attestation_cadence(cadence_periods);
@@ -95,19 +101,17 @@ public:
       // Reach the attestation cadence BEFORE registering finalizer keys, i.e. while no producer
       // is schedulable yet. Ordering is the whole point: once they are, `update_ranked_producers`
       // publishes a policy of ALL of them, and the node then signs and verifies one vote per
-      // finalizer on EVERY block. Paying that across a `block_spacing` (25 000) block advance is
-      // what took this suite from minutes to over an hour and blew CI's 1000 s ctest timeout.
-      // Advancing first leaves the cheap single-finalizer genesis policy in force for those
-      // 25 000 blocks, and the larger policy applies only to the handful of blocks a test
-      // produces afterwards.
+      // finalizer on EVERY block. Advancing first leaves the cheap single-finalizer genesis policy
+      // in force for the configured history, and the larger policy applies only to the handful of
+      // blocks a test produces afterwards.
       register_schedulable_finalizer_keys(std::vector<name>(producers.begin(), producers.end()));
       produce_blocks();
    }
 
    /**
-    * Produce blocks until the head reaches the given number of `block_spacing` periods.
+    * Produce blocks until the head reaches the given number of test-cadence periods.
     *
-    * `votesnaphash` rejects a height above the head, and only multiples of `block_spacing` are
+    * `votesnaphash` rejects a height above the head, and only multiples of the configured cadence are
     * scheduled, so a test that votes needs the chain at least one period along -- and a test that
     * needs two scheduled heights live at once needs two.
     *
@@ -120,9 +124,9 @@ public:
     *
     * It skips duplicate validation too, and those flags STAY set: the validating controller never
     * received these blocks, so re-enabling it afterwards makes the very next block unlinkable
-    * against a node tens of thousands of blocks behind.
+    * against the validating controller's older head.
     *
-    * @param periods how many `block_spacing` periods of history to build.
+    * @param periods how many test-cadence periods of history to build.
     */
    void advance_to_attestation_cadence(uint32_t periods) {
       const uint32_t target = scheduled_height(periods);
@@ -145,7 +149,7 @@ public:
    /// `set_node_finalizers` is not optional here, and the reason is easy to miss: once these
    /// producers are schedulable, `onblock`'s throttled rebuild proposes a finalizer policy built
    /// from exactly these keys. A policy this node cannot vote for freezes LIB -- and these tests
-   /// then advance `block_spacing` (25 000) blocks to reach an attestable height, so an unpruned
+   /// then advance to a scheduled height, so an unpruned
    /// fork database grows the whole way and the chainbase segment is exhausted long before the
    /// test finishes. It is called ONCE, over every key any test in this fixture will register,
    /// which is why `extra_producers` is a constructor parameter rather than test-local setup.
@@ -232,7 +236,7 @@ public:
       const auto opreg_abi = get_resolver()("sysio.opreg"_n);
       BOOST_REQUIRE(opreg_abi.has_value());
       const auto row = opreg_abi->binary_to_variant(
-         "operator_entry", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+         "operator_entry", data, fixture_abi_yield_function());
       return row["status"].as<sysio::opp::types::OperatorStatus>();
    }
 
@@ -287,10 +291,20 @@ public:
          ("snapshot_hash", snapshot_hash));
    }
 
-   /// Set snapshot attestation configuration.
-   action_result setsnpcfg(uint32_t min_providers) {
+   /// Set snapshot attestation configuration, using the small test cadence by default.
+   action_result setsnpcfg(uint32_t min_providers, uint32_t block_spacing = test_block_spacing) {
       return push_action(config::system_account_name, "setsnpcfg"_n, mvo()
-         ("min_providers", min_providers));
+         ("min_providers", min_providers)
+         ("block_spacing", block_spacing));
+   }
+
+   /// Return the singleton snapshot-attestation configuration row.
+   fc::variant get_snap_config() {
+      const vector<char> data = get_row_by_account(
+         config::system_account_name, config::system_account_name,
+         "snapconfig"_n, "snapconfig"_n);
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
+         "snap_config", data, fixture_abi_yield_function());
    }
 
    /// Return an attested snapshot record from the contract table.
@@ -299,7 +313,7 @@ public:
          config::system_account_name, config::system_account_name,
          "snaprecords"_n, name(block_num));
       return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
-         "snap_record", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+         "snap_record", data, fixture_abi_yield_function());
    }
 
    /// Return a registered snapshot provider from the contract table.
@@ -308,7 +322,7 @@ public:
          config::system_account_name, config::system_account_name,
          "snapprovs"_n, snap_account);
       return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
-         "snap_provider", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+         "snap_provider", data, fixture_abi_yield_function());
    }
 
    /// Count pending snapshot tuple rows across the scheduled tally space.
@@ -325,13 +339,11 @@ public:
       return count;
    }
 
-   /// The height a given `block_spacing` period falls on.
+   /// The height a given test-cadence period falls on.
    ///
-   /// Usable WITHOUT advancing: `votesnaphash` runs its two height checks -- is this a scheduled
-   /// multiple, and is it at or below the head -- before it reads any table, so a test asserting on
-   /// either of those needs no chain history at all and belongs on the base fixture.
+   /// Usable without advancing when a test only needs to construct a candidate height.
    static constexpr uint32_t scheduled_height(uint32_t period) {
-      return period * sysiosystem::snapshot_attestation::block_spacing;
+      return period * test_block_spacing;
    }
 
    /// The latest attestable height at or below the head.
@@ -341,7 +353,7 @@ public:
    /// for one has no attestable height and says so, rather than silently buying one mid-test at
    /// several times the price.
    uint32_t vote_block_num() {
-      const uint32_t spacing = sysiosystem::snapshot_attestation::block_spacing;
+      constexpr uint32_t spacing = test_block_spacing;
       // Commit registrations and configuration the test queued before reading the height.
       produce_block();
       const uint32_t head_block_num = control->head().block_num();
@@ -391,7 +403,7 @@ private:
 /**
  * Fixture for the VOTING tests -- the ones whose assertions need a real attestable height.
  *
- * It builds one `block_spacing` (25 000) block period BEFORE the system contract is deployed and
+ * It builds one small configured-cadence period BEFORE the system contract is deployed and
  * BEFORE any finalizer key is registered, which is the only cheap order: once the producers are
  * schedulable, `update_ranked_producers` publishes a policy of all of them and the node signs plus
  * verifies one vote per finalizer on EVERY block. Paying that across the advance took this suite
@@ -661,7 +673,8 @@ BOOST_FIXTURE_TEST_CASE(setsnpcfg_basic, snapshot_attest_tester) { try {
    // Only sysio can call — producer1 should fail
    BOOST_REQUIRE_EQUAL(error("missing authority of sysio"),
                         push_action("producer1"_n, "setsnpcfg"_n, mvo()
-                           ("min_providers", 2)));
+                           ("min_providers", 2)
+                           ("block_spacing", test_block_spacing)));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(setsnpcfg_validation, snapshot_attest_tester) { try {
@@ -669,16 +682,88 @@ BOOST_FIXTURE_TEST_CASE(setsnpcfg_validation, snapshot_attest_tester) { try {
                         setsnpcfg(0));
    // min_providers cannot exceed the provider-table ceiling (max_snap_provider_rank
    // == 30): above it, quorum is unreachable no matter how many providers register.
-   // The boundary value is accepted; one past it is rejected.
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(30));
+   // One past each supported boundary is rejected without initializing the singleton.
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("min_providers exceeds the maximum registrable providers"),
                         setsnpcfg(31));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("block_spacing must be greater than 0"),
+                       setsnpcfg(1, 0));
+   BOOST_REQUIRE(get_snap_config().is_null());
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(30));
+   BOOST_REQUIRE_EQUAL(30u, get_snap_config()["min_providers"].as_uint64());
 } FC_LOG_AND_RETHROW() }
+
+/** Governance can select every positive uint32 cadence, including single-block test spacing. */
+BOOST_FIXTURE_TEST_CASE(setsnpcfg_accepts_every_positive_block_spacing, snapshot_attest_tester) { try {
+   const std::array spacings{
+      uint32_t{1}, sysiosystem::snapshot_attestation::default_block_spacing + 1,
+      std::numeric_limits<uint32_t>::max()};
+   for (const auto spacing : spacings) {
+      BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, spacing));
+      const auto config = get_snap_config();
+      BOOST_REQUIRE(!config.is_null());
+      BOOST_REQUIRE_EQUAL(1u, config["min_providers"].as_uint64());
+      BOOST_REQUIRE_EQUAL(spacing, config["block_spacing"].as_uint64());
+   }
+} FC_LOG_AND_RETHROW() }
+
+/** Quorum and cadence can change together; a rejected zero leaves the previous values intact. */
+BOOST_FIXTURE_TEST_CASE(setsnpcfg_updates_cadence_and_quorum, snapshot_attest_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(3));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, test_block_spacing + 1));
+   auto config = get_snap_config();
+   BOOST_REQUIRE_EQUAL(2u, config["min_providers"].as_uint64());
+   BOOST_REQUIRE_EQUAL(test_block_spacing + 1, config["block_spacing"].as_uint64());
+
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("block_spacing must be greater than 0"),
+                       setsnpcfg(1, 0));
+   config = get_snap_config();
+   BOOST_REQUIRE_EQUAL(2u, config["min_providers"].as_uint64());
+   BOOST_REQUIRE_EQUAL(test_block_spacing + 1, config["block_spacing"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
+/** Height eligibility accepts any positive cadence and grace deliberately rounds down. */
+BOOST_AUTO_TEST_CASE(snapshot_attestation_cadence_helpers_enforce_boundaries) {
+   namespace cadence = sysiosystem::snapshot_attestation;
+   constexpr uint32_t small_spacing = 4;
+   constexpr uint32_t odd_spacing = 5;
+   constexpr auto largest_spacing = std::numeric_limits<uint32_t>::max();
+   BOOST_CHECK(!cadence::is_valid_block_spacing(0));
+   BOOST_CHECK(cadence::is_valid_block_spacing(1));
+   BOOST_CHECK(cadence::is_valid_block_spacing(cadence::default_block_spacing + 1));
+   BOOST_CHECK(cadence::is_valid_block_spacing(largest_spacing));
+
+   BOOST_CHECK(!cadence::is_scheduled_block(0, small_spacing));
+   BOOST_CHECK(!cadence::is_scheduled_block(small_spacing - 1, small_spacing));
+   BOOST_CHECK(cadence::is_scheduled_block(small_spacing, small_spacing));
+   BOOST_CHECK(!cadence::is_scheduled_block(small_spacing + 1, small_spacing));
+   BOOST_CHECK(cadence::is_scheduled_block(largest_spacing, largest_spacing));
+   BOOST_CHECK(!cadence::is_scheduled_block(largest_spacing, 0));
+   BOOST_CHECK(cadence::is_scheduled_block(1, 1));
+
+   BOOST_CHECK_EQUAL(0u, cadence::snapshot_attestation_grace_blocks(1));
+   BOOST_CHECK_EQUAL(2u, cadence::snapshot_attestation_grace_blocks(odd_spacing));
+   BOOST_CHECK_EQUAL(12'500u,
+                     cadence::snapshot_attestation_grace_blocks(cadence::default_block_spacing));
+}
 
 // ---------------------------------------------------------------------------
 // votesnaphash tests
 // ---------------------------------------------------------------------------
+/** A cadence update changes eligible heights immediately in the contract. */
+BOOST_FIXTURE_TEST_CASE(votesnaphash_uses_updated_cadence, snapshot_voting_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   const auto formerly_unscheduled = make_block_id(vote_block_num() - 1);
+   const auto snapshot_hash = make_snap_hash(1);
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("snapshot block is not a scheduled attestation height"),
+                       votesnaphash("snapprov1"_n, formerly_unscheduled, snapshot_hash));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 1));
+   BOOST_REQUIRE_EQUAL(success(),
+                       votesnaphash("snapprov1"_n, formerly_unscheduled, snapshot_hash));
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(votesnaphash_unregistered, snapshot_voting_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1));
    auto bid = make_block_id(vote_block_num());
    auto shash = make_snap_hash(1);
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("snap_account is not a registered snapshot provider"),
@@ -721,15 +806,17 @@ BOOST_FIXTURE_TEST_CASE(delsnapprov_does_not_retract_an_accepted_vote, snapshot_
    BOOST_REQUIRE(get_snap_provider("snapprov1"_n).is_null());
    BOOST_REQUIRE_EQUAL(1u, snapshot_vote_count());
 
-   // The retired account is refused while the tuple is still PENDING. Asserting this after the
-   // tuple finalizes would prove nothing: an exact match against a final record returns before
-   // votesnaphash ever looks the provider up.
+   // The retired account is refused while the tuple is still PENDING.
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("snap_account is not a registered snapshot provider"),
                         votesnaphash("snapprov1"_n, block_id, snapshot_hash));
 
    // The retired producer's vote still counts toward K, so producer2 alone completes the quorum.
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, block_id, snapshot_hash));
    BOOST_REQUIRE(!getsnaphash(block_num).is_null());
+
+   // ...and once FINAL, where the tuple matches the record.
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("snap_account is not a registered snapshot provider"),
+                        votesnaphash("snapprov1"_n, block_id, snapshot_hash));
 } FC_LOG_AND_RETHROW() }
 
 /// Revocation reaches the vote: an ineligible producer rotates away from a compromised
@@ -917,6 +1004,62 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_final_tuple_retry_is_idempotent, snapshot_v
    BOOST_REQUIRE_EQUAL(0u, snapshot_vote_count());
 } FC_LOG_AND_RETHROW() }
 
+/// An account that is not a registered provider cannot land a no-op vote on a final tuple, though
+/// a mismatch with the record is still reported to it as a disagreement.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_final_tuple_rejects_unregistered_account, snapshot_voting_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1));
+
+   const auto block_num     = vote_block_num();
+   const auto block_id      = make_block_id(block_num);
+   const auto snapshot_hash = make_snap_hash(106);
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, block_id, snapshot_hash));
+   BOOST_REQUIRE(!getsnaphash(block_num).is_null());
+
+   BOOST_REQUIRE(get_snap_provider("snapprov2"_n).is_null());
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("snap_account is not a registered snapshot provider"),
+                        votesnaphash("snapprov2"_n, block_id, snapshot_hash));
+   // snap_hash_disagreement_error = 9001 (defined in snapshot_attest.hpp)
+   BOOST_REQUIRE_EQUAL(wasm_assert_code(9001),
+                        votesnaphash("snapprov2"_n, block_id, make_snap_hash(107)));
+} FC_LOG_AND_RETHROW() }
+
+/// A registered provider that did not vote before quorum may still vote the final tuple: a no-op that
+/// writes no vote row and earns no attestation credit.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_final_tuple_accepts_late_provider_vote, snapshot_voting_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1));
+
+   const auto block_num     = vote_block_num();
+   const auto block_id      = make_block_id(block_num);
+   const auto snapshot_hash = make_snap_hash(108);
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, block_id, snapshot_hash));
+   BOOST_REQUIRE(!getsnaphash(block_num).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, block_id, snapshot_hash));
+   BOOST_REQUIRE_EQUAL(0u, snapshot_vote_count());
+   BOOST_REQUIRE_EQUAL(0u, get_producer_info("producer2"_n)["snapshot_attestations"].as<uint32_t>());
+} FC_LOG_AND_RETHROW() }
+
+/// Standing gates only a vote that can count toward a quorum, so a registered provider whose producer
+/// has lost operator standing may still vote a final tuple.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_final_tuple_skips_standing_check, snapshot_voting_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1));
+
+   const auto block_num     = vote_block_num();
+   const auto block_id      = make_block_id(block_num);
+   const auto snapshot_hash = make_snap_hash(109);
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, block_id, snapshot_hash));
+   BOOST_REQUIRE(!getsnaphash(block_num).is_null());
+
+   terminate_operator("producer2"_n);
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, block_id, snapshot_hash));
+   BOOST_REQUIRE_EQUAL(0u, snapshot_vote_count());
+} FC_LOG_AND_RETHROW() }
+
 /// Voting is disabled until governance explicitly chooses a nonzero fixed K.
 BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_unconfigured_quorum, snapshot_voting_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
@@ -929,14 +1072,16 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_unconfigured_quorum, snapshot_votin
 
 /// A provider cannot pre-attest a tuple for a block height the chain has not reached.
 ///
-/// On the base fixture: the head is far below the first scheduled height, so that height is itself
-/// in the future. The check runs before `votesnaphash` reads any table, so proving it needs no
-/// chain history -- only a height the chain has not reached, which is every scheduled height here.
+/// The candidate is computed from the live head so this remains a future-height test even when
+/// fixture setup grows or the configured test cadence changes.
 BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_future_block_height, snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1));
+   produce_block();
 
-   const uint32_t future_block_num = scheduled_height(1);
+   const uint32_t current_block_num = control->head().block_num();
+   const uint32_t future_block_num =
+      (current_block_num / test_block_spacing + 2) * test_block_spacing;
    BOOST_REQUIRE(control->head().block_num() < future_block_num);
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("snapshot block cannot be in the future"),
                        votesnaphash("snapprov1"_n,
@@ -946,9 +1091,8 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_future_block_height, snapshot_attes
 
 /// A manual snapshot height cannot enter the bounded on-chain tally space.
 ///
-/// On the base fixture: the scheduled-multiple check is the FIRST thing `votesnaphash` evaluates
-/// after decoding the height -- ahead of the future-height check and every table read -- so an
-/// off-cadence height is rejected for being off-cadence no matter where the head sits.
+/// The configured-cadence check precedes the future-height check, so an off-cadence height is
+/// rejected for being off-cadence no matter where the head sits.
 BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_unscheduled_block_height, snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1));
@@ -958,6 +1102,25 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_unscheduled_block_height, snapshot_
                        votesnaphash("snapprov1"_n,
                                     make_block_id(unscheduled_block_num),
                                     make_snap_hash(104)));
+} FC_LOG_AND_RETHROW() }
+
+/// The contract accepts the exact configured boundary and rejects both adjacent heights.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_enforces_configured_cadence_edges,
+                        snapshot_multi_height_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2));
+   BOOST_REQUIRE_GE(vote_block_num(), test_block_spacing + 1);
+
+   const auto snapshot_hash = make_snap_hash(105);
+   BOOST_REQUIRE_EQUAL(
+      wasm_assert_msg("snapshot block is not a scheduled attestation height"),
+      votesnaphash("snapprov1"_n, make_block_id(test_block_spacing - 1), snapshot_hash));
+   BOOST_REQUIRE_EQUAL(success(),
+                       votesnaphash("snapprov1"_n,
+                                    make_block_id(test_block_spacing), snapshot_hash));
+   BOOST_REQUIRE_EQUAL(
+      wasm_assert_msg("snapshot block is not a scheduled attestation height"),
+      votesnaphash("snapprov1"_n, make_block_id(test_block_spacing + 1), snapshot_hash));
 } FC_LOG_AND_RETHROW() }
 
 // ---------------------------------------------------------------------------
@@ -1176,7 +1339,7 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_keeps_scheduled_heights_independent_until_f
 
    // Both heights are already behind the head -- the fixture built two cadence periods up front.
    const uint32_t newer_block_num = vote_block_num();
-   const uint32_t older_block_num = newer_block_num - sysiosystem::snapshot_attestation::block_spacing;
+   const uint32_t older_block_num = newer_block_num - test_block_spacing;
    const auto older_block_id = make_block_id(older_block_num);
    const auto older_hash = make_snap_hash(5);
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, older_block_id, older_hash));
@@ -1203,7 +1366,7 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_reopening_purged_historical_height,
 
    // Both heights are already behind the head -- the fixture built two cadence periods up front.
    const uint32_t newer_block_num = vote_block_num();
-   const uint32_t older_block_num = newer_block_num - sysiosystem::snapshot_attestation::block_spacing;
+   const uint32_t older_block_num = newer_block_num - test_block_spacing;
    const auto older_block_id = make_block_id(older_block_num);
    const auto older_hash = make_snap_hash(25);
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, older_block_id, older_hash));

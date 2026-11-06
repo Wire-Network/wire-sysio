@@ -32,8 +32,7 @@ sysio.authex::createlink(chain_kind, account, sig, pub_key, nonce)
 ```
 
 Sign this once per active outpost chain, with your Ethereum and Solana keys respectively.
-`regoperator` refuses an account that lacks a link for any active outpost chain, and the links are
-what the depot publishes for you in the `OPERATORS` roster it sends each outpost.
+`regoperator` refuses an account that lacks a link for any active outpost chain.
 
 The `nonce` is a millisecond timestamp and is rejected if it is more than ten minutes old, so
 generate it at signing time.
@@ -69,8 +68,9 @@ When every required token is at or above its minimum, your operator status flips
 its own. No producer rank exists yet: the first score is written only after the producer row and
 active finalizer key are created in steps 4 and 5.
 
-You can top up at any time. Once your producer row exists, every balance change rescores it, so
-additional collateral raises your rank as soon as it lands.
+You can top up at any time. Your bond multiplies your score, so collateral above the minimum raises
+your rank as soon as it lands. Once your producer row exists, every balance change rescores it, so
+falling below a minimum costs you your rank at once.
 
 ## Step 4 — Register your block-signing key
 
@@ -79,8 +79,16 @@ sysio.system::regproducer(producer, producer_key, url, location)
 ```
 
 Use `regproducer2` instead if you want a multi-key block-signing authority rather than a single
-key. The `url` is where you publish information about your operation, and `location` is an
-advisory number used for peer topology.
+key. The `url` is where you publish information about your operation. `location` sets your place
+in the production order: each new schedule runs in ascending `location`, account name breaking
+ties, so producers next to each other in that order take consecutive rounds. It has no effect on
+rank or on the per-block rate. To move, repeat the registration action you used, `regproducer` or
+`regproducer2`, with your current URL and signing key or authority and the new `location`. The
+change applies the next time the set of scheduled producers changes; a running schedule is never
+reordered on its own.
+
+Your first registration also takes a **registration order** from a chain-wide counter, which breaks
+ties between equal scores. Registering again, or parking and returning, keeps it.
 
 Creating a producer row, or reactivating one parked with `unregprod`, succeeds only after
 `sysio.opreg` reports your account as an `ACTIVE` producer that meets the live minimums. Calling
@@ -130,7 +138,8 @@ Rank is **position in a score-ordered index**, derived by iteration rather than 
 action. The chain rebuilds the schedule at most once every 120 block slots, roughly a minute; at
 that point the highest ranked eligible producers become the active schedule, and the finalizer
 policy is rebuilt to match. If your score puts you in the top 21 you are scheduled, and you begin
-producing in your slot.
+producing in your slot. Rank decides only whether you are among the 21; your `location` decides
+where in the round you produce.
 
 To hold a position at all you need three things at once: an active producer row, an `ACTIVE`
 producer operator registration backed by collateral, and an active finalizer key. Missing any one
@@ -153,8 +162,8 @@ be picked back up.
 
 ## How your rank is scored
 
-The score is a weighted sum of normalised factors, ordered **within a tier**. Tier always beats
-score, so no amount of collateral lifts a producer out of the tier it is in.
+A score orders producers **within a tier**. Tier always beats score, so no amount of seniority or
+collateral lifts a producer out of the tier it is in.
 
 There are three, and they sort in this order:
 
@@ -171,11 +180,40 @@ community producer that qualifies outranks all of them. They fill the schedule o
 too few community producers to fill it, and they yield those slots automatically as real producers
 arrive. Nobody has to vote them out, and there is no flag day.
 
-| Factor | What it measures |
+```
+score = M x (seniority + snapshot credit + base)
+```
+
+| Term | What it is |
 |---|---|
-| Collateral | Your bond divided by the required minimum, taken as the **minimum** across every required token. Linear and uncapped, so more collateral always outranks less. |
-| Participation | Falls with each consecutive unserved round and recovers when you serve one. |
-| Snapshot service | Snapshot attestations that reached quorum in the current pay period. Weighted at a tenth of collateral, so it separates producers the bond has left tied rather than outranking a larger bond. |
+| M | Your bond divided by the required minimum, taken as the **minimum** across every required token, counted in hundredths. Linear and uncapped, so bonding above the minimum raises your rank; below 1x you hold no rank at all. Bootstrapped producers hold no bond and count as 1x. |
+| Seniority | Your time in the schedule, counted in whole hours. Each round that pay counts adds the scheduled time since the last round it counted, up to one rotation of the schedule, so a day in the schedule is a day of seniority at any schedule size and a reordered schedule never credits a rotation twice. A round you do not serve costs a penalty, seven days by default, down to zero. |
+| Snapshot credit | Snapshot attestations that reached quorum in the current pay period, worth three days at full credit by default. |
+| Base | Seven days by default, the same for everyone, so a producer with no seniority still scores and standbys rank by stake. |
+
+Everything in the parentheses is multiplied by M, so snapshot credit is worth more at a larger stake
+and a miss costs M times the penalty. Ranking by M gives the same order as ranking by each producer's
+share of the total stake, since every producer would be divided by the same total.
+
+A standby at k_s times the minimum overtakes an incumbent at k_i with seniority S only when
+k_s x base > k_i x (S + base). With the 7-day base, a standby needs this multiple of the
+incumbent's stake:
+
+| Incumbent seniority | Stake needed to overtake |
+|---|---|
+| 30 days | about 5.3x |
+| 1 year | about 53x |
+| 2 years | about 105x |
+
+Stake moving producers around inside the top 21 changes nothing: membership changes only when a
+producer crosses the 21st position, and a running schedule keeps its order.
+
+Equal scores rank by registration order, earliest first.
+
+Seniority is kept while you are parked, on standby or demoted, but it grows only in rounds you are
+scheduled for. Termination or slashing resets it to zero and clears your registration order. A
+terminated producer that bonds again takes a new order with `regproducer`, and accrues no seniority
+until it does.
 
 Three further factors, relay, API and benchmark service, exist in the configuration at zero weight.
 They stay at zero until the chain can observe them; a self-declared factor would only be a source
@@ -187,23 +225,35 @@ again and frees the registration slot it held. Only votes that reach quorum are
 credited, so registering alone earns nothing. The credit is a rating of the CURRENT pay period and
 is stamped with it, so it expires at the period boundary rather than being consumed when you leave:
 attestations you earned this period still count if you park and come back inside it, and none of
-them survive into the next one. Blocks you have already produced behave the opposite way, because
-they are earnings rather than a rating.
+them survive into the next one. Blocks already counted toward your pay behave the opposite way,
+because they are earnings rather than a rating.
 
 ## Getting paid
 
-Producers are paid **per block produced**. Each block earns the same rate, computed as the active
-share of the producer pool divided by the period's slot count. A block you miss is simply not paid,
-and that pay stays in the treasury rather than being handed to whoever did produce.
+Producers are paid **per counted block**. A block you produce is counted, but only one round per
+rotation of the schedule counts: if a schedule change gives you a second round in the same
+rotation, its blocks are not counted. Each counted block earns the same rate, computed as the
+active share of the producer pool divided by the period's slot count. A block you miss is never
+counted, and that pay stays in the treasury rather than being handed to whoever did produce.
 
 Positions 22 and beyond, up to a configured end rank, are **standbys**. They draw a retainer from a
 separate slice of the pool, decaying linearly with position, so the network keeps a ready bench.
 
-Blocks you have produced are not forfeited. If you are not payable when a payout runs — parked,
-demoted, or temporarily under-collateralized — your block count is held rather than cleared, and it
-is paid at the first payout after you are payable again. Unregistering right after producing and
+Counted blocks are not forfeited. If you are not payable when a payout runs — parked, demoted, or
+temporarily under-collateralized — your count is held rather than cleared, and it is paid at the
+first payout after you are payable again. Unregistering right after producing and
 re-registering before your next round costs you nothing provided you still meet the admission
 requirements; if governance raised a collateral minimum while you were parked, top up first.
+
+Termination does not forfeit them either, but re-registering alone does not make you payable:
+termination credits your whole bond to your `claimremit` claim, and `regoperator` starts a new
+`UNKNOWN` registration with no bond. Cancel any withdrawal still queued from before termination with
+`cancelwtdw`: the queue is per account, so it would reserve part of the new bond and be paid out of
+it when it matures. Then post every required bond again, and call `regproducer`: termination reset
+your seniority and registration order, and you accrue seniority again only once you register again.
+If your producer row was parked, the call is also what makes you payable. The held blocks are paid
+at the first payout after that. Slashing is the exception: a slashed producer can never be payable
+again, so any blocks it produced and was not yet paid for are forfeited.
 
 The one bound worth stating: a payout walks the ranking from the top and stops after a fixed number
 of rows, far below which no producer is paid anything anyway. Settling held blocks therefore
@@ -227,8 +277,8 @@ Only rounds you were actually scheduled for count, so time spent off the schedul
 hurts you. The streak is consecutive rather than a rate, so it measures whether you are down right
 now, not what your record looked like last week.
 
-Demotion is categorical: it moves you into a tier that no amount of collateral climbs out of, and
-the next rebuild drops you from the schedule.
+Demotion is categorical: it moves you into a tier that no amount of seniority or collateral climbs
+out of, and the next rebuild drops you from the schedule.
 
 There are two ways back, and which one applies depends on whether you still hold a slot:
 
@@ -242,16 +292,17 @@ There are two ways back, and which one applies depends on whether you still hold
    producer row was parked, reactivation also rechecks operator status and the live collateral
    minimum, so top up before calling it when the bar has moved.
 
+Neither door returns the seniority the unserved rounds cost.
+
 The schedule check is what keeps the second door honest. `regproducer` costs nothing but a
 signature and can be repeated, so if a scheduled producer could call it to erase a demotion, an
 absent operator would simply run it on a timer and hold its slot without ever producing.
 
-One subtlety worth planning around: even a single unserved round short of demotion lowers your
-participation factor, and if that drops you below the last scheduled position you stop being
-scheduled — without being demoted. You are then in the first case's blind spot and the second
-case's reach: no slot to serve, so `regproducer` is the lever, and it restores your score along
-with your tier. Collateral works from outside the schedule too — post enough to outrank whoever
-displaced you and the next rebuild puts you back.
+One subtlety worth planning around: even a single unserved round short of demotion costs the miss
+penalty, and if that drops you below the last scheduled position you stop being scheduled — without
+being demoted. Off the schedule you accrue nothing, so you return when your score again outranks
+the last scheduled producer: when one leaves or loses seniority, or when more collateral or snapshot
+credit lifts you.
 
 Changing either threshold re-derives every producer's standing as the rescore sweep drains, so a
 lowered limit binds on streaks that already breach it and a raised one releases the producers now
@@ -260,9 +311,9 @@ under it. It is not applied only to rounds missed from that point on.
 ## Leaving, voluntarily or otherwise
 
 - **Park** with `unregprod`. Your bond is untouched and your operator status stays `ACTIVE`; you
-  simply hold no schedule position. `regproducer` brings you back at the position your collateral
-  earns after rechecking current admission; a minimum raised while you were parked requires a
-  top-up first.
+  simply hold no schedule position. `regproducer` brings you back at the position your bond,
+  seniority and registration order earn after rechecking current admission; a minimum raised while you were
+  parked requires a top-up first. Parked time adds no seniority.
 - **Withdraw** with `sysio.opreg::withdraw(account, token_code, amount)`. The request is queued
   rather than immediate (`cancelwtdw` cancels it before it flushes); once it flushes at an epoch
   advance, the funds are credited to a per-token claim that you pull with
@@ -285,7 +336,7 @@ under it. It is not applied only to rounds missed from that point on.
   Yield is shared first come, first served: rounding can leave the last claimant up to a few
   atomic WIRE short, and that dust is paid only when later slack covers it.
 - **Slashing** is punitive and permanent. A slashed operator's row is never pruned and the registry
-  refuses to re-register it, so a slashed account cannot come back.
+  refuses to re-register it, so a slashed account cannot come back. Its seniority is reset.
 
 ## A note on schedule size
 

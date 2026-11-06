@@ -55,8 +55,8 @@ This allows a single unified message format across all supported chains.
 
 ### Outbound (Wire → External Chain)
 
-1. System contracts queue attestations for a target outpost via `sysio.msgch::queueout()`.
-2. When the epoch advances, `buildenv()` packs the `READY` attestations into a protobuf-encoded outbound envelope; anything that does not fit stays queued for the next epoch.
+1. System contracts queue attestations for a target outpost via `sysio.msgch::queueout()`. Once an outpost has 512 non-roster attestations waiting, `queueout` refuses another.
+2. When the epoch advances, `buildenv()` packs the outpost's `READY` attestations, rosters first, into a protobuf-encoded outbound envelope of at most 32,768 bytes and 64 attestations; the rest stays queued for the next epoch.
 3. Batch operators read the outbound envelope and submit it to the target chain's Outpost — chunked on both chains (`OPPInbound.epochIn` on Ethereum, `epoch_in` on Solana).
 4. The Outpost verifies the envelope chain and group consensus, then routes attestations to their registered handlers. An unhandled type is skipped, never reverted.
 
@@ -66,7 +66,7 @@ This allows a single unified message format across all supported chains.
 
 | Category | Types | Direction | Purpose |
 |----------|-------|-----------|---------|
-| **Operator Rosters** | `OPERATORS`, `BATCH_OPERATOR_GROUPS` | depot → outpost | Full operator roster and the next epoch's batch-operator group, sent every epoch |
+| **Operator Rosters** | `OPERATORS`, `BATCH_OPERATOR_GROUPS` | depot → outpost | The operators the schedule window seats, with their chain addresses, and the next epoch's batch-operator group, sent every epoch, except that an empty window sends no roster and an empty next group withholds `BATCH_OPERATOR_GROUPS` |
 | **Liquidity Syndication** | `SYNDICATE_LIQ`, `LIQ_YIELD` | outpost → depot | A user syndicating liq tokens into outpost custody; realized custody yield |
 | **Liquidity Desyndication** | `DESYNDICATE_LIQ` | depot → outpost | Return syndicated liq tokens to a holder on the outpost |
 | **Node Owners** | `NODE_OWNER_REG` | outpost → depot | Node-owner NFT committed on Ethereum, registering the owner on the depot |
@@ -84,7 +84,7 @@ Elected via Appointed Proof of Stake (APoS). They validate transactions and prod
 Operators scheduled in groups of `operators_per_epoch` (default 21 operators in 3 groups of 7); one group is on duty per epoch, and the schedule slides forward every epoch. They run the `batch_operator_plugin` and are responsible for:
 - Reading each outpost's outbound envelope and delivering it to `sysio.msgch`
 - Relaying the depot's outbound envelopes to each outpost
-- Cranking the depot: `sysio.msgch::chkcons` (epoch advance), `sysio.chalg::chkdispute`, `sysio.swap::tickyield`, `sysio.liq::queueyield`
+- Cranking the depot: `sysio.msgch::chkcons` (epoch advance), `sysio.chalg::chkdispute`, `sysio.swap::tickyield`, `sysio.liq::queueyield`, `sysio.kicker::kick`
 
 Batch operators post depot-native collateral on `sysio.opreg`; a non-canonical delivery is slashed and missed deliveries lead to termination.
 
@@ -110,6 +110,7 @@ Holders of a node-owner NFT who commit it on the Ethereum outpost (`NODE_OWNER_R
 | **sysio.bond** | Generic bonded underwriting of provable statements |
 | **sysio.liq** | Shadow liq tokens (`LIQETH`, `LIQSOL`) minted against outpost custody, with a WIRE yield index |
 | **sysio.swap** | Depot-local constant-product AMM; every pair's second leg is WIRE |
+| **sysio.kicker** | Budgeted simple-accrual T5 WIRE gifts to LIQ holders, priced by swap TWAP with bounded accrual and daily payouts |
 | **sysio.dclaim** | Funded WIRE launch import, account linking and claims |
 | **sysio.andon** | Emergency stop: one cord freezing depot fund egress |
 | **sysio.roa** | Resources and node-owner registry |

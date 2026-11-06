@@ -9,12 +9,17 @@
 #include <fc/network/http/http_client.hpp>
 #include <fc/slug_name.hpp>
 #include <fc/task/deadline.hpp>
-#include <fc/task/retry.hpp>
+
+#include <magic_enum/magic_enum.hpp>
 
 #include <algorithm>
+#include <format>
 #include <limits>
 #include <map>
 #include <ranges>
+#include <condition_variable>
+#include <mutex>
+#include <thread>
 
 namespace sysio {
 
@@ -23,16 +28,20 @@ namespace {
 constexpr auto option_name_client = "outpost-ethereum-client";
 constexpr auto option_name_client_config_file = "outpost-ethereum-client-config-file";
 constexpr auto option_abi_file = "ethereum-abi-file";
-constexpr auto chain_id_resolution_timeout = fc::seconds(5);
+constexpr auto option_name_read_block_tag = "outpost-ethereum-read-block-tag";
+constexpr auto option_name_read_confirmations = "outpost-ethereum-read-confirmations";
+constexpr auto option_name_read_max_finality_lag_sec = "outpost-ethereum-read-max-finality-lag-sec";
+constexpr std::string_view read_options_source = "the outpost-ethereum-read-* options";
+constexpr std::string_view configuration_file_source = "the client configuration file";
+constexpr auto chain_id_request_timeout = fc::seconds(2);
 constexpr auto chain_id_resolution_initial_backoff = fc::milliseconds(200);
 constexpr auto chain_id_resolution_max_backoff = fc::seconds(1);
 constexpr std::string_view cli_transaction_policy_client_id = "cli-client";
 constexpr auto unavailable_policy_limit = "n/a";
-constexpr std::string_view chain_id_resolution_operation = "ethereum-client:eth_chainId";
+constexpr auto chain_id_log_interval = fc::seconds(30);
 constexpr std::string_view outbound_http_failure_prefix = "Outbound HTTP ";
 constexpr std::string_view http_status_detail_prefix = "failed with status ";
 constexpr size_t http_status_code_width = 3;
-constexpr std::string_view retry_budget_exhausted_cause = "retry_budget_exhausted";
 constexpr std::string_view standard_exception_cause = "std_exception";
 constexpr std::string_view invalid_rpc_response_cause = "invalid_rpc_response";
 constexpr std::string_view fc_exception_cause_prefix = "fc_exception:";
@@ -64,13 +73,85 @@ constexpr outbound_http::transport_option_names transport_option_names{
 using client_map = std::map<std::string, ethereum_client_entry_ptr>;
 namespace client_config = opp::config;
 using client_config::EvmClientConfiguration;
+using fc::network::ethereum::block_tag_t;
+using fc::network::ethereum::ethereum_read_confirmation;
 using fc::network::ethereum::ethereum_transaction_policy;
 
-/** Whether startup must verify a configured local chain id against `eth_chainId`. */
-enum class rpc_chain_id_validation {
-   not_required,
-   required,
+/** Locally validated connection awaiting asynchronous identity discovery. */
+struct pending_client {
+   std::string id;
+   std::string url;
+   fc::crypto::signature_provider_ptr provider;
+   fc::network::json_rpc::client_options rpc_options;
+   ethereum_read_confirmation read_confirmation;
 };
+
+/** Refuse a read confirmation no read can be made at, as a configuration error naming `source`. */
+void assert_valid_read_confirmation(const ethereum_read_confirmation& confirmation, std::string_view source) {
+   try {
+      fc::network::ethereum::validate_read_confirmation(confirmation);
+   } catch (const fc::invalid_arg_exception& rejection) {
+      FC_THROW_EXCEPTION(chain::plugin_config_exception, "Invalid Ethereum read confirmation in {}: {}", source,
+                         rejection.top_message());
+   }
+}
+
+/** The read confirmation the read options configure, for clients given with --outpost-ethereum-client. */
+ethereum_read_confirmation read_confirmation_from_options(const boost::program_options::variables_map& options) {
+   const auto tag_text = options.at(option_name_read_block_tag).as<std::string>();
+   const auto tag      = magic_enum::enum_cast<block_tag_t>(tag_text);
+   SYS_ASSERT(tag, chain::plugin_config_exception, "--{} must be finalized, safe or latest, not '{}'",
+              option_name_read_block_tag, tag_text);
+
+   // Depth and the finality fallback only mean something for `latest`; refusing them elsewhere keeps
+   // a configuration from reading weaker or stronger than it says.
+   for (const auto* latest_only : {option_name_read_confirmations, option_name_read_max_finality_lag_sec}) {
+      SYS_ASSERT(*tag == block_tag_t::latest || options.at(latest_only).defaulted(), chain::plugin_config_exception,
+                 "--{} applies only with --{}=latest, not {}", latest_only, option_name_read_block_tag, tag_text);
+   }
+
+   const ethereum_read_confirmation confirmation{
+      .tag              = *tag,
+      .confirmations    = options.at(option_name_read_confirmations).as<uint32_t>(),
+      .max_finality_lag = fc::seconds(options.at(option_name_read_max_finality_lag_sec).as<uint32_t>()),
+   };
+   assert_valid_read_confirmation(confirmation, read_options_source);
+   return confirmation;
+}
+
+/** The runtime block tag for a validated configuration-file tag. */
+block_tag_t block_tag_from_configuration(client_config::EvmReadBlockTag tag) {
+   switch (tag) {
+   case client_config::EVM_READ_BLOCK_TAG_FINALIZED: return block_tag_t::finalized;
+   case client_config::EVM_READ_BLOCK_TAG_SAFE:      return block_tag_t::safe;
+   case client_config::EVM_READ_BLOCK_TAG_LATEST:    return block_tag_t::latest;
+   default:
+      FC_THROW_EXCEPTION(chain::plugin_config_exception, "Unsupported Ethereum read block tag {}",
+                         client_config::EvmReadBlockTag_Name(tag));
+   }
+}
+
+/** Convert a validated protobuf read confirmation, defaulting each field the file leaves out. */
+ethereum_read_confirmation read_confirmation_from_configuration(const EvmClientConfiguration& client) {
+   ethereum_read_confirmation confirmation = fc::network::ethereum::ethereum_read_confirmation_defaults;
+   if (!client.has_read_confirmation()) return confirmation;
+
+   const auto& configured = client.read_confirmation();
+   if (configured.has_block_tag()) confirmation.tag = block_tag_from_configuration(configured.block_tag());
+   if (configured.has_confirmations()) confirmation.confirmations = configured.confirmations();
+   if (configured.has_max_finality_lag_sec()) {
+      confirmation.max_finality_lag = fc::seconds(configured.max_finality_lag_sec());
+   }
+   assert_valid_read_confirmation(confirmation, configuration_file_source);
+   return confirmation;
+}
+
+/** Describe a read confirmation for the startup log. */
+std::string describe_read_confirmation(const ethereum_read_confirmation& confirmation) {
+   if (confirmation.tag != block_tag_t::latest) return fc::network::ethereum::to_string(confirmation.tag);
+   return std::format("{} confirmations, finalized when finality lags over {} s", confirmation.confirmations,
+                      confirmation.max_finality_lag.to_seconds());
+}
 
 /** Parse a positive decimal or Ethereum hex quantity without fixed-width wraparound. */
 std::optional<uint32_t> parse_cli_chain_id(std::string_view text) {
@@ -183,74 +264,16 @@ std::string sanitized_chain_id_failure_cause(const fc::exception& failure) {
    return std::string{fc_exception_cause_prefix} + failure.name();
 }
 
-/** Report a startup chain-id lookup failure with only sanitized diagnostic context. */
-[[noreturn]] void throw_chain_id_resolution_failure(const std::string& client_id,
-                                                    const std::string& endpoint,
-                                                    std::string_view last_failure) {
-   FC_THROW_EXCEPTION(chain::plugin_config_exception,
-                      "Unable to resolve or validate chain id for outpost Ethereum client '{}' "
-                      "within the bounded RPC startup grace (endpoint={},last_failure={})",
-                      client_id,
-                      endpoint,
-                      last_failure);
-}
-
-/** Return the retry envelope used independently by each startup chain-id probe. */
-fc::task::retry_options chain_id_resolution_retry_options() {
-   fc::task::retry_options options;
-   options.initial_backoff = chain_id_resolution_initial_backoff;
-   options.max_backoff = chain_id_resolution_max_backoff;
-   options.total_timeout = chain_id_resolution_timeout;
-   return options;
-}
-
-/** Resolve and bound one RPC chain id after retrying transient transport failures. */
-uint32_t resolve_rpc_chain_id(
-   const std::string& client_id,
-   const std::string& url,
-   const fc::network::json_rpc::client_options& rpc_options) {
-   const auto endpoint = fc::http::sanitized_endpoint(fc::url(url));
-   std::string last_failure(retry_budget_exhausted_cause);
-   try {
-      fc::task::deadline_scope deadline(fc::time_point::now() + chain_id_resolution_timeout);
-      return fc::task::retry_until<uint32_t>(
-         chain_id_resolution_operation,
-         chain_id_resolution_retry_options(),
-         [&]() -> std::optional<uint32_t> {
-            fc::variant response;
-            try {
-               auto rpc = fc::network::json_rpc::json_rpc_client::create(url, rpc_options);
-               response = rpc.call_idempotent(
-                  std::string(ethereum_rpc_method::chain_id), fc::variants{});
-            } catch (const fc::exception& failure) {
-               const auto cause = sanitized_chain_id_failure_cause(failure);
-               const auto total_timeout_cause =
-                  fc::http::failure_kind_name(fc::http::failure_kind::timeout_total);
-               if (cause != total_timeout_cause || last_failure == retry_budget_exhausted_cause) {
-                  last_failure = cause;
-               }
-               return std::nullopt;
-            } catch (const std::exception&) {
-               last_failure = standard_exception_cause;
-               return std::nullopt;
-            }
-
-            const auto chain_id = fc::network::ethereum::parse_rpc_quantity(
-               response, transaction_policy_field::chain_id);
-            if (chain_id == 0 || chain_id > std::numeric_limits<uint32_t>::max()) {
-               throw_chain_id_resolution_failure(client_id, endpoint, invalid_rpc_response_cause);
-            }
-            return chain_id.convert_to<uint32_t>();
-         });
-   } catch (const chain::plugin_config_exception&) {
-      throw;
-   } catch (const fc::network::ethereum::ethereum_transaction_policy_exception&) {
-      throw_chain_id_resolution_failure(client_id, endpoint, invalid_rpc_response_cause);
-   } catch (const fc::exception&) {
-      throw_chain_id_resolution_failure(client_id, endpoint, last_failure);
-   } catch (const std::exception&) {
-      throw_chain_id_resolution_failure(client_id, endpoint, last_failure);
-   }
+/** Make one bounded discovery attempt; callers retain the client and retry until shutdown. */
+uint32_t resolve_rpc_chain_id(const pending_client& pending,
+                             const fc::network::json_rpc::client_options& rpc_options) {
+   fc::task::deadline_scope deadline(fc::time_point::now() + chain_id_request_timeout);
+   auto rpc = fc::network::json_rpc::json_rpc_client::create(pending.url, rpc_options);
+   const auto response = rpc.call_idempotent(std::string(ethereum_rpc_method::chain_id), fc::variants{});
+   const auto chain_id = fc::network::ethereum::parse_rpc_quantity(response, transaction_policy_field::chain_id);
+   FC_ASSERT(chain_id > 0 && chain_id <= std::numeric_limits<uint32_t>::max(),
+             "Invalid discovered Ethereum chain ID");
+   return chain_id.convert_to<uint32_t>();
 }
 
 /** Resolve an explicitly named Ethereum signature provider for one configured client. */
@@ -288,37 +311,29 @@ ethereum_client_ptr create_client(
    }
 }
 
-/** Add one fully initialized and optionally RPC-validated client before publication. */
+/** Publish a client using its locally authoritative ID, without consulting RPC. */
 void add_client(client_map& clients,
                 const std::string& client_id,
                 const std::string& url,
                 const fc::crypto::signature_provider_ptr& signature_provider,
                 ethereum_transaction_policy policy,
                 const fc::network::json_rpc::client_options& rpc_options,
-                rpc_chain_id_validation chain_id_validation) {
+                const ethereum_read_confirmation& read_confirmation) {
    const auto chain_id = policy.chain_id;
    auto client = create_client(signature_provider, url, std::move(policy), rpc_options);
-   if (chain_id_validation == rpc_chain_id_validation::required) {
-      const auto remote_chain_id = resolve_rpc_chain_id(client_id, url, rpc_options);
-      SYS_ASSERT(remote_chain_id == chain_id,
-                 chain::plugin_config_exception,
-                 "Chain id mismatch for outpost Ethereum client '{}': configured {}, RPC endpoint reports {}",
-                 client_id,
-                 chain_id,
-                 remote_chain_id);
-   }
    const bool inserted = clients.emplace(
       client_id,
       std::make_shared<ethereum_client_entry_t>(
-         client_id, signature_provider, std::move(client), chain_id)).second;
+         client_id, signature_provider, std::move(client), chain_id, read_confirmation)).second;
    SYS_ASSERT(inserted,
               chain::plugin_config_exception,
               "Duplicate outpost Ethereum client id '{}'",
               client_id);
-   ilog("Added Ethereum client (id={},endpoint={},chain_id={})",
+   ilog("Added Ethereum client (id={},endpoint={},chain_id={},read_confirmation={})",
         client_id,
         fc::http::sanitized_endpoint(fc::url(url)),
-        chain_id);
+        chain_id,
+        describe_read_confirmation(read_confirmation));
 }
 
 /** Load every protobuf-configured client into a map that is published only on complete success. */
@@ -338,7 +353,7 @@ client_map load_file_clients(
                  provider,
                  policy_from_configuration(configured_client),
                  rpc_options,
-                 rpc_chain_id_validation::required);
+                 read_confirmation_from_configuration(configured_client));
    }
    return clients;
 }
@@ -347,7 +362,9 @@ client_map load_file_clients(
 client_map load_cli_clients(
    const std::vector<std::string>& client_specs,
    signature_provider_manager_plugin& signature_provider_manager,
-   const fc::network::json_rpc::client_options& rpc_options) {
+   const fc::network::json_rpc::client_options& rpc_options,
+   const ethereum_read_confirmation& read_confirmation,
+   std::vector<pending_client>& pending) {
    client_map clients;
    for (const auto& client_spec : client_specs) {
       const auto parts = fc::split(client_spec, ',');
@@ -383,20 +400,30 @@ client_map load_cli_clients(
                     option_name_client,
                     client_id);
          chain_id = *parsed;
-      } else {
-         chain_id = resolve_rpc_chain_id(client_id, url, rpc_options);
       }
 
       auto provider = resolve_signature_provider(
          signature_provider_manager, client_id, signature_provider_id);
+      if (chain_id == 0) {
+         // Validate the transport locally now. This constructor does not perform RPC.
+         try {
+            (void)fc::network::json_rpc::json_rpc_client::create(url, rpc_options);
+         } catch (...) {
+            throw_client_initialization_failure(client_id);
+         }
+         SYS_ASSERT(clients.emplace(client_id, std::make_shared<ethereum_client_entry_t>(
+                       client_id, provider, nullptr, 0, read_confirmation)).second,
+                    chain::plugin_config_exception, "Duplicate outpost Ethereum client id '{}'", client_id);
+         pending.push_back({client_id, url, provider, rpc_options, read_confirmation});
+         continue;
+      }
       add_client(clients,
                  client_id,
                  url,
                  provider,
                  maximum_policy(transaction_policy_client_label(client_id), chain_id),
                  rpc_options,
-                 parts.size() == 4 ? rpc_chain_id_validation::required
-                                   : rpc_chain_id_validation::not_required);
+                 read_confirmation);
    }
    return clients;
 }
@@ -406,11 +433,71 @@ client_map load_cli_clients(
 /** Private plugin state and lookup operations for fully initialized Ethereum clients. */
 class outpost_ethereum_client_plugin_impl {
    std::map<std::string, ethereum_client_entry_ptr> _clients{};
+   std::mutex _clients_mutex;
+   std::vector<pending_client> _pending;
+   std::vector<std::jthread> _discovery_workers;
+
+   /** Resolve independently so a hanging endpoint cannot hold up another client. */
+   void discover(const pending_client& pending, std::stop_token stop) {
+      auto options = pending.rpc_options;
+      options.request.cancel_check = [stop] { return stop.stop_requested(); };
+      auto backoff = chain_id_resolution_initial_backoff;
+      auto next_log = fc::time_point::min();
+      std::mutex wait_mutex;
+      std::condition_variable_any wake;
+      while (!stop.stop_requested()) {
+         std::string failure;
+         try {
+            const auto chain_id = resolve_rpc_chain_id(pending, options);
+            client_map resolved;
+            add_client(resolved, pending.id, pending.url, pending.provider,
+                       maximum_policy(transaction_policy_client_label(pending.id), chain_id), pending.rpc_options,
+                       pending.read_confirmation);
+            if (stop.stop_requested()) return;
+            std::lock_guard lock(_clients_mutex);
+            _clients.at(pending.id) = std::move(resolved.at(pending.id));
+            return;
+         } catch (const fc::network::ethereum::ethereum_transaction_policy_exception&) {
+            failure = invalid_rpc_response_cause;
+         } catch (const fc::exception& error) {
+            failure = sanitized_chain_id_failure_cause(error);
+         } catch (const std::exception&) {
+            failure = standard_exception_cause;
+         }
+         if (stop.stop_requested()) return;
+         if (fc::time_point::now() >= next_log) {
+            wlog("Ethereum identity discovery pending (client={},endpoint={},last_failure={}); retrying",
+                 pending.id, fc::http::sanitized_endpoint(fc::url(pending.url)), failure);
+            next_log = fc::time_point::now() + chain_id_log_interval;
+         }
+         std::unique_lock lock(wait_mutex);
+         wake.wait_for(lock, stop, std::chrono::microseconds(backoff.count()), [] { return false; });
+         backoff = std::min(backoff + backoff, chain_id_resolution_max_backoff);
+      }
+   }
    using file_abi_contracts_t =
       std::pair<std::filesystem::path, std::vector<fc::network::ethereum::abi::contract>>;
    std::vector<file_abi_contracts_t> _abi_files{};
 
 public:
+   /** Join discovery before destroying the map or its synchronization primitives. */
+   ~outpost_ethereum_client_plugin_impl() { stop_discovery(); }
+
+   /** Start only after all local configuration has passed validation. */
+   void start_discovery() {
+      for (const auto& pending : _pending) {
+         _discovery_workers.emplace_back([this, pending](std::stop_token stop) { discover(pending, stop); });
+      }
+   }
+
+   /** Cancel every request first, then join; shutdown cost does not grow per endpoint. */
+   void stop_discovery() {
+      for (auto& worker : _discovery_workers) worker.request_stop();
+      _discovery_workers.clear();
+   }
+
+   /** Stage unresolved CLI connections alongside immutable pending entries. */
+   void set_pending(std::vector<pending_client> pending) { _pending = std::move(pending); }
    /** Load and de-duplicate ABI files while preserving their parsed contract definitions. */
    std::vector<file_abi_contracts_t>
    load_abi_files(const std::vector<std::filesystem::path>& file_names) {
@@ -432,11 +519,13 @@ public:
 
    /** Return every published client in deterministic identifier order. */
    std::vector<ethereum_client_entry_ptr> get_clients() {
+      std::lock_guard lock(_clients_mutex);
       return std::views::values(_clients) | std::ranges::to<std::vector>();
    }
 
    /** Return the published client identified by @p id, or null when there is none. */
    ethereum_client_entry_ptr get_client(const std::string& id) {
+      std::lock_guard lock(_clients_mutex);
       auto it = _clients.find(id);
       return it == _clients.end() ? nullptr : it->second;
    }
@@ -463,15 +552,25 @@ void outpost_ethereum_client_plugin::plugin_initialize(const variables_map& opti
 
    try {
       if (has_file) {
+         // A configuration file sets the read confirmation per client; an option set beside it would
+         // otherwise be silently ignored.
+         for (const auto* read_option :
+              {option_name_read_block_tag, option_name_read_confirmations, option_name_read_max_finality_lag_sec}) {
+            SYS_ASSERT(options.at(read_option).defaulted(), chain::plugin_config_exception,
+                       "--{} configures --{} clients; set read_confirmation per client in --{} instead",
+                       read_option, option_name_client, option_name_client_config_file);
+         }
          my->set_clients(load_file_clients(
             options.at(option_name_client_config_file).as<std::filesystem::path>(),
             signature_provider_manager,
             rpc_options));
       } else {
+         std::vector<pending_client> pending;
          my->set_clients(load_cli_clients(
             options.at(option_name_client).as<std::vector<std::string>>(),
             signature_provider_manager,
-            rpc_options));
+            rpc_options, read_confirmation_from_options(options), pending));
+         my->set_pending(std::move(pending));
       }
    } catch (const client_config::client_config_exception& rejection) {
       elog("Rejected Ethereum client configuration (reason_code={},field={},observed={},allowed={})",
@@ -492,6 +591,7 @@ void outpost_ethereum_client_plugin::plugin_initialize(const variables_map& opti
 
 void outpost_ethereum_client_plugin::plugin_startup() {
    ilog("Starting outpost Ethereum client plugin");
+   my->start_discovery();
 }
 
 outpost_ethereum_client_plugin::outpost_ethereum_client_plugin()
@@ -506,7 +606,8 @@ void outpost_ethereum_client_plugin::set_program_options(options_description& cl
        boost::program_options::value<std::vector<std::string>>()->multitoken(),
        "CLI outpost Ethereum client spec: "
        "<client-id>,<signature-provider-id>,<rpc-url>[,<chain-id>]. A three-field spec resolves "
-       "eth_chainId during startup; a four-field chain id controls signing and is verified against the endpoint. "
+       "eth_chainId asynchronously, retrying until available; signing waits for discovery. "
+       "A four-field chain id controls signing without an endpoint-ID startup check. "
        "For a client serving an OPP outpost the client-id MUST be that chain's sysio.chains code "
        "(e.g. ETHEREUM): the operator daemons look their RPC client up under the chain code.")
       (option_name_client_config_file,
@@ -515,11 +616,30 @@ void outpost_ethereum_client_plugin::set_program_options(options_description& cl
        "with --outpost-ethereum-client.")
       (option_abi_file,
        boost::program_options::value<std::vector<std::filesystem::path>>()->multitoken(),
-       "Ethereum contract ABI file(s). Expects a JSON array of ABI-compliant contract definitions.");
+       "Ethereum contract ABI file(s). Expects a JSON array of ABI-compliant contract definitions.")
+      // Help text below must stay ASCII with no " --" sequence (PerformanceHarness splits nodeop
+      // --help output on that token).
+      (option_name_read_block_tag,
+       boost::program_options::value<std::string>()->default_value(
+          fc::network::ethereum::to_string(fc::network::ethereum::ethereum_read_confirmation_defaults.tag)),
+       "Block tag at which the outpost-ethereum-client clients read what an outpost emitted before the operator "
+       "acts on it: finalized, safe or latest. With latest the read is outpost-ethereum-read-confirmations blocks "
+       "deep, and at the finalized block while finality lags. Reading unlike the rest of the batch operator group "
+       "risks a slash or missed deliveries.")
+      (option_name_read_confirmations,
+       boost::program_options::value<uint32_t>()->default_value(
+          fc::network::ethereum::ethereum_read_confirmation_defaults.confirmations),
+       "With read block tag latest: how many blocks deep the read is, the head counting as one.")
+      (option_name_read_max_finality_lag_sec,
+       boost::program_options::value<uint32_t>()->default_value(static_cast<uint32_t>(
+          fc::network::ethereum::ethereum_read_confirmation_defaults.max_finality_lag.to_seconds())),
+       "With read block tag latest: how far, in seconds, the finalized block may trail the head before reads "
+       "fall back to the finalized block.");
    outbound_http::add_transport_program_options(cfg, transport_option_names, "Ethereum RPC");
 }
 
 void outpost_ethereum_client_plugin::plugin_shutdown() {
+   my->stop_discovery();
    ilog("Shutdown outpost Ethereum client plugin");
 }
 
@@ -545,6 +665,7 @@ outpost_ethereum_client_plugin::create_outpost_client(const std::string& eth_cli
                                                        const std::string& opp_inbound_addr) {
    const auto entry = my->get_client(eth_client_id);
    FC_ASSERT(entry, "Unknown ethereum client id: {}", eth_client_id);
+   FC_ASSERT(entry->client, "Ethereum client '{}' is awaiting chain ID discovery", eth_client_id);
    const auto chain_name = fc::slug_name{chain_code}.to_string();
    SYS_ASSERT(entry->chain_id == chain_id,
               chain::plugin_config_exception,

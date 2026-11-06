@@ -562,17 +562,20 @@ private:
    std::thread _worker;
 };
 
-/** Return the temporary sibling used while @p output is being downloaded. */
-std::filesystem::path partial_path(const std::filesystem::path& output) {
-   auto partial = output;
-   partial += ".downloading";
-   return partial;
+/** Check all unique temporary siblings, so cleanup tests cannot pass by checking an obsolete fixed path. */
+bool has_partial_file(const std::filesystem::path& output) {
+   const auto prefix = "." + output.filename().string() + ".tmp.";
+   for (const auto& entry : std::filesystem::directory_iterator(output.parent_path())) {
+      if (entry.path().filename().string().starts_with(prefix))
+         return true;
+   }
+   return false;
 }
 
 /** Verify that neither the final output nor its temporary sibling exists. */
 void check_download_files_removed(const std::filesystem::path& output) {
    BOOST_CHECK(!std::filesystem::exists(output));
-   BOOST_CHECK(!std::filesystem::exists(partial_path(output)));
+   BOOST_CHECK(!has_partial_file(output));
 }
 
 /** Return the complete binary contents of @p path. */
@@ -2182,6 +2185,35 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(http_client_file_download_tests)
 
+/// Filesystem failures retain the HTTP exception contract and clean the unique sibling.
+BOOST_AUTO_TEST_CASE(rename_failure_preserves_target_and_cleans_temporary) {
+   scripted_http_server server([](tcp::socket& socket, const std::atomic_bool&) {
+      write_bytes(socket, fixed_length_header(exact_body_bytes) + std::string(exact_body));
+   });
+   fc::temp_directory temp;
+   const auto output = temp.path() / "target-directory";
+   std::filesystem::create_directory(output);
+   std::ofstream(output / "sentinel") << "old";
+   BOOST_CHECK_THROW(download(server, output, download_options(exact_body_bytes)), fc::exception);
+   BOOST_CHECK_EQUAL(read_file(output / "sentinel"), "old");
+   BOOST_CHECK(!has_partial_file(output));
+}
+
+/// An interrupted replacement preserves an existing complete download.
+BOOST_AUTO_TEST_CASE(truncated_response_preserves_existing_output) {
+   scripted_http_server server([](tcp::socket& socket, const std::atomic_bool&) {
+      write_bytes(socket, fixed_length_header(exact_body_bytes) + "short");
+      boost::system::error_code error;
+      socket.shutdown(tcp::socket::shutdown_send, error);
+   });
+   fc::temp_directory temp;
+   const auto output = temp.path() / "existing.bin";
+   std::ofstream(output) << "old";
+   BOOST_CHECK_THROW(download(server, output, download_options(exact_body_bytes)), fc::exception);
+   BOOST_CHECK_EQUAL(read_file(output), "old");
+   BOOST_CHECK(!has_partial_file(output));
+}
+
 /// Snapshot file transfers retain their pre-refactor unbounded deadline behavior.
 BOOST_AUTO_TEST_CASE(snapshot_file_download_has_no_transport_deadlines) {
    const auto options = download_options(exact_body_bytes);
@@ -2574,7 +2606,7 @@ BOOST_AUTO_TEST_CASE(exact_maximum_response_succeeds) {
 
    BOOST_CHECK_NO_THROW(download(server, output, options));
    BOOST_CHECK(std::filesystem::exists(output));
-   BOOST_CHECK(!std::filesystem::exists(partial_path(output)));
+   BOOST_CHECK(!has_partial_file(output));
    BOOST_CHECK_EQUAL(read_file(output), exact_body);
    BOOST_REQUIRE(!statuses.empty());
    std::vector<fc::http_file_download_phase> observed_phases;

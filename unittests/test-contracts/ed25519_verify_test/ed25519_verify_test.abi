@@ -1,0 +1,136 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "badptr",
+            "base": "",
+            "fields": [
+                {
+                    "name": "buffer",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "batch",
+            "base": "",
+            "fields": [
+                {
+                    "name": "entries",
+                    "type": "ed25519_input[]"
+                },
+                {
+                    "name": "expected",
+                    "type": "int32"
+                }
+            ]
+        },
+        {
+            "name": "boundary",
+            "base": "",
+            "fields": [
+                {
+                    "name": "entry",
+                    "type": "ed25519_input"
+                },
+                {
+                    "name": "buffer",
+                    "type": "uint32"
+                },
+                {
+                    "name": "overrun",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "clean",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "ed25519_input",
+            "base": "",
+            "fields": [
+                {
+                    "name": "signature",
+                    "type": "bytes"
+                },
+                {
+                    "name": "public_key",
+                    "type": "bytes"
+                },
+                {
+                    "name": "message",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "stress",
+            "base": "",
+            "fields": [
+                {
+                    "name": "entry",
+                    "type": "ed25519_input"
+                }
+            ]
+        },
+        {
+            "name": "verify",
+            "base": "",
+            "fields": [
+                {
+                    "name": "entry",
+                    "type": "ed25519_input"
+                },
+                {
+                    "name": "expected",
+                    "type": "int32"
+                },
+                {
+                    "name": "unaligned",
+                    "type": "bool"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "badptr",
+            "type": "badptr",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "batch",
+            "type": "batch",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "boundary",
+            "type": "boundary",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "clean",
+            "type": "clean",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "stress",
+            "type": "stress",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "verify",
+            "type": "verify",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": []
+}

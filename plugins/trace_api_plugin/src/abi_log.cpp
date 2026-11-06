@@ -2,6 +2,7 @@
 #include <sysio/trace_api/logging.hpp>
 
 #include <fc/io/raw.hpp>
+#include <fc/io/atomic_file.hpp>
 
 #include <boost/crc.hpp>
 
@@ -740,33 +741,23 @@ void abi_log::compact_journal() {
          live.emplace_back(entry.block_num, key.first, key.second, entry.abi_bytes);
    }
 
-   std::filesystem::path tmp = _journal_path;
-   tmp += ".tmp";
-   std::error_code ec;
-
    std::lock_guard<std::mutex> lock(_journal_mtx);
    try {
       // Test aid: simulate a rewrite that cannot complete (e.g. disk full), to exercise the
       // truncate fallback in the fail-closed rollback path.  Always false in production.
       if (_force_journal_compaction_failure)
          throw std::runtime_error("forced journal compaction failure (test)");
-      {
-         fc::cfile t;
-         t.set_file_path(tmp);
-         // Truncating open ("wb+") so any stale temp left by a previously interrupted compaction is
-         // overwritten rather than appended to.
-         t.open(fc::cfile::truncate_rw_mode);
-         auto hdr_data = fc::raw::pack(abi_journal_header{});
-         t.write(hdr_data.data(), hdr_data.size());
-         for (const auto& [block_num, account, global_seq, blob] : live) {
-            auto rec = frame_journal_record(encode_put_body(block_num, account, global_seq, blob));
-            t.write(rec.data(), rec.size());
-         }
-         t.flush();
-         t.close();
+      // A fresh sibling cannot append to a crash leftover from an earlier compaction.
+      fc::io::atomic_file_writer output(_journal_path);
+      auto& t = output.file();
+      auto hdr_data = fc::raw::pack(abi_journal_header{});
+      t.write(hdr_data.data(), hdr_data.size());
+      for (const auto& [block_num, account, global_seq, blob] : live) {
+         auto rec = frame_journal_record(encode_put_body(block_num, account, global_seq, blob));
+         t.write(rec.data(), rec.size());
       }
       _journal_cfile.close();
-      std::filesystem::rename(tmp, _journal_path); // atomic on POSIX
+      output.commit();
       _journal_cfile.set_file_path(_journal_path);
       _journal_cfile.open(fc::cfile::update_rw_mode);
       _journal_end_offset = std::filesystem::file_size(_journal_path);
@@ -775,7 +766,6 @@ void abi_log::compact_journal() {
       fc_wlog(_log, "trace_api: abi_log journal compaction failed for {}: {}; "
                     "reversible ABI records will not survive a restart",
               _journal_path.generic_string(), e.what());
-      std::filesystem::remove(tmp, ec);
       _journal_enabled = false;
    }
 }

@@ -31,7 +31,7 @@ an EVM address, a Solana public key, a PDA, or a signature-provider format.
 | `chain_id()` | Numeric chain id on the target chain; Solana has none and reports `0` |
 | `authenticated_caller_address()` | Raw chain-native address that authenticates this client's writes — 20 bytes on Ethereum, 32 on Solana |
 | `to_string()` | `{chain_code}:{ChainKind_Name}:{chain_id}`. The default prints `chain_code()` as the raw packed integer, so the row registered as `ETH` against a local chain renders `23373212024832:CHAIN_KIND_EVM:31337`. Virtual, with a default derived from the three getters |
-| `deliver_outbound_envelope(epoch_index, envelope_bytes, deadline)` | OPP outbound — submit one envelope to the remote chain; returns the chain-native transaction id |
+| `deliver_outbound_envelope(epoch_index, envelope_bytes, deadline)` | OPP outbound — submit one envelope to the remote chain. Returns the chain-native id of the last transaction sent, or an empty string when nothing needed sending and the epoch counts as handled; throws `outpost_delivery_incomplete_exception` when the epoch is left open for this relay to finish on a later tick |
 | `read_inbound_envelope(epoch_index, deadline)` | OPP inbound — return the envelope the remote chain produced for this epoch, or an empty vector when the latest slot does not match |
 | `crank_outpost(epoch_index, deadline)` | Drive the outpost's permissionless per-epoch instructions right after this operator's delivery lands; best-effort, retried next epoch. The default cranks nothing; Solana overrides it with `report_liq_yield`, Ethereum with `SyndicationPool.realizeYield` |
 
@@ -39,8 +39,8 @@ Two rules bind every implementation. Each RPC-bound call must enforce the `deadl
 remote chain cannot starve a cron worker; the protected helper `throw_if_past_deadline(deadline_abs, op)`
 throws `fc::timeout_exception` labelled with `to_string()` and is meant to be called before each blocking
 RPC. And `read_inbound_envelope` must filter by `epoch_index` itself — both outposts expose a single
-latest-outbound storage slot, so a poll can still observe the preceding epoch until the consensus-reaching
-delivery overwrites it, and forwarding that stale envelope to `sysio.msgch::deliver` trips an
+latest-outbound storage slot, so a poll can still observe the preceding epoch until the delivery that emits
+this one overwrites it, and forwarding that stale envelope to `sysio.msgch::deliver` trips an
 `envelope epoch_index mismatch` assertion.
 
 The header also declares the cross-chain envelope cap:

@@ -19,10 +19,12 @@
 #include <boost/version.hpp>
 #include <boost/container/deque.hpp>
 
+#include <bit>
 #include <memory>
 #include <vector>
 #include <deque>
 #include <cstdint>
+#include <cstring>
 #include <functional>
 #include <type_traits>
 #include <utility>
@@ -108,10 +110,10 @@ namespace sysio::chain {
       return hash;
    }
 
-   /// Compute table_id from a string name (for test/tooling convenience).
-   /// Narrowing cast to uint16_t truncates to the low 16 bits (well-defined for unsigned).
-   inline constexpr uint16_t compute_table_id(std::string_view table_name) {
-      return static_cast<uint16_t>(kv_djbh_hash(table_name));
+   /// DJB2 over a string's bytes, truncated to the low 16 bits. This is NOT the table_id CDT assigns a table of that
+   /// name, which comes from compute_table_id(name.to_uint64_t()). For text that is not a valid name, and for tests.
+   inline constexpr uint16_t compute_string_table_id(std::string_view text) {
+      return static_cast<uint16_t>(kv_djbh_hash(text));
    }
 
    /// Compute table_id from a raw uint64_t template parameter (name::raw or hash_id::raw).
@@ -132,9 +134,7 @@ namespace sysio::chain {
    }
 
    // ── KV key encoding utilities ──────────────────────────────────────────────
-   // Used throughout chain, plugins, and tests for constructing KV keys.
-   // Legacy 24-byte layout: [table:8B BE][scope:8B BE][pk:8B BE]
-   // New layout (after CDT table_id update): [scope:8B BE][pk:8B BE] = 16B
+   // Used throughout chain, plugins, and tests for constructing KV keys: [scope:8B BE][pk:8B BE] = 16B
 
    /// Encode a uint64_t as 8 bytes big-endian into buf.
    inline void kv_encode_be64(char* buf, uint64_t v) {
@@ -143,8 +143,9 @@ namespace sysio::chain {
 
    /// Decode 8 bytes big-endian from buf into a uint64_t.
    inline uint64_t kv_decode_be64(const char* buf) {
-      uint64_t v = 0;
-      for (int i = 0; i < 8; ++i) v = (v << 8) | static_cast<uint8_t>(buf[i]);
+      uint64_t v;
+      std::memcpy(&v, buf, sizeof(v));
+      if constexpr (std::endian::native == std::endian::little) v = __builtin_bswap64(v);
       return v;
    }
 
@@ -152,11 +153,6 @@ namespace sysio::chain {
    inline constexpr size_t kv_pri_key_size       = sizeof(uint64_t); ///< [pk:8B]
    inline constexpr size_t kv_scope_prefix_size  = sizeof(uint64_t); ///< [scope:8B BE]
    inline constexpr size_t kv_scoped_key_size    = kv_scope_prefix_size + kv_pri_key_size; ///< [scope:8B][pk:8B] = 16B
-
-   // Legacy 24-byte key constants — used by chain_plugin until step 5 migration
-   inline constexpr size_t kv_table_prefix_size = sizeof(uint64_t); ///< legacy [table:8B]
-   inline constexpr size_t kv_prefix_size       = kv_table_prefix_size + kv_scope_prefix_size; ///< legacy [table:8B][scope:8B] = 16B
-   inline constexpr size_t kv_key_size          = kv_table_prefix_size + kv_scope_prefix_size + kv_pri_key_size; ///< legacy 24B
 
    /// Build a 16-byte scoped KV key: [scope:8B BE][pk:8B BE]
    struct kv_scoped_key_t {
@@ -174,64 +170,6 @@ namespace sysio::chain {
 
    inline kv_scoped_key_t make_kv_scoped_key(name scope, uint64_t pk) {
       return make_kv_scoped_key(scope.to_uint64_t(), pk);
-   }
-
-   /// Build a legacy 24-byte KV key: [table:8B BE][scope:8B BE][pk:8B BE]
-   struct kv_key_t {
-      static constexpr size_t size = kv_key_size;
-      char data[size];
-      std::string_view to_string_view() const { return {data, size}; }
-   };
-
-   inline kv_key_t make_kv_key(uint64_t table, uint64_t scope, uint64_t pk) {
-      kv_key_t key;
-      kv_encode_be64(key.data,                                               table);
-      kv_encode_be64(key.data + kv_table_prefix_size,                        scope);
-      kv_encode_be64(key.data + kv_table_prefix_size + kv_scope_prefix_size, pk);
-      return key;
-   }
-
-   inline kv_key_t make_kv_key(name table, name scope, uint64_t pk) {
-      return make_kv_key(table.to_uint64_t(), scope.to_uint64_t(), pk);
-   }
-
-   /// Build a 16-byte KV prefix: [table:8B BE][scope:8B BE]
-   struct kv_prefix_t {
-      static constexpr size_t size = kv_prefix_size;
-      char data[size];
-      std::string_view to_string_view() const { return {data, size}; }
-      /// True if kv starts with this prefix
-      bool matches(std::string_view kv) const { return kv.size() >= size && memcmp(kv.data(), data, size) == 0; }
-   };
-
-   inline kv_prefix_t make_kv_prefix(uint64_t table, uint64_t scope) {
-      kv_prefix_t prefix;
-      kv_encode_be64(prefix.data,     table);
-      kv_encode_be64(prefix.data + 8, scope);
-      return prefix;
-   }
-
-   inline kv_prefix_t make_kv_prefix(name table, name scope) {
-      return make_kv_prefix(table.to_uint64_t(), scope.to_uint64_t());
-   }
-
-   /// Build an 8-byte KV table prefix: [table:8B BE]
-   struct kv_table_prefix_t {
-      static constexpr size_t size = kv_table_prefix_size;
-      char data[size];
-      std::string_view to_string_view() const { return {data, size}; }
-      /// True if kv starts with this prefix
-      bool matches(std::string_view kv) const { return kv.size() >= size && memcmp(kv.data(), data, size) == 0; }
-   };
-
-   inline kv_table_prefix_t make_kv_table_prefix(uint64_t table) {
-      kv_table_prefix_t prefix;
-      kv_encode_be64(prefix.data, table);
-      return prefix;
-   }
-
-   inline kv_table_prefix_t make_kv_table_prefix(name table) {
-      return make_kv_table_prefix(table.to_uint64_t());
    }
 
    struct void_t{};

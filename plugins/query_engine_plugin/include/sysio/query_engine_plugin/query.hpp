@@ -60,8 +60,9 @@ inline constexpr auto timeout_ms = "timeout_ms";
 inline constexpr auto all = std::to_array<std::string_view>({query, limit, offset, timeout_ms});
 } // namespace request_field
 
-/// Names reported in `error.data.limit` for the fixed parser/ABI bounds and for the chain's read
-/// window. None is a query-plugin option, so none carries the `query-` prefix the options use.
+/// Names reported in `error.data.limit` for the fixed parser/ABI bounds and for producer_plugin's
+/// read-only thread pool and read window. None is a query-plugin option, so none carries the `query-`
+/// prefix the options use.
 namespace bound {
 inline constexpr auto tokens = "sql-tokens";
 inline constexpr auto depth = "sql-depth";
@@ -71,6 +72,8 @@ inline constexpr auto abi_depth = "abi-depth";
 inline constexpr auto abi_nodes = "abi-nodes";
 /// producer_plugin's read window option: a capture stops at the window's end even inside its own budget.
 inline constexpr auto read_window = "read-only-read-window-time-us";
+/// producer_plugin's read-only thread count: without read-only threads no chain read can run.
+inline constexpr auto read_only_threads = "read-only-threads";
 } // namespace bound
 
 /// Stable response member names, shared by capture, evaluation and RPC serialization.
@@ -143,7 +146,8 @@ inline constexpr uint32_t max_in_flight = 4;
 inline constexpr uint32_t max_query_bytes = 16384;
 inline constexpr std::chrono::milliseconds timeout{1000};
 /// Capture budget of a directly constructed engine. The plugin replaces it with producer_plugin's
-/// read-only transaction budget unless `query-max-capture-ms` is set explicitly.
+/// read-only transaction budget when the node has read-only threads, unless `query-max-capture-ms` is
+/// set explicitly.
 inline constexpr std::chrono::microseconds max_capture{50000};
 inline constexpr uint32_t max_abi_bytes = 1048576;
 inline constexpr uint64_t max_scan_rows = 100000;

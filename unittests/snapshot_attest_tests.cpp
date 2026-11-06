@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_SUITE(snapshot_attest_tests)
 // after a successful attestation vote
 // ---------------------------------------------------------------------------
 BOOST_FIXTURE_TEST_CASE(snapshot_hash_matches_attestation, snapshot_attest_fixture) { try {
-   // Set fixed K so one vote is sufficient.
+   // Set fixed K and the fixture cadence so one vote is sufficient.
    set_snap_config(single_provider_minimum);
 
    // Take a snapshot

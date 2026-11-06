@@ -4,6 +4,7 @@
 #include <sysio/chain/exceptions.hpp>
 
 #include <fc/io/raw.hpp>
+#include <fc/io/atomic_file.hpp>
 
 #include <bit>
 #include <cstring>
@@ -67,9 +68,8 @@ void trx_id_index_writer::write(const std::filesystem::path& path) const {
       buckets[idx].block_num = block_num;
    }
 
-   fc::cfile f;
-   f.set_file_path(path);
-   f.open(fc::cfile::create_or_update_rw_mode);
+   fc::io::atomic_file_writer output(path);
+   auto& f = output.file();
 
    trx_id_index_header header;
    header.bucket_count = bucket_count;
@@ -83,7 +83,7 @@ void trx_id_index_writer::write(const std::filesystem::path& path) const {
    // the field-by-field pack and avoids the per-bucket call overhead.
    f.write(reinterpret_cast<const char*>(buckets.data()),
            buckets.size() * sizeof(trx_id_bucket));
-   f.flush();
+   output.commit();
 }
 
 // ---------------------------------------------------------------------------

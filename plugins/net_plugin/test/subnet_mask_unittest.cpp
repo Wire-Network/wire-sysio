@@ -1,6 +1,8 @@
 #include <boost/test/unit_test.hpp>
 #include <sysio/net_plugin/net_utils.hpp>
 
+#include "test_ports.hpp"
+
 #include <boost/asio/ip/address_v4.hpp>
 #include <boost/asio/ip/address_v6.hpp>
 
@@ -105,6 +107,51 @@ BOOST_AUTO_TEST_CASE(ipv4_slash16) {
    auto masked1 = sysio::net_utils::apply_prefix_mask(addr1.to_bytes(), 96 + 16);
    auto masked2 = sysio::net_utils::apply_prefix_mask(addr2.to_bytes(), 96 + 16);
    BOOST_CHECK(masked1 == masked2);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(mapped_v6_address_tests)
+
+BOOST_AUTO_TEST_CASE(ipv4_is_mapped) {
+   const auto mapped = sysio::net_utils::to_mapped_v6(boost::asio::ip::make_address("192.0.2.7"));
+   BOOST_CHECK(mapped.is_v4_mapped());
+   BOOST_CHECK(mapped == boost::asio::ip::make_address_v6("::ffff:192.0.2.7"));
+}
+
+BOOST_AUTO_TEST_CASE(ipv6_is_unchanged) {
+   const auto address = boost::asio::ip::make_address("2001:db8::1");
+   BOOST_CHECK(sysio::net_utils::to_mapped_v6(address) == address.to_v6());
+}
+
+BOOST_AUTO_TEST_CASE(parse_ip_literals) {
+   using sysio::net_utils::parse_mapped_v6;
+   BOOST_CHECK(parse_mapped_v6("192.0.2.7") == boost::asio::ip::make_address_v6("::ffff:192.0.2.7"));
+   // an IPv4 peer reaching a dual-stack listener is seen in its mapped spelling
+   BOOST_CHECK(parse_mapped_v6("::ffff:192.0.2.7") == parse_mapped_v6("192.0.2.7"));
+   BOOST_CHECK(parse_mapped_v6("2001:db8::1") == boost::asio::ip::make_address_v6("2001:db8::1"));
+   BOOST_CHECK(parse_mapped_v6("[2001:db8::1]") == boost::asio::ip::make_address_v6("2001:db8::1"));
+}
+
+BOOST_AUTO_TEST_CASE(scope_id_is_dropped) {
+   // a connection's recorded remote address keeps no scope id, so a scoped literal compares without one; this is why a
+   // link-local source address is never matched as a bp (bp_connection_manager::mark_inbound_bp_connection)
+   const auto parsed = sysio::net_utils::parse_mapped_v6("fe80::1%1");
+   BOOST_REQUIRE(parsed);
+   BOOST_CHECK_EQUAL(parsed->scope_id(), 0u);
+   BOOST_CHECK(*parsed == boost::asio::ip::make_address_v6("fe80::1"));
+}
+
+BOOST_AUTO_TEST_CASE(parse_rejects_non_literals) {
+   using sysio::net_utils::parse_mapped_v6;
+   BOOST_CHECK(!parse_mapped_v6(""));
+   BOOST_CHECK(!parse_mapped_v6("[]"));
+   BOOST_CHECK(!parse_mapped_v6("localhost"));
+   BOOST_CHECK(!parse_mapped_v6("p2p.example.com"));
+   using sysio::testing::port_category;
+   const std::string endpoint = "192.0.2.7:" + std::to_string(sysio::testing::get_port(port_category::alternate_p2p));
+   BOOST_CHECK(!parse_mapped_v6(endpoint));
+   BOOST_CHECK(!parse_mapped_v6("[192.0.2.7"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

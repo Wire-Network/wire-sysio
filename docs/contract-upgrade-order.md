@@ -129,7 +129,9 @@ callee of `sysio.epoch`.
 
 Independently of inlines, the emissions readiness gate in `sysio.epoch` **reads**
 `sysio.system`'s `emitcfg`, `t5state` and `payclaimtot`, and `sysio.token`'s
-`accounts`.
+`accounts`. `sysio.kicker::kick` reads the same four tables to size the treasury
+reserve it never draws into, plus `sysio.swap`'s `stat` and `priceaccum` and
+`sysio.liq`'s `stat` to price and size each gift.
 
 WIRE-352 adds separate inline edges whose failure behavior depends on the caller:
 
@@ -138,7 +140,7 @@ WIRE-352 adds separate inline edges whose failure behavior depends on the caller
 | `sysio.msgch` node-owner dispatch | `sysio.roa::nodeownreg` | Deploy `sysio.msgch` and `sysio.roa` as one compatibility-coupled set. | WIRE-352 adds the required `eth_address` field. An old caller underflows the new action decoder; the inverse pairing is also unsupported. Node-owner delivery can abort. |
 | `sysio.roa::nodeownreg` | `sysio.authex::recordlink` | Deploy `sysio.roa` and `sysio.authex` as the same compatibility-coupled set. | WIRE-352 adds the required `native_address` field. An old caller underflows the new action decoder; the inverse pairing is also unsupported. Node-owner delivery can abort. |
 | `sysio.authex::createlink` | `sysio.dclaim::linkswept` | Deploy `sysio.dclaim` before the first user-created external-key link. | A missing or non-privileged callee aborts before link insertion. Any inline failure rolls the transaction back, so the user can submit a fresh retry. |
-| `sysio.authex::recordlink` | `sysio.dclaim::linkswept` | Prefer deploying `sysio.dclaim` before trusted node-owner dispatch begins. | A missing or non-privileged callee skips the sweep but preserves the trusted link; an identical operator-authorized `recordlink` can retry it after bootstrap. |
+| `sysio.authex::recordlink` | `sysio.dclaim::linkswept` | Prefer deploying `sysio.dclaim` before trusted node-owner dispatch begins. | A missing or non-privileged callee skips the sweep but preserves the trusted link; governance can retry it after bootstrap with an identical `recordlink` submitted as `sysio.authex@active`. |
 | `sysio.msgch` inbound envelope dispatch | `sysio.synd::onsynd`, `sysio.synd::onyield`, `sysio.synd::closeenv` | Deploy `sysio.msgch`, `sysio.synd`, `sysio.liq`, `sysio.bond` and `sysio.authex` as one compatibility-coupled set, and deploy `sysio.synd` before any liq token is activated. | The actions run inside the consensus transaction that accepts the envelope. A missing `sysio.synd`, or one without these actions, asserts in its dispatcher and aborts that transaction, so no envelope of the outpost is accepted until the set is whole. |
 | `sysio.synd` intake and queue | `sysio.liq::mint`, `sysio.liq::burn`, `sysio.liq::mintyield` | The same set. | `sysio.synd` verifies every condition `mint` checks before sending it, so the current `sysio.liq` never refuses it. A `sysio.liq` without these actions, or one that does not accept `sysio.synd` as their only signer, aborts the intake and with it the inbound envelope. |
 | `sysio.authex::createlink` | `sysio.synd::linkswept` | None. Nothing is parked before `sysio.synd` is deployed, and it deploys privileged through `setsyscode`. | A missing or non-privileged callee skips the sweep and keeps the link; the permissionless `sysio.synd::sweep` delivers the parked shadow later. The delivery's `sysio.liq::transfer` notifies the linking account, so a contract account whose transfer handler throws aborts its own `createlink` and cannot link while shadow is parked for its key. |
@@ -146,7 +148,7 @@ WIRE-352 adds separate inline edges whose failure behavior depends on the caller
 | `sysio.synd` queue step (`closeenv`, `crank`) | `sysio.bond::request`, `sysio.bond::claim`, `sysio.liq::transfer`, `sysio.liq::mintyield`, `sysio.liq::burn`, `sysio.liq::creditowed` | Deploy `sysio.bond` before or with `sysio.synd`. | With no code on `sysio.bond` the step leaves each envelope WAITING and prints why; a later step requests it. `sysio.synd` checks every condition `request` checks before sending it, so the current `sysio.bond` never aborts the envelope path, but a `sysio.bond` without that action would abort `closeenv` and with it the inbound envelope. The current `sysio.bond` bills the request and escrow rows of a privileged issuer to the `sysio` RAM pool; an older build would bill them to `sysio.synd`, which has no RAM quota of its own, and abort `closeenv` the same way. |
 | `sysio.synd` queue step, an envelope ruled INVALID or VALID after a challenge | `sysio.bond::claim` | Deploy `sysio.bond` before or with `sysio.synd`. | The step reads the `requests` and `escrows` rows first and sends `claim` only when `sysio.bond` records a forfeit or an award for `sysio.synd`, so the current `sysio.bond` never refuses it with `nothing to claim`. A `sysio.bond` whose rows or claim differ would abort `closeenv` and with it the inbound envelope; the two are one compatibility-coupled set. |
 | `sysio.synd::challenge` | `sysio.liq::transfer`, `sysio.bond::hold` | Deploy `sysio.bond` before or with `sysio.synd`. | A signed action: a missing or refusing callee fails only the challenge, which the challenger can retry. |
-| Andon custody readers: swap, liq, bond, synd | Three-field `cord` row | Deploy all five from the same revision on a fresh deployment; configure native pull/clear permissions. | Existing cord rows use an incompatible layout; no in-place migration is supplied. |
+| Andon custody readers: swap, liq, bond, synd, kicker | Three-field `cord` row | Deploy all six from the same revision on a fresh deployment; configure native pull/clear permissions. | Existing cord rows use an incompatible layout; no in-place migration is supplied. |
 | Syndication custody shortfall | Andon `pull(reason)` with `sysio.andon@active` | Deploy Andon before syndication carries traffic. Privileged syndication needs no custom pull permission. | Missing account/permission or incompatible code fails the transaction atomically. |
 | `sysio.synd` reading its own `mismatch` rows | its own table: `mismatch` is new | Deploy this `sysio.synd` fresh, as the row below requires. | One latest incident per chain/token; a new shortfall overwrites it. Snapshot evidence externally before governance reconciliation erases it. |
 | Syndication envelope and bucket rows | Current ABI layouts | Deploy fresh without rows from earlier layouts. | Buckets now store level and last epoch only; no frozen-epoch marker or migration is included. |
@@ -154,6 +156,27 @@ WIRE-352 adds separate inline edges whose failure behavior depends on the caller
 Production deployment through `sysio.roa::setsyscode` privileges `sysio.dclaim`
 as part of the deploy, so there is no separate privilege step. The durable
 precondition is ordering: deploy DClaim before any link action can execute.
+
+On a fresh deployment, finish the DClaim import before the first `createlink` or
+`recordlink`: fund `sysio.dclaim` with the total of the credits, push every
+`importseed` batch, reconcile the `unmapped` rows against the export, and only
+then seal the import with `importdone`. The LCO import in the cluster bootstrap
+(`LcoImportSteps` in wire-tools-ts) runs these steps in the epoch-0 window and
+stops before the seal when a row differs. A link sweeps only the credits already
+in `unmapped`, and its holder cannot trigger the sweep again: `createlink`
+accepts one link per account and chain, and only `sysio.authex` may send
+`linkswept`. `linkswept` moves the `unmapped` row matching the supplied chain and
+address to the supplied account without consulting the link, so recovering a
+credit imported after its key was linked is for governance, through `sysio.msig`
+as `sysio.authex@active`. The `links` row keeps only the account, chain and
+public key, not the native address, so governance derives the address from the
+stored key (SVM: the raw 32-byte ED key; EVM: the canonical 20-byte address of
+the stored EM key, the trailing 20 bytes of `keccak256(X || Y)` over the 64-byte
+coordinates, without the leading SEC1 `0x04` byte, as
+`opp::evm_address_from_uncompressed_key` computes it) and checks the link and the
+exact target `unmapped` row before proposing `linkswept`. The same derivation and
+check come first when governance replays the identical `recordlink` for a
+node-owner link.
 
 The two added address fields are intentionally not a staged compatibility
 protocol. Activate WIRE-352 in a quiesced maintenance window:
@@ -180,8 +203,8 @@ pre-launch procedure because a complete immutable roster history is required
 to credit the batch-operator payout:
 
 1. Set `pay_cadence_epochs` to a value in `[1, 10]` that also satisfies
-   `pay_cadence_epochs * operators_per_epoch <= 100` before the window. At the
-   intended 21-operator topology, the maximum is 4. An older stored value
+   `pay_cadence_epochs * operators_per_epoch <= 100` before the window. Groups are
+   at most 7 operators, so any cadence up to 10 qualifies. An older stored value
    outside the accepted bounds is read with an effective clamp until rewritten.
 2. Prefer a completed payment period and verify that `t5state` has
    `pending_emission_amount == 0`, all `batch_group_epochs` counters are zero,
@@ -235,7 +258,7 @@ changes. For the edges on `advance`'s path today:
 |---|---|
 | `sysio.opreg`, `sysio.chalg`, `sysio.msgch` before `sysio.epoch`, when the release adds or changes an action `advance` inlines into them | Call edge: the new `advance` would otherwise reach a callee that cannot dispatch the action, and every advance aborts. |
 | `sysio` (`sysio.system`) before `sysio.epoch`, when the release adds or changes `accrueepoch` / `rcrdbatch` / `payepoch` | Call edge — but an action `sysio.system` does not implement is silently ignored rather than asserted, so this skew drops the effect instead of stalling. |
-| `sysio.epoch` before `sysio.system`, when `sysio.system` gains state the emissions gate must reserve (as `payclaimtot` reserves unclaimed `payclaims`) | Table edge: the old gate counts the new backing as spendable, so a later pay period can double-commit it and leave credited claims underfunded. |
+| `sysio.epoch` and `sysio.kicker` before `sysio.system`, when `sysio.system` gains state the emissions gate must reserve (as `payclaimtot` reserves unclaimed `payclaims`) | Table edge: the old gate counts the new backing as spendable, so a later pay period can double-commit it and leave credited claims underfunded; an old kicker counts it as available treasury and `kick` can draw it. |
 | `sysio.epoch` before `sysio.msgch`, when the release adds or changes an action `chkcons` inlines into `sysio.epoch` | Call edge in the other direction. |
 
 When a release changes both directions of one pair, the two contracts are a
@@ -276,14 +299,6 @@ credits. Restoring the old ABI alone cannot decode these rows. DClaim's finalize
 window must never reopen imports. Removal of an inline action requires retiring its
 callers first; addition requires deploying the callee first. Fresh-state bootstrap must
 use a matching contract set and generated SDK interface.
-
-> **WIRE-350 pre-launch note:** Provider nodes that previously started with the old automatic
-> snapshot schedule must delete their local `snapshot-schedule.json` once before starting this
-> build. The old `(spacing=25000, start=24999, end=MAX)` request and the corrected
-> `(spacing=25000, start=25000, end=MAX)` request have different identities, so the scheduler would
-> otherwise retain both persisted requests. No on-chain migration or production upgrade path is
-> provided because snapshot attestation is being deployed before launch.
->
 
 **A downgrade is not the upgrade run backwards. It is a data-migration problem
 first, and a code-ordering problem second** — because by the time you want to
@@ -335,3 +350,34 @@ LIQ earned-yield distribution and their normal claim actions remain.
 `sysio.synd::setconfig` requires `min_desyndicate` as an ordinary uint64, and `syndconfig` stores it
 as an ordinary field. Bootstrap schema version 1 contains chains, tokens, LIQ pools and syndications;
 it has no external-reserve or underwriting configuration.
+
+Custody tolerance adds an ordinary `uint32 custody_shortfall_bps` field to `setconfig` and `syndconfig`.
+Deploy on fresh pre-launch state and regenerate SDK contract types. Supply zero for strict backing on
+other pairs and 100 for LIQETH's 1% shortfall allowance. This is part of the existing per-pair row;
+there is no compatibility table or migration. Every later `setconfig` must preserve the intended value.
+
+## WIRE-382 pre-launch deployment
+
+This change extends the persisted `snapconfig` row from `min_providers` to
+`(min_providers, block_spacing)` and extends `setsnpcfg` by the same required field. There is no in-place
+row migration, compatibility shim, or mixed-version contract/node interface. Bootstrap fresh state with
+matching system-contract artifacts, native nodes, and generated SDK types, then initialize the two-field
+configuration before enabling snapshot providers or endpoint bootstrap.
+
+Nodes read the two-uint32 `snapconfig` KV row directly once at startup, defaulting to 25,000 blocks
+when it is absent. Governance may change any positive uint32 interval, but operators must restart
+provider and serving nodes afterward. Small values are for testing; production should use much larger
+values to avoid excessive snapshot overhead. Grace is `floor(min(block_spacing, 25000) / 2)` blocks.
+At startup, provider nodes create or reuse the
+exact automatic request shape, removing requests with the reserved `snapshot-provider auto` description
+when their spacing or bounds differ. For an interval too large to repeat (above half the uint32 height range), all provider-owned
+automatic requests are removed and none is created. Manual requests remain untouched. There is no
+irreversible-block refresh.
+
+## WIRE-415 pre-launch deployment
+
+Deploy this `sysio.msgch` on fresh state and regenerate the SDK contract types with it. The
+`attestations` table's `bystatus`, `bytype` and `byepoch` indexes are replaced by `byqueue`, and a row
+written before the change has no `byqueue` entry, so `buildenv` never finds it: a queued
+`DESYNDICATE_LIQ` would never ship, and an inbound row would never be erased. There is no migration
+path.

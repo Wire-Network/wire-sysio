@@ -131,7 +131,7 @@ transaction sysio_wrap_tester::wrap_exec( account_name executer, const transacti
    transaction trx2;
    set_transaction_headers(trx2, expiration);
    action act;
-   abi_serializer::from_variant( act_obj, act, get_resolver(), abi_serializer::create_yield_function(abi_serializer_max_time) );
+   abi_serializer::from_variant( act_obj, act, get_resolver(), fixture_abi_yield_function() );
    trx2.actions.push_back( std::move(act) );
    return trx2;
 }
@@ -152,7 +152,7 @@ transaction sysio_wrap_tester::reqauth( account_name from, const vector<permissi
    transaction trx;
    set_transaction_headers(trx, expiration);
    action act;
-   abi_serializer::from_variant( act_obj, act, get_resolver(), abi_serializer::create_yield_function(abi_serializer_max_time) );
+   abi_serializer::from_variant( act_obj, act, get_resolver(), fixture_abi_yield_function() );
    trx.actions.push_back( std::move(act) );
    return trx;
 }

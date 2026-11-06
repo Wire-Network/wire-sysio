@@ -8,6 +8,7 @@
 #include <sysio.roa.hpp>                    // authoritative Tier-1 electorate preflight
 #include <sysio/slug_name.hpp>
 #include <sysio.opp.common/evm_address.hpp>
+#include <sysio.opp.common/secp256k1_point.hpp>
 #include <sysio.opp.common/safe_ops.hpp>   // to_depot_amount — WSA-028 fail-closed TokenAmount gate
 #include <sysio.opp.common/name_ops.hpp>   // parse_wire_account_name — never-throw account-name parse
 #include <sysio.opp.common/opp_canonical_codec.hpp> // canonical envelope encoding + keccak epoch digest
@@ -17,6 +18,7 @@
 #include <zpp_bits.h>
 #include <magic_enum/magic_enum.hpp>
 #include <algorithm>
+#include <limits>
 #include <optional>
 
 namespace sysio {
@@ -78,34 +80,6 @@ constexpr auto UNSUPPORTED_PAYLOAD_VERSION = "unsupported OPP MessagePayload ver
 /// binds inbound registrations to this exact outpost — see the WSA-005 note there.
 constexpr sysio::slug_name NODE_OWNER_SRC_CHAIN = "ETHEREUM"_s;
 
-/// Hard cap on the encoded envelope size in BOTH directions, mirroring the
-/// Solana (`opp_outpost::MAX_ENVELOPE_BYTES`) and Ethereum (`OPP.MAX_ENVELOPE_BYTES`)
-/// caps. 32 KiB is the e2e-supported maximum across WIRE / Ethereum / Solana.
-/// Solana's 256 KiB BPF heap divided by ~3.3× envelope-size peak heap usage
-/// during the finalising chunk's `Envelope::decode + keccak::hash + clone`
-/// tolerates more, but Ethereum is the binding constraint: a cold
-/// `emitOutboundEnvelope` of a near-64-KiB envelope costs ~45 M gas, ~2.7× the
-/// EIP-7825 per-transaction cap of 16 777 216, so the platform cap is 32 768.
-/// Outbound, the `buildenv` packing loop uses this to decide how many READY
-/// attestations to bundle into the current epoch's envelope; any that don't fit
-/// stay in the `attestations` table with status READY for the next epoch's
-/// `buildenv` call. Inbound, `deliver` rejects anything larger before hashing
-/// or storing it.
-constexpr size_t   MAX_ENVELOPE_BYTES         = 32'768;
-
-/// Conservative per-attestation byte budget used by the `buildenv` packing
-/// loop: protobuf tags + length prefixes + the attestation type/data-size
-/// fields. Over-counts by a few bytes per attestation versus the actual
-/// `zpp::bits` encoded size, which keeps the loop O(N) and always errs on the
-/// side of leaving a gap. The trailing `packed.size()` check after final
-/// serialisation is the hard backstop.
-constexpr size_t   ATTESTATION_OVERHEAD_BYTES = 24;
-
-/// Conservative envelope/message header budget for the packing loop —
-/// covers the `Envelope` header fields, the wrapping `Message`, its header
-/// + payload preamble, and a safety margin for `zpp::bits` length prefixes.
-constexpr size_t   ENVELOPE_BASELINE_BYTES    = 512;
-
 /// Epochs of inbound `envelopes` rows kept: the current epoch, which every on-chain reader uses, and
 /// the previous one, so a batch operator whose cached epoch lags by one still finds its delivery.
 constexpr uint32_t INBOUND_ENVELOPE_RETENTION_EPOCHS = 2;
@@ -140,11 +114,11 @@ constexpr const char* DISPUTE_NO_TIER_ONE_ELECTORATE_LOG =
 /// Mint the next attestation id from the `attseq` singleton.
 ///
 /// Replaces a `std::max<uint64_t>(1, atts.available_primary_key())` call
-/// at every `attestations_t` insertion site. The `attseq` singleton survives the
-/// `buildenv` cleanup of `ATTESTATION_STATUS_PROCESSED` rows, so the
-/// monotonic counter keeps advancing across phases even when the atts
-/// table is drained. Reusing an erased row's id would give a later attestation
-/// the same identity as an earlier audit record.
+/// at every `attestations_t` insertion site. The `attseq` singleton survives
+/// `buildenv` erasing shipped and inbound rows, so the monotonic counter
+/// keeps advancing across phases even when the atts table is drained.
+/// Reusing an erased row's id would give a later attestation the same
+/// identity as an earlier audit record.
 ///
 /// First call materialises the row at `next = 2` and returns `1`.
 /// Subsequent calls return the current `next` and post-increment.
@@ -159,6 +133,12 @@ uint64_t mint_att_id(name self) {
    uint64_t out = row.next;
    seq.modify(same_payer, pk, [&](auto& r) { r.next = out + 1; });
    return out;
+}
+
+/// The outpost's `outqueue` row, or an empty one before its first general-lane attestation.
+msgch::outbound_queue_entry outbound_queue_of(const msgch::outqueue_t& queues, uint64_t chain_code) {
+   return queues.try_get(msgch::outbound_queue_key{chain_code})
+      .value_or(msgch::outbound_queue_entry{.chain_code = chain_code, .queued = 0});
 }
 
 /// Size of the ACTIVE batch-operator group -- the set that can actually deliver for the current
@@ -569,14 +549,18 @@ struct em_identity {
 
 /// Validate the BAR-provided uncompressed secp256k1 key, compress it for authex storage, and derive
 /// its canonical EVM address from the same bytes. `reg.actor.address` is metadata only and is never
-/// trusted as identity input.
+/// trusted as identity input. Bytes that are not a curve point are refused: no private key exists
+/// for them, so the link they would create could never sign, yet `advance` would still publish it
+/// in the OPERATORS roster.
 std::optional<em_identity> em_identity_from_uncompressed_key(const std::vector<char>& b) {
+   if (!opp::secp256k1::is_uncompressed_key(b.data(), b.size())) return std::nullopt;
    const auto address = opp::evm_address_from_uncompressed_key(b.data(), b.size());
    if (!address) return std::nullopt;
 
    sysio::ecc_public_key compressed{};
-   // Compressed prefix = 0x02 if Y is even, 0x03 if odd; Y is bytes [33,65), parity is its LSB.
-   compressed[0] = static_cast<char>(0x02 | (static_cast<uint8_t>(b[64]) & 1));
+   // The compressed prefix encodes Y's parity; Y is bytes [33,65), parity is its LSB.
+   compressed[0] = (static_cast<uint8_t>(b[64]) & 1) == 0 ? opp::secp256k1::compressed_even_y_prefix
+                                                          : opp::secp256k1::compressed_odd_y_prefix;
    std::copy(b.begin() + 1, b.begin() + 33, compressed.begin() + 1);  // X coordinate
 
    sysio::public_key pk;
@@ -699,68 +683,6 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
    return carried_syndication_value;
 }
 
-/// Read a protobuf uint64 without crossing a submessage boundary or discarding high bits.
-[[nodiscard]] bool bounded_varint(std::span<const char>& data, uint64_t& value) {
-   value = 0;
-   for (unsigned shift = 0; shift < 70; shift += 7) {
-      if (data.empty()) return false;
-      const auto part = static_cast<uint8_t>(data.front());
-      data = data.subspan(1);
-      if (shift == 63 && part > 1) return false;
-      value |= uint64_t(part & 0x7f) << shift;
-      if (!(part & 0x80)) return true;
-   }
-   return false;
-}
-
-/// Validate raw version width before zpp narrows a protobuf varint to uint32. Walk only
-/// Envelope.messages(40) -> Message.payload(2) -> MessagePayload.version(1); opaque
-/// header/attestation bodies keep their existing decoders. Recursion is limited to three levels.
-[[nodiscard]] bool payload_version_encoding_valid(std::span<const char> data, unsigned level = 0) {
-   while (!data.empty()) {
-      uint64_t tag;
-      if (!bounded_varint(data, tag)) return false;
-      const auto field = tag >> 3;
-      const auto wire_type = tag & 7;
-      if (field == 0 || field > 0x1fffffff) return false;
-      const bool nested = (level == 0 && field == 40) || (level == 1 && field == 2);
-      const bool version = level == 2 && field == 1;
-      if ((nested && wire_type != 2) || (version && wire_type != 0)) return false;
-      uint64_t value;
-      if (wire_type == 0) {
-         if (!bounded_varint(data, value) || (version && value > UINT32_MAX)) return false;
-      } else if (wire_type == 2) {
-         if (!bounded_varint(data, value) || value > data.size()) return false;
-         if (nested && !payload_version_encoding_valid(data.first(value), level + 1)) return false;
-         data = data.subspan(value);
-      } else if (wire_type == 1 || wire_type == 5) {
-         const size_t length = wire_type == 1 ? 8 : 4;
-         if (length > data.size()) return false;
-         data = data.subspan(length);
-      } else {
-         return false;
-      }
-   }
-   return true;
-}
-
-/// Check every payload before any delivery or attestation is recorded. Empty envelopes have no
-/// payload version to validate; a message with an omitted payload/version decodes to zero and fails.
-[[nodiscard]] bool payload_versions_supported(const opp::Envelope& envelope,
-                                               uint64_t chain_code, uint32_t epoch_index) {
-   for (size_t i = 0; i < envelope.messages.size(); ++i) {
-      const auto version = static_cast<uint32_t>(envelope.messages[i].payload.version);
-      if (version != SUPPORTED_PAYLOAD_VERSION) {
-         sysio::print_f("DROP unsupported OPP MessagePayload version: chain_code=% epoch=% "
-                        "message=% version=% supported=%\n",
-                        static_cast<unsigned long long>(chain_code), epoch_index,
-                        static_cast<unsigned long long>(i), version, SUPPORTED_PAYLOAD_VERSION);
-         return false;
-      }
-   }
-   return true;
-}
-
 /// Validate an inbound envelope against the per-outpost chains for `chain_code` at `epoch_index`:
 /// the envelope-level chain (`previous_envelope_hash` continues `outpcons.envelope_digest`) and the
 /// per-message semantic headers + inbound message chain (`semantic_headers_ok`). Pure read + compute
@@ -784,7 +706,6 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
                                           uint64_t chain_code, uint32_t epoch_index,
                                           checksum256& out_envelope_digest,
                                           checksum256& out_new_message_tip) {
-   if (!payload_versions_supported(envelope, chain_code, epoch_index)) return false;
    out_envelope_digest = opp::canonical::epoch_digest(envelope);
    checksum256 inbound_message_tip{};
    {
@@ -863,7 +784,6 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
 
    // Decode the protobuf Envelope (raw protobuf, no size prefix).
    opp::Envelope envelope;
-   check(payload_version_encoding_valid(raw), "failed to decode inbound OPP Envelope");
    auto in = zpp::bits::in{std::span{raw.data(), raw.size()}, zpp::bits::no_size{}};
    auto decode_result = in(envelope);
    check(decode_result == zpp::bits::errc{}, "failed to decode inbound OPP Envelope");
@@ -1142,11 +1062,14 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
    uint32_t epoch = epoch::current_epoch_index();
    opp::Envelope env_check;
    {
-      check(payload_version_encoding_valid(data), "failed to decode inbound envelope");
       auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
       auto result = in(env_check);
       check(result == zpp::bits::errc{}, "failed to decode inbound envelope");
-      check(payload_versions_supported(env_check, chain_code, epoch), UNSUPPORTED_PAYLOAD_VERSION);
+      // Reject every unsupported decoded payload before recording any delivery.
+      for (const auto& message : env_check.messages) {
+         check(static_cast<uint32_t>(message.payload.version) == SUPPORTED_PAYLOAD_VERSION,
+               UNSUPPORTED_PAYLOAD_VERSION);
+      }
       uint32_t env_epoch = static_cast<uint32_t>(env_check.epoch_index);
       // Lambda overload: the formatted message (triple std::to_string concat) is built only on the
       // failure path, not on every successful delivery.
@@ -1523,6 +1446,17 @@ void msgch::queueout(uint64_t chain_code,
          has_auth(synd::account) || has_auth(get_self()),
          "queueout: caller not authorized to queue outbound attestations");
 
+   // A row no envelope can carry would abort every later `buildenv`, and with it `sysio.epoch::advance`.
+   // Rejecting it here reverts only the producer's transaction, including the state change it queued
+   // the row for.
+   check(data.size() <= MAX_ATTESTATION_DATA_BYTES,
+         "sysio.msgch::queueout: attestation exceeds MAX_ATTESTATION_DATA_BYTES");
+   // A general-lane row must also fit beside the schedule lane every envelope carries first, or it
+   // would stall the general lane behind it for good.
+   const queue_lane lane = lane_of(attest_type);
+   check(lane == queue_lane::schedule || data.size() <= MAX_GENERAL_ATTESTATION_DATA_BYTES,
+         "sysio.msgch::queueout: attestation exceeds MAX_GENERAL_ATTESTATION_DATA_BYTES");
+
    // The chains registry is the ONLY authority on which chain codes exist.
    //
    // This is not an attack gate -- the authorization check above is. It is an
@@ -1530,10 +1464,8 @@ void msgch::queueout(uint64_t chain_code,
    // sysio.chains, but a governance msig holding one of those authorities can
    // call queueout directly, and a typo'd code used to abort here. Without it
    // the row is created READY and is then unreachable forever: epoch::advance
-   // only fans buildenv to registered active outposts, the PROCESSED drain
-   // skips mismatched codes, and no prune action exists -- so it is permanent
-   // sysio-pool RAM, re-walked by the Phase-1 bystatus scan on every buildenv,
-   // for every outpost, every epoch.
+   // only fans buildenv to registered active outposts and no prune action
+   // exists -- so it is permanent sysio-pool RAM.
    //
    // The SVM terminal-account estimator that used to live beside this lookup
    // was deliberately deleted (it made the depot model another chain's packet
@@ -1542,6 +1474,17 @@ void msgch::queueout(uint64_t chain_code,
    sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
    chains_tbl.get(sysio::chains::chain_key{sysio::slug_name{chain_code}},
                   "sysio.msgch::queueout: chain_code is not registered");
+
+   // Backpressure: past the cap, a general-lane row fails its producer's transaction (a `desyndicate`
+   // reverts whole, burn included) instead of growing the queue. Schedule rows are exempt because
+   // `sysio.epoch` queues them inside `advance`, which must not fail.
+   if (lane == queue_lane::general) {
+      outqueue_t queues(get_self());
+      auto       queue = outbound_queue_of(queues, chain_code);
+      check(queue.queued < MAX_QUEUED_ATTESTATIONS, "sysio.msgch::queueout: outbound queue is full for this outpost");
+      ++queue.queued;
+      queues.set(ram_payer, outbound_queue_key{chain_code}, queue);
+   }
 
    auto now_sec = static_cast<uint64_t>(current_time_point().sec_since_epoch());
 
@@ -1564,11 +1507,12 @@ void msgch::queueout(uint64_t chain_code,
 // ---------------------------------------------------------------------------
 //  buildenv — build outbound envelope from READY attestations
 //
-//  Packs as many READY attestations as fit under MAX_ENVELOPE_BYTES into a
-//  single outbound envelope; any that don't fit stay in the table with
-//  status = READY and ride the next epoch's `buildenv` call. Mirrors the
-//  Solana (`emit_outbound_inner`) and Ethereum (`emitOutboundEnvelope`)
-//  packing-loop pattern — never drop, never refuse, always emit what fits.
+//  Packs this outpost's READY attestations in queue order (schedule lane
+//  first, FIFO within a lane) into a single outbound envelope, up to
+//  MAX_ENVELOPE_BYTES and MAX_ENVELOPE_ATTESTATIONS; the rest stay READY and
+//  ride the next epoch's `buildenv` call. Mirrors the Solana
+//  (`emit_outbound_inner`) and Ethereum (`emitOutboundEnvelope`) packing-loop
+//  pattern — never drop, never refuse, always emit what fits.
 //
 //  Each envelope chains from its predecessor on the same outpost stream:
 //  `previous_envelope_hash` carries the prior emit's canonical epoch digest
@@ -1589,36 +1533,57 @@ void msgch::buildenv(uint64_t chain_code) {
 
    uint32_t epoch = epoch::current_epoch_index();
    attestations_t atts(get_self());
-   auto now_sec = static_cast<uint64_t>(current_time_point().sec_since_epoch());
    // OPP wire timestamps (`MessageHeader.timestamp`, `Envelope.epoch_timestamp`) are milliseconds
    // since the Unix epoch (opp.proto). WIRE's half-second blocks make sub-second resolution
-   // meaningful, so emit real milliseconds; `now_sec` stays for the seconds-unit table columns.
+   // meaningful, so emit real milliseconds.
    const uint64_t now_ms =
       static_cast<uint64_t>(current_time_point().time_since_epoch().count()) / 1000;
 
-   // ── Phase 1: collect candidate READY attestations for this outpost.
-   //    Order is the secondary index's natural order, which is stable across
-   //    epochs — preserves cross-epoch attestation ordering for the receiving
-   //    chain.
-   std::vector<opp::AttestationEntry> candidate_entries;
-   std::vector<uint64_t>              candidate_ids;
+   // Phase 1: take this outpost's READY rows in queue order, stopping at the first one that would push
+   // the estimate past MAX_ENVELOPE_BYTES, or at MAX_ENVELOPE_ATTESTATIONS. The walk reads nothing it
+   // does not ship, so its cost does not grow with the backlog, and the rows it leaves keep their place.
+   //
+   // The estimate is conservative. The trim loop below is the source of truth for the encoded size
+   // invariant.
+   //
+   // This pass deliberately does NOT bound the envelope by any destination chain's transaction
+   // capacity. Solana dispatch is resumable: the outpost settles `[cursor, cursor + dispatch_limit)`
+   // per terminal call and the relay loops until the cursor drains, so an envelope that needs more
+   // effect accounts than one Solana transaction can carry is settled across several calls rather
+   // than refused here. Sizing a WIRE consensus envelope against another chain's packet limit put
+   // that chain's MTU inside depot consensus; the cursor removes the need.
+   auto by_queue = atts.get_index<"byqueue"_n>();
+   const auto in_ready_queue = [&](const auto& row) {
+      return row != by_queue.end() && row->chain_code == chain_code &&
+             row->status == AttestationStatus::ATTESTATION_STATUS_READY;
+   };
 
-   auto status_idx = atts.get_index<"bystatus"_n>();
-   for (auto it = status_idx.lower_bound(
-           static_cast<uint64_t>(AttestationStatus::ATTESTATION_STATUS_READY));
-        it != status_idx.end() &&
-        it->status == AttestationStatus::ATTESTATION_STATUS_READY; ++it) {
-      if (it->chain_code != chain_code) continue;
+   auto ready = by_queue.lower_bound(
+      queue_key(chain_code, AttestationStatus::ATTESTATION_STATUS_READY, queue_lane::schedule));
+   if (!in_ready_queue(ready)) return;
+
+   std::vector<opp::AttestationEntry> entries;
+   std::vector<uint64_t>              included_ids;
+   size_t                             estimated_bytes = ENVELOPE_BASELINE_BYTES;
+   for (; in_ready_queue(ready) && entries.size() < MAX_ENVELOPE_ATTESTATIONS; ++ready) {
+      const size_t entry_bytes = ATTESTATION_OVERHEAD_BYTES + ready->data.size();
+      if (estimated_bytes + entry_bytes > MAX_ENVELOPE_BYTES) {
+         break;
+      }
+      estimated_bytes += entry_bytes;
 
       opp::AttestationEntry entry;
-      entry.type = it->type;
-      entry.data_size = zpp::bits::vuint32_t{static_cast<uint32_t>(it->data.size())};
-      entry.data = it->data;
-      candidate_entries.push_back(std::move(entry));
-      candidate_ids.push_back(it->id);
+      entry.type = ready->type;
+      entry.data_size = zpp::bits::vuint32_t{static_cast<uint32_t>(ready->data.size())};
+      entry.data = ready->data;
+      entries.push_back(std::move(entry));
+      included_ids.push_back(ready->id);
    }
 
-   if (candidate_entries.empty()) return;
+   // Invariant, not a reachable failure: `queueout` caps every row at MAX_ATTESTATION_DATA_BYTES, which
+   // is what the estimate leaves an otherwise empty envelope, so the first row always fits.
+   check(!entries.empty(),
+         "sysio.msgch::buildenv: a single READY attestation exceeds the outbound envelope");
 
    const auto op_row = [&]() {
       sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
@@ -1638,56 +1603,21 @@ void msgch::buildenv(uint64_t chain_code) {
    route_endpoints.end.kind   = op_row.kind;
    route_endpoints.end.id     = op_row.external_chain_id;
 
-   // Phase 2: estimator-based initial pick. Walk candidates in order, accumulating a conservative byte
-   // estimate; stop once the next one would push the envelope over MAX_ENVELOPE_BYTES. The trim loop
-   // below is the source of truth for the encoded size invariant.
-   //
-   // This pass deliberately does NOT bound the envelope by any destination chain's transaction
-   // capacity. Solana dispatch is resumable: the outpost settles `[cursor, cursor + dispatch_limit)`
-   // per terminal call and the relay loops until the cursor drains, so an envelope that needs more
-   // effect accounts than one Solana transaction can carry is settled across several calls rather
-   // than refused here. Sizing a WIRE consensus envelope against another chain's packet limit put
-   // that chain's MTU inside depot consensus; the cursor removes the need.
-   size_t              included_count = 0;
-   size_t              estimated_bytes = ENVELOPE_BASELINE_BYTES;
-   for (const auto& entry : candidate_entries) {
-      const size_t entry_bytes = ATTESTATION_OVERHEAD_BYTES + entry.data.size();
-      if (estimated_bytes + entry_bytes > MAX_ENVELOPE_BYTES) {
-         break;
-      }
-      estimated_bytes += entry_bytes;
-      ++included_count;
-   }
-
-   // First-attestation-too-big guard. The estimator picks zero only when the first candidate alone
-   // overshoots the envelope; the trim loop below would surface the same condition, but aborting
-   // upfront avoids building anything in the doomed case. Never expected at protocol level because
-   // every valid current attestation should fit by itself.
-   check(included_count > 0,
-         "sysio.msgch::buildenv: a single READY attestation exceeds the outbound envelope");
-
-   std::vector<opp::AttestationEntry> entries(
-      std::make_move_iterator(candidate_entries.begin()),
-      std::make_move_iterator(candidate_entries.begin() + included_count));
-   std::vector<uint64_t> included_ids(
-      candidate_ids.begin(),
-      candidate_ids.begin() + included_count);
-
-   // Chain links: the previous envelope emitted for this outpost. `outenvelopes` is one-deep per
-   // outpost (see the cleanup below), so the single surviving row is the previous emit; its
-   // `envelope_hash` is that envelope's epoch digest and its `last_message_id` is this outpost's
-   // message-stream tip. The first emit for an outpost has no row and chains both links from
-   // empty (genesis), matching the outpost contracts' zero genesis tip.
+   // Chain links come from the previous emit, the newest row for this outpost: one step back from the
+   // first `byoutepoch` entry past it, so retained rows are never walked. No row means genesis: both
+   // links chain from empty.
    outenvelopes_t envelopes(get_self());
    std::vector<char> prev_envelope_digest;
    std::vector<char> prev_message_id;
    {
-      auto by_outpost = envelopes.get_index<"byoutpost"_n>();
-      auto prev_it = by_outpost.lower_bound(chain_code);
-      if (prev_it != by_outpost.end() && prev_it->chain_code == chain_code) {
-         const auto digest_bytes = prev_it->envelope_hash.extract_as_byte_array();
+      auto by_epoch = envelopes.get_index<"byoutepoch"_n>();
+      auto it = by_epoch.upper_bound(
+         opp::outpost_epoch_key(chain_code, std::numeric_limits<uint32_t>::max()));
+      --it;
+      if (it != by_epoch.end() && it->chain_code == chain_code) {
+         const auto digest_bytes = it->envelope_hash.extract_as_byte_array();
          prev_envelope_digest.assign(digest_bytes.begin(), digest_bytes.end());
-         const auto tip_bytes = prev_it->last_message_id.extract_as_byte_array();
+         const auto tip_bytes = it->last_message_id.extract_as_byte_array();
          prev_message_id.assign(tip_bytes.begin(), tip_bytes.end());
       }
    }
@@ -1758,12 +1688,14 @@ void msgch::buildenv(uint64_t chain_code) {
    // under-counted relative to the actual zpp::bits encoding for this candidate set), pop the last
    // entry and retry. This loop -- not the estimator -- is the sole authority on the size invariant. It
    // replaces the previous post-build hard abort, which left this action in a dead-letter loop on
-   // estimator drift: the PROCESSED markings would roll back with the aborted tx, the same set would
-   // re-pack against the same estimator next epoch, and the same check would trip again. Popped entries
-   // stay READY and ride the next `buildenv` call. PROCESSED marking is deferred until after the loop
-   // converges so a popped entry never needs a status revert.
+   // estimator drift: the erasures would roll back with the aborted tx, the same set would re-pack
+   // against the same estimator next epoch, and the same check would trip again. Popped entries stay
+   // READY and ride the next `buildenv` call. Erasure waits until the loop converges, so a popped entry
+   // is never touched.
    std::vector<char> packed = build_packed(entries);
    while (packed.size() > MAX_ENVELOPE_BYTES) {
+      // Invariant: the estimate over-counts the real encoding, so one row within the `queueout` cap
+      // always packs and the loop never pops the last entry.
       check(entries.size() > 1,
             "sysio.msgch::buildenv: a single READY attestation exceeds "
             "MAX_ENVELOPE_BYTES -- cannot pack into an envelope");
@@ -1772,16 +1704,20 @@ void msgch::buildenv(uint64_t chain_code) {
       packed = build_packed(entries);
    }
 
-   // Mark the surviving attestations as PROCESSED. Remaining candidates (popped by the trim loop or
-   // never picked by the estimator) stay READY for the next epoch's `buildenv` call.
-   for (uint64_t aid : included_ids) {
-      auto att_pk = id_key{aid};
-      if (atts.contains(att_pk)) {
-         atts.modify(same_payer, att_pk, [&](auto& a) {
-            a.status              = AttestationStatus::ATTESTATION_STATUS_PROCESSED;
-            a.processed_timestamp = now_sec;
-         });
-      }
+   // The shipped rows' bytes are in `packed` now: erase them, and count the general-lane ones out of the
+   // outpost's queue. Rows the walk stopped before, or the trim loop popped, stay READY for the next
+   // epoch's `buildenv` call.
+   uint32_t general_shipped = 0;
+   for (size_t i = 0; i < included_ids.size(); ++i) {
+      if (lane_of(entries[i].type) == queue_lane::general) ++general_shipped;
+      atts.erase(id_key{included_ids[i]});
+   }
+   if (general_shipped > 0) {
+      outqueue_t queues(get_self());
+      auto       queue = outbound_queue_of(queues, chain_code);
+      // Saturating: the count only bounds `queueout`, and a short one must not abort `advance`.
+      queue.queued -= std::min(queue.queued, general_shipped);
+      queues.set(ram_payer, outbound_queue_key{chain_code}, queue);
    }
 
    // This envelope's canonical epoch digest: keccak256 over the packed bytes, which equal the
@@ -1805,34 +1741,42 @@ void msgch::buildenv(uint64_t chain_code) {
 
    // === AUDIT LOG + INLINE CLEANUP OF WORKING STATE ===
    //
-   // Audit-log row mirrors the outbound emit (WIRE → outpost). Followed
-   // by inline drains of the previous-epoch outenvelopes row (one-deep
-   // retention; the batch op only ever reads the most-recent emit) and
-   // the just-PROCESSED attestations for this outpost (their bytes are
-   // now baked into `packed` above).
+   // Audit-log row mirrors the outbound emit (WIRE → outpost). Then drain the outenvelopes rows the
+   // outpost has consumed and this outpost's inbound attestations, already dispatched.
    {
       // Same endpoints the wire envelope carries (derived above from the
       // destination's `sysio.chains` row).
       write_envelope_log(get_self(), route_endpoints, epoch, envelope_digest);
 
-      // Drop previous outpost emits — keep only the row we just inserted.
-      auto by_outpost = envelopes.get_index<"byoutpost"_n>();
-      for (auto it = by_outpost.lower_bound(chain_code);
-           it != by_outpost.end() && it->chain_code == chain_code; ) {
-         if (it->id == out_id) { ++it; continue; }
-         it = by_outpost.erase(std::move(it));
+      // Drop the prefix of prior emits the outpost has consumed: an outpost emits epoch N only after
+      // accepting ours, so `outpcons.epoch_index` covering a row's epoch proves consumption. The walk
+      // stops at the first row it does not cover, the oldest copy the outpost still needs; no
+      // `outpcons` row acknowledges nothing.
+      auto by_epoch = envelopes.get_index<"byoutepoch"_n>();
+      auto it = by_epoch.lower_bound(opp::outpost_epoch_key(chain_code, 0));
+      outpost_consensus_t opcons(get_self());
+      const auto opc_pk = outpost_consensus_key{chain_code};
+      if (opcons.contains(opc_pk)) {
+         const uint32_t acked = opcons.get(opc_pk).epoch_index;
+         while (it != by_epoch.end() && it->chain_code == chain_code && it->epoch_index <= acked) {
+            if (it->id == out_id) { ++it; continue; }
+            it = by_epoch.erase(std::move(it));
+         }
+      }
+      if (it != by_epoch.end() && it->chain_code == chain_code && it->id != out_id) {
+         // Not expected: only a transaction signed directly by sysio.msgch or sysio.epoch skips the
+         // `chkcons` consensus check. Logged once so retained rows are visible.
+         sysio::print_f("msgch::buildenv: retaining unacknowledged emits from epoch %u, chain_code=%llu\n",
+                        it->epoch_index, static_cast<unsigned long long>(chain_code));
       }
 
-      // Drop the attestations we just consumed (status PROCESSED rows
-      // for this outpost). They've been bundled into `packed`; the
-      // bytes are dead weight on chain.
-      auto processed_idx = atts.get_index<"bystatus"_n>();
-      for (auto it = processed_idx.lower_bound(
-                        static_cast<uint64_t>(AttestationStatus::ATTESTATION_STATUS_PROCESSED));
-           it != processed_idx.end() &&
-           it->status == AttestationStatus::ATTESTATION_STATUS_PROCESSED; ) {
-         if (it->chain_code != chain_code) { ++it; continue; }
-         it = processed_idx.erase(std::move(it));
+      // Drop this outpost's inbound attestations: `evalcons` stores them PROCESSED and dispatches them
+      // inline, so their bytes are dead weight on chain. The range holds this outpost's rows only.
+      for (auto inbound = by_queue.lower_bound(
+              queue_key(chain_code, AttestationStatus::ATTESTATION_STATUS_PROCESSED, queue_lane::schedule));
+           inbound != by_queue.end() && inbound->chain_code == chain_code &&
+           inbound->status == AttestationStatus::ATTESTATION_STATUS_PROCESSED; ) {
+         inbound = by_queue.erase(std::move(inbound));
       }
    }
 }

@@ -1,5 +1,6 @@
 #include <boost/test/unit_test.hpp>
 #include <list>
+#include <fstream>
 
 #include <sysio/trace_api/compressed_file.hpp>
 #include <sysio/trace_api/test_common.hpp>
@@ -87,6 +88,21 @@ namespace std {
 }
 
 BOOST_AUTO_TEST_SUITE(compressed_file_tests)
+
+/// A failed publication retains the input and previous destination and removes the partial archive.
+BOOST_AUTO_TEST_CASE(compression_publication_failure) {
+   fc::temp_directory directory;
+   const auto input = directory.path() / "trace.log";
+   const auto output = directory.path() / "trace.clog";
+   std::ofstream(input) << "trace data";
+   std::filesystem::create_directory(output);
+   std::ofstream(output / "sentinel") << "old";
+   BOOST_CHECK_THROW(compressed_file::process(input, output, 64), std::filesystem::filesystem_error);
+   BOOST_CHECK(std::filesystem::is_regular_file(input));
+   BOOST_CHECK(std::filesystem::is_regular_file(output / "sentinel"));
+   BOOST_CHECK_EQUAL(std::distance(std::filesystem::directory_iterator(directory.path()),
+                                   std::filesystem::directory_iterator()), 2);
+}
 
 BOOST_FIXTURE_TEST_CASE_TEMPLATE(random_access_test, T, test_types, temp_file_fixture) {
    // generate a large dataset where ever 8 bytes is the offset to that 8 bytes of data

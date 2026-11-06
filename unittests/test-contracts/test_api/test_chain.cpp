@@ -45,9 +45,8 @@ void test_chain::test_get_ram_usage() {
     // creates a kv entry
     char key1[24];
     make_kv_key(table1, receiver, "tom"_n.value, key1);
-    kv_set( 0, payer, key1, 24, info.c_str(), info.size() );
-    // KV billing: key_size(24) + value_size + kv_object overhead (112)
-    // billable_size_v<kv_object> = 48 (fixed fields incl id) + 32*2 (index overhead) = 112
+    (void)kv_set( 0, payer, key1, 24, info.c_str(), info.size(), kv_upsert );
+    // KV billing: key_size(24) + value_size + the row overhead (112), a protocol price
     int64_t billable_size_v_kv_object = 112;
     int64_t billable_size = (int64_t)(24 + info.size() + billable_size_v_kv_object);
 
@@ -62,7 +61,7 @@ void test_chain::test_get_ram_usage() {
     // add another kv entry
     char key2[24];
     make_kv_key(table1, receiver, "tom"_n.value+1, key2);
-    kv_set( 0, payer, key2, 24, info.c_str(), info.size() );
+    (void)kv_set( 0, payer, key2, 24, info.c_str(), info.size(), kv_upsert );
     expected_ram += (int64_t)(24 + info.size() + billable_size_v_kv_object);
 
     ram_bytes = get_ram_usage( ram_usage.account );

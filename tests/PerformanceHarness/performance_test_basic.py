@@ -122,6 +122,8 @@ class PerformanceTestBasic:
 
         def __post_init__(self):
             self._totalNodes = self.producerNodeCount + self.validationNodeCount + self.apiNodeCount
+            # The launcher spreads the producers over this many nodes; left at 1, every producer lands on node_00.
+            self._pNodes = self.producerNodeCount
             # Setup Expectations for Producer and Validation Node IDs
             # Producer Nodes are index [0, producerNodeCount) and non-producer nodes (validationNodeCount, apiNodeCount) nodes follow the producer nodes [producerNodeCount, _totalNodes)
             self._producerNodeIds = list(range(0, self.producerNodeCount))
@@ -205,7 +207,7 @@ class PerformanceTestBasic:
         self.testEnd = self.testStart
         self.testNamePath = testNamePath
         # Keep concurrent CTest runs from sharing performance artifact directories.
-        logDirUniqueSuffix = f"-{self.ptbConfig.targetTps}-{Utils.getTestPortOffset()}-{os.getpid()}"
+        logDirUniqueSuffix = f"-{self.ptbConfig.targetTps}-{os.getpid()}"
         self.loggingConfig = PerformanceTestBasic.LoggingConfig(logDirBase=Path(self.ptbConfig.logDirRoot)/f"{self.testNamePath}Logs",
                                                                 logDirTimestamp=f"{self.testStart.strftime('%Y-%m-%d_%H-%M-%S')}",
                                                                 logDirTimestampedOptSuffix=logDirUniqueSuffix)
@@ -787,11 +789,12 @@ class PtbArgumentsHandler(object):
                                                                 "to prune from the beginning and end of the range of blocks of interest for evaluation."), default=2)
         ptbBaseParserGroup.add_argument("--signature-cpu-billable-pct", type=int, help=argparse.SUPPRESS if suppressHelp else "Percentage of actual signature recovery cpu to bill. Whole number percentages, e.g. 50 for 50%%", default=0)
         ptbBaseParserGroup.add_argument("--chain-threads", type=int, help=argparse.SUPPRESS if suppressHelp else "Number of worker threads in controller thread pool", default=2)
-        ptbBaseParserGroup.add_argument("--database-map-mode", type=str, help=argparse.SUPPRESS if suppressHelp else "Database map mode (\"mapped\", \"heap\", or \"locked\"). \
+        ptbBaseParserGroup.add_argument("--database-map-mode", type=str, help=argparse.SUPPRESS if suppressHelp else "Database map mode (\"mapped\", \"mapped_private\", \"heap\", or \"locked\"). \
                                                                 In \"mapped\" mode database is memory mapped as a file. \
+                                                                In \"mapped_private\" mode database is memory mapped as a file using a private mapping (no disk writeback until program exit). \
                                                                 In \"heap\" mode database is preloaded in to swappable memory and will use huge pages if available. \
                                                                 In \"locked\" mode database is preloaded, locked in to memory, and will use huge pages if available.",
-                                                                choices=["mapped", "heap", "locked"], default="mapped")
+                                                                choices=["mapped", "mapped_private", "heap", "locked"], default="mapped")
         ptbBaseParserGroup.add_argument("--cluster-log-lvl", type=str, help=argparse.SUPPRESS if suppressHelp else "Cluster log level (\"all\", \"debug\", \"info\", \"warn\", \"error\", or \"off\"). \
                                                                 Performance Harness Test Basic relies on some logging at \"info\" level, so it is recommended lowest logging level to use. \
                                                                 However, there are instances where more verbose logging can be useful.",

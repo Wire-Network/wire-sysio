@@ -438,6 +438,8 @@ namespace sysio { namespace chain {
                                     3110007, "Missing Trace API Plugin" )
       FC_DECLARE_DERIVED_EXCEPTION( signing_transient_exception,                  plugin_exception,
                                     3110008, "Transient signing-provider failure; the operation should be retried" )
+      FC_DECLARE_DERIVED_EXCEPTION( outpost_delivery_incomplete_exception,        plugin_exception,
+                                    3110009, "Outpost delivery left the epoch open; the next tick resumes it" )
 
 
    FC_DECLARE_DERIVED_EXCEPTION( wallet_exception, chain_exception,
@@ -564,12 +566,16 @@ namespace sysio { namespace chain {
                                     3160019, "Exceeded maximum number of KV iterators" )
       FC_DECLARE_DERIVED_EXCEPTION( kv_invalid_iterator,                 contract_exception,
                                     3160020, "Invalid KV iterator handle" )
-      FC_DECLARE_DERIVED_EXCEPTION( kv_write_denied,                     contract_exception,
-                                    3160021, "KV write operation denied" )
-      FC_DECLARE_DERIVED_EXCEPTION( kv_key_not_found,                    contract_exception,
-                                    3160022, "KV key not found" )
+      FC_DECLARE_DERIVED_EXCEPTION( kv_invalid_table_id,                 contract_exception,
+                                    3160021, "KV table_id is out of range" )
+      FC_DECLARE_DERIVED_EXCEPTION( kv_empty_key,                        contract_exception,
+                                    3160022, "KV key must not be empty" )
       FC_DECLARE_DERIVED_EXCEPTION( kv_secondary_key_too_large,          contract_exception,
                                     3160023, "KV secondary key exceeds maximum allowed size" )
+      FC_DECLARE_DERIVED_EXCEPTION( kv_invalid_mode,                     contract_exception,
+                                    3160024, "Unknown KV write mode" )
+      FC_DECLARE_DERIVED_EXCEPTION( kv_key_outside_prefix,               contract_exception,
+                                    3160025, "KV key does not start with the prefix" )
 
    FC_DECLARE_DERIVED_EXCEPTION( producer_exception,           chain_exception,
                                  3170000, "Producer exception" )

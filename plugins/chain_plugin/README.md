@@ -4,7 +4,7 @@
 state database, fork database, WASM runtime, protocol features, whitelists and blacklists — brings it up from
 genesis, a snapshot, or existing state, and relays the controller's signals onto the appbase channels
 declared in `chain_interface`. Those channels have few subscribers: `batch_operator_plugin` takes
-`irreversible_block` as its sync gate and `status_monitor_plugin` ships one snapshot per irreversible block;
+`irreversible_block` as its sync gate and `alert_monitor_plugin` ships one snapshot per irreversible block;
 nothing else subscribes to any of them — `net_plugin` connects to the controller's signals directly instead. `nodeop` initializes it on every
 run alongside `resource_monitor_plugin`, `net_plugin`, and `producer_plugin`, so there is no `plugin =` line
 to add; it pulls in `signature_provider_manager_plugin` through `APPBASE_PLUGIN_REQUIRES`, which in turn
@@ -78,15 +78,24 @@ The CLI options select where the node comes up from:
 - **A snapshot file** — `--snapshot <path>`. Operator-trusted; no attestation is verified.
 - **A snapshot endpoint** — `--snapshot-endpoint <url>`, which downloads and hash-checks a snapshot from a
   serving node and then loads it. This path is not trusted the same way, and it carries hard constraints. The
-  endpoint must serve a snapshot taken at a block number that is a multiple of 25000, because only those
-  heights are attested on chain, and the snapshot must contain readable, enabled on-chain attestation state.
-  After the node syncs past the snapshot's height, the loaded block id and root hash are checked against the
-  on-chain attestation record on each finalized block: a record that does not match the loaded snapshot stops
-  the node immediately, with no grace, while a record that has not appeared yet keeps verification pending.
-  Verification only concludes once the node has caught up to the live tip: until then every finalized block
-  simply retries, with no limit. Past that point a missing record is tolerated for a grace window of 12,500
-  finalized blocks beyond the snapshot height before the node is stopped. The option requires an empty
-  database; use `--delete-all-blocks` to clear existing data.
+  loaded state must declare compatible attestation schemas. Before replay, its readable, enabled
+  attestation state provides block spacing `S`; the loaded snapshot head must be a positive
+  multiple of `S`. Rejections tell the operator to delete the loaded state. Endpoint metadata is not trusted
+  to establish cadence. After replay the resulting configuration becomes the running node's startup value.
+  After the node syncs past the snapshot's height,
+  the loaded block id and root hash are checked against the on-chain attestation record on each finalized
+  block: a record that does not match the loaded snapshot stops the node immediately, with no grace, while a
+  record that has not appeared yet keeps verification pending. Verification only concludes once the node has
+  caught up to the live tip: until then every finalized block simply retries, with no limit. Past that point a
+  missing record is tolerated for `floor(min(block_spacing, 25000) / 2)` finalized blocks beyond the snapshot height,
+  using the post-replay startup spacing rather than the pre-replay classification value `S`,
+  before the node is stopped. The option requires an empty database; use `--delete-all-blocks` to clear
+  existing data.
+
+Cadence is read once after startup replay directly from the two-uint32 `snapconfig` KV row, with a 25,000-block
+fallback if no row exists. Restart nodes after governance changes the interval; small values are for testing,
+and production should use much larger intervals to avoid excessive snapshot overhead. Small intervals
+shorten verification grace; large intervals cannot extend it beyond 12,500 blocks.
 
 Both snapshot paths share the chain-state size setting as their download and state ceiling
 (`--chain-state-db-size-mb`), and the endpoint path accepts per-caller HTTPS transport overrides
@@ -99,7 +108,7 @@ registered by `http_client_plugin`.
 `get_info_db` refreshes its cached `/v1/chain/get_info` result on every irreversible block, and on every
 accepted block outside `read-mode = irreversible` — but only when an in-process consumer is configured.
 "Configured" means a `plugin` option value contains `sysio::chain_api_plugin` or
-`sysio::status_monitor_plugin`. Without one, the cache is filled lazily on first use and not refreshed. The
+`sysio::alert_monitor_plugin`. Without one, the cache is filled lazily on first use and not refreshed. The
 flag is fixed when `chain_plugin` initializes, because appbase runs that before any dependent plugin.
 
 ### Features that add work only when enabled
@@ -272,7 +281,7 @@ process-wide `outbound-http-*` fallback that `http_client_plugin` registers.
 | `truncate-at-block` | `0` | Stop hard replay or block-log recovery at this block number when non-zero. Combined with `terminate-at-block`, prunes received blocks from the fork database on exit. |
 | `terminate-at-block` | `0` | Stop the node after reaching this block number when non-zero. To pause at a block instead, use `/v1/producer/pause_at_block`. |
 | `snapshot` | unset | File to read the snapshot state from. |
-| `snapshot-endpoint` | unset | Fetch a snapshot from a URL and bootstrap. `http(s)://host:port` fetches the latest snapshot; `http(s)://host:port/50000` fetches the snapshot at block 50000. The served snapshot's block number must be a multiple of 25000, since only those heights are attested on chain. Requires an empty database. |
+| `snapshot-endpoint` | unset | Fetch a snapshot from a URL and bootstrap. `http(s)://host:port` fetches the latest snapshot; `http(s)://host:port/50000` fetches the snapshot at block 50000. After load, the snapshot head must be a positive multiple of its startup configured block spacing `S`. Requires an empty database. |
 
 ## HTTP API
 
@@ -314,14 +323,19 @@ a dedicated handler and shut the node down; the fix is more space or a larger `c
 
 ```bash
 ninja -C build/debug test_chain_plugin
-./build/debug/plugins/chain_plugin/test/test_chain_plugin
+ctest --test-dir build/debug -R '^test_chain_plugin_' --output-on-failure
 ```
 
 The suite is registered as one CTest case per Boost test case, so a single area can be run on its own:
 
 ```bash
-./build/debug/plugins/chain_plugin/test/test_chain_plugin --run_test=get_info_consumer_plugin_policy
+ctest --test-dir build/debug -R '^test_chain_plugin_get_info_consumer_plugin_policy$' --output-on-failure
 ```
+
+CTest runs this binary through the build tree's `tests/bind_registry.py`, which supplies the
+`SYSIO_TEST_PORTS` lease required by tests that bind sockets. The wrapper uses Python's standard library and
+the host-wide WIRE bind-registry protocol. For direct filtered runs, invoke that wrapper before the binary
+and Boost arguments.
 
 It covers the snapshot attestation policies (configuration preflight, required schemas, record tuple, block
 identity, table-read failure, timeout, and retry), snapshot-endpoint option registration and validation,
@@ -342,5 +356,5 @@ VM OC whitelist on builds that have it, and the three side databases: `account_q
   `http_client_plugin`, which registers the process-wide `outbound-http-*` options.
 - [`snapshot_api_plugin`](../snapshot_api_plugin/README.md) — serves the snapshots that `--snapshot-endpoint`
   downloads.
-- [`status_monitor_plugin`](../status_monitor_plugin/README.md) — the second in-process consumer of the
+- [`alert_monitor_plugin`](../alert_monitor_plugin/README.md) — the second in-process consumer of the
   `get_info` cache.

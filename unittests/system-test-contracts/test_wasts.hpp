@@ -191,11 +191,11 @@ static const char entry_import_wast[] = R"=====(
 static const char entry_db_wast[] = R"=====(
 (module
   (func $exit (import "env" "sysio_exit") (param i32))
-  (func $kv_set (import "env" "kv_set") (param i32 i64 i32 i32 i32 i32) (result i64))
+  (func $kv_set (import "env" "kv_set") (param i32 i64 i32 i32 i32 i32 i32) (result i32))
   (func $current_receiver (import "env" "current_receiver") (result i64))
   (memory 1)
   (func $start
-    (drop (call $kv_set (i32.const 0) (call $current_receiver) (i32.const 0) (i32.const 8) (i32.const 0) (i32.const 0)))
+    (drop (call $kv_set (i32.const 0) (call $current_receiver) (i32.const 0) (i32.const 8) (i32.const 0) (i32.const 0) (i32.const 0)))
   )
   (func (export "apply") (param i64 i64 i64)
     (call $exit (i32.const 0))
@@ -989,17 +989,6 @@ static const char negative_memory_grow_trap_wast[] = R"=====(
    (drop (i32.load (i32.const 0)))
   )
  )
-)
-)=====";
-
-static const char set_jumbo_row_wast[] = R"=====(
-(module
-   (import "env" "db_store_i64" (func $db_store_i64 (param i64 i64 i64 i64 i32 i32) (result i32)))
-   (memory $0 528)
-   (export "apply" (func $apply))
-   (func $apply (param $receiver i64) (param $account i64) (param $action_name i64)
-      (drop (call $db_store_i64 (get_local $receiver) (get_local $receiver) (get_local $receiver) (i64.const 0) (i32.const 1) (i32.const 34603007)))
-   )
 )
 )=====";
 

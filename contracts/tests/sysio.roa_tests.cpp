@@ -16,6 +16,7 @@
 #include <fc/crypto/ethereum/ethereum_types.hpp>
 #include <boost/test/unit_test.hpp>
 #include <algorithm>
+#include <limits>
 #include <memory>
 #include <optional>
 #include <string>
@@ -38,6 +39,13 @@ using sysio::chain::compute_table_id;
 constexpr account_name ROA = "sysio.roa"_n;
 constexpr uint64_t NETWORK_GEN = 0;
 
+/// Weight fields of a `policies` row.
+namespace policy_field {
+constexpr char net_weight[] = "net_weight";
+constexpr char cpu_weight[] = "cpu_weight";
+constexpr char ram_weight[] = "ram_weight";
+} // namespace policy_field
+
 /// Generated sub-account names newuser checks before giving up.
 constexpr size_t NEWUSER_MAX_NAME_ATTEMPTS = 100;
 /// newuser's abort when the nonce was already used by the same creator.
@@ -51,6 +59,36 @@ constexpr size_t MAX_ACCOUNT_NAME_LENGTH = 12;
 static std::string newuser_names_exhausted_message() {
    return "Failed to generate a unique account name after " +
           std::to_string(NEWUSER_MAX_NAME_ATTEMPTS) + " attempts";
+}
+
+/// Account limit every tier-1 owner starts with before governance calls setacctlim.
+constexpr uint64_t DEFAULT_ACCOUNT_LIMIT = 1000;
+/// Largest factor one raiseacctlim may multiply a limit by before governance calls setacctlim (1.5x).
+constexpr uint32_t DEFAULT_MAX_RAISE_MULTIPLIER_BPS = 15000;
+/// Basis points in 1x.
+constexpr uint32_t BPS_DENOMINATOR = 10000;
+/// A raise multiplier of 2x, in basis points.
+constexpr uint32_t DOUBLE_BPS = 2 * BPS_DENOMINATOR;
+/// setacctlim's abort for a multiplier that could not grow a limit.
+static const std::string RAISE_MULTIPLIER_TOO_SMALL =
+   "assertion failure with message: max_raise_multiplier_bps must exceed " + std::to_string(BPS_DENOMINATOR);
+/// raiseacctlim's abort for a caller that is not a registered tier-1 node owner.
+constexpr auto RAISE_NOT_TIER1_OWNER = "Owner is not a registered tier-1 node owner";
+
+/// Returns newuser's error once the creator has sponsored `limit` accounts.
+static std::string account_limit_reached_message( uint64_t limit ) {
+   return "Creator has reached its account limit of " + std::to_string(limit) + "; raise it with raiseacctlim";
+}
+
+/// Returns raiseacctlim's error for a new limit that does not exceed `current_limit`.
+static std::string raise_not_above_current_message( uint64_t current_limit ) {
+   return "New account limit must exceed the current limit of " + std::to_string(current_limit);
+}
+
+/// Returns raiseacctlim's error for a new limit above `max_new_limit`, the multiplier bound on `current_limit`.
+static std::string raise_above_multiplier_message( uint64_t max_new_limit, uint64_t current_limit ) {
+   return "New account limit may be at most " + std::to_string(max_new_limit) + " for a current limit of " +
+          std::to_string(current_limit);
 }
 
 class sysio_roa_tester : public tester {
@@ -68,7 +106,7 @@ public:
       BOOST_REQUIRE( accnt != nullptr );
       abi_def abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
-      abi_ser.set_abi(abi, abi_serializer::create_yield_function(abi_serializer_max_time));
+      abi_ser.set_abi(abi, fixture_abi_yield_function());
 
       // Deploy sysio.system, init, and set default emission config
       set_code( config::system_account_name, test_contracts::sysio_system_wasm() );
@@ -87,7 +125,7 @@ public:
          BOOST_REQUIRE( sys_accnt != nullptr );
          abi_def sys_abi;
          BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(sys_accnt->abi, sys_abi), true);
-         sys_abi_ser.set_abi(sys_abi, abi_serializer::create_yield_function(abi_serializer_max_time));
+         sys_abi_ser.set_abi(sys_abi, fixture_abi_yield_function());
       }
 
       setup_emission_config();
@@ -122,7 +160,7 @@ public:
       act.name = "setemitcfg"_n;
       act.authorization = {{config::system_account_name, config::active_name}};
       act.data = sys_abi_ser.variant_to_binary(act_type, mvo()("cfg", cfg),
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
 
       signed_transaction trx;
       trx.actions.push_back(std::move(act));
@@ -138,7 +176,7 @@ public:
       action act;
       act.account = ROA;
       act.name    = name;
-      act.data    = abi_ser.variant_to_binary( action_type_name, data, abi_serializer::create_yield_function(abi_serializer_max_time) );
+      act.data    = abi_ser.variant_to_binary( action_type_name, data, fixture_abi_yield_function() );
 
       return base_tester::push_action( std::move(act), signer.to_uint64_t() );
    }
@@ -166,14 +204,13 @@ public:
 
    fc::variant get_nodeowner( account_name acc )
    {
-      const auto& db = control->db();
       auto key = make_kv_scoped_key(static_cast<uint64_t>(NETWORK_GEN), acc.to_uint64_t());
-      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-      auto it = kv_idx.find(boost::make_tuple(ROA, compute_table_id(name("nodeowners").to_uint64_t()), key.to_string_view()));
-      if (it != kv_idx.end()) {
-         const vector<char> data(it->value.data(), it->value.data() + it->value.size());
+      const auto row =
+         control->kv().find_row(ROA, compute_table_id(name("nodeowners").to_uint64_t()), key.to_string_view());
+      if (row) {
+         const vector<char> data(row->value.begin(), row->value.end());
          if (!data.empty()) {
-            return abi_ser.binary_to_variant( "nodeowners", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
+            return abi_ser.binary_to_variant( "nodeowners", data, fixture_abi_yield_function() );
          }
       }
       return fc::variant();
@@ -182,14 +219,13 @@ public:
    // Read the nodeownerreg audit row (status/reason/tier) written by nodeownreg's soft-fail path.
    fc::variant get_nodeownerreg( account_name acc )
    {
-      const auto& db = control->db();
       auto key = make_kv_scoped_key(static_cast<uint64_t>(NETWORK_GEN), acc.to_uint64_t());
-      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-      auto it = kv_idx.find(boost::make_tuple(ROA, compute_table_id(name("nodeownerreg").to_uint64_t()), key.to_string_view()));
-      if (it != kv_idx.end()) {
-         const vector<char> data(it->value.data(), it->value.data() + it->value.size());
+      const auto row =
+         control->kv().find_row(ROA, compute_table_id(name("nodeownerreg").to_uint64_t()), key.to_string_view());
+      if (row) {
+         const vector<char> data(row->value.begin(), row->value.end());
          if (!data.empty()) {
-            return abi_ser.binary_to_variant( "nodeownerreg", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
+            return abi_ser.binary_to_variant( "nodeownerreg", data, fixture_abi_yield_function() );
          }
       }
       return fc::variant();
@@ -197,48 +233,68 @@ public:
 
    fc::variant get_sponsorship( account_name acc, account_name nonce)
    {
-      const auto& db = control->db();
       auto key = make_kv_scoped_key(acc, nonce.to_uint64_t());
-      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-      auto it = kv_idx.find(boost::make_tuple(ROA, compute_table_id("sponsors"_n.to_uint64_t()), key.to_string_view()));
-      if (it != kv_idx.end()) {
-         const vector<char> data(it->value.data(), it->value.data() + it->value.size());
+      const auto row = control->kv().find_row(ROA, compute_table_id("sponsors"_n.to_uint64_t()), key.to_string_view());
+      if (row) {
+         const vector<char> data(row->value.begin(), row->value.end());
          if (!data.empty()) {
-            return abi_ser.binary_to_variant( "sponsor", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
+            return abi_ser.binary_to_variant( "sponsor", data, fixture_abi_yield_function() );
          }
       }
       return fc::variant();
    }
 
-   uint64_t get_sponsor_count( account_name acc )
+   /// The owner's `sponsorcount` row (count and raised limit), or null when it has none.
+   fc::variant get_sponsorcount( account_name acc )
    {
-      const auto& db = control->db();
       auto key = make_kv_scoped_key(static_cast<uint64_t>(NETWORK_GEN), acc.to_uint64_t());
-      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-      auto it = kv_idx.find(boost::make_tuple(ROA, compute_table_id(name("sponsorcount").to_uint64_t()), key.to_string_view()));
-      if (it != kv_idx.end()) {
-         const vector<char> data(it->value.data(), it->value.data() + it->value.size());
+      const auto row =
+         control->kv().find_row(ROA, compute_table_id(name("sponsorcount").to_uint64_t()), key.to_string_view());
+      if (row) {
+         const vector<char> data(row->value.begin(), row->value.end());
          if (!data.empty()) {
-            auto record = abi_ser.binary_to_variant("sponsorcount", data, abi_serializer::create_yield_function(abi_serializer_max_time));
-            return record["count"].as<uint64_t>();
+            return abi_ser.binary_to_variant("sponsorcount", data, fixture_abi_yield_function());
          }
       }
-      return 0;
+      return fc::variant();
+   }
+
+   /// The owner's sponsored-account count, or zero when it has no `sponsorcount` row.
+   uint64_t get_sponsor_count( account_name acc )
+   {
+      const auto row = get_sponsorcount(acc);
+      return row.is_null() ? 0 : row["count"].as<uint64_t>();
+   }
+
+   /// Governance sets the default account limit and the raise multiplier.
+   action_result set_account_limit( uint64_t default_limit, uint32_t max_raise_multiplier_bps )
+   {
+      return push_action(ROA, "setacctlim"_n, mvo()
+           ("default_limit", default_limit)
+           ("max_raise_multiplier_bps", max_raise_multiplier_bps)
+      );
+   }
+
+   /// A tier-1 owner raises its own account limit, paying for its sponsorcount row like newuser.
+   transaction_trace_ptr raise_account_limit( account_name owner, uint64_t new_limit )
+   {
+      return push_paid_action(owner, "raiseacctlim"_n, mvo()
+           ("owner", owner)
+           ("new_limit", new_limit)
+      );
    }
 
    fc::variant get_reslimit( account_name acc )
    {
       // reslimit is kv::table (unscoped) — key is [owner:8B BE]
-      const auto& db = control->db();
       char key_buf[chain::kv_pri_key_size];
       chain::kv_encode_be64(key_buf, acc.to_uint64_t());
       std::string_view key_sv(key_buf, chain::kv_pri_key_size);
-      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-      auto it = kv_idx.find(boost::make_tuple(ROA, compute_table_id("reslimit"_n.to_uint64_t()), key_sv));
-      if (it != kv_idx.end()) {
-         const vector<char> data(it->value.data(), it->value.data() + it->value.size());
+      const auto row = control->kv().find_row(ROA, compute_table_id("reslimit"_n.to_uint64_t()), key_sv);
+      if (row) {
+         const vector<char> data(row->value.begin(), row->value.end());
          if (!data.empty()) {
-            return abi_ser.binary_to_variant( "reslimit", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
+            return abi_ser.binary_to_variant( "reslimit", data, fixture_abi_yield_function() );
          }
       }
       return fc::variant();
@@ -246,14 +302,12 @@ public:
 
    fc::variant get_policy( account_name acc, account_name owner )
    {
-      const auto& db = control->db();
       auto key = make_kv_scoped_key(owner, acc.to_uint64_t());
-      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-      auto it = kv_idx.find(boost::make_tuple(ROA, compute_table_id("policies"_n.to_uint64_t()), key.to_string_view()));
-      if (it != kv_idx.end()) {
-         const vector<char> data(it->value.data(), it->value.data() + it->value.size());
+      const auto row = control->kv().find_row(ROA, compute_table_id("policies"_n.to_uint64_t()), key.to_string_view());
+      if (row) {
+         const vector<char> data(row->value.begin(), row->value.end());
          if (!data.empty()) {
-            return abi_ser.binary_to_variant( "policies", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
+            return abi_ser.binary_to_variant( "policies", data, fixture_abi_yield_function() );
          }
       }
       return fc::variant();
@@ -613,6 +667,289 @@ BOOST_FIXTURE_TEST_CASE( newuser_same_nonce_distinct_creators, sysio_roa_tester 
    BOOST_REQUIRE_EQUAL(1, get_sponsor_count("bob"_n));
    BOOST_REQUIRE_EQUAL(1, get_sponsor_count("carol"_n));
    BOOST_REQUIRE_EQUAL(1, get_sponsor_count("darcy"_n));
+} FC_LOG_AND_RETHROW()
+
+// ===== Tier-1 account limit (setacctlim / raiseacctlim) =====
+
+/// Before governance calls setacctlim, every tier-1 owner starts at DEFAULT_ACCOUNT_LIMIT and one
+/// raise may at most multiply it by DEFAULT_MAX_RAISE_MULTIPLIER_BPS. Probed through raiseacctlim's
+/// bounds rather than by minting a thousand accounts.
+BOOST_FIXTURE_TEST_CASE( account_limit_defaults_before_setacctlim, sysio_roa_tester ) try {
+   BOOST_REQUIRE_EQUAL(success(), regnodeowner("alice"_n, 1));
+   produce_blocks(1);
+
+   const uint64_t max_raise = DEFAULT_ACCOUNT_LIMIT * DEFAULT_MAX_RAISE_MULTIPLIER_BPS / BPS_DENOMINATOR;   // 1500
+   BOOST_REQUIRE_EXCEPTION(raise_account_limit("alice"_n, DEFAULT_ACCOUNT_LIMIT),
+                           sysio_assert_message_exception,
+                           sysio_assert_message_is(raise_not_above_current_message(DEFAULT_ACCOUNT_LIMIT)));
+   BOOST_REQUIRE_EXCEPTION(raise_account_limit("alice"_n, max_raise + 1),
+                           sysio_assert_message_exception,
+                           sysio_assert_message_is(raise_above_multiplier_message(max_raise, DEFAULT_ACCOUNT_LIMIT)));
+   BOOST_REQUIRE(get_sponsorcount("alice"_n).is_null());
+
+   raise_account_limit("alice"_n, max_raise);
+   produce_blocks(1);
+
+   const auto row = get_sponsorcount("alice"_n);
+   BOOST_REQUIRE(!row.is_null());
+   BOOST_REQUIRE_EQUAL(0, row["count"].as<uint64_t>());
+   BOOST_REQUIRE_EQUAL(max_raise, row["raised_limit"].as<uint64_t>());
+} FC_LOG_AND_RETHROW()
+
+/// newuser refuses once the creator has sponsored as many accounts as its limit allows, and the
+/// refused call creates nothing and draws no RAM from sysio's pool.
+BOOST_FIXTURE_TEST_CASE( newuser_stops_at_account_limit, sysio_roa_tester ) try {
+   BOOST_REQUIRE_EQUAL(success(), set_account_limit(2, DOUBLE_BPS));
+   BOOST_REQUIRE_EQUAL(success(), regnodeowner("alice"_n, 1));
+   produce_blocks(1);
+
+   create_newuser("alice"_n);
+   create_newuser("alice"_n);
+   produce_blocks(1);
+   BOOST_REQUIRE_EQUAL(2, get_sponsor_count("alice"_n));
+
+   const int64_t sysio_ram = get_reslimit("sysio"_n)["ram_bytes"].as_int64();
+   BOOST_REQUIRE_EXCEPTION(newuser("alice"_n, "overlimit"_n, get_public_key("alice"_n, "active")),
+                           sysio_assert_message_exception,
+                           sysio_assert_message_is(account_limit_reached_message(2)));
+   produce_blocks(1);
+
+   BOOST_REQUIRE(get_sponsorship("alice"_n, "overlimit"_n).is_null());
+   BOOST_REQUIRE_EQUAL(2, get_sponsor_count("alice"_n));
+   BOOST_REQUIRE_EQUAL(sysio_ram, get_reslimit("sysio"_n)["ram_bytes"].as_int64());
+} FC_LOG_AND_RETHROW()
+
+/// Limits are per owner: one owner at its limit does not hold back another.
+BOOST_FIXTURE_TEST_CASE( account_limit_is_per_owner, sysio_roa_tester ) try {
+   BOOST_REQUIRE_EQUAL(success(), set_account_limit(1, DOUBLE_BPS));
+   BOOST_REQUIRE_EQUAL(success(), regnodeowner("alice"_n, 1));
+   BOOST_REQUIRE_EQUAL(success(), regnodeowner("bob"_n, 1));
+   produce_blocks(1);
+
+   create_newuser("alice"_n);
+   produce_blocks(1);
+   BOOST_REQUIRE_EXCEPTION(newuser("alice"_n, "second"_n, get_public_key("alice"_n, "active")),
+                           sysio_assert_message_exception,
+                           sysio_assert_message_is(account_limit_reached_message(1)));
+
+   create_newuser("bob"_n);
+   produce_blocks(1);
+   BOOST_REQUIRE_EQUAL(1, get_sponsor_count("alice"_n));
+   BOOST_REQUIRE_EQUAL(1, get_sponsor_count("bob"_n));
+} FC_LOG_AND_RETHROW()
+
+/// A raise needs no usage and no waiting: an owner can raise before sponsoring anything and raise
+/// again in the same block, each call within the multiplier. Any value up to the bound is accepted, and
+/// newuser then honors the raised limit.
+BOOST_FIXTURE_TEST_CASE( raiseacctlim_raises_without_usage_or_time_gate, sysio_roa_tester ) try {
+   BOOST_REQUIRE_EQUAL(success(), set_account_limit(1, DOUBLE_BPS));
+   BOOST_REQUIRE_EQUAL(success(), regnodeowner("alice"_n, 1));
+   produce_blocks(1);
+
+   raise_account_limit("alice"_n, 2);
+   raise_account_limit("alice"_n, 4);
+   produce_blocks(1);
+   BOOST_REQUIRE_EQUAL(4, get_sponsorcount("alice"_n)["raised_limit"].as<uint64_t>());
+   BOOST_REQUIRE_EQUAL(0, get_sponsor_count("alice"_n));
+
+   for (int i = 0; i < 4; ++i)
+      create_newuser("alice"_n);
+   produce_blocks(1);
+   BOOST_REQUIRE_EXCEPTION(newuser("alice"_n, "fifth"_n, get_public_key("alice"_n, "active")),
+                           sysio_assert_message_exception,
+                           sysio_assert_message_is(account_limit_reached_message(4)));
+
+   // Raising by less than the full multiple is allowed.
+   raise_account_limit("alice"_n, 5);
+   create_newuser("alice"_n);
+   produce_blocks(1);
+   BOOST_REQUIRE_EXCEPTION(newuser("alice"_n, "sixth"_n, get_public_key("alice"_n, "active")),
+                           sysio_assert_message_exception,
+                           sysio_assert_message_is(account_limit_reached_message(5)));
+
+   const auto row = get_sponsorcount("alice"_n);
+   BOOST_REQUIRE_EQUAL(5, row["count"].as<uint64_t>());
+   BOOST_REQUIRE_EQUAL(5, row["raised_limit"].as<uint64_t>());
+} FC_LOG_AND_RETHROW()
+
+/// A raise must strictly exceed the current limit and stay within the multiplier bound.
+BOOST_FIXTURE_TEST_CASE( raiseacctlim_enforces_bounds, sysio_roa_tester ) try {
+   BOOST_REQUIRE_EQUAL(success(), set_account_limit(4, DOUBLE_BPS));
+   BOOST_REQUIRE_EQUAL(success(), regnodeowner("alice"_n, 1));
+   produce_blocks(1);
+
+   for (uint64_t not_above : {uint64_t{0}, uint64_t{3}, uint64_t{4}})
+      BOOST_REQUIRE_EXCEPTION(raise_account_limit("alice"_n, not_above),
+                              sysio_assert_message_exception,
+                              sysio_assert_message_is(raise_not_above_current_message(4)));
+   BOOST_REQUIRE_EXCEPTION(raise_account_limit("alice"_n, 9),
+                           sysio_assert_message_exception,
+                           sysio_assert_message_is(raise_above_multiplier_message(8, 4)));
+   BOOST_REQUIRE(get_sponsorcount("alice"_n).is_null());
+
+   raise_account_limit("alice"_n, 8);
+   produce_blocks(1);
+   BOOST_REQUIRE_EQUAL(8, get_sponsorcount("alice"_n)["raised_limit"].as<uint64_t>());
+} FC_LOG_AND_RETHROW()
+
+/// The multiplier is governance-configurable.
+BOOST_FIXTURE_TEST_CASE( raiseacctlim_uses_configured_multiplier, sysio_roa_tester ) try {
+   BOOST_REQUIRE_EQUAL(success(), set_account_limit(2, 3 * BPS_DENOMINATOR));
+   BOOST_REQUIRE_EQUAL(success(), regnodeowner("alice"_n, 1));
+   produce_blocks(1);
+
+   raise_account_limit("alice"_n, 6);
+   produce_blocks(1);
+   BOOST_REQUIRE_EXCEPTION(raise_account_limit("alice"_n, 19),
+                           sysio_assert_message_exception,
+                           sysio_assert_message_is(raise_above_multiplier_message(18, 6)));
+   raise_account_limit("alice"_n, 18);
+   produce_blocks(1);
+   BOOST_REQUIRE_EQUAL(18, get_sponsorcount("alice"_n)["raised_limit"].as<uint64_t>());
+} FC_LOG_AND_RETHROW()
+
+/// A fractional multiplier rounds the bound up, so every raise can add at least one account even from a
+/// limit of 1: at 1.5x the bounds run 1 -> 2 -> 3 -> 5.
+BOOST_FIXTURE_TEST_CASE( raiseacctlim_rounds_fractional_bound_up, sysio_roa_tester ) try {
+   BOOST_REQUIRE_EQUAL(success(), set_account_limit(1, DEFAULT_MAX_RAISE_MULTIPLIER_BPS));
+   BOOST_REQUIRE_EQUAL(success(), regnodeowner("alice"_n, 1));
+   produce_blocks(1);
+
+   BOOST_REQUIRE_EXCEPTION(raise_account_limit("alice"_n, 3),
+                           sysio_assert_message_exception,
+                           sysio_assert_message_is(raise_above_multiplier_message(2, 1)));
+   raise_account_limit("alice"_n, 2);
+   raise_account_limit("alice"_n, 3);
+   produce_blocks(1);
+   BOOST_REQUIRE_EXCEPTION(raise_account_limit("alice"_n, 6),
+                           sysio_assert_message_exception,
+                           sysio_assert_message_is(raise_above_multiplier_message(5, 3)));
+   raise_account_limit("alice"_n, 5);
+   produce_blocks(1);
+   BOOST_REQUIRE_EQUAL(5, get_sponsorcount("alice"_n)["raised_limit"].as<uint64_t>());
+} FC_LOG_AND_RETHROW()
+
+/// Near the top of uint64 the multiplier bound saturates: from 2^63 a doubling exceeds uint64, so the
+/// bound is uint64 max rather than a wrapped value that would refuse every raise.
+BOOST_FIXTURE_TEST_CASE( raiseacctlim_bound_saturates_at_uint64_max, sysio_roa_tester ) try {
+   constexpr uint64_t max_limit = std::numeric_limits<uint64_t>::max();
+   constexpr uint64_t half_max  = max_limit / 2 + 1;
+   BOOST_REQUIRE_EQUAL(success(), set_account_limit(half_max, DOUBLE_BPS));
+   BOOST_REQUIRE_EQUAL(success(), regnodeowner("alice"_n, 1));
+   produce_blocks(1);
+
+   raise_account_limit("alice"_n, max_limit);
+   produce_blocks(1);
+   BOOST_REQUIRE_EQUAL(max_limit, get_sponsorcount("alice"_n)["raised_limit"].as<uint64_t>());
+   BOOST_REQUIRE_EXCEPTION(raise_account_limit("alice"_n, max_limit),
+                           sysio_assert_message_exception,
+                           sysio_assert_message_is(raise_not_above_current_message(max_limit)));
+} FC_LOG_AND_RETHROW()
+
+/// An owner's limit is the larger of the default and the limit it raised to: raising the default
+/// lifts every owner below it, lowering it leaves raised limits alone, and an owner already past a
+/// lowered default cannot sponsor until it raises above its count again.
+BOOST_FIXTURE_TEST_CASE( account_limit_follows_default_changes, sysio_roa_tester ) try {
+   BOOST_REQUIRE_EQUAL(success(), set_account_limit(2, DOUBLE_BPS));
+   BOOST_REQUIRE_EQUAL(success(), regnodeowner("alice"_n, 1));
+   BOOST_REQUIRE_EQUAL(success(), regnodeowner("bob"_n, 1));
+   produce_blocks(1);
+
+   raise_account_limit("alice"_n, 3);
+   create_newuser("bob"_n);
+   create_newuser("bob"_n);
+   produce_blocks(1);
+
+   // Raised default: alice's raised 3 is now below the default, so 5 is her limit.
+   BOOST_REQUIRE_EQUAL(success(), set_account_limit(5, DOUBLE_BPS));
+   BOOST_REQUIRE_EXCEPTION(raise_account_limit("alice"_n, 5),
+                           sysio_assert_message_exception,
+                           sysio_assert_message_is(raise_not_above_current_message(5)));
+
+   // Lowered default: alice keeps her raised 3; bob, never raised, drops to 1 below his count of 2.
+   BOOST_REQUIRE_EQUAL(success(), set_account_limit(1, DOUBLE_BPS));
+   BOOST_REQUIRE_EXCEPTION(raise_account_limit("alice"_n, 3),
+                           sysio_assert_message_exception,
+                           sysio_assert_message_is(raise_not_above_current_message(3)));
+   BOOST_REQUIRE_EXCEPTION(newuser("bob"_n, "lowered"_n, get_public_key("bob"_n, "active")),
+                           sysio_assert_message_exception,
+                           sysio_assert_message_is(account_limit_reached_message(1)));
+
+   // Bob climbs back past his count one raise at a time.
+   raise_account_limit("bob"_n, 2);
+   produce_blocks(1);
+   BOOST_REQUIRE_EXCEPTION(newuser("bob"_n, "atcount"_n, get_public_key("bob"_n, "active")),
+                           sysio_assert_message_exception,
+                           sysio_assert_message_is(account_limit_reached_message(2)));
+   raise_account_limit("bob"_n, 4);
+   create_newuser("bob"_n);
+   produce_blocks(1);
+   BOOST_REQUIRE_EQUAL(3, get_sponsor_count("bob"_n));
+} FC_LOG_AND_RETHROW()
+
+/// Only a registered tier-1 owner has an account limit to raise.
+BOOST_FIXTURE_TEST_CASE( raiseacctlim_is_tier1_only, sysio_roa_tester ) try {
+   BOOST_REQUIRE_EQUAL(success(), regnodeowner("bob"_n, 2));
+   produce_blocks(1);
+
+   BOOST_REQUIRE_EXCEPTION(raise_account_limit("bob"_n, DEFAULT_ACCOUNT_LIMIT + 1),
+                           sysio_assert_message_exception, sysio_assert_message_is(RAISE_NOT_TIER1_OWNER));
+   BOOST_REQUIRE_EXCEPTION(raise_account_limit("carol"_n, DEFAULT_ACCOUNT_LIMIT + 1),
+                           sysio_assert_message_exception, sysio_assert_message_is(RAISE_NOT_TIER1_OWNER));
+   BOOST_REQUIRE(get_sponsorcount("bob"_n).is_null());
+   BOOST_REQUIRE(get_sponsorcount("carol"_n).is_null());
+} FC_LOG_AND_RETHROW()
+
+/// Only the owner can raise its own limit.
+BOOST_FIXTURE_TEST_CASE( raiseacctlim_requires_owner_authority, sysio_roa_tester ) try {
+   BOOST_REQUIRE_EQUAL(success(), regnodeowner("alice"_n, 1));
+   produce_blocks(1);
+
+   BOOST_REQUIRE_THROW(base_tester::push_action(ROA, "raiseacctlim"_n,
+                                                vector<permission_level>{{"bob"_n, config::sysio_payer_name},
+                                                                         {"bob"_n, config::active_name}},
+                                                mvo()("owner", "alice"_n)("new_limit", DEFAULT_ACCOUNT_LIMIT + 1)),
+                       missing_auth_exception);
+   BOOST_REQUIRE(get_sponsorcount("alice"_n).is_null());
+} FC_LOG_AND_RETHROW()
+
+/// The first raise creates the owner's sponsorcount row and bills it to the owner: a 24-byte value
+/// and a 16-byte (scope, owner) key over the 112-byte kv_object overhead. Later raises only rewrite it.
+BOOST_FIXTURE_TEST_CASE( raiseacctlim_bills_sponsorcount_row_to_owner, sysio_roa_tester ) try {
+   constexpr int64_t sponsorcount_row_bytes = 152;
+   BOOST_REQUIRE_EQUAL(success(), regnodeowner("alice"_n, 1));
+   produce_blocks(1);
+
+   const auto& rlm = control->get_resource_limits_manager();
+   const int64_t alice_before = rlm.get_account_ram_usage("alice"_n);
+   const int64_t roa_before   = rlm.get_account_ram_usage(ROA);
+   raise_account_limit("alice"_n, DEFAULT_ACCOUNT_LIMIT + 1);
+   produce_blocks(1);
+   BOOST_REQUIRE_EQUAL(sponsorcount_row_bytes, rlm.get_account_ram_usage("alice"_n) - alice_before);
+   BOOST_REQUIRE_EQUAL(roa_before, rlm.get_account_ram_usage(ROA));
+
+   const int64_t alice_after_first = rlm.get_account_ram_usage("alice"_n);
+   raise_account_limit("alice"_n, DEFAULT_ACCOUNT_LIMIT + 2);
+   produce_blocks(1);
+   BOOST_REQUIRE_EQUAL(alice_after_first, rlm.get_account_ram_usage("alice"_n));
+} FC_LOG_AND_RETHROW()
+
+/// setacctlim is governance-only and refuses a zero default or a multiplier that could not grow a limit.
+BOOST_FIXTURE_TEST_CASE( setacctlim_requires_governance_and_valid_values, sysio_roa_tester ) try {
+   BOOST_REQUIRE_EQUAL(error("missing authority of sysio.roa"),
+                       push_action("alice"_n, "setacctlim"_n, mvo()
+                          ("default_limit", uint64_t{5})
+                          ("max_raise_multiplier_bps", DOUBLE_BPS)));
+   BOOST_REQUIRE_EQUAL(error("assertion failure with message: default_limit must be positive"),
+                       set_account_limit(0, DOUBLE_BPS));
+   BOOST_REQUIRE_EQUAL(error(RAISE_MULTIPLIER_TOO_SMALL), set_account_limit(5, BPS_DENOMINATOR));
+   BOOST_REQUIRE_EQUAL(error(RAISE_MULTIPLIER_TOO_SMALL), set_account_limit(5, 0));
+
+   // None of the refused calls changed the defaults.
+   BOOST_REQUIRE_EQUAL(success(), regnodeowner("alice"_n, 1));
+   BOOST_REQUIRE_EXCEPTION(raise_account_limit("alice"_n, DEFAULT_ACCOUNT_LIMIT),
+                           sysio_assert_message_exception,
+                           sysio_assert_message_is(raise_not_above_current_message(DEFAULT_ACCOUNT_LIMIT)));
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
@@ -1502,6 +1839,43 @@ BOOST_FIXTURE_TEST_CASE( reducepolicy_wrong_symbol, sysio_roa_full_tester ) try 
       sysio_assert_message_is("policy weights must be denominated in the core SYS symbol"));
 } FC_LOG_AND_RETHROW()
 
+// ===== 1c. shared network_gen guard =====
+
+// activateroa fixes the generation at 0 and no action advances it, so each policy action rejects
+// generation 1 while the same call at the current generation goes through.
+BOOST_FIXTURE_TEST_CASE( policy_actions_reject_future_network_gen, sysio_roa_full_tester ) try {
+   constexpr auto future_gen  = NETWORK_GEN + 1;
+   constexpr auto invalid_gen = "Invalid network generation.";
+   constexpr auto granted     = "2.0000 SYS";   // per resource, by addpolicy
+   constexpr auto step        = "1.0000 SYS";   // per resource, added by expandpolicy and taken back by reducepolicy
+   constexpr uint32_t unlocked_time_block = 0;  // lets reducepolicy run at once
+   const auto issuer = node_owners[2];
+   const auto user   = create_newuser(issuer);
+   produce_block();
+
+   BOOST_CHECK_EXCEPTION(
+      add_roa_policy(issuer, user, granted, granted, granted, unlocked_time_block, future_gen),
+      sysio_assert_message_exception, sysio_assert_message_is(invalid_gen));
+   add_roa_policy(issuer, user, granted, granted, granted, unlocked_time_block, NETWORK_GEN);
+
+   BOOST_CHECK_EXCEPTION(
+      expand_roa_policy(issuer, user, step, step, step, future_gen),
+      sysio_assert_message_exception, sysio_assert_message_is(invalid_gen));
+   expand_roa_policy(issuer, user, step, step, step, NETWORK_GEN);
+
+   BOOST_CHECK_EXCEPTION(
+      reduce_roa_policy(issuer, user, step, step, step, future_gen),
+      sysio_assert_message_exception, sysio_assert_message_is(invalid_gen));
+   reduce_roa_policy(issuer, user, step, step, step, NETWORK_GEN);
+   produce_block();
+
+   // Only the current-generation calls moved the policy, and their expand and reduce cancel out.
+   const auto p = get_policy(user, issuer);
+   for (const char* field : {policy_field::net_weight, policy_field::cpu_weight, policy_field::ram_weight}) {
+      BOOST_TEST(p[field].as_string() == granted);
+   }
+} FC_LOG_AND_RETHROW()
+
 // ===== 2. expandpolicy validation =====
 
 // Expand non-existent policy should fail
@@ -2138,7 +2512,7 @@ public:
       BOOST_REQUIRE( accnt != nullptr );
       abi_def abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
-      authex_abi_ser.set_abi(abi, abi_serializer::create_yield_function(abi_serializer_max_time));
+      authex_abi_ser.set_abi(abi, fixture_abi_yield_function());
 
       // Production marks sysio.roa privileged and deliberately installs no cross-contract
       // active-permission delegation. Privilege lets nodeownreg declare sysio.authex.active on its
@@ -2177,7 +2551,7 @@ public:
       auto data = get_row_by_id(AUTHEX, AUTHEX, "links"_n, id);
       return data.empty() ? fc::variant()
          : authex_abi_ser.binary_to_variant(
-              "links_s", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+              "links_s", data, fixture_abi_yield_function());
    }
 
    // Create the claim account in-flow (depot path) with `wire_pub_key` as owner/active.
@@ -2198,7 +2572,7 @@ public:
       act.data          = authex_abi_ser.variant_to_binary("recordlink",
          mvo()("account", account)("chain_kind", opp::types::ChainKind::CHAIN_KIND_EVM)
               ("pub_key", pub_key)("native_address", native_address),
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
       return base_tester::push_action(std::move(act), AUTHEX.to_uint64_t());
    }
 
@@ -2681,6 +3055,34 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_invalid_tier, sysio_roa_nodeownreg_tester ) 
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: Tier level must be between 1 and 3"),
       nodeownreg("someacct"_n, 4, eth_pub, wire_pub));
+} FC_LOG_AND_RETHROW()
+
+// An EM depositor key that is not a secp256k1 point is a depot invariant -> hard abort. msgch drops
+// such keys before dispatch; one that arrived anyway would make recordlink skip the link while this
+// action recorded CONFIRMED, so nothing may be registered, audited or linked.
+BOOST_FIXTURE_TEST_CASE( nodeownreg_rejects_em_key_off_the_curve, sysio_roa_nodeownreg_tester ) try {
+   const auto owner    = "claimacct"_n;
+   const auto wire_pub = gen_k1_key();
+   BOOST_REQUIRE_EQUAL(success(), newnameduser(owner, wire_pub, 2));
+   produce_blocks();
+
+   // x = 0 has no point (7 is not a square mod p); the all-zero bytes have no valid prefix either.
+   fc::em::public_key_data zero_x{};
+   zero_x[0] = 0x02;
+   for (const auto& key_bytes : {fc::em::public_key_data{}, zero_x}) {
+      const fc::crypto::public_key eth_pub{fc::crypto::public_key::storage_type{fc::em::public_key_shim{key_bytes}}};
+      action act;
+      act.account = ROA;
+      act.name    = "nodeownreg"_n;
+      // Packed raw: the ABI serializer's key rendering refuses some of these encodings.
+      act.data    = fc::raw::pack(std::make_tuple(owner, uint8_t{2}, eth_pub, wire_pub,
+                                                  std::vector<char>(20, char{0x01})));
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: eth_pub_key must be a secp256k1 curve point"),
+                          base_tester::push_action(std::move(act), ROA.to_uint64_t()));
+      BOOST_REQUIRE(get_nodeowner(owner).is_null());
+      BOOST_REQUIRE(get_nodeownerreg(owner).is_null());
+      BOOST_REQUIRE(get_authex_link(0).is_null());
+   }
 } FC_LOG_AND_RETHROW()
 
 // Non-EM depositor key is a depot invariant -> hard abort.

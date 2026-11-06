@@ -255,6 +255,46 @@ BOOST_AUTO_TEST_CASE(rejects_incomplete_noncanonical_and_inconsistent_policy) {
    })json") == config::client_config_reason::policy_fee_relationship_invalid);
 }
 
+/// One client whose `read_confirmation` is `read_confirmation_json`.
+std::string with_read_confirmation(std::string_view read_confirmation_json) {
+   return std::string(R"json({
+      "schema_version":1,
+      "clients":[{
+        "connection":{"client_id":"a","signature_provider_id":"s","rpc_url":"http://localhost"},
+        "chain_id":1,
+        "read_confirmation":)json") +
+          std::string(read_confirmation_json) + "}]}";
+}
+
+BOOST_AUTO_TEST_CASE(accepts_each_read_confirmation_shape) {
+   for (const auto* read_confirmation :
+        {R"json({})json", R"json({"block_tag":"EVM_READ_BLOCK_TAG_FINALIZED"})json",
+         R"json({"block_tag":"EVM_READ_BLOCK_TAG_SAFE"})json",
+         R"json({"block_tag":"EVM_READ_BLOCK_TAG_LATEST","confirmations":20,"max_finality_lag_sec":600})json",
+         R"json({"confirmations":1})json"}) {
+      fc::temp_directory directory;
+      const auto configuration = config::load_evm_client_configuration_file(
+         write_configuration(directory, with_read_confirmation(read_confirmation)));
+      BOOST_CHECK(configuration.clients(0).has_read_confirmation());
+   }
+}
+
+BOOST_AUTO_TEST_CASE(rejects_read_confirmations_no_read_can_be_made_at) {
+   for (const auto* read_confirmation :
+        {R"json({"block_tag":"EVM_READ_BLOCK_TAG_UNSPECIFIED"})json",
+         R"json({"block_tag":"EVM_READ_BLOCK_TAG_SAFE","confirmations":12})json",
+         R"json({"block_tag":"EVM_READ_BLOCK_TAG_FINALIZED","max_finality_lag_sec":600})json",
+         R"json({"confirmations":0})json", R"json({"max_finality_lag_sec":0})json"}) {
+      BOOST_TEST_CONTEXT(read_confirmation) {
+         BOOST_CHECK(rejection_reason(with_read_confirmation(read_confirmation)) ==
+                     config::client_config_reason::read_confirmation_invalid);
+      }
+   }
+   // A tag the schema does not know is not ProtoJSON at all.
+   BOOST_CHECK(rejection_reason(with_read_confirmation(R"json({"block_tag":"EVM_READ_BLOCK_TAG_PENDING"})json")) ==
+               config::client_config_reason::proto_json_invalid);
+}
+
 BOOST_AUTO_TEST_CASE(redacts_unknown_fields_and_urls_from_failures) {
    constexpr std::string_view secret = "https://user:password@example.invalid/rpc?token=secret";
    fc::temp_directory directory;

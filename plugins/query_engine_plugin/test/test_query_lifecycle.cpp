@@ -1,23 +1,14 @@
 #include "query_fixture.hpp"
 
 #include <atomic>
-#include <thread>
 
 using namespace sysio::query_engine;
 using namespace sysio::query_engine::test;
 
 namespace {
 constexpr auto count_query = "SELECT COUNT(*) AS n FROM sample.wide";
-
-/// Bound harness synchronization without advancing the injected query clock.
-template <typename Predicate>
-void await(Predicate predicate) {
-   const auto deadline = query_budget::clock::now() + test_wait;
-   while (!predicate()) {
-      BOOST_REQUIRE(query_budget::clock::now() < deadline);
-      std::this_thread::yield();
-   }
-}
+/// The message of the read scheduler that models a node without read-only threads.
+constexpr auto no_read_threads_message = "No read-only threads drain the read-exclusive queue";
 
 /// Errors cross the synchronous public API as their original typed exceptions.
 void check_error(std::future<query_result>& future, error_kind kind) {
@@ -314,6 +305,37 @@ BOOST_AUTO_TEST_CASE(queued_deadline_retains_admission_until_callback_drains) {
    engine.stop();
    BOOST_CHECK_EQUAL(engine.stats().timed_out, 1);
    BOOST_CHECK_EQUAL(engine.stats().completed, 2);
+}
+
+/// A read scheduler that cannot run chain reads, as on a node without read-only threads, fails each query
+/// at once with STATE_UNAVAILABLE naming read-only-threads: nothing is queued, the failed task releases its
+/// admission, and later queries are never rejected as busy even with a single admission slot.
+BOOST_AUTO_TEST_CASE(engine_without_read_threads_fails_fast) {
+   constexpr uint64_t queries = 3;
+   // One admission slot: a busy rejection would expose a failed task that never released its slot.
+   constexpr uint32_t single_admission_slot = 1;
+   query_config config;
+   config.max_in_flight = single_admission_slot;
+   query_engine engine(config, std::make_shared<query_read_api>(
+                                  std::make_shared<local_table_source>(*validating_node),
+                                  [](std::function<void()>) {
+                                     throw query_error(error_kind::STATE_UNAVAILABLE, no_read_threads_message,
+                                                       std::nullopt, bound::read_only_threads);
+                                  },
+                                  std::thread::id{}));
+   for (uint64_t call = 0; call < queries; ++call) {
+      // Admission is released when the worker drops the failed task, after execute() has already returned.
+      if (call > 0)
+         await([&] { return engine.stats().in_flight == 0; });
+      BOOST_CHECK_EXCEPTION(engine.execute(count_query), query_error, [](const query_error& error) {
+         return error.kind == error_kind::STATE_UNAVAILABLE && error.limit == bound::read_only_threads;
+      });
+   }
+   engine.stop();
+   const auto stats = engine.stats();
+   BOOST_CHECK_EQUAL(stats.accepted, queries);
+   BOOST_CHECK_EQUAL(stats.failed[*magic_enum::enum_index(error_kind::STATE_UNAVAILABLE)], queries);
+   BOOST_CHECK_EQUAL(stats.rejected_busy, 0);
 }
 
 BOOST_AUTO_TEST_CASE(shutdown_with_pending_chain_callbacks_never_waits_for_app_thread) {

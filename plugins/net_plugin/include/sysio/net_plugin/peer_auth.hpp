@@ -30,6 +30,12 @@
 ///      recovers the signer from the signature, checks it matches the claimed
 ///      key, and then checks `is_key_authorized()` against the local policy.
 ///
+/// An invalid signature, mismatched key or unauthorized key is rejected on
+/// receipt with `go_away(authentication)`, which the peer does not redial.
+/// A peer that has not authenticated within the grace window
+/// (`auth_grace_expired`) is closed with `go_away(benign_other)` and may
+/// redial, because a timeout is no evidence against its key.
+///
 /// ## Connection policies (`possible_connections`)
 ///
 ///   - `None`      — reject all peers (node is isolated).
@@ -51,6 +57,7 @@
 #include <fc/io/raw.hpp>
 #include <fc/crypto/sha256.hpp>
 #include <algorithm>
+#include <chrono>
 #include <functional>
 #include <map>
 #include <vector>
@@ -77,6 +84,18 @@ namespace sysio::peer_auth {
       fc::raw::pack(enc, my_node_id);
       fc::raw::pack(enc, chain_id);
       return enc.result();
+   }
+
+   /// Returns true once `grace` has passed since the session started; a peer that has not
+   /// authenticated by then is closed. An honest dialer can sign only after the acceptor's
+   /// handshake reaches it, about one round trip into the session, so `grace` must exceed a round trip.
+   /// @param session_start start of the session, or `time_point::min()` when no session is open
+   /// @param now           time of the check; earlier than `session_start` if taken before a reconnect
+   /// @param grace         time allowed to authenticate; net_plugin uses the heartbeat timeout
+   inline bool auth_grace_expired(std::chrono::steady_clock::time_point session_start,
+                                  std::chrono::steady_clock::time_point now,
+                                  std::chrono::milliseconds grace) {
+      return session_start != std::chrono::steady_clock::time_point::min() && now - session_start >= grace;
    }
 
    /// Encapsulates peer authentication policy: which connections are allowed,

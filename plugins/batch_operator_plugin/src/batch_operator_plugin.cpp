@@ -49,7 +49,8 @@ namespace eth = fc::network::ethereum;
 namespace sol = fc::network::solana;
 
 namespace {
-   constexpr fc::microseconds DELIVERY_TIMEOUT  = fc::seconds(15);
+   /// Shared RPC/depot budget; see the SHARED KNOB comment in set_program_options.
+   constexpr fc::microseconds DELIVERY_TIMEOUT  = fc::seconds(60);
    constexpr fc::microseconds EPOCH_POLL        = fc::seconds(15);
    constexpr fc::microseconds EPOCH_EDGE_BUFFER = fc::milliseconds(2500);
    /// Minimum spacing between this operator's `sysio.swap::tickyield` pushes per
@@ -60,6 +61,16 @@ namespace {
    constexpr uint32_t whole_milliseconds(fc::microseconds d) {
       return static_cast<uint32_t>(d.count() / fc::milliseconds(1).count());
    }
+   /// First retry spacing of this operator's `sysio.kicker::kick` pushes per LIQ
+   /// token (`--batch-kick-interval-ms`). `kick_due` already withholds every push
+   /// the rows show cannot pay; this bounds the retries of one that still did not
+   /// (an Andon hold, a gift below `min_gift`), doubling per unpaid attempt.
+   constexpr fc::microseconds KICK_INTERVAL = fc::minutes(1);
+   /// Longest wait between this operator's unpaid kick attempts on one pool.
+   constexpr fc::microseconds KICK_RETRY_CEILING = batch_operator_detail::kicker::max_retry_wait;
+   /// `--batch-kick-crank` default: on, like every other depot crank, which
+   /// runs whenever its contract is deployed.
+   constexpr bool KICK_CRANK_ENABLED = true;
 
    /// Minimum private cron-service thread count even when 0 outposts are
    /// discovered at startup — keeps `epoch_tick` viable so a cold-sync node
@@ -71,6 +82,8 @@ namespace {
    constexpr std::size_t EPOCH_TICK_CRON_JOBS = 1;
    /// The underwriter's polling cron entry.
    constexpr std::size_t UNDERWRITER_CRON_JOBS = 1;
+   /// The kick crank's polling cron entry.
+   constexpr std::size_t KICK_CRON_JOBS = 1;
    /// Exact secondary-index lookups should return at most the matching row.
    constexpr uint32_t EXACT_LOOKUP_LIMIT = 1;
    /// How long past the head block's time a pushed transaction stays valid.
@@ -89,6 +102,8 @@ namespace {
    constexpr fc::microseconds UNDERWRITER_IDLE_CRANK_INTERVAL = fc::minutes(5);
    /// What a signer signs at startup to show that its signatures recover to its own key.
    constexpr std::string_view SIGNER_PROBE = "batch_operator_plugin signer probe";
+   /// A `kv::global` singleton table holds exactly one row.
+   constexpr uint32_t SINGLETON_ROW_LIMIT = 1;
 
    // ── WIRE contract identifiers (actions, tables, indexes, field names) ──
    // Centralised so a contract rename/refactor shows up as one search hit,
@@ -160,13 +175,10 @@ namespace {
 
    namespace uw = batch_operator_detail::underwriter;
 
-   /// A depot action a role pushes.
-   struct pushed_action {
-      const char* contract;
-      const char* action;
-   };
+   using batch_operator_detail::pushed_action;
 
-   /// Every action the relay pushes: `<operator>@active` must be allowed to declare each one (`linkauth`).
+   /// Every action the relay pushes whatever its options: `<operator>@active` must be allowed to declare each one
+   /// (`linkauth`).
    constexpr std::array RELAY_ACTIONS{
       pushed_action{msgch::account, msgch::action_deliver},
       pushed_action{msgch::account, msgch::action_chkcons},
@@ -174,6 +186,9 @@ namespace {
       pushed_action{batch_operator_detail::swap::account, batch_operator_detail::swap::action_tickyield},
       pushed_action{batch_operator_detail::liq::account, batch_operator_detail::liq::action_queueyield},
    };
+   /// What the relay pushes only while the kick crank is on (`--batch-kick-crank`).
+   constexpr pushed_action KICK_ACTION{batch_operator_detail::kicker::account,
+                                       batch_operator_detail::kicker::action_kick};
 
    /// Every action the underwriter pushes: its permission must be allowed to declare each one (`linkauth`).
    constexpr std::array UNDERWRITER_ACTIONS{
@@ -320,8 +335,12 @@ struct batch_operator_plugin::impl {
    std::set<uw::request_id_t>               underwriter_bonded;
    /// Which forfeit stops bonding (`underwriter::forfeit_watch`).
    uw::forfeit_watch                        underwriter_forfeits;
+   /// `--batch-kick-crank`: whether this operator pushes `sysio.kicker::kick`.
+   bool         kick_crank_enabled = KICK_CRANK_ENABLED;
+   /// `--batch-kick-interval-ms`: the first retry spacing of an unpaid kick (`kick_backoff`).
+   fc::microseconds kick_interval = KICK_INTERVAL;
 
-   // Yield cranks -- see `crank_yield`.
+   // Yield cranks -- see `crank_yield` and `kick_tick`.
    /// Whether `sysio.swap` and `sysio.liq` run code, refreshed off the read-only
    /// executor queue every poll (a chainbase read belongs in a read window). The
    /// cranks act on the last reading rather than wait for a fresh one: one poll
@@ -329,6 +348,12 @@ struct batch_operator_plugin::impl {
    /// off chainbase.
    std::atomic<bool>                    yield_contracts_deployed{false};
    batch_operator_detail::crank_spacing yield_tick_spacing;
+   /// Whether `sysio.kicker` runs code, refreshed by the kick crank's own job. It, `kick_backoff` and `kick_scan`
+   /// are touched only from that job.
+   std::atomic<bool>                     kicker_deployed{false};
+   batch_operator_detail::kick_backoff   kick_backoff;
+   /// Fair bounded traversal of kicker pools across polls.
+   batch_operator_detail::kick_pool_scan kick_scan;
 
    // Epoch state tracked across polls
    uint32_t                 current_epoch = 0;
@@ -345,7 +370,8 @@ struct batch_operator_plugin::impl {
    // would be wasted CPU on the WIRE chain (msgch's deliver action will reject
    // since the operator no longer holds bond) AND a TERMINATED operator's
    // bond is already remitted, so any continued participation is misleading.
-   bool                     is_active = true;
+   /// Written by the epoch tick, read by the kick crank's own cron job.
+   std::atomic<bool>        is_active{true};
 
    // Plugin references
    chain_plugin*                     chain_plug = nullptr;
@@ -666,6 +692,20 @@ struct batch_operator_plugin::impl {
       });
    }
 
+   /// Refresh `kicker_deployed` from a read window, for the same reason as `refresh_yield_contract_presence`.
+   void refresh_kicker_presence() {
+      app().executor().post(appbase::priority::low, appbase::exec_queue::read_only, [this] {
+         using namespace batch_operator_detail;
+         if (shutting_down) return;
+         const bool kicker_runs = runs_code(chain_plug->chain(), kicker::account);
+         if (kicker_deployed.exchange(kicker_runs) != kicker_runs) {
+            ilog("batch_operator: kick crank {}: {} is {}",
+                 kicker_runs ? "active" : "idle", kicker::account,
+                 kicker_runs ? "deployed" : "not deployed");
+         }
+      });
+   }
+
    /**
     * Crank the two permissionless yield actions nothing on chain schedules:
     * `sysio.swap::tickyield` for every yield pool whose reservoir has a queued
@@ -759,6 +799,105 @@ struct batch_operator_plugin::impl {
             // the shadow has no yield pool yet (`regliqpool` still to come).
             dlog("batch_operator: queueyield({}): {}", symbol_code_name(*code), e.to_string());
          }
+      }
+   }
+
+   /**
+    * One pass of the kick crank, run by its own cron job (`batch_operator_kick`) so that its pushes -- each may
+    * wait out a full `delivery_timeout` -- never hold up the epoch tick and the election state the per-outpost jobs
+    * read. Pushes only for an ACTIVE operator whose relay key still signs, like the epoch tick's own cranks, and
+    * idles until `sysio.kicker` runs code.
+    */
+   void kick_tick() {
+      if (shutting_down || !enabled || !kick_crank_enabled) return;
+      if (!is_active || !relay_signer_valid) return;
+      refresh_kicker_presence();
+      if (!kicker_deployed) return;
+      try {
+         crank_kicks();
+      } FC_LOG_AND_DROP();
+   }
+
+   /**
+    * Crank `sysio.kicker::kick(sym)` for every kicker pool `kick_due` says could pay.
+    *
+    * Read at most ten pools per poll and retain the next-key cursor, so one pass
+    * stays bounded as governance adds pools. A page whose read fails ends the pass
+    * without moving the cursor: it is not the end of a sweep, and treating it as one
+    * would restart from the first page and prune the retry markers of every pool
+    * past it. Complete sweeps prune removed symbols from the retry markers.
+    *
+    * Like `crank_yield`, NOT gated on `is_elected`: the elected operator may be
+    * the one that is offline. `kick_due` withholds every push the rows show would
+    * not pay -- the clock check, a zero LIQ supply, TWAP warm-up after each payment,
+    * an exhausted budget, a spent daily ceiling -- so the node spends nothing between
+    * payments. A kick
+    * that passes them and still does not pay (an Andon hold, a gift below `min_gift`,
+    * a treasury reserve, spot past the spot guard, a broken swap pair) is retried on `kick_backoff`, starting at
+    * `batch-kick-interval-ms` and doubling to `KICK_RETRY_CEILING` while `last_kick`
+    * does not move. The backoff is marked on every attempt, failed or not.
+    */
+   void crank_kicks() {
+      using namespace batch_operator_detail;
+      // The config singleton: without it `kick` asserts "kicker not configured".
+      sysio::chain_apis::read_only::get_table_rows_params config;
+      config.code        = chain::name(kicker::account);
+      config.scope       = kicker::account;
+      config.table       = kicker::table_kickcfg;
+      config.limit       = SINGLETON_ROW_LIMIT;
+      config.values_only = true;
+      const auto config_rows = read_table_checked(std::move(config));
+      if (!config_rows || config_rows->rows.empty() || !config_rows->rows.front().is_object()) return;
+      const auto settings = read_kick_settings(config_rows->rows.front().get_object());
+      if (!settings) return;
+
+      // One page of pools, keyed by the LIQ symbol code `kick` takes, then the `sysio.liq::stat` row of each
+      // token on it: `kick` pays nothing on a zero supply, and only restarts the clock. Every read is bounded
+      // (a page of at most ten pools, an exact lookup per token), so the page bounds the whole poll.
+      kick_page(kick_scan, kick_backoff, *settings, kick_interval, KICK_RETRY_CEILING,
+                [this](const std::string& lower_bound) {
+                   sysio::chain_apis::read_only::get_table_rows_params pools;
+                   pools.code        = chain::name(kicker::account);
+                   pools.scope       = kicker::account;
+                   pools.table       = kicker::table_kickpools;
+                   pools.limit       = kicker::pools_per_poll;
+                   pools.lower_bound = lower_bound;
+                   return read_table_checked(std::move(pools));
+                },
+                [this](chain::symbol_code code) { return read_liq_stat(code); },
+                [this](chain::symbol_code code) { push_kick(code); }, [] { return fc::time_point::now(); },
+                [this] { return shutting_down.load(); });
+   }
+
+   /// The `sysio.liq::stat` value of the LIQ token `code` (none when it has no row), by an exact key lookup; nullopt
+   /// when the read failed.
+   std::optional<fc::variants> read_liq_stat(chain::symbol_code code) {
+      using namespace batch_operator_detail;
+      sysio::chain_apis::read_only::get_table_rows_params stat;
+      stat.code        = chain::name(liq::account);
+      stat.scope       = liq::account;
+      stat.table       = liq::table_stat;
+      stat.find        = fc::json::to_string(fc::mutable_variant_object()(liq::field::symbol_code, code.value),
+                                             fc::json::yield_function_t{});
+      stat.limit       = EXACT_LOOKUP_LIMIT;
+      stat.values_only = true;
+      std::optional<sysio::chain_apis::read_only::get_table_rows_result> rows = read_table_checked(std::move(stat));
+      if (!rows) return std::nullopt;
+      return std::move(rows->rows);
+   }
+
+   /// Push `sysio.kicker::kick(code)` as the relay. A refusal is logged by the push callback; a throw here is
+   /// logged and dropped.
+   void push_kick(chain::symbol_code code) {
+      using namespace batch_operator_detail;
+      try {
+         push_action(kicker::account, kicker::action_kick, *relay_signer,
+                     fc::mutable_variant_object()(kicker::field::sym, code));
+      } catch (const fc::exception& e) {
+         // Expected-transient: governance removed the pool between the scan and
+         // the push. Persistent while the pool's LIQ/WIRE swap pair is missing or
+         // invalid, which only governance can repair.
+         dlog("batch_operator: kick({}): {}", symbol_code_name(code), e.to_string());
       }
    }
 
@@ -965,7 +1104,7 @@ struct batch_operator_plugin::impl {
    struct client_build {
       std::shared_ptr<sysio::outpost_client> client;
       /// Why this node cannot serve the chain at all; empty when `client` is set, or when the row only lacks
-      /// its remote contract address so far.
+      /// its remote contract address or is awaiting Ethereum chain-ID discovery.
       std::string                            unserviceable;
    };
 
@@ -975,7 +1114,7 @@ struct batch_operator_plugin::impl {
    /// A missing RPC client, an unsupported chain kind or a factory refusal is local configuration only the
    /// operator can fix, reported as `unserviceable`. Missing CONTRACT ADDRESSES are governance state on the row,
    /// fixable with `sysio.chains::setoutpost` without touching any node, so the chain is skipped (no client, no
-   /// reason) and picked up on a later refresh.
+   /// reason) and picked up on a later refresh. Pending Ethereum discovery is likewise retried by either role.
    client_build make_outpost_client(const outpost_descriptor& op, solana_outpost_role role) {
       const std::string code_str = fc::slug_name{op.id}.to_string();
       try {
@@ -984,12 +1123,15 @@ struct batch_operator_plugin::impl {
             // client is the one registered under this chain's OWN code, and
             // the OPP / OPPInbound contract addresses come from the row
             // itself. `create_outpost_client` additionally asserts the
-            // client's verified eth_chainId equals the row's
+            // client's configured or discovered chain ID equals the row's
             // external_chain_id, so a client registered under the wrong code
             // is caught rather than relayed through.
-            if (!eth_plug->get_client(code_str)) {
+            const auto entry = eth_plug->get_client(code_str);
+            if (!entry) {
                return {.unserviceable = "no Ethereum RPC client is registered under this chain code"};
             }
+            // Discovery publishes a ready snapshot later; both roles retry on their normal refresh tick.
+            if (!entry->client) return {};
             if (op.opp_addr.empty() || op.opp_inbound_addr.empty()) {
                wlog("batch_operator: outpost {} (EVM) has no OPP/OPPInbound address on its "
                     "sysio.chains row; skipping until sysio.chains::setoutpost supplies both",
@@ -1036,7 +1178,7 @@ struct batch_operator_plugin::impl {
 
    /// Build, with `wrap(op, client)`, what `built` lacks for each chain in `active`, the clients made for `role`.
    /// Returns the chains this node cannot serve; a chain whose row has no remote address yet is skipped until
-   /// `setoutpost` supplies one.
+   /// `setoutpost` supplies one. Pending Ethereum clients wait for discovery on a later refresh.
    template <typename Key, typename Built, typename Wrap>
    std::vector<unserviceable_chain> build_missing(std::map<Key, Built>& built,
                                                   const std::vector<outpost_descriptor>& active,
@@ -1050,7 +1192,7 @@ struct batch_operator_plugin::impl {
             unserviceable.push_back({fc::slug_name{op.id}.to_string(), std::move(made.unserviceable)});
             continue;
          }
-         if (!made.client) continue;   // no remote address on the row yet
+         if (!made.client) continue;   // remote address or Ethereum discovery is still pending
          built.emplace(key, wrap(op, made.client));
       }
       return unserviceable;
@@ -1207,14 +1349,16 @@ struct batch_operator_plugin::impl {
    /// of `actions`. Call on the main thread, after the sync gate.
    std::optional<signer> resolve_signer(std::string_view role, const chain::permission_level& level,
                                         std::span<const pushed_action> actions) {
-      const chain::controller& chain  = chain_plug->chain();
-      bool                     linked = true;
-      for (const auto& [contract, action] : actions) {
-         if (permission_satisfies_link(chain, level, chain::name(contract), chain::name(action))) continue;
+      const chain::controller& chain    = chain_plug->chain();
+      const std::vector<pushed_action> unlinked = batch_operator_detail::unlinked_actions(
+         actions, [&](const pushed_action& a) {
+            return permission_satisfies_link(chain, level, chain::name(a.contract), chain::name(a.action));
+         });
+      for (const auto& [contract, action] : unlinked) {
          elog("batch_operator: {} declares {}@{}, which may not authorize {}::{}: link that action to it",
               role, level.actor.to_string(), level.permission.to_string(), contract, action);
-         linked = false;
       }
+      const bool linked = unlinked.empty();
       signature_provider_manager_plugin& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
       const batch_operator_detail::signer_choice<fc::crypto::signature_provider_ptr> choice =
          batch_operator_detail::choose_signer(
@@ -1252,7 +1396,10 @@ struct batch_operator_plugin::impl {
    bool resolve_signers() {
       bool resolved = true;
       if (enabled) {
-         relay_signer = resolve_signer("the relay", {operator_account, chain::config::active_name}, RELAY_ACTIONS);
+         // A disabled crank's action is not required: its link cannot stop the node.
+         const std::vector<pushed_action> relay_actions = batch_operator_detail::required_actions(
+            RELAY_ACTIONS, std::array{batch_operator_detail::optional_action{KICK_ACTION, kick_crank_enabled}});
+         relay_signer = resolve_signer("the relay", {operator_account, chain::config::active_name}, relay_actions);
          resolved     = relay_signer.has_value() && resolved;
       }
       if (underwriter_enabled) {
@@ -1676,7 +1823,8 @@ struct batch_operator_plugin::impl {
    }
 
    /// The digest each outpost recorded for the envelope it emitted, for every (chain, epoch) an OPEN envelope request
-   /// names, read at finality. A chain whose read fails is reported and leaves only its own requests waiting.
+   /// names, read at each outpost client's settled commitment. A chain whose read fails is reported and leaves only
+   /// its own requests waiting.
    std::map<uw::envelope_key, fc::sha256> read_emitted_digests(const std::vector<uw::request>& requests) {
       return uw::collect_emitted(
          uw::wanted_envelopes(requests),
@@ -1753,11 +1901,17 @@ struct batch_operator_plugin::impl {
       }
    }
 
-   /// Whether `future` is ready by `deadline`.
+   /// Whether `future` is ready by `deadline`. Waits in short slices and gives up once the node is shutting down,
+   /// so a push in flight does not hold a cron thread, and with it shutdown, for the rest of its deadline.
    template <typename T>
-   static bool ready_by(const std::future<T>& future, fc::time_point deadline) {
-      const fc::microseconds left = std::max(deadline - fc::time_point::now(), fc::microseconds(0));
-      return future.wait_for(std::chrono::microseconds(left.count())) == std::future_status::ready;
+   bool ready_by(const std::future<T>& future, fc::time_point deadline) const {
+      constexpr auto slice = std::chrono::milliseconds(200);
+      while (true) {
+         const fc::microseconds left = std::max(deadline - fc::time_point::now(), fc::microseconds(0));
+         const auto wait = std::min<std::chrono::microseconds>(std::chrono::microseconds(left.count()), slice);
+         if (future.wait_for(wait) == std::future_status::ready) return true;
+         if (left.count() == 0 || shutting_down) return false;
+      }
    }
 
    /// Build, sign and submit a depot action, declaring `by.auth` and signed by `by.provider`. True when the node
@@ -1791,7 +1945,8 @@ struct batch_operator_plugin::impl {
                                   built->set_value(build_unsigned(contract, action_name, auth, data));
                                });
          if (!ready_by(built_future, deadline)) {
-            elog("batch_operator: push {}::{} timed out before signing", contract, action_name);
+            if (shutting_down) wlog("batch_operator: push {}::{} abandoned on shutdown", contract, action_name);
+            else elog("batch_operator: push {}::{} timed out before signing", contract, action_name);
             return false;
          }
          trx = built_future.get();
@@ -1815,7 +1970,8 @@ struct batch_operator_plugin::impl {
                                });
       }
       if (!ready_by(future, deadline)) {
-         elog("batch_operator: push {}::{} timed out", contract, action_name);
+         if (shutting_down) wlog("batch_operator: push {}::{} abandoned on shutdown", contract, action_name);
+         else elog("batch_operator: push {}::{} timed out", contract, action_name);
          return false;
       }
       return completion->succeeded();
@@ -1861,7 +2017,9 @@ struct batch_operator_plugin::impl {
       // when no outposts are known yet.
       const std::size_t outpost_count    = opp_jobs.size();
       const std::size_t relay_jobs =
-         enabled ? outpost_count * OPP_CRON_JOBS_PER_OUTPOST + EPOCH_TICK_CRON_JOBS : 0;
+         enabled ? outpost_count * OPP_CRON_JOBS_PER_OUTPOST + EPOCH_TICK_CRON_JOBS +
+                      (kick_crank_enabled ? KICK_CRON_JOBS : 0)
+                 : 0;
       const std::size_t underwriter_jobs = underwriter_enabled ? UNDERWRITER_CRON_JOBS : 0;
       const std::size_t thread_count     = std::max(relay_jobs + underwriter_jobs, MIN_CRON_THREADS);
 
@@ -1890,6 +2048,9 @@ struct batch_operator_plugin::impl {
       // and `within_epoch_window` accurate for every per-outpost job.
       if (enabled) schedule_poll("batch_operator_epoch_tick", [this]() { poll_epoch_state(); });
       if (underwriter_enabled) schedule_poll("batch_operator_underwriter", [this]() { underwriter_tick(); });
+      // The kick crank pushes serially and each push may wait out `delivery_timeout`: its own job keeps that off
+      // the epoch tick.
+      if (enabled && kick_crank_enabled) schedule_poll("batch_operator_kick", [this]() { kick_tick(); });
 
       if (enabled) schedule_opp_jobs();
    }
@@ -1942,23 +2103,22 @@ void batch_operator_plugin::set_program_options(options_description& cli,
    opts("batch-epoch-poll-ms", bpo::value<uint32_t>()->default_value(whole_milliseconds(EPOCH_POLL)),
         "How often to check epoch state (ms)");
    // SIZING RULE for batch-delivery-timeout-ms: it bounds the WHOLE outbound
-   // delivery, and an Ethereum delivery is now one transaction PER CHUNK
-   // (ETHEREUM_MAX_CHUNK_BYTES = 8192; Solana chunks at 672). Size it as
-   //     total chunks x (target block time + confirmation margin)
-   // for the largest envelope the outpost is expected to carry. At the 32768
-   // byte platform envelope cap that is 4 Ethereum chunks, so the 15000 ms
-   // default covers a 1 s block time with wide margin. Undersizing is not fatal:
-   // the relay resumes from the on-chain per-operator high-water mark on the
-   // next cron tick, so a truncated tick converges rather than restarting from
-   // chunk zero. SHARED KNOB: this same value also bounds the depot
-   // push_action completion wait (see push_action above); post-WIRE-331 a
-   // timeout there is safe (the async_action_completion callback retains its
-   // own state), but raising this option lengthens BOTH waits, so raise it for
-   // chunking deliberately rather than as a blanket tuning step.
+   // delivery, a sequence of confirmed transactions. Ethereum sends the envelope
+   // in ONE `epochIn` plus one continuation per dispatch spill (a handful at
+   // most for a full-cap envelope), and each receipt wait may use whatever of
+   // this budget is left; Solana chunks the envelope at 672 bytes. Size it as
+   //     expected transactions x (target block time + confirmation margin)
+   // for the largest expected envelope; the 60000 ms default leaves room for
+   // confirmation plus a 30 s progress-read retry. Undersizing is not fatal:
+   // the relay resumes from the outpost's on-chain cursor on the next cron tick.
+   // SHARED KNOB: this value also bounds the depot push_action completion wait
+   // (see push_action above), depot table reads, and the read-write API deadline.
+   // A timeout there is safe (the async_action_completion callback retains its
+   // own state), but raising this also lengthens depot waits, so size it deliberately.
    // Help text below must stay ASCII with no " --" sequence (PerformanceHarness
    // splits nodeop --help output on that token).
    opts("batch-delivery-timeout-ms", bpo::value<uint32_t>()->default_value(whole_milliseconds(DELIVERY_TIMEOUT)),
-        "Max time to wait for chain delivery confirmation (ms)");
+        "Max time for one outbound delivery, every transaction and confirmation wait included (ms)");
    opts("batch-yield-tick-interval-ms",
         bpo::value<uint32_t>()->default_value(whole_milliseconds(YIELD_TICK_INTERVAL)),
         "Minimum spacing between this operator's sysio.swap::tickyield pushes per yield pool (ms)");
@@ -1971,6 +2131,11 @@ void batch_operator_plugin::set_program_options(options_description& cli,
    opts("batch-underwriter-max-exposure", bpo::value<std::vector<std::string>>()->composing(),
         "Most the underwriter may have bonded at once in one shadow token, as an asset such as "
         "100.000000000 LIQETH. Repeat for each token; requests in a token without one are not bonded.");
+   opts("batch-kick-crank", bpo::value<bool>()->default_value(KICK_CRANK_ENABLED),
+        "Push sysio.kicker::kick for every kicker pool that could pay");
+   opts("batch-kick-interval-ms", bpo::value<uint32_t>()->default_value(whole_milliseconds(KICK_INTERVAL)),
+        "First spacing between this operator's sysio.kicker::kick retries of a pool that did not pay (ms); "
+        "doubles per unpaid attempt, up to an hour. Must be 1 to 3600000");
 }
 
 void batch_operator_plugin::plugin_initialize(const variables_map& options) {
@@ -1999,6 +2164,12 @@ void batch_operator_plugin::plugin_initialize(const variables_map& options) {
    if (!_impl->underwriter_enabled && !_impl->underwriter_caps.empty()) {
       wlog("batch_operator_plugin: batch-underwriter-max-exposure has no effect without batch-underwriter-account");
    }
+   _impl->kick_crank_enabled = options["batch-kick-crank"].as<bool>();
+   const uint32_t kick_interval_ms = options["batch-kick-interval-ms"].as<uint32_t>();
+   FC_ASSERT(batch_operator_detail::kick_interval_valid(kick_interval_ms),
+             "batch-kick-interval-ms must be between 1 and {} (the retry ceiling), got {}",
+             whole_milliseconds(KICK_RETRY_CEILING), kick_interval_ms);
+   _impl->kick_interval = fc::milliseconds(kick_interval_ms);
    _impl->chain_plug = &app().get_plugin<chain_plugin>();
    _impl->cron_plug  = &app().get_plugin<cron_plugin>();
    _impl->eth_plug   = &app().get_plugin<outpost_ethereum_client_plugin>();

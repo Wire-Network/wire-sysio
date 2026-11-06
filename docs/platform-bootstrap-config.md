@@ -83,8 +83,8 @@ pubkey has linked through `sysio.authex`, or parks it until the link is made.
 
 `ReserveSpec`, `UwritConfig`, `reserves`, `uwrit` and `t5_reserve_allocation` are removed from the
 pre-launch schema. Authored JSON uses schema version 1; strict parsing rejects removed keys.
-The DEX earmark alone is subtracted from the T5 allotment. Regenerate matching OPP models and
-bootstrap clients for a fresh deployment.
+The schema carries only the DEX earmark. Subtract any separately configured kicker earmark
+as described below. Regenerate matching OPP models and bootstrap clients for a fresh deployment.
 
 ## T5 DEX earmark
 
@@ -111,6 +111,59 @@ count WIRE that has physically left the treasury — the readiness gate blocks a
 launch scale, and effective emissions headroom silently shrinks by `W`. Hence
 the outside-the-pool earmark.
 
+## Kicker deployment and earmark
+
+Deploy `sysio.kicker` privileged with `sysio.roa::setsyscode`, alongside LIQ and swap.
+After `setemitcfg`/`initt5` and each `regliqpool`, governance (`sysio`) calls
+`sysio.kicker::setconfig({budget_remaining, min_interval_sec, twap_window_sec, max_spot_deviation_bps})`, then
+`addpool(sym, rate_bps, min_gift, max_gift_per_day)` for each LIQ token. The
+C++ defaults are 200 bps and 1,000,000,000 WIRE subunits; all action fields must
+be supplied by ABI clients. The daily cap defaults to 1,000 WIRE, must be positive,
+and cannot exceed 1,000 WIRE per pool. A third LIQ
+requires these same configuration calls and no kicker code change. Any keeper
+may call `kick(sym)`, and every ACTIVE batch operator does once a pool could pay; `setpool` changes the whole open interval's rate and
+`rmpool` stops accrual. Re-adding starts a new clock and pays no history.
+
+The kicker earmark `K` uses a governance action, **not a new bootstrap proto field**.
+Set `t5_distributable = A - D - K` and retain enough WIRE to back both earmarks.
+`setconfig` replaces the remaining budget; it is not an additive top-up and does
+not validate the off-chain earmark arithmetic. Governance must back every replacement
+with treasury funds outside emissions. The reserve guard protects pending emissions,
+claims, and the remaining emission ceiling; it does not reserve node-owner vest. Partial payments advance
+a floored pro-rata clock within at most 72 hours of accrual; payment forfeits older
+accrual. Pricing uses swap's cumulative-price TWAP with an observation since registration
+or the last payment of at least `kickcfg.twap_window_sec` seconds. This governance
+setting defaults to **86,400 seconds (one day)** and must be at least **60 seconds**.
+Production keeps one day; test clusters may use a shorter window, with `min_interval_sec`
+and `min_gift` low enough to permit payment. A change applies on the next `kick` to the
+in-flight observation without resetting `price_time`, `price_snapshot` or the accrual
+clock. Lowering the window can make that observation immediately eligible; raising it
+makes the same observation wait until the new window elapses.
+Monitor actual kicks: the batch-operator
+crank is the schedule, the minimum interval is a floor, and TWAP warm-up also gates payment.
+
+A one-block price spike in a shallow pool contributes its duration weight to the
+arithmetic TWAP. A large trade held across one block can push one kick's gift to the daily
+cap, cashed by a partial unwind, the kick and the rest of the unwind in one block. A holder
+of most of the LIQ supply, who receives most of that gift, can then profit from the round
+trip. This residual risk is accepted.
+
+A kick pays only while the pool's spot is within `max_spot_deviation_bps` of the window
+TWAP (default **5,000 bps**, set from 1 to 10,000); otherwise it pays nothing and holds the
+clock and the observation, because restarting it would let one atomic trade delay payment by
+a full window. This bounds the straddle, a pump raised before one kick and unwound after
+it: **one price excursion funds one capped payout plus at most `d * cap` of excess on the
+next payout**, where `d` is the threshold as a fraction (500 WIRE at the default; see
+`contracts/sysio.system/EMISSIONS.md`). Governance registers only pools with deep liquidity
+and sizes `max_gift_per_day` so that `(1 + d) * max_gift_per_day` stays well under the
+cheaper of holding that pool's price for a full window and a one-block spike. The threshold is a liveness and
+griefing knob, not a manipulation-cost one: tighter holds payment through more honest
+volatility and makes a griefing spike cheaper, wider does the reverse and loosens the
+straddle bound (see `contracts/sysio.system/EMISSIONS.md`).
+
+The legacy Python boot tool does not deploy the LIQ/swap subsystem; the platform
+bootstrap client must create/deploy/configure the kicker in its LIQ flow.
+
 ## Validation
 
 Parsing is **strict**: unknown / misspelled keys are rejected, not dropped,
@@ -126,7 +179,7 @@ validator in `test_bootstrap_platform_config.cpp` enforces:
 | V5 | exactly one native token per non-depot chain |
 | V6–V9 | retired with the external-reserve and underwriting configuration |
 | V10 | `t5_dex_allocation > 0` when any liq pool is seeded; Σ `liq_pools[].initial_wire_amount` ≤ `t5_dex_allocation` |
-| V11 | each liq pool references a declared `TOKEN_KIND_LIQ` token on its chain and is unique; `pair_symbol` 1..7 characters `[A-Z]`; seeds > 0; `fee ≤ 9999`; `conversion_horizon_sec > 0`; `depth_cap_bps` ∈ 1..10000; `clip_floor > 0` |
+| V11 | each liq pool references a declared `TOKEN_KIND_LIQ` token on its chain and is unique; `pair_symbol` 1..7 characters `[A-Z]`; seeds > 0; `fee ≤ 9999`; `conversion_horizon_sec > 0`; `depth_cap_bps` ∈ 1..`fee` (`sysio.swap::setyield` refuses a cap above the fee); `clip_floor > 0` |
 | V12 | each syndication references a declared liq token on its chain; `pubkey` fits the chain family; `amount > 0` |
 | V13 | a non-zero `custody_total` equals the pool's `initial_chain_amount` plus the sum of that token's `syndications` |
 

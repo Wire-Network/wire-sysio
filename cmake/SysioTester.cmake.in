@@ -311,6 +311,13 @@ target_include_directories(SysioChain INTERFACE
         @CMAKE_INSTALL_FULL_INCLUDEDIR@/wasm-jit
         @CMAKE_INSTALL_FULL_INCLUDEDIR@/softfloat)
 
+# softfloat is linked above as a raw archive, so the definitions its CMake package carries are repeated:
+# THREAD_LOCAL is the storage class the archive's per-thread state was built with, and the alias disable
+# keeps softfloat's legacy float32_t/float64_t typedefs away from arm_neon.h on arm64.
+target_compile_definitions(SysioChain INTERFACE
+        THREAD_LOCAL=__thread
+        SOFTFLOAT_DISABLE_LEGACY_TYPE_ALIASES)
+
 add_library(SysioTester INTERFACE)
 
 target_link_libraries(SysioTester INTERFACE

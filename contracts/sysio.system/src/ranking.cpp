@@ -11,6 +11,7 @@
 
 #include <type_traits>
 #include <limits>
+#include <optional>
 #include <set>
 #include <algorithm>
 #include <cmath>
@@ -29,7 +30,8 @@ namespace sysiosystem {
       const auto ct = current_time_point();
 
       const auto key = producer_key_t{producer.value};
-      const bool needs_admission = !_producers.contains(key) || !_producers.get(key).active();
+      const std::optional<producer_info> existing = _producers.try_get(key);
+      const bool needs_admission = !existing || !existing->active();
       if (needs_admission) {
          check( producer_rank::has_live_producer_standing( producer ),
                 "producer operator is not eligible for admission" );
@@ -61,6 +63,13 @@ namespace sysiosystem {
       const bool scheduled = std::find( active_schedule.begin(), active_schedule.end(), producer )
                              != active_schedule.end();
 
+      // Registration order is taken once per registration, with live standing: at row creation, or
+      // again after a termination or slash cleared it. Parking keeps it.
+      uint64_t registration_seq = existing ? existing->registration_seq : 0;
+      if( registration_seq == 0 && ( needs_admission || producer_rank::has_live_producer_standing( producer ) ) ) {
+         registration_seq = next_registration_seq();
+      }
+
       _producers.upsert( get_self(), key,
          producer_info{
             .owner              = producer,
@@ -70,6 +79,7 @@ namespace sysiosystem {
             .last_claim_time    = ct,
             .location           = location,
             .producer_authority = producer_authority,
+            .registration_seq   = registration_seq,
          },
          [&]( producer_info& info ){
             info.producer_key       = producer_key;
@@ -77,6 +87,7 @@ namespace sysiosystem {
             info.url                = url;
             info.location           = location;
             info.producer_authority = producer_authority;
+            info.registration_seq   = registration_seq;
             if ( info.last_claim_time == time_point() )
                info.last_claim_time = ct;
             // The door back for a producer the schedule DROPPED, and only for one. `regproducer`
@@ -91,8 +102,28 @@ namespace sysiosystem {
             info.consecutive_missed_rounds = 0;
          });
 
-      // The clear above changes the producer's tier, so its sort key is stale until rescored.
+      // The clear above changes the producer's tier, and a new registration order moves its key,
+      // so the sort key is stale until rescored.
       rescore_producer( producer );
+   }
+
+   uint64_t system_contract::next_registration_seq() {
+      uint64_t seq = 0;
+      _prodstate.modify( get_self(), [&]( auto& g ) {
+         if( g.last_registration_seq < std::numeric_limits<uint64_t>::max() ) ++g.last_registration_seq;
+         seq = g.last_registration_seq;
+      });
+      return seq;
+   }
+
+   void system_contract::reset_seniority( const name& producer ) {
+      const auto key = producer_key_t{producer.value};
+      const std::optional<producer_info> info = _producers.try_get(key);
+      if( !info || ( info->service_sec == 0 && info->registration_seq == 0 ) ) return;
+      _producers.modify( same_payer, key, []( producer_info& p ) {
+         p.service_sec      = 0;
+         p.registration_seq = 0;
+      });
    }
 
    void system_contract::rescore_producer( const name& producer ) {
@@ -100,6 +131,11 @@ namespace sysiosystem {
    }
 
    void system_contract::onprocessprod( name account, bool, bool ) {
+      // A slash or termination ends the registration, so seniority and registration order start
+      // over. Read from the live status: a balance change on an operator that is merely below the
+      // minimum keeps both.
+      if( has_terminal_operator_status( account ) ) reset_seniority( account );
+
       // The eligibility flags are not consulted: rescore_producer reads the operator's live status
       // and balances, which is the same information after the flip and cannot go stale between the
       // notification and this handler.
@@ -109,16 +145,8 @@ namespace sysiosystem {
    void system_contract::setscorecfg( const producer_rank::producer_score_config& weights ) {
       require_auth( get_self() );
 
-      // Every factor is multiplied by its weight and summed. `mul_sat` keeps a single term from
-      // wrapping, but a configuration whose weights cannot be told apart is still useless, so
-      // bound them at the scale the factors are normalised to.
-      check( weights.collateral_weight    <= producer_rank::max_factor_weight
-             && weights.participation_weight <= producer_rank::max_factor_weight
-             && weights.snapshot_weight      <= producer_rank::max_factor_weight
-             && weights.relay_weight         <= producer_rank::max_factor_weight
-             && weights.api_weight           <= producer_rank::max_factor_weight
-             && weights.benchmark_weight     <= producer_rank::max_factor_weight,
-             "factor weight exceeds the maximum" );
+      // Weights, the miss penalty and the seniority base are seconds and take any value: every score
+      // term saturates, so none can wrap.
 
       // A zero target would make the snapshot factor divide by zero.
       check( weights.snapshot_target_attestations > 0,
@@ -146,7 +174,7 @@ namespace sysiosystem {
    }
 
    void system_contract::open_rescore_sweep() {
-      _global.modify( get_self(), []( auto& g ) {
+      _prodstate.modify( get_self(), []( auto& g ) {
          g.rescore_cursor  = 0;
          g.rescore_pending = true;
       });
@@ -198,7 +226,7 @@ namespace sysiosystem {
       // large roster is rescored, during which a slashed, terminated or demoted producer would keep
       // its slot and its finality weight. A briefly mixed ordering is a far smaller harm than a
       // schedule that cannot be rebuilt at all.
-      _global.modify( get_self(), [&]( auto& g ) { g.last_producer_schedule_update = block_time; });
+      _prodstate.modify( get_self(), [&]( auto& g ) { g.last_producer_schedule_update = block_time; });
 
       auto idx = _producers.get_index<"prodrank"_n>();
 
@@ -247,8 +275,20 @@ namespace sysiosystem {
          return;
       }
 
-      // Sort by producer name for deterministic ordering
-      std::sort( top_producers.begin(), top_producers.end(), []( const value_type& lhs, const value_type& rhs ) {
+      // Rank picked WHO is scheduled. A new set runs in `location` order, name breaking ties. The
+      // set already producing keeps its order: a reorder alone reassigns rounds at activation and
+      // skips miss attribution, so a location change must wait for the set to change.
+      const auto active_schedule = sysio::get_active_producers();
+      const auto active_position = [&]( const value_type& p ) {
+         return static_cast<size_t>( std::find( active_schedule.begin(), active_schedule.end(), p.first.producer_name )
+                                     - active_schedule.begin() );
+      };
+      const bool same_set = top_producers.size() == active_schedule.size()
+         && std::all_of( top_producers.begin(), top_producers.end(),
+                         [&]( const value_type& p ) { return active_position( p ) < active_schedule.size(); } );
+      std::sort( top_producers.begin(), top_producers.end(), [&]( const value_type& lhs, const value_type& rhs ) {
+         if( same_set ) return active_position( lhs ) < active_position( rhs );
+         if( lhs.second != rhs.second ) return lhs.second < rhs.second;
          return lhs.first.producer_name < rhs.first.producer_name;
       } );
 
@@ -258,7 +298,7 @@ namespace sysiosystem {
          producers.push_back( std::move(item.first) );
 
       if( set_proposed_producers( producers ) >= 0 ) {
-         _global.modify( get_self(), [&]( auto& g ) {
+         _prodstate.modify( get_self(), [&]( auto& g ) {
             g.last_producer_schedule_size = static_cast<decltype(g.last_producer_schedule_size)>( producers.size() );
          });
       }

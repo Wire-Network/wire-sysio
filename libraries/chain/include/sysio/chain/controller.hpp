@@ -2,6 +2,7 @@
 #include <sysio/chain/block_state.hpp>
 #include <sysio/chain/block_handle.hpp>
 #include <sysio/chain/block_log.hpp>
+#include <sysio/chain/kv_store.hpp>
 #include <sysio/chain/trace.hpp>
 #include <sysio/chain/genesis_state.hpp>
 #include <chainbase/pinnable_mapped_file.hpp>
@@ -238,6 +239,8 @@ namespace sysio::chain {
          void sign_block( const signer_callback_type& signer_callback );
          void commit_block();
          void testing_allow_voting(bool val);
+         /// Runs this controller on another KV engine. Call before startup. Only the test harness calls this.
+         void testing_set_kv_store(std::shared_ptr<kv_store> store);
          bool get_testing_allow_voting_flag();
          void set_async_voting(async_t val);
          void set_async_aggregation(async_t val);
@@ -268,6 +271,9 @@ namespace sysio::chain {
          boost::asio::io_context& get_thread_pool();
 
          const chainbase::database& db()const;
+
+         /// The engine holding KV rows and index entries. All reads of KV state go through it.
+         const kv_store& kv()const;
 
          const account_object&                 get_account( account_name n )const;
          const account_object*                 find_account( account_name n )const;
@@ -390,8 +396,11 @@ namespace sysio::chain {
          signed_block_ptr fetch_block_by_id( const block_id_type& id )const;
          // thread-safe, retrieves serialized signed block
          std::vector<char> fetch_serialized_block_by_number( uint32_t block_num)const;
-         // thread-safe, batch retrieves serialized signed blocks starting at first_block_num
-         std::vector<std::vector<char>> fetch_serialized_blocks_by_number( uint32_t first_block_num, uint32_t count)const;
+         // thread-safe, batch retrieves serialized signed blocks starting at first_block_num, from the block log then
+         // fork_db, within max_bytes (see serialized_block_batch_budget)
+         std::vector<std::vector<char>> fetch_serialized_blocks_by_number(
+            uint32_t first_block_num, uint32_t count,
+            uint64_t max_bytes = serialized_block_batch_budget::unlimited)const;
          // thread-safe
          bool block_exists(const block_id_type& id) const;
          bool validated_block_exists(const block_id_type& id) const;
@@ -561,6 +570,7 @@ namespace sysio::chain {
          friend class savanna_cluster::node_t;
 
          chainbase::database& mutable_db()const;
+         kv_store& mutable_kv()const;
 
          std::unique_ptr<controller_impl> my;
    }; // controller

@@ -122,7 +122,7 @@ try:
     results = apiNode.pushTransaction(trx2)
     assert results[0], f"KV put 2 failed: {results}"
 
-    # Push multi_index action (format=1)
+    # Push multi_index action
     Print("Push multi_index addnumobj action")
     trx3 = {"actions": [{"account": "mitest", "name": "addnumobj",
              "authorization": [{"actor": "mitest", "permission": "active"}],

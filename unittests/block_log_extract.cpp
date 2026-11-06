@@ -4,6 +4,7 @@
 
 #include <sysio/chain/block_log.hpp>
 #include <sysio/chain/block.hpp>
+#include <fstream>
 #include <regex>
 
 using namespace sysio::chain;
@@ -48,6 +49,29 @@ struct block_log_extract_fixture {
 };
 
 BOOST_AUTO_TEST_SUITE(block_log_extraction_tests)
+
+/** An active log created before interrupted startup has no preamble to read. */
+BOOST_AUTO_TEST_CASE(empty_active_log_reports_interrupted_initialization) {
+   fc::temp_directory active_dir;
+   {
+      block_log uninitialized(active_dir.path());
+   }
+   const auto expected = (active_dir.path() / "blocks.log").generic_string() +
+                         " is empty: the launch that created it did not complete startup. "
+                         "Rerun once with --delete-all-blocks.";
+   BOOST_REQUIRE_EXCEPTION(block_log::extract_chain_context(active_dir.path(), {}), block_log_exception,
+                           [&](const auto& ex) { return ex.top_message() == expected; });
+}
+
+BOOST_AUTO_TEST_CASE(empty_retained_log_is_rejected) {
+   fc::temp_directory active_dir;
+   fc::temp_directory retained_dir;
+   {
+      std::ofstream log(retained_dir.path() / "blocks-3-7.log", std::ios::binary);
+   }
+   BOOST_CHECK_THROW(block_log::extract_chain_context(active_dir.path(), retained_dir.path()),
+                     std::ios_base::failure);
+}
 
 BOOST_FIXTURE_TEST_CASE(extract_from_middle, block_log_extract_fixture) try {
 

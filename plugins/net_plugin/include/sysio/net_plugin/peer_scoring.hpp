@@ -48,4 +48,29 @@ namespace sysio::peer_scoring {
       std::atomic<int32_t> score_{baseline};
    };
 
+   /// Select the peer to evict so that a new connection can be admitted over a connection limit: the evictable peer
+   /// with the lowest score, when that score is below eviction_threshold. No other peer is evicted, so a node full of
+   /// peers in good standing refuses the new connection instead. A peer already closing is never chosen, since its
+   /// slot is being freed anyway.
+   ///
+   /// @tparam PeerPtr   shared pointer to a peer that provides get_peer_score() and closed()
+   /// @param  peers     provides for_each_connection(), which visits every peer
+   /// @param  evictable true for a peer that counts against the limit and may be evicted
+   /// @return the peer to evict, or a null pointer when no peer qualifies
+   template <typename PeerPtr, typename Peers, typename Evictable>
+   PeerPtr select_eviction_victim(const Peers& peers, Evictable&& evictable) {
+      PeerPtr victim;
+      int32_t lowest_score = eviction_threshold;
+      peers.for_each_connection([&](const PeerPtr& peer) {
+         if (!peer->closed() && evictable(peer)) {
+            if (const int32_t score = peer->get_peer_score(); score < lowest_score) {
+               lowest_score = score;
+               victim = peer;
+            }
+         }
+         return true;
+      });
+      return victim;
+   }
+
 } // namespace sysio::peer_scoring

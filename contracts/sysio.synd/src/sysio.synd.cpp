@@ -6,6 +6,7 @@
 #include <sysio/action.hpp>
 #include <sysio/print.hpp>
 #include <sysio/privileged.hpp>
+#include <sysio/system.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio.bond/sysio.bond.hpp>
@@ -36,6 +37,11 @@ constexpr name ack_action = "ack"_n;
 constexpr name settle_action = "settle"_n;
 constexpr name requestkeep_action = "requestkeep"_n;
 constexpr name syncenv_action = "syncenv"_n;
+constexpr name logintake_action = "logintake"_n;
+constexpr name logrelease_action = "logrelease"_n;
+constexpr name logparked_action = "logparked"_n;
+constexpr name logburn_action = "logburn"_n;
+constexpr auto self_inline_receipt_msg = "syndication receipts require a self inline action";
 constexpr auto outpost_token_not_found_msg = "outpost token not found";
 constexpr auto custody_incident_not_found_msg = "custody incident not found";
 constexpr auto custody_still_below_outstanding_msg = "custody still below outstanding";
@@ -74,12 +80,13 @@ constexpr name pull_action = "pull"_n;
 
 /// Largest amount an `asset` carries, as the unsigned base units every row holds.
 constexpr uint64_t max_asset_amount = static_cast<uint64_t>(asset::max_amount);
+/// Governance may tolerate at most a 10% custody loss.
+constexpr uint32_t max_custody_shortfall_bps = 1'000;
 
 /// Memos of the transfers a parked delivery and a desyndication send.
 constexpr std::string_view desyndicate_memo     = "sysio.synd desyndicate";
 /// Memo of the transfers a release to a linked account sends.
-/// Memo of the transfer that pulls a challenger's charge, and of the one that forwards a challenger
-/// the share of the hold bond a VALID ruling returns.
+/// Memo of the transfer that pulls a challenger's charge.
 constexpr std::string_view challenge_memo       = "sysio.synd challenge";
 /// Memo of the transfer that pays `sysio` the WIRE the fee pot earned.
 constexpr std::string_view fee_yield_memo       = "sysio.synd fee pot yield";
@@ -94,11 +101,14 @@ constexpr std::string_view no_symbol_message     = "shadow symbol does not exist
 constexpr std::string_view window_message        = "importsynd is bootstrap-window only";
 constexpr std::string_view finalized_message     = "import already finalized";
 constexpr std::string_view fee_bps_message       = "fee must be at most 10000 basis points";
+constexpr std::string_view custody_bps_message   = "custody shortfall tolerance must be at most 1000 basis points";
 constexpr std::string_view window_sec_message    = "window_sec must be positive";
 constexpr std::string_view config_range_message  = "bucket, bounty and challenge amounts must fit an asset";
 constexpr std::string_view challenger_role_msg   = "the challenger cannot be sysio.synd or sysio.bond";
 constexpr std::string_view no_envelope_message   = "envelope not found";
 constexpr std::string_view challenged_message    = "the envelope's request is already challenged";
+constexpr std::string_view unbonded_message      =
+   "the envelope's request is not fully bonded; it cannot be challenged yet";
 constexpr std::string_view unchallengeable_msg   =
    "only a REQUESTED, RELEASABLE or DONE envelope can be challenged";
 constexpr std::string_view zero_charge_message   = "challenge charge is zero; configure challenge_extra";
@@ -113,7 +123,10 @@ constexpr std::string_view desynd_budget_message = "desyndication exceeds the cu
 constexpr std::string_view min_desynd_config_message =
    "minimum desyndication must be positive and fit the burst and asset range";
 constexpr std::string_view min_desynd_quantity_message = "quantity is below the minimum desyndication";
+constexpr std::string_view desynd_max_fee_message = "desyndication fee exceeds max_fee";
 constexpr std::string_view desynd_net_message    = "desyndication net of the fee must be positive";
+constexpr std::string_view desynd_fee_flat_message =
+   "flat desyndication fee must fit an asset and be below the minimum desyndication";
 
 /// Diagnostic path names of the intake actions.
 constexpr std::string_view onsynd_path   = "onsynd";
@@ -149,8 +162,6 @@ constexpr std::string_view unset_bucket_reason =
    "no syndconfig row: the syndication bucket is unset, nothing releases";
 constexpr std::string_view empty_bucket_reason    = "syndication bucket is empty until it refills";
 constexpr std::string_view yield_headroom_reason  = "yield exceeds the shadow's headroom; the item waits";
-constexpr std::string_view frozen_share_reason    =
-   "the challenger's hold share waits for the andon cord to clear";
 constexpr std::string_view frozen_burn_reason     =
    "request ruled INVALID while the andon cord is pulled; the burn waits for the clear, the pair waits";
 
@@ -161,6 +172,7 @@ constexpr std::string_view frozen_step_note =
 /// `custody shortfall <chain> <token> seq <n>`, far below `andon::MAX_TEXT_BYTES`.
 constexpr std::string_view excess_verdict       = ": EXCESS -- reported ";
 constexpr std::string_view shortfall_verdict    = ": SHORTFALL -- reported ";
+constexpr std::string_view tolerated_verdict    = ": TOLERATED -- reported ";
 constexpr std::string_view outstanding_label    = " outstanding ";
 constexpr std::string_view shortfall_reason     = "custody shortfall ";
 constexpr std::string_view sequence_label       = " seq ";
@@ -295,14 +307,15 @@ synd::item_key item_key_of(const synd::item_row& item) {
                          .id          = item.id};
 }
 
-/// Store `item` under the next item id, which it is given. Never throws.
-void add_item(name self, synd::item_row item) {
+/// Store `item` under the next item id and return that id. Never throws.
+uint64_t add_item(name self, synd::item_row item) {
    synd::syndcounters_t counters(self);
    synd::synd_counters  c = counters.get_or_default(synd::synd_counters{});
    item.id                = c.next_item_id++;
    counters.set(c, ram_payer);
    synd::items_t items(self);
    items.set(ram_payer, item_key_of(item), item);
+   return item.id;
 }
 
 /// The key of the parked row of `(token_code, chain_kind, pubkey)`.
@@ -348,13 +361,19 @@ void credit_owed(name self, name account, symbol_code sym, uint64_t wire) {
 /// True iff `account` exists and has contract code. Never throws.
 bool has_code(name account) { return is_account(account) && get_code_hash(account) != checksum256{}; }
 
-/// Hold `amount` of the shadow `token_code` (symbol `sym`), already in this contract's own `sysio.liq`
-/// row, in the parked row of `(chain_kind, pubkey)`, with `banked` WIRE the pubkey earned elsewhere in
-/// this contract added to its position. The position settles at the live index before the balance
-/// grows. Nothing is written when both are zero. Never throws.
-void park_shadow(name self, sysio::slug_name token_code, symbol_code sym, ChainKind chain_kind,
-                 const std::vector<char>& pubkey, uint64_t amount, uint64_t banked) {
-   if (amount == 0 && banked == 0) return;
+/// Whether parked principal came from a receipted live release or a launch import.
+enum class principal_source {
+   RELEASE, ///< principal joined to a live intake receipt
+   IMPORT   ///< launch principal with no live intake receipt
+};
+
+/// Hold shadow principal and banked WIRE for a pubkey, returning its principal batch ID.
+/// A yield-only contribution allocates no batch. Imports remain unattributed to live intakes.
+/// The position settles at the live index before its balance grows. Never throws.
+uint64_t park_shadow(name self, sysio::slug_name token_code, symbol_code sym, ChainKind chain_kind,
+                     const std::vector<char>& pubkey, uint64_t amount, uint64_t banked, principal_source source) {
+   if (amount == 0 && banked == 0)
+      return 0;
    synd::parkeds_t        parked(self);
    const synd::parked_key key = parked_key_of(token_code, chain_kind, pubkey);
    synd::parked_row       row = parked.try_get(key).value_or(synd::parked_row{
@@ -362,9 +381,27 @@ void park_shadow(name self, sysio::slug_name token_code, symbol_code sym, ChainK
       .chain_kind = chain_kind,
       .pubkey     = pubkey,
    });
+   if (amount > 0) {
+      if (row.balance == 0) {
+         synd::syndcounters_t counters(self);
+         synd::synd_counters  state = counters.get_or_default(synd::synd_counters{});
+         row.batch_id = state.next_batch_id++;
+         counters.set(state, ram_payer);
+      }
+      if (source == principal_source::IMPORT)
+         row.unattributed = opp::safe::add_sat_u64(row.unattributed, amount);
+   }
    custody::settle_and_adjust(row.position, row.balance, static_cast<int64_t>(amount), synd::LIQ_ACCOUNT, sym);
    row.position.owed_wire = std::min(custody::MAX_OWED_WIRE, opp::safe::add_sat_u64(row.position.owed_wire, banked));
    parked.set(ram_payer, key, row);
+   return amount > 0 ? row.batch_id : 0;
+}
+
+/// Emit a terminal receipt only once the envelope's held items have all been removed.
+void log_burn(name self, const synd::envelope_row& row) {
+   action(active_of(self), self, logburn_action,
+          std::make_tuple(synd::burn_receipt{row.chain_code, row.token_code, row.epoch_index, row.digest}))
+      .send();
 }
 
 /// Add `amount` of the shadow `token_code` (symbol `sym`) to the token's fee pot, settling its position
@@ -396,6 +433,32 @@ uint64_t take_bounty(name self, sysio::slug_name token_code, symbol_code sym, ui
 /// because `setconfig` bounds `bps` by the denominator.
 uint64_t fee_of(uint64_t amount, uint32_t bps) {
    return static_cast<uint64_t>(static_cast<uint128_t>(amount) * bps / bond::BPS_DENOMINATOR);
+}
+
+/// The desyndication fee on `quantity` under `config`: the basis-point part, `fee_of(quantity,
+/// desynd_fee_bps)`, plus the flat `desynd_fee_flat`, which covers the external-chain gas of the round trip.
+/// The basis-point part is at most `quantity` and `setconfig` bounds the flat part by the asset range, so
+/// with `quantity` within the asset range the sum stays below 2^63 and cannot wrap. The fee may reach or
+/// exceed `quantity` (at a high basis-point rate); the caller refuses that.
+uint64_t desynd_fee_of(const synd::synd_config& config, uint64_t quantity) {
+   return fee_of(quantity, config.desynd_fee_bps) + config.desynd_fee_flat;
+}
+
+/// Resolve the pair and validate the gross quantity identically for quotes and execution.
+synd::synd_config assert_desynd_config(name self, slug_name chain_code, slug_name token_code, uint64_t quantity) {
+   check(quantity > 0 && quantity <= max_asset_amount, quantity_message.data());
+   const auto config = synd::syndconfig_t(self).try_get(
+      synd::config_key{.chain_code = chain_code.value, .token_code = token_code.value});
+   check(config.has_value(), desynd_unset_message.data());
+   check(quantity >= config->min_desyndicate, min_desynd_quantity_message.data());
+   return *config;
+}
+
+/// Validate a positive net and calculate the same fee/net pair for quotes and execution.
+synd::desynd_quote assert_desynd_fee(const synd::synd_config& config, uint64_t quantity) {
+   const uint64_t fee = desynd_fee_of(config, quantity);
+   check(fee < quantity, desynd_net_message.data());
+   return {.fee = fee, .net = quantity - fee};
 }
 
 /// The key of the bucket of `(chain_code, token_code, direction)`.
@@ -462,17 +525,13 @@ void synchronize(name self, synd::envelope_row& row) {
    using state = bond::request_state;
    using outcome = synd::request_outcome;
    if (req->state == state::APPROVED) row.outcome = outcome::APPROVED;
-   else if (req->state == state::VALID) {
-      row.outcome = outcome::VALID;
-      row.hold_share = bond::share_of(req->covered - req->bonded, req->hold_bond, req->covered);
-      row.hold_beneficiary = req->hold_beneficiary;
-      row.share_pending = row.hold_share > 0 && row.hold_beneficiary != name{};
-   } else if (req->state == state::INVALID) {
+   else if (req->state == state::VALID) row.outcome = outcome::VALID;
+   else if (req->state == state::INVALID) {
       row.outcome = outcome::INVALID;
       row.forfeit = req->bonded;
       row.bounty_returned = req->hold_beneficiary == name{} ? req->bounty : 0;
    } else return;
-   if (row.outcome == outcome::INVALID || row.share_pending) {
+   if (row.outcome == outcome::INVALID) {
       if (row.state == synd::envelope_state::DONE) row.state = synd::envelope_state::HELD;
       synd::ledger_t ledger(self);
       const synd::ledger_key key{row.chain_code.value, row.token_code.value};
@@ -632,7 +691,6 @@ private:
          const uint64_t              request_id = row->request_id;
          const uint64_t              released   = row->released;
          const uint64_t              burned     = row->burned;
-         const bool                  pending    = row->share_pending;
          if (row->state == synd::envelope_state::REQUESTED || row->state == synd::envelope_state::RELEASABLE ||
              row->state == synd::envelope_state::HELD) {
             refresh(*row, unbonded, st);
@@ -642,10 +700,9 @@ private:
          }
          if (underwriting_ && row->state == synd::envelope_state::WAITING && !unbonded && spend())
             issue_request(*row, config);
-         // The outcome's snapshots (`forfeit`, `bounty_returned`, `hold_share`, `hold_beneficiary`) are only
-         // ever written with the outcome; `share_pending` clears on its own when the forward is paid.
+         // The outcome's snapshots (`forfeit`, `bounty_returned`) are only ever written with the outcome.
          if (row->state != before || row->outcome != outcome || row->request_id != request_id ||
-             row->released != released || row->burned != burned || row->share_pending != pending) {
+             row->released != released || row->burned != burned) {
             envelopes.set(ram_payer, key, *row);
          }
 
@@ -672,11 +729,11 @@ private:
    /// Refresh `row` from its `sysio.bond` request, found through the request's `bystatement` key. OPEN
    /// keeps it REQUESTED; BONDED makes it RELEASABLE; HELD makes it HELD. The first time the request is
    /// seen APPROVED, VALID or INVALID the outcome is recorded on `row` and the request row is never read
-   /// again: APPROVED and VALID make it RELEASABLE (VALID forwarding a challenger its share of the hold
-   /// bond), INVALID burns it (`invalidate`). Sets `unbonded` when the request is neither bonded nor
-   /// ruled -- OPEN, or HELD before it was fully bonded -- when no request row is found for an envelope
-   /// with no recorded outcome, while an INVALID envelope's burn is unfinished, and on any state it
-   /// does not know, where the items are left untouched.
+   /// again: APPROVED and VALID make it RELEASABLE, INVALID burns it (`invalidate`). Sets `unbonded` when
+   /// the request is neither bonded nor ruled -- OPEN, or HELD before it was fully bonded, which `challenge`
+   /// never does -- when no request row is found for an envelope with no recorded outcome, while an
+   /// INVALID envelope's burn is unfinished, and on any state it does not know, where the items are left
+   /// untouched.
    void refresh(synd::envelope_row& row, bool& unbonded, const liq::currency_stats& st) {
       using request_state = bond::request_state;
       using outcome       = synd::request_outcome;
@@ -686,7 +743,6 @@ private:
          return;
       }
       if (row.outcome != outcome::PENDING) {
-         if (!underwriting_ && row.share_pending) forward_hold_share(row, st);
          row.state = synd::envelope_state::RELEASABLE;
          return;
       }
@@ -709,26 +765,6 @@ private:
          note(row.chain_code, row.token_code, row.epoch_index, unknown_state_reason);
          unbonded = true;
       }
-   }
-
-   /// Forward the challenger the hold share snapshotted on VALID envelope `row` (`hold_share` to
-   /// `hold_beneficiary`), once, and clear `share_pending`: the share of the hold bond no bond covered,
-   /// which `sysio.bond` awards this contract, the issuer, and which the challenger paid. While the
-   /// `sysio.andon` cord is pulled it waits, pending, for the first step after the clear. The award is
-   /// claimed first while `sysio.bond` still owes it (a claim with nothing owed would throw; anyone may have
-   /// claimed it for this contract already, and a request pruned since was fully paid, so the share sits in
-   /// this contract's row either way), then credited by `sysio.liq::settle` without recipient execution.
-   void forward_hold_share(synd::envelope_row& row, const liq::currency_stats& st) {
-      if (frozen_) {
-         note(row.chain_code, row.token_code, row.epoch_index, frozen_share_reason);
-         return;
-      }
-      pull_first(st);
-      if (bond::settlement_due(synd::BOND_ACCOUNT, row.request_id, self_) > 0) send_claim(row.request_id);
-      action(active_of(self_), synd::LIQ_ACCOUNT, settle_action,
-             std::make_tuple(self_, row.hold_beneficiary,
-                             asset{static_cast<int64_t>(row.hold_share), st.supply.symbol})).send();
-      row.share_pending = false;
    }
 
    /// Burn envelope `row`, whose request was ruled INVALID, from the forfeit and bounty snapshotted on it.
@@ -783,6 +819,7 @@ private:
       burn(row, repaid);
       add_to_feepot(self_, row.token_code, code, opp::safe::add_sat_u64(row.forfeit - repaid, row.bounty_returned));
       row.state = synd::envelope_state::INVALID;
+      log_burn(self_, row);
       note(row.chain_code, row.token_code, row.epoch_index, invalid_burned_reason);
    }
 
@@ -937,6 +974,7 @@ private:
       const symbol      sym  = st.supply.symbol;
       const symbol_code code = sym.code();
       const name        account = deliverable_account(self_, item.chain_kind, item.pubkey);
+      uint64_t parked_batch_id = 0;
       if (account != name{}) {
          // Pull first -- nothing this release queues may touch this contract's liq row ahead of the
          // claim (custody obligation 3) -- then take the item's banked WIRE out of what the pool covers.
@@ -950,7 +988,8 @@ private:
          // released whole it would be erased with it, so it moves to the pubkey's parked row instead,
          // which a later `sweep` pays once the pool covers it.
          if (item.remaining == 0 && item.position.owed_wire > 0) {
-            park_shadow(self_, item.token_code, code, item.chain_kind, item.pubkey, 0, item.position.owed_wire);
+            park_shadow(self_, item.token_code, code, item.chain_kind, item.pubkey, 0, item.position.owed_wire,
+                        principal_source::RELEASE);
             item.position.owed_wire = 0;
          }
          if (net > 0) {
@@ -965,10 +1004,19 @@ private:
                                     code);
          const uint64_t banked   = item.position.owed_wire;
          item.position.owed_wire = 0;
-         park_shadow(self_, item.token_code, code, item.chain_kind, item.pubkey, net, banked);
+         parked_batch_id = park_shadow(self_, item.token_code, code, item.chain_kind, item.pubkey, net, banked,
+                                       principal_source::RELEASE);
       }
       add_to_feepot(self_, item.token_code, code, fee);
       row.released = opp::safe::add_sat_u64(row.released, tranche);
+      const auto destination = net == 0            ? synd::release_destination::FEE_ONLY
+                               : account != name{} ? synd::release_destination::ACCOUNT
+                                                   : synd::release_destination::PARKED;
+      action(active_of(self_), self_, logrelease_action,
+             std::make_tuple(synd::release_receipt{item.id, item.chain_code, item.token_code, item.epoch_index, tranche,
+                                                   fee, net, item.remaining, destination, net > 0 ? account : name{},
+                                                   parked_batch_id}))
+         .send();
    }
 
    /// Release yield `item` whole into `sysio.liq`'s pending yield by `mintyield`: no fee and no
@@ -1021,6 +1069,12 @@ private:
 
 };
 
+/// Receipt payloads are authenticated by their immediate emitter, not a user-supplied signer.
+void require_receipt_origin(name self) {
+   require_auth(self);
+   check(get_sender() == self, self_inline_receipt_msg);
+}
+
 } // anonymous namespace
 
 // ---------------------------------------------------------------------------
@@ -1070,13 +1124,18 @@ void synd::onsynd(sysio::slug_name chain_code, uint32_t epoch_index, checksum256
    };
    custody::settle_and_adjust(item.position, item.remaining, static_cast<int64_t>(amount), LIQ_ACCOUNT,
                               st->supply.symbol.code());
-   add_item(get_self(), std::move(item));
+   // Keep the source identity in the action trace even after the operational item is erased.
+   const auto item_id = add_item(get_self(), item);
    add_to_envelope(get_self(), chain_code, token_code, epoch_index, digest, amount, 0);
    ensure_ledger(get_self(), chain_code, token_code);
 
    // resolve_intake verified every condition `mint` checks: the shadow exists and the amount is
    // positive and within its headroom. This contract is an account, so the mint cannot fail.
    action(active_of(get_self()), LIQ_ACCOUNT, mint_action, std::make_tuple(get_self(), token_code, amount)).send();
+   action(active_of(get_self()), get_self(), logintake_action,
+          std::make_tuple(intake_receipt{item_id, chain_code, token_code, epoch_index, digest, sequence, chain_kind,
+                                         std::move(item.pubkey), amount}))
+      .send();
 }
 
 void synd::onyield(sysio::slug_name chain_code, uint32_t epoch_index, checksum256 digest, uint64_t sequence,
@@ -1144,13 +1203,14 @@ void synd::closeenv(sysio::slug_name chain_code, uint32_t epoch_index, checksum2
 void synd::setconfig(sysio::slug_name chain_code, sysio::slug_name token_code, uint32_t synd_fee_bps,
                      uint32_t desynd_fee_bps, uint64_t synd_burst, uint64_t synd_refill, uint64_t desynd_burst,
                      uint64_t desynd_refill, uint32_t window_sec, uint64_t bounty, uint64_t challenge_extra,
-                     uint64_t min_desyndicate) {
+                     uint64_t min_desyndicate, uint64_t desynd_fee_flat, uint32_t custody_shortfall_bps) {
    require_auth(SYSTEM_ACCOUNT);
    check(outpost_kind(chain_code).has_value(), not_outpost_message.data());
    const auto st = liq::find_stat_by_token(LIQ_ACCOUNT, token_code);
    check(st.has_value(), no_shadow_reason.data());
    check(st->chain_code == chain_code, other_chain_reason.data());
    check(synd_fee_bps <= bond::BPS_DENOMINATOR && desynd_fee_bps <= bond::BPS_DENOMINATOR, fee_bps_message.data());
+   check(custody_shortfall_bps <= max_custody_shortfall_bps, custody_bps_message.data());
    check(window_sec > 0, window_sec_message.data());
    for (const uint64_t amount : { synd_burst, synd_refill, desynd_burst, desynd_refill, bounty, challenge_extra }) {
       check(amount <= max_asset_amount, config_range_message.data());
@@ -1159,6 +1219,8 @@ void synd::setconfig(sysio::slug_name chain_code, sysio::slug_name token_code, u
    syndconfig_t configs(get_self());
    check(min_desyndicate > 0 && min_desyndicate <= max_asset_amount &&
          (desynd_burst == 0 || min_desyndicate <= desynd_burst), min_desynd_config_message.data());
+   // Below the minimum, so a minimum-size desyndication nets at least one base unit at 0 bps.
+   check(desynd_fee_flat <= max_asset_amount && desynd_fee_flat < min_desyndicate, desynd_fee_flat_message.data());
    configs.set(ram_payer, config_key{.chain_code = chain_code.value, .token_code = token_code.value},
                synd_config{
                   .chain_code      = chain_code,
@@ -1173,6 +1235,8 @@ void synd::setconfig(sysio::slug_name chain_code, sysio::slug_name token_code, u
                   .bounty          = bounty,
                   .challenge_extra = challenge_extra,
                   .min_desyndicate = min_desyndicate,
+                  .desynd_fee_flat = desynd_fee_flat,
+                  .custody_shortfall_bps = custody_shortfall_bps,
                });
 }
 
@@ -1224,7 +1288,6 @@ void synd::pruneenv(sysio::slug_name chain_code, sysio::slug_name token_code, ui
       const auto row = *it;
       if (row.chain_code != chain_code || row.token_code != token_code) break;
       if (row.state != envelope_state::DONE && row.state != envelope_state::INVALID) break;
-      if (row.share_pending) break;
       const bool dropped = row.state == envelope_state::INVALID && row.request_id == 0;
       if (!dropped && row.outcome == request_outcome::PENDING) break;
       const auto item = items.lower_bound(item_key{chain_code.value, token_code.value, row.epoch_index, 0});
@@ -1305,6 +1368,7 @@ void synd::dropenv(sysio::slug_name chain_code, sysio::slug_name token_code, uin
    row->burned = opp::safe::add_sat_u64(row->burned, unreleased);
    row->state  = envelope_state::INVALID;
    envelopes.set(same_payer, key, *row);
+   log_burn(get_self(), *row);
    note(chain_code, token_code, epoch_index, dropped_reason);
 }
 
@@ -1324,13 +1388,14 @@ void synd::challenge(name challenger, sysio::slug_name chain_code, sysio::slug_n
             row->state == envelope_state::DONE,
          unchallengeable_msg.data());
 
-   // sysio.bond holds only an OPEN or BONDED request, so a second hold fails its state check; mirrored
-   // here, before anything is charged, in this contract's words.
+   // sysio.bond refuses a second hold; mirrored here, before anything is charged, in this contract's words.
    const auto req = find_request(get_self(), *row);
    check(req.has_value(), no_request_message.data());
    check(req->state != bond::request_state::HELD, challenged_message.data());
-   check(req->state == bond::request_state::OPEN || req->state == bond::request_state::BONDED,
-         request_final_message.data());
+   // Only a fully bonded request: nothing releases before then, and a held request takes no more bonds, so
+   // holding an under-bonded one would stop the pair until `sysio` rules.
+   check(req->state != bond::request_state::OPEN, unbonded_message.data());
+   check(req->state == bond::request_state::BONDED, request_final_message.data());
 
    const auto st = liq::find_stat_by_token(LIQ_ACCOUNT, token_code);
    check(st.has_value(), no_shadow_reason.data());
@@ -1427,7 +1492,11 @@ void synd::linkswept(name account, ChainKind chain_kind, std::vector<char> pubke
 //  Desyndication
 // ---------------------------------------------------------------------------
 
-void synd::desyndicate(name holder, asset quantity) {
+synd::desynd_quote synd::quotedesynd(slug_name chain_code, slug_name token_code, uint64_t quantity) {
+   return assert_desynd_fee(assert_desynd_config(get_self(), chain_code, token_code, quantity), quantity);
+}
+
+void synd::desyndicate(name holder, asset quantity, uint64_t max_fee) {
    require_auth(holder);
    andon::check_clear(andon::ANDON_ACCOUNT);
    check(quantity.is_valid() && quantity.amount > 0, quantity_message.data());
@@ -1443,24 +1512,22 @@ void synd::desyndicate(name holder, asset quantity) {
 
    // The pair's desyndication bucket, ticked to the depot's current epoch, must hold the whole quantity;
    // it drops by the whole quantity, the fee included.
-   syndconfig_t   configs(get_self());
-   const auto     config = configs.try_get(config_key{.chain_code = st.chain_code.value,
-                                                      .token_code = st.token_code.value});
-   check(config.has_value(), desynd_unset_message.data());
    const uint64_t quantity_units = static_cast<uint64_t>(quantity.amount);
-   check(quantity_units >= config->min_desyndicate, min_desynd_quantity_message.data());
+   const auto config = assert_desynd_config(get_self(), st.chain_code, st.token_code, quantity_units);
+   const auto quote = assert_desynd_fee(config, quantity_units);
+   check(quote.fee <= max_fee, desynd_max_fee_message.data());
    bucket_row     bucket = tick_bucket(get_self(), st.chain_code, st.token_code, bucket_direction::DESYNDICATION,
-                                       config->desynd_burst, config->desynd_refill, epoch::current_epoch_index());
+                                       config.desynd_burst, config.desynd_refill, epoch::current_epoch_index());
    check(quantity_units <= bucket.level, desynd_budget_message.data());
    bucket.level -= quantity_units;
    buckets_t(get_self()).set(ram_payer, bucket_key_of(st.chain_code, st.token_code, bucket_direction::DESYNDICATION),
                              bucket);
 
-   // The fee stays in this contract as part of the fee pot; only the rest is burned and released on the
-   // outpost. A fee that rounds to zero leaves the whole quantity to burn.
-   const uint64_t fee    = fee_of(quantity_units, config->desynd_fee_bps);
-   const uint64_t amount = quantity_units - fee;
-   check(amount > 0, desynd_net_message.data());
+   // The fee, basis points plus the flat part, stays in this contract as part of the fee pot; only the rest
+   // is burned and released on the outpost. A zero fee leaves the whole quantity to burn; a fee of the whole
+   // quantity or more leaves nothing to release and is refused before the subtraction.
+   const uint64_t fee    = quote.fee;
+   const uint64_t amount = quote.net;
    // The depot's outstanding shadow once the burn below has run, read from `st` before it: the burn is
    // inline, so nothing has moved supply yet. The net was part of the holder's balance, so it is within
    // the supply and the difference cannot underflow.
@@ -1566,6 +1633,18 @@ void synd::check_custody(std::string_view path, const liq::currency_stats& st, s
       return;
    }
 
+   const auto config = syndconfig_t(get_self()).try_get(
+      config_key{.chain_code = chain_code.value, .token_code = st.token_code.value});
+   const uint32_t tolerance_bps = config ? config->custody_shortfall_bps : 0;
+   // Compare exact ratios with widened integer products: no overflow, floating point or rounding up
+   // of sub-unit tolerances. `reported < expected` above makes subtraction safe.
+   if (static_cast<uint128_t>(expected - reported) * bond::BPS_DENOMINATOR <=
+       static_cast<uint128_t>(expected) * tolerance_bps) {
+      sysio::print("sysio.synd::", std::string(path), std::string(tolerated_verdict), reported,
+                   std::string(outstanding_label), expected, "\n");
+      return;
+   }
+
    sysio::print("sysio.synd::", std::string(path), std::string(shortfall_verdict), reported,
                 std::string(outstanding_label), expected, "\n");
    // Replace current evidence for this pair; never accumulate historical shortfall rows.
@@ -1619,6 +1698,8 @@ void synd::deliver_parked(name account, ChainKind chain_kind, const std::vector<
       const uint64_t balance = settled.balance;
       if (settled.position.owed_wire > 0) {
          settled.balance = 0;
+         settled.batch_id = 0;
+         settled.unattributed = 0;
          parked.set(ram_payer, key, settled);
       } else {
          parked.erase(key);
@@ -1627,6 +1708,10 @@ void synd::deliver_parked(name account, ChainKind chain_kind, const std::vector<
       if (balance > 0) {
          action(active_of(get_self()), LIQ_ACCOUNT, settle_action,
                 std::make_tuple(get_self(), account, asset{static_cast<int64_t>(balance), sym}))
+            .send();
+         action(active_of(get_self()), get_self(), logparked_action,
+                std::make_tuple(parked_receipt{row->batch_id, it->token_code, chain_kind, pubkey, account, balance,
+                                               row->unattributed}))
             .send();
       }
       credit_owed(get_self(), account, code, banked);
@@ -1643,8 +1728,24 @@ void synd::credit_by_pubkey(sysio::slug_name token_code, symbol_code sym, ChainK
    // Parked: the position settles at the live index before the balance grows, and the shadow it
    // attributes arrives in this contract's own row by the mint sent right after (custody
    // obligation 0).
-   park_shadow(get_self(), token_code, sym, chain_kind, pubkey, amount, 0);
+   park_shadow(get_self(), token_code, sym, chain_kind, pubkey, amount, 0, principal_source::IMPORT);
    action(active_of(get_self()), LIQ_ACCOUNT, mint_action, std::make_tuple(get_self(), token_code, amount)).send();
+}
+
+void synd::logintake(intake_receipt) {
+   require_receipt_origin(get_self());
+}
+
+void synd::logrelease(release_receipt) {
+   require_receipt_origin(get_self());
+}
+
+void synd::logparked(parked_receipt) {
+   require_receipt_origin(get_self());
+}
+
+void synd::logburn(burn_receipt) {
+   require_receipt_origin(get_self());
 }
 
 } // namespace sysio
