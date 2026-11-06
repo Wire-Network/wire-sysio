@@ -187,7 +187,8 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
     * the height differs by block id or snapshot hash. A height without its own final record cannot
     * be reopened below the latest attested height after pending rows have been purged.
     *
-    * A new vote, or a retry while the tuple is pending, requires live operator standing: an ACTIVE
+    * Every vote, including a no-op vote on a final tuple, requires a registered snap_account. A new
+    * vote, or a retry while the tuple is pending, also requires live operator standing: an ACTIVE
     * PRODUCER in sysio.opreg that clears the live collateral minimum, bootstrapped exempt. Votes
     * accepted earlier keep counting.
     */
