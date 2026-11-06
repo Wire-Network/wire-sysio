@@ -223,6 +223,20 @@ inline request_id_t next_scan_start(request_id_t from, const std::vector<request
    return lowest.value_or(next);
 }
 
+/// Request ids read in id order from some id on, and whether the read stopped before the end of the table.
+struct request_id_page {
+   std::vector<request_id_t> ids;
+   bool                      more = false;   ///< rows past the last id were left unread
+};
+
+/// Where the next `sysio.bond::prune` starts after one of `limit` from `from`, given `page`, the ids from `from` read
+/// before the push: the id after the first `limit`, 0 at the end of the table, or `from` if the read was cut short.
+/// It never skips a request: erased rows only make a prune examine further, and new rows only append.
+inline request_id_t next_prune_start(request_id_t from, const request_id_page& page, uint32_t limit) {
+   if (page.ids.size() > limit) return page.ids[limit];
+   return page.more ? from : 0;
+}
+
 /// The envelope requests among `bonded` ruled INVALID, in id order: the underwriter's bond on each is forfeited.
 /// Whether the bond row is paid, or even still there, does not matter: anyone may `claim` a forfeited bond's yield,
 /// which marks it paid, and `prune` then erases the row.

@@ -213,6 +213,18 @@ BOOST_AUTO_TEST_CASE(the_scan_window_keeps_every_request_still_needed) {
    BOOST_CHECK_EQUAL(7u, next_scan_start(7, {}, {}, {}));
 }
 
+BOOST_AUTO_TEST_CASE(next_prune_start_moves_past_what_a_prune_examines) {
+   constexpr uint32_t limit = 3;
+   // More rows than one prune examines: the next one starts at the first id it leaves.
+   BOOST_CHECK_EQUAL(9u, next_prune_start(2, {.ids = {2, 4, 7, 9}, .more = true}, limit));
+   BOOST_CHECK_EQUAL(9u, next_prune_start(2, {.ids = {2, 4, 7, 9}}, limit));
+   // The prune reaches the end of the table: the next one starts over.
+   BOOST_CHECK_EQUAL(0u, next_prune_start(2, {.ids = {2, 4, 7}}, limit));
+   BOOST_CHECK_EQUAL(0u, next_prune_start(5, {}, limit));
+   // A read cut short before the id after the prune's: the next one starts where this one did.
+   BOOST_CHECK_EQUAL(4u, next_prune_start(4, {.ids = {4, 7}, .more = true}, limit));
+}
+
 BOOST_AUTO_TEST_CASE(bonded_requests_are_remembered_until_their_row_is_pruned) {
    const auto r1 = synd_request(1, eth, 1, liqeth, 10);
    const auto r2 = synd_request(2, eth, 2, liqeth, 10);
