@@ -806,15 +806,17 @@ BOOST_FIXTURE_TEST_CASE(delsnapprov_does_not_retract_an_accepted_vote, snapshot_
    BOOST_REQUIRE(get_snap_provider("snapprov1"_n).is_null());
    BOOST_REQUIRE_EQUAL(1u, snapshot_vote_count());
 
-   // The retired account is refused while the tuple is still PENDING. Asserting this after the
-   // tuple finalizes would prove nothing: an exact match against a final record returns before
-   // votesnaphash ever looks the provider up.
+   // The retired account is refused while the tuple is still PENDING.
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("snap_account is not a registered snapshot provider"),
                         votesnaphash("snapprov1"_n, block_id, snapshot_hash));
 
    // The retired producer's vote still counts toward K, so producer2 alone completes the quorum.
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, block_id, snapshot_hash));
    BOOST_REQUIRE(!getsnaphash(block_num).is_null());
+
+   // ...and once FINAL, where the tuple matches the record.
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("snap_account is not a registered snapshot provider"),
+                        votesnaphash("snapprov1"_n, block_id, snapshot_hash));
 } FC_LOG_AND_RETHROW() }
 
 /// Revocation reaches the vote: an ineligible producer rotates away from a compromised
@@ -999,6 +1001,62 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_final_tuple_retry_is_idempotent, snapshot_v
 
    BOOST_REQUIRE_EQUAL(success(), unregproducer("producer1"_n));
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, block_id, snapshot_hash));
+   BOOST_REQUIRE_EQUAL(0u, snapshot_vote_count());
+} FC_LOG_AND_RETHROW() }
+
+/// An account that is not a registered provider cannot land a no-op vote on a final tuple, though
+/// a mismatch with the record is still reported to it as a disagreement.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_final_tuple_rejects_unregistered_account, snapshot_voting_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1));
+
+   const auto block_num     = vote_block_num();
+   const auto block_id      = make_block_id(block_num);
+   const auto snapshot_hash = make_snap_hash(106);
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, block_id, snapshot_hash));
+   BOOST_REQUIRE(!getsnaphash(block_num).is_null());
+
+   BOOST_REQUIRE(get_snap_provider("snapprov2"_n).is_null());
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("snap_account is not a registered snapshot provider"),
+                        votesnaphash("snapprov2"_n, block_id, snapshot_hash));
+   // snap_hash_disagreement_error = 9001 (defined in snapshot_attest.hpp)
+   BOOST_REQUIRE_EQUAL(wasm_assert_code(9001),
+                        votesnaphash("snapprov2"_n, block_id, make_snap_hash(107)));
+} FC_LOG_AND_RETHROW() }
+
+/// A registered provider that did not vote before quorum may still vote the final tuple: a no-op that
+/// writes no vote row and earns no attestation credit.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_final_tuple_accepts_late_provider_vote, snapshot_voting_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1));
+
+   const auto block_num     = vote_block_num();
+   const auto block_id      = make_block_id(block_num);
+   const auto snapshot_hash = make_snap_hash(108);
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, block_id, snapshot_hash));
+   BOOST_REQUIRE(!getsnaphash(block_num).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, block_id, snapshot_hash));
+   BOOST_REQUIRE_EQUAL(0u, snapshot_vote_count());
+   BOOST_REQUIRE_EQUAL(0u, get_producer_info("producer2"_n)["snapshot_attestations"].as<uint32_t>());
+} FC_LOG_AND_RETHROW() }
+
+/// Standing gates only a vote that can count toward a quorum, so a registered provider whose producer
+/// has lost operator standing may still vote a final tuple.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_final_tuple_skips_standing_check, snapshot_voting_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1));
+
+   const auto block_num     = vote_block_num();
+   const auto block_id      = make_block_id(block_num);
+   const auto snapshot_hash = make_snap_hash(109);
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, block_id, snapshot_hash));
+   BOOST_REQUIRE(!getsnaphash(block_num).is_null());
+
+   terminate_operator("producer2"_n);
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, block_id, snapshot_hash));
    BOOST_REQUIRE_EQUAL(0u, snapshot_vote_count());
 } FC_LOG_AND_RETHROW() }
 
