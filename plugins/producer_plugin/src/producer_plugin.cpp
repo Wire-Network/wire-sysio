@@ -1493,6 +1493,11 @@ void producer_plugin::set_program_options(
           "Disable subjective CPU billing for all contract payer accounts. On by default: under "
           "contract-pays the payer is the called contract, so billing it for its callers' failures "
           "charges the party provisioned to absorb traffic rather than the account causing it")
+         ("disable-subjective-sysio-authorizer-billing", bpo::value<bool>()->default_value(false),
+          "Disable keeping the subjective CPU billed to the first authorizer of an action paid by a sysio.* "
+          "contract once its transaction is in a block. Kept by default: sysio.* contracts have unlimited CPU, so this "
+          "charge, read from every block and decaying over subjective-account-decay-time-minutes, is what limits "
+          "their callers to subjective-account-cpu-allowed-us plus their own CPU limit")
          ("disable-subjective-p2p-billing", bpo::value<bool>()->default_value(false),
           "Disable subjective CPU billing for P2P transactions")
          ("disable-subjective-api-billing", bpo::value<bool>()->default_value(false),
@@ -1623,8 +1628,13 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
    _disable_subjective_p2p_billing = options.at("disable-subjective-p2p-billing").as<bool>();
    _disable_subjective_api_billing = options.at("disable-subjective-api-billing").as<bool>();
    chain.get_mutable_subjective_billing().disable_payer_billing(options.at("disable-subjective-payer-billing").as<bool>());
-   dlog("disable-subjective-p2p-billing: {}, disable-subjective-api-billing: {}, disable-subjective-payer-billing: {}",
-        _disable_subjective_p2p_billing, _disable_subjective_api_billing, chain.get_subjective_billing().is_payer_billing_disabled());
+   chain.get_mutable_subjective_billing().disable_sysio_authorizer_billing(
+      options.at("disable-subjective-sysio-authorizer-billing").as<bool>());
+   dlog("disable-subjective-p2p-billing: {}, disable-subjective-api-billing: {}, disable-subjective-payer-billing: {}, "
+        "disable-subjective-sysio-authorizer-billing: {}",
+        _disable_subjective_p2p_billing, _disable_subjective_api_billing,
+        chain.get_subjective_billing().is_payer_billing_disabled(),
+        chain.get_subjective_billing().is_sysio_authorizer_billing_disabled());
    if (_disable_subjective_p2p_billing && _disable_subjective_api_billing) {
       chain.get_mutable_subjective_billing().set_disabled(true);
       ilog("Subjective CPU billing disabled");
