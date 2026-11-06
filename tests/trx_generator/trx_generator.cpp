@@ -9,6 +9,7 @@
 #include <fc/io/raw.hpp>
 #include <fmt/format.h>
 #include <regex>
+#include <span>
 
 namespace sysio::testing {
    using namespace chain::literals;
@@ -142,18 +143,54 @@ namespace sysio::testing {
       }
    }
 
-   void locate_key_words_in_action_mvo(std::vector<std::string>& acct_gen_fields_out, const fc::mutable_variant_object& action_mvo, const std::string& key_word) {
-      for (const fc::mutable_variant_object::entry& e: action_mvo) {
-         if (e.value().is_string() && e.value() == key_word) {
-            acct_gen_fields_out.push_back(e.key());
-         } else if (e.value().get_type() == fc::variant::object_type) {
-            auto inner_mvo = fc::mutable_variant_object(e.value());
-            locate_key_words_in_action_mvo(acct_gen_fields_out, inner_mvo, key_word);
+   namespace {
+      /// Appends the path of every string under `node` equal to `key_word`; `path` leads from the action to `node`.
+      void locate_key_words(std::vector<key_word_path>& paths_out, const fc::variant& node, const std::string& key_word,
+                            key_word_path& path) {
+         if (node.is_string()) {
+            if (node.get_string() == key_word)
+               paths_out.push_back(path);
+         } else if (node.is_object()) {
+            for (const auto& e : node.get_object()) {
+               path.emplace_back(e.key());
+               locate_key_words(paths_out, e.value(), key_word, path);
+               path.pop_back();
+            }
+         } else if (node.is_array()) {
+            const auto& elements = node.get_array();
+            for (size_t i = 0; i < elements.size(); ++i) {
+               path.emplace_back(i);
+               locate_key_words(paths_out, elements[i], key_word, path);
+               path.pop_back();
+            }
          }
       }
+
+      /// Returns a copy of `node` with the field at `path` set to `replacement`.
+      fc::variant replace_at_path(const fc::variant& node, std::span<const key_word_path_step> path,
+                                  const std::string& replacement) {
+         if (path.empty())
+            return fc::variant(replacement);
+         return std::visit(chain::overloaded{
+            [&](const std::string& key) {
+               fc::mutable_variant_object object(node.get_object());
+               object.set(key, replace_at_path(object[key], path.subspan(1), replacement));
+               return fc::variant(std::move(object));
+            },
+            [&](size_t index) {
+               fc::variants elements = node.get_array();
+               elements.at(index) = replace_at_path(elements.at(index), path.subspan(1), replacement);
+               return fc::variant(std::move(elements));
+            }}, path.front());
+      }
+   } // namespace
+
+   void locate_key_words_in_action_mvo(std::vector<key_word_path>& acct_gen_fields_out, const fc::mutable_variant_object& action_mvo, const std::string& key_word) {
+      key_word_path path;
+      locate_key_words(acct_gen_fields_out, fc::variant(action_mvo), key_word, path);
    }
 
-   void locate_key_words_in_action_array(std::map<int, std::vector<std::string>>& acct_gen_fields_out, const fc::variants& action_array, const std::string& key_word) {
+   void locate_key_words_in_action_array(std::map<int, std::vector<key_word_path>>& acct_gen_fields_out, const fc::variants& action_array, const std::string& key_word) {
       for (size_t i = 0; i < action_array.size(); ++i) {
          auto action_mvo = fc::mutable_variant_object(action_array[i]);
          locate_key_words_in_action_mvo(acct_gen_fields_out[i], action_mvo, key_word);
@@ -163,30 +200,24 @@ namespace sysio::testing {
       }
    }
 
-   void update_key_word_fields_in_sub_action(const std::string& key, fc::mutable_variant_object& action_mvo, const std::string& action_inner_key,
-                                                            const std::string& key_word) {
-      if (action_mvo.find(action_inner_key) != action_mvo.end()) {
-         const auto& inner = action_mvo[action_inner_key].get_object();
-         if (inner.find(key) != inner.end()) {
-            fc::mutable_variant_object inner_mvo = fc::mutable_variant_object(inner);
-            inner_mvo.set(key, key_word);
-            action_mvo.set(action_inner_key, std::move(inner_mvo));
-         }
+   void update_key_word_fields_in_action(const std::vector<key_word_path>& acct_gen_fields, fc::mutable_variant_object& action_mvo, const std::string& replacement) {
+      for (const auto& path : acct_gen_fields) {
+         action_mvo = fc::mutable_variant_object(replace_at_path(fc::variant(action_mvo), path, replacement));
       }
    }
 
-   void update_key_word_fields_in_action(std::vector<std::string>& acct_gen_fields, fc::mutable_variant_object& action_mvo, const std::string& key_word) {
-      for (const auto& key: acct_gen_fields) {
-         if (action_mvo.find(key) != action_mvo.end()) {
-            action_mvo.set(key, key_word);
-         } else {
-            for (const auto& e: action_mvo) {
-               if (e.value().get_type() == fc::variant::object_type) {
-                  update_key_word_fields_in_sub_action(key, action_mvo, e.key(), key_word);
-               }
-            }
-         }
+   std::string key_word_path_to_string(const key_word_path& path) {
+      std::string out;
+      for (const auto& step : path) {
+         std::visit(chain::overloaded{
+            [&](const std::string& key) {
+               if (!out.empty())
+                  out += '.';
+               out += key;
+            },
+            [&](size_t index) { out += fmt::format("[{}]", index); }}, step);
       }
+      return out;
    }
 
    void trx_generator::update_resign_transaction(chain::signed_transaction& trx, const fc::crypto::private_key& priv_key, uint64_t& nonce_prefix, uint64_t& nonce,
@@ -268,8 +299,10 @@ namespace sysio::testing {
 
       if (!_acct_gen_fields.empty()) {
          ilog("Located the following account names that need to be generated and populated in each transaction:");
-         for (const auto& e: _acct_gen_fields) {
-            ilog("acct_gen_fields entry: {}", e);
+         for (const auto& [action_index, paths] : _acct_gen_fields) {
+            for (const auto& path : paths) {
+               ilog("acct_gen_fields entry: action {} field {}", action_index, key_word_path_to_string(path));
+            }
          }
          ilog("Priming name generator for trx generator prefix.");
          _acct_name_generator.setPrefix(_config._generator_id);

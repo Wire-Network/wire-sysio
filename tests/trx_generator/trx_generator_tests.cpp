@@ -19,6 +19,7 @@
 #include <fstream>
 #include <future>
 #include <optional>
+#include <set>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -722,6 +723,26 @@ constexpr std::string_view transfer_abi =
    R"({"name":"from","type":"name"},{"name":"to","type":"name"},{"name":"quantity","type":"asset"},)"
    R"({"name":"memo","type":"string"}]}],"actions":[{"name":"transfer","type":"transfer","ricardian_contract":""}],)"
    R"("tables":[],"ricardian_clauses":[],"variants":[],"action_results":[]})";
+constexpr std::string_view nested_abi =
+   R"({"version":"sysio::abi/1.2","types":[],"structs":[)"
+   R"({"name":"payload","base":"","fields":[{"name":"memo","type":"string"}]},)"
+   R"({"name":"nested","base":"","fields":[{"name":"from","type":"name"},{"name":"payload","type":"payload"},)"
+   R"({"name":"memos","type":"string[]"},{"name":"payloads","type":"payload[]"}]}],)"
+   R"("actions":[{"name":"nested","type":"nested","ricardian_contract":""}],)"
+   R"("tables":[],"ricardian_clauses":[],"variants":[],"action_results":[]})";
+constexpr std::string_view replacement_name = "1a1111111112";
+
+/// Writes `abi` to `dir` and returns the file's path.
+std::string write_abi_file(const fc::temp_directory& dir, std::string_view abi) {
+   const std::string abi_file = (dir.path() / "test.abi").string();
+   std::ofstream(abi_file) << abi;
+   return abi_file;
+}
+
+/// Whether the placeholder text survives anywhere in packed action data.
+bool contains_key_word(const chain::bytes& data) {
+   return std::string_view(data.data(), data.size()).find(acct_per_trx_key_word) != std::string_view::npos;
+}
 
 /// Generator config with the sysio.noop nonce action switched on or off.
 trx_generator_base_config noop_nonce_test_config(bool noop_nonce) {
@@ -778,8 +799,7 @@ BOOST_AUTO_TEST_CASE(noop_nonce_action_is_optional)
 BOOST_AUTO_TEST_CASE(noop_nonce_off_requires_acct_per_trx)
 {
    fc::temp_directory dir;
-   const std::string abi_file = (dir.path() / "transfer.abi").string();
-   std::ofstream(abi_file) << transfer_abi;
+   const std::string abi_file = write_abi_file(dir, transfer_abi);
    const std::string action_auths =
       fc::json::to_string(fc::mutable_variant_object()(std::string(noop_nonce_test_sender), noop_nonce_test_priv_key),
                           fc::time_point::maximum());
@@ -803,6 +823,78 @@ BOOST_AUTO_TEST_CASE(noop_nonce_off_requires_acct_per_trx)
    generator.update_resign_transaction(trx._trx, trx._signer, generator._nonce_prefix, generator._nonce,
                                        tg_config._trx_expiration_us, tg_config._chain_id, tg_config._last_irr_block_id);
    BOOST_TEST(trx._trx.context_free_actions.empty());
+   BOOST_TEST(trx._trx.actions.front().data != first_data);
+   generator._provider.teardown();
+}
+
+/// Placeholders are found and replaced at any depth, inside objects and arrays, leaving other fields alone.
+BOOST_AUTO_TEST_CASE(key_word_paths_reach_nested_objects_and_arrays)
+{
+   const fc::variant key_word{acct_per_trx_key_word};
+   const auto action = fc::mutable_variant_object()
+      ("actionName", "nested")
+      ("actionData", fc::mutable_variant_object()
+         ("from", key_word)
+         ("payload", fc::mutable_variant_object()("memo", key_word)("note", fixed_memo))
+         ("memos", fc::variants{key_word, fc::variant(fixed_memo)})
+         ("payloads", fc::variants{fc::variant(fc::mutable_variant_object()("memo", key_word))}));
+
+   std::vector<key_word_path> paths;
+   locate_key_words_in_action_mvo(paths, action, std::string(acct_per_trx_key_word));
+   std::set<std::string> rendered;
+   for (const auto& path : paths)
+      rendered.insert(key_word_path_to_string(path));
+   BOOST_TEST(rendered == (std::set<std::string>{"actionData.from", "actionData.payload.memo", "actionData.memos[0]",
+                                                 "actionData.payloads[0].memo"}),
+              boost::test_tools::per_element());
+
+   auto updated = action;
+   update_key_word_fields_in_action(paths, updated, std::string(replacement_name));
+   const auto& data = updated["actionData"].get_object();
+   BOOST_TEST(data["from"].as_string() == replacement_name);
+   BOOST_TEST(data["payload"]["memo"].as_string() == replacement_name);
+   BOOST_TEST(data["payload"]["note"].as_string() == fixed_memo);
+   BOOST_TEST(data["memos"].get_array().at(0).as_string() == replacement_name);
+   BOOST_TEST(data["memos"].get_array().at(1).as_string() == fixed_memo);
+   BOOST_TEST(data["payloads"].get_array().at(0)["memo"].as_string() == replacement_name);
+
+   std::vector<key_word_path> remaining;
+   locate_key_words_in_action_mvo(remaining, updated, std::string(acct_per_trx_key_word));
+   BOOST_TEST(remaining.empty());
+}
+
+/// Without the nonce action, placeholders in nested structs and arrays still make every transaction unique.
+BOOST_AUTO_TEST_CASE(noop_nonce_off_substitutes_nested_placeholders)
+{
+   fc::temp_directory dir;
+   const std::string abi_file = write_abi_file(dir, nested_abi);
+   const std::string action_auths =
+      fc::json::to_string(fc::mutable_variant_object()(std::string(noop_nonce_test_sender), noop_nonce_test_priv_key),
+                          fc::time_point::maximum());
+   const fc::variant key_word{acct_per_trx_key_word};
+   const std::string actions_data = fc::json::to_string(fc::variants{fc::mutable_variant_object()
+      ("actionName", "nested")
+      ("actionAuthAcct", noop_nonce_test_sender)
+      ("actionData", fc::mutable_variant_object()
+         ("from", noop_nonce_test_sender)
+         ("payload", fc::mutable_variant_object()("memo", key_word))
+         ("memos", fc::variants{key_word})
+         ("payloads", fc::variants{fc::variant(fc::mutable_variant_object()("memo", key_word))}))
+      ("authorization", fc::mutable_variant_object()("actor", noop_nonce_test_sender)("permission", "active"))},
+      fc::time_point::maximum());
+   const provider_base_config p_config{"http", "127.0.0.1", get_port(port_category::node_http)};
+   const auto tg_config = noop_nonce_test_config(false);
+
+   trx_generator generator{tg_config, p_config, {abi_file, actions_data, action_auths}};
+   BOOST_REQUIRE(generator.setup());
+   BOOST_REQUIRE_EQUAL(generator._acct_gen_fields.at(0).size(), 3u);
+   auto& trx = generator._trxs.front();
+   BOOST_TEST(!contains_key_word(trx._trx.actions.front().data));
+
+   const auto first_data = trx._trx.actions.front().data;
+   generator.update_resign_transaction(trx._trx, trx._signer, generator._nonce_prefix, generator._nonce,
+                                       tg_config._trx_expiration_us, tg_config._chain_id, tg_config._last_irr_block_id);
+   BOOST_TEST(!contains_key_word(trx._trx.actions.front().data));
    BOOST_TEST(trx._trx.actions.front().data != first_data);
    generator._provider.teardown();
 }
