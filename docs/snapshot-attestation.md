@@ -210,8 +210,9 @@ Operators must restart provider and serving nodes after a change so they adopt t
 snapshot bootstrap checks the loaded height against its own pre-replay configuration. The post-replay
 value is then cached for the running node. Already-attested records remain discoverable after cadence changes.
 
-A producer may retry a pending tuple idempotently while it keeps its operator standing (retrying a
-finalized tuple is a no-op while its height remains eligible under the current cadence), and may vote at
+A producer may retry a pending tuple idempotently while it keeps its operator standing (a vote from a
+registered provider on a finalized tuple is a no-op while its height remains eligible under the current
+cadence; any other account is rejected), and may vote at
 multiple scheduled heights, but cannot submit two
 different tuples at one height. Registration and producer-status churn never removes an accepted
 vote.
