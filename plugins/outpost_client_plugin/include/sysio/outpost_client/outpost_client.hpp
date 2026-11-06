@@ -104,9 +104,10 @@ public:
     * @param deadline        Upper bound on the total time spent talking to the
     *                        remote chain for this call.
     * @return Chain-native transaction id / signature suitable for logs, or
-    *         EMPTY when the relay found nothing to send and the epoch counts
-    *         as handled (the outpost had already finalized it, or it settled
-    *         on another relay's envelope).
+    *         EMPTY when the relay found nothing to send (the outpost had already
+    *         settled it, or it settled on another relay's envelope). Neither a
+    *         signature nor an empty return permanently marks the job complete:
+    *         it retries with backoff until inbound delivery establishes completion.
     * @throws chain::outpost_delivery_incomplete_exception when the epoch is
     *         left open for THIS relay to finish on a later tick; the job does
     *         not mark it handled.
