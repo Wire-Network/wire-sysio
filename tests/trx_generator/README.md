@@ -77,8 +77,8 @@ Instructions and examples for running `trx_generator` to create transactions wit
 
 Each transaction normally carries a context-free `sysio.noop::nonce` action so repeated actions stay unique. Deployed
 chains keep `sysio.noop` without a contract, so a top-level action to it fails there. Against such a chain pass
-`--noop-nonce false` and put `ACCT_PER_TRX` in a free-form field, such as a transfer memo, to make each transaction
-unique:
+`--noop-nonce false` and put `ACCT_PER_TRX` in a free-form field the action's ABI defines, such as a transfer memo,
+to make each transaction unique. Setup refuses actions data whose placeholders leave the serialized actions unchanged:
 
 ```json
 [{"actionName": "transfer", "actionAuthAcct": "alice",

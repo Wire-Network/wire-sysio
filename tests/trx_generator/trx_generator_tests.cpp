@@ -756,12 +756,12 @@ trx_generator_base_config noop_nonce_test_config(bool noop_nonce) {
 }
 
 /// One transfer from the test sender with the given memo, as trx_generator actions data.
-std::string transfer_actions_data(std::string_view memo) {
+std::string transfer_actions_data(std::string_view memo, const fc::mutable_variant_object& extra_data = {}) {
    return fc::json::to_string(fc::variants{fc::mutable_variant_object()
       ("actionName", "transfer")
       ("actionAuthAcct", noop_nonce_test_sender)
       ("actionData", fc::mutable_variant_object()("from", noop_nonce_test_sender)("to", noop_nonce_test_receiver)
-                                                 ("quantity", noop_nonce_test_quantity)("memo", memo))
+                                                 ("quantity", noop_nonce_test_quantity)("memo", memo)(extra_data))
       ("authorization", fc::mutable_variant_object()("actor", noop_nonce_test_sender)("permission", "active"))},
       fc::time_point::maximum());
 }
@@ -810,6 +810,15 @@ BOOST_AUTO_TEST_CASE(noop_nonce_off_requires_acct_per_trx)
    {
       trx_generator generator{tg_config, p_config, {abi_file, transfer_actions_data(fixed_memo), action_auths}};
       BOOST_TEST(!generator.setup());
+   }
+
+   // A placeholder in a field the ABI does not define is dropped by serialization, so setup refuses it too.
+   {
+      const auto ignored_field = fc::mutable_variant_object()("nonce", acct_per_trx_key_word);
+      trx_generator generator{tg_config, p_config,
+                              {abi_file, transfer_actions_data(fixed_memo, ignored_field), action_auths}};
+      BOOST_TEST(!generator.setup());
+      BOOST_TEST(generator._acct_gen_fields.at(0).size() == 1u);
    }
 
    trx_generator generator{tg_config, p_config,

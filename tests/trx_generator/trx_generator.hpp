@@ -249,6 +249,9 @@ namespace sysio::testing {
 
 
       std::vector<sysio::chain::action> generate_actions();
+      /// Whether the placeholders change the serialized actions from one transaction to the next. A placeholder in a
+      /// field the ABI does not define is dropped by serialization, so it cannot make transactions unique.
+      bool acct_gen_fields_change_actions();
       virtual void update_resign_transaction(sysio::chain::signed_transaction& trx, const fc::crypto::private_key& priv_key, uint64_t& nonce_prefix, uint64_t& nonce,
                                      const fc::microseconds& trx_expiration, const sysio::chain::chain_id_type& chain_id, const sysio::chain::block_id_type& last_irr_block_id);
 

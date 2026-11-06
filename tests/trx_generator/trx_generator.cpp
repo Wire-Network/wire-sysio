@@ -220,6 +220,13 @@ namespace sysio::testing {
       return out;
    }
 
+   bool trx_generator::acct_gen_fields_change_actions() {
+      if (_acct_gen_fields.empty()) {
+         return false;
+      }
+      return fc::raw::pack(generate_actions()) != fc::raw::pack(generate_actions());
+   }
+
    void trx_generator::update_resign_transaction(chain::signed_transaction& trx, const fc::crypto::private_key& priv_key, uint64_t& nonce_prefix, uint64_t& nonce,
                                                  const fc::microseconds& trx_expiration, const chain::chain_id_type& chain_id, const chain::block_id_type& last_irr_block_id) {
       trx.actions.clear();
@@ -291,12 +298,6 @@ namespace sysio::testing {
                      });
       locate_key_words_in_action_array(_acct_gen_fields, action_array, std::string(acct_per_trx_key_word));
 
-      if (!_config._noop_nonce && _acct_gen_fields.empty()) {
-         elog("Without the sysio.noop nonce action, the actions data needs an {} field so each transaction is unique.",
-              acct_per_trx_key_word);
-         return false;
-      }
-
       if (!_acct_gen_fields.empty()) {
          ilog("Located the following account names that need to be generated and populated in each transaction:");
          for (const auto& [action_index, paths] : _acct_gen_fields) {
@@ -306,6 +307,12 @@ namespace sysio::testing {
          }
          ilog("Priming name generator for trx generator prefix.");
          _acct_name_generator.setPrefix(_config._generator_id);
+      }
+
+      if (!_config._noop_nonce && !acct_gen_fields_change_actions()) {
+         elog("Without the sysio.noop nonce action, the actions data needs an {} field that the ABI serializes, "
+              "so each transaction is unique.", acct_per_trx_key_word);
+         return false;
       }
 
       ilog("Setting up transaction signer.");
