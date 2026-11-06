@@ -29,6 +29,9 @@ constexpr uint32_t expected_error_log_count = 1;
 /// Default delivery budget in milliseconds.
 constexpr auto delivery_timeout_option = "batch-delivery-timeout-ms";
 constexpr uint32_t expected_delivery_timeout_ms = 60'000;
+/// Whether each role's account pays for its own pushes.
+constexpr auto relay_explicit_payer_option       = "batch-operator-explicit-payer";
+constexpr auto underwriter_explicit_payer_option = "batch-underwriter-explicit-payer";
 
 namespace callback_lifetime_action {
 constexpr auto contract = "sysio.system";
@@ -62,6 +65,8 @@ BOOST_AUTO_TEST_CASE(plugin_options_are_registered) try {
    BOOST_CHECK(option_names.count("batch-yield-tick-interval-ms") > 0);
    BOOST_CHECK(option_names.count("batch-kick-crank") > 0);
    BOOST_CHECK(option_names.count("batch-kick-interval-ms") > 0);
+   BOOST_CHECK(option_names.count(relay_explicit_payer_option) > 0);
+   BOOST_CHECK(option_names.count(underwriter_explicit_payer_option) > 0);
    // Configuring batch-operator-account is what enables the relay. A separate
    // enable flag would let an operator set the account and still relay nothing,
    // which is indistinguishable from a healthy node until the group misses an epoch.
@@ -92,6 +97,9 @@ BOOST_AUTO_TEST_CASE(default_options_are_correct) try {
    // pool no faster than the tickyield crank ticks one.
    BOOST_CHECK(vm["batch-kick-crank"].as<bool>());
    BOOST_CHECK_EQUAL(vm["batch-kick-interval-ms"].as<uint32_t>(), 60000u);
+   // Each pushed action's contract pays unless a role's account is set up to pay for itself.
+   BOOST_CHECK(!vm[relay_explicit_payer_option].as<bool>());
+   BOOST_CHECK(!vm[underwriter_explicit_payer_option].as<bool>());
    // No default account: an unconfigured node leaves the relay off.
    BOOST_CHECK_EQUAL(vm.count("batch-operator-account"), 0u);
 } FC_LOG_AND_RETHROW();

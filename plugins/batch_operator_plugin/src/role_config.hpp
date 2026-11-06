@@ -1,8 +1,8 @@
 #pragma once
 /**
  * @file role_config.hpp
- * @brief Parsing of the batch-operator plugin's role options and the choice of the key a role signs with. Pure
- *        functions, so the plugin's tests drive them without a node.
+ * @brief Parsing of the batch-operator plugin's role options, the choice of the key a role signs with, and the
+ *        authorization it declares. Pure functions, so the plugin's tests drive them without a node.
  */
 
 #include <cstddef>
@@ -43,6 +43,27 @@ inline std::map<chain::symbol_code, chain::asset> parse_exposure_caps(const std:
                 "exposure cap names {} more than once", cap.get_symbol().name());
    }
    return caps;
+}
+
+/// Who pays the CPU and NET of the actions a role pushes.
+enum class action_payer {
+   contract,   ///< each action's contract, the chain's default
+   account,    ///< the role's own account, declared as the explicit payer
+};
+
+/// The authorization a role declares on each action it pushes: `level`, preceded by the `sysio.payer` marker of
+/// its account when the account pays. The chain requires the marker first and paired with a real permission of the
+/// same actor, so `level`'s signature is all the transaction needs.
+inline std::vector<chain::permission_level> declared_authorization(const chain::permission_level& level,
+                                                                   action_payer                   payer) {
+   if (payer == action_payer::contract) return {level};
+   return {{level.actor, chain::config::sysio_payer_name}, level};
+}
+
+/// Whether an account with these resource weights has CPU and NET to pay with: zero gives it none, negative is
+/// unlimited.
+inline bool has_own_resources(int64_t net_weight, int64_t cpu_weight) {
+   return net_weight != 0 && cpu_weight != 0;
 }
 
 /// A depot action a role pushes.
