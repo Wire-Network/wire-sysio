@@ -744,7 +744,7 @@ namespace sysio::chain {
          int64_t delta_per_action = (( total_cpu_time_us - trace->total_cpu_usage_us ) / billed_cpu_us.size()) + 1;
          total_cpu_time_us = 0;
          const bool subjectively_bill_payer_disabled = control.get_subjective_billing().is_payer_billing_disabled();
-         const transaction& trx = packed_trx.get_transaction();
+         const auto trx_first_authorizer = packed_trx.get_transaction().first_authorizer(); // used if action has no authorizer
          for (size_t i = 0; i < billed_cpu_us.size(); ++i) {
             auto& b = billed_cpu_us[i];
             // if exception thrown, action_traces may not be the same size as billed_cpu_us
@@ -756,7 +756,8 @@ namespace sysio::chain {
                auto payer = act_trace.act.payer();
                accounts_billing[payer].cpu_usage_us += b.value;
                if (bill_subjectively) {
-                  const account_name first_auth = subjective_billing::billed_authorizer(act_trace.act, trx);
+                  const account_name first_auth =
+                     subjective_billing::billed_authorizer(act_trace.act, trx_first_authorizer);
                   // validate_referenced_accounts rejects non-read-only, non-implicit trxs with zero
                   // auths (tx_no_auths), so first_auth must be populated by here on the subjective path.
                   assert(!first_auth.empty());

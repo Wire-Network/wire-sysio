@@ -802,16 +802,17 @@ BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_billing_actions_test ) {
 
    subjective_billing sub_bill;
    signed_transaction trx = make_trx( {
+      make_action( sysio_token, {} ),                                                                // 5 us to alice
       make_action( sysio_token, {{alice, config::active_name}} ),                                   // 20 us to alice
       make_action( sysio_token, {{erin, config::sysio_payer_name}, {erin, config::active_name}} ),   // erin pays
       make_action( "token"_n, {{alice, config::active_name}} ),                                      // token pays
       make_action( sysio_token, {{erin, config::active_name}} ),                                     // 160 us to erin
    }, 1 );
-   // A context-free action has no authorizer, so its sysio.* CPU goes to the transaction's first authorizer.
+   // An action without authorization, like a context-free action, bills the transaction's first authorizer.
    trx.context_free_actions.emplace_back( make_action( sysio_token, {} ) );                          // 10 us to alice
 
-   sub_bill.on_block( log, make_block( now, {{ trx, {10, 20, 40, 80, 160} }} ), now );
-   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).count() == 10 + 20 );
+   sub_bill.on_block( log, make_block( now, {{ trx, {10, 5, 20, 40, 80, 160} }} ), now );
+   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).count() == 10 + 5 + 20 );
    BOOST_TEST( sub_bill.get_subjective_bill( erin, now ).count() == 160 );
 }
 
@@ -841,22 +842,37 @@ BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_billing_block_age_test ) {
    fc::logger log;
    const account_name alice = "alice"_n;
    const auto now = sysio_paid_now;
-   const auto block_for = [&]( fc::time_point time, uint16_t nonce ) {
-      return make_block( time, {{ make_trx( {make_action( "sysio.token"_n, {{alice, config::active_name}} )}, nonce ),
-                                  {1000} }} );
-   };
+   const auto block = make_block( now, {
+      { make_trx( {make_action( "sysio.token"_n, {{alice, config::active_name}} )}, 1 ), {1000} },
+   } );
 
-   subjective_billing sub_bill;
-   const auto window = decay_window( sub_bill );
+   subjective_billing live_bill;
+   const auto window = decay_window( live_bill );
+   const auto half = fc::microseconds( window.count() / 2 );
+   const auto three_quarters = fc::microseconds( window.count() * 3 / 4 );
+   live_bill.on_block( log, block, now );
 
-   // A node applying a block late, e.g. while syncing, charges only what is left after the block's age.
-   sub_bill.on_block( log, block_for( now - fc::microseconds( window.count() / 2 ), 1 ), now );
-   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).count() == 500 );
+   // A node applying the block half a window late, e.g. while syncing, holds the same charge from then on as the
+   // node that applied it live: the charge decays from the block's time.
+   subjective_billing late_bill;
+   late_bill.on_block( log, block, now + half );
+   BOOST_TEST( late_bill.get_subjective_bill( alice, now + half ).count() == 500 );
+   for( const auto time : {now + half, now + three_quarters, now + window} ) {
+      BOOST_TEST( late_bill.get_subjective_bill( alice, time ).count() ==
+                  live_bill.get_subjective_bill( alice, time ).count() );
+   }
+   BOOST_TEST( late_bill.get_subjective_bill( alice, now + window ).count() == 0 );
+
+   // A charge older than the account's last update is decayed to that update first.
+   subjective_billing updated_bill;
+   updated_bill.subjective_bill_failure( {}, {{alice, fc::microseconds( 1000 )}}, now + half );
+   updated_bill.on_block( log, block, now + half );
+   BOOST_TEST( updated_bill.get_subjective_bill( alice, now + half ).count() == 1000 + 500 );
 
    // A block older than the decay window charges nothing.
    subjective_billing old_bill;
-   old_bill.on_block( log, block_for( now - window, 2 ), now );
-   BOOST_TEST( old_bill.get_subjective_bill( alice, now ).count() == 0 );
+   old_bill.on_block( log, block, now + window );
+   BOOST_TEST( old_bill.get_subjective_bill( alice, now + window ).count() == 0 );
    BOOST_TEST( old_bill.get_account_cache_size() == 0u );
 }
 

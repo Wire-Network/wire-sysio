@@ -131,18 +131,31 @@ private:
    }
 
    /**
+    * Adds `units` charged at `ordinal`, so they decay from that time rather than from when this node learned of them.
+    * The accumulator holds one timeline, so a charge older than its last update is first decayed to that update.
+    */
+   void add_dated_charge( decaying_accumulator& accumulator, uint64_t units, uint32_t ordinal ) const {
+      const uint32_t window = _expired_accumulator_average_window;
+      if( accumulator.last_ordinal > ordinal ) {
+         const uint32_t age = accumulator.last_ordinal - ordinal;
+         if( age >= window ) return;
+         units = units * ( window - age ) / window;
+      }
+      accumulator.add( units, ordinal, window );
+   }
+
+   /**
     * Charges the billed CPU of each sysio.*-paid action in `block` to its authorizer, where it decays like a
     * failure. Reading it from the block counts every included transaction on every node, including ones this node
-    * never executed and ones in blocks it produced. The charge is reduced by the block's age, so a node syncing old
-    * blocks charges only what is left of their usage, and a block older than the decay window costs one check.
-    * A transaction re-included after a fork switch is charged again.
+    * never executed and ones in blocks it produced. The charge is dated at the block's time, so a node applying a
+    * block late, e.g. while syncing, holds the same charge from then on as a node that applied it live, and a block
+    * older than the decay window costs one check. A transaction re-included after a fork switch is charged again.
     * @return the number of actions charged
     */
    uint32_t bill_sysio_paid_authorizers( const chain::signed_block& block, uint32_t time_ordinal ) {
       const uint32_t block_time_ordinal = time_ordinal_for( block.timestamp.to_time_point() );
       const uint32_t block_age = time_ordinal > block_time_ordinal ? time_ordinal - block_time_ordinal : 0;
       if( block_age >= _expired_accumulator_average_window ) return 0;
-      const uint64_t remaining_window = _expired_accumulator_average_window - block_age;
 
       uint32_t charged = 0;
       for( const auto& receipt : block.transactions ) {
@@ -150,16 +163,16 @@ private:
          // Checked against the transaction when the block was applied.
          assert( receipt.cpu_usage_us.size() == trx.total_actions() );
          if( receipt.cpu_usage_us.size() != trx.total_actions() ) continue;
+         const account_name trx_first_authorizer = trx.first_authorizer();
          std::array all_actions = {std::views::all(trx.context_free_actions), std::views::all(trx.actions)};
          size_t action_index = 0;
          for( const auto& act : std::views::join(all_actions) ) {
             const uint64_t cpu_us = receipt.cpu_usage_us[action_index++].value;
-            const account_name authorizer = billed_authorizer( act, trx );
+            const account_name authorizer = billed_authorizer( act, trx_first_authorizer );
             if( !is_sysio_paid_authorizer( act.payer(), authorizer ) || _disabled_accounts.contains( authorizer ) )
                continue;
-            const uint64_t bill = cpu_us * remaining_window / _expired_accumulator_average_window;
-            _account_subjective_bill_cache[authorizer].expired_accumulator.add(
-               bill, time_ordinal, _expired_accumulator_average_window );
+            add_dated_charge( _account_subjective_bill_cache[authorizer].expired_accumulator, cpu_us,
+                              block_time_ordinal );
             ++charged;
          }
       }
@@ -189,12 +202,13 @@ public: // public for tests
 
 public:
    /**
-    * The account an action's CPU is subjectively billed to as its authorizer: the action's first authorizer, or the
-    * transaction's first authorizer for an action without authorization (a context-free action).
+    * The account an action's CPU is subjectively billed to as its authorizer: the action's first authorizer, or, for
+    * an action without authorization, `trx_first_authorizer`, the transaction's first authorizer. Callers look that
+    * up once per transaction: transaction::first_authorizer() scans the actions.
     */
-   static account_name billed_authorizer( const action& act, const transaction& trx ) {
+   static account_name billed_authorizer( const action& act, const account_name& trx_first_authorizer ) {
       const account_name first_authorizer = act.first_authorizer();
-      return first_authorizer.empty() ? trx.first_authorizer() : first_authorizer;
+      return first_authorizer.empty() ? trx_first_authorizer : first_authorizer;
    }
 
    /**
