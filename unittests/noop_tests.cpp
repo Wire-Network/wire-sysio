@@ -62,4 +62,48 @@ BOOST_FIXTURE_TEST_CASE(noop, sysio::testing::validating_tester) { try {
 
 } FC_LOG_AND_RETHROW() }
 
+// Deployed chains leave sysio.noop without a contract so nobody can push free no-op transactions, while contracts may
+// notify it or send it inline actions as events. Those are billed to the originating action's payer, not sysio.noop.
+BOOST_FIXTURE_TEST_CASE(inline_and_notify_to_account_without_contract, sysio::testing::validating_tester) { try {
+   constexpr auto source = "alice"_n;
+   constexpr auto noop   = "sysio.noop"_n;
+   create_accounts({source, noop});
+   set_code(source, test_contracts::action_order_test_wasm());
+   set_abi(source, test_contracts::action_order_test_abi());
+   produce_block();
+
+   // A transaction sent straight to sysio.noop is rejected.
+   {
+      signed_transaction trx;
+      trx.actions.emplace_back(vector<permission_level>{{noop, config::active_name}}, noop, "noop"_n, bytes{});
+      set_transaction_headers(trx);
+      trx.sign(get_private_key(noop, "active"), control->get_chain_id());
+      BOOST_CHECK_EXCEPTION(push_transaction(trx), action_validate_exception,
+                            fc_exception_message_is("No contract for action noop on account sysio.noop"));
+   }
+
+   // Leave sysio.noop no CPU or NET, so billing it anything would fail the transaction.
+   auto& rlm = control->get_mutable_resource_limits_manager();
+   int64_t ram_bytes = 0, net_weight = 0, cpu_weight = 0;
+   rlm.get_account_limits(noop, ram_bytes, net_weight, cpu_weight);
+   rlm.set_account_limits(noop, ram_bytes, 0, 0, false);
+   produce_block();
+   const auto& limits = control->get_resource_limits_manager();
+   BOOST_REQUIRE_EQUAL(limits.get_account_cpu_limit_ex(noop).first.max, 0);
+   BOOST_REQUIRE_EQUAL(limits.get_account_net_limit_ex(noop).first.max, 0);
+
+   // mixedord notifies obs, sends a context-free inline to cfat and a regular inline to inlt.
+   auto trace = push_action(source, "mixedord"_n, source,
+                            mutable_variant_object()("obs", noop)("inlt", noop)("cfat", noop));
+   BOOST_REQUIRE(trace->receipt);
+
+   const auto reached_noop = std::ranges::count_if(trace->action_traces, [&](const action_trace& at) {
+      return at.receiver == noop && at.receipt.has_value();
+   });
+   BOOST_TEST(reached_noop == 3);
+
+   BOOST_TEST(limits.get_account_cpu_limit_ex(noop).first.used == 0);
+   BOOST_TEST(limits.get_account_net_limit_ex(noop).first.used == 0);
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_SUITE_END()
