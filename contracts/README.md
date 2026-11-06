@@ -22,9 +22,9 @@ The collection of system contracts consists of the following individual contract
 
 ## Depot flow tests
 
-See [Depot flow coverage](tests/DEPOT_FLOW_TESTING.md) for the native mirrors of
-all enabled cluster flows, the generic external-chain simulator, deterministic
-action sequences, and focused/full validation commands.
+See [Depot flow tests](tests/DEPOT_FLOW_TESTING.md) for the native contract test
+layers, the generic external-chain simulator, deterministic action sequences,
+and governance settlement parity.
 
 ## Branches
 

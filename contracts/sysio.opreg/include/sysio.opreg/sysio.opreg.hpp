@@ -398,6 +398,13 @@ namespace sysio {
          uint64_t by_type()   const { return magic_enum::enum_integer(type); }
          uint64_t by_status() const { return magic_enum::enum_integer(status); }
 
+         /// Whether the operator has entered a permanent punishment or removal state (SLASHED or
+         /// TERMINATED) that collateral changes must never reverse.
+         bool has_terminal_status() const {
+            return status == opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED ||
+                   status == opp::types::OperatorStatus::OPERATOR_STATUS_TERMINATED;
+         }
+
          SYSLIB_SERIALIZE(operator_entry,
             (account)(type)(status)(is_bootstrapped)(balances)
             (registered_at)(available_at)(updated_at)(terminated_at)

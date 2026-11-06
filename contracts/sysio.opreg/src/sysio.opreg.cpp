@@ -459,19 +459,12 @@ find_balance(const opreg::operator_entry& op,
    return nullptr;
 }
 
-/// Return true when the operator has entered a permanent punishment or
-/// removal state that collateral changes must never reverse.
-bool has_terminal_status(OperatorStatus status) {
-   return status == OperatorStatus::OPERATOR_STATUS_SLASHED ||
-          status == OperatorStatus::OPERATOR_STATUS_TERMINATED;
-}
-
 /// Compute available balance for a given (op, chain, token). The single
 /// rollup formula: balance - sum(pending withdraws),
 /// gated by status. Slashed / terminated operators read as zero.
 uint64_t available_inline(const opreg::operator_entry& op,
                           sysio::slug_name chain_code, sysio::slug_name token_code) {
-   if (has_terminal_status(op.status)) {
+   if (op.has_terminal_status()) {
       return 0;
    }
    const auto* bal = find_balance(op, chain_code, token_code);
@@ -1049,7 +1042,7 @@ void reevaluate_eligibility(opreg::operators_t& ops,
    opreg::opconfig_t cfg_tbl(self);
    auto cfg = cfg_tbl.get_or_default(opreg::op_config{});
    auto refreshed = ops.get(op_pk);
-   if (has_terminal_status(refreshed.status)) return;
+   if (refreshed.has_terminal_status()) return;
    bool was_eligible = (refreshed.status == OperatorStatus::OPERATOR_STATUS_ACTIVE);
    bool is_eligible  = meets_role_min(refreshed, cfg);
 
@@ -1255,7 +1248,7 @@ void process_eligibility_change(name self, name account,
    // The notification below is NOT gated on it: a producer's terminal
    // transition is exactly what sysio.system must hear about, and slash and
    // termination dispatch through here (`notify_producer_standing`) to say so.
-   const bool terminal = has_terminal_status(ops.get(op_pk).status);
+   const bool terminal = ops.get(op_pk).has_terminal_status();
 
    auto now = current_time_ms();
    if (!terminal && !was_eligible && is_eligible) {
@@ -1551,7 +1544,7 @@ void opreg::termcheck(name account) {
    auto op = ops.get(op_pk);
    // UNKNOWN is evaluated too. This runs only when the operator's own duty epoch closes, and an
    // operator that withdraws before each close and cancels after it is UNKNOWN every time.
-   if (has_terminal_status(op.status)) return;
+   if (op.has_terminal_status()) return;
    // Bootstrapped operators are the genesis / chain-of-trust seed set and
    // are NEVER subject to rolling-window termination — see
    // .claude/rules/bootstrapped-operator-invariants.md at the wire root. A

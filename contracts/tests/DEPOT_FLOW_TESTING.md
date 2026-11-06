@@ -1,10 +1,4 @@
-# Depot flow coverage
-
-The reviewed coverage inventory is [depot_flow_coverage.json](depot_flow_coverage.json).
-It maps every enabled `wire-tools-ts` flow at the recorded feature-branch head to
-specific native contract cases, describes its WIRE obligations, and states the
-behaviors that still require a cluster. The map is a reviewable traceability
-record, not a line-coverage percentage or a proof that every possible sequence is covered.
+# Depot flow tests
 
 ## Test layers
 
@@ -12,7 +6,7 @@ record, not a line-coverage percentage or a proof that every possible sequence i
    rejection, replay, pagination and individual state transitions. The existing
    bond, syndication, collateral, emissions and producer suites remain essential.
 2. **Depot integration tests** exercise inline calls between the real contracts.
-   New generic scenarios cover backed import, held intake, bonding, partial
+   Generic scenarios cover backed import, held intake, bonding, partial
    release, challenge adjudication, freeze/repair, fee rounding, link delivery,
    yield conversion, funded import claims and return instructions.
 3. **Cluster flows** retain responsibility for external contract execution,
@@ -83,75 +77,8 @@ Assertions include:
 - A reported custody deficit pulls the cord and retains evidence; repairing custody
   and clearing the cord resumes release without erasing the incident.
 
-The map also selects focused edge cases for FIFO/budget saturation, nonzero
-challenge fees/bounties, retained outcomes after pruning, frozen budget accounting,
-producer scoring and authorization. Add small named regressions for failures found
-by larger campaigns rather than relying only on a random seed.
-
-## Running
-
-From `wire-sysio`, build the default target using the repository's configured
-build procedure, for example:
-
-```sh
-cmake --build build/release -- -j12
-python3 contracts/tools/verify_depot_flow_coverage.py
-python3 contracts/tools/verify_depot_flow_coverage.py --tools-root ../wire-tools-ts
-```
-
-Use the correct feature checkout for `--tools-root` (a separate worktree may have a
-different path). Flow enablement uses the same rule as `scripts/run-flow.mjs`: a
-`packages/flow-*/package.json` with a nonempty `scripts.test`. Newly enabled,
-disabled or renamed flows require a reviewed map update. Standalone sysio CI
-validates the committed map and native references without requiring a sibling repo.
-This check detects inventory drift; reviewers must still assess changed assertions.
-
-Run the focused native mirror set:
-
-```sh
-flow_filter=$(python3 contracts/tools/verify_depot_flow_coverage.py --filter)
-build/release/contracts/tests/contracts_unit_test \
-  --run_test="$flow_filter" --report_level=detailed -- --sys-vm
-```
-
-Run the broader contract gate before publishing:
-
-```sh
-build/release/contracts/tests/contracts_unit_test --report_level=detailed -- --sys-vm
-ctest --test-dir build/release -R '^depot_flow_coverage_map' --output-on-failure
-```
-
-Run tests only after the build completes, with no concurrent build in that directory: the
-default build can clean and replace contract WASM while regenerating dependencies.
-These commands use the WASM/ABI under the selected build directory. A passing old
-binary or stale contract artifact is not evidence for the edited source. Record
-the branch head, dirty test changes, build completion, runtime, case/assertion
-counts and any artifact differences with the validation result. No fresh external
-cluster is needed for these native tests.
-
-## Validation record — 2026-10-02
-
-Validated on `feature/syndication-underwriting`, based on
-`5bbb0c5e4d57e6133181a3d9dc4b58a0ddef14ed` plus the test changes in this patch.
-The default all-target build completed, and tests used the freshly built WASM/ABI.
-The final full run used a stable build directory with no concurrent build.
-
-| Gate | Result | Elapsed |
-| --- | --- | --- |
-| All native contract cases (`--sys-vm`) | 1,087 cases; 248,033 assertions passed | 10m 37s |
-| Eleven new simulator/integration cases | 2,911 assertions passed | 3.64s |
-| Coverage-map CTest checks | Both passed, including five validator regression tests | 0.11s |
-| Enabled-flow comparison against recorded tools head | All 13 flows mapped to 67 existing native cases | — |
-
-Broad validation also exposed two old fixture assumptions. Dispute deployment now
-produces a block between contracts to avoid exhausting cumulative block NET.
-Multisig chunk tests now use bounded valid WASM padding instead of depending on
-production `sysio.system` size. Their complete suites passed in the final gate.
-No production contract changes were needed for these fixture repairs.
-
-The external cluster flows were not rerun for this test-only patch. The generated
-campaign covers 24 linked rounds across three seeds; this result does not claim
-exhaustive exploration or a measured production line-coverage percentage.
+Add small named regressions for failures found by larger campaigns rather than
+relying only on a random seed.
 
 ## Governance shortcut parity
 
@@ -162,8 +89,7 @@ linked and initially unlinked recipients. The test compares the economic trace
 through frozen release, successive partial releases, same-epoch no-refill, fee
 rounding, principal/link delivery, pending yield, and actual return instructions
 paid exactly once by the external model. It also rejects unauthorized governance
-and early provider approval. All 1,824 assertions passed; the complete syndication
-and bond suites passed 152 cases and 12,311 assertions.
+and early provider approval.
 
 Only the downstream settlement trace is equivalent. Bond state, escrow ownership,
 challenge timing, provider returns and bounty allocation deliberately differ.
