@@ -2,6 +2,7 @@
 
 #include <sysio/chain/types.hpp>
 #include <sysio/chain/exceptions.hpp>
+#include <sysio/chain/block.hpp>
 #include <sysio/chain/transaction.hpp>
 #include <sysio/chain/resource_limits.hpp>
 #include <sysio/chain/resource_limits_private.hpp>
@@ -14,7 +15,12 @@
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 
+#include <algorithm>
+#include <array>
 #include <concepts>
+#include <ranges>
+#include <unordered_map>
+#include <unordered_set>
 
 namespace sysio::chain {
 
@@ -56,23 +62,30 @@ private:
    static constexpr uint32_t default_expired_accumulator_average_window =
       chain::config::account_cpu_usage_average_window_ms / subjective_time_interval_ms;
 
+   /// The account cache is swept for fully decayed entries this many times per decay window.
+   static constexpr uint32_t prunes_per_decay_window = 4;
+
    bool                                      _disabled = false;
    bool                                      _disabled_payer_billing = false;
+   bool                                      _disabled_sysio_authorizer_billing = false;
    fc::microseconds                          _subjective_account_cpu_allowed{config::default_subjective_cpu_us};
    trx_cache_index                           _trx_cache_index;
    account_subjective_bill_cache             _account_subjective_bill_cache;
    std::unordered_set<chain::account_name>    _disabled_accounts;
    uint32_t                                  _expired_accumulator_average_window = default_expired_accumulator_average_window;
+   uint32_t                                  _next_prune_time_ordinal = 0;
 
 private:
    void _reset() { // for testing
       _disabled = false;
       _disabled_payer_billing = false;
+      _disabled_sysio_authorizer_billing = false;
       _subjective_account_cpu_allowed = fc::microseconds{config::default_subjective_cpu_us};
       _trx_cache_index.clear();
       _account_subjective_bill_cache.clear();
       _disabled_accounts.clear();
       _expired_accumulator_average_window = default_expired_accumulator_average_window;
+      _next_prune_time_ordinal = 0;
    }
 
    static uint32_t time_ordinal_for( const fc::time_point& t ) {
@@ -117,6 +130,65 @@ private:
       }
    }
 
+   /**
+    * Adds `units` charged at `ordinal`, so they decay from that time rather than from when this node learned of them.
+    * The accumulator holds one timeline, so a charge older than its last update is first decayed to that update.
+    */
+   void add_dated_charge( decaying_accumulator& accumulator, uint64_t units, uint32_t ordinal ) const {
+      const uint32_t window = _expired_accumulator_average_window;
+      if( accumulator.last_ordinal > ordinal ) {
+         const uint32_t age = accumulator.last_ordinal - ordinal;
+         if( age >= window ) return;
+         units = units * ( window - age ) / window;
+      }
+      accumulator.add( units, ordinal, window );
+   }
+
+   /**
+    * Charges the billed CPU of each sysio.*-paid action in `block` to its authorizer, where it decays like a
+    * failure. Reading it from the block counts every included transaction on every node, including ones this node
+    * never executed and ones in blocks it produced. The charge is dated at the block's time, so a node applying a
+    * block late, e.g. while syncing, holds the same charge from then on as a node that applied it live, and a block
+    * older than the decay window costs one check. A transaction re-included after a fork switch is charged again.
+    * @return the number of actions charged
+    */
+   uint32_t bill_sysio_paid_authorizers( const chain::signed_block& block, uint32_t time_ordinal ) {
+      const uint32_t block_time_ordinal = time_ordinal_for( block.timestamp.to_time_point() );
+      const uint32_t block_age = time_ordinal > block_time_ordinal ? time_ordinal - block_time_ordinal : 0;
+      if( block_age >= _expired_accumulator_average_window ) return 0;
+
+      uint32_t charged = 0;
+      for( const auto& receipt : block.transactions ) {
+         const transaction& trx = receipt.trx.get_transaction();
+         // Checked against the transaction when the block was applied.
+         assert( receipt.cpu_usage_us.size() == trx.total_actions() );
+         if( receipt.cpu_usage_us.size() != trx.total_actions() ) continue;
+         const account_name trx_first_authorizer = trx.first_authorizer();
+         std::array all_actions = {std::views::all(trx.context_free_actions), std::views::all(trx.actions)};
+         size_t action_index = 0;
+         for( const auto& act : std::views::join(all_actions) ) {
+            const uint64_t cpu_us = receipt.cpu_usage_us[action_index++].value;
+            const account_name authorizer = billed_authorizer( act, trx_first_authorizer );
+            if( !is_sysio_paid_authorizer( act.payer(), authorizer ) || _disabled_accounts.contains( authorizer ) )
+               continue;
+            add_dated_charge( _account_subjective_bill_cache[authorizer].expired_accumulator, cpu_us,
+                              block_time_ordinal );
+            ++charged;
+         }
+      }
+      return charged;
+   }
+
+   /// Erases accounts with nothing pending and nothing left to decay, at most once per prune interval.
+   void prune_decayed_accounts( uint32_t time_ordinal ) {
+      if( time_ordinal < _next_prune_time_ordinal ) return;
+      _next_prune_time_ordinal =
+         time_ordinal + std::max<uint32_t>( 1, _expired_accumulator_average_window / prunes_per_decay_window );
+      std::erase_if( _account_subjective_bill_cache, [&]( const auto& entry ) {
+         return entry.second.empty( time_ordinal, _expired_accumulator_average_window );
+      } );
+   }
+
 public: // public for tests
    size_t get_account_cache_size() const {return _account_subjective_bill_cache.size();}
    void remove_subjective_billing( const chain::transaction_id_type& trx_id, uint32_t time_ordinal ) {
@@ -129,12 +201,34 @@ public: // public for tests
    }
 
 public:
+   /**
+    * The account an action's CPU is subjectively billed to as its authorizer: the action's first authorizer, or, for
+    * an action without authorization, `trx_first_authorizer`, the transaction's first authorizer. Callers look that
+    * up once per transaction: transaction::first_authorizer() scans the actions.
+    */
+   static account_name billed_authorizer( const action& act, const account_name& trx_first_authorizer ) {
+      const account_name first_authorizer = act.first_authorizer();
+      return first_authorizer.empty() ? trx_first_authorizer : first_authorizer;
+   }
+
+   /**
+    * True if an action's CPU stays charged to its authorizer after its transaction is in a block: the payer is a
+    * sysio.* contract, whose CPU is unlimited, and the authorizer is someone else. An explicit sysio.payer makes the
+    * authorizer the payer, which pays from its own objective CPU instead.
+    */
+   static bool is_sysio_paid_authorizer( const account_name& payer, const account_name& authorizer ) {
+      return payer.prefix() == config::system_account_name && authorizer != payer;
+   }
+
    void set_subjective_account_cpu_allowed( fc::microseconds v ) { _subjective_account_cpu_allowed = v; }
    fc::microseconds get_subjective_account_cpu_allowed() const { return _subjective_account_cpu_allowed; }
    void set_disabled(bool disable) { _disabled = disable; }
    bool is_disabled() const { return _disabled; }
    void disable_payer_billing(bool disable) { _disabled_payer_billing = disable; }
    bool is_payer_billing_disabled() const { return _disabled_payer_billing; }
+   /// Stops on_block from charging the authorizers of sysio.*-paid actions in a block (see is_sysio_paid_authorizer).
+   void disable_sysio_authorizer_billing(bool disable) { _disabled_sysio_authorizer_billing = disable; }
+   bool is_sysio_authorizer_billing_disabled() const { return _disabled_sysio_authorizer_billing; }
    void disable_account( chain::account_name a ) { _disabled_accounts.emplace( a ); }
    bool is_account_disabled(const account_name& a ) const { return _disabled || _disabled_accounts.contains( a ); }
    bool is_any_account_disabled(const action_payers_t& accounts ) const {
@@ -201,15 +295,24 @@ public:
       return fc::microseconds{0};
    }
 
+   /**
+    * Applies an accepted block, produced here or received: drops the pending bill of each transaction it includes,
+    * then charges the authorizers of its sysio.*-paid actions (bill_sysio_paid_authorizers), so that charge outlasts
+    * inclusion. Also prunes accounts whose bill has fully decayed.
+    */
    void on_block( fc::logger& log, const chain::signed_block_ptr& block, const fc::time_point& now ) {
       if( block == nullptr || _disabled ) return;
       const auto time_ordinal = time_ordinal_for(now);
       const auto orig_count = _account_subjective_bill_cache.size();
       remove_subjective_billing( block, time_ordinal );
-      if (orig_count > 0) {
-         fc_dlog( log, "Subjective billed accounts {} removed {}",
-                  orig_count, orig_count - _account_subjective_bill_cache.size() );
+      const auto removed = orig_count - _account_subjective_bill_cache.size();
+      const uint32_t charged =
+         _disabled_sysio_authorizer_billing ? 0 : bill_sysio_paid_authorizers( *block, time_ordinal );
+      if (orig_count > 0 || charged > 0) {
+         fc_dlog( log, "Subjective billed accounts {} removed {}, sysio-paid actions charged {}",
+                  orig_count, removed, charged );
       }
+      prune_decayed_accounts( time_ordinal );
    }
 
    template <std::predicate<> Yield>

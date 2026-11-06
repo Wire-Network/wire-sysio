@@ -558,9 +558,15 @@ objective bill went to the contract.
 
 Two properties keep this landing on abusers rather than on ordinary users:
 
-- **Successful transactions do not accumulate.** A subjective bill is held as `pending_cpu_us` and
-  removed when the transaction appears in a block. Traffic that lands costs the signer nothing over
-  time.
+- **Successful transactions do not accumulate, unless a `sysio.*` contract pays.** A subjective bill
+  is held as `pending_cpu_us` and removed when the transaction appears in a block. Traffic that lands
+  costs the signer nothing over time. The exception is an action whose payer is a `sysio.*` account
+  (no explicit `sysio.payer`): those contracts have unlimited CPU, so nothing else would limit their
+  callers. When a block is applied, every node charges the billed CPU of each such action, from the
+  block's receipts, to the action's first authorizer, where it decays like a failure. A signer can
+  therefore use `subjective-account-cpu-allowed-us` plus its own CPU limit of `sysio.*`-paid CPU per
+  `subjective-account-decay-time-minutes`, wherever it submits. Signing with `sysio.payer` moves the
+  cost to the signer's own objective CPU instead.
 - **Most failures accumulate and decay slowly.** A failed transaction moves its bill into a
   decaying accumulator whose window is `subjective-account-decay-time-minutes` — 24 hours by
   default. Repeatedly submitting transactions that fail is what burns the budget.
@@ -607,6 +613,7 @@ failures would point the cost at the wrong account. The signer still is.
 | `subjective-account-max-failures` | `3` | Failures allowed per account per window |
 | `subjective-account-max-failures-window-size` | `1` | Window size in blocks for the failure limit |
 | `disable-subjective-payer-billing` | `true` | Set false to also meter the payer (the contract) |
+| `disable-subjective-sysio-authorizer-billing` | `false` | Set true to stop charging signers for `sysio.*`-paid actions that land in a block |
 | `disable-subjective-account-billing <acct>` | — | Disables subjective billing for the **whole transaction** when any first authorizer matches — including the failure-limit precheck, and for every co-authorizer |
 
 Independent of all of it, `incoming-transaction-queue-size-mb` (default `1024`) subjectively drops

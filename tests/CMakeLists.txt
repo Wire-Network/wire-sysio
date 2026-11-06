@@ -227,7 +227,7 @@ set(READ_ONLY_TRX_TESTS
 )
 set_tests_properties(${READ_ONLY_TRX_TESTS} PROPERTIES RESOURCE_LOCK read_only_trx)
 
-add_np_test(NAME subjective_billing_test COMMAND tests/subjective_billing_test.py -v -p 2 -n 4)
+add_np_test(NAME subjective_billing_test COMMAND tests/subjective_billing_test.py -v -p 2 -n 5)
 add_np_test(NAME get_account_test COMMAND tests/get_account_test.py -v -p 2 -n 3)
 add_np_test(NAME multisig_review_test COMMAND tests/multisig_review_test.py -v -p 1 -n 1)
 add_np_test(NAME pause_at_block_test COMMAND tests/pause_at_block_test.py -v)
