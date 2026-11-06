@@ -332,8 +332,8 @@ struct batch_operator_plugin::impl {
    fc::time_point                           underwriter_cranked_at;   ///< last crank
    /// The lowest `sysio.bond::requests` id the next pass reads (`underwriter::next_scan_start`); 0 reads them all.
    uw::request_id_t                         underwriter_scan_from = 0;
-   /// The `sysio.bond::requests` id the next prune starts from (`underwriter::next_prune_start`).
-   uw::request_id_t                         underwriter_prune_from = 0;
+   /// Where the underwriter's prunes are in their walk of `sysio.bond::requests` (`underwriter::prune_sweep`).
+   uw::prune_sweep                          underwriter_prune_sweep;
    /// Every request the underwriter bonded, until its request row is pruned (`underwriter::remember_bonded`).
    std::set<uw::request_id_t>               underwriter_bonded;
    /// Which forfeit stops bonding (`underwriter::forfeit_watch`).
@@ -1615,18 +1615,21 @@ struct batch_operator_plugin::impl {
            describe(*r), s->digest.str(), s->chain_code.to_string(), emitted->second.str(), s->epoch_index);
    }
 
-   /// `sysio.bond::prune` from `underwriter_prune_from`, which then moves past the requests it examines, and
-   /// `sysio.synd::pruneenv` for every shadow's pair. Both are permissionless and bounded by UNDERWRITER_PRUNE_LIMIT.
+   /// The next `sysio.bond::prune` of `underwriter_prune_sweep`, and `sysio.synd::pruneenv` for every shadow's pair.
+   /// Both are permissionless and bounded by UNDERWRITER_PRUNE_LIMIT.
    void underwriter_prune(const std::map<fc::slug_name, liq_token>& tokens) {
+      uw::prune_sweep& sweep = underwriter_prune_sweep;
+      if (!sweep.last) {
+         const std::optional<uw::request_id_page> newest = read_bond_request_ids(0, 1, true);
+         if (newest) sweep.last = newest->ids.empty() ? 0 : newest->ids.front();
+      }
       const std::optional<uw::request_id_page> page =
-         read_bond_request_ids(underwriter_prune_from, UNDERWRITER_PRUNE_LIMIT + 1);
+         read_bond_request_ids(sweep.from, UNDERWRITER_PRUNE_LIMIT + 1, false);
       const bool pruned = underwriter_push(uw::bond::account, uw::bond::action_prune,
                                            fc::mutable_variant_object()
-                                              (uw::bond::field::from_id, underwriter_prune_from)
+                                              (uw::bond::field::from_id, sweep.from)
                                               (uw::bond::field::limit,   UNDERWRITER_PRUNE_LIMIT));
-      if (pruned && page) {
-         underwriter_prune_from = uw::next_prune_start(underwriter_prune_from, *page, UNDERWRITER_PRUNE_LIMIT);
-      }
+      if (pruned && page && sweep.last) sweep.advance(*page, UNDERWRITER_PRUNE_LIMIT);
       for (const auto& [token_code, token] : tokens) {
          underwriter_push(uw::synd::account, uw::synd::action_pruneenv,
                           fc::mutable_variant_object()
@@ -1708,9 +1711,9 @@ struct batch_operator_plugin::impl {
       return out;
    }
 
-   /// The ids of at most `count` `sysio.bond::requests` rows from id `from`, or nullopt when the read failed or a row
-   /// carries no id.
-   std::optional<uw::request_id_page> read_bond_request_ids(uw::request_id_t from, uint32_t count) {
+   /// The ids of at most `count` `sysio.bond::requests` rows from id `from`, newest first if `newest_first`, or nullopt
+   /// when the read failed or a row carries no id.
+   std::optional<uw::request_id_page> read_bond_request_ids(uw::request_id_t from, uint32_t count, bool newest_first) {
       sysio::chain_apis::read_only::get_table_rows_params p;
       p.code        = chain::name(uw::bond::account);
       p.scope       = uw::bond::account;
@@ -1718,6 +1721,7 @@ struct batch_operator_plugin::impl {
       p.lower_bound = fc::json::to_string(fc::mutable_variant_object()(uw::bond::field::id, from),
                                           fc::json::yield_function_t{});
       p.limit       = count;
+      p.reverse     = newest_first;
       p.values_only = true;
       const std::optional<sysio::chain_apis::read_only::get_table_rows_result> rows = read_table_checked(std::move(p));
       if (!rows) return std::nullopt;

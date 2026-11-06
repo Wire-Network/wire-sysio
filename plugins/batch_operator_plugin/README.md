@@ -151,8 +151,8 @@ requests `sysio.synd` issues for syndication envelopes. Each poll it:
    and **claims** them once approved or ruled VALID, and again while yield the pool
    could not yet cover is owed. Every 10 minutes it claims what a forfeited bond
    earned, which pays it into `sysio.liq` so the request can be pruned, and prunes
-   `sysio.bond` and `sysio.synd`. Each `sysio.bond` prune starts after the requests
-   the previous one examined, and over from the first once one reaches the end.
+   `sysio.bond` and `sysio.synd`. Its `sysio.bond` prunes sweep the requests issued
+   before each sweep began, each starting after those the previous one examined.
 
 What it cannot act on waits and is logged on every poll it holds; deduplicating
 those lines is left to log tooling:
