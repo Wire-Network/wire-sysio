@@ -4,6 +4,7 @@
 #include <simple_rest_server.hpp>
 #include <test_ports.hpp>
 #include <sysio/net_plugin/protocol.hpp>
+#include <fc/filesystem.hpp>
 
 #define BOOST_TEST_MODULE trx_generator_tests
 #include <boost/test/included/unit_test.hpp>
@@ -15,6 +16,7 @@
 #include <array>
 #include <cstdlib>
 #include <exception>
+#include <fstream>
 #include <future>
 #include <optional>
 #include <sstream>
@@ -704,6 +706,105 @@ BOOST_AUTO_TEST_CASE(trx_generator_constructor)
    user_specified_trx_config trx_config{abi_file, actions_data, action_auths};
 
    auto generator = std::make_shared<trx_generator>(tg_config, p_config, trx_config);
+}
+
+namespace {
+constexpr std::string_view noop_nonce_test_priv_key = "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3";
+constexpr std::string_view noop_nonce_test_lib_id =
+   "00000062989f69fd251df3e0b274c3364ffc2f4fce73de3f1c7b5e11a4c92f21";
+constexpr std::string_view noop_nonce_test_chain_id = "999";
+constexpr std::string_view noop_nonce_test_sender   = "testacct1";
+constexpr std::string_view noop_nonce_test_receiver = "testacct2";
+constexpr std::string_view noop_nonce_test_quantity = "0.0001 CUR";
+constexpr std::string_view fixed_memo               = "fixed memo";
+constexpr std::string_view transfer_abi =
+   R"({"version":"sysio::abi/1.2","types":[],"structs":[{"name":"transfer","base":"","fields":[)"
+   R"({"name":"from","type":"name"},{"name":"to","type":"name"},{"name":"quantity","type":"asset"},)"
+   R"({"name":"memo","type":"string"}]}],"actions":[{"name":"transfer","type":"transfer","ricardian_contract":""}],)"
+   R"("tables":[],"ricardian_clauses":[],"variants":[],"action_results":[]})";
+
+/// Generator config with the sysio.noop nonce action switched on or off.
+trx_generator_base_config noop_nonce_test_config(bool noop_nonce) {
+   trx_generator_base_config config;
+   config._generator_id              = 1;
+   config._chain_id                  = chain::chain_id_type(std::string(noop_nonce_test_chain_id));
+   config._contract_owner_account    = chain::name("sysio.token");
+   config._last_irr_block_id         = fc::variant(std::string(noop_nonce_test_lib_id)).as<chain::block_id_type>();
+   config._noop_nonce                = noop_nonce;
+   return config;
+}
+
+/// One transfer from the test sender with the given memo, as trx_generator actions data.
+std::string transfer_actions_data(std::string_view memo) {
+   return fc::json::to_string(fc::variants{fc::mutable_variant_object()
+      ("actionName", "transfer")
+      ("actionAuthAcct", noop_nonce_test_sender)
+      ("actionData", fc::mutable_variant_object()("from", noop_nonce_test_sender)("to", noop_nonce_test_receiver)
+                                                 ("quantity", noop_nonce_test_quantity)("memo", memo))
+      ("authorization", fc::mutable_variant_object()("actor", noop_nonce_test_sender)("permission", "active"))},
+      fc::time_point::maximum());
+}
+} // namespace
+
+/// The sysio.noop nonce action is added, and replaced on every re-sign, only when noop_nonce is set.
+BOOST_AUTO_TEST_CASE(noop_nonce_action_is_optional)
+{
+   const auto key = fc::crypto::private_key::from_string(std::string(noop_nonce_test_priv_key));
+   const provider_base_config p_config{"http", "127.0.0.1", get_port(port_category::node_http)};
+   for (const bool noop_nonce : {true, false}) {
+      BOOST_TEST_CONTEXT("noop_nonce " << noop_nonce) {
+         const auto tg_config = noop_nonce_test_config(noop_nonce);
+         trx_generator_base generator{tg_config, p_config};
+         uint64_t nonce_prefix = 1;
+         uint64_t nonce = 0;
+         auto trx = generator.create_trx_w_actions_and_signer({make_test_signed_transaction().actions.front()}, key,
+                                                              nonce_prefix, nonce, tg_config._trx_expiration_us,
+                                                              tg_config._chain_id, tg_config._last_irr_block_id);
+         const size_t expected_nonce_actions = noop_nonce ? 1 : 0;
+         BOOST_TEST(trx._trx.context_free_actions.size() == expected_nonce_actions);
+
+         generator.update_resign_transaction(trx._trx, key, nonce_prefix, nonce, tg_config._trx_expiration_us,
+                                             tg_config._chain_id, tg_config._last_irr_block_id);
+         BOOST_TEST(trx._trx.context_free_actions.size() == expected_nonce_actions);
+         if (noop_nonce) {
+            BOOST_TEST(trx._trx.context_free_actions.front().account == chain::name("sysio.noop"));
+            BOOST_TEST(trx._trx.context_free_actions.front().name == chain::name("nonce"));
+         }
+      }
+   }
+}
+
+/// Without the nonce action, setup requires an ACCT_PER_TRX field, which makes every re-signed transaction unique.
+BOOST_AUTO_TEST_CASE(noop_nonce_off_requires_acct_per_trx)
+{
+   fc::temp_directory dir;
+   const std::string abi_file = (dir.path() / "transfer.abi").string();
+   std::ofstream(abi_file) << transfer_abi;
+   const std::string action_auths =
+      fc::json::to_string(fc::mutable_variant_object()(std::string(noop_nonce_test_sender), noop_nonce_test_priv_key),
+                          fc::time_point::maximum());
+   const provider_base_config p_config{"http", "127.0.0.1", get_port(port_category::node_http)};
+   const auto tg_config = noop_nonce_test_config(false);
+
+   // A fixed memo would repeat the same transaction, so setup refuses it.
+   {
+      trx_generator generator{tg_config, p_config, {abi_file, transfer_actions_data(fixed_memo), action_auths}};
+      BOOST_TEST(!generator.setup());
+   }
+
+   trx_generator generator{tg_config, p_config,
+                           {abi_file, transfer_actions_data(acct_per_trx_key_word), action_auths}};
+   BOOST_REQUIRE(generator.setup());
+   BOOST_REQUIRE_EQUAL(generator._trxs.size(), 1u);
+   auto& trx = generator._trxs.front();
+   BOOST_TEST(trx._trx.context_free_actions.empty());
+
+   const auto first_data = trx._trx.actions.front().data;
+   generator.update_resign_transaction(trx._trx, trx._signer, generator._nonce_prefix, generator._nonce,
+                                       tg_config._trx_expiration_us, tg_config._chain_id, tg_config._last_irr_block_id);
+   BOOST_TEST(trx._trx.context_free_actions.empty());
+   BOOST_TEST(trx._trx.actions.front().data != first_data);
+   generator._provider.teardown();
 }
 
 /// Verifies the P2P provider sends a valid session handshake and answers peer heartbeat messages.

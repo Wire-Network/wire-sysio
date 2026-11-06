@@ -7,6 +7,7 @@
 #include <sysio/chain/name.hpp>
 #include <fc/bitutil.hpp>
 #include <fc/io/raw.hpp>
+#include <fmt/format.h>
 #include <regex>
 
 namespace sysio::testing {
@@ -30,11 +31,20 @@ namespace sysio::testing {
       chain::signed_transaction trx;
       set_transaction_headers(trx, last_irr_block_id, trx_expiration);
       trx.actions = std::move(acts);
-      trx.context_free_actions.emplace_back(std::vector<chain::permission_level>(), noop_account_name, chain::name("nonce"),
-         fc::raw::pack(std::to_string(_config._generator_id) + ":" + std::to_string(nonce_prefix) + ":" + std::to_string(++nonce) + ":" + std::to_string(fc::time_point::now().time_since_epoch().count())));
+      add_noop_nonce_action(trx, nonce_prefix, nonce);
 
       trx.sign(priv_key, chain_id);
       return signed_transaction_w_signer(trx, priv_key);
+   }
+
+   void trx_generator_base::add_noop_nonce_action(chain::transaction& trx, uint64_t& nonce_prefix, uint64_t& nonce) {
+      if (!_config._noop_nonce) {
+         return;
+      }
+      const auto nonce_data = fmt::format("{}:{}:{}:{}", _config._generator_id, nonce_prefix, ++nonce,
+                                          fc::time_point::now().time_since_epoch().count());
+      trx.context_free_actions.emplace_back(std::vector<chain::permission_level>(), noop_account_name,
+                                            chain::name("nonce"), fc::raw::pack(nonce_data));
    }
 
    void transfer_trx_generator::create_initial_transfer_transactions(uint64_t& nonce_prefix, uint64_t& nonce) {
@@ -52,8 +62,7 @@ namespace sysio::testing {
    void trx_generator_base::update_resign_transaction(chain::signed_transaction& trx, const fc::crypto::private_key& priv_key, uint64_t& nonce_prefix, uint64_t& nonce,
                                                       const fc::microseconds& trx_expiration, const chain::chain_id_type& chain_id, const chain::block_id_type& last_irr_block_id) {
       trx.context_free_actions.clear();
-      trx.context_free_actions.emplace_back(std::vector<chain::permission_level>(), noop_account_name, chain::name("nonce"),
-         fc::raw::pack(std::to_string(_config._generator_id) + ":" + std::to_string(nonce_prefix) + ":" + std::to_string(++nonce) + ":" + std::to_string(fc::time_point::now().time_since_epoch().count())));
+      add_noop_nonce_action(trx, nonce_prefix, nonce);
       set_transaction_headers(trx, last_irr_block_id, trx_expiration);
       trx.signatures.clear();
       trx.sign(priv_key, chain_id);
@@ -243,15 +252,19 @@ namespace sysio::testing {
       ilog("Loaded actions data: {}", fc::json::to_pretty_string(unpacked_actions_data_json));
       ilog("Loaded actions auths data: {}", fc::json::to_pretty_string(unpacked_actions_auths_data_json));
 
-      const std::string gen_acct_name_per_trx("ACCT_PER_TRX");
-
       const auto& action_array = unpacked_actions_data_json.get_array();
       _unpacked_actions.reserve(action_array.size());
       std::transform(action_array.begin(), action_array.end(), std::back_inserter(_unpacked_actions),
                      [&](const auto& var) {
                         return fc::mutable_variant_object(var);
                      });
-      locate_key_words_in_action_array(_acct_gen_fields, action_array, gen_acct_name_per_trx);
+      locate_key_words_in_action_array(_acct_gen_fields, action_array, std::string(acct_per_trx_key_word));
+
+      if (!_config._noop_nonce && _acct_gen_fields.empty()) {
+         elog("Without the sysio.noop nonce action, the actions data needs an {} field so each transaction is unique.",
+              acct_per_trx_key_word);
+         return false;
+      }
 
       if (!_acct_gen_fields.empty()) {
          ilog("Located the following account names that need to be generated and populated in each transaction:");

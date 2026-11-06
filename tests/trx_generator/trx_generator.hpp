@@ -1,6 +1,7 @@
 #pragma once
 #include <trx_provider.hpp>
 #include <string>
+#include <string_view>
 #include <vector>
 #include <sysio/chain/transaction.hpp>
 #include <sysio/chain/asset.hpp>
@@ -102,12 +103,16 @@ namespace sysio::testing {
       sysio::chain::block_id_type _last_irr_block_id = sysio::chain::block_id_type();
       std::string _log_dir = ".";
       bool _stop_on_trx_failed = true;
+      /// Add a context-free `sysio.noop::nonce` action to make each transaction unique. It needs a contract on
+      /// `sysio.noop`, which deployed chains do not have; without it the action data must be unique per transaction.
+      bool _noop_nonce = true;
 
       std::string to_string() const {
          std::ostringstream ss;
          ss << " generator id: " << _generator_id << " chain id: " << _chain_id.str() << " contract owner account: "
             << _contract_owner_account << " trx expiration seconds: " << _trx_expiration_us.to_seconds() << " lib id: " << _last_irr_block_id.str()
-            << " log dir: " << _log_dir << " stop on trx failed: " << _stop_on_trx_failed;
+            << " log dir: " << _log_dir << " stop on trx failed: " << _stop_on_trx_failed
+            << " noop nonce: " << _noop_nonce;
          return std::move(ss).str();
       };
    };
@@ -184,6 +189,9 @@ namespace sysio::testing {
 
       void set_transaction_headers(sysio::chain::transaction& trx, const sysio::chain::block_id_type& last_irr_block_id, const fc::microseconds& expiration, uint32_t delay_sec = 0);
 
+      /// Appends the context-free `sysio.noop::nonce` action when `_config._noop_nonce` is set.
+      void add_noop_nonce_action(sysio::chain::transaction& trx, uint64_t& nonce_prefix, uint64_t& nonce);
+
       signed_transaction_w_signer create_trx_w_actions_and_signer(std::vector<sysio::chain::action>&& act, const fc::crypto::private_key& priv_key, uint64_t& nonce_prefix,
                                                                   uint64_t& nonce, const fc::microseconds& trx_expiration, const sysio::chain::chain_id_type& chain_id,
                                                                   const sysio::chain::block_id_type& last_irr_block_id);
@@ -208,6 +216,9 @@ namespace sysio::testing {
 
       bool setup();
    };
+
+   /// Action data placeholder replaced with a newly generated account name in every transaction.
+   inline constexpr std::string_view acct_per_trx_key_word = "ACCT_PER_TRX";
 
    void locate_key_words_in_action_mvo(std::vector<std::string>& acct_gen_fields_out, const fc::mutable_variant_object& action_mvo, const std::string& key_word);
    void locate_key_words_in_action_array(std::map<int, std::vector<std::string>>& acct_gen_fields_out, const fc::variants& action_array, const std::string& key_word);

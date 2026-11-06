@@ -49,6 +49,12 @@ The Transaction Generator logs each transaction's id and sent timestamp at the m
 - `--log-dir arg` set the logs directory
 - `--stop-on-trx-failed arg` (=1) stop transaction generation if sending
   fails.
+- `--noop-nonce arg` (=1) add a context-free `sysio.noop::nonce`
+  action to make each transaction unique.
+  Needs a contract on `sysio.noop`; set
+  false for chains without one, which
+  requires actions data with an
+  `ACCT_PER_TRX` field.
 - `--abi-file arg` The path to the contract abi file to
   use for the supplied transaction action
   data
@@ -68,6 +74,17 @@ The Transaction Generator logs each transaction's id and sent timestamp at the m
 ## Running Other Actions
 
 Instructions and examples for running `trx_generator` to create transactions with the custom action instead of the default transfer actions. The tool uses the ABI to serialize the action and sign the transactions with the provided private keys. If you need to generate unique account names per transaction (e.g., for account creation actions), the tool supports placeholders like `ACCT_PER_TRX` in the action, which it will replace with generated names.
+
+Each transaction normally carries a context-free `sysio.noop::nonce` action so repeated actions stay unique. Deployed
+chains keep `sysio.noop` without a contract, so a top-level action to it fails there. Against such a chain pass
+`--noop-nonce false` and put `ACCT_PER_TRX` in a free-form field, such as a transfer memo, to make each transaction
+unique:
+
+```json
+[{"actionName": "transfer", "actionAuthAcct": "alice",
+  "actionData": {"from": "alice", "to": "bob", "quantity": "0.000000001 WIRE", "memo": "ACCT_PER_TRX"},
+  "authorization": {"actor": "alice", "permission": "active"}}]
+```
 
 1. **Prepare the ABI File**: Specify the path to the ABI file, using the `--abi-file` option. This file describes the structure of the actions available in the contract.
 
