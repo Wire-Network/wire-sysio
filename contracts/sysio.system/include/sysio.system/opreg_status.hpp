@@ -62,4 +62,15 @@ inline bool is_op_active( const sysio::name& account,
    return find_active_operator( account, expected_type ).has_value();
 }
 
+/// Return whether `account`'s operator row is SLASHED or TERMINATED, whatever its role.
+///
+/// @param account operator account to check.
+/// @return true iff the row exists and has a terminal status; false for a missing row.
+inline bool has_terminal_operator_status( const sysio::name& account ) {
+   sysio::opreg::operators_t ops( opreg_refs::account );
+   const std::optional<sysio::opreg::operator_entry> op =
+      ops.try_get( sysio::opreg::operator_key{ account.value } );
+   return op && op->has_terminal_status();
+}
+
 } // namespace sysiosystem
