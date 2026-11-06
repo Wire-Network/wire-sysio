@@ -1075,6 +1075,14 @@
                 {
                     "name": "last_paid_round",
                     "type": "uint32"
+                },
+                {
+                    "name": "service_sec",
+                    "type": "uint64"
+                },
+                {
+                    "name": "registration_seq",
+                    "type": "uint64"
                 }
             ]
         },
@@ -1103,6 +1111,40 @@
             ]
         },
         {
+            "name": "producer_runtime_state",
+            "base": "",
+            "fields": [
+                {
+                    "name": "last_producer_schedule_update",
+                    "type": "block_timestamp_type"
+                },
+                {
+                    "name": "last_producer_schedule_size",
+                    "type": "uint16"
+                },
+                {
+                    "name": "last_producer",
+                    "type": "name"
+                },
+                {
+                    "name": "rescore_cursor",
+                    "type": "uint64"
+                },
+                {
+                    "name": "rescore_pending",
+                    "type": "bool"
+                },
+                {
+                    "name": "round_start_block",
+                    "type": "uint32"
+                },
+                {
+                    "name": "last_registration_seq",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "producer_schedule",
             "base": "",
             "fields": [
@@ -1120,14 +1162,6 @@
             "name": "producer_score_config",
             "base": "",
             "fields": [
-                {
-                    "name": "collateral_weight",
-                    "type": "uint32"
-                },
-                {
-                    "name": "participation_weight",
-                    "type": "uint32"
-                },
                 {
                     "name": "snapshot_weight",
                     "type": "uint32"
@@ -1154,6 +1188,14 @@
                 },
                 {
                     "name": "min_blocks_per_round",
+                    "type": "uint32"
+                },
+                {
+                    "name": "miss_penalty_sec",
+                    "type": "uint32"
+                },
+                {
+                    "name": "seniority_base_sec",
                     "type": "uint32"
                 }
             ]
@@ -1581,34 +1623,6 @@
                 {
                     "name": "total_ram_bytes_reserved",
                     "type": "uint64"
-                },
-                {
-                    "name": "last_producer_schedule_update",
-                    "type": "block_timestamp_type"
-                },
-                {
-                    "name": "last_pervote_bucket_fill",
-                    "type": "time_point"
-                },
-                {
-                    "name": "last_producer_schedule_size",
-                    "type": "uint16"
-                },
-                {
-                    "name": "last_producer",
-                    "type": "name"
-                },
-                {
-                    "name": "rescore_cursor",
-                    "type": "uint64"
-                },
-                {
-                    "name": "rescore_pending",
-                    "type": "bool"
-                },
-                {
-                    "name": "round_start_block",
-                    "type": "uint32"
                 }
             ]
         },
@@ -2365,6 +2379,14 @@
             "key_names": ["name"],
             "key_types": ["name"],
             "table_id": 26071
+        },
+        {
+            "name": "prodstate",
+            "type": "producer_runtime_state",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 56323
         },
         {
             "name": "producers",

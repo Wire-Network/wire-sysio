@@ -52,14 +52,11 @@ namespace sysiosystem {
 
       /**
        * Collateral factor: the MINIMUM, across every (chain, token) pair in `req_prod_collat`, of
-       * bonded / min_bond -- in basis points, linear and uncapped (saturating only at the bit
-       * budget).
+       * bonded / min_bond -- in basis points, linear and uncapped (saturating only at uint64).
        *
        * `min` rather than a sum: posting extra on the cheapest chain must do nothing, so raising the
        * score requires lifting EVERY pair and the marginal cost is dominated by the most expensive
-       * chain. There is no secondary sum term -- it existed only to stop every min compressing to
-       * 1.0 and the ordering falling through to alphabetical, and participation and snapshot now
-       * break that tie.
+       * chain.
        *
        * An empty `req_prod_collat` scores 0, consistent with opreg's `meets_role_min` returning
        * false for it: such a producer cannot be ACTIVE and so is not schedulable anyway.
@@ -88,9 +85,10 @@ namespace sysiosystem {
                static_cast<unsigned __int128>(bonded_balance(op, req.chain_code, req.token_code))
                * static_cast<unsigned __int128>(score_scale);
             const unsigned __int128 ratio = scaled / static_cast<unsigned __int128>(req.min_bond);
-            const uint64_t bounded = ratio > static_cast<unsigned __int128>(composite_max)
-                                        ? composite_max
-                                        : static_cast<uint64_t>(ratio);
+            const uint64_t bounded =
+               ratio > static_cast<unsigned __int128>(std::numeric_limits<uint64_t>::max())
+                  ? std::numeric_limits<uint64_t>::max()
+                  : static_cast<uint64_t>(ratio);
             if (bounded < lowest) lowest = bounded;
          }
          // Every requirement was zero: nothing to measure, same as an empty vector.
@@ -217,25 +215,27 @@ namespace sysiosystem {
       }
 
       /// The per-producer inputs a score needs from `producer_info`. Passed as a struct rather than
-      /// four positional flags so a new factor's input is a new member, not a new parameter at every
+      /// positional arguments so a new factor's input is a new member, not a new parameter at every
       /// call site.
       struct score_inputs {
          /// Whether the producers row is active -- false after `unregprod` parks it.
-         bool     is_active                  = true;
+         bool     is_active             = true;
          /// Whether the producer is currently demoted for consecutive missed rounds.
-         bool     is_demoted                 = false;
-         /// The producer's current miss streak.
-         uint32_t consecutive_missed_rounds  = 0;
+         bool     is_demoted            = false;
+         /// Accrued seniority, `producer_info::service_sec`.
+         uint64_t service_sec           = 0;
          /// Snapshot attestations credited this pay period.
-         uint32_t snapshot_attestations      = 0;
+         uint32_t snapshot_attestations = 0;
+         /// Registration order, `producer_info::registration_seq`; 0 is unassigned.
+         uint64_t registration_seq      = 0;
       };
 
       /**
        * Compute a producer's packed `rank_score` from its on-chain standing.
        *
-       * The composite is a weighted sum of capped, normalised factors; the collateral term is the
-       * one deliberately-unbounded input, so the sum saturates rather than wraps. Adding a factor
-       * means adding a weight and a term here -- the packed layout never changes.
+       * The composite is `M x (seniority + snapshot credit + seniority base)`, M the collateral
+       * multiple; see `weighted_composite`. Every term saturates, so nothing wraps. Equal composites
+       * order by registration.
        *
        * @param producer the producer account being scored.
        * @param inputs   the per-producer counters read from `producer_info`.
@@ -314,20 +314,18 @@ namespace sysiosystem {
          const uint64_t collateral_ratio = collateral_factor(*op, opreg_cfg);
          if (!meets_live_producer_minimum(*op, collateral_ratio)) return unscored();
 
-         // Every term saturates: the collateral factor is uncapped by design, so factor * weight
-         // must not be allowed to wrap.
-         const uint64_t collateral = mul_sat(collateral_ratio, weights.collateral_weight);
-         const uint64_t participation =
-            mul_sat(participation_factor(inputs.consecutive_missed_rounds,
-                                         weights.max_consecutive_missed_rounds),
-                    weights.participation_weight);
-         const uint64_t snapshot =
-            mul_sat(snapshot_factor(inputs.snapshot_attestations,
-                                    weights.snapshot_target_attestations),
-                    weights.snapshot_weight);
+         // Bootstrapped operators hold no bond and are exempt from the minimum, so they score at 1x.
+         const uint64_t multiple_bps = op->is_bootstrapped ? score_scale : collateral_ratio;
+         const uint64_t snapshot     =
+            scale_sat(snapshot_factor(inputs.snapshot_attestations, weights.snapshot_target_attestations),
+                      weights.snapshot_weight);
+         const uint64_t time_sec     =
+            add_sat(add_sat(seniority_credit(inputs.service_sec), snapshot), weights.seniority_base_sec);
 
-         const uint64_t composite = add_sat(add_sat(collateral, participation), snapshot);
-         return pack(tier_for(inputs.is_demoted, op->is_bootstrapped), composite);
+         // Ranking by M x time orders producers exactly as stake share x time would: every producer
+         // divides by the same total, and skipping that spares a rescore of everyone on any bond change.
+         const uint64_t composite = weighted_composite(multiple_bps, time_sec);
+         return pack(tier_for(inputs.is_demoted, op->is_bootstrapped), composite, inputs.registration_seq);
       }
 
       /**
@@ -346,10 +344,10 @@ namespace sysiosystem {
        * moved.
        *
        * The ONE write path for the key. Every event that moves a scoring input ends here: a
-       * collateral change (via the opreg notification), a missed or produced round, a snapshot
-       * attestation credit, the pay-period counter reset, and the rescore sweep a weight or
-       * collateral-minimum change opens. A factor whose event does not reach this function never
-       * reaches the index.
+       * collateral change (via the opreg notification), a round that moves the miss streak or the
+       * seniority hour, a registration, a snapshot attestation credit, the pay-period counter
+       * reset, and the rescore sweep a weight or collateral-minimum change opens. A factor whose
+       * event does not reach this function never reaches the index.
        *
        * @param self      the sysio.system contract account.
        * @param producers the producers table.
@@ -367,12 +365,13 @@ namespace sysiosystem {
             self,
             producer,
             score_inputs{
-               .is_active                 = info.active(),
-               .is_demoted                = info.is_demoted,
-               .consecutive_missed_rounds = info.consecutive_missed_rounds,
+               .is_active             = info.active(),
+               .is_demoted            = info.is_demoted,
+               .service_sec           = info.service_sec,
                // Stale credit does not count -- see `producer_info::snapshot_period`.
-               .snapshot_attestations     = info.snapshot_period == current_pay_period(self)
-                                               ? info.snapshot_attestations : 0
+               .snapshot_attestations = info.snapshot_period == current_pay_period(self)
+                                           ? info.snapshot_attestations : 0,
+               .registration_seq      = info.registration_seq
             },
             weights);
 

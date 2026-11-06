@@ -16,7 +16,8 @@ namespace sysiosystem {
     _finalizers(get_self()),
     _last_prop_finalizers(get_self()),
     _fin_key_id_generator(get_self()),
-    _global(get_self())
+    _global(get_self()),
+    _prodstate(get_self())
    {}
 
    sysio_global_state default_global_state() {
