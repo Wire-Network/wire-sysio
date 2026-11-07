@@ -49,7 +49,9 @@ other account in the set**.
 **2. A large set does not fit in one transaction.** The default
 `max_transaction_net_usage` is **524,288** bytes (`config::default_max_block_net_usage
 / 2`), and `sysio.msig::propose` receives the complete inner transaction before it
-chunks storage, so proposing through msig does not dodge that input NET. The
+chunks storage, so proposing through msig does not dodge that input NET. `propose`
+requires `{proposer, sysio.payer}`, so that NET is billed to the proposer, whose ROA
+policy must cover it. The
 contracts on `advance`'s path are not small (sizes of the builds in this tree):
 
 | | code | abi | total |

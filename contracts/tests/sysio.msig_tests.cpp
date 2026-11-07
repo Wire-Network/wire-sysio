@@ -3,6 +3,7 @@
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/kv_table_objects.hpp>
+#include <sysio/chain/resource_limits_private.hpp>
 #include <sysio/chain/wast_to_wasm.hpp>
 
 #include <fc/variant_object.hpp>
@@ -74,26 +75,86 @@ public:
       return asset( result, symbol(CORE_SYM) );
    }
 
+   /// `{account, sysio.payer}, {account, active}`: `account` authorizes the action and pays its CPU and NET.
+   static vector<permission_level> payer_auths( account_name account ) {
+      return { { account, config::sysio_payer_name }, { account, config::active_name } };
+   }
+
+   /// `propose` must be paid by its signer; the other msig actions bill the contract.
+   static bool requires_payer( const action_name& name ) {
+      return name == "propose"_n;
+   }
+
    transaction_trace_ptr push_action( const account_name& signer, const action_name& name, const variant_object& data, bool auth = true ) {
-      vector<account_name> accounts;
+      vector<permission_level> auths;
       if( auth )
-         accounts.push_back( signer );
-      auto trace = base_tester::push_action( "sysio.msig"_n, name, accounts, data );
+         auths = requires_payer( name ) ? payer_auths( signer )
+                                        : vector<permission_level>{ { signer, config::active_name } };
+      auto trace = base_tester::push_action( "sysio.msig"_n, name, auths, data );
       produce_block();
       BOOST_REQUIRE_EQUAL( true, chain_has_transaction(trace->id) );
       return trace;
+   }
 
-      /*
-         string action_type_name = abi_ser.get_action_type(name);
+   /// CPU and NET usage accumulators of `account`.
+   struct resource_usage {
+      resource_limits::usage_accumulator cpu;
+      resource_limits::usage_accumulator net;
+   };
 
-         action act;
-         act.account = "sysio.msig"_n;
-         act.name = name;
-         act.data = abi_ser.variant_to_binary( action_type_name, data, fixture_abi_yield_function() );
-         //std::cout << "test:\n" << fc::to_hex(act.data.data(), act.data.size()) << " size = " << act.data.size() << std::endl;
+   resource_usage get_resource_usage( account_name account ) const {
+      const auto& usage = control->db().get<resource_limits::resource_object, resource_limits::by_owner>( account );
+      return { usage.cpu_usage, usage.net_usage };
+   }
 
-         return base_tester::push_action( std::move(act), auth ? uint64_t(signer) : 0 );
-      */
+   /// Pushes `trx` with its CPU measured rather than the tester's fixed bill, and checks that the whole
+   /// transaction's CPU and NET went to `payer` while every account in `unbilled` was left untouched.
+   /// The pending block is not produced, so the expected usage is the payer's accumulator plus this
+   /// transaction at the pending slot.
+   transaction_trace_ptr push_and_check_billed_to( signed_transaction& trx, account_name payer,
+                                                   const vector<account_name>& unbilled ) {
+      const auto payer_before = get_resource_usage( payer );
+      vector<resource_usage> unbilled_before;
+      for( const auto& account : unbilled )
+         unbilled_before.push_back( get_resource_usage( account ) );
+
+      auto trace = base_tester::push_transaction( trx, fc::time_point::maximum(), measured_cpu );
+
+      const auto& cfg = control->db().get<resource_limits::resource_limits_config_object>();
+      const auto slot = block_timestamp_type( control->pending_block_time() ).slot;
+      auto expected = payer_before;
+      expected.cpu.add( trace->total_cpu_usage_us, slot, cfg.account_cpu_usage_average_window );
+      expected.net.add( trace->net_usage, slot, cfg.account_net_usage_average_window );
+      check_usage_equal( expected, get_resource_usage( payer ) );
+
+      for( size_t i = 0; i < unbilled.size(); ++i )
+         check_usage_equal( unbilled_before[i], get_resource_usage( unbilled[i] ) );
+      return trace;
+   }
+
+   static void check_usage_equal( const resource_usage& expected, const resource_usage& actual ) {
+      BOOST_CHECK_EQUAL( expected.cpu.last_ordinal, actual.cpu.last_ordinal );
+      BOOST_CHECK_EQUAL( expected.cpu.value_ex,     actual.cpu.value_ex );
+      BOOST_CHECK_EQUAL( expected.cpu.consumed,     actual.cpu.consumed );
+      BOOST_CHECK_EQUAL( expected.net.last_ordinal, actual.net.last_ordinal );
+      BOOST_CHECK_EQUAL( expected.net.value_ex,     actual.net.value_ex );
+      BOOST_CHECK_EQUAL( expected.net.consumed,     actual.net.consumed );
+   }
+
+   /// `billed_cpu_time_us` of 0 makes the chain measure the transaction's CPU.
+   static constexpr uint32_t measured_cpu = 0;
+
+   /// A one-action transaction on `code`, signed with the active key of every non-payer authorizer.
+   signed_transaction create_signed_trx( account_name code, action_name act, const vector<permission_level>& auths,
+                                         const variant_object& data ) {
+      signed_transaction trx;
+      trx.actions.emplace_back( get_action( code, act, auths, data ) );
+      set_transaction_headers( trx );
+      for( const auto& auth : auths ) {
+         if( auth.permission != config::sysio_payer_name )
+            trx.sign( get_private_key( auth.actor, auth.permission.to_string() ), control->get_chain_id() );
+      }
+      return trx;
    }
 
    transaction reqauth( account_name from, const vector<permission_level>& auths, uint32_t delay_sec = 0 );
@@ -183,6 +244,39 @@ BOOST_FIXTURE_TEST_CASE( propose_approve_execute, sysio_msig_tester ) try {
                         {{"receiver", "sysio.msig"_n}, {"act_name", "exec"_n}},
                         {{"receiver", config::system_account_name}, {"act_name", "reqauth"_n}}
                         } );
+} FC_LOG_AND_RETHROW()
+
+// `propose` bills the proposer: it fails without `{proposer, sysio.payer}`, and when another account is the payer.
+BOOST_FIXTURE_TEST_CASE( propose_requires_payer_auth, sysio_msig_tester ) try {
+   auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}} );
+   const auto propose_data = mvo()
+      ("proposer",      "alice")
+      ("proposal_name", "first")
+      ("trx",           trx)
+      ("requested",     vector<permission_level>{{ "alice"_n, config::active_name }});
+
+   BOOST_REQUIRE_EXCEPTION( base_tester::push_action( "sysio.msig"_n, "propose"_n, "alice"_n, propose_data ),
+                            missing_auth_exception,
+                            fc_exception_message_is("missing authority of alice/sysio.payer") );
+
+   vector<permission_level> bob_pays = payer_auths( "bob"_n );
+   bob_pays.push_back( { "alice"_n, config::active_name } );
+   BOOST_REQUIRE_EXCEPTION( base_tester::push_action( "sysio.msig"_n, "propose"_n, bob_pays, propose_data ),
+                            missing_auth_exception,
+                            fc_exception_message_is("missing authority of alice/sysio.payer") );
+
+   base_tester::push_action( "sysio.msig"_n, "propose"_n, payer_auths( "alice"_n ), propose_data );
+} FC_LOG_AND_RETHROW()
+
+// The proposer pays the CPU and NET of `propose`; msig and the proposal's requested approver are not billed.
+BOOST_FIXTURE_TEST_CASE( propose_billed_to_proposer, sysio_msig_tester ) try {
+   auto proposed = reqauth( "carol"_n, {permission_level{"carol"_n, config::active_name}} );
+   auto propose_trx = create_signed_trx( "sysio.msig"_n, "propose"_n, payer_auths( "alice"_n ), mvo()
+                                            ("proposer",      "alice")
+                                            ("proposal_name", "first")
+                                            ("trx",           proposed)
+                                            ("requested", vector<permission_level>{{ "carol"_n, config::active_name }}) );
+   push_and_check_billed_to( propose_trx, "alice"_n, { "sysio.msig"_n, "carol"_n } );
 } FC_LOG_AND_RETHROW()
 
 
@@ -1007,7 +1101,7 @@ BOOST_FIXTURE_TEST_CASE( sendinline, sysio_msig_tester ) try {
 
    transaction trx = reqauth( "alice"_n, {permission_level{"alice"_n, "perm"_n}} );
 
-   base_tester::push_action( "sysio.msig"_n, "propose"_n, "bob"_n, mvo()
+   base_tester::push_action( "sysio.msig"_n, "propose"_n, payer_auths( "bob"_n ), mvo()
                               ("proposer", "bob")
                               ("proposal_name", "first")
                               ("trx", trx)

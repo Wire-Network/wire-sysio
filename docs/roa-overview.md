@@ -236,6 +236,9 @@ later quota sync by passing `-1, -1` for a `sysio.`-prefixed owner. The prefix a
 nothing — `activateroa` deliberately creates
 `sysio.acct` at **zero** CPU and NET, a pure RAM bucket for account creation.
 
+`sysio.msig::propose` is the exception: its data is a caller-supplied transaction, so it requires
+`{proposer, sysio.payer}` first and the proposer pays its CPU and NET.
+
 > **What `-1` means here.** It is a **sentinel** meaning "no limit," not a quantity. The chain
 > tests for it explicitly (`is_unlimited_cpu` returns `cpu_weight == -1`) and substitutes a large
 > finite number where arithmetic is needed. Seeing `-1` in a `get_account` response is not an

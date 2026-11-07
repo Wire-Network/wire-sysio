@@ -357,6 +357,19 @@ public:
       msig_abi_ser.set_abi(msig_abi, fixture_abi_yield_function());
    }
 
+   /// Pushes a `sysio.msig` action signed by `signer`. `propose` carries `{signer, sysio.payer}` first, as
+   /// msig requires, so `signer` pays; the other msig actions bill the contract.
+   action_result push_action_msig( const account_name& signer, const action_name& name, const variant_object& data ) {
+      action act;
+      act.account = "sysio.msig"_n;
+      act.name = name;
+      act.data = msig_abi_ser.variant_to_binary( msig_abi_ser.get_action_type(name), data, fixture_abi_yield_function() );
+
+      if( name == "propose"_n )
+         return base_tester::push_action( std::move(act), signer.to_uint64_t() );
+      return base_tester::push_contract_paid_action( std::move(act), signer.to_uint64_t() );
+   }
+
    /// Compatibility spelling for activate_producers(). Producer registration itself now requires
    /// the ACTIVE OPERATOR_TYPE_PRODUCER rows that activate_producers installs first.
    ///
