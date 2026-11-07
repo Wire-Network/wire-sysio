@@ -462,8 +462,8 @@ private:
    /// Whether the outpost's state at the read confirmation (`read_settled_block`)
    /// already shows this relay's part of `epoch_index` done: the epoch closed or
    /// tipped, or this relay's delivery recorded. The relay reports an epoch
-   /// handled only then, so a delivery a reorg removes is delivered again
-   /// instead of left to the one consensus retry.
+   /// handled only then, so a delivery a reorg removes is delivered again.
+   /// The job retries after the boundary until inbound delivery reaches the depot.
    bool settled_past_delivery(uint32_t epoch_index);
 
    /// Settle the signer's journal before anything else is sent, the journal's

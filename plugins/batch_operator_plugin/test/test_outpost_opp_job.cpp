@@ -1,18 +1,19 @@
-#include "mocks/mock_depot_ops.hpp"
-#include "mocks/mock_outpost_client.hpp"
-
-#include <fc/network/json_rpc/json_rpc_client.hpp>
-#include <sysio/batch_operator_plugin/outpost_opp_job.hpp>
-#include <sysio/chain/exceptions.hpp>
-
-#include <boost/test/unit_test.hpp>
-
 #include <algorithm>
 #include <array>
 #include <atomic>
 #include <chrono>
 #include <memory>
 #include <thread>
+
+#include <boost/test/unit_test.hpp>
+
+#include <fc/network/json_rpc/json_rpc_client.hpp>
+
+#include <sysio/batch_operator_plugin/outpost_opp_job.hpp>
+#include <sysio/chain/exceptions.hpp>
+
+#include "mocks/mock_depot_ops.hpp"
+#include "mocks/mock_outpost_client.hpp"
 
 using namespace std::literals;
 using sysio::opp::debugging::DEBUG_OUTPOST_ENDPOINTS_TYPE_DEPOT_OUTPOST_ETHEREUM;
@@ -36,28 +37,17 @@ constexpr fc::microseconds kDeadline = fc::seconds(2);
 constexpr auto kTestEpoch = 5u;
 constexpr auto kSolanaChainCode = 1u;
 constexpr auto kSolanaChainId = 0u;
-constexpr auto kInitialRetryDelay = 1s;
-constexpr auto kRetryEpsilon = 1ms;
-constexpr auto kSlowDeliveryDuration = 10s;
 constexpr auto kProcessedSignature = "processed-signature";
 constexpr auto kUnknownConfirmation = "confirmation unknown";
 constexpr auto kExecutionFailure = "execution failed";
 constexpr auto kCompletionQueryFailure = "depot query failed";
-constexpr auto kIncompleteUpload = "more chunks remain";
 constexpr auto kRepeatedPolls = 100u;
-constexpr std::array kExpectedRetryDelays{1s, 2s, 4s, 8s, 16s, 30s, 30s};
 
-/// Freeze time in tests that inspect repeated polls without exercising retry timing.
-std::chrono::steady_clock::time_point fixed_retry_time() {
-   return {};
-}
-
-/// Drive retry eligibility without real sleeps or wall-clock assumptions.
+/// Exercise ordinary cron ticks with one envelope pending until depot completion.
 struct outbound_retry_fixture {
    std::shared_ptr<mock_outpost_client> client = make_client(CHAIN_KIND_SVM, kSolanaChainCode, kSolanaChainId);
    mock_depot_ops depot;
-   std::chrono::steady_clock::time_point now{};
-   outpost_opp_job job{client, depot, kDeadline, [this] { return now; }};
+   outpost_opp_job job{client, depot, kDeadline};
 
    /// Keep a single envelope pending until a test supplies completion evidence.
    outbound_retry_fixture() {
@@ -70,6 +60,7 @@ struct outbound_retry_fixture {
    }
 };
 
+
 } // namespace
 
 BOOST_AUTO_TEST_SUITE(outpost_opp_job_tests)
@@ -81,7 +72,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_skips_when_epoch_window_closed) {
    mock_depot_ops depot;
    depot.window_open = false;
 
-   outpost_opp_job job(client, depot, kDeadline, fixed_retry_time);
+   outpost_opp_job job(client, depot, kDeadline);
    job.run_outbound();
 
    BOOST_CHECK(client->outbound_calls.empty());
@@ -94,7 +85,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_skips_when_not_elected) {
    mock_depot_ops depot;
    depot.elected = false;
 
-   outpost_opp_job job(client, depot, kDeadline, fixed_retry_time);
+   outpost_opp_job job(client, depot, kDeadline);
    job.run_outbound();
 
    BOOST_CHECK(client->outbound_calls.empty());
@@ -107,7 +98,7 @@ BOOST_AUTO_TEST_CASE(run_inbound_skips_when_not_elected) {
    mock_depot_ops depot;
    depot.elected = false;
 
-   outpost_opp_job job(client, depot, kDeadline, fixed_retry_time);
+   outpost_opp_job job(client, depot, kDeadline);
    job.run_inbound();
 
    BOOST_CHECK(client->inbound_calls.empty());
@@ -120,7 +111,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_noop_when_no_pending_envelope) {
    mock_depot_ops depot;
    // depot.pending_response returns nullopt by default.
 
-   outpost_opp_job job(client, depot, kDeadline, fixed_retry_time);
+   outpost_opp_job job(client, depot, kDeadline);
    job.run_outbound();
 
    BOOST_REQUIRE_EQUAL(depot.read_pending_calls.size(), 1u);
@@ -142,7 +133,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_delivers_and_emits_eth_depot_direction) {
    };
    client->deliver_response = [](const auto&) { return std::string{"0x1234"}; };
 
-   outpost_opp_job job(client, depot, kDeadline, fixed_retry_time);
+   outpost_opp_job job(client, depot, kDeadline);
    job.run_outbound();
 
    BOOST_REQUIRE_EQUAL(client->outbound_calls.size(), 1u);
@@ -167,15 +158,15 @@ BOOST_AUTO_TEST_CASE(run_outbound_emits_sol_depot_direction) {
       return rec;
    };
 
-   outpost_opp_job job(client, depot, kDeadline, fixed_retry_time);
+   outpost_opp_job job(client, depot, kDeadline);
    job.run_outbound();
 
    BOOST_REQUIRE_EQUAL(depot.emitted_events.size(), 1u);
    BOOST_CHECK(std::get<1>(depot.emitted_events[0]) == DEBUG_OUTPOST_ENDPOINTS_TYPE_DEPOT_OUTPOST_SOLANA);
 }
 
-/// Consecutive cron polls are throttled, and changing epoch makes the next envelope eligible.
-BOOST_AUTO_TEST_CASE(run_outbound_throttles_repeated_polls_and_resets_on_new_epoch) {
+/// A successful first send waits for the boundary, while a new epoch sends immediately.
+BOOST_AUTO_TEST_CASE(run_outbound_waits_for_boundary_before_retrying) {
    auto client = make_client(CHAIN_KIND_EVM, 0, 31337);
    mock_depot_ops depot;
    depot.epoch = 5;
@@ -186,7 +177,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_throttles_repeated_polls_and_resets_on_new_epo
       return rec;
    };
 
-   outpost_opp_job job(client, depot, kDeadline, fixed_retry_time);
+   outpost_opp_job job(client, depot, kDeadline);
    job.run_outbound();
    job.run_outbound(); // Second fire in the same epoch.
 
@@ -212,7 +203,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_cranks_the_outpost_once_per_epoch_after_delive
       return rec;
    };
 
-   outpost_opp_job job(client, depot, kDeadline, fixed_retry_time);
+   outpost_opp_job job(client, depot, kDeadline);
    job.run_outbound();
    BOOST_REQUIRE_EQUAL(client->outbound_calls.size(), 1u);
    BOOST_REQUIRE_EQUAL(client->crank_calls.size(), 1u);
@@ -241,7 +232,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_consensus_retry_does_not_crank_again) {
       return rec;
    };
 
-   outpost_opp_job job(client, depot, kDeadline, fixed_retry_time);
+   outpost_opp_job job(client, depot, kDeadline);
    job.run_outbound();
    BOOST_REQUIRE_EQUAL(client->crank_calls.size(), 1u);
 
@@ -264,7 +255,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_does_not_crank_when_delivery_fails) {
    };
    client->deliver_response = [](const auto&) -> std::string { FC_THROW("rpc down"); };
 
-   outpost_opp_job job(client, depot, kDeadline, fixed_retry_time);
+   outpost_opp_job job(client, depot, kDeadline);
    job.run_outbound();
    BOOST_CHECK_EQUAL(client->outbound_calls.size(), 1u);
    BOOST_CHECK(client->crank_calls.empty());
@@ -284,7 +275,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_crank_failure_leaves_the_delivery_marked) {
    };
    client->crank_response = [](const auto&) { FC_THROW("crank refused"); };
 
-   outpost_opp_job job(client, depot, kDeadline, fixed_retry_time);
+   outpost_opp_job job(client, depot, kDeadline);
    job.run_outbound();
    BOOST_CHECK_EQUAL(client->outbound_calls.size(), 1u);
    BOOST_CHECK_EQUAL(client->crank_calls.size(), 1u);
@@ -311,16 +302,14 @@ BOOST_AUTO_TEST_CASE(run_outbound_swallows_exceptions_and_does_not_mark_epoch) {
       FC_THROW("boom");
    };
 
-   std::chrono::steady_clock::time_point now{};
-   outpost_opp_job job(client, depot, kDeadline, [&] { return now; });
+   outpost_opp_job job(client, depot, kDeadline);
    BOOST_CHECK_NO_THROW(job.run_outbound());
    // Visibility fix: emit fires BEFORE delivery, so a failed attempt still
    // lands a debug event with the attempted bytes.
    BOOST_CHECK_EQUAL(depot.emitted_events.size(), 1u);
 
-   // A failed attempt stays eligible once its nonblocking backoff elapses.
+   // The failed attempt should NOT bump _last_outbound_epoch; next tick retries.
    client->deliver_response = [](const auto&) { return std::string{"recovered"}; };
-   now += kInitialRetryDelay;
    job.run_outbound();
    BOOST_REQUIRE_EQUAL(client->outbound_calls.size(), 2u);
    // Two emits total: one for the failed attempt, one for the recovered retry.
@@ -328,8 +317,9 @@ BOOST_AUTO_TEST_CASE(run_outbound_swallows_exceptions_and_does_not_mark_epoch) {
    BOOST_REQUIRE_EQUAL(depot.emitted_events.size(), 2u);
 }
 
-/// Partial progress retains the short continuation delay and cranks only after success.
-BOOST_AUTO_TEST_CASE(run_outbound_retries_an_incomplete_delivery_after_backoff_without_cranking) {
+/// An incomplete delivery is neither a failure nor a handled epoch: the job
+/// neither cranks nor marks it, and the next tick delivers again.
+BOOST_AUTO_TEST_CASE(run_outbound_retries_an_incomplete_delivery_next_tick_without_cranking) {
    auto client = make_client(CHAIN_KIND_EVM, 0, 31337);
    mock_depot_ops depot;
    depot.epoch = 5;
@@ -342,15 +332,13 @@ BOOST_AUTO_TEST_CASE(run_outbound_retries_an_incomplete_delivery_after_backoff_w
       SYS_THROW(sysio::chain::outpost_delivery_incomplete_exception, "still open");
    };
 
-   std::chrono::steady_clock::time_point now{};
-   outpost_opp_job job(client, depot, kDeadline, [&] { return now; });
+   outpost_opp_job job(client, depot, kDeadline);
    BOOST_CHECK_NO_THROW(job.run_outbound());
    BOOST_CHECK_EQUAL(client->outbound_calls.size(), 1u);
    BOOST_CHECK_EQUAL(client->crank_calls.size(), 0u);
 
    // Not marked: the next tick resumes it, and the crank rides the delivery that lands.
    client->deliver_response = [](const auto&) { return std::string{"0xfinished"}; };
-   now += kInitialRetryDelay;
    job.run_outbound();
    BOOST_CHECK_EQUAL(client->outbound_calls.size(), 2u);
    BOOST_CHECK_EQUAL(client->crank_calls.size(), 1u);
@@ -358,8 +346,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_retries_an_incomplete_delivery_after_backoff_w
    BOOST_CHECK_EQUAL(client->outbound_calls.size(), 2u);
 }
 
-/// Failed submissions still emit diagnostic bytes and retry after their scheduled delay.
-BOOST_AUTO_TEST_CASE(run_outbound_emits_event_on_failure_and_retries_after_backoff) {
+BOOST_AUTO_TEST_CASE(run_outbound_emits_event_on_failure_and_retries_next_tick) {
    // Reproduces the dev-026 Solana groups-of-7 symptom: delivery throws a
    // json_rpc_error with -32602/empty body, the cron tick swallows it, and
    // the next beat retries against the same epoch+envelope. Visibility fix
@@ -376,8 +363,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_emits_event_on_failure_and_retries_after_backo
       throw fc::network::json_rpc::json_rpc_error(-32602, "", fc::variant{});
    };
 
-   std::chrono::steady_clock::time_point now{};
-   outpost_opp_job job(client, depot, kDeadline, [&] { return now; });
+   outpost_opp_job job(client, depot, kDeadline);
    BOOST_CHECK_NO_THROW(job.run_outbound());
 
    BOOST_REQUIRE_EQUAL(depot.emitted_events.size(), 1u);
@@ -390,7 +376,6 @@ BOOST_AUTO_TEST_CASE(run_outbound_emits_event_on_failure_and_retries_after_backo
    // Same epoch, success on retry — proves _last_outbound_epoch wasn't
    // advanced by the failure.
    client->deliver_response = [](const auto&) { return std::string{"sig"}; };
-   now += kInitialRetryDelay;
    job.run_outbound();
    BOOST_REQUIRE_EQUAL(client->outbound_calls.size(), 2u);
    BOOST_REQUIRE_EQUAL(depot.emitted_events.size(), 2u);
@@ -411,60 +396,33 @@ BOOST_AUTO_TEST_CASE(run_outbound_emit_failure_does_not_break_delivery) {
    client->deliver_response = [](const auto&) { return std::string{"0xdeadbeef"}; };
    depot.emit_thrower = [] { FC_THROW("debug sink down"); };
 
-   outpost_opp_job job(client, depot, kDeadline, fixed_retry_time);
+   outpost_opp_job job(client, depot, kDeadline);
    BOOST_CHECK_NO_THROW(job.run_outbound());
 
    BOOST_REQUIRE_EQUAL(client->outbound_calls.size(), 1u);
    BOOST_CHECK(depot.emitted_events.empty()); // throwing emit was not recorded
 }
 
-/// Provisional success never exhausts retries, and inbound remains runnable between them.
-BOOST_FIXTURE_TEST_CASE(run_outbound_retries_with_capped_backoff_while_inbound_is_empty, outbound_retry_fixture) {
+/// Before the boundary, only the first success sends; afterward each cron tick retries until completion.
+BOOST_FIXTURE_TEST_CASE(run_outbound_retries_each_post_boundary_tick_until_depot_completion, outbound_retry_fixture) {
    job.run_outbound();
-   for (const auto delay : kExpectedRetryDelays) {
-      const auto calls = client->outbound_calls.size();
-      now += delay - kRetryEpsilon;
-      for (unsigned tick = 0; tick < kRepeatedPolls; ++tick) {
-         job.run_outbound();
-         job.run_inbound();
-      }
-      BOOST_CHECK_EQUAL(client->outbound_calls.size(), calls);
-      now += kRetryEpsilon;
+   for (unsigned tick = 0; tick < kRepeatedPolls; ++tick) {
       job.run_outbound();
-      BOOST_CHECK_EQUAL(client->outbound_calls.size(), calls + 1);
+      job.run_inbound();
    }
-   BOOST_CHECK_EQUAL(client->inbound_calls.size(), kRepeatedPolls * kExpectedRetryDelays.size());
-   BOOST_CHECK(depot.deliver_calls.empty());
+   BOOST_CHECK_EQUAL(client->outbound_calls.size(), 1u);
+   BOOST_CHECK_EQUAL(client->inbound_calls.size(), kRepeatedPolls);
+   depot.epoch_boundary_past = true;
+   for (unsigned tick = 0; tick < kRepeatedPolls; ++tick)
+      job.run_outbound();
+   BOOST_CHECK_EQUAL(client->outbound_calls.size(), kRepeatedPolls + 1);
+   depot.has_delivered_response = [](uint64_t, uint32_t) { return true; };
+   job.run_outbound();
+   BOOST_CHECK_EQUAL(client->outbound_calls.size(), kRepeatedPolls + 1);
    BOOST_CHECK_EQUAL(client->crank_calls.size(), 1u);
 }
 
-/// The boundary expedites one attempt, then subsequent polls obey backoff again.
-BOOST_FIXTURE_TEST_CASE(run_outbound_boundary_resets_backoff_once, outbound_retry_fixture) {
-   job.run_outbound();
-   for (size_t attempt = 0; attempt < 5; ++attempt) {
-      now += kExpectedRetryDelays[attempt];
-      job.run_outbound();
-   }
-   const auto before_boundary = client->outbound_calls.size();
-   depot.epoch_boundary_past = true;
-   job.run_outbound();
-   BOOST_CHECK_EQUAL(client->outbound_calls.size(), before_boundary + 1);
-   depot.epoch_boundary_past = false;
-   job.run_outbound();
-   depot.epoch_boundary_past = true;
-   job.run_outbound();
-   BOOST_CHECK_EQUAL(client->outbound_calls.size(), before_boundary + 1);
-   now += kInitialRetryDelay;
-   job.run_outbound();
-   BOOST_CHECK_EQUAL(client->outbound_calls.size(), before_boundary + 2);
-   BOOST_CHECK_EQUAL(client->crank_calls.size(), 1u);
-   ++depot.epoch;
-   job.run_outbound();
-   BOOST_CHECK_EQUAL(client->outbound_calls.size(), before_boundary + 3);
-   BOOST_CHECK_EQUAL(client->crank_calls.size(), 2u);
-}
-
-/// Successful terminal sends before the remote boundary still need a later consensus retry.
+/// The depot's boundary can precede the remote boundary by a dispatch drain; another tick must still tip.
 BOOST_FIXTURE_TEST_CASE(run_outbound_recovers_when_outpost_boundary_is_later, outbound_retry_fixture) {
    bool outpost_boundary_past = false;
    bool consensus = false;
@@ -476,17 +434,15 @@ BOOST_FIXTURE_TEST_CASE(run_outbound_recovers_when_outpost_boundary_is_later, ou
    depot.epoch_boundary_past = true;
    job.run_outbound();
    BOOST_CHECK(!consensus);
-   now += kInitialRetryDelay;
    job.run_outbound();
    BOOST_CHECK(!consensus);
    outpost_boundary_past = true;
-   now += kExpectedRetryDelays[1];
    job.run_outbound();
    BOOST_CHECK(consensus);
    BOOST_CHECK_EQUAL(client->outbound_calls.size(), 4u);
 }
 
-/// A local completion row stops sends, but its disappearance must restore recovery.
+/// A local completion row stops sends, but its disappearance must restore post-boundary recovery.
 BOOST_FIXTURE_TEST_CASE(run_outbound_rechecks_depot_completion_without_latching_it, outbound_retry_fixture) {
    bool completed = true;
    depot.has_delivered_response = [&](uint64_t, uint32_t) { return completed; };
@@ -495,7 +451,7 @@ BOOST_FIXTURE_TEST_CASE(run_outbound_rechecks_depot_completion_without_latching_
    completed = false;
    job.run_outbound();
    BOOST_CHECK_EQUAL(client->outbound_calls.size(), 1u);
-   now += kInitialRetryDelay;
+   depot.epoch_boundary_past = true;
    completed = true;
    job.run_outbound();
    BOOST_CHECK_EQUAL(client->outbound_calls.size(), 1u);
@@ -504,34 +460,19 @@ BOOST_FIXTURE_TEST_CASE(run_outbound_rechecks_depot_completion_without_latching_
    BOOST_CHECK_EQUAL(client->outbound_calls.size(), 2u);
 }
 
-/// A confirmed settled shortcut is still provisional and cannot consume a final retry.
+/// A settled shortcut is provisional and cannot consume a final retry.
 BOOST_FIXTURE_TEST_CASE(run_outbound_empty_success_keeps_recovery_eligible, outbound_retry_fixture) {
    client->deliver_response = [](const auto&) { return std::string{}; };
    job.run_outbound();
    depot.epoch_boundary_past = true;
    job.run_outbound();
-   now += kInitialRetryDelay;
    job.run_outbound();
    BOOST_CHECK_EQUAL(client->outbound_calls.size(), 3u);
    BOOST_CHECK_EQUAL(client->crank_calls.size(), 1u);
 }
 
-/// Rate limits are measured after RPC completion, including a slow successful send.
-BOOST_FIXTURE_TEST_CASE(run_outbound_backoff_starts_after_delivery_completes, outbound_retry_fixture) {
-   client->deliver_response = [&](const auto&) {
-      now += kSlowDeliveryDuration;
-      return std::string{kProcessedSignature};
-   };
-   job.run_outbound();
-   job.run_outbound();
-   BOOST_CHECK_EQUAL(client->outbound_calls.size(), 1u);
-   now += kInitialRetryDelay;
-   job.run_outbound();
-   BOOST_CHECK_EQUAL(client->outbound_calls.size(), 2u);
-}
-
-/// Execution errors and unknown confirmations both leave the epoch recoverable and rate limited.
-BOOST_FIXTURE_TEST_CASE(run_outbound_backs_off_errors_and_unknown_confirmations, outbound_retry_fixture) {
+/// Execution errors and unknown confirmations leave the first delivery eligible on the next tick.
+BOOST_FIXTURE_TEST_CASE(run_outbound_retries_errors_and_unknown_confirmations, outbound_retry_fixture) {
    for (const bool unknown_confirmation : {false, true}) {
       ++depot.epoch;
       client->deliver_response = [unknown_confirmation](const auto&) -> std::string {
@@ -542,42 +483,25 @@ BOOST_FIXTURE_TEST_CASE(run_outbound_backs_off_errors_and_unknown_confirmations,
       const auto calls = client->outbound_calls.size();
       job.run_outbound();
       job.run_outbound();
-      BOOST_CHECK_EQUAL(client->outbound_calls.size(), calls + 1);
-      now += kInitialRetryDelay;
+      BOOST_CHECK_EQUAL(client->outbound_calls.size(), calls + 2);
       client->deliver_response = [](const auto&) { return std::string{kProcessedSignature}; };
       job.run_outbound();
-      BOOST_CHECK_EQUAL(client->outbound_calls.size(), calls + 2);
+      BOOST_CHECK_EQUAL(client->outbound_calls.size(), calls + 3);
    }
 }
 
-/// A failed completion query is unknown state, not a permanently handled epoch.
+/// A failed completion query is unknown state; the next tick must recover.
 BOOST_FIXTURE_TEST_CASE(run_outbound_recovers_from_completion_query_failure, outbound_retry_fixture) {
    depot.has_delivered_response = [](uint64_t, uint32_t) -> bool { FC_THROW(kCompletionQueryFailure); };
    BOOST_CHECK_NO_THROW(job.run_outbound());
    BOOST_CHECK(client->outbound_calls.empty());
    depot.has_delivered_response = {};
    job.run_outbound();
-   BOOST_CHECK(client->outbound_calls.empty());
-   now += kInitialRetryDelay;
-   job.run_outbound();
    BOOST_CHECK_EQUAL(client->outbound_calls.size(), 1u);
 }
 
-/// Incomplete continuations retain a short delay without requiring proof of progress.
-BOOST_FIXTURE_TEST_CASE(run_outbound_partial_progress_keeps_short_backoff, outbound_retry_fixture) {
-   client->deliver_response = [](const auto&) -> std::string {
-      SYS_THROW(sysio::chain::outpost_delivery_incomplete_exception, kIncompleteUpload);
-   };
-   for (unsigned attempt = 0; attempt < 6; ++attempt) {
-      job.run_outbound();
-      BOOST_CHECK_EQUAL(client->outbound_calls.size(), attempt + 1);
-      now += kInitialRetryDelay;
-   }
-   BOOST_CHECK(client->crank_calls.empty());
-}
-
-/// Missing work spends no retry delay, and epoch zero never sends.
-BOOST_FIXTURE_TEST_CASE(run_outbound_missing_envelope_and_genesis_do_not_spend_backoff, outbound_retry_fixture) {
+/// Missing work stays eligible, and epoch zero never sends.
+BOOST_FIXTURE_TEST_CASE(run_outbound_missing_envelope_and_genesis_stay_eligible, outbound_retry_fixture) {
    const auto pending = depot.pending_response;
    depot.pending_response = {};
    job.run_outbound();
@@ -590,7 +514,7 @@ BOOST_FIXTURE_TEST_CASE(run_outbound_missing_envelope_and_genesis_do_not_spend_b
    BOOST_CHECK_EQUAL(client->outbound_calls.size(), 1u);
 }
 
-/// The production jobs recover two-of-three consensus after both final allowed sends roll back.
+/// The production jobs recover two-of-three consensus after the initial and first retry sends roll back.
 /// Mock sends return processed success on a discarded fork; inbound stays empty until
 /// canonical settlement is explicitly finalized. No restart or third operator is supplied.
 BOOST_AUTO_TEST_CASE(run_outbound_recovers_rolled_back_success_with_two_online_operators) {
@@ -599,7 +523,6 @@ BOOST_AUTO_TEST_CASE(run_outbound_recovers_rolled_back_success_with_two_online_o
    const std::vector<char> outbound{'e', 'n', 'v'};
    const std::vector<char> inbound{'f', 'i', 'n'};
    for (const bool rollback_initial : {false, true}) {
-      std::chrono::steady_clock::time_point now{};
       std::array<mock_depot_ops, online_operators> depots;
       std::array<std::shared_ptr<mock_outpost_client>, online_operators> clients;
       std::array<std::unique_ptr<outpost_opp_job>, online_operators> jobs;
@@ -644,7 +567,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_recovers_rolled_back_success_with_two_online_o
          clients[op]->inbound_response = [&](const auto&) {
             return canonical_consensus && finalized ? inbound : std::vector<char>{};
          };
-         jobs[op] = std::make_unique<outpost_opp_job>(clients[op], depots[op], kDeadline, [&] { return now; });
+         jobs[op] = std::make_unique<outpost_opp_job>(clients[op], depots[op], kDeadline);
          jobs[op]->run_outbound();
       }
       fork_deliveries = canonical_deliveries;
@@ -665,7 +588,6 @@ BOOST_AUTO_TEST_CASE(run_outbound_recovers_rolled_back_success_with_two_online_o
       BOOST_CHECK(!canonical_consensus);
       for (unsigned poll = 0; poll < kRepeatedPolls; ++poll) {
          for (auto& job : jobs) {
-            job->run_outbound();
             job->run_inbound();
          }
       }
@@ -673,7 +595,6 @@ BOOST_AUTO_TEST_CASE(run_outbound_recovers_rolled_back_success_with_two_online_o
          BOOST_CHECK_EQUAL(clients[op]->outbound_calls.size(), 2u);
          BOOST_CHECK(depots[op].deliver_calls.empty());
       }
-      now += kInitialRetryDelay;
       for (auto& job : jobs) {
          job->run_outbound();
          job->run_inbound();
@@ -702,7 +623,7 @@ BOOST_AUTO_TEST_CASE(run_inbound_skips_when_epoch_window_closed) {
    mock_depot_ops depot;
    depot.window_open = false;
 
-   outpost_opp_job job(client, depot, kDeadline, fixed_retry_time);
+   outpost_opp_job job(client, depot, kDeadline);
    job.run_inbound();
 
    BOOST_CHECK(client->inbound_calls.empty());
@@ -714,7 +635,7 @@ BOOST_AUTO_TEST_CASE(run_inbound_skips_when_already_delivered) {
    mock_depot_ops depot;
    depot.has_delivered_response = [](uint64_t, uint32_t) { return true; };
 
-   outpost_opp_job job(client, depot, kDeadline, fixed_retry_time);
+   outpost_opp_job job(client, depot, kDeadline);
    job.run_inbound();
 
    BOOST_REQUIRE_EQUAL(depot.has_delivered_calls.size(), 1u);
@@ -726,7 +647,7 @@ BOOST_AUTO_TEST_CASE(run_inbound_noop_when_remote_has_nothing) {
    auto client = make_client(CHAIN_KIND_EVM, 0, 31337);
    mock_depot_ops depot;
 
-   outpost_opp_job job(client, depot, kDeadline, fixed_retry_time);
+   outpost_opp_job job(client, depot, kDeadline);
    job.run_inbound();
 
    BOOST_REQUIRE_EQUAL(client->inbound_calls.size(), 1u);
@@ -741,7 +662,7 @@ BOOST_AUTO_TEST_CASE(run_inbound_delivers_to_depot_and_emits_eth_depot_signal) {
    std::vector<char> raw{'i', 'n', 'b'};
    client->inbound_response = [raw](const auto&) { return raw; };
 
-   outpost_opp_job job(client, depot, kDeadline, fixed_retry_time);
+   outpost_opp_job job(client, depot, kDeadline);
    job.run_inbound();
 
    BOOST_REQUIRE_EQUAL(depot.deliver_calls.size(), 1u);
@@ -761,7 +682,7 @@ BOOST_AUTO_TEST_CASE(run_inbound_emits_sol_depot_signal) {
    std::vector<char> raw{'s'};
    client->inbound_response = [raw](const auto&) { return raw; };
 
-   outpost_opp_job job(client, depot, kDeadline, fixed_retry_time);
+   outpost_opp_job job(client, depot, kDeadline);
    job.run_inbound();
 
    BOOST_REQUIRE_EQUAL(depot.emitted_events.size(), 1u);
@@ -779,7 +700,7 @@ BOOST_AUTO_TEST_CASE(run_inbound_emits_before_deliver_to_depot) {
    client->inbound_response = [raw](const auto&) { return raw; };
    depot.deliver_thrower = [] { FC_THROW("transient mempool"); };
 
-   outpost_opp_job job(client, depot, kDeadline, fixed_retry_time);
+   outpost_opp_job job(client, depot, kDeadline);
    BOOST_CHECK_NO_THROW(job.run_inbound());
 
    BOOST_REQUIRE_EQUAL(depot.emitted_events.size(), 1u);
@@ -801,7 +722,7 @@ BOOST_AUTO_TEST_CASE(run_inbound_emit_failure_does_not_break_delivery) {
    client->inbound_response = [raw](const auto&) { return raw; };
    depot.emit_thrower = [] { FC_THROW("debug sink down"); };
 
-   outpost_opp_job job(client, depot, kDeadline, fixed_retry_time);
+   outpost_opp_job job(client, depot, kDeadline);
    BOOST_CHECK_NO_THROW(job.run_inbound());
 
    BOOST_REQUIRE_EQUAL(depot.deliver_calls.size(), 1u);
@@ -833,7 +754,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_and_run_inbound_serialize_on_state_mx) {
       return std::string{"tx"};
    };
 
-   outpost_opp_job job(client, depot, kDeadline, fixed_retry_time);
+   outpost_opp_job job(client, depot, kDeadline);
 
    std::thread outbound([&] { job.run_outbound(); });
    while (!outbound_started) std::this_thread::sleep_for(1ms);
