@@ -895,7 +895,7 @@ std::string contract_encode_data(const abi::contract& contract, const std::vecto
       const auto& comp = inputs[i];
       auto encoded = encode_value(comp, params[i]);
 
-      if (comp.is_dynamic() || comp.is_list()) {
+      if (comp.is_dynamic()) {
          heads.emplace_back(32, 0);
          tails.push_back(std::move(encoded));
       } else {
@@ -904,7 +904,8 @@ std::string contract_encode_data(const abi::contract& contract, const std::vecto
       }
    }
 
-   size_t head_size = heads.size() * 32;
+   auto head_sizes = heads | std::views::transform([](const auto& h) { return h.size(); });
+   size_t head_size = std::ranges::fold_left(head_sizes, size_t{}, std::plus<>{});
    size_t offset = head_size;
 
    for (size_t i = 0; i < heads.size(); ++i) {
@@ -960,8 +961,8 @@ fc::variant contract_decode_data(const abi::contract& contract, const std::strin
    // If there's only one component, return it directly (not wrapped in an array)
    if (components.size() == 1) {
       const auto& comp = components[0];
-      // For dynamic or list components, we need to read the offset pointer first
-      if (comp.is_dynamic() || comp.is_list()) {
+      // Only ABI-dynamic components have an offset pointer; fixed arrays of static elements are inline.
+      if (comp.is_dynamic()) {
          size_t actual_offset = offset + read_abi_word_as_size(data, offset, data_size, "parameter offset");
          return decode_value(comp, data, data_size, actual_offset);
       }

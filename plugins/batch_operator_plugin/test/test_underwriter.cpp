@@ -2,6 +2,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <algorithm>
 #include <cstdint>
 #include <cstring>
 #include <limits>
@@ -211,6 +212,64 @@ BOOST_AUTO_TEST_CASE(the_scan_window_keeps_every_request_still_needed) {
    other_issuer.issuer = sysio::chain::name{"someone"};
    BOOST_CHECK_EQUAL(2u, next_scan_start(0, {other_issuer, settled(1)}, {}, {}));
    BOOST_CHECK_EQUAL(7u, next_scan_start(7, {}, {}, {}));
+}
+
+BOOST_AUTO_TEST_CASE(a_prune_sweep_moves_past_what_each_prune_examines) {
+   constexpr uint32_t limit = 3;
+   // More rows than one prune examines: the next one starts at the first id it leaves.
+   prune_sweep sweep{.from = 2, .last = 9};
+   sweep.advance({.ids = {2, 4, 7, 9}, .more = true}, limit);
+   BOOST_CHECK_EQUAL(9u, sweep.from);
+   BOOST_CHECK_EQUAL(9u, sweep.last.value());
+   // A read cut short before the id after the prune's: the next one starts where this one did.
+   sweep.advance({.ids = {9, 11}, .more = true}, limit);
+   BOOST_CHECK_EQUAL(9u, sweep.from);
+   // The first id left is newer than the sweep: a new sweep starts at 0 and reads its own newest id.
+   sweep.advance({.ids = {9, 11, 12, 14}}, limit);
+   BOOST_CHECK_EQUAL(0u, sweep.from);
+   BOOST_CHECK(!sweep.last.has_value());
+   // The prune reaches the end of the table: a new sweep, too.
+   sweep = {.from = 2, .last = 7};
+   sweep.advance({.ids = {2, 4, 7}}, limit);
+   BOOST_CHECK_EQUAL(0u, sweep.from);
+   BOOST_CHECK(!sweep.last.has_value());
+   sweep = {.from = 0, .last = 0};   // an empty table
+   sweep.advance({}, limit);
+   BOOST_CHECK_EQUAL(0u, sweep.from);
+   BOOST_CHECK(!sweep.last.has_value());
+}
+
+// Requests arrive faster than one prune per interval examines, and each becomes prunable a retention period after it
+// arrives. Every sweep still returns to the oldest requests, so they are pruned once eligible.
+BOOST_AUTO_TEST_CASE(a_prune_sweep_returns_to_old_requests_under_sustained_intake) {
+   constexpr uint32_t limit             = 64;
+   constexpr uint32_t arrivals          = limit + 1;   // per interval
+   constexpr uint32_t retention         = 7 * 24 * 6;  // intervals of 10 minutes: seven days
+   constexpr uint32_t intervals         = 3 * retention;
+   std::map<request_id_t, uint32_t> table;              // request id -> interval it arrived in
+   request_id_t                     next_id = 1;
+   prune_sweep                      sweep;
+   uint32_t                         sweeps = 0, removed = 0;
+   for (uint32_t now = 0; now < intervals; ++now) {
+      for (uint32_t i = 0; i < arrivals; ++i) table.emplace(next_id++, now);
+      if (!sweep.last) sweep.last = table.empty() ? 0 : table.rbegin()->first;
+      request_id_page page;
+      auto            it = table.lower_bound(sweep.from);
+      for (; it != table.end() && page.ids.size() <= limit; ++it) page.ids.push_back(it->first);
+      page.more = it != table.end();
+      // The prune: the first `limit` requests from `from` go once their retention period has passed.
+      for (size_t i = 0; i < std::min<size_t>(limit, page.ids.size()); ++i) {
+         if (now - table.at(page.ids[i]) >= retention) {
+            table.erase(page.ids[i]);
+            ++removed;
+         }
+      }
+      sweep.advance(page, limit);
+      if (sweep.from == 0) ++sweeps;
+   }
+   BOOST_CHECK(!table.contains(1));
+   BOOST_CHECK_GT(removed, 0u);
+   BOOST_CHECK_GT(sweeps, 1u);
 }
 
 BOOST_AUTO_TEST_CASE(bonded_requests_are_remembered_until_their_row_is_pruned) {

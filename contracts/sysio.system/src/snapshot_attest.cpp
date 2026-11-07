@@ -305,7 +305,16 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
 
    snap_records_table records(get_self());
    const snap_record_key_t record_key{static_cast<uint64_t>(block_num)};
-   if (matches_final_snapshot_record(records, record_key, block_id, snapshot_hash)) {
+   // Matched before the provider check: a provider node shuts down on snap_hash_disagreement_error, so a
+   // mismatch is reported whether or not the account still holds a mapping.
+   const bool already_final = matches_final_snapshot_record(records, record_key, block_id, snapshot_hash);
+
+   // Checked before the already-final return, so only a registered provider's late vote succeeds.
+   snap_providers_table providers(get_self());
+   const auto provider_itr = providers.find(snap_provider_key_t{snap_account.value});
+   check(provider_itr != providers.end(), provider_not_registered_error);
+   // A late vote cannot count toward a quorum, so it skips the standing check below.
+   if (already_final) {
       return;
    }
    if (records.cbegin() != records.cend()) {
@@ -313,9 +322,6 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
       check(block_num > latest_record->block_num, historical_block_id_error);
    }
 
-   snap_providers_table providers(get_self());
-   const auto provider_itr = providers.find(snap_provider_key_t{snap_account.value});
-   check(provider_itr != providers.end(), provider_not_registered_error);
    const name producer = provider_itr->producer;
    // Each vote re-checks the producer's live operator standing: ACTIVE in sysio.opreg and clear of the live
    // collateral minimum, bootstrapped exempt. A slash, a termination or a withdrawal below the minimum ends it, and a

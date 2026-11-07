@@ -151,8 +151,12 @@ constexpr uint64_t BPS_DENOMINATOR = 10000;
 constexpr std::string_view STATEMENT_SCHEMA = "oppenvelope";
 /// sysio.synd's default challenge window, for a pair with no `syndconfig` row.
 constexpr uint32_t DEFAULT_WINDOW_SEC = 10800;
-/// A crank budget large enough for every case here.
-constexpr uint32_t CRANK_LIMIT = 100;
+/// sysio.synd's MAX_CRANK_LIMIT: the largest budget a crank or sync acts on.
+constexpr uint32_t MAX_CRANK_LIMIT = 64;
+/// A crank budget large enough for every case here: the largest a crank takes.
+constexpr uint32_t CRANK_LIMIT = MAX_CRANK_LIMIT;
+/// A limit far past MAX_CRANK_LIMIT, which a crank or sync clamps.
+constexpr uint32_t HUGE_LIMIT = std::numeric_limits<uint32_t>::max();
 
 /// sysio.bond's PRUNE_RETENTION_SEC: a ruled request stays seven days.
 constexpr uint32_t PRUNE_RETENTION_SEC = 604'800;
@@ -500,6 +504,33 @@ public:
    }
    action_result crank(uint32_t limit = CRANK_LIMIT, name signer = "carol"_n) {
       return push(SYND_ACCOUNT, synd_abi_ser, signer, "crank"_n, mvo()("limit", limit));
+   }
+   /// Push sysio.synd's `action_name` in a read-only transaction, which the chain refuses on any row
+   /// write: success() only when the action wrote nothing.
+   action_result push_readonly(name action_name, const variant_object& data) {
+      action act;
+      act.account = SYND_ACCOUNT;
+      act.name    = action_name;
+      act.data    = synd_abi_ser.variant_to_binary(synd_abi_ser.get_action_type(action_name), data,
+                                                   fixture_abi_yield_function());
+      signed_transaction trx;
+      trx.actions.emplace_back(std::move(act));
+      set_transaction_headers(trx);
+      try {
+         push_transaction(trx, fc::time_point::maximum(), DEFAULT_BILLED_CPU_TIME_US, false,
+                          transaction_metadata::trx_type::read_only);
+      } catch (const fc::exception& ex) {
+         return error(ex.top_message());
+      }
+      return success();
+   }
+   /// The data of sysio.synd's `syncenv` for the SOLANA envelope of `token_code` at `epoch`.
+   static mvo syncenv_data(uint32_t epoch, std::string_view token_code = LIQSOL) {
+      return mvo()("chain_code", codename_mvo(SOLANA))("token_code", codename_mvo(token_code))("epoch_index", epoch);
+   }
+   /// The data of sysio.synd's `pruneenv` for SOLANA's `token_code`, up to `limit` envelopes.
+   static mvo pruneenv_data(uint32_t limit, std::string_view token_code = LIQSOL) {
+      return mvo()("chain_code", codename_mvo(SOLANA))("token_code", codename_mvo(token_code))("limit", limit);
    }
    /// Move the depot's current epoch index, through the stand-in on sysio.epoch.
    action_result set_epoch(uint32_t index) {
@@ -3034,6 +3065,113 @@ BOOST_FIXTURE_TEST_CASE(a_step_over_many_idle_pairs_stops_on_the_cap, sysio_synd
    BOOST_REQUIRE_EQUAL(success(), crank(1));
    BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQTWO, 1)["state"].as_string());
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(3 * UNIT), liq_balance("alice"_n, LIQTWO_SYM));
+} FC_LOG_AND_RETHROW()
+
+// Anyone may crank and sysio.synd pays the CPU, so a crank's limit is clamped to MAX_CRANK_LIMIT: with one
+// more item than that releasable, a crank asking for everything releases MAX_CRANK_LIMIT items, and the next
+// crank releases the last one.
+BOOST_FIXTURE_TEST_CASE(a_crank_limit_past_the_maximum_is_clamped, sysio_synd_tester) try {
+   const auto signer = ed_signer();
+   const auto pubkey = ed_bytes(signer.get_public_key());
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
+   constexpr uint32_t items  = MAX_CRANK_LIMIT + 1;
+   const auto         digest = digest_of("envelope-1");
+   for (uint64_t sequence = 1; sequence <= items; ++sequence) {
+      BOOST_REQUIRE_EQUAL(success(), onsynd(SOLANA, 1, digest, sequence, ChainKind::CHAIN_KIND_SVM, pubkey, LIQSOL,
+                                            UNIT));
+   }
+   BOOST_REQUIRE_EQUAL(success(), closeenv(SOLANA, 1, digest));
+   underwrite_envelope(SOLANA, LIQSOL, 1);
+
+   BOOST_REQUIRE_EQUAL(success(), crank(HUGE_LIMIT));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(MAX_CRANK_LIMIT * UNIT), liq_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(STATE_RELEASABLE, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
+   BOOST_REQUIRE_EQUAL(1u, kv_rows("items"_n).size());
+   BOOST_REQUIRE_EQUAL(UNIT, item_row(items)["remaining"].as_uint64());
+
+   BOOST_REQUIRE_EQUAL(success(), crank(HUGE_LIMIT));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(items * UNIT), liq_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
+   BOOST_REQUIRE(kv_rows("items"_n).empty());
+} FC_LOG_AND_RETHROW()
+
+// `sync` clamps its limit the same way: over one more envelope than MAX_CRANK_LIMIT, a sync asking for
+// everything stops its cursor on the last envelope, and the next visits it and wraps to the start.
+BOOST_FIXTURE_TEST_CASE(a_sync_limit_past_the_maximum_is_clamped, sysio_synd_tester) try {
+   const auto         pubkey    = ed_bytes(ed_key());
+   constexpr uint32_t envelopes = MAX_CRANK_LIMIT + 1;
+   for (uint32_t epoch = 1; epoch <= envelopes; ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(), onsynd(SOLANA, epoch, digest_of(std::to_string(epoch)), epoch,
+                                            ChainKind::CHAIN_KIND_SVM, pubkey, LIQSOL, UNIT));
+   }
+   BOOST_REQUIRE(state_row().is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), push(SYND_ACCOUNT, synd_abi_ser, "carol"_n, "sync"_n, mvo()("limit", HUGE_LIMIT)));
+   BOOST_REQUIRE(!state_row().is_null());
+   BOOST_REQUIRE_EQUAL(envelopes, state_row()["sync_cursor"]["epoch_index"].as<uint32_t>());
+
+   BOOST_REQUIRE_EQUAL(success(), push(SYND_ACCOUNT, synd_abi_ser, "carol"_n, "sync"_n, mvo()("limit", HUGE_LIMIT)));
+   BOOST_REQUIRE_EQUAL(0u, state_row()["sync_cursor"]["epoch_index"].as<uint32_t>());
+} FC_LOG_AND_RETHROW()
+
+// A crank, sync, syncenv or pruneenv with nothing to record or erase writes no row: each succeeds in a
+// read-only transaction, which the chain refuses on any write. A DONE envelope still awaiting its ruling and
+// a REQUESTED envelope whose request is open are each visited and left as they are. Once the ruling lands,
+// syncenv has something to record and writes it, exactly once.
+BOOST_FIXTURE_TEST_CASE(an_idle_crank_writes_nothing, sysio_synd_tester) try {
+   const auto signer = ed_signer();
+   const auto pubkey = ed_bytes(signer.get_public_key());
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.window_sec = 1}));
+   syndicate_and_close(1, 1, pubkey, LIQSOL, UNIT);
+   const auto id = envelope_row(SOLANA, LIQSOL, 1)["request_id"].as_uint64();
+   underwrite_envelope(SOLANA, LIQSOL, 1);
+   BOOST_REQUIRE_EQUAL(success(), crank());
+   BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
+   syndicate_and_close(2, 2, pubkey, LIQSOL, UNIT);
+   BOOST_REQUIRE_EQUAL(STATE_REQUESTED, envelope_row(SOLANA, LIQSOL, 2)["state"].as_string());
+   BOOST_REQUIRE_EQUAL(REQUEST_OPEN, bond_request(envelope_row(SOLANA, LIQSOL, 2)["request_id"].as_uint64())
+                                        ["state"].as_string());
+
+   BOOST_REQUIRE_EQUAL(success(), push_readonly("crank"_n, mvo()("limit", HUGE_LIMIT)));
+   BOOST_REQUIRE_EQUAL(success(), push_readonly("sync"_n, mvo()("limit", HUGE_LIMIT)));
+   BOOST_REQUIRE_EQUAL(success(), push_readonly("syncenv"_n, syncenv_data(1)));
+   BOOST_REQUIRE_EQUAL(success(), push_readonly("syncenv"_n, syncenv_data(2)));
+   BOOST_REQUIRE_EQUAL(success(), push_readonly("pruneenv"_n, pruneenv_data(HUGE_LIMIT)));
+
+   produce_block(fc::seconds(2));
+   BOOST_REQUIRE_EQUAL(success(), push(BOND_ACCOUNT, bond_abi_ser, "carol"_n, "approve"_n, mvo()("request_id", id)));
+   BOOST_REQUIRE(success() != push_readonly("syncenv"_n, syncenv_data(1)));
+   BOOST_REQUIRE_EQUAL(success(), push(SYND_ACCOUNT, synd_abi_ser, "carol"_n, "syncenv"_n, syncenv_data(1)));
+   BOOST_REQUIRE_EQUAL(REQUEST_APPROVED, envelope_row(SOLANA, LIQSOL, 1)["outcome"].as_string());
+   BOOST_REQUIRE_EQUAL(success(), push_readonly("syncenv"_n, syncenv_data(1)));
+} FC_LOG_AND_RETHROW()
+
+// A sweepyield with nothing to pull or pay writes no row; once yield accrues it pulls and pays again.
+BOOST_FIXTURE_TEST_CASE(an_idle_sweepyield_writes_nothing, sysio_synd_tester) try {
+   const auto signer = ed_signer();
+   const auto pubkey = ed_bytes(signer.get_public_key());
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.synd_fee_bps = 1000}));
+   syndicate_and_close(1, 1, pubkey, LIQSOL, 20 * UNIT);
+   underwrite_envelope(SOLANA, LIQSOL, 1);
+   BOOST_REQUIRE_EQUAL(success(), crank());
+   BOOST_REQUIRE_EQUAL(2 * UNIT, feepot_balance(LIQSOL));
+   const auto sweep_data = mvo()("token_code", codename_mvo(LIQSOL));
+
+   BOOST_REQUIRE_EQUAL(success(), addyield("carol"_n, 4 * UNIT));
+   const int64_t sysio_wire = wire_balance(SYSIO_ACCOUNT);
+   BOOST_REQUIRE_EQUAL(success(), push(SYND_ACCOUNT, synd_abi_ser, "alice"_n, "sweepyield"_n, sweep_data));
+   const int64_t first_share = wire_balance(SYSIO_ACCOUNT) - sysio_wire;
+   BOOST_REQUIRE_GT(first_share, 0);
+   BOOST_REQUIRE_EQUAL(success(), push_readonly("sweepyield"_n, sweep_data));
+
+   BOOST_REQUIRE_EQUAL(success(), addyield("carol"_n, 4 * UNIT));
+   BOOST_REQUIRE(success() != push_readonly("sweepyield"_n, sweep_data));
+   BOOST_REQUIRE_EQUAL(success(), push(SYND_ACCOUNT, synd_abi_ser, "alice"_n, "sweepyield"_n, sweep_data));
+   BOOST_REQUIRE_GT(wire_balance(SYSIO_ACCOUNT), sysio_wire + first_share);
+   BOOST_REQUIRE_EQUAL(success(), push_readonly("sweepyield"_n, sweep_data));
 } FC_LOG_AND_RETHROW()
 
 // A pair both of whose flows have stopped -- its syndications behind an empty bucket, its yield behind a

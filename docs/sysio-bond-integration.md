@@ -151,10 +151,11 @@ owed; `claim` also pulls before it pays.
 
 ## Pruning
 
-`prune(from_id, limit)` walks the requests from id `from_id` up and acts on at most `limit` terminal
-requests. It erases a request with its rows once they are all paid or owe nothing -- the forfeit and
-every award claimed, with no residual owed yield -- and its ruling is at least `PRUNE_RETENTION_SEC`
-(seven days) old. Durable requests also require issuer acknowledgement. Paid bond rows with no
+`prune(from_id, limit)` examines at most `limit` requests from id `from_id` up, prunable or not, and
+refuses a `limit` above `MAX_PRUNE_LIMIT` (64). A crank covers the table by calling again from the id
+after the last request examined, and from 0 once a call reaches the end. It erases a request with its
+rows once they are all paid or owe nothing -- the forfeit and every award claimed, with no residual owed
+yield -- and its ruling is at least `PRUNE_RETENTION_SEC` (seven days) old. Durable requests also require issuer acknowledgement. Paid bond rows with no
 residual yield may be erased independently; an unrelated unclaimed payout does not hold their RAM. A request whose token no longer resolves is skipped.
 Anyone may call it.
 

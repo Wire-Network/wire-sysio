@@ -47,6 +47,9 @@ constexpr std::string_view claimremit_transfer_memo = "opreg::claimremit collate
 /// Message of the `check` a depot-native action raises for a token it cannot custody.
 constexpr std::string_view unsupported_token_msg = "unsupported depot-native collateral token";
 
+/// Message an operator-scoped action raises when `account` has no operator row.
+constexpr std::string_view operator_not_found_msg = "operator not found";
+
 /// Message of the `check` `sweepyield` raises when the registry's `sysio.liq` row is owed nothing.
 constexpr std::string_view no_yield_to_sweep_msg = "no yield to sweep";
 
@@ -434,19 +437,12 @@ find_balance(const opreg::operator_entry& op,
    return nullptr;
 }
 
-/// Return true when the operator has entered a permanent punishment or
-/// removal state that collateral changes must never reverse.
-bool has_terminal_status(OperatorStatus status) {
-   return status == OperatorStatus::OPERATOR_STATUS_SLASHED ||
-          status == OperatorStatus::OPERATOR_STATUS_TERMINATED;
-}
-
 /// Compute available balance for a given (op, chain, token). The single
 /// rollup formula: balance - sum(pending withdraws),
 /// gated by status. Slashed / terminated operators read as zero.
 uint64_t available_inline(const opreg::operator_entry& op,
                           sysio::slug_name chain_code, sysio::slug_name token_code) {
-   if (has_terminal_status(op.status)) {
+   if (op.has_terminal_status()) {
       return 0;
    }
    const auto* bal = find_balance(op, chain_code, token_code);
@@ -839,6 +835,8 @@ struct enqueue_result {
    std::string error_message;
 };
 
+/// Validate and queue a withdraw for `account`, whose operator row the caller has already checked
+/// exists. A validation failure is returned for the operator's action log instead of reverting.
 enqueue_result try_enqueue_withdraw(name account,
                                     sysio::slug_name chain_code,
                                     sysio::slug_name token_code,
@@ -849,10 +847,7 @@ enqueue_result try_enqueue_withdraw(name account,
 
    opreg::operators_t ops(name{"sysio.opreg"_n});
    auto op_pk = opreg::operator_key{account.value};
-   if (!ops.contains(op_pk)) {
-      return { false, 0, "operator not registered" };
-   }
-   auto op = ops.get(op_pk);
+   auto op = ops.get(op_pk, operator_not_found_msg.data());
    if (op.status != OperatorStatus::OPERATOR_STATUS_ACTIVE &&
        op.status != OperatorStatus::OPERATOR_STATUS_UNKNOWN) {
       return { false, 0, "operator not in a withdraw-eligible state" };
@@ -965,15 +960,17 @@ OperatorAction build_deposit_action(const opp::types::ChainAddress& op_address,
 // Operator-authorized; queues a (chain=WIRE, token=token_code) row in the
 // withdraw queue subject to WITHDRAW_WAIT_EPOCHS maturation. A token this
 // registry cannot custody reverts, so a request that could never be paid out
-// is never queued. Every other validation failure DOES NOT revert — it
-// appends a failure entry to the operator's `recent_actions` ring buffer,
-// The operator reads the recorded result through WIRE JSON-RPC.
+// is never queued. A caller with no operator row reverts: it has nothing to
+// withdraw and no row to log into. Every other validation failure DOES NOT
+// revert — it appends a failure entry to the operator's `recent_actions` ring
+// buffer, which the operator reads through WIRE JSON-RPC.
 void opreg::withdraw(name account, sysio::slug_name token_code, uint64_t amount) {
    require_auth(account);
    check(resolve_depot_native_token(token_code).has_value(), unsupported_token_msg);
 
    operators_t ops(get_self());
    auto op_pk = operator_key{account.value};
+   check(ops.contains(op_pk), operator_not_found_msg);
 
    auto result = try_enqueue_withdraw(account, opp::wire::chain_code, token_code, amount);
    auto action = build_withdraw_request_action(account, opp::wire::chain_code, token_code, amount,
@@ -1024,7 +1021,7 @@ void reevaluate_eligibility(opreg::operators_t& ops,
    opreg::opconfig_t cfg_tbl(self);
    auto cfg = cfg_tbl.get_or_default(opreg::op_config{});
    auto refreshed = ops.get(op_pk);
-   if (has_terminal_status(refreshed.status)) return;
+   if (refreshed.has_terminal_status()) return;
    bool was_eligible = (refreshed.status == OperatorStatus::OPERATOR_STATUS_ACTIVE);
    bool is_eligible  = meets_role_min(refreshed, cfg);
 
@@ -1088,7 +1085,7 @@ void opreg::deposit(name account, sysio::slug_name token_code, uint64_t amount) 
 
    operators_t ops(get_self());
    auto op_pk = operator_key{account.value};
-   auto op = ops.get(op_pk, "operator not found");
+   auto op = ops.get(op_pk, operator_not_found_msg.data());
    check(op.status != OperatorStatus::OPERATOR_STATUS_SLASHED &&
          op.status != OperatorStatus::OPERATOR_STATUS_TERMINATED,
          "operator not in a deposit-eligible state");
@@ -1221,7 +1218,7 @@ void process_eligibility_change(name self, name account,
                                 bool notify_system) {
    opreg::operators_t ops(self);
    auto op_pk = opreg::operator_key{account.value};
-   check(ops.contains(op_pk), "operator not found");
+   check(ops.contains(op_pk), operator_not_found_msg);
 
    // Eligibility callbacks are inline today, but the terminal-state invariant
    // belongs at the transition sink as well as at each caller. A stale or
@@ -1230,7 +1227,7 @@ void process_eligibility_change(name self, name account,
    // The notification below is NOT gated on it: a producer's terminal
    // transition is exactly what sysio.system must hear about, and slash and
    // termination dispatch through here (`notify_producer_standing`) to say so.
-   const bool terminal = has_terminal_status(ops.get(op_pk).status);
+   const bool terminal = ops.get(op_pk).has_terminal_status();
 
    auto now = current_time_ms();
    if (!terminal && !was_eligible && is_eligible) {
@@ -1279,7 +1276,7 @@ void opreg::slash(name account, std::string reason) {
 
    operators_t ops(get_self());
    auto op_pk = operator_key{account.value};
-   auto op = ops.get(op_pk, "operator not found");
+   auto op = ops.get(op_pk, operator_not_found_msg.data());
    check(op.status != OperatorStatus::OPERATOR_STATUS_SLASHED,
          "operator already slashed");
    check(op.status != OperatorStatus::OPERATOR_STATUS_TERMINATED,
@@ -1336,7 +1333,7 @@ namespace {
 void terminate_inline(name self, name account, const std::string& reason) {
    opreg::operators_t ops(self);
    auto op_pk = opreg::operator_key{account.value};
-   auto op = ops.get(op_pk, "operator not found");
+   auto op = ops.get(op_pk, operator_not_found_msg.data());
    check(op.status == OperatorStatus::OPERATOR_STATUS_ACTIVE ||
          op.status == OperatorStatus::OPERATOR_STATUS_UNKNOWN,
          "operator not in a terminable state");
@@ -1443,7 +1440,7 @@ void opreg::claimyield(name account, sysio::slug_name token_code) {
    const remitclaim_key debt_key{account.value, token_code};
    auto debt = debts.try_get(debt_key);
    const bool has_operator = ops.contains(op_pk);
-   check(has_operator || debt.has_value(), "operator not found");
+   check(has_operator || debt.has_value(), operator_not_found_msg);
 
    remitclaims_t claims(get_self());
    const auto existing = claims.try_get(remitclaim_key{account.value, opp::wire::token_code});
@@ -1526,7 +1523,7 @@ void opreg::termcheck(name account) {
    auto op = ops.get(op_pk);
    // UNKNOWN is evaluated too. This runs only when the operator's own duty epoch closes, and an
    // operator that withdraws before each close and cancels after it is UNKNOWN every time.
-   if (has_terminal_status(op.status)) return;
+   if (op.has_terminal_status()) return;
    // Bootstrapped operators are the genesis / chain-of-trust seed set and
    // are NEVER subject to rolling-window termination — see
    // .claude/rules/bootstrapped-operator-invariants.md at the wire root. A

@@ -4,13 +4,25 @@
 #include <sysio.token/sysio.token.hpp>
 
 #include <algorithm>
+#include <limits>
 #include <vector>
 
 namespace sysiosystem {
 
-   using sysio::current_time_point;
    using sysio::microseconds;
    using sysio::token;
+
+   namespace {
+      /// Milliseconds in a second, for the block interval.
+      constexpr uint64_t milliseconds_per_second = 1'000;
+
+      /// Seconds one producer's round lasts: `blocks_per_round` slots at the block interval.
+      constexpr uint64_t round_duration_sec =
+         uint64_t{blocks_per_round} * sysio::block_timestamp::block_interval_ms / milliseconds_per_second;
+      static_assert( uint64_t{blocks_per_round} * sysio::block_timestamp::block_interval_ms
+                        % milliseconds_per_second == 0,
+                     "a round must last a whole number of seconds" );
+   }
 
    void system_contract::onblock( ignore<block_header> ) {
       using namespace sysio;
@@ -27,10 +39,6 @@ namespace sysiosystem {
       // Add latest block information to blockinfo table.
       add_to_blockinfo_table(previous_block_id, timestamp);
 
-      if( _global.get().last_pervote_bucket_fill == time_point() )  /// start the presses
-         _global.modify( get_self(), []( auto& g ) { g.last_pervote_bucket_fill = current_time_point(); });
-
-
       /**
        * At startup the initial producer may not be one that is registered / elected
        * and therefore there may be no producer object for them.
@@ -39,18 +47,39 @@ namespace sysiosystem {
       // zeroes the count; a block this producer's slot did not deliver is simply never counted.
       // Only one round per rotation counts: a schedule switch can hand a producer a second round
       // in the same rotation, and paying it would let a reorder pay one producer twice.
+      //
+      // Seniority is credited for the same counted rounds: the scheduled time since the previously
+      // counted one, at most a rotation. The round index comes from this producer's own block, so a
+      // late successor takes nothing away, and a second round in one rotation is never counted.
       auto key = producer_key_t{producer.value};
       if ( _producers.contains(key) ) {
          const uint32_t round = timestamp.slot / blocks_per_round;
+         bool seniority_moved = false;
          _producers.modify( same_payer, key, [&]( auto& p ) {
             if( p.last_paid_round != round ) {
-               const auto rotation =
+               const uint32_t rotation =
                   std::max<uint32_t>( static_cast<uint32_t>( sysio::get_active_producers().size() ), 1 );
                if( p.last_paid_round != 0 && p.last_paid_round / rotation == round / rotation ) return;
+               // A row a termination or slash cleared accrues nothing until `regproducer` takes a
+               // new registration order.
+               if( p.registration_seq != 0 ) {
+                  const uint64_t rotation_sec = uint64_t{rotation} * round_duration_sec;
+                  const uint64_t rounds_since = round > p.last_paid_round ? round - p.last_paid_round : 0;
+                  const uint64_t credit_sec   = p.last_paid_round == 0
+                     ? rotation_sec
+                     : std::min( rotation_sec, rounds_since * round_duration_sec );
+                  const uint64_t before = producer_rank::seniority_credit( p.service_sec );
+                  p.service_sec = p.service_sec > std::numeric_limits<uint64_t>::max() - credit_sec
+                                     ? std::numeric_limits<uint64_t>::max()
+                                     : p.service_sec + credit_sec;
+                  seniority_moved = producer_rank::seniority_credit( p.service_sec ) != before;
+               }
                p.last_paid_round = round;
             }
             p.unpaid_blocks++;
          });
+         // The score reads seniority in whole hours, so only an hour crossed costs a rescore.
+         if( seniority_moved ) rescore_producer( producer );
       }
 
       // Attribute the rounds nobody produced. This must happen on every block: the count above
@@ -61,7 +90,7 @@ namespace sysiosystem {
       record_round_participation( producer, block_info::block_height_from_id(previous_block_id) + 1 );
 
       /// only update block producers once every minute, block_timestamp is in half seconds
-      if( timestamp.slot - _global.get().last_producer_schedule_update.slot > 120 ) {
+      if( timestamp.slot - _prodstate.get().last_producer_schedule_update.slot > 120 ) {
          // Drain any pending rescore BEFORE rebuilding, so the rebuild sees the freshest scores it
          // can. A sweep spans many ticks and the rebuild does NOT wait for it: ranking is allowed
          // to converge, and the alternative -- holding the schedule until the sweep finishes --
@@ -74,7 +103,7 @@ namespace sysiosystem {
 
    void system_contract::record_round_participation( const name& current_producer,
                                                      uint32_t block_height ) {
-      const auto& state = _global.get();
+      const auto& state = _prodstate.get();
 
       // Mid-round: the same producer made the previous block, so no slot was skipped. Nothing is
       // scored here -- a round is judged once, at the transition where its block count is known,
@@ -137,7 +166,7 @@ namespace sysiosystem {
          record_round_outcome( state.last_producer, block_height - state.round_start_block, weights );
       }
 
-      _global.modify( get_self(), [&]( auto& g ) {
+      _prodstate.modify( get_self(), [&]( auto& g ) {
          g.last_producer     = current_producer;
          g.round_start_block = block_height;
       });
@@ -157,6 +186,7 @@ namespace sysiosystem {
       const auto before = _producers.get(key);
       const auto before_streak  = before.consecutive_missed_rounds;
       const auto before_demoted = before.is_demoted;
+      const uint64_t before_seniority = producer_rank::seniority_credit( before.service_sec );
 
       _producers.modify( same_payer, key, [&]( auto& p ) {
          if( served ) {
@@ -169,6 +199,9 @@ namespace sysiosystem {
          }
 
          p.consecutive_missed_rounds++;
+         // A round that began with blocks was credited when pay counted it; the penalty applies
+         // on top of that credit.
+         p.service_sec -= std::min<uint64_t>( p.service_sec, weights.miss_penalty_sec );
          // Categorical: a tier no score climbs out of. Back via `regproducer`, or by serving a
          // round while still scheduled.
          if( producer_rank::warrants_demotion( p.consecutive_missed_rounds, weights ) ) {
@@ -176,16 +209,17 @@ namespace sysiosystem {
          }
       });
 
-      // Only these two feed the score, and a rescore costs two cross-contract opreg reads on an
-      // `onblock` path -- so a round that moved neither pays nothing.
+      // Rescore only when the round moved the streak, the demotion or the seniority hour: a rescore
+      // costs two cross-contract opreg reads on an `onblock` path.
       const auto after = _producers.get(key);
-      if( after.consecutive_missed_rounds != before_streak || after.is_demoted != before_demoted ) {
+      if( after.consecutive_missed_rounds != before_streak || after.is_demoted != before_demoted
+          || producer_rank::seniority_credit( after.service_sec ) != before_seniority ) {
          rescore_producer( producer );
       }
    }
 
    void system_contract::drain_rescore_cursor() {
-      const auto& state = _global.get();
+      const auto& state = _prodstate.get();
       if( !state.rescore_pending ) return;
 
       // Bounded per tick, mirroring opreg's MAX_WTDW_FLUSH_PER_EPOCH: the producers table is
@@ -226,7 +260,7 @@ namespace sysiosystem {
          rescore_producer( producer );
       }
 
-      _global.modify( get_self(), [&]( auto& g ) {
+      _prodstate.modify( get_self(), [&]( auto& g ) {
          g.rescore_cursor  = done ? 0 : cursor;
          g.rescore_pending = !done;
       });
