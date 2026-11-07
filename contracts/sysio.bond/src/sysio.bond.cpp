@@ -108,6 +108,9 @@ constexpr std::string_view nothing_msg = "nothing to claim";
 /// Message of the `check` `sweepyield` raises for WIRE, which is not a shadow token.
 constexpr std::string_view wire_no_yield_msg = "WIRE collateral earns no shadow yield";
 
+/// Message of the `check` `prune` raises for a limit above MAX_PRUNE_LIMIT.
+constexpr std::string_view prune_limit_msg = "limit exceeds the most requests one prune examines";
+
 /// Message of the `check` `accept` raises on a request in any state but OPEN and BONDED.
 constexpr std::string_view not_accepting_msg = "request is not accepting bonds";
 
@@ -723,7 +726,8 @@ void bond::claimwire(name account) {
 
 // prune - erase terminal requests nothing is owed on, with their rows, and paid bond rows.
 //
-// Walks the requests in id order from `from_id` and acts on up to `limit` of them. A request still owed
+// Examines the requests in id order from `from_id`, at most `limit` of them whatever it finds: the work
+// of a call is bounded by the rows it reads, not by the rows it acts on. A request still owed
 // a claim, or ruled less than PRUNE_RETENTION_SEC ago, keeps its row -- an issuer that polls the row
 // (sysio.bond notifies no one) always sees the ruling -- but its bond rows already paid out are erased:
 // a paid row carries nothing any claim or check reads, and an underwriter's RAM must not wait on
@@ -731,28 +735,27 @@ void bond::claimwire(name account) {
 // be settled) is skipped and left whole. What an erased escrow still holds is the division remainder,
 // which stays in the contract.
 void bond::prune(uint64_t from_id, uint32_t limit) {
+   check(limit <= MAX_PRUNE_LIMIT, prune_limit_msg);
    requests_t            requests(get_self());
    bonds_t               bonds(get_self());
    const time_point      now = current_time_point();
    std::vector<uint64_t> prunable;
    std::vector<bond_key> paid_bonds;
-   uint32_t              acted = 0;
-   for (auto it = requests.lower_bound(request_key{from_id}); it != requests.end() && acted < limit; ++it) {
+   uint32_t              examined = 0;
+   for (auto it = requests.lower_bound(request_key{from_id}); it != requests.end() && examined < limit;
+        ++it, ++examined) {
       if (!is_terminal(it->state)) continue;
       const auto custody_token = resolve_bond_token(it->token_code);
       if (!custody_token) continue;
       const bool retained = now < it->resolved_at + seconds(PRUNE_RETENTION_SEC);
       if (!retained && it->outcome_acknowledged && fully_paid(get_self(), *it, live_index_of(it->token_code, *custody_token))) {
          prunable.push_back(it->id);
-         ++acted;
          continue;
       }
-      const size_t before = paid_bonds.size();
       for (auto bit = bonds.lower_bound(bond_key{.request_id = it->id, .underwriter = name{}});
            bit != bonds.end() && bit->request_id == it->id; ++bit) {
          if (bit->paid && bit->yield.owed_wire == 0) paid_bonds.push_back(bond_key{.request_id = it->id, .underwriter = bit->underwriter});
       }
-      if (paid_bonds.size() != before) ++acted;
    }
 
    for (const bond_key& key : paid_bonds) bonds.erase(key);

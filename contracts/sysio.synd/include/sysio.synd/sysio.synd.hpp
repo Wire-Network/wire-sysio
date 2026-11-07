@@ -30,7 +30,8 @@
  *      requestkeep retains outcomes until acknowledged. A queued syncenv records the real assigned ID.
  * Each of phases 2 and 3 has its own `limit` work budget and `4 * limit` examination cap, with separate
  * pair cursors. Outcome consumption therefore does not require a large release budget or a polling
- * deadline. Late settlement discovered after DONE rewinds the release cursor to that envelope.
+ * deadline. Late settlement discovered after DONE rewinds the release cursor to that envelope. `limit`
+ * is clamped to MAX_CRANK_LIMIT, so a caller cannot choose the CPU this contract pays.
  *
  * Challenge. Any account may `challenge` an envelope that is REQUESTED, RELEASABLE or DONE while its
  * request is BONDED: it pays the request's hold bond plus the pair's `challenge_extra` in the
@@ -158,6 +159,10 @@ namespace sysio {
       /// Units of work of the queue step `closeenv` runs inline: small and fixed, so intake stays cheap;
       /// `crank` does the rest.
       static constexpr uint32_t CLOSEENV_QUEUE_LIMIT = 16;
+      /// Largest `limit` `crank` and `sync` act on; a larger one is clamped, never refused. Anyone may
+      /// call them and this contract pays the CPU, so the caller must not choose the cost. Four times
+      /// the batch operator's per-pass crank of 16.
+      static constexpr uint32_t MAX_CRANK_LIMIT = 64;
 
       /// Lifecycle of one `(outpost, token, epoch)` envelope row.
       enum class envelope_state : uint8_t {
@@ -331,22 +336,25 @@ namespace sysio {
 
       /// Run bounded outcome synchronization, FIFO release, and underwriting, in that order. Sync
       /// visits at most `limit` envelopes; underwriting and release each have `limit` work units and
-      /// `4 * limit` examinations, with independent cursors. Permissionless. Blocked work waits; while
-      /// frozen only synchronization and request issuance run. Durable outcomes have no polling deadline.
+      /// `4 * limit` examinations, with independent cursors. `limit` is clamped to MAX_CRANK_LIMIT.
+      /// Permissionless. Blocked work waits; while frozen only synchronization and request issuance run.
+      /// Durable outcomes have no polling deadline.
       [[sysio::action]] void crank(uint32_t limit);
 
       /// Synchronize one issued envelope's request identity and terminal outcome without releasing,
-      /// burning or claiming funds. Permissionless; safe while frozen and independent of FIFO release.
+      /// burning or claiming funds. Writes the envelope only when that records something.
+      /// Permissionless; safe while frozen and independent of FIFO release.
       [[sysio::action]] void syncenv(sysio::slug_name chain_code, sysio::slug_name token_code,
                                    uint32_t epoch_index);
 
-      /// Synchronize at most `limit` envelopes from a persistent cursor, including DONE envelopes
-      /// still awaiting a ruling. Permissionless; no recipient code or funds movement.
+      /// Synchronize at most `limit` envelopes, clamped to MAX_CRANK_LIMIT, from a persistent cursor,
+      /// including DONE envelopes still awaiting a ruling. Permissionless; no recipient code or funds
+      /// movement.
       [[sysio::action]] void sync(uint32_t limit);
 
       /// Erase at most `limit` settled prefix envelopes, retaining a replay floor. Stops at the first
-      /// unfinished row; DONE before finality, unacknowledged outcomes and items stay.
-      /// Permissionless, counts every examined envelope, and never moves funds.
+      /// unfinished row; DONE before finality, unacknowledged outcomes and items stay. Writes nothing
+      /// when nothing is erased. Permissionless, counts every examined envelope, and never moves funds.
       [[sysio::action]] void pruneenv(sysio::slug_name chain_code, sysio::slug_name token_code, uint32_t limit);
 
       /// Governance attests that custody is reconciled at `reported` base units, which must cover
@@ -388,7 +396,8 @@ namespace sysio {
       /// Pull the WIRE `sysio.liq` owes this contract's holder row of the shadow `token_code` into the
       /// token's `yieldpool`, so held and parked positions can be paid out of it, and pay `sysio` what the
       /// token's fee pot earned, as far as the pool covers it: the pot is protocol revenue, and so is its
-      /// yield. Refused while the `sysio.andon` cord is pulled. Permissionless.
+      /// yield. Writes only the rows that change. Refused while the `sysio.andon` cord is pulled.
+      /// Permissionless.
       [[sysio::action]] void sweepyield(sysio::slug_name token_code);
 
       // -----------------------------------------------------------------------

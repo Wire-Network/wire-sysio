@@ -223,6 +223,32 @@ inline request_id_t next_scan_start(request_id_t from, const std::vector<request
    return lowest.value_or(next);
 }
 
+/// Request ids read in id order from some id on, and whether the read stopped before the end of the table.
+struct request_id_page {
+   std::vector<request_id_t> ids;
+   bool                      more = false;   ///< rows past the last id were left unread
+};
+
+/// Successive `sysio.bond::prune` calls over the requests issued before a sweep began. Requests issued during a sweep
+/// wait for the next one, so steady intake cannot hold the cursor among new requests and away from old ones.
+struct prune_sweep {
+   request_id_t                from = 0;   ///< where the next prune starts
+   std::optional<request_id_t> last;       ///< newest request id when this sweep began (0: none); unset between sweeps
+
+   /// Move past a prune of `limit` from `from`, given `page`, the ids from `from` read before the push: to the id after
+   /// the first `limit`, or to a new sweep once that passes `last` or the end of the table. A read cut short before
+   /// that id stays put. No request is skipped: erased rows only make a prune examine further.
+   void advance(const request_id_page& page, uint32_t limit) {
+      if (page.ids.size() <= limit && page.more) return;
+      if (page.ids.size() > limit && last && page.ids[limit] <= *last) {
+         from = page.ids[limit];
+         return;
+      }
+      from = 0;
+      last.reset();
+   }
+};
+
 /// The envelope requests among `bonded` ruled INVALID, in id order: the underwriter's bond on each is forfeited.
 /// Whether the bond row is paid, or even still there, does not matter: anyone may `claim` a forfeited bond's yield,
 /// which marks it paid, and `prune` then erases the row.
