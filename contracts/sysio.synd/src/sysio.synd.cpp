@@ -516,11 +516,13 @@ std::optional<bond::request_row> find_request(name self, const synd::envelope_ro
 
 /// Snapshot a terminal outcome before acknowledging it. This function moves no funds and includes
 /// DONE envelopes whose release finished before challenge finality. Settlement work rewinds release.
-void synchronize(name self, synd::envelope_row& row) {
+/// True when it changed `row`: a new request id, or a terminal outcome.
+bool synchronize(name self, synd::envelope_row& row) {
    if (row.state == synd::envelope_state::OPEN || row.state == synd::envelope_state::WAITING ||
-       row.outcome != synd::request_outcome::PENDING) return;
+       row.outcome != synd::request_outcome::PENDING) return false;
    const auto req = find_request(self, row);
-   if (!req) return;
+   if (!req) return false;
+   const bool identified = row.request_id != req->id;
    row.request_id = req->id;
    using state = bond::request_state;
    using outcome = synd::request_outcome;
@@ -530,7 +532,7 @@ void synchronize(name self, synd::envelope_row& row) {
       row.outcome = outcome::INVALID;
       row.forfeit = req->bonded;
       row.bounty_returned = req->hold_beneficiary == name{} ? req->bounty : 0;
-   } else return;
+   } else return identified;
    if (row.outcome == outcome::INVALID) {
       if (row.state == synd::envelope_state::DONE) row.state = synd::envelope_state::HELD;
       synd::ledger_t ledger(self);
@@ -542,6 +544,7 @@ void synchronize(name self, synd::envelope_row& row) {
       }
    }
    action(active_of(self), synd::BOND_ACCOUNT, ack_action, std::make_tuple(req->id)).send();
+   return true;
 }
 
 /// Record that the queue step left `(chain_code, token_code, epoch_index)` where it was, for `reason`.
@@ -550,6 +553,9 @@ void note(sysio::slug_name chain_code, sysio::slug_name token_code, uint32_t epo
    sysio::print("sysio.synd::queue: ", chain_code.to_string(), " ", token_code.to_string(), " epoch ", epoch_index,
                 " -- ", std::string(reason), "\n");
 }
+
+/// A permissionless step's `limit`, clamped to `synd::MAX_CRANK_LIMIT`.
+uint32_t bounded_limit(uint32_t limit) { return std::min(limit, synd::MAX_CRANK_LIMIT); }
 
 /// One bounded underwriting or release pass. Each owns its work/examination budget and pair cursor;
 /// underwriting also uses a separate per-pair epoch cursor so release backlogs cannot stall issuance.
@@ -1241,7 +1247,9 @@ void synd::setconfig(sysio::slug_name chain_code, sysio::slug_name token_code, u
 }
 
 void synd::crank(uint32_t limit) {
-   // Permissionless and never throwing: a step only moves what the rules already allow.
+   // Permissionless and never throwing: a step only moves what the rules already allow. The caller
+   // does not choose the CPU this contract pays: a larger limit is clamped.
+   limit = bounded_limit(limit);
    sync(limit);
    queue_step(get_self(), limit).run();
    queue_step(get_self(), limit, true).run();
@@ -1252,11 +1260,11 @@ void synd::syncenv(sysio::slug_name chain_code, sysio::slug_name token_code, uin
    const auto key = envelope_key_of(chain_code, token_code, epoch_index);
    auto row = envelopes.try_get(key);
    if (!row) return;
-   synchronize(get_self(), *row);
-   envelopes.set(ram_payer, key, *row);
+   if (synchronize(get_self(), *row)) envelopes.set(ram_payer, key, *row);
 }
 
 void synd::sync(uint32_t limit) {
+   limit = bounded_limit(limit);
    if (limit == 0) return;
    syndstate_t state(get_self());
    auto stored = state.get_or_default(synd_state{});
@@ -1284,6 +1292,7 @@ void synd::pruneenv(sysio::slug_name chain_code, sysio::slug_name token_code, ui
    bond::requests_t requests(BOND_ACCOUNT);
    auto it = envelopes.lower_bound(envelope_key_of(chain_code, token_code, 0));
    uint32_t examined = 0;
+   bool pruned = false;
    while (it != envelopes.end() && examined++ < limit) {
       const auto row = *it;
       if (row.chain_code != chain_code || row.token_code != token_code) break;
@@ -1297,8 +1306,9 @@ void synd::pruneenv(sysio::slug_name chain_code, sysio::slug_name token_code, ui
       if (request && !request->outcome_acknowledged) break;
       state->retained_from_epoch = uint64_t{row.epoch_index} + 1;
       it = envelopes.erase(it);
+      pruned = true;
    }
-   ledger.set(ram_payer, lkey, *state);
+   if (pruned) ledger.set(ram_payer, lkey, *state);
 }
 
 void synd::reconcile(sysio::slug_name chain_code, sysio::slug_name token_code, uint64_t reported) {
@@ -1452,8 +1462,12 @@ void synd::sweepyield(sysio::slug_name token_code) {
    auto      pot      = pots.try_get(key);
    uint64_t  fee_wire = 0;
    if (pot) {
+      const custody::position before = pot->position;
       fee_wire = custody::settle_and_take(pot->position, pot->balance, pool.pool, LIQ_ACCOUNT, code);
-      pots.set(same_payer, key, *pot);
+      if (pot->position.index_checkpoint != before.index_checkpoint ||
+          pot->position.owed_wire != before.owed_wire) {
+         pots.set(same_payer, key, *pot);
+      }
    }
    if (pulled || fee_wire > 0) pools.set(ram_payer, key, pool);
    if (fee_wire > 0) {

@@ -188,6 +188,15 @@ constexpr uint64_t kShadowFunding = 10 * kWireUnit;
 constexpr std::string_view kUnsupportedTokenError =
    "assertion failure with message: unsupported depot-native collateral token";
 
+/// Error raised by an operator-scoped action for an account with no operator row.
+constexpr std::string_view kOperatorNotFoundError = "assertion failure with message: operator not found";
+
+/// Withdraw amount `withdraw` rejects as not positive.
+constexpr uint64_t kZeroWithdrawAmount = 0;
+
+/// `recent_actions` error a registered operator's zero-amount withdraw records.
+constexpr std::string_view kZeroWithdrawLogError = "amount must be positive";
+
 /// Error raised by `claimremit` when no claim row exists for the requested token.
 constexpr std::string_view kNoClaimableRemitError =
    "assertion failure with message: no claimable remit for this account";
@@ -2011,6 +2020,41 @@ BOOST_FIXTURE_TEST_CASE(withdraw_unknown_token_is_rejected, sysio_opreg_tester) 
 
    BOOST_REQUIRE(get_wtdw(kFirstWithdrawalRequestId).is_null());
    BOOST_REQUIRE_EQUAL(actions_before, get_operator(OPERATOR)["recent_actions"].get_array().size());
+} FC_LOG_AND_RETHROW() }
+
+/// A withdraw by an account with no operator row reverts, whatever the amount: it has nothing to
+/// withdraw and no `recent_actions` row to log into, so succeeding would do nothing at no cost to
+/// the caller.
+BOOST_FIXTURE_TEST_CASE(withdraw_by_non_operator_is_rejected, sysio_opreg_tester) { try {
+   const auto NON_OPERATOR = "uwrit.bob"_n;
+
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE(get_operator(NON_OPERATOR).is_null());
+
+   BOOST_REQUIRE_EQUAL(error(std::string(kOperatorNotFoundError)),
+                       withdraw(NON_OPERATOR, kWireCodename, kWireUnit));
+   BOOST_REQUIRE_EQUAL(error(std::string(kOperatorNotFoundError)),
+                       withdraw(NON_OPERATOR, kWireCodename, kZeroWithdrawAmount));
+
+   BOOST_REQUIRE(get_wtdw(kFirstWithdrawalRequestId).is_null());
+   BOOST_REQUIRE(get_operator(NON_OPERATOR).is_null());
+} FC_LOG_AND_RETHROW() }
+
+/// A registered operator's zero-amount withdraw stays on the logged path: the action succeeds,
+/// queues nothing, and records the failure in `recent_actions`.
+BOOST_FIXTURE_TEST_CASE(withdraw_zero_amount_by_operator_logs_failure, sysio_opreg_tester) { try {
+   const auto OPERATOR = "uwrit.alice"_n;
+
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(), regoperator(OPERATOR, OPERATOR_TYPE_UNDERWRITER, /*is_bootstrapped=*/false));
+
+   BOOST_REQUIRE_EQUAL(success(), withdraw(OPERATOR, kWireCodename, kZeroWithdrawAmount));
+
+   auto entry = latest_action_log(OPERATOR);
+   BOOST_REQUIRE(!entry.is_null());
+   BOOST_REQUIRE_EQUAL(false, entry["success"].as_bool());
+   BOOST_REQUIRE_EQUAL(std::string(kZeroWithdrawLogError), entry["error_message"].as_string());
+   BOOST_REQUIRE(get_wtdw(kFirstWithdrawalRequestId).is_null());
 } FC_LOG_AND_RETHROW() }
 
 /// WIRE and shadow deposits by one operator land in two rows, and `available()` rolls each up

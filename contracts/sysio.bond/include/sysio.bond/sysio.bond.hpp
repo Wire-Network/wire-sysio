@@ -81,6 +81,8 @@ inline constexpr std::string_view amount_range_msg = "amount exceeds the asset r
       static constexpr uint32_t DEFAULT_HOLD_BPS        = 1000;
       /// Minimum retention for ordinary requests. Durable requests additionally require issuer acknowledgement.
       static constexpr uint32_t PRUNE_RETENTION_SEC     = 7 * 24 * 60 * 60;
+      /// Most requests one `prune` examines, prunable or not: the bound on the work of a call.
+      static constexpr uint32_t MAX_PRUNE_LIMIT         = 64;
       /// One whole, in basis points.
       static constexpr uint32_t BPS_DENOMINATOR         = 10000;
       /// Base of the decimal increment arithmetic.
@@ -236,11 +238,13 @@ inline constexpr std::string_view amount_range_msg = "amount exceeds the asset r
       };
       using wireclaims_t = kv::table<"wireclaims"_n, wire_key, wire_claim>;
 
-      /// Walk the terminal requests from id `from_id` up and act on at most `limit` of them. A request
-      /// whose rows are all paid or owe nothing, and that was ruled at least PRUNE_RETENTION_SEC ago, is
-      /// erased with its bond and escrow rows. Any other terminal request keeps its row, but the bond rows
-      /// already paid out are erased, so an unclaimed payout holds no other underwriter's RAM. A request
-      /// whose token no longer resolves is skipped, never touched. Permissionless.
+      /// Examine the requests from id `from_id` up, at most `limit` of them (refused above MAX_PRUNE_LIMIT),
+      /// counting every one whether or not it is pruned. A terminal request whose rows are all paid or owe
+      /// nothing, and that was ruled at least PRUNE_RETENTION_SEC ago, is erased with its bond and escrow
+      /// rows. Any other terminal request keeps its row, but the bond rows already paid out are erased, so
+      /// an unclaimed payout holds no other underwriter's RAM. A request whose token no longer resolves is
+      /// skipped, never touched. A crank covers the table by calling again from the id after the last
+      /// request examined, and from 0 once a call reaches the end. Permissionless.
       [[sysio::action]] void prune(uint64_t from_id, uint32_t limit);
 
       // -----------------------------------------------------------------------
