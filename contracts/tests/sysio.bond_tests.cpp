@@ -12,6 +12,7 @@
 #include "contracts.hpp"
 #include "contract_test_support.hpp"
 
+#include <limits>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -48,6 +49,7 @@ constexpr std::string_view beneficiary_msg       = "hold beneficiary is not an a
 constexpr std::string_view beneficiary_self_msg  = "hold beneficiary cannot be the contract";
 constexpr std::string_view nothing_msg           = "nothing to claim";
 constexpr std::string_view wire_no_yield_msg     = "WIRE collateral earns no shadow yield";
+constexpr std::string_view prune_limit_msg       = "limit exceeds the most requests one prune examines";
 
 /// The memo of the one transfer that pays the issuer an INVALID request's bonds.
 constexpr std::string_view forfeit_memo = "sysio.bond::forfeit";
@@ -72,6 +74,9 @@ constexpr size_t MAX_STATEMENT_BYTES = 1024;
 
 /// Mirrors the contract's PRUNE_RETENTION_SEC: seven days.
 constexpr uint32_t PRUNE_RETENTION_SEC = 604'800;
+
+/// Mirrors the contract's MAX_PRUNE_LIMIT.
+constexpr uint32_t MAX_PRUNE_LIMIT = 64;
 
 /// `sysio.liq`'s fixed-point scale of the yield index (`YIELD_INDEX_SCALE`).
 constexpr uint64_t YIELD_INDEX_SCALE = 1'000'000'000'000;
@@ -352,6 +357,20 @@ public:
       std::string key;
       append_key_word(key, id);
       return key;
+   }
+   /// The ids of at most `count` requests from id `from` up, in id order: what a crank reads to place its
+   /// next prune.
+   std::vector<uint64_t> request_ids_from(uint64_t from, size_t count) {
+      const auto            table_id = compute_table_id("requests"_n.to_uint64_t());
+      std::vector<uint64_t> ids;
+      auto cursor = control->kv().open_row_cursor();
+      chain::kv_row row;
+      for (bool more = cursor->seek_lower({BOND_ACCOUNT, table_id, request_key_of(from)}, row);
+           more && ids.size() < count && row.code == BOND_ACCOUNT && row.table_id == table_id;
+           more = cursor->next(row))
+         ids.push_back(decode(bond_abi_ser, "request_row", std::vector<char>(row.value.begin(), row.value.end()))["id"]
+                          .as_uint64());
+      return ids;
    }
    /// The account that pays the RAM of the kv row of `table` keyed `key`; the test fails without one.
    name payer_of(name table, const std::string& key) {
@@ -1412,7 +1431,7 @@ BOOST_FIXTURE_TEST_CASE(unbacked_yield_survives_pruning_and_never_repays_princip
    BOOST_REQUIRE_GT(residual, 0u);
    BOOST_REQUIRE(raw_bond_of(1, "alice"_n).paid);
    pass_retention();
-   BOOST_REQUIRE_EQUAL(success(), prune(0, 100));
+   BOOST_REQUIRE_EQUAL(success(), prune(0, 10));
    BOOST_REQUIRE(!request_row_of(1).is_null());
    BOOST_REQUIRE_EQUAL(residual, raw_bond_of(1, "alice"_n).yield.owed_wire);
    // Unattributed custody earns slack that can back the already-recorded residual.
@@ -1424,7 +1443,7 @@ BOOST_FIXTURE_TEST_CASE(unbacked_yield_survives_pruning_and_never_repays_princip
    const auto wire_before = wire_balance("alice"_n);
    BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n));
    BOOST_REQUIRE_EQUAL(wire_before + earned, wire_balance("alice"_n));
-   BOOST_REQUIRE_EQUAL(success(), prune(0, 100));
+   BOOST_REQUIRE_EQUAL(success(), prune(0, 10));
    BOOST_REQUIRE(request_row_of(1).is_null());
 } FC_LOG_AND_RETHROW()
 
@@ -1445,7 +1464,7 @@ BOOST_FIXTURE_TEST_CASE(rejected_wire_cannot_block_liq_or_expire_with_request, s
    BOOST_REQUIRE(!notified("alice"_n, "transfer"_n));
    BOOST_REQUIRE(claimwire("alice"_n) != success());
    pass_retention();
-   BOOST_REQUIRE_EQUAL(success(), prune(0, 100));
+   BOOST_REQUIRE_EQUAL(success(), prune(0, 10));
    set_code("alice"_n, std::vector<uint8_t>{});
    produce_blocks();
    BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n));
@@ -1761,6 +1780,75 @@ BOOST_FIXTURE_TEST_CASE(prune_starts_at_from_id, sysio_bond_tester) try {
    BOOST_REQUIRE_EQUAL(STATE_INVALID, request_state_of(1));
    BOOST_REQUIRE_EQUAL(success(), prune(1, 10));
    BOOST_REQUIRE(request_row_of(1).is_null());
+} FC_LOG_AND_RETHROW()
+
+// `limit` counts every request a call examines, so a run of requests it cannot prune -- open, still
+// retained, or in a token that no longer resolves -- ends the call instead of being walked past.
+BOOST_FIXTURE_TEST_CASE(prune_limit_counts_every_request_it_examines, sysio_bond_tester) try {
+   for (char fill : {'a', 'b', 'c', 'd', 'e', 'f'}) {
+      BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, fill), LIQSOL, 10 * UNIT, 0));
+   }
+   for (uint64_t id = 4; id <= 6; ++id) BOOST_REQUIRE_EQUAL(success(), rslvinvalid(SYSIO_ACCOUNT, id));
+   pass_retention();
+   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(SYSIO_ACCOUNT, 3));
+   rewrite_request_token(4, "NOPE");
+   produce_block();
+   // 1 and 2 are OPEN, 3 is retained, 4's token no longer resolves; 5 and 6 are prunable.
+
+   BOOST_REQUIRE_EQUAL(success(), prune(0, 0));
+   BOOST_REQUIRE_EQUAL(success(), prune(0, 4));
+   for (uint64_t id = 1; id <= 6; ++id) BOOST_REQUIRE(!request_row_of(id).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), prune(5, 4));
+   BOOST_REQUIRE(request_row_of(5).is_null());
+   BOOST_REQUIRE(request_row_of(6).is_null());
+   BOOST_REQUIRE_EQUAL(STATE_OPEN, request_state_of(1));
+   BOOST_REQUIRE_EQUAL(STATE_OPEN, request_state_of(2));
+   BOOST_REQUIRE_EQUAL(STATE_INVALID, request_state_of(3));
+   BOOST_REQUIRE_EQUAL(STATE_INVALID, request_state_of(4));
+} FC_LOG_AND_RETHROW()
+
+// A caller cannot have one call walk more than MAX_PRUNE_LIMIT requests.
+BOOST_FIXTURE_TEST_CASE(prune_refuses_a_limit_above_the_maximum, sysio_bond_tester) try {
+   BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'a'), LIQSOL, 10 * UNIT, 0));
+   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(SYSIO_ACCOUNT, 1));
+   pass_retention();
+
+   const auto refused = wasm_assert_msg(std::string(prune_limit_msg));
+   BOOST_REQUIRE_EQUAL(refused, prune(0, MAX_PRUNE_LIMIT + 1));
+   BOOST_REQUIRE_EQUAL(refused, prune(0, std::numeric_limits<uint32_t>::max()));
+   BOOST_REQUIRE_EQUAL(STATE_INVALID, request_state_of(1));
+   BOOST_REQUIRE_EQUAL(success(), prune(0, MAX_PRUNE_LIMIT));
+   BOOST_REQUIRE(request_row_of(1).is_null());
+} FC_LOG_AND_RETHROW()
+
+// A crank that starts each call at the id after the requests the last one examined, and over at 0 once a
+// call reaches the end, prunes every prunable request in one pass of ceil(rows / limit) calls.
+BOOST_FIXTURE_TEST_CASE(a_crank_resuming_after_each_prune_prunes_every_prunable_request, sysio_bond_tester) try {
+   constexpr uint32_t limit = 2;
+   constexpr uint64_t rows  = 9;
+   const auto         stays_open = [](uint64_t id) { return id % 3 == 0; };
+   for (uint64_t id = 1; id <= rows; ++id) {
+      BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, char('a' + id)), LIQSOL,
+                                             10 * UNIT, 0));
+      if (!stays_open(id)) BOOST_REQUIRE_EQUAL(success(), rslvinvalid(SYSIO_ACCOUNT, id));
+   }
+   pass_retention();
+
+   uint64_t from  = 0;
+   uint32_t calls = 0;
+   do {
+      const auto ids = request_ids_from(from, limit + 1);
+      BOOST_REQUIRE_EQUAL(success(), prune(from, limit));
+      ++calls;
+      from = ids.size() > limit ? ids[limit] : 0;
+   } while (from != 0);
+
+   BOOST_REQUIRE_EQUAL((rows + limit - 1) / limit, calls);
+   for (uint64_t id = 1; id <= rows; ++id) {
+      if (stays_open(id)) BOOST_REQUIRE_EQUAL(STATE_OPEN, request_state_of(id));
+      else BOOST_REQUIRE(request_row_of(id).is_null());
+   }
 } FC_LOG_AND_RETHROW()
 
 // A request whose token no longer resolves cannot be settled: prune skips it instead of failing,
