@@ -98,6 +98,8 @@ namespace sysio { namespace chain {
          return fc::raw::unpack<T>(data);
       }
 
+      /// True when the first authorization names an explicit payer (permission sysio_payer_name).
+      bool has_explicit_payer() const;
       // sysio_payer_name actor or contract
       account_name payer() const;
       // first authorization actor (which will be sysio_payer_name actor if exists) or empty() if no authorizer

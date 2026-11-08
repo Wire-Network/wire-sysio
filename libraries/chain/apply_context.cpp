@@ -99,8 +99,14 @@ void apply_context::exec_one()
          action_return_value.clear();
          receiver_account = &db.get<account_object,by_name>( receiver );
          receiver_account_metadata = db.find<account_metadata_object,by_name>( receiver );
+         // Read here rather than from `privileged`, which light validation leaves unset for a context-free action.
+         const bool receiver_privileged =
+            receiver_account_metadata != nullptr && receiver_account_metadata->is_privileged();
+         const bool measured_frame = trx_context.begin_frame(
+            action_ordinal, config::is_system_account( receiver ) && receiver_privileged,
+            receiver_account_metadata != nullptr && receiver_account_metadata->code_hash != digest_type() );
          if( !(context_free && control.skip_trx_checks()) ) {
-            privileged = receiver_account_metadata != nullptr && receiver_account_metadata->is_privileged();
+            privileged = receiver_privileged;
             auto native = control.find_apply_handler( receiver, act->account, act->name );
             if( native ) {
                if( trx_context.enforce_whiteblacklist && control.is_speculative_block() ) {
@@ -131,6 +137,8 @@ void apply_context::exec_one()
             }
             validate_account_ram_deltas();
          }
+         if( measured_frame )
+            trx_context.end_frame( action_ordinal );
       } FC_RETHROW_EXCEPTIONS( warn, "{} <= {}::{} pending console output: {}",
                                receiver, act->account, act->name, _pending_console_output )
 
@@ -218,7 +226,7 @@ void apply_context::validate_account_ram_deltas() {
       auto& payer = itr->account;
       auto& ram_delta = itr->delta;
       if (payer != receiver && ram_delta > 0) {
-         if (receiver.prefix() == sysio::chain::config::system_account_name && is_privileged()) {
+         if (config::is_system_account(receiver) && is_privileged()) {
             // sysio.* contracts allowed
          } else if (payer == sysio::chain::config::system_account_name && is_privileged()) {
             // explicit sysio payer allowed when privileged
@@ -574,7 +582,7 @@ action_name apply_context::get_sender() const {
 }
 
 bool apply_context::is_sys_vm_oc_whitelisted() const {
-   return receiver.prefix() == sysio::chain::config::system_account_name || // "sysio"_n
+   return config::is_system_account(receiver) ||
           control.is_sys_vm_oc_whitelisted(receiver);
 }
 

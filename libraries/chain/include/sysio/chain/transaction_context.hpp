@@ -149,7 +149,31 @@ namespace sysio::chain {
          friend struct benchmark::interface_in_benchmark; // defined in benchmark/bls.cpp
 
          //        limit,greylisted,unlimited
-         std::tuple<int64_t, bool, bool> get_cpu_limit(account_name a) const;
+         std::tuple<int64_t, bool, bool> get_cpu_limit(account_name a, const std::optional<block_timestamp_type>& current_time = {}) const;
+
+         /**
+          * Picks the billed_cpu_us entry that pays for a frame: one receiver's run of one action. An input action bills
+          * its payer. A child (a notification or an inline action) bills its parent's entry, unless the parent's
+          * receiver is a system account and the child's receiver is a contract outside the system accounts: that
+          * contract then pays for its own code, in a new entry after the input entries. Below an explicit payer, and in
+          * an implicit transaction, every frame bills the input payer. Called by apply_context::exec_one.
+          * @param system_receiver the receiver is a privileged system account
+          * @param receiver_has_code the receiver has contract code as the frame starts
+          * @return true when the frame's CPU is measured for a receiver entry: end_frame follows if the frame completes
+          */
+         bool begin_frame( uint32_t action_ordinal, bool system_receiver, bool receiver_has_code );
+         /// Adds the CPU of a frame begin_frame measured to its receiver entry, and moves the deadline back to the
+         /// input action's payer. A frame that throws fails the transaction and skips this.
+         void end_frame( uint32_t action_ordinal );
+         /// Sets the deadline for code billed to `account`, which has `cpu_limit_us` left from `from`, within the
+         /// transaction's deadline.
+         void set_billing_deadline( account_name account, int64_t cpu_limit_us, bool greylisted, fc::time_point from );
+
+         /// Sum of billed_cpu_us; throws if it does not fit the trace's 32-bit total.
+         uint32_t billed_cpu_sum() const;
+         /// Bills the receipt's entries for contracts billed for their own code. An entry the receipt leaves out bills
+         /// nothing, so a block receipt that leaves one out differs from the one built here and the block is rejected.
+         void bill_explicit_receiver_entries();
 
          void verify_init_subjective_billing() const;
          void verify_net_usage(account_name account, int64_t net_usage, uint32_t net_usage_leeway);
@@ -259,6 +283,35 @@ namespace sysio::chain {
             speculative_executed_adjusted_max_transaction_time // !prev_accounts_billing.empty()
          };
          tx_cpu_usage_exceeded_reason  tx_cpu_usage_reason = tx_cpu_usage_exceeded_reason::account_cpu_limit;
+         /// tx_cpu_usage_reason as init() left it: the reason when no account's CPU sets the deadline.
+         tx_cpu_usage_exceeded_reason  trx_cpu_usage_reason = tx_cpu_usage_exceeded_reason::account_cpu_limit;
+
+         /// The billed_cpu_us entry that pays for a frame.
+         struct frame_billing {
+            uint32_t entry   = 0;     ///< index in billed_cpu_us
+            bool     system  = false; ///< the receiver is a privileged system account
+            bool     tracked = false; ///< false below an explicit payer, where every frame bills the input payer
+         };
+
+         /// A billed_cpu_us entry after the input entries: a frame whose receiver pays for its own code, together with
+         /// the frames below it that bill the same contract.
+         struct receiver_entry {
+            account_name account;
+            uint32_t     input          = 0;     ///< index of the input action above it
+            uint32_t     ordinal        = 0;     ///< action ordinal of the frame where billing switched
+            int64_t      cpu_us         = 0;     ///< CPU measured for its frames
+            int64_t      cpu_limit_us   = 0;     ///< CPU the contract has left, read as the entry starts
+            bool         cpu_greylisted = false;
+         };
+
+         std::vector<frame_billing>  frames;           ///< by action ordinal - 1
+         std::vector<receiver_entry> receiver_entries; ///< in the order their frames started
+         fc::microseconds            frame_begin;      ///< now - action_start as the measured frame began
+
+         /// Bills `cpu_us` of receiver entry `e` to its contract: CPU only, never NET.
+         void bill_receiver( const receiver_entry& e, uint32_t cpu_us );
+         /// First authorizer of input action `input`, or the transaction's when it has none.
+         account_name input_first_authorizer( uint32_t input ) const;
    };
 
 } // namespace sysio::chain

@@ -24,6 +24,10 @@ namespace sysio::chain::config {
   static constexpr auto producers_account_name { "sysio.prods"_n };
   static constexpr auto roa_account_name       { "sysio.roa"_n };
 
+  /// True for sysio and every sysio.* account. Callers that grant a system contract more also require it to be
+  /// privileged.
+  constexpr bool is_system_account( name account ) { return account.prefix() == system_account_name; }
+
   // Active permission of producers account requires greater than 2/3 of the producers to authorize
   static constexpr auto majority_producers_permission_name { "prod.major"_n }; // greater than 1/2 of producers needed to authorize
   static constexpr auto minority_producers_permission_name { "prod.minor"_n }; // greater than 1/3 of producers needed to authorize0

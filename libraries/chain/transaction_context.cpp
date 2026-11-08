@@ -98,8 +98,11 @@ namespace sysio::chain {
       }
 
       executed_action_receipts = action_digests_t{};
-      // accounts_billing should only be updated in init(), not updated during transaction execution
+      // accounts_billing should only be updated in init(), not updated during transaction execution. Receiver
+      // entries are billed after execution, so the retry starts them over.
       validate_ram_usage.clear();
+      frames.clear();
+      receiver_entries.clear();
    }
 
    void transaction_context::initialize() {
@@ -114,14 +117,12 @@ namespace sysio::chain {
 
       const transaction& trx = packed_trx.get_transaction();
       if (explicit_billed_cpu_time) {
-         SYS_ASSERT(billed_cpu_us.size() == trx.total_actions(), transaction_exception,
-                    "Transaction receipt cpu usage count ({}) does not match action count ({})",
+         // One entry per input action, then one per frame whose receiver pays for its own code. Those are known only
+         // after execution (bill_explicit_receiver_entries).
+         SYS_ASSERT(billed_cpu_us.size() >= trx.total_actions(), transaction_exception,
+                    "Transaction receipt cpu usage count ({}) is less than the action count ({})",
                     billed_cpu_us.size(), trx.total_actions());
-         const int64_t cpu_sum = std::ranges::fold_left(billed_cpu_us, int64_t{0}, std::plus());
-         SYS_ASSERT(cpu_sum >= 0 && cpu_sum <= std::numeric_limits<uint32_t>::max(),
-                    transaction_exception,
-                    "Transaction total cpu usage {} us overflows uint32", cpu_sum);
-         trace->total_cpu_usage_us = static_cast<uint32_t>(cpu_sum);
+         trace->total_cpu_usage_us = billed_cpu_sum();
       } else {
          billed_cpu_us.reserve(trx.total_actions());
       }
@@ -275,6 +276,7 @@ namespace sysio::chain {
          trx_deadline = block_deadline;
       }
 
+      trx_cpu_usage_reason = tx_cpu_usage_reason;
       active_deadline = enforce_deadline ? trx_deadline : fc::time_point::maximum();
       transaction_timer.start( active_deadline );
       checktime(); // Fail early if deadline as already been exceeded
@@ -330,8 +332,6 @@ namespace sysio::chain {
    void transaction_context::exec() {
       assert( is_initialized );
       const transaction& trx = packed_trx.get_transaction();
-      const auto& sub_bill = control.get_subjective_billing();
-      const auto pending_block_time = control.pending_block_time();
 
       auto add_trace_net = [&]( size_t idx ) {
          if (!is_input) return;
@@ -368,28 +368,11 @@ namespace sysio::chain {
                      billing_timer_exception_code = org_code;
                      tx_cpu_usage_reason = org_reason;
                   });
-               active_deadline = trx_deadline;
-               if (!explicit_billed_cpu_time) {
-                  account_name a = act.payer();
-                  auto& b = accounts_billing[a];
-                  cpu_limit_due_to_greylist = b.cpu_greylisted;
-                  if (!is_read_only()) {
-                     subjective_cpu_bill = sub_bill.get_subjective_bill(a, pending_block_time);
-                     int64_t account_cpu_limit = b.cpu_limit_us - subjective_cpu_bill.count() + leeway.count();
-                     // Add leeway to allow powerup
-                     // Possibly limit deadline to account subjective cpu left
-                     if (action_start + fc::microseconds(account_cpu_limit) < trx_deadline) {
-                        active_deadline = action_start + fc::microseconds(account_cpu_limit);
-                        billing_timer_exception_code = tx_cpu_usage_exceeded::code_value;
-                        tx_cpu_usage_reason = tx_cpu_usage_exceeded_reason::account_cpu_limit;
-                     }
-                  }
-               }
-               if (enforce_deadline) {
-                  transaction_timer.stop();
-                  transaction_timer.start(active_deadline);
+               const account_name payer = act.payer();
+               const auto& b = accounts_billing[payer];
+               set_billing_deadline(payer, b.cpu_limit_us, b.cpu_greylisted, action_start);
+               if (enforce_deadline)
                   checktime(); // Fail early if deadline already exceeded
-               }
                try {
                   execute_action(i, 0);
                } catch (const fc::exception& e) {
@@ -422,6 +405,9 @@ namespace sysio::chain {
             throw;
          }
       }
+
+      if (explicit_billed_cpu_time)
+         bill_explicit_receiver_entries();
    }
 
    void transaction_context::finalize() {
@@ -444,6 +430,8 @@ namespace sysio::chain {
 
       constexpr uint32_t net_leeway = 0;
       for (auto& [account, bill]: accounts_billing) {
+         if (!bill.pays_net)
+            continue;
          verify_net_usage(account, bill.net_usage, net_leeway);
          if (!explicit_billed_cpu_time) {
             std::tie(bill.cpu_limit_us, bill.cpu_greylisted, std::ignore) = get_cpu_limit(account);
@@ -454,7 +442,8 @@ namespace sysio::chain {
       trace->elapsed = std::max(now - start, fc::microseconds(0));
 
       // Update CPU time and validate CPU usage
-      assert(billed_cpu_us.size() == packed_trx.get_transaction().total_actions());
+      assert(billed_cpu_us.size() ==
+             packed_trx.get_transaction().total_actions() + (explicit_billed_cpu_time ? receiver_entries.size() : 0));
       assert(trace->action_traces.size() >= billed_cpu_us.size());
       update_billed_cpu_time( now );
 
@@ -728,24 +717,45 @@ namespace sysio::chain {
       const bool bill_objectively  = !is_read_only();
       const bool bill_subjectively = bill_objectively && !is_implicit();
 
-      const int64_t cpu_sum = std::ranges::fold_left(billed_cpu_us, int64_t{0}, std::plus());
-      SYS_ASSERT(cpu_sum >= 0 && cpu_sum <= std::numeric_limits<uint32_t>::max(),
-                 transaction_exception,
-                 "Transaction total cpu usage {} us overflows uint32", cpu_sum);
-      trace->total_cpu_usage_us = static_cast<uint32_t>(cpu_sum);
+      account_subjective_cpu_bill_t authorizers_cpu;
+      const bool subjectively_bill_payer_disabled = control.get_subjective_billing().is_payer_billing_disabled();
+      const size_t input_entries = billed_cpu_us.size();
+      int64_t receivers_cpu_us = 0;
+      // Receiver entries exist only on a receipt, so only a transaction that succeeded gets them. A failed one keeps
+      // all of its CPU on the input entries, which take its receivers' time as part of the time outside them below.
+      if (!trace->except) {
+         billed_cpu_us.reserve(input_entries + receiver_entries.size());
+         for (const auto& e : receiver_entries) {
+            const uint32_t cpu =
+               static_cast<uint32_t>(std::min<int64_t>(e.cpu_us, std::numeric_limits<uint32_t>::max()));
+            billed_cpu_us.emplace_back(cpu);
+            receivers_cpu_us += cpu;
+            trace->action_traces[e.ordinal - 1].cpu_usage_us = cpu;
+            if (bill_objectively) {
+               bill_receiver(e, cpu);
+               // Subjectively, the input action's first authorizer is billed, as for the input entry, and not twice
+               // when it is the receiver and payer billing bills it as a payer.
+               if (bill_subjectively) {
+                  const account_name first_auth = input_first_authorizer(e.input);
+                  if (first_auth != e.account || subjectively_bill_payer_disabled)
+                     authorizers_cpu[first_auth] += fc::microseconds{cpu};
+               }
+            }
+         }
+      }
+
+      trace->total_cpu_usage_us = billed_cpu_sum();
       const auto& cfg = control.get_global_properties().configuration;
       int64_t total_cpu_time_us = std::max( (now - pseudo_start).count(), static_cast<int64_t>(cfg.min_transaction_cpu_usage) );
       SYS_ASSERT(total_cpu_time_us - trace->total_cpu_usage_us >= 0, tx_cpu_usage_exceeded,
                  "Invalid CPU usage calculation {} - {}", total_cpu_time_us, trace->total_cpu_usage_us);
-      account_subjective_cpu_bill_t authorizers_cpu;
-      if (!billed_cpu_us.empty()) {
+      if (input_entries > 0) {
          assert(trace->action_traces.size() >= billed_cpu_us.size());
-         // +1 so total is above min_transaction_cpu_usage
-         int64_t delta_per_action = (( total_cpu_time_us - trace->total_cpu_usage_us ) / billed_cpu_us.size()) + 1;
-         total_cpu_time_us = 0;
-         const bool subjectively_bill_payer_disabled = control.get_subjective_billing().is_payer_billing_disabled();
-         const auto trx_first_authorizer = packed_trx.get_transaction().first_authorizer(); // used if action has no authorizer
-         for (size_t i = 0; i < billed_cpu_us.size(); ++i) {
+         // +1 so total is above min_transaction_cpu_usage. The time outside any entry's frames (signature recovery,
+         // setup) goes on the input entries only.
+         int64_t delta_per_action = (( total_cpu_time_us - trace->total_cpu_usage_us ) / input_entries) + 1;
+         total_cpu_time_us = receivers_cpu_us;
+         for (size_t i = 0; i < input_entries; ++i) {
             auto& b = billed_cpu_us[i];
             // if exception thrown, action_traces may not be the same size as billed_cpu_us
             auto& act_trace = trace->action_traces[i];
@@ -756,9 +766,7 @@ namespace sysio::chain {
                auto payer = act_trace.act.payer();
                accounts_billing[payer].cpu_usage_us += b.value;
                if (bill_subjectively) {
-                  auto first_auth = act_trace.act.first_authorizer();
-                  if (first_auth.empty())
-                     first_auth = trx_first_authorizer;
+                  auto first_auth = input_first_authorizer(i);
                   // validate_referenced_accounts rejects non-read-only, non-implicit trxs with zero
                   // auths (tx_no_auths), so first_auth must be populated by here on the subjective path.
                   assert(!first_auth.empty());
@@ -792,6 +800,140 @@ namespace sysio::chain {
       }
 
       is_cpu_updated = true;
+   }
+
+   uint32_t transaction_context::billed_cpu_sum() const {
+      const int64_t cpu_sum = std::ranges::fold_left(billed_cpu_us, int64_t{0}, std::plus());
+      SYS_ASSERT(cpu_sum >= 0 && cpu_sum <= std::numeric_limits<uint32_t>::max(),
+                 transaction_exception,
+                 "Transaction total cpu usage {} us overflows uint32", cpu_sum);
+      return static_cast<uint32_t>(cpu_sum);
+   }
+
+   void transaction_context::bill_explicit_receiver_entries() {
+      assert(explicit_billed_cpu_time);
+      const size_t input_entries = packed_trx.get_transaction().total_actions();
+      const size_t expected      = input_entries + receiver_entries.size();
+      SYS_ASSERT(billed_cpu_us.size() <= expected, transaction_exception,
+                 "Transaction receipt cpu usage count ({}) is more than the expected {}: {} for input actions and {} "
+                 "for contracts billed for their own code", billed_cpu_us.size(), expected, input_entries,
+                 receiver_entries.size());
+      // An entry the receipt leaves out bills nothing. In a block, the receipt built from billed_cpu_us then differs
+      // from the block's receipt, and the block is rejected.
+      billed_cpu_us.resize(expected);
+      for (size_t k = 0; k < receiver_entries.size(); ++k) {
+         const auto& e = receiver_entries[k];
+         const uint32_t cpu = billed_cpu_us[input_entries + k].value;
+         bill_receiver(e, cpu);
+         trace->action_traces[e.ordinal - 1].cpu_usage_us = cpu;
+      }
+   }
+
+   void transaction_context::bill_receiver( const receiver_entry& e, uint32_t cpu_us ) {
+      // A receiver pays CPU only: its NET window is neither updated nor checked.
+      accounts_billing.try_emplace(e.account, account_billing{ .cpu_limit_us   = e.cpu_limit_us,
+                                                               .cpu_greylisted = e.cpu_greylisted,
+                                                               .pays_net       = false })
+         .first->second.cpu_usage_us += cpu_us;
+   }
+
+   account_name transaction_context::input_first_authorizer( uint32_t input ) const {
+      auto first_auth = trace->action_traces[input].act.first_authorizer();
+      return first_auth.empty() ? packed_trx.get_transaction().first_authorizer() : first_auth;
+   }
+
+   bool transaction_context::begin_frame( uint32_t action_ordinal, bool system_receiver, bool receiver_has_code ) {
+      if (is_implicit())
+         return false; // no receipt, so every frame bills the input payer
+      const action_trace& act_trace     = get_action_trace(action_ordinal);
+      const uint32_t      creator       = act_trace.creator_action_ordinal.value; // the frame that notified or sent it
+      const uint32_t      input_entries = packed_trx.get_transaction().total_actions();
+      uint32_t            entry         = action_ordinal - 1;
+      if (creator == 0) {
+         assert(action_ordinal <= input_entries);
+         if (act_trace.act.has_explicit_payer())
+            return false; // the explicit payer pays for every frame below it
+      } else {
+         if (creator > frames.size() || !frames[creator - 1].tracked)
+            return false; // below an explicit payer
+         const frame_billing& parent = frames[creator - 1];
+         entry = parent.entry;
+         if (parent.system && !system_receiver && receiver_has_code) {
+            const bool         parent_on_input = parent.entry < input_entries;
+            const account_name parent_payer    = parent_on_input
+                                                    ? get_action_trace(parent.entry + 1).act.payer()
+                                                    : receiver_entries[parent.entry - input_entries].account;
+            if (act_trace.receiver != parent_payer) {
+               receiver_entry e{ .account = act_trace.receiver,
+                                 .input   = parent_on_input ? parent.entry
+                                                            : receiver_entries[parent.entry - input_entries].input,
+                                 .ordinal = action_ordinal };
+               if (!explicit_billed_cpu_time && !is_read_only()) {
+                  // Its usage window was not updated in this block, so its usage decays to the pending block.
+                  std::tie(e.cpu_limit_us, e.cpu_greylisted, std::ignore) =
+                     get_cpu_limit(e.account, block_timestamp_type(control.pending_block_time()));
+               }
+               entry = input_entries + receiver_entries.size();
+               receiver_entries.push_back(e);
+            }
+         }
+      }
+      if (frames.size() < action_ordinal)
+         frames.resize(action_ordinal);
+      frames[action_ordinal - 1] = { .entry = entry, .system = system_receiver, .tracked = true };
+      if (explicit_billed_cpu_time || entry < input_entries)
+         return false; // the receipt carries the CPU, or the input entry measures its whole action
+
+      // The receiver pays for this frame, so the frame runs against the receiver's remaining CPU.
+      const receiver_entry& e = receiver_entries[entry - input_entries];
+      int64_t used_us = 0;
+      for (const auto& r : receiver_entries)
+         if (r.account == e.account)
+            used_us += r.cpu_us;
+      const fc::time_point now = fc::time_point::now();
+      frame_begin = now - action_start;
+      set_billing_deadline(e.account, e.cpu_limit_us - used_us, e.cpu_greylisted, now);
+      if (enforce_deadline)
+         checktime(); // fail early if the receiver has no CPU left
+      return true;
+   }
+
+   void transaction_context::end_frame( uint32_t action_ordinal ) {
+      const uint32_t   input_entries = packed_trx.get_transaction().total_actions();
+      receiver_entry&  e             = receiver_entries[frames[action_ordinal - 1].entry - input_entries];
+      // action_start moves forward by any pause, so this leaves paused time out
+      const fc::microseconds cpu = std::max(fc::time_point::now() - action_start - frame_begin, fc::microseconds(0));
+      e.cpu_us += cpu.count();
+      // The frame's CPU is not the input payer's: the action's clock and deadline move past it.
+      action_start += cpu;
+      const account_name payer = get_action_trace(e.input + 1).act.payer();
+      const auto&        b     = accounts_billing.at(payer);
+      set_billing_deadline(payer, b.cpu_limit_us, b.cpu_greylisted, action_start);
+   }
+
+   void transaction_context::set_billing_deadline( account_name account, int64_t cpu_limit_us, bool greylisted,
+                                                   fc::time_point from ) {
+      active_deadline     = trx_deadline;
+      tx_cpu_usage_reason = trx_cpu_usage_reason;
+      if (!explicit_billed_cpu_time) {
+         cpu_limit_due_to_greylist = greylisted;
+         if (!is_read_only()) {
+            subjective_cpu_bill =
+               control.get_subjective_billing().get_subjective_bill(account, control.pending_block_time());
+            // Add leeway to allow powerup
+            const int64_t account_cpu_limit = cpu_limit_us - subjective_cpu_bill.count() + leeway.count();
+            // Possibly limit deadline to account subjective cpu left
+            if (from + fc::microseconds(account_cpu_limit) < trx_deadline) {
+               active_deadline              = from + fc::microseconds(account_cpu_limit);
+               billing_timer_exception_code = tx_cpu_usage_exceeded::code_value;
+               tx_cpu_usage_reason          = tx_cpu_usage_exceeded_reason::account_cpu_limit;
+            }
+         }
+      }
+      if (enforce_deadline) {
+         transaction_timer.stop();
+         transaction_timer.start(active_deadline);
+      }
    }
 
    void transaction_context::verify_init_subjective_billing() const {
@@ -835,8 +977,9 @@ namespace sysio::chain {
       }
    }
 
-   std::tuple<int64_t, bool, bool> transaction_context::get_cpu_limit(account_name a) const {
-      return control.get_cpu_limit(a);
+   std::tuple<int64_t, bool, bool>
+   transaction_context::get_cpu_limit(account_name a, const std::optional<block_timestamp_type>& current_time) const {
+      return control.get_cpu_limit(a, current_time);
    }
 
    void transaction_context::verify_net_usage(account_name a, int64_t net_usage, uint32_t net_usage_leeway) {

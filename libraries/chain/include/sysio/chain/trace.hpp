@@ -36,7 +36,7 @@ namespace sysio::chain {
       action                          act;
       bool                            context_free = false;
       fc::microseconds                elapsed;
-      std::optional<fc::unsigned_int> cpu_usage_us; // only populated for input action
+      std::optional<fc::unsigned_int> cpu_usage_us; // populated for an input action and for a frame whose billing switched to its receiver
       std::optional<fc::unsigned_int> net_usage;    // only populated for input action
       string                          console;
       transaction_id_type             trx_id; ///< the transaction that generated this action
