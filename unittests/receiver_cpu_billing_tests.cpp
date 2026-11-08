@@ -615,9 +615,12 @@ BOOST_FIXTURE_TEST_CASE( block_with_wrong_receipt_entry_count_is_rejected, recei
       return other;
    };
 
-   // Left out, the receiver entry bills nothing, so the receipt the node builds differs from the block's.
-   BOOST_CHECK_EXCEPTION( other_node()->push_block(
-                             tamper( []( auto& receipts ) { receipts[0].cpu_usage_us.pop_back(); } ) ),
+   // Left out, the receiver entry bills nothing, so the receipt the node builds differs from the block's. Its CPU
+   // moves onto the input entry, so the transaction still meets the CPU minimum.
+   BOOST_CHECK_EXCEPTION( other_node()->push_block( tamper( []( auto& receipts ) {
+                             auto& cpu   = receipts[0].cpu_usage_us;
+                             cpu.front() = fc::unsigned_int( cpu.front().value + cpu.back().value );
+                             cpu.pop_back(); } ) ),
                           block_validate_exception, fc_exception_message_contains( receipt_mismatch ) );
    BOOST_CHECK_EXCEPTION( other_node()->push_block( tamper( []( auto& receipts ) {
                              receipts[1].cpu_usage_us.push_back( fc::unsigned_int( 1 ) ); } ) ),
