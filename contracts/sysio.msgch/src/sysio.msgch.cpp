@@ -66,6 +66,11 @@ constexpr name     ram_payer       = "sysio"_n;
 /// always WIRE.
 constexpr uint32_t WIRE_CHAIN_ID  = 1;
 
+/// The payload format emitted and accepted by this release; zero is not an implicit V1.
+constexpr uint32_t SUPPORTED_PAYLOAD_VERSION = 1;
+/// Admission failure distinct from protobuf decoding, header validation, and consensus failures.
+constexpr auto UNSUPPORTED_PAYLOAD_VERSION = "unsupported OPP MessagePayload version";
+
 // `operator""_s` is declared at global scope by <sysio/slug_name.hpp>.
 
 /// Codename of the Ethereum outpost — the sole source of node-owner NFT (ERC1155) deposits, which
@@ -1060,6 +1065,11 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
       auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
       auto result = in(env_check);
       check(result == zpp::bits::errc{}, "failed to decode inbound envelope");
+      // Reject every unsupported decoded payload before recording any delivery.
+      for (const auto& message : env_check.messages) {
+         check(static_cast<uint32_t>(message.payload.version) == SUPPORTED_PAYLOAD_VERSION,
+               UNSUPPORTED_PAYLOAD_VERSION);
+      }
       uint32_t env_epoch = static_cast<uint32_t>(env_check.epoch_index);
       // Lambda overload: the formatted message (triple std::to_string concat) is built only on the
       // failure path, not on every successful delivery.
@@ -1631,7 +1641,7 @@ void msgch::buildenv(uint64_t chain_code) {
    checksum256 message_id{};
    auto build_packed = [&](const std::vector<opp::AttestationEntry>& src) {
       opp::MessagePayload payload;
-      payload.version = zpp::bits::vuint32_t{1};
+      payload.version = zpp::bits::vuint32_t{SUPPORTED_PAYLOAD_VERSION};
       payload.attestations = src;
 
       const std::vector<char> payload_bytes = opp::canonical::encode(payload);

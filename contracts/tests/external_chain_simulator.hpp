@@ -96,6 +96,8 @@ public:
       result.set_epoch_timestamp(EnvelopeTimestamp);
       result.set_previous_envelope_hash(previous_envelope_);
       auto* message = result.add_messages();
+      // Match the explicit V1 format emitted by real outposts.
+      message->mutable_payload()->set_version(1);
       for (const auto& [type, data] : entries) {
          auto* entry = message->mutable_payload()->add_attestations();
          entry->set_type(type);
