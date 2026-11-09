@@ -41,6 +41,7 @@
 #include <set>
 
 #include "contracts.hpp"
+#include "registry_test_support.hpp"
 #include "contract_test_support.hpp"
 
 using namespace sysio::testing;
@@ -418,6 +419,7 @@ public:
    /// schedule, and the genesis advance. The configurable cohort supports even split regressions;
    /// `build_schedule = false` skips `schbatchgps`, leaving the window empty.
    void bootstrap(uint32_t n_batch_ops = 1, bool batchop_is_bootstrapped = true, bool build_schedule = true) {
+      sysio_system::test_support::registry::seed_depot_pair(*this);
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
          "setconfig"_n, mvo()
             ("epoch_duration_sec",                  EPOCH_DURATION_SEC)
@@ -1142,6 +1144,7 @@ public:
    /// registered outposts' chain codes.
    std::vector<uint64_t> bootstrap_rotation(uint64_t terminate_window_ms, bool batchop_is_bootstrapped = false,
                                             rotation_outposts outposts = rotation_outposts::eth) {
+      sysio_system::test_support::registry::seed_depot_pair(*this);
       const bool with_eth = outposts != rotation_outposts::none;
       const bool with_sol = outposts == rotation_outposts::eth_and_sol;
 

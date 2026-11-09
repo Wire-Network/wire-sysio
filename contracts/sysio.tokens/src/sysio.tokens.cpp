@@ -2,10 +2,14 @@
 #include <sysio.epoch/sysio.epoch.hpp>
 #include <sysio.opp.common/registry_codes.hpp>
 #include <sysio.opp.common/registry_metadata.hpp>
+#include <sysio.opp.common/registry_references.hpp>
 
 namespace sysio {
 
 namespace {
+
+/// Contract context identifying registry validation failures.
+constexpr char registry_context[] = "sysio.tokens";
 
 // System-owned rows bill to the sysio RAM pool, not this contract account (privileged-contract
 // model, as sysio.token uses): the account stays finite at code+abi size; growth draws from the pool.
@@ -56,9 +60,9 @@ void tokens::regtoken(opp::types::TokenKind    kind,
    // Rendering is total, so an uncanonical one still produces text -- text that either
    // fails validation on the way back, or silently re-parses as a DIFFERENT token.
    // Refuse it before it becomes a permanent row.
-   opp::registry::check_codes({code}, "sysio.tokens");
+   opp::registry::check_codes({code}, registry_context);
    // Both strings persist into a `sysio`-billed row -- bound them before emplace.
-   opp::registry::check_metadata(symbol_name, description, "sysio.tokens");
+   opp::registry::check_metadata(symbol_name, description, registry_context);
 
    tokens_t tbl(get_self());
    token_key pk{code};
@@ -104,7 +108,8 @@ void tokens::regctok(sysio::slug_name   chain_code,
 
    // Both codes form this row's COMPOSITE PRIMARY KEY and are rendered as strings by
    // every reader -- refuse either that does not round-trip before the row becomes permanent.
-   opp::registry::check_codes({chain_code, token_code}, "sysio.tokens");
+   opp::registry::check_codes({chain_code, token_code}, registry_context);
+   opp::registry::check_registered_parents(chain_code, token_code, get_self(), registry_context);
 
    chaintokens_t tbl(get_self());
    chain_token_key pk{chain_code, token_code};
