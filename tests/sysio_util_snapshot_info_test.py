@@ -16,8 +16,8 @@ expected_results = [
         "file": "unittests/snapshots/snap_v1.bin.gz",
         "result": {
             "version": 1,
-            "chain_id": "087244f65e31c0106a58554b8f855e30ae657efb98c6c40348bb14db8bdb3f8e",
-            "head_block_id": "0000001d528897b7b0a6e7a5027c05ed26dcf6985590b418ba5b6d8b0c3fd8f6",
+            "chain_id": "47ae951a06f2f2ab68f635ab8e13a90e9fb86a84b9a7e452cb283ee64eaf10ec",
+            "head_block_id": "0000001d6c66eed3cf0eba51d54cb11d017b8a1ce2b3e6d5ed4a3df4ef6ce6da",
             "head_block_num": 29,
             "head_block_time": "2025-01-01T00:00:14.000"
         }

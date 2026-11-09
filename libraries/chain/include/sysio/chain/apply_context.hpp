@@ -29,11 +29,10 @@ class apply_context {
       void exec_one();
       void exec();
       void execute_inline( action&& a );
-      void execute_context_free_inline( action&& a );
 
    protected:
-      uint32_t schedule_action( uint32_t ordinal_of_action_to_schedule, account_name receiver, bool context_free );
-      uint32_t schedule_action( action&& act_to_schedule, account_name receiver, bool context_free );
+      uint32_t schedule_action( uint32_t ordinal_of_action_to_schedule, account_name receiver );
+      uint32_t schedule_action( action&& act_to_schedule, account_name receiver );
 
 
    /// Authorization methods:
@@ -149,7 +148,6 @@ class apply_context {
 
 
       int get_action( uint32_t type, uint32_t index, char* buffer, size_t buffer_size )const;
-      int get_context_free_data( uint32_t index, char* buffer, size_t buffer_size )const;
       vector<account_name> get_active_producers() const;
 
       uint64_t next_global_sequence();
@@ -159,7 +157,6 @@ class apply_context {
       void add_ram_usage( account_name account, int64_t ram_delta );
       void finalize_trace( action_trace& trace, const fc::time_point& start );
 
-      bool is_context_free()const { return context_free; }
       bool is_privileged()const { return privileged; }
       action_name get_receiver()const { return receiver; }
       const action& get_action()const { return *act; }
@@ -186,7 +183,6 @@ class apply_context {
       uint32_t                      first_receiver_action_ordinal = 0;
       uint32_t                      action_ordinal = 0;
       bool                          privileged   = false;
-      bool                          context_free = false;
 
    public:
       std::vector<char>             action_return_value;
@@ -209,7 +205,6 @@ class apply_context {
       std::optional<const account_metadata_object*> _first_receiver_metadata; ///< cached across notification dispatch
       vector< std::pair<account_name, uint32_t> > _notified; ///< keeps track of new accounts to be notifed of current message
       vector<uint32_t>                    _inline_actions; ///< action_ordinals of queued inline actions
-      vector<uint32_t>                    _cfa_inline_actions; ///< action_ordinals of queued inline context-free actions
       std::string                         _pending_console_output;
       flat_set<account_delta>             _account_ram_deltas; ///< flat_set of account_delta so json is an array of objects
 

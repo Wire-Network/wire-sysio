@@ -565,7 +565,7 @@ namespace impl {
       template<typename Resolver>
       static void add( mutable_variant_object& out, const char* name, const action_trace& act_trace, const Resolver& resolver, abi_traverse_context& ctx )
       {
-         static_assert(fc::reflector<action_trace>::total_member_count == 19);
+         static_assert(fc::reflector<action_trace>::total_member_count == 18);
          auto h = ctx.enter_scope();
          mutable_variant_object mvo;
 
@@ -575,7 +575,6 @@ namespace impl {
          mvo("receipt", act_trace.receipt);
          mvo("receiver", act_trace.receiver);
          add(mvo, "act", act_trace.act, resolver, ctx);
-         mvo("context_free", act_trace.context_free);
          mvo("elapsed", act_trace.elapsed);
          mvo("cpu_usage_us", act_trace.cpu_usage_us);
          mvo("net_usage", act_trace.net_usage);

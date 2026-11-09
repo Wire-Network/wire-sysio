@@ -57,8 +57,6 @@ const std::vector<const char*> genesis_intrinsics = {
    "tapos_block_num",
    "get_action",
    "send_inline",
-   "send_context_free_inline",
-   "get_context_free_data",
    "memcpy",
    "memmove",
    "memcmp",

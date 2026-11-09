@@ -384,11 +384,6 @@ void send_inline(char* serialized_action, size_t size) {
 }
 
 INTRINSIC_EXPORT
-void send_context_free_inline(char* serialized_action, size_t size) {
-   native_context_stack::current()->send_context_free_inline(aligned_span<const char>{(void*)serialized_action, (uint32_t)size});
-}
-
-INTRINSIC_EXPORT
 int32_t read_transaction(char* buffer, size_t buffer_size) {
    return native_context_stack::current()->read_transaction(aligned_span<char>{(void*)buffer, (uint32_t)buffer_size});
 }
@@ -416,12 +411,6 @@ int32_t tapos_block_prefix() {
 INTRINSIC_EXPORT
 int32_t get_action(uint32_t type, uint32_t index, char* buffer, size_t buffer_size) {
    return native_context_stack::current()->get_action(type, index,
-      aligned_span<char>{(void*)buffer, (uint32_t)buffer_size});
-}
-
-INTRINSIC_EXPORT
-int32_t get_context_free_data(uint32_t index, char* buffer, size_t buffer_size) {
-   return native_context_stack::current()->get_context_free_data(index,
       aligned_span<char>{(void*)buffer, (uint32_t)buffer_size});
 }
 
