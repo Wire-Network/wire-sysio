@@ -1,6 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/abi_serializer.hpp>
+#include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/kv_table_objects.hpp>
 #include <sysio/opp/opp.hpp>
 #include <sysio/opp/attestations/attestations.pb.h>
@@ -1662,6 +1663,128 @@ sysio::opp::attestations::DesyndicateLIQ queued_desyndication(sysio_synd_tester&
    BOOST_REQUIRE(msg.ParseFromArray(data.data(), static_cast<int>(data.size())));
    return msg;
 }
+
+/// An ordinary, unprivileged holder contract may desyndicate once from its own LIQ notification.
+struct reentrant_synd_tester : sysio_synd_tester {
+   abi_serializer holder_abi_ser;
+
+   /// Give alice only her own code authority; sysio.synd is called directly at transaction depth zero.
+   reentrant_synd_tester() {
+      constexpr auto holder = "alice"_n;
+      deploy(holder, contracts::util::reenter_desyndicate_wasm(), contracts::util::reenter_desyndicate_abi(),
+             holder_abi_ser, false);
+      authority auth(get_public_key(holder, "active"));
+      auth.accounts.push_back(permission_level_weight{{holder, config::sysio_code_name}, 1});
+      set_authority(holder, config::active_name, auth, config::owner_name);
+      produce_blocks();
+      BOOST_REQUIRE_EQUAL(config::default_max_inline_action_depth,
+                          control->get_global_properties().configuration.max_inline_action_depth);
+   }
+
+   /// Arm exactly one nested request without adding a wrapper action around the outer request.
+   action_result arm(uint64_t quantity, uint64_t max_fee = std::numeric_limits<uint64_t>::max()) {
+      return push("alice"_n, holder_abi_ser, "alice"_n, "arm"_n,
+                  mvo()("quantity", asset(static_cast<int64_t>(quantity), LIQSOL_SYM))("max_fee", max_fee));
+   }
+};
+
+/// Each FIFO message snapshots live supply after its own burn, including parked yield and retained fees.
+BOOST_AUTO_TEST_CASE(desyndicate_reentry_emits_nested_then_outer_live_outstanding) try {
+   for (const uint32_t fee_bps : {0u, 250u}) {
+      reentrant_synd_tester t;
+      constexpr uint64_t initial = 100 * t.UNIT;
+      constexpr uint64_t parked = 7 * t.UNIT;
+      constexpr uint64_t outer = 40 * t.UNIT;
+      constexpr uint64_t nested = 20 * t.UNIT;
+      const uint64_t outer_fee = outer * fee_bps / BPS_DENOMINATOR;
+      const uint64_t nested_fee = nested * fee_bps / BPS_DENOMINATOR;
+      const uint64_t outer_net = outer - outer_fee;
+      const uint64_t nested_net = nested - nested_fee;
+      BOOST_REQUIRE_EQUAL(t.success(), t.liq_mint("alice"_n, t.LIQSOL, initial));
+      BOOST_REQUIRE_EQUAL(t.success(), t.liq_mintyield(t.SOLANA, t.LIQSOL, parked));
+      BOOST_REQUIRE_EQUAL(t.success(), t.link_svm("alice"_n, t.ed_signer()));
+      BOOST_REQUIRE_EQUAL(t.success(), t.setconfig(t.SOLANA, t.LIQSOL,
+                          {.desynd_fee_bps = fee_bps, .desynd_burst = initial}));
+      BOOST_REQUIRE_EQUAL(t.success(), t.arm(nested, nested_fee));
+      BOOST_REQUIRE_EQUAL(t.success(), t.desyndicate("alice"_n, outer, t.LIQSOL_SYM, name{}, outer_fee));
+
+      const auto inner_msg = queued_desyndication(t, 1);
+      const auto outer_msg = queued_desyndication(t, 2);
+      BOOST_REQUIRE_EQUAL(2u, inner_msg.request_id());
+      BOOST_REQUIRE_EQUAL(1u, outer_msg.request_id());
+      BOOST_REQUIRE_EQUAL(nested_net, inner_msg.amount().amount());
+      BOOST_REQUIRE_EQUAL(outer_net, outer_msg.amount().amount());
+      BOOST_REQUIRE_EQUAL(initial + parked - nested_net, inner_msg.total_syndicated());
+      BOOST_REQUIRE_EQUAL(initial + parked - nested_net - outer_net, outer_msg.total_syndicated());
+      BOOST_REQUIRE_EQUAL(initial - nested_net - outer_net, t.supply());
+      BOOST_REQUIRE_EQUAL(parked, t.pending());
+      BOOST_REQUIRE_EQUAL(initial - outer - nested, t.liq_balance("alice"_n));
+      BOOST_REQUIRE_EQUAL(outer_fee + nested_fee, t.feepot_balance(t.LIQSOL));
+      BOOST_REQUIRE_EQUAL(outer_fee + nested_fee, t.liq_balance(t.SYND_ACCOUNT));
+      BOOST_REQUIRE_EQUAL(initial - outer - nested, t.desynd_bucket_row(t.SOLANA, t.LIQSOL)["level"].as_uint64());
+      BOOST_REQUIRE_EQUAL(outer_net, t.return_row(1)["amount"].as_uint64());
+      BOOST_REQUIRE_EQUAL(nested_net, t.return_row(2)["amount"].as_uint64());
+      BOOST_REQUIRE_EQUAL("alice", t.return_row(1)["holder"].as_string());
+      BOOST_REQUIRE_EQUAL("alice", t.return_row(2)["holder"].as_string());
+      BOOST_REQUIRE_EQUAL(3u, t.counters_row()["next_request_id"].as_uint64());
+      BOOST_REQUIRE(t.attestation_row(3).is_null());
+      BOOST_REQUIRE_EQUAL(inner_msg.user().SerializeAsString(), outer_msg.user().SerializeAsString());
+
+      // Receipt global sequences reflect execution order; action-trace slots reflect scheduling order.
+      std::vector<std::pair<uint64_t, name>> ordered;
+      for (const auto& trace : t.last_trace->action_traces) {
+         if (trace.receiver == trace.act.account &&
+             (trace.act.name == "burn"_n || trace.act.name == "emitdesynd"_n || trace.act.name == "queueout"_n)) {
+            BOOST_REQUIRE(trace.receipt.has_value());
+            ordered.emplace_back(trace.receipt->global_sequence, trace.act.name);
+         }
+      }
+      std::sort(ordered.begin(), ordered.end());
+      const std::vector<name> expected{"burn"_n, "emitdesynd"_n, "queueout"_n,
+                                       "burn"_n, "emitdesynd"_n, "queueout"_n};
+      BOOST_REQUIRE_EQUAL(ordered.size(), expected.size());
+      for (size_t i = 0; i < expected.size(); ++i) BOOST_REQUIRE_EQUAL(expected[i], ordered[i].second);
+
+      // The arm was consumed: a later ordinary request adds exactly one attestation.
+      BOOST_REQUIRE_EQUAL(t.success(), t.desyndicate("alice"_n, t.UNIT));
+      BOOST_REQUIRE_EQUAL(3u, queued_desyndication(t, 3).request_id());
+      BOOST_REQUIRE(t.attestation_row(4).is_null());
+   }
+} FC_LOG_AND_RETHROW()
+
+/// A nested refusal rolls back the outer transfer, fee, bucket debit, return and request allocation.
+BOOST_FIXTURE_TEST_CASE(desyndicate_reentry_refusal_rolls_back_every_request, reentrant_synd_tester) try {
+   constexpr uint64_t initial = 100 * UNIT;
+   constexpr uint64_t outer = 40 * UNIT;
+   constexpr uint64_t nested = 20 * UNIT;
+   BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, initial));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_signer()));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.desynd_fee_bps = 250, .desynd_burst = outer}));
+   BOOST_REQUIRE_EQUAL(success(), arm(nested));
+   const auto before = desynd_state();
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("desyndication exceeds the current budget"), desyndicate("alice"_n, outer));
+   BOOST_REQUIRE(before == desynd_state());
+   BOOST_REQUIRE(return_row(1).is_null());
+   BOOST_REQUIRE(attestation_row(1).is_null());
+} FC_LOG_AND_RETHROW()
+
+/// Neither a holder signature nor a direct system-contract signature can forge or replay an emission.
+BOOST_FIXTURE_TEST_CASE(desyndicate_emission_requires_self_inline_origin, sysio_synd_tester) try {
+   BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_signer()));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, UNIT));
+   const auto before = desynd_state();
+   for (const uint64_t request_id : {uint64_t{0}, uint64_t{1}, std::numeric_limits<uint64_t>::max()}) {
+      BOOST_REQUIRE(mentions(push(SYND_ACCOUNT, synd_abi_ser, "alice"_n, "emitdesynd"_n,
+                                  mvo()("request_id", request_id)), "missing authority of sysio.synd"));
+      BOOST_REQUIRE_EQUAL(wasm_assert_msg("syndication receipts require a self inline action"),
+                          push(SYND_ACCOUNT, synd_abi_ser, SYND_ACCOUNT, "emitdesynd"_n,
+                               mvo()("request_id", request_id)));
+      BOOST_REQUIRE(before == desynd_state());
+   }
+   BOOST_REQUIRE(attestation_row(2).is_null());
+} FC_LOG_AND_RETHROW()
 
 // Review Focus 6: a DESYNDICATE_LIQ carries the depot's outstanding shadow after its own burn -- the
 // supply plus the yield parked in liqpending, net of the burned amount -- and `desyndlog` records the
