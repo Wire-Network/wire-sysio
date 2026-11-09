@@ -445,20 +445,50 @@ namespace sysio::chain {
       assert(billed_cpu_us.size() ==
              packed_trx.get_transaction().total_actions() + (explicit_billed_cpu_time ? receiver_entries.size() : 0));
       assert(trace->action_traces.size() >= billed_cpu_us.size());
-      update_billed_cpu_time( now );
 
-      validate_cpu_minimum();
+      // The checks below can still fail the transaction, so its subjective bill waits for them. A check that fails
+      // undoes the CPU billing, and the controller then bills the transaction as a failed one.
+      cpu_usage_t                   measured_cpu_us;
+      accounts_billing_t            unbilled;
+      account_subjective_cpu_bill_t authorizers_cpu;
       if (!explicit_billed_cpu_time) {
-         // validated in init() when explicit_billed_cpu_time (validating trx in block)
-         validate_trx_billed_cpu();
-
-         for (const auto& [account, b] : accounts_billing) {
-            validate_available_account_cpu( account, b.cpu_usage_us, b.cpu_limit_us, b.cpu_greylisted );
+         measured_cpu_us = billed_cpu_us;
+         unbilled        = accounts_billing;
+      }
+      try {
+         if (!explicit_billed_cpu_time) {
+            authorizers_cpu = bill_cpu( now );
+            // A contract billed for its own code is checked against its limit as the transaction leaves it, which
+            // counts CPU the transaction granted it. Its usage window was not updated in this block.
+            for (auto& [account, bill] : accounts_billing) {
+               if (!bill.pays_net) {
+                  std::tie(bill.cpu_limit_us, bill.cpu_greylisted, std::ignore) =
+                     get_cpu_limit(account, block_timestamp_type(control.pending_block_time()));
+               }
+            }
          }
+
+         validate_cpu_minimum();
+         if (!explicit_billed_cpu_time) {
+            // validated in init() when explicit_billed_cpu_time (validating trx in block)
+            validate_trx_billed_cpu();
+
+            for (const auto& [account, b] : accounts_billing) {
+               validate_available_account_cpu( account, b.cpu_usage_us, b.cpu_limit_us, b.cpu_greylisted );
+            }
+         }
+
+         // Should never fail
+         rl.add_transaction_usage( accounts_billing, trace->total_cpu_usage_us, trace->net_usage,
+                                   block_timestamp_type(control.pending_block_time()).slot, is_transient() );
+      } catch (...) {
+         if (!explicit_billed_cpu_time)
+            unbill_cpu( std::move(measured_cpu_us), std::move(unbilled) );
+         throw;
       }
 
-      rl.add_transaction_usage( accounts_billing, trace->total_cpu_usage_us, trace->net_usage,
-                                block_timestamp_type(control.pending_block_time()).slot, is_transient() ); // Should never fail
+      if (!explicit_billed_cpu_time)
+         bill_subjectively( authorizers_cpu );
    }
 
 
@@ -707,6 +737,11 @@ namespace sysio::chain {
 
    void transaction_context::update_billed_cpu_time( fc::time_point now ) {
       if( explicit_billed_cpu_time || is_cpu_updated ) return; // updated in init() for explicit_billed_cpu
+      bill_subjectively( bill_cpu( now ) );
+   }
+
+   account_subjective_cpu_bill_t transaction_context::bill_cpu( fc::time_point now ) {
+      assert(!explicit_billed_cpu_time && !is_cpu_updated);
 
       // Read-only trxs are never billed (objective or subjective): they don't change chain state,
       // they may legitimately have zero authorizations, and any accounts_billing accumulation here
@@ -714,8 +749,8 @@ namespace sysio::chain {
       // type) are objectively billed to sysio but skip the subjective path -- they're chain-generated,
       // never appear in block->transactions (so on_block() can't clear a subjective entry), and the
       // sysio authorizer doesn't need subjective throttling.
-      const bool bill_objectively  = !is_read_only();
-      const bool bill_subjectively = bill_objectively && !is_implicit();
+      const bool bill_objectively    = !is_read_only();
+      const bool billed_subjectively = bill_objectively && !is_implicit();
 
       account_subjective_cpu_bill_t authorizers_cpu;
       const bool subjectively_bill_payer_disabled = control.get_subjective_billing().is_payer_billing_disabled();
@@ -735,7 +770,7 @@ namespace sysio::chain {
                bill_receiver(e, cpu);
                // Subjectively, the input action's first authorizer is billed, as for the input entry, and not twice
                // when it is the receiver and payer billing bills it as a payer.
-               if (bill_subjectively) {
+               if (billed_subjectively) {
                   const account_name first_auth = input_first_authorizer(e.input);
                   if (first_auth != e.account || subjectively_bill_payer_disabled)
                      authorizers_cpu[first_auth] += fc::microseconds{cpu};
@@ -765,7 +800,7 @@ namespace sysio::chain {
             if (bill_objectively) {
                auto payer = act_trace.act.payer();
                accounts_billing[payer].cpu_usage_us += b.value;
-               if (bill_subjectively) {
+               if (billed_subjectively) {
                   auto first_auth = input_first_authorizer(i);
                   // validate_referenced_accounts rejects non-read-only, non-implicit trxs with zero
                   // auths (tx_no_auths), so first_auth must be populated by here on the subjective path.
@@ -784,22 +819,35 @@ namespace sysio::chain {
       }
       trace->total_cpu_usage_us = total_cpu_time_us;
 
-      if (bill_subjectively) {
-         auto& subjective_bill = control.get_mutable_subjective_billing();
-         if( trace->except ) {
-            const fc::exception& e = *trace->except;
-            if( !exception_is_exhausted( e ) && e.code() != tx_duplicate::code_value) {
-               subjective_bill.subjective_bill_failure(accounts_billing, authorizers_cpu, control.pending_block_time());
-            }
-         } else {
-            // if producing then trx is in objective cpu account billing. Also no block will be received to remove the billing.
-            if (!control.is_producing_block()) {
-               subjective_bill.subjective_bill(packed_trx.id(), packed_trx.expiration(), accounts_billing, authorizers_cpu);
-            }
-         }
-      }
-
       is_cpu_updated = true;
+      return authorizers_cpu;
+   }
+
+   void transaction_context::unbill_cpu( cpu_usage_t measured_cpu_us, accounts_billing_t unbilled ) {
+      assert(!explicit_billed_cpu_time);
+      // A failed transaction gets no receiver entries, so its traces carry no receiver CPU either.
+      for (const auto& e : receiver_entries)
+         trace->action_traces[e.ordinal - 1].cpu_usage_us.reset();
+      billed_cpu_us    = std::move(measured_cpu_us);
+      accounts_billing = std::move(unbilled);
+      is_cpu_updated   = false;
+   }
+
+   void transaction_context::bill_subjectively( const account_subjective_cpu_bill_t& authorizers_cpu ) {
+      // Read-only and implicit trxs are not billed subjectively; see bill_cpu().
+      if (is_read_only() || is_implicit())
+         return;
+      auto& subjective_bill = control.get_mutable_subjective_billing();
+      if( trace->except ) {
+         const fc::exception& e = *trace->except;
+         if( !exception_is_exhausted( e ) && e.code() != tx_duplicate::code_value) {
+            subjective_bill.subjective_bill_failure(accounts_billing, authorizers_cpu, control.pending_block_time());
+         }
+      } else if (!control.is_producing_block()) {
+         // if producing then trx is in objective cpu account billing. Also no block will be received to remove the
+         // billing.
+         subjective_bill.subjective_bill(packed_trx.id(), packed_trx.expiration(), accounts_billing, authorizers_cpu);
+      }
    }
 
    uint32_t transaction_context::billed_cpu_sum() const {
@@ -831,10 +879,8 @@ namespace sysio::chain {
 
    void transaction_context::bill_receiver( const receiver_entry& e, uint32_t cpu_us ) {
       // A receiver pays CPU only: its NET window is neither updated nor checked.
-      accounts_billing.try_emplace(e.account, account_billing{ .cpu_limit_us   = e.cpu_limit_us,
-                                                               .cpu_greylisted = e.cpu_greylisted,
-                                                               .pays_net       = false })
-         .first->second.cpu_usage_us += cpu_us;
+      auto& bill = accounts_billing.try_emplace(e.account, account_billing{ .pays_net = false }).first->second;
+      bill.cpu_usage_us += cpu_us;
    }
 
    account_name transaction_context::input_first_authorizer( uint32_t input ) const {
