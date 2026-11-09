@@ -65,18 +65,30 @@ namespace sysio::testing {
       }
    }
 
-   void trx_generator_base::update_resign_transaction(chain::signed_transaction& trx, const fc::crypto::private_key& priv_key, uint64_t& nonce_prefix, uint64_t& nonce,
-                                                      const fc::microseconds& trx_expiration, const chain::chain_id_type& chain_id, const chain::block_id_type& last_irr_block_id) {
-      if (_config._noop_nonce) {
-         // create_trx_w_actions_and_signer appended the nonce action last.
-         auto& nonce_action = trx.actions.back();
-         SYS_ASSERT(nonce_action.account == noop_account_name && nonce_action.name == noop_nonce_action_name,
-                    chain::transaction_exception, "the last action is not the sysio.noop nonce action");
-         nonce_action.data = make_noop_nonce_data(nonce_prefix, nonce);
+   void trx_generator_base::refresh_noop_nonce_action(chain::transaction& trx, uint64_t& nonce_prefix, uint64_t& nonce) {
+      if (!_config._noop_nonce) {
+         return;
       }
+      // create_trx_w_actions_and_signer appended the nonce action last.
+      SYS_ASSERT(!trx.actions.empty(), chain::transaction_exception, "the transaction has no sysio.noop nonce action");
+      auto& nonce_action = trx.actions.back();
+      SYS_ASSERT(nonce_action.account == noop_account_name && nonce_action.name == noop_nonce_action_name,
+                 chain::transaction_exception, "the last action is not the sysio.noop nonce action");
+      nonce_action.data = make_noop_nonce_data(nonce_prefix, nonce);
+   }
+
+   void trx_generator_base::resign_transaction(chain::signed_transaction& trx, const fc::crypto::private_key& priv_key,
+                                               const fc::microseconds& trx_expiration, const chain::chain_id_type& chain_id,
+                                               const chain::block_id_type& last_irr_block_id) {
       set_transaction_headers(trx, last_irr_block_id, trx_expiration);
       trx.signatures.clear();
       trx.sign(priv_key, chain_id);
+   }
+
+   void trx_generator_base::update_resign_transaction(chain::signed_transaction& trx, const fc::crypto::private_key& priv_key, uint64_t& nonce_prefix, uint64_t& nonce,
+                                                      const fc::microseconds& trx_expiration, const chain::chain_id_type& chain_id, const chain::block_id_type& last_irr_block_id) {
+      refresh_noop_nonce_action(trx, nonce_prefix, nonce);
+      resign_transaction(trx, priv_key, trx_expiration, chain_id, last_irr_block_id);
    }
 
    chain::bytes transfer_trx_generator::make_transfer_data(const chain::name& from, const chain::name& to, const chain::asset& quantity, const std::string& memo) {
@@ -239,9 +251,10 @@ namespace sysio::testing {
 
    void trx_generator::update_resign_transaction(chain::signed_transaction& trx, const fc::crypto::private_key& priv_key, uint64_t& nonce_prefix, uint64_t& nonce,
                                                  const fc::microseconds& trx_expiration, const chain::chain_id_type& chain_id, const chain::block_id_type& last_irr_block_id) {
-      trx.actions.clear();
+      // The rebuilt actions replace the nonce action too, so append a new one.
       trx.actions = generate_actions();
-      trx_generator_base::update_resign_transaction(trx, priv_key, nonce_prefix, nonce, trx_expiration, chain_id, last_irr_block_id);
+      add_noop_nonce_action(trx, nonce_prefix, nonce);
+      resign_transaction(trx, priv_key, trx_expiration, chain_id, last_irr_block_id);
    }
 
    trx_generator::trx_generator(const trx_generator_base_config& trx_gen_base_config, const provider_base_config& provider_config, const user_specified_trx_config& usr_trx_config)
