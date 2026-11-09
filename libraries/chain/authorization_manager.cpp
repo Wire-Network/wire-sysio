@@ -613,24 +613,8 @@ namespace sysio { namespace chain {
                                         _noop_checktime
                                       );
 
-      // Context-free actions are not walked, matching consensus: controller passes only
-      // `trn.actions` to check_authorization, so CFAs are never authorization-checked there either.
-      // Their only screen is validate_referenced_accounts, which permits a CFA to carry EITHER no
-      // authorization at all (the ordinary case -- a CFA has no access to authorization state) OR
-      // exactly one, and that one only a `sysio.payer` marker whose actor is already a declared
-      // payer in trx.actions.
-      //
-      // That allowance exists for billing, not authorization: transaction_context::init bills every
-      // action -- context-free included -- to act.payer(), which falls through to the contract when
-      // no marker is present. Without it a self-paying account's CFAs would still bill the contract,
-      // splitting one transaction across two payers. The pairing requirement is what keeps it safe:
-      // a CFA carries no signatures and no real permission, so a marker standing alone would name a
-      // payer with nothing authorizing it. Requiring the actor to already be a payer in trx.actions
-      // means the CFA inherits an authorization proven over there (index 0, paired real permission,
-      // satisfying signatures) rather than creating one.
-      //
-      // For discovery that means a CFA has no key to contribute: the marker is keyless, and the key
-      // backing that payer sits on the paired real permission in trx.actions, which is walked below.
+      // Only `trn.actions` is walked, matching consensus: transaction_context rejects a transaction that carries
+      // context-free actions, and controller passes only `trn.actions` to check_authorization.
       for (const auto& act : trx.actions ) {
          // `sysio.payer` is a virtual marker, not a permission: no `permission_object` exists for
          // it and it carries no keys of its own. The key that authorizes a payer is the one on the

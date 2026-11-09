@@ -25,7 +25,6 @@ static const name first_account = "aaaprobe"_n;
 // Sorts above every account: the largest name an account can have, since a 13th character is refused.
 static const name last_account  = "zzzzzzzzzzzz"_n;
 static const name edge_account  = "kvedge"_n;
-static const name cf_account    = "kvcfa"_n;
 
 // The first and last bytes of a contract with one page of memory, and a 4-byte size output that just fits.
 static constexpr uint32_t page_size     = 64 * 1024;
@@ -85,74 +84,17 @@ enum class kv_edge_call : uint32_t {
    key_span, value_span, get_output, read_key_buffer, read_value_buffer, read_first_size, read_second_size, pri_span
 };
 
-// Calls the KV intrinsic the action data names, one branch per intrinsic in declaration order. Id 19 calls nothing, and
-// proves the module runs. Every argument is harmless, so only the context-free check can stop a call.
-static constexpr char kv_context_free_wast[] = R"=====(
-(module
-  (import "env" "read_action_data" (func $read_action_data (param i32 i32) (result i32)))
-  (import "env" "kv_set" (func $kv_set (param i32 i64 i32 i32 i32 i32 i32) (result i32)))
-  (import "env" "kv_erase" (func $kv_erase (param i32 i32 i32) (result i32)))
-  (import "env" "kv_get" (func $kv_get (param i32 i64 i32 i32 i32 i32 i32) (result i32)))
-  (import "env" "kv_idx_store" (func $kv_idx_store (param i32 i64 i32 i32 i32 i32) (result i32)))
-  (import "env" "kv_idx_update" (func $kv_idx_update (param i32 i64 i32 i32 i32 i32 i32 i32) (result i32)))
-  (import "env" "kv_idx_erase" (func $kv_idx_erase (param i32 i32 i32 i32 i32) (result i32)))
-  (import "env" "kv_it_create" (func $kv_it_create (param i32 i64 i32 i32 i32 i32) (result i32)))
-  (import "env" "kv_it_next" (func $kv_it_next (param i32 i32 i32 i32 i32 i32 i32) (result i32)))
-  (import "env" "kv_it_prev" (func $kv_it_prev (param i32 i32 i32 i32 i32 i32 i32) (result i32)))
-  (import "env" "kv_it_lower_bound" (func $kv_it_lower_bound (param i32 i32 i32 i32 i32 i32 i32 i32 i32) (result i32)))
-  (import "env" "kv_it_read" (func $kv_it_read (param i32 i32 i32 i32 i32 i32 i32 i32) (result i32)))
-  (import "env" "kv_it_destroy" (func $kv_it_destroy (param i32)))
-  (import "env" "kv_idx_create" (func $kv_idx_create (param i32 i64 i32 i32 i32 i32) (result i32)))
-  (import "env" "kv_idx_next" (func $kv_idx_next (param i32 i32 i32 i32 i32 i32 i32) (result i32)))
-  (import "env" "kv_idx_prev" (func $kv_idx_prev (param i32 i32 i32 i32 i32 i32 i32) (result i32)))
-  (import "env" "kv_idx_lower_bound" (func $kv_idx_lower_bound (param i32 i32 i32 i32 i32 i32 i32 i32 i32) (result i32)))
-  (import "env" "kv_idx_read" (func $kv_idx_read (param i32 i32 i32 i32 i32 i32 i32) (result i32)))
-  (import "env" "kv_idx_destroy" (func $kv_idx_destroy (param i32)))
-  (import "env" "kv_idx_find" (func $kv_idx_find (param i32 i64 i32 i32 i32 i32) (result i32)))
-  (memory 1)
-  (export "memory" (memory 0))
-  (func (export "apply") (param i64 i64 i64)
-    (local $call i32)
-    (drop (call $read_action_data (i32.const 0) (i32.const 4)))
-    (set_local $call (i32.load (i32.const 0)))
-    (if (i32.eq (get_local $call) (i32.const 0)) (then (drop (call $kv_set (i32.const 1) (i64.const 1) (i32.const 8) (i32.const 1) (i32.const 8) (i32.const 1) (i32.const 0)))))
-    (if (i32.eq (get_local $call) (i32.const 1)) (then (drop (call $kv_erase (i32.const 1) (i32.const 8) (i32.const 1)))))
-    (if (i32.eq (get_local $call) (i32.const 2)) (then (drop (call $kv_get (i32.const 1) (i64.const 1) (i32.const 8) (i32.const 1) (i32.const 0) (i32.const 8) (i32.const 1)))))
-    (if (i32.eq (get_local $call) (i32.const 3)) (then (drop (call $kv_idx_store (i32.const 1) (i64.const 1) (i32.const 8) (i32.const 1) (i32.const 8) (i32.const 1)))))
-    (if (i32.eq (get_local $call) (i32.const 4)) (then (drop (call $kv_idx_update (i32.const 1) (i64.const 1) (i32.const 8) (i32.const 1) (i32.const 8) (i32.const 1) (i32.const 8) (i32.const 1)))))
-    (if (i32.eq (get_local $call) (i32.const 5)) (then (drop (call $kv_idx_erase (i32.const 1) (i32.const 8) (i32.const 1) (i32.const 8) (i32.const 1)))))
-    (if (i32.eq (get_local $call) (i32.const 6)) (then (drop (call $kv_it_create (i32.const 1) (i64.const 1) (i32.const 8) (i32.const 1) (i32.const 8) (i32.const 1)))))
-    (if (i32.eq (get_local $call) (i32.const 7)) (then (drop (call $kv_it_next (i32.const 0) (i32.const 8) (i32.const 1) (i32.const 8) (i32.const 1) (i32.const 16) (i32.const 20)))))
-    (if (i32.eq (get_local $call) (i32.const 8)) (then (drop (call $kv_it_prev (i32.const 0) (i32.const 8) (i32.const 1) (i32.const 8) (i32.const 1) (i32.const 16) (i32.const 20)))))
-    (if (i32.eq (get_local $call) (i32.const 9)) (then (drop (call $kv_it_lower_bound (i32.const 0) (i32.const 8) (i32.const 1) (i32.const 8) (i32.const 1) (i32.const 8) (i32.const 1) (i32.const 16) (i32.const 20)))))
-    (if (i32.eq (get_local $call) (i32.const 10)) (then (drop (call $kv_it_read (i32.const 0) (i32.const 0) (i32.const 8) (i32.const 1) (i32.const 8) (i32.const 1) (i32.const 16) (i32.const 20)))))
-    (if (i32.eq (get_local $call) (i32.const 11)) (then (call $kv_it_destroy (i32.const 0))))
-    (if (i32.eq (get_local $call) (i32.const 12)) (then (drop (call $kv_idx_create (i32.const 1) (i64.const 1) (i32.const 8) (i32.const 1) (i32.const 8) (i32.const 1)))))
-    (if (i32.eq (get_local $call) (i32.const 13)) (then (drop (call $kv_idx_next (i32.const 0) (i32.const 8) (i32.const 1) (i32.const 8) (i32.const 1) (i32.const 16) (i32.const 20)))))
-    (if (i32.eq (get_local $call) (i32.const 14)) (then (drop (call $kv_idx_prev (i32.const 0) (i32.const 8) (i32.const 1) (i32.const 8) (i32.const 1) (i32.const 16) (i32.const 20)))))
-    (if (i32.eq (get_local $call) (i32.const 15)) (then (drop (call $kv_idx_lower_bound (i32.const 0) (i32.const 8) (i32.const 1) (i32.const 8) (i32.const 1) (i32.const 8) (i32.const 1) (i32.const 16) (i32.const 20)))))
-    (if (i32.eq (get_local $call) (i32.const 16)) (then (drop (call $kv_idx_read (i32.const 0) (i32.const 8) (i32.const 1) (i32.const 8) (i32.const 1) (i32.const 16) (i32.const 20)))))
-    (if (i32.eq (get_local $call) (i32.const 17)) (then (call $kv_idx_destroy (i32.const 0))))
-    (if (i32.eq (get_local $call) (i32.const 18)) (then (drop (call $kv_idx_find (i32.const 1) (i64.const 1) (i32.const 8) (i32.const 1) (i32.const 8) (i32.const 1)))))
-  )
-)
-)=====";
-
-// The intrinsic count, and the id that makes kv_context_free_wast call nothing.
-static constexpr uint32_t kv_intrinsic_count = 19;
-
 // Shared tester: deploy kv_intrinsic_probe once, reuse across cases.
 // Each action uses distinct table_ids/keys so shared state is safe.
 struct kv_probe_shared_tester : validating_tester {
    kv_probe_shared_tester() {
-      create_accounts({probe_account, notified_a, notified_b, first_account, last_account, edge_account, cf_account});
+      create_accounts({probe_account, notified_a, notified_b, first_account, last_account, edge_account});
       produce_block();
       for (name account : {probe_account, notified_a, notified_b, first_account, last_account}) {
          set_code(account, test_contracts::kv_intrinsic_probe_wasm());
          set_abi(account, test_contracts::kv_intrinsic_probe_abi().c_str());
       }
       set_code(edge_account, kv_edge_wast);
-      set_code(cf_account, kv_context_free_wast);
       produce_block();
    }
 
@@ -187,19 +129,6 @@ struct kv_probe_tester {
                                bytes(reinterpret_cast<const char*>(&args), reinterpret_cast<const char*>(&args + 1)));
       t.set_transaction_headers(trx);
       trx.sign(t.get_private_key(edge_account, "active"), t.control->get_chain_id());
-      t.push_transaction(trx);
-      t.produce_block();
-   }
-
-   /// A context-free action that makes call `id` of kv_context_free_wast, and the ordinary action a transaction needs.
-   void context_free_call(uint32_t id) {
-      signed_transaction trx;
-      trx.context_free_actions.emplace_back(vector<permission_level>{}, cf_account, "call"_n, fc::raw::pack(id));
-      trx.context_free_data.emplace_back();
-      trx.actions.emplace_back(vector<permission_level>{{cf_account, config::active_name}}, cf_account, "nothing"_n,
-                               fc::raw::pack(kv_intrinsic_count));
-      t.set_transaction_headers(trx);
-      trx.sign(t.get_private_key(cf_account, "active"), t.control->get_chain_id());
       t.push_transaction(trx);
       t.produce_block();
    }
@@ -961,18 +890,8 @@ BOOST_FIXTURE_TEST_CASE(refused_ram_bill_in_a_notified_contract_undoes_both_cont
 }
 
 // =============================================================================
-// The ends of contract memory, and context-free actions. Both need WAST.
+// The ends of contract memory. It needs WAST.
 // =============================================================================
-
-BOOST_FIXTURE_TEST_CASE(context_free_action_cannot_call_any_kv_intrinsic, kv_probe_tester) {
-   BOOST_CHECK_NO_THROW(context_free_call(kv_intrinsic_count));
-   for (uint32_t call = 0; call < kv_intrinsic_count; ++call) {
-      BOOST_TEST_CONTEXT("call " << call) {
-         BOOST_CHECK_EXCEPTION(context_free_call(call), unaccessible_api,
-                               fc_exception_message_is("only context free api's can be used in this context"));
-      }
-   }
-}
 
 // A span may end exactly at the end of memory. The first byte past it traps, however the span gets there.
 BOOST_FIXTURE_TEST_CASE(spans_stop_at_the_end_of_memory, kv_probe_tester) {

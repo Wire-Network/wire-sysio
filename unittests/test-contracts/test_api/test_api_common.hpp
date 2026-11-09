@@ -37,20 +37,6 @@ struct u128_action {
   SYSLIB_SERIALIZE( u128_action, (values) )
 };
 
-struct cf_action {
-   static uint64_t get_name() {
-      return sysio::name{"cf_action"}.value;
-   }
-   static uint64_t get_account() {
-      return sysio::name{"testapi"}.value;
-   }
-
-   uint32_t       payload = 100;
-   uint32_t       cfd_idx = 0; // context free data index
-
-   SYSLIB_SERIALIZE( cf_action, (payload)(cfd_idx) )
-};
-
 #pragma pack(pop)
 
 static_assert( sizeof(dummy_action) == 13 , "unexpected packing" );

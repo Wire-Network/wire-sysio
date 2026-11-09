@@ -62,8 +62,7 @@ comes first is not part of this spec.
 | **A9.** A `seek` has no size limit. CDT sends a 513-byte all-0xFF key to reach the end of a table, so a governance limit here would break it. | `kv_intrinsic_probe_tests/it_lower_bound_stays_in_the_prefix`, `lookups_take_a_key_of_any_size` |
 | **A10.** A `kv_set` mode other than 0 (upsert), 1 (insert) or 2 (update) throws `kv_invalid_mode`. | `kv_intrinsic_probe_tests/kv_set_unknown_mode_rejected`, `intrinsic_value_tests/kv_set_modes_are_a_closed_set`, `intrinsic_value_tests/kv_set_checks_the_table_id_first` |
 | **A11.** In a read-only transaction, `kv_set`, `kv_erase`, `kv_idx_store`, `kv_idx_update` and `kv_idx_erase` throw `table_operation_not_permitted`. Reads work. | `kv_api_tests/read_only_trx_rejects_write`, `read_only_rejects_kv_erase`, `read_only_rejects_kv_idx_store`, `read_only_rejects_kv_idx_update`, `read_only_rejects_kv_idx_erase`, `read_only_trx_allows_every_read`, `read_only_trx_tests/db_read_only_mode_test` |
-| **A12.** A context-free action cannot call any KV intrinsic. | `kv_intrinsic_probe_tests/context_free_action_cannot_call_any_kv_intrinsic`, `api_part1_tests/cf_action_tests` |
-| **A13.** A key a call only looks up has no size limit: `key` in `kv_get` and `kv_erase`, `pri_key` and `sec_key` in `kv_idx_erase`, `pri_key` and `old_sec_key` in `kv_idx_update`, and `sec_key` in `kv_idx_find`. With no row at that key the call is a plain miss, so a key over 512 bytes misses rather than throws. | `kv_intrinsic_probe_tests/lookups_take_a_key_of_any_size` |
+| **A12.** A key a call only looks up has no size limit: `key` in `kv_get` and `kv_erase`, `pri_key` and `sec_key` in `kv_idx_erase`, `pri_key` and `old_sec_key` in `kv_idx_update`, and `sec_key` in `kv_idx_find`. With no row at that key the call is a plain miss, so a key over 512 bytes misses rather than throws. | `kv_intrinsic_probe_tests/lookups_take_a_key_of_any_size` |
 
 ## 3. Status values
 

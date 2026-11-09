@@ -10,21 +10,19 @@
  *     1. The receiver's own action body (the "self" apply).
  *     2. Every action queued by require_recipient(), in FIFO order
  *        (the "notification phase").
- *     3. Every action queued by send_context_free_inline(), in FIFO order
- *        (the "CFA inline phase").
- *     4. Every action queued by send_inline(), in FIFO order
- *        (the "regular inline phase").
+ *     3. Every action queued by send_inline(), in FIFO order
+ *        (the "inline phase").
  *
  * As a diagram:
  *
- *   +--------+    +---------------+    +-------------+    +-----------------+
- *   |  self  | -> | notifications | -> | CFA inlines | -> | regular inlines |
- *   |        |    |     FIFO      |    |    FIFO     |    |      FIFO       |
- *   +--------+    +---------------+    +-------------+    +-----------------+
- *    phase 1         phase 2              phase 3              phase 4
+ *   +--------+    +---------------+    +-----------------+
+ *   |  self  | -> | notifications | -> |     inlines     |
+ *   |        |    |     FIFO      |    |      FIFO       |
+ *   +--------+    +---------------+    +-----------------+
+ *    phase 1         phase 2              phase 3
  *
  * Crucially, action_ordinal is the SCHEDULE order (the order in which
- * require_recipient / send_*_inline host calls were issued), while
+ * require_recipient / send_inline host calls were issued), while
  * global_sequence is the EXECUTION order (assigned only when an action's
  * receipt is built, after that action has actually run).
  *
@@ -40,7 +38,7 @@
  * assumed their notification handler would observe the post-inline state.
  *
  * ----------------------------------------------------------------------------
- * All six cases at a glance, in the EOSIO PR #6897 trace-tree notation:
+ * All five cases at a glance, in the EOSIO PR #6897 trace-tree notation:
  *
  *     (act.account::act.name -> receiver) [N]
  *        ||
@@ -109,20 +107,6 @@
  *                  ||===> (carol::notifyme -> bob) [4]
  *
  *
- *   Case 6 - CFA inline + regular inline + notification (mixedord) -
- *     TRIPLE divergence:
- *     alice body : send_inline(noop on carol);              // scheduled 1st
- *                  send_context_free_inline(noop on dave);  // scheduled 2nd
- *                  require_recipient(bob);                  // scheduled 3rd
- *
- *     (alice::mixedord -> alice) [1]
- *        ||
- *        ||===> (carol::noop -> carol) [4]      <-- scheduled 1st, runs LAST
- *        ||
- *        ||===> (dave::noop -> dave)   [3]      <-- scheduled 2nd, runs 3rd
- *        ||
- *        ||===> (alice::mixedord -> bob) [2]    <-- scheduled 3rd, runs 2nd
- *
  * ----------------------------------------------------------------------------
  *
  * The 6 actions defined below drive unittests/action_ordering_tests.cpp
@@ -134,7 +118,7 @@ public:
    using sysio::contract::contract;
 
    /**
-    * @brief Silent stub. Used as the target of inline / CFA inline calls.
+    * @brief Silent stub. Used as the target of inline calls.
     *
     * Deliberately does nothing so the resulting action_trace records only
     * the apply itself (no further notifications or inlines), keeping
@@ -196,7 +180,7 @@ public:
     *     +---------------------+
     *                                 |
     *                                 v
-    *     +---------------------+ phase 4 (regular inlines)
+    *     +---------------------+ phase 3 (inlines)
     *     | noop inline (ord 2) |  gseq=g0+2   <-- 3rd to run, ordinal 2
     *     +---------------------+
     *
@@ -264,56 +248,6 @@ public:
     * notification does NOT leak into the outer queue.
     */
    [[sysio::action]] void nestedcall(sysio::name obs, sysio::name inlt);
-
-   /**
-    * @brief CFA-inline runs BEFORE regular inline, regardless of schedule.
-    *
-    * Body, in order:
-    *     1. send_inline(noop on inlt)              // ordinal +1
-    *     2. send_context_free_inline(noop on cfat) // ordinal +2 (CFA)
-    *     3. require_recipient(obs)                 // ordinal +3
-    *
-    * Execution order, per apply_context::exec():
-    *     self -> notifications -> CFA inlines -> regular inlines.
-    *
-    * So the chain runs: source self, obs notification, CFA noop on cfat,
-    * regular noop on inlt. Trace shape:
-    *
-    *     index 0: source self          ord=1 gseq=g0
-    *     index 1: regular noop on inlt ord=2 gseq=g0+3   (LAST executed)
-    *     index 2: CFA noop on cfat     ord=3 gseq=g0+2
-    *     index 3: notification on obs  ord=4 gseq=g0+1   (FIRST after self)
-    *
-    *                            source body (mixedord)
-    *                                 |
-    *                                 v
-    *     +-----------------------+ phase 1
-    *     | self  (ord 1)         |  gseq=g0
-    *     +-----------------------+
-    *                                 |
-    *                                 v
-    *     +-----------------------+ phase 2 (notifications)
-    *     | obs notify  (ord 4)   |  gseq=g0+1   <-- scheduled LAST,  ran 2nd
-    *     +-----------------------+
-    *                                 |
-    *                                 v
-    *     +-----------------------+ phase 3 (CFA inlines)
-    *     | cfa noop    (ord 3)   |  gseq=g0+2
-    *     +-----------------------+
-    *                                 |
-    *                                 v
-    *     +-----------------------+ phase 4 (regular inlines)
-    *     | inline noop (ord 2)   |  gseq=g0+3   <-- scheduled FIRST, ran LAST
-    *     +-----------------------+
-    *
-    *     action_traces VECTOR order:  [ self, inline, cfa, notify ]
-    *     action_traces EXEC   order:  [ self, notify, cfa, inline ]  (tail reversed)
-    *
-    * This is a TRIPLE divergence: every non-self trace's gseq disagrees
-    * with its ordinal. It also encodes the (often forgotten) invariant
-    * that CFA inlines run BEFORE regular inlines, never alongside them.
-    */
-   [[sysio::action]] void mixedord(sysio::name obs, sysio::name inlt, sysio::name cfat);
 
    /**
     * @brief Notification handler for notiffire.

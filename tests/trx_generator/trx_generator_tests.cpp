@@ -781,15 +781,21 @@ BOOST_AUTO_TEST_CASE(noop_nonce_action_is_optional)
          auto trx = generator.create_trx_w_actions_and_signer({make_test_signed_transaction().actions.front()}, key,
                                                               nonce_prefix, nonce, tg_config._trx_expiration_us,
                                                               tg_config._chain_id, tg_config._last_irr_block_id);
-         const size_t expected_nonce_actions = noop_nonce ? 1 : 0;
-         BOOST_TEST(trx._trx.context_free_actions.size() == expected_nonce_actions);
+         const size_t expected_actions = noop_nonce ? 2 : 1;
+         BOOST_TEST(trx._trx.context_free_actions.empty());
+         BOOST_TEST(trx._trx.actions.size() == expected_actions);
+         const auto first_nonce = trx._trx.actions.back().data;
 
          generator.update_resign_transaction(trx._trx, key, nonce_prefix, nonce, tg_config._trx_expiration_us,
                                              tg_config._chain_id, tg_config._last_irr_block_id);
-         BOOST_TEST(trx._trx.context_free_actions.size() == expected_nonce_actions);
+         BOOST_TEST(trx._trx.context_free_actions.empty());
+         BOOST_TEST(trx._trx.actions.size() == expected_actions);
          if (noop_nonce) {
-            BOOST_TEST(trx._trx.context_free_actions.front().account == chain::name("sysio.noop"));
-            BOOST_TEST(trx._trx.context_free_actions.front().name == chain::name("nonce"));
+            const auto& nonce_action = trx._trx.actions.back();
+            BOOST_TEST(nonce_action.account == chain::name("sysio.noop"));
+            BOOST_TEST(nonce_action.name == chain::name("nonce"));
+            BOOST_TEST(nonce_action.authorization.empty());
+            BOOST_TEST(nonce_action.data != first_nonce);
          }
       }
    }

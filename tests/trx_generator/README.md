@@ -49,8 +49,8 @@ The Transaction Generator logs each transaction's id and sent timestamp at the m
 - `--log-dir arg` set the logs directory
 - `--stop-on-trx-failed arg` (=1) stop transaction generation if sending
   fails.
-- `--noop-nonce arg` (=1) add a context-free `sysio.noop::nonce`
-  action to make each transaction unique.
+- `--noop-nonce arg` (=1) add a `sysio.noop::nonce` action, with no
+  authorization, to make each transaction unique.
   Needs a contract on `sysio.noop`; set
   false for chains without one, which
   requires actions data with an
@@ -75,7 +75,7 @@ The Transaction Generator logs each transaction's id and sent timestamp at the m
 
 Instructions and examples for running `trx_generator` to create transactions with the custom action instead of the default transfer actions. The tool uses the ABI to serialize the action and sign the transactions with the provided private keys. If you need to generate unique account names per transaction (e.g., for account creation actions), the tool supports placeholders like `ACCT_PER_TRX` in the action, which it will replace with generated names.
 
-Each transaction normally carries a context-free `sysio.noop::nonce` action so repeated actions stay unique. Deployed
+Each transaction normally carries a `sysio.noop::nonce` action, with no authorization, so repeated actions stay unique. Deployed
 chains keep `sysio.noop` without a contract, so a top-level action to it fails there. Against such a chain pass
 `--noop-nonce false` and put `ACCT_PER_TRX` in a free-form field the action's ABI defines, such as a transfer memo,
 to make each transaction unique. Setup refuses actions data whose placeholders leave the serialized actions unchanged:

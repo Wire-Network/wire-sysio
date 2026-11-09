@@ -46,7 +46,7 @@ void action_order_test::on_notiffire([[maybe_unused]] name obs) {
 
 void action_order_test::inlnotify(name obs, name inlt) {
    // HEADLINE: schedule the inline FIRST, then the notification.
-   // Inline is queued in _inline_actions (regular inline phase, phase 4).
+   // Inline is queued in _inline_actions (inline phase, phase 3).
    // Notification is queued in _notified (notification phase, phase 2).
    // Result: notification runs first at execution time, but the action_trace
    // for the inline appears EARLIER in the action_traces vector because it
@@ -75,19 +75,3 @@ void action_order_test::nestedcall(name obs, name inlt) {
    inline_act.send(obs);
 }
 
-void action_order_test::mixedord(name obs, name inlt, name cfat) {
-   // Three host calls in this scheduling order:
-   //   1. regular inline noop on inlt
-   //   2. CFA inline    noop on cfat
-   //   3. require_recipient(obs)
-   //
-   // Despite that, execution runs phases in fixed order:
-   //   self -> notifications -> CFA inlines -> regular inlines.
-   // So the obs notification (last scheduled) runs FIRST after self,
-   // the CFA noop runs second, the regular noop runs LAST.
-   auto regular_inline = make_unauthed_wrapper<noop_action>(inlt);
-   regular_inline.send();
-   auto cfa_inline = make_unauthed_wrapper<noop_action>(cfat);
-   cfa_inline.send_context_free();
-   require_recipient(obs);
-}
