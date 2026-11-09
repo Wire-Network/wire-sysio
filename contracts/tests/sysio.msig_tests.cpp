@@ -192,6 +192,37 @@ BOOST_FIXTURE_TEST_CASE( propose_approve_execute, sysio_msig_tester ) try {
 //
 // This is the end-to-end behaviour a delayed proposal is supposed to have; it holds on the
 // unmodified contract too, which is what shows the delayed path was never broken.
+// propose's data must end with the proposed transaction
+BOOST_FIXTURE_TEST_CASE( propose_rejects_bytes_after_transaction, sysio_msig_tester ) try {
+   const auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}} );
+   const auto data = abi_ser.variant_to_binary( "propose", mvo()
+      ("proposer",      "alice")
+      ("proposal_name", "first")
+      ("requested",     vector<permission_level>{{ "alice"_n, config::active_name }})
+      ("trx",           trx), fixture_abi_yield_function() );
+   const auto push_raw = [&]( bytes action_data ) {
+      signed_transaction propose_trx;
+      propose_trx.actions.emplace_back( vector<permission_level>{{"alice"_n, config::active_name}},
+                                        "sysio.msig"_n, "propose"_n, std::move(action_data) );
+      set_transaction_headers( propose_trx );
+      propose_trx.sign( get_private_key( "alice"_n, "active" ), control->get_chain_id() );
+      return push_transaction( propose_trx );
+   };
+
+   auto with_tail = data;
+   with_tail.push_back( 0 );
+   BOOST_REQUIRE_EXCEPTION( push_raw( with_tail ), wasm_execution_error,
+                            fc_exception_message_contains( "check_transaction_authorization: 1 trailing bytes" ) );
+
+   push_raw( data );
+   produce_block();
+   push_action( "alice"_n, "approve"_n, mvo()
+                  ("proposer",      "alice")
+                  ("proposal_name", "first")
+                  ("level",         permission_level{ "alice"_n, config::active_name })
+   );
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( propose_approve_execute_with_delay, sysio_msig_tester ) try {
    const uint32_t delay_sec = 60;
    auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}}, delay_sec );

@@ -175,6 +175,11 @@ using namespace sysio;
 // the host -- so alias it once and call through.
 namespace raw = ::sysio::internal_use_do_not_use;
 
+/// Parameter of an action that reads its whole action data itself through `read_action_data`. Being `ignore<T>`, the
+/// dispatcher neither unpacks it nor requires the data to be consumed. At file scope because the generated dispatcher
+/// names it.
+using raw_action_data = sysio::ignore<std::vector<char>>;
+
 namespace {
 // -----------------------------------------------------------------------------
 // Hash digest sizes. Named constants per CLAUDE.md "no magic literals".
@@ -657,7 +662,7 @@ public:
 
    // Golden: host recovers the exact pub the driver embedded.
    [[sysio::action]]
-   void recok() {
+   void recok( raw_action_data payload ) {
       unsigned char buf[RECOVER_BUF_CAPACITY] = {};
       uint32_t n = sysio::action_data_size();
       check( n >= sizeof(sig_hash_key_header), "recover_key action data too short" );
@@ -689,7 +694,7 @@ public:
    // surfaces as a canary byte change. Driver verifies the in-contract checks via the probe's own check() calls -- any
    // host misbehavior surfaces as a sysio_assert_message_exception rather than BOOST_CHECK_NO_THROW noise.
    [[sysio::action]]
-   void recsmpub() {
+   void recsmpub( raw_action_data payload ) {
       unsigned char buf[RECOVER_BUF_CAPACITY] = {};
       uint32_t n = sysio::action_data_size();
       check( n <= RECOVER_BUF_CAPACITY, "recsmpub action data too large" );
@@ -721,7 +726,7 @@ public:
    // Unaligned digest pointer. aligned_ptr<const fc::sha256, 8> forces the
    // argument_proxy copy-in path when the wasm pointer is not 8-aligned.
    [[sysio::action]]
-   void recuald() {
+   void recuald( raw_action_data payload ) {
       unsigned char buf[RECOVER_BUF_CAPACITY] = {};
       uint32_t n = sysio::action_data_size();
       check( n <= RECOVER_BUF_CAPACITY, "recuald action data too large" );
@@ -749,7 +754,7 @@ public:
    // variant unpack rejects during sig decoding, before any secp256k1 math runs. Post-never-throw: recover_key
    // returns -1 on this path rather than throwing.
    [[sysio::action]]
-   void recbadvar() {
+   void recbadvar( raw_action_data payload ) {
       unsigned char buf[RECOVER_BUF_CAPACITY] = {};
       uint32_t n = sysio::action_data_size();
       check( n <= RECOVER_BUF_CAPACITY, "recbadvar action data too large" );
@@ -769,7 +774,7 @@ public:
    // Setting it outside the accepted range triggers FC_THROW_EXCEPTION in elliptic_secp256k1.cpp which recover_key
    // now catches and surfaces as rc = -1 instead of propagating.
    [[sysio::action]]
-   void recbadrec() {
+   void recbadrec( raw_action_data payload ) {
       unsigned char buf[RECOVER_BUF_CAPACITY] = {};
       uint32_t n = sysio::action_data_size();
       check( n <= RECOVER_BUF_CAPACITY, "recbadrec action data too large" );
@@ -794,7 +799,7 @@ public:
    // swept under the rug, which violates the "compare-recovered-against-known-authorized" pattern that is the only
    // safe way to use recover_key.
    [[sysio::action]]
-   void recbadrs() {
+   void recbadrs( raw_action_data payload ) {
       unsigned char buf[RECOVER_BUF_CAPACITY] = {};
       uint32_t n = sysio::action_data_size();
       check( n <= RECOVER_BUF_CAPACITY, "recbadrs action data too large" );
@@ -820,7 +825,7 @@ public:
    // Short sig (1 byte): valid variant tag but no shim content. fc::raw unpack of the shim bytes hits datastream
    // end; recover_key catches the unpack failure and returns -1.
    [[sysio::action]]
-   void recshort() {
+   void recshort( raw_action_data payload ) {
       unsigned char buf[RECOVER_BUF_CAPACITY] = {};
       uint32_t n = sysio::action_data_size();
       check( n <= RECOVER_BUF_CAPACITY, "recshort action data too large" );
@@ -836,7 +841,7 @@ public:
 
    // Zero-length sig: datastream runs dry before the variant tag itself; recover_key returns -1.
    [[sysio::action]]
-   void recempsig() {
+   void recempsig( raw_action_data payload ) {
       unsigned char dig[SHA256_SIZE] = {};
       char recovered[MAX_RECOVERED_PUB] = {};
       int32_t rc = recover_key( dig, nullptr, 0, recovered, sizeof(recovered) );
@@ -847,7 +852,7 @@ public:
    // to the (zero-length) buffer, so callers can use "query with size=0, allocate exactly, call again" when they
    // don't want CDT's 256-byte optimistic pre-allocation.
    [[sysio::action]]
-   void recqsize() {
+   void recqsize( raw_action_data payload ) {
       unsigned char buf[RECOVER_BUF_CAPACITY] = {};
       uint32_t n = sysio::action_data_size();
       check( n <= RECOVER_BUF_CAPACITY, "recqsize action data too large" );
@@ -870,7 +875,7 @@ public:
    // Raw WA sig bytes are passed as action data with no header framing; the driver constructs a WA-variant
    // blob large enough to trigger the cap but small enough to fit in max_transaction_net_usage.
    [[sysio::action]]
-   void recbigwa() {
+   void recbigwa( raw_action_data payload ) {
       uint32_t n = sysio::action_data_size();
       check( n <= BIG_WA_BUF_CAPACITY, "recbigwa action data exceeds probe static buffer" );
       sysio::read_action_data( big_wa_buf, n );
@@ -886,7 +891,7 @@ public:
 
    // assert_recover_key: matching digest + sig + pub -> no throw.
    [[sysio::action]]
-   void arecok() {
+   void arecok( raw_action_data payload ) {
       unsigned char buf[RECOVER_BUF_CAPACITY] = {};
       uint32_t n = sysio::action_data_size();
       check( n <= RECOVER_BUF_CAPACITY, "arecok action data too large" );
@@ -902,7 +907,7 @@ public:
    // assert_recover_key: recovery succeeds but recovered pub != supplied pub
    // -> SYS_ASSERT(check == p, crypto_api_exception, "...") fires.
    [[sysio::action]]
-   void arecng() {
+   void arecng( raw_action_data payload ) {
       unsigned char buf[RECOVER_BUF_CAPACITY] = {};
       uint32_t n = sysio::action_data_size();
       check( n <= RECOVER_BUF_CAPACITY, "arecng action data too large" );
@@ -929,7 +934,7 @@ public:
    // host throws BEFORE the pub-equality compare. Pins that the error path
    // is the recovery failure, not the compare.
    [[sysio::action]]
-   void arecbadrec() {
+   void arecbadrec( raw_action_data payload ) {
       unsigned char buf[RECOVER_BUF_CAPACITY] = {};
       uint32_t n = sysio::action_data_size();
       check( n <= RECOVER_BUF_CAPACITY, "arecbadrec action data too large" );
@@ -951,7 +956,7 @@ public:
    // "Public key type does not match signature type" fires BEFORE the
    // secp256k1 recovery math runs.
    [[sysio::action]]
-   void arecpubty() {
+   void arecpubty( raw_action_data payload ) {
       unsigned char buf[RECOVER_BUF_CAPACITY] = {};
       uint32_t n = sysio::action_data_size();
       check( n <= RECOVER_BUF_CAPACITY, "arecpubty action data too large" );
@@ -973,7 +978,7 @@ public:
 
    // assert_recover_key with empty sig -> throws at unpack step.
    [[sysio::action]]
-   void arecempsig() {
+   void arecempsig( raw_action_data payload ) {
       unsigned char dig[SHA256_SIZE] = {};
       const char* pub_placeholder = "\x00";
       assert_recover_key( dig, nullptr, 0, pub_placeholder, 0 );
@@ -999,7 +1004,7 @@ public:
    // Driver computes the digest of a pre-registered unactivated feature and
    // passes it as the full 32-byte action data payload.
    [[sysio::action]]
-   void preactok() {
+   void preactok( raw_action_data payload ) {
       unsigned char digest[SHA256_SIZE] = {};
       uint32_t n = sysio::action_data_size();
       check( n == SHA256_SIZE, "preactok action data must be exactly 32 bytes" );

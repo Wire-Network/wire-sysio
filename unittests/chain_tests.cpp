@@ -125,6 +125,46 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( decompressed_size_under_limit, T, testers ) try {
 
 } FC_LOG_AND_RETHROW()
 
+// Packed context-free data is its list and nothing after it. With no context-free data, no bytes and the packed empty
+// list are both accepted.
+BOOST_AUTO_TEST_CASE_TEMPLATE( packed_context_free_data_without_trailing_bytes, T, testers ) try {
+   T chain;
+
+   signed_transaction trx;
+   trx.actions.emplace_back(vector<permission_level>{{config::system_account_name, config::active_name}},
+                            config::system_account_name, "reqauth"_n, fc::raw::pack(config::system_account_name));
+   chain.set_transaction_headers(trx);
+   trx.sign(chain.get_private_key(config::system_account_name, "active"), chain.get_chain_id());
+
+   const bytes packed_trx = fc::raw::pack(static_cast<const transaction&>(trx));
+   const auto pack_with = [&](bytes packed_cfd) {
+      return packed_transaction(bytes(packed_trx), vector<signature_type>(trx.signatures), std::move(packed_cfd),
+                                packed_transaction::compression_type::none);
+   };
+   const auto check_trailing_rejected = [&](bytes packed_cfd) {
+      BOOST_CHECK_EXCEPTION(pack_with(std::move(packed_cfd)), tx_extra_data,
+                            fc_exception_message_is("packed_transaction contains extra data beyond context-free data"));
+   };
+
+   const bytes empty_list = fc::raw::pack(vector<bytes>{});
+   BOOST_CHECK(pack_with({}).get_context_free_data().empty());
+   BOOST_CHECK(pack_with(empty_list).get_context_free_data().empty());
+
+   bytes empty_list_then_byte = empty_list;
+   empty_list_then_byte.push_back(0);
+   check_trailing_rejected(empty_list_then_byte);
+
+   bytes entry_then_byte = fc::raw::pack(vector<bytes>{bytes{}});
+   entry_then_byte.push_back(0);
+   check_trailing_rejected(entry_then_byte);
+
+   // The packed empty list is how clients send a transaction without context-free data.
+   auto with_empty_list = pack_with(empty_list);
+   BOOST_REQUIRE(chain.push_transaction(with_empty_list)->receipt);
+   chain.produce_block();
+
+} FC_LOG_AND_RETHROW()
+
 // verify accepted_block signals validated blocks
 BOOST_AUTO_TEST_CASE_TEMPLATE( signal_validated_blocks, T, testers ) try {
    T chain;
