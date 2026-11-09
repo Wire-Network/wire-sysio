@@ -1,4 +1,5 @@
 #include <sysio/chain/webassembly/sys-vm-oc/executor.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/chained_signal_handler.hpp>
 #include <sysio/chain/webassembly/sys-vm-oc/code_cache.hpp>
 #include <sysio/chain/webassembly/sys-vm-oc/memory.hpp>
 #include <sysio/chain/webassembly/sys-vm-oc/thread_exec_mem.hpp>
@@ -36,7 +37,7 @@ namespace sysio::chain::sysvmoc {
 
 static constexpr auto signal_sentinel = 0x4D56534F45534559ul;
 
-static void(*chained_handler)(int,siginfo_t*,void*);
+static chained_signal_handler chained_handler;
 static void segv_handler(int sig, siginfo_t* info, void* ctx)  {
    control_block* cb_in_main_segment;
 
@@ -66,10 +67,8 @@ static void segv_handler(int sig, siginfo_t* info, void* ctx)  {
          siglongjmp(*cb_in_main_segment->jmp, SYSVMOC_EXIT_SEGV);
 
 notus:
-   if(chained_handler) {
-      chained_handler(sig, info, ctx);
+   if(chained_handler(sig, info, ctx))
       return;
-   }
    ::signal(sig, SIG_DFL);
    ::raise(sig);
    __builtin_unreachable();
@@ -150,15 +149,12 @@ static intrinsic check_memcpy_params_intrinsic("sysvmoc_internal.check_memcpy_pa
 
 struct executor_signal_init {
    executor_signal_init() {
-      struct sigaction sig_action, old_sig_action;
+      struct sigaction sig_action{}, old_sig_action{};
       sig_action.sa_sigaction = segv_handler;
       sigemptyset(&sig_action.sa_mask);
       sig_action.sa_flags = SA_SIGINFO | SA_NODEFER;
       sigaction(SIGSEGV, &sig_action, &old_sig_action);
-      if(old_sig_action.sa_flags & SA_SIGINFO)
-         chained_handler = old_sig_action.sa_sigaction;
-      else if(old_sig_action.sa_handler != SIG_IGN && old_sig_action.sa_handler != SIG_DFL)
-         chained_handler = (void (*)(int,siginfo_t*,void*))old_sig_action.sa_handler;
+      chained_handler = chained_signal_handler(old_sig_action);
    }
 };
 
