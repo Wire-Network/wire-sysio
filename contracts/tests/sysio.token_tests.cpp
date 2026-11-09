@@ -100,16 +100,6 @@ public:
       );
    }
 
-   action_result open( account_name owner,
-                       const string& symbolname,
-                       account_name ram_payer    ) {
-      return push_action( ram_payer, "open"_n, mvo()
-           ( "owner", owner )
-           ( "symbol", symbolname )
-           ( "ram_payer", ram_payer )
-      );
-   }
-
    action_result close( account_name owner,
                         const string& symbolname ) {
       return push_action( owner, "close"_n, mvo()
@@ -258,6 +248,12 @@ BOOST_FIXTURE_TEST_CASE( issue_tests, sysio_token_tester ) try {
                         issue( "alice"_n, asset::from_string("-1.000 TKN"), "hola" )
    );
 
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "tokens can only be issued to issuer account" ),
+                        push_action( "alice"_n, "issue"_n, mvo()
+                                     ( "to",       "bob" )
+                                     ( "quantity", asset::from_string("1.000 TKN") )
+                                     ( "memo",     "" ) ) );
+
    BOOST_REQUIRE_EQUAL( success(),
                         issue( "alice"_n, asset::from_string("1.000 TKN"), "hola" )
    );
@@ -361,52 +357,6 @@ BOOST_FIXTURE_TEST_CASE( transfer_tests, sysio_token_tester ) try {
       transfer( "alice"_n, "bob"_n, asset::from_string("-1000 CERO"), "hola" )
    );
 
-
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( open_tests, sysio_token_tester ) try {
-
-   auto token = create( "alice"_n, asset::from_string("1000 CERO"));
-
-   auto alice_balance = get_account("alice"_n, "0,CERO");
-   BOOST_REQUIRE_EQUAL(true, alice_balance.is_null() );
-   BOOST_REQUIRE_EQUAL( wasm_assert_msg("tokens can only be issued to issuer account"),
-                        push_action( "alice"_n, "issue"_n, mvo()
-                                     ( "to",       "bob")
-                                     ( "quantity", asset::from_string("1000 CERO") )
-                                     ( "memo",     "") ) );
-   BOOST_REQUIRE_EQUAL( success(), issue( "alice"_n, asset::from_string("1000 CERO"), "issue" ) );
-
-   alice_balance = get_account("alice"_n, "0,CERO");
-   REQUIRE_MATCHING_OBJECT( alice_balance, mvo()
-      ("balance", "1000 CERO")
-   );
-
-   auto bob_balance = get_account("bob"_n, "0,CERO");
-   BOOST_REQUIRE_EQUAL(true, bob_balance.is_null() );
-
-   BOOST_REQUIRE_EQUAL( wasm_assert_msg("owner account does not exist"),
-                        open( "nonexistent"_n, "0,CERO", "alice"_n ) );
-   BOOST_REQUIRE_EQUAL( success(),
-                        open( "bob"_n,         "0,CERO", "alice"_n ) );
-
-   bob_balance = get_account("bob"_n, "0,CERO");
-   REQUIRE_MATCHING_OBJECT( bob_balance, mvo()
-      ("balance", "0 CERO")
-   );
-
-   BOOST_REQUIRE_EQUAL( success(), transfer( "alice"_n, "bob"_n, asset::from_string("200 CERO"), "hola" ) );
-
-   bob_balance = get_account("bob"_n, "0,CERO");
-   REQUIRE_MATCHING_OBJECT( bob_balance, mvo()
-      ("balance", "200 CERO")
-   );
-
-   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "symbol does not exist" ),
-                        open( "carol"_n, "0,INVALID", "alice"_n ) );
-
-   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "symbol precision mismatch" ),
-                        open( "carol"_n, "1,CERO", "alice"_n ) );
 
 } FC_LOG_AND_RETHROW()
 

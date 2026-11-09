@@ -808,17 +808,6 @@ fc::variant regproducer_variant(const account_name& producer, const public_key_t
             ;
 }
 
-chain::action create_open(const string& contract, const name& owner, symbol sym, const name& ram_payer) {
-   auto open_ = fc::mutable_variant_object
-      ("owner", owner)
-      ("symbol", sym)
-      ("ram_payer", ram_payer);
-    return action {
-      get_account_permissions(tx_permission, {ram_payer, sysio::chain::config::active_name}),
-      name(contract), "open"_n, variant_to_bin( name(contract), "open"_n, open_ )
-   };
-}
-
 chain::action create_transfer(const string& contract, const name& sender, const name& recipient, asset amount, const string& memo ) {
 
    auto transfer = fc::mutable_variant_object
@@ -3036,7 +3025,6 @@ int main( int argc, char** argv ) {
    string recipient;
    string amount;
    string memo;
-   bool pay_ram = false;
 
    auto transfer_cmd = app.add_subcommand("transfer", localized("Transfer tokens from account to account"));
    transfer_cmd->add_option("sender", sender, localized("The account sending tokens"))->required();
@@ -3044,18 +3032,12 @@ int main( int argc, char** argv ) {
    transfer_cmd->add_option("amount", amount, localized("The amount of tokens to send"))->required();
    transfer_cmd->add_option("memo", memo, localized("The memo for the transfer"));
    transfer_cmd->add_option("--contract,-c", con, localized("The contract that controls the token, defaults to sysio.token for asset amounts"));
-   transfer_cmd->add_flag("--pay-ram-to-open", pay_ram, localized("Pay RAM to open recipient's token balance row"));
 
    add_standard_transaction_options_plus_signing(transfer_cmd, "sender@active");
    transfer_cmd->callback([&] {
       auto transfer_amount = to_asset(name(con), amount);
       auto transfer = create_transfer(con, name(sender), name(recipient), transfer_amount, memo);
-      if (!pay_ram) {
-         send_actions( { transfer }, signing_keys_opt.get_keys());
-      } else {
-         auto open_ = create_open(con, name(recipient), transfer_amount.get_symbol(), name(sender));
-         send_actions( { open_, transfer }, signing_keys_opt.get_keys());
-      }
+      send_actions( { transfer }, signing_keys_opt.get_keys());
    });
 
    // Net subcommand

@@ -115,15 +115,14 @@ BOOST_FIXTURE_TEST_CASE(settle_before_mutate_conserves_every_subunit, sysio_liq_
    BOOST_REQUIRE_EQUAL(0u, pot());
    BOOST_REQUIRE_EQUAL(0, owed("alice"_n));
 
-   // A row opened after the index moved is stamped, not zeroed: nothing is owed,
-   // claiming sends nothing, and a later credit accrues only from here.
-   BOOST_REQUIRE_EQUAL(success(), open("dave"_n, LIQSOL_SYM, "dave"_n));
+   // A row created after the index moved is stamped, not zeroed: nothing is owed,
+   // claiming sends nothing, and later yield accrues only from here.
+   BOOST_REQUIRE_EQUAL(success(), mint("dave"_n, 100 * UNIT));
    BOOST_REQUIRE_EQUAL(index(), account_row("dave"_n)["index_checkpoint"].as_uint128());
+   BOOST_REQUIRE_EQUAL(0, owed("dave"_n));
    const int64_t dave_before = wire_balance("dave"_n);
    BOOST_REQUIRE_EQUAL(success(), claim("dave"_n));
    BOOST_REQUIRE_EQUAL(dave_before, wire_balance("dave"_n));
-   BOOST_REQUIRE_EQUAL(success(), mint("dave"_n, 100 * UNIT));
-   BOOST_REQUIRE_EQUAL(0, owed("dave"_n));
    BOOST_REQUIRE_EQUAL(success(), addyield("carol"_n, 50 * UNIT));   // 500 supply: dave holds a fifth
    BOOST_REQUIRE_EQUAL(10 * UNIT, owed("dave"_n));
 
@@ -192,7 +191,6 @@ BOOST_FIXTURE_TEST_CASE(the_index_grows_past_64_bits, sysio_liq_tester) try {
 BOOST_FIXTURE_TEST_CASE(addyield_distributes_only_supplied_wire, sysio_liq_tester) try {
    constexpr int64_t intake = 100 * UNIT;
    BOOST_REQUIRE_EQUAL(success(), mint("alice"_n, 100 * UNIT));
-   BOOST_REQUIRE_EQUAL(success(), openext("alice"_n, "alice"_n, extended_symbol{WIRE_SYM, TOKEN_ACCOUNT}));
    BOOST_REQUIRE_EQUAL(success(), transfer_wire("alice"_n, SWAP_ACCOUNT, intake));
    const auto treasury_before = wire_balance(SYSIO_ACCOUNT);
    const auto holder_before = wire_balance("alice"_n);
@@ -327,11 +325,6 @@ BOOST_FIXTURE_TEST_CASE(pending_yield_is_reserved_against_the_asset_range, sysio
 BOOST_FIXTURE_TEST_CASE(a_holder_can_sell_shadow_into_the_yield_pool_for_wire, sysio_liq_tester) try {
    BOOST_REQUIRE_EQUAL(success(), mint("alice"_n, 100 * UNIT));
    BOOST_REQUIRE_EQUAL(success(), regliqpool(SOLANA, LIQSOL, POOL_SYM, 1000 * UNIT, 1000 * UNIT));
-
-   const extended_symbol shadow_ext{ LIQSOL_SYM, LIQ_ACCOUNT };
-   const extended_symbol wire_ext{ WIRE_SYM, TOKEN_ACCOUNT };
-   BOOST_REQUIRE_EQUAL(success(), openext("alice"_n, "alice"_n, shadow_ext));
-   BOOST_REQUIRE_EQUAL(success(), openext("alice"_n, "alice"_n, wire_ext));
 
    constexpr int64_t sold = 50 * UNIT;
    BOOST_REQUIRE_EQUAL(success(), transfer_shadow("alice"_n, SWAP_ACCOUNT, sold));
