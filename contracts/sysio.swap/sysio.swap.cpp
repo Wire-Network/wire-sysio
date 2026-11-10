@@ -16,16 +16,6 @@ namespace {
 
 namespace sysio {
 
-void swap::openext( const name& user, const name& payer, const extended_symbol& ext_symbol) {
-    check( is_account( user ), "user account does not exist" );
-    require_auth( payer );
-    evodexacnts acnts( get_self(), user.value );
-    const auto key = key_of(ext_symbol);
-    if( !acnts.contains(key) ) {
-        acnts.emplace( payer, key, evodex_account{ extended_asset{0, ext_symbol} } );
-    }
-}
-
 void swap::closeext( const name& user, const name& to, const extended_symbol& ext_symbol, string memo) {
     require_auth( user );
     evodexacnts acnts( get_self(), user.value );
@@ -167,7 +157,7 @@ void swap::add_signed_liq(name user, asset to_add, bool is_buying,
 
     add_signed_ext_balance(user, -to_pay1);
     add_signed_ext_balance(user, -to_pay2);
-    (to_add.amount > 0)? add_balance(user, to_add, user) : sub_balance(user, -to_add);
+    (to_add.amount > 0)? add_balance(user, to_add) : sub_balance(user, -to_add);
     update_price_accumulators(token);
     statstable.modify( name{}, key, [&]( auto& a ) {
       a.supply += to_add;
@@ -286,7 +276,7 @@ void swap::setconfig(name fee_authority, extended_symbol system_token) {
     check( is_account( system_token.get_contract() ), "system token contract does not exist" );
     check( system_token.get_symbol().is_valid(), "invalid system token symbol" );
     swapconfig_t config( get_self() );
-    config.set( swap_config{ fee_authority, system_token }, get_self() );
+    config.set( swap_config{ fee_authority, system_token }, RAM_PAYER );
 }
 
 swap::swap_config swap::configured() const {
@@ -330,7 +320,7 @@ std::optional<extended_symbol> yield_leg)
         // shadow can have.
         check( *yield_leg == initial_pool1.get_extended_symbol(), "yield_leg must be the pair's first leg" );
         reservoirs reservoir_table( get_self() );
-        reservoir_table.emplace( user, key, reservoir{ extended_asset{ 0, *yield_leg } } );
+        reservoir_table.emplace( RAM_PAYER, key, reservoir{ extended_asset{ 0, *yield_leg } } );
     }
     check( 0 <= initial_fee && initial_fee <= MAX_FEE, "fee out of range" );
     if (fee_authority == name{}) {
@@ -339,7 +329,7 @@ std::optional<extended_symbol> yield_leg)
         check( is_account( fee_authority ), "fee authority account does not exist" );
     }
 
-    statstable.emplace( user, key, currency_stats{
+    statstable.emplace( RAM_PAYER, key, currency_stats{
         .supply        = new_token,
         .max_supply    = asset{MAX, new_symbol},
         .issuer        = get_self(),
@@ -352,11 +342,11 @@ std::optional<extended_symbol> yield_leg)
     } );
 
     priceaccums accums( get_self() );
-    accums.emplace( user, key, price_accumulator{ .last_update = current_time_point() } );
+    accums.emplace( RAM_PAYER, key, price_accumulator{ .last_update = current_time_point() } );
 
     placeindex(user, new_symbol, initial_pool1, initial_pool2 );
     // The locked shares count toward supply but are credited to nobody.
-    add_balance(user, new_token - locked_shares, user);
+    add_balance(user, new_token - locked_shares);
     add_signed_ext_balance(user, -initial_pool1);
     add_signed_ext_balance(user, -initial_pool2);
 }
@@ -364,7 +354,7 @@ std::optional<extended_symbol> yield_leg)
 void swap::placeindex(name user, symbol evo_symbol,
   extended_asset pool1, extended_asset pool2 ) {
     evoindexes indextable( get_self() );
-    indextable.emplace( user, identity_of(pool1.get_extended_symbol(), pool2.get_extended_symbol()),
+    indextable.emplace( RAM_PAYER, identity_of(pool1.get_extended_symbol(), pool2.get_extended_symbol()),
                         pair_index{ evo_symbol }, "the pool is already indexed" );
 }
 
@@ -431,7 +421,7 @@ swap::currency_stats swap::accrue(const pair_key& key, const currency_stats& tok
     const extended_asset payout{ asset{ int64_t(owed), payout_symbol.get_symbol() }, payout_symbol.get_contract() };
 
     yieldpayouts payouts( get_self() );
-    payouts.emplace( get_self(), contract_key{ shadow.get_contract() },
+    payouts.emplace( RAM_PAYER, contract_key{ shadow.get_contract() },
                      payout_receipt{ token.supply.symbol.code(), payout },
                      "a yield payout from this contract is still pending" );
     // The pool changes: close the accumulators' interval at the old price first.
@@ -454,11 +444,9 @@ void swap::fundyield(name from, symbol_code pair_token, asset quantity) {
     const extended_symbol& shadow = require_yield_leg(*token);
     check( quantity.symbol == shadow.get_symbol(), "quantity must be in the pair's shadow symbol" );
     check( quantity.amount > 0, "quantity must be positive" );
-    // Billed to `from`: only the matching transfer erases the row, so an
-    // announcement nobody delivers would otherwise sit on the contract's RAM,
-    // one per account that ever called this. cancelyield refunds it.
+    // One row per funder, erased by the matching transfer or by cancelyield.
     yieldfunds funds( get_self() );
-    funds.upsert( from, funder_key{ from },
+    funds.upsert( RAM_PAYER, funder_key{ from },
                   fund_receipt{ pair_token, extended_asset{ quantity, shadow.get_contract() } } );
 }
 
@@ -623,13 +611,19 @@ swap::pair_identity_key swap::identity_of(const extended_symbol& a, const extend
 void swap::add_signed_ext_balance( const name& user, const extended_asset& to_add )
 {
     check( to_add.quantity.is_valid(), "invalid asset" );
+    if (to_add.quantity.amount == 0) return;
     evodexacnts acnts( get_self(), user.value );
     const auto key = key_of(to_add.get_extended_symbol());
-    check( acnts.contains(key), "extended_symbol not registered for this user,\
- please run openext action or write exchange details in the memo of your transfer");
-    acnts.modify( name{}, key, [&]( auto& a ) {
-        a.balance += to_add;
-        check( a.balance.quantity.amount >= 0, "insufficient funds");
-    });
+    if (acnts.contains(key)) {
+        acnts.modify( RAM_PAYER, key, [&]( auto& a ) {
+            a.balance += to_add;
+            check( a.balance.quantity.amount >= 0, "insufficient funds");
+        });
+        return;
+    }
+    // The first credit creates the row; a debit with no row has nothing to draw on.
+    check( to_add.quantity.amount > 0, "insufficient funds" );
+    check( is_account( user ), "user account does not exist" );
+    acnts.emplace( RAM_PAYER, key, evodex_account{ to_add } );
 }
 } // namespace sysio

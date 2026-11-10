@@ -130,10 +130,11 @@ constexpr std::string_view desynd_net_message    = "desyndication net of the fee
 constexpr std::string_view desynd_fee_flat_message =
    "flat desyndication fee must fit an asset and be below the minimum desyndication";
 
-/// Diagnostic path names of the intake actions.
-constexpr std::string_view onsynd_path   = "onsynd";
-constexpr std::string_view onyield_path  = "onyield";
-constexpr std::string_view closeenv_path = "closeenv";
+/// Diagnostic path names of the intake actions and of `retsent`.
+constexpr std::string_view onsynd_path     = "onsynd";
+constexpr std::string_view onyield_path    = "onyield";
+constexpr std::string_view closeenv_path   = "closeenv";
+constexpr std::string_view retsent_path = "retsent";
 
 /// Drop reasons, one per rule an intake message can fail.
 constexpr std::string_view pubkey_misfit_reason   = "pubkey does not fit the chain family";
@@ -148,6 +149,11 @@ constexpr std::string_view envelope_yield_reason  = "the envelope's yield would 
 constexpr std::string_view envelope_closed_reason = "envelope already closed or of another digest";
 constexpr std::string_view replay_reason          = "replayed sequence";
 constexpr std::string_view digest_reason          = "envelope digest does not match; left OPEN";
+
+/// Why `retsent` left a request id's row as it was.
+constexpr std::string_view return_resolved_reason = "no outstanding return for the request id";
+constexpr std::string_view return_outpost_reason  = "the return belongs to another outpost";
+constexpr std::string_view return_stamped_reason  = "the return already records the envelope that carried it";
 
 /// Why one step of the queue left an envelope or an item where it was.
 constexpr std::string_view no_bond_reason         = "sysio.bond is not deployed; the envelope stays WAITING";
@@ -1596,6 +1602,29 @@ void synd::emitdesynd(uint64_t request_id) {
    action(active_of(get_self()), MSGCH_ACCOUNT, queueout_action,
           std::make_tuple(row.chain_code.value, AttestationType::ATTESTATION_TYPE_DESYNDICATE_LIQ, encoded))
       .send();
+}
+
+void synd::retsent(sysio::slug_name chain_code, uint32_t epoch_index, std::vector<uint64_t> request_ids) {
+   require_auth(MSGCH_ACCOUNT);
+   returns_t pending(get_self());
+   for (const uint64_t request_id : request_ids) {
+      const return_key key{request_id};
+      auto             row = pending.try_get(key);
+      if (!row.has_value()) {
+         drop(retsent_path, return_resolved_reason);
+         continue;
+      }
+      if (row->chain_code != chain_code) {
+         drop(retsent_path, return_outpost_reason);
+         continue;
+      }
+      if (row->sent_epoch != 0) {
+         drop(retsent_path, return_stamped_reason);
+         continue;
+      }
+      row->sent_epoch = epoch_index;
+      pending.set(ram_payer, key, *row);
+   }
 }
 
 // ---------------------------------------------------------------------------

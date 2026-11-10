@@ -72,22 +72,8 @@ namespace sysio {
                         const asset&   quantity,
                         const string&  memo );
          /**
-          * Allows `ram_payer` to create an account `owner` with zero balance for
-          * token `symbol` at the expense of `ram_payer`.
-          *
-          * @param owner - the account to be created,
-          * @param symbol - the token to be payed with by `ram_payer`,
-          * @param ram_payer - the account that supports the cost of this action.
-          *
-          * More information can be read [here](https://github.com/SYSIO/sysio.contracts/issues/62)
-          * and [here](https://github.com/SYSIO/sysio.contracts/issues/61).
-          */
-         [[sysio::action]]
-         void open( const name& owner, const symbol& symbol, const name& ram_payer );
-
-         /**
-          * This action is the opposite for open, it closes the account `owner`
-          * for token `symbol`.
+          * Erases the empty balance row of `owner` for token `symbol`. Balance rows are
+          * billed to `sysio` and created by the first credit.
           *
           * @param owner - the owner account to execute the close action for,
           * @param symbol - the symbol of the token to execute the close action for.
@@ -116,7 +102,6 @@ namespace sysio {
          using issue_action = sysio::action_wrapper<"issue"_n, &token::issue>;
          using retire_action = sysio::action_wrapper<"retire"_n, &token::retire>;
          using transfer_action = sysio::action_wrapper<"transfer"_n, &token::transfer>;
-         using open_action = sysio::action_wrapper<"open"_n, &token::open>;
          using close_action = sysio::action_wrapper<"close"_n, &token::close>;
 
          // Account row + key types are public so foreign contracts can read
@@ -152,7 +137,7 @@ namespace sysio {
          using stats    = kv::scoped_table<"stat"_n, stat_key, currency_stats>;
 
          void sub_balance( const name& owner, const asset& value );
-         void add_balance( const name& owner, const asset& value, const name& ram_payer );
+         void add_balance( const name& owner, const asset& value );
    };
 
 }

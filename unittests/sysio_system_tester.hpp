@@ -76,16 +76,6 @@ public:
             get_balance(name("sysio")) + get_balance(name("sysio.ramfee")) + get_balance(name("sysio.stake")) + get_balance(name("sysio.ram")) );
    }
 
-   action_result open( account_name  owner,
-                       const string& symbolname,
-                       account_name  ram_payer    ) {
-      return push_action( ram_payer, "open"_n, mvo()
-                          ( "owner", owner )
-                          ( "symbol", symbolname )
-                          ( "ram_payer", ram_payer )
-         );
-   }
-
    transaction_trace_ptr setup_producer_accounts( const std::vector<account_name>& accounts ) {
       account_name creator(config::system_account_name);
       signed_transaction trx;

@@ -2,6 +2,10 @@
 
 #include <fc/exception/exception.hpp>
 
+#include <cerrno>
+#include <sys/wait.h>
+#include <unistd.h>
+
 BOOST_AUTO_TEST_SUITE(exception)
 
 /**
@@ -34,5 +38,49 @@ BOOST_AUTO_TEST_CASE(rethrow) try {
    }
 
 } FC_LOG_AND_RETHROW();
+
+/// Preserve the existing policy: cleanup drops ordinary failures and the general macro propagates interprocess OOM.
+BOOST_AUTO_TEST_CASE(cleanup_exception_policy) {
+   const auto cleanup = [](auto failure) noexcept {
+      try {
+         failure();
+      } FC_LOG_AND_DROP_NOEXCEPT("cleanup regression")
+   };
+   BOOST_CHECK_NO_THROW(cleanup([] { FC_THROW_EXCEPTION(fc::invalid_arg_exception, "expected cleanup failure"); }));
+   BOOST_CHECK_NO_THROW(cleanup([] { throw std::runtime_error("expected cleanup failure"); }));
+   BOOST_CHECK_NO_THROW(cleanup([] { throw 0; }));
+   const auto propagate = [] {
+      try {
+         throw boost::interprocess::bad_alloc();
+      } FC_LOG_AND_DROP("allocation regression")
+   };
+   BOOST_CHECK_THROW(propagate(), boost::interprocess::bad_alloc);
+}
+
+/// Preserve the existing noexcept cleanup policy, which terminates on interprocess OOM.
+BOOST_AUTO_TEST_CASE(cleanup_allocation_failure_terminates) {
+   constexpr int terminated = 73;
+   constexpr int returned = 74;
+   const auto child = ::fork();
+   BOOST_REQUIRE(child >= 0);
+   if (child == 0) {
+      std::set_terminate([] { ::_exit(terminated); });
+      const auto cleanup = []() noexcept {
+         try {
+            throw boost::interprocess::bad_alloc();
+         } FC_LOG_AND_DROP_NOEXCEPT("allocation regression")
+      };
+      cleanup();
+      ::_exit(returned);
+   }
+   int status = 0;
+   pid_t waited;
+   do {
+      waited = ::waitpid(child, &status, 0);
+   } while (waited == -1 && errno == EINTR);
+   BOOST_REQUIRE_EQUAL(waited, child);
+   BOOST_REQUIRE(WIFEXITED(status));
+   BOOST_CHECK_EQUAL(WEXITSTATUS(status), terminated);
+}
 
 BOOST_AUTO_TEST_SUITE_END()
