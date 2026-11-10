@@ -18,24 +18,6 @@
             ]
         },
         {
-            "name": "mixedord",
-            "base": "",
-            "fields": [
-                {
-                    "name": "obs",
-                    "type": "name"
-                },
-                {
-                    "name": "inlt",
-                    "type": "name"
-                },
-                {
-                    "name": "cfat",
-                    "type": "name"
-                }
-            ]
-        },
-        {
             "name": "nestedcall",
             "base": "",
             "fields": [
@@ -93,11 +75,6 @@
         {
             "name": "inlnotify",
             "type": "inlnotify",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "mixedord",
-            "type": "mixedord",
             "ricardian_contract": ""
         },
         {

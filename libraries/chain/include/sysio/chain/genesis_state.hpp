@@ -22,8 +22,6 @@ struct genesis_state {
       .target_block_net_usage_pct           = config::default_target_block_net_usage_pct,
       .max_transaction_net_usage            = config::default_max_transaction_net_usage,
       .net_usage_leeway                     = config::default_net_usage_leeway,
-      .context_free_discount_net_usage_num  = config::default_context_free_discount_net_usage_num,
-      .context_free_discount_net_usage_den  = config::default_context_free_discount_net_usage_den,
 
       .max_block_cpu_usage                  = config::default_max_block_cpu_usage,
       .target_block_cpu_usage_pct           = config::default_target_block_cpu_usage_pct,

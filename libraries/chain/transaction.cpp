@@ -170,20 +170,12 @@ signed_transaction::get_signature_keys( const chain_id_type& chain_id, fc::time_
 }
 
 uint32_t packed_transaction::get_action_billable_size(size_t action_index)const {
-   assert(action_index < unpacked_trx.total_actions());
+   // transaction_context bills only transactions it accepted, and it rejects any with context-free actions
+   assert(unpacked_trx.context_free_actions.empty());
+   assert(action_index < unpacked_trx.actions.size());
    assert(billable_net_per_action_overhead > 0);
 
-   uint32_t size = billable_net_per_action_overhead;
-   if (action_index < unpacked_trx.context_free_actions.size()) {
-      // init() enforces: context_free_data is empty or its size equals context_free_actions.size()
-      if (unpacked_trx.context_free_data.size() > action_index) {
-         size += unpacked_trx.context_free_data[action_index].size();
-      }
-      size += unpacked_trx.context_free_actions[action_index].get_billable_size();
-   } else {
-      size += unpacked_trx.actions[action_index - unpacked_trx.context_free_actions.size()].get_billable_size();
-   }
-   return size;
+   return billable_net_per_action_overhead + unpacked_trx.actions[action_index].get_billable_size();
 }
 
 size_t packed_transaction::get_estimated_size()const {
@@ -228,7 +220,11 @@ static vector<bytes> unpack_context_free_data(const bytes& data) {
    if( data.size() == 0 )
       return vector<bytes>();
 
-   return fc::raw::unpack< vector<bytes> >(data);
+   vector<bytes> cfd;
+   fc::datastream<const char*> ds(data.data(), data.size());
+   fc::raw::unpack(ds, cfd);
+   SYS_ASSERT( !ds.remaining(), tx_extra_data, "packed_transaction contains extra data beyond context-free data" );
+   return cfd;
 }
 
 static transaction unpack_transaction(const bytes& data) {

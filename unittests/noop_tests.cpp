@@ -92,15 +92,14 @@ BOOST_FIXTURE_TEST_CASE(inline_and_notify_to_account_without_contract, sysio::te
    BOOST_REQUIRE_EQUAL(limits.get_account_cpu_limit_ex(noop).first.max, 0);
    BOOST_REQUIRE_EQUAL(limits.get_account_net_limit_ex(noop).first.max, 0);
 
-   // mixedord notifies obs, sends a context-free inline to cfat and a regular inline to inlt.
-   auto trace = push_action(source, "mixedord"_n, source,
-                            mutable_variant_object()("obs", noop)("inlt", noop)("cfat", noop));
+   // inlnotify sends an inline action to inlt and notifies obs.
+   auto trace = push_action(source, "inlnotify"_n, source, mutable_variant_object()("obs", noop)("inlt", noop));
    BOOST_REQUIRE(trace->receipt);
 
    const auto reached_noop = std::ranges::count_if(trace->action_traces, [&](const action_trace& at) {
       return at.receiver == noop && at.receipt.has_value();
    });
-   BOOST_TEST(reached_noop == 3);
+   BOOST_TEST(reached_noop == 2);
 
    BOOST_TEST(limits.get_account_cpu_limit_ex(noop).first.used == 0);
    BOOST_TEST(limits.get_account_net_limit_ex(noop).first.used == 0);

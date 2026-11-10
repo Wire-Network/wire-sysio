@@ -326,6 +326,23 @@ vector<chain::permission_level> get_account_permissions(const vector<string>& pe
    }
 }
 
+/// Authorizations for a multisig action signed by `signer`: the `-p` permissions, or `signer@active` when there
+/// are none, behind the `-P` payer. An empty `signer` is set to the first actor that is not the payer marker.
+vector<chain::permission_level> get_signer_permissions(string& signer, std::string_view signer_param) {
+   auto permissions = signer.empty()
+      ? get_account_permissions(tx_permission)
+      : get_account_permissions(tx_permission, {name(signer), sysio::chain::config::active_name});
+   const auto signer_permission = std::ranges::find_if(permissions, [](const chain::permission_level& p) {
+      return p.permission != sysio::chain::config::sysio_payer_name;
+   });
+   SYS_ASSERT(signer_permission != permissions.end(), missing_auth_exception,
+              "Authority is not provided (either by multisig parameter <{}> or -p)", signer_param);
+   if (signer.empty()) {
+      signer = signer_permission->actor.to_string();
+   }
+   return permissions;
+}
+
 template<typename T>
 fc::variant call( const std::string& url,
                   const std::string& path,
@@ -3554,17 +3571,7 @@ int main( int argc, char** argv ) {
          trxperm = transaction_perm_var.as<vector<permission_level>>();
       } SYS_RETHROW_EXCEPTIONS(transaction_type_exception, "Wrong transaction permissions format: '{}'", fc::json::to_log_string(transaction_perm_var));
 
-      auto accountPermissions = get_account_permissions(tx_permission);
-      if (accountPermissions.empty()) {
-         if (!proposer.empty()) {
-            accountPermissions = vector<permission_level>{{name(proposer), sysio::chain::config::active_name}};
-         } else {
-            SYS_THROW(missing_auth_exception, "Authority is not provided (either by multisig parameter <proposer> or -p)");
-         }
-      }
-      if (proposer.empty()) {
-         proposer = name(accountPermissions.at(0).actor).to_string();
-      }
+      auto accountPermissions = get_signer_permissions(proposer, "proposer");
 
       transaction trx;
 
@@ -3623,17 +3630,7 @@ int main( int argc, char** argv ) {
          trx_var = trx; // implicit conversion serializes vector<char> action data as hex
       }
 
-      auto account_permissions = get_account_permissions(tx_permission);
-      if (account_permissions.empty()) {
-         if (!proposer.empty()) {
-            account_permissions = vector<permission_level>{{name(proposer), sysio::chain::config::active_name}};
-         } else {
-            SYS_THROW(missing_auth_exception, "Authority is not provided (either by multisig parameter <proposer> or -p)");
-         }
-      }
-      if (proposer.empty()) {
-         proposer = name(account_permissions.at(0).actor).to_string();
-      }
+      auto account_permissions = get_signer_permissions(proposer, "proposer");
 
       auto args = fc::mutable_variant_object()
          ("proposer", proposer )
@@ -3954,17 +3951,7 @@ int main( int argc, char** argv ) {
    cancel->add_option("proposal_name", proposal_name, localized("The proposal name (string)"))->required();
    cancel->add_option("canceler", canceler, localized("The canceler name (string)"));
    cancel->callback([&]() {
-      auto accountPermissions = get_account_permissions(tx_permission);
-      if (accountPermissions.empty()) {
-         if (!canceler.empty()) {
-            accountPermissions = vector<permission_level>{{name(canceler), sysio::chain::config::active_name}};
-         } else {
-            SYS_THROW(missing_auth_exception, "Authority is not provided (either by multisig parameter <canceler> or -p)");
-         }
-      }
-      if (canceler.empty()) {
-         canceler = name(accountPermissions.at(0).actor).to_string();
-      }
+      auto accountPermissions = get_signer_permissions(canceler, "canceler");
       auto args = fc::mutable_variant_object()
          ("proposer", proposer)
          ("proposal_name", proposal_name)
@@ -3982,17 +3969,7 @@ int main( int argc, char** argv ) {
    exec->add_option("proposal_name", proposal_name, localized("The proposal name (string)"))->required();
    exec->add_option("executer", executer, localized("The account paying for execution (string)"));
    exec->callback([&] {
-      auto accountPermissions = get_account_permissions(tx_permission);
-      if (accountPermissions.empty()) {
-         if (!executer.empty()) {
-            accountPermissions = vector<permission_level>{{name(executer), sysio::chain::config::active_name}};
-         } else {
-            SYS_THROW(missing_auth_exception, "Authority is not provided (either by multisig parameter <executer> or -p)");
-         }
-      }
-      if (executer.empty()) {
-         executer = name(accountPermissions.at(0).actor).to_string();
-      }
+      auto accountPermissions = get_signer_permissions(executer, "executer");
 
       auto args = fc::mutable_variant_object()
          ("proposer", proposer )

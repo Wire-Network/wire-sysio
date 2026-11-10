@@ -248,17 +248,6 @@ BOOST_FIXTURE_TEST_CASE(producers_upgrade_system_contract, sysio_system_tester) 
 
    produce_blocks();
 
-   //helper function
-   auto push_action_msig = [&]( const account_name& signer, const action_name &name, const variant_object &data, bool auth = true ) -> action_result {
-         string action_type_name = msig_abi_ser.get_action_type(name);
-
-         action act;
-         act.account = "sysio.msig"_n;
-         act.name = name;
-         act.data = msig_abi_ser.variant_to_binary( action_type_name, data, fixture_abi_yield_function() );
-
-         return base_tester::push_contract_paid_action( std::move(act), (auth ? signer : signer == "bob111111111"_n ? "alice1111111"_n : "bob111111111"_n).to_uint64_t() );
-   };
    // test begins
    vector<permission_level> prod_perms;
    for ( auto& x : producer_names ) {
@@ -358,8 +347,6 @@ fc::mutable_variant_object config_to_variant( const sysio::chain::chain_config& 
       ( "max_block_net_usage", config.max_block_net_usage )
       ( "target_block_net_usage_pct", config.target_block_net_usage_pct )
       ( "max_transaction_net_usage", config.max_transaction_net_usage )
-      ( "context_free_discount_net_usage_num", config.context_free_discount_net_usage_num )
-      ( "context_free_discount_net_usage_den", config.context_free_discount_net_usage_den )
       ( "max_block_cpu_usage", config.max_block_cpu_usage )
       ( "target_block_cpu_usage_pct", config.target_block_cpu_usage_pct )
       ( "max_transaction_cpu_usage", config.max_transaction_cpu_usage )
@@ -380,17 +367,6 @@ BOOST_FIXTURE_TEST_CASE( setparams, sysio_system_tester ) try {
 
    add_roa_policy(NODE_DADDY, "alice1111111"_n, "32.0000 SYS", "32.0000 SYS", "500.0000 SYS", 0, 0);
 
-   //helper function
-   auto push_action_msig = [&]( const account_name& signer, const action_name &name, const variant_object &data, bool auth = true ) -> action_result {
-         string action_type_name = msig_abi_ser.get_action_type(name);
-
-         action act;
-         act.account = "sysio.msig"_n;
-         act.name = name;
-         act.data = msig_abi_ser.variant_to_binary( action_type_name, data, fixture_abi_yield_function() );
-
-         return base_tester::push_contract_paid_action( std::move(act), (auth ? signer : signer == "bob111111111"_n ? "alice1111111"_n : "bob111111111"_n).to_uint64_t() );
-   };
 
    // test begins
    vector<permission_level> prod_perms;
@@ -476,17 +452,6 @@ BOOST_FIXTURE_TEST_CASE( wasmcfg, sysio_system_tester ) try {
 
    add_roa_policy(NODE_DADDY, "alice1111111"_n, "32.0000 SYS", "32.0000 SYS", "500.0000 SYS", 0, 0);
 
-   //helper function
-   auto push_action_msig = [&]( const account_name& signer, const action_name &name, const variant_object &data, bool auth = true ) -> action_result {
-         string action_type_name = msig_abi_ser.get_action_type(name);
-
-         action act;
-         act.account = "sysio.msig"_n;
-         act.name = name;
-         act.data = msig_abi_ser.variant_to_binary( action_type_name, data, fixture_abi_yield_function() );
-
-         return base_tester::push_contract_paid_action( std::move(act), (auth ? signer : signer == "bob111111111"_n ? "alice1111111"_n : "bob111111111"_n).to_uint64_t() );
-   };
 
    // test begins
    vector<permission_level> prod_perms;
@@ -618,6 +583,71 @@ BOOST_FIXTURE_TEST_CASE( setabi, sysio_system_tester ) try {
       BOOST_REQUIRE( abi_hash.hash == result );
    }
 
+} FC_LOG_AND_RETHROW()
+
+// Action data with bytes after the arguments fails
+BOOST_FIXTURE_TEST_CASE( action_data_checked, sysio_system_tester ) try {
+   const auto push_raw = [&]( name action_name, bytes data ) {
+      action act;
+      act.account = config::system_account_name;
+      act.name    = action_name;
+      act.data    = std::move(data);
+      return base_tester::push_contract_paid_action( std::move(act), "alice1111111"_n.to_uint64_t() );
+   };
+   const auto with_tail = []( bytes data, size_t tail ) {
+      data.insert( data.end(), tail, 0 );
+      return data;
+   };
+   constexpr size_t large_tail_size = 100'000;
+
+   // limitauthchg reads exactly its arguments.
+   add_roa_policy( NODE_DADDY, "alice1111111"_n, "32.0000 SYS", "32.0000 SYS", "32.0000 SYS", 0, 0 );
+   const auto limitauthchg = abi_ser.variant_to_binary( "limitauthchg", mvo()
+      ("account", "alice1111111")
+      ("allow_perms", std::vector<name>{})
+      ("disallow_perms", std::vector<name>{}), fixture_abi_yield_function() );
+   const auto left_over = wasm_assert_msg( "action data has bytes left after the arguments" );
+   BOOST_REQUIRE_EQUAL( left_over, push_raw( "limitauthchg"_n, with_tail( limitauthchg, 1 ) ) );
+   BOOST_REQUIRE_EQUAL( left_over, push_raw( "limitauthchg"_n, with_tail( limitauthchg, large_tail_size ) ) );
+   BOOST_REQUIRE_EQUAL( success(), push_raw( "limitauthchg"_n, limitauthchg ) );
+} FC_LOG_AND_RETHROW()
+
+// setabi and setcode accept the memo the system contract declares, and no byte after it
+BOOST_FIXTURE_TEST_CASE( setabi_setcode_memo, sysio_system_tester ) try {
+   const name alice = "alice1111111"_n;
+   add_roa_policy( NODE_DADDY, alice, "32.0000 SYS", "32.0000 SYS", "320.0000 SYS", 0, 0 );
+   const auto memo = fc::raw::pack( std::string( "deploy" ) );
+   const auto push_native = [&]( auto native, const bytes& tail ) {
+      action act( vector<permission_level>{{alice, config::active_name}}, native );
+      act.data.insert( act.data.end(), tail.begin(), tail.end() );
+      signed_transaction trx;
+      trx.actions.push_back( std::move(act) );
+      set_transaction_headers( trx );
+      trx.sign( get_private_key( alice, "active" ), control->get_chain_id() );
+      push_transaction( trx );
+   };
+   const auto with_byte = []( bytes data ) {
+      data.push_back( 0 );
+      return data;
+   };
+
+   const auto abi =
+      fc::raw::pack( fc::json::from_string( (const char*)contracts::token_abi().data() ).template as<abi_def>() );
+   const sysio::chain::setabi set_abi_action{ .account = alice, .abi = abi };
+   BOOST_CHECK_EXCEPTION( push_native( set_abi_action, with_byte( memo ) ), action_data_and_struct_mismatch,
+                          fc_exception_message_contains( "bytes left after the arguments" ) );
+   push_native( set_abi_action, memo );
+   const auto* metadata = control->find_account_metadata( alice );
+   BOOST_REQUIRE( metadata != nullptr && metadata->abi.size() != 0 );
+
+   const auto wasm = contracts::token_wasm();
+   const sysio::chain::setcode set_code_action{ .account = alice, .vmtype = 0, .vmversion = 0,
+                                                .code = bytes( wasm.begin(), wasm.end() ) };
+   BOOST_CHECK_EXCEPTION( push_native( set_code_action, with_byte( memo ) ), action_data_and_struct_mismatch,
+                          fc_exception_message_contains( "bytes left after the arguments" ) );
+   push_native( set_code_action, memo );
+   metadata = control->find_account_metadata( alice );
+   BOOST_REQUIRE( metadata != nullptr && metadata->code_hash != digest_type() );
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()

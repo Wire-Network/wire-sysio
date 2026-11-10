@@ -53,15 +53,9 @@ void test_action::test_dummy_action() {
 
    dummy_action dum13 = act.data_as<dummy_action>();
 
-   if ( dum13.b == 200 ) {
-      // attempt to access context free only api
-      sysio::get_context_free_data( 0, nullptr, 0 );
-      sysio_assert( false, "get_context_free_data() not allowed in non-context free action" );
-   } else {
-      sysio_assert( dum13.a == DUMMY_ACTION_DEFAULT_A, "dum13.a == DUMMY_ACTION_DEFAULT_A" );
-      sysio_assert( dum13.b == DUMMY_ACTION_DEFAULT_B, "dum13.b == DUMMY_ACTION_DEFAULT_B" );
-      sysio_assert( dum13.c == DUMMY_ACTION_DEFAULT_C, "dum13.c == DUMMY_ACTION_DEFAULT_C" );
-   }
+   sysio_assert( dum13.a == DUMMY_ACTION_DEFAULT_A, "dum13.a == DUMMY_ACTION_DEFAULT_A" );
+   sysio_assert( dum13.b == DUMMY_ACTION_DEFAULT_B, "dum13.b == DUMMY_ACTION_DEFAULT_B" );
+   sysio_assert( dum13.c == DUMMY_ACTION_DEFAULT_C, "dum13.c == DUMMY_ACTION_DEFAULT_C" );
 }
 
 void test_action::read_action() {
@@ -76,91 +70,6 @@ void test_action::read_action_to_0() {
 
 void test_action::read_action_to_64k() {
    read_action_data( (void *)((1<<16)-2), action_data_size());
-}
-
-void test_action::test_cf_action() {
-
-   sysio::action act = sysio::get_action( 0, 0 );
-   cf_action cfa = act.data_as<cf_action>();
-   if ( cfa.payload == 100 ) {
-      // verify read of get_context_free_data, also verifies system api access
-      int size = sysio::get_context_free_data( cfa.cfd_idx, nullptr, 0 );
-      sysio_assert( size > 0, "size determination failed" );
-      std::vector<char> cfd( static_cast<size_t>(size) );
-      size = sysio::get_context_free_data( cfa.cfd_idx, &cfd[0], static_cast<size_t>(size) );
-      sysio_assert(static_cast<size_t>(size) == cfd.size(), "get_context_free_data failed" );
-      uint32_t v = sysio::unpack<uint32_t>( &cfd[0], cfd.size() );
-      sysio_assert( v == cfa.payload, "invalid value" );
-
-      // verify crypto api access
-      char test[] = "test";
-      auto hash = sha256( test, sizeof(test) );
-      sysio::assert_sha256( test, sizeof(test), hash );
-      // verify action api access
-      action_data_size();
-      // verify console api access
-      sysio::print("test\n");
-      // verify memory api access
-      uint32_t i = 42;
-      memccpy( &v, &i, sizeof(i), sizeof(i) );
-      // verify transaction api access
-      sysio_assert(sysio::transaction_size() > 0, "transaction_size failed");
-      // verify softfloat api access
-      float f1 = 1.0f, f2 = 2.0f;
-      float f3 = f1 + f2;
-      sysio_assert( f3 >  2.0f, "Unable to add float.");
-      // verify context_free_system_api
-      sysio_assert( true, "verify sysio_assert can be called" );
-
-
-   } else if ( cfa.payload == 200 ) {
-      // attempt to access non context free api, privileged_api
-      is_privileged(act.name.value);
-      sysio_assert( false, "privileged_api should not be allowed" );
-   } else if ( cfa.payload == 201 ) {
-      // attempt to access non context free api, producer_api
-      get_active_producers( nullptr, 0 );
-      sysio_assert( false, "producer_api should not be allowed" );
-   } else if ( cfa.payload == 202 ) {
-      // attempt to access non context free api, kv_api
-      char key[24];
-      make_kv_key("testapi"_n.value, "testapi"_n.value, 0, key);
-      (void)kv_set( test_table_id, "testapi"_n.value, key, 24, "test", 4, kv_upsert );
-      sysio_assert( false, "kv_api should not be allowed" );
-   } else if ( cfa.payload == 203 ) {
-      // attempt to access non context free api, kv_idx_api
-      uint64_t i = 0;
-      uint64_t pk = 0;
-      (void)kv_idx_store( 100, 0, &pk, sizeof(pk), &i, sizeof(i) );
-      sysio_assert( false, "kv_api should not be allowed" );
-   } else if ( cfa.payload == 204 ) {
-      char key[24];
-      make_kv_key("testapi"_n.value, "testapi"_n.value, 1, key);
-      kv_get( test_table_id, "testapi"_n.value, key, 24, 0, nullptr, 0 );
-      sysio_assert( false, "kv_api should not be allowed" );
-   } else if ( cfa.payload == 205 ) {
-      // attempt to access non context free api, send action
-      sysio::action dum_act;
-      dum_act.send();
-      sysio_assert( false, "action send should not be allowed" );
-   } else if ( cfa.payload == 206 ) {
-      sysio::require_auth("test"_n);
-      sysio_assert( false, "authorization_api should not be allowed" );
-   } else if ( cfa.payload == 207 || cfa.payload == 208 ) {
-      // 207 is obsolete as now() is removed from system.h
-      current_time();
-      sysio_assert( false, "system_api should not be allowed" );
-   } else if ( cfa.payload == 209 ) {
-      publication_time();
-      sysio_assert( false, "system_api should not be allowed" );
-   } else if ( cfa.payload == 210 ) {
-      sysio::internal_use_do_not_use::send_inline( (char*)"hello", 6 );
-      sysio_assert( false, "transaction_api should not be allowed" );
-   } else if ( cfa.payload == 211 ) {
-      set_action_return_value("hi", 2);
-      sysio_assert( false, "set_action_return_value should not be allowed" );
-   }
-
 }
 
 void test_action::require_notice( uint64_t receiver, uint64_t code, uint64_t action ) {
@@ -198,10 +107,6 @@ void test_action::assert_false() {
 }
 
 void test_action::assert_true() {
-   sysio_assert( true, "test_action::assert_true" );
-}
-
-void test_action::assert_true_cf() {
    sysio_assert( true, "test_action::assert_true" );
 }
 

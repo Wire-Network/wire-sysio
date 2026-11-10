@@ -244,8 +244,7 @@ namespace sysio { namespace chain {
                                     3040002, "Transaction should have at least one normal action" )
       FC_DECLARE_DERIVED_EXCEPTION( tx_no_auths,                 transaction_exception,
                                     3040003, "Transaction should have at least one required authority" )
-      FC_DECLARE_DERIVED_EXCEPTION( cfa_irrelevant_auth,         transaction_exception,
-                                    3040004, "Context-free action should have no required authority" )
+      // cfa_irrelevant_auth     3040004
       FC_DECLARE_DERIVED_EXCEPTION( expired_tx_exception,        transaction_exception,
                                     3040005, "Expired Transaction" )
       FC_DECLARE_DERIVED_EXCEPTION( tx_exp_too_far_exception,    transaction_exception,

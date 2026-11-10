@@ -3464,7 +3464,6 @@ inline std::pair<action_trace, std::string> generate_action_trace(const std::opt
       <<             "\"data\":\"09746573745f64617461\","
       <<             "\"hex_data\":\"09746573745f64617461\""
       <<         "},"
-      <<         "\"context_free\":false,"
       <<         "\"elapsed\":3,"
       <<         "\"cpu_usage_us\":3,"
       <<         "\"net_usage\":5,"

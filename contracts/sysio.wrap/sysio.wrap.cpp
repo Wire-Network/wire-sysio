@@ -17,6 +17,10 @@ void wrap::exec( ignore<name>, ignore<transaction> ) {
    _ds >> context_free_actions;
    check( context_free_actions.empty(), "not allowed to `exec` a transaction with context-free actions" );
    _ds >> actions;
+   extensions_type transaction_extensions;
+   _ds >> transaction_extensions;
+   check( transaction_extensions.empty(), "not allowed to `exec` a transaction with transaction extensions" );
+   check_action_data_consumed( _ds );
 
    for (const auto& act : actions) {
       act.send();

@@ -32,6 +32,9 @@ public:
     * saved in the proposals table and the `requested` permission levels to the
     * approvals table (for the `proposer` context). Storage changes are billed to `proposer`.
     *
+    * The action must carry `{proposer, sysio.payer}` as its first authorization, so `proposer`
+    * pays its CPU and NET instead of this contract.
+    *
     * @param proposer - The account proposing a transaction
     * @param proposal_name - The name of the proposal (should be unique for proposer)
     * @param requested - Permission levels expected to approve the proposal

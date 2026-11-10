@@ -12,6 +12,7 @@
 #include <cstring>
 #include <cstdint>
 #include <limits>
+#include <tuple>
 #include <vector>
 
 // Raw kv_* host intrinsic declarations. Listed here instead of via CDT's kv.h so every adversarial test is explicit about
@@ -81,6 +82,9 @@ int32_t  kv_idx_find(uint32_t table_id, uint64_t code, const void* prefix, uint3
 }
 
 using namespace sysio;
+
+/// Data of an inline action that takes no arguments: packs to zero bytes.
+using no_action_data = std::tuple<>;
 
 // Distinct table_id per action keeps probes independent under the shared tester.
 static constexpr uint32_t tid_zval       = 501;
@@ -2688,7 +2692,7 @@ public:
    void abrtinline() {
       abort_work('a');
       sysio::action(std::vector<sysio::permission_level>{{get_self(), "active"_n}}, get_self(), "abrtchild"_n,
-                    std::vector<char>{})
+                    no_action_data{})
          .send();
    }
 
@@ -3246,7 +3250,7 @@ private:
       must(put_row(tid_inliso, self, k, sizeof(k), "v", 1));
       check(it_create(tid_inliso, self, &marker, 0) == 0, "first primary alloc must be slot 0");
       sysio::action(std::vector<sysio::permission_level>{{get_self(), "active"_n}}, get_self(), child,
-                    std::vector<char>{})
+                    no_action_data{})
          .send();
    }
 

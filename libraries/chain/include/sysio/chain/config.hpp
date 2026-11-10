@@ -57,8 +57,6 @@ namespace sysio::chain::config {
   static constexpr uint32_t   default_target_block_net_usage_pct           = 10 * percent_1; /// we target 1000 TPS
   static constexpr uint32_t   default_max_transaction_net_usage            = default_max_block_net_usage / 2;
   static constexpr uint32_t   default_net_usage_leeway                     = 500; // bytes of NET leeway for transactions
-  static constexpr uint32_t   default_context_free_discount_net_usage_num  = 0; // Wire does not support discount of context free data
-  static constexpr uint32_t   default_context_free_discount_net_usage_den  = 1; // Wire does not support discount of context free data
   static constexpr uint32_t   transaction_id_net_usage                     = 32; // 32 bytes for the size of a transaction id
 
   static constexpr uint32_t   default_max_block_cpu_usage                  = 200'000; /// max block cpu usage in microseconds

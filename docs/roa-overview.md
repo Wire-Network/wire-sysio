@@ -121,10 +121,6 @@ resources. On a regular action the protocol requires all three of the following 
 - the **same actor** also appears on that action under a real permission, and
 - the transaction carries **signatures** satisfying that paired declared authorization.
 
-A context-free action takes the opposite form. It may carry the marker *alone* — a paired real
-permission there is rejected outright — and only when that same actor is already an explicit payer
-on one of the transaction's regular actions.
-
 The paired permission is not required to be `active`. `authorization_manager` looks for any entry
 whose actor matches the payer and whose permission is not `sysio.payer` itself, then satisfies it
 like any other declared authority — so `owner`, or a custom permission linked to that action, works
@@ -163,8 +159,8 @@ flowchart TD
     F --> H["Actor billed CPU and NET, contract not.<br/>Marker authorizes RAM billed to the actor;<br/>contract may still bill RAM to itself."]
 ```
 
-Declared regular actions only. A context-free action takes the marker alone, as above; inline and
-notification execution differ on both authorization and billing, below.
+Declared actions only. Inline and notification execution differ on both authorization and billing,
+below.
 
 The objective billing map is populated only from the actions a transaction *declares*, and is keyed
 on `payer()` — so two declared actions sharing a payer aggregate into one entry. An authorizing
@@ -235,6 +231,9 @@ inherited: native `newaccount` writes 0/0/0 and transfers the fixed RAM gift, th
 later quota sync by passing `-1, -1` for a `sysio.`-prefixed owner. The prefix alone guarantees
 nothing — `activateroa` deliberately creates
 `sysio.acct` at **zero** CPU and NET, a pure RAM bucket for account creation.
+
+`sysio.msig::propose` is the exception: its data is a caller-supplied transaction, so it requires
+`{proposer, sysio.payer}` first and the proposer pays its CPU and NET.
 
 > **What `-1` means here.** It is a **sentinel** meaning "no limit," not a quantity. The chain
 > tests for it explicitly (`is_unlimited_cpu` returns `cpu_weight == -1`) and substitutes a large
@@ -705,8 +704,7 @@ Two anchors to calibrate against:
 
 - **NET is small and predictable, but it is not just the action.** Each action is billed its own
   serialized size *plus a share of the transaction's overhead* — a fixed 16 bytes, the signatures,
-  the extensions and the header, divided across the actions and rounded up. A context-free action
-  is additionally billed the bytes of its matching `context_free_data` entry:
+  the extensions and the header, divided across the actions and rounded up:
 
   ```cpp
   // libraries/chain/transaction.cpp

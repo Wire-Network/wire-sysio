@@ -86,22 +86,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        platform: [ubuntu24, ubsan, asan, asserton, gcc, ubuntu26]
+        # The first entry sets every platform's defaults; later entries override them per platform.
+        # An include naming an excluded platform would add it back, so ubuntu26 must not get one.
         include:
-          - platform: ubuntu24
-            build_jobs: 11
-            run_sharded_np_lr: true
-          - platform: ubsan
-            build_jobs: 11
+          - build_jobs: 11
             run_sharded_np_lr: true
           - platform: asan
-            build_jobs: 11
             run_sharded_np_lr: false
-          - platform: asserton
-            build_jobs: 11
-            run_sharded_np_lr: true
           - platform: gcc
             build_jobs: 8
-            run_sharded_np_lr: true
+        # ubuntu26 runs only on master pushes and manual dispatches.
+        exclude:
+          - platform: ${{ github.event_name != 'workflow_dispatch' && github.ref != 'refs/heads/master' && 'ubuntu26' || '' }}
     runs-on:
       group: core-repo-group
     # Full-job ceiling for build, package, parallel tests, and sharded NP/LR tests whose per-test timeout is 45 minutes.

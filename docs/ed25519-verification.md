@@ -27,7 +27,7 @@ Ed25519ph or Ed25519ctx. The existing `recover_key` API retains its signature
 format and ASCII-hex digest behavior. Both verification paths use the same raw
 helper and libsodium initialization.
 
-The import is available to normal and context-free actions through the genesis whitelist.
+The import is available to every action through the genesis whitelist.
 
 ## Acceptance rules
 
@@ -109,7 +109,7 @@ bool verify_message(const char* message, uint32_t message_size,
 
 `ed25519_intrinsic_tests` deploys the checked-in WASM fixture and covers published
 RFC 8032 vectors, frozen acceptance rules, binary/empty messages, independent
-WASM loops of 1/24/68 signatures, invalid sizes, context-free actions, memory
+WASM loops of 1/24/68 signatures, invalid sizes, memory
 bounds, native export dispatch, already-expired execution, and timeout rollback.
 The `ed25519_tests` suite in `test_fc` runs all the same acceptance vectors, including invalid lengths,
 through the shared verifier and preserves the transaction digest-recovery convention.

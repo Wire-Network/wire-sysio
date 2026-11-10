@@ -20,15 +20,7 @@ name global_receiver;
 extern "C" {
    void apply( uint64_t receiver, uint64_t code, uint64_t action ) {
 
-      if ( action == name{"cfaction"}.value ) {
-         test_action::test_cf_action();
-         return;
-      }
-      WASM_TEST_HANDLER( test_action, assert_true_cf );
-
-      if ( action != WASM_TEST_ACTION("test_transaction", "stateful_api") &&
-           action != WASM_TEST_ACTION("test_transaction", "context_free_api") &&
-           action != WASM_TEST_ACTION("test_checktime", "checktime_no_auth_failure") )
+      if ( action != WASM_TEST_ACTION("test_checktime", "checktime_no_auth_failure") )
          require_auth(code);
 
       //test_types
@@ -174,10 +166,6 @@ extern "C" {
       WASM_TEST_HANDLER   ( test_transaction, send_action_recurse                    );
       WASM_TEST_HANDLER   ( test_transaction, test_read_transaction                  );
       WASM_TEST_HANDLER   ( test_transaction, test_transaction_size                  );
-      WASM_TEST_HANDLER   ( test_transaction, send_cf_action                         );
-      WASM_TEST_HANDLER   ( test_transaction, send_cf_action_fail                    );
-      WASM_TEST_HANDLER   ( test_transaction, stateful_api                           );
-      WASM_TEST_HANDLER   ( test_transaction, context_free_api                       );
 
       //test chain
       WASM_TEST_HANDLER( test_chain, test_activeprods );

@@ -91,11 +91,22 @@ namespace sysio { namespace chain {
             : action_base(account, name, std::move(auth)), data(data)  {
       }
 
+      /**
+       * Unpacks the action's data as `T`, the struct of a native action.
+       *
+       * The data must hold exactly a `T`. Bytes left after it fail with action_data_and_struct_mismatch, so a later
+       * version of `T` can give them a meaning.
+       */
       template<typename T>
       T data_as()const {
          SYS_ASSERT( account == T::get_account(), action_type_exception, "account is not consistent with action struct" );
          SYS_ASSERT( name == T::get_name(), action_type_exception, "action name is not consistent with action struct"  );
-         return fc::raw::unpack<T>(data);
+         fc::datastream<const char*> ds( data.data(), data.size() );
+         T value;
+         fc::raw::unpack( ds, value );
+         SYS_ASSERT( ds.remaining() == 0, action_data_and_struct_mismatch,
+                     "action data of {}::{} has {} bytes left after the arguments", account, name, ds.remaining() );
+         return value;
       }
 
       // sysio_payer_name actor or contract

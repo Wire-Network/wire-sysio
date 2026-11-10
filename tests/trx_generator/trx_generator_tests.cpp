@@ -781,18 +781,64 @@ BOOST_AUTO_TEST_CASE(noop_nonce_action_is_optional)
          auto trx = generator.create_trx_w_actions_and_signer({make_test_signed_transaction().actions.front()}, key,
                                                               nonce_prefix, nonce, tg_config._trx_expiration_us,
                                                               tg_config._chain_id, tg_config._last_irr_block_id);
-         const size_t expected_nonce_actions = noop_nonce ? 1 : 0;
-         BOOST_TEST(trx._trx.context_free_actions.size() == expected_nonce_actions);
+         const size_t expected_actions = noop_nonce ? 2 : 1;
+         BOOST_TEST(trx._trx.context_free_actions.empty());
+         BOOST_TEST(trx._trx.actions.size() == expected_actions);
+         const auto first_nonce = trx._trx.actions.back().data;
 
          generator.update_resign_transaction(trx._trx, key, nonce_prefix, nonce, tg_config._trx_expiration_us,
                                              tg_config._chain_id, tg_config._last_irr_block_id);
-         BOOST_TEST(trx._trx.context_free_actions.size() == expected_nonce_actions);
+         BOOST_TEST(trx._trx.context_free_actions.empty());
+         BOOST_TEST(trx._trx.actions.size() == expected_actions);
          if (noop_nonce) {
-            BOOST_TEST(trx._trx.context_free_actions.front().account == chain::name("sysio.noop"));
-            BOOST_TEST(trx._trx.context_free_actions.front().name == chain::name("nonce"));
+            const auto& nonce_action = trx._trx.actions.back();
+            BOOST_TEST(nonce_action.account == chain::name("sysio.noop"));
+            BOOST_TEST(nonce_action.name == chain::name("nonce"));
+            BOOST_TEST(nonce_action.authorization.empty());
+            BOOST_TEST(nonce_action.data != first_nonce);
          }
       }
    }
+}
+
+/// The custom generator rebuilds its actions on every re-sign and appends a new sysio.noop nonce action after them.
+BOOST_AUTO_TEST_CASE(noop_nonce_on_custom_actions)
+{
+   fc::temp_directory dir;
+   const std::string abi_file = write_abi_file(dir, transfer_abi);
+   const std::string action_auths =
+      fc::json::to_string(fc::mutable_variant_object()(std::string(noop_nonce_test_sender), noop_nonce_test_priv_key),
+                          fc::time_point::maximum());
+   const provider_base_config p_config{"http", "127.0.0.1", get_port(port_category::node_http)};
+   const auto tg_config = noop_nonce_test_config(true);
+
+   trx_generator generator{tg_config, p_config, {abi_file, transfer_actions_data(fixed_memo), action_auths}};
+   BOOST_REQUIRE(generator.setup());
+   BOOST_REQUIRE_EQUAL(generator._trxs.size(), 1u);
+   auto& trx = generator._trxs.front();
+   BOOST_REQUIRE_EQUAL(trx._trx.actions.size(), 2u);
+   const auto transfer_data = trx._trx.actions.front().data;
+   auto previous_nonce = trx._trx.actions.back().data;
+
+   for (int resign = 1; resign <= 2; ++resign) {
+      BOOST_TEST_CONTEXT("re-sign " << resign) {
+         generator.update_resign_transaction(trx._trx, trx._signer, generator._nonce_prefix, generator._nonce,
+                                             tg_config._trx_expiration_us, tg_config._chain_id,
+                                             tg_config._last_irr_block_id);
+         BOOST_TEST(trx._trx.context_free_actions.empty());
+         BOOST_REQUIRE_EQUAL(trx._trx.actions.size(), 2u);
+         BOOST_TEST(trx._trx.actions.front().name == chain::name("transfer"));
+         BOOST_TEST(trx._trx.actions.front().data == transfer_data);
+         const auto& nonce_action = trx._trx.actions.back();
+         BOOST_TEST(nonce_action.account == chain::name("sysio.noop"));
+         BOOST_TEST(nonce_action.name == chain::name("nonce"));
+         BOOST_TEST(nonce_action.authorization.empty());
+         BOOST_TEST(nonce_action.data != previous_nonce);
+         BOOST_TEST(trx._trx.signatures.size() == 1u);
+         previous_nonce = nonce_action.data;
+      }
+   }
+   generator._provider.teardown();
 }
 
 /// Without the nonce action, setup requires an ACCT_PER_TRX field, which makes every re-signed transaction unique.

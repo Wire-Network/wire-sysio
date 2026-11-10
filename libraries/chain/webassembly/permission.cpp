@@ -33,6 +33,8 @@ namespace sysio { namespace chain { namespace webassembly {
       assert_all_unpacked( ds, "check_transaction_authorization" );
       SYS_ASSERT( trx.transaction_extensions.empty(), invalid_transaction_extension,
                   "transaction extensions are not currently supported" );
+      SYS_ASSERT( trx.context_free_actions.empty(), transaction_exception,
+                  "context-free actions are not supported" );
 
       flat_set<public_key_type> provided_keys;
       unpack_provided_keys( provided_keys, pubkeys_data.data(), pubkeys_data.size() );

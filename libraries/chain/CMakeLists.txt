@@ -61,7 +61,6 @@ set(CHAIN_WEBASSEMBLY_SOURCES
    webassembly/authorization.cpp
    webassembly/cf_system.cpp
    webassembly/cf_transaction.cpp
-   webassembly/context_free.cpp
    webassembly/console.cpp
    webassembly/crypto.cpp
    webassembly/database.cpp

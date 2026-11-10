@@ -82,8 +82,6 @@ inline constexpr auto get_intrinsic_table() {
       "env.tapos_block_num",
       "env.get_action",
       "env.send_inline",
-      "env.send_context_free_inline",
-      "env.get_context_free_data",
       "env.memcpy",
       "env.memmove",
       "env.memcmp",

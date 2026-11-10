@@ -1150,7 +1150,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_splitted_log, T, state_history_testers) {
    chain.produce_blocks(49, true);
 
    deploy_test_api(chain);
-   auto cfd_trace = push_test_cfd_transaction(chain);
+   push_test_dummy_transaction(chain);
 
    chain.produce_block();
    chain.produce_blocks(99, true);
@@ -1610,7 +1610,6 @@ BOOST_AUTO_TEST_CASE(test_trace_abi_roundtrip) {
          BOOST_CHECK_EQUAL(at["action_ordinal"].as_uint64(), (uint64_t)cpp_at.action_ordinal);
          BOOST_CHECK_EQUAL(at["creator_action_ordinal"].as_uint64(), (uint64_t)cpp_at.creator_action_ordinal);
          BOOST_CHECK_EQUAL(at["receiver"].as_string(), cpp_at.receiver.to_string());
-         BOOST_CHECK_EQUAL(at["context_free"].as_bool(), cpp_at.context_free);
          BOOST_CHECK_EQUAL(at["elapsed"].as_int64(), 0); // 0 in non-debug mode
 
          // action fields

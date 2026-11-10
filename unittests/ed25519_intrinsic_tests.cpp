@@ -162,8 +162,8 @@ struct stress_call {
 
 BOOST_AUTO_TEST_SUITE(ed25519_intrinsic_tests)
 
-/// Published vectors, binary/empty messages, unaligned spans, and context-free execution.
-BOOST_FIXTURE_TEST_CASE(raw_messages_and_context_free, ed25519_tester) {
+/// Published vectors, binary/empty messages and unaligned spans.
+BOOST_FIXTURE_TEST_CASE(raw_messages, ed25519_tester) {
    for (size_t i = 0; i < rfc_vectors.size(); ++i)
       verify(known_input(i), verification_success, true);
    bytes binary(byte_values);
@@ -174,12 +174,6 @@ BOOST_FIXTURE_TEST_CASE(raw_messages_and_context_free, ed25519_tester) {
    auto hex_message = known_input(1);
    hex_message.message = decode("3732"); // ASCII "72" differs from the signed byte 0x72.
    verify(hex_message, verification_failure);
-   auto trx = transaction(clean_action, {});
-   trx.signatures.clear();
-   trx.context_free_actions.emplace_back(vector<permission_level>{}, contract_account, verify_action,
-                                         fc::raw::pack(std::make_tuple(known_input(), verification_success, false)));
-   trx.sign(get_private_key(contract_account, "active"), control->get_chain_id());
-   BOOST_REQUIRE(push_transaction(trx)->receipt);
 }
 
 /// Consensus acceptance goldens also run through a deployed contract, including wrong-sized signatures.

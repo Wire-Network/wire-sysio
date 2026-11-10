@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
          ("monitor-max-lag-duration-us", bpo::value<int64_t>(&max_lag_duration_us)->default_value(1000000), "Max microseconds that transaction generation can be in violation before quitting. Defaults to 1000000 (1s).")
          ("log-dir", bpo::value<std::string>(&trx_gen_base_config._log_dir), "set the logs directory")
          ("stop-on-trx-failed", bpo::value<bool>(&trx_gen_base_config._stop_on_trx_failed)->default_value(true), "stop transaction generation if sending fails.")
-         ("noop-nonce", bpo::value<bool>(&trx_gen_base_config._noop_nonce)->default_value(true), "add a context-free sysio.noop::nonce action to make each transaction unique. Needs a contract on sysio.noop; set false for chains without one, which requires actions data with an ACCT_PER_TRX field.")
+         ("noop-nonce", bpo::value<bool>(&trx_gen_base_config._noop_nonce)->default_value(true), "add a sysio.noop::nonce action, with no authorization, to make each transaction unique. Needs a contract on sysio.noop; set false for chains without one, which requires actions data with an ACCT_PER_TRX field.")
          ("abi-file", bpo::value<std::string>(&user_trx_config._abi_data_file_path), "The path to the contract abi file to use for the supplied transaction action data")
          ("actions-data", bpo::value<std::string>(&user_trx_config._actions_data_json_file_or_str), "The json actions data file or json actions data description string to use")
          ("actions-auths", bpo::value<std::string>(&user_trx_config._actions_auths_json_file_or_str), "The json actions auth file or json actions auths description string to use, containting authAcctName to activePrivateKey pairs.")

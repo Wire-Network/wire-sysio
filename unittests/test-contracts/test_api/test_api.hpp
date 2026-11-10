@@ -170,13 +170,11 @@ struct test_action {
    static void read_action_to_0();
    static void read_action_to_64k();
    static void test_dummy_action();
-   static void test_cf_action();
    static void require_notice(uint64_t receiver, uint64_t code, uint64_t action);
    static void require_notice_tests(uint64_t receiver, uint64_t code, uint64_t action);
    static void require_auth();
    static void assert_false();
    static void assert_true();
-   static void assert_true_cf();
    static void test_current_time();
    static void test_abort() __attribute__ ((noreturn)) ;
    static void test_current_receiver(uint64_t receiver, uint64_t code, uint64_t action);
@@ -283,10 +281,6 @@ struct test_transaction {
    static void test_read_transaction();
    static void test_transaction_size();
    static void assert_false_error_handler(const sysio::transaction&);
-   static void send_cf_action();
-   static void send_cf_action_fail();
-   static void stateful_api();
-   static void context_free_api();
 };
 
 struct test_chain {

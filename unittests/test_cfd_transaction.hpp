@@ -16,6 +16,8 @@ struct dummy_action {
    int32_t  c; // 4
 };
 
+/// A context-free action's data, for tests of the packed transaction format. The chain rejects a transaction that
+/// carries one.
 struct cf_action {
    static sysio::chain::name get_name() {
       using namespace sysio::chain::literals;
@@ -37,5 +39,8 @@ FC_REFLECT(cf_action, (payload)(cfd_idx))
 #define DUMMY_ACTION_DEFAULT_B 0xab11cd1244556677
 #define DUMMY_ACTION_DEFAULT_C 0x7451ae12
 
+/// Creates the testapi and dummy accounts and deploys test_api on testapi.
 std::vector<sysio::chain::signed_block_ptr> deploy_test_api(sysio::testing::tester& chain);
-sysio::chain::transaction_trace_ptr push_test_cfd_transaction(sysio::testing::tester& chain);
+
+/// Pushes test_api's dummy action, authorized by testapi. Needs deploy_test_api.
+sysio::chain::transaction_trace_ptr push_test_dummy_transaction(sysio::testing::tester& chain);

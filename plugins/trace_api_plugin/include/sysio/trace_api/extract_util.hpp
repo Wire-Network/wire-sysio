@@ -49,7 +49,6 @@ inline transaction_trace_v0 to_transaction_trace( const cache_trace& t ) {
 
    r.actions.reserve( t.trace->action_traces.size());
    for( const auto& at : t.trace->action_traces ) {
-      if( at.context_free ) continue; // skip context-free actions
       if( at.except ) continue;       // skip failed actions
       r.actions.emplace_back( to_action_trace(at) );
    }
