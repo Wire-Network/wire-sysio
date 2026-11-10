@@ -110,8 +110,11 @@ public:
         set_abi( "anothertoken"_n, contracts::token_abi().data() );
         set_privileged( "anothertoken"_n );
 
+        // Privileged like the deployment makes it (sysio.roa::setsyscode): its
+        // pair-token balance rows are billed to sysio.
         set_code( "sysio.swap"_n, contracts::swap_wasm() );
         set_abi( "sysio.swap"_n, contracts::swap_abi().data() );
+        set_privileged( "sysio.swap"_n );
 
         set_code( "carol"_n, contracts::token_wasm() );
         set_abi( "carol"_n, contracts::token_abi().data() );
@@ -225,20 +228,6 @@ public:
             ( "memo", memo)
         );
     }
-    action_result open( name owner, symbol sym, name ram_payer ) {
-        return push_action( "sysio.swap"_n, owner, "open"_n, mvo()
-            ( "owner", owner)
-            ( "symbol", sym)
-            ( "ram_payer", ram_payer)
-        );
-    }
-    action_result openext( name user, name payer, extended_symbol ext_symbol ) {
-        return push_action( "sysio.swap"_n, payer, "openext"_n, mvo()
-            ( "user", user)
-            ( "payer", payer)
-            ( "ext_symbol", ext_symbol)
-        );
-    }
     action_result closeext ( const name user, const name to, const extended_symbol ext_symbol ){ 
         return push_action( "sysio.swap"_n, user, "closeext"_n, mvo()
             ( "user", user )
@@ -267,10 +256,10 @@ public:
     action_result inittoken( name user, symbol new_symbol, extended_asset initial_pool1,
       extended_asset initial_pool2, int initial_fee, name fee_authority, asset locked_shares,
       std::optional<extended_symbol> yield_leg = std::nullopt ){
-        // inittoken bills the new rows to `user`, so the action must carry the
-        // user's sysio.payer permission in addition to the two active authorities.
+        // inittoken needs the user's and the contract's authority; the pair's rows
+        // are billed to sysio.
         return push_swap_action( "inittoken"_n,
-          { {user, config::sysio_payer_name}, {user, config::active_name}, {"sysio.swap"_n, config::active_name} },
+          { {user, config::active_name}, {"sysio.swap"_n, config::active_name} },
           mvo()
           ( "user", user)
           ("new_symbol", new_symbol)
@@ -306,10 +295,9 @@ public:
     vector<char> pending_payout( name contract ) {
         return get_kv_row( "sysio.swap"_n, "yieldpayouts"_n, { contract.to_uint64_t() } );
     }
-    // fundyield is the funder's own call; the fixture adds its payer permission,
-    // which the row is billed to.
+    // fundyield is the funder's own call; its row is billed to sysio.
     action_result fundyield( name from, symbol_code pair_token, asset quantity ) {
-        return push_action( "sysio.swap"_n, from, "fundyield"_n, mvo()
+        return push_swap_action( "fundyield"_n, { {from, config::active_name} }, mvo()
           ( "from", from )( "pair_token", pair_token )( "quantity", quantity )
         );
     }
@@ -319,6 +307,18 @@ public:
     action_result cancelyield( name from ) { return cancelyield( from, from ); }
     int64_t ram_usage( name account ) const {
         return control->get_resource_limits_manager().get_account_ram_usage( account );
+    }
+    // The account billed for `user`'s pair-token balance row of `pair_token`.
+    name balance_payer( name user, symbol_code pair_token ) const {
+        return row_payer( "accounts"_n, { user.to_uint64_t(), pair_token.value } );
+    }
+    // The account billed for `user`'s deposit row of `ext`.
+    name deposit_payer( name user, const extended_symbol& ext ) const {
+        return row_payer( "evodexacnts"_n, { user.to_uint64_t(), ext.contract.to_uint64_t(), ext.sym.value() } );
+    }
+    action_result send_pair_token( name from, name to, asset quantity ) {
+        return push_action( "sysio.swap"_n, from, "transfer"_n, mvo()
+          ( "from", from )( "to", to )( "quantity", quantity )( "memo", "" ) );
     }
     // The pending funding announced by `funder`, as a variant; null when none.
     fc::variant pending_funding( name funder ) {
@@ -346,9 +346,9 @@ public:
         action announce;
         announce.account = "sysio.swap"_n;
         announce.name    = "fundyield"_n;
-        // The announcement's row is billed to the funder, so it carries the payer
-        // permission as well as the active one.
-        announce.authorization = { {from, config::sysio_payer_name}, {from, config::active_name} };
+        // The announcement's row is billed to sysio, so it carries only the funder's
+        // active permission.
+        announce.authorization = { {from, config::active_name} };
         announce.data = abi_ser.variant_to_binary( "fundyield",
             mvo()( "from", from )( "pair_token", pair )( "quantity", quantity ),
             fixture_abi_yield_function() );
@@ -518,8 +518,13 @@ public:
         const auto data = get_kv_row( "sysio.liq"_n, "yieldidx"_n, { sym.value } );
         return data.empty() ? shadow_index_row{ 0, 0, 0 } : fc::raw::unpack<shadow_index_row>( data );
     }
-    // A user's deposit of any extended symbol, resolved without `extend`.
+    // A user's deposit of any extended symbol, resolved without `extend`; 0 without a row.
     int64_t deposit_of( name user, const extended_symbol& ext );
+    // Whether `user` has a deposit row for `ext`.
+    bool has_deposit( name user, const extended_symbol& ext ) {
+        return !get_kv_row( "sysio.swap"_n, "evodexacnts"_n,
+                            { user.to_uint64_t(), ext.contract.to_uint64_t(), ext.sym.value() } ).empty();
+    }
     action_result addliquidity(name user, asset to_buy, asset max_asset1, asset max_asset2) {
         return push_action( "sysio.swap"_n, user, "addliquidity"_n, mvo()
           ( "user", user )
@@ -601,13 +606,23 @@ public:
 
     // Raw KV read of a composite-keyed row: every key word big-endian, in order
     // (for a scoped table the scope is the first word). Empty when absent.
-    vector<char> get_kv_row( name code, name table, std::initializer_list<uint64_t> key_words ) {
+    static std::string kv_key( std::initializer_list<uint64_t> key_words ) {
         std::string key;
         for (uint64_t word : key_words)
             for (int shift = 56; shift >= 0; shift -= 8) key.push_back( char((word >> shift) & 0xff) );
-        const auto row = control->kv().find_row( code, chain::compute_table_id(table.to_uint64_t()), key );
+        return key;
+    }
+    vector<char> get_kv_row( name code, name table, std::initializer_list<uint64_t> key_words ) {
+        const auto row = control->kv().find_row( code, chain::compute_table_id(table.to_uint64_t()), kv_key( key_words ) );
         if (!row) return {};
         return vector<char>( row->value.begin(), row->value.end() );
+    }
+    // The account billed for a sysio.swap row, keyed as get_kv_row keys it; the test fails without the row.
+    name row_payer( name table, std::initializer_list<uint64_t> key_words ) const {
+        const auto row = control->kv().find_row( "sysio.swap"_n, chain::compute_table_id(table.to_uint64_t()),
+                                                 kv_key( key_words ) );
+        BOOST_REQUIRE_MESSAGE( row.has_value(), "no " << table << " row" );
+        return row->payer;
     }
     // A user's deposit of `sym`, with the token contract resolved as `extend` does:
     // the evodexacnts row keyed by the extended symbol, scoped by the user.
@@ -654,14 +669,6 @@ public:
         BOOST_REQUIRE_EQUAL( success(), issue( system_token.contract, "alice"_n, "alice"_n, asset( SystemTokenIssuance, system_token.sym ), "") );
         BOOST_REQUIRE_EQUAL( success(), issue( "anothertoken"_n, "bob"_n, "bob"_n, asset::from_string("461168601842738.7903 VOICE"), "") );
         BOOST_REQUIRE_EQUAL( success(), issue( "sysio.token"_n, "alice"_n, "alice"_n, asset::from_string("46116860184273879.03 TUSD"), "") );
-    }
-    void many_openext() {
-        BOOST_REQUIRE_EQUAL( success(), openext( "alice"_n, "alice"_n, system_token ) );
-        BOOST_REQUIRE_EQUAL( success(), openext( "alice"_n, "alice"_n, extended_symbol{symbol::from_string("4,VOICE"), "anothertoken"_n}) );
-        BOOST_REQUIRE_EQUAL( success(), openext( "alice"_n, "alice"_n, extended_symbol{symbol::from_string("2,TUSD"), "sysio.token"_n}) );
-        BOOST_REQUIRE_EQUAL( success(), openext( "bob"_n, "alice"_n, system_token ) );
-        BOOST_REQUIRE_EQUAL( success(), openext( "bob"_n, "alice"_n, extended_symbol{symbol::from_string("4,VOICE"), "anothertoken"_n}) );
-        BOOST_REQUIRE_EQUAL( success(), openext( "bob"_n, "alice"_n, extended_symbol{symbol::from_string("2,TUSD"), "sysio.token"_n}) );
     }
     // The deposits the pools are seeded from. The system token is always
     // accepted; VOICE and TUSD have no pair yet, so their deposits carry the
@@ -867,7 +874,7 @@ vector<int64_t> sysio_swap_tester::total() {
 int64_t sysio_swap_tester::deposit_of( name user, const extended_symbol& ext ) {
     const auto data = get_kv_row( "sysio.swap"_n, "evodexacnts"_n,
                                   { user.to_uint64_t(), ext.contract.to_uint64_t(), ext.sym.value() } );
-    BOOST_REQUIRE_MESSAGE( !data.empty(), "no deposit row for " << user << " " << ext.sym );
+    if (data.empty()) return 0;
     const auto row = abi_ser.binary_to_variant( "evodex_account", data,
                                                 fixture_abi_yield_function() );
     return to_int( fc::json::to_string( row["balance"]["quantity"],
@@ -893,11 +900,9 @@ struct sysio_swap_yield_tester : public sysio_swap_tester {
     void setup_yield_pool() {
         create_tokens_and_issue();
         abi_ser.set_abi( swap_abi_def(), fixture_abi_yield_function() );
-        many_openext();
         many_transfer();
         BOOST_REQUIRE_EQUAL( success(), shadow_mint( "alice"_n, asset( ShadowIssuance, SHD4 ) ) );
         BOOST_REQUIRE_EQUAL( success(), transfer( "sysio.token"_n, "alice"_n, "bob"_n, asset( BobDonationBudget, WIRE9 ), "" ) );
-        BOOST_REQUIRE_EQUAL( success(), openext( "alice"_n, "alice"_n, SHADOW ) );
         BOOST_REQUIRE_EQUAL( success(), seed_transfer( "sysio.liq"_n, "alice"_n, asset( YieldPoolShadow, SHD4 ), "" ) );
         BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, SHEO6, shd( YieldPoolShadow ),
             extend( asset( YieldPoolWire, WIRE9 ) ), 10, name{}, 0, SHADOW ) );
@@ -936,7 +941,6 @@ struct sysio_swap_yield_tester : public sysio_swap_tester {
         const int64_t front_run = YieldPoolShadow / 100;
         BOOST_REQUIRE_LT( 0, yield_reference::sandwich_gain( YieldPoolShadow, YieldPoolWire, fee, uint32_t(fee + 1),
                                                              front_run ) );
-        BOOST_REQUIRE_EQUAL( success(), openext( "bob"_n, "bob"_n, SHADOW ) );
         BOOST_REQUIRE_EQUAL( success(), shadow_transfer( "alice"_n, "bob"_n, asset( front_run, SHD4 ), "" ) );
         BOOST_REQUIRE_EQUAL( success(), shadow_transfer( "bob"_n, "sysio.swap"_n, asset( front_run, SHD4 ), "" ) );
         // Settle what the pool is owed first, so the front-run is priced against
@@ -971,7 +975,6 @@ int64_t sysio_swap_tester::settle_swap( name user, symbol_code pair, asset in, s
 void sysio_swap_tester::setup_pools() {
     create_tokens_and_issue();
     abi_ser.set_abi( swap_abi_def(), fixture_abi_yield_function() );
-    many_openext();
     many_transfer();
     BOOST_REQUIRE_EQUAL( success(), transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n,
                                               asset::from_string("168601842738.7903 EOS"), "") );
@@ -997,9 +1000,6 @@ BOOST_FIXTURE_TEST_CASE( add_rem_liquidity, sysio_swap_tester ) try {
     transfer( "anothertoken"_n, "bob"_n, "alice"_n, asset::from_string("500000000.0000 VOICE"), "");
 
     abi_ser.set_abi(abi_evo, fixture_abi_yield_function());
-
-    many_openext();
-
     transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset::from_string("10000000.0000 EOS"), "");
     seed_transfer( "anothertoken"_n, "alice"_n, asset::from_string("200000000.0000 VOICE"), "");
 
@@ -1098,7 +1098,6 @@ BOOST_FIXTURE_TEST_CASE( exchange_action, sysio_swap_tester ) try {
     create_tokens_and_issue();
     transfer( "anothertoken"_n, "bob"_n, "alice"_n, asset::from_string("500000000.0000 VOICE"), "");
     abi_ser.set_abi(abi_evo, fixture_abi_yield_function());
-    many_openext();
     transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset::from_string("10000000.0000 EOS"), "");
     seed_transfer( "anothertoken"_n, "alice"_n, asset::from_string("200000000.0000 VOICE"), "");
     inittoken( "alice"_n, EVO4,
@@ -1187,7 +1186,6 @@ BOOST_FIXTURE_TEST_CASE( increasing_poolvalue, sysio_swap_tester) try {
 
     create_tokens_and_issue();
     abi_ser.set_abi(abi_evo, fixture_abi_yield_function());
-    many_openext(); 
     many_transfer();
     transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, 
     asset::from_string("168601842738.7903 EOS"), "");
@@ -1298,8 +1296,6 @@ BOOST_FIXTURE_TEST_CASE( memoexchange_test, sysio_swap_tester ) try {
     transfer( "anothertoken"_n, "bob"_n, "alice"_n, asset::from_string("0.0001 VOICE"), "");
 
     abi_ser.set_abi(abi_evo, fixture_abi_yield_function());
-
-    many_openext();
     many_transfer();
 
     BOOST_REQUIRE_EQUAL( success(),
@@ -1405,28 +1401,6 @@ BOOST_FIXTURE_TEST_CASE( the_other_actions, sysio_swap_tester ) try {
     BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt2->abi, abi_evo), true);
     abi_ser.set_abi(abi_evo, fixture_abi_yield_function());
 
-    // add_signed_ext_balance
-    BOOST_REQUIRE_EQUAL( wasm_assert_msg("extended_symbol not registered for this user,\
- please run openext action or write exchange details in the memo of your transfer"),
-      transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset::from_string("0.1000 EOS"), "") );
-
-    // OPENEXT
-    BOOST_REQUIRE_EQUAL( error("missing authority of natalia"), 
-      push_action( "sysio.swap"_n, "bob"_n, "openext"_n, mvo()
-        ( "user", "bob"_n)( "payer", "natalia"_n )
-        ( "ext_symbol", extended_symbol{VOICE4, "anothertoken"_n} ))
-    );
-    BOOST_REQUIRE_EQUAL( success(), openext( "alice"_n, "alice"_n, 
-      extended_symbol{EOS4, "sysio.token"_n}) );
-    BOOST_REQUIRE_EQUAL( success(), openext( "alice"_n, "alice"_n, 
-      extended_symbol{VOICE4, "anothertoken"_n}) );
-    BOOST_REQUIRE_EQUAL( success(), openext( "alice"_n, "alice"_n, 
-      extended_symbol{VOICE4, "anothertoken"_n}) );
-    BOOST_REQUIRE_EQUAL( wasm_assert_msg( "user account does not exist"), 
-      openext( "cat"_n, "alice"_n, extended_symbol{VOICE4, "anothertoken"_n}) );
-    BOOST_REQUIRE_EQUAL( success(), openext( "alice"_n, "alice"_n, 
-      extended_symbol{VOICE4, "anothertoken"_n}) );
-
     // ONTRANSFER
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("This transfer is not for sysio.swap"), 
       transfer( "badtoken"_n, "alice"_n, "bob"_n, asset::from_string("1000.0000 EOS"), ""));
@@ -1434,8 +1408,14 @@ BOOST_FIXTURE_TEST_CASE( the_other_actions, sysio_swap_tester ) try {
       transfer( "badtoken"_n, "alice"_n, "sysio.swap"_n, asset::from_string("-1000.0000 EOS"), ""));
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("Donation not accepted"), transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, 
       asset::from_string("1000.0000 EOS"), "deposit to: sysio.swap") );
+    // The first credit creates the deposit row; a deposit for an account that does not
+    // exist is refused.
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("user account does not exist"), transfer( "sysio.token"_n, "alice"_n,
+      "sysio.swap"_n, asset::from_string("1000.0000 EOS"), "deposit to: cat") );
+    BOOST_REQUIRE( !has_deposit( "alice"_n, extended_symbol{EOS4, "sysio.token"_n} ) );
     BOOST_REQUIRE_EQUAL( success(), transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n,
       asset::from_string("1000.0000 EOS"), "") );
+    BOOST_REQUIRE_EQUAL( 1000'0000, deposit_of( "alice"_n, extended_symbol{EOS4, "sysio.token"_n} ) );
     // Only the system token and the first legs of existing pairs are accepted;
     // a first leg's seed gets in ahead of its pair only with the contract's authority.
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("token is not a leg of any pair"), transfer( "anothertoken"_n, "alice"_n, "sysio.swap"_n,
@@ -1456,6 +1436,10 @@ BOOST_FIXTURE_TEST_CASE( the_other_actions, sysio_swap_tester ) try {
       extend(asset::from_string("-0.0001 EOS")) ));
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("insufficient funds"), withdraw( "alice"_n, "bob"_n,
       extend(asset::from_string("0.0003 EOS")) ));
+    // A debit with no deposit row has nothing to draw on.
+    BOOST_REQUIRE( !has_deposit( "bob"_n, extended_symbol{EOS4, "sysio.token"_n} ) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("insufficient funds"), withdraw( "bob"_n, "alice"_n,
+      extend(asset::from_string("0.0001 EOS")) ));
 
     // INITTOKEN
     BOOST_REQUIRE_EQUAL( error("missing authority of sysio.swap"), 
@@ -1562,7 +1546,6 @@ struct sysio_swap_unconfigured_tester : public sysio_swap_tester {
 BOOST_FIXTURE_TEST_CASE( nothing_works_before_setconfig, sysio_swap_unconfigured_tester ) try {
     create_tokens_and_issue();
     abi_ser.set_abi( swap_abi_def(), fixture_abi_yield_function() );
-    many_openext();
     // Without a system token nothing can be deposited, with or without the
     // contract's authority, and no pair can be created, whoever its authority is.
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("swap not configured"),
@@ -1596,7 +1579,6 @@ BOOST_FIXTURE_TEST_CASE( nothing_works_before_setconfig, sysio_swap_unconfigured
 BOOST_FIXTURE_TEST_CASE( seed_locks_shares, sysio_swap_tester ) try {
     create_tokens_and_issue();
     abi_ser.set_abi( swap_abi_def(), fixture_abi_yield_function() );
-    many_openext();
     many_transfer();
     const int64_t minted = 100'000'000'000;   // sqrt(1e10 * 1e12)
     const int64_t locked = 5'000'000;
@@ -1649,7 +1631,6 @@ BOOST_FIXTURE_TEST_CASE( seed_locks_shares, sysio_swap_tester ) try {
 BOOST_FIXTURE_TEST_CASE( yield_leg_rules, sysio_swap_tester ) try {
     create_tokens_and_issue();
     abi_ser.set_abi( swap_abi_def(), fixture_abi_yield_function() );
-    many_openext();
     many_transfer();
     const extended_symbol voice{ VOICE4, "anothertoken"_n };
     const extended_symbol tusd{ TUSD2, "sysio.token"_n };
@@ -1946,13 +1927,10 @@ BOOST_FIXTURE_TEST_CASE( yield_accrues_before_a_swap_is_priced, sysio_swap_yield
 BOOST_FIXTURE_TEST_CASE( yield_payout_route_is_exact, sysio_swap_yield_tester ) try {
     setup_yield_pool();
     // A transfer from a shadow contract with no claim outstanding is an ordinary
-    // deposit, and needs the ordinary deposit row: the payout route only exists
-    // while a receipt does.
+    // deposit, which creates its deposit row: the payout route only exists while a
+    // receipt does.
     BOOST_REQUIRE_EQUAL( success(), shadow_mint( "sysio.liq"_n, asset( 1'0000, SHD4 ) ) );
-    BOOST_REQUIRE_EQUAL( wasm_assert_msg("extended_symbol not registered for this user,"
-                                         " please run openext action or write exchange details in the memo of your transfer"),
-        shadow_transfer( "sysio.liq"_n, "sysio.swap"_n, asset( 1'0000, SHD4 ), "" ) );
-    BOOST_REQUIRE_EQUAL( success(), openext( "sysio.liq"_n, "alice"_n, SHADOW ) );
+    BOOST_REQUIRE( !has_deposit( "sysio.liq"_n, SHADOW ) );
     BOOST_REQUIRE_EQUAL( success(), shadow_transfer( "sysio.liq"_n, "sysio.swap"_n, asset( 1'0000, SHD4 ), "" ) );
     BOOST_REQUIRE_EQUAL( 1'0000, deposit_of( "sysio.liq"_n, SHADOW ) );
     BOOST_REQUIRE_EQUAL( YieldPoolWire, system_balance( SHEO.value ).at(1) );
@@ -1994,7 +1972,11 @@ BOOST_FIXTURE_TEST_CASE( yield_funding_fills_the_reservoir, sysio_swap_yield_tes
     // untouched, and the delivery goes to the reservoir.
     const int64_t first = 100'0000;
     const int64_t alice_deposit = deposit_of( "alice"_n, SHADOW );
+    const int64_t alice_ram = ram_usage( "alice"_n );
     BOOST_REQUIRE_EQUAL( success(), fundyield( "alice"_n, SHEO, asset( first, SHD4 ) ) );
+    // The announcement is billed to sysio, not to the funder.
+    BOOST_REQUIRE_EQUAL( config::system_account_name, row_payer( "yieldfunds"_n, { "alice"_n.to_uint64_t() } ) );
+    BOOST_REQUIRE_EQUAL( alice_ram, ram_usage( "alice"_n ) );
     auto pending = pending_funding( "alice"_n );
     BOOST_REQUIRE_EQUAL( SHEO6.name(), pending["pair"].as_string() );
     BOOST_REQUIRE_EQUAL( asset( first, SHD4 ).to_string(), pending["quantity"]["quantity"].as_string() );
@@ -2028,14 +2010,15 @@ BOOST_FIXTURE_TEST_CASE( yield_funding_fills_the_reservoir, sysio_swap_yield_tes
     BOOST_REQUIRE_EQUAL( first + second + third, reservoir_of( SHEO ) );
     BOOST_REQUIRE( pending_funding( "alice"_n ).is_null() );
 
-    // The announcement's row is the funder's, not the contract's, and cancelling
-    // gives it back. Otherwise one abandoned announcement per account that ever
-    // called fundyield would sit on the contract's RAM with no way to reclaim it.
+    // The announcement's row is billed to sysio, not to the funder or the contract,
+    // and cancelling frees it.
     {
-        const int64_t swap_ram = ram_usage( "sysio.swap"_n );
-        const int64_t bob_ram  = ram_usage( "bob"_n );
+        const int64_t sysio_ram = ram_usage( config::system_account_name );
+        const int64_t swap_ram  = ram_usage( "sysio.swap"_n );
+        const int64_t bob_ram   = ram_usage( "bob"_n );
         BOOST_REQUIRE_EQUAL( success(), fundyield( "bob"_n, SHEO, asset( 5'0000, SHD4 ) ) );
-        BOOST_REQUIRE_LT( bob_ram, ram_usage( "bob"_n ) );
+        BOOST_REQUIRE_LT( sysio_ram, ram_usage( config::system_account_name ) );
+        BOOST_REQUIRE_EQUAL( bob_ram, ram_usage( "bob"_n ) );
         BOOST_REQUIRE_EQUAL( swap_ram, ram_usage( "sysio.swap"_n ) );
         // While it is pending bob cannot deposit anything else...
         BOOST_REQUIRE_EQUAL( wasm_assert_msg("yield funding does not match the pending fundyield"),
@@ -2044,6 +2027,7 @@ BOOST_FIXTURE_TEST_CASE( yield_funding_fills_the_reservoir, sysio_swap_yield_tes
         BOOST_REQUIRE_EQUAL( error("missing authority of bob"), cancelyield( "bob"_n, "alice"_n ) );
         BOOST_REQUIRE_EQUAL( success(), cancelyield( "bob"_n ) );
         BOOST_REQUIRE( pending_funding( "bob"_n ).is_null() );
+        BOOST_REQUIRE_EQUAL( sysio_ram, ram_usage( config::system_account_name ) );
         BOOST_REQUIRE_EQUAL( bob_ram, ram_usage( "bob"_n ) );
         BOOST_REQUIRE_EQUAL( wasm_assert_msg("no pending fundyield"), cancelyield( "bob"_n ) );
         // Ordinary deposits work again.
@@ -2528,9 +2512,7 @@ BOOST_FIXTURE_TEST_CASE( fee_authority_configuration, sysio_swap_tester ) try {
     BOOST_REQUIRE_EQUAL( success(), create( "sysio.token"_n, "alice"_n, asset::from_string("1000.0000 CVO") ) );
     BOOST_REQUIRE_EQUAL( success(), issue( "sysio.token"_n, "alice"_n, "alice"_n, asset::from_string("1000.0000 CVO"), "" ) );
     abi_ser.set_abi( swap_abi_def(), fixture_abi_yield_function() );
-    many_openext();
     many_transfer();
-    BOOST_REQUIRE_EQUAL( success(), openext( "alice"_n, "alice"_n, extended_symbol{ CVO4, "sysio.token"_n } ) );
     BOOST_REQUIRE_EQUAL( success(), seed_transfer( "sysio.token"_n, "alice"_n, asset::from_string("1000.0000 CVO"), "" ) );
 
     // EVO adopts the configured authority (sysio); ETUSD names alice as its own.
@@ -2569,7 +2551,6 @@ BOOST_FIXTURE_TEST_CASE( indextable, sysio_swap_tester ) try {
     abi_def abi_evo;
     BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt2->abi, abi_evo), true);
     abi_ser.set_abi(abi_evo, fixture_abi_yield_function());
-    many_openext();
     transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset::from_string("10000000.0000 EOS"), "");
     seed_transfer( "anothertoken"_n, "alice"_n, asset::from_string("200000000.0000 VOICE"), "");
 
@@ -2601,11 +2582,10 @@ BOOST_FIXTURE_TEST_CASE( indextable, sysio_swap_tester ) try {
     BOOST_REQUIRE( get_kv_row( "sysio.swap"_n, "evoindex"_n,
         { "sysio.token"_n.to_uint64_t(), EOS4.value(), "anothertoken"_n.to_uint64_t(), VOICE4.value() } ).empty() );
 
-    // A first leg with a different precision is a different token: it has no
-    // deposit row. A second leg that is not exactly the system token, by
+    // A first leg with a different precision is a different token: alice has none
+    // of it on deposit. A second leg that is not exactly the system token, by
     // precision or by contract, is not a pair.
-    BOOST_REQUIRE_EQUAL(wasm_assert_msg("extended_symbol not registered for this user,\
- please run openext action or write exchange details in the memo of your transfer"),
+    BOOST_REQUIRE_EQUAL(wasm_assert_msg("insufficient funds"),
         inittoken( "alice"_n, EOS4,
         extend(asset::from_string("1.00000 VOICE")),
         extend(asset::from_string("1.0000 EOS")), 10, name{}) );
@@ -2898,7 +2878,6 @@ BOOST_FIXTURE_TEST_CASE( precision_extremes, sysio_swap_tester ) try {
     // trades can be pushed to the int64 asset ceiling with no external limit.
     create_tokens_and_issue();
     abi_ser.set_abi( swap_abi_def(), fixture_abi_yield_function() );
-    many_openext();
     const asset all_eos   = asset::from_string("461168601842738.7903 EOS");
     const asset all_voice = asset::from_string("461168601842738.7903 VOICE");
     const asset all_tusd  = asset::from_string("46116860184273879.03 TUSD");
@@ -3000,7 +2979,6 @@ BOOST_FIXTURE_TEST_CASE( minimum_fee_closes_the_free_window, sysio_swap_tester )
     // 1000.0000 EOS against 1000.0000 VOICE, 10 bps.
     create_tokens_and_issue();
     abi_ser.set_abi( swap_abi_def(), fixture_abi_yield_function() );
-    many_openext();
     BOOST_REQUIRE_EQUAL( success(), transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset::from_string("2000.0000 EOS"), "") );
     BOOST_REQUIRE_EQUAL( success(), seed_transfer( "anothertoken"_n, "bob"_n, asset::from_string("2000.0000 VOICE"), "deposit to: alice") );
     BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, EVO4,
@@ -3054,8 +3032,6 @@ BOOST_FIXTURE_TEST_CASE( guard_semantics_on_the_memo_path, sysio_swap_tester ) t
     abi_ser.set_abi( swap_abi_def(), fixture_abi_yield_function() );
     // badtoken's EOS is a different token from the system token's EOS: it is the
     // pair's first leg, seeded with the contract's authority.
-    BOOST_REQUIRE_EQUAL( success(), openext( "alice"_n, "alice"_n, extended_symbol{EOS4, "badtoken"_n}) );
-    BOOST_REQUIRE_EQUAL( success(), openext( "alice"_n, "alice"_n, SYSTEM_TOKEN) );
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("token is not a leg of any pair"),
         transfer( "badtoken"_n, "alice"_n, "sysio.swap"_n, asset::from_string("2000.0000 EOS"), "") );
     BOOST_REQUIRE_EQUAL( success(), seed_transfer( "badtoken"_n, "alice"_n, asset::from_string("2000.0000 EOS"), "") );
@@ -3191,7 +3167,6 @@ BOOST_FIXTURE_TEST_CASE( price_accumulators_span_extreme_prices, sysio_swap_test
     // needs the high limb and the average still recovers the price exactly.
     create_tokens_and_issue();
     abi_ser.set_abi( swap_abi_def(), fixture_abi_yield_function() );
-    many_openext();
     BOOST_REQUIRE_EQUAL( success(), transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset::from_string("461168601842738.7903 EOS"), "") );
     BOOST_REQUIRE_EQUAL( success(), seed_transfer( "anothertoken"_n, "bob"_n, asset::from_string("461168601842738.7903 VOICE"), "deposit to: alice") );
     const int64_t init_max = 1'000'000'000'000'000 - 1;
@@ -3232,7 +3207,7 @@ BOOST_FIXTURE_TEST_CASE( abi_surface_is_pinned, sysio_swap_tester ) try {
     for (const auto& a : abi.actions) actions.insert(a.name.to_string());
     const std::set<std::string> expected_actions{
         "accrueyield", "addliquidity", "cancelyield", "changefee", "close", "closeext", "exchange", "fundyield",
-        "inittoken", "open", "openext", "remliquidity", "setconfig", "setyield", "sync", "tickyield", "transfer",
+        "inittoken", "remliquidity", "setconfig", "setyield", "sync", "tickyield", "transfer",
         "withdraw" };
     BOOST_REQUIRE( actions == expected_actions );
 
@@ -3338,7 +3313,6 @@ BOOST_FIXTURE_TEST_CASE( a_freeze_refuses_every_token_move, sysio_swap_tester ) 
     create_tokens_and_issue();
     transfer( "anothertoken"_n, "bob"_n, "alice"_n, asset::from_string("500000000.0000 VOICE"), "");
     abi_ser.set_abi(swap_abi, fixture_abi_yield_function());
-    many_openext();
     BOOST_REQUIRE_EQUAL( success(), transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n,
                                               asset::from_string("10000000.0000 EOS"), "") );
     BOOST_REQUIRE_EQUAL( success(), seed_transfer( "anothertoken"_n, "alice"_n,
@@ -3369,7 +3343,6 @@ BOOST_FIXTURE_TEST_CASE( a_freeze_refuses_every_token_move, sysio_swap_tester ) 
     // What moves nothing runs.
     BOOST_REQUIRE_EQUAL( success(), sync( EVO ) );
     BOOST_REQUIRE_EQUAL( success(), changefee( EVO, 20 ) );
-    BOOST_REQUIRE_EQUAL( success(), openext( "carol"_n, "alice"_n, system_token ) );
 
     BOOST_REQUIRE_EQUAL( success(), andon::clear(*this, andon_abi_ser) );
     BOOST_REQUIRE_EQUAL( success(), exchange( "alice"_n, EVO, extend(asset::from_string("1.0000 EOS")),
@@ -3412,6 +3385,77 @@ BOOST_FIXTURE_TEST_CASE( a_freeze_refuses_inittoken_accrual_and_a_selling_tick, 
     BOOST_REQUIRE_LT( reservoir_of( SHEO ), 1000'0000 );
     BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, ETUSD5,
         extend(asset::from_string("1.00 TUSD")), extend( asset( 1'0000, WIRE9 ) ), 10, name{}) );
+} FC_LOG_AND_RETHROW()
+
+
+// Pair-token balance rows are billed to sysio: minting, sending, receiving and closing leave the
+// holders' RAM unchanged.
+BOOST_FIXTURE_TEST_CASE( pair_token_balances_are_billed_to_sysio, sysio_swap_tester ) try {
+    const name sysio_account = config::system_account_name;
+    setup_pools();
+    BOOST_REQUIRE_EQUAL( sysio_account, balance_payer( "alice"_n, EVO ) );
+
+    // A send into a new row bills neither party.
+    int64_t alice_ram = ram_usage( "alice"_n );
+    int64_t bob_ram   = ram_usage( "bob"_n );
+    BOOST_REQUIRE_EQUAL( success(), send_pair_token( "alice"_n, "bob"_n, asset::from_string("100.0000 EVO") ) );
+    BOOST_REQUIRE_EQUAL( alice_ram, ram_usage( "alice"_n ) );
+    BOOST_REQUIRE_EQUAL( bob_ram, ram_usage( "bob"_n ) );
+    BOOST_REQUIRE_EQUAL( sysio_account, balance_payer( "bob"_n, EVO ) );
+
+    // The sender of a row it did not create keeps its RAM, and so does the recipient.
+    BOOST_REQUIRE_EQUAL( success(), send_pair_token( "bob"_n, "alice"_n, asset::from_string("40.0000 EVO") ) );
+    BOOST_REQUIRE_EQUAL( bob_ram, ram_usage( "bob"_n ) );
+    BOOST_REQUIRE_EQUAL( alice_ram, ram_usage( "alice"_n ) );
+    BOOST_REQUIRE_EQUAL( sysio_account, balance_payer( "bob"_n, EVO ) );
+    BOOST_REQUIRE_EQUAL( sysio_account, balance_payer( "alice"_n, EVO ) );
+
+    // Shares minted by addliquidity are billed to sysio too.
+    BOOST_REQUIRE_EQUAL( success(), addliquidity( "alice"_n, asset::from_string("50.0000 EVO"),
+                                                  asset::from_string("1000000.0000 VOICE"),
+                                                  asset::from_string("1000000.0000 EOS") ) );
+    BOOST_REQUIRE_EQUAL( alice_ram, ram_usage( "alice"_n ) );
+    BOOST_REQUIRE_EQUAL( sysio_account, balance_payer( "alice"_n, EVO ) );
+
+    // Emptying and closing a row leaves the holder's RAM unchanged.
+    BOOST_REQUIRE_EQUAL( success(), send_pair_token( "bob"_n, "alice"_n, asset::from_string("60.0000 EVO") ) );
+    BOOST_REQUIRE_EQUAL( success(), push_action( "sysio.swap"_n, "bob"_n, "close"_n, mvo()
+        ( "owner", "bob"_n )( "symbol", EVO4 ) ) );
+    BOOST_REQUIRE_EQUAL( 0, lp_balance( "bob"_n, EVO ) );
+    BOOST_REQUIRE_EQUAL( bob_ram, ram_usage( "bob"_n ) );
+} FC_LOG_AND_RETHROW()
+
+// The configuration, the rows inittoken writes and the deposit rows are billed to
+// sysio. The first credit creates a deposit row; depositing, withdrawing and closing
+// leave the holders' RAM unchanged.
+BOOST_FIXTURE_TEST_CASE( swap_rows_are_billed_to_sysio, sysio_swap_tester ) try {
+    const name sysio_account = config::system_account_name;
+    BOOST_REQUIRE_EQUAL( sysio_account, row_payer( "swapconfig"_n, { "swapconfig"_n.to_uint64_t() } ) );
+    setup_pools();
+    BOOST_REQUIRE_EQUAL( sysio_account, row_payer( "stat"_n, { EVO.value } ) );
+    BOOST_REQUIRE_EQUAL( sysio_account, row_payer( "priceaccum"_n, { EVO.value } ) );
+    BOOST_REQUIRE_EQUAL( sysio_account, row_payer( "evoindex"_n,
+        { "anothertoken"_n.to_uint64_t(), VOICE4.value(), "sysio.token"_n.to_uint64_t(), EOS4.value() } ) );
+    BOOST_REQUIRE_EQUAL( sysio_account, deposit_payer( "alice"_n, SYSTEM_TOKEN ) );
+
+    // A deposit for another account creates that account's row; neither is billed.
+    // setup_pools deposited all of alice's EOS, so she withdraws some to send.
+    BOOST_REQUIRE_EQUAL( success(), withdraw( "alice"_n, "alice"_n, extend( asset::from_string("1.0000 EOS") ) ) );
+    BOOST_REQUIRE( !has_deposit( "carol"_n, SYSTEM_TOKEN ) );
+    const int64_t alice_ram = ram_usage( "alice"_n );
+    const int64_t carol_ram = ram_usage( "carol"_n );
+    BOOST_REQUIRE_EQUAL( success(), transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n,
+                                              asset::from_string("1.0000 EOS"), "deposit to: carol" ) );
+    BOOST_REQUIRE_EQUAL( 1'0000, deposit_of( "carol"_n, SYSTEM_TOKEN ) );
+    BOOST_REQUIRE_EQUAL( sysio_account, deposit_payer( "carol"_n, SYSTEM_TOKEN ) );
+    BOOST_REQUIRE_EQUAL( alice_ram, ram_usage( "alice"_n ) );
+    BOOST_REQUIRE_EQUAL( carol_ram, ram_usage( "carol"_n ) );
+
+    // Withdrawing and closing leave the holder's RAM unchanged.
+    BOOST_REQUIRE_EQUAL( success(), withdraw( "carol"_n, "carol"_n, extend( asset::from_string("0.5000 EOS") ) ) );
+    BOOST_REQUIRE_EQUAL( success(), closeext( "carol"_n, "carol"_n, SYSTEM_TOKEN ) );
+    BOOST_REQUIRE( !has_deposit( "carol"_n, SYSTEM_TOKEN ) );
+    BOOST_REQUIRE_EQUAL( carol_ram, ram_usage( "carol"_n ) );
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()
