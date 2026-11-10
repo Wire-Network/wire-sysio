@@ -106,6 +106,56 @@ struct limitauth_tester: sysio_system_tester {
       return push_action_raw(
          config::system_account_name, "unlinkauth"_n, pl, account, code, type, authorized_by);
    }
+
+   /////////////
+   // RAM quota helpers
+
+   /// Sets `account`'s RAM quota to its current usage plus `headroom` bytes; CPU and NET become unlimited.
+   void set_ram_headroom(name account, int64_t headroom) {
+      const auto usage = control->get_resource_limits_manager().get_account_ram_usage(account);
+      TESTER::push_action(config::system_account_name, "setalimits"_n, config::system_account_name,
+                          mvo()("account", account)("ram_bytes", usage + headroom)("net_weight", -1)("cpu_weight", -1));
+      produce_block();
+   }
+
+   action limitauthchg_action(const name& account, const std::vector<name>& allow_perms,
+                              const std::vector<name>& disallow_perms) {
+      return get_action(config::system_account_name, "limitauthchg"_n, {{account, active}},
+                        mvo()("account", account)("allow_perms", allow_perms)("disallow_perms", disallow_perms));
+   }
+
+   /// Pushes `actions` as one transaction signed with `signer`'s active key.
+   action_result push_actions(std::vector<action> actions, name signer) {
+      try {
+         signed_transaction trx;
+         trx.actions = std::move(actions);
+         set_transaction_headers(trx, DEFAULT_EXPIRATION_DELTA);
+         trx.sign(get_private_key(signer, "active"), control->get_chain_id());
+         push_transaction(trx);
+         return "";
+      } catch (const fc::exception& ex) {
+         edump((ex.to_detail_string()));
+         return ex.top_message();
+      }
+   }
+
+   /// `count` distinct permission names, none of them owner (`perma`, `permb`, ...).
+   static std::vector<name> permission_names(size_t count) {
+      constexpr std::string_view prefix = "perm";
+      constexpr size_t alphabet = 26;
+      std::vector<name> names;
+      names.reserve(count);
+      for (size_t i = 0; i < count; ++i) {
+         std::string suffix;
+         for (size_t n = i; ; n = n / alphabet - 1) {
+            suffix.insert(suffix.begin(), static_cast<char>('a' + n % alphabet));
+            if (n < alphabet)
+               break;
+         }
+         names.emplace_back(std::string(prefix) + suffix);
+      }
+      return names;
+   }
 }; // limitauth_tester
 
 BOOST_AUTO_TEST_SUITE(sysio_system_limitauth_tests)
@@ -509,6 +559,45 @@ BOOST_FIXTURE_TEST_CASE(disallow_perms_tests, limitauth_tester) try {
       "",
       deleteauth({alice, owner}, alice, admin2, owner));
 } // disallow_perms_tests
+FC_LOG_AND_RETHROW()
+
+// limitauthchg's row is billed to the account. When the row grows, the account must be within its RAM quota right after
+// the write, not only at the end of the transaction.
+BOOST_FIXTURE_TEST_CASE(limitauthchg_checks_ram_quota_when_it_runs, limitauth_tester) try {
+   // The contract's check, as opposed to the chain's end-of-transaction check, which reports the same condition
+   // without the assertion prefix.
+   const std::string contract_rejection = "assertion failure with message: account " + alice.to_string() +
+                                          " has insufficient ram";
+   constexpr int64_t headroom = 512;
+   constexpr size_t names_over_headroom = 256; // 2 KiB of names
+   constexpr size_t names_within_headroom = 8;
+   constexpr size_t names_after_shrink = 4;
+
+   set_ram_headroom(alice, headroom);
+   const auto usage_before = control->get_resource_limits_manager().get_account_ram_usage(alice);
+
+   // Lists that do not fit fail, even when the next action removes the row again.
+   const auto result = push_actions(
+      {limitauthchg_action(alice, {}, permission_names(names_over_headroom)), limitauthchg_action(alice, {}, {})},
+      alice);
+   BOOST_REQUIRE_MESSAGE(result.starts_with(contract_rejection), result);
+   BOOST_REQUIRE_EQUAL(control->get_resource_limits_manager().get_account_ram_usage(alice), usage_before);
+
+   // Lists that fit succeed.
+   BOOST_REQUIRE_EQUAL("", limitauthchg({alice, active}, alice, {}, permission_names(names_within_headroom)));
+   produce_block();
+
+   // With no room left, shrinking the lists and removing the row still succeed.
+   set_ram_headroom(alice, 0);
+   BOOST_REQUIRE_EQUAL("", limitauthchg({alice, active}, alice, {}, permission_names(names_after_shrink)));
+   BOOST_REQUIRE_EQUAL("", limitauthchg({alice, active}, alice, {}, {}));
+   produce_block();
+
+   // With no room left, writing the row again fails in the contract.
+   set_ram_headroom(alice, 0);
+   const auto grow = limitauthchg({alice, active}, alice, {}, permission_names(names_after_shrink));
+   BOOST_REQUIRE_MESSAGE(grow.starts_with(contract_rejection), grow);
+} // limitauthchg_checks_ram_quota_when_it_runs
 FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()

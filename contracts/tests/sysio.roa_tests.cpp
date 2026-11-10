@@ -2431,6 +2431,151 @@ BOOST_FIXTURE_TEST_CASE( setsyscode_rejects_unlimited_ram_target, sysio_roa_test
          ("account","alice")("vmtype",0)("vmversion",0)("code", bytes(wasm.begin(), wasm.end()))) );
 } FC_LOG_AND_RETHROW()
 
+// The chain checks an account's RAM quota when native setcode / setabi run, so setsyscode and setsysabi gift an upper
+// bound before deploying and settle it to the exact change afterwards. These tests start from an account whose quota
+// equals its usage, as a new system account's does.
+namespace {
+
+/// The RAM books setsyscode / setsysabi move bytes between: the target's quota and usage, sysio's chain quota, and the
+/// `sysio` / `sysio.acct` reslimit rows.
+struct deploy_ram_books {
+   int64_t account_quota  = 0;
+   int64_t account_usage  = 0;
+   int64_t sysio_quota    = 0;
+   int64_t sysio_reslimit = 0;
+   int64_t acct_reslimit  = 0;
+};
+
+struct sysdeploy_ram_tester : sysio_roa_tester {
+   deploy_ram_books books(account_name account) {
+      const auto& rlm = control->get_resource_limits_manager();
+      deploy_ram_books b;
+      int64_t net = 0, cpu = 0;
+      rlm.get_account_limits(account, b.account_quota, net, cpu);
+      rlm.get_account_limits(config::system_account_name, b.sysio_quota, net, cpu);
+      b.account_usage  = rlm.get_account_ram_usage(account);
+      b.sysio_reslimit = get_reslimit(config::system_account_name)["ram_bytes"].as<int64_t>();
+      b.acct_reslimit  = get_reslimit("sysio.acct"_n)["ram_bytes"].as<int64_t>();
+      return b;
+   }
+
+   /// Sets `account`'s RAM quota to its usage plus `free_bytes`, in the pending block. sysio's usage grows with each
+   /// block's `onblock`, so a test that sets sysio's free RAM acts on it before producing another block.
+   void set_free_ram(account_name account, int64_t free_bytes) {
+      int64_t ram = 0, net = 0, cpu = 0;
+      control->get_resource_limits_manager().get_account_limits(account, ram, net, cpu);
+      base_tester::push_action(config::system_account_name, "setalimits"_n, config::system_account_name, mvo()
+         ("account", account)
+         ("ram_bytes", control->get_resource_limits_manager().get_account_ram_usage(account) + free_bytes)
+         ("net_weight", net)
+         ("cpu_weight", cpu));
+   }
+
+   action_result setsyscode(account_name account, const std::vector<uint8_t>& wasm) {
+      return push_action(config::system_account_name, "setsyscode"_n, mvo()
+         ("account", account)("vmtype", 0)("vmversion", 0)("code", bytes(wasm.begin(), wasm.end())));
+   }
+
+   action_result setsysabi(account_name account, const bytes& abi) {
+      return push_action(config::system_account_name, "setsysabi"_n, mvo()("account", account)("abi", abi));
+   }
+
+   /// Requires `account` to be funded exactly (quota equal to usage) and every byte it gained or returned to have
+   /// moved through sysio's pool, against the books taken before the first deploy.
+   void require_exact_funding(account_name account, const deploy_ram_books& start) {
+      const auto now = books(account);
+      BOOST_REQUIRE_EQUAL(now.account_quota, now.account_usage);
+      BOOST_REQUIRE_EQUAL(now.account_quota + now.sysio_quota, start.account_quota + start.sysio_quota);
+      BOOST_REQUIRE_EQUAL(now.sysio_reslimit + now.acct_reslimit, start.sysio_reslimit + start.acct_reslimit);
+      BOOST_REQUIRE_EQUAL(start.sysio_reslimit - now.sysio_reslimit, now.account_quota - start.account_quota);
+   }
+};
+
+} // anonymous namespace
+
+BOOST_FIXTURE_TEST_CASE( setsyscode_and_setsysabi_fund_an_account_without_ram_headroom, sysdeploy_ram_tester ) try {
+   set_free_ram("alice"_n, 0);
+   produce_blocks();
+   const auto start = books("alice"_n);
+   const auto small = test_contracts::noop_wasm();
+   const auto large = test_contracts::sysio_token_wasm();
+   BOOST_REQUIRE_GT(large.size(), small.size());
+
+   // First deploy, then a larger contract, then a smaller one (which returns RAM).
+   BOOST_REQUIRE_EQUAL(success(), setsyscode("alice"_n, small));
+   produce_blocks();
+   require_exact_funding("alice"_n, start);
+
+   BOOST_REQUIRE_EQUAL(success(), setsyscode("alice"_n, large));
+   produce_blocks();
+   require_exact_funding("alice"_n, start);
+   const auto with_large = books("alice"_n);
+
+   BOOST_REQUIRE_EQUAL(success(), setsyscode("alice"_n, small));
+   produce_blocks();
+   require_exact_funding("alice"_n, start);
+   BOOST_REQUIRE_LT(books("alice"_n).account_quota, with_large.account_quota);
+
+   const auto* meta = control->find_account_metadata("alice"_n);
+   BOOST_REQUIRE(meta != nullptr && meta->is_privileged());
+   BOOST_REQUIRE(meta->code_hash == fc::sha256::hash(reinterpret_cast<const char*>(small.data()),
+                                                     static_cast<uint32_t>(small.size())));
+
+   // Set an ABI, then clear it (which returns RAM).
+   const auto abi = fc::raw::pack(fc::json::from_string(test_contracts::sysio_token_abi()).as<abi_def>());
+   BOOST_REQUIRE_EQUAL(success(), setsysabi("alice"_n, abi));
+   produce_blocks();
+   require_exact_funding("alice"_n, start);
+   const auto with_abi = books("alice"_n);
+
+   BOOST_REQUIRE_EQUAL(success(), setsysabi("alice"_n, bytes{}));
+   produce_blocks();
+   require_exact_funding("alice"_n, start);
+   BOOST_REQUIRE_LT(books("alice"_n).account_quota, with_abi.account_quota);
+   BOOST_REQUIRE_EQUAL(control->find_account_metadata("alice"_n)->abi.size(), 0u);
+} FC_LOG_AND_RETHROW()
+
+// The gift ahead of the deploy may briefly exceed sysio's free RAM: only the settled change has to fit.
+BOOST_FIXTURE_TEST_CASE( setsyscode_settles_within_sysio_pool_after_gifting_ahead, sysdeploy_ram_tester ) try {
+   set_free_ram("alice"_n, 0);
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), setsyscode("alice"_n, test_contracts::sysio_system_wasm()));
+   produce_blocks();
+   const auto with_large = books("alice"_n);
+
+   // No free RAM left in sysio's pool: a smaller re-deploy still succeeds, and the pool gets back what it freed.
+   set_free_ram(config::system_account_name, 0);
+   const auto before = books("alice"_n);
+   BOOST_REQUIRE_EQUAL(before.sysio_quota,
+                       control->get_resource_limits_manager().get_account_ram_usage(config::system_account_name));
+   BOOST_REQUIRE_EQUAL(success(), setsyscode("alice"_n, test_contracts::noop_wasm()));
+   require_exact_funding("alice"_n, before);
+
+   const auto now = books("alice"_n);
+   BOOST_REQUIRE_LT(now.account_quota, with_large.account_quota);
+   BOOST_REQUIRE_EQUAL(now.sysio_quota - before.sysio_quota, with_large.account_quota - now.account_quota);
+} FC_LOG_AND_RETHROW()
+
+// When sysio's pool cannot cover the change, the deploy fails as a whole and nothing moves.
+BOOST_FIXTURE_TEST_CASE( setsyscode_fails_when_sysio_pool_cannot_cover_the_change, sysdeploy_ram_tester ) try {
+   set_free_ram("alice"_n, 0);
+   produce_blocks();
+   set_free_ram(config::system_account_name, 0);
+   const auto before = books("alice"_n);
+
+   const auto result = setsyscode("alice"_n, test_contracts::noop_wasm());
+   BOOST_REQUIRE_MESSAGE(result.find("account sysio has insufficient ram") != std::string::npos, result);
+
+   const auto after = books("alice"_n);
+   BOOST_REQUIRE_EQUAL(after.account_quota, before.account_quota);
+   BOOST_REQUIRE_EQUAL(after.account_usage, before.account_usage);
+   BOOST_REQUIRE_EQUAL(after.sysio_quota, before.sysio_quota);
+   BOOST_REQUIRE_EQUAL(after.sysio_reslimit, before.sysio_reslimit);
+   BOOST_REQUIRE_EQUAL(after.acct_reslimit, before.acct_reslimit);
+   const auto* meta = control->find_account_metadata("alice"_n);
+   BOOST_REQUIRE(meta == nullptr || meta->code_hash == digest_type());
+} FC_LOG_AND_RETHROW()
+
 // ---- newnameduser: depot-created vanity-named account, funded from sysio ----
 
 BOOST_FIXTURE_TEST_CASE( newnameduser_creates_funds_idempotent, sysio_roa_tester ) try {

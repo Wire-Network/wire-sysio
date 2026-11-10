@@ -23,6 +23,21 @@
 
 namespace sysio::chain {
 
+namespace {
+
+/**
+ * Bills `ram_delta` bytes to `account` and, when the account grows, requires it to be within its RAM quota right
+ * away, with the same check and exception as the end-of-transaction check. The new code, ABI or authority has to fit
+ * when it is written; RAM freed later in the transaction does not count. A shrink always passes.
+ */
+void add_ram_usage_within_quota( apply_context& context, account_name account, int64_t ram_delta ) {
+   context.add_ram_usage( account, ram_delta );
+   if( ram_delta > 0 )
+      context.control.get_resource_limits_manager().verify_account_ram_usage( account );
+}
+
+} // anonymous namespace
+
 void validate_authority_precondition( const apply_context& context, const authority& auth ) {
    for(const auto& a : auth.accounts) {
       auto* acct = context.db.find<account_object, by_name>(a.permission.actor);
@@ -206,7 +221,7 @@ void apply_sysio_setcode(apply_context& context) {
          dm_logger->on_ram_trace(RAM_EVENT_ID("${account}", ("account", act.account)), "code", operation, "setcode");
       }
 
-      context.add_ram_usage( act.account, new_size - old_size + metadata_ram_delta );
+      add_ram_usage_within_quota( context, act.account, new_size - old_size + metadata_ram_delta );
    }
 }
 
@@ -251,7 +266,7 @@ void apply_sysio_setabi(apply_context& context) {
          dm_logger->on_ram_trace(RAM_EVENT_ID("${account}", ("account", act.account)), "abi", operation, "setabi");
       }
 
-      context.add_ram_usage( act.account, new_size - old_size + metadata_ram_delta );
+      add_ram_usage_within_quota( context, act.account, new_size - old_size + metadata_ram_delta );
    }
 }
 
@@ -309,7 +324,7 @@ void apply_sysio_updateauth(apply_context& context) {
          dm_logger->on_ram_trace(RAM_EVENT_ID("${id}", ("id", permission->id)), "auth", "update", "updateauth_update");
       }
 
-      context.add_ram_usage( permission->owner, new_size - old_size );
+      add_ram_usage_within_quota( context, permission->owner, new_size - old_size );
    } else {
       const auto& p = authorization.create_permission( update.account, update.permission, parent_id, update.auth, context.trx_context.is_transient() );
 
@@ -319,7 +334,7 @@ void apply_sysio_updateauth(apply_context& context) {
          dm_logger->on_ram_trace(RAM_EVENT_ID("${id}", ("id", p.id)), "auth", "add", "updateauth_create");
       }
 
-      context.add_ram_usage( update.account, new_size );
+      add_ram_usage_within_quota( context, update.account, new_size );
    }
 }
 

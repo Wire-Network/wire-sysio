@@ -15,8 +15,101 @@
 #include <fc/variant_object.hpp>
 
 #include <contracts.hpp>
+#include <test_contracts.hpp>
 
 #include "sysio_system_tester.hpp"
+
+namespace {
+
+using namespace sysio::chain;
+using namespace sysio::testing;
+using mvo = fc::mutable_variant_object;
+
+/**
+ * Validating tester with an account whose RAM quota can be set to leave an exact number of bytes free, and a
+ * contract (`ram_restrictions_test`) that bills its rows to a named payer. Native `setcode`, `setabi` and
+ * `updateauth` must leave the account within its quota at the moment they grow its RAM, so each test sizes the
+ * quota around the change it makes.
+ */
+struct native_ram_quota_fixture : validating_tester {
+   static constexpr account_name account     = "alice"_n;
+   static constexpr account_name row_contract = "rambiller"_n;
+   static constexpr permission_name spending  = "spending"_n;
+
+   native_ram_quota_fixture() {
+      create_accounts({account, row_contract});
+      set_contract(row_contract, test_contracts::ram_restrictions_test_wasm(),
+                   test_contracts::ram_restrictions_test_abi());
+      produce_block();
+   }
+
+   int64_t ram_usage() const { return control->get_resource_limits_manager().get_account_ram_usage(account); }
+
+   /// Sets the account's RAM quota to its current usage plus `headroom` bytes; CPU and NET stay unlimited.
+   void set_ram_headroom(int64_t headroom) {
+      push_action(config::system_account_name, "setalimits"_n, config::system_account_name,
+                  mvo()("account", account)("ram_bytes", ram_usage() + headroom)("net_weight", -1)("cpu_weight", -1));
+      produce_block();
+   }
+
+   /// Pushes `actions` as one transaction signed with the account's active key.
+   transaction_trace_ptr push_actions(vector<action> actions) {
+      signed_transaction trx;
+      trx.actions = std::move(actions);
+      set_transaction_headers(trx);
+      trx.sign(get_private_key(account, "active"), control->get_chain_id());
+      return push_transaction(trx);
+   }
+
+   static vector<permission_level> active_auth() { return {{account, config::active_name}}; }
+
+   static action setcode_action(const vector<uint8_t>& wasm) {
+      return action(active_auth(), setcode{.account = account, .code = bytes(wasm.begin(), wasm.end())});
+   }
+
+   static action setabi_action(const bytes& abi) { return action(active_auth(), setabi{.account = account, .abi = abi}); }
+
+   static action updateauth_action(const authority& auth) {
+      return action(active_auth(),
+                    updateauth{.account = account, .permission = spending, .parent = config::active_name, .auth = auth});
+   }
+
+   /// `ram_restrictions_test::setdata`, writing a `row_bytes` row billed to the account.
+   action setdata_action(uint32_t row_bytes) {
+      return get_action(row_contract, "setdata"_n,
+                        {{account, config::sysio_payer_name}, {account, config::active_name}},
+                        mvo()("len1", row_bytes)("len2", 0)("payer", account));
+   }
+
+   /// A valid packed ABI of at least `min_size` bytes: the no-op contract's ABI with a padding clause.
+   static bytes abi_of_size(size_t min_size) {
+      auto abi = fc::json::from_string(test_contracts::noop_abi()).as<abi_def>();
+      abi.ricardian_clauses.push_back(clause_pair{"padding", std::string(min_size, 'x')});
+      return fc::raw::pack(abi);
+   }
+
+   /// A one-of-n authority over `key_count` distinct keys of the account.
+   static authority keys_authority(size_t key_count) {
+      authority auth;
+      auth.threshold = 1;
+      for (size_t i = 0; i < key_count; ++i)
+         auth.keys.push_back(key_weight{get_public_key(account, "key" + std::to_string(i)), 1});
+      auth.sort_fields();
+      return auth;
+   }
+
+   /// RAM a permission over `key_count` K1 keys takes (K1 keys hold no bytes outside their element).
+   static int64_t permission_ram(size_t key_count) {
+      return static_cast<int64_t>(config::billable_size_v<permission_object> +
+                                  key_count * config::billable_size_v<key_weight>);
+   }
+
+   static int64_t code_ram(const vector<uint8_t>& wasm) {
+      return static_cast<int64_t>(wasm.size()) * static_cast<int64_t>(config::setcode_ram_bytes_multiplier);
+   }
+};
+
+} // anonymous namespace
 
 /*
  * register test suite `ram_tests`
@@ -510,6 +603,134 @@ BOOST_AUTO_TEST_CASE(setabi_update_ram_billing) { try {
     // Metadata already exists from the first setabi, so the update only bills
     // the raw serialized-size delta.
     BOOST_REQUIRE_EQUAL(after_update - before_update, new_abi_size - old_abi_size);
+} FC_LOG_AND_RETHROW() }
+
+// Native setcode, setabi and updateauth check the account's RAM quota when they grow it, not only at the end of the
+// transaction.
+
+BOOST_FIXTURE_TEST_CASE(setcode_checks_ram_quota_when_it_runs, native_ram_quota_fixture) { try {
+    const auto& wasm = test_contracts::no_auth_table_wasm();
+    set_ram_headroom(code_ram(wasm) - 1);
+    const auto usage_before = ram_usage();
+
+    // The code does not fit, so the transaction fails even though its second action clears the code again.
+    BOOST_REQUIRE_EXCEPTION(push_actions({setcode_action(wasm), setcode_action({})}), ram_usage_exceeded,
+                            fc_exception_message_contains("insufficient ram"));
+    BOOST_REQUIRE_EQUAL(ram_usage(), usage_before);
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(setabi_checks_ram_quota_when_it_runs, native_ram_quota_fixture) { try {
+    constexpr int64_t headroom = 1024;
+    set_ram_headroom(headroom);
+    const auto abi = abi_of_size(2 * headroom);
+    const auto usage_before = ram_usage();
+
+    BOOST_REQUIRE_EXCEPTION(push_actions({setabi_action(abi), setabi_action({})}), ram_usage_exceeded,
+                            fc_exception_message_contains("insufficient ram"));
+    BOOST_REQUIRE_EQUAL(ram_usage(), usage_before);
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(updateauth_checks_ram_quota_when_it_runs, native_ram_quota_fixture) { try {
+    constexpr size_t key_count = 64;
+    const auto large = keys_authority(key_count);
+    const auto small = keys_authority(1);
+
+    // A row billed to the account, which a later action can free.
+    const auto row_bytes = static_cast<uint32_t>(2 * permission_ram(key_count));
+    set_ram_headroom(2 * static_cast<int64_t>(row_bytes));
+    push_actions({setdata_action(row_bytes)});
+    produce_block();
+    set_ram_headroom(permission_ram(key_count) / 2);
+    const auto usage_before = ram_usage();
+
+    // Creating a permission that does not fit fails, even when the next action frees more than it takes.
+    BOOST_REQUIRE_EXCEPTION(push_actions({updateauth_action(large), setdata_action(0)}), ram_usage_exceeded,
+                            fc_exception_message_contains("insufficient ram"));
+    BOOST_REQUIRE_EQUAL(ram_usage(), usage_before);
+
+    // Growing an existing permission past the quota fails, even when the next action shrinks it back.
+    push_actions({updateauth_action(small)});
+    produce_block();
+    const auto usage_with_small = ram_usage();
+    BOOST_REQUIRE_EXCEPTION(push_actions({updateauth_action(large), updateauth_action(small)}), ram_usage_exceeded,
+                            fc_exception_message_contains("insufficient ram"));
+    BOOST_REQUIRE_EQUAL(ram_usage(), usage_with_small);
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(native_actions_within_ram_quota_succeed, native_ram_quota_fixture) { try {
+    const auto& large_wasm = test_contracts::no_auth_table_wasm();
+    const auto& small_wasm = test_contracts::noop_wasm();
+    BOOST_REQUIRE_GT(large_wasm.size(), small_wasm.size());
+    const auto abi = abi_of_size(1024);
+    // Room for the larger contract, the ABI, the hash rows the system contract records, and a permission.
+    constexpr int64_t slack = 4096;
+    set_ram_headroom(code_ram(large_wasm) + static_cast<int64_t>(abi.size()) + slack);
+
+    // setcode and setabi in one transaction.
+    push_actions({setcode_action(small_wasm), setabi_action(abi)});
+    produce_block();
+
+    // Replacing the code with larger code, then with smaller code.
+    push_actions({setcode_action(large_wasm)});
+    produce_block();
+    push_actions({setcode_action(small_wasm)});
+    produce_block();
+
+    // An authority that fits.
+    push_actions({updateauth_action(keys_authority(4))});
+    produce_block();
+
+    const auto* metadata = control->find_account_metadata(account);
+    BOOST_REQUIRE(metadata != nullptr);
+    BOOST_REQUIRE(metadata->code_hash == fc::sha256::hash(reinterpret_cast<const char*>(small_wasm.data()),
+                                                          static_cast<uint32_t>(small_wasm.size())));
+    BOOST_REQUIRE_EQUAL(metadata->abi.size(), abi.size());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(native_actions_count_ram_freed_earlier_in_the_transaction, native_ram_quota_fixture) { try {
+    const auto& wasm = test_contracts::no_auth_table_wasm();
+    constexpr int64_t slack = 1024;
+    set_ram_headroom(code_ram(wasm) + slack);
+    push_actions({setcode_action(wasm)});
+    produce_block();
+    set_ram_headroom(0);
+
+    // Clearing the code first frees enough RAM for an ABI half its size in the same transaction.
+    const auto abi = abi_of_size(static_cast<size_t>(code_ram(wasm) / 2));
+    push_actions({setcode_action({}), setabi_action(abi)});
+    produce_block();
+
+    const auto* metadata = control->find_account_metadata(account);
+    BOOST_REQUIRE(metadata != nullptr);
+    BOOST_REQUIRE(metadata->code_hash == digest_type());
+    BOOST_REQUIRE_EQUAL(metadata->abi.size(), abi.size());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(native_shrink_passes_while_account_is_over_ram_quota, native_ram_quota_fixture) { try {
+    const auto& wasm = test_contracts::no_auth_table_wasm();
+    const auto abi = abi_of_size(1024);
+    constexpr int64_t slack = 4096;
+    set_ram_headroom(code_ram(wasm) + static_cast<int64_t>(abi.size()) + slack);
+    push_actions({setcode_action(wasm), setabi_action(abi), updateauth_action(keys_authority(8))});
+    produce_block();
+    set_ram_headroom(0);
+
+    // A row billed to the account puts it over its quota for the rest of the transaction. Clearing code, clearing
+    // the ABI and shrinking an authority all release RAM, so they pass; the last action frees the row again.
+    constexpr uint32_t row_bytes = 2048;
+    push_actions({setdata_action(row_bytes), setcode_action({}), setabi_action({}),
+                  updateauth_action(keys_authority(1)), setdata_action(0)});
+    produce_block();
+
+    // Growing RAM while over the quota fails, even though clearing the code later in the transaction would leave the
+    // account within it.
+    set_ram_headroom(code_ram(wasm) + slack);
+    push_actions({setcode_action(wasm)});
+    produce_block();
+    set_ram_headroom(0);
+    BOOST_REQUIRE_EXCEPTION(push_actions({setdata_action(row_bytes), setabi_action(abi_of_size(64)),
+                                          setcode_action({}), setdata_action(0)}),
+                            ram_usage_exceeded, fc_exception_message_contains("insufficient ram"));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()
