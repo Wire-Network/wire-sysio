@@ -51,12 +51,6 @@
       "version>=": "2022-06-28#3"
     },
     {
-      "name": "wire-sys-vm",
-      "features": [
-        "softfloat-skip-install"
-      ]
-    },
-    {
       "name": "nlohmann-json",
       "version>=": "3.12.0#1"
     },
@@ -148,10 +142,6 @@
     {
       "name": "softfloat",
       "version": "3.0.0#3"
-    },
-    {
-      "name": "wire-sys-vm",
-      "version": "1.2.0#2"
     },
     {
       "name": "nlohmann-json",
