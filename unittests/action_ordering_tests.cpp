@@ -5,23 +5,22 @@
  *
  * What the chain guarantees (see libraries/chain/apply_context.cpp::exec):
  *
- *   Within a single apply_context, actions run in four fixed phases:
+ *   Within a single apply_context, actions run in three fixed phases:
  *
  *     phase 1: the receiver's own action body         ("self" apply)
  *     phase 2: every require_recipient() in FIFO      (notification phase)
- *     phase 3: every send_context_free_inline() FIFO  (CFA inline phase)
- *     phase 4: every send_inline() in FIFO            (regular inline phase)
+ *     phase 3: every send_inline() in FIFO            (inline phase)
  *
- *     +--------+    +---------------+    +-------------+    +-----------------+
- *     |  self  | -> | notifications | -> | CFA inlines | -> | regular inlines |
- *     |        |    |     FIFO      |    |    FIFO     |    |      FIFO       |
- *     +--------+    +---------------+    +-------------+    +-----------------+
- *      phase 1         phase 2              phase 3              phase 4
+ *     +--------+    +---------------+    +-----------------+
+ *     |  self  | -> | notifications | -> |     inlines     |
+ *     |        |    |     FIFO      |    |      FIFO       |
+ *     +--------+    +---------------+    +-----------------+
+ *      phase 1         phase 2              phase 3
  *
  * Two distinct counters describe a trace:
  *
  *   action_ordinal   - SCHEDULE order. Assigned the moment a host call
- *                      (require_recipient / send_*_inline) enqueues a new
+ *                      (require_recipient / send_inline) enqueues a new
  *                      action. action_traces is indexed by action_ordinal,
  *                      so action_traces[0..N] is in SCHEDULE order, NEVER
  *                      execution order.
@@ -49,10 +48,10 @@
  *     when you mean execution order. Sort by receipt.global_sequence, or
  *     walk the (creator_action_ordinal, action_ordinal) tree explicitly.
  *
- * Six focused cases are covered here. A separate, monolithic test in
+ * Five focused cases are covered here. A separate, monolithic test in
  * api_tests.cpp (action_ordinal_test) covers the same rules across a more
  * elaborate fixture; the cases below complement that with clean,
- * documented invariants and the CFA-inline coverage that test lacks.
+ * documented invariants.
  *
  * Each case is instantiated for every tester in `validating_testers` so the
  * trace shape produced by block production is also exercised through the
@@ -82,15 +81,13 @@ BOOST_AUTO_TEST_SUITE(action_ordering_tests)
 namespace {
 
 /**
- * @brief Common fixture: four accounts wired up for ordering tests.
+ * @brief Common fixture: three accounts wired up for ordering tests.
  *
  *   source - originates the action; has the contract.
  *   obs    - notification recipient; has the contract so its on_notify
  *            handler (used by Case 2) can dispatch.
  *   inlt   - inline recipient; has the contract so nested-case inlines
  *            can run real contract logic (notifyme) on it.
- *   cfat   - CFA-inline recipient; intentionally has NO contract. The
- *            CFA noop trace is still recorded; no wasm runs.
  *
  * Parameterised on the tester type so each test case can be instantiated
  * via BOOST_AUTO_TEST_CASE_TEMPLATE against validating_testers, picking up
@@ -102,10 +99,9 @@ struct ordering_fixture {
    account_name source = "alice"_n;
    account_name obs    = "bob"_n;
    account_name inlt   = "carol"_n;
-   account_name cfat   = "dave"_n;
 
    ordering_fixture() {
-      chain.create_accounts({source, obs, inlt, cfat});
+      chain.create_accounts({source, obs, inlt});
       chain.produce_block();
       chain.set_code(source, test_contracts::action_order_test_wasm());
       chain.set_abi(source, test_contracts::action_order_test_abi());
@@ -340,65 +336,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(nested_inline_fires_inner_notification,
    BOOST_CHECK_EQUAL(rows[3].act_account, f.inlt);
    BOOST_CHECK_EQUAL(rows[3].act_name, "notifyme"_n);
    BOOST_CHECK_EQUAL(rows[3].gseq, rows[0].gseq + 3);
-} FC_LOG_AND_RETHROW()
-
-// ---------------------------------------------------------------------------
-// Case 6 (CFA): CFA inlines run BEFORE regular inlines, regardless of the
-// order in which they were scheduled.
-//
-// Body schedules: regular_inline -> CFA_inline -> require_recipient.
-// Chain runs phases in fixed order:
-//   self -> notifications -> CFA inlines -> regular inlines.
-//
-// All three non-self traces have global_sequence values that DISAGREE with
-// their action_ordinal. This is the strongest divergence in the suite.
-//
-// Trace shape:
-//   [0] ord=1 gseq=g0   source self (mixedord)
-//   [1] ord=2 gseq=g0+3 regular noop on inlt   (LAST executed)
-//   [2] ord=3 gseq=g0+2 CFA noop on cfat
-//   [3] ord=4 gseq=g0+1 notification on obs    (FIRST executed after self)
-// ---------------------------------------------------------------------------
-BOOST_AUTO_TEST_CASE_TEMPLATE(cfa_runs_before_regular_inline,
-                              T, validating_testers) try {
-   ordering_fixture<T> f;
-   auto trace = f.chain.push_action(f.source, "mixedord"_n, f.source,
-                                    mvo()("obs",  f.obs.to_string())
-                                         ("inlt", f.inlt.to_string())
-                                         ("cfat", f.cfat.to_string()));
-   auto rows = tabulate(trace);
-   BOOST_REQUIRE_EQUAL(rows.size(), 4u);
-
-   // [0] self
-   BOOST_CHECK_EQUAL(rows[0].ordinal, 1u);
-   BOOST_CHECK_EQUAL(rows[0].receiver, f.source);
-   BOOST_CHECK_EQUAL(rows[0].act_name, "mixedord"_n);
-
-   // [1] regular inline (scheduled first, executed last)
-   BOOST_CHECK_EQUAL(rows[1].ordinal, 2u);
-   BOOST_CHECK_EQUAL(rows[1].receiver, f.inlt);
-   BOOST_CHECK_EQUAL(rows[1].act_account, f.inlt);
-   BOOST_CHECK_EQUAL(rows[1].act_name, "noop"_n);
-   BOOST_CHECK_EQUAL(rows[1].gseq, rows[0].gseq + 3);
-
-   // [2] CFA inline
-   BOOST_CHECK_EQUAL(rows[2].ordinal, 3u);
-   BOOST_CHECK_EQUAL(rows[2].receiver, f.cfat);
-   BOOST_CHECK_EQUAL(rows[2].act_account, f.cfat);
-   BOOST_CHECK_EQUAL(rows[2].act_name, "noop"_n);
-   BOOST_CHECK_EQUAL(rows[2].gseq, rows[0].gseq + 2);
-
-   // [3] notification (scheduled last, executed first after self)
-   BOOST_CHECK_EQUAL(rows[3].ordinal, 4u);
-   BOOST_CHECK_EQUAL(rows[3].receiver, f.obs);
-   BOOST_CHECK_EQUAL(rows[3].act_account, f.source);
-   BOOST_CHECK_EQUAL(rows[3].act_name, "mixedord"_n);
-   BOOST_CHECK_EQUAL(rows[3].gseq, rows[0].gseq + 1);
-
-   // Phase-order invariants as plain inequalities.
-   // (notification phase) < (CFA phase) < (regular inline phase).
-   BOOST_CHECK_LT(rows[3].gseq, rows[2].gseq);
-   BOOST_CHECK_LT(rows[2].gseq, rows[1].gseq);
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -241,14 +241,6 @@
                     "type": "uint32"
                 },
                 {
-                    "name": "context_free_discount_net_usage_num",
-                    "type": "uint32"
-                },
-                {
-                    "name": "context_free_discount_net_usage_den",
-                    "type": "uint32"
-                },
-                {
                     "name": "max_block_cpu_usage",
                     "type": "uint32"
                 },

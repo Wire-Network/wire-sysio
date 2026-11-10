@@ -514,31 +514,9 @@ BOOST_FIXTURE_TEST_CASE(get_required_keys_explicit_payer_tests, validating_teste
                           "Payer 'payloadless' did not authorize this action" );
    }
 
-   // --- Context-free actions contribute nothing and are not screened here. Consensus passes only
-   //     trn.actions to check_authorization, so CFAs are never authorization-checked there either;
-   //     the sole authorization one may carry is a keyless `sysio.payer` marker that inherits an
-   //     authorization proven on a regular action. Discovery mirrors check_authorization's rules,
-   //     not transaction_context's -- the CFA shape rule lives only in validate_referenced_accounts
-   //     and is deliberately left to it. ---
+   // --- Discovery does not walk context-free actions, matching check_authorization, which consensus calls with
+   //     only trn.actions. A transaction that carries one is rejected when it is pushed. ---
    {
-      signed_transaction trx;
-      trx.context_free_actions.emplace_back(
-         vector<permission_level>{ { "payloadless"_n, config::sysio_payer_name } },
-         "payloadless"_n, "doit"_n, bytes{} );
-      trx.actions.emplace_back(
-         vector<permission_level>{ { "payloadless"_n, config::sysio_payer_name },
-                                   { "payloadless"_n, config::active_name } },
-         "payloadless"_n, "doit"_n, bytes{} );
-      set_transaction_headers( trx );
-
-      // The CFA's marker adds no key; only the regular action's paired permission does.
-      BOOST_CHECK( required_keys( trx, all_keys ) == flat_set<public_key_type>{ active_pub } );
-   }
-   {
-      // A CFA marker naming an actor that is NOT a payer in trx.actions is rejected by
-      // validate_referenced_accounts, but discovery does not walk CFAs and so does not throw.
-      // Asserting the asymmetry keeps it deliberate: a later change that starts screening CFAs
-      // here should have to update this expectation rather than silently widen the function.
       signed_transaction trx;
       trx.context_free_actions.emplace_back(
          vector<permission_level>{ { "bob"_n, config::sysio_payer_name } },
@@ -549,13 +527,13 @@ BOOST_FIXTURE_TEST_CASE(get_required_keys_explicit_payer_tests, validating_teste
          "payloadless"_n, "doit"_n, bytes{} );
       set_transaction_headers( trx );
 
+      // The context-free action adds no key; only the regular action's paired permission does.
       BOOST_CHECK( required_keys( trx, keys_with_bob ) == flat_set<public_key_type>{ active_pub } );
 
       auto signed_trx = trx;
       signed_trx.sign( active_key, control->get_chain_id() );
       BOOST_CHECK_EXCEPTION( push_transaction( signed_trx ), sysio::chain::transaction_exception,
-                             fc_exception_message_is(
-                                "context-free actions can only have a valid explicit payer authorization" ) );
+                             fc_exception_message_is( "context-free actions are not supported" ) );
    }
 
    // A well-formed payer action alongside an unrelated one still discovers normally -- the rules
@@ -755,183 +733,102 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(require_notice_tests, T, validating_testers) { try
 // action has no test calling it now.
 
 /*************************************************************************************
- * context free action tests
+ * context-free action tests
  *************************************************************************************/
-BOOST_AUTO_TEST_CASE_TEMPLATE(cf_action_tests, T, validating_testers) { try {
-      T chain;
+/// A transaction carries no context-free actions, and so no context-free data.
+BOOST_AUTO_TEST_CASE_TEMPLATE(context_free_actions_rejected, T, validating_testers) { try {
+   T chain;
 
-      chain.produce_block();
-      chain.create_account( "testapi"_n );
-      chain.create_account( "dummy"_n );
-      chain.produce_block();
-      chain.set_code( "testapi"_n, test_contracts::test_api_wasm() );
-      chain.produce_block();
-      cf_action cfa;
+   chain.produce_block();
+   chain.create_account( "testapi"_n );
+   chain.create_account( "dummy"_n );
+   chain.produce_block();
+   chain.set_code( "testapi"_n, test_contracts::test_api_wasm() );
+   chain.produce_block();
+
+   const auto pl = vector<permission_level>{{"testapi"_n, config::active_name}};
+   const dummy_action da = { DUMMY_ACTION_DEFAULT_A, DUMMY_ACTION_DEFAULT_B, DUMMY_ACTION_DEFAULT_C };
+   const action act1(pl, da);
+   const action cfa_act({}, cf_action{});
+
+   const auto sign_and_push = [&](signed_transaction trx) {
+      chain.set_transaction_headers(trx);
+      trx.sign(chain.get_private_key("testapi"_n, "active"), chain.get_chain_id());
+      return chain.push_transaction(trx);
+   };
+   const auto check_cfa_rejected = [&](signed_transaction trx) {
+      BOOST_CHECK_EXCEPTION(sign_and_push(std::move(trx)), transaction_exception,
+                            fc_exception_message_is("context-free actions are not supported"));
+   };
+
+   // need at least one action, and a context-free action does not count
+   {
       signed_transaction trx;
-      chain.set_transaction_headers(trx);
-      // need at least one action
-      BOOST_CHECK_EXCEPTION(chain.push_transaction(trx), tx_no_action, fc_exception_message_is("packed_transaction contains no actions"));
+      BOOST_CHECK_EXCEPTION(sign_and_push(trx), tx_no_action,
+                            fc_exception_message_is("packed_transaction contains no actions"));
+      trx.context_free_actions.push_back(cfa_act);
+      trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100));
+      BOOST_CHECK_EXCEPTION(sign_and_push(trx), tx_no_action,
+                            fc_exception_message_is("packed_transaction contains no actions"));
+   }
 
-      action act({}, cfa);
-      trx.context_free_actions.push_back(act);
-      trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100)); // verify payload matches context free data
-      chain.set_transaction_headers(trx);
-
-      // need at least one normal action
-      BOOST_CHECK_EXCEPTION(chain.push_transaction(trx), tx_no_action, fc_exception_message_is("packed_transaction contains no actions"));
-
-      trx.signatures.clear();
-
-      // add a normal action along with cfa
-      dummy_action da = { DUMMY_ACTION_DEFAULT_A, DUMMY_ACTION_DEFAULT_B, DUMMY_ACTION_DEFAULT_C };
-      auto pl = vector<permission_level>{{"testapi"_n, config::active_name}};
-      action act1(pl, da);
+   // a context-free action is rejected with or without its data
+   {
+      signed_transaction trx;
       trx.actions.push_back(act1);
-      // add an extra cfa data to verify cfa data and cfa must match
-      trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100)); // verify payload matches context free data
-      chain.set_transaction_headers(trx);
+      trx.context_free_actions.push_back(cfa_act);
+      check_cfa_rejected(trx);
+      trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100));
+      check_cfa_rejected(trx);
+   }
 
-      auto sigs = trx.sign(chain.get_private_key("testapi"_n, "active"), chain.get_chain_id());
-      BOOST_CHECK_EXCEPTION(chain.push_transaction(trx), transaction_exception,
-                            fc_exception_message_is("Context free data size 2 not equal to context free actions size 1"));
-
-      trx.signatures.clear();
-
-      // add a normal action along with cfa
-      trx.actions.clear();
-      trx.context_free_data.clear();
-      trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100)); // verify payload matches context free data
+   // and with an authorization or an explicit payer
+   {
+      signed_transaction trx;
       trx.actions.push_back(act1);
-      chain.set_transaction_headers(trx);
-      // run normal passing case
-      sigs = trx.sign(chain.get_private_key("testapi"_n, "active"), chain.get_chain_id());
-      auto res = chain.push_transaction(trx);
+      trx.context_free_actions.emplace_back(pl, cf_action{});
+      check_cfa_rejected(trx);
+   }
+   {
+      signed_transaction trx;
+      trx.context_free_actions.emplace_back(vector<permission_level>{{"testapi"_n, config::sysio_payer_name}},
+                                            cf_action{});
+      trx.actions.emplace_back(vector<permission_level>{{"testapi"_n, config::sysio_payer_name},
+                                                        {"testapi"_n, config::active_name}},
+                               test_api_action<TEST_METHOD("test_checktime", "checktime_pass")>{});
+      check_cfa_rejected(trx);
+   }
 
-      chain.produce_block();
+   // whatever the receiver and however large its data
+   {
+      constexpr size_t large_entry_size = 100'000;
+      signed_transaction trx;
+      trx.actions.push_back(act1);
+      trx.context_free_actions.emplace_back(vector<permission_level>{}, config::system_account_name,
+                                            "undefined"_n, bytes{});
+      trx.context_free_data.emplace_back(bytes(large_entry_size, 0));
+      check_cfa_rejected(trx);
+   }
 
-      // verify context_free_actions can't have a normal authorizations
-      {
-         signed_transaction trx;
-         action act({pl}, cfa);
-         trx.context_free_actions.push_back(act);
-         chain.set_transaction_headers(trx);
-         trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100)); // verify payload matches context free data
-         trx.actions.push_back(act1);
-         chain.set_transaction_headers(trx);
-         sigs = trx.sign(chain.get_private_key("testapi"_n, "active"), chain.get_chain_id());
-         BOOST_CHECK_EXCEPTION(chain.push_transaction(trx), transaction_exception,
-                               fc_exception_message_is("context-free actions can only have a valid explicit payer authorization"));
-      }
+   // context-free data needs a context-free action of its own
+   {
+      signed_transaction trx;
+      trx.actions.push_back(act1);
+      trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100));
+      BOOST_CHECK_EXCEPTION(sign_and_push(trx), transaction_exception,
+                            fc_exception_message_is("Context free data size 1 not equal to context free actions size 0"));
+   }
 
-      // verify context_free_actions can have an explicit payer
-      {
-         signed_transaction trx;
-         auto cfa_pl = vector<permission_level>{{"testapi"_n, config::sysio_payer_name}};
-         action act({cfa_pl}, cfa);
-         trx.context_free_actions.push_back(act);
-         chain.set_transaction_headers(trx);
-         trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100)); // verify payload matches context free data
-         auto pl = vector<permission_level>{{"testapi"_n, config::sysio_payer_name},{"testapi"_n, config::active_name}};
-         auto tm = test_api_action<TEST_METHOD("test_checktime", "checktime_pass")>{};
-         action act1(pl, tm);
-         trx.actions.push_back(act1);
-         chain.set_transaction_headers(trx);
-         sigs = trx.sign(chain.get_private_key("testapi"_n, "active"), chain.get_chain_id());
-         chain.push_transaction(trx);
-      }
+   // the regular action alone runs
+   {
+      signed_transaction trx;
+      trx.actions.push_back(act1);
+      BOOST_REQUIRE(sign_and_push(trx)->receipt);
+   }
+   chain.produce_block();
 
-      chain.produce_block();
-
-      // verify context_free_actions can have an explicit payer, but not more than one
-      {
-         signed_transaction trx;
-         auto cfa_pl = vector<permission_level>{{"testapi"_n, config::sysio_payer_name}, {"testapi"_n, config::active_name}};
-         action act({cfa_pl}, cfa);
-         trx.context_free_actions.push_back(act);
-         chain.set_transaction_headers(trx);
-         trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100)); // verify payload matches context free data
-         auto pl = vector<permission_level>{{"testapi"_n, config::sysio_payer_name},{"testapi"_n, config::active_name}};
-         auto tm = test_api_action<TEST_METHOD("test_checktime", "checktime_pass")>{};
-         action act1(pl, tm);
-         trx.actions.push_back(act1);
-         chain.set_transaction_headers(trx);
-         sigs = trx.sign(chain.get_private_key("testapi"_n, "active"), chain.get_chain_id());
-         BOOST_CHECK_EXCEPTION(chain.push_transaction(trx), transaction_exception,
-                               fc_exception_message_is("context-free actions can only have a valid explicit payer authorization"));
-      }
-
-
-      // add a large trx so that it is compressed
-      trx.signatures.clear();
-      chain.set_transaction_headers(trx);
-      trx.context_free_actions.push_back(act);
-      trx.context_free_data.clear();
-      trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100)); // verify payload matches context free data
-      trx.context_free_data.emplace_back(fc::raw::pack<vector<uint32_t>>(vector<uint32_t>(251, 1))); // 251*4 > 1000
-      BOOST_TEST( fc::raw::pack_size(trx) > 1000); // so that it is compressed
-      sigs = trx.sign(chain.get_private_key("testapi"_n, "active"), chain.get_chain_id());
-      res = chain.push_transaction(trx);
-
-      // attempt to access context free api in non context free action
-
-      da = { DUMMY_ACTION_DEFAULT_A, 200, DUMMY_ACTION_DEFAULT_C };
-      action act2(pl, da);
-      trx.signatures.clear();
-      trx.actions.clear();
-      trx.actions.push_back(act2);
-      chain.set_transaction_headers(trx);
-      // run (dummy_action.b = 200) case looking for invalid use of context_free api
-      sigs = trx.sign(chain.get_private_key("testapi"_n, "active"), chain.get_chain_id());
-      BOOST_CHECK_EXCEPTION(chain.push_transaction(trx), unaccessible_api,
-                            [](const fc::exception& e) {
-                               return expect_assert_message(e, "this API may only be called from context_free apply");
-                            }
-      );
-      {
-         // back to normal action
-         action act1(pl, da);
-         signed_transaction trx;
-
-         trx.actions.push_back(act1);
-         // attempt to access non context free api
-         for (uint32_t i = 200; i <= 211; ++i) {
-            trx.context_free_actions.clear();
-            trx.context_free_data.clear();
-            cfa.payload = i;
-            cfa.cfd_idx = 1;
-            action cfa_act({}, cfa);
-            trx.context_free_actions.emplace_back(cfa_act);
-            trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100)); // verify payload matches context free data
-            trx.signatures.clear();
-            chain.set_transaction_headers(trx);
-            sigs = trx.sign(chain.get_private_key("testapi"_n, "active"), chain.get_chain_id());
-            BOOST_CHECK_EXCEPTION(chain.push_transaction(trx), unaccessible_api,
-                 [](const fc::exception& e) {
-                    return expect_assert_message(e, "only context free api's can be used in this context" );
-                 }
-            );
-         }
-
-      }
-      chain.produce_block();
-
-      // test send context free action
-      auto ttrace = CALL_TEST_FUNCTION( chain, "test_transaction", "send_cf_action", {} );
-
-      BOOST_REQUIRE_EQUAL(ttrace->action_traces.size(), 2);
-      BOOST_CHECK_EQUAL((int)(ttrace->action_traces[1].creator_action_ordinal), 1);
-      BOOST_CHECK_EQUAL(ttrace->action_traces[1].receiver, account_name("dummy"));
-      BOOST_CHECK_EQUAL(ttrace->action_traces[1].act.account, account_name("dummy"));
-      BOOST_CHECK_EQUAL(ttrace->action_traces[1].act.name, account_name("event1"));
-      BOOST_CHECK_EQUAL(ttrace->action_traces[1].act.authorization.size(), 0);
-
-      BOOST_CHECK_EXCEPTION( CALL_TEST_FUNCTION( chain, "test_transaction", "send_cf_action_fail", {} ),
-                             sysio_assert_message_exception,
-                             sysio_assert_message_is("context free actions cannot have authorizations") );
-
-      BOOST_REQUIRE_EQUAL( chain.validate(), true );
+   BOOST_REQUIRE_EQUAL( chain.validate(), true );
 } FC_LOG_AND_RETHROW() }
-
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(cfa_tx_signature, T, validating_testers)  try {
    T chain;
@@ -952,118 +849,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(cfa_tx_signature, T, validating_testers)  try {
    BOOST_TEST(tx1.sign(priv_key, chain.get_chain_id()).to_string() != tx2.sign(priv_key, chain.get_chain_id()).to_string());
 
    BOOST_REQUIRE_EQUAL( chain.validate(), true );
-} FC_LOG_AND_RETHROW()
-
-BOOST_AUTO_TEST_CASE_TEMPLATE(cfa_stateful_api, T, validating_testers)  try {
-   T chain;
-
-   chain.create_account( "testapi"_n );
-	chain.produce_block();
-	chain.set_code( "testapi"_n, test_contracts::test_api_wasm() );
-
-   account_name a = "testapi2"_n;
-   account_name creator = config::system_account_name;
-
-   signed_transaction trx;
-
-   trx.actions.emplace_back( vector<permission_level>{{creator,config::active_name}},
-                                 newaccount{
-                                 .creator  = creator,
-                                 .name     = a,
-                                 .owner    = authority( chain.get_public_key( a, "owner" ) ),
-                                 .active   = authority( chain.get_public_key( a, "active" ) )
-                                 });
-   action act({}, test_api_action<TEST_METHOD("test_transaction", "stateful_api")>{});
-   trx.context_free_actions.push_back(act);
-   trx.context_free_data.emplace_back();
-   chain.set_transaction_headers(trx);
-   trx.sign( chain.get_private_key( creator, "active" ), chain.get_chain_id()  );
-   BOOST_CHECK_EXCEPTION(chain.push_transaction( trx ), fc::exception,
-      [&](const fc::exception &e) {
-         return expect_assert_message(e, "only context free api's can be used in this context");
-      });
-
-   BOOST_REQUIRE_EQUAL( chain.validate(), true );
-} FC_LOG_AND_RETHROW()
-
-BOOST_AUTO_TEST_CASE(light_validation_skip_cfa) try {
-   tester chain(setup_policy::full);
-
-   std::vector<signed_block_ptr> blocks;
-   blocks.push_back(chain.produce_block());
-
-   chain.create_account( "testapi"_n );
-   chain.create_account( "dummy"_n );
-   blocks.push_back(chain.produce_block());
-   chain.set_code( "testapi"_n, test_contracts::test_api_wasm() );
-   blocks.push_back(chain.produce_block());
-
-   cf_action cfa;
-   signed_transaction trx;
-   action act({}, cfa);
-   trx.context_free_actions.push_back(act);
-   trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100)); // verify payload matches context free data
-   // add a normal action along with cfa
-   dummy_action da = { DUMMY_ACTION_DEFAULT_A, DUMMY_ACTION_DEFAULT_B, DUMMY_ACTION_DEFAULT_C };
-   action act1(vector<permission_level>{{"testapi"_n, config::active_name}}, da);
-   trx.actions.push_back(act1);
-   chain.set_transaction_headers(trx);
-   // run normal passing case
-   auto sigs = trx.sign(chain.get_private_key("testapi"_n, "active"), chain.get_chain_id());
-   auto trace = chain.push_transaction(trx);
-   blocks.push_back(chain.produce_block());
-
-   BOOST_REQUIRE(trace->receipt);
-   BOOST_CHECK_EQUAL(2, trace->action_traces.size());
-
-   BOOST_CHECK(trace->action_traces.at(0).context_free); // cfa
-   BOOST_CHECK_EQUAL("test\n", trace->action_traces.at(0).console); // cfa executed
-
-   BOOST_CHECK(!trace->action_traces.at(1).context_free); // non-cfa
-   BOOST_CHECK_EQUAL("", trace->action_traces.at(1).console);
-
-
-   fc::temp_directory tempdir;
-   auto conf_genesis = tester::default_config( tempdir );
-
-   auto& cfg = conf_genesis.first;
-   cfg.trusted_producers = { "sysio"_n }; // light validation
-
-   tester other( conf_genesis.first, conf_genesis.second );
-   other.execute_setup_policy( setup_policy::full );
-
-   transaction_trace_ptr other_trace;
-   auto cc = other.control->applied_transaction().connect( [&](std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> x) {
-      auto& t = std::get<0>(x);
-      if( t && t->id == trace->id ) {
-         other_trace = t;
-      }
-   } );
-
-   for (auto& new_block : blocks) {
-      other.push_block(new_block);
-   }
-   blocks.clear();
-
-   BOOST_REQUIRE(other_trace);
-   BOOST_REQUIRE(other_trace->receipt);
-   BOOST_CHECK(*trace->receipt == *other_trace->receipt);
-   BOOST_CHECK_EQUAL(2, other_trace->action_traces.size());
-
-   auto check_action_traces = [](const auto& t, const auto& ot) {
-      BOOST_CHECK_EQUAL("", ot.console); // cfa not executed for light validation (trusted producer)
-      BOOST_CHECK_EQUAL(t.receipt->global_sequence, ot.receipt->global_sequence);
-      BOOST_CHECK_EQUAL(t.digest_savanna(), ot.digest_savanna());
-   };
-
-   BOOST_CHECK(other_trace->action_traces.at(0).context_free); // cfa
-   check_action_traces(trace->action_traces.at(0), other_trace->action_traces.at(0));
-
-   BOOST_CHECK(!other_trace->action_traces.at(1).context_free); // non-cfa
-   check_action_traces(trace->action_traces.at(1), other_trace->action_traces.at(1));
-
-   other.close();
-
 } FC_LOG_AND_RETHROW()
 
 /*************************************************************************************

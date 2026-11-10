@@ -457,7 +457,6 @@ BOOST_FIXTURE_TEST_CASE(packed_arguments_reject_trailing_bytes, value_tester) { 
    const auto& gpo = control->get_global_properties();
    const vector<permission_level> contract_active{{contract, config::active_name}};
    const action self_action{contract_active, contract, "x"_n, bytes{}};
-   const action free_action{vector<permission_level>{}, contract, "x"_n, bytes{}};
 
    const bytes wasm_config_bytes = fc::raw::pack(gpo.wasm_configuration);
    const auto versioned_wasm_parameters = [&](uint32_t version) {
@@ -470,7 +469,6 @@ BOOST_FIXTURE_TEST_CASE(packed_arguments_reject_trailing_bytes, value_tester) { 
    BOOST_CHECK_THROW(run(set_wasm_parameters.with(versioned_wasm_parameters(1))), wasm_config_unknown_version);
 
    const packed_case send_inline{"send_inline", one_span_signature, one_span_call};
-   const packed_case send_context_free_inline{"send_context_free_inline", one_span_signature, one_span_call};
    const packed_case set_blockchain_parameters{"set_blockchain_parameters_packed", one_span_signature, one_span_call};
    const packed_case set_parameters{"set_parameters_packed", one_span_signature, one_span_call};
 
@@ -500,7 +498,6 @@ BOOST_FIXTURE_TEST_CASE(packed_arguments_reject_trailing_bytes, value_tester) { 
 
    const std::vector<std::pair<packed_case, bytes>> cases{
       {send_inline, pack_with_junk(self_action)},
-      {send_context_free_inline, pack_with_junk(free_action)},
       {set_wasm_parameters, wasm_parameters},
       {set_blockchain_parameters, pack_with_junk(blockchain_parameters)},
       {set_parameters, pack_with_junk(no_ids)},
@@ -520,10 +517,8 @@ BOOST_FIXTURE_TEST_CASE(packed_arguments_reject_trailing_bytes, value_tester) { 
    // The loop above would also pass against a check that refused everything, so each argument has to read at its exact
    // size. The inline actions go to other_account, as a contract sending itself this call would repeat it forever.
    const action target_action{contract_active, other_account, "x"_n, bytes{}};
-   const action free_target_action{vector<permission_level>{}, other_account, "x"_n, bytes{}};
    const std::vector<std::pair<packed_case, bytes>> exact_cases{
       {send_inline, fc::raw::pack(target_action)},
-      {send_context_free_inline, fc::raw::pack(free_target_action)},
       {set_wasm_parameters, versioned_wasm_parameters(0)},
       {set_blockchain_parameters, fc::raw::pack(blockchain_parameters)},
       {set_parameters, fc::raw::pack(no_ids)},
@@ -577,6 +572,11 @@ BOOST_FIXTURE_TEST_CASE(authorization_arguments_reject_trailing_bytes, value_tes
    with_extension.transaction_extensions.emplace_back(uint16_t{0}, std::vector<char>{});
    BOOST_CHECK_THROW(run(check_authorization(fc::raw::pack(with_extension), empty_list, empty_list)),
                      invalid_transaction_extension);
+
+   transaction with_context_free_action;
+   with_context_free_action.context_free_actions.emplace_back(vector<permission_level>{}, contract, ""_n, bytes{});
+   BOOST_CHECK_EXCEPTION(run(check_authorization(fc::raw::pack(with_context_free_action), empty_list, empty_list)),
+                         transaction_exception, fc_exception_message_is("context-free actions are not supported"));
 
    const auto check_permission = [&](const bytes& keys, const bytes& permissions) {
       bytes data = keys;

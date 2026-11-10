@@ -1786,6 +1786,22 @@ BOOST_FIXTURE_TEST_CASE(desyndicate_emission_requires_self_inline_origin, sysio_
    BOOST_REQUIRE(attestation_row(2).is_null());
 } FC_LOG_AND_RETHROW()
 
+/// The rebuilt continuation retains the dispatcher's rejection of bytes after its request ID.
+BOOST_FIXTURE_TEST_CASE(desyndicate_emission_rejects_trailing_action_bytes, sysio_synd_tester) try {
+   constexpr auto emitdesynd_action = "emitdesynd"_n;
+   constexpr std::string_view trailing_data_message = "action data has bytes left after the arguments";
+   const auto before = desynd_state();
+   action act;
+   act.account = SYND_ACCOUNT;
+   act.name    = emitdesynd_action;
+   act.data    = synd_abi_ser.variant_to_binary(synd_abi_ser.get_action_type(emitdesynd_action),
+                                               mvo()("request_id", uint64_t{0}), fixture_abi_yield_function());
+   act.data.push_back(0);
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(trailing_data_message.data()),
+                       base_tester::push_contract_paid_action(std::move(act), SYND_ACCOUNT.to_uint64_t()));
+   BOOST_REQUIRE(before == desynd_state());
+} FC_LOG_AND_RETHROW()
+
 // Review Focus 6: a DESYNDICATE_LIQ carries the depot's outstanding shadow after its own burn -- the
 // supply plus the yield parked in liqpending, net of the burned amount -- and `desyndlog` records the
 // same total. The fee stays outstanding: it is transferred into the fee pot, not burned. The carried
