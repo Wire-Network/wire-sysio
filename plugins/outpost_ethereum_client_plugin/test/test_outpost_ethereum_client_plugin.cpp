@@ -179,9 +179,6 @@ constexpr std::string_view emit_outbound_envelope_abi_name = "emitOutboundEnvelo
 constexpr std::string_view emit_outbound_envelope_selector = "a3ad9cc3";
 constexpr std::string_view test_opp_address = "5FbDB2315678afecb367f032d93F642f64180aa3";
 const std::string latest_slot_test_rpc_url = startup_test::unused_url();
-constexpr std::string_view http_scheme_prefix = "http://";
-/** Prefix identifying the bounded transport category in chain-id startup diagnostics. */
-constexpr std::string_view last_failure_detail_prefix = "last_failure=";
 constexpr std::string_view latest_slot_test_entry_id = "latest-slot-test";
 constexpr std::string_view latest_slot_test_private_key =
    "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
@@ -199,7 +196,6 @@ constexpr size_t emit_outbound_envelope_call_hex_chars =
    evm_function_selector_hex_chars + evm_abi_word_hex_chars;
 constexpr uint64_t test_outpost_chain_code = 1;
 constexpr uint32_t test_evm_chain_id = 31337;
-constexpr size_t transient_chain_id_failures = 1;
 constexpr uint32_t test_wire_epoch = 7;
 constexpr uint32_t test_stale_wire_epoch = test_wire_epoch - 1;
 constexpr uint32_t test_different_wire_epoch = test_wire_epoch + 1;

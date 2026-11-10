@@ -160,7 +160,7 @@ std::tuple<size_t, size_t> code_cache_async::consume_compile_thread_queue() {
 }
 
 
-const code_descriptor* const
+const code_descriptor*
 code_cache_async::get_descriptor_for_code(mode m, account_name receiver, const digest_type& code_id, const uint8_t& vm_version, get_cd_failure& failure) {
    //if there are any outstanding compiles, process the result queue now
    //When app is in write window, all tasks are running sequentially and read-only threads
@@ -243,7 +243,7 @@ code_cache_sync::~code_cache_sync() {
       elog("unexpected response from SYS VM OC compile monitor during shutdown");
 }
 
-const code_descriptor* const code_cache_sync::get_descriptor_for_code_sync(mode m, account_name receiver, const digest_type& code_id, const uint8_t& vm_version) {
+const code_descriptor* code_cache_sync::get_descriptor_for_code_sync(mode m, account_name receiver, const digest_type& code_id, const uint8_t& vm_version) {
    //check for entry in cache
    code_cache_index::index<by_hash>::type::iterator it = _cache_index.get<by_hash>().find(code_id);
    if(it != _cache_index.get<by_hash>().end()) {

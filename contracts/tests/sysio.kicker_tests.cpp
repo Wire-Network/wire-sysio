@@ -826,7 +826,7 @@ BOOST_AUTO_TEST_CASE(spot_deviation_threshold_is_inclusive) {
             BOOST_CHECK_EQUAL(0, t.paid());
             BOOST_CHECK(after.deviation);
             BOOST_CHECK_EQUAL(gift, after.shortfall);
-            BOOST_CHECK(after.observed == t.control->head_block_time());
+            BOOST_CHECK(after.observed == t.control->head().block_time());
             // The clock and the observation are held.
             BOOST_CHECK(after.clock == observation.clock);
             BOOST_CHECK(after.price_time == observation.price_time);

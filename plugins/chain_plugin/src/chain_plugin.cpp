@@ -1095,7 +1095,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
       }
 
       chain_config->sig_cpu_bill_pct = options.at("signature-cpu-billable-pct").as<uint32_t>();
-      SYS_ASSERT( chain_config->sig_cpu_bill_pct >= 0 && chain_config->sig_cpu_bill_pct <= 100, plugin_config_exception,
+      SYS_ASSERT( chain_config->sig_cpu_bill_pct <= 100, plugin_config_exception,
                   "signature-cpu-billable-pct must be 0 - 100, {}", chain_config->sig_cpu_bill_pct );
       chain_config->sig_cpu_bill_pct *= config::percent_1;
 

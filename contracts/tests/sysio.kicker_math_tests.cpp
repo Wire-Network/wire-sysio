@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(spot_deviation_threshold) {
    BOOST_CHECK(!math::spot_deviates(0, 0, 1));
    // Prices near 2^128 times 10,000 overflow 128 bits; the comparison stays exact against a wide oracle.
    const math::u128 top = ~math::u128{0};
-   for (const auto [spot, twap, bps] : {std::tuple<math::u128, math::u128, uint16_t>{top, top / 2, 10'000},
+   for (const auto& [spot, twap, bps] : {std::tuple<math::u128, math::u128, uint16_t>{top, top / 2, 10'000},
                                         {top / 2, top, 5'000}, {top / 2, top, 4'999}, {top, top - 1, 1}}) {
       const wide gap = spot > twap ? wide(spot) - wide(twap) : wide(twap) - wide(spot);
       BOOST_CHECK_EQUAL(gap * 10'000 > wide(twap) * bps, math::spot_deviates(spot, twap, bps));

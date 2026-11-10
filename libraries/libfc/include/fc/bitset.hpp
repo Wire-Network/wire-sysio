@@ -27,8 +27,9 @@ struct bitset {
    static constexpr size_type bits_per_block = 8;
    static constexpr size_type npos           = static_cast<size_type>(-1);
 
+   /// Round up the storage requirement without overflowing at the maximum bit count.
    static constexpr size_type calc_num_blocks(size_type num_bits) {
-      return (num_bits + bits_per_block - 1) / bits_per_block;
+      return num_bits / bits_per_block + (num_bits % bits_per_block != 0);
    }
 
    static size_type block_index(size_type pos) noexcept { return pos / bits_per_block; }
@@ -123,13 +124,14 @@ struct bitset {
       return *this;
    }
 
+   /// Clear padding only when a final storage block exists.
    void zero_unused_bits() {
       assert (m_bits.size() == calc_num_blocks(m_num_bits));
 
       // if != 0 this is the number of bits used in the last block
       const size_type extra_bits = bit_index(size());
 
-      if (extra_bits != 0)
+      if (!m_bits.empty() && extra_bits != 0)
          m_bits.back() &= (uint8_t(1) << extra_bits) - 1;
    }
 
