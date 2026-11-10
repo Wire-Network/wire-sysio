@@ -28,13 +28,13 @@ class memory {
       memory(const memory&) = delete;
       memory& operator=(const memory&) = delete;
 
-      uint8_t* const zero_page_memory_base() const { return zeropage_base; }
-      uint8_t* const full_page_memory_base() const { return fullpage_base; }
+      uint8_t* zero_page_memory_base() const { return zeropage_base; }
+      uint8_t* full_page_memory_base() const { return fullpage_base; }
 
-      control_block* const get_control_block() const { return reinterpret_cast<control_block* const>(zeropage_base - cb_offset);}
+      control_block* get_control_block() const { return reinterpret_cast<control_block*>(zeropage_base - cb_offset);}
 
       //these two are really only inteded for SEGV handling
-      uint8_t* const start_of_memory_slices() const { return mapbase; }
+      uint8_t* start_of_memory_slices() const { return mapbase; }
       size_t size_of_memory_slice_mapping() const { return mapsize; }
 
       //to obtain memory protected for n wasm-pages, use the pointer computed from:

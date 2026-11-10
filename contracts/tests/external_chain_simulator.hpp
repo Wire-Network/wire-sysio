@@ -121,7 +121,7 @@ public:
       const auto [seen, fresh] = received_.emplace(id, message.SerializeAsString());
       FC_ASSERT(fresh || seen->second == message.SerializeAsString(), "conflicting return replay");
       if (paid_requests_.contains(id)) return false;
-      const auto amount = message.amount().amount();
+      const auto amount = static_cast<uint64_t>(message.amount().amount());
       const auto [it, inserted] = pending_.emplace(id, amount);
       FC_ASSERT(inserted || it->second == amount, "conflicting return replay");
       return settle(id);

@@ -640,7 +640,7 @@ fc::variant json_from_file_or_string(const string& file_or_str, fc::json::parse_
    } else if (looks_like_json) {
       try {
          return fc::json::from_string(file_or_str, ptype);
-      } SYS_RETHROW_EXCEPTIONS(json_parse_exception, "Fail to parse JSON from string: {}", ("string", file_or_str));
+      } SYS_RETHROW_EXCEPTIONS(json_parse_exception, "Fail to parse JSON from string: {}", file_or_str);
    } else {
       return file_or_str;
    }

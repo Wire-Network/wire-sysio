@@ -49,6 +49,9 @@ public:
       _init_lib();
    }
 
+   /// Preserve memberwise key assignment alongside the custom copy constructor.
+   public_key_impl& operator=(const public_key_impl&) = default;
+
    public_key_data _key{};
 };
 

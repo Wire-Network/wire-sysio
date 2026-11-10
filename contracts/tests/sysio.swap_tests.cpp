@@ -2090,7 +2090,7 @@ BOOST_FIXTURE_TEST_CASE( yield_tick_sells_the_reservoir_over_the_horizon, sysio_
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("yield tick parameters not set"), tickyield( SHEO ) );
     BOOST_REQUIRE_EQUAL( success(), setyield( SHEO, horizon_sec, cap_bps, clip_floor ) );
     const int64_t set_at = last_tick_us( SHEO );
-    BOOST_REQUIRE_EQUAL( control->head_block_time().time_since_epoch().count(), set_at );   // setyield starts the clock
+    BOOST_REQUIRE_EQUAL( control->head().block_time().time_since_epoch().count(), set_at );   // setyield starts the clock
 
     // An empty reservoir: the tick is a no-op and the clock is untouched.
     auto before = system_balance( SHEO.value );

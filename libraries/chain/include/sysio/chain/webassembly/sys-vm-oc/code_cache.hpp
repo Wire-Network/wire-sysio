@@ -121,7 +121,7 @@ class code_cache_async : public code_cache_base {
       //If code is in cache: returns pointer & bumps to front of MRU list
       //If code is not in cache, and not blacklisted, and not currently compiling: return nullptr and kick off compile
       //otherwise: return nullptr
-      const code_descriptor* const get_descriptor_for_code(mode m, account_name receiver, const digest_type& code_id,
+      const code_descriptor* get_descriptor_for_code(mode m, account_name receiver, const digest_type& code_id,
                                                            const uint8_t& vm_version, get_cd_failure& failure);
 
    private:
@@ -144,7 +144,7 @@ class code_cache_sync : public code_cache_base {
       ~code_cache_sync();
 
       //Can still fail and return nullptr if, for example, there is an expected instantiation failure
-      const code_descriptor* const get_descriptor_for_code_sync(mode m, account_name receiver,
+      const code_descriptor* get_descriptor_for_code_sync(mode m, account_name receiver,
                                                                 const digest_type& code_id, const uint8_t& vm_version);
 };
 

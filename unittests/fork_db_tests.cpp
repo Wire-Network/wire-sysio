@@ -303,7 +303,7 @@ BOOST_AUTO_TEST_CASE(locks_out_branch_of_test) try {
    };
 
    //               root (block 10)
-   //              /    \
+   //              /    \  (branches)
    //         bsp11a    bsp11b
    //           |         |
    //         bsp12a    bsp12b
@@ -536,7 +536,7 @@ BOOST_AUTO_TEST_CASE(locks_out_branch_of_lib_advanced_past_shared_ancestor) try 
    //                root (block 10)
    //                  |
    //               bsp11_shared (block 11)         <-- shared ancestor; will be qc_target
-   //               /            \
+   //               /            \  (branches)
    //           bsp12a            bsp12b  (carries strong QC for 11)
    //             |                  |
    //        bsp13a_shared         bsp13b  (carries strong QC for 12, lib advances to 11)
