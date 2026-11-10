@@ -220,7 +220,11 @@ static vector<bytes> unpack_context_free_data(const bytes& data) {
    if( data.size() == 0 )
       return vector<bytes>();
 
-   return fc::raw::unpack< vector<bytes> >(data);
+   vector<bytes> cfd;
+   fc::datastream<const char*> ds(data.data(), data.size());
+   fc::raw::unpack(ds, cfd);
+   SYS_ASSERT( !ds.remaining(), tx_extra_data, "packed_transaction contains extra data beyond context-free data" );
+   return cfd;
 }
 
 static transaction unpack_transaction(const bytes& data) {

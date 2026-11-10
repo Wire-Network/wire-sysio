@@ -280,6 +280,36 @@ BOOST_FIXTURE_TEST_CASE( propose_billed_to_proposer, sysio_msig_tester ) try {
 } FC_LOG_AND_RETHROW()
 
 
+// propose's data must end with the proposed transaction
+BOOST_FIXTURE_TEST_CASE( propose_rejects_bytes_after_transaction, sysio_msig_tester ) try {
+   const auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}} );
+   const auto data = abi_ser.variant_to_binary( "propose", mvo()
+      ("proposer",      "alice")
+      ("proposal_name", "first")
+      ("requested",     vector<permission_level>{{ "alice"_n, config::active_name }})
+      ("trx",           trx), fixture_abi_yield_function() );
+   const auto push_raw = [&]( bytes action_data ) {
+      signed_transaction propose_trx;
+      propose_trx.actions.emplace_back( payer_auths( "alice"_n ), "sysio.msig"_n, "propose"_n, std::move(action_data) );
+      set_transaction_headers( propose_trx );
+      propose_trx.sign( get_private_key( "alice"_n, "active" ), control->get_chain_id() );
+      return push_transaction( propose_trx );
+   };
+
+   auto with_tail = data;
+   with_tail.push_back( 0 );
+   BOOST_REQUIRE_EXCEPTION( push_raw( with_tail ), wasm_execution_error,
+                            fc_exception_message_contains( "check_transaction_authorization: 1 trailing bytes" ) );
+
+   push_raw( data );
+   produce_block();
+   push_action( "alice"_n, "approve"_n, mvo()
+                  ("proposer",      "alice")
+                  ("proposal_name", "first")
+                  ("level",         permission_level{ "alice"_n, config::active_name })
+   );
+} FC_LOG_AND_RETHROW()
+
 // A proposal carrying a non-zero `delay_sec` executes once its delay has elapsed, and not
 // before. Nothing else in this suite proposes with a delay, so without this case the whole
 // delayed-execution path is unexercised.
