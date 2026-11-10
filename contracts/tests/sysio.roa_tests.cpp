@@ -2480,6 +2480,34 @@ struct sysdeploy_ram_tester : sysio_roa_tester {
       return push_action(config::system_account_name, "setsysabi"_n, mvo()("account", account)("abi", abi));
    }
 
+   /// The no-op contract with a `padding`-byte custom section appended, so a test can choose its code size.
+   static std::vector<uint8_t> padded_wasm(uint32_t padding) {
+      constexpr uint8_t custom_section_id = 0;
+      constexpr std::string_view section_name = "padding";
+      const auto append_leb128 = [](std::vector<uint8_t>& out, uint32_t value) {
+         constexpr uint8_t low_bits = 0x7f;
+         constexpr uint8_t continuation = 0x80;
+         constexpr uint32_t bits_per_byte = 7;
+         do {
+            uint8_t byte = value & low_bits;
+            value >>= bits_per_byte;
+            if (value != 0)
+               byte |= continuation;
+            out.push_back(byte);
+         } while (value != 0);
+      };
+      std::vector<uint8_t> payload;
+      append_leb128(payload, static_cast<uint32_t>(section_name.size()));
+      payload.insert(payload.end(), section_name.begin(), section_name.end());
+      payload.resize(payload.size() + padding, 0);
+
+      auto wasm = test_contracts::noop_wasm();
+      wasm.push_back(custom_section_id);
+      append_leb128(wasm, static_cast<uint32_t>(payload.size()));
+      wasm.insert(wasm.end(), payload.begin(), payload.end());
+      return wasm;
+   }
+
    /// Requires `account` to be funded exactly (quota equal to usage) and every byte it gained or returned to have
    /// moved through sysio's pool, against the books taken before the first deploy.
    void require_exact_funding(account_name account, const deploy_ram_books& start) {
@@ -2553,6 +2581,33 @@ BOOST_FIXTURE_TEST_CASE( setsyscode_settles_within_sysio_pool_after_gifting_ahea
 
    const auto now = books("alice"_n);
    BOOST_REQUIRE_LT(now.account_quota, with_large.account_quota);
+   BOOST_REQUIRE_EQUAL(now.sysio_quota - before.sysio_quota, with_large.account_quota - now.account_quota);
+} FC_LOG_AND_RETHROW()
+
+// The code being replaced is already funded, so the gift ahead is capped at sysio's pool: a smaller re-deploy succeeds
+// even when the full RAM of the new code exceeds sysio's whole quota.
+BOOST_FIXTURE_TEST_CASE( setsyscode_replacement_larger_than_sysio_quota_succeeds, sysdeploy_ram_tester ) try {
+   constexpr uint32_t large_padding = 300'000;
+   constexpr uint32_t smaller_padding = 250'000;
+   set_free_ram("alice"_n, 0);
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), setsyscode("alice"_n, padded_wasm(large_padding)));
+   produce_blocks();
+   const auto with_large = books("alice"_n);
+
+   // sysio's whole quota is now its usage, less than the full RAM of the replacement code.
+   set_free_ram(config::system_account_name, 0);
+   const auto before = books("alice"_n);
+   const auto replacement = padded_wasm(smaller_padding);
+   BOOST_REQUIRE_GT(static_cast<int64_t>(replacement.size()) * static_cast<int64_t>(config::setcode_ram_bytes_multiplier),
+                    before.sysio_quota);
+
+   BOOST_REQUIRE_EQUAL(success(), setsyscode("alice"_n, replacement));
+   require_exact_funding("alice"_n, before);
+   const auto now = books("alice"_n);
+   BOOST_REQUIRE_EQUAL(with_large.account_quota - now.account_quota,
+                       static_cast<int64_t>(large_padding - smaller_padding) *
+                          static_cast<int64_t>(config::setcode_ram_bytes_multiplier));
    BOOST_REQUIRE_EQUAL(now.sysio_quota - before.sysio_quota, with_large.account_quota - now.account_quota);
 } FC_LOG_AND_RETHROW()
 

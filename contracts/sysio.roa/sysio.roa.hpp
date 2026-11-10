@@ -260,9 +260,10 @@ namespace sysio {
              * The reconciliation is bidirectional: `delta > 0` gifts from sysio's pool,
              * `delta < 0` reclaims back to it (e.g. re-deploying a smaller contract). Inline-called
              * by setsyscode/setsysabi twice: before their setcode/setabi with `usage_before` lowered
-             * by an upper bound on the change, which gifts that bound ahead (the chain checks the
-             * account's quota when setcode/setabi run), and after it with `usage_before` raised by
-             * the same bound, which settles the gift to the exact change (a follow-on PR drives
+             * by the most the change can bill, capped at sysio's pool, which gifts that ahead (the
+             * chain checks the account's quota when setcode/setabi run), and after it with
+             * `usage_before` raised by the same amount, which settles the gift to the exact change
+             * (a follow-on PR drives
              * per-contract gifting). createlink no longer calls giftram -- it records the
              * external-chain link only and bills the row to sysio -- so `sysio.authex` is not an
              * authorizer.
@@ -275,9 +276,9 @@ namespace sysio {
 
             /**
              * @brief Deploy a system contract's code to `account`, making it privileged, and gift
-             * the exact RAM the code consumes out of sysio's pool (via giftram: an upper bound
-             * before the deploy, settled to the measured change after it). Re-callable: a smaller
-             * re-deploy reclaims the freed RAM. Callable by `sysio`.
+             * the exact RAM the code consumes out of sysio's pool (via giftram: the most the code
+             * can bill, capped at sysio's pool, before the deploy, settled to the measured change
+             * after it). Re-callable: a smaller re-deploy reclaims the freed RAM. Callable by `sysio`.
              *
              * @param account   The account to set code on.
              * @param vmtype    VM type (0 for wasm).
@@ -289,9 +290,9 @@ namespace sysio {
 
             /**
              * @brief Set a system contract's abi on `account` and gift the exact RAM it consumes
-             * out of sysio's pool (via giftram: an upper bound before setabi, settled to the
-             * measured change after it). Re-callable: a smaller/cleared abi reclaims the freed RAM.
-             * Callable by `sysio`.
+             * out of sysio's pool (via giftram: the most the abi can bill, capped at sysio's pool,
+             * before setabi, settled to the measured change after it). Re-callable: a smaller/cleared
+             * abi reclaims the freed RAM. Callable by `sysio`.
              *
              * @param account The account to set the abi on.
              * @param abi     The serialized abi bytes.
@@ -686,6 +687,16 @@ namespace sysio {
              * @brief Decrease ram_bytes on an existing reslimit entry
              */
             void decrease_reslimit(const name& owner, uint64_t ram_bytes);
+
+            /**
+             * @brief RAM setsyscode / setsysabi gift an account ahead of their inline setcode / setabi.
+             *
+             * The most a new value billed at @p stored_ram_bytes can add to the account (the value plus the metadata
+             * row a first deploy creates), capped at what sysio's pool holds: its chain RAM quota and its reslimit
+             * row. The value being replaced is already funded, so a deploy whose net change fits the pool never
+             * needs more than the pool holds.
+             */
+            int64_t deploy_ram_gift(int64_t stored_ram_bytes);
 
     }; // namespace roa
 } // namespace sysio

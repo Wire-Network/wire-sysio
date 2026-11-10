@@ -194,6 +194,17 @@ namespace sysio {
         });
     }
 
+    int64_t roa::deploy_ram_gift(int64_t stored_ram_bytes) {
+        int64_t sysio_ram = 0, sysio_net = 0, sysio_cpu = 0;
+        get_resource_limits("sysio"_n, sysio_ram, sysio_net, sysio_cpu);
+        reslimit_t reslimit(get_self());
+        const auto sysio_row = reslimit.get(reslimit_key{"sysio"_n.value}, "No resource limit exists for this account.");
+        const int64_t row_ram = static_cast<int64_t>(
+            std::min<uint64_t>(sysio_row.ram_bytes, static_cast<uint64_t>(std::numeric_limits<int64_t>::max())));
+        const int64_t pool = std::min(sysio_ram, row_ram);
+        return std::max<int64_t>(0, std::min(native_deploy_ram_bound(stored_ram_bytes), pool));
+    }
+
     void roa::activateroa(const asset& total_sys, const uint64_t& bytes_per_unit) {
         require_auth(get_self());
 
@@ -363,9 +374,10 @@ namespace sysio {
 
         // Move `get_ram_usage(account) - usage_before` bytes between sysio's pool and `account`.
         // setsyscode / setsysabi call this twice: before their inline setcode / setabi, with a
-        // usage_before lowered by an upper bound on the change, which gifts that bound ahead (the
-        // chain checks the account's quota when setcode / setabi run); then after it, with
-        // usage_before raised by the same bound, which settles the gift to the exact change.
+        // usage_before lowered by the most the change can bill (capped at sysio's pool), which
+        // gifts that ahead (the chain checks the account's quota when setcode / setabi run); then
+        // after it, with usage_before raised by the same amount, which settles the gift to the
+        // exact change.
         //   delta > 0 → gift from sysio's pool;  delta < 0 → reclaim back to it (e.g. re-deploying
         //   a smaller contract returns RAM). Always a *conserving transfer* with sysio — never a
         //   mint — so total RAM stays accounted for on both the reslimit books and chain quota,
@@ -412,13 +424,12 @@ namespace sysio {
 
         int64_t usage_before = get_ram_usage(account);
         // The chain checks the account's RAM quota when setcode runs, so the RAM it bills is gifted first.
-        const int64_t gift_bound =
-            native_deploy_ram_bound(static_cast<int64_t>(code.size()) * SETCODE_RAM_BYTES_MULTIPLIER);
+        const int64_t gift = deploy_ram_gift(static_cast<int64_t>(code.size()) * SETCODE_RAM_BYTES_MULTIPLIER);
 
-        // 1) Gift the most the code can bill out of sysio's pool. Usage has not moved yet, so giftram gifts exactly
-        //    gift_bound.
+        // 1) Gift the most the code can bill (capped at sysio's pool) out of sysio's pool. Usage has not moved yet, so
+        //    giftram gifts exactly `gift`.
         action(permission_level{get_self(), "active"_n}, get_self(), "giftram"_n,
-               std::make_tuple(account, usage_before - gift_bound)).send();
+               std::make_tuple(account, usage_before - gift)).send();
         // 2) Deploy the code (bills RAM to `account`).
         action(permission_level{account, "active"_n}, "sysio"_n, "setcode"_n,
                std::make_tuple(account, vmtype, vmversion, code)).send();
@@ -427,10 +438,11 @@ namespace sysio {
         //    is ordered after (2); roa is privileged so it can declare sysio's auth. Idempotent.
         action(permission_level{"sysio"_n, "active"_n}, "sysio"_n, "setpriv"_n,
                std::make_tuple(account, static_cast<uint8_t>(1))).send();
-        // 4) Settle `account`'s gifted RAM to its exact new usage: measured from usage_before + gift_bound, giftram
-        //    returns what (1) gave beyond the RAM actually used, so the net gift is exactly the change in usage.
+        // 4) Settle `account`'s gifted RAM to its exact new usage: measured from usage_before + gift, giftram returns
+        //    what (1) gave beyond the RAM actually used, or adds what is missing, so the net gift is exactly the
+        //    change in usage.
         action(permission_level{get_self(), "active"_n}, get_self(), "giftram"_n,
-               std::make_tuple(account, usage_before + gift_bound)).send();
+               std::make_tuple(account, usage_before + gift)).send();
     }
 
     void roa::setsysabi(const name& account, const bytes& abi) {
@@ -439,17 +451,17 @@ namespace sysio {
         check(roastate.get().is_active, "ROA is not active yet");
         check(is_account(account), "account does not exist");
 
-        // Gift the most the abi can bill (the chain checks the quota when setabi runs), set the abi (bills RAM to
-        // `account`), then settle the gift to the exact change in usage -- returning RAM if the new abi is smaller
-        // (or cleared). See setsyscode.
+        // Gift the most the abi can bill, capped at sysio's pool (the chain checks the quota when setabi runs), set the
+        // abi (bills RAM to `account`), then settle the gift to the exact change in usage -- returning RAM if the new
+        // abi is smaller (or cleared). See setsyscode.
         int64_t usage_before = get_ram_usage(account);
-        const int64_t gift_bound = native_deploy_ram_bound(static_cast<int64_t>(abi.size()));
+        const int64_t gift = deploy_ram_gift(static_cast<int64_t>(abi.size()));
         action(permission_level{get_self(), "active"_n}, get_self(), "giftram"_n,
-               std::make_tuple(account, usage_before - gift_bound)).send();
+               std::make_tuple(account, usage_before - gift)).send();
         action(permission_level{account, "active"_n}, "sysio"_n, "setabi"_n,
                std::make_tuple(account, abi)).send();
         action(permission_level{get_self(), "active"_n}, get_self(), "giftram"_n,
-               std::make_tuple(account, usage_before + gift_bound)).send();
+               std::make_tuple(account, usage_before + gift)).send();
     }
 
     void roa::addpolicy(const name& owner, const name& issuer, const asset& net_weight, const asset& cpu_weight, const asset& ram_weight,
