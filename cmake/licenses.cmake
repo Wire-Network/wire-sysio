@@ -3,6 +3,7 @@ configure_file(${CMAKE_SOURCE_DIR}/LICENSE.md licenses/sysio/LICENSE.md COPYONLY
 
 # In-tree dependency licenses
 configure_file(${CMAKE_SOURCE_DIR}/libraries/wasm-jit/LICENSE licenses/sysio/LICENSE.wavm COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/libraries/sys-vm/LICENSE.md licenses/sysio/LICENSE.wire-sys-vm COPYONLY)
 
 # vcpkg dependency licenses
 # Collect copyright files from all vcpkg-installed packages into the licenses directory.
@@ -48,6 +49,10 @@ foreach(_dir IN LISTS _installed_dirs)
       get_filename_component(_pkg "${_dir}" NAME)
       # Skip vcpkg-internal helpers and non-package directories
       if(_pkg MATCHES "^vcpkg-" OR _pkg STREQUAL "cmake" OR _pkg STREQUAL "doc" OR _pkg STREQUAL "pkgconfig")
+         continue()
+      endif()
+      # A reused vcpkg installation may retain the old VM port; its license now comes from the submodule.
+      if(_pkg STREQUAL "wire-sys-vm")
          continue()
       endif()
       # Skip if already collected above
