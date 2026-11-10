@@ -11,7 +11,9 @@
 #include <test_contracts.hpp>
 
 #include <algorithm>
+#include <limits>
 #include <numeric>
+#include <string>
 
 using namespace sysio;
 using namespace sysio::chain;
@@ -31,15 +33,33 @@ constexpr account_name game            = "game"_n;         ///< contracts runnin
 constexpr account_name winner          = "winner"_n;
 constexpr account_name relay           = "relay"_n;
 constexpr account_name idle            = "idle"_n;         ///< contract given no CPU
+constexpr account_name cold            = "coldload"_n;     ///< runs a large module once, in one test
 constexpr action_name  setalimits      = "setalimits"_n;   ///< sysio.bios: sets an account's resource limits
+constexpr action_name  setparams       = "setparams"_n;    ///< sysio.bios: sets the chain parameters
 
 constexpr const char* max_supply = "1000000.0000 TKN";
 constexpr const char* issued     = "2000.0000 TKN";
 constexpr const char* funding    = "1000.0000 TKN"; ///< what the game starts with
 constexpr const char* amount     = "1.0000 TKN";
+constexpr const char* bob_funding = "100.0000 TKN"; ///< what bob sends from in the many-notifications test
+const symbol          token_symbol{ 4, "TKN" };
 constexpr const char* spin_memo  = "spin:20000";
 constexpr uint32_t    spin_count = 20000;
 constexpr int64_t     cpu_weight = 10'000'000'000; ///< ample CPU for the accounts that run or pay for code
+
+// A handler either stays inside the stipend or is measured to run well past it.
+/// The notify_cpu_stipend the fixture sets: well above a no-op handler on every runtime, so that a frame inside or
+/// past it does not depend on the host's speed.
+constexpr int64_t     stipend_us         = 1000;
+constexpr int64_t     long_frame_us      = 4 * stipend_us; ///< long_spins() keeps a frame busy at least this long
+constexpr uint32_t    first_long_spins   = 1000;
+constexpr uint32_t    max_spin_doublings = 21; ///< first_long_spins doubled this often still fits in uint32_t
+constexpr uint32_t    calibration_runs   = 3;  ///< runs of each loop count long_spins() measures
+constexpr uint32_t    short_spin_count   = 10;
+constexpr uint32_t    many_notifications = 50;
+constexpr const char* spin_command       = "spin:";     ///< cpu_receiver_test memo: loop n times
+constexpr const char* spinsend_command   = "spinsend:"; ///< loop n times and send itself an inline spin of n
+
 constexpr uint32_t    proposal_expiration_sec  = 3600;
 constexpr uint32_t    high_min_trx_cpu_us      = 20'000;
 constexpr uint8_t     small_max_cpu_usage_ms   = 5;
@@ -47,6 +67,8 @@ constexpr const char* receipt_has_extra_entry  = "is more than the expected";
 constexpr const char* receipt_mismatch         = "receipt does not match";
 constexpr const char* account_cpu_limit_reached = "reached account cpu limit";
 constexpr const char* idle_over_its_limit      = "billable CPU time for the account idle";
+constexpr const char* relay_over_its_limit     = "billable CPU time for the account relay";
+constexpr const char* stipend_over_trx_limit   = "notify cpu stipend cannot exceed max transaction cpu usage";
 constexpr const char* idle_over_greylisted_limit = "greylisted billable CPU time for the account idle";
 constexpr const char* greylisted_frame_stopped = "greylisted transaction";
 constexpr const char* trx_max_cpu_reached      = "reached trx specified max_cpu_usage_ms";
@@ -64,7 +86,14 @@ uint64_t total( const std::vector<uint32_t>& entries ) {
    return std::accumulate( entries.begin(), entries.end(), uint64_t{ 0 } );
 }
 
-/// Contracts reached through system contracts pay CPU for their own code; see transaction_context::begin_frame.
+/// The most a notified contract's entry can hold for frames that ran `elapsed_us` in all: the stipend covers the rest.
+/// A frame's CPU is within its elapsed time, so a frame inside the stipend leaves an entry of 0.
+uint32_t most_past_stipend( int64_t elapsed_us, int64_t stipend = stipend_us ) {
+   return static_cast<uint32_t>( std::max<int64_t>( elapsed_us - stipend, 0 ) );
+}
+
+/// Contracts reached through system contracts pay CPU for their own code past the stipend of a notification; see
+/// transaction_context::begin_frame.
 struct receiver_cpu_tester : validating_tester {
    receiver_cpu_tester() {
       create_accounts(
@@ -85,6 +114,8 @@ struct receiver_cpu_tester : validating_tester {
       for( auto account : { alice, game, winner, relay, unprivileged } )
          set_cpu_weight( account, cpu_weight );
       set_cpu_weight( idle, 0 );
+      genesis_stipend = control->get_global_properties().configuration.notify_cpu_stipend;
+      set_notify_cpu_stipend( stipend_us );
       produce_block();
 
       push_action( token_account, "create"_n, token_account,
@@ -94,6 +125,15 @@ struct receiver_cpu_tester : validating_tester {
       push_action( token_account, "transfer"_n, alice,
                    mvo()( "from", alice )( "to", game )( "quantity", asset::from_string( funding ) )( "memo", "" ) );
       produce_block();
+   }
+
+   uint32_t genesis_stipend = 0; ///< notify_cpu_stipend at genesis, before the fixture sets stipend_us
+
+   /// Sets chain_config::notify_cpu_stipend through sysio.bios setparams, keeping the other parameters.
+   void set_notify_cpu_stipend( uint32_t stipend ) {
+      auto cfg = control->get_global_properties().configuration;
+      cfg.notify_cpu_stipend = stipend;
+      push_action( config::system_account_name, setparams, config::system_account_name, mvo()( "params", cfg ) );
    }
 
    /// sysio.bios setalimits data giving `account` these NET and CPU weights, keeping its RAM.
@@ -173,10 +213,66 @@ struct receiver_cpu_tester : validating_tester {
       return push_transaction( trx, deadline, 0 );
    }
 
+   /// Pushes with `billed` as the receipt's CPU, read the way a validator reads a block's receipt.
+   transaction_trace_ptr push_explicit( const signed_transaction& trx, cpu_usage_t billed ) {
+      auto ptrx  = std::make_shared<packed_transaction>( trx );
+      auto meta  = transaction_metadata::start_recover_keys( ptrx, control->get_thread_pool(), control->get_chain_id(),
+                                                             fc::microseconds::maximum(),
+                                                             transaction_metadata::trx_type::input ).get();
+      auto trace = control->test_push_transaction( meta, fc::time_point::maximum(), fc::microseconds::maximum(),
+                                                   std::move( billed ), true );
+      if( trace->except_ptr )
+         std::rethrow_exception( trace->except_ptr );
+      return trace;
+   }
+
    transaction_trace_ptr transfer( account_name from, account_name to, const char* quantity, const std::string& memo,
                                    bool explicit_payer = false ) {
       return push_measured( make_trx( { transfer_action( from, to, quantity, memo, explicit_payer ) } ) );
    }
+
+   std::optional<uint32_t> long_spin_count; ///< long_spins(), once measured
+
+   /**
+    * A loop count that keeps cpu_receiver_test busy for at least long_frame_us, well past the stipend. Runtimes differ
+    * by orders of magnitude, so it is measured: spins the game pays for directly, doubled until even the fastest of
+    * calibration_runs runs takes that long. The measuring takes a good part of a block's CPU, so the block is produced
+    * and the test's own transactions start in a new one.
+    */
+   uint32_t long_spins() {
+      if( !long_spin_count ) {
+         uint32_t n = first_long_spins;
+         for( uint32_t i = 0; i <= max_spin_doublings && !long_spin_count; ++i, n *= 2 ) {
+            // Being descheduled only adds to a run's elapsed time, so the fastest of a few runs is the loop's cost.
+            int64_t fastest_us = std::numeric_limits<int64_t>::max();
+            for( uint32_t run = 0; run < calibration_runs; ++run ) {
+               auto spin  = get_action( game, "spin"_n, auth( game ), mvo()( "n", n + run ) ); // distinct transactions
+               auto trace = push_measured( make_trx( { spin } ) );
+               fastest_us = std::min( fastest_us, trace->action_traces[0].elapsed.count() );
+            }
+            if( fastest_us >= long_frame_us )
+               long_spin_count = n;
+         }
+         BOOST_REQUIRE( long_spin_count );
+         produce_block();
+      }
+      return *long_spin_count;
+   }
+
+   /// The smallest game entry of calibration_runs transfers to it with memo `command` and a count: `count` raised by
+   /// the run, so that the transactions differ. Being descheduled only adds to an entry.
+   uint32_t smallest_game_entry( const std::string& command, uint32_t count ) {
+      uint32_t smallest = std::numeric_limits<uint32_t>::max();
+      for( uint32_t run = 0; run < calibration_runs; ++run ) {
+         auto receipt = entries( transfer( alice, game, amount, command + std::to_string( count + run ) ) );
+         BOOST_REQUIRE_EQUAL( receipt.size(), 2u );
+         smallest = std::min( smallest, receipt[1] );
+      }
+      return smallest;
+   }
+
+   /// A transfer memo that keeps cpu_receiver_test's handler busy well past the stipend.
+   std::string long_spin_memo() { return spin_command + std::to_string( long_spins() ); }
 
    const resource_limits::resource_object& usage( const controller& c, account_name account ) const {
       return c.db().get<resource_limits::resource_object, resource_limits::by_owner>( account );
@@ -252,10 +348,11 @@ BOOST_FIXTURE_TEST_CASE( transfer_between_plain_accounts_adds_no_entry, receiver
    produce_and_check_validator( { token_account, alice, bob } );
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( contract_pays_for_its_transfer_handler, receiver_cpu_tester ) try {
+BOOST_FIXTURE_TEST_CASE( notified_contract_pays_only_past_the_stipend, receiver_cpu_tester ) try {
+   const auto memo = long_spin_memo();
    auto before     = cpu_windows( { token_account, alice, game } );
    auto game_net   = usage( *control, game ).net_usage;
-   auto trace      = transfer( alice, game, amount, spin_memo );
+   auto trace      = transfer( alice, game, amount, memo );
 
    const auto receipt = entries( trace );
    BOOST_REQUIRE_EQUAL( receipt.size(), 2u );
@@ -263,12 +360,59 @@ BOOST_FIXTURE_TEST_CASE( contract_pays_for_its_transfer_handler, receiver_cpu_te
    const auto& handler = frame( trace, game, "transfer"_n );
    BOOST_REQUIRE( handler.cpu_usage_us );
    BOOST_TEST( handler.cpu_usage_us->value == receipt[1] );
+   // sysio.token's entry carries the stipend, and the game's entry the rest of its handler.
+   BOOST_REQUIRE( handler.elapsed.count() > stipend_us );
+   BOOST_TEST( receipt[0] >= stipend_us );
    BOOST_TEST( receipt[1] > 0u );
+   BOOST_TEST( receipt[1] <= most_past_stipend( handler.elapsed.count() ) );
    BOOST_TEST( trace->total_cpu_usage_us.value == total( receipt ) );
    BOOST_TEST( !frame( trace, alice, "transfer"_n ).cpu_usage_us ); // no code, so no entry
    check_billed( before, { token_account, game } );
    BOOST_TEST( same_window( usage( *control, game ).net_usage, game_net ) ); // NET stays with the input payer
    produce_and_check_validator( { token_account, alice, game } );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( notify_cpu_stipend_starts_at_100_us, receiver_cpu_tester ) try {
+   BOOST_TEST( genesis_stipend == config::default_notify_cpu_stipend );
+   BOOST_TEST( config::default_notify_cpu_stipend == 100u );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( stipend_follows_setparams, receiver_cpu_tester ) try {
+   // A larger stipend leaves more of the handler on sysio.token's entry.
+   constexpr int64_t larger = 2 * stipend_us;
+   const auto memo = long_spin_memo();
+   set_notify_cpu_stipend( larger );
+   auto before  = cpu_windows( { token_account, alice, game } );
+   auto trace   = transfer( alice, game, amount, memo );
+   auto receipt = entries( trace );
+   BOOST_REQUIRE_EQUAL( receipt.size(), 2u );
+   const auto& handler = frame( trace, game, "transfer"_n );
+   BOOST_TEST( receipt[0] >= larger );
+   BOOST_TEST( receipt[1] > 0u );
+   BOOST_TEST( receipt[1] <= most_past_stipend( handler.elapsed.count(), larger ) );
+   check_billed( before, { token_account, game } );
+   produce_and_check_validator( { token_account, alice, game } );
+
+   // 0 turns the stipend off: a handler that returns at once bills the game, and a contract with no CPU cannot
+   // receive.
+   set_notify_cpu_stipend( 0 );
+   before  = cpu_windows( { token_account, alice, game } );
+   trace   = transfer( alice, game, amount, "" );
+   receipt = entries( trace );
+   BOOST_REQUIRE_EQUAL( receipt.size(), 2u );
+   BOOST_TEST( receipt[1] > 0u );
+   check_billed( before, { token_account, game } );
+   BOOST_CHECK_EXCEPTION( transfer( alice, idle, amount, "" ), tx_cpu_usage_exceeded,
+                          fc_exception_message_contains( idle_over_its_limit ) );
+   produce_and_check_validator( { token_account, alice, game, idle } );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( stipend_above_the_transaction_limit_is_rejected, receiver_cpu_tester ) try {
+   const uint32_t max_trx_cpu = control->get_global_properties().configuration.max_transaction_cpu_usage;
+   set_notify_cpu_stipend( max_trx_cpu );
+   BOOST_CHECK_EXCEPTION( set_notify_cpu_stipend( max_trx_cpu + 1 ), action_validate_exception,
+                          fc_exception_message_contains( stipend_over_trx_limit ) );
+   produce_block();
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( authorizer_without_cpu_or_net_is_billed_nothing, receiver_cpu_tester ) try {
@@ -280,11 +424,12 @@ BOOST_FIXTURE_TEST_CASE( authorizer_without_cpu_or_net_is_billed_nothing, receiv
    BOOST_REQUIRE_EQUAL( net_weight, 0 );
    BOOST_REQUIRE_EQUAL( cpu_weight, 0 );
 
-   // sysio.token pays for its transfer, CPU and NET, and the game for its handler, CPU only.
+   // sysio.token pays for its transfer, CPU and NET, and the game for its handler past the stipend, CPU only.
+   const auto memo = long_spin_memo();
    auto before    = cpu_windows( { token_account, carol, game } );
    auto carol_net = usage( *control, carol ).net_usage;
    auto token_net = usage( *control, token_account ).net_usage;
-   auto trace     = transfer( carol, game, amount, spin_memo );
+   auto trace     = transfer( carol, game, amount, memo );
    BOOST_TEST( entries( trace ).size() == 2u );
    check_billed( before, { token_account, game } );
    BOOST_TEST( same_window( usage( *control, carol ).net_usage, carol_net ) );
@@ -292,40 +437,142 @@ BOOST_FIXTURE_TEST_CASE( authorizer_without_cpu_or_net_is_billed_nothing, receiv
    produce_and_check_validator( { token_account, carol, game } );
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( contract_without_cpu_receives_only_from_an_explicit_payer, receiver_cpu_tester ) try {
-   BOOST_CHECK_EXCEPTION( transfer( alice, idle, amount, spin_memo ), tx_cpu_usage_exceeded,
-                          fc_exception_message_contains( idle_over_its_limit ) );
+BOOST_FIXTURE_TEST_CASE( contract_without_cpu_receives_within_the_stipend, receiver_cpu_tester ) try {
+   // idle has no CPU. A handler the stipend covers costs it nothing: its entry is 0 and its CPU window stays put.
+   auto before  = cpu_windows( { token_account, alice, idle } );
+   auto trace   = transfer( alice, idle, amount, "" );
+   auto receipt = entries( trace );
+   BOOST_REQUIRE_EQUAL( receipt.size(), 2u );
+   BOOST_TEST( receipt[1] == 0u );
+   BOOST_TEST( frame( trace, idle, "transfer"_n ).cpu_usage_us->value == 0u );
+   check_billed( before, { token_account } );
+   produce_and_check_validator( { token_account, alice, idle } );
 
-   auto before = cpu_windows( { token_account, alice, idle } );
-   auto trace  = transfer( alice, idle, amount, spin_memo, true );
+   // Past the stipend it owes CPU it does not have, so the transfer fails with the usual CPU error and moves nothing.
+   const auto memo          = long_spin_memo();
+   const auto alice_balance = get_currency_balance( token_account, token_symbol, alice );
+   const auto idle_balance  = get_currency_balance( token_account, token_symbol, idle );
+   BOOST_CHECK_EXCEPTION( transfer( alice, idle, amount, memo ), tx_cpu_usage_exceeded,
+                          fc_exception_message_contains( idle_over_its_limit ) );
+   BOOST_TEST( get_currency_balance( token_account, token_symbol, alice ) == alice_balance );
+   BOOST_TEST( get_currency_balance( token_account, token_symbol, idle ) == idle_balance );
+
+   // An explicit payer pays for all of it.
+   before = cpu_windows( { token_account, alice, idle } );
+   trace  = transfer( alice, idle, amount, memo, true );
    BOOST_TEST( entries( trace ).size() == 1u );
    check_billed( before, { alice } );
    produce_and_check_validator( { token_account, alice, idle } );
 } FC_LOG_AND_RETHROW()
 
+BOOST_FIXTURE_TEST_CASE( many_notifications_in_one_block_cost_the_contract_nothing, receiver_cpu_tester ) try {
+   // relay returns at once on transfers it has nothing to do for. Many such transfers to it from other accounts in one
+   // block bill it nothing, and its own actions in that block and the next still run.
+   transfer( alice, bob, bob_funding, "" );
+   produce_block();
+   auto before = cpu_windows( { relay } );
+   for( uint32_t k = 0; k < many_notifications; ++k ) {
+      const auto quantity = asset( k + 1, token_symbol ).to_string(); // distinct transactions
+      auto receipt = entries( transfer( k % 2 == 0 ? alice : bob, relay, quantity.c_str(), "" ) );
+      BOOST_REQUIRE_EQUAL( receipt.size(), 2u );
+      BOOST_TEST( receipt[1] == 0u );
+   }
+   check_billed( before, {} );
+   auto own_spin = [&]( uint32_t n ) {
+      return push_measured( make_trx( { get_action( relay, "spin"_n, auth( relay ), mvo()( "n", n ) ) } ) );
+   };
+   BOOST_TEST( own_spin( short_spin_count )->action_traces[0].console == spun );
+   produce_and_check_validator( { token_account, alice, bob, relay } );
+   BOOST_TEST( own_spin( short_spin_count + 1 )->action_traces[0].console == spun );
+   produce_and_check_validator( { token_account, alice, bob, relay } );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( cold_module_load_takes_none_of_the_stipend, receiver_cpu_tester ) try {
+   // A contract with no CPU is notified for the first time, and its first run loads a large module no one has run
+   // before. Loading pauses billing: the frame's CPU and its deadline both leave the load out. With no leeway, the
+   // handler, which has nothing to do for transfers, still fits the stipend, though the load takes far longer: tens of
+   // milliseconds to compile or parse the module on each runtime, against a few hundred microseconds for a warm run on
+   // the interpreter.
+   create_accounts( { cold } );
+   set_code( cold, test_contracts::sysio_system_wasm() ); // no transfer handler, and nothing else runs this code
+   set_cpu_weight( cold, 0 );
+   produce_block();
+   transfer( alice, bob, amount, "" ); // warms everything but cold's module
+   control->set_subjective_cpu_leeway( fc::microseconds( 0 ) );
+
+   // A block deadline, as a producer and a speculative node push every transaction with, enables the billing pause.
+   auto before  = cpu_windows( { token_account, cold } );
+   auto trace   = push_measured( make_trx( { transfer_action( alice, cold, amount, "" ) } ),
+                                 fc::time_point::now() + fc::seconds( 10 ) );
+   auto receipt = entries( trace );
+   BOOST_REQUIRE_EQUAL( receipt.size(), 2u );
+   BOOST_TEST( receipt[1] == 0u );
+   BOOST_TEST( frame( trace, cold, "transfer"_n ).elapsed.count() > stipend_us ); // the load ran past the stipend
+   check_billed( before, { token_account } );
+   control->set_subjective_cpu_leeway( fc::microseconds( config::default_subjective_cpu_leeway_us ) );
+   produce_and_check_validator( { token_account, alice, cold } );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( zero_entry_leaves_the_contracts_cpu_window_alone, receiver_cpu_tester ) try {
+   // relay spends CPU and then loses its weight, so its window holds more than its allowance of none. Billing it even
+   // 0 us would fail the window check.
+   push_measured( make_trx( { get_action( relay, "spin"_n, auth( relay ), mvo()( "n", long_spins() ) ) } ) );
+   produce_block();
+   set_cpu_weight( relay, 0 );
+   produce_block();
+   const auto [relay_cpu_us, greylisted, unlimited] =
+      control->get_cpu_limit( relay, control->pending_block_timestamp() );
+   BOOST_REQUIRE( !unlimited );
+   BOOST_REQUIRE_EQUAL( relay_cpu_us, 0 );
+   BOOST_REQUIRE( usage( *control, relay ).cpu_usage.value_ex > 0 );
+
+   // A handler the stipend covers bills relay nothing, so its window is neither checked nor moved.
+   auto before  = cpu_windows( { token_account, alice, relay } );
+   auto trace   = transfer( alice, relay, amount, "" );
+   auto receipt = entries( trace );
+   BOOST_REQUIRE_EQUAL( receipt.size(), 2u );
+   BOOST_TEST( receipt[1] == 0u );
+   check_billed( before, { token_account } );
+   produce_and_check_validator( { token_account, alice, relay } );
+
+   // Past the stipend it is over its limit.
+   BOOST_CHECK_EXCEPTION( transfer( alice, relay, amount, long_spin_memo() ), tx_cpu_usage_exceeded,
+                          fc_exception_message_contains( relay_over_its_limit ) );
+   produce_block();
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( receiver_over_its_limit_fails_on_account_cpu_limit, receiver_cpu_tester ) try {
-   // A real deadline: the handler runs until idle's remaining CPU, which is tighter than the transaction's limit.
+   // A real deadline: the handler runs through its stipend and then idle's remaining CPU, which together are tighter
+   // than the transaction's limit.
    const auto deadline = fc::time_point::now() + fc::seconds( 10 );
    BOOST_CHECK_EXCEPTION( push_measured( make_trx( { transfer_action( alice, idle, amount, "forever" ) } ), deadline ),
                           tx_cpu_usage_exceeded, fc_exception_message_contains( "reached account cpu limit" ) );
    produce_block();
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( game_pays_for_its_payout_and_the_winner_for_its_handler, receiver_cpu_tester ) try {
-   // Called directly, the game is the input payer, so its transfer stays on the input entry.
+BOOST_FIXTURE_TEST_CASE( game_pays_the_winners_stipend_and_the_winner_the_rest, receiver_cpu_tester ) try {
+   // Called directly, the game is the input payer: its transfer stays on the input entry, which pays the winner's
+   // stipend, and the winner pays for the rest of its handler.
+   const auto memo = long_spin_memo();
    auto before = cpu_windows( { token_account, game, winner } );
    auto payout = get_action( game, "payout"_n, auth( game ),
-                             mvo()( "to", winner )( "quantity", asset::from_string( amount ) )( "memo", spin_memo ) );
+                             mvo()( "to", winner )( "quantity", asset::from_string( amount ) )( "memo", memo ) );
    auto trace  = push_measured( make_trx( { payout } ) );
    auto receipt = entries( trace );
    BOOST_REQUIRE_EQUAL( receipt.size(), 2u );
-   BOOST_TEST( frame( trace, winner, "transfer"_n ).cpu_usage_us->value == receipt[1] );
+   const auto& winner_handler = frame( trace, winner, "transfer"_n );
+   BOOST_TEST( winner_handler.cpu_usage_us->value == receipt[1] );
+   BOOST_REQUIRE( winner_handler.elapsed.count() > stipend_us );
+   BOOST_TEST( receipt[0] >= stipend_us );
+   BOOST_TEST( receipt[1] > 0u );
+   BOOST_TEST( receipt[1] <= most_past_stipend( winner_handler.elapsed.count() ) );
    BOOST_TEST( !frame( trace, game, "transfer"_n ).cpu_usage_us ); // billed to the game already
    BOOST_TEST( !frame( trace, token_account, "transfer"_n ).cpu_usage_us );
    check_billed( before, { game, winner } );
    produce_and_check_validator( { token_account, game, winner } );
 
-   // From the game's transfer handler: the game pays for its handler and its transfer, the winner for its handler.
+   // From the game's transfer handler: the game's transfer notifies the winner, so the game's entry pays the winner's
+   // stipend on top of the game's own code past its stipend.
    before  = cpu_windows( { token_account, alice, game, winner } );
    trace   = transfer( alice, game, amount, "pay:winner" );
    receipt = entries( trace );
@@ -333,20 +580,64 @@ BOOST_FIXTURE_TEST_CASE( game_pays_for_its_payout_and_the_winner_for_its_handler
    BOOST_TEST( trace->action_traces[0].cpu_usage_us->value == receipt[0] );
    BOOST_TEST( frame( trace, game, "transfer"_n ).cpu_usage_us->value == receipt[1] );
    BOOST_TEST( !frame( trace, game, "transfer"_n, 1 ).cpu_usage_us ); // notified of its own transfer
-   BOOST_TEST( frame( trace, winner, "transfer"_n ).cpu_usage_us->value == receipt[2] );
-   check_billed( before, { token_account, game, winner } );
+   const auto& paid = frame( trace, winner, "transfer"_n );
+   BOOST_TEST( paid.cpu_usage_us->value == receipt[2] );
+   BOOST_TEST( receipt[2] <= most_past_stipend( paid.elapsed.count() ) );
+   // The game's frames: its handler, its transfer, and its notification of that transfer.
+   const int64_t game_frames_us = frame( trace, game, "transfer"_n ).elapsed.count() +
+                                  frame( trace, token_account, "transfer"_n, 1 ).elapsed.count() +
+                                  frame( trace, game, "transfer"_n, 1 ).elapsed.count();
+   BOOST_TEST( receipt[1] > 0u ); // the winner's stipend at least
+   BOOST_TEST( receipt[1] <= most_past_stipend( game_frames_us ) + paid.elapsed.count() );
+   flat_set<account_name> billed{ token_account, game };
+   if( receipt[2] > 0 )
+      billed.insert( winner );
+   check_billed( before, billed );
    produce_and_check_validator( { token_account, alice, game, winner } );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( forwarded_notification_bills_the_forwarder, receiver_cpu_tester ) try {
-   auto before = cpu_windows( { token_account, relay, winner } );
-   auto trace  = transfer( alice, relay, amount, "forward:winner" );
+   auto before  = cpu_windows( { token_account, relay, winner } );
+   auto trace   = transfer( alice, relay, amount, "forward:winner" );
+   auto receipt = entries( trace );
 
-   BOOST_TEST( entries( trace ).size() == 2u );
-   BOOST_TEST( frame( trace, relay, "transfer"_n ).cpu_usage_us.has_value() );
-   BOOST_TEST( !frame( trace, winner, "transfer"_n ).cpu_usage_us );
-   check_billed( before, { token_account, relay } );
+   // The winner's handler bills the relay's entry and shares its stipend.
+   BOOST_REQUIRE_EQUAL( receipt.size(), 2u );
+   const auto& relay_handler = frame( trace, relay, "transfer"_n );
+   const auto& forwarded     = frame( trace, winner, "transfer"_n );
+   BOOST_TEST( relay_handler.cpu_usage_us->value == receipt[1] );
+   BOOST_TEST( !forwarded.cpu_usage_us );
+   BOOST_TEST( receipt[1] <= most_past_stipend( relay_handler.elapsed.count() + forwarded.elapsed.count() ) );
+   flat_set<account_name> billed{ token_account };
+   if( receipt[1] > 0 )
+      billed.insert( relay );
+   check_billed( before, billed );
    produce_and_check_validator( { token_account, relay, winner } );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( stipend_is_shared_by_the_frames_billed_to_the_contract, receiver_cpu_tester ) try {
+   // The game's handler spins and sends itself an inline spin: both frames bill its one entry, with one stipend.
+   const uint32_t n = long_spins() / 2; // each frame runs about half of long_frame_us, well past the stipend
+   auto before  = cpu_windows( { token_account, alice, game } );
+   auto trace   = transfer( alice, game, amount, spinsend_command + std::to_string( n ) );
+   auto receipt = entries( trace );
+   BOOST_REQUIRE_EQUAL( receipt.size(), 2u );
+   const auto& handler = frame( trace, game, "transfer"_n );
+   const auto& spin    = frame( trace, game, "spin"_n );
+   BOOST_TEST( handler.cpu_usage_us->value == receipt[1] );
+   BOOST_TEST( !spin.cpu_usage_us ); // on the handler's entry
+   BOOST_TEST( spin.console == spun );
+   BOOST_TEST( receipt[1] > 0u );
+   BOOST_TEST( receipt[1] <= most_past_stipend( handler.elapsed.count() + spin.elapsed.count() ) );
+   check_billed( before, { token_account, game } );
+   produce_and_check_validator( { token_account, alice, game } );
+
+   // The same loops in one frame bill about as much. A stipend for each frame would leave the two-frame entry a
+   // whole stipend lower; the second frame's own overhead only raises it.
+   const uint32_t one_frame  = smallest_game_entry( spin_command, 2 * n );
+   const uint32_t two_frames = smallest_game_entry( spinsend_command, n );
+   BOOST_TEST( static_cast<int64_t>( two_frames ) > static_cast<int64_t>( one_frame ) - stipend_us / 2 );
+   produce_and_check_validator( { token_account, alice, game } );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( explicit_payer_pays_for_everything_below_it, receiver_cpu_tester ) try {
@@ -365,11 +656,11 @@ BOOST_FIXTURE_TEST_CASE( explicit_payer_pays_for_everything_below_it, receiver_c
    produce_block();
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( msig_exec_bills_the_called_contract, receiver_cpu_tester ) try {
+BOOST_FIXTURE_TEST_CASE( msig_exec_bills_the_called_contract_without_a_stipend, receiver_cpu_tester ) try {
    transaction proposed;
-   proposed.actions.emplace_back( get_action( game, "spin"_n, auth( game ), mvo()( "n", spin_count ) ) );
+   proposed.actions.emplace_back( get_action( game, "spin"_n, auth( game ), mvo()( "n", short_spin_count ) ) );
    set_transaction_headers( proposed, proposal_expiration_sec );
-   push_action( msig_account, "propose"_n, alice,
+   push_action( msig_account, "propose"_n, auth( alice, true ),
                 mvo()( "proposer", alice )( "proposal_name", "spin" )( "trx", proposed )
                      ( "requested", vector<permission_level>{ { game, config::active_name } } ) );
    push_action( msig_account, "approve"_n, game,
@@ -383,7 +674,11 @@ BOOST_FIXTURE_TEST_CASE( msig_exec_bills_the_called_contract, receiver_cpu_teste
                                                              ( "executer", alice ) ) } ) );
    auto receipt = entries( trace );
    BOOST_REQUIRE_EQUAL( receipt.size(), 2u );
-   BOOST_TEST( frame( trace, game, "spin"_n ).cpu_usage_us->value == receipt[1] );
+   // An action sent to the game, not a notification, bills it from the start, as calling it directly does.
+   const auto& spin = frame( trace, game, "spin"_n );
+   BOOST_TEST( spin.cpu_usage_us->value == receipt[1] );
+   BOOST_TEST( receipt[1] > 0u );
+   BOOST_TEST( receipt[1] <= spin.elapsed.count() );
    check_billed( before, { msig_account, game } );
    produce_and_check_validator( { msig_account, alice, game } );
 } FC_LOG_AND_RETHROW()
@@ -393,7 +688,7 @@ BOOST_FIXTURE_TEST_CASE( overhead_goes_on_input_entries_only, receiver_cpu_teste
    auto cfg = control->get_global_properties().configuration;
    cfg.min_transaction_cpu_usage = high_min_trx_cpu_us;
    // measured, since the new minimum applies to this transaction already
-   push_measured( make_trx( { get_action( config::system_account_name, "setparams"_n,
+   push_measured( make_trx( { get_action( config::system_account_name, setparams,
                                           auth( config::system_account_name ), mvo()( "params", cfg ) ) } ) );
    produce_block();
 
@@ -401,8 +696,8 @@ BOOST_FIXTURE_TEST_CASE( overhead_goes_on_input_entries_only, receiver_cpu_teste
    auto receipt = entries( trace );
    BOOST_REQUIRE_EQUAL( receipt.size(), 2u );
    BOOST_TEST( total( receipt ) >= high_min_trx_cpu_us );
-   // the receiver entry is its frame's run alone, which the frame's elapsed covers
-   BOOST_TEST( receipt[1] <= static_cast<uint64_t>( frame( trace, game, "transfer"_n ).elapsed.count() ) );
+   // the receiver entry is its frame's run past the stipend alone, which the frame's elapsed covers
+   BOOST_TEST( receipt[1] <= most_past_stipend( frame( trace, game, "transfer"_n ).elapsed.count() ) );
    BOOST_TEST( receipt[0] > receipt[1] );
    produce_and_check_validator( { token_account, alice, game } );
 } FC_LOG_AND_RETHROW()
@@ -506,8 +801,9 @@ BOOST_FIXTURE_TEST_CASE( transaction_failing_its_final_checks_bills_no_receiver,
             failed = std::get<0>( x );
       } );
 
-   // Both handlers run to the end, and then idle, which has no CPU, fails the final checks. The transaction is billed
-   // as a failed one: its CPU stays on the input actions, and neither receiver is billed.
+   // Both handlers run to the end, and then idle, which has no CPU and ran past its stipend, fails the final checks.
+   // The transaction is billed as a failed one: its CPU stays on the input actions, and neither receiver is billed.
+   const auto idle_memo = long_spin_memo();
    for( bool speculative : { false, true } ) {
       for( bool payer_billing_disabled : { true, false } ) {
          BOOST_TEST_CONTEXT( "speculative " << speculative << ", payer billing disabled " << payer_billing_disabled ) {
@@ -518,7 +814,7 @@ BOOST_FIXTURE_TEST_CASE( transaction_failing_its_final_checks_bills_no_receiver,
             const auto now = control->pending_block_time();
             failed.reset();
             auto trx = make_trx( { transfer_action( alice, game, amount, spin_memo ),
-                                   transfer_action( alice, idle, amount, "" ) } );
+                                   transfer_action( alice, idle, amount, idle_memo ) } );
             BOOST_CHECK_EXCEPTION( push_measured( trx ), tx_cpu_usage_exceeded,
                                    fc_exception_message_contains( idle_over_its_limit ) );
             BOOST_REQUIRE( failed );
@@ -541,42 +837,50 @@ BOOST_FIXTURE_TEST_CASE( transaction_failing_its_final_checks_bills_no_receiver,
 
 BOOST_FIXTURE_TEST_CASE( receiver_limit_includes_cpu_granted_in_the_transaction, receiver_cpu_tester ) try {
    // idle has no CPU as sysio.token notifies it, and the same transaction grants it CPU, after its handler or before.
-   // The final checks read idle's limit as the transaction leaves it.
+   // Its handler runs past the stipend, and the final checks read idle's limit as the transaction leaves it.
+   const auto memo = long_spin_memo();
    for( bool grant_first : { false, true } ) {
       BOOST_TEST_CONTEXT( "grant first " << grant_first ) {
          set_cpu_weight( idle, 0 );
          produce_block();
          auto before = cpu_windows( { token_account, alice, idle } );
-         vector<action> actions{ transfer_action( alice, idle, amount, "" ), cpu_weight_action( idle, cpu_weight ) };
+         vector<action> actions{ transfer_action( alice, idle, amount, memo ), cpu_weight_action( idle, cpu_weight ) };
          if( grant_first )
             std::ranges::reverse( actions );
          auto trace   = push_measured( make_trx( std::move( actions ) ) );
          auto receipt = entries( trace );
          BOOST_REQUIRE_EQUAL( receipt.size(), 3u );
          BOOST_TEST( frame( trace, idle, "transfer"_n ).cpu_usage_us->value == receipt[2] );
+         BOOST_TEST( receipt[2] > 0u );
          check_billed( before, { token_account, idle } );
          produce_and_check_validator( { token_account, alice, idle } );
       }
    }
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( receiver_subjective_bill_limits_its_frame, receiver_cpu_tester ) try {
+BOOST_FIXTURE_TEST_CASE( receiver_subjective_bill_limits_its_frame_past_the_stipend, receiver_cpu_tester ) try {
    auto& sub_bill = control->get_mutable_subjective_billing();
    sub_bill.reset();
+   const auto memo = long_spin_memo();
    transfer( alice, bob, amount, "" );
    const auto now = control->pending_block_time();
    const auto [game_cpu_us, greylisted, unlimited] = control->get_cpu_limit( game, block_timestamp_type( now ) );
    BOOST_REQUIRE( !unlimited );
 
-   // CPU pending for the game from another transaction leaves it none, leeway included.
+   // CPU pending for the game from another transaction leaves it none, leeway included: its frame stops when the
+   // stipend runs out.
    const auto pending_id = transaction_id_type::hash( std::string( "pending" ) );
    sub_bill.subjective_bill( pending_id, fc::time_point_sec( now + fc::seconds( pending_bill_lifetime_sec ) ), {},
                              { { game, fc::microseconds( game_cpu_us + beyond_any_leeway_us ) } } );
    const auto deadline = fc::time_point::now() + fc::seconds( 10 );
-   auto trx = make_trx( { transfer_action( alice, game, amount, spin_memo ) } );
+   auto trx = make_trx( { transfer_action( alice, game, amount, memo ) } );
    BOOST_CHECK_EXCEPTION( push_measured( trx, deadline ), tx_cpu_usage_exceeded,
                           fc_exception_message_contains( account_cpu_limit_reached ) );
    transfer( alice, bob, amount, "spin:1" ); // reaches no contract
+   // A handler within the stipend still runs, and bills the game nothing.
+   auto receipt = entries( push_measured( make_trx( { transfer_action( alice, game, amount, "" ) } ), deadline ) );
+   BOOST_REQUIRE_EQUAL( receipt.size(), 2u );
+   BOOST_TEST( receipt[1] == 0u );
 
    sub_bill.remove_subjective_billing( pending_id, 0 );
    BOOST_TEST( entries( push_measured( trx, deadline ) ).size() == 2u );
@@ -598,19 +902,6 @@ BOOST_FIXTURE_TEST_CASE( read_only_transaction_skips_receiver_limits, receiver_c
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( explicit_receipt_entries_follow_the_billing_switches, receiver_cpu_tester ) try {
-   // An explicitly billed push reads its receipt the way a validator does.
-   auto push_explicit = [&]( const signed_transaction& trx, cpu_usage_t billed ) {
-      auto ptrx  = std::make_shared<packed_transaction>( trx );
-      auto meta  = transaction_metadata::start_recover_keys( ptrx, control->get_thread_pool(), control->get_chain_id(),
-                                                             fc::microseconds::maximum(),
-                                                             transaction_metadata::trx_type::input ).get();
-      auto trace = control->test_push_transaction( meta, fc::time_point::maximum(), fc::microseconds::maximum(),
-                                                   billed, true );
-      if( trace->except_ptr )
-         std::rethrow_exception( trace->except_ptr );
-      return trace;
-   };
-
    auto switching = make_trx( { transfer_action( alice, game, amount, spin_memo ) } );
    BOOST_CHECK_EXCEPTION( push_explicit( switching, { 500, 500, 500 } ), transaction_exception,
                           fc_exception_message_contains( receipt_has_extra_entry ) );
@@ -628,50 +919,25 @@ BOOST_FIXTURE_TEST_CASE( explicit_receipt_entries_follow_the_billing_switches, r
    check_billed( before, { token_account, game } );
    produce_and_check_validator( { token_account, game } );
 
-   // A receiver entry the receipt leaves out bills nothing, and the receipt built here gets it.
+   // A receiver entry the receipt leaves out bills nothing, and the receipt built here gets it as 0, which leaves the
+   // game's CPU window alone. The validator replays the block to the same windows.
    before = cpu_windows( { token_account, game } );
    trace  = push_explicit( make_trx( { transfer_action( alice, game, amount, "spin:10" ) } ), { 500 } );
    BOOST_TEST( entries( trace ) == std::vector<uint32_t>( { 500, 0 } ), boost::test_tools::per_element() );
    BOOST_TEST( frame( trace, game, "transfer"_n ).cpu_usage_us->value == 0u );
-   check_billed( before, { token_account, game } );
+   check_billed( before, { token_account } );
    produce_and_check_validator( { token_account, game } );
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( context_free_receiver_entry_is_the_same_under_light_validation, receiver_cpu_tester ) try {
-   auto before = cpu_windows( { system_receiver, game } );
-   auto trace  = push_measured( make_trx( { get_action( system_receiver, "cfspin"_n, auth( alice ),
-                                                        mvo()( "to", game )( "n", spin_count ) ) } ) );
-   const auto receipt = entries( trace );
-   BOOST_REQUIRE_EQUAL( receipt.size(), 2u );
-   const auto& spin = frame( trace, game, "spin"_n );
-   BOOST_TEST( spin.context_free );
-   BOOST_TEST( spin.console == spun );
-   BOOST_TEST( spin.cpu_usage_us->value == receipt[1] );
-   check_billed( before, { system_receiver, game } );
-   produce_and_check_validator( { system_receiver, game } );
-
-   // A node that skips context-free actions in this producer's blocks builds the same receipt and windows.
-   fc::temp_directory dir;
-   auto [cfg, genesis]  = tester::default_config( dir );
-   cfg.trusted_producers = { control->head().producer() };
-   tester light( cfg, genesis );
-   transaction_trace_ptr light_trace;
-   auto connection = light.control->applied_transaction().connect(
-      [&]( std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> x ) {
-         if( std::get<0>( x )->id == trace->id )
-            light_trace = std::get<0>( x );
-      } );
-   for( uint32_t n = 2; n <= control->head().block_num(); ++n )
-      light.push_block( control->fetch_block_by_number( n ) );
-   BOOST_REQUIRE( light_trace && light_trace->receipt );
-   BOOST_TEST( ( *light_trace->receipt == *trace->receipt ) );
-   BOOST_TEST( frame( light_trace, game, "spin"_n ).console.empty() ); // not run
-   for( auto a : { system_receiver, game } ) {
-      BOOST_TEST_CONTEXT( a << " on the light node" ) {
-         BOOST_TEST( same_window( usage( *control, a ).cpu_usage, usage( *light.control, a ).cpu_usage ) );
-         BOOST_TEST( same_window( usage( *control, a ).net_usage, usage( *light.control, a ).net_usage ) );
-      }
-   }
+BOOST_FIXTURE_TEST_CASE( validator_bills_the_producers_split, receiver_cpu_tester ) try {
+   // A validator bills the receipt's entries as given and never applies the stipend itself: a split no node would
+   // measure, with nothing on the receiver, still bills exactly as written.
+   const auto memo = long_spin_memo();
+   auto before = cpu_windows( { token_account, idle } );
+   auto trace  = push_explicit( make_trx( { transfer_action( alice, idle, amount, memo ) } ), { 5'000, 0 } );
+   BOOST_TEST( entries( trace ) == std::vector<uint32_t>( { 5'000, 0 } ), boost::test_tools::per_element() );
+   check_billed( before, { token_account } );
+   produce_and_check_validator( { token_account, alice, idle } );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( block_with_wrong_receipt_entry_count_is_rejected, receiver_cpu_tester ) try {
@@ -722,9 +988,10 @@ BOOST_FIXTURE_TEST_CASE( only_a_privileged_sysio_account_is_a_system_receiver, r
    check_billed( before, { token_account } );
    produce_and_check_validator( { token_account, system_receiver } );
 
-   // The sysio prefix alone does not make one: an unprivileged sysio.* contract pays for its handler.
+   // The sysio prefix alone does not make one: an unprivileged sysio.* contract pays for its handler past the stipend.
+   const auto memo = long_spin_memo();
    before      = cpu_windows( { token_account, unprivileged } );
-   trace       = transfer( alice, unprivileged, amount, spin_memo );
+   trace       = transfer( alice, unprivileged, amount, memo );
    auto receipt = entries( trace );
    BOOST_REQUIRE_EQUAL( receipt.size(), 2u );
    BOOST_TEST( frame( trace, unprivileged, "transfer"_n ).cpu_usage_us->value == receipt[1] );
@@ -735,6 +1002,7 @@ BOOST_FIXTURE_TEST_CASE( only_a_privileged_sysio_account_is_a_system_receiver, r
 BOOST_FIXTURE_TEST_CASE( entries_follow_their_input_actions, receiver_cpu_tester ) try {
    auto& sub_bill = control->get_mutable_subjective_billing();
    transfer( alice, bob, "10.0000 TKN", "" );
+   const auto memo = long_spin_memo();
    produce_block();
 
    // Two inputs with different authorizers each reach a contract. The receiver entries follow the input entries in
@@ -746,8 +1014,8 @@ BOOST_FIXTURE_TEST_CASE( entries_follow_their_input_actions, receiver_cpu_tester
          start_speculative_block();
          const auto now      = control->pending_block_time();
          const auto* quantity = payer_billing_disabled ? "1.0000 TKN" : "2.0000 TKN";
-         auto trace   = push_measured( make_trx( { transfer_action( alice, game, quantity, spin_memo ),
-                                                   transfer_action( bob, winner, quantity, spin_memo ) } ) );
+         auto trace   = push_measured( make_trx( { transfer_action( alice, game, quantity, memo ),
+                                                   transfer_action( bob, winner, quantity, memo ) } ) );
          auto receipt = entries( trace );
          BOOST_REQUIRE_EQUAL( receipt.size(), 4u );
          BOOST_TEST( frame( trace, game, "transfer"_n ).cpu_usage_us->value == receipt[2] );
@@ -764,25 +1032,31 @@ BOOST_FIXTURE_TEST_CASE( entries_follow_their_input_actions, receiver_cpu_tester
    }
 
    auto before = cpu_windows( { token_account, alice, bob, game, winner } );
-   push_measured( make_trx( { transfer_action( alice, game, amount, spin_memo ),
-                              transfer_action( bob, winner, amount, spin_memo ) } ) );
+   push_measured( make_trx( { transfer_action( alice, game, amount, memo ),
+                              transfer_action( bob, winner, amount, memo ) } ) );
    check_billed( before, { token_account, game, winner } );
    produce_and_check_validator( { token_account, alice, bob, game, winner } );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( contract_reached_twice_gets_an_entry_each_time, receiver_cpu_tester ) try {
    auto& sub_bill = control->get_mutable_subjective_billing();
+   const auto memo = long_spin_memo();
    sub_bill.reset();
    sub_bill.disable_payer_billing( false );
    start_speculative_block();
    const auto now = control->pending_block_time();
-   auto trx     = make_trx( { transfer_action( alice, game, amount, spin_memo ),
-                              transfer_action( alice, game, amount, spin_memo ) } );
+   auto trx     = make_trx( { transfer_action( alice, game, amount, memo ),
+                              transfer_action( alice, game, amount, memo ) } );
    auto trace   = push_measured( trx );
    auto receipt = entries( trace );
    BOOST_REQUIRE_EQUAL( receipt.size(), 4u );
-   BOOST_TEST( frame( trace, game, "transfer"_n, 0 ).cpu_usage_us->value == receipt[2] );
-   BOOST_TEST( frame( trace, game, "transfer"_n, 1 ).cpu_usage_us->value == receipt[3] );
+   // Each notification is its own switch, with its own stipend.
+   for( size_t occurrence : { 0u, 1u } ) {
+      const auto& handler = frame( trace, game, "transfer"_n, occurrence );
+      BOOST_TEST( handler.cpu_usage_us->value == receipt[2 + occurrence] );
+      BOOST_TEST( receipt[2 + occurrence] > 0u );
+      BOOST_TEST( receipt[2 + occurrence] <= most_past_stipend( handler.elapsed.count() ) );
+   }
    BOOST_TEST( sub_bill.get_subjective_bill( game, now ).count() == receipt[2] + receipt[3] );
    control->abort_block();
 
@@ -794,17 +1068,19 @@ BOOST_FIXTURE_TEST_CASE( contract_reached_twice_gets_an_entry_each_time, receive
 
 BOOST_FIXTURE_TEST_CASE( receiver_that_pays_for_another_input_is_billed_once, receiver_cpu_tester ) try {
    auto& sub_bill = control->get_mutable_subjective_billing();
+   const auto memo = long_spin_memo();
    sub_bill.reset();
    sub_bill.disable_payer_billing( false );
    start_speculative_block();
    const auto now = control->pending_block_time();
-   // The game pays for its own spin, an input, and for its transfer handler, a receiver entry.
+   // The game pays for its own spin, an input, and for its transfer handler past the stipend, a receiver entry.
    auto spin    = get_action( game, "spin"_n, auth( game ), mvo()( "n", spin_count ) );
-   auto trx     = make_trx( { spin, transfer_action( alice, game, amount, spin_memo ) } );
+   auto trx     = make_trx( { spin, transfer_action( alice, game, amount, memo ) } );
    auto trace   = push_measured( trx );
    auto receipt = entries( trace );
    BOOST_REQUIRE_EQUAL( receipt.size(), 3u );
    BOOST_TEST( frame( trace, game, "transfer"_n ).cpu_usage_us->value == receipt[2] );
+   BOOST_TEST( receipt[2] > 0u );
    BOOST_TEST( sub_bill.get_subjective_bill( game, now ).count() == receipt[0] + receipt[2] );
    control->abort_block();
 
@@ -826,7 +1102,10 @@ BOOST_FIXTURE_TEST_CASE( explicit_payer_covers_only_its_own_action, receiver_cpu
    BOOST_REQUIRE_EQUAL( receipt.size(), 3u );
    BOOST_TEST( !frame( trace, game, "transfer"_n ).cpu_usage_us );
    BOOST_TEST( frame( trace, relay, "transfer"_n ).cpu_usage_us->value == receipt[2] );
-   check_billed( before, { token_account, alice, relay } );
+   flat_set<account_name> billed{ token_account, alice };
+   if( receipt[2] > 0 )
+      billed.insert( relay );
+   check_billed( before, billed );
    produce_and_check_validator( { token_account, alice, game, winner, relay } );
 } FC_LOG_AND_RETHROW()
 
@@ -841,14 +1120,15 @@ BOOST_FIXTURE_TEST_CASE( receiver_frame_stops_at_the_transaction_limit, receiver
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( greylisted_receiver_fails_as_greylisted, receiver_cpu_tester ) try {
-   // On a speculative block, a greylisted contract with no CPU fails as greylisted, both while its frame runs and in
-   // the final checks.
+   // On a speculative block, a greylisted contract with no CPU fails as greylisted past its stipend, both while its
+   // frame runs and in the final checks.
    control->add_resource_greylist( idle );
+   const auto memo = long_spin_memo();
    start_speculative_block();
    const auto deadline = fc::time_point::now() + fc::seconds( 10 );
    BOOST_CHECK_EXCEPTION( push_measured( make_trx( { transfer_action( alice, idle, amount, "forever" ) } ), deadline ),
                           greylist_cpu_usage_exceeded, fc_exception_message_contains( greylisted_frame_stopped ) );
-   BOOST_CHECK_EXCEPTION( push_measured( make_trx( { transfer_action( alice, idle, amount, "" ) } ), deadline ),
+   BOOST_CHECK_EXCEPTION( push_measured( make_trx( { transfer_action( alice, idle, amount, memo ) } ), deadline ),
                           greylist_cpu_usage_exceeded, fc_exception_message_contains( idle_over_greylisted_limit ) );
    control->abort_block();
    control->remove_resource_greylist( idle );
@@ -862,11 +1142,12 @@ BOOST_FIXTURE_TEST_CASE( receiver_code_is_read_as_its_frame_starts, receiver_cpu
    };
 
    // Code set earlier in the transaction counts: bob, a plain account, pays for the handler it just got.
+   const auto memo = long_spin_memo();
    set_cpu_weight( bob, cpu_weight );
    produce_block();
    auto before  = cpu_windows( { token_account, bob } );
    auto trace   = push_measured( make_trx( { set_code_action( bob, bytes( wasm.begin(), wasm.end() ) ),
-                                             transfer_action( alice, bob, amount, spin_memo ) } ) );
+                                             transfer_action( alice, bob, amount, memo ) } ) );
    auto receipt = entries( trace );
    BOOST_REQUIRE_EQUAL( receipt.size(), 3u );
    BOOST_TEST( frame( trace, bob, "transfer"_n ).cpu_usage_us->value == receipt[2] );

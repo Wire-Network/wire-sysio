@@ -6,16 +6,17 @@ using namespace sysio;
 
 namespace {
 
-constexpr name             token_account   = "sysio.token"_n;
-constexpr name             transfer_action = "transfer"_n;
-constexpr name             spin_action     = "spin"_n;
-constexpr const char*      spun            = "spun";
-constexpr uint32_t         default_spins   = 1000;
-constexpr std::string_view spin_command    = "spin:";
-constexpr std::string_view forward_command = "forward:";
-constexpr std::string_view pay_command     = "pay:";
-constexpr std::string_view forever_command = "forever";
-constexpr std::string_view pay_memo        = "spin:1000"; ///< the payee loops default_spins times
+constexpr name             token_account    = "sysio.token"_n;
+constexpr name             transfer_action  = "transfer"_n;
+constexpr name             spin_action      = "spin"_n;
+constexpr const char*      spun             = "spun";
+constexpr uint32_t         default_spins    = 1000;
+constexpr std::string_view spin_command     = "spin:";
+constexpr std::string_view spinsend_command = "spinsend:";
+constexpr std::string_view forward_command  = "forward:";
+constexpr std::string_view pay_command      = "pay:";
+constexpr std::string_view forever_command  = "forever";
+constexpr std::string_view pay_memo         = "spin:1000"; ///< the payee loops default_spins times
 
 bool starts_with( std::string_view text, std::string_view prefix ) {
    return text.substr( 0, prefix.size() ) == prefix;
@@ -51,6 +52,10 @@ void cpu_receiver_test::on_transfer( name from, name to, asset quantity, std::st
    const std::string_view command = memo;
    if( starts_with( command, spin_command ) ) {
       loop( parse_count( command.substr( spin_command.size() ) ) );
+   } else if( starts_with( command, spinsend_command ) ) {
+      const uint32_t n = parse_count( command.substr( spinsend_command.size() ) );
+      loop( n );
+      action( permission_level{ get_self(), "active"_n }, get_self(), spin_action, std::make_tuple( n ) ).send();
    } else if( starts_with( command, forward_command ) ) {
       require_recipient( name( command.substr( forward_command.size() ) ) );
    } else if( starts_with( command, pay_command ) ) {
@@ -69,10 +74,6 @@ void cpu_receiver_test::payout( name to, asset quantity, std::string memo ) {
 void cpu_receiver_test::spin( uint32_t n ) {
    loop( n );
    print( spun );
-}
-
-void cpu_receiver_test::cfspin( name to, uint32_t n ) {
-   action( std::vector<permission_level>{}, to, spin_action, std::make_tuple( n ) ).send_context_free();
 }
 
 void cpu_receiver_test::notify( name to ) {

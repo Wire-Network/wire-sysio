@@ -13,6 +13,7 @@ public:
    /**
     * Handles a sysio.token transfer this contract is notified of. A transfer to it does what the memo says:
     *   spin:<n>        loops n times
+    *   spinsend:<n>    loops n times and sends itself an inline spin of n loops
     *   forward:<acct>  forwards the notification to acct
     *   pay:<acct>      pays the quantity to acct with sysio.token, memo "spin:1000"
     *   forever         loops until the transaction runs out of CPU
@@ -25,13 +26,9 @@ public:
    [[sysio::action]]
    void payout( sysio::name to, sysio::asset quantity, std::string memo );
 
-   /// Loops n times and prints that it ran. It needs no authorization and is context free.
+   /// Loops n times and prints that it ran. It needs no authorization.
    [[sysio::action]]
    void spin( uint32_t n );
-
-   /// Sends `to` a context-free inline `spin` of n loops.
-   [[sysio::action]]
-   void cfspin( sysio::name to, uint32_t n );
 
    /// Notifies `to` of this action, without authorization or writes, so a read-only transaction can run it.
    [[sysio::action]]

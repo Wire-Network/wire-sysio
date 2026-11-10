@@ -876,6 +876,8 @@ namespace sysio::chain {
    }
 
    void transaction_context::bill_receiver( const receiver_entry& e, uint32_t cpu_us ) {
+      if (cpu_us == 0)
+         return; // a contract whose stipend covered its code owes nothing, whatever its CPU window holds
       // A receiver pays CPU only: its NET window is neither updated nor checked.
       auto& bill = accounts_billing.try_emplace(e.account, account_billing{ .pays_net = false }).first->second;
       bill.cpu_usage_us += cpu_us;
@@ -908,10 +910,17 @@ namespace sysio::chain {
                                                     ? get_action_trace(parent.entry + 1).act.payer()
                                                     : receiver_entries[parent.entry - input_entries].account;
             if (act_trace.receiver != parent_payer) {
-               receiver_entry e{ .account = act_trace.receiver,
-                                 .input   = parent_on_input ? parent.entry
-                                                            : receiver_entries[parent.entry - input_entries].input,
-                                 .ordinal = action_ordinal };
+               // A notification reaches a contract that cannot refuse it, so the parent's entry covers its first
+               // stipend. An action sent to the contract itself bills it from the start, as calling it directly does.
+               const bool notified = act_trace.receiver != act_trace.act.account;
+               receiver_entry e{ .account         = act_trace.receiver,
+                                 .input           = parent_on_input
+                                                       ? parent.entry
+                                                       : receiver_entries[parent.entry - input_entries].input,
+                                 .ordinal         = action_ordinal,
+                                 .stipend_entry   = parent.entry,
+                                 .stipend_left_us =
+                                    notified ? control.get_global_properties().configuration.notify_cpu_stipend : 0 };
                if (!explicit_billed_cpu_time && !is_read_only()) {
                   // Its usage window was not updated in this block, so its usage decays to the pending block.
                   std::tie(e.cpu_limit_us, e.cpu_greylisted, std::ignore) =
@@ -928,7 +937,8 @@ namespace sysio::chain {
       if (explicit_billed_cpu_time || entry < input_entries)
          return false; // the receipt carries the CPU, or the input entry measures its whole action
 
-      // The receiver pays for this frame, so the frame runs against the receiver's remaining CPU.
+      // The receiver pays for this frame past its stipend, so the frame runs against what is left of the stipend and
+      // then the receiver's remaining CPU. The stipend's payer is checked against its limit in finalize().
       const receiver_entry& e = receiver_entries[entry - input_entries];
       int64_t used_us = 0;
       for (const auto& r : receiver_entries)
@@ -936,7 +946,8 @@ namespace sysio::chain {
             used_us += r.cpu_us;
       const fc::time_point now = fc::time_point::now();
       frame_begin = now - action_start;
-      set_billing_deadline(e.account, e.cpu_limit_us - used_us, e.cpu_greylisted, now);
+      set_billing_deadline(e.account, e.cpu_limit_us - used_us, e.cpu_greylisted, now,
+                           fc::microseconds(e.stipend_left_us));
       if (enforce_deadline)
          checktime(); // fail early if the receiver has no CPU left
       return true;
@@ -947,16 +958,25 @@ namespace sysio::chain {
       receiver_entry&  e             = receiver_entries[frames[action_ordinal - 1].entry - input_entries];
       // action_start moves forward by any pause, so this leaves paused time out
       const fc::microseconds cpu = std::max(fc::time_point::now() - action_start - frame_begin, fc::microseconds(0));
-      e.cpu_us += cpu.count();
-      // The frame's CPU is not the input payer's: the action's clock and deadline move past it.
-      action_start += cpu;
+      const int64_t stipend_us = std::min(cpu.count(), e.stipend_left_us);
+      e.stipend_left_us -= stipend_us;
+      e.cpu_us += cpu.count() - stipend_us;
+      if (e.stipend_entry < input_entries) {
+         // The input entry measures its action's whole time apart from receiver entries' CPU, so leaving the stipend
+         // in the action's clock bills it to the input entry.
+         action_start += cpu - fc::microseconds(stipend_us);
+      } else {
+         receiver_entries[e.stipend_entry - input_entries].cpu_us += stipend_us;
+         // The frame's CPU is not the input payer's: the action's clock and deadline move past it.
+         action_start += cpu;
+      }
       const account_name payer = get_action_trace(e.input + 1).act.payer();
       const auto&        b     = accounts_billing.at(payer);
       set_billing_deadline(payer, b.cpu_limit_us, b.cpu_greylisted, action_start);
    }
 
    void transaction_context::set_billing_deadline( account_name account, int64_t cpu_limit_us, bool greylisted,
-                                                   fc::time_point from ) {
+                                                   fc::time_point from, fc::microseconds stipend ) {
       active_deadline     = trx_deadline;
       tx_cpu_usage_reason = trx_cpu_usage_reason;
       if (!explicit_billed_cpu_time) {
@@ -965,7 +985,10 @@ namespace sysio::chain {
             subjective_cpu_bill =
                control.get_subjective_billing().get_subjective_bill(account, control.pending_block_time());
             // Add leeway to allow powerup
-            const int64_t account_cpu_limit = cpu_limit_us - subjective_cpu_bill.count() + leeway.count();
+            int64_t account_cpu_limit = cpu_limit_us - subjective_cpu_bill.count() + leeway.count();
+            // An account with no CPU left still runs for its stipend, which another entry pays for.
+            if (stipend > fc::microseconds(0))
+               account_cpu_limit = stipend.count() + std::max<int64_t>(account_cpu_limit, 0);
             // Possibly limit deadline to account subjective cpu left
             if (from + fc::microseconds(account_cpu_limit) < trx_deadline) {
                active_deadline              = from + fc::microseconds(account_cpu_limit);

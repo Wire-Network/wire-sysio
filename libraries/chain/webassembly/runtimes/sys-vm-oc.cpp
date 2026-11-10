@@ -5,6 +5,8 @@
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/global_property_object.hpp>
 
+#include <fc/scoped_exit.hpp>
+
 #include <vector>
 #include <iterator>
 
@@ -28,7 +30,14 @@ class sysvmoc_instantiated_module : public wasm_instantiated_module_interface {
          sysio::chain::sysvmoc::code_cache_sync::mode m;
          m.whitelisted = context.is_sys_vm_oc_whitelisted();
          m.write_window = context.control.is_write_window();
-         const code_descriptor* const cd = _sysvmoc_runtime.cc.get_descriptor_for_code_sync(m, context.get_receiver(), _code_hash, _vm_version);
+         const code_descriptor* cd = _sysvmoc_runtime.cc.get_cached_descriptor(m, _code_hash);
+         if (!cd) {
+            // Compiling the module loads it, which is not billed, as instantiating a module is not for the other
+            // runtimes.
+            context.trx_context.pause_billing_timer();
+            auto resume = fc::make_scoped_exit([&]() { context.trx_context.resume_billing_timer(); });
+            cd = _sysvmoc_runtime.cc.get_descriptor_for_code_sync(m, context.get_receiver(), _code_hash, _vm_version);
+         }
          SYS_ASSERT(cd, wasm_execution_error, "SYS VM OC instantiation failed");
 
          _sysvmoc_runtime.exec_mem.get_executor().execute(*cd, _sysvmoc_runtime.exec_mem.get_memory(), context);

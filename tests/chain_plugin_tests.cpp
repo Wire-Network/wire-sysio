@@ -162,6 +162,7 @@ BOOST_AUTO_TEST_CASE( get_consensus_parameters ) try {
    BOOST_TEST(v0config.max_kv_key_size == t.control->get_global_properties().configuration.max_kv_key_size);
    BOOST_TEST(v0config.max_kv_value_size == t.control->get_global_properties().configuration.max_kv_value_size);
    BOOST_TEST(v0config.max_kv_secondary_key_size == t.control->get_global_properties().configuration.max_kv_secondary_key_size);
+   BOOST_TEST(v0config.notify_cpu_stipend == t.control->get_global_properties().configuration.notify_cpu_stipend);
 
    BOOST_TEST(!!parms.wasm_config); // enabled at genesis for Wire
 

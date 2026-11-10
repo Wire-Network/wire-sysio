@@ -62,6 +62,8 @@ BOOST_FIXTURE_TEST_CASE(throw_test, params_tester){
                           fc_exception_message_contains("max KV key size must be between") );
    BOOST_CHECK_EXCEPTION( [&]{action("setthrow5"_n, mvo());}(), chain::action_validate_exception,
                           fc_exception_message_contains("max KV secondary key size must be between") );
+   BOOST_CHECK_EXCEPTION( [&]{action("throwstipend"_n, mvo());}(), chain::action_validate_exception,
+                          fc_exception_message_contains("notify cpu stipend cannot exceed max transaction cpu usage") );
    BOOST_CHECK_THROW( [&]{action("getthrow1"_n, mvo());}(), chain::config_parse_error);
    BOOST_CHECK_THROW( [&]{action("getthrow2"_n, mvo());}(), fc::out_of_range_exception);
    BOOST_CHECK_THROW( [&]{action("getthrow3"_n, mvo());}(), chain::config_parse_error);

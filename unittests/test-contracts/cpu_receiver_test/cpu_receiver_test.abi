@@ -4,20 +4,6 @@
     "types": [],
     "structs": [
         {
-            "name": "cfspin",
-            "base": "",
-            "fields": [
-                {
-                    "name": "to",
-                    "type": "name"
-                },
-                {
-                    "name": "n",
-                    "type": "uint32"
-                }
-            ]
-        },
-        {
             "name": "notify",
             "base": "",
             "fields": [
@@ -57,11 +43,6 @@
         }
     ],
     "actions": [
-        {
-            "name": "cfspin",
-            "type": "cfspin",
-            "ricardian_contract": ""
-        },
         {
             "name": "notify",
             "type": "notify",
