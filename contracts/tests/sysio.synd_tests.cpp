@@ -240,8 +240,7 @@ public:
       deploy(TOKENS_ACCOUNT, contracts::tokens_wasm(), contracts::tokens_abi(), tokens_abi_ser);
       deploy(TOKEN_ACCOUNT,  contracts::token_wasm(),  contracts::token_abi(),  token_abi_ser);
       deploy(MSGCH_ACCOUNT,  contracts::msgch_wasm(),  contracts::msgch_abi(),  msgch_abi_ser);
-      // The swap is unprivileged, as it is deployed; it bills a user's rows to the user.
-      deploy(SWAP_ACCOUNT,   contracts::swap_wasm(),   contracts::swap_abi(),   swap_abi_ser, false);
+      deploy(SWAP_ACCOUNT,   contracts::swap_wasm(),   contracts::swap_abi(),   swap_abi_ser);
       deploy(LIQ_ACCOUNT,    contracts::liq_wasm(),    contracts::liq_abi(),    liq_abi_ser);
       deploy(SYND_ACCOUNT,   contracts::synd_wasm(),   contracts::synd_abi(),   synd_abi_ser);
       deploy(BOND_ACCOUNT,   contracts::bond_wasm(),   contracts::bond_abi(),   bond_abi_ser);
@@ -430,6 +429,17 @@ public:
                              uint64_t max_fee = std::numeric_limits<uint64_t>::max()) {
       return push(SYND_ACCOUNT, synd_abi_ser, signer == name{} ? holder : signer, "desyndicate"_n, mvo()
          ("holder", holder)("quantity", asset(static_cast<int64_t>(amount), sym))("max_fee", max_fee));
+   }
+   /// The `sysio.msgch::buildenv` notice that `chain_code`'s envelope of `epoch` carried `request_ids`.
+   action_result retsent(std::string_view chain_code, uint32_t epoch, const std::vector<uint64_t>& request_ids,
+                            name signer = MSGCH_ACCOUNT) {
+      return push(SYND_ACCOUNT, synd_abi_ser, signer, "retsent"_n, mvo()
+         ("chain_code", codename_mvo(chain_code))("epoch_index", epoch)("request_ids", request_ids));
+   }
+   /// Build `chain_code`'s outbound envelope at the depot's current epoch, as `sysio.epoch::advance` does.
+   action_result buildenv(std::string_view chain_code) {
+      return push(MSGCH_ACCOUNT, msgch_abi_ser, EPOCH_ACCOUNT, "buildenv"_n,
+                  mvo()("chain_code", slug_value(chain_code)));
    }
    /// Query the fee path and retain its return trace, including refusal diagnostics.
    action_result quotedesynd(std::string_view chain, std::string_view token, uint64_t quantity) {
@@ -818,6 +828,12 @@ public:
    }
    fc::variant return_row(uint64_t request_id) {
       return decode(synd_abi_ser, "return_row", get_row_by_id(SYND_ACCOUNT, SYND_ACCOUNT, "returns"_n, request_id));
+   }
+   /// The `sent_epoch` of `request_id`'s `returns` row: the epoch of the envelope that carried it, 0 until then.
+   uint32_t sent_epoch(uint64_t request_id) {
+      const auto row = return_row(request_id);
+      BOOST_REQUIRE(!row.is_null());
+      return row["sent_epoch"].as<uint32_t>();
    }
    fc::variant pool_row(std::string_view token_code) {
       return decode(synd_abi_ser, "pool_row",
@@ -1597,6 +1613,7 @@ BOOST_FIXTURE_TEST_CASE(outstanding_returns_record_the_original_obligation, sysi
          BOOST_REQUIRE_EQUAL(amount, row["amount"].as_uint64());
          BOOST_REQUIRE_EQUAL("alice", row["holder"].as_string());
          BOOST_REQUIRE_EQUAL(32u, row["pubkey"].as<std::vector<char>>().size());
+         BOOST_REQUIRE_EQUAL(0u, row["sent_epoch"].as<uint32_t>());   // no envelope built yet
       }
    };
    check_log(1, LIQSOL, 10 * UNIT);
@@ -1650,6 +1667,183 @@ BOOST_FIXTURE_TEST_CASE(return_refund_failure_preserves_obligation, sysio_synd_t
       push(SYND_ACCOUNT, synd_abi_ser, SYSIO_ACCOUNT, "refundreturn"_n, mvo()("request_id", 1)));
    BOOST_REQUIRE(!return_row(1).is_null());
    BOOST_REQUIRE_EQUAL(0, liq_balance("alice"_n));
+} FC_LOG_AND_RETHROW()
+
+/// The request ids of the `retsent` notices the last pushed transaction ran, in order.
+std::vector<std::vector<uint64_t>> retsent_notices(sysio_synd_tester& t) {
+   std::vector<std::vector<uint64_t>> notices;
+   if (!t.last_trace) return notices;
+   for (const auto& at : t.last_trace->action_traces) {
+      if (at.receiver != sysio_synd_tester::SYND_ACCOUNT || at.act.account != sysio_synd_tester::SYND_ACCOUNT ||
+          at.act.name != "retsent"_n)
+         continue;
+      const auto data = t.synd_abi_ser.binary_to_variant("retsent", at.act.data,
+                                                         sysio_synd_tester::fixture_abi_yield_function());
+      notices.push_back(data["request_ids"].as<std::vector<uint64_t>>());
+   }
+   return notices;
+}
+
+/// A `returns` row records the epoch of the outbound envelope that carried its DESYNDICATE_LIQ: 0 while the
+/// attestation is queued, then the epoch `buildenv` built the envelope at. Desyndications that ride one
+/// envelope share its epoch; a later envelope's epoch leaves earlier rows as they were.
+BOOST_FIXTURE_TEST_CASE(a_return_records_the_epoch_of_the_envelope_that_carried_it, sysio_synd_tester) try {
+   BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_signer()));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
+   BOOST_REQUIRE_EQUAL(success(), set_epoch(3));
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, 10 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, 7 * UNIT));
+   BOOST_REQUIRE_EQUAL(0u, sent_epoch(1));
+   BOOST_REQUIRE_EQUAL(0u, sent_epoch(2));
+
+   // ETH's envelope ships ETH's own row and none of SOLANA's: no notice, nothing stamped.
+   BOOST_REQUIRE_EQUAL(success(), push(MSGCH_ACCOUNT, msgch_abi_ser, MSGCH_ACCOUNT, "queueout"_n, mvo()
+      ("chain_code", slug_value(ETH))
+      ("attest_type", static_cast<uint32_t>(sysio::opp::types::ATTESTATION_TYPE_OPERATOR_ACTION))
+      ("data", std::vector<char>{'\x01'})));
+   BOOST_REQUIRE(!attestation_row(3).is_null());
+   BOOST_REQUIRE_EQUAL(success(), set_epoch(4));
+   BOOST_REQUIRE_EQUAL(success(), buildenv(ETH));
+   BOOST_REQUIRE(attestation_row(3).is_null());
+   BOOST_REQUIRE(retsent_notices(*this).empty());
+   BOOST_REQUIRE_EQUAL(0u, sent_epoch(1));
+
+   // `advance` builds SOLANA's envelope at the epoch it just started: one notice for both rows.
+   BOOST_REQUIRE_EQUAL(success(), buildenv(SOLANA));
+   BOOST_REQUIRE(attestation_row(1).is_null());
+   BOOST_REQUIRE(attestation_row(2).is_null());
+   BOOST_REQUIRE((retsent_notices(*this) == std::vector<std::vector<uint64_t>>{{1, 2}}));
+   BOOST_REQUIRE_EQUAL(4u, sent_epoch(1));
+   BOOST_REQUIRE_EQUAL(4u, sent_epoch(2));
+
+   // A desyndication in epoch 4 rides the envelope built at epoch 5.
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, 5 * UNIT));
+   BOOST_REQUIRE_EQUAL(0u, sent_epoch(3));
+   BOOST_REQUIRE_EQUAL(success(), set_epoch(5));
+   BOOST_REQUIRE_EQUAL(success(), buildenv(SOLANA));
+   BOOST_REQUIRE((retsent_notices(*this) == std::vector<std::vector<uint64_t>>{{3}}));
+   BOOST_REQUIRE_EQUAL(4u, sent_epoch(1));
+   BOOST_REQUIRE_EQUAL(4u, sent_epoch(2));
+   BOOST_REQUIRE_EQUAL(5u, sent_epoch(3));
+} FC_LOG_AND_RETHROW()
+
+/// Desyndications all queued in epoch 1 spill across three envelopes, and each row records the epoch of the
+/// envelope it actually shipped in. Two desyndications queued back to back land in different envelopes when
+/// the first fills one. The rows between them carry DESYNDICATE_LIQ bytes with no request id: `buildenv`
+/// skips them, and an envelope that carries only such rows sends no notice.
+BOOST_FIXTURE_TEST_CASE(returns_spilled_across_envelopes_record_the_envelope_each_shipped_in,
+                        sysio_synd_tester) try {
+   constexpr uint32_t MAX_ENVELOPE_ATTESTATIONS = 64;   // mirrors sysio.msgch.hpp
+   constexpr uint32_t QUEUEOUTS_PER_BLOCK       = 20;
+   BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_signer()));
+   BOOST_REQUIRE_EQUAL(success(), set_epoch(1));
+
+   // `next_attestation` is the id the next queued attestation takes.
+   uint64_t next_attestation = 1;
+   // Queue `count` rows with no request id.
+   const auto queue_filler = [&](uint32_t count) {
+      for (uint32_t i = 0; i < count; ++i) {
+         BOOST_REQUIRE_EQUAL(success(), push(MSGCH_ACCOUNT, msgch_abi_ser, MSGCH_ACCOUNT, "queueout"_n, mvo()
+            ("chain_code", slug_value(SOLANA))
+            ("attest_type", static_cast<uint32_t>(sysio::opp::types::ATTESTATION_TYPE_DESYNDICATE_LIQ))
+            ("data", std::vector<char>{static_cast<char>(i >> 8), static_cast<char>(i)})));
+         ++next_attestation;
+         if ((i + 1) % QUEUEOUTS_PER_BLOCK == 0) produce_block();
+      }
+      produce_block();
+   };
+   const auto queue_desyndication = [&](uint64_t amount) {
+      BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, amount));
+      BOOST_REQUIRE_EQUAL("ATTESTATION_TYPE_DESYNDICATE_LIQ",
+                          attestation_row(next_attestation)["type"].as_string());
+      ++next_attestation;
+   };
+
+   // Attestations 1-64 are filler; requests 1 and 2 take 65 and 66; filler takes 67-127; requests 3 and 4
+   // take 128 and 129.
+   queue_filler(MAX_ENVELOPE_ATTESTATIONS);
+   queue_desyndication(10 * UNIT);
+   queue_desyndication(5 * UNIT);
+   queue_filler(MAX_ENVELOPE_ATTESTATIONS - 3);
+   queue_desyndication(4 * UNIT);
+   queue_desyndication(3 * UNIT);
+   BOOST_REQUIRE_EQUAL(2 * MAX_ENVELOPE_ATTESTATIONS + 2, next_attestation);
+
+   // The epoch-2 envelope carries only filler.
+   BOOST_REQUIRE_EQUAL(success(), set_epoch(2));
+   BOOST_REQUIRE_EQUAL(success(), buildenv(SOLANA));
+   BOOST_REQUIRE(!executed(SYND_ACCOUNT, "retsent"_n));
+   for (uint64_t id = 1; id <= 4; ++id) BOOST_REQUIRE_EQUAL(0u, sent_epoch(id));
+
+   // The epoch-3 envelope carries requests 1, 2 and 3 and fills before request 4.
+   BOOST_REQUIRE_EQUAL(success(), set_epoch(3));
+   BOOST_REQUIRE_EQUAL(success(), buildenv(SOLANA));
+   BOOST_REQUIRE((retsent_notices(*this) == std::vector<std::vector<uint64_t>>{{1, 2, 3}}));
+   BOOST_REQUIRE_EQUAL(3u, sent_epoch(1));
+   BOOST_REQUIRE_EQUAL(3u, sent_epoch(2));
+   BOOST_REQUIRE_EQUAL(3u, sent_epoch(3));
+   BOOST_REQUIRE_EQUAL(0u, sent_epoch(4));
+   BOOST_REQUIRE(!attestation_row(2 * MAX_ENVELOPE_ATTESTATIONS + 1).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), set_epoch(4));
+   BOOST_REQUIRE_EQUAL(success(), buildenv(SOLANA));
+   BOOST_REQUIRE((retsent_notices(*this) == std::vector<std::vector<uint64_t>>{{4}}));
+   BOOST_REQUIRE(attestation_row(2 * MAX_ENVELOPE_ATTESTATIONS + 1).is_null());
+   BOOST_REQUIRE_EQUAL(3u, sent_epoch(3));
+   BOOST_REQUIRE_EQUAL(4u, sent_epoch(4));
+} FC_LOG_AND_RETHROW()
+
+/// A return governance resolves before its envelope is built leaves the build whole: the notice for its
+/// request id finds no row and is dropped with a diagnostic.
+BOOST_FIXTURE_TEST_CASE(a_return_resolved_before_its_envelope_is_built_leaves_the_build_whole,
+                        sysio_synd_tester) try {
+   BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_signer()));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, 10 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, 5 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(),
+      push(SYND_ACCOUNT, synd_abi_ser, SYSIO_ACCOUNT, "finishreturn"_n, mvo()("request_id", 1)));
+
+   BOOST_REQUIRE_EQUAL(success(), set_epoch(1));
+   BOOST_REQUIRE_EQUAL(success(), buildenv(SOLANA));
+   BOOST_REQUIRE((retsent_notices(*this) == std::vector<std::vector<uint64_t>>{{1, 2}}));
+   BOOST_REQUIRE(console_has("sysio.synd::retsent: DROP -- no outstanding return for the request id"));
+   BOOST_REQUIRE(return_row(1).is_null());
+   BOOST_REQUIRE_EQUAL(1u, sent_epoch(2));
+} FC_LOG_AND_RETHROW()
+
+/// `retsent` is sysio.msgch's alone. It stamps a row once, only for the outpost whose envelope carried
+/// it, and drops every id it cannot stamp without aborting.
+BOOST_FIXTURE_TEST_CASE(retsent_stamps_each_return_once_for_its_own_outpost, sysio_synd_tester) try {
+   BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_signer()));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, 10 * UNIT));
+
+   BOOST_REQUIRE(mentions(retsent(SOLANA, 7, {1}, "alice"_n), "missing authority of sysio.msgch"));
+   BOOST_REQUIRE(mentions(retsent(SOLANA, 7, {1}, SYND_ACCOUNT), "missing authority of sysio.msgch"));
+   BOOST_REQUIRE_EQUAL(0u, sent_epoch(1));
+
+   BOOST_REQUIRE_EQUAL(success(), retsent(SOLANA, 7, {}));
+   BOOST_REQUIRE_EQUAL(0u, sent_epoch(1));
+
+   BOOST_REQUIRE_EQUAL(success(), retsent(ETH, 7, {1}));
+   BOOST_REQUIRE(console_has("sysio.synd::retsent: DROP -- the return belongs to another outpost"));
+   BOOST_REQUIRE_EQUAL(0u, sent_epoch(1));
+
+   BOOST_REQUIRE_EQUAL(success(), retsent(SOLANA, 7, {99, 1}));
+   BOOST_REQUIRE(console_has("sysio.synd::retsent: DROP -- no outstanding return for the request id"));
+   BOOST_REQUIRE_EQUAL(7u, sent_epoch(1));
+   BOOST_REQUIRE(return_row(99).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), retsent(SOLANA, 9, {1}));
+   BOOST_REQUIRE(
+      console_has("sysio.synd::retsent: DROP -- the return already records the envelope that carried it"));
+   BOOST_REQUIRE_EQUAL(7u, sent_epoch(1));
 } FC_LOG_AND_RETHROW()
 
 /// The DESYNDICATE_LIQ attestation `id` queued, decoded.

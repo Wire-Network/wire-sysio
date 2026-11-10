@@ -73,7 +73,7 @@ void run_compile(wrapped_fd&& response_sock, wrapped_fd&& wasm_code, uint64_t st
       if(!global.type.isMutable)
          continue;
       prologue_it -= 8;
-      global_union* const u = (global_union* const)&*prologue_it;
+      global_union* const u = (global_union*)&*prologue_it;
 
       switch(global.initializer.type) {
          case InitializerExpression::Type::i32_const: u->i32 = global.initializer.i32; break;

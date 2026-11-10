@@ -44,6 +44,9 @@ namespace sysio {
          /// FEE_DENOMINATOR/fee units, a window that is a thousand whole tokens for a
          /// zero-precision symbol.
          static constexpr uint64_t MIN_SWAP_FEE = 1;
+         /// The account billed for this contract's rows. `sysio.swap` holds only the RAM
+         /// its code needs, so its rows are billed to `sysio`, as `sysio.token`'s are.
+         static constexpr name RAM_PAYER = "sysio"_n;
 
          using contract::contract;
          /// Deployment configuration, required before anything else works. The fee
@@ -67,7 +70,8 @@ namespace sysio {
          /// `yield_leg`, when set, must be the first leg and names it as a shadow
          /// token, making the pair a yield pool: the pool absorbs the WIRE yield
          /// distributed on the shadow it holds, and sells queued yield shadow through
-         /// itself. Empty makes a plain pool. Both seeds must already be on deposit.
+         /// itself. Empty makes a plain pool. The pair's rows are billed to `sysio`.
+         /// Both seeds must already be on deposit.
          /// The system token's always can be; the first leg has no pair yet, so its
          /// seed transfer must also carry this contract's authority.
          [[sysio::action]] void inittoken(name user, symbol new_symbol,
@@ -119,11 +123,9 @@ namespace sysio {
          /// announcement per account is pending at a time; a new one replaces it, and
          /// while one is pending any other transfer from `from` is refused. Typed and
          /// memo-free, so a contract can do both steps inline in one transaction.
-         /// Requires `from`'s authority.
-         /// Requires `from`'s authority, and bills `from` for the row, so the
-         /// announcement carries `{from, sysio.payer}` alongside its active permission.
+         /// Requires `from`'s authority. The row is billed to `sysio`.
          [[sysio::action]] void fundyield(name from, symbol_code pair_token, asset quantity);
-         /// Drop `from`'s pending announcement and refund its row. Their transfers go
+         /// Drop `from`'s pending announcement and erase its row. Their transfers go
          /// back to being ordinary deposits. Announcing again replaces a pending row,
          /// so this is for leaving none at all. Requires `from`'s authority.
          [[sysio::action]] void cancelyield(name from);
@@ -151,7 +153,8 @@ namespace sysio {
          /// Requires `setyield` to have run. No authorization is required.
          [[sysio::action]] void tickyield(symbol_code pair_token);
          [[sysio::on_notify("*::transfer")]] void ontransfer(name from, name to, asset quantity, string memo);
-         [[sysio::action]] void openext( const name& user, const name& payer, const extended_symbol& ext_symbol);
+         /// Erase `user`'s deposit row for `ext_symbol`, sending any balance to `to`.
+         /// Deposit rows are billed to `sysio` and created by the first credit.
          [[sysio::action]] void closeext ( const name& user, const name& to, const extended_symbol& ext_symbol, string memo);
          [[sysio::action]] void withdraw(name user, name to, extended_asset to_withdraw, string memo);
          [[sysio::action]] void addliquidity(name user, asset to_buy, asset max_asset1, asset max_asset2);
@@ -167,7 +170,8 @@ namespace sysio {
 
          [[sysio::action]] void transfer(const name& from, const name& to,
            const asset& quantity, const string&  memo );
-         [[sysio::action]] void open( const name& owner, const symbol& symbol, const name& ram_payer );
+         /// Erase `owner`'s empty pair-token balance row for `symbol`. Balance rows are billed to
+         /// `sysio` and created by the first credit.
          [[sysio::action]] void close( const name& owner, const symbol& symbol );
 
       private:
@@ -330,6 +334,8 @@ namespace sysio {
          /// owed amount and collides with the receipt the first one left.
          currency_stats accrue(const pair_key& key, const currency_stats& token);
 
+         /// Credit (positive) or debit (negative) `value` to `owner`'s deposit of its token.
+         /// The first credit creates the row, billed to `sysio`; a debit needs the balance.
          void add_signed_ext_balance( const name& owner, const extended_asset& value );
          void add_signed_liq(name user, asset to_buy, bool is_buying, asset max_asset1, asset max_asset2);
          void memoexchange(name user, extended_asset ext_asset_in, string_view details);
@@ -373,7 +379,9 @@ namespace sysio {
          /// interval is weighted at the price that actually held during it.
          void update_price_accumulators(const currency_stats& token);
          void placeindex(name user, symbol evo_symbol, extended_asset pool1, extended_asset pool2 );
-         void add_balance( const name& owner, const asset& value, const name& ram_payer );
+         /// Credit `value` to `owner`'s pair-token balance, creating the row; billed to `sysio`.
+         void add_balance( const name& owner, const asset& value );
+         /// Debit `value` from `owner`'s pair-token balance; billed to `sysio`.
          void sub_balance( const name& owner, const asset& value );
    };
 }

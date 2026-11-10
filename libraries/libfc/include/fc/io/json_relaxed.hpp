@@ -188,6 +188,7 @@ namespace fc { namespace json_relaxed
              case 'r':
                  if( strict )
                      FC_THROW_EXCEPTION( parse_error_exception, "raw strings not supported in strict mode" );
+                 [[fallthrough]];
              case 'R':
                  in.get();
                  c2 = in.peek();

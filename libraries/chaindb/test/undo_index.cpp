@@ -103,7 +103,8 @@ struct undo_index_in_segment {
          segment_manager.destroy_ptr(p);
    }
 
-   undo_index_t* const operator->() {
+   /// Access the stored index without applying an ignored qualifier to the returned pointer.
+   undo_index_t* operator->() {
       return p;
    }
 

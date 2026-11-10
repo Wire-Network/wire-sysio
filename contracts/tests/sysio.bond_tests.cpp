@@ -51,10 +51,6 @@ constexpr std::string_view nothing_msg           = "nothing to claim";
 constexpr std::string_view wire_no_yield_msg     = "WIRE collateral earns no shadow yield";
 constexpr std::string_view prune_limit_msg       = "limit exceeds the most requests one prune examines";
 
-/// The memo of the one transfer that pays the issuer an INVALID request's bonds.
-constexpr std::string_view forfeit_memo = "sysio.bond::forfeit";
-/// The memo of the transfer that pays a claim in the request's token.
-constexpr std::string_view claim_memo = "sysio.bond::claim";
 
 /// `request_state` names as the ABI renders them.
 constexpr std::string_view STATE_OPEN     = "OPEN";

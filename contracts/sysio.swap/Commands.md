@@ -6,20 +6,12 @@ Configure the contract (deployment step, the contract's own authority): the cont
 
     cleos push action evolutiondex setconfig '["sysio", {"contract":"eosio.token", "sym":"4,EOS"}]' -p evolutiondex
 
-Open a channel in the contract. This channel will store your trading tokens. You need to create one channel for each token you plan to trade. The second input below is the ram payer, and the authorizer must be the ram payer.
-
-    cleos push action evolutiondex openext '["YOUR_ACCOUNT", "YOUR_ACCOUNT", {"contract":"eosio.token", "sym":"4,EOS"}]' -p YOUR_ACCOUNT
-
-Open a channel for the second token you wish to trade in evodex:
-
-    cleos push action evolutiondex openext '["YOUR_ACCOUNT", "YOUR_ACCOUNT", {"contract":"pesocontract", "sym":"4,PESO"}]' -p YOUR_ACCOUNT
-
 Close the contract's channel for a specific token. In case there are funds there,
 it returns them to the account "TO".
 
     cleos push action evolutiondex closeext '["YOUR_ACCOUNT", "TO", {"contract":"eosio.token", "sym":"4,EOS"}, "memo"]' -p YOUR_ACCOUNT
 
-Fill your account with the desired tokens. The contract accepts only the system token and the first legs of existing pairs; anything else is refused. A pair's first leg has no pair yet when its seed is deposited, so that one transfer also carries the contract's authority.
+Fill your account with the desired tokens. The contract stores each token you deposit in a channel, created by your first deposit of that token and billed to sysio. The contract accepts only the system token and the first legs of existing pairs; anything else is refused. A pair's first leg has no pair yet when its seed is deposited, so that one transfer also carries the contract's authority.
 
     cleos push action eosio.token transfer '["YOUR_ACCOUNT", "evolutiondex", "100.0000 EOS", "memo"]' -p YOUR_ACCOUNT
 
@@ -117,7 +109,7 @@ See evotoken stats:
     cleos get table evolutiondex EOSPESO stat
 
 In many practical cases, users will prefer to run many actions in a single transaction.
-For example, if you want to add liquidity, you will probably prefer to close the accounts in the contract evolutiondex corresponding to the external tokens, to avoid spending RAM. To that end, you may run:
+For example, to deposit, add liquidity and close the channels of the external tokens in one transaction, you may run:
 
     cleos push transaction addliquidity.json
 
@@ -127,24 +119,6 @@ where the file addliquidity.json contains:
         "actions":
         [
         {
-            "account": "evolutiondex",
-            "name": "openext",
-            "authorization": [{"actor": "YOUR_ACCOUNT","permission": "active"}],
-            "data": {
-                "user": "YOUR_ACCOUNT",
-                "payer": "YOUR_ACCOUNT",
-                "ext_symbol": {"contract":"eosio.token", "sym":"4,EOS"}
-            }
-        },{
-            "account": "evolutiondex",
-            "name": "openext",
-            "authorization": [{"actor": "YOUR_ACCOUNT","permission": "active"}],
-            "data": {
-                "user": "YOUR_ACCOUNT",
-                "payer": "YOUR_ACCOUNT",
-                "ext_symbol": {"contract":"pesocontract", "sym":"4,PESO"}
-            }
-        },{
             "account": "eosio.token",
             "name": "transfer",
             "authorization": [{"actor": "YOUR_ACCOUNT","permission": "active"}],

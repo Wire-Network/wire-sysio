@@ -1815,8 +1815,7 @@ BOOST_AUTO_TEST_CASE( snapshot_perf_benchmark )
 // Large-scale benchmark of the two KV sections, which hold nearly all contract state.
 //
 // Build with RUN_PERF_BENCHMARKS defined for this file, then run:
-//   TMPDIR=<dir on a real disk> ./unit_test --run_test=snapshot_part2_tests/snapshot_large_benchmark \
-//      --log_level=message -- --sys-vm
+//   TMPDIR=<dir on a real disk> ./unit_test --run_test=snapshot_part2_tests/snapshot_large_benchmark --log_level=message -- --sys-vm
 //
 // TMPDIR holds the mapped state and the snapshot, so a tmpfs would hide the file I/O and rule out KV_SNAP_BENCH_COLD.
 //

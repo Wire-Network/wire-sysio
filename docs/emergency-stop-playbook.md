@@ -108,7 +108,7 @@ Each item is a deploy or upgrade step. An item not done is a freeze that cannot 
 
 | While the cord is pulled | Refused or deferred | Still runs |
 |---|---|---|
-| `sysio.swap` | every action that moves tokens (among them `exchange`, `addliquidity`, `remliquidity`, `withdraw`, `closeext` of a funded deposit, `tickyield` and `accrueyield` with yield owed, `inittoken`) | reads, and actions that move nothing (`sync`, `changefee`, `openext`, `setyield`) |
+| `sysio.swap` | every action that moves tokens (among them `exchange`, `addliquidity`, `remliquidity`, `withdraw`, `closeext` of a funded deposit, `tickyield` and `accrueyield` with yield owed, `inittoken`) | reads, and actions that move nothing (`sync`, `changefee`, `setyield`) |
 | `sysio.liq` | `transfer` to anything but a custody contract (`sysio.bond`, `sysio.synd`, `sysio.opreg`), so holders cannot move shadow LIQ between themselves; `claim` by anyone but a custody contract; `queueyield` | `mint`; transfers into a custody contract; `claim` by a custody contract (it moves WIRE into custody) |
 | `sysio.bond` | `claim` | `request`, `addbounty`, `accept`, `hold`, `approve`, `rslvvalid`, `rslvinvalid`, `sweepyield`, `prune` |
 | `sysio.kicker` | `kick` returns without paying and without writing: `last_kick` stays where it was, so accrual keeps running and the first paying `kick` after the clear covers it, within the 72-hour catch-up | `setconfig`, `addpool`, `setpool`, `rmpool` |
