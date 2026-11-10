@@ -20,13 +20,13 @@ public:
    }
 
    /// Invoke the predecessor with its original ABI; false leaves default fault handling to the caller.
-   bool operator()(int signal, siginfo_t* info, void* context) const {
+   bool operator()(int sig, siginfo_t* info, void* context) const {
       if (siginfo_handler) {
-         siginfo_handler(signal, info, context);
+         siginfo_handler(sig, info, context);
          return true;
       }
       if (legacy_handler) {
-         legacy_handler(signal);
+         legacy_handler(sig);
          return true;
       }
       return false;

@@ -13,13 +13,13 @@ struct handler_observation {
 handler_observation observed;
 
 /// Model a one-argument POSIX handler.
-void legacy_handler(int signal) {
-   observed.signal = signal;
+void legacy_handler(int sig) {
+   observed.signal = sig;
 }
 
 /// Model a three-argument SA_SIGINFO handler.
-void siginfo_handler(int signal, siginfo_t* info, void* context) {
-   observed = {signal, info, context};
+void siginfo_handler(int sig, siginfo_t* info, void* context) {
+   observed = {sig, info, context};
 }
 
 } // namespace
