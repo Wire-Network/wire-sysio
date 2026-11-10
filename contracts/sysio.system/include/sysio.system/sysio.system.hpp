@@ -663,6 +663,9 @@ namespace sysiosystem {
           * If both allow_perms and disallow_perms are empty, then opts out of the restrictions. limitauthchg
           * aborts if both allow_perms and disallow_perms are non-empty.
           *
+          * The row is billed to `account`. When it grows, the account must be within its RAM quota right
+          * after the write, not only at the end of the transaction.
+          *
           * @param account - account to change
           * @param allow_perms - permissions which may use the restricted actions
           * @param disallow_perms - permissions which may not use the restricted actions
