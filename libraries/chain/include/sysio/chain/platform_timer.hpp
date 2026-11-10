@@ -67,7 +67,8 @@ private:
       bool callback_in_flight = false;
       generation_t generation_running = 0;
    };
-   std::atomic<timer_state_t> _state;
+   /// Explicitly initialized: clang 20+ with libstdc++ 15 finds no default constructor for this atomic.
+   std::atomic<timer_state_t> _state{timer_state_t{}};
    bool timer_running_forever = false;
    generation_t generation = 0;
 

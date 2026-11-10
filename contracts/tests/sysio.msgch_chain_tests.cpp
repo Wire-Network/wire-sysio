@@ -819,6 +819,7 @@ public:
       if (!prev.empty()) env.set_previous_envelope_hash(prev);
       if (!env_hash.empty()) env.set_envelope_hash(env_hash);
       auto* payload = env.add_messages()->mutable_payload();
+      payload->set_version(1); // The production emitters explicitly stamp V1.
       for (const auto& attestation : attestations) {
          auto* att = payload->add_attestations();
          att->set_type(attestation.type);
@@ -1283,6 +1284,40 @@ public:
 // ---------------------------------------------------------------------------
 
 BOOST_AUTO_TEST_SUITE(sysio_msgch_chain_tests)
+
+/// WIRE-310: reject decoded versions 0 and 2 on both inbound routes. Unsupported messages never
+/// enter the vote tally or dispatch, even after a valid message; a corrected V1 retry succeeds.
+BOOST_FIXTURE_TEST_CASE(inbound_payload_versions_rejected_atomically, sysio_msgch_chain_tester) { try {
+   bootstrap();
+   const uint32_t epoch = current_epoch();
+   constexpr uint32_t unsupported_versions[] = {0, 2};
+   for (const auto chain_code : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
+      const auto valid = encode_delivery(epoch, "version-check");
+      for (const uint32_t version : unsupported_versions) {
+         for (const bool mixed : {false, true}) {
+            auto env = decode_envelope(valid);
+            if (mixed) *env.add_messages() = env.messages(0);
+            auto* message = env.mutable_messages(mixed ? 1 : 0);
+            message->mutable_payload()->set_version(version);
+            // Keep every semantic header correct: only the version is unacceptable.
+            oracle::finalize_header(*message, mixed ? env.messages(0).header().message_id() : "",
+                                    1'775'612'516'983ULL);
+            std::vector<char> raw(env.ByteSizeLong());
+            env.SerializeToArray(raw.data(), static_cast<int>(raw.size()));
+            BOOST_REQUIRE_EQUAL(error("assertion failure with message: unsupported OPP MessagePayload version"),
+                                deliver(chain_code, raw));
+            BOOST_REQUIRE(find_inbound_delivery(chain_code, epoch, BATCHOP).is_null());
+            BOOST_REQUIRE(get_outpcons(chain_code).is_null());
+            BOOST_REQUIRE_EQUAL(attestation_count(chain_code, epoch), 0u);
+         }
+      }
+
+      BOOST_REQUIRE_EQUAL(success(), deliver(chain_code, valid));
+      BOOST_REQUIRE(!find_inbound_delivery(chain_code, epoch, BATCHOP).is_null());
+      BOOST_REQUIRE_EQUAL(get_outpcons(chain_code)[msgch_fields::EPOCH_INDEX].as<uint32_t>(), epoch);
+      BOOST_REQUIRE_EQUAL(attestation_count(chain_code, epoch), 1u);
+   }
+} FC_LOG_AND_RETHROW() }
 
 /// The encoding hex and keccak256 digests below pin the canonical encoding of these exact
 /// logical envelopes for cross-language agreement: the identical values are pinned in the

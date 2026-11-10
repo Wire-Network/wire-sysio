@@ -69,7 +69,6 @@ apply_context::apply_context(controller& con, transaction_context& trx_ctx, uint
    action_trace& trace = trx_ctx.get_action_trace(action_ordinal);
    act = &trace.act;
    receiver = trace.receiver;
-   context_free = trace.context_free;
 }
 
 void apply_context::exec_one()
@@ -99,44 +98,39 @@ void apply_context::exec_one()
          action_return_value.clear();
          receiver_account = &db.get<account_object,by_name>( receiver );
          receiver_account_metadata = db.find<account_metadata_object,by_name>( receiver );
-         // Read here rather than from `privileged`, which light validation leaves unset for a context-free action.
-         const bool receiver_privileged =
-            receiver_account_metadata != nullptr && receiver_account_metadata->is_privileged();
+         privileged = receiver_account_metadata != nullptr && receiver_account_metadata->is_privileged();
          const bool measured_frame = trx_context.begin_frame(
-            action_ordinal, config::is_system_account( receiver ) && receiver_privileged,
+            action_ordinal, config::is_system_account( receiver ) && privileged,
             receiver_account_metadata != nullptr && receiver_account_metadata->code_hash != digest_type() );
-         if( !(context_free && control.skip_trx_checks()) ) {
-            privileged = receiver_privileged;
-            auto native = control.find_apply_handler( receiver, act->account, act->name );
-            if( native ) {
-               if( trx_context.enforce_whiteblacklist && control.is_speculative_block() ) {
-                  control.check_contract_list( receiver );
-                  control.check_action_list( act->account, act->name );
-               }
-               (*native)( *this );
+         auto native = control.find_apply_handler( receiver, act->account, act->name );
+         if( native ) {
+            if( trx_context.enforce_whiteblacklist && control.is_speculative_block() ) {
+               control.check_contract_list( receiver );
+               control.check_action_list( act->account, act->name );
             }
-
-            if( receiver_account_metadata != nullptr && receiver_account_metadata->code_hash != digest_type() ) {
-               if( trx_context.enforce_whiteblacklist && control.is_speculative_block() ) {
-                  control.check_contract_list( receiver );
-                  control.check_action_list( act->account, act->name );
-               }
-               try {
-                  control.get_wasm_interface().apply( receiver_account_metadata->code_hash,
-                                                      receiver_account_metadata->vm_type,
-                                                      receiver_account_metadata->vm_version,
-                                                      *this );
-               } catch( const wasm_exit& ) {}
-            } else {
-               // allow inline and notify to non-existing contracts
-               // allow onblock and native actions when no sysio system contract by allowing no contract on sysio
-               if (receiver != sysio::chain::config::system_account_name && act->account == receiver && get_sender().empty()) {
-                  SYS_ASSERT(false, action_validate_exception,
-                             "No contract for action {} on account {}", act->name, receiver);
-               }
-            }
-            validate_account_ram_deltas();
+            (*native)( *this );
          }
+
+         if( receiver_account_metadata != nullptr && receiver_account_metadata->code_hash != digest_type() ) {
+            if( trx_context.enforce_whiteblacklist && control.is_speculative_block() ) {
+               control.check_contract_list( receiver );
+               control.check_action_list( act->account, act->name );
+            }
+            try {
+               control.get_wasm_interface().apply( receiver_account_metadata->code_hash,
+                                                   receiver_account_metadata->vm_type,
+                                                   receiver_account_metadata->vm_version,
+                                                   *this );
+            } catch( const wasm_exit& ) {}
+         } else {
+            // allow inline and notify to non-existing contracts
+            // allow onblock and native actions when no sysio system contract by allowing no contract on sysio
+            if (receiver != sysio::chain::config::system_account_name && act->account == receiver && get_sender().empty()) {
+               SYS_ASSERT(false, action_validate_exception,
+                          "No contract for action {} on account {}", act->name, receiver);
+            }
+         }
+         validate_account_ram_deltas();
          if( measured_frame )
             trx_context.end_frame( action_ordinal );
       } FC_RETHROW_EXCEPTIONS( warn, "{} <= {}::{} pending console output: {}",
@@ -273,13 +267,9 @@ void apply_context::exec()
       exec_one();
    }
 
-   if( !_cfa_inline_actions.empty() || !_inline_actions.empty() ) {
+   if( !_inline_actions.empty() ) {
       SYS_ASSERT( recurse_depth < control.get_global_properties().configuration.max_inline_action_depth,
                   transaction_exception, "max inline action depth per transaction reached" );
-
-      for( uint32_t ordinal : _cfa_inline_actions ) {
-         trx_context.execute_action( ordinal, recurse_depth + 1 );
-      }
 
       for( uint32_t ordinal : _inline_actions ) {
          trx_context.execute_action( ordinal, recurse_depth + 1 );
@@ -351,7 +341,7 @@ void apply_context::require_recipient( account_name recipient ) {
    if( !has_recipient(recipient) ) {
       _notified.emplace_back(
          recipient,
-         schedule_action( action_ordinal, recipient, false )
+         schedule_action( action_ordinal, recipient )
       );
 
       if( auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient()) ) {
@@ -415,7 +405,7 @@ void apply_context::execute_inline( action&& a ) {
 
    auto inline_receiver = a.account;
    _inline_actions.emplace_back(
-      schedule_action( std::move(a), inline_receiver, false )
+      schedule_action( std::move(a), inline_receiver )
    );
 
    if (auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient())) {
@@ -423,38 +413,20 @@ void apply_context::execute_inline( action&& a ) {
    }
 }
 
-void apply_context::execute_context_free_inline( action&& a ) {
-   auto* code = control.db().find<account_object, by_name>(a.account);
-   SYS_ASSERT( code != nullptr, action_validate_exception,
-               "inline action's code account {} does not exist", a.account );
-
-   SYS_ASSERT( a.authorization.size() == 0, action_validate_exception,
-               "inline context-free actions cannot have authorizations" );
-
-   auto inline_receiver = a.account;
-   _cfa_inline_actions.emplace_back(
-      schedule_action( std::move(a), inline_receiver, true )
-   );
-
-   if( auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient())) {
-      dm_logger->on_send_context_free_inline();
-   }
-}
-
-uint32_t apply_context::schedule_action( uint32_t ordinal_of_action_to_schedule, account_name receiver, bool context_free )
+uint32_t apply_context::schedule_action( uint32_t ordinal_of_action_to_schedule, account_name receiver )
 {
    uint32_t scheduled_action_ordinal = trx_context.schedule_action( ordinal_of_action_to_schedule,
-                                                                    receiver, context_free,
+                                                                    receiver,
                                                                     action_ordinal, first_receiver_action_ordinal );
 
    act = &trx_context.get_action_trace( action_ordinal ).act;
    return scheduled_action_ordinal;
 }
 
-uint32_t apply_context::schedule_action( action&& act_to_schedule, account_name receiver, bool context_free )
+uint32_t apply_context::schedule_action( action&& act_to_schedule, account_name receiver )
 {
    uint32_t scheduled_action_ordinal = trx_context.schedule_action( std::move(act_to_schedule),
-                                                                    receiver, context_free,
+                                                                    receiver,
                                                                     action_ordinal, first_receiver_action_ordinal );
 
    act = &trx_context.get_action_trace( action_ordinal ).act;
@@ -503,21 +475,6 @@ int apply_context::get_action( uint32_t type, uint32_t index, char* buffer, size
       fc::raw::pack( ds, *act_ptr );
    }
    return ps;
-}
-
-int apply_context::get_context_free_data( uint32_t index, char* buffer, size_t buffer_size )const
-{
-   const auto& trx = trx_context.packed_trx.get_signed_transaction();
-
-   if( index >= trx.context_free_data.size() ) return -1;
-
-   auto s = trx.context_free_data[index].size();
-   if( buffer_size == 0 ) return s;
-
-   auto copy_size = std::min( buffer_size, s );
-   memcpy( buffer, trx.context_free_data[index].data(), copy_size );
-
-   return copy_size;
 }
 
 uint64_t apply_context::next_global_sequence() {

@@ -117,7 +117,7 @@ private:
       std::vector<pending_abi_op>     ops;
       std::unordered_set<chain::name> lazy_collected_this_trx;
       for (const auto& at : trace.action_traces) {
-         if (!at.receipt) continue; // skip context-free or failed actions
+         if (!at.receipt) continue; // skip failed actions
 
          const chain::name account = at.act.account;
 

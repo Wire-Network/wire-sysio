@@ -201,10 +201,10 @@ namespace sysio::chain {
          validate_trx_billed_cpu();
       }
 
-      std::array all_actions = {std::views::all(trx.context_free_actions), std::views::all(trx.actions)};
-      assert(std::ranges::distance(std::views::join(all_actions)) == trx.total_actions());
+      // init_for_input_trx rejects context-free actions, so every billed action is a regular one.
+      assert(trx.context_free_actions.empty());
       size_t action_index = 0;
-      for (const auto& act : std::views::join(all_actions)) {
+      for (const auto& act : trx.actions) {
          // For each action, add either the explicit payer (if present) or the contract (if no payer)
          account_name a = act.payer();
          auto& b = accounts_billing[a];
@@ -296,12 +296,16 @@ namespace sysio::chain {
    void transaction_context::init_for_input_trx()
    {
       const transaction& trx = packed_trx.get_transaction();
-      // delayed, compressed, and extension-bearing transactions are not supported by wire
+      // delayed, compressed, extension-bearing and context-free transactions are not supported by wire
       SYS_ASSERT( trx.delay_sec.value == 0, transaction_exception, "transaction cannot be delayed" );
       SYS_ASSERT( packed_trx.get_compression() == packed_transaction::compression_type::none,
                   tx_compression_not_allowed, "packed transaction cannot be compressed");
       SYS_ASSERT( trx.transaction_extensions.empty(), invalid_transaction_extension,
                   "transaction extensions are not currently supported" );
+      // packed_transaction::init() requires one context-free data entry per context-free action, so this leaves the
+      // transaction no context-free data either.
+      SYS_ASSERT( trx.context_free_actions.empty(), transaction_exception,
+                  "context-free actions are not supported" );
 
       is_input = true;
       if (!control.skip_trx_checks()) {
@@ -339,20 +343,14 @@ namespace sysio::chain {
          trace->action_traces[idx].net_usage = packed_trx.get_action_billable_size(idx);
       };
 
-      trace->action_traces.reserve(trx.context_free_actions.size() + trx.actions.size());
+      trace->action_traces.reserve(trx.actions.size());
 
       for (int oc_retry = 0; oc_retry < 2; ++oc_retry) { // interrupt_oc_exception can only happen once
          try {
             size_t idx = 0;
 
-            for (const auto& act : trx.context_free_actions) {
-               schedule_action(act, act.account, true, 0, 0);
-               add_trace_net(idx);
-               ++idx;
-            }
-
             for (const auto& act : trx.actions) {
-               schedule_action(act, act.account, false, 0, 0);
+               schedule_action(act, act.account, 0, 0);
                add_trace_net(idx);
                ++idx;
             }
@@ -1084,33 +1082,33 @@ namespace sysio::chain {
       return trace->action_traces[action_ordinal-1];
    }
 
-   uint32_t transaction_context::schedule_action( const action& act, account_name receiver, bool context_free,
+   uint32_t transaction_context::schedule_action( const action& act, account_name receiver,
                                                   uint32_t creator_action_ordinal,
                                                   uint32_t closest_unnotified_ancestor_action_ordinal )
    {
       uint32_t new_action_ordinal = trace->action_traces.size() + 1;
 
-      trace->action_traces.emplace_back( *trace, act, receiver, context_free,
+      trace->action_traces.emplace_back( *trace, act, receiver,
                                          new_action_ordinal, creator_action_ordinal,
                                          closest_unnotified_ancestor_action_ordinal );
 
       return new_action_ordinal;
    }
 
-   uint32_t transaction_context::schedule_action( action&& act, account_name receiver, bool context_free,
+   uint32_t transaction_context::schedule_action( action&& act, account_name receiver,
                                                   uint32_t creator_action_ordinal,
                                                   uint32_t closest_unnotified_ancestor_action_ordinal )
    {
       uint32_t new_action_ordinal = trace->action_traces.size() + 1;
 
-      trace->action_traces.emplace_back( *trace, std::move(act), receiver, context_free,
+      trace->action_traces.emplace_back( *trace, std::move(act), receiver,
                                          new_action_ordinal, creator_action_ordinal,
                                          closest_unnotified_ancestor_action_ordinal );
 
       return new_action_ordinal;
    }
 
-   uint32_t transaction_context::schedule_action( uint32_t action_ordinal, account_name receiver, bool context_free,
+   uint32_t transaction_context::schedule_action( uint32_t action_ordinal, account_name receiver,
                                                   uint32_t creator_action_ordinal,
                                                   uint32_t closest_unnotified_ancestor_action_ordinal )
    {
@@ -1123,7 +1121,7 @@ namespace sysio::chain {
       // The reserve above is required so that the emplace_back below does not invalidate the provided_action reference,
       // which references an action within the `trace->action_traces` vector we are appending to.
 
-      trace->action_traces.emplace_back( *trace, provided_action, receiver, context_free,
+      trace->action_traces.emplace_back( *trace, provided_action, receiver,
                                          new_action_ordinal, creator_action_ordinal,
                                          closest_unnotified_ancestor_action_ordinal );
 
@@ -1149,37 +1147,6 @@ namespace sysio::chain {
    void transaction_context::validate_referenced_accounts( const transaction& trx, bool enforce_actor_whitelist_blacklist )const {
       const auto& db = control.db();
       const auto& auth_manager = control.get_authorization_manager();
-
-      if( !trx.context_free_actions.empty() && !control.skip_trx_checks() ) {
-         for( const auto& a : trx.context_free_actions ) {
-            auto* code = db.find<account_object, by_name>( a.account );
-            SYS_ASSERT( code != nullptr, transaction_exception,
-                        "action's code account '{}' does not exist", a.account );
-            auto verify_auth = [&]() -> bool {
-               if (a.authorization.size() == 0)
-                  return true;
-               // context_free_action authorization only allowed to be sysio_payer_name for an authorized explicit payer
-               // of a regular action.
-               if (a.authorization.size() == 1) {
-                  if (a.authorization[0].permission == config::sysio_payer_name) {
-                     bool found = std::ranges::any_of(trx.actions,
-                                                      [&](const auto& act) {
-                                                         return std::ranges::any_of(act.authorization,
-                                                            [&](const auto& auth) {
-                                                               return auth.permission == config::sysio_payer_name &&
-                                                                      auth.actor == a.authorization[0].actor;
-                                                            });
-                                                      });
-                     if (found)
-                        return true;
-                  }
-               }
-               return false;
-            };
-            SYS_ASSERT( verify_auth(), transaction_exception,
-                        "context-free actions can only have a valid explicit payer authorization" );
-         }
-      }
 
       flat_set<account_name> actors;
 

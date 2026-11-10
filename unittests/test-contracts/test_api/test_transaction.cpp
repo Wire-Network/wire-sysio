@@ -227,27 +227,3 @@ void test_transaction::assert_false_error_handler( const sysio::transaction& dtr
    sysio_assert( dtrx.actions[0].authorization[0].permission == "active"_n, "action's authorization has wrong permission" );
 }
 
-void test_transaction::send_cf_action() {
-   using namespace sysio;
-   action act( std::vector<permission_level>{}, "dummy"_n, "event1"_n, std::vector<char>{} );
-   act.send_context_free();
-}
-
-void test_transaction::send_cf_action_fail() {
-   using namespace sysio;
-   action act( std::vector<permission_level>{{"dummy"_n, "active"_n}}, "dummy"_n, "event1"_n, std::vector<char>{} );
-   act.send_context_free();
-   sysio_assert( false, "send_cfa_action_fail() should've thrown an error" );
-}
-
-void test_transaction::stateful_api() {
-   char buf[4] = {1};
-   char key[24];
-   make_kv_key(sysio::name{"table"}.value, sysio::name{"testtrans"}.value, 0, key);
-   (void)kv_set( 0, sysio::name{"testtrans"}.value, key, 24, buf, 4, kv_upsert );
-}
-
-void test_transaction::context_free_api() {
-   char buf[128] = {0};
-   sysio::get_context_free_data( 0, buf, sizeof(buf) );
-}

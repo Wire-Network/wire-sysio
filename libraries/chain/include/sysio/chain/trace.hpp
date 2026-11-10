@@ -20,10 +20,10 @@ namespace sysio::chain {
    using transaction_trace_ptr = std::shared_ptr<transaction_trace>;
 
    struct action_trace {
-      action_trace(  const transaction_trace& trace, const action& act, account_name receiver, bool context_free,
+      action_trace(  const transaction_trace& trace, const action& act, account_name receiver,
                      uint32_t action_ordinal, uint32_t creator_action_ordinal,
                      uint32_t closest_unnotified_ancestor_action_ordinal );
-      action_trace(  const transaction_trace& trace, action&& act, account_name receiver, bool context_free,
+      action_trace(  const transaction_trace& trace, action&& act, account_name receiver,
                      uint32_t action_ordinal, uint32_t creator_action_ordinal,
                      uint32_t closest_unnotified_ancestor_action_ordinal );
       action_trace(){}
@@ -34,7 +34,6 @@ namespace sysio::chain {
       std::optional<action_receipt>   receipt;
       action_name                     receiver;
       action                          act;
-      bool                            context_free = false;
       fc::microseconds                elapsed;
       std::optional<fc::unsigned_int> cpu_usage_us; // populated for an input action and for a frame whose billing switched to its receiver
       std::optional<fc::unsigned_int> net_usage;    // only populated for input action
@@ -122,7 +121,7 @@ FC_REFLECT( sysio::chain::account_delta,
 
 FC_REFLECT( sysio::chain::action_trace,
                (action_ordinal)(creator_action_ordinal)(closest_unnotified_ancestor_action_ordinal)(receipt)
-               (receiver)(act)(context_free)(elapsed)(cpu_usage_us)(net_usage)(console)(trx_id)(block_num)(block_time)
+               (receiver)(act)(elapsed)(cpu_usage_us)(net_usage)(console)(trx_id)(block_num)(block_time)
                (producer_block_id)(account_ram_deltas)(except)(error_code)(return_value) )
 
 // @ignore except_ptr

@@ -1,7 +1,12 @@
 {
     "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
     "version": "sysio::abi/1.2",
-    "types": [],
+    "types": [
+        {
+            "new_type_name": "raw_action_data",
+            "type": "bytes"
+        }
+    ],
     "structs": [
         {
             "name": "actprdok",
@@ -16,27 +21,52 @@
         {
             "name": "arecbadrec",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "payload",
+                    "type": "raw_action_data"
+                }
+            ]
         },
         {
             "name": "arecempsig",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "payload",
+                    "type": "raw_action_data"
+                }
+            ]
         },
         {
             "name": "arecng",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "payload",
+                    "type": "raw_action_data"
+                }
+            ]
         },
         {
             "name": "arecok",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "payload",
+                    "type": "raw_action_data"
+                }
+            ]
         },
         {
             "name": "arecpubty",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "payload",
+                    "type": "raw_action_data"
+                }
+            ]
         },
         {
             "name": "aripeem",
@@ -149,11 +179,6 @@
             "fields": []
         },
         {
-            "name": "gcfdcf",
-            "base": "",
-            "fields": []
-        },
-        {
             "name": "glpbact",
             "base": "",
             "fields": []
@@ -201,7 +226,12 @@
         {
             "name": "preactok",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "payload",
+                    "type": "raw_action_data"
+                }
+            ]
         },
         {
             "name": "printlem",
@@ -226,52 +256,102 @@
         {
             "name": "recbadrec",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "payload",
+                    "type": "raw_action_data"
+                }
+            ]
         },
         {
             "name": "recbadrs",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "payload",
+                    "type": "raw_action_data"
+                }
+            ]
         },
         {
             "name": "recbadvar",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "payload",
+                    "type": "raw_action_data"
+                }
+            ]
         },
         {
             "name": "recbigwa",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "payload",
+                    "type": "raw_action_data"
+                }
+            ]
         },
         {
             "name": "recempsig",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "payload",
+                    "type": "raw_action_data"
+                }
+            ]
         },
         {
             "name": "recok",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "payload",
+                    "type": "raw_action_data"
+                }
+            ]
         },
         {
             "name": "recqsize",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "payload",
+                    "type": "raw_action_data"
+                }
+            ]
         },
         {
             "name": "recshort",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "payload",
+                    "type": "raw_action_data"
+                }
+            ]
         },
         {
             "name": "recsmpub",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "payload",
+                    "type": "raw_action_data"
+                }
+            ]
         },
         {
             "name": "recuald",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "payload",
+                    "type": "raw_action_data"
+                }
+            ]
         },
         {
             "name": "reslimok",
@@ -573,11 +653,6 @@
         {
             "name": "gacok",
             "type": "gacok",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "gcfdcf",
-            "type": "gcfdcf",
             "ricardian_contract": ""
         },
         {

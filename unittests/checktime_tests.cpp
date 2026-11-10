@@ -93,20 +93,22 @@ transaction_trace_ptr push_dummy(base_tester& t, account_name from, const string
             }))
             ("data", fc::mutable_variant_object()
                ("from", from)
-            )
-         })
-     )
-     // lets also push a context free action
-     ("context_free_actions", fc::variants({
+            ),
+         // a passing assert carries `v`, which keeps each transaction unique
          fc::mutable_variant_object()
             ("account", name("asserter"))
             ("name", "procassert")
+            ("authorization", fc::variants({
+               fc::mutable_variant_object()
+                  ("actor", from)
+                  ("permission", name(config::active_name))
+            }))
             ("data", fc::mutable_variant_object()
                 ("condition", 1)
                 ("message", "noop failed: " + v )
             )
          })
-      );
+     );
 
    signed_transaction trx;
    abi_serializer::from_variant(pretty_trx, trx, t.get_resolver(), abi_serializer::create_yield_function( base_tester::abi_serializer_max_time ));

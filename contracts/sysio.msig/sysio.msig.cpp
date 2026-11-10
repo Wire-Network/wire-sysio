@@ -6,6 +6,12 @@
 
 namespace sysio {
 
+namespace {
+/// Marks its actor as the payer of an action's CPU and NET when it is the action's first
+/// authorization (see `action::payer()` on the host).
+constexpr name payer_permission = "sysio.payer"_n;
+}
+
 transaction_header get_trx_header(const char* ptr, size_t sz);
 bool trx_is_authorized(const std::vector<permission_level>& approvals, const std::vector<char>& packed_trx);
 
@@ -120,6 +126,8 @@ void multisig::propose( name proposer,
                         ignore<transaction> trx )
 {
    require_auth( proposer );
+   // The proposer, not msig, pays the CPU and NET of propose, whose data is the proposed transaction.
+   require_auth( permission_level{ proposer, payer_permission } );
    auto& ds = get_datastream();
 
    const char* trx_pos = ds.pos();
