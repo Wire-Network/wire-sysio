@@ -600,4 +600,39 @@ BOOST_FIXTURE_TEST_CASE(limitauthchg_checks_ram_quota_when_it_runs, limitauth_te
 } // limitauthchg_checks_ram_quota_when_it_runs
 FC_LOG_AND_RETHROW()
 
+// The permission actions accept authorized_by, and no byte after it
+BOOST_FIXTURE_TEST_CASE(bytes_after_authorized_by_rejected, limitauth_tester) try {
+   add_roa_policy(NODE_DADDY, alice, "32.0000 SYS", "32.0000 SYS", "32.0000 SYS", 0, 0);
+   const authority freebie_key{get_public_key(alice, "freebie")};
+   const uint8_t extra_byte = 0;
+   const auto left_over = [](std::string_view action_name) {
+      return "action data of sysio::" + std::string(action_name) + " has 1 bytes left after the arguments";
+   };
+
+   BOOST_REQUIRE_EQUAL(
+      left_over("updateauth"),
+      push_action_raw(config::system_account_name, "updateauth"_n, {alice, active}, alice, freebie, active, freebie_key,
+                      active, extra_byte));
+   BOOST_REQUIRE_EQUAL("", updateauth({alice, active}, alice, freebie, active, freebie_key, active));
+
+   BOOST_REQUIRE_EQUAL(
+      left_over("linkauth"),
+      push_action_raw(config::system_account_name, "linkauth"_n, {alice, active}, alice, "sysio.null"_n, "noop"_n,
+                      freebie, active, extra_byte));
+   BOOST_REQUIRE_EQUAL("", linkauth({alice, active}, alice, "sysio.null"_n, "noop"_n, freebie, active));
+
+   BOOST_REQUIRE_EQUAL(
+      left_over("unlinkauth"),
+      push_action_raw(config::system_account_name, "unlinkauth"_n, {alice, active}, alice, "sysio.null"_n, "noop"_n,
+                      active, extra_byte));
+   BOOST_REQUIRE_EQUAL("", unlinkauth({alice, active}, alice, "sysio.null"_n, "noop"_n, active));
+
+   BOOST_REQUIRE_EQUAL(
+      left_over("deleteauth"),
+      push_action_raw(config::system_account_name, "deleteauth"_n, {alice, active}, alice, freebie, active,
+                      extra_byte));
+   BOOST_REQUIRE_EQUAL("", deleteauth({alice, active}, alice, freebie, active));
+} // bytes_after_authorized_by_rejected
+FC_LOG_AND_RETHROW()
+
 BOOST_AUTO_TEST_SUITE_END()
