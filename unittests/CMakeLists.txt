@@ -129,7 +129,7 @@ add_test(NAME kv_doc_links_unit_test_check
                  ${CMAKE_SOURCE_DIR}/docs/kv-behavior-spec.md ${CMAKE_SOURCE_DIR}/docs/kv-security-audit.md)
 # Include every unit_test entry, including the runtime-independent suites.
 set(ctest_tests
-    "'_unit_test_|^(protocol_feature_digest|sysvmoc_signal_handler)_unit_test$' -LE wasm_spec_tests -j8")
+    "'_unit_test_|^(protocol_feature_digest|sysvmoc_signal_handler)_unit_test' -LE wasm_spec_tests -j8")
 
 ### COVERAGE TESTING ###
 if(ENABLE_COVERAGE_TESTING)
