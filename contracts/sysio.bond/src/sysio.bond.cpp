@@ -37,9 +37,11 @@ namespace custody = opp::shadow::custody;
 
 // The contract's own rows -- `bondconfig`, `bondcounters`, `yieldpool` -- bill the sysio RAM pool,
 // not this contract account (privileged-contract model, as sysio.opreg uses): the account stays
-// finite at code+abi size. A request's rows bill the account that created them (`payer_for`): the
-// issuer its `requests` and `escrows` rows, an underwriter its `bonds` row. Later writes by any signer
-// keep the row's payer (`same_payer`), which a privileged contract may do.
+// finite at code+abi size. So does a `bonds` row: it exists only against locked bond tokens, at most
+// one per underwriter per request, so an underwriter needs no RAM of its own. An issuer's `requests`
+// and `escrows` rows bill the issuer (`payer_for`): anyone may open a request, with a statement of
+// its own size. Later writes by any signer keep the row's payer (`same_payer`), which a privileged
+// contract may do.
 constexpr name ram_payer = bond::SYSTEM_ACCOUNT;
 
 /// Permission this contract sends its own `sysio.liq::addyield` under.
@@ -139,7 +141,7 @@ constexpr uint64_t max_asset_amount = static_cast<uint64_t>(asset::max_amount);
 /// A privileged account is a system contract (`sysio.synd` issuing requests for its envelopes), and a
 /// system contract has no RAM quota of its own -- it lives on what `sysio.roa` gifts it for its code
 /// and abi -- so its rows bill the `sysio` RAM pool, as every system contract's own rows do. The ONE
-/// place that decides the payer of a request, escrow or bond row.
+/// place that decides the payer of a request or escrow row.
 name payer_for(name account) {
    return is_privileged(account) ? ram_payer : account;
 }
@@ -442,7 +444,7 @@ void bond::accept(name underwriter, uint64_t request_id, uint64_t amount) {
    bond_row       row = bonds.try_get(key).value_or(
       bond_row{.request_id = request_id, .underwriter = underwriter, .amount = 0});
    credit_holding(row.yield, row.amount, bonded_amount, req->token_code, *custody);
-   bonds.set(payer_for(underwriter), key, row);
+   bonds.set(ram_payer, key, row);
 
    const bool fully_bonded = bonded_amount == remainder;
    requests.modify(same_payer, request_key{request_id}, [&](request_row& r) {

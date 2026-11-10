@@ -859,8 +859,9 @@ BOOST_FIXTURE_TEST_CASE(accept_and_request_checkpoint_the_live_index, sysio_bond
    BOOST_REQUIRE_EQUAL(0u, wire_bond.yield.owed_wire);
 } FC_LOG_AND_RETHROW()
 
-// A bond row bills its underwriter; the request row the accept updates stays the issuer's.
-BOOST_FIXTURE_TEST_CASE(accept_bills_the_underwriter, sysio_bond_tester) try {
+// A bond row bills the sysio RAM pool, never its underwriter; the request row the accept updates
+// stays the issuer's.
+BOOST_FIXTURE_TEST_CASE(accept_bills_sysio, sysio_bond_tester) try {
    // The bounty opens sysio.bond's own LIQSOL holder row on sysio.liq first, which sysio.liq bills.
    BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'a'), LIQSOL, 10 * UNIT, 1 * UNIT));
    const auto sysio_ram  = ram_usage(SYSIO_ACCOUNT);
@@ -870,11 +871,11 @@ BOOST_FIXTURE_TEST_CASE(accept_bills_the_underwriter, sysio_bond_tester) try {
    BOOST_REQUIRE_EQUAL(success(), accept("alice"_n, 1, 10 * UNIT));
    std::string bond_key = request_key_of(1);
    append_key_word(bond_key, "alice"_n.to_uint64_t());
-   BOOST_REQUIRE_EQUAL("alice"_n, payer_of("bonds"_n, bond_key));
+   BOOST_REQUIRE_EQUAL(SYSIO_ACCOUNT, payer_of("bonds"_n, bond_key));
    BOOST_REQUIRE_EQUAL("issuer"_n, payer_of("requests"_n, request_key_of(1)));
-   BOOST_REQUIRE_GT(ram_usage("alice"_n), alice_ram);
+   BOOST_REQUIRE_EQUAL(alice_ram, ram_usage("alice"_n));
    BOOST_REQUIRE_EQUAL(issuer_ram, ram_usage("issuer"_n));
-   BOOST_REQUIRE_EQUAL(sysio_ram, ram_usage(SYSIO_ACCOUNT));
+   BOOST_REQUIRE_GT(ram_usage(SYSIO_ACCOUNT), sysio_ram);
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE(accept_in_wire_pulls_wire, sysio_bond_tester) try {
@@ -1907,7 +1908,7 @@ BOOST_FIXTURE_TEST_CASE(durable_outcome_requires_issuer_acknowledgement, sysio_b
 } FC_LOG_AND_RETHROW()
 
 // A request still owed a claim keeps its row, but the bond rows already paid out go: one unclaimed
-// payout holds no other underwriter's RAM, and the unpaid rows claim exactly as before.
+// payout holds no other underwriter's row in RAM, and the unpaid rows claim exactly as before.
 BOOST_FIXTURE_TEST_CASE(prune_erases_the_paid_bonds_of_a_request_it_keeps, sysio_bond_tester) try {
    constexpr uint32_t window_sec = 3600;
    BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'a'), LIQSOL, 10 * UNIT, 1 * UNIT,
@@ -1919,12 +1920,12 @@ BOOST_FIXTURE_TEST_CASE(prune_erases_the_paid_bonds_of_a_request_it_keeps, sysio
    BOOST_REQUIRE_EQUAL(success(), claim(1, "alice"_n));
 
    // Within the retention period: alice's paid row goes at once, bob's stays, and so does the request.
-   const auto alice_ram = ram_usage("alice"_n);
+   const auto sysio_ram = ram_usage(SYSIO_ACCOUNT);
    BOOST_REQUIRE_EQUAL(success(), prune(0, 10));
    BOOST_REQUIRE_EQUAL(1u, bond_rows_of(1).size());
    BOOST_REQUIRE_EQUAL(6 * UNIT, bond_amount_of(1, "bob"_n));
    BOOST_REQUIRE_EQUAL(STATE_APPROVED, request_state_of(1));
-   BOOST_REQUIRE_LT(ram_usage("alice"_n), alice_ram);
+   BOOST_REQUIRE_LT(ram_usage(SYSIO_ACCOUNT), sysio_ram);
    BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(nothing_msg)), claim(1, "alice"_n));
 
    // Past it, bob's unclaimed bond still keeps the request.

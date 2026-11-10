@@ -20,11 +20,11 @@
  * transfer into this contract.
  *
  * Privileged: an action signed by an account pulls that account's tokens by an inline `transfer`
- * under its `active` authority. The issuer pays the RAM of its `requests` and `escrows` rows and an
- * underwriter that of its `bonds` row -- unless that account is itself privileged: a system contract
- * (`sysio.synd` issuing for an envelope) has no RAM quota of its own, so its rows bill the `sysio` RAM
- * pool instead. Later writes by other signers keep the row's payer. The contract's own singletons and
- * yield pools bill the `sysio` RAM pool.
+ * under its `active` authority. The issuer pays the RAM of its `requests` and `escrows` rows --
+ * unless it is itself privileged: a system contract (`sysio.synd` issuing for an envelope) has no RAM
+ * quota of its own, so its rows bill the `sysio` RAM pool instead. Later writes by other signers keep
+ * the row's payer. Every `bonds` row, the contract's own singletons and the yield pools bill the
+ * `sysio` RAM pool, so an underwriter needs no RAM.
  */
 
 #include <sysio/sysio.hpp>

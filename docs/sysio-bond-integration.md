@@ -32,11 +32,12 @@ The id the request will take is `bondcounters.next_request_id`, read before send
 from one action take consecutive ids from there. An issuer that must not depend on that ordering finds
 its request afterwards through the `bystatement` key instead, as the syndication contract's queue does.
 
-The issuer pays the RAM of its request's `requests` and `escrows` rows, and each underwriter the RAM
-of its `bonds` row. A privileged issuer or underwriter is the exception: a system contract (the
-syndication contract, issuing for its envelopes) has no RAM quota of its own, so the rows created on
-its behalf bill the `sysio` RAM pool instead. Later writes by other signers (a ruling, a claim) keep
-those payers. `prune` releases the RAM.
+The issuer pays the RAM of its request's `requests` and `escrows` rows. A privileged issuer is the
+exception: a system contract (the syndication contract, issuing for its envelopes) has no RAM quota
+of its own, so the rows created on its behalf bill the `sysio` RAM pool instead. A `bonds` row always
+bills the `sysio` RAM pool, so an underwriter needs no RAM: the row exists only against locked bond
+tokens, at most one per underwriter per request. Later writes by other signers (a ruling, a claim)
+keep those payers. `prune` releases the RAM.
 
 ## The increment
 
