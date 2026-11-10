@@ -69,6 +69,11 @@
  * flat part covers the external-chain gas the batch operators pay for the round trip. The rest is burned with
  * `sysio.liq::burn`, queued as DESYNDICATE_LIQ to the token's outpost with the next request id, and
  * retained in `returns` until governance establishes its external outcome. The bucket drops by the whole quantity.
+ * `sysio.msgch::buildenv` reports through `retsent` which outbound envelope carried each DESYNDICATE_LIQ,
+ * and the row records that envelope's depot epoch in `sent_epoch`. It stays 0 while the attestation waits
+ * in the outbound queue, which can hold it past several envelopes. The outpost has consumed the row's envelope
+ * once `sysio.msgch`'s `outpcons` epoch for the outpost reaches the row's `sent_epoch`: an outpost emits its
+ * envelope for an epoch only after accepting the depot's.
  * The attestation carries `total_syndicated`, the depot's outstanding shadow of the symbol
  * after the burn (`liq::outstanding_of`), for the outpost's custody check.
  *
@@ -105,12 +110,12 @@
  * Launch. `importsynd` replays pre-launch positions inside the epoch-0 bootstrap window, minting
  * straight to a linked account or into `parked`; `importdone` closes the import for good.
  *
- * Never-throw: `onsynd`, `onyield` and `closeenv` run inside `sysio.msgch`'s consensus transaction.
- * They `check` nothing on their input; a message that fails a rule is dropped with a `DROP`
- * diagnostic on the console and consumes no sequence. The inline `sysio.liq::mint` of a held
- * syndication is sent only after every condition that `mint` checks has been verified here. Receipt
- * actions accept only self-inline calls; the queue step `closeenv` runs keeps the same discipline
- * for every action it sends.
+ * Never-throw: `onsynd`, `onyield` and `closeenv` run inside `sysio.msgch`'s consensus transaction, and
+ * `retsent` inside `sysio.epoch::advance`. They `check` nothing on their input; a message that fails a
+ * rule is dropped with a `DROP` diagnostic on the console and consumes no sequence. The inline
+ * `sysio.liq::mint` of a held syndication is sent only after every condition that `mint` checks has been
+ * verified here. Receipt actions accept only self-inline calls; the queue step `closeenv` runs keeps the
+ * same discipline for every action it sends.
  *
  * Privileged (roa::setsyscode): every row bills the `sysio` RAM pool -- there is no signer to bill on
  * the envelope path -- and inline actions carry this contract's own authority without a
@@ -449,6 +454,15 @@ namespace sysio {
       [[sysio::action, sysio::read_only]]
       desynd_quote quotedesynd(slug_name chain_code, slug_name token_code, uint64_t quantity);
 
+      /// The outbound envelope of outpost `chain_code` built for depot epoch `epoch_index` carried the
+      /// DESYNDICATE_LIQ attestations of `request_ids`. Each listed `returns` row of that outpost records
+      /// `epoch_index` as its `sent_epoch`, once: a row already stamped keeps its epoch. An id with no row (governance has
+      /// resolved it) or whose row belongs to another outpost is dropped with a diagnostic. Sent by
+      /// `sysio.msgch::buildenv` inside `sysio.epoch::advance`, only when the envelope carried a
+      /// DESYNDICATE_LIQ; never throws. Auth=sysio.msgch.
+      [[sysio::action]] void retsent(sysio::slug_name chain_code, uint32_t epoch_index,
+                                        std::vector<uint64_t> request_ids);
+
       // -----------------------------------------------------------------------
       //  Launch ingestion (privileged caller, epoch-0 bootstrap window)
       // -----------------------------------------------------------------------
@@ -658,7 +672,11 @@ namespace sysio {
          opp::types::ChainKind chain_kind; ///< destination key family
          std::vector<char> pubkey; ///< destination captured when queued
          uint64_t amount = 0; ///< exact net burned amount; the fee is not refundable here
-         SYSLIB_SERIALIZE(return_row, (request_id)(holder)(chain_code)(token_code)(chain_kind)(pubkey)(amount))
+         /// Depot epoch of the outbound envelope that carried the DESYNDICATE_LIQ, from `retsent`; 0 until
+         /// that envelope is built. No envelope is built for epoch 0.
+         uint32_t sent_epoch = 0;
+         SYSLIB_SERIALIZE(return_row,
+                          (request_id)(holder)(chain_code)(token_code)(chain_kind)(pubkey)(amount)(sent_epoch))
       };
       /// Outstanding returns only; completed/refunded rows are erased atomically.
       using returns_t = kv::table<"returns"_n, return_key, return_row>;

@@ -907,6 +907,24 @@
             ]
         },
         {
+            "name": "retsent",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "request_ids",
+                    "type": "uint64[]"
+                }
+            ]
+        },
+        {
             "name": "return_key",
             "base": "",
             "fields": [
@@ -947,6 +965,10 @@
                 {
                     "name": "amount",
                     "type": "uint64"
+                },
+                {
+                    "name": "sent_epoch",
+                    "type": "uint32"
                 }
             ]
         },
@@ -1311,6 +1333,11 @@
         {
             "name": "refundreturn",
             "type": "refundreturn",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "retsent",
+            "type": "retsent",
             "ricardian_contract": ""
         },
         {
