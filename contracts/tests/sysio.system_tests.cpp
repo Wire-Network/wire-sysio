@@ -248,17 +248,6 @@ BOOST_FIXTURE_TEST_CASE(producers_upgrade_system_contract, sysio_system_tester) 
 
    produce_blocks();
 
-   //helper function
-   auto push_action_msig = [&]( const account_name& signer, const action_name &name, const variant_object &data, bool auth = true ) -> action_result {
-         string action_type_name = msig_abi_ser.get_action_type(name);
-
-         action act;
-         act.account = "sysio.msig"_n;
-         act.name = name;
-         act.data = msig_abi_ser.variant_to_binary( action_type_name, data, fixture_abi_yield_function() );
-
-         return base_tester::push_contract_paid_action( std::move(act), (auth ? signer : signer == "bob111111111"_n ? "alice1111111"_n : "bob111111111"_n).to_uint64_t() );
-   };
    // test begins
    vector<permission_level> prod_perms;
    for ( auto& x : producer_names ) {
@@ -358,8 +347,6 @@ fc::mutable_variant_object config_to_variant( const sysio::chain::chain_config& 
       ( "max_block_net_usage", config.max_block_net_usage )
       ( "target_block_net_usage_pct", config.target_block_net_usage_pct )
       ( "max_transaction_net_usage", config.max_transaction_net_usage )
-      ( "context_free_discount_net_usage_num", config.context_free_discount_net_usage_num )
-      ( "context_free_discount_net_usage_den", config.context_free_discount_net_usage_den )
       ( "max_block_cpu_usage", config.max_block_cpu_usage )
       ( "target_block_cpu_usage_pct", config.target_block_cpu_usage_pct )
       ( "max_transaction_cpu_usage", config.max_transaction_cpu_usage )
@@ -380,17 +367,6 @@ BOOST_FIXTURE_TEST_CASE( setparams, sysio_system_tester ) try {
 
    add_roa_policy(NODE_DADDY, "alice1111111"_n, "32.0000 SYS", "32.0000 SYS", "500.0000 SYS", 0, 0);
 
-   //helper function
-   auto push_action_msig = [&]( const account_name& signer, const action_name &name, const variant_object &data, bool auth = true ) -> action_result {
-         string action_type_name = msig_abi_ser.get_action_type(name);
-
-         action act;
-         act.account = "sysio.msig"_n;
-         act.name = name;
-         act.data = msig_abi_ser.variant_to_binary( action_type_name, data, fixture_abi_yield_function() );
-
-         return base_tester::push_contract_paid_action( std::move(act), (auth ? signer : signer == "bob111111111"_n ? "alice1111111"_n : "bob111111111"_n).to_uint64_t() );
-   };
 
    // test begins
    vector<permission_level> prod_perms;
@@ -476,17 +452,6 @@ BOOST_FIXTURE_TEST_CASE( wasmcfg, sysio_system_tester ) try {
 
    add_roa_policy(NODE_DADDY, "alice1111111"_n, "32.0000 SYS", "32.0000 SYS", "500.0000 SYS", 0, 0);
 
-   //helper function
-   auto push_action_msig = [&]( const account_name& signer, const action_name &name, const variant_object &data, bool auth = true ) -> action_result {
-         string action_type_name = msig_abi_ser.get_action_type(name);
-
-         action act;
-         act.account = "sysio.msig"_n;
-         act.name = name;
-         act.data = msig_abi_ser.variant_to_binary( action_type_name, data, fixture_abi_yield_function() );
-
-         return base_tester::push_contract_paid_action( std::move(act), (auth ? signer : signer == "bob111111111"_n ? "alice1111111"_n : "bob111111111"_n).to_uint64_t() );
-   };
 
    // test begins
    vector<permission_level> prod_perms;

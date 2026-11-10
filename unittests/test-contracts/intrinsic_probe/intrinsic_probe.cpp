@@ -20,7 +20,7 @@
 // BOOST_CHECK_THROW.
 
 #include <sysio/sysio.hpp>
-#include <sysio/transaction.hpp>  // raw::{read_transaction, get_action, get_context_free_data}
+#include <sysio/transaction.hpp>  // raw::{read_transaction, get_action}
 #include <sysio/crypto.hpp>       // public_key -- decoding the authority returned by get_permission_lower_bound
 #include <sysio/time.hpp>         // time_point -- the last_updated field of a permission record
 #include <cstring>
@@ -1194,7 +1194,7 @@ public:
    // validator cost is per-call proportional to the string length. The *_l /
    // *_message variants use aligned_span<const char> with explicit size and
    // are the path the cleanup PR will keep. Remaining aligned_span<char>
-   // readers (read_action_data, get_context_free_data, raw::get_action,
+   // readers (read_action_data, raw::get_action,
    // raw::read_transaction) document a "size=0 returns required size" contract
    // that the small-buffer probes here pin in place.
    //
@@ -1325,22 +1325,6 @@ public:
    void rtxsm() {
       size_t rc = raw::read_transaction( nullptr, 0 );
       check( rc > 0, "raw::read_transaction(nullptr, 0) should return required size" );
-   }
-
-   // raw::get_context_free_data is registered context-free-only
-   // (REGISTER_ALIGNED_CF_ONLY_HOST_FUNCTION). Its context_free_check
-   // precondition fires BEFORE the host body and SYS_ASSERTs unaccessible_api
-   // ("this API may only be called from context_free apply") whenever the
-   // calling apply context is not context free. This probe drives it from a
-   // regular action, so the gate must throw before the aligned_span<char>
-   // buffer is ever adapted -- the arguments are deliberately bogus (null
-   // data, zero length) to prove the rejection is unconditional on the span.
-   // Mirrors the privileged_check rejection probes (preactnp / setresnp).
-   [[sysio::action]]
-   void gcfdcf() {
-      raw::get_context_free_data( 0, nullptr, 0 );
-      check( false, "raw::get_context_free_data from non-context-free apply "
-                    "must throw unaccessible_api" );
    }
 
    // raw::send_inline with empty span -> host tries to unpack and fails. Pins

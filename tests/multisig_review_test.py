@@ -195,18 +195,15 @@ try:
     Print(f"Inner trx JSON written to {trx_path} (size={trx_path.stat().st_size} bytes)")
 
     # ----- Propose the chunked transaction via clio.
-    # `-p alice@sysio.payer -p alice@active` — Wire's ROA layer requires the
-    # virtual `sysio.payer` permission whenever a contract bills RAM to the
-    # signer, and propose stores the proposal row + chunk rows on the
-    # proposer's quota. The chain also enforces that the explicit payer
-    # permission must be the FIRST declared authorization on the action, so
-    # `sysio.payer` has to precede `active` in the -p list.
+    # sysio.msig::propose requires `alice@sysio.payer` as the first
+    # authorization, so alice pays its CPU and NET. `-P alice` with the
+    # positional proposer makes clio send `alice@sysio.payer, alice@active`.
     Print("Submit `multisig propose_trx` against the API node")
     propose_cmd = (
         f"multisig propose_trx -j chunkprop "
         f"{shlex.quote(str(perm_path))} "
         f"{shlex.quote(str(trx_path))} "
-        f"alice -p alice@sysio.payer -p alice@active"
+        f"alice -P alice"
     )
     # Submit through the API node so that once we wait for the proposal
     # transaction to land in a block, the proposal row is in the API node's

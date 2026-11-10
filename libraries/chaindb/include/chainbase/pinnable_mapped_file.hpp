@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <system_error>
 #include <boost/interprocess/managed_mapped_file.hpp>
 #include <boost/interprocess/sync/file_lock.hpp>
@@ -67,7 +68,8 @@ using allocator = object_allocator<T, ss_allocator_t>;
 
 class pinnable_mapped_file {
    public:
-      enum map_mode {
+      /// Fixed underlying type: Boost.LexicalCast casts -1 to this enum in a constant expression.
+      enum map_mode : std::uint8_t {
          mapped,        // file is mmaped in MAP_SHARED mode. Only mode where changes can be seen by another chainbase instance
          mapped_private,// file is mmaped in MAP_PRIVATE mode, and only updated at exit
          heap,          // file is copied at startup to an anonymous mapping using huge pages (if available)

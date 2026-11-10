@@ -23,11 +23,6 @@ namespace sysio { namespace chain {
                   "max transaction net usage must be at least {} bytes",
                   config::min_max_transaction_net_usage );
 
-      SYS_ASSERT( context_free_discount_net_usage_den > 0, action_validate_exception,
-                  "net usage discount ratio for context free data cannot have a 0 denominator" );
-      SYS_ASSERT( context_free_discount_net_usage_num <= context_free_discount_net_usage_den, action_validate_exception,
-                  "net usage discount ratio for context free data cannot exceed 1" );
-
       SYS_ASSERT( min_transaction_cpu_usage <= max_transaction_cpu_usage, action_validate_exception,
                   "min transaction cpu usage cannot exceed max transaction cpu usage" );
       SYS_ASSERT( max_transaction_cpu_usage < (max_block_cpu_usage - min_transaction_cpu_usage), action_validate_exception,

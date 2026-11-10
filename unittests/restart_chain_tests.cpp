@@ -41,16 +41,7 @@ struct dummy_action {
    int32_t  c; // 4
 };
 
-struct cf_action {
-   static sysio::chain::name get_name() { return "cfaction"_n; }
-   static sysio::chain::name get_account() { return "testapi"_n; }
-
-   uint32_t payload = 100;
-   uint32_t cfd_idx = 0; // context free data index
-};
-
 FC_REFLECT(dummy_action, (a)(b)(c))
-FC_REFLECT(cf_action, (payload)(cfd_idx))
 
 #define DUMMY_ACTION_DEFAULT_A 0x45
 #define DUMMY_ACTION_DEFAULT_B 0xab11cd1244556677
@@ -273,29 +264,16 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( test_light_validation_restart_from_block_log, T, 
    chain.set_code("testapi"_n, test_contracts::test_api_wasm());
    chain.produce_block();
 
-   cf_action          cfa;
    signed_transaction trx;
-   action             act({}, cfa);
-   trx.context_free_actions.push_back(act);
-   trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100)); // verify payload matches context free data
-   // add a normal action along with cfa
    dummy_action da = {DUMMY_ACTION_DEFAULT_A, DUMMY_ACTION_DEFAULT_B, DUMMY_ACTION_DEFAULT_C};
-   action       act1(vector<permission_level>{{"testapi"_n, config::active_name}}, da);
-   trx.actions.push_back(act1);
+   trx.actions.emplace_back(vector<permission_level>{{"testapi"_n, config::active_name}}, da);
    chain.set_transaction_headers(trx);
-   // run normal passing case
-   auto sigs  = trx.sign(chain.get_private_key("testapi"_n, "active"), chain.get_chain_id());
+   trx.sign(chain.get_private_key("testapi"_n, "active"), chain.get_chain_id());
    auto trace = chain.push_transaction(trx);
    chain.produce_block();
 
    BOOST_REQUIRE(trace->receipt);
-   BOOST_CHECK_EQUAL(2u, trace->action_traces.size());
-
-   BOOST_CHECK(trace->action_traces.at(0).context_free); // cfa
-   BOOST_CHECK_EQUAL("test\n", trace->action_traces.at(0).console); // cfa executed
-
-   BOOST_CHECK(!trace->action_traces.at(1).context_free); // non-cfa
-   BOOST_CHECK_EQUAL("", trace->action_traces.at(1).console);
+   BOOST_CHECK_EQUAL(1u, trace->action_traces.size());
 
    chain.close();
 
@@ -318,19 +296,12 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( test_light_validation_restart_from_block_log, T, 
    BOOST_REQUIRE(other_trace);
    BOOST_REQUIRE(other_trace->receipt);
    BOOST_CHECK(*trace->receipt == *other_trace->receipt);
-   BOOST_CHECK_EQUAL(2u, other_trace->action_traces.size());
+   BOOST_REQUIRE_EQUAL(1u, other_trace->action_traces.size());
 
-   auto check_action_traces = [](const auto& t, const auto& ot) {
-      BOOST_CHECK_EQUAL("", ot.console); // cfa not executed for replay
-      BOOST_CHECK_EQUAL(t.receipt->global_sequence, ot.receipt->global_sequence);
-      BOOST_CHECK_EQUAL(t.digest_savanna(), ot.digest_savanna());
-   };
-
-   BOOST_CHECK(other_trace->action_traces.at(0).context_free); // cfa
-   check_action_traces(trace->action_traces.at(0), other_trace->action_traces.at(0));
-
-   BOOST_CHECK(!other_trace->action_traces.at(1).context_free); // non-cfa
-   check_action_traces(trace->action_traces.at(1), other_trace->action_traces.at(1));
+   const auto& at  = trace->action_traces.at(0);
+   const auto& oat = other_trace->action_traces.at(0);
+   BOOST_CHECK_EQUAL(at.receipt->global_sequence, oat.receipt->global_sequence);
+   BOOST_CHECK_EQUAL(at.digest_savanna(), oat.digest_savanna());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

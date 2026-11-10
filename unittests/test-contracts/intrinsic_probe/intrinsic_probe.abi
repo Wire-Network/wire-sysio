@@ -179,11 +179,6 @@
             "fields": []
         },
         {
-            "name": "gcfdcf",
-            "base": "",
-            "fields": []
-        },
-        {
             "name": "glpbact",
             "base": "",
             "fields": []
@@ -658,11 +653,6 @@
         {
             "name": "gacok",
             "type": "gacok",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "gcfdcf",
-            "type": "gcfdcf",
             "ricardian_contract": ""
         },
         {
