@@ -49,12 +49,6 @@ namespace sysio::chain::webassembly {
                   "feature, regen reference data, sync wire-cdt" )
 
 // =============================================================================
-// Context-free data
-// =============================================================================
-SYS_PIN_INTRINSIC( get_context_free_data,
-                   int32_t (interface::*)(uint32_t, span<char>) const );
-
-// =============================================================================
 // Privileged
 // =============================================================================
 SYS_PIN_INTRINSIC( preactivate_feature,
@@ -333,8 +327,6 @@ SYS_PIN_INTRINSIC( memset,
 // Transaction
 // =============================================================================
 SYS_PIN_INTRINSIC( send_inline,
-                   void (interface::*)(span<const char>) );
-SYS_PIN_INTRINSIC( send_context_free_inline,
                    void (interface::*)(span<const char>) );
 SYS_PIN_INTRINSIC( read_transaction,
                    int32_t (interface::*)(span<char>) const );

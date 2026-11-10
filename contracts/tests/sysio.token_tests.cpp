@@ -360,6 +360,41 @@ BOOST_FIXTURE_TEST_CASE( transfer_tests, sysio_token_tester ) try {
 
 } FC_LOG_AND_RETHROW()
 
+// transfer's data must hold exactly its arguments
+BOOST_FIXTURE_TEST_CASE( transfer_rejects_bytes_after_arguments, sysio_token_tester ) try {
+   create( "alice"_n, asset::from_string("1000 CERO") );
+   issue( "alice"_n, asset::from_string("1000 CERO"), "issue" );
+
+   const auto push_raw = [&]( bytes data ) {
+      action act;
+      act.account = "sysio.token"_n;
+      act.name    = "transfer"_n;
+      act.data    = std::move(data);
+      return base_tester::push_contract_paid_action( std::move(act), "alice"_n.to_uint64_t() );
+   };
+   const auto with_tail = []( bytes data, size_t tail ) {
+      data.insert( data.end(), tail, 0 );
+      return data;
+   };
+   constexpr size_t large_tail_size = 100'000;
+
+   const auto transfer_data = abi_ser.variant_to_binary( "transfer", mvo()
+      ("from", "alice")
+      ("to", "bob")
+      ("quantity", "300 CERO")
+      ("memo", "hola"), fixture_abi_yield_function() );
+
+   const auto left_over = wasm_assert_msg( "action data has bytes left after the arguments" );
+   BOOST_REQUIRE_EQUAL( left_over, push_raw( with_tail( transfer_data, 1 ) ) );
+   BOOST_REQUIRE_EQUAL( left_over, push_raw( with_tail( transfer_data, large_tail_size ) ) );
+   BOOST_REQUIRE_EQUAL( true, get_account( "bob"_n, "0,CERO" ).is_null() );
+
+   BOOST_REQUIRE_EQUAL( success(), push_raw( transfer_data ) );
+   REQUIRE_MATCHING_OBJECT( get_account( "bob"_n, "0,CERO" ), mvo()
+      ("balance", "300 CERO")
+   );
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( close_tests, sysio_token_tester ) try {
 
    auto token = create( "alice"_n, asset::from_string("1000 CERO"));

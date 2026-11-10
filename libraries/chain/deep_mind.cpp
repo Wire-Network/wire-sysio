@@ -147,10 +147,6 @@ namespace sysio::chain {
    {
       fc_dlog(_logger, "CREATION_OP INLINE {}", _action_id);
    }
-   void deep_mind_handler::on_send_context_free_inline()
-   {
-      fc_dlog(_logger, "CREATION_OP CFA_INLINE {}", _action_id);
-   }
    // KV deep_mind hooks — unified KV_OP format with table_id
    void deep_mind_handler::on_kv_set(const kv_row& row, bool is_new, account_name old_payer, const char* old_value,
                                      std::size_t old_value_size)

@@ -104,8 +104,8 @@ namespace sysio::testing {
       sysio::chain::block_id_type _last_irr_block_id = sysio::chain::block_id_type();
       std::string _log_dir = ".";
       bool _stop_on_trx_failed = true;
-      /// Add a context-free `sysio.noop::nonce` action to make each transaction unique. It needs a contract on
-      /// `sysio.noop`, which deployed chains do not have; without it the action data must be unique per transaction.
+      /// Add a `sysio.noop::nonce` action, with no authorization, to make each transaction unique. It needs a contract
+      /// on `sysio.noop`, which deployed chains do not have; without it the action data must be unique per transaction.
       bool _noop_nonce = true;
 
       std::string to_string() const {
@@ -190,8 +190,20 @@ namespace sysio::testing {
 
       void set_transaction_headers(sysio::chain::transaction& trx, const sysio::chain::block_id_type& last_irr_block_id, const fc::microseconds& expiration, uint32_t delay_sec = 0);
 
-      /// Appends the context-free `sysio.noop::nonce` action when `_config._noop_nonce` is set.
+      /// Appends the `sysio.noop::nonce` action, as the last action, when `_config._noop_nonce` is set.
       void add_noop_nonce_action(sysio::chain::transaction& trx, uint64_t& nonce_prefix, uint64_t& nonce);
+
+      /// Gives the `sysio.noop::nonce` action that `add_noop_nonce_action` appended new data, when
+      /// `_config._noop_nonce` is set. Throws `transaction_exception` when the last action is not that nonce action.
+      void refresh_noop_nonce_action(sysio::chain::transaction& trx, uint64_t& nonce_prefix, uint64_t& nonce);
+
+      /// The data of the next `sysio.noop::nonce` action, unique per generator, prefix and nonce.
+      sysio::chain::bytes make_noop_nonce_data(uint64_t& nonce_prefix, uint64_t& nonce) const;
+
+      /// Sets new headers on `trx` and signs it again with `priv_key`, dropping its old signatures.
+      void resign_transaction(sysio::chain::signed_transaction& trx, const fc::crypto::private_key& priv_key,
+                              const fc::microseconds& trx_expiration, const sysio::chain::chain_id_type& chain_id,
+                              const sysio::chain::block_id_type& last_irr_block_id);
 
       signed_transaction_w_signer create_trx_w_actions_and_signer(std::vector<sysio::chain::action>&& act, const fc::crypto::private_key& priv_key, uint64_t& nonce_prefix,
                                                                   uint64_t& nonce, const fc::microseconds& trx_expiration, const sysio::chain::chain_id_type& chain_id,

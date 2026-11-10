@@ -18,18 +18,6 @@ namespace webassembly {
          inline const apply_context& get_context() const { return context; }
 
          /**
-          * Retrieve the signed_transaction.context_free_data[index].
-          *
-          * @ingroup context-free
-          * @param index - the index of the context_free_data entry to retrieve.
-          * @param[out] buffer - output buffer of the context_free_data entry.
-          *
-          * @retval -1 if the index is not valid.
-          * @retval size of the cfd if the buffer is empty, otherwise return the amount of data copied onto the buffer.
-         */
-         int32_t get_context_free_data(uint32_t index, span<char> buffer) const;
-
-         /**
           * Allows a privileged smart contract, e.g. the system contract, to pre-activate a consensus protocol upgrade feature.
           *
           * @ingroup privileged
@@ -609,14 +597,14 @@ namespace webassembly {
          /**
           * Aborts processing of this action and unwinds all pending changes.
           *
-          * @ingroup context-free
+          * @ingroup system
          */
          void abort() const;
 
          /**
           * Aborts processing of this action if the test condition is false.
           *
-          * @ingroup context-free
+          * @ingroup system
           * @param condition - test condition: 1 or 0. Any other value aborts.
           * @param msg - string explaining the reason for failure.
          */
@@ -625,7 +613,7 @@ namespace webassembly {
          /**
           * Aborts processing of this action if the test condition is false.
           *
-          * @ingroup context-free
+          * @ingroup system
           * @param condition - test condition: 1 or 0. Any other value aborts.
           * @param msg - string explaining the reason for failure.
           */
@@ -636,7 +624,7 @@ namespace webassembly {
           * It can be used to provide an error code rather than a message string on assertion checks.
           * If the assertion fails, the provided error code will be made available through the exception message.
           *
-          * @ingroup context-free
+          * @ingroup system
           * @param condition - test condition: 1 or 0. Any other value aborts.
           * @param error_code - the error code associated. A reserved code aborts whatever the condition is.
          */
@@ -645,7 +633,7 @@ namespace webassembly {
          /**
           * This method will abort execution of wasm without failing the contract.
           *
-          * @ingroup context-free
+          * @ingroup system
           * @param code - must be 0. Any other value aborts the action. The host gives the code no meaning.
          */
          void sysio_exit(int32_t code) const;
@@ -1068,17 +1056,9 @@ namespace webassembly {
          void send_inline(span<const char> data);
 
          /**
-          * Send a context free inline action in the context of the parent transaction of this operation.
-          *
-          * @ingroup transaction
-          * @param data - the packed free inline action to be sent. Trailing bytes abort.
-         */
-         void send_context_free_inline(span<const char> data);
-
-         /**
           * Access a copy of the currently executing transaction.
           *
-          * @ingroup context-free-transaction
+          * @ingroup transaction
           * @param[out] data - the currently executing transaction (packed).
           *
           * @retval false if transaction was not found.
@@ -1089,7 +1069,7 @@ namespace webassembly {
          /**
           * Gets the size of the currently executing transaction.
           *
-          * @ingroup context-free-transaction
+          * @ingroup transaction
           *
           * @return size of the currently executing transaction.
          */
@@ -1098,7 +1078,7 @@ namespace webassembly {
          /**
           * Gets the expiration of the currently executing transaction.
           *
-          * @ingroup context-free-transaction
+          * @ingroup transaction
           *
           * @return expiration of the currently executing transaction in seconds since Unix epoch.
          */
@@ -1107,7 +1087,7 @@ namespace webassembly {
          /**
           * Gets the block number used for TAPOS on the currently executing transaction.
           *
-          * @ingroup context-free-transaction
+          * @ingroup transaction
           *
           * @return block number used for TAPOS on the currently executing transaction.
          */
@@ -1116,7 +1096,7 @@ namespace webassembly {
          /**
           * Gets the block prefix used for TAPOS on the currently executing transaction.
           *
-          * @ingroup context-free-transaction
+          * @ingroup transaction
           *
           * @return block prefix used for TAPOS on the currently executing transaction.
          */
@@ -1125,9 +1105,9 @@ namespace webassembly {
          /**
           * Retrieve the indicated action from the active transaction.
           *
-          * @ingroup context-free-transaction
+          * @ingroup transaction
           *
-          * @param type - 0 for context free action, 1 for action.
+          * @param type - 0 for a context-free action, of which a transaction has none, 1 for an action.
           * @param index - the index of the requested action.
           * @param[out] buffer - the action we want (packed).
           *
