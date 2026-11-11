@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE(http_queue_deadlines_and_shutdown_do_not_need_query_workers
 /// chain callbacks to drain harmlessly afterwards.
 BOOST_AUTO_TEST_CASE(http_handler_stop_completes_in_flight_requests_once) {
    read_queue reads;
-   query_config config;
+   auto config = relaxed_config();
    config.worker_threads = 2;
    config.max_in_flight = 2;
    auto engine = std::make_shared<query_engine>(config, reads.create_api(*validating_node));
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(reads_cut_short_by_the_window_retry_until_the_deadline) {
    std::atomic<size_t> windows{0};
    constexpr auto open_window = std::chrono::seconds(1);
    // The first window has already ended; every later one leaves plenty of time.
-   query_engine engine({}, reads.create_api(*validating_node, [&] {
+   query_engine engine(relaxed_config(), reads.create_api(*validating_node, [&] {
       return ++windows == 1 ? std::chrono::microseconds::zero() : std::chrono::microseconds(open_window);
    }));
    BOOST_CHECK_EQUAL(execute(engine, reads, count_query).rows.size(), 1);
@@ -341,7 +341,7 @@ BOOST_AUTO_TEST_CASE(engine_without_read_threads_fails_fast) {
 BOOST_AUTO_TEST_CASE(shutdown_with_pending_chain_callbacks_never_waits_for_app_thread) {
    for (auto stage : {query_stage::describe, query_stage::capture}) {
       read_queue reads;
-      query_engine engine({}, reads.create_api(*validating_node));
+      query_engine engine(relaxed_config(), reads.create_api(*validating_node));
       auto result = std::async(std::launch::async, [&] { return engine.execute(count_query); });
       await([&] { return reads.size() == 1; });
       if (stage == query_stage::capture) {
@@ -363,12 +363,13 @@ BOOST_AUTO_TEST_CASE(shutdown_at_each_worker_stage_completes_once) {
       std::promise<void> release;
       const auto barrier = release.get_future().share();
       std::atomic<bool> reached{false};
-      query_engine engine({}, reads.create_api(*validating_node), query_budget::clock::now, [&](auto current) {
-         if (current == stage) {
-            reached = true;
-            barrier.wait();
-         }
-      });
+      query_engine engine(
+         relaxed_config(), reads.create_api(*validating_node), query_budget::clock::now, [&](auto current) {
+            if (current == stage) {
+               reached = true;
+               barrier.wait();
+            }
+         });
       auto result = std::async(std::launch::async, [&] { return engine.execute(count_query); });
       const auto deadline = query_budget::clock::now() + test_wait;
       while (!reached) {
@@ -415,7 +416,7 @@ BOOST_AUTO_TEST_CASE(notifications_have_no_payload_even_on_invocation_errors) {
 /// Only the adapter enforces JSON envelope size; engine counters count completed C++ results.
 BOOST_AUTO_TEST_CASE(response_byte_limit_has_no_partial_result) {
    read_queue reads;
-   query_config config;
+   auto config = relaxed_config();
    config.max_response_bytes = 1;
    auto engine = std::make_shared<query_engine>(config, reads.create_api(*validating_node));
    query_http_handler handler(engine);

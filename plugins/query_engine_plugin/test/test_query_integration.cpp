@@ -17,7 +17,7 @@ BOOST_FIXTURE_TEST_SUITE(query_integration, chain_fixture)
 
 BOOST_AUTO_TEST_CASE(grouping_through_production_service) {
    read_queue reads;
-   auto engine = std::make_shared<query_engine>(query_config{}, reads.create_api(*validating_node));
+   auto engine = std::make_shared<query_engine>(relaxed_config(), reads.create_api(*validating_node));
    query_http_handler handler(engine);
    const auto response =
       submit(handler, reads,
