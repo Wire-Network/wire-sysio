@@ -90,7 +90,8 @@ struct snap_vote_key_t {
 
 /**
  * One pending snapshot tuple and its monotonic producer voters, billed to sysio. Rows exist only for the
- * last snapshot_attestation::max_pending_vote_heights scheduled heights, at most max_snap_providers each.
+ * last snapshot_attestation::max_pending_vote_heights scheduled heights. A producer votes once per height, so a
+ * height holds at most one row per distinct producer that held a delegation while it was open.
  */
 struct [[sysio::table("snapvotes"), sysio::contract("sysio.system")]] snap_vote {
    /// Pending tuple identifier.

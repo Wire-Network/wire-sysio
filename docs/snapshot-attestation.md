@@ -234,6 +234,11 @@ pending rows. Scheduling remains based on block number, never elapsed time or bl
   quorum never forms: an older height is rejected ("snapshot block is older than the pending vote
   window") and the next accepted vote purges its rows. Two periods are at least four times the
   verification grace, so a vote that lands in time for verifiers is never refused.
+- A producer votes once per height, so an open height holds at most one row per distinct producer
+  that held a delegation while it was open. Delegation churn can push a height past
+  `max_snap_providers` rows only by bringing in further collateral-backed producers ranked within
+  `max_snap_provider_rank`, and those rows are purged with the rest of the height once it leaves
+  the window.
 - Once a newer height is attested, a purged unfinished historical height cannot be reopened.
   The latest retained `snaprecords` row acts as the monotonic finalized-height watermark.
 - After a block is attested, any later vote carrying a different block ID or hash for that height
