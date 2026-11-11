@@ -1007,7 +1007,7 @@ BOOST_FIXTURE_TEST_CASE(dispatch_existing_node_owner_name_rejects_without_blocki
    BOOST_CHECK_EQUAL(get_dclaim_row("pclaims"_n, "pending_claim", fresh.to_uint64_t())["balance"].as<asset>().get_amount(), 4321);
    const auto& active = control->get_authorization_manager().get_permission({CLAIM_ACCOUNT, config::active_name});
    BOOST_REQUIRE_EQUAL(active.auth.keys.size(), 1u);
-   BOOST_CHECK_EQUAL(active.auth.keys.front().key, victim_key);
+   BOOST_CHECK_EQUAL(active.auth.keys[0].key, victim_key);
 } FC_LOG_AND_RETHROW() }
 
 // Only ATTESTATION_TYPE_NODE_OWNER_REG reaches the node-owner handler. The outbound-only types
