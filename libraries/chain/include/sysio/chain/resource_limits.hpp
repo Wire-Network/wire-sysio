@@ -105,7 +105,10 @@ namespace sysio { namespace chain {
          uint64_t get_block_cpu_limit() const;
          uint64_t get_block_net_limit() const;
 
-         std::pair<int64_t, bool> get_account_cpu_limit( const account_name& name, uint32_t greylist_limit = config::maximum_elastic_resource_multiplier ) const;
+         /// Available CPU for `name`. With `current_time`, usage decays to that time first, for an account whose window
+         /// update_account_usage has not brought up to date in this block.
+         std::pair<int64_t, bool> get_account_cpu_limit( const account_name& name, uint32_t greylist_limit = config::maximum_elastic_resource_multiplier,
+                                                         const std::optional<block_timestamp_type>& current_time = {} ) const;
          std::pair<int64_t, bool> get_account_net_limit( const account_name& name, uint32_t greylist_limit = config::maximum_elastic_resource_multiplier ) const;
 
          std::pair<account_resource_limit, bool>

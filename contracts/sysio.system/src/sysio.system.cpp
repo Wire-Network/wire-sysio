@@ -52,7 +52,7 @@ namespace sysiosystem {
 #ifndef SYSTEM_BLOCKCHAIN_PARAMETERS
       set_blockchain_parameters( params );
 #else
-      constexpr size_t param_count = 17;
+      constexpr size_t param_count = 18;
       // an upper bound on the serialized size
       char buf[1 + sizeof(params) + param_count];
       datastream<char*> stream(buf, sizeof(buf));
@@ -77,7 +77,9 @@ namespace sysiosystem {
              << uint8_t(13) << params.max_action_return_value_size
              << uint8_t(14) << params.max_kv_key_size
              << uint8_t(15) << params.max_kv_value_size
-             << uint8_t(16) << params.max_kv_secondary_key_size;
+             << uint8_t(16) << params.max_kv_secondary_key_size
+
+             << uint8_t(17) << params.notify_cpu_stipend;
 
       set_parameters_packed(buf, stream.tellp());
 #endif

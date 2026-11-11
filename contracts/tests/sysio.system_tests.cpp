@@ -359,7 +359,8 @@ fc::mutable_variant_object config_to_variant( const sysio::chain::chain_config& 
       ( "max_action_return_value_size", config.max_action_return_value_size )
       ( "max_kv_key_size", config.max_kv_key_size )
       ( "max_kv_value_size", config.max_kv_value_size )
-      ( "max_kv_secondary_key_size", config.max_kv_secondary_key_size );
+      ( "max_kv_secondary_key_size", config.max_kv_secondary_key_size )
+      ( "notify_cpu_stipend", config.notify_cpu_stipend );
 }
 
 BOOST_FIXTURE_TEST_CASE( setparams, sysio_system_tester ) try {

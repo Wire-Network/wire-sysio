@@ -387,7 +387,8 @@ class cluster_generator:
                             'max_action_return_value_size': 1024,
                             'max_kv_key_size': 256,
                             'max_kv_value_size': 262144,
-                            'max_kv_secondary_key_size': 256
+                            'max_kv_secondary_key_size': 256,
+                            'notify_cpu_stipend': 100
                         }
                     }
         else:

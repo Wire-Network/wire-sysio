@@ -58,7 +58,7 @@ struct snap_provider_key_t {
    SYSLIB_SERIALIZE(snap_provider_key_t, (snap_account))
 };
 
-/** One producer-to-snapshot-account delegation. */
+/** One producer-to-snapshot-account delegation, billed to sysio; the table holds at most max_snap_providers. */
 struct [[sysio::table("snapprovs"), sysio::contract("sysio.system")]] snap_provider {
    /// Account authorized to submit snapshot votes.
    name snap_account;
@@ -88,7 +88,11 @@ struct snap_vote_key_t {
    SYSLIB_SERIALIZE(snap_vote_key_t, (id))
 };
 
-/** One pending snapshot tuple and its monotonic producer voters. */
+/**
+ * One pending snapshot tuple and its monotonic producer voters, billed to sysio. Rows exist only for the
+ * last snapshot_attestation::max_pending_vote_heights scheduled heights. A producer votes once per height, so a
+ * height holds at most one row per distinct producer that held a delegation while it was open.
+ */
 struct [[sysio::table("snapvotes"), sysio::contract("sysio.system")]] snap_vote {
    /// Pending tuple identifier.
    uint64_t           id;
@@ -186,6 +190,10 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
     * Rejects with snap_hash_disagreement_error when a final record at
     * the height differs by block id or snapshot hash. A height without its own final record cannot
     * be reopened below the latest attested height after pending rows have been purged.
+    *
+    * Only the last max_pending_vote_heights scheduled heights at or below the current block take
+    * votes, retries included; each accepted vote purges rows below that window. A matching or
+    * disagreeing vote on a final record is answered as above at any height.
     *
     * Every vote, including a no-op vote on a final tuple, requires a registered snap_account. A new
     * vote, or a retry while the tuple is pending, also requires live operator standing: an ACTIVE

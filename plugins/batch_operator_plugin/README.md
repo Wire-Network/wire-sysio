@@ -86,10 +86,13 @@ requires `read-mode = irreversible`.
 
 Each role signs with the one operator-configured WIRE signature provider, of any key
 type, whose key alone satisfies its authorization on chain: `<operator>@active` for
-the relay, the configured permission for the underwriter. At startup the node also
+the relay, the configured permission for the underwriter. The provider may hold its
+key remotely, as a `KMS:` WIRE K1 key does
+([signature_provider_kms_plugin](../signature_provider_kms_plugin/README.md)). At startup the node also
 checks that the key's signatures recover to it and that the authorization may
 declare every action the role pushes (`linkauth`). A role that fails either check,
-or matches no provider or more than one, stops the node.
+or matches no provider or more than one, stops the node. A transient signing failure
+during the key check, such as KMS throttling, is logged and passes the check.
 
 The node exempts the accounts it signs as from subjective CPU billing: both roles
 push on a schedule that loses some pushes (a race another operator won, an action

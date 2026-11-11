@@ -29,6 +29,7 @@ namespace sysio {
 
          // Contracts in `unittests/test-contracts' directory
          MAKE_READ_WASM_ABI(asserter,              asserter,              unittests/test-contracts)
+         MAKE_READ_WASM_ABI(cpu_receiver_test,     cpu_receiver_test,     unittests/test-contracts)
          MAKE_READ_WASM_ABI(deferred_test,         deferred_test,         unittests/test-contracts)
          MAKE_READ_WASM_ABI(get_sender_test,       get_sender_test,       unittests/test-contracts)
          MAKE_READ_WASM_ABI(get_table_test,        get_table_test,        unittests/test-contracts)

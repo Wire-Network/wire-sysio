@@ -19,6 +19,9 @@ struct account_billing {
    uint64_t     cpu_usage_us = 0;
    uint64_t     net_usage = 0;
    bool         cpu_greylisted = false;
+   /// False for a contract billed only for its own code after a system contract reached it. It pays CPU but no NET,
+   /// so its NET window is neither updated nor checked.
+   bool         pays_net = true;
 };
 using accounts_billing_t = flat_map<account_name, account_billing>;
 
@@ -111,4 +114,4 @@ class transaction_metadata {
 
 } } // sysio::chain
 
-FC_REFLECT( sysio::chain::account_billing, (cpu_limit_us)(cpu_usage_us)(net_usage)(cpu_greylisted) )
+FC_REFLECT( sysio::chain::account_billing, (cpu_limit_us)(cpu_usage_us)(net_usage)(cpu_greylisted)(pays_net) )
