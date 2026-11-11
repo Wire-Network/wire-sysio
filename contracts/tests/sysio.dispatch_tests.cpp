@@ -977,6 +977,9 @@ BOOST_FIXTURE_TEST_CASE(dispatch_existing_node_owner_name_rejects_without_blocki
    create_accounts({CLAIM_ACCOUNT});
    constexpr auto fresh = "freshclaim"_n;
    const auto victim_key = get_public_key(CLAIM_ACCOUNT, "active");
+   const auto operator_link = get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 0);
+   BOOST_REQUIRE(!operator_link.empty());
+   BOOST_REQUIRE(get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 1).empty());
    const auto eth_pub = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
    const auto eth_address = fc::crypto::ethereum::address_to_bytes(eth_pub);
    const std::vector<char> native_address(eth_address.begin(), eth_address.end());
@@ -998,10 +1001,12 @@ BOOST_FIXTURE_TEST_CASE(dispatch_existing_node_owner_name_rejects_without_blocki
    BOOST_CHECK(get_nodeowner(CLAIM_ACCOUNT).is_null());
    BOOST_CHECK(get_dclaim_row("pclaims"_n, "pending_claim", CLAIM_ACCOUNT.to_uint64_t()).is_null());
    // Only the fresh account's link may consume the depositor's imported credit.
-   const auto linked = get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 0);
+   // Bootstrap already linked the underwriter; preserve it and add only the fresh owner's link.
+   BOOST_CHECK(get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 0) == operator_link);
+   const auto linked = get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 1);
    BOOST_REQUIRE(!linked.empty());
    BOOST_CHECK_EQUAL(authex_abi.binary_to_variant("links_s", linked, fixture_abi_yield_function())["username"].as<name>(), fresh);
-   BOOST_CHECK(get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 1).empty());
+   BOOST_CHECK(get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 2).empty());
    BOOST_REQUIRE(!get_nodeowner(fresh).is_null());
    BOOST_CHECK_EQUAL(get_nodeownerreg(fresh)["status"].as<uint64_t>(), audit::status_confirmed);
    BOOST_CHECK_EQUAL(get_dclaim_row("pclaims"_n, "pending_claim", fresh.to_uint64_t())["balance"].as<asset>().get_amount(), 4321);
