@@ -399,6 +399,8 @@ cd $BUILD_DIR && python3 tests/<test_name>.py
 ```
 Do NOT run from the source root — that would use stale or missing binaries.
 
+Review [contract upgrade order](docs/contract-upgrade-order.md) when changing inline calls between system contracts; unchanged ABIs do not guarantee mixed-version compatibility.
+
 ## Smart Contract Compilation (System Contracts specifically)
 
 The system contracts are compiled via the `contracts_project` CMake target.

@@ -875,8 +875,8 @@ and are omitted.
 | `newuser` | tier-1 node owner | Create a sponsored sub-account |
 | `raiseacctlim` | tier-1 node owner | Raise its own account limit, at most by the configured multiplier |
 | `setacctlim` | `sysio.roa` | Set the default account limit and the raise multiplier |
-| `newnameduser` | `sysio.roa` | Create a vanity account (NFT-claim flow) |
-| `nodeownreg` | `sysio.roa` | Register a node owner from an OPP attestation |
+| `newnameduser` | `sysio.roa` | Privileged vanity-account creation; also called internally by `nodeownreg` |
+| `nodeownreg` | `sysio.roa` | Create and register a fresh node-owner account from an OPP attestation |
 | `forcereg` | `sysio.roa` | Register a node owner directly (governance/bootstrap) |
 | `activateroa` | `sysio.roa` | Activate ROA and set the initial byte price |
 | `setbyteprice` | `sysio.roa` | Change bytes-per-unit on network expansion |
@@ -914,3 +914,19 @@ and are omitted.
 above — contract-as-payer billing, the failure mode of an unprovisioned contract, RAM-free token
 transfers, and multi-issuer policy stacking — were each verified against the code and confirmed
 with executable tests. The transcript blocks reproduce actual test output.*
+
+## NFT registration names
+
+Node-owner NFT claims create **new accounts only** (admin-approved WIRE-439 policy).
+`sysio.msgch` dispatches `nodeownreg`, which rejects an existing name with
+`ACCOUNT_EXISTS` (7), including when the claim copies its public active key.
+Already registered owners retain the `DUPLICATE` outcome. Rejection records an
+audit row without changing the account authority, AuthEx link or owner allocation.
+A fresh accepted claim creates the requested authority, allocates the owner and
+records the depositor's Ethereum link in one atomic Wire transaction.
+
+The Hub checks name availability before BAR commitment; this cannot reserve the
+name against a competing claim. A name taken before depot execution is rejected
+and the NFT remains subject to BAR's existing escrow/recovery rules. This change
+adds no automatic refund or recovery action. Deploy the coupled contracts as
+specified in [contract upgrade order](contract-upgrade-order.md#wire-439-node-owner-registration).

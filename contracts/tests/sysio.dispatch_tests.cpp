@@ -324,9 +324,7 @@ public:
    static constexpr auto ROA_ACCOUNT    = "sysio.roa"_n;
    static constexpr auto BATCHOP        = "batchop.a"_n;
    static constexpr auto UWRIT_OP       = "uwrit.alice"_n;
-   // Pre-created claim account for the NodeOwnerRegistration test: a fresh single-key account, so
-   // nodeownreg's active_key_matches succeeds when the claim carries that same key (existing-account
-   // path -- exercises the dispatch decode + routing without the account-creation machinery).
+   /// Node-owner claim target, deliberately absent until depot dispatch.
    static constexpr auto CLAIM_ACCOUNT  = "claimacct"_n;
    static constexpr uint64_t ROA_NETWORK_GEN = 0;
    /// Termination prune delay for the suite's opreg config: ten minutes, far beyond any test's wall clock.
@@ -340,15 +338,6 @@ public:
          CHALG_ACCOUNT, TOKEN_ACCOUNT, CHAINS_ACCOUNT,
          DCLAIM_ACCOUNT, BATCHOP, UWRIT_OP
       });
-      // CLAIM_ACCOUNT with NO roa policy (include_roa_policy=false) so regnodeowner exercises the
-      // fresh create-branch of increase_reslimit. (A pre-existing reslimit row would now be reconciled,
-      // not rejected -- SEC-087 -- but this dispatch test keeps the clean create path.) include_code=true
-      // leaves the standard <account>@sysio.code on active, which exercises active_key_matches against a
-      // real (non-single-entry) authority.
-      create_account(CLAIM_ACCOUNT, config::system_account_name,
-                     /*multisig=*/false, /*include_code=*/true, /*include_roa_policy=*/false);
-      produce_blocks(2);
-
       deploy(MSGCH_ACCOUNT,  contracts::msgch_wasm(),   contracts::msgch_abi(),   msgch_abi);
       deploy(OPREG_ACCOUNT,  contracts::opreg_wasm(),   contracts::opreg_abi(),   opreg_abi);
       deploy(EPOCH_ACCOUNT,  contracts::epoch_wasm(),   contracts::epoch_abi(),   epoch_abi);
@@ -935,11 +924,7 @@ BOOST_FIXTURE_TEST_CASE(deliver_envelope_at_size_cap_succeeds, sysio_dispatch_te
    BOOST_REQUIRE_EQUAL(current_epoch(), row["epoch_index"].as<uint32_t>());
 } FC_LOG_AND_RETHROW() }
 
-// NodeOwnerRegistration: msgch decodes the attestation and inline-sends sysio.roa::newnameduser then
-// nodeownreg. CLAIM_ACCOUNT pre-exists with a single-key active, so newnameduser no-ops and the
-// claim's matching wire key drives nodeownreg's existing-account path to CONFIRMED (registers the
-// owner and inline-records the depositor's ETH link in sysio.authex). Exercises the full dispatch:
-// proto decode (account name + WireKey + ETH key) -> routing -> both roa actions -> recordlink.
+/// Full depot dispatch creates the account, registers it and sweeps pre-link DClaim rewards.
 BOOST_FIXTURE_TEST_CASE(dispatch_routes_node_owner_reg_to_roa, sysio_dispatch_tester) { try {
    // Node-owner NFT deposits originate on the Ethereum outpost (code "ETHEREUM", matching the launch
    // bootstrap config and msgch's NODE_OWNER_SRC_CHAIN). Bootstrap it as the scheduled source outpost
@@ -947,7 +932,7 @@ BOOST_FIXTURE_TEST_CASE(dispatch_routes_node_owner_reg_to_roa, sysio_dispatch_te
    bootstrap_for_dispatch("ETHEREUM");
 
    const auto eth_code = fc::slug_name{"ETHEREUM"}.value;
-   // The claim must carry CLAIM_ACCOUNT's own active key so nodeownreg's active_key_matches passes.
+   // The supplied key becomes the new account's owner and active authority.
    auto wire_key = k1_pubkey_bytes(get_public_key(CLAIM_ACCOUNT, "active"));
    // BAR supplies the depositor's ETH key as an uncompressed 65-byte point.
    auto eth_pub = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
@@ -983,6 +968,46 @@ BOOST_FIXTURE_TEST_CASE(dispatch_routes_node_owner_reg_to_roa, sysio_dispatch_te
    auto pending = get_dclaim_row("pclaims"_n, "pending_claim", CLAIM_ACCOUNT.to_uint64_t());
    BOOST_REQUIRE(!pending.is_null());
    BOOST_REQUIRE_EQUAL(pending["balance"].as<asset>().get_amount(), 4321);
+} FC_LOG_AND_RETHROW() }
+
+/// A copied public key cannot authorize an existing name, and rejection must not block a fresh claim.
+BOOST_FIXTURE_TEST_CASE(dispatch_existing_node_owner_name_rejects_without_blocking_fresh_claim, sysio_dispatch_tester) { try {
+   namespace audit = sysio_system::test_support::nodeownerreg;
+   bootstrap_for_dispatch("ETHEREUM");
+   create_accounts({CLAIM_ACCOUNT});
+   constexpr auto fresh = "freshclaim"_n;
+   const auto victim_key = get_public_key(CLAIM_ACCOUNT, "active");
+   const auto eth_pub = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
+   const auto eth_address = fc::crypto::ethereum::address_to_bytes(eth_pub);
+   const std::vector<char> native_address(eth_address.begin(), eth_address.end());
+   BOOST_REQUIRE_EQUAL(success(), push(DCLAIM_ACCOUNT, dclaim_abi, DCLAIM_ACCOUNT, "importseed"_n, mvo()
+      ("chain", ChainKind::CHAIN_KIND_EVM)("credits", fc::variants{
+         mvo()("native_address", native_address)("wire_atomic", int64_t{4321})})));
+   std::vector<std::string> claims;
+   for (const auto owner : {CLAIM_ACCOUNT, fresh}) {
+      claims.push_back(encode_node_owner_registration(
+         owner.to_string(), 2, sysio::opp::types::WIRE_KEY_TYPE_K1,
+         k1_pubkey_bytes(get_public_key(owner, "active")), em_uncompressed_pubkey_bytes(eth_pub), eth_address));
+   }
+   BOOST_REQUIRE_EQUAL(success(), deliver(fc::slug_name{"ETHEREUM"}.value,
+      encode_envelope_with_attestations(current_epoch(), sysio::opp::types::ATTESTATION_TYPE_NODE_OWNER_REG, claims)));
+   const auto rejected = get_nodeownerreg(CLAIM_ACCOUNT);
+   BOOST_REQUIRE(!rejected.is_null());
+   BOOST_CHECK_EQUAL(rejected["status"].as<uint64_t>(), audit::status_rejected);
+   BOOST_CHECK_EQUAL(rejected["reason"].as<uint64_t>(), audit::reason_account_exists);
+   BOOST_CHECK(get_nodeowner(CLAIM_ACCOUNT).is_null());
+   BOOST_CHECK(get_dclaim_row("pclaims"_n, "pending_claim", CLAIM_ACCOUNT.to_uint64_t()).is_null());
+   // Only the fresh account's link may consume the depositor's imported credit.
+   const auto linked = get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 0);
+   BOOST_REQUIRE(!linked.empty());
+   BOOST_CHECK_EQUAL(authex_abi.binary_to_variant("links_s", linked, fixture_abi_yield_function())["username"].as<name>(), fresh);
+   BOOST_CHECK(get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 1).empty());
+   BOOST_REQUIRE(!get_nodeowner(fresh).is_null());
+   BOOST_CHECK_EQUAL(get_nodeownerreg(fresh)["status"].as<uint64_t>(), audit::status_confirmed);
+   BOOST_CHECK_EQUAL(get_dclaim_row("pclaims"_n, "pending_claim", fresh.to_uint64_t())["balance"].as<asset>().get_amount(), 4321);
+   const auto& active = control->get_authorization_manager().get_permission({CLAIM_ACCOUNT, config::active_name});
+   BOOST_REQUIRE_EQUAL(active.auth.keys.size(), 1u);
+   BOOST_CHECK_EQUAL(active.auth.keys.front().key, victim_key);
 } FC_LOG_AND_RETHROW() }
 
 // Only ATTESTATION_TYPE_NODE_OWNER_REG reaches the node-owner handler. The outbound-only types

@@ -116,7 +116,7 @@ namespace sysio {
 
             /**
              * @brief Directly register `owner` as a node owner at `tier`, bypassing the OPP claim
-             *        flow. Privileged bootstrap/test path -- NOT the production registration route.
+             *        flow. Also used as nodeownreg's internal allocation step after native account creation.
              *
              * Requires `sysio.roa` active authority, so it is governance/system-only and never
              * user-callable. It exists to seed node owners where the full OPP machinery is absent or
@@ -137,27 +137,19 @@ namespace sysio {
             void forcereg(const name& owner, const uint8_t& tier);
 
             /**
-             * @brief Registers a node owner when the depot (sysio.msgch) processes an inbound OPP
-             *        NodeOwnerRegistration attestation. The register step of the NFT claim flow; the
-             *        depot inline-sends newnameduser immediately before this. It creates a missing
-             *        account only when the name is valid and the tier has registration capacity.
+             * @brief Create and register a new node-owner account from an authenticated OPP claim.
              *
-             * Trust-OPP: the OPP envelope is the deposit proof, so this RECORDS the depositor's ETH
-             * key as a sysio.authex link (inline recordlink) rather than verifying a pre-existing
-             * createlink. Claim-payload problems (bad name, account controlled by a different key,
-             * already registered, tier full) are soft-failed -- recorded in `nodeownerreg` with a reject_reason
-             * and returned -- never thrown, so the dispatching transaction commits. Depot/system
-             * invariants (tier range, ETH key type and curve membership, ROA active) stay hard checks:
-             * sysio.msgch drops a depositor key that is not a secp256k1 point before dispatch, and
-             * one that still arrived would leave recordlink skipping the link this action confirms.
+             * Requires sysio.roa authority. Existing accounts are rejected even if wire_pub_key
+             * matches a public active key. Valid claims queue native account creation, tier allocation
+             * through forcereg, and the depositor's AuthEx link in one atomic transaction.
+             * Claim-payload errors record a terminal rejection without aborting depot dispatch.
+             * Tier range, depositor key/address validity and ROA activation remain hard invariants.
              *
-             * @param owner        The Wire account to register as node owner (created in-flow if absent).
-             * @param tier         Node owner tier: 1, 2, or 3.
-             * @param eth_pub_key  The depositor's ETH public key (Wire PUB_EM format); recorded as the link.
-             * @param wire_pub_key The Wire account owner/active key the claim specified; an existing
-             *                     account must be controlled by exactly this key or the claim is rejected.
-             * @param eth_address  Depositor 20-byte ETH address used to sweep DClaim rewards
-             *                     deposited before the link existed.
+             * @param owner        New Wire account name, valid for the claimed tier.
+             * @param tier         Node-owner tier 1, 2 or 3.
+             * @param eth_pub_key  Depositor EM public key, recorded as the account's Ethereum link.
+             * @param wire_pub_key Owner and active key for the newly created account.
+             * @param eth_address  Depositor's 20-byte address, used to sweep pre-link DClaim rewards.
              */
             [[sysio::action]]
             void nodeownreg(const name& owner, const uint8_t& tier, const public_key& eth_pub_key,
@@ -236,11 +228,10 @@ namespace sysio {
             /**
              * @brief Create a node-owner account with a user-chosen (vanity) name and the holder's
              * K1 key as owner/active, funded with the fixed newaccount_ram from sysio's pool. The
-             * create step of the OPP NFT claim flow (newnameduser -> nodeownreg, whose inline
-             * recordlink records the external-chain link and sweeps pre-link rewards).
+             * creation helper called internally by nodeownreg before its queued allocation and AuthEx link.
              *
-             * Dispatched by privileged sysio.msgch as {sysio.roa, active}, without a cross-contract
-             * active grant, like nodeownreg. Idempotent: a no-op if the account already exists.
+             * Standalone creation is privileged and idempotent. An account created separately is
+             * not eligible for a later NFT claim.
              * Tier-based name rules: tier-1 = 2-6 char prefix; tier 2/3 = up to 12 chars.
              * Invalid names and full tiers skip creation without spending RAM; nodeownreg records
              * the rejection. Capacity comes from the live generation's authoritative owner rows.
@@ -439,20 +430,15 @@ namespace sysio {
             // Rejection reason for `nodeownerreg::reason` (only meaningful when status == REJECTED).
             // Under trust-OPP, nodeownreg soft-fails claim-payload errors by recording one of these
             // instead of aborting the dispatching transaction, so the failure is queryable on Wire.
-            // (Values renumbered for the create-in-flow model: the ETH link is now *recorded* via
-            // sysio.authex::recordlink rather than verified against a pre-existing createlink, so the
-            // former NO_AUTHEX_LINK / KEY_MISMATCH reasons no longer apply. Pre-launch: no stored rows
-            // to migrate.)
             enum reject_reason : uint8_t {
                 NONE                 = 0,  // not rejected
                 NAME_INVALID         = 1,  // chosen name violates the tier's length rule or is a reserved sysio. name
-                OWNER_NOT_ACCOUNT    = 2,  // account does not exist (creation did not occur)
-                ACCOUNT_KEY_MISMATCH = 3,  // existing account's active authority != the single claimed wire key
+                OWNER_NOT_ACCOUNT    = 2,  // historical: creation did not occur
+                ACCOUNT_KEY_MISMATCH = 3,  // historical: submitted key did not match active authority
                 DUPLICATE            = 4,  // owner is already a registered node owner
                 LINK_KEY_MISMATCH    = 5,  // account already carries a different external-chain link key
-                TIER_CAP_REACHED     = 6   // the claimed tier has no remaining registration capacity
-                // (OWNER_HAS_RESLIMIT removed: a pre-existing reslimit row no longer rejects registration --
-                //  regnodeowner reconciles it via increase_reslimit. Pre-launch: no stored rows to migrate. SEC-087.)
+                TIER_CAP_REACHED     = 6,  // the claimed tier has no remaining registration capacity
+                ACCOUNT_EXISTS       = 7   // the target existed before this claim; registration requires a new account
             };
 
             // Under trust-OPP the OPP envelope is the deposit proof, so this audit row records only
@@ -606,18 +592,7 @@ namespace sysio {
              */
             static bool valid_name_for_tier(const name& account, uint8_t tier);
 
-            /**
-             * @brief Whether `key` can satisfy `account`'s `active` authority by itself -- i.e. it
-             *        appears among the active keys with weight >= threshold. Passes for a
-             *        newnameduser-created account ({key}) and for a standard account that also carries
-             *        the benign <account>@sysio.code entry; rejects an account a different key controls
-             *        (that key won't be present) and a multi-sig where `key` alone is insufficient.
-             *
-             * @param account The account whose active permission to inspect.
-             * @param key     The claimed owner/active public key.
-             * @return true if `key` alone controls `account`'s active permission.
-             */
-            static bool active_key_matches(const name& account, const public_key& key);
+
 
 
             /**

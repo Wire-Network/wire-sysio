@@ -383,3 +383,16 @@ Deploy this `sysio.msgch` on fresh state and regenerate the SDK contract types w
 written before the change has no `byqueue` entry, so `buildenv` never finds it: a queued
 `DESYNDICATE_LIQ` would never ship, and an inbound row would never be erased. There is no migration
 path.
+
+## WIRE-439 node-owner registration
+
+Deploy the matching `sysio.roa` and `sysio.msgch` WASMs together in one transaction,
+or quiesce inbound dispatch until both are installed. The ABI and stored-row
+layouts are unchanged, but mixed revisions are not compatible: old MSGCH creates
+the account before new ROA rejects it, while new MSGCH leaves creation to ROA.
+Do not process node-owner claims between separate deployments. Preserve both
+contracts' privileged status and the default inline-depth limit.
+
+Deploy the new-account-only Hub and Tools companions with this pair. Existing
+memberships and historical audit reason values remain readable; this update does
+not remediate previously bound links or release escrowed NFTs.

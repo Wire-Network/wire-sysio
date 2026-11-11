@@ -3,6 +3,8 @@
 Wire Sysio is a fork of Spring, a C++ implementation of the [AntelopeIO](https://github.com/AntelopeIO) protocol. It
 contains blockchain node software and supporting tools for developers and node operators.
 
+Resource allocation and node-owner registration are described in [the ROA overview](docs/roa-overview.md).
+
 ## Branches
 
 The `master` branch is the latest stable branch.
