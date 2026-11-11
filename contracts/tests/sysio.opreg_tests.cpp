@@ -125,8 +125,6 @@ constexpr auto kEligibilityBatchOperator = "batchop.a"_n;
 /// Producer account used by focused eligibility tests.
 constexpr auto kEligibilityProducer = "producer.a"_n;
 
-/// Ethereum chain and token codename used by focused collateral tests.
-constexpr std::string_view kEthCodename = "ETH";
 
 /// Native WIRE chain and token codename used by focused collateral tests.
 constexpr std::string_view kWireCodename = "WIRE";
@@ -314,9 +312,6 @@ constexpr std::string_view kYieldNotCoveredError =
    "assertion failure with message: owed yield is rounding dust the WIRE received from sysio.liq does not "
    "cover; only later slack can cover it";
 
-/// Recent-actions reason `depositinle` records when it drops a credit naming the depot chain.
-constexpr std::string_view kDepotChainCreditReason =
-   "depot-chain collateral is bonded through deposit, never credited from an outpost";
 
 /// Account with no stake in the yield cases that cranks `claimyield` for someone else.
 constexpr auto kYieldKeeper = "uwrit.a"_n;

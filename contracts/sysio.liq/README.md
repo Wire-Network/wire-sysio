@@ -68,7 +68,7 @@ and sets the tick parameters. The pre-launch positions are replayed by
 | `burn(token_code, amount)` | `sysio.synd` | Burn shadow out of `sysio.synd`'s own row |
 | `mintyield(chain_code, token_code, amount)` | `sysio.synd` | LIQ_YIELD into the pending balance |
 | `queueyield(sym)` | none | Pending yield into the swap's reservoir |
-| `transfer`, `open`, `close`, `claim` | holder | `sysio.token`'s shape; `close` refuses while yield is owed |
+| `transfer`, `close`, `claim` | holder | `sysio.token`'s shape, balance rows billed to `sysio`; `close` refuses while yield is owed |
 | `addyield(from, quantity, target)` | `from` | Distribute WIRE to `target`'s holders |
 | `regliqpool(...)` | privileged caller, epoch 0 | Seed a shadow's yield pool |
 

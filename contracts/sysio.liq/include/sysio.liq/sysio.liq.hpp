@@ -135,7 +135,6 @@ namespace sysio {
       /// and sysio.bond may debit their own balance. Settles both yield positions, preserves supply,
       /// and requires the Andon cord clear, including self-settlement.
       [[sysio::action]] void settle(name custodian, name beneficiary, asset quantity);
-      [[sysio::action]] void open(name owner, symbol symbol, name ram_payer);
       /// Erase `owner`'s empty row for `symbol`. Refused while the row is still
       /// owed yield, so closing never discards WIRE.
       [[sysio::action]] void close(name owner, symbol symbol);
@@ -261,9 +260,9 @@ namespace sysio {
       /// The one funnel every balance move goes through: settle `row` at `index`,
       /// stamp it, then apply `delta`. Nothing else writes `balance`.
       static void settle_and_adjust(opp::shadow::account& row, u128 index, const asset& delta);
-      /// Apply `delta` to `owner`'s row for its symbol through the funnel. A row
+      /// Apply `delta` to `owner`'s row for its symbol through the funnel, billed to `sysio`. A row
       /// created here is stamped at the current index, so no history is credited.
-      void adjust_account(name owner, const asset& delta, name payer);
+      void adjust_account(name owner, const asset& delta);
       /// Grow `sym`'s supply by `quantity`; false (and no change) past its headroom.
       bool grow_supply(symbol_code sym, uint64_t quantity);
       /// Advance `sym`'s index by `quantity` WIRE over its supply, carrying the
