@@ -2800,7 +2800,7 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_happy_path, sysio_roa_nodeownreg_tester ) tr
    for (const auto& [owner, tier] : {std::pair{"freshone"_n, uint8_t{2}},
                                    std::pair{"fresh"_n, uint8_t{1}},
                                    std::pair{"freshthree"_n, uint8_t{3}}}) {
-      BOOST_REQUIRE(control->db().find<account_object, by_name>(owner) == nullptr);
+      BOOST_REQUIRE((control->db().find<account_object, by_name>(owner) == nullptr));
       BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, tier, eth_pub, wire_pub));
       produce_blocks();
       const auto reg = get_nodeowner(owner);
