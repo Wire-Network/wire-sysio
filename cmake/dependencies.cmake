@@ -84,6 +84,7 @@ find_package(bn256 CONFIG REQUIRED)
 find_package(bls12-381 CONFIG REQUIRED)
 
 find_package(CURL 8.16.0 CONFIG REQUIRED)
+find_package(sys-vm CONFIG REQUIRED)
 
 # Allocator overrides - linked per-target by apply_malloc_config (cmake/linker-config.cmake).
 # vcpkg jemalloc port only ships .a + pkg-config (no CMake config), so find by name when enabled.

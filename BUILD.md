@@ -20,13 +20,7 @@ git clone --recursive https://github.com/Wire-Network/wire-sysio.git
 
 # Enter the repo directory
 cd wire-sysio
-
-# Refresh pinned submodules when updating an existing checkout
-git submodule update --init --recursive vcpkg libraries/appbase libraries/sys-vm
 ```
-
-The eos-vm headers are built from the pinned `libraries/sys-vm` submodule. Softfloat and the other
-third-party packages continue to come from vcpkg.
 
 # On Host Machine
 

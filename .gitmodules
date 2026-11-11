@@ -6,6 +6,3 @@
 	path = vcpkg
 	url = https://github.com/Microsoft/vcpkg.git
 
-[submodule "libraries/sys-vm"]
-	path = libraries/sys-vm
-	url = https://github.com/Wire-Network/eos-vm
