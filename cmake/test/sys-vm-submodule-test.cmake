@@ -5,6 +5,8 @@ endif()
 if(NOT GENERATOR)
    set(GENERATOR Ninja)
 endif()
+# Never let a previous SDK installation or CMake cache satisfy the current run.
+file(REMOVE_RECURSE "${WORK_DIR}")
 file(MAKE_DIRECTORY "${WORK_DIR}/source/sentinel-modules" "${WORK_DIR}/consumer")
 file(WRITE "${WORK_DIR}/source/sentinel-modules/dependencies.cmake"
      "message(FATAL_ERROR \"The VM resolved its parent's dependencies.cmake\")\n")
@@ -16,9 +18,14 @@ include(GNUInstallDirs)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_INSTALL_DEFAULT_COMPONENT_NAME parent_component)
 foreach(option ENABLE_TESTS ENABLE_SPEC_TESTS ENABLE_FUZZ_TESTS ENABLE_TOOLS ENABLE_CCACHE
-               ENABLE_PROFILE ENABLE_GPERFTOOLS ENABLE_ADDRESS_SANITIZER ENABLE_UNDEFINED_BEHAVIOR_SANITIZER)
+               ENABLE_PROFILE ENABLE_GPERFTOOLS ENABLE_ADDRESS_SANITIZER ENABLE_UNDEFINED_BEHAVIOR_SANITIZER
+               ENABLE_MEMORY_OPS_ALIGNMENT)
    set(${option} ON CACHE BOOL "Parent setting that the VM must preserve" FORCE)
 endforeach()
+# Match sysio_chain's dependency order: another imported target exposes vcpkg/include first.
+if(NOT VCPKG_INSTALLED_TARGET_DIR)
+   get_filename_component(VCPKG_INSTALLED_TARGET_DIR "${softfloat_DIR}/../.." ABSOLUTE)
+endif()
 get_property(original_launcher GLOBAL PROPERTY RULE_LAUNCH_COMPILE)
 list(PREPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/sentinel-modules")
 set(SYSVM_INSTALL_COMPONENT dev)
@@ -28,7 +35,8 @@ if(NOT VM_SOURCE)
 endif()
 add_sys_vm_submodule("${VM_SOURCE}" "${CMAKE_CURRENT_BINARY_DIR}/vm")
 foreach(option ENABLE_TESTS ENABLE_SPEC_TESTS ENABLE_FUZZ_TESTS ENABLE_TOOLS ENABLE_CCACHE
-               ENABLE_PROFILE ENABLE_GPERFTOOLS ENABLE_ADDRESS_SANITIZER ENABLE_UNDEFINED_BEHAVIOR_SANITIZER)
+               ENABLE_PROFILE ENABLE_GPERFTOOLS ENABLE_ADDRESS_SANITIZER ENABLE_UNDEFINED_BEHAVIOR_SANITIZER
+               ENABLE_MEMORY_OPS_ALIGNMENT)
    get_property(cached CACHE ${option} PROPERTY VALUE)
    if(NOT ${option} OR NOT cached)
       message(FATAL_ERROR "The VM changed parent setting ${option}")
@@ -43,8 +51,9 @@ endif()
 if(TARGET unit_tests OR TARGET sys_vm_spec_tests OR TARGET sys-vm-interp)
    message(FATAL_ERROR "The VM enabled its standalone tests or tools")
 endif()
+find_package(bn256 CONFIG REQUIRED PATHS "${VCPKG_INSTALLED_TARGET_DIR}/share/bn256" NO_DEFAULT_PATH)
 add_executable(vm_probe main.cpp)
-target_link_libraries(vm_probe PRIVATE sys-vm::sys-vm)
+target_link_libraries(vm_probe PRIVATE bn256::bn256 sys-vm::sys-vm)
 ]=])
 string(CONFIGURE "${project}" project @ONLY)
 file(WRITE "${WORK_DIR}/source/CMakeLists.txt" "${project}")
@@ -52,6 +61,9 @@ file(WRITE "${WORK_DIR}/source/main.cpp" [=[
 #include <sysio/vm/config.hpp>
 #include <sysio/vm/signals.hpp>
 static_assert(sysio::vm::use_softfloat);
+#ifdef SYS_VM_ALIGN_MEMORY_OPS
+#error "Sysio must not enable VM memory alignment hints"
+#endif
 /// Verify that both build-tree and installed consumers use the fixed signal disposition handling.
 int main() {
    auto& previous = sysio::vm::prev_signal_handler<SIGILL>;
@@ -114,6 +126,23 @@ foreach(build IN ITEMS build consumer-build)
    run_checked("${build}-run" "${probe}")
 endforeach()
 
+# A shared installation containing the retired port must fail before its headers can shadow the submodule.
+file(MAKE_DIRECTORY "${WORK_DIR}/stale-installed/include/sysio/vm" "${WORK_DIR}/stale-installed/share")
+file(WRITE "${WORK_DIR}/stale-installed/include/sysio/vm/signals.hpp"
+     "#error Retired VM headers shadowed the submodule\n")
+# Reproduce the imported dependency that exposes the old include directory before the VM target.
+file(COPY "${SOFTFLOAT_DIR}/../bn256" DESTINATION "${WORK_DIR}/stale-installed/share")
+file(CREATE_LINK "${SOFTFLOAT_DIR}/../../lib" "${WORK_DIR}/stale-installed/lib" SYMBOLIC)
+execute_process(COMMAND "${CMAKE_COMMAND}" -S "${WORK_DIR}/source" -B "${WORK_DIR}/stale-build"
+                ${configure_options} "-DVCPKG_INSTALLED_TARGET_DIR=${WORK_DIR}/stale-installed"
+                -DVCPKG_MANIFEST_INSTALL=OFF
+                RESULT_VARIABLE result OUTPUT_VARIABLE output ERROR_VARIABLE error)
+file(WRITE "${WORK_DIR}/stale-headers.log" "${output}${error}")
+string(REGEX REPLACE "[ \t\r\n]+" " " diagnostic "${output}${error}")
+if(result EQUAL 0 OR NOT diagnostic MATCHES "Stale wire-sys-vm headers")
+   message(FATAL_ERROR "A reused installation did not reject headers from the retired VM port")
+endif()
+
 # A checkout without the submodule must fail early with an actionable initialization command.
 execute_process(COMMAND "${CMAKE_COMMAND}" -S "${WORK_DIR}/source" -B "${WORK_DIR}/missing-build"
                 ${configure_options} "-DVM_SOURCE=${WORK_DIR}/missing"
@@ -123,4 +152,4 @@ string(REGEX REPLACE "[ \t\r\n]+" " " diagnostic "${output}${error}")
 if(result EQUAL 0 OR NOT diagnostic MATCHES "git submodule update --init libraries/sys-vm")
    message(FATAL_ERROR "A missing VM submodule did not produce the expected initialization error")
 endif()
-message(STATUS "VM submodule, SDK consumers, option isolation, and missing-submodule checks passed")
+message(STATUS "VM submodule, SDK consumers, option isolation, stale-header, and missing-submodule checks passed")

@@ -4,6 +4,13 @@ function(add_sys_vm_submodule SOURCE_DIRECTORY BINARY_DIRECTORY)
       message(FATAL_ERROR "Missing sys-vm submodule. Run: git submodule update --init libraries/sys-vm")
    endif()
 
+   # A reused vcpkg include directory can shadow these headers through another dependency's include path.
+   if(VCPKG_INSTALLED_TARGET_DIR AND EXISTS "${VCPKG_INSTALLED_TARGET_DIR}/include/sysio/vm")
+      message(FATAL_ERROR
+         "Stale wire-sys-vm headers in ${VCPKG_INSTALLED_TARGET_DIR}/include/sysio/vm. "
+         "Enable VCPKG_MANIFEST_INSTALL or use a clean vcpkg installed directory before configuring Sysio.")
+   endif()
+
    # The subproject predates CMP0077; normal variables keep its options local to this function.
    set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
    set(ENABLE_TESTS OFF)
@@ -17,6 +24,7 @@ function(add_sys_vm_submodule SOURCE_DIRECTORY BINARY_DIRECTORY)
    set(ENABLE_SOFTFLOAT ON)
    set(ENABLE_SOFTFLOAT_INSTALL OFF)
    set(FULL_DEBUG_BUILD OFF)
+   set(ENABLE_MEMORY_OPS_ALIGNMENT OFF)
    set(CMAKE_INSTALL_DEFAULT_COMPONENT_NAME "${SYSVM_INSTALL_COMPONENT}")
 
    # cmake_dependent_option writes the shared cache even with CMP0077 NEW. Preserve the parent choices.

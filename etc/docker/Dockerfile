@@ -129,10 +129,10 @@ ARG REPO=https://github.com/Wire-Network/wire-sysio
 RUN mkdir -p /wire
 WORKDIR /wire
 
-# Clone the selected branch with submodules, then ensure full submodule initialization
-RUN git clone --recursive -b ${SYSIO_BRANCH} ${REPO} ${APP_DIR}
+# Clone the selected branch and initialize only the top-level dependencies.
+RUN git clone -b ${SYSIO_BRANCH} ${REPO} ${APP_DIR}
 WORKDIR ${APP_DIR}
-RUN git submodule update --init --recursive
+RUN git submodule update --init vcpkg libraries/appbase libraries/sys-vm
 RUN if [ -f ./vcpkg/bootstrap-vcpkg.sh ]; then ./vcpkg/bootstrap-vcpkg.sh; else echo "vcpkg bootstrap script not found, skipping"; fi
 
 # Stage 4a: app-build-local
