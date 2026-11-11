@@ -129,6 +129,7 @@ endforeach()
 # A shared installation containing the retired port must fail before its headers can shadow the submodule.
 file(MAKE_DIRECTORY "${WORK_DIR}/stale-installed/include/sysio/vm" "${WORK_DIR}/stale-installed/share")
 file(WRITE "${WORK_DIR}/stale-installed/include/sysio/vm/signals.hpp"
+     "/// Detect accidental selection of headers from the retired vcpkg port.\n"
      "#error Retired VM headers shadowed the submodule\n")
 # Reproduce the imported dependency that exposes the old include directory before the VM target.
 file(COPY "${SOFTFLOAT_DIR}/../bn256" DESTINATION "${WORK_DIR}/stale-installed/share")
