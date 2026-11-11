@@ -12,14 +12,19 @@
  *   plugin.register_spec_handler("KMS", &sysio::sigprov::kms::create_kms_provider);
  * from `main()` before `app().initialize(...)`.
  *
- * The lower-level helpers (`parse_kms_spec`, `der_to_compact`, `recover_v`, `spki_der_to_public_key`,
- * `throw_kms_error`, `make_kms_signature_provider`) are exposed both because they are well-defined operations on
+ * KMS keys are secp256k1 (`ECC_SECG_P256K1`). They back two key types: Ethereum keys (`chain_key_type_ethereum`)
+ * and WIRE K1 keys (`chain_key_type_wire` with a `PUB_K1_` public key).
+ *
+ * The lower-level helpers (`parse_kms_spec`, `der_to_compact`, `recover_v`, `der_to_eth_signature`,
+ * `der_to_wire_k1_signature`, `spki_der_to_public_key`, `throw_kms_error`, `make_kms_signature_provider`) are
+ * exposed both because they are well-defined operations on
  * KMS-shaped data and so the test suite can exercise them directly without going through the plugin.
  */
 
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 
 #include <fc/crypto/chain_types_reflect.hpp>
+#include <fc/crypto/elliptic.hpp>
 #include <fc/crypto/elliptic_em.hpp>
 #include <fc/crypto/keccak256.hpp>
 #include <fc/crypto/public_key.hpp>
@@ -181,6 +186,24 @@ fc::em::compact_signature der_to_eth_signature(
    const fc::em::public_key&           expected_pubkey);
 
 /**
+ * @brief End-to-end: DER -> low-S compact + recovered id -> 65-byte WIRE K1 sig.
+ *
+ * The WIRE K1 counterpart of `der_to_eth_signature`: same decode, low-S normalisation and recovery, packed as
+ * `[ (31 + recovery_id) | r | s ]`, the `fc::ecc::compact_signature` layout `fc::ecc::private_key::sign_compact`
+ * produces (header 27 + 4 for a compressed key).
+ *
+ * @param der DER-encoded ECDSA signature returned from KMS::Sign
+ * @param digest 32-byte digest that was passed to KMS as `MessageType=DIGEST`
+ * @param expected_pubkey the K1 key's secp256k1 point, validated against `KMSClient::GetPublicKey`
+ * @throws sysio::chain::plugin_config_exception on malformed DER or if neither parity recovers `expected_pubkey`
+ * @return 65-byte recoverable signature for an `fc::ecc::signature_shim`
+ */
+fc::ecc::compact_signature der_to_wire_k1_signature(
+   std::span<const unsigned char>      der,
+   std::span<const std::uint8_t, 32>   digest,
+   const fc::em::public_key&           expected_pubkey);
+
+/**
  * @brief Decode an X.509 SubjectPublicKeyInfo (DER) into a secp256k1 public key.
  *
  * AWS KMS `GetPublicKey` returns the public key as a DER-encoded
@@ -292,9 +315,10 @@ struct kms_signer {
  *
  * Validates `key_type` and the public-key variant, resolves the shared
  * `KMSClient` for `ref.region` via `get_kms_client`, and captures the client,
- * key id, and expected public key into the returned closure. No network I/O
- * happens here; the first KMS request occurs only when the closure -- or the
- * returned `warm_up` probe -- is invoked.
+ * key id, and expected public key into the returned closure. No KMS request
+ * happens here (a region-less `ref` may query IMDS to resolve its region); the
+ * first KMS request occurs only when the closure -- or the returned `warm_up`
+ * probe -- is invoked.
  *
  * Until a pin has succeeded, the closure performs public-key pinning before
  * signing: it calls `KMSClient::GetPublicKey`, decodes the returned X.509
@@ -312,28 +336,29 @@ struct kms_signer {
  * subtle part; the signing-closure implementation in the `.cpp` carries that
  * full wire-format rationale as the single source of truth, so it is not
  * restated here.) It then decodes KMS's DER signature, normalises it to low-S,
- * recovers the Ethereum `v` byte by trying both parities and matching against
- * `expected_pubkey`, and returns a 65-byte compact signature. If neither parity
- * recovers to the expected key the call throws `chain::plugin_config_exception`;
- * once pinning has passed this is a defence-in-depth check that should never
- * fire.
+ * recovers the recovery id by trying both parities and matching against
+ * `expected_pubkey`, and returns a 65-byte compact signature: an Ethereum
+ * signature (`der_to_eth_signature`) for `chain_key_type_ethereum`, a WIRE K1
+ * signature (`der_to_wire_k1_signature`) for `chain_key_type_wire`. If neither
+ * parity recovers to the expected key the call throws
+ * `chain::plugin_config_exception`; once pinning has passed this is a
+ * defence-in-depth check that should never fire.
  *
  * A failed `Sign` or `GetPublicKey` call is classified by retryability: a
  * transient failure (throttle, `KMSInternal`, timeout) throws
  * `chain::signing_transient_exception` and may be retried with backoff; a
  * permanent one throws `chain::plugin_config_exception`. See `throw_kms_error`.
  *
- * v1 only supports secp256k1 keys held as Ethereum public keys
- * (`chain_key_type_ethereum` + `fc::em::public_key_shim`). Other key types
- * raise `chain::pending_impl_exception` at construction; a `public_key`
- * variant that does not hold the Ethereum shim raises
- * `chain::plugin_config_exception`.
+ * Supported pairs are `chain_key_type_ethereum` with an `fc::em::public_key_shim` and `chain_key_type_wire` with an
+ * `fc::ecc::public_key_shim` (K1). An Ethereum key type with any other variant raises
+ * `chain::plugin_config_exception`; any other key type, or a WIRE key that is not K1, raises
+ * `chain::pending_impl_exception`. Both are raised before the client is resolved.
  *
  * @param ref parsed `(region, key_id)` pair
- * @param key_type chain key type; must be `chain_key_type_ethereum`
+ * @param key_type chain key type: `chain_key_type_ethereum` or `chain_key_type_wire`
  * @param expected_pubkey public key the operator pinned in the spec; checked
  *        against `GetPublicKey` until pinning first passes, then used on each
- *        signature KMS produces to recover the `v` byte and to assert the
+ *        signature KMS produces to recover the recovery id and to assert the
  *        signature matches that key
  * @return a `kms_signer` bundling the signing closure and the startup probe
  */
@@ -341,6 +366,26 @@ kms_signer make_kms_signature_provider(
    const kms_key_ref&            ref,
    fc::crypto::chain_key_type_t  key_type,
    const fc::crypto::public_key& expected_pubkey);
+
+/**
+ * @brief Build a KMS-backed signer that signs through `client`.
+ *
+ * Identical to the `kms_key_ref` overload, except that it uses the given client instead of the per-region cache.
+ * A host can supply its own configured client this way, and tests can substitute a `KMSClient` double.
+ *
+ * @param client client every `GetPublicKey` / `Sign` call goes through; must not be null
+ * @param key_id `KeyId` handed to KMS, in any form `kms_key_ref::key_id` documents
+ * @param key_type chain key type: `chain_key_type_ethereum` or `chain_key_type_wire`
+ * @param expected_pubkey public key the operator pinned in the spec
+ * @throws sysio::chain::plugin_config_exception if `client` is null, or as the `kms_key_ref` overload
+ * @throws sysio::chain::pending_impl_exception as the `kms_key_ref` overload
+ * @return a `kms_signer` bundling the signing closure and the startup probe
+ */
+kms_signer make_kms_signature_provider(
+   std::shared_ptr<Aws::KMS::KMSClient> client,
+   std::string                          key_id,
+   fc::crypto::chain_key_type_t         key_type,
+   const fc::crypto::public_key&        expected_pubkey);
 
 /**
  * @brief Adapter that fits `signature_provider_manager_plugin`'s
@@ -358,8 +403,8 @@ kms_signer make_kms_signature_provider(
  * @param spec_data    the spec body after `KMS:`
  * @throws sysio::chain::plugin_config_exception on malformed spec or
  *         key-type / pubkey mismatch
- * @throws sysio::chain::pending_impl_exception if the chain key type is not
- *         `chain_key_type_ethereum`
+ * @throws sysio::chain::pending_impl_exception if the chain key type is neither
+ *         `chain_key_type_ethereum` nor `chain_key_type_wire`, or a WIRE key is not K1
  * @return packaged result ready to install in the plugin's registry
  */
 sysio::provider_spec_result create_kms_provider(

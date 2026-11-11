@@ -2,9 +2,11 @@
 
 `signature_provider_kms_plugin` adds the `KMS:<key-ref>` signature-provider scheme to
 `signature_provider_manager_plugin`. Every signature is a remote AWS KMS `Sign` call, so the private key
-never exists on the host or in the node's memory. Scope is secp256k1 / ethereum keys only — the provider
-rejects any other key type at construction — and the per-signature round trip (typically 30–100 ms) rules
-it out for block production, which the ethereum-only scoping already prevents structurally. It is opt-in:
+never exists on the host or in the node's memory. Scope is secp256k1 keys: Ethereum keys and WIRE K1 keys.
+The provider rejects any other key type at construction. The per-signature round trip (typically 30–100 ms)
+rules it out for block production, and `producer_plugin` refuses it there: a node with producers configured
+requires a local private key for every WIRE key. A WIRE K1 key suits a batch operator's account, but not a
+snapshot provider's: snapshot votes sign only with WIRE keys held locally (`KEY:` or `SSM:`). It is opt-in:
 the plugin is registered by `nodeop` but does nothing until an operator adds
 `plugin = sysio::signature_provider_kms_plugin`.
 
@@ -45,14 +47,20 @@ that passes pinning issues one `Sign` request with `SigningAlgorithm=ECDSA_SHA_2
 so KMS signs the 32 bytes as-is rather than re-hashing them. The DER signature KMS returns is then decoded to
 a 64-byte `r || s` pair, normalised to low-S (EIP-2 / BIP-62 — KMS does not enforce it), and given a recovery
 byte derived locally by trying both parities and matching against the pinned public key, producing the 65-byte
-`r || s || (27 + recovery_id)` form the ethereum signing paths consume. If neither parity recovers the
-expected key the call fails; once pinning has passed, that is a defence-in-depth check that should never fire.
+`r || s || (27 + recovery_id)` form the ethereum signing paths consume. For a WIRE K1 key the digest is the
+transaction's sha256 signing digest and the result is the K1 form `(31 + recovery_id) || r || s`. If neither
+parity recovers the expected key the call fails; once pinning has passed, that is a defence-in-depth check that
+should never fire.
 
 ### Spec grammar
 
 ```
 --signature-provider <name>,ethereum,ethereum,<your-ethereum-public-key>,KMS:<key-ref>
+--signature-provider <name>,wire,wire,<your-wire-k1-public-key>,KMS:<key-ref>
 ```
+
+A WIRE spec must name a K1 key (`PUB_K1_...` or the legacy `SYS...` form); an R1 or other WIRE key type is
+rejected.
 
 `<key-ref>` is one of three forms:
 
@@ -103,6 +111,9 @@ signature-provider = eth-01,ethereum,ethereum,<your-ethereum-public-key>,KMS:ali
 
 # Full ARN.
 signature-provider = eth-01,ethereum,ethereum,<your-ethereum-public-key>,KMS:arn:aws:kms:us-east-1:<your-account-id>:alias/your-signing-key
+
+# WIRE K1 key, e.g. a batch operator's account key.
+signature-provider = wire-01,wire,wire,<your-wire-k1-public-key>,KMS:us-east-1:alias/your-wire-signing-key
 ```
 
 ### Command line
@@ -129,9 +140,11 @@ aws kms create-alias \
     --target-key-id <the-KeyId-from-the-response>
 ```
 
-The `<public-key>` field of the spec is the key's uncompressed `04 || X || Y` point (130 hex characters),
-read out of the DER `SubjectPublicKeyInfo` that `aws kms get-public-key` returns. The key parser also
-accepts the 64-byte raw `X || Y` form and the 33-byte compressed form, with an optional `0x` prefix.
+For an Ethereum spec, the `<public-key>` field is the key's uncompressed `04 || X || Y` point (130 hex
+characters), read out of the DER `SubjectPublicKeyInfo` that `aws kms get-public-key` returns. The key parser also
+accepts the 64-byte raw `X || Y` form and the 33-byte compressed form, with an optional `0x` prefix. For a WIRE
+spec it is the same point as a WIRE K1 public key string (`PUB_K1_...`), and that is the key the account's
+permission must name. `clio convert eth_to_k1_public 0x04<128 hex>` converts the uncompressed point.
 
 ## Options
 
@@ -156,9 +169,9 @@ Failures split two ways, matching the AWS SDK's own retryability classification:
 | Permanent | `plugin_config_exception` | Access denied, key not found, disabled key, invalid key state, bad parameters, a malformed spec, a public key that does not match the KMS key, an unresolvable region. |
 | Transient | `signing_transient_exception` | Throttling, `KMSInternal`, dependency or network timeouts, service-unavailable. |
 
-One configuration error sits outside both rows: a spec whose key type is not `ethereum` — that is, `wire`,
-`wire_bls`, or `solana` — is rejected at provider creation with `pending_impl_exception`, since KMS signing
-here is secp256k1/Ethereum-only. The other two key types never reach this plugin:
+One configuration error sits outside both rows: a spec whose key type is `wire_bls` or `solana`, or a `wire`
+spec whose key is not K1, is rejected at provider creation with `pending_impl_exception`, since KMS signing
+here is secp256k1-only. The other two key types never reach this plugin:
 `signature_provider_manager_plugin` rejects `sui` with `pending_impl_exception` and `unknown` with
 `config_parse_error` before any provider scheme runs. The rejection still aborts the boot; it just carries the
 not-yet-implemented type rather than the misconfiguration one, and the unit tests assert that.
@@ -189,11 +202,14 @@ ninja -C build/debug test_signature_provider_kms_plugin
 Everything in the default run is offline. The suite covers the spec parser (all three forms, multi-region
 keys, and every rejected shape — bare region, non-region lead before a colon, missing or bad ARN tail,
 empty region or account, wrong or mis-cased partition and service, too few segments), DER-to-compact
-conversion against known-answer vectors, low-S normalisation, v recovery, the end-to-end DER-to-ethereum
-signature path checked against a local sign, `SubjectPublicKeyInfo` decoding (including wrong-curve,
-truncated, off-curve, wrong-algorithm, trailing-byte, and nonzero-unused-bit rejections), pinning against a
-mismatched key, and the plugin's construction-time handler registration plus the probe actually running at
-the manager's startup.
+conversion against known-answer vectors, low-S normalisation, v recovery, the end-to-end DER-to-ethereum and
+DER-to-WIRE-K1 signature paths checked against a local sign, `SubjectPublicKeyInfo` decoding (including
+wrong-curve, truncated, off-curve, wrong-algorithm, trailing-byte, and nonzero-unused-bit rejections), pinning
+against a mismatched key, and the plugin's construction-time handler registration plus the probe actually
+running at the manager's startup. The signing closure itself runs against `local_key_kms_client`, a `KMSClient`
+double that answers `GetPublicKey` and `Sign` from a local key: Ethereum and WIRE K1 signing, the request KMS
+receives, high-S signatures, a mismatched pin that never reaches `Sign`, a transient pin failure retried on the
+next sign, `Sign` errors, malformed DER, and a signature from another key after the pin passed.
 
 One case reaches AWS and is skipped cleanly when its environment variables are unset:
 
@@ -207,7 +223,8 @@ export KMS_LIVE_PUBKEY='<your-ethereum-public-key-hex>'
 ```
 
 It signs one fixed deterministic digest, converts the result to the 65-byte ethereum form, and recovers the
-public key locally (no `kms:Verify` call) to check it matches. A run is a single `Sign` call. `test/README.md`
+public key locally (no `kms:Verify` call) to check it matches, then does the same through a WIRE K1 spec for the
+same key. A run is two `Sign` calls. `test/README.md`
 in this directory carries the full runbook, including the cost note and a table of common failure modes.
 
 ## Related plugins
@@ -218,5 +235,7 @@ in this directory carries the full runbook, including the cost note and a table 
   fetches the key once and signs locally, so it works for every key type including producer block signing.
 - `libraries/signature_provider_aws` — the shared AWS glue: SDK lifecycle, per-region client cache, region
   resolution, and the transient-versus-permanent error split.
-- `outpost_ethereum_client_plugin` — the ethereum-side submission path a `KMS:` key typically signs for.
+- `outpost_ethereum_client_plugin` — the ethereum-side submission path a `KMS:` Ethereum key signs for.
+- [`batch_operator_plugin`](../batch_operator_plugin/README.md) — signs its WIRE actions with a WIRE key, which
+  can be a `KMS:` K1 key.
 - `docs/signature-provider-manager-plugin.md` — the spec reference shared by every scheme.
