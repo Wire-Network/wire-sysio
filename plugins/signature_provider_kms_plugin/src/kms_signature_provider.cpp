@@ -70,6 +70,46 @@ const secp256k1_context* kms_secp_ctx() {
    return ctx;
 }
 
+/// `fc::ecc::compact_signature` header base: 27 + 4 (compressed-key flag), plus the recovery id.
+constexpr unsigned char k1_compact_header_base = 31;
+
+/// How a signature from a secp256k1 KMS key is packed for the key type the spec names.
+enum class secp256k1_signature_format {
+   ethereum, ///< `der_to_eth_signature`, held in an `fc::em::signature_shim`
+   wire_k1,  ///< `der_to_wire_k1_signature`, held in an `fc::ecc::signature_shim`
+};
+
+/// The secp256k1 point a KMS key must hold, and how its signatures are packed.
+struct secp256k1_kms_key {
+   fc::em::public_key         pubkey;
+   secp256k1_signature_format format;
+};
+
+/// Map the spec's key type and public key onto the KMS key it requires. Offline; throws before any client exists.
+secp256k1_kms_key resolve_secp256k1_kms_key(fc::crypto::chain_key_type_t  key_type,
+                                            const fc::crypto::public_key& expected_pubkey) {
+   switch (key_type) {
+   case fc::crypto::chain_key_type_ethereum: {
+      SYS_ASSERT(expected_pubkey.contains<fc::em::public_key_shim>(), chain::plugin_config_exception,
+                 "KMS spec key_type={} does not match the public key variant (expected em::public_key_shim)",
+                 fc::crypto::chain_key_type_reflector::to_fc_string(key_type));
+      return {expected_pubkey.get<fc::em::public_key_shim>().unwrapped(), secp256k1_signature_format::ethereum};
+   }
+   case fc::crypto::chain_key_type_wire: {
+      SYS_ASSERT(expected_pubkey.contains<fc::ecc::public_key_shim>(), chain::pending_impl_exception,
+                 "KMS signing supports only K1 keys for key_type={}",
+                 fc::crypto::chain_key_type_reflector::to_fc_string(key_type));
+      // Same curve: the compressed K1 bytes are a valid compressed secp256k1 point for `fc::em::public_key`.
+      const fc::ecc::public_key_data& k1_data = expected_pubkey.get<fc::ecc::public_key_shim>().serialize();
+      return {fc::em::public_key{k1_data}, secp256k1_signature_format::wire_k1};
+   }
+   default:
+      FC_THROW_EXCEPTION(chain::pending_impl_exception,
+                         "KMS signing supports only chain_key_type_ethereum and chain_key_type_wire, got {}",
+                         fc::crypto::chain_key_type_reflector::to_fc_string(key_type));
+   }
+}
+
 /// Per-closure state for a KMS-backed signer. Captured by `std::shared_ptr`
 /// so that `std::function` copies remain cheap and the same `KMSClient` /
 /// expected pubkey are shared across copies of the closure.
@@ -80,17 +120,20 @@ const secp256k1_context* kms_secp_ctx() {
 struct kms_signer_state {
    kms_signer_state(std::shared_ptr<Aws::KMS::KMSClient> client_,
                     std::string                         key_id_,
-                    fc::em::public_key                  expected_em_pubkey_)
+                    secp256k1_kms_key                   key)
       : client(std::move(client_))
       , key_id(std::move(key_id_))
-      , expected_em_pubkey(std::move(expected_em_pubkey_)) {}
+      , expected_em_pubkey(std::move(key.pubkey))
+      , format(key.format) {}
 
    std::shared_ptr<Aws::KMS::KMSClient> client;
    std::string                          key_id;
-   /// secp256k1 uncompressed public key the spec pinned. Verified once against
+   /// secp256k1 public key the spec pinned, for Ethereum and WIRE K1 keys alike. Verified once against
    /// the live KMS key by `verify_kms_pubkey`, then used by `recover_v` to
    /// discriminate between recovery_id 0 and 1.
    fc::em::public_key                   expected_em_pubkey;
+   /// How each signature is packed for the spec's key type.
+   secp256k1_signature_format           format;
    /// Guard for the GetPublicKey pinning check. The check runs on the first
    /// `Sign` (or the startup probe) and never again once it has passed.
    ///
@@ -477,7 +520,7 @@ unsigned char recover_v(const std::array<unsigned char, 64>& compact,
       }
    }
    FC_THROW_EXCEPTION(chain::plugin_config_exception,
-                      "Could not recover v: signature does not match expected public key");
+                      "Could not find a recovery id: signature does not match expected public key");
 }
 
 fc::em::compact_signature der_to_eth_signature(
@@ -491,6 +534,20 @@ fc::em::compact_signature der_to_eth_signature(
    fc::em::compact_signature out{};
    std::ranges::copy(compact, out.begin());
    out[64] = static_cast<unsigned char>(fc::crypto::ethereum::v_offset + rec_id);
+   return out;
+}
+
+fc::ecc::compact_signature der_to_wire_k1_signature(
+   std::span<const unsigned char>      der,
+   std::span<const std::uint8_t, 32>   digest,
+   const fc::em::public_key&           expected_pubkey) {
+   std::array<unsigned char, 64> compact = der_to_compact(der);
+   normalise_low_s(compact);
+   const unsigned char rec_id = recover_v(compact, digest, expected_pubkey);
+
+   fc::ecc::compact_signature out{};
+   out[0] = static_cast<unsigned char>(k1_compact_header_base + rec_id);
+   std::ranges::copy(compact, out.begin() + 1);
    return out;
 }
 
@@ -515,29 +572,12 @@ fc::em::public_key spki_der_to_public_key(std::span<const unsigned char> spki_de
    }
 }
 
-kms_signer make_kms_signature_provider(const kms_key_ref&             ref,
-                                       fc::crypto::chain_key_type_t   key_type,
-                                       const fc::crypto::public_key&  expected_pubkey) {
-   // v1 only supports secp256k1 keys held as Ethereum-flavoured public keys
-   // (ECC_SECG_P256K1 in KMS, signed with ECDSA_SHA_256). Wire K1 (sysio's
-   // own secp256k1 path), R1, BLS, Ed25519, and webauthn use different key
-   // shapes or curves and need separate plumbing, so they are out of scope
-   // for v1.
-   SYS_ASSERT(key_type == fc::crypto::chain_key_type_ethereum,
-              chain::pending_impl_exception,
-              "KMS signing currently supports only chain_key_type_ethereum, got {}",
-              fc::crypto::chain_key_type_reflector::to_string(key_type));
+namespace {
 
-   SYS_ASSERT(expected_pubkey.contains<fc::em::public_key_shim>(),
-              chain::plugin_config_exception,
-              "KMS spec key_type={} does not match the public key variant "
-              "(expected em::public_key_shim)",
-              fc::crypto::chain_key_type_reflector::to_string(key_type));
-
-   const auto& shim = expected_pubkey.get<fc::em::public_key_shim>();
-
-   auto state = std::make_shared<kms_signer_state>(
-      get_kms_client(ref.region), ref.key_id, shim.unwrapped());
+/// Build the signing closure and startup probe for `key`, signing through `client`.
+kms_signer make_kms_signer(std::shared_ptr<Aws::KMS::KMSClient> client, std::string key_id, secp256k1_kms_key key) {
+   const std::shared_ptr<kms_signer_state> state =
+      std::make_shared<kms_signer_state>(std::move(client), std::move(key_id), std::move(key));
 
    fc::crypto::sign_fn sign = [state](const chain::digest_type& digest) -> chain::signature_type {
       // Public-key pinning. Before any billable Sign, fetch the KMS key's own
@@ -589,20 +629,27 @@ kms_signer make_kms_signature_provider(const kms_key_ref&             ref,
       const std::span<const unsigned char> der{
          der_buf.GetUnderlyingData(), der_buf.GetLength()};
 
-      // `der_to_eth_signature` -> `recover_v` recovers the signer to pick the
+      // Both packers run `recover_v`, which recovers the signer to pick the
       // recovery id AND throws if it does not match the pinned key. That runs on
       // every sign and is the per-signature guarantee that KMS signed with the
-      // expected key -- keep it. `em_sign_keccak` (the caller) recovers once more,
-      // but only on the first sign per provider (gated by
+      // expected key -- keep it. For an Ethereum key, `em_sign_keccak` (the caller)
+      // recovers once more, but only on the first sign per provider (gated by
       // `signature_provider_t::self_verified`): a one-time structural check that
-      // the keccak digest survived the `sha256`-typed closure boundary. So the
-      // first sign does two recoveries and every later sign one; this is the
-      // external-chain submission path, not a hot loop, so neither cost matters.
-      const auto compact = der_to_eth_signature(
-         der, digest.to_uint8_span(), state->expected_em_pubkey);
-
-      return fc::crypto::signature(
-         fc::crypto::signature::storage_type{fc::em::signature_shim{compact}});
+      // the keccak digest survived the `sha256`-typed closure boundary.
+      switch (state->format) {
+      case secp256k1_signature_format::ethereum: {
+         const fc::em::compact_signature eth_sig =
+            der_to_eth_signature(der, digest.to_uint8_span(), state->expected_em_pubkey);
+         return fc::crypto::signature(fc::crypto::signature::storage_type{fc::em::signature_shim{eth_sig}});
+      }
+      case secp256k1_signature_format::wire_k1: {
+         const fc::ecc::compact_signature k1_sig =
+            der_to_wire_k1_signature(der, digest.to_uint8_span(), state->expected_em_pubkey);
+         return fc::crypto::signature(fc::crypto::signature::storage_type{fc::ecc::signature_shim{k1_sig}});
+      }
+      }
+      FC_THROW_EXCEPTION(chain::plugin_config_exception, "KMS signer has an unknown signature format {}",
+                         magic_enum::enum_integer(state->format));
    };
 
    // Startup probe: runs the same pinning check as the sign path (cached
@@ -617,6 +664,25 @@ kms_signer make_kms_signature_provider(const kms_key_ref&             ref,
    std::function<void()> warm_up = [state] { ensure_kms_pubkey_pinned(*state); };
 
    return kms_signer{.sign = std::move(sign), .warm_up = std::move(warm_up)};
+}
+
+} // namespace
+
+kms_signer make_kms_signature_provider(const kms_key_ref&             ref,
+                                       fc::crypto::chain_key_type_t   key_type,
+                                       const fc::crypto::public_key&  expected_pubkey) {
+   // Resolve the key before the client: a region-less ref resolves its region from the environment, possibly IMDS.
+   secp256k1_kms_key key = resolve_secp256k1_kms_key(key_type, expected_pubkey);
+   return make_kms_signer(get_kms_client(ref.region), ref.key_id, std::move(key));
+}
+
+kms_signer make_kms_signature_provider(std::shared_ptr<Aws::KMS::KMSClient> client,
+                                       std::string                          key_id,
+                                       fc::crypto::chain_key_type_t         key_type,
+                                       const fc::crypto::public_key&        expected_pubkey) {
+   SYS_ASSERT(client, chain::plugin_config_exception, "KMS signer requires a KMS client");
+   secp256k1_kms_key key = resolve_secp256k1_kms_key(key_type, expected_pubkey);
+   return make_kms_signer(std::move(client), std::move(key_id), std::move(key));
 }
 
 std::shared_ptr<Aws::KMS::KMSClient> get_kms_client(const std::string& region) {
