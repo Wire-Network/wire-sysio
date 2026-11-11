@@ -1346,6 +1346,7 @@ public:
 // attacker-controlled. It must reach sysio as an ordinary notification and change nothing: not sysio's owner, active,
 // auth.ext or any other permission, and not a user's.
 BOOST_FIXTURE_TEST_CASE(claimed_auth_msg_notification_changes_no_permission, node_owner_claim_tester) { try {
+   create_account(CLAIM_ACCOUNT);
    bootstrap_for_dispatch(NODE_OWNER_SOURCE_CHAIN);
    create_account(PAYER_ACCOUNT);
    deploy_system_contract();
@@ -1361,6 +1362,7 @@ BOOST_FIXTURE_TEST_CASE(claimed_auth_msg_notification_changes_no_permission, nod
    const auto replacement_key = get_public_key(REPLACEMENT_KEY_NAME, "active");
    const auto sysio_before    = permissions_of(config::system_account_name);
    const auto user_before     = permissions_of(CLAIM_ACCOUNT);
+   BOOST_REQUIRE(!user_before.empty());
    for (const auto target : {config::system_account_name, CLAIM_ACCOUNT}) {
       for (const auto permission : {config::owner_name, config::active_name, AUTH_EXT_PERMISSION, OTHER_PERMISSION}) {
          BOOST_CHECK_MESSAGE(notify_onlinkauth(target, permission, replacement_key),
@@ -2397,6 +2399,7 @@ BOOST_AUTO_TEST_CASE(generic_external_simulator_drives_production_dispatch) {
 // Funded pre-launch imports link and settle the exact token balance.
 BOOST_FIXTURE_TEST_CASE(funded_import_claims_link_and_settle, sysio_dispatch_tester) {
    using namespace sysio::testing::external;
+   create_account(CLAIM_ACCOUNT);
    bootstrap_for_dispatch(First.chain, First.kind);
    deploy(TOKEN_ACCOUNT, contracts::token_wasm(), contracts::token_abi(), token_abi);
    BOOST_REQUIRE_EQUAL(success(), push(TOKEN_ACCOUNT, token_abi, TOKEN_ACCOUNT, "create"_n,
