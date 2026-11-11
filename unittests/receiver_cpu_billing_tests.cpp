@@ -288,16 +288,23 @@ struct receiver_cpu_tester : validating_tester {
       return *long_spin_count;
    }
 
-   /// The smallest game entry of calibration_runs transfers to it with memo `command` and a count: `count` raised by
-   /// the run, so that the transactions differ. Being descheduled only adds to an entry.
-   uint32_t smallest_game_entry( const std::string& command, uint32_t count ) {
-      uint32_t smallest = std::numeric_limits<uint32_t>::max();
+   /**
+    * How much of its two frames' elapsed time the game's entry leaves out, for a transfer whose handler spins `count`
+    * times and sends itself an inline spin of `count`: the least of calibration_runs transfers, `count` raised by the
+    * run so that the transactions differ. A frame's elapsed time and its CPU span the same run, so the host's speed and
+    * load cancel; being descheduled outside a frame only adds to what is left out.
+    */
+   int64_t least_left_out_of_game_frames( uint32_t count ) {
+      int64_t least = std::numeric_limits<int64_t>::max();
       for( uint32_t run = 0; run < calibration_runs; ++run ) {
-         auto receipt = entries( transfer( alice, game, amount, command + std::to_string( count + run ) ) );
+         auto trace   = transfer( alice, game, amount, spinsend_command + std::to_string( count + run ) );
+         auto receipt = entries( trace );
          BOOST_REQUIRE_EQUAL( receipt.size(), 2u );
-         smallest = std::min( smallest, receipt[1] );
+         const int64_t frames_us =
+            frame( trace, game, "transfer"_n ).elapsed.count() + frame( trace, game, "spin"_n ).elapsed.count();
+         least = std::min( least, frames_us - static_cast<int64_t>( receipt[1] ) );
       }
-      return smallest;
+      return least;
    }
 
    /// A transfer memo that keeps cpu_receiver_test's handler busy well past the stipend.
@@ -726,11 +733,9 @@ BOOST_FIXTURE_TEST_CASE( stipend_is_shared_by_the_frames_billed_to_the_contract,
    check_billed( before, { token_account, game } );
    produce_and_check_validator( { token_account, alice, game } );
 
-   // The same loops in one frame bill about as much. A stipend for each frame would leave the two-frame entry a
-   // whole stipend lower; the second frame's own overhead only raises it.
-   const uint32_t one_frame  = smallest_game_entry( spin_command, 2 * n );
-   const uint32_t two_frames = smallest_game_entry( spinsend_command, n );
-   BOOST_TEST( static_cast<int64_t>( two_frames ) > static_cast<int64_t>( one_frame ) - stipend_us / 2 );
+   // The entry leaves out of its frames' elapsed time one stipend and the little time outside the frames. A stipend
+   // for each frame would leave out a second one.
+   BOOST_TEST( least_left_out_of_game_frames( n ) < stipend_us + stipend_us / 2 );
    produce_and_check_validator( { token_account, alice, game } );
 } FC_LOG_AND_RETHROW()
 
