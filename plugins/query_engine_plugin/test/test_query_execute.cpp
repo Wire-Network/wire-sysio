@@ -19,10 +19,11 @@ BOOST_AUTO_TEST_CASE(typed_rows_metadata_and_worker_execution) {
    read_queue reads;
    const auto caller = std::this_thread::get_id();
    std::atomic<size_t> worker_stages{0}, caller_stages{0};
-   query_engine engine({}, reads.create_api(*validating_node), query_budget::clock::now, [&](query_stage) {
-      ++worker_stages;
-      caller_stages += std::this_thread::get_id() == caller;
-   });
+   query_engine engine(
+      relaxed_config(), reads.create_api(*validating_node), query_budget::clock::now, [&](query_stage) {
+         ++worker_stages;
+         caller_stages += std::this_thread::get_id() == caller;
+      });
    auto result = execute(engine, reads, ordered_sql);
    static_assert(std::is_same_v<decltype(result.rows), std::vector<fc::variant_object>>);
    BOOST_REQUIRE_EQUAL(result.rows.size(), 3);
@@ -43,7 +44,7 @@ BOOST_AUTO_TEST_CASE(typed_rows_metadata_and_worker_execution) {
 /// Pagination is applied to completed, ordered groups and composes with SQL LIMIT by taking the smaller limit.
 BOOST_AUTO_TEST_CASE(limit_offset_and_aggregate_semantics) {
    read_queue reads;
-   query_engine engine({}, reads.create_api(*validating_node));
+   query_engine engine(relaxed_config(), reads.create_api(*validating_node));
    auto result = execute(engine, reads, ordered_sql, query_options{.limit = 1, .offset = 1});
    BOOST_REQUIRE_EQUAL(result.rows.size(), 1);
    BOOST_CHECK_EQUAL(result.rows[0]["id"].as_string(), "1");
@@ -66,7 +67,7 @@ BOOST_AUTO_TEST_CASE(limit_offset_and_aggregate_semantics) {
 /// `page` describes the window over the complete ordered output for detail and grouped queries.
 BOOST_AUTO_TEST_CASE(page_window_metadata) {
    read_queue reads;
-   query_engine engine({}, reads.create_api(*validating_node));
+   query_engine engine(relaxed_config(), reads.create_api(*validating_node));
    const auto expect_page = [](const query_result& result, const std::string& offset,
                                const std::optional<std::string>& limit, const std::string& returned,
                                const std::string& total, bool has_more) {
@@ -210,7 +211,7 @@ BOOST_AUTO_TEST_CASE(default_timeout_is_configured_and_no_deadline_is_explicit) 
 /// Invalid options, typed SQL failures and configured resource caps propagate without an RPC envelope.
 BOOST_AUTO_TEST_CASE(option_errors_and_resource_limits) {
    read_queue reads;
-   query_config config;
+   auto config = relaxed_config();
    config.max_result_rows = 1;
    query_engine engine(config, reads.create_api(*validating_node));
    // A negative timeout names no limit; one beyond the clock's range names the timeout option.
@@ -241,7 +242,7 @@ BOOST_AUTO_TEST_CASE(option_errors_and_resource_limits) {
 /// A caller-owned budget is required and serves exactly one call; it may be inspected afterwards.
 BOOST_AUTO_TEST_CASE(caller_owned_budgets_serve_one_call) {
    read_queue reads;
-   query_engine engine({}, reads.create_api(*validating_node));
+   query_engine engine(relaxed_config(), reads.create_api(*validating_node));
    BOOST_CHECK_EXCEPTION(engine.execute(ordered_sql, std::shared_ptr<query_budget>{}), query_error,
                          [](const auto& error) { return error.kind == error_kind::INVALID_PARAMS; });
    const auto budget = engine.create_budget();
@@ -265,7 +266,7 @@ BOOST_AUTO_TEST_CASE(application_thread_cannot_block_its_own_read_dispatch) {
    auto api = std::make_shared<query_read_api>(
       std::make_shared<local_table_source>(*validating_node), [&](auto callback) { reads.post(std::move(callback)); },
       std::this_thread::get_id());
-   query_engine engine({}, api);
+   query_engine engine(relaxed_config(), api);
    query_service& service = engine;
    BOOST_CHECK_EXCEPTION(service.execute(ordered_sql), query_error,
                          [](const auto& error) { return error.kind == error_kind::INVALID_PARAMS; });
