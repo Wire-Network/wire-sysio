@@ -855,9 +855,9 @@ BOOST_FIXTURE_TEST_CASE(accept_and_request_checkpoint_the_live_index, sysio_bond
    BOOST_REQUIRE_EQUAL(0u, wire_bond.yield.owed_wire);
 } FC_LOG_AND_RETHROW()
 
-// A bond row bills the sysio RAM pool, never its underwriter; on a non-privileged issuer's request,
-// the request row the accept updates stays the issuer's.
-BOOST_FIXTURE_TEST_CASE(accept_bills_sysio, sysio_bond_tester) try {
+// A bond row on an ordinary issuer's request bills that issuer, never the underwriter or the sysio RAM
+// pool; the request row the accept updates stays the issuer's.
+BOOST_FIXTURE_TEST_CASE(accept_bills_the_issuer, sysio_bond_tester) try {
    // The bounty opens sysio.bond's own LIQSOL holder row on sysio.liq first, which sysio.liq bills.
    BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'a'), LIQSOL, 10 * UNIT, 1 * UNIT));
    const auto sysio_ram  = ram_usage(SYSIO_ACCOUNT);
@@ -867,16 +867,28 @@ BOOST_FIXTURE_TEST_CASE(accept_bills_sysio, sysio_bond_tester) try {
    BOOST_REQUIRE_EQUAL(success(), accept("alice"_n, 1, 10 * UNIT));
    std::string bond_key = request_key_of(1);
    append_key_word(bond_key, "alice"_n.to_uint64_t());
-   BOOST_REQUIRE_EQUAL(SYSIO_ACCOUNT, payer_of("bonds"_n, bond_key));
+   BOOST_REQUIRE_EQUAL("issuer"_n, payer_of("bonds"_n, bond_key));
    BOOST_REQUIRE_EQUAL("issuer"_n, payer_of("requests"_n, request_key_of(1)));
    BOOST_REQUIRE_EQUAL(alice_ram, ram_usage("alice"_n));
-   BOOST_REQUIRE_EQUAL(issuer_ram, ram_usage("issuer"_n));
-   BOOST_REQUIRE_GT(ram_usage(SYSIO_ACCOUNT), sysio_ram);
+   BOOST_REQUIRE_GT(ram_usage("issuer"_n), issuer_ram);
+   BOOST_REQUIRE_EQUAL(sysio_ram, ram_usage(SYSIO_ACCOUNT));
+} FC_LOG_AND_RETHROW()
+
+// An accept the ordinary issuer has no RAM for fails, and the underwriter keeps its tokens.
+BOOST_FIXTURE_TEST_CASE(accept_fails_when_the_issuer_has_no_ram, sysio_bond_tester) try {
+   BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'a'), LIQSOL, 10 * UNIT, 1 * UNIT));
+   control->get_mutable_resource_limits_manager().set_account_limits("issuer"_n, ram_usage("issuer"_n), -1, -1,
+                                                                     false);
+   const auto alice_balance = liq_balance("alice"_n);
+
+   const auto result = accept("alice"_n, 1, 10 * UNIT);
+   BOOST_REQUIRE_MESSAGE(result.find("account issuer has insufficient ram") != std::string::npos, result);
+   BOOST_REQUIRE_EQUAL(0u, bond_amount_of(1, "alice"_n));
+   BOOST_REQUIRE_EQUAL(alice_balance, liq_balance("alice"_n));
 } FC_LOG_AND_RETHROW()
 
 // An accept on a privileged issuer's request -- a system contract's, as sysio.synd's are -- bills the
-// bond row to the sysio RAM pool as on any other request, and the request row it updates stays on
-// the pool.
+// bond row to the sysio RAM pool, where the request row it updates also stays.
 BOOST_FIXTURE_TEST_CASE(accept_on_a_privileged_issuers_request_bills_sysio, sysio_bond_tester) try {
    // sysio.tokens, the token registry, is a privileged system contract of the fixture.
    constexpr auto system_contract = TOKENS_ACCOUNT;
@@ -1940,12 +1952,14 @@ BOOST_FIXTURE_TEST_CASE(prune_erases_the_paid_bonds_of_a_request_it_keeps, sysio
    BOOST_REQUIRE_EQUAL(success(), claim(1, "alice"_n));
 
    // Within the retention period: alice's paid row goes at once, bob's stays, and so does the request.
-   const auto sysio_ram = ram_usage(SYSIO_ACCOUNT);
+   const auto issuer_ram = ram_usage("issuer"_n);
+   const auto sysio_ram  = ram_usage(SYSIO_ACCOUNT);
    BOOST_REQUIRE_EQUAL(success(), prune(0, 10));
    BOOST_REQUIRE_EQUAL(1u, bond_rows_of(1).size());
    BOOST_REQUIRE_EQUAL(6 * UNIT, bond_amount_of(1, "bob"_n));
    BOOST_REQUIRE_EQUAL(STATE_APPROVED, request_state_of(1));
-   BOOST_REQUIRE_LT(ram_usage(SYSIO_ACCOUNT), sysio_ram);
+   BOOST_REQUIRE_LT(ram_usage("issuer"_n), issuer_ram);
+   BOOST_REQUIRE_EQUAL(sysio_ram, ram_usage(SYSIO_ACCOUNT));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(nothing_msg)), claim(1, "alice"_n));
 
    // Past it, bob's unclaimed bond still keeps the request.

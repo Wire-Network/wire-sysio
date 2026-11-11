@@ -20,11 +20,12 @@
  * transfer into this contract.
  *
  * Privileged: an action signed by an account pulls that account's tokens by an inline `transfer`
- * under its `active` authority. The issuer pays the RAM of its `requests` and `escrows` rows --
- * unless it is itself privileged: a system contract (`sysio.synd` issuing for an envelope) has no RAM
- * quota of its own, so its rows bill the `sysio` RAM pool instead. Later writes by other signers keep
- * the row's payer. Every `bonds` row, the contract's own singletons and the yield pools bill the
- * `sysio` RAM pool, so an underwriter needs no RAM.
+ * under its `active` authority. The issuer pays the RAM of every row its request creates -- its
+ * `requests` and `escrows` rows and each underwriter's `bonds` row -- unless it is itself privileged:
+ * a system contract (`sysio.synd` issuing for an envelope) has no RAM quota of its own, so its
+ * requests' rows bill the `sysio` RAM pool instead. Either way an underwriter needs no RAM. Later
+ * writes by other signers keep the row's payer. The contract's own singletons, the yield pools and
+ * the per-account `wireclaims` rows bill the `sysio` RAM pool.
  */
 
 #include <sysio/sysio.hpp>
@@ -176,7 +177,8 @@ inline constexpr std::string_view amount_range_msg = "amount exceeds the asset r
 
       /// Bond `amount` of request `request_id`'s token (a positive multiple of the increment) as
       /// `underwriter`, reduced to what remains uncovered. The request becomes BONDED when bonded
-      /// reaches covered. Auth=underwriter.
+      /// reaches covered. The `bonds` row bills the request's issuer, or the `sysio` RAM pool for a
+      /// privileged issuer, never the underwriter. Auth=underwriter.
       [[sysio::action]] void accept(name underwriter, uint64_t request_id, uint64_t amount);
 
       /// Hold request `request_id`, OPEN or BONDED, naming `beneficiary`, an existing account other
