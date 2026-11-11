@@ -1,13 +1,13 @@
 # signature_provider_kms_plugin
 
 `signature_provider_kms_plugin` adds the `KMS:<key-ref>` signature-provider scheme to
-`signature_provider_manager_plugin`. Every signature is a remote AWS KMS `Sign` call, so the private key
-never exists on the host or in the node's memory. Scope is secp256k1 keys: Ethereum keys and WIRE K1 keys.
-The provider rejects any other key type at construction. The per-signature round trip (typically 30–100 ms)
-rules it out for block production, and `producer_plugin` refuses it there: a node with producers configured
-requires a local private key for every WIRE key. A WIRE K1 key suits a batch operator's account, but not a
-snapshot provider's: snapshot votes sign only with WIRE keys held locally (`KEY:` or `SSM:`). It is opt-in:
-the plugin is registered by `nodeop` but does nothing until an operator adds
+`signature_provider_manager_plugin`. Every signature is a remote AWS KMS `Sign` call, so the private key never
+exists on the host or in the node's memory. Scope is Ethereum and WIRE K1 keys (secp256k1 KMS keys) and Solana
+keys (Ed25519 KMS keys). The provider rejects any other key type at construction. The per-signature round trip
+(typically 30–100 ms) rules it out for block production, and `producer_plugin` refuses it there: a node with
+producers configured requires a local private key for every WIRE key. A WIRE K1 key suits a batch operator's
+account, but not a snapshot provider's: snapshot votes sign only with WIRE keys held locally (`KEY:` or
+`SSM:`). It is opt-in: the plugin is registered by `nodeop` but does nothing until an operator adds
 `plugin = sysio::signature_provider_kms_plugin`.
 
 The plugin carries the AWS SDK dependency, so `programs/nodeop/CMakeLists.txt` links it into `nodeop` alone
@@ -52,11 +52,18 @@ transaction's sha256 signing digest and the result is the K1 form `(31 + recover
 parity recovers the expected key the call fails; once pinning has passed, that is a defence-in-depth check that
 should never fire.
 
+A Solana key signs whole messages, not digests: the provider's `sign_raw` sends the serialized transaction
+message (at most 4096 bytes, the KMS limit; a Solana transaction is at most 1232) with
+`SigningAlgorithm=ED25519_SHA_512` and `MessageType=RAW`, which is pure Ed25519 (RFC 8032), and verifies the
+returned 64-byte signature against the pinned key before using it. `ED25519_SHA_512` needs aws-sdk-cpp 1.11.686
+or later.
+
 ### Spec grammar
 
 ```
 --signature-provider <name>,ethereum,ethereum,<your-ethereum-public-key>,KMS:<key-ref>
 --signature-provider <name>,wire,wire,<your-wire-k1-public-key>,KMS:<key-ref>
+--signature-provider <name>,solana,solana,<your-solana-public-key>,KMS:<key-ref>
 ```
 
 A WIRE spec must name a K1 key (`PUB_K1_...` or the legacy `SYS...` form); an R1 or other WIRE key type is
@@ -114,6 +121,9 @@ signature-provider = eth-01,ethereum,ethereum,<your-ethereum-public-key>,KMS:arn
 
 # WIRE K1 key, e.g. a batch operator's account key.
 signature-provider = wire-01,wire,wire,<your-wire-k1-public-key>,KMS:us-east-1:alias/your-wire-signing-key
+
+# Solana key, e.g. for an outpost Solana client.
+signature-provider = sol-01,solana,solana,<your-solana-public-key>,KMS:us-east-1:alias/your-solana-signing-key
 ```
 
 ### Command line
@@ -125,7 +135,8 @@ nodeop --plugin sysio::signature_provider_kms_plugin \
 
 ### One-time key setup
 
-The key must be created with the secp256k1 key spec and signing usage:
+The key must be created with signing usage and the key spec its key type needs: `ECC_SECG_P256K1` for an
+Ethereum or WIRE key, `ECC_NIST_EDWARDS25519` for a Solana key.
 
 ```bash
 aws kms create-key \
@@ -144,7 +155,8 @@ For an Ethereum spec, the `<public-key>` field is the key's uncompressed `04 || 
 characters), read out of the DER `SubjectPublicKeyInfo` that `aws kms get-public-key` returns. The key parser also
 accepts the 64-byte raw `X || Y` form and the 33-byte compressed form, with an optional `0x` prefix. For a WIRE
 spec it is the same point as a WIRE K1 public key string (`PUB_K1_...`), and that is the key the account's
-permission must name. `clio convert eth_to_k1_public 0x04<128 hex>` converts the uncompressed point.
+permission must name. `clio convert eth_to_k1_public 0x04<128 hex>` converts the uncompressed point. For a
+Solana spec it is the base58 public key: the last 32 bytes of the 44-byte `SubjectPublicKeyInfo`.
 
 ## Options
 
@@ -162,16 +174,18 @@ info-level `Running signature-provider startup probes for <n> signing key(s)` li
 `Signature-provider startup probe: transient error for one key, deferring its check to the first sign: <detail>`
 followed by the deferred-count variant of the passed line.
 
-Failures split two ways, matching the AWS SDK's own retryability classification:
+Failures from AWS split two ways, matching the AWS SDK's own retryability classification; a third row covers
+messages KMS cannot sign:
 
 | Class | Thrown as | Typical cause |
 |---|---|---|
 | Permanent | `plugin_config_exception` | Access denied, key not found, disabled key, invalid key state, bad parameters, a malformed spec, a public key that does not match the KMS key, an unresolvable region. |
 | Transient | `signing_transient_exception` | Throttling, `KMSInternal`, dependency or network timeouts, service-unavailable. |
+| Caller error | `fc::invalid_arg_exception` | A Solana message that is empty or over 4096 bytes, rejected before any KMS request. |
 
-One configuration error sits outside both rows: a spec whose key type is `wire_bls` or `solana`, or a `wire`
-spec whose key is not K1, is rejected at provider creation with `pending_impl_exception`, since KMS signing
-here is secp256k1-only. The other two key types never reach this plugin:
+One configuration error sits outside both rows: a spec whose key type is `wire_bls`, or a `wire` spec whose key
+is not K1, is rejected at provider creation with `pending_impl_exception`, since KMS signing here covers only
+secp256k1 Ethereum and WIRE K1 keys and Ed25519 Solana keys. The other two key types never reach this plugin:
 `signature_provider_manager_plugin` rejects `sui` with `pending_impl_exception` and `unknown` with
 `config_parse_error` before any provider scheme runs. The rejection still aborts the boot; it just carries the
 not-yet-implemented type rather than the misconfiguration one, and the unit tests assert that.
@@ -210,8 +224,12 @@ running at the manager's startup. The signing closure itself runs against `local
 double that answers `GetPublicKey` and `Sign` from a local key: Ethereum and WIRE K1 signing, the request KMS
 receives, high-S signatures, a mismatched pin that never reaches `Sign`, a transient pin failure retried on the
 next sign, `Sign` errors, malformed DER, and a signature from another key after the pin passed.
+`local_ed25519_kms_client` does the same for Ed25519: Solana signing through `sol_client_signer`, the RAW
+`ED25519_SHA_512` request, digest signing that matches a local key, an Ed25519 SPKI known-answer vector from
+RFC 8410 and its rejected shapes, a mismatched or secp256k1 KMS key, a signature from another key or of the wrong
+length, and a message over the 4096-byte KMS limit.
 
-One case reaches AWS and is skipped cleanly when its environment variables are unset:
+Two cases reach AWS and are skipped cleanly when their environment variables are unset:
 
 ```bash
 export KMS_LIVE_SPEC='us-east-1:alias/your-signing-key'   # or the full ARN form
@@ -224,8 +242,10 @@ export KMS_LIVE_PUBKEY='<your-ethereum-public-key-hex>'
 
 It signs one fixed deterministic digest, converts the result to the 65-byte ethereum form, and recovers the
 public key locally (no `kms:Verify` call) to check it matches, then does the same through a WIRE K1 spec for the
-same key. A run is two `Sign` calls. `test/README.md`
-in this directory carries the full runbook, including the cost note and a table of common failure modes.
+same key. A run is two `Sign` calls. `kms_live_ed25519_sign_round_trip` takes `KMS_LIVE_ED25519_SPEC` and
+`KMS_LIVE_ED25519_PUBKEY` (base58) for an `ECC_NIST_EDWARDS25519` key and signs and verifies one Solana message.
+`test/README.md` in this directory carries the full runbook, including the cost note and a table of common
+failure modes.
 
 ## Related plugins
 
@@ -236,6 +256,8 @@ in this directory carries the full runbook, including the cost note and a table 
 - `libraries/signature_provider_aws` — the shared AWS glue: SDK lifecycle, per-region client cache, region
   resolution, and the transient-versus-permanent error split.
 - `outpost_ethereum_client_plugin` — the ethereum-side submission path a `KMS:` Ethereum key signs for.
+- [`outpost_solana_client_plugin`](../outpost_solana_client_plugin/README.md) — the Solana-side submission path a
+  `KMS:` Solana key signs for.
 - [`batch_operator_plugin`](../batch_operator_plugin/README.md) — signs its WIRE actions with a WIRE key, which
   can be a `KMS:` K1 key.
 - `docs/signature-provider-manager-plugin.md` — the spec reference shared by every scheme.

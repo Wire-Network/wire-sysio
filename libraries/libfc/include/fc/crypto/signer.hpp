@@ -132,7 +132,7 @@ struct signer_traits<chain_kind_wire, chain_key_type_ethereum> {
 
 // ---------------------------------------------------------------------------
 // (solana, solana) -- Solana client transaction signing
-// Signs: raw_bytes via ED25519
+// Signs: raw_bytes via ED25519, with a local key or a remote signer's `sign_raw`
 // ---------------------------------------------------------------------------
 template<>
 struct signer_traits<chain_kind_solana, chain_key_type_solana> {
@@ -145,10 +145,24 @@ struct signer_traits<chain_kind_solana, chain_key_type_solana> {
    }
 
    static signature do_sign(const signature_provider_t& p, prepared_type data) {
-      FC_ASSERT(p.private_key, "Solana signing requires a local private key");
-      FC_ASSERT(p.private_key->contains<ed::private_key_shim>(), "Solana signing requires an ED private key");
-      auto& ed_key = p.private_key->get<ed::private_key_shim>();
-      return signature(signature::storage_type(ed_key.sign_raw(data.data(), data.size())));
+      if (p.private_key) {
+         FC_ASSERT(p.private_key->contains<ed::private_key_shim>(), "Solana signing requires an ED private key");
+         auto& ed_key = p.private_key->get<ed::private_key_shim>();
+         return signature(signature::storage_type(ed_key.sign_raw(data.data(), data.size())));
+      }
+
+      FC_ASSERT(static_cast<bool>(p.sign_raw),
+                "Solana signing requires a local ED private key or a raw sign function");
+      const signature sig = p.sign_raw(data);
+
+      // Verify a remote signer's first signature against the provider's key, as `em_sign_keccak` does, so a signer
+      // wired to the wrong key or message is rejected before its transaction is sent.
+      if (!p.self_verified->load(std::memory_order_acquire)) {
+         FC_ASSERT(do_verify(p.public_key, sig, data),
+                   "remote signer produced a signature that does not verify against the provider's public key");
+         p.self_verified->store(true, std::memory_order_release);
+      }
+      return sig;
    }
 
    static bool do_verify(const public_key& pub, const signature& sig, prepared_type data) {

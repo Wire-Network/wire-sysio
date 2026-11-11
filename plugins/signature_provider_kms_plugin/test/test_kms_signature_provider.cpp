@@ -258,6 +258,91 @@ private:
    fc::ecc::private_key _key;
 };
 
+/// Wrap a 32-byte Ed25519 public key in the 44-byte DER SubjectPublicKeyInfo KMS `GetPublicKey` returns for an
+/// `ECC_NIST_EDWARDS25519` key (RFC 8410): SEQUENCE { SEQUENCE { OID 1.3.101.112 }, BIT STRING { 00 <key> } }.
+std::vector<unsigned char> ed25519_to_spki_der(const fc::crypto::ed::public_key_shim& pub) {
+   static constexpr std::array<unsigned char, 12> spki_prefix = {
+      0x30, 0x2A, 0x30, 0x05, 0x06, 0x03, 0x2B, 0x65, 0x70, 0x03, 0x21, 0x00};
+   std::vector<unsigned char> der(spki_prefix.begin(), spki_prefix.end());
+   der.insert(der.end(), pub._data.begin(), pub._data.end());
+   return der;
+}
+
+/// The detached 64-byte signature of an `ed::signature_shim` (it follows the embedded public key).
+std::vector<unsigned char> detached(const fc::crypto::ed::signature_shim& sig) {
+   return {sig._data.begin() + fc::crypto::ed::public_key_shim::size, sig._data.end()};
+}
+
+/// `KMSClient` double for an `ECC_NIST_EDWARDS25519` key: `GetPublicKey` returns the key's SPKI, `Sign` returns the
+/// detached Ed25519 signature of the raw message, as KMS does for `ED25519_SHA_512`. Records every call.
+class local_ed25519_kms_client : public Aws::KMS::KMSClient {
+public:
+   explicit local_ed25519_kms_client(fc::crypto::ed::private_key_shim key)
+      : Aws::KMS::KMSClient(Aws::Auth::AWSCredentials{"test-access-key", "test-secret-key"},
+                            sigaws::make_client_configuration("us-east-1"))
+      , _key(key) {}
+
+   Aws::KMS::Model::GetPublicKeyOutcome
+   GetPublicKey(const Aws::KMS::Model::GetPublicKeyRequest& request) const override {
+      ++get_public_key_calls;
+      last_get_public_key_key_id = request.GetKeyId();
+      const std::vector<unsigned char> spki = spki_reply.value_or(ed25519_to_spki_der(_key.get_public_key()));
+      Aws::KMS::Model::GetPublicKeyResult result;
+      result.SetPublicKey(Aws::Utils::ByteBuffer{spki.data(), spki.size()});
+      return result;
+   }
+
+   Aws::KMS::Model::SignOutcome Sign(const Aws::KMS::Model::SignRequest& request) const override {
+      ++sign_calls;
+      last_sign_key_id  = request.GetKeyId();
+      last_message_type = request.GetMessageType();
+      last_algorithm    = request.GetSigningAlgorithm();
+      const Aws::Utils::CryptoBuffer& message = request.GetMessage();
+      last_message.assign(message.GetUnderlyingData(), message.GetUnderlyingData() + message.GetLength());
+      if (sign_error) {
+         return Aws::KMS::KMSError{*sign_error};
+      }
+
+      const fc::crypto::ed::private_key_shim& signer = sign_with.value_or(_key);
+      const std::vector<unsigned char> sig =
+         sign_reply.value_or(detached(signer.sign_raw(last_message.data(), last_message.size())));
+      Aws::KMS::Model::SignResult result;
+      result.SetSignature(Aws::Utils::ByteBuffer{sig.data(), sig.size()});
+      return result;
+   }
+
+   /// `GetPublicKey` returns these bytes instead of the key's SPKI.
+   std::optional<std::vector<unsigned char>> spki_reply;
+   /// `Sign` signs with this key instead, as after an alias is re-pointed.
+   std::optional<fc::crypto::ed::private_key_shim> sign_with;
+   /// `Sign` returns these bytes as the signature.
+   std::optional<std::vector<unsigned char>> sign_reply;
+   /// `Sign` fails with this error.
+   std::optional<Aws::Client::AWSError<Aws::KMS::KMSErrors>> sign_error;
+
+   mutable int                                   get_public_key_calls = 0;
+   mutable int                                   sign_calls           = 0;
+   mutable Aws::KMS::Model::MessageType          last_message_type    = Aws::KMS::Model::MessageType::NOT_SET;
+   mutable Aws::KMS::Model::SigningAlgorithmSpec last_algorithm = Aws::KMS::Model::SigningAlgorithmSpec::NOT_SET;
+   mutable std::vector<unsigned char>            last_message;
+   mutable Aws::String                           last_get_public_key_key_id;
+   mutable Aws::String                           last_sign_key_id;
+
+private:
+   fc::crypto::ed::private_key_shim _key;
+};
+
+/// A fresh Ed25519 key, as the local key behind `local_ed25519_kms_client`.
+fc::crypto::ed::private_key_shim generate_ed25519_key() {
+   return fc::crypto::private_key::generate(fc::crypto::private_key::key_type::ed)
+      .get<fc::crypto::ed::private_key_shim>();
+}
+
+/// The `fc::crypto::public_key` a Solana spec names for `key`.
+fc::crypto::public_key solana_public_key(const fc::crypto::ed::private_key_shim& key) {
+   return fc::crypto::public_key{fc::crypto::public_key::storage_type{key.get_public_key()}};
+}
+
 } // anonymous namespace
 
 BOOST_AUTO_TEST_SUITE(kms_signature_provider_tests)
@@ -724,6 +809,59 @@ BOOST_AUTO_TEST_CASE(spki_der_to_public_key_rejects_nonzero_unused_bits) {
       sysio::chain::plugin_config_exception);
 }
 
+BOOST_AUTO_TEST_CASE(spki_der_to_ed25519_public_key_decodes_rfc8410_example) {
+   // RFC 8410 section 10.1's example SubjectPublicKeyInfo:
+   // MCowBQYDK2VwAyEAGb9ECWmEzf6FQbrBZ9w7lshQhqowtrbLDFw4rXAxZuE=
+   static constexpr std::array<unsigned char, 44> spki = {
+      0x30, 0x2A, 0x30, 0x05, 0x06, 0x03, 0x2B, 0x65, 0x70, 0x03, 0x21, 0x00, 0x19, 0xBF, 0x44,
+      0x09, 0x69, 0x84, 0xCD, 0xFE, 0x85, 0x41, 0xBA, 0xC1, 0x67, 0xDC, 0x3B, 0x96, 0xC8, 0x50,
+      0x86, 0xAA, 0x30, 0xB6, 0xB6, 0xCB, 0x0C, 0x5C, 0x38, 0xAD, 0x70, 0x31, 0x66, 0xE1};
+   const fc::crypto::ed::public_key_shim decoded =
+      sysio::sigprov::kms::spki_der_to_ed25519_public_key(std::span<const unsigned char>(spki));
+   BOOST_CHECK(std::ranges::equal(decoded._data, std::span<const unsigned char>(spki).subspan(12)));
+}
+
+BOOST_AUTO_TEST_CASE(spki_der_to_ed25519_public_key_rejects_other_shapes) {
+   const fc::crypto::ed::public_key_shim pub = generate_ed25519_key().get_public_key();
+   const auto rejects = [](const std::vector<unsigned char>& der) {
+      BOOST_CHECK_THROW(sysio::sigprov::kms::spki_der_to_ed25519_public_key(std::span<const unsigned char>(der)),
+                        sysio::chain::plugin_config_exception);
+   };
+
+   // A secp256k1 key.
+   rejects(point_to_spki_der(fc::em::private_key::generate().get_public_key().serialize_uncompressed()));
+
+   // Another algorithm OID (X25519, 1.3.101.110).
+   std::vector<unsigned char> x25519 = ed25519_to_spki_der(pub);
+   x25519[8] = 0x6E;
+   rejects(x25519);
+
+   // Parameters after the OID, which RFC 8410 forbids: AlgorithmIdentifier grows by a 2-byte NULL.
+   std::vector<unsigned char> with_params = ed25519_to_spki_der(pub);
+   with_params[1] += 2;
+   with_params[3] += 2;
+   with_params.insert(with_params.begin() + 9, {0x05, 0x00});
+   rejects(with_params);
+
+   // A 31-byte key.
+   std::vector<unsigned char> short_key = ed25519_to_spki_der(pub);
+   short_key.pop_back();
+   short_key[1] -= 1;
+   short_key[10] -= 1;
+   rejects(short_key);
+
+   // Trailing bytes.
+   std::vector<unsigned char> trailing = ed25519_to_spki_der(pub);
+   trailing.push_back(0x00);
+   rejects(trailing);
+}
+
+BOOST_AUTO_TEST_CASE(spki_der_to_public_key_rejects_ed25519) {
+   const std::vector<unsigned char> der = ed25519_to_spki_der(generate_ed25519_key().get_public_key());
+   BOOST_CHECK_THROW(sysio::sigprov::kms::spki_der_to_public_key(std::span<const unsigned char>(der)),
+                     sysio::chain::plugin_config_exception);
+}
+
 BOOST_AUTO_TEST_CASE(spki_der_to_public_key_pinning_rejects_mismatched_key) {
    // Public-key pinning -- the security-relevant branch -- exercised offline.
    //
@@ -896,17 +1034,36 @@ BOOST_AUTO_TEST_CASE(make_kms_signature_provider_validates_key_before_region) {
                      sysio::chain::pending_impl_exception);
 }
 
-BOOST_AUTO_TEST_CASE(make_kms_signature_provider_rejects_solana) {
-   // Solana (Ed25519) KMS signing is not implemented.
-   const auto chain_pub =
-      fc::crypto::private_key::generate(fc::crypto::private_key::key_type::ed).get_public_key();
+BOOST_AUTO_TEST_CASE(make_kms_signature_provider_returns_raw_signer_for_solana) {
+   const sysio::sigprov::kms::kms_signer kms = sysio::sigprov::kms::make_kms_signature_provider(
+      kms_key_ref{"us-east-1", "alias/sol"}, fc::crypto::chain_key_type_solana,
+      solana_public_key(generate_ed25519_key()));
 
-   BOOST_CHECK_THROW(
-      sysio::sigprov::kms::make_kms_signature_provider(
-         kms_key_ref{"us-east-1", "alias/test"},
-         fc::crypto::chain_key_type_solana,
-         chain_pub),
-      sysio::chain::pending_impl_exception);
+   BOOST_CHECK(static_cast<bool>(kms.sign));
+   BOOST_CHECK(static_cast<bool>(kms.sign_raw));
+   BOOST_CHECK(static_cast<bool>(kms.warm_up));
+
+   // Only an Ed25519 key signs raw messages.
+   const fc::ecc::private_key            k1  = fc::ecc::private_key::generate();
+   const sysio::sigprov::kms::kms_signer eth = sysio::sigprov::kms::make_kms_signature_provider(
+      kms_key_ref{"us-east-1", "alias/eth"}, fc::crypto::chain_key_type_ethereum, ethereum_public_key(k1));
+   BOOST_CHECK(!static_cast<bool>(eth.sign_raw));
+}
+
+BOOST_AUTO_TEST_CASE(make_kms_signature_provider_rejects_solana_with_non_ed_key) {
+   const fc::ecc::private_key k1 = fc::ecc::private_key::generate();
+   BOOST_CHECK_THROW(sysio::sigprov::kms::make_kms_signature_provider(
+                        kms_key_ref{"us-east-1", "alias/sol"}, fc::crypto::chain_key_type_solana,
+                        wire_k1_public_key(k1)),
+                     sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(make_kms_signature_provider_rejects_wire_ed25519) {
+   // An Ed25519 key under a WIRE spec has no KMS signing path.
+   BOOST_CHECK_THROW(sysio::sigprov::kms::make_kms_signature_provider(
+                        kms_key_ref{"us-east-1", "alias/x"}, fc::crypto::chain_key_type_wire,
+                        solana_public_key(generate_ed25519_key())),
+                     sysio::chain::pending_impl_exception);
 }
 
 // ---------------------------------------------------------------------------
@@ -1028,6 +1185,130 @@ BOOST_AUTO_TEST_CASE(kms_signer_rejects_malformed_der) {
    BOOST_CHECK_THROW(kms.sign(fc::sha256::hash(std::string{"bad-der"})), sysio::chain::plugin_config_exception);
 }
 
+BOOST_AUTO_TEST_CASE(kms_signer_signs_solana_through_sol_client_signer) {
+   const fc::crypto::ed::private_key_shim         key      = generate_ed25519_key();
+   const std::shared_ptr<local_ed25519_kms_client> client   = std::make_shared<local_ed25519_kms_client>(key);
+   const fc::crypto::public_key                    expected = solana_public_key(key);
+
+   const sysio::sigprov::kms::kms_signer kms = sysio::sigprov::kms::make_kms_signature_provider(
+      client, "alias/sol", fc::crypto::chain_key_type_solana, expected);
+   BOOST_CHECK_NO_THROW(kms.warm_up());
+   const fc::crypto::signature_provider_t provider{fc::crypto::chain_kind_solana, fc::crypto::chain_key_type_solana,
+                                                   "kms-sol", expected, std::nullopt, kms.sign, kms.sign_raw};
+
+   const std::vector<uint8_t>        message(1232, 0xA5); // the largest Solana transaction
+   const fc::crypto::sol_client_signer signer{provider};
+   const fc::crypto::signature       sig = signer.sign(message);
+
+   BOOST_REQUIRE(sig.contains<fc::crypto::ed::signature_shim>());
+   BOOST_CHECK(signer.verify(sig, message));
+   BOOST_CHECK(provider.self_verified->load());
+   // Ed25519 is deterministic, so KMS's signature equals the local key's.
+   BOOST_CHECK(sig.get<fc::crypto::ed::signature_shim>()._data == key.sign_raw(message.data(), message.size())._data);
+
+   BOOST_CHECK_EQUAL(client->last_get_public_key_key_id, "alias/sol");
+   BOOST_CHECK_EQUAL(client->last_sign_key_id, "alias/sol");
+   BOOST_CHECK(client->last_message_type == Aws::KMS::Model::MessageType::RAW);
+   BOOST_CHECK(client->last_algorithm == Aws::KMS::Model::SigningAlgorithmSpec::ED25519_SHA_512);
+   BOOST_CHECK(std::ranges::equal(client->last_message, message));
+   BOOST_CHECK_EQUAL(client->get_public_key_calls, 1);
+   BOOST_CHECK_EQUAL(client->sign_calls, 1);
+}
+
+BOOST_AUTO_TEST_CASE(kms_signer_ed25519_digest_sign_matches_local_key) {
+   // `sign` signs a digest's hex, as a local Ed25519 key's `sign_sha256` does.
+   const fc::crypto::ed::private_key_shim         key    = generate_ed25519_key();
+   const std::shared_ptr<local_ed25519_kms_client> client = std::make_shared<local_ed25519_kms_client>(key);
+   const sysio::sigprov::kms::kms_signer kms = sysio::sigprov::kms::make_kms_signature_provider(
+      client, "alias/sol", fc::crypto::chain_key_type_solana, solana_public_key(key));
+
+   const fc::sha256            digest = fc::sha256::hash(std::string{"ed25519-digest"});
+   const fc::crypto::signature sig    = kms.sign(digest);
+   BOOST_REQUIRE(sig.contains<fc::crypto::ed::signature_shim>());
+   BOOST_CHECK(sig.get<fc::crypto::ed::signature_shim>()._data == key.sign_sha256(digest)._data);
+}
+
+BOOST_AUTO_TEST_CASE(kms_signer_ed25519_rejects_mismatched_pin_before_sign) {
+   const std::shared_ptr<local_ed25519_kms_client> client =
+      std::make_shared<local_ed25519_kms_client>(generate_ed25519_key());
+   const sysio::sigprov::kms::kms_signer kms = sysio::sigprov::kms::make_kms_signature_provider(
+      client, "alias/sol", fc::crypto::chain_key_type_solana, solana_public_key(generate_ed25519_key()));
+
+   BOOST_CHECK_THROW(kms.warm_up(), sysio::chain::plugin_config_exception);
+   const std::vector<uint8_t> message{1, 2, 3};
+   BOOST_CHECK_THROW(kms.sign_raw(message), sysio::chain::plugin_config_exception);
+   BOOST_CHECK_EQUAL(client->sign_calls, 0);
+}
+
+BOOST_AUTO_TEST_CASE(kms_signer_ed25519_rejects_a_secp256k1_kms_key) {
+   // The spec names a Solana key, but the KMS key is secp256k1.
+   const fc::crypto::ed::private_key_shim         key    = generate_ed25519_key();
+   const std::shared_ptr<local_ed25519_kms_client> client = std::make_shared<local_ed25519_kms_client>(key);
+   client->spki_reply = point_to_spki_der(fc::em::private_key::generate().get_public_key().serialize_uncompressed());
+   const sysio::sigprov::kms::kms_signer kms = sysio::sigprov::kms::make_kms_signature_provider(
+      client, "alias/sol", fc::crypto::chain_key_type_solana, solana_public_key(key));
+
+   BOOST_CHECK_THROW(kms.warm_up(), sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(kms_signer_ed25519_rejects_bad_signatures) {
+   const fc::crypto::ed::private_key_shim         key    = generate_ed25519_key();
+   const std::shared_ptr<local_ed25519_kms_client> client = std::make_shared<local_ed25519_kms_client>(key);
+   const sysio::sigprov::kms::kms_signer kms = sysio::sigprov::kms::make_kms_signature_provider(
+      client, "alias/sol", fc::crypto::chain_key_type_solana, solana_public_key(key));
+   const std::vector<uint8_t> message{1, 2, 3};
+
+   // Signed by another key after the pin passed.
+   client->sign_with = generate_ed25519_key();
+   BOOST_CHECK_THROW(kms.sign_raw(message), sysio::chain::plugin_config_exception);
+   client->sign_with.reset();
+
+   // Not 64 bytes.
+   client->sign_reply = std::vector<unsigned char>(63, 0x01);
+   BOOST_CHECK_THROW(kms.sign_raw(message), sysio::chain::plugin_config_exception);
+   BOOST_CHECK_EQUAL(client->sign_calls, 2);
+}
+
+BOOST_AUTO_TEST_CASE(kms_signer_ed25519_rejects_oversized_message_before_sign) {
+   const fc::crypto::ed::private_key_shim         key    = generate_ed25519_key();
+   const std::shared_ptr<local_ed25519_kms_client> client = std::make_shared<local_ed25519_kms_client>(key);
+   const sysio::sigprov::kms::kms_signer kms = sysio::sigprov::kms::make_kms_signature_provider(
+      client, "alias/sol", fc::crypto::chain_key_type_solana, solana_public_key(key));
+
+   BOOST_CHECK_NO_THROW(kms.sign_raw(std::vector<uint8_t>(4096, 0x01)));
+   BOOST_CHECK_THROW(kms.sign_raw(std::vector<uint8_t>(4097, 0x01)), fc::invalid_arg_exception);
+   BOOST_CHECK_EQUAL(client->sign_calls, 1);
+}
+
+BOOST_AUTO_TEST_CASE(kms_signer_ed25519_rejects_empty_or_oversized_message_before_any_kms_call) {
+   const fc::crypto::ed::private_key_shim         key    = generate_ed25519_key();
+   const std::shared_ptr<local_ed25519_kms_client> client = std::make_shared<local_ed25519_kms_client>(key);
+   const sysio::sigprov::kms::kms_signer kms = sysio::sigprov::kms::make_kms_signature_provider(
+      client, "alias/sol", fc::crypto::chain_key_type_solana, solana_public_key(key));
+
+   BOOST_CHECK_THROW(kms.sign_raw(std::vector<uint8_t>{}), fc::invalid_arg_exception);
+   BOOST_CHECK_THROW(kms.sign_raw(std::vector<uint8_t>(4097, 0x01)), fc::invalid_arg_exception);
+   BOOST_CHECK_EQUAL(client->get_public_key_calls, 0);
+   BOOST_CHECK_EQUAL(client->sign_calls, 0);
+}
+
+BOOST_AUTO_TEST_CASE(kms_signer_ed25519_classifies_sign_errors) {
+   const fc::crypto::ed::private_key_shim         key    = generate_ed25519_key();
+   const std::shared_ptr<local_ed25519_kms_client> client = std::make_shared<local_ed25519_kms_client>(key);
+   const sysio::sigprov::kms::kms_signer kms = sysio::sigprov::kms::make_kms_signature_provider(
+      client, "alias/sol", fc::crypto::chain_key_type_solana, solana_public_key(key));
+   const std::vector<uint8_t> message{1, 2, 3};
+
+   client->sign_error = Aws::Client::AWSError<Aws::KMS::KMSErrors>(
+      Aws::KMS::KMSErrors::THROTTLING, "ThrottlingException", "Rate exceeded", /* isRetryable */ true);
+   BOOST_CHECK_THROW(kms.sign_raw(message), sysio::chain::signing_transient_exception);
+
+   client->sign_error = Aws::Client::AWSError<Aws::KMS::KMSErrors>(
+      Aws::KMS::KMSErrors::DISABLED, "DisabledException", "Key is disabled", /* isRetryable */ false);
+   BOOST_CHECK_THROW(kms.sign_raw(message), sysio::chain::plugin_config_exception);
+   BOOST_CHECK_EQUAL(client->sign_calls, 2);
+}
+
 BOOST_AUTO_TEST_CASE(kms_signer_rejects_signature_from_another_key_after_pinning) {
    // The pin passed, then the alias was re-pointed: every signature is still checked against the pinned key.
    const fc::ecc::private_key                  priv   = fc::ecc::private_key::generate();
@@ -1107,6 +1388,36 @@ BOOST_AUTO_TEST_CASE(kms_live_sign_round_trip) {
    BOOST_CHECK_NO_THROW(k1.warm_up());
    const fc::sha256 wire_digest = fc::sha256::hash(std::string{"wire-sysio kms live k1 test 2026"});
    BOOST_CHECK(fc::crypto::public_key::recover(k1.sign(wire_digest), wire_digest) == k1_pub);
+}
+
+// ---------------------------------------------------------------------------
+// Live KMS Ed25519 round-trip -- env-gated, skipped in default CI.
+//
+//   KMS_LIVE_ED25519_SPEC    body of a `KMS:` spec for an ECC_NIST_EDWARDS25519 key
+//   KMS_LIVE_ED25519_PUBKEY  the key's Solana (base58) public key
+//
+// Signs one fixed message through `sol_client_signer` and verifies it locally. One billable Sign call.
+// ---------------------------------------------------------------------------
+BOOST_AUTO_TEST_CASE(kms_live_ed25519_sign_round_trip) {
+   const char* spec_env = std::getenv("KMS_LIVE_ED25519_SPEC");
+   const char* pub_env  = std::getenv("KMS_LIVE_ED25519_PUBKEY");
+   if (!spec_env || !pub_env || *spec_env == '\0' || *pub_env == '\0') {
+      BOOST_TEST_MESSAGE("KMS_LIVE_ED25519_SPEC / KMS_LIVE_ED25519_PUBKEY not set -- skipping live KMS Ed25519 test");
+      return;
+   }
+
+   const fc::crypto::public_key pub =
+      fc::crypto::from_native_string_to_public_key<fc::crypto::chain_key_type_solana>(std::string{pub_env});
+   const sysio::sigprov::kms::kms_signer kms = sysio::sigprov::kms::make_kms_signature_provider(
+      sysio::sigprov::kms::parse_kms_spec(spec_env), fc::crypto::chain_key_type_solana, pub);
+   BOOST_CHECK_NO_THROW(kms.warm_up());
+
+   const fc::crypto::signature_provider_t provider{fc::crypto::chain_kind_solana, fc::crypto::chain_key_type_solana,
+                                                   "kms-live-sol", pub, std::nullopt, kms.sign, kms.sign_raw};
+   const std::string                   text = "wire-sysio kms live ed25519 test 2026";
+   const std::span<const uint8_t>      message{reinterpret_cast<const uint8_t*>(text.data()), text.size()};
+   const fc::crypto::sol_client_signer signer{provider};
+   BOOST_CHECK(signer.verify(signer.sign(message), message));
 }
 
 BOOST_AUTO_TEST_CASE(make_kms_signature_provider_rejects_pubkey_variant_mismatch) {

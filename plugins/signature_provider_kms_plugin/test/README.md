@@ -152,6 +152,27 @@ If you want to confirm the skip path works without spending money, unset the
 env vars and run the same command — Boost prints
 `skipping live KMS test` and the case still reports `No errors detected`.
 
+## Ed25519 (Solana) live case
+
+`kms_signature_provider_tests/kms_live_ed25519_sign_round_trip` does the same for
+an `ECC_NIST_EDWARDS25519` key: it pins the key, signs one fixed message through
+`sol_client_signer` (`ED25519_SHA_512`, `MessageType=RAW`) and verifies the
+signature locally. One `Sign` call.
+
+```bash
+aws kms create-key --region us-east-1 --key-spec ECC_NIST_EDWARDS25519 \
+   --key-usage SIGN_VERIFY --description "wire-sysio KMS live Ed25519 test"
+
+export KMS_LIVE_ED25519_SPEC='us-east-1:alias/wire-ci-test-ed25519'
+export KMS_LIVE_ED25519_PUBKEY='<base58 public key>'   # last 32 bytes of get-public-key
+
+$BUILD_DIR/plugins/signature_provider_kms_plugin/test/test_signature_provider_kms_plugin \
+   --run_test=kms_signature_provider_tests/kms_live_ed25519_sign_round_trip \
+   --log_level=test_suite
+```
+
+The IAM grants are the same as above (`kms:Sign`, `kms:GetPublicKey`).
+
 ## Cost & rate-limit notes
 
 `KMS::Sign` is billed at roughly $0.03 per 10 000 calls, plus the per-key
