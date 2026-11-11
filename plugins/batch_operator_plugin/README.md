@@ -171,13 +171,16 @@ those lines is left to log tooling:
 
 ### Underwriter setup
 
-On the depot, the underwriter account holds the shadow LIQ it bonds and CPU for a
-few pushes per poll. It needs no RAM for its bond rows, which bill the request's
-issuer: the `sysio` RAM pool for `sysio.synd`'s requests. With a dedicated
-permission, link it to exactly the actions it pushes, so the node's key can move
-the inventory nowhere else: `sysio.bond::accept`, `approve`, `claim`, `prune` and
-`sysio.synd::crank`, `pruneenv`. The WIRE its bonds earn is withdrawn with
-`sysio.bond::claimwire`, which stays unlinked.
+On the depot, the underwriter account needs only the shadow LIQ it bonds: no RAM,
+CPU or NET. Its bond rows and the rows that hold the WIRE they earn bill the request's
+issuer (the `sysio` RAM pool for `sysio.synd`'s requests), and its pushes name no
+payer, so their CPU and NET bill the contract they call, `sysio.bond` or `sysio.synd`,
+which have unlimited CPU and NET. With a dedicated permission, link it to exactly the
+actions it pushes, so the node's key can move the inventory nowhere else:
+`sysio.bond::accept`, `approve`, `claim`, `prune` and `sysio.synd::crank`,
+`pruneenv`. The WIRE its bonds earn is recorded per issuer and withdrawn with
+`sysio.bond::claimwire(account, issuer)` (`sysio.synd` for syndication requests),
+which stays unlinked.
 
 The node needs an outpost RPC client for every active chain (each client spec names
 a signing key, though the underwriter only reads), the Ethereum OPP ABI files (which

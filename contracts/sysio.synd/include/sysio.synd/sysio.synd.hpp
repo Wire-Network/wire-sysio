@@ -36,9 +36,10 @@
  * Challenge. Any account may `challenge` an envelope that is REQUESTED, RELEASABLE or DONE while its
  * request is BONDED: it pays the request's hold bond plus the pair's `challenge_extra` in the
  * envelope's token (a charge of zero is refused), the extra stays in `feepot`, and this contract, the
- * issuer, holds the request through `sysio.bond::hold` naming the challenger as the beneficiary. The
- * envelope is HELD and releases nothing more until `sysio` rules, and the pair's queue is rewound to
- * it. One challenge per request. An OPEN request cannot be challenged: nothing has released, and a held
+ * issuer, holds the request through `sysio.bond::hold` naming the challenger as the beneficiary, with
+ * the challenger's authority, so the hold-bond escrow bills the challenger's RAM. The envelope is HELD
+ * and releases nothing more until `sysio` rules, and the pair's queue is rewound to it. One challenge
+ * per request. An OPEN request cannot be challenged: nothing has released, and a held
  * request takes no more bonds, so it would stop the pair until `sysio` rules. A VALID ruling pays the
  * hold bond to the request's bonds; an INVALID one pays it and the bounty to the challenger.
  *
@@ -394,7 +395,9 @@ namespace sysio {
       /// queue processes the ruling even for an envelope it had finished. A charge of zero (a hold bond
       /// that rounds to zero and no `challenge_extra`) is refused, and so is a request not yet fully
       /// bonded. One challenge per request. `challenger` may not be this contract or `sysio.bond`.
-      /// Challenger's authority; any row the challenge creates bills the `sysio` RAM pool.
+      /// Challenger's authority, which the `hold` carries too: the hold-bond escrow it creates on
+      /// `sysio.bond` bills the challenger's RAM. The token's fee pot row, shared by every pair of the
+      /// token, bills the `sysio` RAM pool.
       [[sysio::action]] void challenge(name challenger, sysio::slug_name chain_code, sysio::slug_name token_code,
                                        uint32_t epoch_index);
 

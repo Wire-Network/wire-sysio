@@ -1432,8 +1432,11 @@ void synd::challenge(name challenger, sysio::slug_name chain_code, sysio::slug_n
           std::make_tuple(challenger, get_self(), asset{static_cast<int64_t>(charge), st->supply.symbol},
                           std::string{challenge_memo}))
       .send();
-   // sysio.bond pulls the hold bond back out of this contract's row, where the charge put it.
-   action(active_of(get_self()), BOND_ACCOUNT, hold_action, std::make_tuple(req->id, challenger)).send();
+   // sysio.bond pulls the hold bond back out of this contract's row, where the charge put it. The
+   // challenger signs the hold too: it is the beneficiary, and the hold-bond escrow bills its RAM.
+   action(std::vector<permission_level>{active_of(get_self()), active_of(challenger)}, BOND_ACCOUNT, hold_action,
+          std::make_tuple(req->id, challenger))
+      .send();
 
    row->state = envelope_state::HELD;
    envelopes.set(same_payer, key, *row);
