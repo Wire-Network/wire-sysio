@@ -874,6 +874,28 @@ BOOST_FIXTURE_TEST_CASE(accept_bills_sysio, sysio_bond_tester) try {
    BOOST_REQUIRE_GT(ram_usage(SYSIO_ACCOUNT), sysio_ram);
 } FC_LOG_AND_RETHROW()
 
+// A privileged underwriter -- a system contract -- has its bond row billed to the sysio RAM pool as
+// well: every underwriter's bond row bills the pool, privileged or not.
+BOOST_FIXTURE_TEST_CASE(a_privileged_underwriter_bills_sysio, sysio_bond_tester) try {
+   // sysio.tokens, the token registry, is a privileged system contract of the fixture.
+   constexpr auto system_contract = TOKENS_ACCOUNT;
+   BOOST_REQUIRE_EQUAL(success(), transfer_wire(SYSIO_ACCOUNT, system_contract, 100 * UNIT));
+   // The bounty opens sysio.bond's own WIRE balance row first, so the accept below writes only the bond row.
+   BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'a'), WIRE, 10 * UNIT, 1 * UNIT));
+   const auto sysio_ram       = ram_usage(SYSIO_ACCOUNT);
+   const auto issuer_ram      = ram_usage("issuer"_n);
+   const auto underwriter_ram = ram_usage(system_contract);
+
+   BOOST_REQUIRE_EQUAL(success(), accept(system_contract, 1, 10 * UNIT));
+   std::string bond_key = request_key_of(1);
+   append_key_word(bond_key, system_contract.to_uint64_t());
+   BOOST_REQUIRE_EQUAL(SYSIO_ACCOUNT, payer_of("bonds"_n, bond_key));
+   BOOST_REQUIRE_EQUAL("issuer"_n, payer_of("requests"_n, request_key_of(1)));
+   BOOST_REQUIRE_EQUAL(underwriter_ram, ram_usage(system_contract));
+   BOOST_REQUIRE_EQUAL(issuer_ram, ram_usage("issuer"_n));
+   BOOST_REQUIRE_GT(ram_usage(SYSIO_ACCOUNT), sysio_ram);
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE(accept_in_wire_pulls_wire, sysio_bond_tester) try {
    BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'a'), WIRE, 10 * UNIT, 0));
    const auto before     = wire_balance("alice"_n);
