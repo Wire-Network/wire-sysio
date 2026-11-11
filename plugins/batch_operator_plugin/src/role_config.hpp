@@ -1,8 +1,8 @@
 #pragma once
 /**
  * @file role_config.hpp
- * @brief Parsing of the batch-operator plugin's role options and the choice of the key a role signs with. Pure
- *        functions, so the plugin's tests drive them without a node.
+ * @brief Parsing of the batch-operator plugin's role options and the choice and check of the key a role signs with.
+ *        Free functions, so the plugin's tests drive them without a node.
  */
 
 #include <cstddef>
@@ -13,10 +13,18 @@
 #include <string>
 #include <vector>
 
+#include <exception>
+#include <string_view>
+
+#include <fc/crypto/public_key.hpp>
+#include <fc/crypto/sha256.hpp>
+#include <fc/crypto/signature_provider.hpp>
 #include <fc/exception/exception.hpp>
+#include <fc/log/logger.hpp>
 #include <sysio/chain/asset.hpp>
 #include <sysio/chain/authority.hpp>
 #include <sysio/chain/config.hpp>
+#include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/name.hpp>
 
 namespace sysio::batch_operator_detail {
@@ -97,6 +105,27 @@ signer_choice<Provider> choose_signer(const std::vector<Provider>& providers, Qu
    }
    if (out.matches != 1) out.chosen.reset();
    return out;
+}
+
+/// Whether `provider`'s signature over `probe` recovers to its own key, which is how the chain checks a transaction
+/// signature. Logs why not. A transient signing failure, such as AWS KMS briefly unavailable, says nothing about the
+/// key, so the signer passes unchecked with a warning.
+inline bool signs_for_its_key(std::string_view role, const fc::crypto::signature_provider_t& provider,
+                              const fc::sha256& probe) {
+   try {
+      if (fc::crypto::public_key::recover(provider.sign(probe), probe) == provider.public_key) return true;
+      elog("batch_operator: {}'s signature provider {} makes signatures that do not recover to its key", role,
+           provider.key_name);
+   } catch (const chain::signing_transient_exception& e) {
+      wlog("batch_operator: {}'s signature provider {} could not sign its startup probe, accepting it unchecked: {}",
+           role, provider.key_name, e.top_message());
+      return true;
+   } catch (const fc::exception& e) {
+      elog("batch_operator: {}'s signature provider {} cannot sign: {}", role, provider.key_name, e.top_message());
+   } catch (const std::exception& e) {
+      elog("batch_operator: {}'s signature provider {} cannot sign: {}", role, provider.key_name, e.what());
+   }
+   return false;
 }
 
 } // namespace sysio::batch_operator_detail

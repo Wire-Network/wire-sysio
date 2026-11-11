@@ -2351,7 +2351,8 @@ int main( int argc, char** argv ) {
    auto eth_to_k1_public_cmd = convert_cmd->add_subcommand("eth_to_k1_public",
       localized("Convert an Ethereum uncompressed public key (0x04<128 hex>, or 0x<128 hex> for raw X||Y) to a "
                 "Wire PUB_K1_, plus the matching Ethereum address. Use this to register an account's K1 key "
-                "without handling the private key; signing still requires that private key in a Wire signer."));
+                "without handling the private key; signing needs a Wire signer holding that key, such as a KMS: "
+                "signature provider for a key kept in AWS KMS."));
    eth_to_k1_public_cmd->add_option("public-key", eth_k1_pubhex,
       localized("Ethereum uncompressed public key: 0x04 + 128 hex (65 bytes) or 128 hex (64-byte X||Y)"))->required();
    eth_to_k1_public_cmd->callback([&] {

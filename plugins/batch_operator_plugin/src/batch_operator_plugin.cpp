@@ -1375,24 +1375,9 @@ struct batch_operator_plugin::impl {
               "{}@{}, found {}", role, level.actor.to_string(), level.permission.to_string(), choice.matches);
          return std::nullopt;
       }
-      if (!signs_for_its_key(role, **choice.chosen) || !linked) return std::nullopt;
-      return signer{.auth = level, .provider = *choice.chosen};
-   }
-
-   /// Whether `provider`'s signature over a probe digest recovers to its own key, which is how the chain checks a
-   /// transaction signature. Logs why not.
-   static bool signs_for_its_key(std::string_view role, const fc::crypto::signature_provider_t& provider) {
       const fc::sha256 probe = fc::sha256::hash(SIGNER_PROBE.data(), SIGNER_PROBE.size());
-      try {
-         if (fc::crypto::public_key::recover(provider.sign(probe), probe) == provider.public_key) return true;
-         elog("batch_operator: {}'s signature provider {} makes signatures that do not recover to its key", role,
-              provider.key_name);
-      } catch (const fc::exception& e) {
-         elog("batch_operator: {}'s signature provider {} cannot sign: {}", role, provider.key_name, e.top_message());
-      } catch (const std::exception& e) {
-         elog("batch_operator: {}'s signature provider {} cannot sign: {}", role, provider.key_name, e.what());
-      }
-      return false;
+      if (!batch_operator_detail::signs_for_its_key(role, **choice.chosen, probe) || !linked) return std::nullopt;
+      return signer{.auth = level, .provider = *choice.chosen};
    }
 
    /// Resolve the signer of every enabled role. False when one cannot be resolved, after both are reported.

@@ -1,12 +1,10 @@
 /**
- * Unit tests for the AWS KMS signature provider parser.
+ * Unit tests for the AWS KMS signature provider.
  *
- * These cases cover only the offline parse path -- `parse_kms_spec` does no
- * network I/O and constructs no `KMSClient`, so the suite runs without AWS
- * credentials and without an internet connection. The one end-to-end signing
- * test in this file (`kms_live_sign_round_trip`) is gated on the
- * `KMS_LIVE_SPEC` / `KMS_LIVE_PUBKEY` environment variables and is skipped
- * unless both are set.
+ * Every case runs offline, without AWS credentials. The signing closure is driven through `local_key_kms_client`, a
+ * `KMSClient` double that answers `GetPublicKey` / `Sign` from a local key. The one test against real KMS
+ * (`kms_live_sign_round_trip`) is gated on the `KMS_LIVE_SPEC` / `KMS_LIVE_PUBKEY` environment variables and is
+ * skipped unless both are set.
  */
 
 #include <boost/test/unit_test.hpp>
@@ -31,8 +29,27 @@
 #include <tuple>
 #include <vector>
 
+#include <aws/core/auth/AWSCredentials.h>
+#include <aws/core/utils/Array.h>
+#include <aws/kms/KMSClient.h>
 #include <aws/kms/KMSErrors.h>
+#include <aws/kms/model/GetPublicKeyRequest.h>
+#include <aws/kms/model/GetPublicKeyResult.h>
+#include <aws/kms/model/MessageType.h>
+#include <aws/kms/model/SignRequest.h>
+#include <aws/kms/model/SignResult.h>
+#include <aws/kms/model/SigningAlgorithmSpec.h>
 
+#include <fc/crypto/elliptic.hpp>
+#include <fc/crypto/sha256.hpp>
+#include <fc/crypto/signature.hpp>
+#include <fc/crypto/signature_provider.hpp>
+#include <fc/crypto/signer.hpp>
+
+#include <memory>
+#include <optional>
+
+#include <sysio/signature_provider_aws/aws_common.hpp>
 #include <sysio/signature_provider_aws/test/env_fixtures.hpp>
 #include <sysio/signature_provider_kms_plugin/kms_signature_provider.hpp>
 
@@ -146,6 +163,100 @@ std::array<unsigned char, 64> drop_v(const fc::em::compact_signature& sig) {
    std::copy_n(sig.begin(), 64, rs.begin());
    return rs;
 }
+
+/// Take the 64 bytes (r || s) after the header of a 65-byte K1 compact_signature.
+std::array<unsigned char, 64> drop_k1_header(const fc::ecc::compact_signature& sig) {
+   std::array<unsigned char, 64> rs{};
+   std::copy_n(sig.begin() + 1, 64, rs.begin());
+   return rs;
+}
+
+/// The `fc::crypto::public_key` a WIRE K1 spec names for `key`.
+fc::crypto::public_key wire_k1_public_key(const fc::ecc::private_key& key) {
+   return fc::crypto::public_key{
+      fc::crypto::public_key::storage_type{fc::ecc::public_key_shim{key.get_public_key().serialize()}}};
+}
+
+/// The `fc::crypto::public_key` an Ethereum spec names for the same secp256k1 `key`.
+fc::crypto::public_key ethereum_public_key(const fc::ecc::private_key& key) {
+   return fc::crypto::public_key{
+      fc::crypto::public_key::storage_type{fc::em::public_key_shim{key.get_public_key().serialize()}}};
+}
+
+/// `KMSClient` double answering from a local secp256k1 key the way KMS does: `GetPublicKey` returns the key's
+/// SubjectPublicKeyInfo, `Sign` returns a DER signature over the message with no recovery id (high-S when
+/// `high_s` is set, which KMS may emit). Records every call so tests can assert what reached "KMS".
+class local_key_kms_client : public Aws::KMS::KMSClient {
+public:
+   /// Static credentials keep construction off the default provider chain, whose instance-metadata probe is slow.
+   explicit local_key_kms_client(fc::ecc::private_key key)
+      : Aws::KMS::KMSClient(Aws::Auth::AWSCredentials{"test-access-key", "test-secret-key"},
+                            sigaws::make_client_configuration("us-east-1"))
+      , _key(std::move(key)) {}
+
+   Aws::KMS::Model::GetPublicKeyOutcome
+   GetPublicKey(const Aws::KMS::Model::GetPublicKeyRequest& request) const override {
+      ++get_public_key_calls;
+      last_get_public_key_key_id = request.GetKeyId();
+      if (fail_next_get_public_key) {
+         fail_next_get_public_key = false;
+         return Aws::KMS::KMSError{Aws::Client::AWSError<Aws::KMS::KMSErrors>(
+            Aws::KMS::KMSErrors::THROTTLING, "ThrottlingException", "Rate exceeded", /* isRetryable */ true)};
+      }
+      const fc::em::public_key point{_key.get_public_key().serialize()};
+      const std::vector<unsigned char> spki = point_to_spki_der(point.serialize_uncompressed());
+      Aws::KMS::Model::GetPublicKeyResult result;
+      result.SetPublicKey(Aws::Utils::ByteBuffer{spki.data(), spki.size()});
+      return result;
+   }
+
+   Aws::KMS::Model::SignOutcome Sign(const Aws::KMS::Model::SignRequest& request) const override {
+      ++sign_calls;
+      last_sign_key_id  = request.GetKeyId();
+      last_message_type = request.GetMessageType();
+      last_algorithm    = request.GetSigningAlgorithm();
+      const Aws::Utils::CryptoBuffer& message = request.GetMessage();
+      last_message.assign(message.GetUnderlyingData(), message.GetUnderlyingData() + message.GetLength());
+      if (sign_error) {
+         return Aws::KMS::KMSError{*sign_error};
+      }
+
+      std::vector<unsigned char> der = sign_reply.value_or(std::vector<unsigned char>{});
+      if (!sign_reply) {
+         fc::sha256 digest;
+         BOOST_REQUIRE_EQUAL(last_message.size(), digest.data_size());
+         std::memcpy(digest.data(), last_message.data(), last_message.size());
+         std::array<unsigned char, 64> rs = drop_k1_header(sign_with.value_or(_key).sign_compact(digest));
+         if (high_s) {
+            make_high_s(rs);
+         }
+         der = compact_to_der(rs);
+      }
+      Aws::KMS::Model::SignResult result;
+      result.SetSignature(Aws::Utils::ByteBuffer{der.data(), der.size()});
+      return result;
+   }
+
+   bool         high_s                   = false;
+   mutable bool fail_next_get_public_key = false;
+   /// `Sign` signs with this key instead of the one `GetPublicKey` reports, as after an alias is re-pointed.
+   std::optional<fc::ecc::private_key> sign_with;
+   /// `Sign` fails with this error.
+   std::optional<Aws::Client::AWSError<Aws::KMS::KMSErrors>> sign_error;
+   /// `Sign` returns these bytes as the signature.
+   std::optional<std::vector<unsigned char>> sign_reply;
+
+   mutable int                                   get_public_key_calls = 0;
+   mutable int                                   sign_calls           = 0;
+   mutable Aws::KMS::Model::MessageType          last_message_type    = Aws::KMS::Model::MessageType::NOT_SET;
+   mutable Aws::KMS::Model::SigningAlgorithmSpec last_algorithm = Aws::KMS::Model::SigningAlgorithmSpec::NOT_SET;
+   mutable std::vector<unsigned char>            last_message;
+   mutable Aws::String                           last_get_public_key_key_id;
+   mutable Aws::String                           last_sign_key_id;
+
+private:
+   fc::ecc::private_key _key;
+};
 
 } // anonymous namespace
 
@@ -451,6 +562,48 @@ BOOST_AUTO_TEST_CASE(der_to_eth_signature_normalises_high_s_input) {
    BOOST_CHECK(out == local);
 }
 
+BOOST_AUTO_TEST_CASE(der_to_wire_k1_signature_matches_local_sign) {
+   // libsecp256k1 signs low-S, so the K1 packing of a DER blob must reproduce the local K1 signature byte for byte,
+   // header included.
+   const fc::ecc::private_key      priv   = fc::ecc::private_key::generate();
+   const fc::em::public_key        pub{priv.get_public_key().serialize()};
+   const fc::sha256                digest = fc::sha256::hash(std::string{"wire-k1-end-to-end"});
+   const fc::ecc::compact_signature local = priv.sign_compact(digest);
+
+   const std::vector<unsigned char> der = compact_to_der(drop_k1_header(local));
+   const fc::ecc::compact_signature out = sysio::sigprov::kms::der_to_wire_k1_signature(
+      std::span<const unsigned char>(der), digest.to_uint8_span(), pub);
+
+   BOOST_CHECK(out == local);
+   BOOST_CHECK(fc::ecc::public_key::recover(out, digest) == priv.get_public_key());
+}
+
+BOOST_AUTO_TEST_CASE(der_to_wire_k1_signature_normalises_high_s_input) {
+   const fc::ecc::private_key      priv   = fc::ecc::private_key::generate();
+   const fc::em::public_key        pub{priv.get_public_key().serialize()};
+   const fc::sha256                digest = fc::sha256::hash(std::string{"wire-k1-high-s"});
+   const fc::ecc::compact_signature local = priv.sign_compact(digest);
+
+   std::array<unsigned char, 64> rs = drop_k1_header(local);
+   make_high_s(rs);
+   const std::vector<unsigned char> der = compact_to_der(rs);
+   const fc::ecc::compact_signature out = sysio::sigprov::kms::der_to_wire_k1_signature(
+      std::span<const unsigned char>(der), digest.to_uint8_span(), pub);
+
+   BOOST_CHECK(out == local);
+}
+
+BOOST_AUTO_TEST_CASE(der_to_wire_k1_signature_throws_on_wrong_pubkey) {
+   const fc::ecc::private_key      priv      = fc::ecc::private_key::generate();
+   const fc::em::public_key        wrong_pub{fc::ecc::private_key::generate().get_public_key().serialize()};
+   const fc::sha256                digest    = fc::sha256::hash(std::string{"wire-k1-wrong-pub"});
+   const std::vector<unsigned char> der      = compact_to_der(drop_k1_header(priv.sign_compact(digest)));
+
+   BOOST_CHECK_THROW(sysio::sigprov::kms::der_to_wire_k1_signature(std::span<const unsigned char>(der),
+                                                                   digest.to_uint8_span(), wrong_pub),
+                     sysio::chain::plugin_config_exception);
+}
+
 // ---------------------------------------------------------------------------
 // spki_der_to_public_key -- KMS public-key pinning decoder
 //
@@ -578,9 +731,8 @@ BOOST_AUTO_TEST_CASE(spki_der_to_public_key_pinning_rejects_mismatched_key) {
    // `GetPublicKey` returns and asserts it equals the operator-pinned key
    // (`kms_pubkey == state.expected_em_pubkey`); a mismatch is turned into
    // plugin_config_exception so a spec that pins the WRONG <public-key> is
-   // rejected before any billable Sign. We can't drive verify_kms_pubkey
-   // itself without a live KMSClient -- the GetPublicKey round-trip is covered
-   // by the env-gated kms_live_sign_round_trip above -- but the key-equality
+   // rejected before any billable Sign. `kms_signer_rejects_mismatched_pin_before_sign`
+   // drives verify_kms_pubkey itself through a client double; the key-equality
    // semantics that assertion relies on are exercised here directly: a key
    // decoded from one KMS SPKI must compare equal to itself and unequal to any
    // other key. `spki_der_to_public_key` is the exact decode the pin check runs.
@@ -653,8 +805,8 @@ BOOST_AUTO_TEST_CASE(get_kms_client_empty_region_unresolvable_throws) {
 // make_kms_signature_provider
 //
 // Construction is offline (creates a closure capturing a cached KMSClient
-// and the expected pubkey). Invocation issues a real KMS::Sign request and
-// is therefore covered by env-gated live tests, not this suite.
+// and the expected pubkey). These cases build the closures without calling
+// them; the `kms_signer_*` cases below call them through a client double.
 // ---------------------------------------------------------------------------
 
 BOOST_AUTO_TEST_CASE(make_kms_signature_provider_returns_callable_for_ethereum) {
@@ -691,23 +843,61 @@ BOOST_AUTO_TEST_CASE(make_kms_signature_provider_regionless_resolves_from_env) {
    BOOST_CHECK(static_cast<bool>(kms.warm_up));
 }
 
-BOOST_AUTO_TEST_CASE(make_kms_signature_provider_rejects_wire_k1) {
-   // Wire K1 (`chain_key_type_wire`) is also secp256k1, but its public-key
-   // and signature shapes differ from Ethereum's, so it is not yet supported
-   // -- fail loud rather than sign with the wrong format.
-   const auto chain_pub =
+BOOST_AUTO_TEST_CASE(make_kms_signature_provider_returns_callable_for_wire_k1) {
+   const fc::crypto::public_key chain_pub =
       fc::crypto::private_key::generate(fc::crypto::private_key::key_type::k1).get_public_key();
 
-   BOOST_CHECK_THROW(
-      sysio::sigprov::kms::make_kms_signature_provider(
-         kms_key_ref{"us-east-1", "alias/wire-k1"},
-         fc::crypto::chain_key_type_wire,
-         chain_pub),
-      sysio::chain::pending_impl_exception);
+   const sysio::sigprov::kms::kms_signer kms = sysio::sigprov::kms::make_kms_signature_provider(
+      kms_key_ref{"us-east-1", "alias/wire-k1"}, fc::crypto::chain_key_type_wire, chain_pub);
+
+   BOOST_CHECK(static_cast<bool>(kms.sign));
+   BOOST_CHECK(static_cast<bool>(kms.warm_up));
+}
+
+BOOST_AUTO_TEST_CASE(make_kms_signature_provider_rejects_wire_r1) {
+   // KMS holds secp256k1 keys here; a WIRE R1 (P-256) key has no signing path yet.
+   const fc::crypto::public_key chain_pub =
+      fc::crypto::private_key::generate(fc::crypto::private_key::key_type::r1).get_public_key();
+
+   BOOST_CHECK_THROW(sysio::sigprov::kms::make_kms_signature_provider(
+                        kms_key_ref{"us-east-1", "alias/wire-r1"}, fc::crypto::chain_key_type_wire, chain_pub),
+                     sysio::chain::pending_impl_exception);
+}
+
+BOOST_AUTO_TEST_CASE(make_kms_signature_provider_rejects_null_client) {
+   const fc::ecc::private_key priv = fc::ecc::private_key::generate();
+   BOOST_CHECK_THROW(sysio::sigprov::kms::make_kms_signature_provider(
+                        nullptr, "alias/wire-k1", fc::crypto::chain_key_type_wire, wire_k1_public_key(priv)),
+                     sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(make_kms_signature_provider_rejects_wire_non_k1_and_bls) {
+   // A WIRE spec carrying an Ethereum-variant key, and a BLS key type, have no KMS signing path.
+   const fc::ecc::private_key   priv   = fc::ecc::private_key::generate();
+   const fc::crypto::public_key em_pub = ethereum_public_key(priv);
+   BOOST_CHECK_THROW(sysio::sigprov::kms::make_kms_signature_provider(
+                        kms_key_ref{"us-east-1", "alias/x"}, fc::crypto::chain_key_type_wire, em_pub),
+                     sysio::chain::pending_impl_exception);
+
+   const fc::crypto::public_key bls_pub =
+      fc::crypto::private_key::generate(fc::crypto::private_key::key_type::bls).get_public_key();
+   BOOST_CHECK_THROW(sysio::sigprov::kms::make_kms_signature_provider(
+                        kms_key_ref{"us-east-1", "alias/x"}, fc::crypto::chain_key_type_wire_bls, bls_pub),
+                     sysio::chain::pending_impl_exception);
+}
+
+BOOST_AUTO_TEST_CASE(make_kms_signature_provider_validates_key_before_region) {
+   // With no region resolvable, an unsupported key must still report the key, not the region.
+   const sigaws::test::scoped_unresolvable_region_env pinned;
+   const fc::crypto::public_key r1_pub =
+      fc::crypto::private_key::generate(fc::crypto::private_key::key_type::r1).get_public_key();
+   BOOST_CHECK_THROW(sysio::sigprov::kms::make_kms_signature_provider(
+                        kms_key_ref{{}, "alias/x"}, fc::crypto::chain_key_type_wire, r1_pub),
+                     sysio::chain::pending_impl_exception);
 }
 
 BOOST_AUTO_TEST_CASE(make_kms_signature_provider_rejects_solana) {
-   // Solana keys are Ed25519 -- KMS does not support that signing algorithm.
+   // Solana (Ed25519) KMS signing is not implemented.
    const auto chain_pub =
       fc::crypto::private_key::generate(fc::crypto::private_key::key_type::ed).get_public_key();
 
@@ -717,6 +907,138 @@ BOOST_AUTO_TEST_CASE(make_kms_signature_provider_rejects_solana) {
          fc::crypto::chain_key_type_solana,
          chain_pub),
       sysio::chain::pending_impl_exception);
+}
+
+// ---------------------------------------------------------------------------
+// Signing closure driven through `local_key_kms_client`: pinning, the Sign
+// request, and the packing of the returned DER, without AWS.
+// ---------------------------------------------------------------------------
+
+BOOST_AUTO_TEST_CASE(kms_signer_signs_wire_k1) {
+   for (const bool high_s : {false, true}) {
+      BOOST_TEST_CONTEXT("high_s=" << high_s) {
+         const fc::ecc::private_key                  priv   = fc::ecc::private_key::generate();
+         const std::shared_ptr<local_key_kms_client> client = std::make_shared<local_key_kms_client>(priv);
+         client->high_s                                     = high_s;
+         const fc::crypto::public_key expected              = wire_k1_public_key(priv);
+
+         const sysio::sigprov::kms::kms_signer kms = sysio::sigprov::kms::make_kms_signature_provider(
+            client, "alias/wire-k1", fc::crypto::chain_key_type_wire, expected);
+         BOOST_CHECK_NO_THROW(kms.warm_up());
+
+         const fc::sha256            digest = fc::sha256::hash(std::string{"wire-k1-trx-digest"});
+         const fc::crypto::signature sig    = kms.sign(digest);
+
+         BOOST_REQUIRE(sig.contains<fc::ecc::signature_shim>());
+         BOOST_CHECK(fc::crypto::public_key::recover(sig, digest) == expected);
+         // libsecp256k1 signs deterministically, so the KMS path must reproduce the local K1 signature exactly.
+         BOOST_CHECK(sig.get<fc::ecc::signature_shim>().serialize() == priv.sign_compact(digest));
+
+         BOOST_CHECK_EQUAL(client->last_get_public_key_key_id, "alias/wire-k1");
+         BOOST_CHECK_EQUAL(client->last_sign_key_id, "alias/wire-k1");
+         BOOST_CHECK(client->last_message_type == Aws::KMS::Model::MessageType::DIGEST);
+         BOOST_CHECK(client->last_algorithm == Aws::KMS::Model::SigningAlgorithmSpec::ECDSA_SHA_256);
+         BOOST_CHECK(std::ranges::equal(client->last_message, digest.to_uint8_span()));
+         // warm_up pinned the key, so the sign did not fetch it again.
+         BOOST_CHECK_EQUAL(client->get_public_key_calls, 1);
+         BOOST_CHECK_EQUAL(client->sign_calls, 1);
+      }
+   }
+}
+
+BOOST_AUTO_TEST_CASE(kms_signer_signs_ethereum_through_eth_client_signer) {
+   // The Ethereum caller hands the closure a keccak digest and self-verifies the first signature.
+   const fc::ecc::private_key                  priv     = fc::ecc::private_key::generate();
+   const std::shared_ptr<local_key_kms_client> client   = std::make_shared<local_key_kms_client>(priv);
+   const fc::crypto::public_key                expected = ethereum_public_key(priv);
+
+   const sysio::sigprov::kms::kms_signer kms = sysio::sigprov::kms::make_kms_signature_provider(
+      client, "alias/eth", fc::crypto::chain_key_type_ethereum, expected);
+   const fc::crypto::signature_provider_t provider{fc::crypto::chain_kind_ethereum, fc::crypto::chain_key_type_ethereum,
+                                                   "kms-eth", expected, std::nullopt, kms.sign};
+
+   const std::string                  payload = "rlp-encoded-ethereum-transaction";
+   const std::span<const uint8_t>     bytes{reinterpret_cast<const uint8_t*>(payload.data()), payload.size()};
+   const fc::crypto::eth_client_signer signer{provider};
+   const fc::crypto::signature        sig = signer.sign(bytes);
+
+   BOOST_REQUIRE(sig.contains<fc::em::signature_shim>());
+   BOOST_CHECK(signer.recover(sig, bytes) == expected);
+   BOOST_CHECK(provider.self_verified->load());
+   // No warm_up: the first sign pinned the key.
+   BOOST_CHECK_EQUAL(client->get_public_key_calls, 1);
+   BOOST_CHECK_EQUAL(client->sign_calls, 1);
+}
+
+BOOST_AUTO_TEST_CASE(kms_signer_rejects_mismatched_pin_before_sign) {
+   const fc::ecc::private_key                  held   = fc::ecc::private_key::generate();
+   const fc::ecc::private_key                  pinned = fc::ecc::private_key::generate();
+   const std::shared_ptr<local_key_kms_client> client = std::make_shared<local_key_kms_client>(held);
+
+   const sysio::sigprov::kms::kms_signer kms = sysio::sigprov::kms::make_kms_signature_provider(
+      client, "alias/wire-k1", fc::crypto::chain_key_type_wire, wire_k1_public_key(pinned));
+
+   BOOST_CHECK_THROW(kms.warm_up(), sysio::chain::plugin_config_exception);
+   BOOST_CHECK_THROW(kms.sign(fc::sha256::hash(std::string{"never-signed"})), sysio::chain::plugin_config_exception);
+   // A failed pin is not cached: each attempt fetches the key again, and no Sign is ever sent.
+   BOOST_CHECK_EQUAL(client->get_public_key_calls, 2);
+   BOOST_CHECK_EQUAL(client->sign_calls, 0);
+}
+
+BOOST_AUTO_TEST_CASE(kms_signer_retries_pin_after_transient_failure) {
+   const fc::ecc::private_key                  priv     = fc::ecc::private_key::generate();
+   const std::shared_ptr<local_key_kms_client> client   = std::make_shared<local_key_kms_client>(priv);
+   const fc::crypto::public_key                expected = wire_k1_public_key(priv);
+   client->fail_next_get_public_key                     = true;
+
+   const sysio::sigprov::kms::kms_signer kms = sysio::sigprov::kms::make_kms_signature_provider(
+      client, "alias/wire-k1", fc::crypto::chain_key_type_wire, expected);
+
+   BOOST_CHECK_THROW(kms.warm_up(), sysio::chain::signing_transient_exception);
+   const fc::sha256 digest = fc::sha256::hash(std::string{"after-throttle"});
+   BOOST_CHECK(fc::crypto::public_key::recover(kms.sign(digest), digest) == expected);
+   BOOST_CHECK_EQUAL(client->get_public_key_calls, 2);
+   BOOST_CHECK_EQUAL(client->sign_calls, 1);
+}
+
+BOOST_AUTO_TEST_CASE(kms_signer_classifies_sign_errors) {
+   const fc::ecc::private_key                  priv   = fc::ecc::private_key::generate();
+   const std::shared_ptr<local_key_kms_client> client = std::make_shared<local_key_kms_client>(priv);
+   const sysio::sigprov::kms::kms_signer       kms    = sysio::sigprov::kms::make_kms_signature_provider(
+      client, "alias/wire-k1", fc::crypto::chain_key_type_wire, wire_k1_public_key(priv));
+   const fc::sha256 digest = fc::sha256::hash(std::string{"sign-errors"});
+
+   client->sign_error = Aws::Client::AWSError<Aws::KMS::KMSErrors>(
+      Aws::KMS::KMSErrors::THROTTLING, "ThrottlingException", "Rate exceeded", /* isRetryable */ true);
+   BOOST_CHECK_THROW(kms.sign(digest), sysio::chain::signing_transient_exception);
+
+   client->sign_error = Aws::Client::AWSError<Aws::KMS::KMSErrors>(
+      Aws::KMS::KMSErrors::DISABLED, "DisabledException", "Key is disabled", /* isRetryable */ false);
+   BOOST_CHECK_THROW(kms.sign(digest), sysio::chain::plugin_config_exception);
+   BOOST_CHECK_EQUAL(client->sign_calls, 2);
+}
+
+BOOST_AUTO_TEST_CASE(kms_signer_rejects_malformed_der) {
+   const fc::ecc::private_key                  priv   = fc::ecc::private_key::generate();
+   const std::shared_ptr<local_key_kms_client> client = std::make_shared<local_key_kms_client>(priv);
+   client->sign_reply                                 = std::vector<unsigned char>{0xde, 0xad, 0xbe, 0xef};
+   const sysio::sigprov::kms::kms_signer kms          = sysio::sigprov::kms::make_kms_signature_provider(
+      client, "alias/wire-k1", fc::crypto::chain_key_type_wire, wire_k1_public_key(priv));
+
+   BOOST_CHECK_THROW(kms.sign(fc::sha256::hash(std::string{"bad-der"})), sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(kms_signer_rejects_signature_from_another_key_after_pinning) {
+   // The pin passed, then the alias was re-pointed: every signature is still checked against the pinned key.
+   const fc::ecc::private_key                  priv   = fc::ecc::private_key::generate();
+   const std::shared_ptr<local_key_kms_client> client = std::make_shared<local_key_kms_client>(priv);
+   const sysio::sigprov::kms::kms_signer       kms    = sysio::sigprov::kms::make_kms_signature_provider(
+      client, "alias/wire-k1", fc::crypto::chain_key_type_wire, wire_k1_public_key(priv));
+   BOOST_CHECK_NO_THROW(kms.warm_up());
+
+   client->sign_with = fc::ecc::private_key::generate();
+   BOOST_CHECK_THROW(kms.sign(fc::sha256::hash(std::string{"re-pointed"})), sysio::chain::plugin_config_exception);
+   BOOST_CHECK_EQUAL(client->sign_calls, 1);
 }
 
 // ---------------------------------------------------------------------------
@@ -733,6 +1055,7 @@ BOOST_AUTO_TEST_CASE(make_kms_signature_provider_rejects_solana) {
 //   2. Sign a fixed deterministic digest (so the test is replayable).
 //   3. Recover the public key from the resulting Ethereum compact signature.
 //   4. Assert the recovered key matches `KMS_LIVE_PUBKEY` byte-for-byte.
+//   5. Repeat with a WIRE K1 spec for the same key, recovering the K1 key.
 //
 // Requires AWS credentials in the runner's environment (env, ~/.aws/, IRSA,
 // or IMDS) with `kms:Sign` on the target key. KMS::Sign is billable, so this
@@ -775,6 +1098,15 @@ BOOST_AUTO_TEST_CASE(kms_live_sign_round_trip) {
    const auto& em_sig    = sig.get<fc::em::signature_shim>();
    const auto  recovered = em_sig.recover_eth(keccak).unwrapped();
    BOOST_CHECK(recovered == em_expected);
+
+   // The same KMS key backs a WIRE K1 spec: sign a sha256 digest and recover the K1 key from it.
+   const fc::crypto::public_key k1_pub{
+      fc::crypto::public_key::storage_type{fc::ecc::public_key_shim{em_expected.serialize()}}};
+   const sysio::sigprov::kms::kms_signer k1 =
+      sysio::sigprov::kms::make_kms_signature_provider(ref, fc::crypto::chain_key_type_wire, k1_pub);
+   BOOST_CHECK_NO_THROW(k1.warm_up());
+   const fc::sha256 wire_digest = fc::sha256::hash(std::string{"wire-sysio kms live k1 test 2026"});
+   BOOST_CHECK(fc::crypto::public_key::recover(k1.sign(wire_digest), wire_digest) == k1_pub);
 }
 
 BOOST_AUTO_TEST_CASE(make_kms_signature_provider_rejects_pubkey_variant_mismatch) {

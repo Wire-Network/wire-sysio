@@ -2,6 +2,8 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <fc/crypto/private_key.hpp>
+
 #include <array>
 #include <string>
 #include <string_view>
@@ -64,6 +66,28 @@ BOOST_AUTO_TEST_CASE(a_signer_is_chosen_only_when_exactly_one_provider_qualifies
    const auto two = choose_signer(providers, [](int p) { return p % 2 == 0; });
    BOOST_CHECK(!two.chosen.has_value());
    BOOST_CHECK_EQUAL(2u, two.matches);
+}
+
+BOOST_AUTO_TEST_CASE(a_signer_passes_its_check_when_it_signs_for_its_key_or_is_briefly_unavailable) {
+   const fc::crypto::private_key key   = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::k1);
+   const fc::crypto::private_key other = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::k1);
+   const fc::sha256              probe = fc::sha256::hash(std::string{"probe"});
+   const auto provider = [&](fc::crypto::sign_fn sign) {
+      return fc::crypto::signature_provider_t{fc::crypto::chain_kind_wire, fc::crypto::chain_key_type_wire, "wire-01",
+                                              key.get_public_key(), std::nullopt, std::move(sign)};
+   };
+
+   BOOST_CHECK(signs_for_its_key("the relay", provider(fc::crypto::make_local_sign_fn(key)), probe));
+   BOOST_CHECK(!signs_for_its_key("the relay", provider(fc::crypto::make_local_sign_fn(other)), probe));
+
+   // A remote signer briefly unavailable says nothing about its key.
+   BOOST_CHECK(signs_for_its_key("the relay", provider([](const fc::sha256&) -> fc::crypto::signature {
+      FC_THROW_EXCEPTION(sysio::chain::signing_transient_exception, "throttled");
+   }), probe));
+   // A permanent failure does.
+   BOOST_CHECK(!signs_for_its_key("the relay", provider([](const fc::sha256&) -> fc::crypto::signature {
+      FC_THROW_EXCEPTION(sysio::chain::plugin_config_exception, "access denied");
+   }), probe));
 }
 
 /// Review of #675: the relay required its permission to authorize `sysio.kicker::kick` even with
