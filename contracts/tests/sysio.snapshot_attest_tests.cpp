@@ -11,8 +11,10 @@
 #include <fc/exception/exception.hpp>
 #include <fc/variant_object.hpp>
 
+#include <algorithm>
 #include <array>
 #include <limits>
+#include <map>
 
 #include "sysio.system_tester.hpp"
 #include "finalizer_test_keys.hpp"
@@ -31,6 +33,14 @@ public:
    static std::vector<account_name> fixture_producers() {
       return {"producer1"_n, "producer2"_n, "producer3"_n, "producer4"_n, "producer5"_n};
    }
+
+   /// The five snapshot-provider accounts the fixture creates, paired by index with `fixture_producers`.
+   static std::vector<account_name> fixture_snapshot_providers() {
+      return {"snapprov1"_n, "snapprov2"_n, "snapprov3"_n, "snapprov4"_n, "snapprov5"_n};
+   }
+
+   /// The contract's `max_snap_providers`, which a host test cannot include.
+   static constexpr uint32_t max_snapshot_providers = 30;
 
    snapshot_attest_tester() : snapshot_attest_tester(std::vector<account_name>{}, 0) {}
 
@@ -75,11 +85,7 @@ public:
       setup_producer_accounts(bonded_producers);
 
       // Create snap provider accounts with resources
-      const std::vector<account_name> snap_accounts = {
-         "snapprov1"_n, "snapprov2"_n, "snapprov3"_n,
-         "snapprov4"_n, "snapprov5"_n
-      };
-      setup_producer_accounts(snap_accounts);
+      setup_producer_accounts(fixture_snapshot_providers());
 
       produce_blocks();
 
@@ -323,6 +329,31 @@ public:
          "snapprovs"_n, snap_account);
       return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
          "snap_provider", data, fixture_abi_yield_function());
+   }
+
+   /// RAM `account` currently uses.
+   int64_t ram_usage(account_name account) {
+      return control->get_resource_limits_manager().get_account_ram_usage(account);
+   }
+
+   /// Cut `account` down to what `sysio.roa::newuser` grants: newaccount_ram and no CPU/NET.
+   void limit_to_new_user_resources(account_name account) {
+      constexpr int64_t no_weight = 0;
+      BOOST_REQUIRE_LE(ram_usage(account), static_cast<int64_t>(newaccount_ram));
+      BOOST_REQUIRE_EQUAL(success(), push_action(config::system_account_name, "setacctram"_n, mvo()
+         ("account", account)("ram_bytes", static_cast<int64_t>(newaccount_ram))));
+      BOOST_REQUIRE_EQUAL(success(), push_action(config::system_account_name, "setacctnet"_n, mvo()
+         ("account", account)("net_weight", no_weight)));
+      BOOST_REQUIRE_EQUAL(success(), push_action(config::system_account_name, "setacctcpu"_n, mvo()
+         ("account", account)("cpu_weight", no_weight)));
+   }
+
+   /// Produce blocks until the head is a multiple of `block_spacing`, i.e. a scheduled height.
+   void align_head_to(uint32_t block_spacing) {
+      const uint32_t remainder = control->head().block_num() % block_spacing;
+      if (remainder != 0) {
+         produce_blocks(block_spacing - remainder);
+      }
    }
 
    /// Count pending snapshot tuple rows across the scheduled tally space.
@@ -744,6 +775,31 @@ BOOST_AUTO_TEST_CASE(snapshot_attestation_cadence_helpers_enforce_boundaries) {
    BOOST_CHECK_EQUAL(2u, cadence::snapshot_attestation_grace_blocks(odd_spacing));
    BOOST_CHECK_EQUAL(12'500u,
                      cadence::snapshot_attestation_grace_blocks(cadence::default_block_spacing));
+
+   // The pending window opens at the first scheduled height, then holds exactly the most recent
+   // max_pending_vote_heights scheduled heights at every block.
+   constexpr uint32_t checked_periods = 3;
+   constexpr uint32_t window_blocks   = cadence::max_pending_vote_heights * small_spacing;
+   BOOST_CHECK_EQUAL(0u, cadence::pending_vote_floor(window_blocks - 1, small_spacing));
+   BOOST_CHECK_EQUAL(1u, cadence::pending_vote_floor(window_blocks, small_spacing));
+   for (uint32_t current = window_blocks; current < checked_periods * window_blocks; ++current) {
+      const uint64_t floor        = cadence::pending_vote_floor(current, small_spacing);
+      uint32_t       open_heights = 0;
+      for (uint32_t height = small_spacing; height <= current; height += small_spacing) {
+         if (height >= floor) ++open_heights;
+      }
+      BOOST_CHECK_EQUAL(cadence::max_pending_vote_heights, open_heights);
+   }
+   // A cadence near the uint32 limit cannot wrap the floor past a valid height.
+   BOOST_CHECK_EQUAL(0u, cadence::pending_vote_floor(largest_spacing, largest_spacing));
+
+   // A vote landing at the end of the node-side verification grace still finds its height open.
+   for (const uint32_t spacing : {uint32_t{1}, small_spacing, odd_spacing, cadence::default_block_spacing}) {
+      const uint32_t height = checked_periods * spacing;
+      BOOST_CHECK_LE(cadence::pending_vote_floor(height + cadence::snapshot_attestation_grace_blocks(spacing),
+                                                 spacing),
+                     height);
+   }
 }
 
 // ---------------------------------------------------------------------------
@@ -753,11 +809,13 @@ BOOST_AUTO_TEST_CASE(snapshot_attestation_cadence_helpers_enforce_boundaries) {
 BOOST_FIXTURE_TEST_CASE(votesnaphash_uses_updated_cadence, snapshot_voting_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
-   const auto formerly_unscheduled = make_block_id(vote_block_num() - 1);
+   const uint32_t formerly_unscheduled_height = vote_block_num() - 1;
+   const auto formerly_unscheduled = make_block_id(formerly_unscheduled_height);
    const auto snapshot_hash = make_snap_hash(1);
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("snapshot block is not a scheduled attestation height"),
                        votesnaphash("snapprov1"_n, formerly_unscheduled, snapshot_hash));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 1));
+   // The height becomes its own cadence's first, so it is also inside the pending window.
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, formerly_unscheduled_height));
    BOOST_REQUIRE_EQUAL(success(),
                        votesnaphash("snapprov1"_n, formerly_unscheduled, snapshot_hash));
 } FC_LOG_AND_RETHROW() }
@@ -1384,6 +1442,106 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_reopening_purged_historical_height,
    BOOST_REQUIRE_EQUAL(0u, snapshot_vote_count());
 } FC_LOG_AND_RETHROW() }
 
+/// Without quorum, only the last max_pending_vote_heights scheduled heights keep rows: each vote purges
+/// the rows that fell below the window, and any vote below it, even an exact retry, is refused.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_bounds_pending_votes_without_quorum, snapshot_voting_tester) { try {
+   namespace cadence = sysiosystem::snapshot_attestation;
+   constexpr uint32_t window = cadence::max_pending_vote_heights;
+   // Every successful push produces a block, so one retry plus a round of votes must fit in a period.
+   constexpr uint32_t spacing = 10;
+   constexpr uint32_t rounds  = window + 2;
+   const auto producers = fixture_producers();
+   const auto providers = fixture_snapshot_providers();
+   BOOST_REQUIRE_LT(providers.size() + 1, spacing);
+   for (size_t i = 0; i < providers.size(); ++i) {
+      BOOST_REQUIRE_EQUAL(success(), regsnapprov(producers[i], providers[i]));
+   }
+   // Each provider votes its own tuple, so none reaches K and every height stays pending.
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, spacing));
+   align_head_to(spacing);
+
+   const auto tuple_hash = [&](uint32_t round, size_t provider) {
+      return make_snap_hash(round * static_cast<uint32_t>(providers.size()) + static_cast<uint32_t>(provider));
+   };
+   std::vector<uint32_t> heights;
+   for (uint32_t round = 0; round < rounds; ++round) {
+      const uint32_t height = control->head().block_num();
+      BOOST_REQUIRE(cadence::is_scheduled_block(height, spacing));
+      heights.push_back(height);
+
+      if (round >= window) {
+         // The closed height's rows still exist, but the window refuses them before the tally.
+         const uint32_t closed_round = round - window;
+         BOOST_REQUIRE_EQUAL(wasm_assert_msg("snapshot block is older than the pending vote window"),
+                             votesnaphash(providers[0], make_block_id(heights[closed_round]),
+                                          tuple_hash(closed_round, 0)));
+         // The oldest open height still takes an idempotent retry, which purges the closed rows.
+         const uint32_t oldest_open_round = closed_round + 1;
+         BOOST_REQUIRE_EQUAL(success(), votesnaphash(providers[0], make_block_id(heights[oldest_open_round]),
+                                                     tuple_hash(oldest_open_round, 0)));
+      }
+      for (size_t i = 0; i < providers.size(); ++i) {
+         BOOST_REQUIRE_EQUAL(success(), votesnaphash(providers[i], make_block_id(height), tuple_hash(round, i)));
+      }
+      BOOST_REQUIRE(getsnaphash(height).is_null());
+
+      const uint32_t open_heights = std::min(round + 1, window);
+      BOOST_REQUIRE_EQUAL(providers.size() * open_heights, snapshot_vote_count());
+      BOOST_REQUIRE_LE(snapshot_vote_count(), max_snapshot_providers * window);
+      produce_blocks(height + spacing - control->head().block_num());
+   }
+
+   // Shrinking the cadence strands the old heights below the narrower window; the next vote purges them.
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, 1));
+   const uint32_t height = control->head().block_num();
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash(providers[0], make_block_id(height), tuple_hash(rounds, 0)));
+   BOOST_REQUIRE_EQUAL(1u, snapshot_vote_count());
+} FC_LOG_AND_RETHROW() }
+
+/// The window gates only the pending tally: a final record still answers late votes below it, and
+/// rows it closes stay until an open vote purges them.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_pending_window_preserves_final_record_checks, snapshot_voting_tester) { try {
+   namespace cadence = sysiosystem::snapshot_attestation;
+   constexpr uint32_t spacing = 2;
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, spacing));
+
+   const uint32_t final_height = control->head().block_num() / spacing * spacing;
+   const auto     final_id     = make_block_id(final_height);
+   const auto     final_hash   = make_snap_hash(120);
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, final_id, final_hash));
+   BOOST_REQUIRE(!getsnaphash(final_height).is_null());
+
+   // A later height that never reaches K.
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, spacing));
+   const uint32_t pending_height = control->head().block_num() / spacing * spacing;
+   BOOST_REQUIRE_GT(pending_height, final_height);
+   const auto pending_id   = make_block_id(pending_height);
+   const auto pending_hash = make_snap_hash(121);
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, pending_id, pending_hash));
+   BOOST_REQUIRE_EQUAL(1u, snapshot_vote_count());
+
+   produce_blocks(cadence::max_pending_vote_heights * spacing);
+   BOOST_REQUIRE_GT(cadence::pending_vote_floor(control->head().block_num() + 1, spacing), pending_height);
+
+   // A registered provider's matching late vote is still a no-op, and a mismatch still reports 9001.
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, final_id, final_hash));
+   BOOST_REQUIRE_EQUAL(wasm_assert_code(9001), votesnaphash("snapprov2"_n, final_id, make_snap_hash(122)));
+
+   // The unfinished height is closed to new votes and to retries alike.
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("snapshot block is older than the pending vote window"),
+                       votesnaphash("snapprov2"_n, pending_id, pending_hash));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("snapshot block is older than the pending vote window"),
+                       votesnaphash("snapprov1"_n, pending_id, pending_hash));
+   BOOST_REQUIRE_EQUAL(1u, snapshot_vote_count());
+
+   // An open vote purges the closed row and leaves only its own.
+   const uint32_t open_height = control->head().block_num() / spacing * spacing;
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, make_block_id(open_height), make_snap_hash(123)));
+   BOOST_REQUIRE_EQUAL(1u, snapshot_vote_count());
+} FC_LOG_AND_RETHROW() }
+
 /// Registration churn cannot erase pending votes cast by other producers.
 BOOST_FIXTURE_TEST_CASE(votesnaphash_registration_churn_preserves_other_votes, snapshot_voting_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
@@ -1403,6 +1561,62 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_registration_churn_preserves_other_votes, s
 
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov4"_n, block_id, snapshot_hash));
    BOOST_REQUIRE(!getsnaphash(block_num).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// ---------------------------------------------------------------------------
+// RAM billing tests
+// ---------------------------------------------------------------------------
+/// Provider and vote rows bill sysio, so producers and snapshot accounts holding only what
+/// `sysio.roa::newuser` grants can register, rotate and vote without their RAM usage moving.
+BOOST_FIXTURE_TEST_CASE(snapshot_rows_bill_the_system_account, snapshot_voting_tester) { try {
+   const auto producers = fixture_producers();
+   const auto providers = fixture_snapshot_providers();
+   constexpr uint32_t voters = 3;
+   std::vector<account_name> limited;
+   for (uint32_t i = 0; i < voters; ++i) {
+      limited.push_back(producers[i]);
+      limited.push_back(providers[i]);
+   }
+   // The rotation target too, so the rotated mapping cannot bill it either.
+   limited.push_back(providers[voters]);
+   for (const auto& account : limited) {
+      limit_to_new_user_resources(account);
+   }
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(voters));
+
+   std::map<account_name, int64_t> usage_before;
+   for (const auto& account : limited) {
+      usage_before[account] = ram_usage(account);
+   }
+   const auto require_unbilled = [&]() {
+      for (const auto& account : limited) {
+         BOOST_REQUIRE_EQUAL(usage_before[account], ram_usage(account));
+      }
+   };
+   const int64_t system_before = ram_usage(config::system_account_name);
+
+   for (uint32_t i = 0; i < voters; ++i) {
+      BOOST_REQUIRE_EQUAL(success(), regsnapprov(producers[i], providers[i]));
+   }
+   require_unbilled();
+   BOOST_REQUIRE_GT(ram_usage(config::system_account_name), system_before);
+
+   const auto block_num     = vote_block_num();
+   const auto block_id      = make_block_id(block_num);
+   const auto snapshot_hash = make_snap_hash(130);
+   // The first vote creates the pending row and the second grows it; neither voter pays.
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash(providers[0], block_id, snapshot_hash));
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash(providers[1], block_id, snapshot_hash));
+   BOOST_REQUIRE_EQUAL(1u, snapshot_vote_count());
+   require_unbilled();
+
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash(providers[2], block_id, snapshot_hash));
+   BOOST_REQUIRE(!getsnaphash(block_num).is_null());
+   require_unbilled();
+
+   // Rotation erases and re-creates the mapping, still on sysio.
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov(producers[0], providers[voters]));
+   require_unbilled();
 } FC_LOG_AND_RETHROW() }
 
 // ---------------------------------------------------------------------------
