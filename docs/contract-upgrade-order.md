@@ -387,11 +387,17 @@ path.
 ## WIRE-439 node-owner registration
 
 Deploy the matching `sysio.roa` and `sysio.msgch` WASMs together in one transaction,
-or quiesce inbound dispatch until both are installed. The ABI and stored-row
-layouts are unchanged, but mixed revisions are not compatible: old MSGCH creates
+or quiesce inbound dispatch until both are installed. ROA's ABI adds the self-inline
+`nodeownfin(owner, tier)` allocation action; stored-row layouts are unchanged.
+Mixed revisions are not compatible: old MSGCH creates
 the account before new ROA rejects it, while new MSGCH leaves creation to ROA.
 Do not process node-owner claims between separate deployments. Preserve both
 contracts' privileged status and the default inline-depth limit.
+
+Claim traces contain `nodeownreg`, native `newaccount`, `nodeownfin` and
+`recordlink`; `newnameduser` is called internally and emits no separate action trace.
+Index registration outcomes from `nodeowners`/`nodeownerreg`, not the presence
+of a `newnameduser` trace. The external `nodeownreg` payload is unchanged.
 
 Deploy the new-account-only Hub and Tools companions with this pair. Existing
 memberships and historical audit reason values remain readable; this update does

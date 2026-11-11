@@ -115,18 +115,16 @@ namespace sysio {
 
 
             /**
-             * @brief Directly register `owner` as a node owner at `tier`, bypassing the OPP claim
-             *        flow. Also used as nodeownreg's internal allocation step after native account creation.
+             * @brief Directly register an existing account for governance/bootstrap and tests.
              *
              * Requires `sysio.roa` active authority, so it is governance/system-only and never
              * user-callable. It exists to seed node owners where the full OPP machinery is absent or
              * unnecessary: the C++ unit-test base tester (registers `nodedaddy` as the default policy
              * issuer for the suite), emissions tests, the TestHarness bios bootstrap, and dev clusters.
              *
-             * Production node-owner registration enters through `nodeownreg` -- dispatched by
-             * the OPP depot (sysio.msgch) on an inbound NodeOwnerRegistration attestation, or
-             * governance-signed during bootstrap. Beyond the tier-range check, `forcereg` performs
-             * none of `nodeownreg`'s claim-payload validation (no tier name-rule or new-account
+             * Production NFT registration enters through `nodeownreg`, dispatched by sysio.msgch,
+             * and allocates through the self-inline `nodeownfin` action. Beyond the tier-range check,
+             * `forcereg` performs none of `nodeownreg`'s claim-payload validation (no tier name-rule or new-account
              * check, no sysio.authex link) and writes no `nodeownerreg` audit row -- it simply
              * allocates the tier's SYS via the shared `regnodeowner` helper.
              *
@@ -141,7 +139,7 @@ namespace sysio {
              *
              * Requires sysio.roa authority. Existing accounts are rejected even if wire_pub_key
              * matches a public active key. Valid claims queue native account creation, tier allocation
-             * through forcereg, and the depositor's AuthEx link in one atomic transaction.
+             * through nodeownfin, and the depositor's AuthEx link in one atomic transaction.
              * Claim-payload errors record a terminal rejection without aborting depot dispatch.
              * Tier range, depositor key/address validity and ROA activation remain hard invariants.
              *
@@ -155,6 +153,15 @@ namespace sysio {
             void nodeownreg(const name& owner, const uint8_t& tier, const public_key& eth_pub_key,
                             const public_key& wire_pub_key,
                             const bytes& eth_address);
+
+            /**
+             * @brief Allocate a validated claim after its queued native account creation.
+             * Requires sysio.roa authority and an inline sender of sysio.roa; top-level calls fail.
+             * @param owner Newly created claim account.
+             * @param tier  Node-owner tier already validated by nodeownreg.
+             */
+            [[sysio::action]]
+            void nodeownfin(const name& owner, const uint8_t& tier);
 
             /**
              * @brief Creates a new user account on the network and records the sponsor mapping.
@@ -233,8 +240,9 @@ namespace sysio {
              * Standalone creation is privileged and idempotent. An account created separately is
              * not eligible for a later NFT claim.
              * Tier-based name rules: tier-1 = 2-6 char prefix; tier 2/3 = up to 12 chars.
-             * Invalid names and full tiers skip creation without spending RAM; nodeownreg records
-             * the rejection. Capacity comes from the live generation's authoritative owner rows.
+             * Standalone invalid names and full tiers skip creation without an audit or RAM spend.
+             * nodeownreg records those rejections before calling this helper. Capacity comes from
+             * the live generation's authoritative owner rows.
              *
              * @param account The user-chosen account name.
              * @param pubkey  The holder's K1 public key (becomes owner and active).
@@ -592,9 +600,6 @@ namespace sysio {
              */
             static bool valid_name_for_tier(const name& account, uint8_t tier);
 
-
-
-
             /**
              * @brief A node owner's SYS budget for tier 1, 2, or 3: the tier allocation, net of sysio's
              *        carve-out for tier 1. Matches the rounding activateroa uses to size the reserve.
@@ -649,7 +654,7 @@ namespace sysio {
              * one-time `newaccount_ram` gift is folded into its ram_bytes; when present, only the passed
              * deltas are added (so the gift is never double-counted). Accumulation saturates rather than
              * throwing on overflow (see safe_ops): this helper sits on the OPP never-throw dispatch path
-             * (nodeownreg -> forcereg -> regnodeowner, and newnameduser).
+             * (nodeownreg -> nodeownfin -> regnodeowner, and newnameduser).
              *
              * @param require_to_exist assert the row already exists (no create); used by callers that
              *        must only ever top up a known account (e.g. sysio.acct funding).

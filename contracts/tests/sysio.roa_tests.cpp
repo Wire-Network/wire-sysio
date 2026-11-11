@@ -2813,6 +2813,17 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_happy_path, sysio_roa_nodeownreg_tester ) tr
    }
 } FC_LOG_AND_RETHROW()
 
+/// ROA authority alone cannot invoke the claim-only allocation continuation.
+BOOST_FIXTURE_TEST_CASE( nodeownfin_rejects_top_level_call, sysio_roa_nodeownreg_tester ) try {
+   constexpr auto owner = "alice"_n;
+   BOOST_REQUIRE((control->db().find<account_object, by_name>(owner) != nullptr));
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: nodeownfin must be sent inline by sysio.roa"),
+      push_action(ROA, "nodeownfin"_n, mvo()("owner", owner)("tier", 2)));
+   BOOST_CHECK(get_nodeowner(owner).is_null());
+   BOOST_CHECK(get_nodeownerreg(owner).is_null());
+} FC_LOG_AND_RETHROW()
+
 /// Public-key equality never authorizes registration into an existing account.
 BOOST_FIXTURE_TEST_CASE( nodeownreg_rejects_existing_account_with_matching_key, sysio_roa_nodeownreg_tester ) try {
    const auto owner = "claimacct"_n;
@@ -2882,7 +2893,7 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_rejects_existing_account_with_different_key,
 } FC_LOG_AND_RETHROW()
 
 // SEC-087 resource reconciliation remains supported through privileged forcereg.
-// Public NFT claims reject existing accounts under WIRE-439.
+// Public NFT claims reject existing accounts.
 BOOST_FIXTURE_TEST_CASE( forcereg_reconciles_existing_reslimit, sysio_roa_nodeownreg_tester ) try {
    const auto owner    = "claimacct"_n;
    const auto wire_pub = gen_k1_key();
@@ -3209,14 +3220,16 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_full_tier_preserves_rejection_precedence,
    BOOST_REQUIRE_EQUAL(success(), push_action(ROA, "forcereg"_n, mvo()("owner", "alice")("tier", owners::tier1)));
    produce_block();
    const auto linked_key = gen_em_key();
-   BOOST_REQUIRE_EQUAL(success(), recordlink(linked_key, "bob"_n));
+   constexpr auto linked_name = "linked"_n;
+   BOOST_REQUIRE((control->db().find<account_object, by_name>(linked_name) == nullptr));
+   BOOST_REQUIRE_EQUAL(success(), recordlink(linked_key, linked_name));
    produce_block();
    owners::fill_tier1(*this, abi_ser);
 
    for (const auto& [owner, key, reason] : {
            std::tuple{"alice"_n, get_public_key("alice"_n, "active"), R_DUPLICATE},
            std::tuple{"carol"_n, gen_k1_key(), R_ACCOUNT_EXISTS},
-           std::tuple{"bob"_n, get_public_key("bob"_n, "active"), R_ACCOUNT_EXISTS},
+           std::tuple{linked_name, gen_k1_key(), R_LINK_KEY_MISMATCH},
            std::tuple{"toolong"_n, gen_k1_key(), R_NAME_INVALID}}) {
       BOOST_REQUIRE_EQUAL(success(), newnameduser(owner, key, owners::tier1));
       produce_block();
@@ -3229,7 +3242,8 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_full_tier_preserves_rejection_precedence,
       BOOST_CHECK_EQUAL(owners::count(*this, abi_ser, owners::tier1), owners::tier1_cap);
    }
    BOOST_CHECK(!get_nodeowner("alice"_n).is_null());
-   BOOST_CHECK(get_nodeowner("bob"_n).is_null());
+   BOOST_CHECK(get_nodeowner(linked_name).is_null());
+   BOOST_CHECK((control->db().find<account_object, by_name>(linked_name) == nullptr));
    BOOST_CHECK(get_nodeowner("carol"_n).is_null());
    BOOST_CHECK((control->db().find<account_object, by_name>("toolong"_n) == nullptr));
    BOOST_CHECK_EQUAL(get_authex_link(0)["pub_key"].as<fc::crypto::public_key>(), linked_key);

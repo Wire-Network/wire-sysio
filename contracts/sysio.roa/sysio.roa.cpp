@@ -18,8 +18,8 @@ namespace sysio {
         // literals -- a contract rename is one change here, not scattered across call sites).
         constexpr name AUTHEX_ACCOUNT    = "sysio.authex"_n;
         constexpr name AUTHEX_RECORDLINK = "recordlink"_n;
-        /// Existing privileged allocator, queued after the claim creates its account.
-        constexpr name ROA_FORCEREG = "forcereg"_n;
+        /// Claim allocation continuation, queued after native account creation.
+        constexpr name ROA_NODEOWNFIN = "nodeownfin"_n;
 
         /// Names under this prefix belong to system accounts. The chain refuses them only to non-privileged
         /// creators, and sysio.roa is privileged, so node-owner claims must refuse them here.
@@ -752,8 +752,8 @@ namespace sysio {
 
     void roa::forcereg(const name& owner, const uint8_t& tier) {
         // Privileged bootstrap/test registration -- see the header doc. Governance/system-only
-        // (require_auth self); bypasses the OPP claim path (nodeownreg). Beyond the tier-range guard
-        // it does no name-rule / active-key / authex validation and writes no nodeownerreg audit row
+        // (require_auth self); separate from the OPP claim path. Beyond the tier-range guard
+        // it does no name-rule / new-account / authex validation and writes no nodeownerreg audit row
         // -- it just runs the shared tier allocator.
         require_auth(get_self());
 
@@ -766,7 +766,7 @@ namespace sysio {
                          const public_key& wire_pub_key,
                          const bytes& eth_address) {
         // One authenticated depot claim owns creation and registration. Existing accounts are
-        // never eligible, even when the payload copies their public active key (WIRE-439).
+        // never eligible, even when the payload copies their public active key.
         require_auth(get_self());
 
         // ---- Envelope / system invariants (depot misuse) ----
@@ -830,11 +830,10 @@ namespace sysio {
             return;
         }
 
-        // Queue native newaccount before the privileged allocator. Call the helper directly to
-        // preserve inline-depth headroom for recordlink's DClaim sweep. All effects, including the
+        // Allocation must run after the queued native newaccount. All effects, including the
         // terminal audit below, commit together or roll back if an inline action fails.
         newnameduser(owner, wire_pub_key, tier);
-        action(permission_level{get_self(), "active"_n}, get_self(), ROA_FORCEREG,
+        action(permission_level{get_self(), "active"_n}, get_self(), ROA_NODEOWNFIN,
                std::make_tuple(owner, tier)).send();
 
         // Record the depositor's ETH key as a sysio.authex link via the trusted depot-only path.
@@ -848,6 +847,13 @@ namespace sysio {
 
         record_nodereg(owner, tier, CONFIRMED, NONE, gen);
     };
+
+    void roa::nodeownfin(const name& owner, const uint8_t& tier) {
+        require_auth(get_self());
+        check(get_sender() == get_self(), "nodeownfin must be sent inline by sysio.roa");
+        check(is_account(owner), "claim account was not created");
+        regnodeowner(owner, tier);
+    }
 
     // ---- Private Helper Function ----
 
@@ -974,7 +980,7 @@ namespace sysio {
         // aborting, and never double-counting the gift. Then sync the on-chain quota to the resulting
         // row totals so the reslimit row and the resource limits stay equal on BOTH the fresh and
         // reconcile paths.
-        //   Conservation: nodeownreg's newnameduser call funds newaccount_ram before forcereg, so
+        //   Conservation: nodeownreg's newnameduser call funds newaccount_ram before nodeownfin, so
         //   the create path stays conservation-exact; the reconcile path adds only the node-owner delta.
         //   forcereg over a pre-existing row now reconciles too (previously threw in set_reslimit) --
         //   acceptable for the governance/bootstrap path.
@@ -1236,13 +1242,11 @@ namespace sysio {
         // Tier is a depot/system invariant -- a bad value means the dispatch is malformed, so abort
         // (the name charset [a-z1-5.] is already enforced by the name type).
         check(tier >= 1 && tier <= 3, "Tier level must be between 1 and 3");
-        // The chosen name is claim-payload: if it violates the tier's length rule, skip creation
-        // (non-throwing) and let nodeownreg soft-fail with NAME_INVALID. Without this guard a bad
-        // name would either abort the depot dispatch or create an account the claim then rejects.
+        // Standalone creation silently skips invalid names. nodeownreg validates and records
+        // claim rejections before calling this helper.
         if (!valid_name_for_tier(account, tier)) return;
 
-        // A full tier is another soft rejection. Leave the account and sysio's RAM pool untouched;
-        // nodeownreg records TIER_CAP_REACHED even though no account was created.
+        // Standalone creation also skips full tiers without spending sysio's RAM.
         if (nodeowner_count(get_self(), state.network_gen, tier) >= nodeowner_cap(tier)) return;
 
         // Create the account with the holder's key as both owner and active.

@@ -954,7 +954,16 @@ BOOST_FIXTURE_TEST_CASE(dispatch_routes_node_owner_reg_to_roa, sysio_dispatch_te
    auto envelope = encode_envelope_with_one_attestation(
       current_epoch(), sysio::opp::types::ATTESTATION_TYPE_NODE_OWNER_REG, payload);
 
-   BOOST_REQUIRE_EQUAL(success(), deliver(/*chain_code=*/eth_code, envelope));
+   const auto trace = deliver_trace(eth_code, envelope);
+   BOOST_REQUIRE(trace != nullptr);
+   BOOST_REQUIRE(!trace->except);
+   const auto allocation = std::find_if(trace->action_traces.begin(), trace->action_traces.end(),
+      [](const auto& at) { return at.receiver == ROA_ACCOUNT && at.act.name == "nodeownfin"_n; });
+   BOOST_REQUIRE(allocation != trace->action_traces.end());
+   BOOST_CHECK(std::none_of(trace->action_traces.begin(), trace->action_traces.end(),
+      [](const auto& at) {
+         return at.receiver == ROA_ACCOUNT && (at.act.name == "forcereg"_n || at.act.name == "newnameduser"_n);
+      }));
 
    // Registered at the claimed tier, audited CONFIRMED.
    auto reg = get_nodeowner(CLAIM_ACCOUNT);

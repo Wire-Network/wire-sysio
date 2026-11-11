@@ -546,7 +546,7 @@ BOOST_FIXTURE_TEST_CASE(set_action_return_value_empty, intrinsic_probe_fixture) 
 // I. get_permission_lower_bound (P2)
 //
 // Wire-specific intrinsic (libraries/chain/webassembly/permission.cpp) backing CDT's sysio::get_permission --
-// the only host path a contract has to read another account's authority on-chain (sysio.roa::active_key_matches).
+// the host path a contract uses to read another account's authority on-chain.
 // Each probe queries get_self()'s owner/active permissions (created with a single K1 key at
 // threshold 1) and self-verifies the record via in-contract check(); the driver asserts the host stays silent,
 // so any layout / size-query / sentinel / lower-bound-semantics regression surfaces as a

@@ -877,6 +877,7 @@ and are omitted.
 | `setacctlim` | `sysio.roa` | Set the default account limit and the raise multiplier |
 | `newnameduser` | `sysio.roa` | Privileged vanity-account creation; also called internally by `nodeownreg` |
 | `nodeownreg` | `sysio.roa` | Create and register a fresh node-owner account from an OPP attestation |
+| `nodeownfin` | `sysio.roa`, self-inline only | Allocate a validated claim after native account creation |
 | `forcereg` | `sysio.roa` | Register a node owner directly (governance/bootstrap) |
 | `activateroa` | `sysio.roa` | Activate ROA and set the initial byte price |
 | `setbyteprice` | `sysio.roa` | Change bytes-per-unit on network expansion |
@@ -917,13 +918,16 @@ with executable tests. The transcript blocks reproduce actual test output.*
 
 ## NFT registration names
 
-Node-owner NFT claims create **new accounts only** (admin-approved WIRE-439 policy).
+Node-owner NFT claims create **new accounts only**.
 `sysio.msgch` dispatches `nodeownreg`, which rejects an existing name with
 `ACCOUNT_EXISTS` (7), including when the claim copies its public active key.
 Already registered owners retain the `DUPLICATE` outcome. Rejection records an
 audit row without changing the account authority, AuthEx link or owner allocation.
 A fresh accepted claim creates the requested authority, allocates the owner and
 records the depositor's Ethereum link in one atomic Wire transaction.
+Allocation uses the self-inline `nodeownfin` continuation; `forcereg` remains
+the separate privileged governance/bootstrap path. AuthEx `recordlink` remains
+a sibling action of `nodeownfin`, so its DClaim sweep stays within the inline-depth limit.
 
 The Hub checks name availability before BAR commitment; this cannot reserve the
 name against a competing claim. A name taken before depot execution is rejected
