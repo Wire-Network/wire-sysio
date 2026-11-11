@@ -27,6 +27,8 @@ namespace sysio { namespace chain {
                   "min transaction cpu usage cannot exceed max transaction cpu usage" );
       SYS_ASSERT( max_transaction_cpu_usage < (max_block_cpu_usage - min_transaction_cpu_usage), action_validate_exception,
                   "max transaction cpu usage must be at less than the difference between the max block cpu usage and the min transaction cpu usage" );
+      SYS_ASSERT( notify_cpu_stipend <= max_transaction_cpu_usage, action_validate_exception,
+                  "notify cpu stipend cannot exceed max transaction cpu usage" );
 
       SYS_ASSERT( 1 <= max_authority_depth, action_validate_exception,
                   "max authority depth should be at least 1" );

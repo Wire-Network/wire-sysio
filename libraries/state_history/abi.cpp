@@ -375,7 +375,8 @@ extern const char* const state_history_plugin_abi = R"({
                 { "type": "uint32", "name": "max_action_return_value_size" },
                 { "type": "uint32", "name": "max_kv_key_size" },
                 { "type": "uint32", "name": "max_kv_value_size" },
-                { "type": "uint32", "name": "max_kv_secondary_key_size" }
+                { "type": "uint32", "name": "max_kv_secondary_key_size" },
+                { "type": "uint32", "name": "notify_cpu_stipend" }
             ]
         },
         {

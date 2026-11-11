@@ -659,7 +659,7 @@ namespace {
                                 });
 
       include_ram_gift &= has_roa;
-      include_ram_gift &= a.prefix() != sysio::chain::config::system_account_name;
+      include_ram_gift &= !sysio::chain::config::is_system_account(a);
       if (include_ram_gift) {
          // if bios contract with setalimits available then provide ram for account which is similar to what sysio.system contract does
          const auto* acnt = control->find_account_metadata(sysio::chain::config::system_account_name);
@@ -677,7 +677,7 @@ namespace {
       }
 
       include_roa_policy &= has_roa;
-      include_roa_policy &= a.prefix() != sysio::chain::config::system_account_name;
+      include_roa_policy &= !sysio::chain::config::is_system_account(a);
       if( include_roa_policy ) {
          // ramWeight of 4 SYS needed to cover wasmtest contract use
          trx.actions.emplace_back(get_action(config::roa_account_name, "addpolicy"_n,
