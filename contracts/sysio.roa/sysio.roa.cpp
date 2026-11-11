@@ -974,7 +974,7 @@ namespace sysio {
         // aborting, and never double-counting the gift. Then sync the on-chain quota to the resulting
         // row totals so the reslimit row and the resource limits stay equal on BOTH the fresh and
         // reconcile paths.
-        //   Conservation: production (newnameduser -> nodeownreg) funds newaccount_ram at creation, so
+        //   Conservation: nodeownreg's newnameduser call funds newaccount_ram before forcereg, so
         //   the create path stays conservation-exact; the reconcile path adds only the node-owner delta.
         //   forcereg over a pre-existing row now reconciles too (previously threw in set_reslimit) --
         //   acceptable for the governance/bootstrap path.

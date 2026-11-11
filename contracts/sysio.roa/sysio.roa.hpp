@@ -123,11 +123,11 @@ namespace sysio {
              * unnecessary: the C++ unit-test base tester (registers `nodedaddy` as the default policy
              * issuer for the suite), emissions tests, the TestHarness bios bootstrap, and dev clusters.
              *
-             * Production node-owner registration goes through `nodeownreg` instead -- dispatched by
+             * Production node-owner registration enters through `nodeownreg` -- dispatched by
              * the OPP depot (sysio.msgch) on an inbound NodeOwnerRegistration attestation, or
              * governance-signed during bootstrap. Beyond the tier-range check, `forcereg` performs
-             * none of `nodeownreg`'s claim-payload validation (no tier name-rule check, no active-key
-             * match, no sysio.authex link) and writes no `nodeownerreg` audit row -- it simply
+             * none of `nodeownreg`'s claim-payload validation (no tier name-rule or new-account
+             * check, no sysio.authex link) and writes no `nodeownerreg` audit row -- it simply
              * allocates the tier's SYS via the shared `regnodeowner` helper.
              *
              * @param owner The account to register as a node owner.
@@ -649,7 +649,7 @@ namespace sysio {
              * one-time `newaccount_ram` gift is folded into its ram_bytes; when present, only the passed
              * deltas are added (so the gift is never double-counted). Accumulation saturates rather than
              * throwing on overflow (see safe_ops): this helper sits on the OPP never-throw dispatch path
-             * (nodeownreg -> regnodeowner, newnameduser).
+             * (nodeownreg -> forcereg -> regnodeowner, and newnameduser).
              *
              * @param require_to_exist assert the row already exists (no create); used by callers that
              *        must only ever top up a known account (e.g. sysio.acct funding).
