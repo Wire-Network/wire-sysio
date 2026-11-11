@@ -194,6 +194,16 @@
             ]
         },
         {
+            "name": "emitdesynd",
+            "base": "",
+            "fields": [
+                {
+                    "name": "request_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "envelope_key",
             "base": "",
             "fields": [
@@ -1263,6 +1273,11 @@
         {
             "name": "dropenv",
             "type": "dropenv",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "emitdesynd",
+            "type": "emitdesynd",
             "ricardian_contract": ""
         },
         {

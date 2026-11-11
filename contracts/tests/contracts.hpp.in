@@ -57,6 +57,14 @@ struct contracts {
       static std::vector<uint8_t> reject_all_wasm() { return read_wasm("${CMAKE_SOURCE_DIR}/contracts/test_contracts/reject_all.wasm"); }
       static std::vector<uint8_t> reenter_deposit_wasm() { return read_wasm("${CMAKE_SOURCE_DIR}/contracts/test_contracts/reenter_deposit/reenter_deposit.wasm"); }
       static std::vector<char>    reenter_deposit_abi()  { return read_abi("${CMAKE_SOURCE_DIR}/contracts/test_contracts/reenter_deposit/reenter_deposit.abi"); }
+      /// One-shot holder callback for the desyndication custody-total regression.
+      static std::vector<uint8_t> reenter_desyndicate_wasm() {
+         return read_wasm("${CMAKE_SOURCE_DIR}/contracts/test_contracts/reenter_desyndicate/reenter_desyndicate.wasm");
+      }
+      /// ABI paired with the committed reentrant holder WASM.
+      static std::vector<char> reenter_desyndicate_abi() {
+         return read_abi("${CMAKE_SOURCE_DIR}/contracts/test_contracts/reenter_desyndicate/reenter_desyndicate.abi");
+      }
       static std::vector<uint8_t> block_transfer_wasm()  { return read_wasm("${CMAKE_SOURCE_DIR}/contracts/test_contracts/block_transfer/block_transfer.wasm"); }
       static std::vector<char>    block_transfer_abi()   { return read_abi("${CMAKE_SOURCE_DIR}/contracts/test_contracts/block_transfer/block_transfer.abi"); }
       static std::vector<uint8_t> epoch_stub_wasm()      { return read_wasm("${CMAKE_SOURCE_DIR}/contracts/test_contracts/epoch_stub/epoch_stub.wasm"); }

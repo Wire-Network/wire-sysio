@@ -442,6 +442,10 @@ namespace sysio {
       /// `max_fee` caps the fee in shadow base units before any bucket tick or movement.
       [[sysio::action]] void desyndicate(name holder, asset quantity, uint64_t max_fee);
 
+      /// Self-inline continuation after the recorded return's transfer and burn. Reads live outstanding
+      /// shadow and queues its attestation without an intervening callback. Direct calls are refused.
+      [[sysio::action]] void emitdesynd(uint64_t request_id);
+
       /// Current desyndication fee and amount released, both in shadow base units.
       struct desynd_quote {
          uint64_t fee; ///< Flat plus floored basis-point charge.
