@@ -222,9 +222,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(chain_config_packed_stability, T, validating_teste
 
    // Verify packed size is stable.
    // If this changes, the packed WASM intrinsic format has changed.
-   // 68 = 8 (uint64) + 7x4 (uint32) + 4 (lifetime) + 4 (delay) + 4 (inline_size)
+   // 72 = 8 (uint64) + 7x4 (uint32) + 4 (lifetime) + 4 (delay) + 4 (inline_size)
    //    + 2 (inline_depth) + 2 (auth_depth) + 4x4 (action_return, kv_key, kv_value, kv_sec_key)
-   BOOST_CHECK_EQUAL(packed.size(), 68u);
+   //    + 4 (notify_cpu_stipend)
+   BOOST_CHECK_EQUAL(packed.size(), 72u);
 
    // Round-trip: unpack and verify all fields match
    chain_config_v0 unpacked;
@@ -244,6 +245,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(chain_config_packed_stability, T, validating_teste
    BOOST_CHECK_EQUAL(unpacked.max_inline_action_size, v0.max_inline_action_size);
    BOOST_CHECK_EQUAL(unpacked.max_inline_action_depth, v0.max_inline_action_depth);
    BOOST_CHECK_EQUAL(unpacked.max_authority_depth, v0.max_authority_depth);
+   BOOST_CHECK_EQUAL(unpacked.notify_cpu_stipend, v0.notify_cpu_stipend);
 }
 
 // ============================================================================

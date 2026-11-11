@@ -201,7 +201,8 @@ void resource_limits_manager::add_transaction_usage(const accounts_billing_t& ac
       }
 
       _db.modify( usage, [&]( auto& bu ){
-          bu.net_usage.add( billing.net_usage, time_slot, config.account_net_usage_average_window );
+          if( billing.pays_net )
+             bu.net_usage.add( billing.net_usage, time_slot, config.account_net_usage_average_window );
           bu.cpu_usage.add( billing.cpu_usage_us, time_slot, config.account_cpu_usage_average_window );
 
          if (auto dm_logger = _get_deep_mind_logger(is_trx_transient)) {
@@ -228,7 +229,7 @@ void resource_limits_manager::add_transaction_usage(const accounts_billing_t& ac
                      max_user_use_in_window );
       }
 
-      if( net_weight >= 0 && state.total_net_weight > 0) {
+      if( billing.pays_net && net_weight >= 0 && state.total_net_weight > 0) {
 
          uint128_t window_size = config.account_net_usage_average_window;
          auto virtual_network_capacity_in_window = (uint128_t)state.virtual_net_limit * window_size;
@@ -470,8 +471,11 @@ uint64_t resource_limits_manager::get_block_net_limit() const {
    return config.net_limit_parameters.max - state.pending_net_usage;
 }
 
-std::pair<int64_t, bool> resource_limits_manager::get_account_cpu_limit( const account_name& name, uint32_t greylist_limit ) const {
-   auto [arl, greylisted] = get_account_cpu_limit_ex(name, greylist_limit);
+std::pair<int64_t, bool> resource_limits_manager::get_account_cpu_limit( const account_name& name, uint32_t greylist_limit,
+                                                                         const std::optional<block_timestamp_type>& current_time ) const {
+   auto [arl, greylisted] = get_account_cpu_limit_ex(name, greylist_limit, current_time);
+   if( current_time && arl.max >= 0 ) // limited account: available against the decayed usage
+      return {std::max<int64_t>(arl.max - arl.current_used, 0), greylisted};
    return {arl.available, greylisted};
 }
 

@@ -153,6 +153,10 @@
                 {
                     "name": "max_kv_secondary_key_size",
                     "type": "uint32"
+                },
+                {
+                    "name": "notify_cpu_stipend",
+                    "type": "uint32"
                 }
             ]
         },
