@@ -77,7 +77,7 @@ try:
     Print("Configure and launch txn generators")
     targetTpsPerGenerator = 5
     testTrxGenDurationSec=60*60
-    cluster.launchTrxGenerators(contractOwnerAcctName=cluster.sysioAccount.name, acctNamesList=[cluster.defproduceraAccount.name, cluster.sysioAccount.name],
+    cluster.launchTrxGenerators(contractOwnerAcctName=cluster.noopAccount.name, acctNamesList=[cluster.defproduceraAccount.name, cluster.sysioAccount.name],
                                 acctPrivKeysList=[cluster.defproduceraAccount.activePrivateKey,cluster.sysioAccount.activePrivateKey], nodeId=node2.nodeId,
                                 tpsPerGenerator=targetTpsPerGenerator, numGenerators=1, durationSec=testTrxGenDurationSec,
                                 waitToComplete=False)
