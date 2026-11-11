@@ -3,6 +3,7 @@
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/kv_table_objects.hpp>
+#include <sysio/chain/resource_limits.hpp>
 #include <sysio/opp/opp.hpp>
 #include <sysio/opp/attestations/attestations.pb.h>
 #include <sysio/opp/bootstrap/bootstrap.pb.h>
@@ -663,9 +664,18 @@ public:
    action_result bond_prune(uint64_t from_id, uint32_t limit) {
       return push(BOND_ACCOUNT, bond_abi_ser, "carol"_n, "prune"_n, mvo()("from_id", from_id)("limit", limit));
    }
-   /// sysio.bond's `hold` of request `id` naming `beneficiary`, signed by `signer` (the issuer, sysio.synd).
+   /// sysio.bond's `hold` of request `id` naming `beneficiary`, signed by `signer` (the issuer, sysio.synd)
+   /// and by the beneficiary, whose RAM the hold-bond escrow bills.
    action_result bond_hold(uint64_t id, name beneficiary, name signer = SYND_ACCOUNT) {
-      return push(BOND_ACCOUNT, bond_abi_ser, signer, "hold"_n, mvo()("request_id", id)("beneficiary", beneficiary));
+      try {
+         last_trace = push_action(BOND_ACCOUNT, "hold"_n, std::vector<account_name>{signer, beneficiary},
+                                  mvo()("request_id", id)("beneficiary", beneficiary));
+         produce_block();
+         return success();
+      } catch (const fc::exception& ex) {
+         last_trace.reset();
+         return error(ex.top_message());
+      }
    }
    /// `account`'s claim on request `id`, signed by it.
    action_result bond_claim(uint64_t id, name account) {
@@ -2645,8 +2655,7 @@ BOOST_FIXTURE_TEST_CASE(second_envelope_waits_until_the_first_is_bonded, sysio_s
    BOOST_REQUIRE_EQUAL(2u, next_bond_request_id());
 
    // Held before it was bonded: the queue waits for sysio's ruling.
-   BOOST_REQUIRE_EQUAL(success(), push(BOND_ACCOUNT, bond_abi_ser, SYND_ACCOUNT, "hold"_n, mvo()
-      ("request_id", 1)("beneficiary", "carol"_n)));
+   BOOST_REQUIRE_EQUAL(success(), bond_hold(1, "carol"_n));
    BOOST_REQUIRE_EQUAL(success(), crank());
    BOOST_REQUIRE_EQUAL(STATE_HELD, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
    BOOST_REQUIRE_EQUAL(STATE_WAITING, envelope_row(SOLANA, LIQSOL, 2)["state"].as_string());
@@ -2666,8 +2675,7 @@ BOOST_FIXTURE_TEST_CASE(second_envelope_waits_until_the_first_is_bonded, sysio_s
    // Bonded, then held: the hold stops the second envelope's release but not the queue.
    underwrite_envelope(SOLANA, LIQSOL, 2);
    BOOST_REQUIRE_EQUAL(REQUEST_BONDED, bond_request(2)["state"].as_string());
-   BOOST_REQUIRE_EQUAL(success(), push(BOND_ACCOUNT, bond_abi_ser, SYND_ACCOUNT, "hold"_n, mvo()
-      ("request_id", 2)("beneficiary", "carol"_n)));
+   BOOST_REQUIRE_EQUAL(success(), bond_hold(2, "carol"_n));
    BOOST_REQUIRE_EQUAL(success(), crank());
    BOOST_REQUIRE_EQUAL(STATE_HELD, envelope_row(SOLANA, LIQSOL, 2)["state"].as_string());
    BOOST_REQUIRE_EQUAL(STATE_REQUESTED, envelope_row(SOLANA, LIQSOL, 3)["state"].as_string());
@@ -3704,6 +3712,46 @@ BOOST_FIXTURE_TEST_CASE(challenge_charges_bond_plus_extra_and_holds, sysio_synd_
    BOOST_REQUIRE_EQUAL(success(), crank());
    BOOST_REQUIRE_EQUAL(STATE_HELD, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
    BOOST_REQUIRE_EQUAL(10 * UNIT, item_row(1)["remaining"].as_uint64());
+} FC_LOG_AND_RETHROW()
+
+// The hold a challenge sends carries the challenger's authority, so its hold-bond escrow on sysio.bond
+// bills the challenger -- an ordinary account challenging a request of this privileged contract -- while
+// the request's own rows stay on the sysio RAM pool. A challenger with no RAM cannot challenge.
+BOOST_FIXTURE_TEST_CASE(a_challenge_bills_the_hold_bond_escrow_to_the_challenger, sysio_synd_tester) try {
+   const auto pubkey = ed_bytes(ed_key());
+   syndicate_and_close(1, 1, pubkey, LIQSOL, 10 * UNIT);
+   const uint64_t id = envelope_row(SOLANA, LIQSOL, 1)["request_id"].as_uint64();
+   underwrite_envelope(SOLANA, LIQSOL, 1);
+   BOOST_REQUIRE_EQUAL(success(), liq_mint("carol"_n, LIQSOL, 5 * UNIT));
+   const auto escrows_table = compute_table_id("escrows"_n.to_uint64_t());
+   std::string hold_escrow_key;
+   for (int shift = 56; shift >= 0; shift -= 8) hold_escrow_key.push_back(char((id >> shift) & 0xff));
+   hold_escrow_key.push_back(char(1));   // escrow_kind::HOLD_BOND
+   const auto ram_of = [&](name account) {
+      return control->get_resource_limits_manager().get_account_ram_usage(account);
+   };
+
+   // With no RAM to spare, the challenge fails whole and charges nothing.
+   control->get_mutable_resource_limits_manager().set_account_limits("carol"_n, ram_of("carol"_n), -1, -1, false);
+   BOOST_REQUIRE(mentions(challenge("carol"_n, SOLANA, LIQSOL, 1), "account carol has insufficient ram"));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(5 * UNIT), liq_balance("carol"_n));
+   BOOST_REQUIRE(!control->kv().find_row(BOND_ACCOUNT, escrows_table, hold_escrow_key));
+
+   control->get_mutable_resource_limits_manager().set_account_limits("carol"_n, -1, -1, -1, false);
+   const auto carol_ram = ram_of("carol"_n);
+   BOOST_REQUIRE_EQUAL(success(), challenge("carol"_n, SOLANA, LIQSOL, 1));
+   const auto escrow = control->kv().find_row(BOND_ACCOUNT, escrows_table, hold_escrow_key);
+   BOOST_REQUIRE(escrow.has_value());
+   BOOST_REQUIRE_EQUAL("carol"_n, escrow->payer);
+   BOOST_REQUIRE_EQUAL(carol_ram + static_cast<int64_t>(escrow->key.size() + escrow->value.size() +
+                                                        config::kv_row_overhead_ram_bytes),
+                       ram_of("carol"_n));
+   std::string request_key;
+   for (int shift = 56; shift >= 0; shift -= 8) request_key.push_back(char((id >> shift) & 0xff));
+   BOOST_REQUIRE_EQUAL(SYSIO_ACCOUNT,
+                       control->kv().find_row(BOND_ACCOUNT, compute_table_id("requests"_n.to_uint64_t()), request_key)
+                          ->payer);
+   BOOST_REQUIRE_EQUAL(REQUEST_HELD, bond_request(id)["state"].as_string());
 } FC_LOG_AND_RETHROW()
 
 // Review Focus 4: a request that is APPROVED can no longer be challenged, even while its envelope is
