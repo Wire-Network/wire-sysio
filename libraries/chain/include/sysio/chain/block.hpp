@@ -11,7 +11,11 @@ namespace sysio { namespace chain {
       };
       bool operator==(const transaction_receipt_header&) const = default;
 
-      cpu_usage_t    cpu_usage_us; ///< billed CPU for nth input action
+      /// Billed CPU: one entry per input action, then one per frame whose billing switched to a contract reached
+      /// through a system contract, in execution order. A receiver entry covers its frame and the frames below it
+      /// billed to the same contract; the validator derives each entry's account by running the transaction. The
+      /// transaction's CPU is the sum of all entries.
+      cpu_usage_t    cpu_usage_us;
    };
 
    struct transaction_receipt : public transaction_receipt_header {
@@ -21,7 +25,7 @@ namespace sysio { namespace chain {
       packed_transaction trx;
 
       // Receipt digest format: pack(cpu_usage_us: vec<varuint32>) + pack(trx.digest())
-      // cpu_usage_us is the per-input-action billed CPU vector, in action order.
+      // cpu_usage_us is the billed CPU vector: input actions in action order, then receiver entries.
       // Differs from upstream EOSIO which packed status, cpu_usage_us (uint32), and
       // net_usage_words ahead of the trx digest. Wire removed status and net_usage_words
       // (deferred trxs are not supported) and changed cpu_usage_us to a per-action vector.

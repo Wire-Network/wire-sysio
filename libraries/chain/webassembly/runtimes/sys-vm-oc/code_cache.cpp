@@ -243,14 +243,18 @@ code_cache_sync::~code_cache_sync() {
       elog("unexpected response from SYS VM OC compile monitor during shutdown");
 }
 
-const code_descriptor* code_cache_sync::get_descriptor_for_code_sync(mode m, account_name receiver, const digest_type& code_id, const uint8_t& vm_version) {
-   //check for entry in cache
+const code_descriptor* code_cache_sync::get_cached_descriptor(mode m, const digest_type& code_id) {
    code_cache_index::index<by_hash>::type::iterator it = _cache_index.get<by_hash>().find(code_id);
-   if(it != _cache_index.get<by_hash>().end()) {
-      if (m.write_window)
-         _cache_index.relocate(_cache_index.begin(), _cache_index.project<0>(it));
-      return &*it;
-   }
+   if(it == _cache_index.get<by_hash>().end())
+      return nullptr;
+   if (m.write_window)
+      _cache_index.relocate(_cache_index.begin(), _cache_index.project<0>(it));
+   return &*it;
+}
+
+const code_descriptor* code_cache_sync::get_descriptor_for_code_sync(mode m, account_name receiver, const digest_type& code_id, const uint8_t& vm_version) {
+   if (const code_descriptor* const cached = get_cached_descriptor(m, code_id))
+      return cached;
    if(!m.write_window)
       return nullptr;
 

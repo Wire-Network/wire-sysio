@@ -143,6 +143,9 @@ class code_cache_sync : public code_cache_base {
       using code_cache_base::code_cache_base;
       ~code_cache_sync();
 
+      /// The cached descriptor for `code_id`, or nullptr when it has not been compiled yet. Never compiles.
+      const code_descriptor* get_cached_descriptor(mode m, const digest_type& code_id);
+
       //Can still fail and return nullptr if, for example, there is an expected instantiation failure
       const code_descriptor* get_descriptor_for_code_sync(mode m, account_name receiver,
                                                                 const digest_type& code_id, const uint8_t& vm_version);
