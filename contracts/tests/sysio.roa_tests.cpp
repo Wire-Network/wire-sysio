@@ -2809,7 +2809,7 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_happy_path, sysio_roa_nodeownreg_tester ) tr
       BOOST_CHECK_EQUAL(get_nodeownerreg(owner)["status"].as<uint64_t>(), CONFIRMED);
       const auto& active = control->get_authorization_manager().get_permission({owner, config::active_name});
       BOOST_REQUIRE_EQUAL(active.auth.keys.size(), 1u);
-      BOOST_CHECK_EQUAL(active.auth.keys[0].key, wire_pub);
+      BOOST_CHECK(active.auth.keys[0].key == wire_pub);
    }
 } FC_LOG_AND_RETHROW()
 
@@ -2832,7 +2832,7 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_rejects_existing_account_with_matching_key, 
    BOOST_CHECK_EQUAL(audit["reason"].as<uint64_t>(), R_ACCOUNT_EXISTS);
    const auto& active = control->get_authorization_manager().get_permission({owner, config::active_name});
    BOOST_REQUIRE_EQUAL(active.auth.keys.size(), 1u);
-   BOOST_CHECK_EQUAL(active.auth.keys[0].key, wire_pub);
+   BOOST_CHECK(active.auth.keys[0].key == wire_pub);
    int64_t ram_after = 0, net_after = 0, cpu_after = 0;
    limits.get_account_limits(owner, ram_after, net_after, cpu_after);
    BOOST_CHECK_EQUAL(ram_after, ram_before);
