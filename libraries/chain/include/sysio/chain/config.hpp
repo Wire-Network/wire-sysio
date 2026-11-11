@@ -37,6 +37,9 @@ namespace sysio::chain::config {
   static constexpr auto sysio_code_name { "sysio.code"_n };
   static constexpr auto sysio_payer_name { "sysio.payer"_n };
 
+  /// The action the chain sends to `system_account_name` at the start of every block.
+  static constexpr auto onblock_action_name { "onblock"_n };
+
   static constexpr int      block_interval_ms = 500;
   static constexpr int      block_interval_us = block_interval_ms*1000;
   static constexpr uint64_t block_timestamp_epoch = 1735689600000ull; // epoch is year 2025.

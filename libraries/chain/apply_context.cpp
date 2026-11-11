@@ -120,10 +120,13 @@ void apply_context::exec_one()
                                                    *this );
             } catch( const wasm_exit& ) {}
          } else {
-            // allow inline and notify to non-existing contracts
-            // allow onblock and native actions when no sysio system contract by allowing no contract on sysio
-            if (receiver != sysio::chain::config::system_account_name && act->account == receiver && get_sender().empty()) {
-               SYS_ASSERT(false, action_validate_exception,
+            // Allow inline and notify to accounts without a contract. With no contract on sysio, the chain still
+            // runs its native actions there, and its own onblock, and nothing else.
+            if (act->account == receiver && get_sender().empty()) {
+               const bool own_onblock = act->name == config::onblock_action_name && trx_context.is_implicit();
+               const bool chain_action = receiver == config::system_account_name &&
+                                         (native != nullptr || own_onblock);
+               SYS_ASSERT(chain_action, action_validate_exception,
                           "No contract for action {} on account {}", act->name, receiver);
             }
          }
