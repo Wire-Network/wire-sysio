@@ -69,6 +69,8 @@ constexpr name creditowed_action = "creditowed"_n;
 constexpr name transfer_action   = "transfer"_n;
 /// `sysio.msgch`'s outbound queue.
 constexpr name queueout_action = "queueout"_n;
+/// Final desyndication emission, after the holder's transfer notifications and the burn.
+constexpr name emitdesynd_action = "emitdesynd"_n;
 /// `sysio.liq::mintyield`, which a released yield item sends.
 constexpr name mintyield_action = "mintyield"_n;
 /// `sysio.bond::hold`, which a challenge sends, and `sysio.bond::claim`, which pulls what a ruling awards
@@ -1548,10 +1550,6 @@ void synd::desyndicate(name holder, asset quantity, uint64_t max_fee) {
    // quantity or more leaves nothing to release and is refused before the subtraction.
    const uint64_t fee    = quote.fee;
    const uint64_t amount = quote.net;
-   // The depot's outstanding shadow once the burn below has run, read from `st` before it: the burn is
-   // inline, so nothing has moved supply yet. The net was part of the holder's balance, so it is within
-   // the supply and the difference cannot underflow.
-   const uint64_t total_syndicated = liq::outstanding_of(LIQ_ACCOUNT, st) - amount;
 
    // The fee pot's position settles before the transfer that backs the fee arrives; no distribution runs
    // between this action and its inline transfer, so both settle at one index. The quantity moves to this
@@ -1578,12 +1576,23 @@ void synd::desyndicate(name holder, asset quantity, uint64_t max_fee) {
       .amount = amount,
    });
 
+   // send() queues children: the transfer may re-enter desyndicate before either burn has run.
+   // Read outstanding only in the final child, after this request's transfer and burn finish.
+   action(active_of(get_self()), get_self(), emitdesynd_action, std::make_tuple(request_id)).send();
+}
+
+void synd::emitdesynd(uint64_t request_id) {
+   require_receipt_origin(get_self());
+   const auto row = returns_t(get_self()).get(return_key{request_id}, outstanding_return_not_found_msg);
+   const auto st = liq::find_stat_by_token(LIQ_ACCOUNT, row.token_code);
+   check(st.has_value(), no_shadow_reason.data());
+
    opp::attestations::DesyndicateLIQ msg;
-   msg.chain_code = st.chain_code.value;
-   msg.user       = opp::types::ChainAddress{*kind, *pubkey};
-   msg.amount     = opp::types::TokenAmount{st.token_code.value, static_cast<int64_t>(amount)};
+   msg.chain_code = row.chain_code.value;
+   msg.user       = opp::types::ChainAddress{row.chain_kind, row.pubkey};
+   msg.amount     = opp::types::TokenAmount{row.token_code.value, static_cast<int64_t>(row.amount)};
    msg.request_id = request_id;
-   msg.total_syndicated = total_syndicated;
+   msg.total_syndicated = liq::outstanding_of(LIQ_ACCOUNT, *st);
    // `no_size{}`: raw protobuf bytes, the form the outpost decodes the attestation `data` field as
    // (the same encoding sysio.opreg's emitters use).
    std::vector<char> encoded;
@@ -1591,7 +1600,7 @@ void synd::desyndicate(name holder, asset quantity, uint64_t max_fee) {
    (void)out(msg);
 
    action(active_of(get_self()), MSGCH_ACCOUNT, queueout_action,
-          std::make_tuple(st.chain_code.value, AttestationType::ATTESTATION_TYPE_DESYNDICATE_LIQ, encoded))
+          std::make_tuple(row.chain_code.value, AttestationType::ATTESTATION_TYPE_DESYNDICATE_LIQ, encoded))
       .send();
 }
 
