@@ -43,11 +43,18 @@ through `sysio.synd::refundreturn(request_id)` only after irreversible external 
 A final external payment is acknowledged with `finishreturn`; pending returns remain open.
 `recredit` is reserved for exceptional repairs and must not recover a tracked return.
 
-**Launch ingestion (epoch-0 bootstrap window, privileged caller).** `regliqpool`
-mints the LCO liq to `sysio`, deposits it with the T5 dex earmark WIRE into
-`sysio.swap`, creates the pair (`sysio` fee authority, the shadow as yield leg)
-and sets the tick parameters. The pre-launch positions are replayed by
-`sysio.synd::importsynd`.
+**Yield pools (privileged caller).** `regliqpool` deposits `sysio`'s seed shadow
+with WIRE from the `sysio` treasury into `sysio.swap`, creates the pair (`sysio`
+fee authority, the shadow as yield leg) and sets the tick parameters. Inside the
+epoch-0 bootstrap window the seed is the LCO liq and is minted to `sysio`, with
+the T5 dex earmark as the WIRE side. After the window nothing is minted: `sysio`
+must already hold the seed shadow, so the pool of a shadow opened after launch
+adds no supply beyond what outpost custody already covers, and the WIRE side must
+fit the treasury's unreserved balance (`sysiosystem::treasury::available`: the
+balance less pending emissions, outstanding pay claims and the remaining emission
+ceiling), so it never spends owed pay. Yield reported before the pool exists waits
+in `liqpending` and queues once it does. The pre-launch positions are replayed by
+`sysio.synd::importsynd`, inside the bootstrap window only.
 
 ## Tables
 
@@ -70,7 +77,7 @@ and sets the tick parameters. The pre-launch positions are replayed by
 | `queueyield(sym)` | none | Pending yield into the swap's reservoir |
 | `transfer`, `close`, `claim` | holder | `sysio.token`'s shape, balance rows billed to `sysio`; `close` refuses while yield is owed |
 | `addyield(from, quantity, target)` | `from` | Distribute WIRE to `target`'s holders |
-| `regliqpool(...)` | privileged caller, epoch 0 | Seed a shadow's yield pool |
+| `regliqpool(...)` | privileged caller | Seed a shadow's yield pool; mints the seed only in epoch 0 |
 
 ## Deployment
 
