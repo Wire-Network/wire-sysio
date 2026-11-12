@@ -17,9 +17,17 @@ namespace sysio::chain {
          where the integer represents number of decimals. Number of decimals must be larger than zero.
        */
 
-      static constexpr uint64_t string_to_symbol_c(uint8_t precision, std::string_view str) {
+      /// Longest symbol name: one character in each byte of the `uint64_t` encoding above the precision byte.
+      inline constexpr size_t max_symbol_name_length = sizeof(uint64_t) - 1;
+
+      /**
+       * Encode a symbol at compile time. The characters of the name are not validated. A name longer than
+       * `max_symbol_name_length` does not compile.
+       */
+      static consteval uint64_t string_to_symbol_c(uint8_t precision, std::string_view str) {
+         SYS_ASSERT(str.size() <= max_symbol_name_length, symbol_type_exception,
+                    "symbol name is longer than {} characters", max_symbol_name_length);
          uint64_t result = 0;
-         // No validation is done at compile time
          for (size_t i = 0; i < str.size(); ++i) {
             result |= (uint64_t(str[i]) << (8*(1+i)));
          }
@@ -30,8 +38,16 @@ namespace sysio::chain {
 
 #define SY(P,X) ::sysio::chain::string_to_symbol_c(P,#X)
 
+      /**
+       * Encode a symbol.
+       *
+       * @throws symbol_type_exception if the name is longer than `max_symbol_name_length` or has a character outside
+       *         `A`-`Z`
+       */
       static uint64_t string_to_symbol(uint8_t precision, std::string_view str) {
          try {
+            SYS_ASSERT(str.size() <= max_symbol_name_length, symbol_type_exception,
+                       "symbol name is longer than {} characters", max_symbol_name_length);
             uint64_t result = 0;
             for (size_t i = 0; i < str.size(); ++i) {
                // All characters must be upper case alphabets
