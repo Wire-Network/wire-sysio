@@ -35,11 +35,13 @@ using opp::shadow::u128;
 
 namespace custody = opp::shadow::custody;
 
-// The contract's own rows -- `bondconfig`, `bondcounters`, `yieldpool` -- bill the sysio RAM pool,
-// not this contract account (privileged-contract model, as sysio.opreg uses): the account stays
-// finite at code+abi size. A request's rows bill the account that created them (`payer_for`): the
-// issuer its `requests` and `escrows` rows, an underwriter its `bonds` row. Later writes by any signer
-// keep the row's payer (`same_payer`), which a privileged contract may do.
+// The contract's shared rows -- `bondconfig`, `bondcounters` and `yieldpool` -- bill the sysio RAM pool,
+// not this contract account (privileged-contract model, as sysio.opreg uses): the account stays finite
+// at code+abi size. Every other row is billed by who caused it (`payer_for`): a request's issuer pays for
+// its `requests` row, its bounty escrow, its underwriters' `bonds` rows and the `wireclaims` rows those
+// can credit, so an underwriter needs no RAM of its own; a hold beneficiary pays for the hold-bond escrow
+// of its challenge. Later writes by any signer keep the row's payer (`same_payer`), which a privileged
+// contract may do.
 constexpr name ram_payer = bond::SYSTEM_ACCOUNT;
 
 /// Permission this contract sends its own `sysio.liq::addyield` under.
@@ -132,16 +134,64 @@ constexpr std::string_view beneficiary_self_msg = "hold beneficiary cannot be th
 /// Message of the `check` `hold` raises on a request in any state but OPEN and BONDED.
 constexpr std::string_view hold_state_msg = "hold is only possible while the request is OPEN or BONDED";
 
+/// Message of the `check` that guards the `wireclaims` reservations: a row a live request or bond
+/// should hold is missing. Every such row is reserved before anything can credit or release it, so this
+/// fires only on a broken invariant.
+constexpr std::string_view wire_claim_unreserved_msg = "WIRE claim balance is not reserved";
+
 /// Largest amount an `asset` carries, as the unsigned base units every row holds.
 constexpr uint64_t max_asset_amount = static_cast<uint64_t>(asset::max_amount);
 
-/// The account a row created on behalf of `account` bills: `account` itself, unless it is privileged.
-/// A privileged account is a system contract (`sysio.synd` issuing requests for its envelopes), and a
-/// system contract has no RAM quota of its own -- it lives on what `sysio.roa` gifts it for its code
-/// and abi -- so its rows bill the `sysio` RAM pool, as every system contract's own rows do. The ONE
-/// place that decides the payer of a request, escrow or bond row.
+/// The account the rows `account` causes bill: `account` itself, unless it is privileged. A privileged
+/// account is a system contract (`sysio.synd` issuing requests for its envelopes), and a system contract
+/// has no RAM quota of its own -- it lives on what `sysio.roa` gifts it for its code and abi -- so its
+/// rows bill the `sysio` RAM pool, as every system contract's own rows do. The ONE place that decides the
+/// payer of a request, escrow, bond or `wireclaims` row: `account` is the request's issuer, or the hold
+/// beneficiary for a hold-bond escrow.
 name payer_for(name account) {
    return is_privileged(account) ? ram_payer : account;
+}
+
+/// Count one more row of `issuer` that can credit `account`'s WIRE from `issuer`'s requests: a shadow-
+/// token request of `issuer` when `account` is the issuer, or a bond row of `account` on one of them.
+/// The balance row is created at 0, billed to `payer_for(issuer)`, when it has none, so `claim` only
+/// ever updates it and never needs new RAM.
+void reserve_wire_claim(name self, name account, name issuer) {
+   bond::wireclaims_t   claims(self);
+   const bond::wire_key key{.account = account, .issuer = issuer};
+   if (auto row = claims.try_get(key)) {
+      ++row->reservations;
+      claims.set(same_payer, key, *row);
+   } else {
+      claims.set(payer_for(issuer), key,
+                 bond::wire_claim{.account = account, .issuer = issuer, .amount = 0, .reservations = 1});
+   }
+}
+
+/// Count one fewer row of `issuer` that can credit `account`'s WIRE: its request or bond row is being
+/// erased. A balance nothing reserves any more and nothing is owed on is erased, returning its RAM.
+void release_wire_claim(name self, name account, name issuer) {
+   bond::wireclaims_t   claims(self);
+   const bond::wire_key key{.account = account, .issuer = issuer};
+   auto                 row = claims.try_get(key);
+   check(row.has_value() && row->reservations > 0, wire_claim_unreserved_msg);
+   if (--row->reservations == 0 && row->amount == 0) {
+      claims.erase(key);
+   } else {
+      claims.set(same_payer, key, *row);
+   }
+}
+
+/// Record `amount` of WIRE owed to `account` from `issuer`'s requests on its reserved balance row,
+/// refusing a total no `asset` can carry. Only updates the row, so it never needs new RAM.
+void credit_wire_claim(name self, name account, name issuer, uint64_t amount) {
+   bond::wireclaims_t   claims(self);
+   const bond::wire_key key{.account = account, .issuer = issuer};
+   auto                 row = claims.try_get(key);
+   check(row.has_value(), wire_claim_unreserved_msg);
+   check(amount <= max_asset_amount - row->amount, amount_range_msg);
+   row->amount += amount;
+   claims.set(same_payer, key, *row);
 }
 
 /// Resolve `token_code` against this contract's custody contracts: `sysio.token` for WIRE,
@@ -298,19 +348,37 @@ bool fully_paid(name self, const bond::request_row& req, u128 live_index) {
 }
 
 /// Place `amount` of `token_code` from `funder`, the signing issuer, in request `request_id`'s escrow
-/// of `kind`: create the row at balance 0 or raise the existing one through `credit_holding`, then
-/// pull the tokens. The row bills `payer_for(funder)`.
-void escrow_tokens(name self, uint64_t request_id, bond::escrow_kind kind, name funder, uint64_t amount,
-                   sysio::slug_name token_code, const depot_native_token& custody, std::string_view memo) {
+/// of `kind`: create the row at balance 0, billed to `payer`, or raise the existing one, which keeps its
+/// payer, through `credit_holding`, then pull the tokens. `payer` is `payer_for` of whoever caused the
+/// escrow: the issuer for its bounty, the hold beneficiary for a hold bond.
+void escrow_tokens(name self, uint64_t request_id, bond::escrow_kind kind, name funder, name payer,
+                   uint64_t amount, sysio::slug_name token_code, const depot_native_token& custody,
+                   std::string_view memo) {
    bond::escrows_t        escrows(self);
-   const bond::escrow_key key = bond::escrow_key_of(request_id, kind);
-   bond::escrow_row       row = escrows.try_get(key).value_or(
+   const bond::escrow_key key      = bond::escrow_key_of(request_id, kind);
+   const auto             existing = escrows.try_get(key);
+   bond::escrow_row       row      = existing.value_or(
       bond::escrow_row{.request_id = request_id, .kind = kind, .funder = funder, .amount = 0});
    check(amount <= max_asset_amount - row.amount, amount_range_msg);
    credit_holding(row.yield, row.amount, amount, token_code, custody);
-   escrows.set(payer_for(funder), key, row);
+   escrows.set(existing ? same_payer : payer, key, row);
    pull_depot_native(self, funder, custody, amount, memo);
 }
+
+/// A request `prune` erases, with what its issuer's `wireclaims` reservation is keyed by.
+struct pruned_request {
+   uint64_t id;         ///< the request's id
+   name     issuer;     ///< its issuer, whose own balance row it reserved
+   bool     reserves;   ///< a shadow-token request: it and its bond rows reserved balance rows
+};
+
+/// A paid bond row `prune` erases from a request it keeps, with what its `wireclaims` reservation is
+/// keyed by.
+struct pruned_bond {
+   bond::bond_key key;        ///< the bond row's key; its underwriter owns the reserved balance
+   name           issuer;     ///< the request's issuer, the other half of that balance's key
+   bool           reserves;   ///< a shadow-token request's bond, which reserved a balance row
+};
 
 } // anonymous namespace
 
@@ -371,10 +439,13 @@ void bond::request(name issuer, name schema, std::vector<char> statement, sysio:
    counters.set(c, ram_payer);
 
    requests.emplace(payer_for(issuer), request_key{row.id}, row);
+   // The WIRE the request's escrows earn is the issuer's: reserve its balance row now, so that neither a
+   // later bounty nor a challenger's hold bond, nor any claim, needs the issuer's RAM.
+   if (earns_shadow_yield(token_code)) reserve_wire_claim(get_self(), issuer, issuer);
 
    if (bounty > 0) {
-      escrow_tokens(get_self(), row.id, escrow_kind::BOUNTY, issuer, bounty, token_code, *custody,
-                    request_bounty_memo);
+      escrow_tokens(get_self(), row.id, escrow_kind::BOUNTY, issuer, payer_for(issuer), bounty, token_code,
+                    *custody, request_bounty_memo);
    }
 }
 
@@ -409,8 +480,8 @@ void bond::addbounty(uint64_t request_id, uint64_t amount) {
    check(custody.has_value(), unsupported_token_msg);
 
    requests.modify(same_payer, request_key{request_id}, [&](request_row& r) { r.bounty += amount; });
-   escrow_tokens(get_self(), request_id, escrow_kind::BOUNTY, req->issuer, amount, req->token_code, *custody,
-                 addbounty_memo);
+   escrow_tokens(get_self(), request_id, escrow_kind::BOUNTY, req->issuer, payer_for(req->issuer), amount,
+                 req->token_code, *custody, addbounty_memo);
 }
 
 void bond::accept(name underwriter, uint64_t request_id, uint64_t amount) {
@@ -439,10 +510,16 @@ void bond::accept(name underwriter, uint64_t request_id, uint64_t amount) {
    // so the credited balance stays within the asset range.
    bonds_t        bonds(get_self());
    const bond_key key{.request_id = request_id, .underwriter = underwriter};
-   bond_row       row = bonds.try_get(key).value_or(
+   const auto     existing = bonds.try_get(key);
+   bond_row       row      = existing.value_or(
       bond_row{.request_id = request_id, .underwriter = underwriter, .amount = 0});
    credit_holding(row.yield, row.amount, bonded_amount, req->token_code, *custody);
-   bonds.set(payer_for(underwriter), key, row);
+   bonds.set(existing ? same_payer : payer_for(req->issuer), key, row);
+   // A new bond on a shadow-token request reserves the underwriter's WIRE balance row for this issuer,
+   // billed like the bond row, so the claim that pays the bond's yield never needs the issuer's RAM.
+   if (!existing && earns_shadow_yield(req->token_code)) {
+      reserve_wire_claim(get_self(), underwriter, req->issuer);
+   }
 
    const bool fully_bonded = bonded_amount == remainder;
    requests.modify(same_payer, request_key{request_id}, [&](request_row& r) {
@@ -465,6 +542,9 @@ void bond::hold(uint64_t request_id, name beneficiary) {
    check(req->state == request_state::OPEN || req->state == request_state::BONDED, hold_state_msg);
    check(is_account(beneficiary), beneficiary_msg);
    check(beneficiary != get_self(), beneficiary_self_msg);
+   // The hold-bond escrow is the beneficiary's challenge, so it bills the beneficiary: naming an account
+   // is no authority to charge it, so the beneficiary signs as well.
+   require_auth(beneficiary);
 
    const auto custody = resolve_bond_token(req->token_code);
    check(custody.has_value(), unsupported_token_msg);
@@ -484,8 +564,8 @@ void bond::hold(uint64_t request_id, name beneficiary) {
    // A hold bond rounds to zero on a covered amount below BPS_DENOMINATOR / hold_bps base units:
    // there is nothing to escrow or pull, and no HOLD_BOND row exists.
    if (hold_bond > 0) {
-      escrow_tokens(get_self(), request_id, escrow_kind::HOLD_BOND, req->issuer, hold_bond, req->token_code,
-                    *custody, hold_memo);
+      escrow_tokens(get_self(), request_id, escrow_kind::HOLD_BOND, req->issuer, payer_for(beneficiary),
+                    hold_bond, req->token_code, *custody, hold_memo);
    }
 }
 
@@ -577,8 +657,9 @@ void bond::sweepyield(sysio::slug_name token_code) {
 // claim - pay `account` what terminal request `request_id` owes it.
 //
 // Each account settles independently. LIQ credits invoke no recipient code. Earned WIRE is
-// recorded into a backed claim balance and withdrawn separately; WIRE-denominated requests keep
-// ordinary transfer claims.
+// recorded into the account's backed claim balance for the request's issuer, reserved when the request
+// or the bond was created, and withdrawn separately; WIRE-denominated requests keep ordinary transfer
+// claims.
 //
 // A returned bond and an escrow are still held here, so they settle at sysio.liq's LIVE index: what
 // they earn up to the claim is their owner's. A forfeited bond settles at the request's
@@ -699,13 +780,9 @@ void bond::claim(uint64_t request_id, name account) {
    };
    pay(forfeit_out, forfeit_memo);
    pay(token_out, claim_memo);
-   if (wire_out > 0) {
-      wireclaims_t claims(get_self());
-      const wire_key key{account};
-      auto balance = claims.try_get(key).value_or(wire_claim{account, 0});
-      add_to_transfer(balance.amount, wire_out);
-      claims.set(ram_payer, key, balance);
-   }
+   // The bond row or the request this WIRE came from reserved the balance row, so recording it needs
+   // no RAM, and the issuer's lack of RAM can never hold up a payment it already owes.
+   if (wire_out > 0) credit_wire_claim(get_self(), account, req->issuer, wire_out);
    // sysio.liq refuses a distribution to a symbol with no supply: the WIRE then stays in the contract.
    if (forfeit_wire > 0 && has_supply(req->token_code)) {
       action(permission_level{get_self(), active_permission}, LIQ_ACCOUNT, opp::shadow::ADDYIELD_ACTION,
@@ -714,14 +791,22 @@ void bond::claim(uint64_t request_id, name account) {
    }
 }
 
-void bond::claimwire(name account) {
+void bond::claimwire(name account, name issuer) {
    andon::check_clear(andon::ANDON_ACCOUNT);
-   wireclaims_t claims(get_self());
-   const wire_key key{account};
-   const auto balance = claims.try_get(key);
+   wireclaims_t   claims(get_self());
+   const wire_key key{.account = account, .issuer = issuer};
+   auto           balance = claims.try_get(key);
    check(balance && balance->amount > 0, nothing_msg);
-   claims.erase(key);
-   transfer_depot_native(get_self(), account, wire_custody(), balance->amount, claim_yield_memo);
+   const uint64_t amount = balance->amount;
+   // A row a live request or bond still reserves stays, at 0, for that row's later claims; one nothing
+   // reserves any more is erased, returning its RAM to its payer.
+   if (balance->reservations == 0) {
+      claims.erase(key);
+   } else {
+      balance->amount = 0;
+      claims.set(same_payer, key, *balance);
+   }
+   transfer_depot_native(get_self(), account, wire_custody(), amount, claim_yield_memo);
 }
 
 // prune - erase terminal requests nothing is owed on, with their rows, and paid bond rows.
@@ -730,46 +815,56 @@ void bond::claimwire(name account) {
 // of a call is bounded by the rows it reads, not by the rows it acts on. A request still owed
 // a claim, or ruled less than PRUNE_RETENTION_SEC ago, keeps its row -- an issuer that polls the row
 // (sysio.bond notifies no one) always sees the ruling -- but its bond rows already paid out are erased:
-// a paid row carries nothing any claim or check reads, and an underwriter's RAM must not wait on
-// another party's unclaimed payout. A request whose token no longer resolves (so nothing about it can
-// be settled) is skipped and left whole. What an erased escrow still holds is the division remainder,
-// which stays in the contract.
+// a paid row carries nothing any claim or check reads, and the RAM it bills must not wait on another
+// party's unclaimed payout. Every erased request and bond row releases the `wireclaims` reservation it
+// held. A request whose token no longer resolves (so nothing about it can be settled) is skipped and
+// left whole. What an erased escrow still holds is the division remainder, which stays in the contract.
 void bond::prune(uint64_t from_id, uint32_t limit) {
    check(limit <= MAX_PRUNE_LIMIT, prune_limit_msg);
-   requests_t            requests(get_self());
-   bonds_t               bonds(get_self());
-   const time_point      now = current_time_point();
-   std::vector<uint64_t> prunable;
-   std::vector<bond_key> paid_bonds;
-   uint32_t              examined = 0;
+   requests_t                  requests(get_self());
+   bonds_t                     bonds(get_self());
+   const time_point            now = current_time_point();
+   std::vector<pruned_request> prunable;
+   std::vector<pruned_bond>    paid_bonds;
+   uint32_t                    examined = 0;
    for (auto it = requests.lower_bound(request_key{from_id}); it != requests.end() && examined < limit;
         ++it, ++examined) {
       if (!is_terminal(it->state)) continue;
       const auto custody_token = resolve_bond_token(it->token_code);
       if (!custody_token) continue;
+      const bool reserves = earns_shadow_yield(it->token_code);
       const bool retained = now < it->resolved_at + seconds(PRUNE_RETENTION_SEC);
-      if (!retained && it->outcome_acknowledged && fully_paid(get_self(), *it, live_index_of(it->token_code, *custody_token))) {
-         prunable.push_back(it->id);
+      if (!retained && it->outcome_acknowledged &&
+          fully_paid(get_self(), *it, live_index_of(it->token_code, *custody_token))) {
+         prunable.push_back(pruned_request{.id = it->id, .issuer = it->issuer, .reserves = reserves});
          continue;
       }
       for (auto bit = bonds.lower_bound(bond_key{.request_id = it->id, .underwriter = name{}});
            bit != bonds.end() && bit->request_id == it->id; ++bit) {
-         if (bit->paid && bit->yield.owed_wire == 0) paid_bonds.push_back(bond_key{.request_id = it->id, .underwriter = bit->underwriter});
+         if (bit->paid && bit->yield.owed_wire == 0) {
+            const bond_key key{.request_id = it->id, .underwriter = bit->underwriter};
+            paid_bonds.push_back(pruned_bond{.key = key, .issuer = it->issuer, .reserves = reserves});
+         }
       }
    }
 
-   for (const bond_key& key : paid_bonds) bonds.erase(key);
+   for (const pruned_bond& paid : paid_bonds) {
+      bonds.erase(paid.key);
+      if (paid.reserves) release_wire_claim(get_self(), paid.key.underwriter, paid.issuer);
+   }
    escrows_t escrows(get_self());
-   for (const uint64_t id : prunable) {
-      for (auto it = bonds.lower_bound(bond_key{.request_id = id, .underwriter = name{}});
-           it != bonds.end() && it->request_id == id;) {
+   for (const pruned_request& req : prunable) {
+      for (auto it = bonds.lower_bound(bond_key{.request_id = req.id, .underwriter = name{}});
+           it != bonds.end() && it->request_id == req.id;) {
+         if (req.reserves) release_wire_claim(get_self(), it->underwriter, req.issuer);
          it = bonds.erase(it);
       }
       for (const auto kind : magic_enum::enum_values<escrow_kind>()) {
-         const escrow_key ekey = bond::escrow_key_of(id, kind);
+         const escrow_key ekey = bond::escrow_key_of(req.id, kind);
          if (escrows.contains(ekey)) escrows.erase(ekey);
       }
-      requests.erase(request_key{id});
+      requests.erase(request_key{req.id});
+      if (req.reserves) release_wire_claim(get_self(), req.issuer, req.issuer);
    }
 }
 

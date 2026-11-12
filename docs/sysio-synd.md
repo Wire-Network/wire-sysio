@@ -99,7 +99,9 @@ request's hold bond plus the pair's `challenge_extra`; a charge of zero is refus
 zero; configure challenge_extra`). The extra stays in the fee pot, and `sysio.synd` holds the request
 through `sysio.bond::hold` naming the challenger as beneficiary. The envelope is HELD until `sysio`
 rules, and the pair's `queue_epoch` is rewound to it so the ruling is processed. One challenge per
-request; contract accounts may challenge. Any row the challenge creates bills `sysio`.
+request; contract accounts may challenge. The hold carries the challenger's authority, and its
+hold-bond escrow on `sysio.bond` bills the challenger's RAM, so a challenger without that RAM cannot
+challenge. The fee pot row bills `sysio`.
 
 A request that is not yet fully bonded cannot be challenged (`the envelope's request is not fully
 bonded; it cannot be challenged yet`). Nothing has been released while it is OPEN, and a held request
