@@ -1,4 +1,5 @@
 #include "sysio_liq_tester.hpp"
+#include "kicker_tester.hpp"
 
 BOOST_AUTO_TEST_SUITE(sysio_liq_tests)
 
@@ -428,6 +429,58 @@ BOOST_FIXTURE_TEST_CASE(a_freeze_admits_transfers_into_custody_and_refuses_the_r
    const int64_t alice_wire = wire_balance("alice"_n);
    BOOST_REQUIRE_EQUAL(success(), claim("alice"_n));
    BOOST_REQUIRE_EQUAL(alice_wire + alice_owed, wire_balance("alice"_n));
+} FC_LOG_AND_RETHROW()
+
+// ---------------------------------------------------------------------------
+// A yield pool registered after the bootstrap window
+// ---------------------------------------------------------------------------
+
+// A shadow opened after epoch 0 gets its pool from shadow sysio already holds: regliqpool mints
+// nothing, fails without the seed, and the yield that waited in liqpending queues once the pool exists.
+BOOST_FIXTURE_TEST_CASE(a_pool_registered_after_the_bootstrap_window_is_seeded_from_held_shadow,
+                        kicker_test_support::kicker_tester) try {
+   const symbol  eth_pool  = symbol::from_string("9,ETHPOOL");
+   const int64_t held      = 100 * UNIT;   // syndicated LIQETH, all of it backed by outpost custody
+   const int64_t pool_seed = 40 * UNIT;
+   const int64_t yield     = 10 * UNIT;
+   const auto give_sysio = [&](int64_t amount) {
+      return push_liq("alice"_n, "transfer"_n, mvo()("from", "alice"_n)("to", SYSIO_ACCOUNT)
+         ("quantity", asset(amount, LIQETH_SYM))("memo", ""));
+   };
+   const auto eth_supply = [&] { return stat_row(LIQETH_SYM)["supply"].as<asset>().get_amount(); };
+
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH, epoch_ser, EPOCH, "advance"_n, mvo()));
+   BOOST_REQUIRE_EQUAL(1u, decode(epoch_ser, "epoch_state", get_row_by_id(EPOCH, EPOCH, "epochstate"_n,
+                                                                         "epochstate"_n.value))
+                              ["current_epoch_index"].as_uint64());
+
+   BOOST_REQUIRE_EQUAL(success(), create(LIQETH_SYM, ETH, LIQETH));
+   BOOST_REQUIRE_EQUAL(success(), mint("alice"_n, held, LIQETH));
+   BOOST_REQUIRE_EQUAL(success(), mintyield(ETH, LIQETH, yield));
+   BOOST_REQUIRE_EQUAL(yield, pending_row(LIQETH_SYM)["quantity"].as<asset>().get_amount());
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("no yield pool registered for this shadow"), queueyield(LIQETH_SYM));
+
+   // Without the whole seed in sysio's row the seed transfer fails, and no pool is registered.
+   BOOST_REQUIRE(mentions(regliqpool(ETH, LIQETH, eth_pool, pool_seed, pool_seed), "no balance object found"));
+   BOOST_REQUIRE_EQUAL(success(), give_sysio(pool_seed - 1));
+   BOOST_REQUIRE(mentions(regliqpool(ETH, LIQETH, eth_pool, pool_seed, pool_seed), "overdrawn balance"));
+   BOOST_REQUIRE_EQUAL("", stat_row(LIQETH_SYM)["pair_symbol"].as_string());
+   BOOST_REQUIRE(swap_pool_row(eth_pool).is_null());
+
+   // With it, the pool is seeded from sysio's row and the supply does not move.
+   BOOST_REQUIRE_EQUAL(success(), give_sysio(1));
+   BOOST_REQUIRE_EQUAL(success(), regliqpool(ETH, LIQETH, eth_pool, pool_seed, pool_seed));
+   BOOST_REQUIRE_EQUAL(held, eth_supply());
+   BOOST_REQUIRE_EQUAL("ETHPOOL", stat_row(LIQETH_SYM)["pair_symbol"].as_string());
+   BOOST_REQUIRE_EQUAL(0, account_row(SYSIO_ACCOUNT, LIQETH_SYM)["balance"].as<asset>().get_amount());
+   BOOST_REQUIRE_EQUAL(pool_seed, swap_pool_row(eth_pool)["pool1"]["quantity"].as<asset>().get_amount());
+
+   // The yield that waited queues into the new pool's reservoir.
+   BOOST_REQUIRE_EQUAL(success(), queueyield(LIQETH_SYM));
+   BOOST_REQUIRE(pending_row(LIQETH_SYM).is_null());
+   BOOST_REQUIRE_EQUAL(held + yield, eth_supply());
+   BOOST_REQUIRE_EQUAL(yield, swap_row("reservoirs"_n, "reservoir", SWAP_ACCOUNT, eth_pool.to_symbol_code().value)
+                                 ["balance"]["quantity"].as<asset>().get_amount());
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()

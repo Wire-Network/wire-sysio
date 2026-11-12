@@ -308,7 +308,6 @@ void liq::regliqpool(sysio::slug_name chain_code, sysio::slug_name token_code, s
                      int64_t locked_shares, uint32_t conversion_horizon_sec, uint32_t depth_cap_bps,
                      int64_t clip_floor) {
    opp::require_privileged_self();
-   check(epoch::in_bootstrap_window(), "regliqpool is bootstrap-window only");
    const auto st = find_stat_by_token(get_self(), token_code);
    check(st.has_value(), "token_code has no shadow symbol");
    check(st->chain_code == chain_code, "token_code belongs to another chain");
@@ -323,10 +322,13 @@ void liq::regliqpool(sysio::slug_name chain_code, sysio::slug_name token_code, s
    const asset           wire  { static_cast<int64_t>(initial_wire_amount),  WIRE_SYM };
    const extended_symbol shadow_symbol{ sym, get_self() };
 
-   // The LCO liq is protocol-owned and already in outpost custody: its shadow is
-   // minted to sysio, which seeds the pool with it and holds the pool's shares.
-   check(grow_supply(sym.code(), initial_chain_amount), "supply exceeds the asset range");
-   adjust_account(SYSTEM_ACCOUNT, shadow);
+   // sysio seeds the pool and holds its shares. In the bootstrap window the seed is the LCO liq,
+   // protocol-owned and already in outpost custody, so its shadow is minted. After the window nothing
+   // is minted: the seed is shadow sysio already holds, and the transfer below fails without it.
+   if (epoch::in_bootstrap_window()) {
+      check(grow_supply(sym.code(), initial_chain_amount), "supply exceeds the asset range");
+      adjust_account(SYSTEM_ACCOUNT, shadow);
+   }
    stats statstable(get_self());
    statstable.modify(ram_payer, symbol_key{ sym.code().raw() }, [&](currency_stats& s) {
       s.pair_symbol = pair_symbol.code();
