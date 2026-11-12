@@ -989,8 +989,12 @@ BOOST_FIXTURE_TEST_CASE( receiver_subjective_bill_limits_its_frame_past_the_stip
    BOOST_REQUIRE_EQUAL( receipt.size(), 2u );
    BOOST_TEST( receipt[1] == 0u );
 
+   // With the pending CPU gone, the handler runs past the stipend again.
+   set_notify_cpu_stipend( stipend_us );
    sub_bill.remove_subjective_billing( pending_id, 0 );
-   BOOST_TEST( entries( push_measured( trx, deadline ) ).size() == 2u );
+   receipt = entries( push_measured( trx, deadline ) );
+   BOOST_REQUIRE_EQUAL( receipt.size(), 2u );
+   BOOST_TEST( receipt[1] > 0u );
    produce_block();
 } FC_LOG_AND_RETHROW()
 
