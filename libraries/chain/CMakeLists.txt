@@ -112,6 +112,7 @@ add_library( sysio_chain
               wasm_config.cpp
               apply_context.cpp
               abi_serializer.cpp
+              abi_bounds.cpp
               asset.cpp
               blake3_encoder.cpp
               snapshot.cpp
