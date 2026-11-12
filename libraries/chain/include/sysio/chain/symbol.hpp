@@ -47,12 +47,22 @@ namespace sysio::chain {
          uint64_t value;
 
          operator uint64_t()const { return value; }
+
+         /**
+          * The code's name, e.g. "SYS".
+          *
+          * @throws symbol_type_exception if the value is not the code of a symbol: a character outside `A`-`Z`, or
+          *         a nonzero top byte, which a symbol's precision leaves no room for
+          */
+         std::string to_string() const;
       };
 
       class symbol : fc::reflect_init {
          public:
 
             static constexpr uint8_t max_precision = 18;
+            /// Width of the precision field in the low bits of the value; the symbol code is the bits above it.
+            static constexpr uint32_t precision_bits = 8;
 
             explicit symbol(uint8_t p, std::string_view s): m_value(string_to_symbol(p, s)) {
                SYS_ASSERT(valid(), symbol_type_exception, "invalid symbol: {}", s);
@@ -60,6 +70,13 @@ namespace sysio::chain {
             explicit symbol(uint64_t v = CORE_SYMBOL): m_value(v) {
                SYS_ASSERT(valid(), symbol_type_exception, "invalid symbol: {}", name());
             }
+            /**
+             * Parse a symbol of the form "4,SYS": the precision, a comma, the name.
+             *
+             * @throws symbol_type_exception if the string is empty or has no comma, the precision is outside
+             *         0..`max_precision`, or the name has a character outside `A`-`Z`
+             * @throws fc::parse_error_exception if the precision is not an integer
+             */
             static symbol from_string(std::string_view from);
             uint64_t value() const { return m_value; }
             bool valid() const
@@ -75,7 +92,8 @@ namespace sysio::chain {
             uint8_t decimals() const { return m_value & 0xFF; }
             uint64_t precision() const
             {
-               SYS_ASSERT( decimals() <= max_precision, symbol_type_exception, "precision {} should be <= 18", decimals() );
+               SYS_ASSERT( decimals() <= max_precision, symbol_type_exception,
+                           "precision {} should be <= {}", decimals(), max_precision );
                uint64_t p10 = 1;
                uint64_t p = decimals();
                while( p > 0  ) {
@@ -96,7 +114,7 @@ namespace sysio::chain {
                return result;
             }
 
-            symbol_code to_symbol_code()const { return {m_value >> 8}; }
+            symbol_code to_symbol_code()const { return {m_value >> precision_bits}; }
 
             explicit operator string() const
             {
@@ -116,7 +134,8 @@ namespace sysio::chain {
             }
 
             void reflector_init()const {
-               SYS_ASSERT( decimals() <= max_precision, symbol_type_exception, "precision {} should be <= 18", decimals() );
+               SYS_ASSERT( decimals() <= max_precision, symbol_type_exception,
+                           "precision {} should be <= {}", decimals(), max_precision );
                SYS_ASSERT( valid_name(name()), symbol_type_exception, "invalid symbol: {}", name() );
             }
 
@@ -176,9 +195,7 @@ namespace fc {
 }
 
 namespace fc {
-   inline void to_variant(const sysio::chain::symbol_code& var, fc::variant& vo) {
-      vo = sysio::chain::symbol(var.value << 8).name();
-   }
+   inline void to_variant(const sysio::chain::symbol_code& var, fc::variant& vo) { vo = var.to_string(); }
    inline void from_variant(const fc::variant& var, sysio::chain::symbol_code& vo) {
       vo = sysio::chain::symbol(0, var.get_string()).to_symbol_code();
    }

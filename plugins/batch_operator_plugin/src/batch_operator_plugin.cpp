@@ -771,7 +771,7 @@ struct batch_operator_plugin::impl {
          if (!code) continue;
          const auto queued = queued_by_pool.find(code->value);
          if (queued == queued_by_pool.end() || queued->second <= 0) continue;
-         const auto pool = symbol_code_name(*code);
+         const auto pool = code->to_string();
          if (!yield_tick_spacing.due(pool, now, yield_tick_interval)) continue;
          try {
             push_action(swap::account, swap::action_tickyield, *relay_signer,
@@ -804,7 +804,7 @@ struct batch_operator_plugin::impl {
          } catch (const fc::exception& e) {
             // Expected-transient: another operator queued it first. Persistent while
             // the shadow has no yield pool yet (`regliqpool` still to come).
-            dlog("batch_operator: queueyield({}): {}", symbol_code_name(*code), e.to_string());
+            dlog("batch_operator: queueyield({}): {}", code->to_string(), e.to_string());
          }
       }
    }
@@ -904,7 +904,7 @@ struct batch_operator_plugin::impl {
          // Expected-transient: governance removed the pool between the scan and
          // the push. Persistent while the pool's LIQ/WIRE swap pair is missing or
          // invalid, which only governance can repair.
-         dlog("batch_operator: kick({}): {}", symbol_code_name(code), e.to_string());
+         dlog("batch_operator: kick({}): {}", code.to_string(), e.to_string());
       }
    }
 

@@ -168,7 +168,7 @@ BOOST_AUTO_TEST_CASE(row_symbol_code_reads_the_kv_key_and_renders_it_for_an_acti
    BOOST_REQUIRE(code.has_value());
    BOOST_CHECK_EQUAL(raw_code(shadow_code), code->value);
    // The symbol_code ABI argument of `tickyield` / `queueyield` is the code's name.
-   BOOST_CHECK_EQUAL(std::string(shadow_code), symbol_code_name(*code));
+   BOOST_CHECK_EQUAL(std::string(shadow_code), code->to_string());
    fc::variant rendered;
    fc::to_variant(*code, rendered);
    BOOST_CHECK_EQUAL(std::string(shadow_code), rendered.as_string());
@@ -337,7 +337,7 @@ BOOST_AUTO_TEST_CASE(a_due_kick_pool_is_keyed_by_its_symbol_code) {
    const auto value     = row_value(row);
    BOOST_REQUIRE(code.has_value());
    BOOST_REQUIRE(value.has_value());
-   BOOST_CHECK_EQUAL(std::string(shadow_code), symbol_code_name(*code));
+   BOOST_CHECK_EQUAL(std::string(shadow_code), code->to_string());
    BOOST_CHECK(kick_due(*value, settings(), supplies(), last_kick + fc::days(1)));
 }
 
@@ -352,7 +352,7 @@ BOOST_AUTO_TEST_CASE(kick_rows_pushes_each_due_pool_once_and_stops_on_shutdown) 
    const liq_supplies stocked{{shadow_code, one_token}, {pool_code, one_token}};
    kick_backoff backoff;
    std::vector<std::string> pushed;
-   const auto push  = [&](sysio::chain::symbol_code code) { pushed.push_back(symbol_code_name(code)); };
+   const auto push  = [&](sysio::chain::symbol_code code) { pushed.push_back(code.to_string()); };
    const auto clock = [&] { return now; };
    const auto base = fc::seconds(60), ceiling = fc::hours(1);
 
@@ -528,7 +528,7 @@ struct paged_table {
       return page_t{{fc::variant(kv(pool_code, kick_pool_row(last_kick, pool_code)))}, false, {}};
    }
    std::optional<fc::variants> read_stat(sysio::chain::symbol_code code) {
-      const auto name = symbol_code_name(code);
+      const auto name = code.to_string();
       lookups.push_back(name);
       if (fail_stat) return std::nullopt;
       return fc::variants{liq_stat_row(liq_asset(one_token, name.c_str()))};
@@ -550,7 +550,7 @@ BOOST_AUTO_TEST_CASE(kick_page_finishes_nothing_on_a_failed_read) {
       return kick_page(scan, backoff, settings(), base, ceiling,
                        [&](const std::string& lower_bound) { return table.read_page(lower_bound); },
                        [&](sysio::chain::symbol_code code) { return table.read_stat(code); },
-                       [&](sysio::chain::symbol_code code) { pushed.push_back(symbol_code_name(code)); },
+                       [&](sysio::chain::symbol_code code) { pushed.push_back(code.to_string()); },
                        [&] { return now; }, [] { return false; });
    };
 
@@ -583,7 +583,7 @@ BOOST_AUTO_TEST_CASE(kick_page_looks_up_only_its_own_tokens_and_stops_on_a_faile
       return kick_page(scan, backoff, settings(), base, ceiling,
                        [&](const std::string& lower_bound) { return table.read_page(lower_bound); },
                        [&](sysio::chain::symbol_code code) { return table.read_stat(code); },
-                       [&](sysio::chain::symbol_code code) { pushed.push_back(symbol_code_name(code)); },
+                       [&](sysio::chain::symbol_code code) { pushed.push_back(code.to_string()); },
                        [&] { return now; }, [] { return false; });
    };
 
