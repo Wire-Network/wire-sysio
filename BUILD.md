@@ -21,7 +21,7 @@ git clone https://github.com/Wire-Network/wire-sysio.git
 # Enter the repo directory
 cd wire-sysio
 
-# Refresh pinned submodules when updating an existing checkout
+# Initialize (or refresh) the pinned top-level submodules
 git submodule update --init vcpkg libraries/appbase libraries/sys-vm
 ```
 

@@ -51,10 +51,6 @@ foreach(_dir IN LISTS _installed_dirs)
       if(_pkg MATCHES "^vcpkg-" OR _pkg STREQUAL "cmake" OR _pkg STREQUAL "doc" OR _pkg STREQUAL "pkgconfig")
          continue()
       endif()
-      # A reused vcpkg installation may retain the old VM port; its license now comes from the submodule.
-      if(_pkg STREQUAL "wire-sys-vm")
-         continue()
-      endif()
       # Skip if already collected above
       if(_pkg IN_LIST _vcpkg_packages)
          continue()

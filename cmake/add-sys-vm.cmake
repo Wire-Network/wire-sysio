@@ -1,5 +1,8 @@
 # Add the pinned VM without changing Sysio's test, tool, compiler, or installation settings.
-function(add_sys_vm_submodule SOURCE_DIRECTORY BINARY_DIRECTORY)
+function(add_sys_vm_submodule SOURCE_DIRECTORY BINARY_DIRECTORY INSTALL_COMPONENT)
+   if("${INSTALL_COMPONENT}" STREQUAL "")
+      message(FATAL_ERROR "add_sys_vm_submodule requires a non-empty install component")
+   endif()
    if(NOT EXISTS "${SOURCE_DIRECTORY}/CMakeLists.txt")
       message(FATAL_ERROR "Missing sys-vm submodule. Run: git submodule update --init libraries/sys-vm")
    endif()
@@ -25,7 +28,7 @@ function(add_sys_vm_submodule SOURCE_DIRECTORY BINARY_DIRECTORY)
    set(ENABLE_SOFTFLOAT_INSTALL OFF)
    set(FULL_DEBUG_BUILD OFF)
    set(ENABLE_MEMORY_OPS_ALIGNMENT OFF)
-   set(CMAKE_INSTALL_DEFAULT_COMPONENT_NAME "${SYSVM_INSTALL_COMPONENT}")
+   set(CMAKE_INSTALL_DEFAULT_COMPONENT_NAME "${INSTALL_COMPONENT}")
 
    # cmake_dependent_option writes the shared cache even with CMP0077 NEW. Preserve the parent choices.
    set(dependent_options ENABLE_SPEC_TESTS ENABLE_FUZZ_TESTS

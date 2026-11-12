@@ -28,12 +28,14 @@ if(NOT VCPKG_INSTALLED_TARGET_DIR)
 endif()
 get_property(original_launcher GLOBAL PROPERTY RULE_LAUNCH_COMPILE)
 list(PREPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/sentinel-modules")
-set(SYSVM_INSTALL_COMPONENT dev)
+if(NOT DEFINED VM_INSTALL_COMPONENT)
+   set(VM_INSTALL_COMPONENT dev)
+endif()
 include("@SOURCE_DIR@/cmake/add-sys-vm.cmake")
 if(NOT VM_SOURCE)
    set(VM_SOURCE "@SOURCE_DIR@/libraries/sys-vm")
 endif()
-add_sys_vm_submodule("${VM_SOURCE}" "${CMAKE_CURRENT_BINARY_DIR}/vm")
+add_sys_vm_submodule("${VM_SOURCE}" "${CMAKE_CURRENT_BINARY_DIR}/vm" "${VM_INSTALL_COMPONENT}")
 foreach(option ENABLE_TESTS ENABLE_SPEC_TESTS ENABLE_FUZZ_TESTS ENABLE_TOOLS ENABLE_CCACHE
                ENABLE_PROFILE ENABLE_GPERFTOOLS ENABLE_ADDRESS_SANITIZER ENABLE_UNDEFINED_BEHAVIOR_SANITIZER
                ENABLE_MEMORY_OPS_ALIGNMENT)
@@ -142,6 +144,16 @@ file(WRITE "${WORK_DIR}/stale-headers.log" "${output}${error}")
 string(REGEX REPLACE "[ \t\r\n]+" " " diagnostic "${output}${error}")
 if(result EQUAL 0 OR NOT diagnostic MATCHES "Stale wire-sys-vm headers")
    message(FATAL_ERROR "A reused installation did not reject headers from the retired VM port")
+endif()
+
+# An empty explicit component must not silently install the VM into the Unspecified component.
+execute_process(COMMAND "${CMAKE_COMMAND}" -S "${WORK_DIR}/source" -B "${WORK_DIR}/empty-component-build"
+                ${configure_options} -DVM_INSTALL_COMPONENT=
+                RESULT_VARIABLE result OUTPUT_VARIABLE output ERROR_VARIABLE error)
+file(WRITE "${WORK_DIR}/empty-component.log" "${output}${error}")
+string(REGEX REPLACE "[ \t\r\n]+" " " diagnostic "${output}${error}")
+if(result EQUAL 0 OR NOT diagnostic MATCHES "requires a non-empty install component")
+   message(FATAL_ERROR "An empty VM install component did not produce the expected error")
 endif()
 
 # A checkout without the submodule must fail early with an actionable initialization command.

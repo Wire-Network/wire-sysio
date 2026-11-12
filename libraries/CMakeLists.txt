@@ -1,8 +1,7 @@
 set(APPBASE_INSTALL_COMPONENT "dev")
-set(SYSVM_INSTALL_COMPONENT "dev")
 
 include(add-sys-vm)
-add_sys_vm_submodule("${CMAKE_CURRENT_SOURCE_DIR}/sys-vm" "${CMAKE_CURRENT_BINARY_DIR}/sys-vm")
+add_sys_vm_submodule("${CMAKE_CURRENT_SOURCE_DIR}/sys-vm" "${CMAKE_CURRENT_BINARY_DIR}/sys-vm" "dev")
 
 add_subdirectory(libfc-lite)
 add_subdirectory(libfc)
