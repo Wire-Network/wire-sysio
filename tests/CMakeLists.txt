@@ -139,6 +139,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeownreg_test.py ${CMAKE_CURRENT_BI
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clio_set_syscode_test.py ${CMAKE_CURRENT_BINARY_DIR}/clio_set_syscode_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/interrupt_trx_test.py ${CMAKE_CURRENT_BINARY_DIR}/interrupt_trx_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/trace_plugin_test.py ${CMAKE_CURRENT_BINARY_DIR}/trace_plugin_test.py COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/account_watch_plugin_test.py ${CMAKE_CURRENT_BINARY_DIR}/account_watch_plugin_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nested_container_multi_index_test.py ${CMAKE_CURRENT_BINARY_DIR}/nested_container_multi_index_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/auto_bp_peering_test.py ${CMAKE_CURRENT_BINARY_DIR}/auto_bp_peering_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/auto_bp_peering_test_shape.json ${CMAKE_CURRENT_BINARY_DIR}/auto_bp_peering_test_shape.json COPYONLY)
@@ -334,6 +335,7 @@ add_np_test(NAME plugin_http_category_api_test COMMAND tests/plugin_http_api_tes
             PLUGIN_HTTP_TEST_CATEGORY=ON)
 
 add_np_test(NAME trace_plugin_test COMMAND tests/trace_plugin_test.py -v TIMEOUT 400)
+add_np_test(NAME account_watch_plugin_test COMMAND tests/account_watch_plugin_test.py -v TIMEOUT 300)
 
 add_lr_test(NAME resource_monitor_plugin_test COMMAND tests/resource_monitor_plugin_test.py -v)
 

@@ -23,6 +23,7 @@ macro(chain_target TARGET)
             resource_monitor_plugin
             state_history_plugin
             alert_monitor_plugin
+            account_watch_plugin
             query_engine_plugin
             signature_provider_manager_plugin
             outpost_client_plugin
