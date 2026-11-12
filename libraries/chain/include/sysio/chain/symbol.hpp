@@ -63,6 +63,9 @@ namespace sysio::chain {
          uint64_t value;
 
          operator uint64_t()const { return value; }
+
+         /// The symbol's uppercase name, independent of precision.
+         string name() const;
       };
 
       class symbol : fc::reflect_init {
@@ -141,6 +144,8 @@ namespace sysio::chain {
             friend struct fc::reflector<symbol>;
       }; // class symbol
 
+      inline string symbol_code::name() const { return symbol(value << 8).name(); }
+
       struct extended_symbol {
          symbol       sym;
          account_name contract;
@@ -193,7 +198,7 @@ namespace fc {
 
 namespace fc {
    inline void to_variant(const sysio::chain::symbol_code& var, fc::variant& vo) {
-      vo = sysio::chain::symbol(var.value << 8).name();
+      vo = var.name();
    }
    inline void from_variant(const fc::variant& var, sysio::chain::symbol_code& vo) {
       vo = sysio::chain::symbol(0, var.get_string()).to_symbol_code();

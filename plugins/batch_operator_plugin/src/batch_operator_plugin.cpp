@@ -308,8 +308,8 @@ struct batch_operator_plugin::impl {
    /// Derived from `underwriter_auth` at plugin_initialize: the underwriter runs iff an account was configured,
    /// with or without the relay.
    bool                    underwriter_enabled = false;
-   /// `batch-underwriter-max-exposure`, by shadow symbol code: the most the underwriter may have bonded at once.
-   std::map<chain::symbol_code, chain::asset> underwriter_caps;
+   /// Explicit exposure policies by shadow symbol code; default-created entries disable underwriting.
+   std::map<chain::symbol_code, batch_operator_detail::exposure_policy> underwriter_exposure_policies;
 
    /// The relay's and the underwriter's signers, resolved by `resolve_signers` once the node is synced.
    std::optional<signer> relay_signer;
@@ -1684,7 +1684,7 @@ struct batch_operator_plugin::impl {
          read_own_bonds(underwriter_scan_from, in.requests);
       if (!bonds) return std::nullopt;
       in.bonds = std::move(*bonds);
-      in.caps  = caps_by_token(tokens);
+      in.exposure_policies = exposure_policies_by_token(tokens);
       std::optional<std::map<fc::slug_name, chain::asset>> balances = read_own_balances(tokens);
       if (!balances) return std::nullopt;
       in.balances                     = std::move(*balances);
@@ -1795,28 +1795,23 @@ struct batch_operator_plugin::impl {
       return out;
    }
 
-   /// The configured exposure caps keyed by registry token code. A cap whose precision differs from its shadow's is
-   /// not applied, so that token's requests wait with no cap until the configuration is fixed; a cap that names no
-   /// shadow is reported.
-   std::map<fc::slug_name, chain::asset> caps_by_token(const std::map<fc::slug_name, liq_token>& tokens) {
-      std::map<fc::slug_name, chain::asset> out;
-      std::set<chain::symbol_code>          named;   // the caps that name a shadow
+   /// Exposure policies keyed by registry token code, preserving explicit unlimited entries. A finite cap whose
+   /// precision differs from its shadow's is not applied; a policy that names no shadow is reported.
+   std::map<fc::slug_name, batch_operator_detail::exposure_policy>
+   exposure_policies_by_token(const std::map<fc::slug_name, liq_token>& tokens) {
+      std::map<fc::slug_name, chain::symbol> shadows;
       for (const auto& [token_code, token] : tokens) {
-         const auto cap = underwriter_caps.find(token.symbol.to_symbol_code());
-         if (cap == underwriter_caps.end()) continue;
-         named.insert(cap->first);
-         if (cap->second.get_symbol() != token.symbol) {
+         shadows.emplace(token_code, token.symbol);
+      }
+      return batch_operator_detail::resolve_exposure_policies(
+         underwriter_exposure_policies, shadows,
+         [](const chain::asset& cap, const chain::symbol& shadow) {
             elog("batch_operator: batch-underwriter-max-exposure {} does not match the shadow's symbol {}; not "
-                 "underwriting it", cap->second.to_string(), token.symbol.to_string());
-            continue;
-         }
-         out.emplace(token_code, cap->second);
-      }
-      for (const auto& [code, cap] : underwriter_caps) {
-         if (named.contains(code)) continue;
-         wlog("batch_operator: batch-underwriter-max-exposure {} names no sysio.liq shadow", cap.to_string());
-      }
-      return out;
+                 "underwriting it", cap.to_string(), shadow.to_string());
+         },
+         [](const char* option, const std::string& value) {
+            wlog("batch_operator: {} {} names no sysio.liq shadow", option, value);
+         });
    }
 
    /// The underwriter's `sysio.liq` balances by registry token code, or nullopt when the read failed.
@@ -2179,7 +2174,11 @@ void batch_operator_plugin::set_program_options(options_description& cli,
         "It signs with the one configured WIRE signature provider whose key alone satisfies that permission.");
    opts("batch-underwriter-max-exposure", bpo::value<std::vector<std::string>>()->composing(),
         "Most the underwriter may have bonded at once in one shadow token, as an asset such as "
-        "100.000000000 LIQETH. Repeat for each token; requests in a token without one are not bonded.");
+        "100.000000000 LIQETH. Repeat for each token; cannot name the same token as unlimited exposure.");
+   opts("batch-underwriter-unlimited-exposure", bpo::value<std::vector<std::string>>()->composing(),
+        "Allow unlimited exposure in one shadow token, as a symbol code such as LIQETH. Repeat for each token; "
+        "balance and verification checks still apply. Cannot name the same token as max exposure. "
+        "Tokens without either exposure option are not bonded.");
    opts("batch-kick-crank", bpo::value<bool>()->default_value(KICK_CRANK_ENABLED),
         "Push sysio.kicker::kick for every kicker pool that could pay");
    opts("batch-kick-interval-ms", bpo::value<uint32_t>()->default_value(whole_milliseconds(KICK_INTERVAL)),
@@ -2201,17 +2200,23 @@ void batch_operator_plugin::plugin_initialize(const variables_map& options) {
       } FC_RETHROW_EXCEPTIONS(error, "invalid batch-underwriter-account '{}'", spec)
    }
    _impl->underwriter_enabled = _impl->underwriter_auth.actor.good();
-   if (options.count("batch-underwriter-max-exposure")) {
+   if (options.count("batch-underwriter-max-exposure") || options.count("batch-underwriter-unlimited-exposure")) {
       try {
-         _impl->underwriter_caps = batch_operator_detail::parse_exposure_caps(
-            options["batch-underwriter-max-exposure"].as<std::vector<std::string>>());
-      } FC_RETHROW_EXCEPTIONS(error, "invalid batch-underwriter-max-exposure")
+         _impl->underwriter_exposure_policies = batch_operator_detail::parse_exposure_policies(
+            options.count("batch-underwriter-max-exposure")
+               ? options["batch-underwriter-max-exposure"].as<std::vector<std::string>>()
+               : std::vector<std::string>{},
+            options.count("batch-underwriter-unlimited-exposure")
+               ? options["batch-underwriter-unlimited-exposure"].as<std::vector<std::string>>()
+               : std::vector<std::string>{});
+      } FC_RETHROW_EXCEPTIONS(error, "invalid batch-underwriter exposure options")
    }
-   if (_impl->underwriter_enabled && _impl->underwriter_caps.empty()) {
-      wlog("batch_operator_plugin: batch-underwriter-account without batch-underwriter-max-exposure bonds nothing");
+   if (_impl->underwriter_enabled && _impl->underwriter_exposure_policies.empty()) {
+      wlog("batch_operator_plugin: batch-underwriter-account without batch-underwriter-max-exposure or "
+           "batch-underwriter-unlimited-exposure bonds nothing");
    }
-   if (!_impl->underwriter_enabled && !_impl->underwriter_caps.empty()) {
-      wlog("batch_operator_plugin: batch-underwriter-max-exposure has no effect without batch-underwriter-account");
+   if (!_impl->underwriter_enabled && !_impl->underwriter_exposure_policies.empty()) {
+      wlog("batch_operator_plugin: exposure options have no effect without batch-underwriter-account");
    }
    _impl->kick_crank_enabled = options["batch-kick-crank"].as<bool>();
    const uint32_t kick_interval_ms = options["batch-kick-interval-ms"].as<uint32_t>();
