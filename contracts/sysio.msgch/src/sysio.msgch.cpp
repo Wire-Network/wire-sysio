@@ -585,16 +585,13 @@ std::optional<em_identity> em_identity_from_uncompressed_key(const std::vector<c
    };
 }
 
-/// Decode an inbound NodeOwnerRegistration attestation and drive the NFT node-owner claim: create
-/// the vanity-named Wire account from the claim's wire_pub_key, then register the owner and record
-/// the depositor's ETH link. Both steps are inline-sent to sysio.roa declaring {sysio.roa, active}
-/// (permitted because sysio.msgch is privileged; no cross-contract active grant is required),
-/// newnameduser first so any newaccount runs depth-first before nodeownreg. Invalid names and full
-/// tiers skip creation; nodeownreg records the rejection without allocating an account.
+/// Decode an inbound NodeOwnerRegistration and send one claim to sysio.roa::nodeownreg.
+/// ROA rejects existing accounts before creating the chosen name, allocating the tier and
+/// recording the depositor's ETH link atomically. Privileged msgch declares {sysio.roa, active}.
 ///
 /// Trust-OPP: a malformed envelope (undecodable proto, unparseable name, unusable key bytes,
 /// out-of-range tier) is silently dropped here -- nothing is sent. A well-formed envelope whose
-/// *claim* is rejected (name wrong length for tier, account held by a different key, already registered,
+/// *claim* is rejected (name wrong length for tier, account already exists, already registered,
 /// tier at capacity)
 /// is soft-failed inside nodeownreg, which records a REJECTED audit row. Neither path aborts the
 /// dispatching transaction.
@@ -635,11 +632,7 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
    auto eth_identity = em_identity_from_uncompressed_key(reg.actor_pub_key);
    if (!eth_identity) return;                     // unusable depositor ETH key; drop
 
-   // 1) Create the account (idempotent; soft-skips a name that breaks the tier rule).
-   action(permission_level{ROA_ACCOUNT, "active"_n}, ROA_ACCOUNT, "newnameduser"_n,
-          std::make_tuple(*owner, *wire_pk, tier)).send();
-
-   // 2) Register the owner + record the ETH link, with claim-payload soft-fail + audit recording.
+   // ROA owns the nonexistence check and account creation within the same claim.
    action(permission_level{ROA_ACCOUNT, "active"_n}, ROA_ACCOUNT, "nodeownreg"_n,
           std::make_tuple(*owner, tier, eth_identity->key, *wire_pk, eth_identity->address)).send();
 }
