@@ -28,6 +28,7 @@ playbook; they do not change between incidents unless an account is replaced.
 |---|---|
 | `DEPOT_URL` | HTTP endpoint of a depot producer node (`clio -u`) |
 | `PANIC` | the depot panic account, delegated by native `updateauth` |
+| `JUDGE` | the depot judge account, which `sysio.bond@rslvvalid` and `@rslvinvalid` delegate to |
 | `SOL_RPC` | Solana RPC URL of the outpost's cluster |
 | `SOL_PANIC_KEYPAIR` | keypair file of the Solana panic account (`GlobalConfig.panic`) |
 | `SOL_ADMIN_KEYPAIR` | keypair file of the Solana admin (`GlobalConfig.admin`) |
@@ -235,8 +236,8 @@ Pausing a paused contract reverts (`EnforcedPause`), which is harmless: it was a
 | 2 | Replace the panic account in case its key is the fault ([Replacing the panic account](#replacing-the-panic-account)). | Skip. |
 | 3 | Record the block, the epoch and the last accepted envelope digest on each chain ([Recording](#recording-the-state-of-each-chain)). | Same. |
 | 4 | Read the depot's `mismatch` table and each outpost's shortfall records, and compare each outpost's custody with the depot's outstanding shadow ([Comparing totals](#comparing-totals), [A shortfall-triggered pull](#a-shortfall-triggered-pull)). | Same. No new `mismatch` row; readings pass the applicable configured tolerance. |
-| 5 | Before each request's challenge window ends, hold every doubtful BONDED request (`sysio.synd::challenge`) or obtain a governance invalid ruling (`sysio.bond::rslvinvalid`); a doubtful OPEN request can only be ruled. | None. |
-| 6 | `sysio` rules each held request (`rslvvalid` / `rslvinvalid`). Invalid envelopes burn as in §4.7 once the cord clears. | None. |
+| 5 | Before each request's challenge window ends, hold every doubtful BONDED request (`sysio.synd::challenge`) or obtain an invalid ruling (`sysio.bond::rslvinvalid`); a doubtful OPEN request can only be ruled. | None. |
+| 6 | The judge, or `sysio`, rules each held request (`rslvvalid` / `rslvinvalid`). Invalid envelopes burn as in §4.7 once the cord clears. | None. |
 | 7 | Fix and redeploy the faulty contract while still frozen, in the order of [`contract-upgrade-order.md`](contract-upgrade-order.md). | None. |
 | 8 | Repair custody and clear the outposts first. Have each repaired outpost emit a post-repair message (or wait for its next one); wait for depot admission, verify its admission and healthy custody report, run governance `reconcile` for every affected pair, verify its incident is erased, then clear the depot cord and do the work that waited ([Clearing](#clearing-outposts-first-then-the-depot)). | Same admission check before clearing the depot. |
 | 9 | Continue monitoring admitted messages from each outpost for `mismatch` rows and `SHORTFALL` ([Comparing totals](#comparing-totals)). Record earlier pre-repair sequences reporting the known shortfall as part of this incident. | Same. |
@@ -259,9 +260,13 @@ clio -u "$DEPOT_URL" get table sysio.bond requests -S sysio.bond -l 100   # matc
 clio -u "$DEPOT_URL" push action sysio.synd challenge \
   "{\"challenger\": \"$CHALLENGER\", \"chain_code\": $CHAIN_CODE, \"token_code\": $TOKEN_CODE, \"epoch_index\": $EPOCH_INDEX}" \
   -p "$CHALLENGER@active"
-clio -u "$DEPOT_URL" push action sysio.bond rslvinvalid "[$BOND_REQUEST_ID]" -p sysio@active
-clio -u "$DEPOT_URL" push action sysio.bond rslvvalid   "[$BOND_REQUEST_ID]" -p sysio@active
+clio -u "$DEPOT_URL" push action sysio.bond rslvinvalid "[$BOND_REQUEST_ID]" -p sysio.bond@rslvinvalid
+clio -u "$DEPOT_URL" push action sysio.bond rslvvalid   "[$BOND_REQUEST_ID]" -p sysio.bond@rslvvalid
 ```
+
+A ruling declares `sysio.bond`'s permission of the same name, never the signer's own account. The
+wallet must hold a key that satisfies it: `$JUDGE`'s, or `sysio`'s. Read both authorities and their
+action links with `clio get account sysio.bond`.
 
 `CHAIN_CODE` and `TOKEN_CODE` are the `chain_code` and `token_code` objects exactly as the `envelopes`
 row prints them, `EPOCH_INDEX` its `epoch_index`, and `BOND_REQUEST_ID` its `request_id`. `challenge`
@@ -299,6 +304,14 @@ step; while the cord is pulled the burn of an INVALID envelope waits for the cle
   ```
   Then put the new address in `panicAccount` in the deploy config, so the next permissions apply
   grants it rather than the old one.
+
+### Replacing the judge account
+
+Rerun both `set account permission` commands of
+[`sysio-bond-integration.md`](sysio-bond-integration.md) with `JUDGE="$NEW_JUDGE"`, signed for
+`sysio.bond@active`. Replacing the authorities revokes the previous judge. Keep the governance
+delegate, and read `clio get account sysio.bond` afterwards: a judge can rewrite the permission it
+satisfies, so confirm both authorities and both action links are the intended ones.
 
 ### Recording the state of each chain
 

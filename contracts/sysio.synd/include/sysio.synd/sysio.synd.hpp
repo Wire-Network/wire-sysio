@@ -38,9 +38,9 @@
  * envelope's token (a charge of zero is refused), the extra stays in `feepot`, and this contract, the
  * issuer, holds the request through `sysio.bond::hold` naming the challenger as the beneficiary, with
  * the challenger's authority, so the hold-bond escrow bills the challenger's RAM. The envelope is HELD
- * and releases nothing more until `sysio` rules, and the pair's queue is rewound to it. One challenge
+ * and releases nothing more until a judge rules, and the pair's queue is rewound to it. One challenge
  * per request. An OPEN request cannot be challenged: nothing has released, and a held
- * request takes no more bonds, so it would stop the pair until `sysio` rules. A VALID ruling pays the
+ * request takes no more bonds, so it would stop the pair until a judge rules. A VALID ruling pays the
  * hold bond to the request's bonds; an INVALID one pays it and the bounty to the challenger.
  *
  * An envelope ruled INVALID. The step that first sees the ruling snapshots the forfeit (the bonded
@@ -176,7 +176,7 @@ namespace sysio {
          WAITING,      ///< closed by `closeenv`; waiting for its underwriting request
          REQUESTED,    ///< its `sysio.bond` request is issued and not yet bonded or ruled
          RELEASABLE,   ///< the request is BONDED, APPROVED or VALID: items may be released
-         HELD,         ///< the request is held; nothing releases until `sysio` rules
+         HELD,         ///< the request is held; nothing releases until a judge rules
          INVALID,      ///< the request was ruled INVALID: the envelope is burned and its forfeit pulled
          DONE          ///< every item is released
       };
@@ -260,8 +260,8 @@ namespace sysio {
       enum class request_outcome : uint8_t {
          PENDING,    ///< not seen terminal yet: the request row is read on every step
          APPROVED,   ///< the challenge window passed with no hold
-         VALID,      ///< `sysio` ruled the statement true
-         INVALID     ///< `sysio` ruled the statement false
+         VALID,      ///< a judge ruled the statement true
+         INVALID     ///< a judge ruled the statement false
       };
 
       /// Which flow a leaky bucket limits.

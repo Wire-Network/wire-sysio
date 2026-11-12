@@ -190,7 +190,7 @@ those lines is left to log tooling:
 | An accept is submitted but not yet accounted for by the irreversible view | Its funds stay reserved and that request waits |
 | Startup finality wait | New accepts wait; approvals and claims continue |
 | The `sysio.andon` cord is pulled | Nothing is bonded, approved or claimed until it clears |
-| A request is challenged (HELD) | Reported, whether or not we bonded it: `sysio` rules it |
+| A request is challenged (HELD) | Reported, whether or not we bonded it: a judge rules it |
 | A bond of ours is ruled INVALID while the node runs, even one since claimed or pruned | Bonding stops until a restart; approvals and claims go on. A forfeited bond's principal is not returned |
 | A table read fails, or a row behind one of our bonds does not decode | The pass does nothing |
 
@@ -215,7 +215,7 @@ a signing key, though the underwriter only reads), the Ethereum OPP ABI files (w
 must declare `outboundEnvelopes`) and the Solana IDL (which must declare
 `EnvelopeLog`). Use RPC endpoints independent of the batch operators': the
 verification is only as good as the outpost reads. A request whose record has left
-the outpost can no longer be verified and waits until `sysio` rules it. Ethereum keeps
+the outpost can no longer be verified and waits until a judge rules it. Ethereum keeps
 200 epochs by default, but Solana keeps only its last 10 records, so a Solana request
 must be verified within about 10 epochs. Before `sysio.chains::setoutpost` replaces an
 active outpost's deployment, let that chain's `sysio.synd` envelopes drain, those

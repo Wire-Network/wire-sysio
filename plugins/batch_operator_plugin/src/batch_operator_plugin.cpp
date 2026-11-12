@@ -1589,7 +1589,7 @@ struct batch_operator_plugin::impl {
       }
       for (const uw::request_id_t id : plan.blocked) {
          elog("batch_operator: underwriter {} was challenged (HELD) before it was bonded: its pair releases nothing "
-              "until sysio rules it", name_of(id));
+              "until a judge rules it", name_of(id));
       }
       for (const uw::request_id_t id : plan.forfeited) {
          elog("batch_operator: underwriter {} was ruled INVALID: our bond on it is forfeited", name_of(id));

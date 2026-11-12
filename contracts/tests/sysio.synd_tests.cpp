@@ -655,9 +655,9 @@ public:
       return push(BOND_ACCOUNT, bond_abi_ser, underwriter, "accept"_n, mvo()
          ("underwriter", underwriter)("request_id", request_id)("amount", amount));
    }
-   /// Rule request `id` as sysio: VALID when `valid`, INVALID otherwise.
+   /// Rule request `id` under sysio.bond's own authority: VALID when `valid`, INVALID otherwise.
    action_result rule(uint64_t id, bool valid) {
-      return push(BOND_ACCOUNT, bond_abi_ser, SYSIO_ACCOUNT, valid ? "rslvvalid"_n : "rslvinvalid"_n,
+      return push(BOND_ACCOUNT, bond_abi_ser, BOND_ACCOUNT, valid ? "rslvvalid"_n : "rslvinvalid"_n,
                   mvo()("request_id", id));
    }
    /// sysio.bond's permissionless `prune`, signed by carol.
@@ -2662,7 +2662,7 @@ BOOST_FIXTURE_TEST_CASE(second_envelope_waits_until_the_first_is_bonded, sysio_s
    BOOST_REQUIRE_EQUAL(2u, next_bond_request_id());
 
    // Ruled VALID: the first becomes RELEASABLE and the second is requested.
-   BOOST_REQUIRE_EQUAL(success(), push(BOND_ACCOUNT, bond_abi_ser, SYSIO_ACCOUNT, "rslvvalid"_n, mvo()
+   BOOST_REQUIRE_EQUAL(success(), push(BOND_ACCOUNT, bond_abi_ser, BOND_ACCOUNT, "rslvvalid"_n, mvo()
       ("request_id", 1)));
    BOOST_REQUIRE_EQUAL(success(), crank());
    BOOST_REQUIRE_EQUAL(STATE_RELEASABLE, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
@@ -2699,7 +2699,7 @@ BOOST_FIXTURE_TEST_CASE(bonded_request_makes_the_envelope_releasable, sysio_synd
    BOOST_REQUIRE_EQUAL(success(), crank());
    BOOST_REQUIRE_EQUAL(STATE_RELEASABLE, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
 
-   BOOST_REQUIRE_EQUAL(success(), push(BOND_ACCOUNT, bond_abi_ser, SYSIO_ACCOUNT, "rslvvalid"_n, mvo()
+   BOOST_REQUIRE_EQUAL(success(), push(BOND_ACCOUNT, bond_abi_ser, BOND_ACCOUNT, "rslvvalid"_n, mvo()
       ("request_id", id)));
    BOOST_REQUIRE_EQUAL(success(), crank());
    BOOST_REQUIRE_EQUAL(STATE_RELEASABLE, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
@@ -3791,7 +3791,7 @@ BOOST_FIXTURE_TEST_CASE(a_frozen_request_can_be_held_or_ruled_invalid_after_its_
    produce_block(fc::seconds(window + 1));
    BOOST_REQUIRE_EQUAL(success(), challenge("carol"_n, SOLANA, LIQSOL, 1));
    BOOST_REQUIRE_EQUAL(REQUEST_HELD, bond_request(1)["state"].as_string());
-   BOOST_REQUIRE_EQUAL(success(), push(BOND_ACCOUNT, bond_abi_ser, SYSIO_ACCOUNT, "rslvinvalid"_n,
+   BOOST_REQUIRE_EQUAL(success(), push(BOND_ACCOUNT, bond_abi_ser, BOND_ACCOUNT, "rslvinvalid"_n,
                                       mvo()("request_id", 1)));
    BOOST_REQUIRE_EQUAL(REQUEST_INVALID, bond_request(1)["state"].as_string());
 } FC_LOG_AND_RETHROW()
@@ -3844,7 +3844,7 @@ BOOST_FIXTURE_TEST_CASE(challenge_refused_on_an_unrequested_envelope, sysio_synd
 
 // A request that is not fully bonded cannot be challenged, with nothing bonded or with part of it, and
 // nothing is charged: nothing has been released, and a held request takes no more bonds, so the hold
-// would stop the pair until sysio rules. Once fully bonded, a challenge holds only its own envelope: the
+// would stop the pair until a judge rules. Once fully bonded, a challenge holds only its own envelope: the
 // pair's next envelope is requested, and released once bonded.
 BOOST_FIXTURE_TEST_CASE(challenge_refused_until_the_request_is_fully_bonded, sysio_synd_tester) try {
    const auto signer = ed_signer();

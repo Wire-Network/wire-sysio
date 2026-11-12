@@ -12,6 +12,7 @@
 #include "contracts.hpp"
 #include "contract_test_support.hpp"
 
+#include <algorithm>
 #include <functional>
 #include <limits>
 #include <map>
@@ -55,6 +56,11 @@ constexpr std::string_view beneficiary_self_msg  = "hold beneficiary cannot be t
 constexpr std::string_view nothing_msg           = "nothing to claim";
 constexpr std::string_view wire_no_yield_msg     = "WIRE collateral earns no shadow yield";
 constexpr std::string_view prune_limit_msg       = "limit exceeds the most requests one prune examines";
+
+// The chain's own refusals of a declared authority, as the authorization manager words them.
+constexpr std::string_view unsatisfied_authority_msg = "but does not have signatures for it";
+constexpr std::string_view irrelevant_authority_msg  = "declares irrelevant authority";
+constexpr std::string_view missing_permission_msg    = "authorizations include a non-existent permission";
 
 
 /// `request_state` names as the ABI renders them.
@@ -145,6 +151,11 @@ public:
    static constexpr auto TOKENS_ACCOUNT = "sysio.tokens"_n;
    static constexpr auto CHAINS_ACCOUNT = "sysio.chains"_n;
    static constexpr auto SYSIO_ACCOUNT  = "sysio"_n;
+   /// The account the rulings' native permissions delegate to beside `sysio`.
+   static constexpr auto JUDGE_ACCOUNT  = "bond.judge"_n;
+   /// The rulings; each is linked to the `sysio.bond` permission of the same name.
+   static constexpr auto RSLVVALID      = "rslvvalid"_n;
+   static constexpr auto RSLVINVALID    = "rslvinvalid"_n;
 
    static inline const symbol WIRE_SYM   = symbol::from_string("9,WIRE");
    static inline const symbol LIQSOL_SYM = symbol::from_string("9,LIQSOL");
@@ -160,7 +171,7 @@ public:
    sysio_bond_tester() {
       produce_blocks(2);
       create_accounts({ BOND_ACCOUNT, LIQ_ACCOUNT, SYND_ACCOUNT, TOKEN_ACCOUNT, TOKENS_ACCOUNT, CHAINS_ACCOUNT,
-                        "issuer"_n, "alice"_n, "bob"_n, "carol"_n });
+                        JUDGE_ACCOUNT, "issuer"_n, "alice"_n, "bob"_n, "carol"_n });
       produce_blocks(2);
 
       deploy(CHAINS_ACCOUNT, contracts::chains_wasm(), contracts::chains_abi(), chains_abi_ser, true);
@@ -317,6 +328,70 @@ public:
    }
    action_result rslvinvalid(name signer, uint64_t request_id) {
       return push_bond(signer, "rslvinvalid"_n, mvo()("request_id", request_id));
+   }
+   /// Push ruling `action_name` declaring `sysio.bond@permission`, signed with `signer`'s key: how a
+   /// delegate rules through a linked native permission.
+   action_result rule_through(name action_name, name signer, name permission, uint64_t request_id) {
+      return sysio_system::test_support::push_contract_action_and_produce_block(
+         *this, BOND_ACCOUNT, bond_abi_ser, signer, action_name, mvo()("request_id", request_id), last_trace,
+         {{BOND_ACCOUNT, permission}});
+   }
+   /// The authority any one of `delegates` satisfies alone through its `active`, in chain name order.
+   static authority delegated_authority(std::vector<name> delegates) {
+      std::sort(delegates.begin(), delegates.end());
+      authority auth{1, {}, {}};
+      for (auto delegate : delegates) auth.accounts.push_back({{delegate, config::active_name}, 1});
+      return auth;
+   }
+   /// Replace the delegates of `sysio.bond@permission`, a child of `active`; the account's `active`
+   /// signs the updateauth.
+   void delegate_ruling(name permission, std::vector<name> delegates) {
+      set_authority(BOND_ACCOUNT, permission, delegated_authority(std::move(delegates)), config::active_name);
+      produce_block();
+   }
+   /// Link each ruling to the `sysio.bond` permission of the same name; the account's `owner` signs.
+   void link_rulings() {
+      signed_transaction trx;
+      for (auto ruling : {RSLVVALID, RSLVINVALID})
+         trx.actions.emplace_back(std::vector<permission_level>{{BOND_ACCOUNT, config::owner_name}},
+                                  linkauth{BOND_ACCOUNT, BOND_ACCOUNT, ruling, ruling});
+      set_transaction_headers(trx);
+      trx.sign(get_private_key(BOND_ACCOUNT, "owner"), control->get_chain_id());
+      push_transaction(trx);
+      produce_block();
+   }
+   /// Give each ruling its native permission, delegated to `JUDGE_ACCOUNT` and `sysio`, and link the
+   /// ruling to it, as the bootstrap does.
+   void delegate_rulings() {
+      for (auto ruling : {RSLVVALID, RSLVINVALID}) delegate_ruling(ruling, {JUDGE_ACCOUNT, SYSIO_ACCOUNT});
+      link_rulings();
+   }
+   /// Rewrite `sysio.bond@permission` to `delegates`, declared by that same permission and signed with
+   /// `signer`'s key: the native rule that a permission may rewrite itself.
+   action_result rewrite_ruling_permission(name signer, name permission, std::vector<name> delegates) {
+      try {
+         signed_transaction trx;
+         trx.actions.emplace_back(std::vector<permission_level>{{BOND_ACCOUNT, permission}},
+                                  updateauth{BOND_ACCOUNT, permission, config::active_name,
+                                             delegated_authority(std::move(delegates))});
+         set_transaction_headers(trx);
+         trx.sign(get_private_key(signer, "active"), control->get_chain_id());
+         push_transaction(trx);
+         produce_block();
+         return success();
+      } catch (const fc::exception& ex) {
+         return error(ex.top_message());
+      }
+   }
+   /// Require `result` to be a refusal whose message contains `fragment`.
+   static void require_refusal(const action_result& result, std::string_view fragment) {
+      BOOST_REQUIRE_MESSAGE(result != success() && result.find(fragment) != std::string::npos,
+                            "expected a refusal containing '" << fragment << "', got: " << result);
+   }
+   /// An unbonded OPEN request for `statement_fill`'s statement: the next request id.
+   void open_request(char statement_fill) {
+      BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, statement_fill), LIQSOL,
+                                             10 * UNIT, 0));
    }
    /// `claim` is permissionless; `signer` defaults to the account paid.
    action_result claim(uint64_t request_id, name account, std::optional<name> signer = std::nullopt) {
@@ -1403,7 +1478,7 @@ BOOST_FIXTURE_TEST_CASE(an_ordinary_challenger_pays_for_its_hold_on_a_privileged
    BOOST_REQUIRE_EQUAL(SYSIO_ACCOUNT, payer_of("bonds"_n, bond_key_of(1, "alice"_n)));
 
    // INVALID: the challenger claims the hold bond, the issuer its forfeit; nothing is billed.
-   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(SYSIO_ACCOUNT, 1));
+   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(BOND_ACCOUNT, 1));
    const auto carol_liq = liq_balance("carol"_n);
    require_billed(billed_by([&] { BOOST_REQUIRE_EQUAL(success(), claim(1, "carol"_n)); }), {});
    BOOST_REQUIRE_EQUAL(carol_liq + 1 * UNIT, liq_balance("carol"_n));
@@ -1472,7 +1547,7 @@ BOOST_FIXTURE_TEST_CASE(valid_after_a_hold_pays_the_hold_bond_to_the_underwriter
    BOOST_REQUIRE_EQUAL(success(), hold("issuer"_n, 1, "carol"_n));
    const auto issuer = liq_balance("issuer"_n);
 
-   BOOST_REQUIRE_EQUAL(success(), rslvvalid(SYSIO_ACCOUNT, 1));
+   BOOST_REQUIRE_EQUAL(success(), rslvvalid(BOND_ACCOUNT, 1));
    BOOST_REQUIRE(!notified("issuer"_n, "rslvvalid"_n));
    BOOST_REQUIRE_EQUAL(STATE_VALID, request_state_of(1));
    BOOST_REQUIRE(request_row_of(1)["resolved_at"].as<time_point>() != time_point{});
@@ -1506,7 +1581,7 @@ BOOST_FIXTURE_TEST_CASE(valid_while_partly_bonded_pays_the_unbonded_share_to_sys
 
    // The ruling sends nothing: it awards the unbonded 6/10 of each pot, the bounty's to sysio and the
    // hold bond's to the issuer.
-   BOOST_REQUIRE_EQUAL(success(), rslvvalid(SYSIO_ACCOUNT, 1));
+   BOOST_REQUIRE_EQUAL(success(), rslvvalid(BOND_ACCOUNT, 1));
    BOOST_REQUIRE(!notified("issuer"_n, "rslvvalid"_n));
    BOOST_REQUIRE(settlements().empty());
    BOOST_REQUIRE_EQUAL(sysio, liq_balance(SYSIO_ACCOUNT));
@@ -1545,7 +1620,7 @@ BOOST_FIXTURE_TEST_CASE(valid_with_nothing_bonded, sysio_bond_tester) try {
    BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'a'), LIQSOL, 10 * UNIT, 1 * UNIT));
    const auto issuer = liq_balance("issuer"_n);
    const auto sysio  = liq_balance(SYSIO_ACCOUNT);
-   BOOST_REQUIRE_EQUAL(success(), rslvvalid(SYSIO_ACCOUNT, 1));
+   BOOST_REQUIRE_EQUAL(success(), rslvvalid(BOND_ACCOUNT, 1));
    BOOST_REQUIRE_EQUAL(STATE_VALID, request_state_of(1));
    BOOST_REQUIRE(settlements().empty());
    BOOST_REQUIRE_EQUAL(success(), claim(1, SYSIO_ACCOUNT));
@@ -1559,7 +1634,7 @@ BOOST_FIXTURE_TEST_CASE(valid_with_nothing_bonded, sysio_bond_tester) try {
    BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'b'), LIQSOL, 10 * UNIT, 0));
    BOOST_REQUIRE_EQUAL(success(), hold("issuer"_n, 2, "carol"_n));
    const auto held = liq_balance("issuer"_n);
-   BOOST_REQUIRE_EQUAL(success(), rslvvalid(SYSIO_ACCOUNT, 2));
+   BOOST_REQUIRE_EQUAL(success(), rslvvalid(BOND_ACCOUNT, 2));
    BOOST_REQUIRE_EQUAL(held, liq_balance("issuer"_n));
    BOOST_REQUIRE_EQUAL(success(), claim(2, "issuer"_n));
    BOOST_REQUIRE_EQUAL(held + 1 * UNIT, liq_balance("issuer"_n));
@@ -1569,7 +1644,7 @@ BOOST_FIXTURE_TEST_CASE(valid_with_nothing_bonded, sysio_bond_tester) try {
    // In WIRE the bounty is claimed through sysio.token.
    BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'c'), WIRE, 10 * UNIT, 1 * UNIT));
    const auto sysio_wire = wire_balance(SYSIO_ACCOUNT);
-   BOOST_REQUIRE_EQUAL(success(), rslvvalid(SYSIO_ACCOUNT, 3));
+   BOOST_REQUIRE_EQUAL(success(), rslvvalid(BOND_ACCOUNT, 3));
    BOOST_REQUIRE_EQUAL(sysio_wire, wire_balance(SYSIO_ACCOUNT));
    BOOST_REQUIRE_EQUAL(success(), claim(3, SYSIO_ACCOUNT));
    BOOST_REQUIRE_EQUAL(sysio_wire + 1 * UNIT, wire_balance(SYSIO_ACCOUNT));
@@ -1586,7 +1661,7 @@ BOOST_FIXTURE_TEST_CASE(invalid_after_a_hold_forfeits_bonds_to_the_issuer_and_pa
    const auto carol  = liq_balance("carol"_n);
 
    // The ruling sends nothing: it records the forfeit and awards both escrows to the challenger.
-   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(SYSIO_ACCOUNT, 1));
+   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(BOND_ACCOUNT, 1));
    BOOST_REQUIRE(!notified("issuer"_n, "rslvinvalid"_n));
    BOOST_REQUIRE_EQUAL(STATE_INVALID, request_state_of(1));
    BOOST_REQUIRE(settlements().empty());
@@ -1627,7 +1702,7 @@ BOOST_FIXTURE_TEST_CASE(invalid_on_a_partly_bonded_request_forfeits_the_partial_
    BOOST_REQUIRE_EQUAL(success(), accept("alice"_n, 1, 4 * UNIT));
    const auto issuer = liq_balance("issuer"_n);
 
-   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(SYSIO_ACCOUNT, 1));
+   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(BOND_ACCOUNT, 1));
    BOOST_REQUIRE(!notified("issuer"_n, "rslvinvalid"_n));
    BOOST_REQUIRE_EQUAL(STATE_INVALID, request_state_of(1));
    BOOST_REQUIRE(settlements().empty());
@@ -1642,13 +1717,16 @@ BOOST_FIXTURE_TEST_CASE(invalid_on_a_partly_bonded_request_forfeits_the_partial_
    BOOST_REQUIRE_EQUAL(0u, liq_balance(BOND_ACCOUNT));
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE(rulings_require_sysio_and_refuse_terminal_requests, sysio_bond_tester) try {
+BOOST_FIXTURE_TEST_CASE(rulings_require_the_contract_account_and_refuse_terminal_requests, sysio_bond_tester) try {
    constexpr uint32_t window_sec = 3600;
    bonded_request(1, 'a', window_sec);
-   BOOST_REQUIRE_EQUAL(error("missing authority of sysio"), rslvvalid("alice"_n, 1));
-   BOOST_REQUIRE_EQUAL(error("missing authority of sysio"), rslvinvalid("alice"_n, 1));
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(request_missing_msg)), rslvvalid(SYSIO_ACCOUNT, 99));
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(request_missing_msg)), rslvinvalid(SYSIO_ACCOUNT, 99));
+   BOOST_REQUIRE_EQUAL(error("missing authority of sysio.bond"), rslvvalid("alice"_n, 1));
+   BOOST_REQUIRE_EQUAL(error("missing authority of sysio.bond"), rslvinvalid("alice"_n, 1));
+   // `sysio`'s own authority is not the contract's: governance rules through `sysio.bond`'s permissions.
+   BOOST_REQUIRE_EQUAL(error("missing authority of sysio.bond"), rslvvalid(SYSIO_ACCOUNT, 1));
+   BOOST_REQUIRE_EQUAL(error("missing authority of sysio.bond"), rslvinvalid(SYSIO_ACCOUNT, 1));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(request_missing_msg)), rslvvalid(BOND_ACCOUNT, 99));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(request_missing_msg)), rslvinvalid(BOND_ACCOUNT, 99));
    // Not terminal yet: nothing to claim.
    BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(nothing_msg)), claim(1, "alice"_n));
    BOOST_REQUIRE_EQUAL(STATE_BONDED, request_state_of(1));
@@ -1656,19 +1734,133 @@ BOOST_FIXTURE_TEST_CASE(rulings_require_sysio_and_refuse_terminal_requests, sysi
    // Approval is terminal: no ruling follows it.
    pass_window(window_sec);
    BOOST_REQUIRE_EQUAL(success(), approve(1));
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(terminal_msg)), rslvvalid(SYSIO_ACCOUNT, 1));
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(terminal_msg)), rslvinvalid(SYSIO_ACCOUNT, 1));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(terminal_msg)), rslvvalid(BOND_ACCOUNT, 1));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(terminal_msg)), rslvinvalid(BOND_ACCOUNT, 1));
    BOOST_REQUIRE_EQUAL(STATE_APPROVED, request_state_of(1));
 
    // Nor does a ruling follow a ruling.
    BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'b'), LIQSOL, 10 * UNIT, 0));
-   BOOST_REQUIRE_EQUAL(success(), rslvvalid(SYSIO_ACCOUNT, 2));
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(terminal_msg)), rslvinvalid(SYSIO_ACCOUNT, 2));
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(terminal_msg)), rslvvalid(SYSIO_ACCOUNT, 2));
+   BOOST_REQUIRE_EQUAL(success(), rslvvalid(BOND_ACCOUNT, 2));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(terminal_msg)), rslvinvalid(BOND_ACCOUNT, 2));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(terminal_msg)), rslvvalid(BOND_ACCOUNT, 2));
    BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'c'), LIQSOL, 10 * UNIT, 0));
-   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(SYSIO_ACCOUNT, 3));
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(terminal_msg)), rslvvalid(SYSIO_ACCOUNT, 3));
+   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(BOND_ACCOUNT, 3));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(terminal_msg)), rslvvalid(BOND_ACCOUNT, 3));
    BOOST_REQUIRE_EQUAL(STATE_INVALID, request_state_of(3));
+} FC_LOG_AND_RETHROW()
+
+/// Until a ruling is linked to its permission, only the contract account's own authority can rule:
+/// before the permission exists, and while it exists but the action still requires `active`.
+BOOST_FIXTURE_TEST_CASE(rulings_have_no_delegate_until_permissions_are_linked, sysio_bond_tester) try {
+   open_request('a');
+   require_refusal(rule_through(RSLVVALID, JUDGE_ACCOUNT, config::active_name, 1), unsatisfied_authority_msg);
+   require_refusal(rule_through(RSLVVALID, JUDGE_ACCOUNT, RSLVVALID, 1), missing_permission_msg);
+   require_refusal(rule_through(RSLVINVALID, SYSIO_ACCOUNT, RSLVINVALID, 1), missing_permission_msg);
+
+   // The permissions exist and name the judge, but nothing is linked: a ruling still requires `active`.
+   for (auto ruling : {RSLVVALID, RSLVINVALID}) delegate_ruling(ruling, {JUDGE_ACCOUNT, SYSIO_ACCOUNT});
+   require_refusal(rule_through(RSLVVALID, JUDGE_ACCOUNT, RSLVVALID, 1), irrelevant_authority_msg);
+   require_refusal(rule_through(RSLVINVALID, SYSIO_ACCOUNT, RSLVINVALID, 1), irrelevant_authority_msg);
+   BOOST_REQUIRE_EQUAL(STATE_OPEN, request_state_of(1));
+
+   BOOST_REQUIRE_EQUAL(success(), rule_through(RSLVVALID, BOND_ACCOUNT, config::active_name, 1));
+   BOOST_REQUIRE_EQUAL(STATE_VALID, request_state_of(1));
+} FC_LOG_AND_RETHROW()
+
+/// As deployed, `sysio.bond@active` delegates to `sysio@active`: governance rules through it with no
+/// ruling permission at all, declaring `sysio.bond@active` rather than its own account.
+BOOST_FIXTURE_TEST_CASE(governance_rules_through_the_contract_active_authority, sysio_bond_tester) try {
+   for (char fill : {'a', 'b'}) open_request(fill);
+   set_authority(BOND_ACCOUNT, config::active_name, delegated_authority({SYSIO_ACCOUNT}), config::owner_name);
+   produce_block();
+
+   require_refusal(rule_through(RSLVVALID, JUDGE_ACCOUNT, config::active_name, 1), unsatisfied_authority_msg);
+   BOOST_REQUIRE_EQUAL(error("missing authority of sysio.bond"), rslvvalid(SYSIO_ACCOUNT, 1));
+   BOOST_REQUIRE_EQUAL(success(), rule_through(RSLVVALID, SYSIO_ACCOUNT, config::active_name, 1));
+   BOOST_REQUIRE_EQUAL(STATE_VALID, request_state_of(1));
+   BOOST_REQUIRE_EQUAL(success(), rule_through(RSLVINVALID, SYSIO_ACCOUNT, config::active_name, 2));
+   BOOST_REQUIRE_EQUAL(STATE_INVALID, request_state_of(2));
+} FC_LOG_AND_RETHROW()
+
+/// The judge and governance each rule through the linked permission; nobody else does, and the
+/// permission of one ruling does not authorize the other.
+BOOST_FIXTURE_TEST_CASE(linked_permissions_delegate_each_ruling_to_the_judge_and_governance, sysio_bond_tester) try {
+   delegate_rulings();
+   for (char fill : {'a', 'b', 'c', 'd', 'e'}) open_request(fill);
+
+   // A stranger satisfies neither permission, and the judge's own account is not the contract's.
+   require_refusal(rule_through(RSLVVALID, "alice"_n, RSLVVALID, 1), unsatisfied_authority_msg);
+   BOOST_REQUIRE_EQUAL(error("missing authority of sysio.bond"), rslvvalid(JUDGE_ACCOUNT, 1));
+   // Each permission authorizes its own ruling only.
+   require_refusal(rule_through(RSLVINVALID, JUDGE_ACCOUNT, RSLVVALID, 1), irrelevant_authority_msg);
+   require_refusal(rule_through(RSLVVALID, JUDGE_ACCOUNT, RSLVINVALID, 1), irrelevant_authority_msg);
+   BOOST_REQUIRE_EQUAL(STATE_OPEN, request_state_of(1));
+
+   BOOST_REQUIRE_EQUAL(success(), rule_through(RSLVVALID, JUDGE_ACCOUNT, RSLVVALID, 1));
+   BOOST_REQUIRE_EQUAL(STATE_VALID, request_state_of(1));
+   BOOST_REQUIRE_EQUAL(success(), rule_through(RSLVINVALID, JUDGE_ACCOUNT, RSLVINVALID, 2));
+   BOOST_REQUIRE_EQUAL(STATE_INVALID, request_state_of(2));
+   BOOST_REQUIRE_EQUAL(success(), rule_through(RSLVVALID, SYSIO_ACCOUNT, RSLVVALID, 3));
+   BOOST_REQUIRE_EQUAL(STATE_VALID, request_state_of(3));
+   BOOST_REQUIRE_EQUAL(success(), rule_through(RSLVINVALID, SYSIO_ACCOUNT, RSLVINVALID, 4));
+   BOOST_REQUIRE_EQUAL(STATE_INVALID, request_state_of(4));
+   // The parent `active` still satisfies a linked child permission.
+   BOOST_REQUIRE_EQUAL(success(), rslvvalid(BOND_ACCOUNT, 5));
+   BOOST_REQUIRE_EQUAL(STATE_VALID, request_state_of(5));
+
+   // The delegation covers the rulings and nothing else: `setconfig` stays `sysio`'s.
+   require_refusal(sysio_system::test_support::push_contract_action_and_produce_block(
+                      *this, BOND_ACCOUNT, bond_abi_ser, JUDGE_ACCOUNT, "setconfig"_n, mvo()("hold_bps", 500),
+                      last_trace, {{BOND_ACCOUNT, RSLVVALID}}),
+                   irrelevant_authority_msg);
+   BOOST_REQUIRE_EQUAL(error("missing authority of sysio"), setconfig(JUDGE_ACCOUNT, 500));
+} FC_LOG_AND_RETHROW()
+
+/// Native updateauth replaces or removes a delegate, and gives the two rulings different authorities,
+/// without touching the contract.
+BOOST_FIXTURE_TEST_CASE(updateauth_replaces_the_judge_and_separates_the_rulings, sysio_bond_tester) try {
+   delegate_rulings();
+   for (char fill : {'a', 'b', 'c'}) open_request(fill);
+
+   // Replace the judge on VALID; leave INVALID to governance alone.
+   delegate_ruling(RSLVVALID, {"alice"_n, SYSIO_ACCOUNT});
+   delegate_ruling(RSLVINVALID, {SYSIO_ACCOUNT});
+   require_refusal(rule_through(RSLVVALID, JUDGE_ACCOUNT, RSLVVALID, 1), unsatisfied_authority_msg);
+   require_refusal(rule_through(RSLVINVALID, JUDGE_ACCOUNT, RSLVINVALID, 1), unsatisfied_authority_msg);
+   require_refusal(rule_through(RSLVINVALID, "alice"_n, RSLVINVALID, 1), unsatisfied_authority_msg);
+   BOOST_REQUIRE_EQUAL(STATE_OPEN, request_state_of(1));
+   BOOST_REQUIRE_EQUAL(success(), rule_through(RSLVVALID, "alice"_n, RSLVVALID, 1));
+   BOOST_REQUIRE_EQUAL(STATE_VALID, request_state_of(1));
+   BOOST_REQUIRE_EQUAL(success(), rule_through(RSLVINVALID, SYSIO_ACCOUNT, RSLVINVALID, 2));
+   BOOST_REQUIRE_EQUAL(STATE_INVALID, request_state_of(2));
+   BOOST_REQUIRE_EQUAL(STATE_OPEN, request_state_of(3));
+} FC_LOG_AND_RETHROW()
+
+/// Under the native rules a permission may rewrite itself: the judge can change the authority of the
+/// ruling permission it satisfies, though not the other one. The contract's `active` reverts it.
+BOOST_FIXTURE_TEST_CASE(a_delegate_can_rewrite_its_own_ruling_permission_and_active_reverts_it, sysio_bond_tester) try {
+   delegate_rulings();
+   for (char fill : {'a', 'b', 'c'}) open_request(fill);
+
+   // A stranger cannot, and the judge's hold on VALID does not reach an authority it does not satisfy.
+   require_refusal(rewrite_ruling_permission("alice"_n, RSLVVALID, {"alice"_n}), unsatisfied_authority_msg);
+   delegate_ruling(RSLVINVALID, {SYSIO_ACCOUNT});
+   require_refusal(rewrite_ruling_permission(JUDGE_ACCOUNT, RSLVINVALID, {JUDGE_ACCOUNT}), unsatisfied_authority_msg);
+
+   // The judge hands VALID to alice alone, dropping governance from the permission's own list.
+   BOOST_REQUIRE_EQUAL(success(), rewrite_ruling_permission(JUDGE_ACCOUNT, RSLVVALID, {"alice"_n}));
+   require_refusal(rule_through(RSLVVALID, JUDGE_ACCOUNT, RSLVVALID, 1), unsatisfied_authority_msg);
+   require_refusal(rule_through(RSLVVALID, SYSIO_ACCOUNT, RSLVVALID, 1), unsatisfied_authority_msg);
+   BOOST_REQUIRE_EQUAL(success(), rule_through(RSLVVALID, "alice"_n, RSLVVALID, 1));
+   BOOST_REQUIRE_EQUAL(STATE_VALID, request_state_of(1));
+
+   // The parent `active` still rules, and puts the permission back.
+   BOOST_REQUIRE_EQUAL(success(), rslvvalid(BOND_ACCOUNT, 2));
+   BOOST_REQUIRE_EQUAL(STATE_VALID, request_state_of(2));
+   delegate_ruling(RSLVVALID, {JUDGE_ACCOUNT, SYSIO_ACCOUNT});
+   require_refusal(rule_through(RSLVVALID, "alice"_n, RSLVVALID, 3), unsatisfied_authority_msg);
+   BOOST_REQUIRE_EQUAL(success(), rule_through(RSLVVALID, JUDGE_ACCOUNT, RSLVVALID, 3));
+   BOOST_REQUIRE_EQUAL(STATE_VALID, request_state_of(3));
 } FC_LOG_AND_RETHROW()
 
 // A HOLD_BOND escrow exists only when the hold bond is positive; a hold whose bond rounds to zero
@@ -1683,13 +1875,13 @@ BOOST_FIXTURE_TEST_CASE(a_missing_hold_bond_row_is_no_hold_bond, sysio_bond_test
    BOOST_REQUIRE_EQUAL(success(), hold("issuer"_n, 1, "carol"_n));
    BOOST_REQUIRE_EQUAL(0u, request_row_of(1)["hold_bond"].as_uint64());
    BOOST_REQUIRE(escrow_row_of(1, KIND_HOLD_BOND_BYTE).is_null());
-   BOOST_REQUIRE_EQUAL(success(), rslvvalid(SYSIO_ACCOUNT, 1));
+   BOOST_REQUIRE_EQUAL(success(), rslvvalid(BOND_ACCOUNT, 1));
    BOOST_REQUIRE_EQUAL(STATE_VALID, request_state_of(1));
    BOOST_REQUIRE(settlements().empty());
 
    BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'b'), LIQX, 1, 0));
    BOOST_REQUIRE_EQUAL(success(), hold("issuer"_n, 2, "carol"_n));
-   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(SYSIO_ACCOUNT, 2));
+   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(BOND_ACCOUNT, 2));
    BOOST_REQUIRE_EQUAL(STATE_INVALID, request_state_of(2));
    BOOST_REQUIRE(settlements().empty());
 
@@ -1720,9 +1912,9 @@ BOOST_FIXTURE_TEST_CASE(a_hostile_issuer_blocks_only_its_own_claim, sysio_bond_t
 
    BOOST_REQUIRE_EQUAL(success(), approve(1));
    BOOST_REQUIRE_EQUAL(STATE_APPROVED, request_state_of(1));
-   BOOST_REQUIRE_EQUAL(success(), rslvvalid(SYSIO_ACCOUNT, 2));
+   BOOST_REQUIRE_EQUAL(success(), rslvvalid(BOND_ACCOUNT, 2));
    BOOST_REQUIRE_EQUAL(STATE_VALID, request_state_of(2));
-   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(SYSIO_ACCOUNT, 3));
+   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(BOND_ACCOUNT, 3));
    BOOST_REQUIRE_EQUAL(STATE_INVALID, request_state_of(3));
 
    // The underwriters are paid.
@@ -2044,7 +2236,7 @@ BOOST_FIXTURE_TEST_CASE(escrow_yield_after_approval_reaches_the_funder, sysio_bo
 BOOST_FIXTURE_TEST_CASE(forfeited_bond_yield_returns_to_the_ledger_as_bonus_yield, sysio_bond_tester) try {
    bonded_request(1, 'a');   // alice bonds 10 UNIT of LIQSOL
    BOOST_REQUIRE_EQUAL(success(), addyield("carol"_n, 100 * UNIT));
-   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(SYSIO_ACCOUNT, 1));
+   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(BOND_ACCOUNT, 1));
    BOOST_REQUIRE_EQUAL(success(), sweepyield(LIQSOL));
    const uint64_t pulled = pool_row_of()["pool"]["received"].as_uint64();
    BOOST_REQUIRE(pulled > 0);
@@ -2120,7 +2312,7 @@ BOOST_FIXTURE_TEST_CASE(forfeited_bond_yield_stays_when_the_symbol_has_no_supply
    BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'a'), LIQX, 10 * UNIT, 0));
    BOOST_REQUIRE_EQUAL(success(), accept("alice"_n, 1, 10 * UNIT));
    BOOST_REQUIRE_EQUAL(success(), addyield("carol"_n, 100 * UNIT, LIQX_SYM));
-   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(SYSIO_ACCOUNT, 1));
+   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(BOND_ACCOUNT, 1));
 
    // The issuer takes the forfeit and burns it: LIQX has no supply left.
    BOOST_REQUIRE_EQUAL(success(), claim(1, "issuer"_n));
@@ -2188,7 +2380,7 @@ BOOST_FIXTURE_TEST_CASE(prune_erases_only_paid_out_terminal_requests, sysio_bond
    // 3: forfeited with no yield earned: once the issuer has claimed the forfeit, nothing is owed.
    BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'c'), LIQSOL, 10 * UNIT, 0));
    BOOST_REQUIRE_EQUAL(success(), accept("alice"_n, 3, 4 * UNIT));
-   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(SYSIO_ACCOUNT, 3));
+   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(BOND_ACCOUNT, 3));
    // 4: still OPEN.
    BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'd'), LIQSOL, 10 * UNIT, 0));
 
@@ -2222,7 +2414,7 @@ BOOST_FIXTURE_TEST_CASE(prune_stops_at_its_limit, sysio_bond_tester) try {
    for (char fill : {'a', 'b', 'c'}) {
       BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, fill), LIQSOL, 10 * UNIT, 0));
    }
-   for (uint64_t id = 1; id <= 3; ++id) BOOST_REQUIRE_EQUAL(success(), rslvinvalid(SYSIO_ACCOUNT, id));
+   for (uint64_t id = 1; id <= 3; ++id) BOOST_REQUIRE_EQUAL(success(), rslvinvalid(BOND_ACCOUNT, id));
    pass_retention();
    BOOST_REQUIRE_EQUAL(success(), prune(0, 2));
    BOOST_REQUIRE(request_row_of(1).is_null());
@@ -2236,7 +2428,7 @@ BOOST_FIXTURE_TEST_CASE(prune_starts_at_from_id, sysio_bond_tester) try {
    for (char fill : {'a', 'b', 'c'}) {
       BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, fill), LIQSOL, 10 * UNIT, 0));
    }
-   for (uint64_t id = 1; id <= 3; ++id) BOOST_REQUIRE_EQUAL(success(), rslvinvalid(SYSIO_ACCOUNT, id));
+   for (uint64_t id = 1; id <= 3; ++id) BOOST_REQUIRE_EQUAL(success(), rslvinvalid(BOND_ACCOUNT, id));
    pass_retention();
 
    // From id 2: request 1, prunable, is left; 2 and 3 go.
@@ -2257,9 +2449,9 @@ BOOST_FIXTURE_TEST_CASE(prune_limit_counts_every_request_it_examines, sysio_bond
    for (char fill : {'a', 'b', 'c', 'd', 'e', 'f'}) {
       BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, fill), LIQSOL, 10 * UNIT, 0));
    }
-   for (uint64_t id = 4; id <= 6; ++id) BOOST_REQUIRE_EQUAL(success(), rslvinvalid(SYSIO_ACCOUNT, id));
+   for (uint64_t id = 4; id <= 6; ++id) BOOST_REQUIRE_EQUAL(success(), rslvinvalid(BOND_ACCOUNT, id));
    pass_retention();
-   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(SYSIO_ACCOUNT, 3));
+   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(BOND_ACCOUNT, 3));
    rewrite_request_token(4, "NOPE");
    produce_block();
    // 1 and 2 are OPEN, 3 is retained, 4's token no longer resolves; 5 and 6 are prunable.
@@ -2280,7 +2472,7 @@ BOOST_FIXTURE_TEST_CASE(prune_limit_counts_every_request_it_examines, sysio_bond
 // A caller cannot have one call walk more than MAX_PRUNE_LIMIT requests.
 BOOST_FIXTURE_TEST_CASE(prune_refuses_a_limit_above_the_maximum, sysio_bond_tester) try {
    BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'a'), LIQSOL, 10 * UNIT, 0));
-   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(SYSIO_ACCOUNT, 1));
+   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(BOND_ACCOUNT, 1));
    pass_retention();
 
    const auto refused = wasm_assert_msg(std::string(prune_limit_msg));
@@ -2300,7 +2492,7 @@ BOOST_FIXTURE_TEST_CASE(a_crank_resuming_after_each_prune_prunes_every_prunable_
    for (uint64_t id = 1; id <= rows; ++id) {
       BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, char('a' + id)), LIQSOL,
                                              10 * UNIT, 0));
-      if (!stays_open(id)) BOOST_REQUIRE_EQUAL(success(), rslvinvalid(SYSIO_ACCOUNT, id));
+      if (!stays_open(id)) BOOST_REQUIRE_EQUAL(success(), rslvinvalid(BOND_ACCOUNT, id));
    }
    pass_retention();
 
@@ -2326,7 +2518,7 @@ BOOST_FIXTURE_TEST_CASE(prune_skips_a_request_whose_token_no_longer_resolves, sy
    for (char fill : {'a', 'b'}) {
       BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, fill), LIQSOL, 10 * UNIT, 0));
    }
-   for (uint64_t id = 1; id <= 2; ++id) BOOST_REQUIRE_EQUAL(success(), rslvinvalid(SYSIO_ACCOUNT, id));
+   for (uint64_t id = 1; id <= 2; ++id) BOOST_REQUIRE_EQUAL(success(), rslvinvalid(BOND_ACCOUNT, id));
    pass_retention();
    rewrite_request_token(1, "NOPE");
    produce_block();
@@ -2341,7 +2533,7 @@ BOOST_FIXTURE_TEST_CASE(prune_skips_a_request_whose_token_no_longer_resolves, sy
 // issuer that polls the row rather than being notified always sees the ruling.
 BOOST_FIXTURE_TEST_CASE(prune_keeps_a_ruling_for_the_retention_period, sysio_bond_tester) try {
    BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'a'), LIQSOL, 10 * UNIT, 0));
-   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(SYSIO_ACCOUNT, 1));
+   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(BOND_ACCOUNT, 1));
 
    // Nothing is owed on it at once -- nothing was bonded -- but the ruling is kept.
    BOOST_REQUIRE_EQUAL(success(), prune(0, 10));
@@ -2364,7 +2556,7 @@ BOOST_FIXTURE_TEST_CASE(durable_outcome_requires_issuer_acknowledgement, sysio_b
       ("token_code", codename_mvo(LIQSOL))("covered", 10 * UNIT)("bounty", 0)("window_sec", WINDOW_SEC)));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("request is not resolved"),
                        push_bond("issuer"_n, "ack"_n, mvo()("request_id", 1)));
-   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(SYSIO_ACCOUNT, 1));
+   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(BOND_ACCOUNT, 1));
    pass_retention();
    BOOST_REQUIRE_EQUAL(success(), prune(0, 10));
    BOOST_REQUIRE_EQUAL(STATE_INVALID, request_state_of(1));

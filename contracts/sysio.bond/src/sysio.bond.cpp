@@ -595,7 +595,7 @@ void bond::approve(uint64_t request_id) {
 // their payees to claim: the bounty's for `sysio`, the hold bond's for the issuer who posted it.
 // Nothing is sent and no one is notified, so no party can make the ruling fail.
 void bond::rslvvalid(uint64_t request_id) {
-   require_auth(SYSTEM_ACCOUNT);
+   require_auth(get_self());
    requests_t requests(get_self());
    const auto req = requests.try_get(request_key{request_id});
    check(req.has_value(), request_missing_msg);
@@ -619,7 +619,7 @@ void bond::rslvvalid(uint64_t request_id) {
 // one the bounty is awarded back to the issuer. Nothing is sent and no one is notified. The bonds'
 // positions stop at the ruling's index: the forfeit is no longer theirs.
 void bond::rslvinvalid(uint64_t request_id) {
-   require_auth(SYSTEM_ACCOUNT);
+   require_auth(get_self());
    requests_t requests(get_self());
    const auto req = requests.try_get(request_key{request_id});
    check(req.has_value(), request_missing_msg);
