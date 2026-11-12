@@ -286,6 +286,93 @@ BOOST_AUTO_TEST_CASE(asset_from_string_overflow)
    });
 }
 
+// The amount of an asset string is [-]digits[.digits]: one leading minus is the only sign, and neither part takes
+// any other character. Checked through asset::from_string and through a variant.
+BOOST_AUTO_TEST_CASE(asset_from_string_amount_format)
+{
+   const auto bad_integer = [](const asset_type_exception& e) {
+      return expect_assert_message(e, "Asset's integer part should be digits with an optional leading minus sign");
+   };
+   const auto bad_fraction = [](const asset_type_exception& e) {
+      return expect_assert_message(e, "Asset's decimal fraction should be digits only");
+   };
+
+   const auto check_accepted = [](const std::string& from, int64_t amount, uint8_t decimals) {
+      BOOST_TEST_CONTEXT("asset string " << fc::json::to_string(from, fc::time_point::maximum())) {
+         const asset expected(amount, symbol(decimals, "SYS"));
+         BOOST_CHECK_EQUAL(asset::from_string(from), expected);
+         BOOST_CHECK_EQUAL(fc::variant(from).as<asset>(), expected);
+      }
+   };
+   const auto check_rejected = [](const std::string& from, const auto& expected_message) {
+      BOOST_TEST_CONTEXT("asset string " << fc::json::to_string(from, fc::time_point::maximum())) {
+         BOOST_CHECK_EXCEPTION(asset::from_string(from), asset_type_exception, expected_message);
+         BOOST_CHECK_EXCEPTION(fc::variant(from).as<asset>(), asset_type_exception, expected_message);
+      }
+   };
+
+   // well-formed amounts; the leading minus applies to the whole amount, including when the integer part is zero
+   check_accepted("7 SYS", 7, 0);
+   check_accepted("-7 SYS", -7, 0);
+   check_accepted("1.05 SYS", 105, 2);
+   check_accepted("-1.05 SYS", -105, 2);
+   check_accepted("0.5 SYS", 5, 1);
+   check_accepted("-0.5 SYS", -5, 1);
+   check_accepted("-0.05 SYS", -5, 2);
+   check_accepted("0 SYS", 0, 0);
+   check_accepted("-0 SYS", 0, 0);
+   check_accepted("-0.00 SYS", 0, 2);
+   check_accepted("007.50 SYS", 750, 2);
+   check_accepted("-007.50 SYS", -750, 2);
+   BOOST_CHECK_EQUAL(asset::from_string("-0.5 SYS").to_string(), "-0.5 SYS");
+
+   // a sign inside the fraction; these parsed as 0.95, 1.05, -0.95, -1.05 and 0.00
+   check_rejected("1.-5 SYS", bad_fraction);
+   check_rejected("1.+5 SYS", bad_fraction);
+   check_rejected("-1.-5 SYS", bad_fraction);
+   check_rejected("-1.+5 SYS", bad_fraction);
+   check_rejected("0.-0 SYS", bad_fraction);
+
+   // a plus sign on the amount; these parsed as 1.5, 1, 0.5 and 0
+   check_rejected("+1.5 SYS", bad_integer);
+   check_rejected("+1 SYS", bad_integer);
+   check_rejected("+0.5 SYS", bad_integer);
+   check_rejected("+0 SYS", bad_integer);
+
+   // any other character in the fraction
+   check_rejected("1.5- SYS", bad_fraction);
+   check_rejected("1.5.5 SYS", bad_fraction);
+   check_rejected("1..5 SYS", bad_fraction);
+   check_rejected("1.5e1 SYS", bad_fraction);
+   check_rejected("1.0x5 SYS", bad_fraction);
+   check_rejected("1.5\t SYS", bad_fraction);
+
+   // a second sign, or a sign after the first digit, in the integer part
+   check_rejected("--1.5 SYS", bad_integer);
+   check_rejected("-+1.5 SYS", bad_integer);
+   check_rejected("+-1.5 SYS", bad_integer);
+   check_rejected("1-.5 SYS", bad_integer);
+   check_rejected("1-2 SYS", bad_integer);
+
+   // no digits in the integer part
+   check_rejected(".5 SYS", bad_integer);
+   check_rejected("-.5 SYS", bad_integer);
+   check_rejected("- SYS", bad_integer);
+
+   // any other character in the integer part
+   check_rejected("1e3 SYS", bad_integer);
+   check_rejected("0x10 SYS", bad_integer);
+   check_rejected("1,000 SYS", bad_integer);
+   check_rejected("1,000.00 SYS", bad_integer);
+
+   // bytes that are not ASCII digits: an embedded NUL, a newline, a high-bit byte, a UTF-8 Arabic-Indic digit
+   check_rejected(std::string("1\0 SYS", 6), bad_integer);
+   check_rejected(std::string("1.5\0 SYS", 8), bad_fraction);
+   check_rejected("1\n SYS", bad_integer);
+   check_rejected("1.\xb2 SYS", bad_fraction);
+   check_rejected("\xd9\xa3 SYS", bad_integer);
+}
+
 struct permission_visitor {
    std::vector<permission_level> permissions;
    std::vector<size_t> size_stack;
