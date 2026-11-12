@@ -4,10 +4,10 @@
 #include <fc/io/json.hpp>
 #include <fc/variant.hpp>
 #include <sysio/account_watch_plugin/account_watch.hpp>
+#include <sysio/chain/account_object.hpp>
 #include <sysio/chain/config.hpp>
 #include <sysio/chain/controller.hpp>
 #include <sysio/chain/exceptions.hpp>
-#include <sysio/chain_plugin/chain_plugin.hpp>
 
 #include <fmt/format.h>
 #include <magic_enum/magic_enum.hpp>
@@ -104,6 +104,20 @@ bool has_real_authorization(const chain::action& act, chain::name actor) {
    return std::ranges::any_of(act.authorization, [&](const chain::permission_level& auth) {
       return auth.actor == actor && auth.permission != chain::config::sysio_payer_name;
    });
+}
+
+/// @p account's ABI, validated under @p yield; nullopt when the account has none or it is larger than @p max_abi_bytes.
+/// Throws when the ABI does not unpack or validation runs past the yield's deadline.
+std::optional<chain::abi_serializer> load_abi(const chain::controller& chain, chain::name account,
+                                              uint32_t max_abi_bytes,
+                                              const chain::abi_serializer::yield_function_t& yield) {
+   const chain::account_metadata_object* metadata = chain.find_account_metadata(account);
+   if (metadata == nullptr || metadata->abi.size() > max_abi_bytes)
+      return std::nullopt;
+   chain::abi_def abi;
+   if (!chain::abi_serializer::to_abi(metadata->abi, abi))
+      return std::nullopt;
+   return chain::abi_serializer(std::move(abi), yield);
 }
 
 /// Each rule's to_string, for the start record.
@@ -210,6 +224,11 @@ void add_options(bpo::options_description& cfg) {
       "same format as --{}. An exclude covers only the authorization it matches: another matched authorization of the "
       "same action is still reported. Receiver rules are not affected.",
       option::include);
+   static const std::string max_abi_bytes_description = fmt::format(
+      "Largest packed contract ABI, in bytes, loaded to decode action data. Data of a contract with a larger ABI is "
+      "reported as hex. Loading an ABI is the one step of decoding outside the block's decode time; this bounds it. "
+      "Default {}.",
+      default_max_abi_bytes);
    static const std::string receiver_description = fmt::format(
       "Report every action in an accepted block executed at this account: its own contract's actions, and every "
       "action it is notified of, such as a token transfer it sends or receives. Repeatable. Format: {}, each field an "
@@ -221,9 +240,10 @@ void add_options(bpo::options_description& cfg) {
       option::receiver.c_str(), bpo::value<std::vector<std::string>>()->composing(), receiver_description.c_str())(
       option::max_data_bytes.c_str(), bpo::value<uint32_t>()->default_value(default_max_data_bytes),
       "Largest action data, in bytes, a match record decodes with the contract's ABI. Larger data is reported by size "
-      "and sha256 only.")(option::heartbeat_seconds.c_str(),
-                          bpo::value<uint32_t>()->default_value(default_heartbeat_seconds),
-                          "Seconds between heartbeat records, written as blocks are accepted. 0 disables them.");
+      "and sha256 only.")(option::max_abi_bytes.c_str(), bpo::value<uint32_t>()->default_value(default_max_abi_bytes),
+                          max_abi_bytes_description.c_str())(
+      option::heartbeat_seconds.c_str(), bpo::value<uint32_t>()->default_value(default_heartbeat_seconds),
+      "Seconds between heartbeat records, written as blocks are accepted. 0 disables them.");
 }
 
 config parse_config(const bpo::variables_map& options) {
@@ -237,6 +257,7 @@ config parse_config(const bpo::variables_map& options) {
    return config{
       .rules = std::move(rules),
       .max_data_bytes = options.at(option::max_data_bytes).as<uint32_t>(),
+      .max_abi_bytes = options.at(option::max_abi_bytes).as<uint32_t>(),
       .heartbeat_interval = fc::seconds(options.at(option::heartbeat_seconds).as<uint32_t>()),
    };
 }
@@ -245,10 +266,12 @@ std::string to_json_line(const fc::variant_object& record) {
    return fc::json::to_string(fc::variant{record}, fc::time_point::maximum());
 }
 
-watcher::block_decoder::block_decoder(const chain::controller& chain, fc::microseconds max_time)
-   : abis(make_resolver(chain, max_time, throw_on_yield::no))
-   , deadline(fc::time_point::now().safe_add(max_time))
-   , yield(chain::abi_serializer::create_yield_function(max_time)) {}
+watcher::block_decoder::block_decoder(const chain::controller& chain, fc::microseconds max_time, uint32_t max_abi_bytes)
+   : deadline(fc::time_point::now().safe_add(max_time))
+   , yield(chain::abi_serializer::create_yield_function(max_time))
+   , abis([&chain, max_abi_bytes, yield = yield](const chain::account_name& account) {
+      return load_abi(chain, account, max_abi_bytes, yield);
+   }) {}
 
 watcher::watcher(config cfg, const chain::controller& chain, fc::microseconds abi_serializer_max_time, record_sink sink,
                  clock_function clock)
@@ -269,7 +292,7 @@ void watcher::report_start() const {
    body(field::include, rules_to_variants(_cfg.rules.includes()))(field::exclude,
                                                                   rules_to_variants(_cfg.rules.excludes()))(
       field::receiver, rules_to_variants(_cfg.rules.receivers()))(field::max_data_bytes, _cfg.max_data_bytes)(
-      field::heartbeat_seconds, _cfg.heartbeat_interval.to_seconds());
+      field::max_abi_bytes, _cfg.max_abi_bytes)(field::heartbeat_seconds, _cfg.heartbeat_interval.to_seconds());
    emit(event::start, body);
 }
 
@@ -283,7 +306,8 @@ void watcher::on_block_start(uint32_t) {
 }
 
 void watcher::on_applied_transaction(const chain::transaction_trace_ptr& trace) {
-   // Failed and implicit transactions are never in a block's transaction list; skipping them here saves holding them.
+   // Only transactions in block->transactions are reported (see on_accepted_block). A failed transaction and the
+   // implicit onblock transaction are never there, so they are not held at all.
    if (!trace || !trace->receipt || trace->except || chain::is_onblock(*trace))
       return;
    std::vector<held_action> actions;
@@ -305,7 +329,7 @@ void watcher::on_applied_transaction(const chain::transaction_trace_ptr& trace) 
 
 void watcher::on_accepted_block(const chain::signed_block_ptr& block, const chain::block_id_type& id) {
    if (!_held.empty()) {
-      block_decoder decoder(_chain, _abi_serializer_max_time);
+      block_decoder decoder(_chain, _abi_serializer_max_time, _cfg.max_abi_bytes);
       for (const chain::transaction_receipt& receipt : block->transactions) {
          const auto held = _held.find(receipt.trx.id());
          if (held == _held.end())

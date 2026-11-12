@@ -51,10 +51,11 @@ account-watch-receiver = alice,sysio.token::transfer
 | `account-watch-include` | none | Repeatable authorization rule. An action is reported when one of its authorizations matches an include rule and no exclude rule. |
 | `account-watch-exclude` | none | Repeatable authorization rule. Applies only to include rules, so it needs one. |
 | `account-watch-receiver` | none | Repeatable receiver rule. An action is reported when it runs at an account a receiver rule names. |
+| `account-watch-max-data-bytes` | 1024 | Largest action data, in bytes, a match record decodes. Larger data is reported by size and sha256 only. |
+| `account-watch-max-abi-bytes` | 65536 | Largest packed contract ABI, in bytes, loaded to decode action data. Data of a contract with a larger ABI is reported as hex. |
+| `account-watch-heartbeat-seconds` | 600 | Seconds between heartbeat records. 0 disables them. |
 
 At least one include or receiver rule is required.
-| `account-watch-max-data-bytes` | 1024 | Largest action data, in bytes, a match record decodes. Larger data is reported by size and sha256 only. |
-| `account-watch-heartbeat-seconds` | 600 | Seconds between heartbeat records. 0 disables them. |
 
 ## Rules
 
@@ -133,7 +134,7 @@ failures are logged at `trace` on the default logger. Matches are logged at `war
 
 | `event` | Members |
 |---|---|
-| `start` | `include`, `exclude`, `receiver` (each rule spelled out, e.g. `prod.a@*,*::*`), `max_data_bytes`, `heartbeat_seconds` |
+| `start` | `include`, `exclude`, `receiver` (each rule spelled out, e.g. `prod.a@*,*::*`), `max_data_bytes`, `max_abi_bytes`, `heartbeat_seconds` |
 | `match` | see below |
 | `heartbeat` | `block_num`, `block_id`, `block_time` of the accepted block that carried it, `lib_num`, `matches` (match records since startup) |
 | `stop` | `matches` |
@@ -161,14 +162,16 @@ A match record:
 | `matched` | The authorizations that matched an include rule; empty when only a receiver rule matched |
 | `data_size` | Size of the action data in bytes |
 | `data` | The data decoded with the contract's current ABI, when it is at most `max_data_bytes` |
-| `data_hex` | The data as hex, when it is at most `max_data_bytes` but is not decoded: the contract has no ABI or none for the action, the decode fails, or the block's decode time is spent |
+| `data_hex` | The data as hex, when it is at most `max_data_bytes` but is not decoded: the contract has no ABI, an ABI larger than `max_abi_bytes`, or none for the action, the decode fails, or the block's decode time is spent |
 | `data_sha256` | The data's sha256, when it is larger than `max_data_bytes` |
 
-Decoding runs on the application thread. All the matches of one block share one decode budget, chain_plugin's
-`abi-serializer-max-time-ms`, ABI loads included; once it is spent, the block's remaining matches carry hex. A rule with
-a wildcard contract decodes ABIs anyone can deploy, and an ABI can make a few bytes of data decode until the deadline,
-so the budget, not the data size, bounds the cost per block. A failed decode is logged at `trace` on the default
-logger.
+Decoding runs on the application thread. All the matches of one block share one decode deadline, chain_plugin's
+`abi-serializer-max-time-ms` from the start of the block's reporting; ABI validation and every decode check it, and
+once it has passed the block's remaining matches carry hex. A rule with a wildcard contract decodes ABIs anyone can
+deploy, and an ABI can make a few bytes of data decode until the deadline, so the deadline, not the data size, bounds
+the cost per block. Unpacking and indexing an ABI check no deadline, so an ABI larger than `max_abi_bytes` is never
+loaded: past the deadline a block costs at most one load of an ABI that size. Each contract's ABI is loaded at most
+once per block. A failed decode is logged at `trace` on the default logger.
 
 A heartbeat is written on an accepted block once `heartbeat_seconds` have passed since the last one, the first on the
 first accepted block. It stops when blocks stop being accepted, so a watchdog alerting on missing heartbeats also

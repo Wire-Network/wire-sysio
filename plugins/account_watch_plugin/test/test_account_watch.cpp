@@ -397,19 +397,22 @@ BOOST_AUTO_TEST_CASE(parse_config_options) {
    BOOST_REQUIRE_EQUAL(defaults.rules.includes().size(), 1u);
    BOOST_CHECK(defaults.rules.excludes().empty());
    BOOST_CHECK_EQUAL(defaults.max_data_bytes, aw::default_max_data_bytes);
+   BOOST_CHECK_EQUAL(defaults.max_abi_bytes, aw::default_max_abi_bytes);
    BOOST_CHECK_EQUAL(defaults.heartbeat_interval.count(), fc::seconds(aw::default_heartbeat_seconds).count());
 
    // Command-line and config.ini values compose, command line first; a scalar given on the command line wins.
    const aw::config composed = aw::parse_config(parse_options(
       {fmt::format("--{}=alice,*::*", aw::option::include), fmt::format("--{}=0", aw::option::heartbeat_seconds)},
-      fmt::format("{0} = bob@owner,*::*\n{1} = alice@active,sysio::reqauth\n{2} = 64\n{3} = 30\n", aw::option::include,
-                  aw::option::exclude, aw::option::max_data_bytes, aw::option::heartbeat_seconds)));
+      fmt::format("{0} = bob@owner,*::*\n{1} = alice@active,sysio::reqauth\n{2} = 64\n{3} = 30\n{4} = 4096\n",
+                  aw::option::include, aw::option::exclude, aw::option::max_data_bytes, aw::option::heartbeat_seconds,
+                  aw::option::max_abi_bytes)));
    BOOST_REQUIRE_EQUAL(composed.rules.includes().size(), 2u);
    BOOST_CHECK_EQUAL(composed.rules.includes()[0].to_string(), "alice@*,*::*");
    BOOST_CHECK_EQUAL(composed.rules.includes()[1].to_string(), "bob@owner,*::*");
    BOOST_REQUIRE_EQUAL(composed.rules.excludes().size(), 1u);
    BOOST_CHECK_EQUAL(composed.rules.excludes()[0].to_string(), "alice@active,sysio::reqauth");
    BOOST_CHECK_EQUAL(composed.max_data_bytes, 64u);
+   BOOST_CHECK_EQUAL(composed.max_abi_bytes, 4096u);
    BOOST_CHECK_EQUAL(composed.heartbeat_interval.count(), 0);
 
    // A bad config.ini value is named by its position among all of the option's values.
@@ -685,6 +688,27 @@ BOOST_FIXTURE_TEST_CASE(data_is_decoded_hashed_or_hex, chain_fixture) {
    BOOST_CHECK_EQUAL(matches()[0][aw::field::data_hex].as_string(),
                      fc::to_hex(unbudgeted_data.data(), unbudgeted_data.size()));
    BOOST_CHECK(!matches()[0].contains(aw::field::data));
+
+   // A contract ABI larger than max_abi_bytes is never loaded: its data is hex. At the limit it is loaded.
+   const uint32_t abi_size = static_cast<uint32_t>(chain.control->find_account_metadata(token_account)->abi.size());
+   aw::config small_abi = config_of({"alice,*::*"});
+   small_abi.max_abi_bytes = abi_size - 1;
+   watch(std::move(small_abi));
+   const transaction_trace_ptr unloaded = transfer(alice, bob, "5.0000 TOK");
+   chain.produce_block();
+   BOOST_REQUIRE_EQUAL(matches().size(), 1u);
+   const bytes& unloaded_data = unloaded->action_traces[0].act.data;
+   BOOST_CHECK_EQUAL(matches()[0][aw::field::data_hex].as_string(),
+                     fc::to_hex(unloaded_data.data(), unloaded_data.size()));
+   BOOST_CHECK(!matches()[0].contains(aw::field::data));
+
+   aw::config exact_abi = config_of({"alice,*::*"});
+   exact_abi.max_abi_bytes = abi_size;
+   watch(std::move(exact_abi));
+   transfer(alice, bob, "6.0000 TOK");
+   chain.produce_block();
+   BOOST_REQUIRE_EQUAL(matches().size(), 1u);
+   BOOST_CHECK_EQUAL(matches()[0][aw::field::data]["quantity"].as_string(), "6.0000 TOK");
 }
 
 BOOST_FIXTURE_TEST_CASE(undecodable_data_is_hex, chain_fixture) {
@@ -783,6 +807,7 @@ BOOST_FIXTURE_TEST_CASE(start_and_stop_records, chain_fixture) {
    BOOST_CHECK(start[0][aw::field::receiver].as<std::vector<std::string>>() ==
                std::vector<std::string>{"carol,sysio.token::transfer"});
    BOOST_CHECK_EQUAL(start[0][aw::field::max_data_bytes].as_uint64(), 64u);
+   BOOST_CHECK_EQUAL(start[0][aw::field::max_abi_bytes].as_uint64(), aw::default_max_abi_bytes);
    BOOST_CHECK_EQUAL(start[0][aw::field::heartbeat_seconds].as_uint64(), 30u);
 
    const std::vector<fc::variant_object> stop = harness.of(aw::event::stop);

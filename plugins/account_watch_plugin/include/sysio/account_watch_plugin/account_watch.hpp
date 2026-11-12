@@ -43,12 +43,17 @@ inline const std::string exclude = "account-watch-exclude";
 inline const std::string receiver = "account-watch-receiver";
 /// Largest action data, in bytes, that a match record decodes.
 inline const std::string max_data_bytes = "account-watch-max-data-bytes";
+/// Largest packed contract ABI, in bytes, loaded to decode action data.
+inline const std::string max_abi_bytes = "account-watch-max-abi-bytes";
 /// Seconds between heartbeat records; 0 disables them.
 inline const std::string heartbeat_seconds = "account-watch-heartbeat-seconds";
 } // namespace option
 
 /// Default of --account-watch-max-data-bytes: routine actions fit, setcode and setabi do not.
 inline constexpr uint32_t default_max_data_bytes = 1024;
+/// Default of --account-watch-max-abi-bytes: every contract ABI in the tree fits several times over. Unpacking and
+/// indexing an ABI run outside the decode deadline, so this bounds what one load can add past it.
+inline constexpr uint32_t default_max_abi_bytes = 64 * 1024;
 /// Default of --account-watch-heartbeat-seconds.
 inline constexpr uint32_t default_heartbeat_seconds = 600;
 
@@ -89,6 +94,7 @@ inline const std::string matches = "matches";
 inline const std::string include = "include";
 inline const std::string exclude = "exclude";
 inline const std::string max_data_bytes = "max_data_bytes";
+inline const std::string max_abi_bytes = "max_abi_bytes";
 inline const std::string heartbeat_seconds = "heartbeat_seconds";
 } // namespace field
 
@@ -213,6 +219,7 @@ private:
 struct config {
    rule_set rules;                                   ///< what is reported
    uint32_t max_data_bytes = default_max_data_bytes; ///< action data above this many bytes is hashed, not decoded
+   uint32_t max_abi_bytes = default_max_abi_bytes;   ///< a contract ABI above this many bytes is never loaded
    fc::microseconds heartbeat_interval = fc::seconds(default_heartbeat_seconds); ///< zero: no heartbeat
 };
 
@@ -291,13 +298,14 @@ private:
       chain::transaction_trace_ptr trace; ///< the execution that will be reported if its block is accepted
       std::vector<held_action> actions;   ///< its matching actions, in trace order
    };
-   /// ABI lookups and the decode time budget of one accepted block. An action's data can make a decode run to its
-   /// deadline, and a wildcard-contract rule lets anyone choose the ABI, so the whole block shares one deadline.
+   /// ABI lookups and the decode time budget of one accepted block. A wildcard-contract rule lets anyone choose the
+   /// ABI, and an ABI can make a few bytes of data decode until the deadline, so ABI validation and every decode of
+   /// the block share one deadline. Unpacking and indexing an ABI check no deadline; max_abi_bytes bounds them.
    struct block_decoder {
-      block_decoder(const chain::controller& chain, fc::microseconds max_time);
-      chain::caching_resolver abis;                  ///< each contract's ABI, loaded once per block
+      block_decoder(const chain::controller& chain, fc::microseconds max_time, uint32_t max_abi_bytes);
       fc::time_point deadline;                       ///< when the budget is spent
-      chain::abi_serializer::yield_function_t yield; ///< enforces deadline inside a decode
+      chain::abi_serializer::yield_function_t yield; ///< enforces deadline inside ABI validation and decodes
+      chain::caching_resolver abis;                  ///< each contract's ABI, loaded at most once per block
    };
 
    /** Pass @p body, prefixed with the `event` member naming @p kind, to the sink. */
