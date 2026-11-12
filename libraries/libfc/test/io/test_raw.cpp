@@ -1,10 +1,17 @@
 #include <fc/exception/exception.hpp>
 #include <fc/bitset.hpp>
+#include <fc/container/flat.hpp>
+#include <fc/io/cfile.hpp>
+#include <fc/io/datastream_crc.hpp>
 #include <fc/io/raw.hpp>
 #include <fc/io/raw_variant.hpp>
+#include <fc/network/message_buffer.hpp>
 #include <fc/variant.hpp>
 
+#include <boost/container/deque.hpp>
 #include <boost/test/unit_test.hpp>
+
+#include <sstream>
 
 using namespace fc;
 
@@ -17,7 +24,204 @@ struct A {
 };
 FC_REFLECT(A, (x)(y)(z))
 
+/// Count construction separately from packed bytes to catch eager count-driven element construction.
+struct raw_counted_element {
+   inline static size_t constructions = 0;
+   uint8_t value = 0;
+   raw_counted_element() { ++constructions; }
+};
+FC_REFLECT(raw_counted_element, (value))
+
+/// Only value is serialized; decoding into existing sequence elements must retain the other member.
+struct raw_reused_element {
+   uint32_t value = 0;
+   uint32_t retained = 0;
+};
+FC_REFLECT(raw_reused_element, (value))
+
+/// A valid zero-byte element must not be rejected because its count exceeds the remaining byte count.
+struct raw_empty_element {};
+FC_REFLECT_EMPTY(raw_empty_element)
+
+/// Deque decoding must not acquire a new copy/move requirement.
+struct raw_immovable_element {
+   uint32_t value = 0;
+   raw_immovable_element() = default;
+   raw_immovable_element(const raw_immovable_element&) = delete;
+   raw_immovable_element(raw_immovable_element&&) = delete;
+};
+FC_REFLECT(raw_immovable_element, (value))
+
 BOOST_AUTO_TEST_SUITE(raw_test_suite)
+
+/// Truncated element counts must not construct an entire sequence before reading its first element.
+BOOST_AUTO_TEST_CASE(sequence_allocation_follows_decoding) {
+   const auto packed = raw::pack(unsigned_int{MAX_NUM_ARRAY_ELEMENTS});
+   const auto check = [&]<typename Sequence>() {
+      Sequence output;
+      raw_counted_element::constructions = 0;
+      datastream<const char*> stream(packed.data(), packed.size());
+      BOOST_CHECK_THROW(raw::unpack(stream, output), fc::exception);
+      BOOST_CHECK_LE(raw_counted_element::constructions, 1u);
+      BOOST_CHECK_LE(output.size(), 1u);
+   };
+   check.template operator()<std::vector<raw_counted_element>>();
+   check.template operator()<std::deque<raw_counted_element>>();
+   check.template operator()<boost::container::vector<raw_counted_element>>();
+   check.template operator()<boost::container::deque<raw_counted_element>>();
+}
+
+/// A forged byte count on both bounded and unknown-length streams fails before destination allocation.
+BOOST_AUTO_TEST_CASE(byte_allocation_follows_reads) {
+   const auto packed = raw::pack(unsigned_int{MAX_SIZE_OF_BYTE_ARRAYS});
+   std::vector<char> output;
+   datastream<const char*> input(packed.data(), packed.size());
+   BOOST_CHECK_THROW(raw::unpack(input, output), fc::exception);
+   BOOST_CHECK_EQUAL(output.capacity(), 0u);
+
+   input.seekp(0);
+   bounded_datastream logical_bound(input, MAX_SIZE_OF_BYTE_ARRAYS);
+   BOOST_CHECK_THROW(raw::unpack(logical_bound, output), fc::exception);
+   BOOST_CHECK_EQUAL(output.capacity(), 0u);
+
+   input.seekp(0);
+   datastream_mirror mirror(input);
+   BOOST_CHECK_THROW(raw::unpack(mirror, output), fc::exception);
+   BOOST_CHECK_EQUAL(output.capacity(), 0u);
+
+   input.seekp(0);
+   boost::container::vector<char> boost_output;
+   BOOST_CHECK_THROW(raw::unpack(input, boost_output), fc::exception);
+   BOOST_CHECK_EQUAL(boost_output.capacity(), 0u);
+
+   temp_cfile temporary("wb+");
+   auto& file = temporary.file();
+   file.write(packed.data(), packed.size());
+   file.seek(0);
+   auto file_stream = file.create_datastream();
+   BOOST_CHECK_THROW(raw::unpack(file_stream, output), std::ios_base::failure);
+   BOOST_CHECK_EQUAL(output.capacity(), 0u);
+}
+
+/// Hashed/flat containers and bitsets must not allocate from a count whose first element is missing.
+BOOST_AUTO_TEST_CASE(other_container_counts_do_not_preallocate) {
+   const auto packed = raw::pack(unsigned_int{MAX_NUM_ARRAY_ELEMENTS});
+   const auto check = [&]<typename Container>() {
+      Container output;
+      datastream<const char*> stream(packed.data(), packed.size());
+      BOOST_CHECK_THROW(raw::unpack(stream, output), fc::exception);
+      BOOST_CHECK(output.empty());
+      if constexpr (requires { output.capacity(); })
+         BOOST_CHECK_EQUAL(output.capacity(), 0u);
+      if constexpr (requires { output.bucket_count(); })
+         BOOST_CHECK_LE(output.bucket_count(), 2u);
+   };
+   check.template operator()<std::unordered_set<std::string>>();
+   check.template operator()<std::unordered_map<std::string, uint32_t>>();
+   check.template operator()<fc::flat_set<std::string>>();
+   check.template operator()<fc::flat_multiset<std::string>>();
+   check.template operator()<fc::flat_map<std::string, uint32_t>>();
+   check.template operator()<fc::flat_multimap<std::string, uint32_t>>();
+
+   const auto bit_count = raw::pack(unsigned_int{MAX_NUM_ARRAY_ELEMENTS * bitset::bits_per_block});
+   datastream<const char*> stream(bit_count.data(), bit_count.size());
+   bitset bits;
+   BOOST_CHECK_THROW(raw::unpack(stream, bits), fc::exception);
+   BOOST_CHECK_EQUAL(bits.num_blocks(), 0u);
+
+   variant_object object;
+   datastream<const char*> object_stream(packed.data(), packed.size());
+   BOOST_CHECK_THROW(raw::unpack(object_stream, object), fc::exception);
+   BOOST_CHECK_EQUAL(object.size(), 0u);
+}
+
+/// Preserve in-place reuse, Boost vector reset behavior, zero-byte elements and nonmovable deque elements.
+BOOST_AUTO_TEST_CASE(incremental_sequences_preserve_decoded_values) {
+   const auto packed = raw::pack(std::make_tuple(unsigned_int{1}, uint32_t{7}));
+   const auto check = [&]<typename Sequence>(uint32_t expected_retained) {
+      Sequence output(2);
+      output.front().retained = 42;
+      datastream<const char*> stream(packed.data(), packed.size());
+      raw::unpack(stream, output);
+      BOOST_REQUIRE_EQUAL(output.size(), 1u);
+      BOOST_CHECK_EQUAL(output.front().value, 7u);
+      BOOST_CHECK_EQUAL(output.front().retained, expected_retained);
+   };
+   check.template operator()<std::vector<raw_reused_element>>(42);
+   check.template operator()<std::deque<raw_reused_element>>(42);
+   check.template operator()<boost::container::deque<raw_reused_element>>(42);
+   check.template operator()<boost::container::vector<raw_reused_element>>(0);
+
+   const auto empty_elements = raw::pack(unsigned_int{31});
+   BOOST_CHECK_EQUAL(raw::unpack<std::vector<raw_empty_element>>(empty_elements).size(), 31u);
+
+   datastream<const char*> stream(packed.data(), packed.size());
+   std::deque<raw_immovable_element> immovable;
+   raw::unpack(stream, immovable);
+   BOOST_REQUIRE_EQUAL(immovable.size(), 1u);
+   BOOST_CHECK_EQUAL(immovable.front().value, 7u);
+
+   // The existing null-variant decoder leaves a reused destination unchanged.
+   const auto null_value = raw::pack(std::vector<variant>{variant{}});
+   std::vector<variant> variants{variant{int64_t{42}}};
+   datastream<const char*> null_stream(null_value.data(), null_value.size());
+   raw::unpack(null_stream, variants);
+   BOOST_REQUIRE_EQUAL(variants.size(), 1u);
+   BOOST_CHECK_EQUAL(variants.front().as_int64(), 42);
+
+   const std::vector<bitset> bitsets{bitset("101"), bitset("100001")};
+   BOOST_CHECK(raw::unpack<std::vector<bitset>>(raw::pack(bitsets)) == bitsets);
+}
+
+/// Chunked byte reads preserve each supported stream contract, including boolean remaining() and short reads.
+BOOST_AUTO_TEST_CASE(byte_chunks_preserve_stream_contracts) {
+   const std::vector<char> expected(raw::detail::unpack_chunk_bytes * 3 + 17, 'x');
+   const auto packed = raw::pack(expected);
+   datastream<std::stringbuf> streambuf(std::string(packed.begin(), packed.end()));
+   std::vector<char> output;
+   raw::unpack(streambuf, output);
+   BOOST_CHECK(output == expected);
+
+   std::istringstream input(std::string(packed.begin(), packed.end()));
+   raw::unpack(input, output);
+   BOOST_CHECK(output == expected);
+
+   message_buffer<65536> buffer;
+   std::memcpy(buffer.write_ptr(), packed.data(), packed.size());
+   buffer.advance_write_ptr(packed.size());
+   auto peek = buffer.create_peek_datastream();
+   raw::unpack(peek, output);
+   BOOST_CHECK(output == expected);
+   BOOST_CHECK_EQUAL(buffer.bytes_to_read(), packed.size());
+   auto message = buffer.create_datastream();
+   raw::unpack(message, output);
+   BOOST_CHECK(output == expected);
+   BOOST_CHECK_EQUAL(buffer.bytes_to_read(), 0u);
+
+   datastream<const char*> memory(packed.data(), packed.size());
+   datastream_crc crc(memory);
+   raw::unpack(crc, output);
+   BOOST_CHECK(output == expected);
+
+   const auto short_bytes = raw::pack(unsigned_int{5000}, 'z');
+   std::istringstream short_input(std::string(short_bytes.begin(), short_bytes.end()));
+   output.assign(5000, 'a');
+   raw::unpack(short_input, output);
+   BOOST_REQUIRE_EQUAL(output.size(), 5000u);
+   BOOST_CHECK_EQUAL(output.front(), 'z');
+   BOOST_CHECK(std::all_of(output.begin() + 1, output.end(), [](char value) { return value == 'a'; }));
+
+   // The pre-existing Boost fundamental-vector format encodes count bytes, not count*sizeof(uint32_t).
+   const auto fundamental = raw::pack(std::make_tuple(unsigned_int{3}, std::array<char, 3>{1, 2, 3}));
+   boost::container::vector<uint32_t> boost_output;
+   datastream<const char*> fundamental_stream(fundamental.data(), fundamental.size());
+   raw::unpack(fundamental_stream, boost_output);
+   BOOST_REQUIRE_EQUAL(boost_output.size(), 3u);
+   BOOST_CHECK_EQUAL(std::memcmp(boost_output.data(), fundamental.data() + 1, 3), 0);
+   const auto* storage = reinterpret_cast<const char*>(boost_output.data());
+   BOOST_CHECK(std::all_of(storage + 3, storage + boost_output.size() * sizeof(uint32_t),
+                           [](char value) { return value == 0; }));
+}
 
 
 BOOST_AUTO_TEST_CASE(bitset_test)

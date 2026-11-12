@@ -10,6 +10,7 @@
 #include <fc/safe.hpp>
 #include <fc/static_variant.hpp>
 #include <fc/io/raw_fwd.hpp>
+#include <fc/io/raw_detail.hpp>
 #include <fc/crypto/hex.hpp>
 #include <fc/bitset.hpp>
 
@@ -266,12 +267,11 @@ namespace fc {
       if( value.size() )
         s.write( &value.front(), (uint32_t)value.size() );
     }
+    /// Read byte payloads before growing storage so truncated lengths cannot drive eager allocation.
     template<typename Stream> inline void unpack( Stream& s, std::vector<char>& value ) {
       unsigned_int size; fc::raw::unpack( s, size );
       FC_ASSERT( size.value <= MAX_SIZE_OF_BYTE_ARRAYS );
-      value.resize(size.value);
-      if( value.size() )
-        s.read( value.data(), value.size() );
+      detail::unpack_bytes(s, value, size.value);
     }
 
     // fc::string
@@ -416,12 +416,12 @@ namespace fc {
         ++itr;
       }
     }
+    /// Insert decoded elements without reserving buckets from the untrusted encoded count.
     template<typename Stream, typename T>
     inline void unpack( Stream& s, std::unordered_set<T>& value ) {
       unsigned_int size; fc::raw::unpack( s, size );
       FC_ASSERT( size.value <= MAX_NUM_ARRAY_ELEMENTS );
       value.clear();
-      value.reserve(size.value);
       for( uint32_t i = 0; i < size.value; ++i )
       {
           T tmp;
@@ -464,13 +464,13 @@ namespace fc {
         ++itr;
       }
     }
+    /// Insert decoded entries without reserving buckets from the untrusted encoded count.
     template<typename Stream, typename K, typename V>
     inline void unpack( Stream& s, std::unordered_map<K,V>& value )
     {
       unsigned_int size; fc::raw::unpack( s, size );
       FC_ASSERT( size.value <= MAX_NUM_ARRAY_ELEMENTS );
       value.clear();
-      value.reserve(size.value);
       for( uint32_t i = 0; i < size.value; ++i )
       {
           std::pair<K,V> tmp;
@@ -512,14 +512,12 @@ namespace fc {
       }
     }
 
+    /// Decode existing deque elements in place and construct further elements only as they are reached.
     template<typename Stream, typename T>
     inline void unpack( Stream& s, std::deque<T>& value ) {
       unsigned_int size; fc::raw::unpack( s, size );
       FC_ASSERT( size.value <= MAX_NUM_ARRAY_ELEMENTS );
-      value.resize(size.value);
-      for( auto& i : value ) {
-         fc::raw::unpack( s, i );
-      }
+      detail::unpack_sequence(value, size.value, [&](auto& item) { fc::raw::unpack(s, item); });
     }
 
     template<typename Stream, typename T, typename... U>
@@ -531,15 +529,13 @@ namespace fc {
        }
     }
 
+    /// Grow the deque as decoding progresses, preserving successful reuse of existing elements.
     template<typename Stream, typename T, typename... U>
     inline void unpack( Stream& s, boost::container::deque<T, U...>& value ) {
        unsigned_int size;
        fc::raw::unpack( s, size );
        FC_ASSERT( size.value <= MAX_NUM_ARRAY_ELEMENTS );
-       value.resize( size.value );
-       for( auto& i : value ) {
-          fc::raw::unpack( s, i );
-       }
+       detail::unpack_sequence(value, size.value, [&](auto& item) { fc::raw::unpack(s, item); });
     }
 
     template<typename Stream>
@@ -557,6 +553,7 @@ namespace fc {
       }
     }
 
+    /// Read bitset blocks before growing storage while retaining the existing bit-count encoding and tail masking.
     template<typename Stream>
     inline void unpack( Stream& s, fc::bitset& value ) {
       // the packed size is the number of bits in the set, not the number of blocks
@@ -564,11 +561,16 @@ namespace fc {
       fc::raw::unpack( s, size );
       const size_t num_blocks = bitset::calc_num_blocks(size);
       FC_ASSERT( num_blocks <= MAX_NUM_ARRAY_ELEMENTS );
+      for (size_t i = 0; i < num_blocks; ++i) {
+         uint8_t block = i < value.num_blocks() ? value.byte(i) : 0;
+         fc::raw::unpack(s, block);
+         if (i == value.num_blocks())
+            value.resize(std::min(size_t(size.value), (i + 1) * bitset::bits_per_block));
+         value.byte(i) = block;
+      }
       value.resize(size);
       if (size > 0) {
          assert(num_blocks == value.num_blocks());
-         for (size_t i = 0; i < num_blocks; ++i)
-            fc::raw::unpack( s, value.byte(i) );
          value.zero_unused_bits();
          assert(value.unused_bits_zeroed());
       }
@@ -583,14 +585,12 @@ namespace fc {
       }
     }
 
+    /// Preserve in-place decoding while constructing vector elements only as input decoding reaches them.
     template<typename Stream, typename T>
     inline void unpack( Stream& s, std::vector<T>& value ) {
       unsigned_int size; fc::raw::unpack( s, size );
       FC_ASSERT( size.value <= MAX_NUM_ARRAY_ELEMENTS );
-      value.resize(size.value);
-      for( auto& i : value ) {
-         fc::raw::unpack( s, i );
-      }
+      detail::unpack_sequence(value, size.value, [&](auto& item) { fc::raw::unpack(s, item); });
     }
 
     template<typename Stream, typename T>

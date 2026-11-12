@@ -30,12 +30,12 @@ namespace fc {
             }
          }
 
+         /// Insert only decoded elements; never reserve from a packed count before reading its payload.
          template<template<typename...> class Set, typename Stream, typename T, typename... U>
          inline void unpack_flat_set( Stream& s, Set<T, U...>& value ) {
             unsigned_int size; unpack( s, size );
             FC_ASSERT( size.value <= MAX_NUM_ARRAY_ELEMENTS );
             value.clear();
-            value.reserve( size.value );
             for( uint32_t i = 0; i < size.value; ++i ) {
                auto tmp = ::fc::detail::construct_maybe_with_allocator<T>( value.get_allocator() );
                unpack( s, tmp );
@@ -64,12 +64,12 @@ namespace fc {
             }
          }
 
+         /// Insert only decoded entries; never reserve from a packed count before reading its payload.
          template<template<typename...> class Map, typename Stream, typename K, typename V, typename... U>
          inline void unpack_flat_map( Stream& s, Map<K, V, U...>& value ) {
             unsigned_int size; unpack( s, size );
             FC_ASSERT( size.value <= MAX_NUM_ARRAY_ELEMENTS );
             value.clear();
-            value.reserve( size.value );
             for( uint32_t i = 0; i < size.value; ++i ) {
                auto tmp = ::fc::detail::default_construct_pair_maybe_with_allocator<K, V>( value.get_allocator() );
                unpack( s, tmp );

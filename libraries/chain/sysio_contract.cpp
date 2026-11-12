@@ -16,7 +16,6 @@
 
 #include <sysio/chain/wasm_interface.hpp>
 #include <sysio/chain/abi_serializer.hpp>
-#include <sysio/chain/abi_bounds.hpp>
 
 #include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/resource_limits.hpp>
@@ -232,9 +231,6 @@ void apply_sysio_setabi(apply_context& context) {
    auto  act = context.get_action().data_as<setabi>();
 
    context.require_authorization(act.account);
-
-   // Publication checks packed structure and deterministic bounds, without validating ABI semantics.
-   check_abi_bounds(act.abi.data(), act.abi.size());
 
    const auto* account_metadata = db.find<account_metadata_object,by_name>(act.account);
    int64_t metadata_ram_delta  = 0;
