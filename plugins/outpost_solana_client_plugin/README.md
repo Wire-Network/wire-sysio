@@ -44,7 +44,7 @@ Registers a signing key. Format:
 | `chain-kind` | Target chain: `solana`, `ethereum`, `wire` |
 | `key-type` | Native key type: `solana` (ED25519) |
 | `public-key` | Base58-encoded Solana public key |
-| `provider-type:data` | Either `KEY:<private-key>` or `KIOD:<url>` |
+| `provider-type:data` | `KEY:<private-key>`, `SSM:<param-ref>`, or `KMS:<key-ref>` for an AWS KMS `ECC_NIST_EDWARDS25519` key (`KIOD:` cannot sign Solana messages) |
 
 Example using the repository's public test fixture key:
 

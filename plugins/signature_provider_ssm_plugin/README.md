@@ -207,8 +207,8 @@ billed at standard KMS request rates. `test/README.md` in this directory carries
 - [`signature_provider_manager_plugin`](../signature_provider_manager_plugin/README.md) — required by this
   plugin; owns the spec grammar and creates the providers.
 - [`signature_provider_kms_plugin`](../signature_provider_kms_plugin/README.md) — the sibling AWS scheme;
-  keeps the key inside AWS at the cost of a network round-trip per signature, and covers Ethereum and WIRE K1
-  keys only.
+  keeps the key inside AWS at the cost of a network round-trip per signature, and covers Ethereum, WIRE K1
+  and Solana keys only.
 - `libraries/signature_provider_aws` — the shared AWS glue: SDK lifecycle, per-region client cache, region
   resolution, and the transient-versus-permanent error split.
 - `docs/signature-provider-manager-plugin.md` — the spec reference shared by every scheme.

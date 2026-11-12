@@ -3,7 +3,10 @@
 #include <fc/crypto/public_key.hpp>
 
 #include <atomic>
+#include <cstdint>
+#include <functional>
 #include <memory>
+#include <span>
 
 namespace fc::crypto {
 using signature_provider_id_t  = std::variant<std::string, fc::crypto::public_key>;
@@ -41,6 +44,11 @@ using signature_provider_id_t  = std::variant<std::string, fc::crypto::public_ke
 //        recover, which is harmless.
 using sign_fn        = std::function<fc::crypto::signature(const sha256&)>;
 
+/// Raw-message signing, for a remote signer whose algorithm signs the whole message rather than a 256-bit digest
+/// (Solana Ed25519). `signer_traits<chain_kind_solana, chain_key_type_solana>` calls it when the provider holds no
+/// private key, and verifies the first signature against the provider's public key (see `self_verified`).
+using sign_raw_fn    = std::function<fc::crypto::signature(std::span<const uint8_t>)>;
+
 /**
  * `signature_provider_entry` constructed provider
  */
@@ -63,8 +71,11 @@ struct signature_provider_t  {
    /// Wire default signing (always set for all key types)
    sign_fn        sign;
 
-   /// One-shot guard for the remote-signer self-verify in
-   /// `detail::em_sign_keccak` (signer.hpp). See note above for more detail.
+   /// Raw-message signing of a remote Ed25519 signer; empty for every other provider.
+   sign_raw_fn    sign_raw{};
+
+   /// One-shot guard for the remote-signer self-verify in `detail::em_sign_keccak` and the Solana
+   /// `signer_traits::do_sign` (signer.hpp). See note above for more detail.
    std::shared_ptr<std::atomic<bool>> self_verified = std::make_shared<std::atomic<bool>>(false);
 };
 
