@@ -389,7 +389,8 @@ enum class wait_reason : uint8_t {
    PENDING_ACCEPT,   ///< a submitted contribution is not yet visible in the irreversible view
    STARTUP_FINALITY, ///< pre-restart transactions may still be live beyond the irreversible view
    OVER_CAP,         ///< the token's remaining exposure allowance cannot fund one bond increment
-   LOW_BALANCE       ///< the underwriter cannot fund one bond increment from its token balance
+   LOW_BALANCE,      ///< the underwriter cannot fund one bond increment from its token balance
+   BELOW_MINIMUM     ///< a first contribution would fall below the request's minimum first bond
 };
 
 /// Bond `amount` on request `request_id`.
@@ -528,6 +529,11 @@ inline plan plan_actions(const plan_inputs& in) {
          const int64_t affordable = std::min({remainder.get_amount(), available.get_amount(),
                                               balance->second.get_amount()});
          const chain::asset contribution(affordable - affordable % increment, remainder.get_symbol());
+         // sysio.bond refuses a first bond below the request's minimum; a submitted accept reserves funds either way.
+         if (!ours && !bond_increment::meets_first_bond_minimum(contribution.get_amount(), r->covered.get_amount(),
+                                                                remainder.get_amount())) {
+            wait(wait_reason::BELOW_MINIMUM); break;
+         }
          out.accepts.push_back({r->id, contribution, r->token_code,
                                ours ? bond->second.amount : chain::asset(0, remainder.get_symbol())});
          used            = used + contribution;

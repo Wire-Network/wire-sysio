@@ -1289,6 +1289,31 @@ BOOST_FIXTURE_TEST_CASE(slash_permanent, sysio_opreg_tester) { try {
    );
 } FC_LOG_AND_RETHROW() }
 
+/// WNS-70: `sysio.epoch::advance` reaches `slash` inline, so an operator with nothing left to
+/// slash (no row, already slashed, terminated) is left as it is instead of aborting the caller.
+BOOST_FIXTURE_TEST_CASE(slash_leaves_removed_operator_unchanged, sysio_opreg_tester) { try {
+   constexpr const char* kSlashReason       = "first slash";
+   constexpr const char* kRepeatSlashReason = "repeat slash";
+   constexpr const char* kTerminationReason = "administrative removal";
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+
+   BOOST_REQUIRE(get_operator("batchop.c"_n).is_null());
+   BOOST_REQUIRE_EQUAL(success(), slash("batchop.c"_n, kSlashReason));
+   BOOST_REQUIRE(get_operator("batchop.c"_n).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.a"_n, OPERATOR_TYPE_BATCH, true));
+   BOOST_REQUIRE_EQUAL(success(), slash("batchop.a"_n, kSlashReason));
+   BOOST_REQUIRE_EQUAL(success(), slash("batchop.a"_n, kRepeatSlashReason));
+   BOOST_REQUIRE_EQUAL(kSlashReason, get_operator("batchop.a"_n)["status_reason"].as_string());
+
+   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.b"_n, OPERATOR_TYPE_BATCH, true));
+   BOOST_REQUIRE_EQUAL(success(), terminate("batchop.b"_n, kTerminationReason));
+   BOOST_REQUIRE_EQUAL(success(), slash("batchop.b"_n, kSlashReason));
+   auto terminated = get_operator("batchop.b"_n);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_TERMINATED == terminated["status"].as<OperatorStatus>());
+   BOOST_REQUIRE_EQUAL(kTerminationReason, terminated["status_reason"].as_string());
+} FC_LOG_AND_RETHROW() }
+
 // ── prune ──
 
 BOOST_FIXTURE_TEST_CASE(prune_requires_config, sysio_opreg_tester) { try {
