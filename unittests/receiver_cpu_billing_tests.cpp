@@ -504,6 +504,9 @@ BOOST_FIXTURE_TEST_CASE( contract_without_cpu_receives_within_the_stipend, recei
 BOOST_FIXTURE_TEST_CASE( many_notifications_in_one_block_cost_the_contract_nothing, receiver_cpu_tester ) try {
    // relay returns at once on transfers it has nothing to do for. Many such transfers to it from other accounts in one
    // block bill it nothing, and its own actions in that block and the next still run.
+   // Give this case the maximum permitted stipend: a successful notification stays within it even if descheduled.
+   // Other cases exercise stipend exhaustion; here every zero-billing and unchanged-window assertion stays strict.
+   set_notify_cpu_stipend( control->get_global_properties().configuration.max_transaction_cpu_usage );
    transfer( alice, bob, bob_funding, "" );
    produce_block();
    auto before = cpu_windows( { relay } );

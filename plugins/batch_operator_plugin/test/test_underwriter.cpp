@@ -22,8 +22,9 @@ const fc::slug_name eth{"ETH"};
 const fc::slug_name sol{"SOL"};
 const fc::slug_name liqeth{"LIQETH"};
 const fc::slug_name liqsol{"LIQSOL"};
-const sysio::chain::symbol liqeth_symbol{9, "LIQETH"};
-const sysio::chain::symbol liqsol_symbol{9, "LIQSOL"};
+/// Cent precision makes each base unit a valid 0.01 bond increment. Production-precision cases below use nine decimals.
+const sysio::chain::symbol liqeth_symbol{2, "LIQETH"};
+const sysio::chain::symbol liqsol_symbol{2, "LIQSOL"};
 const token_symbols        symbols{{liqeth, liqeth_symbol}, {liqsol, liqsol_symbol}};
 
 /// `units` base units of `token`.
@@ -333,6 +334,342 @@ BOOST_AUTO_TEST_CASE(a_statement_the_outpost_recorded_is_bonded_for_its_remainde
    BOOST_CHECK(out.waiting.empty());
 }
 
+BOOST_AUTO_TEST_CASE(five_underwriters_with_two_liqsol_each_can_cover_six) {
+   const sysio::chain::symbol sym{9, "LIQSOL"};
+   constexpr int64_t unit = 1'000'000'000;
+   auto r = synd_request(1, sol, 1, liqsol, 0);
+   r.covered = sysio::chain::asset(6 * unit, sym);
+   r.bonded  = sysio::chain::asset(0, sym);
+   std::vector<plan_inputs> providers(5);
+   for (auto& in : providers) {
+      in.requests = {r};
+      in.caps     = {{liqsol, sysio::chain::asset(2 * unit, sym)}};
+      in.balances = {{liqsol, sysio::chain::asset(10 * unit, sym)}};
+      outpost_emitted_all(in);
+   }
+
+   for (size_t i = 0; i < providers.size(); ++i) {
+      auto& in = providers[i];
+      in.requests = {r};
+      const auto out = plan_actions(in);
+      if (i >= 3) {
+         BOOST_CHECK(out.accepts.empty());
+         continue;
+      }
+      BOOST_REQUIRE_EQUAL(1u, out.accepts.size());
+      const auto& contribution = out.accepts.front();
+      BOOST_CHECK_EQUAL(r.id, contribution.request_id);
+      BOOST_CHECK_EQUAL(sysio::chain::asset(2 * unit, sym), contribution.amount);
+      r.bonded += contribution.amount;
+      if (r.bonded == r.covered) r.state = request_state::BONDED;
+
+      // A later pass must count this provider's partial bond against its cap.
+      in.bonds = {{r.id, {.request_id = r.id, .amount = contribution.amount}}};
+      in.balances.at(liqsol) -= contribution.amount;
+      in.requests = {r};
+      const auto next = plan_actions(in);
+      BOOST_CHECK(next.accepts.empty());
+      if (r.state == request_state::OPEN) {
+         BOOST_REQUIRE_EQUAL(1u, next.waiting.size());
+         BOOST_CHECK(wait_reason::OVER_CAP == next.waiting.front().reason);
+      }
+   }
+   BOOST_CHECK_EQUAL(r.covered, r.bonded);
+   BOOST_CHECK(r.state == request_state::BONDED);
+}
+
+BOOST_AUTO_TEST_CASE(partial_contributions_round_down_to_the_contract_increment) {
+   const sysio::chain::symbol sym{9, "LIQSOL"};
+   constexpr int64_t unit = 1'000'000'000;
+   constexpr int64_t cent = unit / 100;
+   /// Available funds and the contribution, or reason to wait, expected from one pass.
+   struct funding_case {
+      int64_t cap;
+      int64_t balance;
+      int64_t expected;
+      wait_reason reason = wait_reason::OVER_CAP;
+   };
+   const std::vector<funding_case> cases{
+      {2 * unit + cent - 1, 6 * unit, 2 * unit},
+      {6 * unit, 2 * unit + cent - 1, 2 * unit},
+      {6 * unit, cent, cent},
+      {cent - 1, 6 * unit, 0, wait_reason::OVER_CAP},
+      {6 * unit, cent - 1, 0, wait_reason::LOW_BALANCE},
+      {0, 6 * unit, 0, wait_reason::OVER_CAP},
+      {6 * unit, 0, 0, wait_reason::LOW_BALANCE},
+   };
+   for (const auto& c : cases) {
+      BOOST_TEST_CONTEXT("cap=" << c.cap << " balance=" << c.balance) {
+         auto r = synd_request(1, sol, 1, liqsol, 0);
+         r.covered = sysio::chain::asset(6 * unit, sym);
+         r.bonded  = sysio::chain::asset(0, sym);
+         plan_inputs in;
+         in.requests = {r};
+         in.caps     = {{liqsol, sysio::chain::asset(c.cap, sym)}};
+         in.balances = {{liqsol, sysio::chain::asset(c.balance, sym)}};
+         outpost_emitted_all(in);
+         const auto out = plan_actions(in);
+         if (c.expected == 0) {
+            BOOST_CHECK(out.accepts.empty());
+            BOOST_REQUIRE_EQUAL(1u, out.waiting.size());
+            BOOST_CHECK(c.reason == out.waiting.front().reason);
+         } else {
+            BOOST_REQUIRE_EQUAL(1u, out.accepts.size());
+            BOOST_CHECK_EQUAL(sysio::chain::asset(c.expected, sym), out.accepts.front().amount);
+            BOOST_CHECK(out.waiting.empty());
+         }
+      }
+   }
+}
+
+BOOST_AUTO_TEST_CASE(a_cap_lowered_below_existing_exposure_waits) {
+   auto in = eth_inputs();
+   auto existing = synd_request(1, eth, 1, liqeth, 100);
+   existing.state = request_state::APPROVED;
+   in.requests = {existing, synd_request(2, eth, 2, liqeth, 10)};
+   in.bonds = {{1, {.request_id = 1, .amount = liqeth_units(100)}}};
+   in.caps.at(liqeth) = liqeth_units(90);
+   outpost_emitted_all(in);
+   const auto out = plan_actions(in);
+   BOOST_CHECK(out.accepts.empty());
+   BOOST_REQUIRE_EQUAL(1u, out.waiting.size());
+   BOOST_CHECK(wait_reason::OVER_CAP == out.waiting.front().reason);
+}
+
+BOOST_AUTO_TEST_CASE(the_contract_and_planner_share_increment_boundaries) {
+   static_assert(!sysio::bond_increment::for_decimals(1));
+   static_assert(sysio::bond_increment::for_decimals(2).value() == 1);
+   static_assert(sysio::bond_increment::for_decimals(9).value() == 10'000'000);
+   BOOST_CHECK(!sysio::bond_increment::for_decimals(0));
+   BOOST_CHECK(!sysio::bond_increment::for_decimals(19));
+   BOOST_CHECK_EQUAL(10'000'000'000'000'000ULL, sysio::bond_increment::for_decimals(18).value());
+}
+
+BOOST_AUTO_TEST_CASE(a_partial_bond_can_be_topped_up_when_capacity_frees_up) {
+   auto in = eth_inputs();
+   auto open = synd_request(1, eth, 1, liqeth, 600);
+   open.bonded = liqeth_units(200);
+   auto approved = synd_request(2, eth, 2, liqeth, 200);
+   approved.state = request_state::APPROVED;
+   in.requests = {open, approved};
+   in.bonds = {{1, {.request_id = 1, .amount = liqeth_units(200)}},
+               {2, {.request_id = 2, .amount = liqeth_units(200)}}};
+   in.caps.at(liqeth) = liqeth_units(400);
+   in.balances.at(liqeth) = liqeth_units(1000);
+   outpost_emitted_all(in);
+   auto out = plan_actions(in);
+   BOOST_CHECK(out.accepts.empty());
+   BOOST_REQUIRE_EQUAL(1u, out.waiting.size());
+   BOOST_CHECK(wait_reason::OVER_CAP == out.waiting.front().reason);
+
+   in.bonds.at(2).paid = true;
+   out = plan_actions(in);
+   BOOST_REQUIRE_EQUAL(1u, out.accepts.size());
+   BOOST_CHECK_EQUAL(liqeth_units(200), out.accepts.front().amount);
+   BOOST_CHECK_EQUAL(liqeth_units(200), out.accepts.front().bonded_before);
+   in.caps.at(liqeth) = liqeth_units(200);
+   out = plan_actions(in);
+   BOOST_CHECK(out.accepts.empty());
+   BOOST_REQUIRE_EQUAL(1u, out.waiting.size());
+   BOOST_CHECK(wait_reason::OVER_CAP == out.waiting.front().reason);
+}
+
+BOOST_AUTO_TEST_CASE(a_partial_accept_is_not_repeated_while_lib_lags) {
+   auto in = eth_inputs();
+   in.requests = {synd_request(1, eth, 1, liqeth, 600)};
+   in.caps.at(liqeth) = liqeth_units(200);
+   in.balances.at(liqeth) = liqeth_units(1000);
+   outpost_emitted_all(in);
+   const auto first = plan_actions(in);
+   BOOST_REQUIRE_EQUAL(1u, first.accepts.size());
+   BOOST_CHECK_EQUAL(liqeth_units(200), first.accepts.front().amount);
+   const fc::time_point_sec expiration(in.now + fc::seconds(30));
+   remember_submitted_accept(in.pending_accepts, first.accepts.front(), expiration);
+
+   // Both an unchanged LIB and a newer LIB short of the inclusion block still show the old row and wallet.
+   for (const auto advance : {fc::seconds(0), fc::seconds(1), fc::seconds(15)}) {
+      in.now += advance;
+      const auto next = plan_actions(in);
+      BOOST_CHECK(next.accepts.empty());
+      BOOST_REQUIRE_EQUAL(1u, next.pending_accepts.size());
+      BOOST_REQUIRE_EQUAL(1u, next.waiting.size());
+      BOOST_CHECK(wait_reason::PENDING_ACCEPT == next.waiting.front().reason);
+   }
+}
+
+BOOST_AUTO_TEST_CASE(submitted_accepts_reserve_both_exposure_and_wallet_for_other_requests) {
+   for (const bool cap_limited : {true, false}) {
+      BOOST_TEST_CONTEXT("cap_limited=" << cap_limited) {
+         auto in = eth_inputs();
+         in.requests = {synd_request(1, eth, 1, liqeth, 100), synd_request(2, eth, 2, liqeth, 600),
+                        synd_request(3, eth, 3, liqeth, 100)};
+         in.caps.at(liqeth) = liqeth_units(cap_limited ? 300 : 1000);
+         in.balances.at(liqeth) = liqeth_units(cap_limited ? 1000 : 300);
+         outpost_emitted_all(in);
+         const auto first = plan_actions(in);
+         BOOST_REQUIRE_EQUAL(2u, first.accepts.size());
+         BOOST_CHECK_EQUAL(liqeth_units(100), first.accepts[0].amount);   // fully covers the first request
+         BOOST_CHECK_EQUAL(liqeth_units(200), first.accepts[1].amount);   // partially covers the second
+         for (const auto& accept : first.accepts) {
+            remember_submitted_accept(in.pending_accepts, accept, fc::time_point_sec(in.now + fc::seconds(30)));
+         }
+         in.now += fc::seconds(1);
+         const auto next = plan_actions(in);
+         BOOST_CHECK(next.accepts.empty());
+         BOOST_REQUIRE_EQUAL(3u, next.waiting.size());
+         BOOST_CHECK(wait_reason::PENDING_ACCEPT == next.waiting[0].reason);
+         BOOST_CHECK(wait_reason::PENDING_ACCEPT == next.waiting[1].reason);
+         BOOST_CHECK((cap_limited ? wait_reason::OVER_CAP : wait_reason::LOW_BALANCE) == next.waiting[2].reason);
+      }
+   }
+}
+
+BOOST_AUTO_TEST_CASE(a_visible_partial_bond_replaces_its_submission_reservation) {
+   auto in = eth_inputs();
+   in.requests = {synd_request(1, eth, 1, liqeth, 600)};
+   in.caps.at(liqeth) = liqeth_units(400);
+   in.balances.at(liqeth) = liqeth_units(1000);
+   // Our row held 2 and another provider bonded 1 before this 2-token top-up was submitted.
+   in.requests.front().bonded = liqeth_units(300);
+   in.bonds = {{1, {.request_id = 1, .amount = liqeth_units(200)}}};
+   outpost_emitted_all(in);
+   const auto first = plan_actions(in);
+   BOOST_REQUIRE_EQUAL(1u, first.accepts.size());
+   remember_submitted_accept(in.pending_accepts, first.accepts.front(), fc::time_point_sec(in.now + fc::seconds(30)));
+   BOOST_CHECK(plan_actions(in).accepts.empty());
+
+   in.requests.front().bonded = liqeth_units(500);
+   in.bonds.at(1).amount = liqeth_units(400);
+   in.balances.at(liqeth) = liqeth_units(800);
+   auto next = plan_actions(in);
+   BOOST_CHECK(next.pending_accepts.empty());
+   BOOST_CHECK(next.accepts.empty());
+   BOOST_REQUIRE_EQUAL(1u, next.waiting.size());
+   BOOST_CHECK(wait_reason::OVER_CAP == next.waiting.front().reason);
+   in.caps.at(liqeth) = liqeth_units(600);
+   next = plan_actions(in);
+   BOOST_REQUIRE_EQUAL(1u, next.accepts.size());
+   BOOST_CHECK_EQUAL(liqeth_units(100), next.accepts.front().amount);
+   BOOST_CHECK_EQUAL(liqeth_units(400), next.accepts.front().bonded_before);
+}
+
+BOOST_AUTO_TEST_CASE(unobserved_submissions_expire_only_after_lib_passes_the_signed_expiration) {
+   auto in = eth_inputs();
+   in.requests = {synd_request(1, eth, 1, liqeth, 600)};
+   in.caps.at(liqeth) = liqeth_units(200);
+   in.balances.at(liqeth) = liqeth_units(1000);
+   outpost_emitted_all(in);
+   const auto first = plan_actions(in);
+   BOOST_REQUIRE_EQUAL(1u, first.accepts.size());
+   // No submission (for example, signing failed) reserves nothing. A submitted but unconfirmed push does.
+   remember_submitted_accept(in.pending_accepts, first.accepts.front(), std::nullopt);
+   BOOST_CHECK(in.pending_accepts.empty());
+   const fc::time_point_sec expiration(in.now + fc::seconds(30));
+   remember_submitted_accept(in.pending_accepts, first.accepts.front(), expiration);
+   in.now = expiration.to_time_point();
+   auto next = plan_actions(in);
+   BOOST_CHECK(next.accepts.empty());
+   BOOST_REQUIRE_EQUAL(1u, next.pending_accepts.size());
+   in.now += fc::milliseconds(1);
+   next = plan_actions(in);
+   BOOST_CHECK(next.pending_accepts.empty());
+   BOOST_REQUIRE_EQUAL(1u, next.accepts.size());
+   BOOST_CHECK_EQUAL(liqeth_units(200), next.accepts.front().amount);
+}
+
+BOOST_AUTO_TEST_CASE(a_request_leaving_open_releases_a_clamped_submission_reservation) {
+   for (const auto state : {request_state::BONDED, request_state::HELD, request_state::APPROVED,
+                            request_state::VALID, request_state::INVALID}) {
+      auto in = eth_inputs();
+      auto r = synd_request(1, eth, 1, liqeth, 600);
+      r.state = state;
+      in.requests = {r};
+      in.bonds = {{1, {.request_id = 1, .amount = liqeth_units(100)}}};
+      // Other providers filled most of the remainder, so the contract accepted less than the submitted 2.
+      in.pending_accepts = {{1, {liqeth, liqeth_units(200), liqeth_units(0),
+                                 fc::time_point_sec(in.now + fc::seconds(30))}}};
+      BOOST_CHECK(plan_actions(in).pending_accepts.empty());
+   }
+}
+
+BOOST_AUTO_TEST_CASE(a_missing_request_does_not_drop_a_live_reservation_or_advance_the_scan_past_it) {
+   auto in = eth_inputs();
+   in.requests = {synd_request(2, eth, 2, liqeth, 600)};
+   in.caps.at(liqeth) = liqeth_units(200);
+   in.balances.at(liqeth) = liqeth_units(1000);
+   in.pending_accepts = {{1, {liqeth, liqeth_units(200), liqeth_units(0),
+                              fc::time_point_sec(in.now + fc::seconds(30))}}};
+   outpost_emitted_all(in);
+   const auto out = plan_actions(in);
+   BOOST_REQUIRE_EQUAL(1u, out.pending_accepts.size());
+   BOOST_CHECK(out.accepts.empty());
+   BOOST_REQUIRE_EQUAL(1u, out.waiting.size());
+   BOOST_CHECK(wait_reason::OVER_CAP == out.waiting.front().reason);
+   BOOST_CHECK_EQUAL(1u, next_scan_start(2, in.requests, in.bonds, {}, out.pending_accepts));
+}
+
+BOOST_AUTO_TEST_CASE(startup_wait_covers_failover_to_an_older_lib) {
+   auto in = eth_inputs();
+   in.now = fc::time_point_sec(in.now).to_time_point();
+   in.requests = {synd_request(1, eth, 1, liqeth, 10)};
+   outpost_emitted_all(in);
+   const auto transaction_lifetime = fc::seconds(30);
+   const auto startup_lib = in.now;
+   const auto old_node_lib = startup_lib + fc::seconds(10);
+   const auto startup_wall_time = startup_lib + fc::seconds(20);
+   const fc::time_point_sec old_submission_expiration(old_node_lib + transaction_lifetime);
+   in.accepts_after = startup_accept_deadline(startup_lib, startup_wall_time, transaction_lifetime);
+   BOOST_CHECK(fc::time_point_sec(startup_wall_time + transaction_lifetime) == *in.accepts_after);
+   // When LIB is ahead of wall time, its transaction expiration remains the conservative bound.
+   BOOST_CHECK(*in.accepts_after == startup_accept_deadline(startup_wall_time, startup_lib, transaction_lifetime));
+
+   // The old LIB-only startup wait has elapsed, but the previous node's accept can still execute.
+   in.now = startup_lib + transaction_lifetime + fc::seconds(1);
+   BOOST_REQUIRE(in.now < old_submission_expiration.to_time_point());
+   auto out = plan_actions(in);
+   BOOST_CHECK(out.accepts.empty());
+   BOOST_REQUIRE_EQUAL(1u, out.waiting.size());
+   BOOST_CHECK(wait_reason::STARTUP_FINALITY == out.waiting.front().reason);
+   in.now = in.accepts_after->to_time_point();
+   BOOST_CHECK(plan_actions(in).accepts.empty());
+   in.now += fc::milliseconds(1);
+   BOOST_REQUIRE_EQUAL(1u, plan_actions(in).accepts.size());
+}
+
+BOOST_AUTO_TEST_CASE(startup_and_unsupported_precision_wait_without_blocking_approvals_or_claims) {
+   auto in = eth_inputs();
+   auto bonded = synd_request(2, eth, 2, liqeth, 10);
+   bonded.state = request_state::BONDED;
+   bonded.bonded_at = in.now - bonded.window;
+   auto approved = synd_request(3, eth, 3, liqeth, 10);
+   approved.state = request_state::APPROVED;
+   in.requests = {synd_request(1, eth, 1, liqeth, 10), bonded, approved};
+   in.bonds = {{2, {.request_id = 2, .amount = liqeth_units(10)}},
+               {3, {.request_id = 3, .amount = liqeth_units(10)}}};
+   outpost_emitted_all(in);
+   in.accepts_after = fc::time_point_sec(in.now + fc::seconds(30));
+   auto out = plan_actions(in);
+   BOOST_CHECK(out.accepts.empty());
+   BOOST_REQUIRE_EQUAL(1u, out.waiting.size());
+   BOOST_CHECK(wait_reason::STARTUP_FINALITY == out.waiting.front().reason);
+   BOOST_CHECK(out.approves == std::vector<uint64_t>{2});
+   BOOST_CHECK(out.claims == std::vector<uint64_t>{3});
+   in.now = in.accepts_after->to_time_point();
+   BOOST_CHECK(plan_actions(in).accepts.empty());
+   in.now += fc::milliseconds(1);
+   BOOST_REQUIRE_EQUAL(1u, plan_actions(in).accepts.size());
+
+   const sysio::chain::symbol unsupported{1, "LIQETH"};
+   in.requests.front().covered = sysio::chain::asset(10, unsupported);
+   in.requests.front().bonded = sysio::chain::asset(0, unsupported);
+   out = plan_actions(in);
+   BOOST_CHECK(out.accepts.empty());
+   BOOST_REQUIRE_EQUAL(1u, out.waiting.size());
+   BOOST_CHECK(wait_reason::INVALID_PRECISION == out.waiting.front().reason);
+   BOOST_CHECK(out.approves == std::vector<uint64_t>{2});
+   BOOST_CHECK(out.claims == std::vector<uint64_t>{3});
+}
+
 BOOST_AUTO_TEST_CASE(a_statement_without_an_outpost_record_waits) {
    auto in = eth_inputs();
    in.requests = {synd_request(1, eth, 11, liqeth, 10), synd_request(2, sol, 1, liqeth, 10)};
@@ -381,13 +718,17 @@ BOOST_AUTO_TEST_CASE(the_cap_counts_unsettled_bonds_and_this_pass_oldest_first) 
    in.bonds = {{1, {.request_id = 1, .amount = liqeth_units(30)}},
                {2, {.request_id = 2, .amount = liqeth_units(50), .paid = true}}};
    // Listed newest first: the plan still takes request 3 before request 4.
-   in.requests = {approved, settled, synd_request(4, eth, 4, liqeth, 40), synd_request(3, eth, 3, liqeth, 60)};
+   in.requests = {approved, settled, synd_request(5, eth, 5, liqeth, 10), synd_request(4, eth, 4, liqeth, 40),
+                  synd_request(3, eth, 3, liqeth, 60)};
    outpost_emitted_all(in);
    const auto out = plan_actions(in);
-   BOOST_REQUIRE_EQUAL(1u, out.accepts.size());
+   BOOST_REQUIRE_EQUAL(2u, out.accepts.size());
    BOOST_CHECK_EQUAL(3u, out.accepts[0].request_id);   // 30 + 60 = 90 fits under 100
+   BOOST_CHECK_EQUAL(liqeth_units(60), out.accepts[0].amount);
+   BOOST_CHECK_EQUAL(4u, out.accepts[1].request_id);   // only the remaining 10 of capacity is contributed
+   BOOST_CHECK_EQUAL(liqeth_units(10), out.accepts[1].amount);
    BOOST_REQUIRE_EQUAL(1u, out.waiting.size());
-   BOOST_CHECK_EQUAL(4u, out.waiting[0].request_id);   // 90 + 40 does not
+   BOOST_CHECK_EQUAL(5u, out.waiting[0].request_id);   // the cap is now exhausted
    BOOST_CHECK(wait_reason::OVER_CAP == out.waiting[0].reason);
    BOOST_CHECK(out.claims == std::vector<uint64_t>{1});
 }
@@ -402,17 +743,21 @@ BOOST_AUTO_TEST_CASE(no_cap_or_too_little_balance_waits) {
 
    in = eth_inputs();
    in.balances = {{liqeth, liqeth_units(50)}};
-   in.requests = {synd_request(1, eth, 1, liqeth, 40), synd_request(2, eth, 2, liqeth, 40)};
+   in.requests = {synd_request(1, eth, 1, liqeth, 40), synd_request(2, eth, 2, liqeth, 40),
+                  synd_request(3, eth, 3, liqeth, 10)};
    outpost_emitted_all(in);
    out = plan_actions(in);
-   BOOST_REQUIRE_EQUAL(1u, out.accepts.size());
+   BOOST_REQUIRE_EQUAL(2u, out.accepts.size());
+   BOOST_CHECK_EQUAL(liqeth_units(40), out.accepts[0].amount);
+   BOOST_CHECK_EQUAL(liqeth_units(10), out.accepts[1].amount);
    BOOST_REQUIRE_EQUAL(1u, out.waiting.size());
+   BOOST_CHECK_EQUAL(3u, out.waiting[0].request_id);
    BOOST_CHECK(wait_reason::LOW_BALANCE == out.waiting[0].reason);
 
    in.balances.clear();   // no balance of the token at all
    out = plan_actions(in);
    BOOST_CHECK(out.accepts.empty());
-   BOOST_REQUIRE_EQUAL(2u, out.waiting.size());
+   BOOST_REQUIRE_EQUAL(3u, out.waiting.size());
    BOOST_CHECK(wait_reason::LOW_BALANCE == out.waiting[0].reason);
 }
 
