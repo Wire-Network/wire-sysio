@@ -435,8 +435,9 @@ BOOST_FIXTURE_TEST_CASE(a_freeze_admits_transfers_into_custody_and_refuses_the_r
 // A yield pool registered after the bootstrap window
 // ---------------------------------------------------------------------------
 
-// A shadow opened after epoch 0 gets its pool from shadow sysio already holds: regliqpool mints
-// nothing, fails without the seed, and the yield that waited in liqpending queues once the pool exists.
+// A shadow opened after epoch 0 gets its pool from shadow sysio already holds and WIRE the treasury has
+// not reserved: regliqpool mints nothing, fails without either, and the yield that waited in liqpending
+// queues once the pool exists.
 BOOST_FIXTURE_TEST_CASE(a_pool_registered_after_the_bootstrap_window_is_seeded_from_held_shadow,
                         kicker_test_support::kicker_tester) try {
    const symbol  eth_pool  = symbol::from_string("9,ETHPOOL");
@@ -467,9 +468,33 @@ BOOST_FIXTURE_TEST_CASE(a_pool_registered_after_the_bootstrap_window_is_seeded_f
    BOOST_REQUIRE_EQUAL("", stat_row(LIQETH_SYM)["pair_symbol"].as_string());
    BOOST_REQUIRE(swap_pool_row(eth_pool).is_null());
 
-   // With it, the pool is seeded from sysio's row and the supply does not move.
    BOOST_REQUIRE_EQUAL(success(), give_sysio(1));
+
+   // The WIRE side must fit what the treasury has not reserved. Here its balance covers the seed, but
+   // owed pay, pending emissions and the emission ceiling leave one subunit too little: nothing changes.
+   const int64_t pending = 5 * UNIT, claims = 60 * UNIT, ceiling = 7 * UNIT;
+   auto emission = mvo(treasury("emitcfg"_n, "emission_config").get_object());
+   emission("t5_distributable", emission["t5_floor"].as_int64() +
+                                   treasury("t5state"_n, "t5_state")["total_distributed"].as_int64() + ceiling);
+   write_global("emitcfg"_n, "emission_config", emission);
+   reserves(pending, claims);
+   BOOST_REQUIRE_EQUAL(success(), transfer_wire(SYSIO_ACCOUNT, "carol"_n, wire_balance(SYSIO_ACCOUNT) - pending -
+                                                                           claims - ceiling - (pool_seed - 1)));
+   const int64_t treasury_before = wire_balance(SYSIO_ACCOUNT);
+   BOOST_REQUIRE_GT(treasury_before, pool_seed);
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("the WIRE seed exceeds the treasury's unreserved balance"),
+                       regliqpool(ETH, LIQETH, eth_pool, pool_seed, pool_seed));
+   BOOST_REQUIRE_EQUAL(treasury_before, wire_balance(SYSIO_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(pool_seed, account_row(SYSIO_ACCOUNT, LIQETH_SYM)["balance"].as<asset>().get_amount());
+   BOOST_REQUIRE_EQUAL(yield, pending_row(LIQETH_SYM)["quantity"].as<asset>().get_amount());
+   BOOST_REQUIRE_EQUAL("", stat_row(LIQETH_SYM)["pair_symbol"].as_string());
+   BOOST_REQUIRE(swap_pool_row(eth_pool).is_null());
+
+   // With one subunit less owed the seed fits exactly: the pool takes sysio's shadow and that WIRE,
+   // and the supply does not move.
+   reserves(pending, claims - 1);
    BOOST_REQUIRE_EQUAL(success(), regliqpool(ETH, LIQETH, eth_pool, pool_seed, pool_seed));
+   BOOST_REQUIRE_EQUAL(treasury_before - pool_seed, wire_balance(SYSIO_ACCOUNT));
    BOOST_REQUIRE_EQUAL(held, eth_supply());
    BOOST_REQUIRE_EQUAL("ETHPOOL", stat_row(LIQETH_SYM)["pair_symbol"].as_string());
    BOOST_REQUIRE_EQUAL(0, account_row(SYSIO_ACCOUNT, LIQETH_SYM)["balance"].as<asset>().get_amount());

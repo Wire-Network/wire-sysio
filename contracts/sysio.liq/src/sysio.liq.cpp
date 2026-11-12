@@ -2,6 +2,7 @@
 #include <sysio.andon/sysio.andon.hpp>
 #include <sysio.chains/sysio.chains.hpp>
 #include <sysio.epoch/sysio.epoch.hpp>
+#include <sysio.system/treasury.hpp>
 #include <sysio.tokens/sysio.tokens.hpp>
 #include <sysio.opp.common/require_privileged.hpp>
 #include <sysio.opp.common/safe_ops.hpp>
@@ -18,6 +19,7 @@ constexpr auto invalid_quantity_msg = "invalid quantity";
 constexpr auto must_settle_positive_quantity_msg = "must settle positive quantity";
 constexpr auto symbol_precision_mismatch_msg = "symbol precision mismatch";
 constexpr auto overdrawn_balance_msg = "overdrawn balance";
+constexpr auto wire_seed_reserved_msg = "the WIRE seed exceeds the treasury's unreserved balance";
 constexpr name bond_account = "sysio.bond"_n;
 
 
@@ -323,11 +325,15 @@ void liq::regliqpool(sysio::slug_name chain_code, sysio::slug_name token_code, s
    const extended_symbol shadow_symbol{ sym, get_self() };
 
    // sysio seeds the pool and holds its shares. In the bootstrap window the seed is the LCO liq,
-   // protocol-owned and already in outpost custody, so its shadow is minted. After the window nothing
-   // is minted: the seed is shadow sysio already holds, and the transfer below fails without it.
+   // protocol-owned and already in outpost custody, so its shadow is minted, and its WIRE is the T5
+   // dex earmark. After the window nothing is minted: the shadow is what sysio already holds (the
+   // transfer below fails without it), and the WIRE may not touch what the treasury has reserved.
    if (epoch::in_bootstrap_window()) {
       check(grow_supply(sym.code(), initial_chain_amount), "supply exceeds the asset range");
       adjust_account(SYSTEM_ACCOUNT, shadow);
+   } else {
+      check(initial_wire_amount <= sysiosystem::treasury::available(SYSTEM_ACCOUNT, TOKEN_ACCOUNT),
+            wire_seed_reserved_msg);
    }
    stats statstable(get_self());
    statstable.modify(ram_payer, symbol_key{ sym.code().raw() }, [&](currency_stats& s) {

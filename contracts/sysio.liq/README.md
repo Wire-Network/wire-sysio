@@ -49,10 +49,12 @@ fee authority, the shadow as yield leg) and sets the tick parameters. Inside the
 epoch-0 bootstrap window the seed is the LCO liq and is minted to `sysio`, with
 the T5 dex earmark as the WIRE side. After the window nothing is minted: `sysio`
 must already hold the seed shadow, so the pool of a shadow opened after launch
-adds no supply beyond what outpost custody already covers. Yield reported before
-the pool exists waits in `liqpending` and queues once it does. The pre-launch
-positions are replayed by `sysio.synd::importsynd`, inside the bootstrap window
-only.
+adds no supply beyond what outpost custody already covers, and the WIRE side must
+fit the treasury's unreserved balance (`sysiosystem::treasury::available`: the
+balance less pending emissions, outstanding pay claims and the remaining emission
+ceiling), so it never spends owed pay. Yield reported before the pool exists waits
+in `liqpending` and queues once it does. The pre-launch positions are replayed by
+`sysio.synd::importsynd`, inside the bootstrap window only.
 
 ## Tables
 

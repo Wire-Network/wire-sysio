@@ -160,9 +160,11 @@ namespace sysio {
       /// window the shadow seed is the LCO liq, already in outpost custody, and
       /// is minted to `sysio` first. After the window nothing is minted, so the
       /// pool adds no shadow beyond what outpost custody already covers: `sysio`
-      /// must already hold the seed, and the action fails when it does not. One
-      /// pool per shadow. `fee` is in 1/10000 of the traded amount,
-      /// `locked_shares` in `pair_symbol`.
+      /// must already hold the seed, and `initial_wire_amount` must fit the
+      /// treasury's unreserved WIRE (`sysiosystem::treasury::available`), so a
+      /// pool never spends owed pay or committed emissions. The action fails
+      /// otherwise. One pool per shadow. `fee` is in 1/10000 of the traded
+      /// amount, `locked_shares` in `pair_symbol`.
       [[sysio::action]] void regliqpool(sysio::slug_name chain_code, sysio::slug_name token_code, symbol pair_symbol,
                                         uint64_t initial_chain_amount, uint64_t initial_wire_amount, int32_t fee,
                                         int64_t locked_shares, uint32_t conversion_horizon_sec,
