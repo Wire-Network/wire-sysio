@@ -44,6 +44,7 @@ constexpr std::string_view hold_bps_range_msg    = "hold_bps must be positive an
 constexpr std::string_view amount_positive_msg   = "amount must be positive";
 constexpr std::string_view request_missing_msg   = "request not found";
 constexpr std::string_view fully_bonded_msg      = "request is fully bonded";
+constexpr std::string_view first_bond_msg        = "first bond is below the request's minimum";
 constexpr std::string_view not_accepting_msg     = "request is not accepting bonds";
 constexpr std::string_view terminal_msg          = "request is already resolved";
 constexpr std::string_view not_bonded_msg        = "request is not bonded";
@@ -74,6 +75,8 @@ constexpr size_t MAX_STATEMENT_BYTES = 1024;
 
 /// Mirrors the contract's PRUNE_RETENTION_SEC: seven days.
 constexpr uint32_t PRUNE_RETENTION_SEC = 604'800;
+/// Mirrors the contract's MAX_BONDS_PER_REQUEST.
+constexpr uint64_t MAX_BONDS_PER_REQUEST = 64;
 
 /// Mirrors the contract's MAX_PRUNE_LIMIT.
 constexpr uint32_t MAX_PRUNE_LIMIT = 64;
@@ -979,6 +982,58 @@ BOOST_FIXTURE_TEST_CASE(accept_refuses_once_fully_bonded, sysio_bond_tester) try
    BOOST_REQUIRE_EQUAL(0u, bond_amount_of(1, "bob"_n));
    BOOST_REQUIRE_EQUAL(10 * UNIT, bond_amount_of(1, "alice"_n));
    BOOST_REQUIRE(bonded_at == request_row_of(1)["bonded_at"].as<time_point>());
+} FC_LOG_AND_RETHROW()
+
+// An underwriter's first bond is at least covered / MAX_BONDS_PER_REQUEST. A top-up of its own row, and
+// a first bond that takes the whole remainder, may be smaller.
+BOOST_FIXTURE_TEST_CASE(accept_refuses_a_first_bond_below_the_request_minimum, sysio_bond_tester) try {
+   constexpr uint64_t increment = UNIT / 100;
+   const auto         refused   = wasm_assert_msg(std::string(first_bond_msg));
+   // 10 UNIT / 64 is 15.625 increments: the smallest first bond is 16.
+   BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'a'), LIQSOL, 10 * UNIT, 0));
+   const auto before = liq_balance("alice"_n);
+
+   BOOST_REQUIRE_EQUAL(refused, accept("alice"_n, 1, 15 * increment));
+   BOOST_REQUIRE_EQUAL(before, liq_balance("alice"_n));
+   BOOST_REQUIRE(bond_rows_of(1).empty());
+   BOOST_REQUIRE_EQUAL(success(), accept("alice"_n, 1, 16 * increment));
+   BOOST_REQUIRE_EQUAL(success(), accept("alice"_n, 1, increment));
+   BOOST_REQUIRE_EQUAL(17 * increment, bond_amount_of(1, "alice"_n));
+   BOOST_REQUIRE_EQUAL(refused, accept("bob"_n, 1, 15 * increment));
+
+   // alice leaves 15 increments uncovered: bob's first bond takes all of it.
+   BOOST_REQUIRE_EQUAL(success(), accept("alice"_n, 1, 10 * UNIT - 32 * increment));
+   BOOST_REQUIRE_EQUAL(success(), accept("bob"_n, 1, 15 * increment));
+   BOOST_REQUIRE_EQUAL(15 * increment, bond_amount_of(1, "bob"_n));
+   BOOST_REQUIRE_EQUAL(STATE_BONDED, request_state_of(1));
+} FC_LOG_AND_RETHROW()
+
+// Bonded at the minimum by as many underwriters as it admits, a request holds MAX_BONDS_PER_REQUEST
+// rows, and one prune erases it with all of them.
+BOOST_FIXTURE_TEST_CASE(a_request_holds_at_most_the_maximum_bonds, sysio_bond_tester) try {
+   constexpr uint64_t increment  = UNIT / 100;
+   constexpr uint64_t minimum    = 2 * increment;
+   constexpr uint32_t window_sec = 3600;
+   std::vector<name> underwriters;
+   for (uint64_t i = 0; i < MAX_BONDS_PER_REQUEST; ++i)
+      underwriters.push_back(name(std::string("uw") + char('a' + i / 8) + char('a' + i % 8)));
+   create_accounts(underwriters);
+   for (const name underwriter : underwriters) BOOST_REQUIRE_EQUAL(success(), mint(underwriter, minimum));
+
+   BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'a'), LIQSOL,
+                                          MAX_BONDS_PER_REQUEST * minimum, 0, window_sec));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(first_bond_msg)), accept("alice"_n, 1, increment));
+   for (const name underwriter : underwriters) BOOST_REQUIRE_EQUAL(success(), accept(underwriter, 1, minimum));
+   BOOST_REQUIRE_EQUAL(STATE_BONDED, request_state_of(1));
+   BOOST_REQUIRE_EQUAL(MAX_BONDS_PER_REQUEST, bond_rows_of(1).size());
+
+   pass_window(window_sec);
+   BOOST_REQUIRE_EQUAL(success(), approve(1));
+   for (const name underwriter : underwriters) BOOST_REQUIRE_EQUAL(success(), claim(1, underwriter));
+   pass_retention();
+   BOOST_REQUIRE_EQUAL(success(), prune(0, 1));
+   BOOST_REQUIRE(request_row_of(1).is_null());
+   BOOST_REQUIRE(bond_rows_of(1).empty());
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE(accept_twice_by_one_underwriter_adds_to_one_row, sysio_bond_tester) try {

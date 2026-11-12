@@ -119,6 +119,9 @@ constexpr std::string_view not_accepting_msg = "request is not accepting bonds";
 /// Message of the `check` `accept` raises once bonded has reached covered.
 constexpr std::string_view fully_bonded_msg = "request is fully bonded";
 
+/// Message of the `check` `accept` raises for an underwriter's first bond below the request's minimum.
+constexpr std::string_view first_bond_msg = "first bond is below the request's minimum";
+
 /// Message of the `check` `approve` raises on a request in any state but BONDED.
 constexpr std::string_view not_bonded_msg = "request is not bonded";
 
@@ -511,6 +514,10 @@ void bond::accept(name underwriter, uint64_t request_id, uint64_t amount) {
    bonds_t        bonds(get_self());
    const bond_key key{.request_id = request_id, .underwriter = underwriter};
    const auto     existing = bonds.try_get(key);
+   // A new row brings at least covered / MAX_BONDS_PER_REQUEST or the whole remainder, so a request
+   // never holds more rows than that: the bound on `claim`'s and `prune`'s scans of them.
+   check(existing || bond_increment::meets_first_bond_minimum(bonded_amount, req->covered, remainder),
+         first_bond_msg);
    bond_row       row      = existing.value_or(
       bond_row{.request_id = request_id, .underwriter = underwriter, .amount = 0});
    credit_holding(row.yield, row.amount, bonded_amount, req->token_code, *custody);
