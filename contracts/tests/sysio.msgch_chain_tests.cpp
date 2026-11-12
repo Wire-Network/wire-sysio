@@ -2143,9 +2143,8 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_
    BOOST_REQUIRE_NE(canonical_checksum, divergent_checksum);
 
    // Stage the split deliveries for both outposts before the boundary. BATCHOP
-   // is non-canonical everywhere, so `advance` must deduplicate it before
-   // invoking slashop: a second opreg::slash throws and would roll the epoch
-   // advance back. BATCHOP_B/C establish canonical consensus after the boundary.
+   // is non-canonical everywhere, and `advance` deduplicates it before invoking
+   // slashop. BATCHOP_B/C establish canonical consensus after the boundary.
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP,   ETH_OUTPOST_ID, divergent));
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP,   SOL_OUTPOST_ID, divergent));
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, canonical));
@@ -2189,6 +2188,47 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_
    // The slide reseated the group without BATCHOP, so the roster no longer lists it.
    for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID})
       BOOST_REQUIRE(!require_roster_is_window(chain).count(BATCHOP.to_string()));
+} FC_LOG_AND_RETHROW() }
+
+/// WNS-70: a member that delivered a non-canonical envelope and was terminated before the epoch
+/// closed leaves its delivery row behind. `advance` still queues it for a slash, which must not
+/// roll the epoch advance back.
+BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_then_termination_still_advances, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t    kBatchOperatorCount  = 3;
+   constexpr uint32_t    kEpochAdvanceCount   = 1;
+   constexpr const char* kCanonicalPayload    = "canonical";
+   constexpr const char* kNonCanonicalPayload = "non-canonical";
+   constexpr const char* kTerminationReason   = "terminated after a non-canonical delivery";
+
+   bootstrap(/*n_batch_ops=*/kBatchOperatorCount, /*batchop_is_bootstrapped=*/false);
+   const uint32_t epoch = current_epoch();
+   inbound_stream_tip tip;
+   const auto canonical = encode_chained_delivery(kCanonicalPayload, tip);
+   const auto divergent = encode_chained_delivery(kNonCanonicalPayload, tip);
+   const auto canonical_checksum = fc::sha256::hash(canonical.data(), canonical.size());
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP,   ETH_OUTPOST_ID, divergent));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP,   SOL_OUTPOST_ID, divergent));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, canonical));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, SOL_OUTPOST_ID, canonical));
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "terminate"_n,
+      mvo()("account", BATCHOP.to_string())("reason", kTerminationReason)));
+   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, canonical));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, SOL_OUTPOST_ID, canonical));
+   for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
+      auto consensus = get_outpcons(chain);
+      BOOST_REQUIRE(!consensus.is_null());
+      BOOST_REQUIRE_EQUAL(epoch, consensus[msgch_fields::EPOCH_INDEX].as<uint32_t>());
+      BOOST_REQUIRE_EQUAL(canonical_checksum.str(), consensus[msgch_fields::WINNING_CHECKSUM].as_string());
+      BOOST_REQUIRE(!find_inbound_delivery(chain, epoch, BATCHOP).is_null());
+   }
+
+   advance_via_consensus();
+
+   BOOST_REQUIRE_EQUAL(epoch + kEpochAdvanceCount, current_epoch());
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_TERMINATED,
+                       get_operator(BATCHOP)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
 } FC_LOG_AND_RETHROW() }
 
 /// With two active outposts, advance() writes exactly one delivery-log row per expiring-group member

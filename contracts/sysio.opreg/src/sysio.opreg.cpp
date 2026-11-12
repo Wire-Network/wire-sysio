@@ -1276,11 +1276,11 @@ void opreg::slash(name account, std::string reason) {
 
    operators_t ops(get_self());
    auto op_pk = operator_key{account.value};
-   auto op = ops.get(op_pk, operator_not_found_msg.data());
-   check(op.status != OperatorStatus::OPERATOR_STATUS_SLASHED,
-         "operator already slashed");
-   check(op.status != OperatorStatus::OPERATOR_STATUS_TERMINATED,
-         "operator already terminated");
+   // Nothing is left to slash on a pruned, slashed or terminated operator. Reached inline from
+   // `sysio.epoch::advance`, so this returns rather than aborting the epoch advance.
+   if (!ops.contains(op_pk)) return;
+   auto op = ops.get(op_pk);
+   if (op.has_terminal_status()) return;
 
    auto now = current_time_ms();
 
