@@ -54,8 +54,8 @@ constexpr uint32_t    spin_count = 20000;
 constexpr int64_t     cpu_weight = 10'000'000'000; ///< ample CPU for the accounts that run or pay for code
 
 // A handler either stays inside the stipend or is measured to run well past it.
-/// The notify_cpu_stipend the fixture sets: well above a no-op handler on every runtime, so that a frame inside or
-/// past it does not depend on the host's speed.
+/// The notify_cpu_stipend the fixture sets: well above a no-op handler on every runtime. A frame's CPU is wall-clock
+/// time, so a case that bills a no-op handler nothing sets ample_stipend(), which a descheduled frame stays inside.
 constexpr int64_t     stipend_us         = 1000;
 constexpr int64_t     long_frame_us      = 4 * stipend_us; ///< long_spins() keeps a frame busy at least this long
 constexpr uint32_t    first_long_spins   = 1000;
@@ -63,7 +63,7 @@ constexpr uint32_t    max_spin_doublings = 21; ///< first_long_spins doubled thi
 constexpr uint32_t    calibration_runs   = 3;  ///< runs of each loop count long_spins() measures
 constexpr uint32_t    short_spin_count   = 10;
 constexpr uint32_t    many_notifications = 50;
-constexpr auto        frame_pause        = std::chrono::milliseconds( 50 ); ///< a pause inside a frame: 50 stipends
+constexpr auto        frame_pause        = std::chrono::milliseconds( 200 ); ///< a pause in a frame, past any stipend
 constexpr uint8_t     short_trx_max_cpu_ms = 20; ///< a transaction limit that frame_pause runs past
 constexpr uint8_t     paused_trx_max_cpu_ms = 100; ///< the transaction's limit when a pause outlasts the block
 constexpr auto        paused_block_time  = std::chrono::milliseconds( 200 ); ///< that push's block deadline
@@ -146,6 +146,9 @@ struct receiver_cpu_tester : validating_tester {
       cfg.notify_cpu_stipend = stipend;
       push_action( config::system_account_name, setparams, config::system_account_name, mvo()( "params", cfg ) );
    }
+
+   /// The largest notify_cpu_stipend the chain accepts.
+   uint32_t ample_stipend() const { return control->get_global_properties().configuration.max_transaction_cpu_usage; }
 
    /// sysio.bios setalimits data giving `account` these NET and CPU weights, keeping its RAM.
    mvo weights( account_name account, int64_t net_weight, int64_t cpu_weight ) const {
@@ -265,8 +268,8 @@ struct receiver_cpu_tester : validating_tester {
    /**
     * A loop count that keeps cpu_receiver_test busy for at least long_frame_us, well past the stipend. Runtimes differ
     * by orders of magnitude, so it is measured: spins the game pays for directly, doubled until even the fastest of
-    * calibration_runs runs takes that long. The measuring takes a good part of a block's CPU, so the block is produced
-    * and the test's own transactions start in a new one.
+    * calibration_runs runs takes that long. Each loop count's runs get a block of their own: descheduled, the runs of
+    * all the counts can take more CPU than one block has. The test's own transactions start in a new block.
     */
    uint32_t long_spins() {
       if( !long_spin_count ) {
@@ -281,9 +284,9 @@ struct receiver_cpu_tester : validating_tester {
             }
             if( fastest_us >= long_frame_us )
                long_spin_count = n;
+            produce_block();
          }
          BOOST_REQUIRE( long_spin_count );
-         produce_block();
       }
       return *long_spin_count;
    }
@@ -475,6 +478,7 @@ BOOST_FIXTURE_TEST_CASE( authorizer_without_cpu_or_net_is_billed_nothing, receiv
 
 BOOST_FIXTURE_TEST_CASE( contract_without_cpu_receives_within_the_stipend, receiver_cpu_tester ) try {
    // idle has no CPU. A handler the stipend covers costs it nothing: its entry is 0 and its CPU window stays put.
+   set_notify_cpu_stipend( ample_stipend() );
    auto before  = cpu_windows( { token_account, alice, idle } );
    auto trace   = transfer( alice, idle, amount, "" );
    auto receipt = entries( trace );
@@ -485,6 +489,7 @@ BOOST_FIXTURE_TEST_CASE( contract_without_cpu_receives_within_the_stipend, recei
    produce_and_check_validator( { token_account, alice, idle } );
 
    // Past the stipend it owes CPU it does not have, so the transfer fails with the usual CPU error and moves nothing.
+   set_notify_cpu_stipend( stipend_us );
    const auto memo          = long_spin_memo();
    const auto alice_balance = get_currency_balance( token_account, token_symbol, alice );
    const auto idle_balance  = get_currency_balance( token_account, token_symbol, idle );
@@ -504,9 +509,7 @@ BOOST_FIXTURE_TEST_CASE( contract_without_cpu_receives_within_the_stipend, recei
 BOOST_FIXTURE_TEST_CASE( many_notifications_in_one_block_cost_the_contract_nothing, receiver_cpu_tester ) try {
    // relay returns at once on transfers it has nothing to do for. Many such transfers to it from other accounts in one
    // block bill it nothing, and its own actions in that block and the next still run.
-   // Give this case the maximum permitted stipend: a successful notification stays within it even if descheduled.
-   // Other cases exercise stipend exhaustion; here every zero-billing and unchanged-window assertion stays strict.
-   set_notify_cpu_stipend( control->get_global_properties().configuration.max_transaction_cpu_usage );
+   set_notify_cpu_stipend( ample_stipend() );
    transfer( alice, bob, bob_funding, "" );
    produce_block();
    auto before = cpu_windows( { relay } );
@@ -528,16 +531,13 @@ BOOST_FIXTURE_TEST_CASE( many_notifications_in_one_block_cost_the_contract_nothi
 
 BOOST_FIXTURE_TEST_CASE( cold_module_load_takes_none_of_the_stipend, receiver_cpu_tester ) try {
    // A contract with no CPU is notified for the first time, and its first run loads a large module no one has run
-   // before. Loading pauses billing: the frame's CPU and its deadline both leave the load out. With no leeway, the
-   // handler, which has nothing to do for transfers, still fits the stipend, though the load takes far longer: tens of
-   // milliseconds to compile or parse the module on each runtime, against a few hundred microseconds for a warm run on
-   // the interpreter.
+   // before. Loading pauses billing: the load is in the transaction's elapsed time and in no entry's CPU.
    create_accounts( { cold } );
    set_code( cold, test_contracts::sysio_system_wasm() ); // no transfer handler, and nothing else runs this code
    set_cpu_weight( cold, 0 );
+   set_notify_cpu_stipend( ample_stipend() );
    produce_block();
    transfer( alice, bob, amount, "" ); // warms everything but cold's module
-   control->set_subjective_cpu_leeway( fc::microseconds( 0 ) );
 
    // A block deadline, as a producer and a speculative node push every transaction with, enables the billing pause.
    auto before  = cpu_windows( { token_account, cold } );
@@ -546,9 +546,8 @@ BOOST_FIXTURE_TEST_CASE( cold_module_load_takes_none_of_the_stipend, receiver_cp
    auto receipt = entries( trace );
    BOOST_REQUIRE_EQUAL( receipt.size(), 2u );
    BOOST_TEST( receipt[1] == 0u );
-   BOOST_TEST( frame( trace, cold, "transfer"_n ).elapsed.count() > stipend_us ); // the load ran past the stipend
+   BOOST_TEST( trace->elapsed.count() - trace->total_cpu_usage_us.value > stipend_us ); // the load, billed to no one
    check_billed( before, { token_account } );
-   control->set_subjective_cpu_leeway( fc::microseconds( config::default_subjective_cpu_leeway_us ) );
    produce_and_check_validator( { token_account, alice, cold } );
 } FC_LOG_AND_RETHROW()
 
@@ -556,12 +555,14 @@ BOOST_FIXTURE_TEST_CASE( pause_in_a_frame_is_left_out_of_its_cpu_and_deadline, r
    // A hook pauses a frame the way a first run's load does, the same on every runtime: first the input action's frame,
    // under a transaction limit shorter than the pause, then a notified contract's that has no CPU, with no leeway. Each
    // push succeeds only if the paused frame's deadline moves past the pause and its CPU leaves the pause out.
+   const int64_t pause_us = std::chrono::microseconds( frame_pause ).count();
+   BOOST_REQUIRE( pause_us > ample_stipend() ); // a pause billed to idle's frame would run past its stipend
+   set_notify_cpu_stipend( ample_stipend() );
    transfer( alice, idle, amount, "" ); // loads the modules, so the hook's are the frames' only pauses
    produce_block();
    // A block deadline, as a producer and a speculative node push every transaction with, enables the billing pause.
-   const auto    block_deadline = [] { return fc::time_point::now() + fc::seconds( 10 ); };
-   const int64_t pause_us       = std::chrono::microseconds( frame_pause ).count();
-   uint32_t      pauses         = 0;
+   const auto block_deadline = [] { return fc::time_point::now() + fc::seconds( 10 ); };
+   uint32_t   pauses         = 0;
    {
       auto hook = pause_frames_of( token_account, frame_pause, pauses );
       auto trx  = make_trx( { transfer_action( alice, idle, amount, "" ) } );
@@ -596,6 +597,7 @@ BOOST_FIXTURE_TEST_CASE( pause_past_the_block_deadline_stops_at_the_block_deadli
    // deadlines move past the pause, but not past the block deadline: the transaction stops there with
    // deadline_exception, which a producer retries in a later block, rather than failing on any account's CPU or the
    // transaction's limit.
+   set_notify_cpu_stipend( ample_stipend() );
    transfer( alice, idle, amount, "" ); // loads the modules, so the hook's are the frames' only pauses
    produce_block();
    uint32_t pauses = 0;
@@ -631,6 +633,7 @@ BOOST_FIXTURE_TEST_CASE( zero_entry_leaves_the_contracts_cpu_window_alone, recei
    BOOST_REQUIRE( usage( *control, relay ).cpu_usage.value_ex > 0 );
 
    // A handler the stipend covers bills relay nothing, so its window is neither checked nor moved.
+   set_notify_cpu_stipend( ample_stipend() );
    auto before  = cpu_windows( { token_account, alice, relay } );
    auto trace   = transfer( alice, relay, amount, "" );
    auto receipt = entries( trace );
@@ -640,6 +643,7 @@ BOOST_FIXTURE_TEST_CASE( zero_entry_leaves_the_contracts_cpu_window_alone, recei
    produce_and_check_validator( { token_account, alice, relay } );
 
    // Past the stipend it is over its limit.
+   set_notify_cpu_stipend( stipend_us );
    BOOST_CHECK_EXCEPTION( transfer( alice, relay, amount, long_spin_memo() ), tx_cpu_usage_exceeded,
                           fc_exception_message_contains( relay_over_its_limit ) );
    produce_block();
@@ -980,6 +984,7 @@ BOOST_FIXTURE_TEST_CASE( receiver_subjective_bill_limits_its_frame_past_the_stip
                           fc_exception_message_contains( account_cpu_limit_reached ) );
    transfer( alice, bob, amount, "spin:1" ); // reaches no contract
    // A handler within the stipend still runs, and bills the game nothing.
+   set_notify_cpu_stipend( ample_stipend() );
    auto receipt = entries( push_measured( make_trx( { transfer_action( alice, game, amount, "" ) } ), deadline ) );
    BOOST_REQUIRE_EQUAL( receipt.size(), 2u );
    BOOST_TEST( receipt[1] == 0u );
