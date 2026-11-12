@@ -122,7 +122,7 @@ title: Advance the Council Round
 summary: '{{nowrap caller}} advances bounded election work.'
 ---
 
-Authenticated {{caller}} advances election {{election_gen}}, round {{round_id}}, processing at most {{max_steps}} seats (1–21) in the persisted original order. After nominations expire, generation freezes one seed; voting opens only after all flights are finalized. After the shared voting deadline, tabulation processes each seat through T1, T2, T3 and A, B, C, immediately excluding elected members from later seats. A subsequent continuation starts fresh nominations, tallies, and ballot counters for every vacancy while retaining winners and snapshots. Rounds repeat until all 21 seats are filled; there is no manual assignment fallback. Stale identities fail. Exact deadlines do not trigger settlement. This action also contributes public entropy.
+Authenticated {{caller}} advances election {{election_gen}}, round {{round_id}}, processing at most {{max_steps}} seats (1–21) in the persisted original order. After nominations expire, generation freezes one seed; voting opens only after all flights are finalized. After the shared voting deadline, tabulation processes each seat through T1, T2, T3 and A, B, C, immediately excluding elected members from later seats. A subsequent continuation starts fresh nominations, tallies, and ballot counters for every vacancy while retaining winners and snapshots. Rounds repeat until all 21 seats are filled; there is no manual assignment fallback. The call that fills the last seat replaces the active authority of sysio.cncl with the 21 members at a threshold of 15. Stale identities fail. Exact deadlines do not trigger settlement. This action also contributes public entropy.
 
 <h1 class="contract">stir</h1>
 
@@ -133,3 +133,13 @@ summary: '{{nowrap caller}} contributes to the public entropy accumulator.'
 ---
 
 Authenticated {{caller}} contributes to the election's deterministic public entropy accumulator. This does not change an already frozen automatic-generation seed or advance election phases. Use settle to drive eligible transitions.
+
+<h1 class="contract">syncnodes</h1>
+
+---
+spec_version: "0.2.0"
+title: Refresh the Node Owner Authority
+summary: '{{nowrap caller}} refreshes the node owner authority.'
+---
+
+Authenticated {{caller}} replaces the active authority of sysio.nodes with the tier-1 node owners currently registered in sysio.roa, each through its own active permission with weight 1, at a threshold of floor(2*N/3)+1. The action fails while no tier-1 owner is registered. It does not change the permissions of sysio or of any other account.
