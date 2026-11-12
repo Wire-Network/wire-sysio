@@ -607,10 +607,10 @@ public:
       }
       }
 
-      auto [signer, privkey, startup_probe] =
+      auto [signer, raw_signer, privkey, startup_probe] =
          create_provider_from_spec(key_type, pubkey, private_key_provider_spec);
       auto provider = std::make_shared<signature_provider_t>(
-         signature_provider_t{target_chain, key_type, key_name, pubkey, privkey, signer}
+         signature_provider_t{target_chain, key_type, key_name, pubkey, privkey, signer, raw_signer}
          );
 
       // Register first. set_provider() throws plugin_config_exception on a duplicate key_name / public_key; reaching

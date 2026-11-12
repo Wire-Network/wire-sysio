@@ -28,6 +28,7 @@
 #include <sysio/chain/asset.hpp>
 #include <sysio/chain/name.hpp>
 #include <sysio/chain/symbol.hpp>
+#include <sysio.bond/bond_increment.hpp>
 
 namespace sysio::batch_operator_detail::underwriter {
 
@@ -174,6 +175,23 @@ struct bond_position {
    chain::asset owed_wire = chain::asset(0, wire::asset_symbol);
 };
 
+/// One submitted accept, retained even if its callback times out or reports a refusal.
+struct pending_accept {
+   fc::slug_name token_code{};       ///< registry code of the token reserved by this submission
+   chain::asset amount{};           ///< submitted contribution, reserved against exposure and wallet funds
+   chain::asset bonded_before{};    ///< our bond row's amount before submission, used to recognize inclusion
+   fc::time_point_sec expires_at{};   ///< the exact signed transaction expiration, judged by LIB time
+};
+
+/// At most one unobserved accept per request for this underwriter.
+using pending_accept_map = std::map<request_id_t, pending_accept>;
+
+/// Wait past old submissions even on failover to a node with an older LIB; only LIB may clear the deadline.
+inline fc::time_point_sec startup_accept_deadline(fc::time_point lib_time, fc::time_point wall_time,
+                                                  fc::microseconds transaction_lifetime) {
+   return fc::time_point_sec(std::max(lib_time, wall_time) + transaction_lifetime);
+}
+
 /// Decode a `bonds` row (`values_only`) when it is `underwriter`'s, else nullopt; its amount is in the token of its
 /// request among `requests`. Throws when the row is the underwriter's but does not decode, names no underwriter, or
 /// names a request missing from `requests`: a bond it cannot read or attribute to a token must stop the pass rather
@@ -206,11 +224,13 @@ inline bool synd_has_work(const std::vector<request>& requests) {
 }
 
 /// The lowest request id a later pass still needs to read: every request in play, ruled but not acknowledged, or
-/// bonded by the underwriter. Request ids only grow and a settled request never comes back into play, so the rows
-/// below it can be skipped. One past the newest read when nothing needs a later look; `from` when nothing was read.
+/// bonded by the underwriter or awaiting submission finality. Request ids only grow and a settled request never comes
+/// back into play, so earlier rows can be skipped. One past the newest read when nothing needs a later look;
+/// `from` when nothing was read.
 inline request_id_t next_scan_start(request_id_t from, const std::vector<request>& requests,
                                     const std::map<request_id_t, bond_position>& bonds,
-                                    const std::set<request_id_t>&                bonded) {
+                                    const std::set<request_id_t>&                bonded,
+                                    const pending_accept_map& pending = {}) {
    std::optional<request_id_t> lowest;
    const auto                  keep = [&](request_id_t id) { lowest = std::min(lowest.value_or(id), id); };
    request_id_t                next = from;
@@ -220,6 +240,7 @@ inline request_id_t next_scan_start(request_id_t from, const std::vector<request
    }
    for (const auto& [id, bond] : bonds) keep(id);
    for (const request_id_t id : bonded) keep(id);
+   for (const auto& [id, accept] : pending) keep(id);
    return lowest.value_or(next);
 }
 
@@ -364,15 +385,29 @@ enum class wait_reason : uint8_t {
    UNVERIFIED,       ///< the outpost holds no final record of an envelope for that epoch
    CONTRADICTED,     ///< the outpost recorded another digest for that epoch: the statement is false
    NO_CAP,           ///< no exposure cap is configured for the token
-   OVER_CAP,         ///< bonding it would exceed the token's exposure cap
-   LOW_BALANCE       ///< the underwriter does not hold enough of the token
+   INVALID_PRECISION, ///< the token cannot represent the contract's bond increment
+   PENDING_ACCEPT,   ///< a submitted contribution is not yet visible in the irreversible view
+   STARTUP_FINALITY, ///< pre-restart transactions may still be live beyond the irreversible view
+   OVER_CAP,         ///< the token's remaining exposure allowance cannot fund one bond increment
+   LOW_BALANCE       ///< the underwriter cannot fund one bond increment from its token balance
 };
 
 /// Bond `amount` on request `request_id`.
 struct accept_action {
    request_id_t request_id = 0;
    chain::asset amount{};
+   fc::slug_name token_code{};   ///< registry code needed to reserve the submitted contribution
+   chain::asset bonded_before{}; ///< our row amount in the view used to plan this contribution
 };
+
+/// Reserve every transaction that reached submission, including one whose callback did not confirm success.
+inline void remember_submitted_accept(pending_accept_map& pending, const accept_action& accept,
+                                      std::optional<fc::time_point_sec> expiration) {
+   if (expiration) {
+      pending.insert_or_assign(accept.request_id, pending_accept{accept.token_code, accept.amount,
+                                                               accept.bonded_before, *expiration});
+   }
+}
 
 /// An OPEN request left for a later pass.
 struct waiting_request {
@@ -382,6 +417,7 @@ struct waiting_request {
 
 /// Everything one pass decides.
 struct plan {
+   pending_accept_map           pending_accepts; ///< submitted accepts still unaccounted for by the view
    std::vector<accept_action>   accepts;
    std::vector<request_id_t>    approves;       ///< BONDED by the underwriter with the window passed
    std::vector<request_id_t>    claims;         ///< APPROVED or VALID with principal or WIRE yield still owed to it
@@ -404,6 +440,9 @@ struct plan_inputs {
    std::map<envelope_key, fc::sha256> emitted;
    std::map<fc::slug_name, chain::asset> caps;       ///< token code -> most the underwriter may have bonded at once
    std::map<fc::slug_name, chain::asset> balances;   ///< token code -> the underwriter's balance
+   pending_accept_map                 pending_accepts;
+   /// On startup, wait until LIB passes one transaction lifetime after the later of startup LIB and wall time.
+   std::optional<fc::time_point_sec>   accepts_after;
    fc::time_point                    now{};
    /// The `sysio.andon` cord is pulled: nothing is bonded, approved or claimed until it clears.
    bool                              frozen = false;
@@ -413,8 +452,9 @@ struct plan_inputs {
 
 /// Decide one pass. Only envelope requests are underwritten, and only when the outpost's own record of the envelope
 /// it emitted for the statement's epoch carries the statement's digest. OPEN requests are taken oldest first, so a
-/// pair's envelopes are bonded in the order `sysio.synd` releases them; each bonds its whole remainder or waits. A
-/// bond counts against its token's cap until `claim` returns it, unless it was forfeited.
+/// pair's envelopes are bonded in the order `sysio.synd` releases them. Each contribution is limited by the uncovered
+/// remainder, available exposure and wallet balance, rounded down to a 0.01-token increment so other underwriters can
+/// complete the coverage. A bond counts against its token's cap until `claim` returns it, unless it was forfeited.
 inline plan plan_actions(const plan_inputs& in) {
    std::map<request_id_t, const request*> by_id;
    for (const request& r : in.requests) by_id.emplace(r.id, &r);
@@ -427,6 +467,23 @@ inline plan plan_actions(const plan_inputs& in) {
       sum = sum + b.amount;
    }
    std::map<fc::slug_name, chain::asset> balances = in.balances;
+   plan out;
+   for (const auto& [id, pending] : in.pending_accepts) {
+      const auto r = by_id.find(id);
+      if (r != by_id.end() && r->second->state != request_state::OPEN) continue;
+      const auto own = in.bonds.find(id);
+      if (own != in.bonds.end() && own->second.amount >= pending.bonded_before + pending.amount) continue;
+      // Equality is not expired: a transaction can still execute at its expiration timestamp.
+      if (in.now > pending.expires_at.to_time_point()) continue;
+      out.pending_accepts.emplace(id, pending);
+      chain::asset& used = outstanding.try_emplace(pending.token_code, 0, pending.amount.get_symbol()).first->second;
+      used = used + pending.amount;
+      const auto balance = balances.find(pending.token_code);
+      if (balance != balances.end()) {
+         const int64_t left = std::max(int64_t{0}, balance->second.get_amount() - pending.amount.get_amount());
+         balance->second = chain::asset(left, balance->second.get_symbol());
+      }
+   }
 
    std::vector<const request*> ordered;
    for (const request& r : in.requests) {
@@ -434,7 +491,6 @@ inline plan plan_actions(const plan_inputs& in) {
    }
    std::ranges::sort(ordered, {}, &request::id);
 
-   plan out;
    out.forfeited = forfeited_requests(in.requests, in.bonded);
    for (const request* r : ordered) {
       const auto bond = in.bonds.find(r->id);
@@ -446,6 +502,10 @@ inline plan plan_actions(const plan_inputs& in) {
          if (in.frozen || in.halted || r->bonded >= r->covered) break;
          const chain::asset remainder = r->covered - r->bonded;
          auto wait = [&](wait_reason why) { out.waiting.push_back({r->id, why}); };
+         if (out.pending_accepts.contains(r->id)) { wait(wait_reason::PENDING_ACCEPT); break; }
+         if (in.accepts_after && in.now <= in.accepts_after->to_time_point()) {
+            wait(wait_reason::STARTUP_FINALITY); break;
+         }
          const std::optional<envelope_statement> s = decode_statement(r->statement);
          if (!s) { wait(wait_reason::BAD_STATEMENT); break; }
          if (s->token_code != r->token_code) { wait(wait_reason::TOKEN_MISMATCH); break; }
@@ -455,12 +515,23 @@ inline plan plan_actions(const plan_inputs& in) {
          const auto cap = in.caps.find(r->token_code);
          if (cap == in.caps.end()) { wait(wait_reason::NO_CAP); break; }
          chain::asset& used = outstanding.try_emplace(r->token_code, 0, remainder.get_symbol()).first->second;
-         if (used + remainder > cap->second) { wait(wait_reason::OVER_CAP); break; }
+         const auto step = bond_increment::for_decimals(remainder.get_symbol().decimals());
+         if (!step) { wait(wait_reason::INVALID_PRECISION); break; }
+         const int64_t increment = static_cast<int64_t>(*step);
+         if (used >= cap->second) { wait(wait_reason::OVER_CAP); break; }
+         const chain::asset available = cap->second - used;
+         if (available.get_amount() < increment) { wait(wait_reason::OVER_CAP); break; }
          const auto balance = balances.find(r->token_code);
-         if (balance == balances.end() || balance->second < remainder) { wait(wait_reason::LOW_BALANCE); break; }
-         out.accepts.push_back({r->id, remainder});
-         used            = used + remainder;
-         balance->second = balance->second - remainder;
+         if (balance == balances.end() || balance->second.get_amount() < increment) {
+            wait(wait_reason::LOW_BALANCE); break;
+         }
+         const int64_t affordable = std::min({remainder.get_amount(), available.get_amount(),
+                                              balance->second.get_amount()});
+         const chain::asset contribution(affordable - affordable % increment, remainder.get_symbol());
+         out.accepts.push_back({r->id, contribution, r->token_code,
+                               ours ? bond->second.amount : chain::asset(0, remainder.get_symbol())});
+         used            = used + contribution;
+         balance->second = balance->second - contribution;
          break;
       }
       case request_state::BONDED:

@@ -144,9 +144,25 @@ requests `sysio.synd` issues for syndication envelopes. Each poll it:
    Whether the statement is true is checked against the outpost alone; amounts,
    states and windows still come from the depot's tables.
 2. **Bonds** each verified OPEN request `sysio.synd` issued under the `oppenvelope`
-   schema, oldest first and for its whole remainder (`sysio.bond::accept`), within
-   the token's exposure cap (bonds not yet claimed count) and the account's
-   `sysio.liq` balance.
+   schema, oldest first (`sysio.bond::accept`). Each contribution is the minimum of
+   the uncovered remainder, the token's remaining exposure allowance (bonds not
+   yet claimed count), and the account's `sysio.liq` balance, rounded down to a
+   0.01-token increment. Multiple underwriters can contribute to the same request;
+   for example, three accounts with 2 LIQSOL of available capacity each can fully
+   bond a 6 LIQSOL request. Each contribution stays locked while the request is
+   OPEN: there is no withdrawal. Principal returns after full coverage, approval
+   and claim, or a VALID governance ruling and claim. An INVALID ruling forfeits
+   it. A lone provider
+   whose cap is below the required coverage can therefore lock its whole cap
+   while waiting for other providers.
+   Submitted accepts reserve both exposure and wallet funds until the
+   irreversible view accounts for them, the request leaves OPEN, or LIB time
+   passes the signed transaction's expiration. This also covers a submission
+   whose callback times out; the next poll cannot repeat its contribution.
+   On startup, new accepts wait until LIB passes one transaction lifetime after
+   the later of startup LIB time and wall time, so a previous process's unobserved
+   transactions cannot be repeated even after failover to a node with an older
+   LIB. Approvals and claims continue during that wait.
 3. **Cranks** `sysio.synd::crank`, which releases what bonding allows and issues the
    next request: every poll while an envelope request is in play or has an outcome
    `sysio.synd` has not acknowledged, otherwise every 5 minutes.
@@ -166,13 +182,18 @@ those lines is left to log tooling:
 | The outpost holds no final record for the statement's epoch | The request waits |
 | The outpost recorded another digest for that epoch | Never bonded; an error log names both digests |
 | The node cannot serve a chain (no RPC client, wrong chain id) | That chain's requests wait; the others go on |
-| No cap, over the cap, or too little balance | The request waits |
+| No cap, or remaining exposure allowance or balance below one 0.01-token increment | The request waits |
+| An accept is submitted but not yet accounted for by the irreversible view | Its funds stay reserved and that request waits |
+| Startup finality wait | New accepts wait; approvals and claims continue |
 | The `sysio.andon` cord is pulled | Nothing is bonded, approved or claimed until it clears |
 | A request is challenged (HELD) | Reported, whether or not we bonded it: `sysio` rules it |
 | A bond of ours is ruled INVALID while the node runs, even one since claimed or pruned | Bonding stops until a restart; approvals and claims go on. A forfeited bond's principal is not returned |
 | A table read fails, or a row behind one of our bonds does not decode | The pass does nothing |
 
 ### Underwriter setup
+
+Use a separate account for each underwriter process: its exposure cap and pending
+submission reservations are local to that process.
 
 On the depot, the underwriter account needs only the shadow LIQ it bonds: no RAM,
 CPU or NET. Its bond rows and the rows that hold the WIRE they earn bill the request's

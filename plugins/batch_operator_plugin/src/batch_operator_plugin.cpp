@@ -336,6 +336,10 @@ struct batch_operator_plugin::impl {
    uw::prune_sweep                          underwriter_prune_sweep;
    /// Every request the underwriter bonded, until its request row is pruned (`underwriter::remember_bonded`).
    std::set<uw::request_id_t>               underwriter_bonded;
+   /// Submitted accepts not yet accounted for by the irreversible view, including uncertain submissions.
+   uw::pending_accept_map                  underwriter_pending_accepts;
+   /// Startup quarantine in LIB time: transactions from a previous process may still be live.
+   std::optional<fc::time_point_sec>        underwriter_accepts_after;
    /// Which forfeit stops bonding (`underwriter::forfeit_watch`).
    uw::forfeit_watch                        underwriter_forfeits;
    /// `--batch-kick-crank`: whether this operator pushes `sysio.kicker::kick`.
@@ -1429,7 +1433,7 @@ struct batch_operator_plugin::impl {
          report_stale_signer(*underwriter_signer, "the underwriter");
          return;
       }
-      // Chain time, which the contracts judge windows by; the wall clock only spaces this node's own housekeeping.
+      // Chain time governs contract windows and reservation expiry; wall time also guards startup after failover.
       const fc::time_point head_time = underwriter_head_time.load();
       if (head_time == fc::time_point()) return;
       const fc::time_point now = fc::time_point::now();
@@ -1449,11 +1453,18 @@ struct batch_operator_plugin::impl {
       }
       in->bonded = underwriter_bonded;
       in->halted = underwriter_forfeits.halted_by.has_value();
+      if (!underwriter_accepts_after) {
+         underwriter_accepts_after = uw::startup_accept_deadline(in->now, now, PUSH_EXPIRATION);
+      }
+      in->accepts_after = underwriter_accepts_after;
+      in->pending_accepts = underwriter_pending_accepts;
       if (!in->frozen && !in->halted) in->emitted = read_emitted_digests(in->requests);
       const uw::plan plan = uw::plan_actions(*in);
+      underwriter_pending_accepts = plan.pending_accepts;
       report_plan(*in, plan);
       push_plan(plan, uw::synd_has_work(in->requests), now);
-      underwriter_scan_from = uw::next_scan_start(underwriter_scan_from, in->requests, in->bonds, underwriter_bonded);
+      underwriter_scan_from = uw::next_scan_start(underwriter_scan_from, in->requests, in->bonds, underwriter_bonded,
+                                                underwriter_pending_accepts);
 
       if (now - underwriter_housekeeping_at >= UNDERWRITER_HOUSEKEEPING_INTERVAL) {
          underwriter_housekeeping_at = now;
@@ -1500,10 +1511,12 @@ struct batch_operator_plugin::impl {
 
    /// Push one action as the underwriter. True when the transaction was accepted; a refusal is logged by the push
    /// callback.
-   bool underwriter_push(const char* contract, const char* action, const fc::variant_object& data) {
+   /// `submitted_until` is set once queued, even if acceptance later times out or fails.
+   bool underwriter_push(const char* contract, const char* action, const fc::variant_object& data,
+                          std::optional<fc::time_point_sec>* submitted_until = nullptr) {
       if (shutting_down) return false;
       try {
-         return push_action(contract, action, *underwriter_signer, data);
+         return push_action(contract, action, *underwriter_signer, data, submitted_until);
       } catch (const fc::exception& e) {
          wlog("batch_operator: underwriter {}::{}: {}", contract, action, e.to_string());
       } catch (const std::exception& e) {
@@ -1513,16 +1526,20 @@ struct batch_operator_plugin::impl {
    }
 
    /// Push what the plan decided: accepts first, so their releases start this pass, then the crank, approves and
-   /// claims. A push the irreversible view does not show yet is planned, and refused, again next pass. `synd_busy`
-   /// says `sysio.synd` has an envelope request in play or an outcome to acknowledge.
+   /// claims. Reserve each submitted accept until the irreversible view accounts for it or its transaction expires;
+   /// a partial accept leaves the request OPEN, so the contract cannot refuse a repeated contribution for us.
+   /// `synd_busy` says `sysio.synd` has an envelope request in play or an outcome to acknowledge.
    void push_plan(const uw::plan& plan, bool synd_busy, fc::time_point now) {
       for (const uw::accept_action& accept : plan.accepts) {
-         // Accepted by this node only: it can still fail where it lands, so the bond is known from its row.
-         if (underwriter_push(uw::bond::account, uw::bond::action_accept,
+         std::optional<fc::time_point_sec> submitted_until;
+         const bool accepted = underwriter_push(uw::bond::account, uw::bond::action_accept,
                               fc::mutable_variant_object()
                                  (uw::bond::field::underwriter, underwriter_auth.actor)
                                  (uw::bond::field::request_id,  accept.request_id)
-                                 (uw::bond::field::amount,      accept.amount.get_amount()))) {
+                                 (uw::bond::field::amount,      accept.amount.get_amount()), &submitted_until);
+         // A timeout does not cancel the queued submission. Reserve it regardless of the callback result.
+         uw::remember_submitted_accept(underwriter_pending_accepts, accept, submitted_until);
+         if (accepted) {
             ilog("batch_operator: underwriter pushed an accept of request {} ({})", accept.request_id,
                  accept.amount.to_string());
          }
@@ -1550,7 +1567,7 @@ struct batch_operator_plugin::impl {
    }
 
    /// Report what the plan leaves to people: a freeze, a halt, challenged and forfeited requests, and requests left
-   /// unbonded.
+   /// awaiting further coverage.
    void report_plan(const uw::plan_inputs& in, const uw::plan& plan) {
       std::map<uw::request_id_t, const uw::request*> by_id;
       for (const uw::request& r : in.requests) by_id.emplace(r.id, &r);
@@ -1582,8 +1599,13 @@ struct batch_operator_plugin::impl {
             report_contradiction(in, waiting.request_id);
             continue;
          }
-         wlog("batch_operator: underwriter left {} unbonded: {}", name_of(waiting.request_id),
-              magic_enum::enum_name(waiting.reason));
+         if (waiting.reason == uw::wait_reason::PENDING_ACCEPT || waiting.reason == uw::wait_reason::STARTUP_FINALITY) {
+            ilog("batch_operator: underwriter left the rest of {} awaiting coverage: {}", name_of(waiting.request_id),
+                 magic_enum::enum_name(waiting.reason));
+         } else {
+            wlog("batch_operator: underwriter left the rest of {} awaiting coverage: {}", name_of(waiting.request_id),
+                 magic_enum::enum_name(waiting.reason));
+         }
       }
    }
 
@@ -1652,6 +1674,8 @@ struct batch_operator_plugin::impl {
    std::optional<uw::plan_inputs> read_underwriter_state(const std::map<fc::slug_name, liq_token>& tokens,
                                                          fc::time_point now) {
       uw::plan_inputs in;
+      // Separate LIB read windows: time must precede requests, then bonds, then balances so retiring a reservation
+      // on request state or expiry cannot omit its landed contribution from the later exposure and balance reads.
       in.now        = now;
       std::optional<std::vector<uw::request>> requests = read_bond_requests(underwriter_scan_from, symbols_of(tokens));
       if (!requests) return std::nullopt;
@@ -1939,11 +1963,14 @@ struct batch_operator_plugin::impl {
    ///
    /// Called from cron threads, which may not read chain state: the build runs in a read window and the submission
    /// on the main thread, while the signature, possibly a remote signer, stays here. The waits do not cancel
-   /// anything: each posted task owns what it uses, so returning on a timeout is safe.
+   /// anything: each posted task owns what it uses, so returning on a timeout is safe. `submitted_until`, when
+   /// supplied, records the exact signed expiration before submission and remains set on a callback timeout.
    bool push_action(const std::string& contract,
                     const std::string& action_name,
                     const signer& by,
-                    const fc::variant_object& data) {
+                    const fc::variant_object& data,
+                    std::optional<fc::time_point_sec>* submitted_until = nullptr) {
+      if (submitted_until) submitted_until->reset();
       if (shutting_down) return false;
       const fc::time_point deadline = fc::time_point::now() + delivery_timeout;
       const bool           on_main  = std::this_thread::get_id() == app().executor().get_main_thread_id();
@@ -1973,6 +2000,7 @@ struct batch_operator_plugin::impl {
       }
       if (!trx) return false;
       trx->trx.signatures.push_back(by.provider->sign(trx->digest));
+      const fc::time_point_sec expiration = trx->trx.expiration;
 
       fc::variant packed_var;
       chain::to_variant(
@@ -1981,6 +2009,7 @@ struct batch_operator_plugin::impl {
       std::shared_ptr<batch_operator_detail::async_action_completion> completion =
          std::make_shared<batch_operator_detail::async_action_completion>();
       std::future<void> future = completion->get_future();
+      if (submitted_until) *submitted_until = expiration;
       if (on_main) {
          submit(completion, contract, action_name, packed_var);
       } else {
