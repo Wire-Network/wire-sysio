@@ -147,7 +147,10 @@ requests `sysio.synd` issues for syndication envelopes. Each poll it:
    schema, oldest first (`sysio.bond::accept`). Each contribution is the minimum of
    the uncovered remainder, the token's remaining exposure allowance (bonds not
    yet claimed count), and the account's `sysio.liq` balance, rounded down to a
-   0.01-token increment. Multiple underwriters can contribute to the same request;
+   0.01-token increment. An account's first contribution to a request must be
+   at least 1/64 of its coverage or take the whole remainder (`sysio.bond`
+   refuses a smaller one); until it can, the request waits.
+   Multiple underwriters can contribute to the same request;
    for example, three accounts with 2 LIQSOL of available capacity each can fully
    bond a 6 LIQSOL request. Each contribution stays locked while the request is
    OPEN: there is no withdrawal. Principal returns after full coverage, approval
@@ -183,6 +186,7 @@ those lines is left to log tooling:
 | The outpost recorded another digest for that epoch | Never bonded; an error log names both digests |
 | The node cannot serve a chain (no RPC client, wrong chain id) | That chain's requests wait; the others go on |
 | No cap, or remaining exposure allowance or balance below one 0.01-token increment | The request waits |
+| A first contribution would be below 1/64 of the request's coverage and not the whole remainder | The request waits |
 | An accept is submitted but not yet accounted for by the irreversible view | Its funds stay reserved and that request waits |
 | Startup finality wait | New accepts wait; approvals and claims continue |
 | The `sysio.andon` cord is pulled | Nothing is bonded, approved or claimed until it clears |

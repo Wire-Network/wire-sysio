@@ -392,7 +392,9 @@ BOOST_AUTO_TEST_CASE(partial_contributions_round_down_to_the_contract_increment)
    const std::vector<funding_case> cases{
       {2 * unit + cent - 1, 6 * unit, 2 * unit},
       {6 * unit, 2 * unit + cent - 1, 2 * unit},
-      {6 * unit, cent, cent},
+      {6 * unit, 10 * cent, 10 * cent},
+      {6 * unit, 9 * cent, 0, wait_reason::BELOW_MINIMUM},   // 6 tokens / 64 is 9.375 cents
+      {9 * cent, 6 * unit, 0, wait_reason::BELOW_MINIMUM},
       {cent - 1, 6 * unit, 0, wait_reason::OVER_CAP},
       {6 * unit, cent - 1, 0, wait_reason::LOW_BALANCE},
       {0, 6 * unit, 0, wait_reason::OVER_CAP},
@@ -443,6 +445,35 @@ BOOST_AUTO_TEST_CASE(the_contract_and_planner_share_increment_boundaries) {
    BOOST_CHECK(!sysio::bond_increment::for_decimals(0));
    BOOST_CHECK(!sysio::bond_increment::for_decimals(19));
    BOOST_CHECK_EQUAL(10'000'000'000'000'000ULL, sysio::bond_increment::for_decimals(18).value());
+}
+
+// sysio.bond holds a first bond to the request's minimum, but not a top-up or one that takes the whole remainder.
+BOOST_AUTO_TEST_CASE(only_a_first_contribution_is_held_to_the_request_minimum) {
+   static_assert(!sysio::bond_increment::meets_first_bond_minimum(9, 640, 640));
+   static_assert(sysio::bond_increment::meets_first_bond_minimum(10, 640, 640));
+   static_assert(!sysio::bond_increment::meets_first_bond_minimum(10, 641, 641));
+   static_assert(sysio::bond_increment::meets_first_bond_minimum(9, 640, 9));
+
+   auto in = eth_inputs();
+   in.caps.at(liqeth)     = liqeth_units(1000);
+   in.balances.at(liqeth) = liqeth_units(9);
+   auto topped_up = synd_request(1, eth, 1, liqeth, 640);
+   topped_up.bonded = liqeth_units(10);
+   auto nearly_bonded = synd_request(2, eth, 2, liqeth, 640);
+   nearly_bonded.bonded = liqeth_units(631);
+   in.requests = {topped_up, nearly_bonded};
+   in.bonds    = {{1, {.request_id = 1, .amount = liqeth_units(10)}}};
+   outpost_emitted_all(in);
+   const auto out = plan_actions(in);
+   BOOST_REQUIRE_EQUAL(1u, out.accepts.size());
+   BOOST_CHECK_EQUAL(1u, out.accepts.front().request_id);
+   BOOST_CHECK_EQUAL(liqeth_units(9), out.accepts.front().amount);
+
+   in.bonds.clear();
+   in.requests = {nearly_bonded};
+   const auto last = plan_actions(in);
+   BOOST_REQUIRE_EQUAL(1u, last.accepts.size());
+   BOOST_CHECK_EQUAL(liqeth_units(9), last.accepts.front().amount);
 }
 
 BOOST_AUTO_TEST_CASE(a_partial_bond_can_be_topped_up_when_capacity_frees_up) {

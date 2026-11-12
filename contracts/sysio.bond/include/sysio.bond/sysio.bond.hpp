@@ -92,6 +92,9 @@ inline constexpr std::string_view amount_range_msg = "amount exceeds the asset r
       static constexpr uint32_t PRUNE_RETENTION_SEC     = 7 * 24 * 60 * 60;
       /// Most requests one `prune` examines, prunable or not: the bound on the work of a call.
       static constexpr uint32_t MAX_PRUNE_LIMIT         = 64;
+      /// Most bond rows one request holds: an underwriter's first bond is at least `covered` divided
+      /// by this, or the whole remainder.
+      static constexpr uint64_t MAX_BONDS_PER_REQUEST   = bond_increment::max_bonds_per_request;
       /// One whole, in basis points.
       static constexpr uint32_t BPS_DENOMINATOR         = 10000;
       /// Base of the decimal increment arithmetic.
@@ -182,10 +185,12 @@ inline constexpr std::string_view amount_range_msg = "amount exceeds the asset r
       [[sysio::action]] void addbounty(uint64_t request_id, uint64_t amount);
 
       /// Bond `amount` of request `request_id`'s token (a positive multiple of the increment) as
-      /// `underwriter`, reduced to what remains uncovered. The request becomes BONDED when bonded
-      /// reaches covered. The `bonds` row bills the request's issuer, or the `sysio` RAM pool for a
-      /// privileged issuer, never the underwriter; so does the underwriter's `wireclaims` row for
-      /// this issuer, reserved at its first bond on a shadow-token request. Auth=underwriter.
+      /// `underwriter`, reduced to what remains uncovered. An underwriter's first bond on a request is
+      /// at least `covered / MAX_BONDS_PER_REQUEST`, or the whole remainder; its later ones add any
+      /// multiple. The request becomes BONDED when bonded reaches covered. The `bonds` row bills the
+      /// request's issuer, or the `sysio` RAM pool for a privileged issuer, never the underwriter; so
+      /// does the underwriter's `wireclaims` row for this issuer, reserved at its first bond on a
+      /// shadow-token request. Auth=underwriter.
       [[sysio::action]] void accept(name underwriter, uint64_t request_id, uint64_t amount);
 
       /// Hold request `request_id`, OPEN or BONDED, naming `beneficiary`, an existing account other

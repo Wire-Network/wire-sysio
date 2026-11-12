@@ -61,6 +61,10 @@ token with a precision below 2 is refused. `covered` and every `accept` amount m
 multiples of it. An `accept` larger than what remains uncovered is reduced to the remainder, and only
 the reduced amount is pulled.
 
+An underwriter's first bond on a request must be at least `covered / 64` (`MAX_BONDS_PER_REQUEST`), or
+take the whole remainder; its later bonds on that request add any multiple of the increment. A request
+therefore never holds more than 64 bond rows, which bounds the work of `claim` and `prune`.
+
 ## Following a request
 
 `sysio.bond` notifies no one and sends nothing when a request changes state: approval and the
