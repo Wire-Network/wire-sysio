@@ -12,6 +12,7 @@ documents what it does, how it works, and how to configure it. The plugin lifecy
 
 | Plugin | Description | Docs |
 |---|---|---|
+| `account_watch_plugin` | Writes one JSON record to the `account_watch` logger for every action in an accepted block that a watched authorization signed (include and exclude rules) or that runs at a watched account (receiver rules), plus heartbeats, for a watchdog to alert on | [README](plugins/account_watch_plugin/README.md) |
 | `alert_monitor_plugin` | Ships one `/v1/chain/get_info` snapshot per irreversible block and, with `query_engine_plugin`, configured WireQL query results to an OpenSearch/Elasticsearch `_bulk` endpoint, rendered through an operator JSON template | [README](plugins/alert_monitor_plugin/README.md) |
 | `batch_operator_plugin` | Cranks depot and outpost contracts, ferrying OPP message chains between the WIRE chain and the external blockchains (Ethereum, Solana) on the epoch schedule; can also run an underwriter, which bonds `sysio.synd` envelope requests once the outpost confirms them | [README](plugins/batch_operator_plugin/README.md) |
 | `chain_api_plugin` | Publishes chain_plugin's read and write APIs as the `/v1/chain/*` HTTP endpoints | [README](plugins/chain_api_plugin/README.md) |
