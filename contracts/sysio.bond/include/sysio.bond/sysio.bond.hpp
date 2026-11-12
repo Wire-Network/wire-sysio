@@ -44,6 +44,7 @@
 #include <sysio/time.hpp>
 #include <sysio/asset.hpp>
 #include <sysio.opp.common/depot_native_token.hpp>
+#include <sysio.bond/bond_increment.hpp>
 #include <string_view>
 #include <sysio.opp.common/shadow_custody_types.hpp>
 
@@ -82,7 +83,7 @@ inline constexpr std::string_view amount_range_msg = "amount exceeds the asset r
       /// Bonds move in steps of 10^-BOND_INCREMENT_DECIMALS token: the increment of a token with
       /// precision `p` is `10^(p - BOND_INCREMENT_DECIMALS)` base units, and a token with a precision
       /// below this is refused.
-      static constexpr uint8_t  BOND_INCREMENT_DECIMALS = 2;
+      static constexpr uint8_t  BOND_INCREMENT_DECIMALS = bond_increment::decimals;
       /// Longest statement a request carries, in bytes.
       static constexpr uint32_t MAX_STATEMENT_BYTES     = 1024;
       /// Hold bond, in basis points of the covered amount, until `setconfig` sets another.
@@ -94,18 +95,15 @@ inline constexpr std::string_view amount_range_msg = "amount exceeds the asset r
       /// One whole, in basis points.
       static constexpr uint32_t BPS_DENOMINATOR         = 10000;
       /// Base of the decimal increment arithmetic.
-      static constexpr uint64_t DECIMAL_BASE            = 10;
+      static constexpr uint64_t DECIMAL_BASE            = bond_increment::decimal_base;
 
       /// The bond increment of a token denominated in `sym`: `10^(precision - BOND_INCREMENT_DECIMALS)`
-      /// base units, or `std::nullopt` when the precision is below BOND_INCREMENT_DECIMALS. A symbol's
-      /// precision is at most 18, so the power fits in 64 bits. The ONE increment computation: this
-      /// contract's `request` and `accept`, and every issuer that must know a covered amount is
-      /// acceptable before it sends `request`, use it.
+      /// base units, or `std::nullopt` when the precision is below BOND_INCREMENT_DECIMALS or above
+      /// `bond_increment::max_token_decimals` (18). Delegates to the shared `bond_increment::for_decimals`
+      /// computation used by the native planner; this contract's `request` and `accept`, and issuers
+      /// that validate covered amounts before sending `request`, use this symbol adapter.
       static std::optional<uint64_t> increment_of(symbol sym) {
-         if (sym.precision() < BOND_INCREMENT_DECIMALS) return std::nullopt;
-         uint64_t increment = 1;
-         for (uint8_t d = BOND_INCREMENT_DECIMALS; d < sym.precision(); ++d) increment *= DECIMAL_BASE;
-         return increment;
+         return bond_increment::for_decimals(sym.precision());
       }
 
       /// sha256 over `schema` (its 8-byte value) then the statement bytes: a request's statement digest.
