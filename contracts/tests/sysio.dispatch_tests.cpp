@@ -2153,6 +2153,82 @@ BOOST_FIXTURE_TEST_CASE(a_custody_shortfall_pulls_the_cord_and_the_epoch_advance
    BOOST_CHECK_EQUAL(current_epoch(), epoch + 1);
 } FC_LOG_AND_RETHROW() }
 
+// A desyndication's `returns` row lives until the outpost has consumed the envelope that carried it, through
+// the real consensus path. `advance` builds the depot's envelope for the new epoch; the row survives a later
+// desyndication until sysio.msgch accepts the outpost's envelope for that epoch, which the outpost emits only
+// after accepting the depot's.
+BOOST_FIXTURE_TEST_CASE(a_desyndication_return_expires_after_the_outposts_next_accepted_envelope,
+                        sysio_dispatch_tester) { try {
+   constexpr auto USER = "synd.user"_n;
+   bootstrap_for_dispatch();
+   setup_liq_for_dispatch();
+   create_accounts({USER});
+   produce_blocks();
+   create_eth_authex_link(USER, fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em));
+   BOOST_REQUIRE_EQUAL(success(), push(SYND_ACCOUNT, synd_abi, config::system_account_name, "setconfig"_n, mvo()
+      ("chain_code", codename_mvo("ETH"))("token_code", codename_mvo("LIQETH"))("synd_fee_bps", 0)
+      ("desynd_fee_bps", 0)("synd_burst", 0)("synd_refill", 0)("desynd_burst", 1'000'000 * LIQ_UNIT)
+      ("desynd_refill", 1'000'000 * LIQ_UNIT)("window_sec", 10800)("bounty", 0)("challenge_extra", 0)
+      ("min_desyndicate", 1)("desynd_fee_flat", 0)("custody_shortfall_bps", 0)));
+   setup_wire_token();
+   enable_epoch_advancement();
+   BOOST_REQUIRE_EQUAL(success(), mint_shadow(USER, 10 * LIQ_UNIT));
+
+   const auto eth = fc::slug_name{"ETH"}.value;
+   const auto desyndicate = [&] {
+      return push(SYND_ACCOUNT, synd_abi, USER, "desyndicate"_n, mvo()
+         ("holder", USER)("quantity", asset(LIQ_UNIT, LIQETH_SYM))("max_fee", 0));
+   };
+   // The request id and `sent_epoch` of every `returns` row, in id order.
+   using return_rows = std::vector<std::pair<uint64_t, uint32_t>>;
+   const auto returns = [&] {
+      return_rows rows;
+      for (const auto& value : synd_rows("returns"_n)) {
+         const auto row = synd_decode("return_row", value);
+         rows.emplace_back(row["request_id"].as_uint64(), row["sent_epoch"].as<uint32_t>());
+      }
+      return rows;
+   };
+   // An attestation the depot drops: the outpost's envelopes only have to reach consensus here.
+   const std::vector<typed_attestation> filler{
+      {ATTESTATION_TYPE_OPERATOR_ACTION,
+       encode_operator_action(sysio::opp::attestations::OperatorAction::ACTION_TYPE_DEPOSIT_REQUEST,
+                              ChainKind::CHAIN_KIND_EVM, uwrit_op_eth_pubkey, eth, eth, 1'000'000)}};
+
+   const uint32_t first_epoch = current_epoch();
+   BOOST_REQUIRE_EQUAL(success(), desyndicate());
+   BOOST_REQUIRE((returns() == return_rows{{1, 0}}));
+
+   // The outpost's envelope for the first epoch reaches consensus, and `advance` builds the depot's envelope
+   // for the next epoch with request 1 in it.
+   const auto first = encode_envelope_with_mixed_attestations(first_epoch, filler);
+   BOOST_REQUIRE_EQUAL(success(), deliver(eth, first));
+   produce_block();   // land the delivery before the clock is moved past its expiration
+   produce_block(fc::seconds(120));
+   produce_block();
+   BOOST_REQUIRE_EQUAL(success(), chkcons());
+   produce_block();
+   const uint32_t second_epoch = current_epoch();
+   BOOST_REQUIRE_EQUAL(first_epoch + 1, second_epoch);
+   BOOST_REQUIRE((returns() == return_rows{{1, second_epoch}}));
+
+   // Built, not consumed: the last envelope accepted from the outpost is still the first epoch's.
+   BOOST_REQUIRE_EQUAL(success(), desyndicate());
+   produce_block();
+   BOOST_REQUIRE((returns() == return_rows{{1, second_epoch}, {2, 0}}));
+
+   // The outpost's envelope for the second epoch is accepted: the next desyndication erases request 1.
+   sysio::opp::Envelope accepted;
+   BOOST_REQUIRE(accepted.ParseFromArray(first.data(), static_cast<int>(first.size())));
+   const auto second = encode_envelope_with_mixed_attestations(
+      second_epoch, filler, oracle::digest_bytes(oracle::epoch_digest(accepted)),
+      accepted.messages(0).header().message_id());
+   BOOST_REQUIRE_EQUAL(success(), deliver(eth, second));
+   produce_block();
+   BOOST_REQUIRE_EQUAL(success(), desyndicate());
+   BOOST_REQUIRE((returns() == return_rows{{2, 0}, {3, 0}}));
+} FC_LOG_AND_RETHROW() }
+
 // Review focus 4 with work pending: the cord a shortfall pulls inline from `onsynd` freezes the very
 // queue step `closeenv` runs later in the same delivered envelope. The earlier envelope of the pair was
 // bonded, challenged and ruled VALID, so the next step would record the ruling and release the syndication
