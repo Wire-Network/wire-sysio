@@ -12,7 +12,6 @@
 #include "contracts.hpp"
 #include "contract_test_support.hpp"
 
-#include <algorithm>
 #include <functional>
 #include <limits>
 #include <map>
@@ -31,6 +30,11 @@ using namespace fc;
 
 using mvo = fc::mutable_variant_object;
 using sysio_system::test_support::codename_mvo;
+using sysio_system::test_support::delegated_authority;
+using sysio_system::test_support::irrelevant_authority_msg;
+using sysio_system::test_support::missing_permission_msg;
+using sysio_system::test_support::require_refusal;
+using sysio_system::test_support::unsatisfied_authority_msg;
 
 namespace {
 
@@ -56,11 +60,6 @@ constexpr std::string_view beneficiary_self_msg  = "hold beneficiary cannot be t
 constexpr std::string_view nothing_msg           = "nothing to claim";
 constexpr std::string_view wire_no_yield_msg     = "WIRE collateral earns no shadow yield";
 constexpr std::string_view prune_limit_msg       = "limit exceeds the most requests one prune examines";
-
-// The chain's own refusals of a declared authority, as the authorization manager words them.
-constexpr std::string_view unsatisfied_authority_msg = "but does not have signatures for it";
-constexpr std::string_view irrelevant_authority_msg  = "declares irrelevant authority";
-constexpr std::string_view missing_permission_msg    = "authorizations include a non-existent permission";
 
 
 /// `request_state` names as the ABI renders them.
@@ -156,6 +155,8 @@ public:
    /// The rulings; each is linked to the `sysio.bond` permission of the same name.
    static constexpr auto RSLVVALID      = "rslvvalid"_n;
    static constexpr auto RSLVINVALID    = "rslvinvalid"_n;
+   /// A permission a judge adds beneath a ruling permission to keep its hold on the ruling.
+   static constexpr auto KEPT_PERMISSION = "kept"_n;
 
    static inline const symbol WIRE_SYM   = symbol::from_string("9,WIRE");
    static inline const symbol LIQSOL_SYM = symbol::from_string("9,LIQSOL");
@@ -336,13 +337,6 @@ public:
          *this, BOND_ACCOUNT, bond_abi_ser, signer, action_name, mvo()("request_id", request_id), last_trace,
          {{BOND_ACCOUNT, permission}});
    }
-   /// The authority any one of `delegates` satisfies alone through its `active`, in chain name order.
-   static authority delegated_authority(std::vector<name> delegates) {
-      std::sort(delegates.begin(), delegates.end());
-      authority auth{1, {}, {}};
-      for (auto delegate : delegates) auth.accounts.push_back({{delegate, config::active_name}, 1});
-      return auth;
-   }
    /// Replace the delegates of `sysio.bond@permission`, a child of `active`; the account's `active`
    /// signs the updateauth.
    void delegate_ruling(name permission, std::vector<name> delegates) {
@@ -366,27 +360,29 @@ public:
       for (auto ruling : {RSLVVALID, RSLVINVALID}) delegate_ruling(ruling, {JUDGE_ACCOUNT, SYSIO_ACCOUNT});
       link_rulings();
    }
+   /// Push one native permission action declared by `sysio.bond@declared` and signed with `signer`'s
+   /// key: what a delegate can do to the account through the permission it satisfies.
+   template <typename NativeAction>
+   action_result push_native_through(name signer, name declared, NativeAction&& native_action) {
+      return sysio_system::test_support::push_native_action_and_produce_block(
+         *this, BOND_ACCOUNT, declared, signer, std::forward<NativeAction>(native_action));
+   }
    /// Rewrite `sysio.bond@permission` to `delegates`, declared by that same permission and signed with
    /// `signer`'s key: the native rule that a permission may rewrite itself.
    action_result rewrite_ruling_permission(name signer, name permission, std::vector<name> delegates) {
-      try {
-         signed_transaction trx;
-         trx.actions.emplace_back(std::vector<permission_level>{{BOND_ACCOUNT, permission}},
-                                  updateauth{BOND_ACCOUNT, permission, config::active_name,
-                                             delegated_authority(std::move(delegates))});
-         set_transaction_headers(trx);
-         trx.sign(get_private_key(signer, "active"), control->get_chain_id());
-         push_transaction(trx);
-         produce_block();
-         return success();
-      } catch (const fc::exception& ex) {
-         return error(ex.top_message());
-      }
+      return push_native_through(signer, permission,
+                                 updateauth{BOND_ACCOUNT, permission, config::active_name,
+                                            delegated_authority(std::move(delegates))});
    }
-   /// Require `result` to be a refusal whose message contains `fragment`.
-   static void require_refusal(const action_result& result, std::string_view fragment) {
-      BOOST_REQUIRE_MESSAGE(result != success() && result.find(fragment) != std::string::npos,
-                            "expected a refusal containing '" << fragment << "', got: " << result);
+   /// Add `sysio.bond@child` beneath `parent`, satisfied by `delegates`, declared by `parent` and signed
+   /// with `signer`'s key: the native rule that a permission may create children of itself.
+   action_result add_child_permission(name signer, name parent, name child, std::vector<name> delegates) {
+      return push_native_through(signer, parent,
+                                 updateauth{BOND_ACCOUNT, child, parent, delegated_authority(std::move(delegates))});
+   }
+   /// Link `ruling` to `sysio.bond@requirement`, declared by `declared` and signed with `signer`'s key.
+   action_result link_ruling_through(name signer, name declared, name ruling, name requirement) {
+      return push_native_through(signer, declared, linkauth{BOND_ACCOUNT, BOND_ACCOUNT, ruling, requirement});
    }
    /// An unbonded OPEN request for `statement_fill`'s statement: the next request id.
    void open_request(char statement_fill) {
@@ -1861,6 +1857,49 @@ BOOST_FIXTURE_TEST_CASE(a_delegate_can_rewrite_its_own_ruling_permission_and_act
    require_refusal(rule_through(RSLVVALID, "alice"_n, RSLVVALID, 3), unsatisfied_authority_msg);
    BOOST_REQUIRE_EQUAL(success(), rule_through(RSLVVALID, JUDGE_ACCOUNT, RSLVVALID, 3));
    BOOST_REQUIRE_EQUAL(STATE_VALID, request_state_of(3));
+} FC_LOG_AND_RETHROW()
+
+/// A judge can add a permission beneath the one it satisfies and link its ruling there. Replacing the
+/// judge on the ruling permission leaves that permission and the link in place, so the former judge
+/// still rules until `active` puts the ruling back on the permission of its own name. What is left
+/// then authorizes nothing, and `active` deletes it.
+BOOST_FIXTURE_TEST_CASE(replacing_a_judge_requires_restoring_the_ruling_link, sysio_bond_tester) try {
+   delegate_rulings();
+   for (char fill : {'a', 'b', 'c', 'd'}) open_request(fill);
+
+   // The judge keeps a permission of its own under VALID and moves the ruling onto it. It cannot do
+   // either under INVALID through VALID, nor can a stranger under VALID.
+   require_refusal(add_child_permission("alice"_n, RSLVVALID, KEPT_PERMISSION, {"alice"_n}), unsatisfied_authority_msg);
+   BOOST_REQUIRE_EQUAL(success(), add_child_permission(JUDGE_ACCOUNT, RSLVVALID, KEPT_PERMISSION, {JUDGE_ACCOUNT}));
+   require_refusal(link_ruling_through(JUDGE_ACCOUNT, RSLVVALID, RSLVINVALID, KEPT_PERMISSION),
+                   irrelevant_authority_msg);
+   BOOST_REQUIRE_EQUAL(success(), link_ruling_through(JUDGE_ACCOUNT, RSLVVALID, RSLVVALID, KEPT_PERMISSION));
+
+   // Governance replaces the judge on the ruling permission and does nothing else.
+   delegate_ruling(RSLVVALID, {"alice"_n, SYSIO_ACCOUNT});
+   require_refusal(rule_through(RSLVVALID, JUDGE_ACCOUNT, RSLVVALID, 1), unsatisfied_authority_msg);
+   // The former judge still rules through the permission it kept; the new one rules through its parent.
+   BOOST_REQUIRE_EQUAL(success(), rule_through(RSLVVALID, JUDGE_ACCOUNT, KEPT_PERMISSION, 1));
+   BOOST_REQUIRE_EQUAL(STATE_VALID, request_state_of(1));
+   BOOST_REQUIRE_EQUAL(success(), rule_through(RSLVVALID, "alice"_n, RSLVVALID, 2));
+   BOOST_REQUIRE_EQUAL(STATE_VALID, request_state_of(2));
+
+   // Restoring the link is what revokes it: the kept permission no longer meets the ruling's
+   // requirement, and cannot move the link back.
+   link_authority(BOND_ACCOUNT, BOND_ACCOUNT, RSLVVALID, RSLVVALID);
+   produce_block();
+   require_refusal(rule_through(RSLVVALID, JUDGE_ACCOUNT, KEPT_PERMISSION, 3), irrelevant_authority_msg);
+   require_refusal(link_ruling_through(JUDGE_ACCOUNT, KEPT_PERMISSION, RSLVVALID, KEPT_PERMISSION),
+                   irrelevant_authority_msg);
+   BOOST_REQUIRE_EQUAL(STATE_OPEN, request_state_of(3));
+   BOOST_REQUIRE_EQUAL(success(), rule_through(RSLVVALID, "alice"_n, RSLVVALID, 3));
+   BOOST_REQUIRE_EQUAL(STATE_VALID, request_state_of(3));
+
+   // The contract account removes what the former judge left behind.
+   delete_authority(BOND_ACCOUNT, KEPT_PERMISSION);
+   produce_block();
+   require_refusal(rule_through(RSLVVALID, JUDGE_ACCOUNT, KEPT_PERMISSION, 4), missing_permission_msg);
+   BOOST_REQUIRE_EQUAL(STATE_OPEN, request_state_of(4));
 } FC_LOG_AND_RETHROW()
 
 // A HOLD_BOND escrow exists only when the hold bond is positive; a hold whose bond rounds to zero

@@ -19,8 +19,11 @@
 
 #include <magic_enum/magic_enum.hpp>
 
+#include <algorithm>
 #include <array>
 #include <string>
+#include <string_view>
+#include <vector>
 
 namespace sysio_system::test_support {
 
@@ -130,6 +133,53 @@ typename Tester::action_result push_contract_action_and_produce_block(
    transaction_trace_ptr trace;
    return push_contract_action_and_produce_block(tester, contract, serializer, signer, action_name, data, trace,
                                                  std::move(authorization));
+}
+
+// ---------------------------------------------------------------------------
+//  Native permission delegation
+//
+//  A system contract delegates an action through a native child permission named after it and a
+//  `linkauth`. These act on such a permission the way a delegate does, and name the chain's own
+//  refusals so a negative test asserts why it was refused.
+// ---------------------------------------------------------------------------
+
+// The authorization manager's refusals of a declared authority, as it words them.
+inline constexpr std::string_view unsatisfied_authority_msg = "but does not have signatures for it";
+inline constexpr std::string_view irrelevant_authority_msg  = "declares irrelevant authority";
+inline constexpr std::string_view missing_permission_msg    = "authorizations include a non-existent permission";
+
+/// The authority any one of `delegates` satisfies alone through its `active`, in chain name order.
+inline authority delegated_authority(std::vector<name> delegates) {
+   std::sort(delegates.begin(), delegates.end());
+   authority auth{1, {}, {}};
+   for (auto delegate : delegates) auth.accounts.push_back({{delegate, config::active_name}, 1});
+   return auth;
+}
+
+/// Push one native permission action (`updateauth`, `linkauth`, ...) declared by `account@declared`
+/// and signed with `signer`'s active key, in its own block: what a delegate can do to the account
+/// through the permission it satisfies.
+template <typename Tester, typename NativeAction>
+typename Tester::action_result push_native_action_and_produce_block(Tester& tester, name account, name declared,
+                                                                    name signer, NativeAction&& native_action) {
+   try {
+      signed_transaction trx;
+      trx.actions.emplace_back(std::vector<permission_level>{{account, declared}},
+                               std::forward<NativeAction>(native_action));
+      tester.set_transaction_headers(trx);
+      trx.sign(tester.get_private_key(signer, "active"), tester.control->get_chain_id());
+      tester.push_transaction(trx);
+      tester.produce_block();
+      return Tester::success();
+   } catch (const fc::exception& ex) {
+      return Tester::error(ex.top_message());
+   }
+}
+
+/// Require `result` to be a refusal whose message contains `fragment`.
+inline void require_refusal(const std::string& result, std::string_view fragment) {
+   BOOST_REQUIRE_MESSAGE(!result.empty() && result.find(fragment) != std::string::npos,
+                         "expected a refusal containing '" << fragment << "', got: " << result);
 }
 
 // ---------------------------------------------------------------------------

@@ -15,6 +15,8 @@ public:
    static constexpr auto PANIC = "panic"_n;
    static constexpr auto PULLER = "puller"_n;
    static constexpr auto ALICE = "alice"_n;
+   /// A permission a delegate adds beneath an action's permission to keep its hold on the action.
+   static constexpr auto KEPT_PERMISSION = "kept"_n;
    abi_serializer ser;
 
    sysio_andon_tester() {
@@ -49,6 +51,14 @@ public:
    action_result call(name action_name, name signer, name permission, const std::string& text = "test") {
       return support::push_contract_action_and_produce_block(*this, ANDON, ser, signer, action_name,
          mvo()(action_name == "pull"_n ? "reason" : "note", text), {{ANDON, permission}});
+   }
+
+   /// Push one native permission action declared by `sysio.andon@declared` and signed with `signer`'s
+   /// key: what a delegate can do to the account through the permission it satisfies.
+   template <typename NativeAction>
+   action_result push_native_through(name signer, name declared, NativeAction&& native_action) {
+      return support::push_native_action_and_produce_block(*this, ANDON, declared, signer,
+                                                           std::forward<NativeAction>(native_action));
    }
 
    /// Raw singleton bytes make idempotence checks exact.
@@ -97,6 +107,54 @@ BOOST_FIXTURE_TEST_CASE(updateauth_rotates_and_revokes_delegates, sysio_andon_te
    BOOST_REQUIRE_EQUAL(success(), call("pull"_n, ALICE, "pull"_n));
    BOOST_REQUIRE_NE(success(), call("clear"_n, PANIC, "clear"_n));
    BOOST_REQUIRE_EQUAL(success(), call("clear"_n, ALICE, "clear"_n));
+}
+
+/// A panic account can add a permission beneath the one it satisfies and link its action there.
+/// Replacing it on the action's permission leaves that permission and the link in place, so it still
+/// pulls until `sysio.andon`'s own authority puts the action back on the permission of its own name.
+/// What is left then authorizes nothing and is deleted.
+BOOST_FIXTURE_TEST_CASE(replacing_a_delegate_requires_restoring_the_action_link, sysio_andon_tester) {
+   configure();
+
+   // The panic account keeps a permission of its own under pull and moves pull onto it. A stranger
+   // cannot, and pull's permission does not reach clear's link.
+   support::require_refusal(push_native_through(ALICE, "pull"_n,
+                               updateauth{ANDON, KEPT_PERMISSION, "pull"_n, support::delegated_authority({ALICE})}),
+                            support::unsatisfied_authority_msg);
+   BOOST_REQUIRE_EQUAL(success(), push_native_through(PANIC, "pull"_n,
+                          updateauth{ANDON, KEPT_PERMISSION, "pull"_n, support::delegated_authority({PANIC})}));
+   support::require_refusal(push_native_through(PANIC, "pull"_n, linkauth{ANDON, ANDON, "clear"_n, KEPT_PERMISSION}),
+                            support::irrelevant_authority_msg);
+   BOOST_REQUIRE_EQUAL(success(),
+                       push_native_through(PANIC, "pull"_n, linkauth{ANDON, ANDON, "pull"_n, KEPT_PERMISSION}));
+
+   // Governance replaces the panic account on both permissions and does nothing else.
+   grant("pull"_n, {ALICE, config::system_account_name});
+   grant("clear"_n, {ALICE, config::system_account_name});
+   support::require_refusal(call("pull"_n, PANIC, "pull"_n), support::unsatisfied_authority_msg);
+   // The former panic account still pulls through the permission it kept.
+   BOOST_REQUIRE_EQUAL(success(), call("pull"_n, PANIC, KEPT_PERMISSION));
+   BOOST_REQUIRE(cord()["pulled"].as_bool());
+   BOOST_REQUIRE_EQUAL(success(), call("clear"_n, ALICE, "clear"_n));
+   BOOST_REQUIRE(!cord()["pulled"].as_bool());
+
+   // Governance restoring the link through `sysio.andon@active` is what revokes it: the kept
+   // permission no longer meets pull's requirement, and cannot move the link back.
+   BOOST_REQUIRE_EQUAL(success(), push_native_through(config::system_account_name, config::active_name,
+                                                      linkauth{ANDON, ANDON, "pull"_n, "pull"_n}));
+   support::require_refusal(call("pull"_n, PANIC, KEPT_PERMISSION), support::irrelevant_authority_msg);
+   support::require_refusal(push_native_through(PANIC, KEPT_PERMISSION,
+                               linkauth{ANDON, ANDON, "pull"_n, KEPT_PERMISSION}),
+                            support::irrelevant_authority_msg);
+   BOOST_REQUIRE(!cord()["pulled"].as_bool());
+   BOOST_REQUIRE_EQUAL(success(), call("pull"_n, ALICE, "pull"_n));
+   BOOST_REQUIRE(cord()["pulled"].as_bool());
+
+   // Governance removes what the former panic account left behind.
+   BOOST_REQUIRE_EQUAL(success(), push_native_through(config::system_account_name, config::active_name,
+                                                      deleteauth{ANDON, KEPT_PERMISSION}));
+   support::require_refusal(call("clear"_n, PANIC, KEPT_PERMISSION), support::missing_permission_msg);
+   BOOST_REQUIRE(cord()["pulled"].as_bool());
 }
 
 /// Repeated requests do not change timestamps or notes, and recorded text is bounded.

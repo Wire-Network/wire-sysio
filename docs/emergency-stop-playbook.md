@@ -278,8 +278,29 @@ step; while the cord is pulled the burn of an INVALID envelope waits for the cle
 
 ### Replacing the panic account
 
-- Depot: rerun both `set account permission` commands above with `PANIC="$NEW_PANIC"`.
-  Replacing the authorities revokes the previous panic account. Keep the governance delegate.
+- Depot: replacing the two authorities is not enough. A panic account can add a permission beneath
+  the one it satisfies and link its action to it; `updateauth` on the action's permission neither
+  removes that permission nor moves the link back, so the previous panic account would still pull or
+  clear through it. Replace the authorities, restore both links, then delete what is left:
+  ```bash
+  PANIC="$NEW_PANIC"
+  # AUTH carries the panic account's name, so rebuild it: the commands below read AUTH, not PANIC.
+  AUTH=$(jq -cn --arg panic "$PANIC" '{threshold:1,keys:[],accounts:[{permission:{actor:$panic,permission:"active"},weight:1},{permission:{actor:"sysio",permission:"active"},weight:1}]} | .accounts |= sort_by(.permission.actor)')
+  clio -u "$DEPOT_URL" set account permission sysio.andon pull "$AUTH" active -p sysio.andon@active
+  clio -u "$DEPOT_URL" set account permission sysio.andon clear "$AUTH" active -p sysio.andon@active
+  clio -u "$DEPOT_URL" set action permission sysio.andon sysio.andon pull pull -p sysio.andon@active
+  clio -u "$DEPOT_URL" set action permission sysio.andon sysio.andon clear clear -p sysio.andon@active
+  clio -u "$DEPOT_URL" get account sysio.andon
+  ```
+  - The two `set action permission` commands put each action back on the permission of its own
+    name. One that finds its link already there is refused with `new requirement is same as old`:
+    the link never moved.
+  - Until both links are restored the previous panic account may still be able to pull or clear.
+    Run the four writes together; where `sysio` is held by a multisig, put them in one proposal.
+  - `get account` must show `pull` and `clear` with the new authority, each linked to its own
+    action, and no permission beneath either. One left there authorizes nothing once the links are
+    restored, but it holds `sysio.andon`'s RAM. Delete each, deepest first:
+    `clio -u "$DEPOT_URL" set account permission sysio.andon <name> NULL -p sysio.andon@active`.
 - Solana, as the admin:
   ```bash
   ANCHOR_PROVIDER_URL="$SOL_RPC" ANCHOR_WALLET="$SOL_ADMIN_KEYPAIR" npx ts-node scripts/wire-config/emergencyStop.ts set-panic "$NEW_SOL_PANIC"
@@ -307,11 +328,31 @@ step; while the cord is pulled the burn of an INVALID envelope waits for the cle
 
 ### Replacing the judge account
 
-Rerun both `set account permission` commands of
-[`sysio-bond-integration.md`](sysio-bond-integration.md) with `JUDGE="$NEW_JUDGE"`, signed for
-`sysio.bond@active`. Replacing the authorities revokes the previous judge. Keep the governance
-delegate, and read `clio get account sysio.bond` afterwards: a judge can rewrite the permission it
-satisfies, so confirm both authorities and both action links are the intended ones.
+Replacing the two authorities is not enough to revoke a judge. A judge can add a permission beneath
+the one it satisfies and link its ruling to it; `updateauth` on the ruling permission neither removes
+that permission nor moves the link back, so the previous judge would still rule through it. Replace
+the authorities, restore both links, then delete what is left:
+
+```bash
+JUDGE="$NEW_JUDGE"
+# AUTH carries the judge's name, so rebuild it: the commands below read AUTH, not JUDGE.
+AUTH=$(jq -cn --arg judge "$JUDGE" '{threshold:1,keys:[],accounts:[{permission:{actor:$judge,permission:"active"},weight:1},{permission:{actor:"sysio",permission:"active"},weight:1}]} | .accounts |= sort_by(.permission.actor)')
+clio -u "$DEPOT_URL" set account permission sysio.bond rslvvalid "$AUTH" active -p sysio.bond@active
+clio -u "$DEPOT_URL" set account permission sysio.bond rslvinvalid "$AUTH" active -p sysio.bond@active
+clio -u "$DEPOT_URL" set action permission sysio.bond sysio.bond rslvvalid rslvvalid -p sysio.bond@active
+clio -u "$DEPOT_URL" set action permission sysio.bond sysio.bond rslvinvalid rslvinvalid -p sysio.bond@active
+clio -u "$DEPOT_URL" get account sysio.bond
+```
+
+- The two `set action permission` commands put each ruling back on the permission of its own name.
+  One that finds its link already there is refused with `new requirement is same as old`: the link
+  never moved.
+- Until both links are restored the previous judge may still be able to rule. Run the four writes
+  together; where `sysio` is held by a multisig, put them in one proposal.
+- `get account` must show `rslvvalid` and `rslvinvalid` with the new authority, each linked to its own
+  action, and no permission beneath either. One left there authorizes nothing once the links are
+  restored, but it holds `sysio.bond`'s RAM. Delete each, deepest first:
+  `clio -u "$DEPOT_URL" set account permission sysio.bond <name> NULL -p sysio.bond@active`.
 
 ### Recording the state of each chain
 
