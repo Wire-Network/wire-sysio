@@ -67,7 +67,7 @@ request synd_request(uint64_t id, fc::slug_name chain_code, uint32_t epoch, fc::
 /// Inputs where LIQETH has room for 100 with 100 held, and no outpost record has been read.
 plan_inputs eth_inputs() {
    plan_inputs in;
-   in.caps     = {{liqeth, liqeth_units(100)}};
+   in.exposure_policies = {{liqeth, liqeth_units(100)}};
    in.balances = {{liqeth, liqeth_units(100)}};
    in.now      = fc::time_point::now();
    return in;
@@ -343,7 +343,7 @@ BOOST_AUTO_TEST_CASE(five_underwriters_with_two_liqsol_each_can_cover_six) {
    std::vector<plan_inputs> providers(5);
    for (auto& in : providers) {
       in.requests = {r};
-      in.caps     = {{liqsol, sysio::chain::asset(2 * unit, sym)}};
+      in.exposure_policies = {{liqsol, sysio::chain::asset(2 * unit, sym)}};
       in.balances = {{liqsol, sysio::chain::asset(10 * unit, sym)}};
       outpost_emitted_all(in);
    }
@@ -407,7 +407,7 @@ BOOST_AUTO_TEST_CASE(partial_contributions_round_down_to_the_contract_increment)
          r.bonded  = sysio::chain::asset(0, sym);
          plan_inputs in;
          in.requests = {r};
-         in.caps     = {{liqsol, sysio::chain::asset(c.cap, sym)}};
+         in.exposure_policies = {{liqsol, sysio::chain::asset(c.cap, sym)}};
          in.balances = {{liqsol, sysio::chain::asset(c.balance, sym)}};
          outpost_emitted_all(in);
          const auto out = plan_actions(in);
@@ -430,7 +430,7 @@ BOOST_AUTO_TEST_CASE(a_cap_lowered_below_existing_exposure_waits) {
    existing.state = request_state::APPROVED;
    in.requests = {existing, synd_request(2, eth, 2, liqeth, 10)};
    in.bonds = {{1, {.request_id = 1, .amount = liqeth_units(100)}}};
-   in.caps.at(liqeth) = liqeth_units(90);
+   in.exposure_policies.at(liqeth) = liqeth_units(90);
    outpost_emitted_all(in);
    const auto out = plan_actions(in);
    BOOST_CHECK(out.accepts.empty());
@@ -455,7 +455,7 @@ BOOST_AUTO_TEST_CASE(only_a_first_contribution_is_held_to_the_request_minimum) {
    static_assert(sysio::bond_increment::meets_first_bond_minimum(9, 640, 9));
 
    auto in = eth_inputs();
-   in.caps.at(liqeth)     = liqeth_units(1000);
+   in.exposure_policies.at(liqeth) = liqeth_units(1000);
    in.balances.at(liqeth) = liqeth_units(9);
    auto topped_up = synd_request(1, eth, 1, liqeth, 640);
    topped_up.bonded = liqeth_units(10);
@@ -485,7 +485,7 @@ BOOST_AUTO_TEST_CASE(a_partial_bond_can_be_topped_up_when_capacity_frees_up) {
    in.requests = {open, approved};
    in.bonds = {{1, {.request_id = 1, .amount = liqeth_units(200)}},
                {2, {.request_id = 2, .amount = liqeth_units(200)}}};
-   in.caps.at(liqeth) = liqeth_units(400);
+   in.exposure_policies.at(liqeth) = liqeth_units(400);
    in.balances.at(liqeth) = liqeth_units(1000);
    outpost_emitted_all(in);
    auto out = plan_actions(in);
@@ -498,7 +498,7 @@ BOOST_AUTO_TEST_CASE(a_partial_bond_can_be_topped_up_when_capacity_frees_up) {
    BOOST_REQUIRE_EQUAL(1u, out.accepts.size());
    BOOST_CHECK_EQUAL(liqeth_units(200), out.accepts.front().amount);
    BOOST_CHECK_EQUAL(liqeth_units(200), out.accepts.front().bonded_before);
-   in.caps.at(liqeth) = liqeth_units(200);
+   in.exposure_policies.at(liqeth) = liqeth_units(200);
    out = plan_actions(in);
    BOOST_CHECK(out.accepts.empty());
    BOOST_REQUIRE_EQUAL(1u, out.waiting.size());
@@ -508,7 +508,7 @@ BOOST_AUTO_TEST_CASE(a_partial_bond_can_be_topped_up_when_capacity_frees_up) {
 BOOST_AUTO_TEST_CASE(a_partial_accept_is_not_repeated_while_lib_lags) {
    auto in = eth_inputs();
    in.requests = {synd_request(1, eth, 1, liqeth, 600)};
-   in.caps.at(liqeth) = liqeth_units(200);
+   in.exposure_policies.at(liqeth) = liqeth_units(200);
    in.balances.at(liqeth) = liqeth_units(1000);
    outpost_emitted_all(in);
    const auto first = plan_actions(in);
@@ -534,7 +534,7 @@ BOOST_AUTO_TEST_CASE(submitted_accepts_reserve_both_exposure_and_wallet_for_othe
          auto in = eth_inputs();
          in.requests = {synd_request(1, eth, 1, liqeth, 100), synd_request(2, eth, 2, liqeth, 600),
                         synd_request(3, eth, 3, liqeth, 100)};
-         in.caps.at(liqeth) = liqeth_units(cap_limited ? 300 : 1000);
+         in.exposure_policies.at(liqeth) = liqeth_units(cap_limited ? 300 : 1000);
          in.balances.at(liqeth) = liqeth_units(cap_limited ? 1000 : 300);
          outpost_emitted_all(in);
          const auto first = plan_actions(in);
@@ -558,7 +558,7 @@ BOOST_AUTO_TEST_CASE(submitted_accepts_reserve_both_exposure_and_wallet_for_othe
 BOOST_AUTO_TEST_CASE(a_visible_partial_bond_replaces_its_submission_reservation) {
    auto in = eth_inputs();
    in.requests = {synd_request(1, eth, 1, liqeth, 600)};
-   in.caps.at(liqeth) = liqeth_units(400);
+   in.exposure_policies.at(liqeth) = liqeth_units(400);
    in.balances.at(liqeth) = liqeth_units(1000);
    // Our row held 2 and another provider bonded 1 before this 2-token top-up was submitted.
    in.requests.front().bonded = liqeth_units(300);
@@ -577,7 +577,7 @@ BOOST_AUTO_TEST_CASE(a_visible_partial_bond_replaces_its_submission_reservation)
    BOOST_CHECK(next.accepts.empty());
    BOOST_REQUIRE_EQUAL(1u, next.waiting.size());
    BOOST_CHECK(wait_reason::OVER_CAP == next.waiting.front().reason);
-   in.caps.at(liqeth) = liqeth_units(600);
+   in.exposure_policies.at(liqeth) = liqeth_units(600);
    next = plan_actions(in);
    BOOST_REQUIRE_EQUAL(1u, next.accepts.size());
    BOOST_CHECK_EQUAL(liqeth_units(100), next.accepts.front().amount);
@@ -587,7 +587,7 @@ BOOST_AUTO_TEST_CASE(a_visible_partial_bond_replaces_its_submission_reservation)
 BOOST_AUTO_TEST_CASE(unobserved_submissions_expire_only_after_lib_passes_the_signed_expiration) {
    auto in = eth_inputs();
    in.requests = {synd_request(1, eth, 1, liqeth, 600)};
-   in.caps.at(liqeth) = liqeth_units(200);
+   in.exposure_policies.at(liqeth) = liqeth_units(200);
    in.balances.at(liqeth) = liqeth_units(1000);
    outpost_emitted_all(in);
    const auto first = plan_actions(in);
@@ -626,7 +626,7 @@ BOOST_AUTO_TEST_CASE(a_request_leaving_open_releases_a_clamped_submission_reserv
 BOOST_AUTO_TEST_CASE(a_missing_request_does_not_drop_a_live_reservation_or_advance_the_scan_past_it) {
    auto in = eth_inputs();
    in.requests = {synd_request(2, eth, 2, liqeth, 600)};
-   in.caps.at(liqeth) = liqeth_units(200);
+   in.exposure_policies.at(liqeth) = liqeth_units(200);
    in.balances.at(liqeth) = liqeth_units(1000);
    in.pending_accepts = {{1, {liqeth, liqeth_units(200), liqeth_units(0),
                               fc::time_point_sec(in.now + fc::seconds(30))}}};
@@ -790,6 +790,146 @@ BOOST_AUTO_TEST_CASE(no_cap_or_too_little_balance_waits) {
    BOOST_CHECK(out.accepts.empty());
    BOOST_REQUIRE_EQUAL(3u, out.waiting.size());
    BOOST_CHECK(wait_reason::LOW_BALANCE == out.waiting[0].reason);
+}
+
+/// An accidental map insertion creates a disabled policy, never permission to bond without a cap.
+BOOST_AUTO_TEST_CASE(default_created_exposure_policy_disables_new_bonds) {
+   auto in = eth_inputs();
+   in.exposure_policies.clear();
+   BOOST_CHECK(std::holds_alternative<sysio::batch_operator_detail::disabled_exposure>(in.exposure_policies[liqeth]));
+   in.requests = {synd_request(1, eth, 1, liqeth, 10)};
+   outpost_emitted_all(in);
+   const auto out = plan_actions(in);
+   BOOST_CHECK(out.accepts.empty());
+   BOOST_REQUIRE_EQUAL(out.waiting.size(), 1u);
+   BOOST_CHECK(wait_reason::NO_CAP == out.waiting.front().reason);
+}
+
+/// Unlimited permits outstanding exposure beyond the old cap, while another token retains its finite cap.
+BOOST_AUTO_TEST_CASE(unlimited_exposure_is_per_token_and_counts_new_bonds_against_balance) {
+   auto in = eth_inputs();
+   in.exposure_policies = {{liqeth, sysio::batch_operator_detail::unlimited_exposure{}}, {liqsol, units_of(liqsol, 20)}};
+   in.balances = {{liqeth, liqeth_units(150)}, {liqsol, units_of(liqsol, 100)}};
+   auto existing = synd_request(1, eth, 1, liqeth, 100);
+   existing.state = request_state::BONDED;
+   existing.bonded = existing.covered;
+   in.bonds = {{1, {.request_id = 1, .amount = liqeth_units(100)}}};
+   in.requests = {existing, synd_request(3, eth, 3, liqeth, 60), synd_request(2, eth, 2, liqeth, 80),
+                  synd_request(4, eth, 4, liqeth, 20), synd_request(5, sol, 1, liqsol, 21),
+                  synd_request(6, eth, 5, liqeth, 1), synd_request(7, sol, 2, liqsol, 1)};
+   outpost_emitted_all(in);
+   auto out = plan_actions(in);
+   BOOST_REQUIRE_EQUAL(4u, out.accepts.size());
+   BOOST_CHECK_EQUAL(2u, out.accepts[0].request_id);
+   BOOST_CHECK_EQUAL(liqeth_units(80), out.accepts[0].amount);
+   BOOST_CHECK_EQUAL(3u, out.accepts[1].request_id);
+   BOOST_CHECK_EQUAL(liqeth_units(10), out.accepts[2].amount);
+   BOOST_CHECK_EQUAL(units_of(liqsol, 20), out.accepts[3].amount);
+   BOOST_REQUIRE_EQUAL(2u, out.waiting.size());
+   BOOST_CHECK_EQUAL(6u, out.waiting[0].request_id);
+   BOOST_CHECK(wait_reason::LOW_BALANCE == out.waiting[0].reason);
+   BOOST_CHECK(wait_reason::OVER_CAP == out.waiting[1].reason);
+
+   in.exposure_policies.erase(liqsol);   // unlimited for LIQETH does not enable LIQSOL
+   out = plan_actions(in);
+   BOOST_REQUIRE_EQUAL(3u, out.waiting.size());
+   BOOST_CHECK(wait_reason::NO_CAP == out.waiting[0].reason);
+   BOOST_CHECK(wait_reason::NO_CAP == out.waiting[2].reason);
+
+   in.balances.erase(liqeth);
+   out = plan_actions(in);
+   BOOST_CHECK(out.accepts.empty());
+   BOOST_REQUIRE_EQUAL(6u, out.waiting.size());
+   BOOST_CHECK(wait_reason::LOW_BALANCE == out.waiting[0].reason);
+}
+
+/// Unlimited removes only the exposure cap: partial contributions remain bounded by the available balance.
+BOOST_AUTO_TEST_CASE(unlimited_exposure_bonds_the_affordable_remainder) {
+   auto in = eth_inputs();
+   in.exposure_policies = {{liqeth, sysio::batch_operator_detail::unlimited_exposure{}}};
+   auto r = synd_request(1, eth, 1, liqeth, 200);
+   r.bonded = liqeth_units(120);
+   in.requests = {r};
+   outpost_emitted_all(in);
+   in.balances[liqeth] = liqeth_units(79);
+   auto out = plan_actions(in);
+   BOOST_REQUIRE_EQUAL(1u, out.accepts.size());
+   BOOST_CHECK_EQUAL(liqeth_units(79), out.accepts[0].amount);
+   in.balances[liqeth] = liqeth_units(80);
+   out = plan_actions(in);
+   BOOST_REQUIRE_EQUAL(1u, out.accepts.size());
+   BOOST_CHECK_EQUAL(liqeth_units(80), out.accepts[0].amount);
+   in.balances[liqeth] = liqeth_units(0);
+   out = plan_actions(in);
+   BOOST_CHECK(out.accepts.empty());
+   BOOST_REQUIRE_EQUAL(1u, out.waiting.size());
+   BOOST_CHECK(wait_reason::LOW_BALANCE == out.waiting[0].reason);
+}
+
+/// Unlimited exposure does not relax the minimum required for a first contribution to a request.
+BOOST_AUTO_TEST_CASE(unlimited_exposure_retains_the_first_contribution_minimum) {
+   auto in = eth_inputs();
+   in.exposure_policies = {{liqeth, sysio::batch_operator_detail::unlimited_exposure{}}};
+   in.requests = {synd_request(1, eth, 1, liqeth, 6400)};
+   outpost_emitted_all(in);
+   in.balances[liqeth] = liqeth_units(99);
+   auto out = plan_actions(in);
+   BOOST_CHECK(out.accepts.empty());
+   BOOST_REQUIRE_EQUAL(1u, out.waiting.size());
+   BOOST_CHECK(wait_reason::BELOW_MINIMUM == out.waiting.front().reason);
+   in.balances[liqeth] = liqeth_units(100);
+   out = plan_actions(in);
+   BOOST_REQUIRE_EQUAL(1u, out.accepts.size());
+   BOOST_CHECK_EQUAL(liqeth_units(100), out.accepts.front().amount);
+}
+
+/// Unlimited exposure retains pending submission reservations so uncertain pushes cannot spend a balance twice.
+BOOST_AUTO_TEST_CASE(unlimited_exposure_reserves_submitted_contributions) {
+   auto in = eth_inputs();
+   in.exposure_policies = {{liqeth, sysio::batch_operator_detail::unlimited_exposure{}}};
+   in.balances = {{liqeth, liqeth_units(150)}};
+   in.requests = {synd_request(1, eth, 1, liqeth, 100)};
+   outpost_emitted_all(in);
+   const auto first = plan_actions(in);
+   BOOST_REQUIRE_EQUAL(1u, first.accepts.size());
+   remember_submitted_accept(in.pending_accepts, first.accepts.front(), fc::time_point_sec(in.now + fc::seconds(30)));
+   in.requests.push_back(synd_request(2, eth, 2, liqeth, 100));
+   outpost_emitted_all(in);
+   const auto next = plan_actions(in);
+   BOOST_REQUIRE_EQUAL(1u, next.accepts.size());
+   BOOST_CHECK_EQUAL(2u, next.accepts.front().request_id);
+   BOOST_CHECK_EQUAL(liqeth_units(50), next.accepts.front().amount);
+   BOOST_REQUIRE_EQUAL(1u, next.waiting.size());
+   BOOST_CHECK(wait_reason::PENDING_ACCEPT == next.waiting.front().reason);
+}
+
+/// Unlimited never bypasses outpost verification, the emergency stop, or a halt after forfeiture.
+BOOST_AUTO_TEST_CASE(unlimited_exposure_retains_verification_freeze_and_halt_checks) {
+   auto in = eth_inputs();
+   in.exposure_policies = {{liqeth, sysio::batch_operator_detail::unlimited_exposure{}}};
+   in.requests = {synd_request(1, eth, 1, liqeth, 10)};
+   auto out = plan_actions(in);
+   BOOST_CHECK(out.accepts.empty());
+   BOOST_REQUIRE_EQUAL(1u, out.waiting.size());
+   BOOST_CHECK(wait_reason::UNVERIFIED == out.waiting[0].reason);
+   in.emitted[{eth, 1}] = digest_of("another envelope");
+   out = plan_actions(in);
+   BOOST_CHECK(out.accepts.empty());
+   BOOST_REQUIRE_EQUAL(1u, out.waiting.size());
+   BOOST_CHECK(wait_reason::CONTRADICTED == out.waiting[0].reason);
+   outpost_emitted_all(in);
+   BOOST_REQUIRE_EQUAL(1u, plan_actions(in).accepts.size());
+   in.frozen = true;
+   BOOST_CHECK(plan_actions(in).accepts.empty());
+   in.frozen = false;
+   in.halted = true;
+   BOOST_CHECK(plan_actions(in).accepts.empty());
+   in.halted = false;
+   in.accepts_after = fc::time_point_sec(in.now + fc::seconds(30));
+   out = plan_actions(in);
+   BOOST_CHECK(out.accepts.empty());
+   BOOST_REQUIRE_EQUAL(1u, out.waiting.size());
+   BOOST_CHECK(wait_reason::STARTUP_FINALITY == out.waiting.front().reason);
 }
 
 BOOST_AUTO_TEST_CASE(a_malformed_or_mismatched_statement_waits) {
