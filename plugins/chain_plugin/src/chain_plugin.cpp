@@ -3619,18 +3619,39 @@ read_only::get_producer_schedule_result read_only::get_producer_schedule( const 
    return result;
 }
 
+namespace {
+
+/**
+ * Reads a `block_num_or_id` request field as a block number.
+ *
+ * @return the block number, or an empty optional when the text is not an unsigned integer and is left to be read as
+ *         a block id
+ * @throws chain::unknown_block_exception when the integer is above the 32-bit block number range and so names no
+ *         block
+ */
+std::optional<uint32_t> to_block_num(std::string_view block_num_or_id) {
+   uint64_t block_num = 0;
+   try {
+      block_num = fc::to_uint64(block_num_or_id);
+   } catch( const fc::exception& ) {
+      return std::nullopt;
+   }
+   SYS_ASSERT( block_num <= std::numeric_limits<uint32_t>::max(), chain::unknown_block_exception,
+               "Could not find block: {}", block_num_or_id );
+   return static_cast<uint32_t>(block_num);
+}
+
+} // anonymous namespace
+
 chain::signed_block_ptr read_only::get_raw_block(const read_only::get_raw_block_params& params, const fc::time_point&) const {
    signed_block_ptr block;
-   std::optional<uint64_t> block_num;
 
    SYS_ASSERT( !params.block_num_or_id.empty() && params.block_num_or_id.size() <= 64,
                chain::block_id_type_exception,
                "Invalid Block number or ID, must be greater than 0 and less than 65 characters"
    );
 
-   try {
-      block_num = fc::to_uint64(params.block_num_or_id);
-   } catch( ... ) {}
+   const std::optional<uint32_t> block_num = to_block_num(params.block_num_or_id);
 
    if( block_num ) {
       block = db.fetch_block_by_number( *block_num );
@@ -3659,16 +3680,12 @@ std::function<chain::t_or_exception<fc::variant>()> read_only::get_block(const g
 }
 
 read_only::get_block_header_result read_only::get_block_header(const read_only::get_block_header_params& params, const fc::time_point& deadline) const{
-   std::optional<uint64_t> block_num;
-
    SYS_ASSERT( !params.block_num_or_id.empty() && params.block_num_or_id.size() <= 64,
                chain::block_id_type_exception,
                "Invalid Block number or ID, must be greater than 0 and less than 65 characters"
    );
 
-   try {
-      block_num = fc::to_uint64(params.block_num_or_id);
-   } catch( ... ) {}
+   const std::optional<uint32_t> block_num = to_block_num(params.block_num_or_id);
 
    if (!params.include_extensions) {
       std::optional<signed_block_header> header;
@@ -3744,11 +3761,7 @@ fc::variant read_only::get_block_info(const read_only::get_block_info_params& pa
 
 fc::variant read_only::get_block_header_state(const get_block_header_state_params& params, const fc::time_point&) const {
    signed_block_ptr sbp;
-   std::optional<uint64_t> block_num;
-
-   try {
-      block_num = fc::to_uint64(params.block_num_or_id);
-   } catch( ... ) {}
+   const std::optional<uint32_t> block_num = to_block_num(params.block_num_or_id);
 
    if( block_num ) {
       sbp = db.fetch_block_by_number(*block_num);

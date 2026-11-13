@@ -18,7 +18,10 @@
 #include <fc/io/json.hpp>
 
 #include <array>
+#include <limits>
+#include <string>
 #include <utility>
+#include <variant>
 
 using namespace sysio;
 using namespace sysio::chain;
@@ -131,6 +134,43 @@ BOOST_FIXTURE_TEST_CASE( get_block_with_invalid_abi, validating_tester ) try {
               json::to_string(fc::variant{static_cast<const signed_block_header&>(*block)}, fc::time_point::maximum()));
 
 } FC_LOG_AND_RETHROW() /// get_block_with_invalid_abi
+
+// Block numbers are 32 bits wide: a block_num_or_id number above UINT32_MAX names no block, and must not be looked up
+// as its low 32 bits.
+BOOST_FIXTURE_TEST_CASE( block_lookup_rejects_block_number_above_uint32, validating_tester ) try {
+   produce_blocks(3);
+
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   chain_apis::read_only plugin(*(this->control), {}, {}, _tracked_votes, fc::microseconds::maximum(),
+                                fc::microseconds::maximum(), {});
+   const fc::time_point no_deadline = fc::time_point::maximum();
+
+   const uint32_t      head_num  = control->head().block_num();
+   const block_id_type head_id   = control->head().id();
+   const std::string   head_text = std::to_string(head_num);
+
+   // the head block is found by its own number
+   BOOST_TEST(plugin.get_raw_block({head_text}, no_deadline)->calculate_id() == head_id);
+   const t_or_exception<fc::variant> head_block = plugin.get_block({head_text}, no_deadline)();
+   BOOST_REQUIRE(std::holds_alternative<fc::variant>(head_block));
+   BOOST_TEST(std::get<fc::variant>(head_block)["id"].as<block_id_type>() == head_id);
+   BOOST_TEST(plugin.get_block_header({head_text, false}, no_deadline).id == head_id);
+   BOOST_TEST(plugin.get_block_header({head_text, true}, no_deadline).id == head_id);
+   BOOST_TEST(plugin.get_block_header_state({head_text}, no_deadline)["id"].as<block_id_type>() == head_id);
+
+   const uint64_t uint32_max = std::numeric_limits<uint32_t>::max();
+   const uint64_t uint64_max = std::numeric_limits<uint64_t>::max();
+   for( uint64_t block_num : {uint32_max, uint32_max + 1, uint32_max + 1 + head_num, uint64_max} ) {
+      const std::string text = std::to_string(block_num);
+      BOOST_TEST_CONTEXT(text) {
+         BOOST_CHECK_THROW(plugin.get_raw_block({text}, no_deadline), unknown_block_exception);
+         BOOST_CHECK_THROW(plugin.get_block({text}, no_deadline), unknown_block_exception);
+         BOOST_CHECK_THROW(plugin.get_block_header({text, false}, no_deadline), unknown_block_exception);
+         BOOST_CHECK_THROW(plugin.get_block_header({text, true}, no_deadline), unknown_block_exception);
+         BOOST_CHECK_THROW(plugin.get_block_header_state({text}, no_deadline), unknown_block_exception);
+      }
+   }
+} FC_LOG_AND_RETHROW() /// block_lookup_rejects_block_number_above_uint32
 
 BOOST_AUTO_TEST_CASE( get_consensus_parameters ) try {
    tester t{setup_policy::preactivate_feature_and_new_bios};

@@ -304,6 +304,11 @@ class PluginHttpTest(unittest.TestCase):
         payload = {"block_num_or_id":1}
         ret_json = self.nodeop.processUrllibRequest(resource, command, payload, endpoint=endpoint)
         self.assertEqual(ret_json["payload"]["block_num"], 1)
+        # get_block with a block number above the 32-bit block number range
+        payload = {"block_num_or_id":2**32 + 1}
+        ret_json = self.nodeop.processUrllibRequest(resource, command, payload, endpoint=endpoint)
+        self.assertEqual(ret_json["code"], 400)
+        self.assertEqual(ret_json["error"]["code"], 3100002)
 
         # get_raw_block with empty parameter
         command = "get_raw_block"
@@ -341,6 +346,12 @@ class PluginHttpTest(unittest.TestCase):
         self.assertTrue("id" in ret_json["payload"])
         self.assertTrue("signed_block_header" in ret_json["payload"])
         self.assertFalse("block_extensions" in ret_json["payload"])
+        # get_block_header with a block number above the 32-bit block number range
+        for include_extensions in (True, False):
+            payload = {"block_num_or_id":2**32 + 1, "include_extensions": include_extensions}
+            ret_json = self.nodeop.processUrllibRequest(resource, command, payload, endpoint=endpoint)
+            self.assertEqual(ret_json["code"], 400)
+            self.assertEqual(ret_json["error"]["code"], 3100002)
 
         # get_block_info with empty parameter
         command =  "get_block_info"
@@ -393,6 +404,11 @@ class PluginHttpTest(unittest.TestCase):
         self.assertEqual(ret_json["payload"]["header"]["producer"], "sysio")
         # get_block_header_state with block far in future
         payload = {"block_num_or_id":head_block_num+2000000}
+        ret_json = self.nodeop.processUrllibRequest(resource, command, payload, endpoint=endpoint)
+        self.assertEqual(ret_json["code"], 400)
+        self.assertEqual(ret_json["error"]["code"], 3100002)
+        # get_block_header_state with a block number above the 32-bit block number range
+        payload = {"block_num_or_id":2**32 + head_block_num}
         ret_json = self.nodeop.processUrllibRequest(resource, command, payload, endpoint=endpoint)
         self.assertEqual(ret_json["code"], 400)
         self.assertEqual(ret_json["error"]["code"], 3100002)
