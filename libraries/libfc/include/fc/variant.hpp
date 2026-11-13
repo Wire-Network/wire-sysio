@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <charconv>
 #include <deque>
 #include <map>
@@ -426,6 +427,18 @@ namespace fc
         void    clear();
       private:
         void    init();
+
+        /// Read a scalar or pointer value without accessing a typed object inside the character storage.
+        template <typename T>
+        T load_payload() const;
+
+        /// Store the value representation without changing bytes outside the payload, including the type tag.
+        template <typename T>
+        void store_payload(T value);
+
+        /// Select inline or owning heap storage for a string, retaining its existing representation.
+        void make_string_inline_or_heap(std::string_view src);
+
         //enough room to store pointers, doubles, uint64s. doubled to allow 1 extra byte to store type at the end
         alignas(double) std::array<char, std::max(sizeof(uintmax_t ), sizeof(double)) * 2> _data = {};
    };

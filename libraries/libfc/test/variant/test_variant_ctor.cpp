@@ -5,7 +5,10 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <array>
+#include <bit>
 #include <cstdint>
+#include <limits>
 #include <string>
 
 using fc::variant;
@@ -314,6 +317,50 @@ BOOST_AUTO_TEST_CASE(optional_ctor_engaged_and_disengaged) {
    BOOST_CHECK(vn.is_null());
    BOOST_CHECK(vs.is_int64() || vs.is_uint64());
    BOOST_CHECK_EQUAL(vs.as_int64(), 99);
+}
+
+/// Narrow inputs must retain the 64-bit payload representation expected by every numeric accessor.
+BOOST_AUTO_TEST_CASE(integer_payload_preserves_full_width) {
+   const auto check_signed = [](auto value) {
+      const variant v{value};
+      BOOST_CHECK_EQUAL(v.get_type(), variant::int64_type);
+      BOOST_CHECK_EQUAL(v.as_int64(), static_cast<int64_t>(value));
+   };
+   const auto check_unsigned = [](auto value) {
+      const variant v{value};
+      BOOST_CHECK_EQUAL(v.get_type(), variant::uint64_type);
+      BOOST_CHECK_EQUAL(v.as_uint64(), static_cast<uint64_t>(value));
+   };
+   check_signed(std::numeric_limits<int8_t>::min());
+   check_signed(std::numeric_limits<int8_t>::max());
+   check_signed(std::numeric_limits<int16_t>::min());
+   check_signed(std::numeric_limits<int16_t>::max());
+   check_signed(std::numeric_limits<int32_t>::min());
+   check_signed(std::numeric_limits<int32_t>::max());
+   check_signed(std::numeric_limits<int64_t>::min());
+   check_signed(std::numeric_limits<int64_t>::max());
+   check_unsigned(std::numeric_limits<uint8_t>::max());
+   check_unsigned(std::numeric_limits<uint16_t>::max());
+   check_unsigned(std::numeric_limits<uint32_t>::max());
+   check_unsigned(std::numeric_limits<uint64_t>::max());
+}
+
+/// Payload reads and byte-wise copies must preserve signed zero, subnormals, infinities and NaN payload bits.
+BOOST_AUTO_TEST_CASE(double_payload_preserves_object_representation) {
+   constexpr std::array<uint64_t, 8> patterns{0x0000000000000000ULL, 0x8000000000000000ULL, 0x0000000000000001ULL,
+                                              0x3ff0000000000000ULL, 0x7fefffffffffffffULL, 0x7ff0000000000000ULL,
+                                              0xfff0000000000000ULL, 0x7ff8000000001234ULL};
+   for (const auto bits : patterns) {
+      BOOST_TEST_CONTEXT("double representation " << bits) {
+         const variant source{std::bit_cast<double>(bits)};
+         BOOST_CHECK_EQUAL(source.get_type(), variant::double_type);
+         BOOST_CHECK_EQUAL(std::bit_cast<uint64_t>(source.as_double()), bits);
+         variant copy{source};
+         variant moved{std::move(copy)};
+         BOOST_CHECK(copy.is_null());
+         BOOST_CHECK_EQUAL(std::bit_cast<uint64_t>(moved.as_double()), bits);
+      }
+   }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
