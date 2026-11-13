@@ -607,9 +607,6 @@ BOOST_AUTO_TEST_CASE(variant_rejects_every_non_string_carrier) {
    // the value the writer meant:
    //
    //   7          -> not a code at all now; a code must start with a letter
-   //   -1         -> lexical_cast does not reject a sign for an unsigned
-   //                 target, it WRAPS; a bound of -1 would page from the far
-   //                 end of the table
    //   null/false -> 0, the absent sentinel, silently
    //   true       -> 1, a value with no canonical spelling at all
    slug_name back;
@@ -634,10 +631,8 @@ BOOST_AUTO_TEST_CASE(variant_rejects_every_non_string_carrier) {
 BOOST_AUTO_TEST_CASE(variant_object_arm_rejects_every_coercible_value_shape) {
    // The transitional object arm reaches a RAW uint64, so it is the one place a
    // malformed number can still land on a key. `fc::variant::as_uint64` coerces
-   // rather than validates — it wraps a negative int64 to UINT64_MAX, truncates
-   // a double, and turns null/bool into 0/1 — and since from_variant feeds
-   // encode_field, `{"value": -1}` would encode be64(UINT64_MAX) and page from
-   // the far end of the table. Each shape below must be refused, not coerced.
+   // rather than validates: it truncates a double, turns null/bool into 0/1 and
+   // accepts a signed string. Each shape below must be refused, not coerced.
    slug_name back;
    const auto obj = [](const fc::variant& value) {
       return fc::variant(fc::mutable_variant_object("value", value));

@@ -2188,6 +2188,11 @@ BOOST_FIXTURE_TEST_CASE( get_kv_rows_wide_secondary_keys_test, validating_tester
       BOOST_CHECK_EQUAL(query("bysmall", R"({"bysmall": 33554432})").rows.size(), 0u);
    }
 
+   // (k) A bound outside the sign of its key is rejected. Each used to encode as its two's
+   //     complement: -1 as a bound above every unsigned key, 2^63 as one below every int64 key.
+   BOOST_CHECK_THROW(query("bysmall", R"({"bysmall": -1})"), fc::parse_error_exception);
+   BOOST_CHECK_THROW(query("byscore", R"({"byscore": 9223372036854775808})"), fc::parse_error_exception);
+
 
    // Everything above drives the codec's ENCODE half: bounds go in through encode_shape,
    // and the row order proves what the contract stored. None of it reaches decode_key,

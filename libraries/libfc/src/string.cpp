@@ -34,12 +34,11 @@ int64_t to_int64(std::string_view i) {
 
 uint64_t to_uint64(std::string_view i) {
    try {
-      try {
-         return boost::lexical_cast<uint64_t>(i.data(), i.size());
-      } catch (const boost::bad_lexical_cast& e) {
+      uint64_t value = 0;
+      // The conversion reads "-n" as 2^64 - n, so of the negative numbers only "-0" is in range.
+      if (!boost::conversion::try_lexical_convert(i.data(), i.size(), value) || (value != 0 && i.starts_with('-')))
          FC_THROW_EXCEPTION(parse_error_exception, "Couldn't parse uint64_t");
-      }
-      FC_RETHROW_EXCEPTIONS(warn, "{} => uint64_t", i)
+      return value;
    }
    FC_CAPTURE_AND_RETHROW("{}", i)
 }

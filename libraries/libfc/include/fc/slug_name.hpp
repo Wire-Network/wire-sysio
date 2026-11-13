@@ -173,13 +173,9 @@ namespace detail {
 
 /// Checked unsigned decode for the transitional object arm's `value`.
 ///
-/// `fc::variant::as_uint64` COERCES where this needs to validate: it wraps a
-/// negative `int64` to `UINT64_MAX`, truncates a `double`, turns null/bool into
-/// 0/1, and its string path goes through a `lexical_cast` that does not reject a
-/// sign (`variant.cpp`, `as_uint64`). `from_variant` feeds `encode_field`, so a
-/// bound of `{"value": -1}` would otherwise encode `be64(UINT64_MAX)` and page
-/// from the far end of the table. Every shape that is not an exact non-negative
-/// integer is rejected here instead.
+/// `fc::variant::as_uint64` COERCES where this needs to validate: it truncates a
+/// `double`, turns null/bool into 0/1, and its string path accepts a sign. Every
+/// shape that is not an exact non-negative integer is rejected here instead.
 ///
 /// Canonicality is deliberately NOT required: a packed value with no canonical spelling is
 /// the one thing the string carrier cannot express, so this arm is the only way

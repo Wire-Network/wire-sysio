@@ -8,7 +8,18 @@
 
 namespace fc
 {
+  /**
+   * Parse a decimal integer with an optional leading '+' or '-'.
+   *
+   * @throw parse_error_exception if the text is not a decimal integer or is outside the range of int64_t
+   */
   std::int64_t  to_int64( std::string_view );
+
+  /**
+   * Parse a decimal integer with an optional leading '+'. A leading '-' is accepted for zero only ("-0").
+   *
+   * @throw parse_error_exception if the text is not a decimal integer or is outside the range of uint64_t
+   */
   std::uint64_t to_uint64( std::string_view );
   double   to_double( std::string_view );
 

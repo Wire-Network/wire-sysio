@@ -30,6 +30,7 @@ add_executable( test_fc
         network/test_json_rpc_client.cpp
         network/solana/test_solana_client.cpp
         network/test_message_buffer.cpp
+        network/test_url.cpp
         scoped_exit/test_scoped_exit.cpp
         static_variant/test_static_variant.cpp
         variant/test_variant.cpp
@@ -49,6 +50,7 @@ add_executable( test_fc
         test_bls.cpp
         test_bitset.cpp
         test_ordered_diff.cpp
+        test_string.cpp
         test_system_timer.cpp
         test_time.cpp
         parallel/test_worker_task_queue.cpp

@@ -132,6 +132,30 @@ BOOST_FIXTURE_TEST_CASE( get_block_with_invalid_abi, validating_tester ) try {
 
 } FC_LOG_AND_RETHROW() /// get_block_with_invalid_abi
 
+// A block number with a minus sign is not a block number. It used to parse as its two's complement, so
+// "-(2^64 - n)" returned block n.
+BOOST_AUTO_TEST_CASE( block_lookup_rejects_negative_block_number ) try {
+   tester t{setup_policy::preactivate_feature_and_new_bios};
+   t.produce_blocks(3);
+
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   chain_apis::read_only plugin(*(t.control), {}, {}, _tracked_votes, fc::microseconds::maximum(), fc::microseconds::maximum(), nullptr);
+
+   const uint32_t    head_num = t.control->head().block_num();
+   const std::string head_text = std::to_string(head_num);
+   BOOST_TEST(plugin.get_raw_block({head_text}, fc::time_point::maximum())->block_num() == head_num);
+   BOOST_TEST(plugin.get_block_header({head_text, false}, fc::time_point::maximum()).id == t.control->head().id());
+
+   for( const std::string& negative : {"-" + std::to_string(uint64_t{0} - head_num), std::string{"-1"}} ) {
+      BOOST_TEST_CONTEXT(negative) {
+         BOOST_CHECK_THROW(plugin.get_raw_block({negative}, fc::time_point::maximum()), block_id_type_exception);
+         BOOST_CHECK_THROW(plugin.get_block_header({negative, false}, fc::time_point::maximum()), block_id_type_exception);
+         BOOST_CHECK_THROW(plugin.get_block_header({negative, true}, fc::time_point::maximum()), block_id_type_exception);
+         BOOST_CHECK_THROW(plugin.get_block_header_state({negative}, fc::time_point::maximum()), block_id_type_exception);
+      }
+   }
+} FC_LOG_AND_RETHROW()
+
 BOOST_AUTO_TEST_CASE( get_consensus_parameters ) try {
    tester t{setup_policy::preactivate_feature_and_new_bios};
    t.produce_block();

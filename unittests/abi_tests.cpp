@@ -811,6 +811,122 @@ BOOST_AUTO_TEST_CASE(slug_name_builtin_type)
 
 } FC_LOG_AND_RETHROW() }
 
+// A JSON value outside the range of a 64-bit integer type is rejected, not packed as its two's complement.
+BOOST_AUTO_TEST_CASE(integer_64_bit_types_reject_out_of_range_values)
+{ try {
+
+   const char* test_abi = R"=====(
+   {
+       "version": "sysio::abi/1.1",
+       "types": [],
+       "structs": [{
+           "name": "wide",
+           "base": "",
+           "fields": [{
+               "name": "unsigned64",
+               "type": "uint64"
+           },{
+               "name": "signed64",
+               "type": "int64"
+           }]
+       }],
+       "actions": [],
+       "tables": [],
+       "ricardian_clauses": [],
+       "enums": [{
+           "name": "level",
+           "type": "uint64",
+           "values": [{"name": "low", "value": 0}, {"name": "high", "value": 9223372036854775807}]
+       }]
+   }
+   )=====";
+
+   abi_serializer abis(fc::json::from_string(test_abi).as<abi_def>(), yield_fn());
+
+   // The hex of `json` packed as `type`, or the name of the exception packing it threw.
+   const auto pack = [&](const std::string& type, const std::string& json) -> std::string {
+      try {
+         return fc::to_hex(abis.variant_to_binary(type, fc::json::from_string(json), yield_fn()));
+      } catch( const fc::exception& e ) {
+         return e.name();
+      }
+   };
+   const std::string rejected = "parse_error_exception";
+
+   // Each type holds its whole range. The values past either end used to pack as the bytes in the comments.
+   for( const std::string type : {"uint64", "varint_uint64"} ) {
+      BOOST_TEST_CONTEXT(type) {
+         BOOST_TEST(pack(type, "0") == "0000000000000000");
+         BOOST_TEST(pack(type, "9223372036854775807") == "ffffffffffffff7f");
+         BOOST_TEST(pack(type, "9223372036854775808") == "0000000000000080");
+         BOOST_TEST(pack(type, "18446744073709551615") == "ffffffffffffffff");
+         BOOST_TEST(pack(type, "-1") == rejected);                     // ffffffffffffffff
+         BOOST_TEST(pack(type, "-9223372036854775808") == rejected);   // 0000000000000080
+      }
+   }
+   for( const std::string type : {"int64", "varint_int64"} ) {
+      BOOST_TEST_CONTEXT(type) {
+         BOOST_TEST(pack(type, "-9223372036854775808") == "0000000000000080");
+         BOOST_TEST(pack(type, "-1") == "ffffffffffffffff");
+         BOOST_TEST(pack(type, "0") == "0000000000000000");
+         BOOST_TEST(pack(type, "9223372036854775807") == "ffffffffffffff7f");
+         BOOST_TEST(pack(type, "9223372036854775808") == rejected);    // 0000000000000080
+         BOOST_TEST(pack(type, "18446744073709551615") == rejected);   // ffffffffffffffff
+      }
+   }
+
+   // A number given as a string is held to the same range. A leading '+' is accepted, and "-0" is zero.
+   BOOST_TEST(pack("uint64", R"("18446744073709551615")") == "ffffffffffffffff");
+   BOOST_TEST(pack("uint64", R"("+1")") == "0100000000000000");
+   BOOST_TEST(pack("uint64", R"("-0")") == "0000000000000000");
+   BOOST_TEST(pack("uint64", R"("-1")") == rejected);                      // ffffffffffffffff
+   BOOST_TEST(pack("uint64", R"("-18446744073709551361")") == rejected);   // ff00000000000000
+   BOOST_TEST(pack("uint64", R"("18446744073709551616")") == rejected);
+   BOOST_TEST(pack("int64", R"("-9223372036854775808")") == "0000000000000080");
+   BOOST_TEST(pack("int64", R"("+1")") == "0100000000000000");
+   BOOST_TEST(pack("int64", R"("9223372036854775808")") == rejected);
+   BOOST_TEST(pack("int64", R"("-9223372036854775809")") == rejected);
+
+   // A number with a fraction truncates toward zero before it is range-checked.
+   BOOST_TEST(pack("uint64", "1.9") == "0100000000000000");
+   BOOST_TEST(pack("uint64", "-0.9") == "0000000000000000");
+   BOOST_TEST(pack("uint64", "-1.0") == rejected);
+   BOOST_TEST(pack("uint64", "18446744073709551616.0") == rejected);
+   BOOST_TEST(pack("uint64", "1000000000000000000000000000000.0") == rejected);
+   BOOST_TEST(pack("int64", "-1.9") == "ffffffffffffffff");
+   BOOST_TEST(pack("int64", "9223372036854775808.0") == rejected);
+   BOOST_TEST(pack("int64", "-1000000000000000000000000000000.0") == rejected);
+
+   // Arrays, optionals, struct fields and an enum's integer form pack through the element type.
+   BOOST_TEST(pack("uint64[]", "[0,18446744073709551615]") == "020000000000000000ffffffffffffffff");
+   BOOST_TEST(pack("uint64[]", "[0,-1]") == rejected);
+   BOOST_TEST(pack("int64[]", "[-1,18446744073709551615]") == rejected);
+   BOOST_TEST(pack("uint64?", "null") == "00");
+   BOOST_TEST(pack("uint64?", "-1") == rejected);
+   BOOST_TEST(pack("int64?", "18446744073709551615") == rejected);
+   BOOST_TEST(pack("wide", R"({"unsigned64":18446744073709551615,"signed64":-9223372036854775808})") ==
+              "ffffffffffffffff0000000000000080");
+   BOOST_TEST(pack("wide", R"({"unsigned64":-1,"signed64":0})") == rejected);
+   BOOST_TEST(pack("wide", R"({"unsigned64":0,"signed64":18446744073709551615})") == rejected);
+   BOOST_TEST(pack("level", R"("high")") == "ffffffffffffff7f");
+   BOOST_TEST(pack("level", "9223372036854775807") == "ffffffffffffff7f");
+   BOOST_TEST(pack("level", "-1") == rejected);
+
+   // The narrower integer types read through the same 64-bit conversions. `bool` packs as a uint8.
+   for( const std::string type : {"uint8", "uint16", "uint32", "varuint32", "bool"} )
+      BOOST_TEST(pack(type, "-1") == rejected, type);
+   for( const std::string type : {"int8", "int16", "int32", "varint32"} )
+      BOOST_TEST(pack(type, "18446744073709551615") == rejected, type);
+
+   // Both serialization entry points reject.
+   BOOST_CHECK_THROW(abis.variant_to_binary("uint64", fc::json::from_string("-1"), max_serialization_time),
+                     fc::parse_error_exception);
+   BOOST_CHECK_THROW(abis.variant_to_binary("int64", fc::json::from_string("18446744073709551615"),
+                                            max_serialization_time),
+                     fc::parse_error_exception);
+
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_CASE(uint_types)
 { try {
 
