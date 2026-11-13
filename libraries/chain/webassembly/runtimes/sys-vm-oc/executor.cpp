@@ -18,6 +18,8 @@
 
 #include <boost/hana/equal.hpp>
 
+#include <optional>
+
 #include "IR/Types.h"
 
 #include <asm/prctl.h>
@@ -252,9 +254,13 @@ void executor::execute(const code_descriptor& code, memory& mem, apply_context& 
 
    void(*apply_func)(uint64_t, uint64_t, uint64_t) = (void(*)(uint64_t, uint64_t, uint64_t))(cb->running_code_base + code.apply_offset);
 
-   switch(sigsetjmp(*cb->jmp, 0)) {
-      case 0:
-         stack.run([&]{
+   // Empty when wasm returns normally.
+   std::optional<sysvmoc_exitcode> early_exit;
+   // sigsetjmp is called on the execution stack, so every siglongjmp out of wasm lands in a live frame higher on
+   // that same stack. glibc's fortified longjmp aborts on a jump down to another stack.
+   stack.run([&]{
+      switch(sigsetjmp(*cb->jmp, 0)) {
+         case 0:
             std::visit(overloaded {
                [&](const no_offset&) {},
                [&](const intrinsic_ordinal& i) {
@@ -267,18 +273,37 @@ void executor::execute(const code_descriptor& code, memory& mem, apply_context& 
                }
             }, code.start);
             apply_func(context.get_receiver().to_uint64_t(), context.get_action().account.to_uint64_t(), context.get_action().name.to_uint64_t());
-         });
-         break;
-      //case 1: clean sysio_exit
-      case SYSVMOC_EXIT_CHECKTIME_FAIL:
-         context.trx_context.checktime();
-         break;
-      case SYSVMOC_EXIT_SEGV:
-         SYS_ASSERT(false, wasm_execution_error, "access violation");
-         break;
-      case SYSVMOC_EXIT_EXCEPTION: //exception
-         std::rethrow_exception(*cb->eptr);
-         break;
+            break;
+         case SYSVMOC_EXIT_CLEAN_EXIT:
+            early_exit = SYSVMOC_EXIT_CLEAN_EXIT;
+            break;
+         case SYSVMOC_EXIT_CHECKTIME_FAIL:
+            early_exit = SYSVMOC_EXIT_CHECKTIME_FAIL;
+            break;
+         case SYSVMOC_EXIT_SEGV:
+            early_exit = SYSVMOC_EXIT_SEGV;
+            break;
+         case SYSVMOC_EXIT_EXCEPTION:
+            early_exit = SYSVMOC_EXIT_EXCEPTION;
+            break;
+      }
+   });
+
+   // Reported from the caller's stack: nothing may unwind through execution_stack::run.
+   if(early_exit) {
+      switch(*early_exit) {
+         case SYSVMOC_EXIT_CLEAN_EXIT: //clean sysio_exit
+            break;
+         case SYSVMOC_EXIT_CHECKTIME_FAIL:
+            context.trx_context.checktime();
+            break;
+         case SYSVMOC_EXIT_SEGV:
+            SYS_ASSERT(false, wasm_execution_error, "access violation");
+            break;
+         case SYSVMOC_EXIT_EXCEPTION:
+            std::rethrow_exception(*cb->eptr);
+            break;
+      }
    }
 }
 
