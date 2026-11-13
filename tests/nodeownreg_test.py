@@ -4,10 +4,9 @@
 nodeownreg_test.py — OPP Node Owner NFT Registration integration test (create-in-flow).
 
 Drives sysio.roa the way the depot (sysio.msgch) does for an inbound NodeOwnerRegistration,
-pushing the two inline actions directly as sysio.roa:
-  1. newnameduser(account, wire_key, tier)        -- create the claim account
-  2. nodeownreg(account, tier, eth_key, wire_key, eth_address)
-                                                  -- register + inline-record the ETH link
+pushing nodeownreg(account, tier, eth_key, wire_key, eth_address) as sysio.roa.
+The claim creates the account, registers it and records its ETH link atomically.
+Existing names are rejected even when the submitted key matches their active authority.
 
 Verifies the nodeowners + nodeownerreg tables, plus the soft-fail (audit row) and hard-fail paths.
 The bios bootstrap marks sysio.roa privileged, so its inline recordlink may declare
@@ -23,7 +22,7 @@ from TestHarness import Account, Cluster, TestHelper, Utils, WalletMgr
 
 # nodeownerreg reg_status + reject_reason values (mirror sysio.roa.hpp).
 CONFIRMED, REJECTED = 0, 1
-R_NAME_INVALID, R_OWNER_NOT_ACCOUNT, R_ACCOUNT_KEY_MISMATCH, R_DUPLICATE = 1, 2, 3, 4
+R_NAME_INVALID, R_DUPLICATE, R_ACCOUNT_EXISTS = 1, 4, 7
 
 
 # ---------------------------------------------------------------------------
@@ -120,10 +119,9 @@ try:
     Utils.Print(f"  eth (EM) key:  {eth_key}")
     Utils.Print(f"  wire (K1) key: {wire_key}")
 
-    # ---- Test 1: happy path -- create the account then register it ----
-    Utils.Print("=== Test 1: newnameduser + nodeownreg happy path ===")
+    # ---- Test 1: happy path -- one claim creates and registers the account ----
+    Utils.Print("=== Test 1: nodeownreg create-and-register happy path ===")
     owner = "claimacct1a"
-    assert push_newnameduser(node, owner, wire_key, 2)[0], "newnameduser failed"
     assert push_nodeownreg(node, owner, 2, eth_address, eth_key, wire_key)[0], "nodeownreg failed"
 
     reg = get_nodeowner(node, owner)
@@ -133,20 +131,19 @@ try:
     assert audit is not None and int(audit["status"]) == CONFIRMED, f"expected CONFIRMED, got {audit}"
     Utils.Print(f"  Verified: {owner} registered tier-2, audit CONFIRMED")
 
-    # ---- Test 2: account controlled by a different key -> soft-fail ACCOUNT_KEY_MISMATCH ----
-    Utils.Print("=== Test 2: nodeownreg with a non-matching wire key (soft-fail) ===")
+    # ---- Test 2: existing account with a matching public key -> soft-fail ACCOUNT_EXISTS ----
+    Utils.Print("=== Test 2: nodeownreg with a copied matching wire key (soft-fail) ===")
     owner2 = "claimacct2a"
     real_key = wallet_create_key(walletMgr.host, walletMgr.port, "K1")
-    other_key = wallet_create_key(walletMgr.host, walletMgr.port, "K1")
     assert push_newnameduser(node, owner2, real_key, 2)[0], "newnameduser (owner2) failed"
-    # Claim owner2 with a different wire key than it was created with.
-    assert push_nodeownreg(node, owner2, 2, eth_address, eth_key, other_key)[0], \
+    # Public active-key equality is not authorization.
+    assert push_nodeownreg(node, owner2, 2, eth_address, eth_key, real_key)[0], \
         "nodeownreg should soft-fail, not abort"
     assert get_nodeowner(node, owner2) is None, "owner2 must not be registered"
     audit2 = get_audit(node, owner2)
     assert audit2 is not None and int(audit2["status"]) == REJECTED \
-        and int(audit2["reason"]) == R_ACCOUNT_KEY_MISMATCH, f"expected ACCOUNT_KEY_MISMATCH, got {audit2}"
-    Utils.Print("  Correctly soft-failed ACCOUNT_KEY_MISMATCH")
+        and int(audit2["reason"]) == R_ACCOUNT_EXISTS, f"expected ACCOUNT_EXISTS, got {audit2}"
+    Utils.Print("  Correctly soft-failed ACCOUNT_EXISTS")
 
     # ---- Test 3: re-register the owner -> soft-fail DUPLICATE ----
     # Use a fresh ETH key so the replay is a *distinct* transaction: a byte-identical resubmission of
