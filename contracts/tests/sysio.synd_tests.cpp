@@ -3567,7 +3567,7 @@ BOOST_FIXTURE_TEST_CASE(a_pair_with_both_flows_stopped_records_a_later_outcome, 
 } FC_LOG_AND_RETHROW()
 
 // A HELD envelope whose request was fully bonded holds only itself: a later envelope of the pair is
-// requested and released past it, and the pair's queue cursor stays on the held one.
+// requested and released past it, and the pair's queue cursor moves on past both.
 BOOST_FIXTURE_TEST_CASE(a_held_envelope_is_skipped_while_a_later_one_releases, sysio_synd_tester) try {
    const auto signer = ed_signer();
    const auto key    = signer.get_public_key();
@@ -3590,7 +3590,313 @@ BOOST_FIXTURE_TEST_CASE(a_held_envelope_is_skipped_while_a_later_one_releases, s
    BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQSOL, 2)["state"].as_string());
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(4 * UNIT), liq_balance("alice"_n));
    BOOST_REQUIRE_EQUAL(10 * UNIT, item_row(1)["remaining"].as_uint64());
-   BOOST_REQUIRE_EQUAL(0u, ledger_row(SOLANA, LIQSOL)["queue_epoch"].as<uint32_t>());
+   BOOST_REQUIRE_EQUAL(3u, ledger_row(SOLANA, LIQSOL)["queue_epoch"].as<uint32_t>());
+} FC_LOG_AND_RETHROW()
+
+/// The envelope of SOLANA/LIQSOL at epoch 1, fully bonded and held by carol's challenge with nothing released, alice
+/// linked to its pubkey, and later envelopes of the pair on demand.
+struct sysio_synd_held_tester : sysio_synd_tester {
+   /// What the held envelope syndicated.
+   static constexpr uint64_t HELD_AMOUNT = 10 * UNIT;
+   /// The `crank` limit the batch operator's underwriter passes, and `closeenv`'s own.
+   static constexpr uint32_t OPERATOR_CRANK_LIMIT = 16;
+   /// Steps run past the one that should have released an envelope: more steps change nothing.
+   static constexpr uint32_t EXTRA_STEPS = 3;
+
+   sysio_synd_held_tester() {
+      const fc::crypto::private_key signer = ed_signer();
+      pubkey                               = ed_bytes(signer.get_public_key());
+      BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
+      BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
+      syndicate_and_close(1, 1, pubkey, LIQSOL, HELD_AMOUNT);
+      held_id = envelope_row(SOLANA, LIQSOL, 1)["request_id"].as_uint64();
+      underwrite_envelope(SOLANA, LIQSOL, 1);
+      BOOST_REQUIRE_EQUAL(success(), liq_mint("carol"_n, LIQSOL, 5 * UNIT));
+      BOOST_REQUIRE_EQUAL(success(), challenge("carol"_n, SOLANA, LIQSOL, 1));
+      BOOST_REQUIRE_EQUAL(STATE_HELD, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
+   }
+
+   /// Syndicate one UNIT to alice in an envelope of each epoch `first`..`last`, bond it whole and run one step of
+   /// `limit`.
+   void release_envelopes(uint32_t first, uint32_t last, uint32_t limit) {
+      for (uint32_t epoch = first; epoch <= last; ++epoch) {
+         syndicate_and_close(epoch, epoch, pubkey, LIQSOL, UNIT);
+         underwrite_envelope(SOLANA, LIQSOL, epoch);
+         BOOST_REQUIRE_EQUAL(success(), crank(limit));
+      }
+   }
+
+   /// The permissionless `syncenv` of the pair's envelope at `epoch`, signed by carol.
+   action_result syncenv(uint32_t epoch) {
+      return push(SYND_ACCOUNT, synd_abi_ser, "carol"_n, "syncenv"_n, mvo()
+         ("chain_code", codename_mvo(SOLANA))("token_code", codename_mvo(LIQSOL))("epoch_index", epoch));
+   }
+
+   /// The pair's release cursor.
+   uint32_t queue_epoch() { return ledger_row(SOLANA, LIQSOL)["queue_epoch"].as<uint32_t>(); }
+
+   /// With as many envelopes at or after the held one as one step of `limit` collects, the next envelope of the
+   /// pair still releases, and the held one keeps what it holds.
+   void check_release_past_a_full_window(uint32_t limit) {
+      // The held envelope and `limit - 1` released ones: a step's whole window.
+      release_envelopes(2, limit, limit);
+      BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQSOL, limit)["state"].as_string());
+
+      release_envelopes(limit + 1, limit + 1, limit);
+      for (uint32_t step = 0; step < EXTRA_STEPS; ++step) BOOST_REQUIRE_EQUAL(success(), crank(limit));
+      BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQSOL, limit + 1)["state"].as_string());
+      BOOST_REQUIRE_EQUAL(static_cast<int64_t>(limit * UNIT), liq_balance("alice"_n));
+      BOOST_REQUIRE_EQUAL(STATE_HELD, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
+      BOOST_REQUIRE_EQUAL(HELD_AMOUNT, item_row(1)["remaining"].as_uint64());
+   }
+
+   std::vector<char> pubkey;
+   uint64_t          held_id = 0;
+};
+
+// A fully bonded hold keeps back only its own envelope however many later ones the pair has: at the batch
+// operator's crank limit, the envelope one past a step's window still releases.
+BOOST_FIXTURE_TEST_CASE(a_held_envelope_does_not_stall_releases_past_the_operators_window, sysio_synd_held_tester) try {
+   check_release_past_a_full_window(OPERATOR_CRANK_LIMIT);
+} FC_LOG_AND_RETHROW()
+
+// The same at the largest limit a crank takes.
+BOOST_FIXTURE_TEST_CASE(a_held_envelope_does_not_stall_releases_past_the_largest_window, sysio_synd_held_tester) try {
+   check_release_past_a_full_window(MAX_CRANK_LIMIT);
+} FC_LOG_AND_RETHROW()
+
+// Several windows of later envelopes all release past the held one, and the pair's cursor moves on with them.
+BOOST_FIXTURE_TEST_CASE(a_held_envelope_lets_several_windows_of_later_envelopes_release, sysio_synd_held_tester) try {
+   const uint32_t last = 3 * OPERATOR_CRANK_LIMIT + 2;
+   release_envelopes(2, last, OPERATOR_CRANK_LIMIT);
+   for (uint32_t epoch = 2; epoch <= last; ++epoch) {
+      BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQSOL, epoch)["state"].as_string());
+   }
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>((last - 1) * UNIT), liq_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(last + 1, queue_epoch());
+   BOOST_REQUIRE_EQUAL(STATE_HELD, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
+   BOOST_REQUIRE_EQUAL(HELD_AMOUNT, item_row(1)["remaining"].as_uint64());
+} FC_LOG_AND_RETHROW()
+
+// A VALID ruling after the queue has moved on: recording it brings the cursor back to the held envelope, the next
+// step releases it, and the cursor returns over the finished envelopes.
+BOOST_FIXTURE_TEST_CASE(a_valid_ruling_releases_a_held_envelope_the_queue_moved_past, sysio_synd_held_tester) try {
+   const uint32_t last = OPERATOR_CRANK_LIMIT + 2;
+   release_envelopes(2, last, OPERATOR_CRANK_LIMIT);
+   BOOST_REQUIRE_EQUAL(last + 1, queue_epoch());
+
+   BOOST_REQUIRE_EQUAL(success(), rule(held_id, true));
+   BOOST_REQUIRE_EQUAL(success(), syncenv(1));
+   BOOST_REQUIRE_EQUAL("VALID", envelope_row(SOLANA, LIQSOL, 1)["outcome"].as_string());
+   BOOST_REQUIRE_EQUAL(1u, queue_epoch());
+
+   BOOST_REQUIRE_EQUAL(success(), crank(OPERATOR_CRANK_LIMIT));
+   BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
+   BOOST_REQUIRE(item_row(1).is_null());
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(HELD_AMOUNT + (last - 1) * UNIT), liq_balance("alice"_n));
+   // That step's window ended short of the last envelopes; one more takes the cursor over them.
+   BOOST_REQUIRE_EQUAL(success(), crank(OPERATOR_CRANK_LIMIT));
+   BOOST_REQUIRE_EQUAL(last + 1, queue_epoch());
+} FC_LOG_AND_RETHROW()
+
+// An INVALID ruling after the queue has moved on: a crank's own synchronization records it, the held syndication
+// is burned and the forfeit goes to the fee pot, and the later envelopes keep what they released.
+BOOST_FIXTURE_TEST_CASE(an_invalid_ruling_burns_a_held_envelope_the_queue_moved_past, sysio_synd_held_tester) try {
+   const uint32_t last = OPERATOR_CRANK_LIMIT + 2;
+   release_envelopes(2, last, OPERATOR_CRANK_LIMIT);
+   BOOST_REQUIRE_EQUAL(last + 1, queue_epoch());
+   const int64_t before = supply();
+
+   BOOST_REQUIRE_EQUAL(success(), rule(held_id, false));
+   for (uint32_t step = 0; step < EXTRA_STEPS; ++step) BOOST_REQUIRE_EQUAL(success(), crank());
+   const fc::variant envelope = envelope_row(SOLANA, LIQSOL, 1);
+   BOOST_REQUIRE_EQUAL(STATE_INVALID, envelope["state"].as_string());
+   BOOST_REQUIRE_EQUAL(0u, envelope["released"].as_uint64());
+   BOOST_REQUIRE_EQUAL(HELD_AMOUNT, envelope["burned"].as_uint64());
+   BOOST_REQUIRE(item_row(1).is_null());
+   BOOST_REQUIRE_EQUAL(HELD_AMOUNT, feepot_balance(LIQSOL));
+   BOOST_REQUIRE_EQUAL(before - static_cast<int64_t>(HELD_AMOUNT), supply());
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>((last - 1) * UNIT), liq_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(last + 1, queue_epoch());
+} FC_LOG_AND_RETHROW()
+
+// Two held envelopes at once: the envelopes between and after them release, and each ruling is processed when it
+// comes, VALID releasing its envelope and INVALID burning its own.
+BOOST_FIXTURE_TEST_CASE(two_held_envelopes_hold_only_themselves, sysio_synd_held_tester) try {
+   release_envelopes(2, 3, OPERATOR_CRANK_LIMIT);
+   syndicate_and_close(4, 4, pubkey, LIQSOL, UNIT);
+   const uint64_t second_held = envelope_row(SOLANA, LIQSOL, 4)["request_id"].as_uint64();
+   underwrite_envelope(SOLANA, LIQSOL, 4);
+   BOOST_REQUIRE_EQUAL(success(), challenge("carol"_n, SOLANA, LIQSOL, 4));
+   const uint32_t last = OPERATOR_CRANK_LIMIT + 6;
+   release_envelopes(5, last, OPERATOR_CRANK_LIMIT);
+   BOOST_REQUIRE_EQUAL(STATE_HELD, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
+   BOOST_REQUIRE_EQUAL(STATE_HELD, envelope_row(SOLANA, LIQSOL, 4)["state"].as_string());
+   BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQSOL, last)["state"].as_string());
+   // Every envelope from 2 to `last` but the second held one.
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>((last - 2) * UNIT), liq_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(last + 1, queue_epoch());
+
+   BOOST_REQUIRE_EQUAL(success(), rule(second_held, true));
+   BOOST_REQUIRE_EQUAL(success(), rule(held_id, false));
+   for (uint32_t step = 0; step < EXTRA_STEPS; ++step) BOOST_REQUIRE_EQUAL(success(), crank());
+   BOOST_REQUIRE_EQUAL(STATE_INVALID, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
+   BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQSOL, 4)["state"].as_string());
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>((last - 1) * UNIT), liq_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(last + 1, queue_epoch());
+} FC_LOG_AND_RETHROW()
+
+// The ruling can first be seen by the underwriting walk, in a step whose release walk is already past the held
+// envelope: the cursor still comes back and the envelope releases. Two tokens `sysio.bond` cannot bond come
+// first in pair order and take the underwriting walk's whole budget in the step that moves the release walk on.
+BOOST_FIXTURE_TEST_CASE(a_ruling_first_seen_by_the_underwriting_walk_brings_the_release_cursor_back,
+                        sysio_synd_tester) try {
+   // A step of two: the release walk reaches the held pair, the underwriting walk is spent before it.
+   constexpr uint32_t         SMALL_LIMIT = 2;
+   constexpr std::string_view LIQTA       = "LIQTA";
+   constexpr std::string_view LIQTB       = "LIQTB";
+   BOOST_REQUIRE_EQUAL(success(), regtoken(LIQTA, 1, ChainKind::CHAIN_KIND_SVM, SOLANA,
+                                           std::vector<char>(32, char(0x5c))));
+   BOOST_REQUIRE_EQUAL(success(), regtoken(LIQTB, 1, ChainKind::CHAIN_KIND_SVM, SOLANA,
+                                           std::vector<char>(32, char(0x5d))));
+   BOOST_REQUIRE_EQUAL(success(), create_shadow(symbol::from_string("1,LIQTA"), SOLANA, LIQTA));
+   BOOST_REQUIRE_EQUAL(success(), create_shadow(symbol::from_string("1,LIQTB"), SOLANA, LIQTB));
+   const fc::crypto::private_key signer = ed_signer();
+   const std::vector<char>       pubkey = ed_bytes(signer.get_public_key());
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
+
+   // One envelope carrying all three tokens: the unbondable two stay WAITING, LIQSOL's is requested.
+   const fc::sha256 digest = digest_of("envelope-1");
+   BOOST_REQUIRE_EQUAL(success(), onsynd(SOLANA, 1, digest, 1, ChainKind::CHAIN_KIND_SVM, pubkey, LIQTA, 50));
+   BOOST_REQUIRE_EQUAL(success(), onsynd(SOLANA, 1, digest, 2, ChainKind::CHAIN_KIND_SVM, pubkey, LIQTB, 50));
+   BOOST_REQUIRE_EQUAL(success(), onsynd(SOLANA, 1, digest, 3, ChainKind::CHAIN_KIND_SVM, pubkey, LIQSOL, 10 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), closeenv(SOLANA, 1, digest));
+   BOOST_REQUIRE_EQUAL(STATE_WAITING, envelope_row(SOLANA, LIQTA, 1)["state"].as_string());
+   BOOST_REQUIRE_EQUAL(STATE_WAITING, envelope_row(SOLANA, LIQTB, 1)["state"].as_string());
+   const uint64_t held_id = envelope_row(SOLANA, LIQSOL, 1)["request_id"].as_uint64();
+   underwrite_envelope(SOLANA, LIQSOL, 1);
+   BOOST_REQUIRE_EQUAL(success(), liq_mint("carol"_n, LIQSOL, 5 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), challenge("carol"_n, SOLANA, LIQSOL, 1));
+
+   // The release walk steps over the held envelope; the underwriting walk never reaches its pair.
+   BOOST_REQUIRE_EQUAL(success(), crank(SMALL_LIMIT));
+   BOOST_REQUIRE_EQUAL(2u, ledger_row(SOLANA, LIQSOL)["queue_epoch"].as<uint32_t>());
+   BOOST_REQUIRE_LT(ledger_row(SOLANA, LIQSOL)["underwriting_epoch"].as<uint32_t>(), 2u);
+   // Keep the next step's synchronization off the held envelope, so the underwriting walk is first to see the
+   // ruling: when the sweep would start on it, run it past now, while there is no ruling to record.
+   if (state_row()["sync_cursor"]["token_code"].as_uint64() == slug_value(LIQSOL)) {
+      BOOST_REQUIRE_EQUAL(success(), push(SYND_ACCOUNT, synd_abi_ser, "carol"_n, "sync"_n, mvo()("limit", 1)));
+   }
+
+   BOOST_REQUIRE_EQUAL(success(), rule(held_id, true));
+   BOOST_REQUIRE_EQUAL(success(), crank(SMALL_LIMIT));
+   BOOST_REQUIRE_EQUAL("VALID", envelope_row(SOLANA, LIQSOL, 1)["outcome"].as_string());
+   BOOST_REQUIRE_EQUAL(2u, ledger_row(SOLANA, LIQSOL)["underwriting_epoch"].as<uint32_t>());
+   BOOST_REQUIRE_EQUAL(1u, ledger_row(SOLANA, LIQSOL)["queue_epoch"].as<uint32_t>());
+
+   BOOST_REQUIRE_EQUAL(success(), crank());
+   BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(10 * UNIT), liq_balance("alice"_n));
+} FC_LOG_AND_RETHROW()
+
+/// Alice linked to a pubkey with SOLANA/LIQSOL configured, and the means to queue envelopes behind a request that
+/// is not fully bonded and to follow them once it is.
+struct sysio_synd_backlog_tester : sysio_synd_tester {
+   /// One more envelope than a step of the batch operator's crank limit collects, and a few past it.
+   static constexpr uint32_t LATER_ENVELOPES = sysio_synd_held_tester::OPERATOR_CRANK_LIMIT + 3;
+
+   sysio_synd_backlog_tester() {
+      const fc::crypto::private_key signer = ed_signer();
+      pubkey                               = ed_bytes(signer.get_public_key());
+      BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, signer));
+      BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
+   }
+
+   /// Syndicate one UNIT to alice in an envelope of each epoch `first`..`last`, running a step after each, then
+   /// some more steps: none of them is requested or released.
+   void queue_behind(uint32_t first, uint32_t last) {
+      const uint64_t next_request = next_bond_request_id();
+      const int64_t  balance      = liq_balance("alice"_n);
+      for (uint32_t epoch = first; epoch <= last; ++epoch) {
+         syndicate_and_close(epoch, epoch, pubkey, LIQSOL, UNIT);
+         BOOST_REQUIRE_EQUAL(success(), crank(sysio_synd_held_tester::OPERATOR_CRANK_LIMIT));
+      }
+      for (uint32_t step = 0; step < sysio_synd_held_tester::EXTRA_STEPS; ++step) {
+         BOOST_REQUIRE_EQUAL(success(), crank());
+      }
+      for (uint32_t epoch = first; epoch <= last; ++epoch) {
+         BOOST_REQUIRE_EQUAL(STATE_WAITING, envelope_row(SOLANA, LIQSOL, epoch)["state"].as_string());
+      }
+      BOOST_REQUIRE_EQUAL(next_request, next_bond_request_id());
+      BOOST_REQUIRE_EQUAL(balance, liq_balance("alice"_n));
+   }
+
+   /// The envelopes of epochs `first`..`last` are requested, bonded and released one at a time in epoch order: each
+   /// is requested only once the one before it is bonded.
+   void check_released_in_order(uint32_t first, uint32_t last) {
+      for (uint32_t epoch = first; epoch <= last; ++epoch) {
+         BOOST_REQUIRE_EQUAL(STATE_REQUESTED, envelope_row(SOLANA, LIQSOL, epoch)["state"].as_string());
+         if (epoch < last) {
+            BOOST_REQUIRE_EQUAL(STATE_WAITING, envelope_row(SOLANA, LIQSOL, epoch + 1)["state"].as_string());
+         }
+         const int64_t balance = liq_balance("alice"_n);
+         underwrite_envelope(SOLANA, LIQSOL, epoch);
+         BOOST_REQUIRE_EQUAL(success(), crank(sysio_synd_held_tester::OPERATOR_CRANK_LIMIT));
+         BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQSOL, epoch)["state"].as_string());
+         BOOST_REQUIRE_EQUAL(balance + static_cast<int64_t>(UNIT), liq_balance("alice"_n));
+      }
+   }
+
+   std::vector<char> pubkey;
+};
+
+// A request that is not fully bonded holds back every later envelope of the pair, more of them than a step
+// collects: none is requested or released. Once it is bonded they follow one at a time, in epoch order.
+BOOST_FIXTURE_TEST_CASE(an_unbonded_request_holds_back_every_later_envelope_until_it_is_bonded,
+                        sysio_synd_backlog_tester) try {
+   syndicate_and_close(1, 1, pubkey, LIQSOL, 10 * UNIT);
+   const uint64_t first = envelope_row(SOLANA, LIQSOL, 1)["request_id"].as_uint64();
+   BOOST_REQUIRE_EQUAL(success(), underwrite("dave"_n, first, 4 * UNIT, LIQSOL));
+   const uint32_t last = 1 + LATER_ENVELOPES;
+   queue_behind(2, last);
+   BOOST_REQUIRE_EQUAL(STATE_REQUESTED, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
+   BOOST_REQUIRE_LT(ledger_row(SOLANA, LIQSOL)["queue_epoch"].as<uint32_t>(), 2u);
+
+   BOOST_REQUIRE_EQUAL(success(), underwrite("bob"_n, first, 6 * UNIT, LIQSOL));
+   BOOST_REQUIRE_EQUAL(success(), crank(sysio_synd_held_tester::OPERATOR_CRANK_LIMIT));
+   BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(10 * UNIT), liq_balance("alice"_n));
+   check_released_in_order(2, last);
+   BOOST_REQUIRE_EQUAL(last + 1, ledger_row(SOLANA, LIQSOL)["queue_epoch"].as<uint32_t>());
+} FC_LOG_AND_RETHROW()
+
+// A request held before it was fully bonded does the same, unlike a fully bonded hold: the cursor stays on its
+// envelope and the later envelopes wait for sysio's ruling. A VALID ruling releases it and they follow in order.
+BOOST_FIXTURE_TEST_CASE(a_hold_on_a_partly_bonded_request_holds_back_every_later_envelope_until_it_is_ruled,
+                        sysio_synd_backlog_tester) try {
+   syndicate_and_close(1, 1, pubkey, LIQSOL, 10 * UNIT);
+   underwrite_envelope(SOLANA, LIQSOL, 1);
+   BOOST_REQUIRE_EQUAL(success(), crank());
+   BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
+
+   syndicate_and_close(2, 2, pubkey, LIQSOL, 4 * UNIT);
+   const uint64_t second = envelope_row(SOLANA, LIQSOL, 2)["request_id"].as_uint64();
+   BOOST_REQUIRE_EQUAL(success(), underwrite("dave"_n, second, 2 * UNIT, LIQSOL));
+   // The issuer's hold pulls the hold bond out of sysio.synd's row, where a challenge would have put it.
+   BOOST_REQUIRE_EQUAL(success(), liq_mint(SYND_ACCOUNT, LIQSOL, 4 * UNIT * HOLD_BPS / BPS_DENOMINATOR));
+   BOOST_REQUIRE_EQUAL(success(), bond_hold(second, "carol"_n));
+   const uint32_t last = 2 + LATER_ENVELOPES;
+   queue_behind(3, last);
+   BOOST_REQUIRE_EQUAL(STATE_HELD, envelope_row(SOLANA, LIQSOL, 2)["state"].as_string());
+   BOOST_REQUIRE_EQUAL(2u, ledger_row(SOLANA, LIQSOL)["queue_epoch"].as<uint32_t>());
+
+   BOOST_REQUIRE_EQUAL(success(), rule(second, true));
+   BOOST_REQUIRE_EQUAL(success(), crank(sysio_synd_held_tester::OPERATOR_CRANK_LIMIT));
+   BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQSOL, 2)["state"].as_string());
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(14 * UNIT), liq_balance("alice"_n));
+   check_released_in_order(3, last);
+   BOOST_REQUIRE_EQUAL(last + 1, ledger_row(SOLANA, LIQSOL)["queue_epoch"].as<uint32_t>());
 } FC_LOG_AND_RETHROW()
 
 // A yield release the shadow's headroom cannot take waits, and a later step releases it once the headroom
