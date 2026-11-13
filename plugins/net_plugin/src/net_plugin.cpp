@@ -1167,7 +1167,8 @@ namespace sysio {
         p2p_address( endpoint )
    {
       auto [host, port, type] = net_utils::split_host_port_type(this_address);
-      listen_address = host + ":" + port; // do not include type in listen_address to avoid peer setting type on connection
+      // do not include type in listen_address to avoid peer setting type on connection
+      listen_address = net_utils::join_host_port(host, port);
       set_connection_type( peer_address() );
       my_impl->mark_configured_bp_connection(this);
       reset_peer_authentication_state();
@@ -4849,7 +4850,12 @@ namespace sysio {
                                     "Unable to retrieve host_name. {}", ec.message());
 
             }
-            return hostname + ":" + port + (type.empty() ? "" : ":" + type);
+            std::string advertised_address = net_utils::join_host_port(hostname, port);
+            if( !type.empty() ) {
+               advertised_address += net_utils::address_section_separator;
+               advertised_address += type;
+            }
+            return advertised_address;
          }
          return p2p_address;
       });

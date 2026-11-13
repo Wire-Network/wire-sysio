@@ -1,6 +1,8 @@
 #include <boost/test/unit_test.hpp>
 #include <sysio/net_plugin/net_utils.hpp>
 
+#include <fc/network/listener.hpp>
+
 BOOST_AUTO_TEST_CASE(test_parse_rate_limit) {
    std::vector<std::string> p2p_addresses = {
         "0.0.0.0:9876"
@@ -53,10 +55,10 @@ BOOST_AUTO_TEST_CASE(test_parse_rate_limit) {
    BOOST_CHECK_EQUAL(listen_addr, "localhost:9879");
    BOOST_CHECK_EQUAL(block_sync_rate_limit, 500u);
    std::tie(listen_addr, block_sync_rate_limit) = sysio::net_utils::parse_listen_address(p2p_addresses.at(which++));
-   BOOST_CHECK_EQUAL(listen_addr, "2001:db8:85a3:8d3:1319:8a2e:370:7348:9876");
+   BOOST_CHECK_EQUAL(listen_addr, "[2001:db8:85a3:8d3:1319:8a2e:370:7348]:9876");
    BOOST_CHECK_EQUAL(block_sync_rate_limit, 250000u);
    std::tie(listen_addr, block_sync_rate_limit) = sysio::net_utils::parse_listen_address(p2p_addresses.at(which++));
-   BOOST_CHECK_EQUAL(listen_addr, "::1:9876");
+   BOOST_CHECK_EQUAL(listen_addr, "[::1]:9876");
    BOOST_CHECK_EQUAL(block_sync_rate_limit, 250000u);
    BOOST_CHECK_EXCEPTION(sysio::net_utils::parse_listen_address(p2p_addresses.at(which++)), sysio::chain::plugin_config_exception,
                          [](const sysio::chain::plugin_config_exception& e)
@@ -86,10 +88,10 @@ BOOST_AUTO_TEST_CASE(test_parse_rate_limit) {
    BOOST_CHECK_EQUAL(listen_addr, "localhost:9879");
    BOOST_CHECK_EQUAL(block_sync_rate_limit, 500u);
    std::tie(listen_addr, block_sync_rate_limit) = sysio::net_utils::parse_listen_address(p2p_addresses.at(which++));
-   BOOST_CHECK_EQUAL(listen_addr, "2001:db8:85a3:8d3:1319:8a2e:370:7348:9876");
+   BOOST_CHECK_EQUAL(listen_addr, "[2001:db8:85a3:8d3:1319:8a2e:370:7348]:9876");
    BOOST_CHECK_EQUAL(block_sync_rate_limit, 250000u);
    std::tie(listen_addr, block_sync_rate_limit) = sysio::net_utils::parse_listen_address(p2p_addresses.at(which++));
-   BOOST_CHECK_EQUAL(listen_addr, "::1:9876");
+   BOOST_CHECK_EQUAL(listen_addr, "[::1]:9876");
    BOOST_CHECK_EQUAL(block_sync_rate_limit, 250000u);
    BOOST_CHECK_EXCEPTION(sysio::net_utils::parse_listen_address(p2p_addresses.at(which++)), sysio::chain::plugin_config_exception,
                          [](const sysio::chain::plugin_config_exception& e)
@@ -318,4 +320,81 @@ BOOST_AUTO_TEST_CASE(test_single_colon_trailing_text) {
    // A type glued to the port without its colon is not the documented syntax.
    std::tie(host, port, type) = sysio::net_utils::split_host_port_type("0.0.0.0:9876trx");
    BOOST_CHECK_EQUAL(type, "");
+}
+
+// Host names and IPv4 addresses join unchanged; an IPv6 literal gets back the brackets split_host_port_type strips.
+BOOST_AUTO_TEST_CASE(test_join_host_port) {
+   using sysio::net_utils::join_host_port;
+
+   BOOST_CHECK_EQUAL(join_host_port("0.0.0.0", "9876"), "0.0.0.0:9876");
+   BOOST_CHECK_EQUAL(join_host_port("192.168.0.1", "9878"), "192.168.0.1:9878");
+   BOOST_CHECK_EQUAL(join_host_port("localhost", "9879"), "localhost:9879");
+   BOOST_CHECK_EQUAL(join_host_port("p2p.example.com", "9876"), "p2p.example.com:9876");
+   // With no p2p-listen-endpoint the outbound connection constructor joins an empty host and port.
+   BOOST_CHECK_EQUAL(join_host_port("", ""), ":");
+
+   BOOST_CHECK_EQUAL(join_host_port("::1", "9876"), "[::1]:9876");
+   BOOST_CHECK_EQUAL(join_host_port("::", "9876"), "[::]:9876");
+   BOOST_CHECK_EQUAL(join_host_port("2001:db8::1", "9876"), "[2001:db8::1]:9876");
+   BOOST_CHECK_EQUAL(join_host_port("2001:db8:85a3:8d3:1319:8a2e:370:7348", "9876"),
+                     "[2001:db8:85a3:8d3:1319:8a2e:370:7348]:9876");
+   BOOST_CHECK_EQUAL(join_host_port("::ffff:192.0.2.1", "9876"), "[::ffff:192.0.2.1]:9876");
+   BOOST_CHECK_EQUAL(join_host_port("fe80::1%eth0", "9876"), "[fe80::1%eth0]:9876");
+}
+
+// The outbound connection constructor splits the first p2p address and joins its host and port, without the type,
+// into the p2p_address of the handshake it sends. The receiving peer splits that address again.
+BOOST_AUTO_TEST_CASE(test_handshake_address_splits_again) {
+   struct handshake_case {
+      std::string first_p2p_address; ///< first p2p-listen-endpoint, or the p2p-server-address paired with it
+      std::string handshake_address; ///< p2p_address an outbound connection sends
+   };
+   const std::vector<handshake_case> cases = {
+        {"0.0.0.0:9876", "0.0.0.0:9876"}
+      , {"192.168.0.1:9878:blk:20MiB/s", "192.168.0.1:9878"}
+      , {"localhost:9879:trx", "localhost:9879"}
+      , {"p2p.example.com:9876", "p2p.example.com:9876"}
+      , {"[::1]:9876", "[::1]:9876"}
+      , {"[::1]:9876:trx:250KB/s", "[::1]:9876"}
+      , {"[2001:db8::1]:9876", "[2001:db8::1]:9876"}
+      , {"[2001:db8::1]:9876:blk", "[2001:db8::1]:9876"}
+      , {"[2001:db8:85a3:8d3:1319:8a2e:370:7348]:9876", "[2001:db8:85a3:8d3:1319:8a2e:370:7348]:9876"}
+      , {"[::ffff:192.0.2.1]:9876", "[::ffff:192.0.2.1]:9876"}
+   };
+   for (const handshake_case& c : cases) {
+      BOOST_TEST_CONTEXT(c.first_p2p_address) {
+         const auto [host, port, type] = sysio::net_utils::split_host_port_type(c.first_p2p_address);
+         const std::string handshake_address = sysio::net_utils::join_host_port(host, port);
+         BOOST_CHECK_EQUAL(handshake_address, c.handshake_address);
+
+         const auto [peer_host, peer_port, peer_type] = sysio::net_utils::split_host_port_type(handshake_address);
+         BOOST_CHECK_EQUAL(peer_host, host);
+         BOOST_CHECK_EQUAL(peer_port, port);
+         BOOST_CHECK_EQUAL(peer_type, "");
+      }
+   }
+}
+
+// fc::create_listener resolves the host and port that fc::split_host_port takes from the listen address.
+BOOST_AUTO_TEST_CASE(test_listen_address_resolver_split) {
+   struct listen_case {
+      std::string p2p_listen_endpoint;
+      std::string host; ///< host the listener resolves
+      std::string port; ///< port the listener resolves
+   };
+   const std::vector<listen_case> cases = {
+        {"0.0.0.0:9877:640KB/s", "0.0.0.0", "9877"}
+      , {"localhost:9879:trx:0.5KB/s", "localhost", "9879"}
+      , {"[::1]:9876:250KB/s", "::1", "9876"}
+      , {"[::]:9876", "::", "9876"}
+      , {"[2001:db8:85a3:8d3:1319:8a2e:370:7348]:9876:trx:250KB/s", "2001:db8:85a3:8d3:1319:8a2e:370:7348", "9876"}
+   };
+   for (const listen_case& c : cases) {
+      BOOST_TEST_CONTEXT(c.p2p_listen_endpoint) {
+         const auto [listen_addr, rate_limit] = sysio::net_utils::parse_listen_address(c.p2p_listen_endpoint);
+         const auto [host, port] = fc::split_host_port(listen_addr);
+         BOOST_CHECK_EQUAL(host, c.host);
+         BOOST_CHECK_EQUAL(port, c.port);
+      }
+   }
 }

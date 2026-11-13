@@ -31,6 +31,12 @@ inline constexpr std::string_view trx_connection_type = "trx";
 inline constexpr std::string_view blk_connection_type = "blk";
 /// Length of a recognized p2p connection type suffix.
 inline constexpr size_t connection_type_length = 3;
+/// Separates the host, port, connection type and rate sections of a p2p address.
+inline constexpr char address_section_separator = ':';
+/// Opens the square brackets that enclose an IPv6 literal host in a p2p address.
+inline constexpr char ipv6_literal_open = '[';
+/// Closes the square brackets that enclose an IPv6 literal host in a p2p address.
+inline constexpr char ipv6_literal_close = ']';
 
 namespace detail {
 
@@ -139,13 +145,38 @@ namespace detail {
 
 } // namespace detail
 
+   /**
+    * Join a host and a port into the `host:port` address that `split_host_port_type` splits.
+    *
+    * A host holding a colon, as an IPv6 literal does, gets back the square brackets `split_host_port_type` strips, so
+    * the address splits again at the port. Host names and IPv4 addresses hold no colon and are joined as they are.
+    *
+    * @param host host name or IP address literal, without brackets
+    * @param port port
+    * @return `host:port`, or `[host]:port` when host holds a colon
+    */
+   inline std::string join_host_port(std::string_view host, std::string_view port) {
+      const bool  needs_brackets = host.find(address_section_separator) != std::string_view::npos;
+      std::string address;
+      if (needs_brackets)
+         address += ipv6_literal_open;
+      address += host;
+      if (needs_brackets)
+         address += ipv6_literal_close;
+      address += address_section_separator;
+      address += port;
+      return address;
+   }
+
    struct endpoint {
       std::string host;
       std::string port;
 
-      std::string address() const { return host + ":" + port; }
+      /// @return the endpoint as `join_host_port` joins it
+      std::string address() const { return join_host_port(host, port); }
 
-      friend std::ostream& operator<<(std::ostream& os, const endpoint& e) { return os << e.host << ":" << e.port; }
+      /// Writes the endpoint as address() returns it.
+      friend std::ostream& operator<<(std::ostream& os, const endpoint& e) { return os << e.address(); }
 
       bool operator==(const endpoint& lhs) const = default;
       auto operator<=>(const endpoint& lhs) const = default;
@@ -263,14 +294,14 @@ namespace detail {
       return current == connection_type::both ? type_from_address(peer_addr) : current;
    }
 
-   /// @return listen address and block sync rate limit (in bytes/sec) of address string
+   /// @return listen address, as `join_host_port` joins it, and block sync rate limit (in bytes/sec) of address string
    /// @throws chain::plugin_config_exception on invalid address
    inline std::tuple<std::string, size_t> parse_listen_address( const std::string& address ) {
       constexpr bool should_throw = true;
       auto [host, port, remainder] = detail::split_host_port_remainder(address, should_throw);
       SYS_ASSERT(!host.empty() && !port.empty(), chain::plugin_config_exception,
                  "Invalid address specification {}; host or port missing.", address);
-      auto listen_addr = host + ":" + port;
+      std::string listen_addr = join_host_port(host, port);
       auto limit = remainder;
       auto last_colon_location = remainder.rfind(':');
       if (last_colon_location != std::string::npos) {
