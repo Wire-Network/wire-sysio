@@ -3,12 +3,14 @@ name: "Prepare Release"
 # Gate 1 of the Strategy-C release path (docs/release-workflow.md): produce the
 # version-bump PR a human reviews and merges. Nothing is tagged or published here.
 #
-# `version` is the SOLE input -- its suffix IS the channel everywhere downstream:
-# a suffix (-dev, -rcN, ...) means prerelease, no suffix means stable.
+# `version`'s suffix IS the channel everywhere downstream: a suffix (-dev, -rcN,
+# ...) means prerelease, no suffix means stable. `branch` is the line the bump
+# lands on: master, or the version's release/<major>.<minor> branch.
 #
 # Post-bump mode is the same dispatch: after a stable release lands, dispatch this
-# workflow again with the next `-dev` version to restore the development suffix on
-# master. The workflow labels the PR accordingly.
+# workflow again on the branch it shipped from to restore the development suffix:
+# master's next `-dev` version, or a release branch's next patch (1.1.0 ->
+# 1.1.1-dev). The workflow labels the PR accordingly.
 on:
   workflow_dispatch:
     inputs:
@@ -16,6 +18,11 @@ on:
         description: "Version to prepare, without a leading v (e.g. 1.0.0-dev, 1.1.0-rc1, 1.1.0)"
         type: string
         required: true
+      branch:
+        description: "Branch to prepare it on: master, or the version's release/<major>.<minor> branch (e.g. release/1.1 for 1.1.0-rc1)"
+        type: string
+        required: true
+        default: master
 
 permissions:
   contents: write
@@ -38,21 +45,19 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
-      # Untrusted dispatch input: passed as an environment variable and NEVER
+      # Untrusted dispatch inputs: passed as environment variables and NEVER
       # interpolated into a script body, so a value such as $(...) stays inert data.
       VERSION: ${{ inputs.version }}
+      TARGET_BRANCH: ${{ inputs.branch }}
     steps:
+      # master stays at the workspace root: its parser vets the inputs and edits
+      # the target branch's CMakeLists.txt, so no code from the target branch runs
+      # here.
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # actions/checkout@v5
         with:
           ref: master
-          # Unshallowed so the remote-tracking refs exist: `git push
-          # --force-with-lease` below needs origin/<prep-branch> to compare
-          # against, and on a shallow clone with no such ref it fails with
-          # "stale info" whenever a previous prep attempt already pushed it.
-          fetch-depth: 0
 
-      - name: Validate version and derive the channel
-        id: version
+      - name: Validate the version and the target branch
         run: |
           set -euo pipefail
 
@@ -61,14 +66,47 @@ jobs:
           # from accepting a version the `write` below would then reject.
           python3 .github/scripts/cmake-version.py validate "$VERSION" \
             || { echo "::error::'${VERSION}' is not <major>.<minor>.<patch>[-<suffix>] (no leading v)" >&2; exit 1; }
+          python3 .github/scripts/cmake-version.py validate "$VERSION" --branch "$TARGET_BRANCH" \
+            || { echo "::error::${VERSION} is prepared on master or its own release/<major>.<minor> branch, not '${TARGET_BRANCH}'" >&2; exit 1; }
 
-          previous="$(python3 .github/scripts/cmake-version.py read)"
+          # Once a line has its release branch, its versions are prepared there.
+          if [[ "$TARGET_BRANCH" == master ]]; then
+            release_branch="$(python3 .github/scripts/cmake-version.py release-branch "$VERSION")"
+            status=0
+            git ls-remote --exit-code --heads origin "refs/heads/${release_branch}" >/dev/null || status=$?
+            if [[ $status -eq 0 ]]; then
+              echo "::error::${release_branch} exists, so ${VERSION} is prepared there, not on master." >&2
+              exit 1
+            elif [[ $status -ne 2 ]]; then
+              echo "::error::Could not check origin for ${release_branch} (git ls-remote exit ${status})." >&2
+              exit 1
+            fi
+          fi
 
-          # Nothing to do: master already carries this version, so the bump would
-          # be an empty commit and the PR would have no diff to review. Fail here
-          # with the reason rather than at `git commit` with "nothing to commit".
+      # refs/heads/ so a tag that shares the branch's name is never checked out.
+      - name: Check out the target branch
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # actions/checkout@v5
+        with:
+          ref: refs/heads/${{ inputs.branch }}
+          path: target
+          # Unshallowed so the remote-tracking refs exist: `git push
+          # --force-with-lease` below needs origin/<prep-branch> to compare
+          # against, and on a shallow clone with no such ref it fails with
+          # "stale info" whenever a previous prep attempt already pushed it.
+          fetch-depth: 0
+
+      - name: Derive the channel and mode
+        id: version
+        run: |
+          set -euo pipefail
+
+          previous="$(python3 .github/scripts/cmake-version.py read --cmakelists target/CMakeLists.txt)"
+
+          # Nothing to do: the branch already carries this version, so the bump
+          # would be an empty commit and the PR would have no diff to review. Fail
+          # here with the reason rather than at `git commit` with "nothing to commit".
           if [[ "$previous" == "$VERSION" ]]; then
-            echo "::error::master is already at ${VERSION}; nothing to prepare. Dispatch with the NEXT version instead." >&2
+            echo "::error::${TARGET_BRANCH} is already at ${VERSION}; nothing to prepare. Dispatch with the NEXT version instead." >&2
             exit 1
           fi
 
@@ -88,40 +126,55 @@ jobs:
             mode="release-prep"
           fi
 
+          # The parser names the bump branch, so the PR version check recognizes it.
+          prep_branch="$(python3 .github/scripts/cmake-version.py prep-branch "$VERSION")"
+
           {
             echo "previous=$previous"
             echo "channel=$channel"
             echo "prerelease=$prerelease"
             echo "mode=$mode"
-            echo "branch=release/prep-v${VERSION}"
+            echo "prep-branch=$prep_branch"
           } >> "$GITHUB_OUTPUT"
 
-          echo "Preparing ${previous} -> ${VERSION} (channel ${channel}, mode ${mode})"
+          echo "Preparing ${previous} -> ${VERSION} on ${TARGET_BRANCH} (channel ${channel}, mode ${mode})"
 
       - name: Write the version into CMakeLists.txt
         run: |
-          python3 .github/scripts/cmake-version.py write "$VERSION"
+          python3 .github/scripts/cmake-version.py write "$VERSION" --cmakelists target/CMakeLists.txt
 
       # NOTE: the former "Pin the latest published wire-cdt release" step (and
       # its .cicd/defaults.json pin file) is retired. The tag build's `v` job
       # now resolves the CDT release itself — an explicit `wire-cdt-release`
-      # dispatch input on tag-release.yaml/linux_amd64_build.yaml, or the latest
-      # published wire-cdt release in the version's channel — and the resolved
+      # dispatch input on tag-release.yaml/linux_amd64_build.yaml, or the highest
+      # published wire-cdt release in the version's channel at or below its
+      # <major>.<minor> line — and the resolved
       # value is recorded durably in the release's
       # wire-sysio-versions-<version>.json asset.
 
       - name: Open the bump PR
+        working-directory: target
         env:
-          BRANCH: ${{ steps.version.outputs.branch }}
+          PREP_BRANCH: ${{ steps.version.outputs.prep-branch }}
           PREVIOUS: ${{ steps.version.outputs.previous }}
           CHANNEL: ${{ steps.version.outputs.channel }}
           MODE: ${{ steps.version.outputs.mode }}
         run: |
           set -euo pipefail
 
+          # A prep branch with an open PR into another branch belongs to that
+          # preparation: force-pushing it would re-point that PR at this
+          # branch's history.
+          open_bases="$(gh pr list --head "$PREP_BRANCH" --state open --json baseRefName --jq '.[].baseRefName')"
+          other_bases="$(grep -vxF -- "$TARGET_BRANCH" <<<"$open_bases" || true)"
+          if [[ -n "$other_bases" ]]; then
+            echo "::error::${PREP_BRANCH} has an open PR into ${other_bases//$'\n'/, }. Close it before preparing ${VERSION} on ${TARGET_BRANCH}." >&2
+            exit 1
+          fi
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -b "$BRANCH"
+          git checkout -b "$PREP_BRANCH"
           git add CMakeLists.txt
           git commit -m "chore(release): ${MODE} ${PREVIOUS} -> ${VERSION}"
           # --force-with-lease, not a bare push: re-dispatching the prep for the
@@ -129,24 +182,26 @@ jobs:
           # replace the previous attempt's branch tip instead of failing
           # non-fast-forward, while still refusing to clobber a tip that someone
           # else moved since this run's fetch.
-          git push --force-with-lease origin "$BRANCH"
+          git push --force-with-lease origin "$PREP_BRANCH"
 
           # NOTE: a PR opened with GITHUB_TOKEN starts its `pull_request` checks in
           # an approval-required state -- gate 1 includes an "Approve and run" click.
           # printf, not an indented heredoc: every body line must start at column 0
           # or GitHub renders the whole description as a code block.
           body="$(printf '%s\n' \
-            "${MODE}: \`${PREVIOUS}\` -> \`${VERSION}\` (channel: **${CHANNEL}**)." \
+            "${MODE}: \`${PREVIOUS}\` -> \`${VERSION}\` on \`${TARGET_BRANCH}\` (channel: **${CHANNEL}**)." \
             "" \
             "- \`CMakeLists.txt\`: \`VERSION_*\` set to \`${VERSION}\`." \
             "" \
-            "The tag build resolves the Wire CDT release itself (latest published" \
-            "in this channel, or an explicit \`wire-cdt-release\` dispatch input);" \
+            "The tag build resolves the Wire CDT release itself (highest published" \
+            "in this channel at or below this version's line, or an explicit" \
+            "\`wire-cdt-release\` dispatch input);" \
             "the resolved version is recorded in the release's" \
             "\`wire-sysio-versions-<version>.json\`. Tagging is a separate," \
-            "approval-gated dispatch of \`tag-release.yaml\` with the same version.")"
+            "approval-gated dispatch of \`tag-release.yaml\` with the same version" \
+            "and branch.")"
           gh pr create \
-            --base master \
-            --head "$BRANCH" \
+            --base "$TARGET_BRANCH" \
+            --head "$PREP_BRANCH" \
             --title "chore(release): ${MODE} v${VERSION}" \
             --body "$body"

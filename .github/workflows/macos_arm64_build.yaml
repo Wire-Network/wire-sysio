@@ -14,10 +14,14 @@ on:
   # `push:` block, and a tag push carries no new commits for the filter to match --
   # so a `paths:`-filtered push trigger would silently suppress every `v*` tag run,
   # which is exactly the run that produces the macOS release tarball. The filter is
-  # therefore kept on `pull_request:` only; master pushes now always build macOS.
+  # therefore kept on `pull_request:` only; master and release-branch pushes always
+  # build macOS.
   push:
     branches:
       - master
+      - "release/*"
+      # Version-bump PR branches: their PR runs the checks.
+      - "!release/prep-*"
     tags:
       - "v*"
   pull_request:
