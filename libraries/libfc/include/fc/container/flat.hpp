@@ -24,7 +24,7 @@ namespace fc {
          }
       }
 
-      /// Decode incrementally, preserving the existing count-byte representation for fundamental vectors.
+      /// Bound eager allocation for nonfundamental vectors while retaining the existing fundamental decoder.
       template<typename Stream, typename T, typename A>
       void unpack( Stream& s, boost::container::vector<T, A>& value ) {
          unsigned_int size;
@@ -32,9 +32,12 @@ namespace fc {
          FC_ASSERT( size.value <= MAX_NUM_ARRAY_ELEMENTS );
          value.clear();
          if constexpr (!std::is_fundamental_v<T>)
-            detail::unpack_sequence(value, size.value, [&](auto& item) { unpack(s, item); });
-         else
-            detail::unpack_bytes(s, value, size.value);
+            detail::unpack_sequence(s, value, size.value, [&](auto& item) { unpack(s, item); });
+         else {
+            value.resize( size.value );
+            if( value.size() )
+               s.read( (char*)value.data(), value.size() );
+         }
       }
 
       template<typename Stream, typename A>
@@ -45,7 +48,7 @@ namespace fc {
             s.write( (const char*)value.data(), value.size() );
       }
 
-      /// Read each byte chunk before growing storage, including streams without remaining().
+      /// Read directly into storage with bounded growth when the stream's byte count is unknown.
       template<typename Stream, typename A>
       void unpack( Stream& s, boost::container::vector<char, A>& value ) {
          unsigned_int size;

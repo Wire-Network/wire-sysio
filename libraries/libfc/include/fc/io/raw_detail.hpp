@@ -1,18 +1,46 @@
 #pragma once
 
+#include <fc/io/datastream.hpp>
+
 #include <algorithm>
-#include <array>
 #include <cstdint>
-#include <cstring>
+#include <type_traits>
 
 namespace fc::raw::detail {
 
-/// Allocation granularity for byte reads, not a limit on accepted encoded lengths.
+/// Allocation granularity, not a limit on accepted encoded lengths.
 inline constexpr size_t unpack_chunk_bytes = 4096;
 
-/// Grow sequences as elements are decoded, retaining existing elements exactly as resize-before-unpack did.
-template <typename Sequence, typename Unpack>
-void unpack_sequence(Sequence& value, uint32_t count, Unpack unpack) {
+/// Whether the elements fit in one allocation chunk, without overflowing a count/size multiplication.
+template <typename Container>
+constexpr bool is_small_allocation(uint32_t count) {
+   return count <= unpack_chunk_bytes / sizeof(typename Container::value_type);
+}
+
+/// Unknown streams, logical bounds and wrappers do not establish how many bytes are physically available.
+template <typename Stream>
+bool has_available_bytes(Stream&, uint32_t) {
+   return false;
+}
+
+/// Only memory datastreams provide an exact count of bytes available for a successful read.
+template <typename Storage, typename Enable>
+bool has_available_bytes(datastream<Storage, Enable>& stream, uint32_t count) {
+   if constexpr (std::is_pointer_v<Storage> || std::is_same_v<Storage, std::vector<char>> ||
+                 std::is_same_v<Storage, std::deque<char>>)
+      return stream.remaining() >= count;
+   return false;
+}
+
+/// Retain existing elements; allocate up front only for small counts or counts covered by available bytes.
+template <typename Stream, typename Sequence, typename Unpack>
+void unpack_sequence(Stream& stream, Sequence& value, uint32_t count, Unpack unpack) {
+   if (is_small_allocation<Sequence>(count) || has_available_bytes(stream, count)) {
+      value.resize(count);
+      for (uint32_t i = 0; i < count; ++i)
+         unpack(value[i]);
+      return;
+   }
    for (uint32_t i = 0; i < count; ++i) {
       if (i == value.size())
          value.emplace_back();
@@ -21,23 +49,21 @@ void unpack_sequence(Sequence& value, uint32_t count, Unpack unpack) {
    value.resize(count);
 }
 
-/** Read each byte chunk before growing its destination, including streams without a byte-count remaining().
- * Prefilling scratch from retained bytes and zeros preserves the existing values of nonthrowing short reads.
- * Boost fundamental vectors also use this helper: their existing encoding stores count bytes, not count*sizeof(T).
- */
+/// Read directly into char storage, growing by at most one chunk ahead of reads unless all bytes are available.
 template <typename Stream, typename Vector>
 void unpack_bytes(Stream& stream, Vector& value, uint32_t count) {
-   std::array<char, unpack_chunk_bytes> scratch;
+   static_assert(std::is_same_v<typename Vector::value_type, char>);
+   if (count <= unpack_chunk_bytes || has_available_bytes(stream, count)) {
+      value.resize(count);
+      if (count)
+         stream.read(value.data(), count);
+      return;
+   }
    for (size_t offset = 0; offset < count;) {
       const auto size = std::min(unpack_chunk_bytes, size_t(count) - offset);
-      std::memset(scratch.data(), 0, size);
-      if (offset < value.size())
-         std::memcpy(scratch.data(), reinterpret_cast<const char*>(value.data()) + offset,
-                     std::min(size, value.size() - offset));
-      stream.read(scratch.data(), size);
       if (value.size() < offset + size)
          value.resize(offset + size);
-      std::memcpy(reinterpret_cast<char*>(value.data()) + offset, scratch.data(), size);
+      stream.read(value.data() + offset, size);
       offset += size;
    }
    value.resize(count);

@@ -267,7 +267,7 @@ namespace fc {
       if( value.size() )
         s.write( &value.front(), (uint32_t)value.size() );
     }
-    /// Read byte payloads before growing storage so truncated lengths cannot drive eager allocation.
+    /// Read bytes directly with bounded growth when the stream cannot establish payload availability.
     template<typename Stream> inline void unpack( Stream& s, std::vector<char>& value ) {
       unsigned_int size; fc::raw::unpack( s, size );
       FC_ASSERT( size.value <= MAX_SIZE_OF_BYTE_ARRAYS );
@@ -416,12 +416,14 @@ namespace fc {
         ++itr;
       }
     }
-    /// Insert decoded elements without reserving buckets from the untrusted encoded count.
+    /// Reserve small sets; otherwise grow storage as elements are decoded.
     template<typename Stream, typename T>
     inline void unpack( Stream& s, std::unordered_set<T>& value ) {
       unsigned_int size; fc::raw::unpack( s, size );
       FC_ASSERT( size.value <= MAX_NUM_ARRAY_ELEMENTS );
       value.clear();
+      if( detail::is_small_allocation<std::unordered_set<T>>( size.value ) )
+         value.reserve( size.value );
       for( uint32_t i = 0; i < size.value; ++i )
       {
           T tmp;
@@ -464,13 +466,15 @@ namespace fc {
         ++itr;
       }
     }
-    /// Insert decoded entries without reserving buckets from the untrusted encoded count.
+    /// Reserve small maps; otherwise grow storage as entries are decoded.
     template<typename Stream, typename K, typename V>
     inline void unpack( Stream& s, std::unordered_map<K,V>& value )
     {
       unsigned_int size; fc::raw::unpack( s, size );
       FC_ASSERT( size.value <= MAX_NUM_ARRAY_ELEMENTS );
       value.clear();
+      if( detail::is_small_allocation<std::unordered_map<K,V>>( size.value ) )
+         value.reserve( size.value );
       for( uint32_t i = 0; i < size.value; ++i )
       {
           std::pair<K,V> tmp;
@@ -512,12 +516,12 @@ namespace fc {
       }
     }
 
-    /// Decode existing deque elements in place and construct further elements only as they are reached.
+    /// Decode deque elements in place with bounded eager allocation.
     template<typename Stream, typename T>
     inline void unpack( Stream& s, std::deque<T>& value ) {
       unsigned_int size; fc::raw::unpack( s, size );
       FC_ASSERT( size.value <= MAX_NUM_ARRAY_ELEMENTS );
-      detail::unpack_sequence(value, size.value, [&](auto& item) { fc::raw::unpack(s, item); });
+      detail::unpack_sequence(s, value, size.value, [&](auto& item) { fc::raw::unpack(s, item); });
     }
 
     template<typename Stream, typename T, typename... U>
@@ -529,13 +533,13 @@ namespace fc {
        }
     }
 
-    /// Grow the deque as decoding progresses, preserving successful reuse of existing elements.
+    /// Decode deque elements in place with bounded eager allocation.
     template<typename Stream, typename T, typename... U>
     inline void unpack( Stream& s, boost::container::deque<T, U...>& value ) {
        unsigned_int size;
        fc::raw::unpack( s, size );
        FC_ASSERT( size.value <= MAX_NUM_ARRAY_ELEMENTS );
-       detail::unpack_sequence(value, size.value, [&](auto& item) { fc::raw::unpack(s, item); });
+       detail::unpack_sequence(s, value, size.value, [&](auto& item) { fc::raw::unpack(s, item); });
     }
 
     template<typename Stream>
@@ -585,12 +589,12 @@ namespace fc {
       }
     }
 
-    /// Preserve in-place decoding while constructing vector elements only as input decoding reaches them.
+    /// Decode vector elements in place with bounded eager allocation.
     template<typename Stream, typename T>
     inline void unpack( Stream& s, std::vector<T>& value ) {
       unsigned_int size; fc::raw::unpack( s, size );
       FC_ASSERT( size.value <= MAX_NUM_ARRAY_ELEMENTS );
-      detail::unpack_sequence(value, size.value, [&](auto& item) { fc::raw::unpack(s, item); });
+      detail::unpack_sequence(s, value, size.value, [&](auto& item) { fc::raw::unpack(s, item); });
     }
 
     template<typename Stream, typename T>

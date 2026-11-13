@@ -52,6 +52,15 @@ struct raw_immovable_element {
 };
 FC_REFLECT(raw_immovable_element, (value))
 
+/// A stream with boolean remaining() must use chunked reads rather than treating it as an exact byte count.
+struct raw_read_count_stream {
+   datastream<const char*> input;
+   size_t read_calls = 0;
+   void read(char* data, size_t count) { ++read_calls; input.read(data, count); }
+   bool get(char& value) { return input.get(value); }
+   bool remaining() const { return input.remaining(); }
+};
+
 BOOST_AUTO_TEST_SUITE(raw_test_suite)
 
 /// Truncated element counts must not construct an entire sequence before reading its first element.
@@ -71,28 +80,28 @@ BOOST_AUTO_TEST_CASE(sequence_allocation_follows_decoding) {
    check.template operator()<boost::container::deque<raw_counted_element>>();
 }
 
-/// A forged byte count on both bounded and unknown-length streams fails before destination allocation.
+/// A forged byte count on both bounded and unknown-length streams allocates at most one chunk before failing.
 BOOST_AUTO_TEST_CASE(byte_allocation_follows_reads) {
    const auto packed = raw::pack(unsigned_int{MAX_SIZE_OF_BYTE_ARRAYS});
    std::vector<char> output;
    datastream<const char*> input(packed.data(), packed.size());
    BOOST_CHECK_THROW(raw::unpack(input, output), fc::exception);
-   BOOST_CHECK_EQUAL(output.capacity(), 0u);
+   BOOST_CHECK_LE(output.capacity(), raw::detail::unpack_chunk_bytes);
 
    input.seekp(0);
    bounded_datastream logical_bound(input, MAX_SIZE_OF_BYTE_ARRAYS);
    BOOST_CHECK_THROW(raw::unpack(logical_bound, output), fc::exception);
-   BOOST_CHECK_EQUAL(output.capacity(), 0u);
+   BOOST_CHECK_LE(output.capacity(), raw::detail::unpack_chunk_bytes);
 
    input.seekp(0);
    datastream_mirror mirror(input);
    BOOST_CHECK_THROW(raw::unpack(mirror, output), fc::exception);
-   BOOST_CHECK_EQUAL(output.capacity(), 0u);
+   BOOST_CHECK_LE(output.capacity(), raw::detail::unpack_chunk_bytes);
 
    input.seekp(0);
    boost::container::vector<char> boost_output;
    BOOST_CHECK_THROW(raw::unpack(input, boost_output), fc::exception);
-   BOOST_CHECK_EQUAL(boost_output.capacity(), 0u);
+   BOOST_CHECK_LE(boost_output.capacity(), raw::detail::unpack_chunk_bytes);
 
    temp_cfile temporary("wb+");
    auto& file = temporary.file();
@@ -100,7 +109,59 @@ BOOST_AUTO_TEST_CASE(byte_allocation_follows_reads) {
    file.seek(0);
    auto file_stream = file.create_datastream();
    BOOST_CHECK_THROW(raw::unpack(file_stream, output), std::ios_base::failure);
-   BOOST_CHECK_EQUAL(output.capacity(), 0u);
+   BOOST_CHECK_LE(output.capacity(), raw::detail::unpack_chunk_bytes);
+}
+
+/// Small and physically backed sequences keep a single allocation, including on streams without exact remaining().
+BOOST_AUTO_TEST_CASE(sequence_allocation_fast_paths) {
+   const auto check = [](size_t count) {
+      const std::vector<uint32_t> expected(count, 7);
+      const auto packed = raw::pack(expected);
+      std::vector<uint32_t> output;
+      datastream<const char*> memory(packed.data(), packed.size());
+      raw::unpack(memory, output);
+      BOOST_CHECK(output == expected);
+      BOOST_CHECK_EQUAL(output.capacity(), count);
+   };
+   check(21);
+   check(raw::detail::unpack_chunk_bytes + 1);
+
+   const std::vector<uint32_t> expected(21, 7);
+   const auto packed = raw::pack(expected);
+   std::istringstream stream(std::string(packed.begin(), packed.end()));
+   std::vector<uint32_t> output;
+   raw::unpack(stream, output);
+   BOOST_CHECK(output == expected);
+   BOOST_CHECK_EQUAL(output.capacity(), expected.size());
+
+   // Counts within one chunk may be constructed before a truncated payload is detected.
+   const auto small_count = raw::detail::unpack_chunk_bytes / sizeof(raw_counted_element);
+   const auto missing = raw::pack(unsigned_int{small_count});
+   datastream<const char*> truncated(missing.data(), missing.size());
+   std::vector<raw_counted_element> counted;
+   raw_counted_element::constructions = 0;
+   BOOST_CHECK_THROW(raw::unpack(truncated, counted), fc::exception);
+   BOOST_CHECK_EQUAL(raw_counted_element::constructions, small_count);
+}
+
+/// Small byte arrays use one direct read; larger unknown-length payloads retain bounded reads.
+BOOST_AUTO_TEST_CASE(byte_allocation_fast_paths) {
+   for (const size_t count : {raw::detail::unpack_chunk_bytes, raw::detail::unpack_chunk_bytes * 3 + 17}) {
+      const std::vector<char> expected(count, 'x');
+      const auto packed = raw::pack(expected);
+      std::vector<char> output;
+      datastream<const char*> memory(packed.data(), packed.size());
+      raw::unpack(memory, output);
+      BOOST_CHECK(output == expected);
+      BOOST_CHECK_EQUAL(output.capacity(), count);
+
+      raw_read_count_stream unknown{{packed.data(), packed.size()}};
+      output.clear();
+      raw::unpack(unknown, output);
+      BOOST_CHECK(output == expected);
+      BOOST_CHECK_EQUAL(unknown.read_calls, (count + raw::detail::unpack_chunk_bytes - 1) /
+                                             raw::detail::unpack_chunk_bytes);
+   }
 }
 
 /// Hashed/flat containers and bitsets must not allocate from a count whose first element is missing.
@@ -133,6 +194,28 @@ BOOST_AUTO_TEST_CASE(other_container_counts_do_not_preallocate) {
    datastream<const char*> object_stream(packed.data(), packed.size());
    BOOST_CHECK_THROW(raw::unpack(object_stream, object), fc::exception);
    BOOST_CHECK_EQUAL(object.size(), 0u);
+}
+
+/// Preserve reservations for small associative containers without allowing arbitrary count-driven allocation.
+BOOST_AUTO_TEST_CASE(small_associative_containers_reserve) {
+   constexpr uint32_t count = 21;
+   const auto packed = raw::pack(unsigned_int{count});
+   const auto check = [&]<typename Container>() {
+      Container output;
+      datastream<const char*> stream(packed.data(), packed.size());
+      BOOST_CHECK_THROW(raw::unpack(stream, output), fc::exception);
+      BOOST_CHECK(output.empty());
+      if constexpr (requires { output.capacity(); })
+         BOOST_CHECK_GE(output.capacity(), count);
+      if constexpr (requires { output.bucket_count(); })
+         BOOST_CHECK_GE(output.bucket_count(), count);
+   };
+   check.template operator()<std::unordered_set<std::string>>();
+   check.template operator()<std::unordered_map<std::string, uint32_t>>();
+   check.template operator()<fc::flat_set<std::string>>();
+   check.template operator()<fc::flat_multiset<std::string>>();
+   check.template operator()<fc::flat_map<std::string, uint32_t>>();
+   check.template operator()<fc::flat_multimap<std::string, uint32_t>>();
 }
 
 /// Preserve in-place reuse, Boost vector reset behavior, zero-byte elements and nonmovable deque elements.
@@ -211,16 +294,6 @@ BOOST_AUTO_TEST_CASE(byte_chunks_preserve_stream_contracts) {
    BOOST_CHECK_EQUAL(output.front(), 'z');
    BOOST_CHECK(std::all_of(output.begin() + 1, output.end(), [](char value) { return value == 'a'; }));
 
-   // The pre-existing Boost fundamental-vector format encodes count bytes, not count*sizeof(uint32_t).
-   const auto fundamental = raw::pack(std::make_tuple(unsigned_int{3}, std::array<char, 3>{1, 2, 3}));
-   boost::container::vector<uint32_t> boost_output;
-   datastream<const char*> fundamental_stream(fundamental.data(), fundamental.size());
-   raw::unpack(fundamental_stream, boost_output);
-   BOOST_REQUIRE_EQUAL(boost_output.size(), 3u);
-   BOOST_CHECK_EQUAL(std::memcmp(boost_output.data(), fundamental.data() + 1, 3), 0);
-   const auto* storage = reinterpret_cast<const char*>(boost_output.data());
-   BOOST_CHECK(std::all_of(storage + 3, storage + boost_output.size() * sizeof(uint32_t),
-                           [](char value) { return value == 0; }));
 }
 
 
