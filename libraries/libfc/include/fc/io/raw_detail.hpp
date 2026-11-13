@@ -37,8 +37,8 @@ template <typename Stream, typename Sequence, typename Unpack>
 void unpack_sequence(Stream& stream, Sequence& value, uint32_t count, Unpack unpack) {
    if (is_small_allocation<Sequence>(count) || has_available_bytes(stream, count)) {
       value.resize(count);
-      for (uint32_t i = 0; i < count; ++i)
-         unpack(value[i]);
+      for (auto& item : value)
+         unpack(item);
       return;
    }
    for (uint32_t i = 0; i < count; ++i) {
