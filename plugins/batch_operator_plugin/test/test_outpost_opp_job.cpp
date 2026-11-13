@@ -1,5 +1,8 @@
+#include <algorithm>
+#include <array>
 #include <atomic>
 #include <chrono>
+#include <memory>
 #include <thread>
 
 #include <boost/test/unit_test.hpp>
@@ -31,6 +34,32 @@ auto make_client(sysio::opp::types::ChainKind k, uint64_t id, uint32_t cid) {
 }
 
 constexpr fc::microseconds kDeadline = fc::seconds(2);
+constexpr auto kTestEpoch = 5u;
+constexpr auto kSolanaChainCode = 1u;
+constexpr auto kSolanaChainId = 0u;
+constexpr auto kProcessedSignature = "processed-signature";
+constexpr auto kUnknownConfirmation = "confirmation unknown";
+constexpr auto kExecutionFailure = "execution failed";
+constexpr auto kCompletionQueryFailure = "depot query failed";
+constexpr auto kRepeatedPolls = 100u;
+
+/// Exercise ordinary cron ticks with one envelope pending until depot completion.
+struct outbound_retry_fixture {
+   std::shared_ptr<mock_outpost_client> client = make_client(CHAIN_KIND_SVM, kSolanaChainCode, kSolanaChainId);
+   mock_depot_ops depot;
+   outpost_opp_job job{client, depot, kDeadline};
+
+   /// Keep a single envelope pending until a test supplies completion evidence.
+   outbound_retry_fixture() {
+      depot.epoch = kTestEpoch;
+      depot.pending_response = [](uint64_t, uint32_t) -> std::optional<outbound_envelope_record> {
+         outbound_envelope_record record;
+         record.raw_envelope = {'x'};
+         return record;
+      };
+   }
+};
+
 
 } // namespace
 
@@ -136,7 +165,8 @@ BOOST_AUTO_TEST_CASE(run_outbound_emits_sol_depot_direction) {
    BOOST_CHECK(std::get<1>(depot.emitted_events[0]) == DEBUG_OUTPOST_ENDPOINTS_TYPE_DEPOT_OUTPOST_SOLANA);
 }
 
-BOOST_AUTO_TEST_CASE(run_outbound_only_delivers_once_per_epoch) {
+/// A successful first send waits for the boundary, while a new epoch sends immediately.
+BOOST_AUTO_TEST_CASE(run_outbound_waits_for_boundary_before_retrying) {
    auto client = make_client(CHAIN_KIND_EVM, 0, 31337);
    mock_depot_ops depot;
    depot.epoch = 5;
@@ -371,6 +401,219 @@ BOOST_AUTO_TEST_CASE(run_outbound_emit_failure_does_not_break_delivery) {
 
    BOOST_REQUIRE_EQUAL(client->outbound_calls.size(), 1u);
    BOOST_CHECK(depot.emitted_events.empty()); // throwing emit was not recorded
+}
+
+/// Before the boundary, only the first success sends; afterward each cron tick retries until completion.
+BOOST_FIXTURE_TEST_CASE(run_outbound_retries_each_post_boundary_tick_until_depot_completion, outbound_retry_fixture) {
+   job.run_outbound();
+   for (unsigned tick = 0; tick < kRepeatedPolls; ++tick) {
+      job.run_outbound();
+      job.run_inbound();
+   }
+   BOOST_CHECK_EQUAL(client->outbound_calls.size(), 1u);
+   BOOST_CHECK_EQUAL(client->inbound_calls.size(), kRepeatedPolls);
+   depot.epoch_boundary_past = true;
+   for (unsigned tick = 0; tick < kRepeatedPolls; ++tick)
+      job.run_outbound();
+   BOOST_CHECK_EQUAL(client->outbound_calls.size(), kRepeatedPolls + 1);
+   depot.has_delivered_response = [](uint64_t, uint32_t) { return true; };
+   job.run_outbound();
+   BOOST_CHECK_EQUAL(client->outbound_calls.size(), kRepeatedPolls + 1);
+   BOOST_CHECK_EQUAL(client->crank_calls.size(), 1u);
+}
+
+/// The depot's boundary can precede the remote boundary by a dispatch drain; another tick must still tip.
+BOOST_FIXTURE_TEST_CASE(run_outbound_recovers_when_outpost_boundary_is_later, outbound_retry_fixture) {
+   bool outpost_boundary_past = false;
+   bool consensus = false;
+   client->deliver_response = [&](const auto&) {
+      consensus = outpost_boundary_past;
+      return std::string{kProcessedSignature};
+   };
+   job.run_outbound();
+   depot.epoch_boundary_past = true;
+   job.run_outbound();
+   BOOST_CHECK(!consensus);
+   job.run_outbound();
+   BOOST_CHECK(!consensus);
+   outpost_boundary_past = true;
+   job.run_outbound();
+   BOOST_CHECK(consensus);
+   BOOST_CHECK_EQUAL(client->outbound_calls.size(), 4u);
+}
+
+/// A local completion row stops sends, but its disappearance must restore post-boundary recovery.
+BOOST_FIXTURE_TEST_CASE(run_outbound_rechecks_depot_completion_without_latching_it, outbound_retry_fixture) {
+   bool completed = true;
+   depot.has_delivered_response = [&](uint64_t, uint32_t) { return completed; };
+   job.run_outbound();
+   BOOST_CHECK(client->outbound_calls.empty());
+   completed = false;
+   job.run_outbound();
+   BOOST_CHECK_EQUAL(client->outbound_calls.size(), 1u);
+   depot.epoch_boundary_past = true;
+   completed = true;
+   job.run_outbound();
+   BOOST_CHECK_EQUAL(client->outbound_calls.size(), 1u);
+   completed = false;
+   job.run_outbound();
+   BOOST_CHECK_EQUAL(client->outbound_calls.size(), 2u);
+}
+
+/// A settled shortcut is provisional and cannot consume a final retry.
+BOOST_FIXTURE_TEST_CASE(run_outbound_empty_success_keeps_recovery_eligible, outbound_retry_fixture) {
+   client->deliver_response = [](const auto&) { return std::string{}; };
+   job.run_outbound();
+   depot.epoch_boundary_past = true;
+   job.run_outbound();
+   job.run_outbound();
+   BOOST_CHECK_EQUAL(client->outbound_calls.size(), 3u);
+   BOOST_CHECK_EQUAL(client->crank_calls.size(), 1u);
+}
+
+/// Execution errors and unknown confirmations leave the first delivery eligible on the next tick.
+BOOST_FIXTURE_TEST_CASE(run_outbound_retries_errors_and_unknown_confirmations, outbound_retry_fixture) {
+   for (const bool unknown_confirmation : {false, true}) {
+      ++depot.epoch;
+      client->deliver_response = [unknown_confirmation](const auto&) -> std::string {
+         if (unknown_confirmation)
+            FC_THROW_EXCEPTION(fc::timeout_exception, kUnknownConfirmation);
+         FC_THROW(kExecutionFailure);
+      };
+      const auto calls = client->outbound_calls.size();
+      job.run_outbound();
+      job.run_outbound();
+      BOOST_CHECK_EQUAL(client->outbound_calls.size(), calls + 2);
+      client->deliver_response = [](const auto&) { return std::string{kProcessedSignature}; };
+      job.run_outbound();
+      BOOST_CHECK_EQUAL(client->outbound_calls.size(), calls + 3);
+   }
+}
+
+/// A failed completion query is unknown state; the next tick must recover.
+BOOST_FIXTURE_TEST_CASE(run_outbound_recovers_from_completion_query_failure, outbound_retry_fixture) {
+   depot.has_delivered_response = [](uint64_t, uint32_t) -> bool { FC_THROW(kCompletionQueryFailure); };
+   BOOST_CHECK_NO_THROW(job.run_outbound());
+   BOOST_CHECK(client->outbound_calls.empty());
+   depot.has_delivered_response = {};
+   job.run_outbound();
+   BOOST_CHECK_EQUAL(client->outbound_calls.size(), 1u);
+}
+
+/// Missing work stays eligible, and epoch zero never sends.
+BOOST_FIXTURE_TEST_CASE(run_outbound_missing_envelope_and_genesis_stay_eligible, outbound_retry_fixture) {
+   const auto pending = depot.pending_response;
+   depot.pending_response = {};
+   job.run_outbound();
+   depot.pending_response = pending;
+   depot.epoch = 0;
+   job.run_outbound();
+   BOOST_CHECK(client->outbound_calls.empty());
+   depot.epoch = kTestEpoch;
+   job.run_outbound();
+   BOOST_CHECK_EQUAL(client->outbound_calls.size(), 1u);
+}
+
+/// The production jobs recover two-of-three consensus after the initial and first retry sends roll back.
+/// Mock sends return processed success on a discarded fork; inbound stays empty until
+/// canonical settlement is explicitly finalized. No restart or third operator is supplied.
+BOOST_AUTO_TEST_CASE(run_outbound_recovers_rolled_back_success_with_two_online_operators) {
+   constexpr size_t seated_operators = 3;
+   constexpr size_t online_operators = 2;
+   const std::vector<char> outbound{'e', 'n', 'v'};
+   const std::vector<char> inbound{'f', 'i', 'n'};
+   for (const bool rollback_initial : {false, true}) {
+      std::array<mock_depot_ops, online_operators> depots;
+      std::array<std::shared_ptr<mock_outpost_client>, online_operators> clients;
+      std::array<std::unique_ptr<outpost_opp_job>, online_operators> jobs;
+      std::array<bool, online_operators> canonical_deliveries{};
+      std::array<bool, online_operators> fork_deliveries{};
+      std::array<bool, online_operators> depot_deliveries{};
+      bool abandoned_fork = rollback_initial;
+      bool canonical_consensus = false;
+      bool fork_consensus = false;
+      bool finalized = false;
+      size_t effects = 0;
+      size_t fork_effects = 0;
+      for (size_t op = 0; op < online_operators; ++op) {
+         depots[op].epoch = kTestEpoch;
+         depots[op].pending_response = [&](uint64_t, uint32_t) -> std::optional<outbound_envelope_record> {
+            outbound_envelope_record record;
+            record.raw_envelope = outbound;
+            return record;
+         };
+         depots[op].has_delivered_response = [&, op](uint64_t, uint32_t) { return depot_deliveries[op]; };
+         depots[op].deliver_thrower = [&, op] {
+            depot_deliveries[op] = true;
+            if (std::count(depot_deliveries.begin(), depot_deliveries.end(), true) > seated_operators / 2) {
+               for (auto& depot : depots)
+                  depot.epoch = kTestEpoch + 1;
+            }
+         };
+         clients[op] = make_client(CHAIN_KIND_SVM, kSolanaChainCode, kSolanaChainId);
+         clients[op]->deliver_response = [&, op](const auto& call) {
+            BOOST_CHECK(call.envelope_bytes == outbound);
+            auto& deliveries = abandoned_fork ? fork_deliveries : canonical_deliveries;
+            auto& consensus = abandoned_fork ? fork_consensus : canonical_consensus;
+            auto& applied_effects = abandoned_fork ? fork_effects : effects;
+            deliveries[op] = true;
+            if (!consensus && depots[op].epoch_boundary_past &&
+                std::count(deliveries.begin(), deliveries.end(), true) > seated_operators / 2) {
+               consensus = true;
+               ++applied_effects;
+            }
+            return std::string{kProcessedSignature};
+         };
+         clients[op]->inbound_response = [&](const auto&) {
+            return canonical_consensus && finalized ? inbound : std::vector<char>{};
+         };
+         jobs[op] = std::make_unique<outpost_opp_job>(clients[op], depots[op], kDeadline);
+         jobs[op]->run_outbound();
+      }
+      fork_deliveries = canonical_deliveries;
+      abandoned_fork = true;
+      for (size_t op = 0; op < online_operators; ++op) {
+         depots[op].epoch_boundary_past = true;
+         jobs[op]->run_outbound();
+         BOOST_REQUIRE_EQUAL(clients[op]->outbound_calls.size(), 2u);
+      }
+      BOOST_REQUIRE(fork_consensus);
+      BOOST_REQUIRE_EQUAL(fork_effects, 1u);
+      // Both terminal calls succeeded and tipped consensus, but only on the
+      // abandoned fork. Remove that provisional state before normal polling.
+      fork_deliveries = {};
+      fork_consensus = false;
+      fork_effects = 0;
+      abandoned_fork = false;
+      BOOST_CHECK(!canonical_consensus);
+      for (unsigned poll = 0; poll < kRepeatedPolls; ++poll) {
+         for (auto& job : jobs) {
+            job->run_inbound();
+         }
+      }
+      for (size_t op = 0; op < online_operators; ++op) {
+         BOOST_CHECK_EQUAL(clients[op]->outbound_calls.size(), 2u);
+         BOOST_CHECK(depots[op].deliver_calls.empty());
+      }
+      for (auto& job : jobs) {
+         job->run_outbound();
+         job->run_inbound();
+      }
+      BOOST_REQUIRE(canonical_consensus);
+      for (const auto& depot : depots)
+         BOOST_CHECK(depot.deliver_calls.empty());
+      finalized = true;
+      for (auto& job : jobs)
+         job->run_inbound();
+      for (size_t op = 0; op < online_operators; ++op) {
+         BOOST_CHECK_EQUAL(depots[op].epoch, kTestEpoch + 1);
+         BOOST_REQUIRE_EQUAL(depots[op].deliver_calls.size(), 1u);
+         BOOST_CHECK(depots[op].deliver_calls.front().raw_messages == inbound);
+         BOOST_CHECK_EQUAL(clients[op]->outbound_calls.size(), 3u);
+         BOOST_CHECK_EQUAL(clients[op]->crank_calls.size(), 1u);
+      }
+      BOOST_CHECK_EQUAL(effects, 1u);
+   }
 }
 
 // ─── run_inbound ────────────────────────────────────────────────────────────
