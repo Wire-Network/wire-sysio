@@ -3,6 +3,8 @@
 Wire Sysio is a fork of Spring, a C++ implementation of the [AntelopeIO](https://github.com/AntelopeIO) protocol. It
 contains blockchain node software and supporting tools for developers and node operators.
 
+Resource allocation and node-owner registration are described in [the ROA overview](docs/roa-overview.md).
+
 ## Branches
 
 The `master` branch is the latest stable branch.
@@ -54,7 +56,7 @@ contract debugging are not part of this support tier yet.
 # it keg-only, so its bin directory has to be on PATH for CMake's find_package(Java) to see it.
 brew install cmake ninja ccache pkgconf autoconf automake libtool openjdk
 export PATH="$(brew --prefix openjdk)/bin:$PATH"
-git submodule update --init --recursive vcpkg libraries/appbase
+git submodule update --init vcpkg libraries/appbase libraries/sys-vm
 ./vcpkg/bootstrap-vcpkg.sh
 
 cmake -B build/macos-arm64 -S . -G Ninja \

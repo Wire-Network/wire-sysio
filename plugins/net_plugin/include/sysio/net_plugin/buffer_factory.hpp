@@ -29,7 +29,7 @@ namespace sysio {
       static send_buffer_type create_send_buffer( const net_message& m ) {
          const uint32_t payload_size = fc::raw::pack_size( m );
 
-         const char* const header = reinterpret_cast<const char* const>(&payload_size); // avoid variable size encoding of uint32_t
+         const char* const header = reinterpret_cast<const char*>(&payload_size); // avoid variable size encoding of uint32_t
          const size_t buffer_size = message_header_size + payload_size;
 
          auto send_buffer = std::make_shared<vector<char>>(buffer_size);
@@ -46,7 +46,7 @@ namespace sysio {
          const uint32_t which_size = fc::raw::pack_size( unsigned_int( which ) );
          const uint32_t payload_size = which_size + fc::raw::pack_size( v );
 
-         const char* const header = reinterpret_cast<const char* const>(&payload_size); // avoid variable size encoding of uint32_t
+         const char* const header = reinterpret_cast<const char*>(&payload_size); // avoid variable size encoding of uint32_t
          const size_t buffer_size = message_header_size + payload_size;
 
          auto send_buffer = std::make_shared<vector<char>>( buffer_size );
@@ -65,7 +65,7 @@ namespace sysio {
          const uint32_t which_size = fc::raw::pack_size( unsigned_int( signed_block_which ) );
          const uint32_t payload_size = which_size + v.size();
 
-         const char* const header = reinterpret_cast<const char* const>(&payload_size); // avoid variable size encoding of uint32_t
+         const char* const header = reinterpret_cast<const char*>(&payload_size); // avoid variable size encoding of uint32_t
          const size_t buffer_size = message_header_size + payload_size;
 
          auto send_buffer = std::make_shared<vector<char>>( buffer_size );
@@ -143,7 +143,7 @@ namespace sysio {
          const uint32_t trx_size = fc::raw::pack_size( *trx );
          const uint32_t payload_size = which_size + id_size + trx_size;
 
-         const char* const header = reinterpret_cast<const char* const>(&payload_size);
+         const char* const header = reinterpret_cast<const char*>(&payload_size);
          const size_t buffer_size = message_header_size + payload_size;
 
          auto send_buffer = std::make_shared<vector<char>>( buffer_size );
@@ -183,7 +183,7 @@ namespace sysio {
          const uint32_t msg_size = fc::raw::pack_size( msg );
          const uint32_t payload_size = which_size + id_size + msg_size;
 
-         const char* const header = reinterpret_cast<const char* const>(&payload_size);
+         const char* const header = reinterpret_cast<const char*>(&payload_size);
          const size_t buffer_size = message_header_size + payload_size;
 
          auto send_buffer = std::make_shared<vector<char>>( buffer_size );
@@ -223,7 +223,7 @@ namespace sysio {
          }
          const uint32_t payload_size = which_size + s;
 
-         const char* const header = reinterpret_cast<const char* const>(&payload_size); // avoid variable size encoding of uint32_t
+         const char* const header = reinterpret_cast<const char*>(&payload_size); // avoid variable size encoding of uint32_t
          const size_t buffer_size = message_header_size + payload_size;
 
          auto send_buffer = std::make_shared<vector<char>>( buffer_size );
@@ -263,7 +263,7 @@ namespace sysio {
          s += fc::raw::pack_size(signed_empty);
          const uint32_t payload_size = which_size + s;
 
-         const char* const header = reinterpret_cast<const char* const>(&payload_size); // avoid variable size encoding of uint32_t
+         const char* const header = reinterpret_cast<const char*>(&payload_size); // avoid variable size encoding of uint32_t
          const size_t buffer_size = message_header_size + payload_size;
 
          auto send_buffer = std::make_shared<vector<char>>( buffer_size );

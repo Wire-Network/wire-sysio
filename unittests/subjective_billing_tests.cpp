@@ -728,13 +728,14 @@ action make_action( account_name code, vector<permission_level> auth ) {
    return action( std::move( auth ), code, "transfer"_n, bytes{} );
 }
 
-/// A block at `time` with one receipt per transaction, billing `cpu_us[i]` to each one's i-th action.
+/// A block at `time` with one receipt per transaction, billing `cpu_us[i]` to each one's i-th action. Entries past
+/// the actions are receiver entries, billed to contracts reached through a system contract.
 signed_block_ptr make_block( fc::time_point time,
                              const vector<std::pair<signed_transaction, vector<uint32_t>>>& trxs ) {
    auto block = std::make_shared<signed_block>();
    block->timestamp = block_timestamp_type{time};
    for( const auto& [trx, cpu_us] : trxs ) {
-      BOOST_REQUIRE_EQUAL( cpu_us.size(), trx.total_actions() );
+      BOOST_REQUIRE_GE( cpu_us.size(), trx.actions.size() );
       auto& receipt = block->transactions.emplace_back( packed_transaction{trx} );
       for( uint32_t cpu : cpu_us ) receipt.cpu_usage_us.emplace_back( cpu );
    }
@@ -801,19 +802,31 @@ BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_billing_actions_test ) {
    const auto now = sysio_paid_now;
 
    subjective_billing sub_bill;
-   signed_transaction trx = make_trx( {
+   // An action without authorization bills the transaction's first authorizer.
+   const signed_transaction trx = make_trx( {
       make_action( sysio_token, {} ),                                                                // 5 us to alice
       make_action( sysio_token, {{alice, config::active_name}} ),                                   // 20 us to alice
       make_action( sysio_token, {{erin, config::sysio_payer_name}, {erin, config::active_name}} ),   // erin pays
       make_action( "token"_n, {{alice, config::active_name}} ),                                      // token pays
       make_action( sysio_token, {{erin, config::active_name}} ),                                     // 160 us to erin
    }, 1 );
-   // An action without authorization, like a context-free action, bills the transaction's first authorizer.
-   trx.context_free_actions.emplace_back( make_action( sysio_token, {} ) );                          // 10 us to alice
 
-   sub_bill.on_block( log, make_block( now, {{ trx, {10, 5, 20, 40, 80, 160} }} ), now );
-   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).count() == 10 + 5 + 20 );
+   sub_bill.on_block( log, make_block( now, {{ trx, {5, 20, 40, 80, 160} }} ), now );
+   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).count() == 5 + 20 );
    BOOST_TEST( sub_bill.get_subjective_bill( erin, now ).count() == 160 );
+}
+
+BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_billing_receiver_entries_test ) {
+   fc::logger log;
+   const account_name alice = "alice"_n;
+   const auto now = sysio_paid_now;
+   const signed_transaction trx = make_trx( {make_action( "sysio.token"_n, {{alice, config::active_name}} )}, 1 );
+
+   // The entries after the action's are billed to the contracts sysio.token notified, from their own CPU.
+   subjective_billing sub_bill;
+   sub_bill.on_block( log, make_block( now, {{ trx, {1000, 300, 700} }} ), now );
+   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).count() == 1000 );
+   BOOST_TEST( sub_bill.get_account_cache_size() == 1u );
 }
 
 BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_billing_replaces_pending_test ) {

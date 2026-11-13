@@ -8,12 +8,18 @@
 #include <sysio/chain/wasm_sysio_constraints.hpp>
 //sys-vm includes
 #include <sysio/vm/backend.hpp>
+#include <sysio/vm/config.hpp>
 #include <sysio/chain/webassembly/preconditions.hpp>
 #ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
 #include <sysio/chain/webassembly/sys-vm-oc.hpp>
 #endif
 #include <boost/hana/string.hpp>
 #include <boost/hana/equal.hpp>
+
+/// Consensus execution requires deterministic software floating-point operations in the actual chain build.
+static_assert(sysio::vm::use_softfloat, "Sysio requires VM software floating-point operations");
+/// Preserve the VM memory-alignment behavior independently of caller cache or toolchain settings.
+static_assert(!sysio::vm::should_align_memory_ops, "Sysio requires VM memory-alignment hints to be disabled");
 
 namespace sysio { namespace chain { namespace webassembly { namespace sys_vm_runtime {
 
@@ -320,41 +326,18 @@ struct host_function_registrator {
    inline static auto NAME##_registrator = NAME##_registrator_impl();
 
 #define REGISTER_HOST_FUNCTION(NAME, ...)                                                                              \
-   static host_function_registrator<&interface::NAME, core_precondition, context_aware_check, ##__VA_ARGS__>           \
+   static host_function_registrator<&interface::NAME, core_precondition, ##__VA_ARGS__>                                \
        NAME##_registrator_impl() {                                                                                     \
-      return {BOOST_HANA_STRING("env"), BOOST_HANA_STRING(#NAME)};                                                     \
-   }                                                                                                                   \
-   inline static auto NAME##_registrator = NAME##_registrator_impl();
-
-#define REGISTER_CF_HOST_FUNCTION(NAME, ...)                                                                           \
-   static host_function_registrator<&interface::NAME, core_precondition, ##__VA_ARGS__> NAME##_registrator_impl() {    \
       return {BOOST_HANA_STRING("env"), BOOST_HANA_STRING(#NAME)};                                                     \
    }                                                                                                                   \
    inline static auto NAME##_registrator = NAME##_registrator_impl();
 
 #define REGISTER_ALIGNED_HOST_FUNCTION(NAME, ...)                                                                       \
-   static host_function_registrator<&interface::NAME, aligned_static_check_wl_args, context_aware_check, ##__VA_ARGS__> \
-       NAME##_registrator_impl() {                                                                                     \
-      return {BOOST_HANA_STRING("env"), BOOST_HANA_STRING(#NAME)};                                                     \
-   }                                                                                                                   \
-   inline static auto NAME##_registrator = NAME##_registrator_impl();
-
-#define REGISTER_ALIGNED_CF_HOST_FUNCTION(NAME, ...)                                                                    \
    static host_function_registrator<&interface::NAME, aligned_static_check_wl_args, ##__VA_ARGS__>                      \
        NAME##_registrator_impl() {                                                                                     \
       return {BOOST_HANA_STRING("env"), BOOST_HANA_STRING(#NAME)};                                                     \
    }                                                                                                                   \
    inline static auto NAME##_registrator = NAME##_registrator_impl();
-
-#define REGISTER_ALIGNED_CF_ONLY_HOST_FUNCTION(NAME, ...)                                                               \
-   static host_function_registrator<&interface::NAME, aligned_static_check_wl_args, context_free_check, ##__VA_ARGS__>  \
-       NAME##_registrator_impl() {                                                                                     \
-      return {BOOST_HANA_STRING("env"), BOOST_HANA_STRING(#NAME)};                                                     \
-   }                                                                                                                   \
-   inline static auto NAME##_registrator = NAME##_registrator_impl();
-
-// context free api
-REGISTER_ALIGNED_CF_ONLY_HOST_FUNCTION(get_context_free_data)
 
 // privileged api
 REGISTER_ALIGNED_HOST_FUNCTION(preactivate_feature, privileged_check);
@@ -436,17 +419,17 @@ REGISTER_INJECTED_HOST_FUNCTION(_sysio_ui64_to_f64);
 REGISTER_HOST_FUNCTION(get_active_producers);
 
 // crypto api
-REGISTER_CF_HOST_FUNCTION(ed25519_verify);
-REGISTER_ALIGNED_CF_HOST_FUNCTION(assert_recover_key);
-REGISTER_ALIGNED_CF_HOST_FUNCTION(recover_key);
-REGISTER_ALIGNED_CF_HOST_FUNCTION(assert_sha256);
-REGISTER_ALIGNED_CF_HOST_FUNCTION(assert_sha1);
-REGISTER_ALIGNED_CF_HOST_FUNCTION(assert_sha512);
-REGISTER_ALIGNED_CF_HOST_FUNCTION(assert_ripemd160);
-REGISTER_ALIGNED_CF_HOST_FUNCTION(sha256);
-REGISTER_ALIGNED_CF_HOST_FUNCTION(sha1);
-REGISTER_ALIGNED_CF_HOST_FUNCTION(sha512);
-REGISTER_ALIGNED_CF_HOST_FUNCTION(ripemd160);
+REGISTER_HOST_FUNCTION(ed25519_verify);
+REGISTER_ALIGNED_HOST_FUNCTION(assert_recover_key);
+REGISTER_ALIGNED_HOST_FUNCTION(recover_key);
+REGISTER_ALIGNED_HOST_FUNCTION(assert_sha256);
+REGISTER_ALIGNED_HOST_FUNCTION(assert_sha1);
+REGISTER_ALIGNED_HOST_FUNCTION(assert_sha512);
+REGISTER_ALIGNED_HOST_FUNCTION(assert_ripemd160);
+REGISTER_ALIGNED_HOST_FUNCTION(sha256);
+REGISTER_ALIGNED_HOST_FUNCTION(sha1);
+REGISTER_ALIGNED_HOST_FUNCTION(sha512);
+REGISTER_ALIGNED_HOST_FUNCTION(ripemd160);
 
 // permission api
 REGISTER_ALIGNED_HOST_FUNCTION(check_transaction_authorization);
@@ -468,31 +451,31 @@ REGISTER_ALIGNED_HOST_FUNCTION(is_feature_activated);
 REGISTER_HOST_FUNCTION(get_sender);
 REGISTER_HOST_FUNCTION(get_ram_usage);
 
-// context-free system api
-REGISTER_CF_HOST_FUNCTION(abort)
-REGISTER_ALIGNED_CF_HOST_FUNCTION(sysio_assert)
-REGISTER_ALIGNED_CF_HOST_FUNCTION(sysio_assert_message)
-REGISTER_CF_HOST_FUNCTION(sysio_assert_code)
-REGISTER_CF_HOST_FUNCTION(sysio_exit)
+// system api
+REGISTER_HOST_FUNCTION(abort)
+REGISTER_ALIGNED_HOST_FUNCTION(sysio_assert)
+REGISTER_ALIGNED_HOST_FUNCTION(sysio_assert_message)
+REGISTER_HOST_FUNCTION(sysio_assert_code)
+REGISTER_HOST_FUNCTION(sysio_exit)
 
 // action api
-REGISTER_ALIGNED_CF_HOST_FUNCTION(read_action_data);
-REGISTER_CF_HOST_FUNCTION(action_data_size);
-REGISTER_CF_HOST_FUNCTION(current_receiver);
+REGISTER_ALIGNED_HOST_FUNCTION(read_action_data);
+REGISTER_HOST_FUNCTION(action_data_size);
+REGISTER_HOST_FUNCTION(current_receiver);
 REGISTER_HOST_FUNCTION(set_action_return_value);
 
 // console api
-REGISTER_ALIGNED_CF_HOST_FUNCTION(prints);
-REGISTER_ALIGNED_CF_HOST_FUNCTION(prints_l);
-REGISTER_CF_HOST_FUNCTION(printi);
-REGISTER_CF_HOST_FUNCTION(printui);
-REGISTER_ALIGNED_CF_HOST_FUNCTION(printi128);
-REGISTER_ALIGNED_CF_HOST_FUNCTION(printui128);
-REGISTER_CF_HOST_FUNCTION(printsf);
-REGISTER_CF_HOST_FUNCTION(printdf);
-REGISTER_ALIGNED_CF_HOST_FUNCTION(printqf);
-REGISTER_CF_HOST_FUNCTION(printn);
-REGISTER_ALIGNED_CF_HOST_FUNCTION(printhex);
+REGISTER_ALIGNED_HOST_FUNCTION(prints);
+REGISTER_ALIGNED_HOST_FUNCTION(prints_l);
+REGISTER_HOST_FUNCTION(printi);
+REGISTER_HOST_FUNCTION(printui);
+REGISTER_ALIGNED_HOST_FUNCTION(printi128);
+REGISTER_ALIGNED_HOST_FUNCTION(printui128);
+REGISTER_HOST_FUNCTION(printsf);
+REGISTER_HOST_FUNCTION(printdf);
+REGISTER_ALIGNED_HOST_FUNCTION(printqf);
+REGISTER_HOST_FUNCTION(printn);
+REGISTER_ALIGNED_HOST_FUNCTION(printhex);
 
 // kv database api
 REGISTER_ALIGNED_HOST_FUNCTION(kv_set);
@@ -516,47 +499,46 @@ REGISTER_HOST_FUNCTION(kv_idx_destroy);
 REGISTER_ALIGNED_HOST_FUNCTION(kv_idx_find);
 
 // memory api
-REGISTER_ALIGNED_CF_HOST_FUNCTION(memcpy);
-REGISTER_ALIGNED_CF_HOST_FUNCTION(memmove);
-REGISTER_ALIGNED_CF_HOST_FUNCTION(memcmp);
-REGISTER_ALIGNED_CF_HOST_FUNCTION(memset);
+REGISTER_ALIGNED_HOST_FUNCTION(memcpy);
+REGISTER_ALIGNED_HOST_FUNCTION(memmove);
+REGISTER_ALIGNED_HOST_FUNCTION(memcmp);
+REGISTER_ALIGNED_HOST_FUNCTION(memset);
 
 // transaction api
 REGISTER_ALIGNED_HOST_FUNCTION(send_inline);
-REGISTER_ALIGNED_HOST_FUNCTION(send_context_free_inline);
 
-// context-free transaction api
-REGISTER_ALIGNED_CF_HOST_FUNCTION(read_transaction);
-REGISTER_CF_HOST_FUNCTION(transaction_size);
-REGISTER_CF_HOST_FUNCTION(expiration);
-REGISTER_CF_HOST_FUNCTION(tapos_block_num);
-REGISTER_CF_HOST_FUNCTION(tapos_block_prefix);
-REGISTER_ALIGNED_CF_HOST_FUNCTION(get_action);
+// transaction api
+REGISTER_ALIGNED_HOST_FUNCTION(read_transaction);
+REGISTER_HOST_FUNCTION(transaction_size);
+REGISTER_HOST_FUNCTION(expiration);
+REGISTER_HOST_FUNCTION(tapos_block_num);
+REGISTER_HOST_FUNCTION(tapos_block_prefix);
+REGISTER_ALIGNED_HOST_FUNCTION(get_action);
 
 // get_block_num
-REGISTER_CF_HOST_FUNCTION( get_block_num );
+REGISTER_HOST_FUNCTION( get_block_num );
 
 // crypto_primitives
-REGISTER_CF_HOST_FUNCTION( alt_bn128_add );
-REGISTER_CF_HOST_FUNCTION( alt_bn128_mul );
-REGISTER_CF_HOST_FUNCTION( alt_bn128_pair );
-REGISTER_CF_HOST_FUNCTION( mod_exp );
-REGISTER_CF_HOST_FUNCTION( blake2_f );
-REGISTER_CF_HOST_FUNCTION( sha3 );
-REGISTER_CF_HOST_FUNCTION( k1_recover );
-REGISTER_CF_HOST_FUNCTION( blake2b_256 );
+REGISTER_HOST_FUNCTION( alt_bn128_add );
+REGISTER_HOST_FUNCTION( alt_bn128_mul );
+REGISTER_HOST_FUNCTION( alt_bn128_pair );
+REGISTER_HOST_FUNCTION( mod_exp );
+REGISTER_HOST_FUNCTION( blake2_f );
+REGISTER_HOST_FUNCTION( sha3 );
+REGISTER_HOST_FUNCTION( k1_recover );
+REGISTER_HOST_FUNCTION( blake2b_256 );
 
 // bls_primitives
-REGISTER_CF_HOST_FUNCTION( bls_g1_add );
-REGISTER_CF_HOST_FUNCTION( bls_g2_add );
-REGISTER_CF_HOST_FUNCTION( bls_g1_weighted_sum );
-REGISTER_CF_HOST_FUNCTION( bls_g2_weighted_sum );
-REGISTER_CF_HOST_FUNCTION( bls_pairing );
-REGISTER_CF_HOST_FUNCTION( bls_g1_map );
-REGISTER_CF_HOST_FUNCTION( bls_g2_map );
-REGISTER_CF_HOST_FUNCTION( bls_fp_mod );
-REGISTER_CF_HOST_FUNCTION( bls_fp_mul );
-REGISTER_CF_HOST_FUNCTION( bls_fp_exp );
+REGISTER_HOST_FUNCTION( bls_g1_add );
+REGISTER_HOST_FUNCTION( bls_g2_add );
+REGISTER_HOST_FUNCTION( bls_g1_weighted_sum );
+REGISTER_HOST_FUNCTION( bls_g2_weighted_sum );
+REGISTER_HOST_FUNCTION( bls_pairing );
+REGISTER_HOST_FUNCTION( bls_g1_map );
+REGISTER_HOST_FUNCTION( bls_g2_map );
+REGISTER_HOST_FUNCTION( bls_fp_mod );
+REGISTER_HOST_FUNCTION( bls_fp_mul );
+REGISTER_HOST_FUNCTION( bls_fp_exp );
 
 } // namespace webassembly
 } // namespace chain

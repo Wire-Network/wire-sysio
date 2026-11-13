@@ -24,6 +24,13 @@ namespace sysio::chain::config {
   static constexpr auto producers_account_name { "sysio.prods"_n };
   static constexpr auto roa_account_name       { "sysio.roa"_n };
 
+  /// The system contract action the implicit transaction at the start of every block runs, and nothing else may.
+  static constexpr auto onblock_action_name { "onblock"_n };
+
+  /// True for sysio and every sysio.* account. Callers that grant a system contract more also require it to be
+  /// privileged.
+  constexpr bool is_system_account( name account ) { return account.prefix() == system_account_name; }
+
   // Active permission of producers account requires greater than 2/3 of the producers to authorize
   static constexpr auto majority_producers_permission_name { "prod.major"_n }; // greater than 1/2 of producers needed to authorize
   static constexpr auto minority_producers_permission_name { "prod.minor"_n }; // greater than 1/3 of producers needed to authorize0
@@ -57,8 +64,6 @@ namespace sysio::chain::config {
   static constexpr uint32_t   default_target_block_net_usage_pct           = 10 * percent_1; /// we target 1000 TPS
   static constexpr uint32_t   default_max_transaction_net_usage            = default_max_block_net_usage / 2;
   static constexpr uint32_t   default_net_usage_leeway                     = 500; // bytes of NET leeway for transactions
-  static constexpr uint32_t   default_context_free_discount_net_usage_num  = 0; // Wire does not support discount of context free data
-  static constexpr uint32_t   default_context_free_discount_net_usage_den  = 1; // Wire does not support discount of context free data
   static constexpr uint32_t   transaction_id_net_usage                     = 32; // 32 bytes for the size of a transaction id
 
   static constexpr uint32_t   default_max_block_cpu_usage                  = 200'000; /// max block cpu usage in microseconds
@@ -67,6 +72,8 @@ namespace sysio::chain::config {
   static constexpr uint32_t   default_min_transaction_cpu_usage            = 100; /// min trx cpu usage in microseconds (10000 TPS equiv)
   static constexpr uint32_t   default_subjective_cpu_leeway_us             = 31000; /// default subjective cpu leeway in microseconds
   static constexpr uint32_t   default_subjective_cpu_us                    = 300000; /// default subjective cpu given to each account
+  /// Genesis value of chain_config::notify_cpu_stipend, in microseconds
+  static constexpr uint32_t   default_notify_cpu_stipend                   = 100;
 
   static constexpr uint32_t   default_max_trx_lifetime                     = 60*60; // 1 hour
   static constexpr uint32_t   default_max_trx_delay                        = 45*24*3600; // 45 days

@@ -76,16 +76,6 @@ public:
             get_balance(name("sysio")) + get_balance(name("sysio.ramfee")) + get_balance(name("sysio.stake")) + get_balance(name("sysio.ram")) );
    }
 
-   action_result open( account_name  owner,
-                       const string& symbolname,
-                       account_name  ram_payer    ) {
-      return push_action( ram_payer, "open"_n, mvo()
-                          ( "owner", owner )
-                          ( "symbol", symbolname )
-                          ( "ram_payer", ram_payer )
-         );
-   }
-
    transaction_trace_ptr setup_producer_accounts( const std::vector<account_name>& accounts ) {
       account_name creator(config::system_account_name);
       signed_transaction trx;
@@ -126,8 +116,6 @@ public:
          ("target_block_net_usage_pct", 10 + n )
          ("max_transaction_net_usage", 1000000 + n )
          ("net_usage_leeway", 500 + n )
-         ("context_free_discount_net_usage_num", 1 + n )
-         ("context_free_discount_net_usage_den", 100 + n )
          ("max_block_cpu_usage", 10000000 + n )
          ("target_block_cpu_usage_pct", 10 + n )
          ("max_transaction_cpu_usage", 1000000 + n )
@@ -141,6 +129,7 @@ public:
          ("max_kv_key_size", 256 + n)
          ("max_kv_value_size", 262144 + n)
          ("max_kv_secondary_key_size", 256 + n)
+         ("notify_cpu_stipend", 100 + n)
          ("max_ram_size", (n % 10 + 1) * 1024 * 1024)
          ("ram_reserve_ratio", 100 + n);
    }

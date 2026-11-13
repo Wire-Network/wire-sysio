@@ -96,6 +96,8 @@ public:
       result.set_epoch_timestamp(EnvelopeTimestamp);
       result.set_previous_envelope_hash(previous_envelope_);
       auto* message = result.add_messages();
+      // Match the explicit V1 format emitted by real outposts.
+      message->mutable_payload()->set_version(1);
       for (const auto& [type, data] : entries) {
          auto* entry = message->mutable_payload()->add_attestations();
          entry->set_type(type);
@@ -119,7 +121,7 @@ public:
       const auto [seen, fresh] = received_.emplace(id, message.SerializeAsString());
       FC_ASSERT(fresh || seen->second == message.SerializeAsString(), "conflicting return replay");
       if (paid_requests_.contains(id)) return false;
-      const auto amount = message.amount().amount();
+      const auto amount = static_cast<uint64_t>(message.amount().amount());
       const auto [it, inserted] = pending_.emplace(id, amount);
       FC_ASSERT(inserted || it->second == amount, "conflicting return replay");
       return settle(id);

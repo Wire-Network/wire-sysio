@@ -432,10 +432,21 @@ namespace fc
       throw e; \
    }
 
-#define FC_LOG_AND_DROP( FORMAT, ... )  \
-   catch( const boost::interprocess::bad_alloc& ) {\
-      throw;\
-   } catch( fc::exception& er ) { \
+/// Log ordinary failures while allowing shared-memory allocation failures to propagate.
+#define FC_LOG_AND_DROP( FORMAT, ... ) \
+   catch( const boost::interprocess::bad_alloc& ) { \
+      throw; \
+   } FC_DETAIL_LOG_AND_DROP( FORMAT, ##__VA_ARGS__ )
+
+/// Preserve the fail-fast allocation policy in a noexcept cleanup operation.
+#define FC_LOG_AND_DROP_NOEXCEPT( FORMAT, ... ) \
+   catch( const boost::interprocess::bad_alloc& ) { \
+      std::terminate(); \
+   } FC_DETAIL_LOG_AND_DROP( FORMAT, ##__VA_ARGS__ )
+
+/// Common logging handlers; callers decide how to handle interprocess allocation failures.
+#define FC_DETAIL_LOG_AND_DROP( FORMAT, ... ) \
+   catch( fc::exception& er ) { \
       wlog( FORMAT " {}", ##__VA_ARGS__, er.to_detail_string() ); \
    } catch( const std::exception& e ) {  \
       fc::std_exception_wrapper sew( \

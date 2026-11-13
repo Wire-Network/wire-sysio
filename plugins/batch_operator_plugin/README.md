@@ -73,7 +73,8 @@ permission then need not be linked for `sysio.kicker::kick`.
 | `--batch-delivery-timeout-ms` | 60000 | Max time for one outbound delivery, every transaction and confirmation wait included (ms). On Ethereum a single receipt wait may use whatever of it is left, so size it past the outpost chain's block time. |
 | `--batch-yield-tick-interval-ms` | 60000 | Minimum spacing between this operator's `sysio.swap::tickyield` pushes per yield pool (ms) |
 | `--batch-underwriter-account` | none | `account` or `account@permission` (default `active`) the underwriter bonds from. Configuring it enables the underwriter |
-| `--batch-underwriter-max-exposure` | none | Most the underwriter may have bonded at once in one shadow token, as an asset (`100.000000000 LIQETH`). Repeat per token; a token without one is not underwritten |
+| `--batch-underwriter-max-exposure` | none | Most the underwriter may have bonded at once in one shadow token, as a positive asset (`100.000000000 LIQETH`). Repeat per token; cannot name the same token as unlimited exposure |
+| `--batch-underwriter-unlimited-exposure` | none | Allow exposure without a cap for one shadow token, as its symbol code (`LIQETH`, without amount or precision). Repeat per token; balance and verification checks still apply. Startup fails if max exposure names the same token |
 | `--batch-kick-crank` | true | Push `sysio.kicker::kick` for every kicker pool that could pay. Off, the relay's permission need not authorize `kick` |
 | `--batch-kick-interval-ms` | 60000 | First wait before this operator retries a `sysio.kicker::kick` that did not pay (ms); doubles per unpaid attempt, up to an hour. Must be 1 to 3600000; startup fails otherwise |
 
@@ -86,10 +87,13 @@ requires `read-mode = irreversible`.
 
 Each role signs with the one operator-configured WIRE signature provider, of any key
 type, whose key alone satisfies its authorization on chain: `<operator>@active` for
-the relay, the configured permission for the underwriter. At startup the node also
+the relay, the configured permission for the underwriter. The provider may hold its
+key remotely, as a `KMS:` WIRE K1 key does
+([signature_provider_kms_plugin](../signature_provider_kms_plugin/README.md)). At startup the node also
 checks that the key's signatures recover to it and that the authorization may
 declare every action the role pushes (`linkauth`). A role that fails either check,
-or matches no provider or more than one, stops the node.
+or matches no provider or more than one, stops the node. A transient signing failure
+during the key check, such as KMS throttling, is logged and passes the check.
 
 The node exempts the accounts it signs as from subjective CPU billing: both roles
 push on a schedule that loses some pushes (a race another operator won, an action
@@ -141,9 +145,30 @@ requests `sysio.synd` issues for syndication envelopes. Each poll it:
    Whether the statement is true is checked against the outpost alone; amounts,
    states and windows still come from the depot's tables.
 2. **Bonds** each verified OPEN request `sysio.synd` issued under the `oppenvelope`
-   schema, oldest first and for its whole remainder (`sysio.bond::accept`), within
-   the token's exposure cap (bonds not yet claimed count) and the account's
-   `sysio.liq` balance.
+   schema, oldest first (`sysio.bond::accept`). Each contribution is the minimum of
+   the uncovered remainder, the token's remaining exposure allowance (bonds not
+   yet claimed count), and the account's `sysio.liq` balance, rounded down to a
+   0.01-token increment. Explicit unlimited exposure removes only the exposure
+   allowance limit; a token with neither exposure option is not underwritten.
+   An account's first contribution to a request must be
+   at least 1/64 of its coverage or take the whole remainder (`sysio.bond`
+   refuses a smaller one); until it can, the request waits.
+   Multiple underwriters can contribute to the same request;
+   for example, three accounts with 2 LIQSOL of available capacity each can fully
+   bond a 6 LIQSOL request. Each contribution stays locked while the request is
+   OPEN: there is no withdrawal. Principal returns after full coverage, approval
+   and claim, or a VALID governance ruling and claim. An INVALID ruling forfeits
+   it. A lone provider
+   whose cap is below the required coverage can therefore lock its whole cap
+   while waiting for other providers.
+   Submitted accepts reserve both exposure and wallet funds until the
+   irreversible view accounts for them, the request leaves OPEN, or LIB time
+   passes the signed transaction's expiration. This also covers a submission
+   whose callback times out; the next poll cannot repeat its contribution.
+   On startup, new accepts wait until LIB passes one transaction lifetime after
+   the later of startup LIB time and wall time, so a previous process's unobserved
+   transactions cannot be repeated even after failover to a node with an older
+   LIB. Approvals and claims continue during that wait.
 3. **Cranks** `sysio.synd::crank`, which releases what bonding allows and issues the
    next request: every poll while an envelope request is in play or has an outcome
    `sysio.synd` has not acknowledged, otherwise every 5 minutes.
@@ -151,7 +176,8 @@ requests `sysio.synd` issues for syndication envelopes. Each poll it:
    and **claims** them once approved or ruled VALID, and again while yield the pool
    could not yet cover is owed. Every 10 minutes it claims what a forfeited bond
    earned, which pays it into `sysio.liq` so the request can be pruned, and prunes
-   `sysio.bond` and `sysio.synd`.
+   `sysio.bond` and `sysio.synd`. Its `sysio.bond` prunes sweep the requests issued
+   before each sweep began, each starting after those the previous one examined.
 
 What it cannot act on waits and is logged on every poll it holds; deduplicating
 those lines is left to log tooling:
@@ -162,7 +188,10 @@ those lines is left to log tooling:
 | The outpost holds no final record for the statement's epoch | The request waits |
 | The outpost recorded another digest for that epoch | Never bonded; an error log names both digests |
 | The node cannot serve a chain (no RPC client, wrong chain id) | That chain's requests wait; the others go on |
-| No cap, over the cap, or too little balance | The request waits |
+| Neither exposure option for the token, or remaining finite exposure allowance or balance below one 0.01-token increment | The request waits |
+| A first contribution would be below 1/64 of the request's coverage and not the whole remainder | The request waits |
+| An accept is submitted but not yet accounted for by the irreversible view | Its funds stay reserved and that request waits |
+| Startup finality wait | New accepts wait; approvals and claims continue |
 | The `sysio.andon` cord is pulled | Nothing is bonded, approved or claimed until it clears |
 | A request is challenged (HELD) | Reported, whether or not we bonded it: `sysio` rules it |
 | A bond of ours is ruled INVALID while the node runs, even one since claimed or pruned | Bonding stops until a restart; approvals and claims go on. A forfeited bond's principal is not returned |
@@ -170,12 +199,19 @@ those lines is left to log tooling:
 
 ### Underwriter setup
 
-On the depot, the underwriter account holds the shadow LIQ it bonds, RAM for its
-bond rows, and CPU for a few pushes per poll. With a dedicated permission, link it to
-exactly the actions it pushes, so the node's key can move the inventory nowhere
-else: `sysio.bond::accept`, `approve`, `claim`, `prune` and `sysio.synd::crank`,
-`pruneenv`. The WIRE its bonds earn is withdrawn with `sysio.bond::claimwire`, which
-stays unlinked.
+Use a separate account for each underwriter process: its exposure cap and pending
+submission reservations are local to that process.
+
+On the depot, the underwriter account needs only the shadow LIQ it bonds: no RAM,
+CPU or NET. Its bond rows and the rows that hold the WIRE they earn bill the request's
+issuer (the `sysio` RAM pool for `sysio.synd`'s requests), and its pushes name no
+payer, so their CPU and NET bill the contract they call, `sysio.bond` or `sysio.synd`,
+which have unlimited CPU and NET. With a dedicated permission, link it to exactly the
+actions it pushes, so the node's key can move the inventory nowhere else:
+`sysio.bond::accept`, `approve`, `claim`, `prune` and `sysio.synd::crank`,
+`pruneenv`. The WIRE its bonds earn is recorded per issuer and withdrawn with
+`sysio.bond::claimwire(account, issuer)` (`sysio.synd` for syndication requests),
+which stays unlinked.
 
 The node needs an outpost RPC client for every active chain (each client spec names
 a signing key, though the underwriter only reads), the Ethereum OPP ABI files (which
@@ -192,6 +228,29 @@ other means: a cap counts only the bonds its node makes.
 
 Size each cap for the most the token syndicates in one challenge window
 (`window_sec`, 3 hours by default) plus the time it takes to claim.
+
+Alternatively, explicitly allow unlimited exposure for selected shadow symbols:
+
+```sh
+--batch-underwriter-account uw.acct \
+--batch-underwriter-unlimited-exposure LIQETH \
+--batch-underwriter-max-exposure '5.000000000 LIQSOL'
+```
+
+This permits LIQETH bonds up to the account's available balance while limiting
+outstanding LIQSOL bonds to 5 LIQSOL. Repeat the unlimited option for additional
+symbols. Neither option enables other tokens, and both require an underwriter
+account to have any effect. Naming the same symbol in both options is a startup
+error, regardless of argument order or whether it comes from the command line or
+configuration file. Duplicate unlimited symbols are also rejected. Unlimited
+exposure removes only the cap: contribution rounding and minimums, pending balance
+reservations, startup finality, outpost verification, emergency-stop and
+forfeiture-halt checks still apply.
+
+A finite cap bounds the token inventory that can be bonded at once. Unlimited
+exposure can bond the account's entire inventory of that token within one
+challenge window, before a forfeiture triggers the halt. Fund an unlimited
+underwriter account with only what you are prepared to have bonded at once.
 
 ## Dependencies
 

@@ -20,11 +20,19 @@
  * transfer into this contract.
  *
  * Privileged: an action signed by an account pulls that account's tokens by an inline `transfer`
- * under its `active` authority. The issuer pays the RAM of its `requests` and `escrows` rows and an
- * underwriter that of its `bonds` row -- unless that account is itself privileged: a system contract
- * (`sysio.synd` issuing for an envelope) has no RAM quota of its own, so its rows bill the `sysio` RAM
- * pool instead. Later writes by other signers keep the row's payer. The contract's own singletons and
- * yield pools bill the `sysio` RAM pool.
+ * under its `active` authority. RAM is paid by whoever causes it:
+ *   - The issuer pays for its underwriting: its `requests` row, its bounty escrow, each
+ *     underwriter's `bonds` row, and the `wireclaims` rows that hold the WIRE its requests' bonds and
+ *     escrows earn. A privileged issuer -- a system contract, as `sysio.synd` is when it issues for
+ *     an envelope -- has no RAM quota of its own, so these rows bill the `sysio` RAM pool instead.
+ *     An underwriter needs no RAM.
+ *   - The hold beneficiary, who signs `hold`, pays for the hold-bond escrow: a challenger pays for
+ *     its own challenge, even on a privileged issuer's request.
+ *   - The `sysio` RAM pool pays for the contract's shared rows: the configuration and counter
+ *     singletons and the per-token yield pools.
+ * A `wireclaims` row is reserved when the obligation is taken -- the issuer's at `request`, an
+ * underwriter's at its first `accept` -- so `claim` never needs new RAM. Later writes by any signer
+ * keep a row's payer, and erasing a row (`prune`, `claimwire`) returns its RAM to that payer.
  */
 
 #include <sysio/sysio.hpp>
@@ -36,6 +44,7 @@
 #include <sysio/time.hpp>
 #include <sysio/asset.hpp>
 #include <sysio.opp.common/depot_native_token.hpp>
+#include <sysio.bond/bond_increment.hpp>
 #include <string_view>
 #include <sysio.opp.common/shadow_custody_types.hpp>
 
@@ -74,28 +83,30 @@ inline constexpr std::string_view amount_range_msg = "amount exceeds the asset r
       /// Bonds move in steps of 10^-BOND_INCREMENT_DECIMALS token: the increment of a token with
       /// precision `p` is `10^(p - BOND_INCREMENT_DECIMALS)` base units, and a token with a precision
       /// below this is refused.
-      static constexpr uint8_t  BOND_INCREMENT_DECIMALS = 2;
+      static constexpr uint8_t  BOND_INCREMENT_DECIMALS = bond_increment::decimals;
       /// Longest statement a request carries, in bytes.
       static constexpr uint32_t MAX_STATEMENT_BYTES     = 1024;
       /// Hold bond, in basis points of the covered amount, until `setconfig` sets another.
       static constexpr uint32_t DEFAULT_HOLD_BPS        = 1000;
       /// Minimum retention for ordinary requests. Durable requests additionally require issuer acknowledgement.
       static constexpr uint32_t PRUNE_RETENTION_SEC     = 7 * 24 * 60 * 60;
+      /// Most requests one `prune` examines, prunable or not: the bound on the work of a call.
+      static constexpr uint32_t MAX_PRUNE_LIMIT         = 64;
+      /// Most bond rows one request holds: an underwriter's first bond is at least `covered` divided
+      /// by this, or the whole remainder.
+      static constexpr uint64_t MAX_BONDS_PER_REQUEST   = bond_increment::max_bonds_per_request;
       /// One whole, in basis points.
       static constexpr uint32_t BPS_DENOMINATOR         = 10000;
       /// Base of the decimal increment arithmetic.
-      static constexpr uint64_t DECIMAL_BASE            = 10;
+      static constexpr uint64_t DECIMAL_BASE            = bond_increment::decimal_base;
 
       /// The bond increment of a token denominated in `sym`: `10^(precision - BOND_INCREMENT_DECIMALS)`
-      /// base units, or `std::nullopt` when the precision is below BOND_INCREMENT_DECIMALS. A symbol's
-      /// precision is at most 18, so the power fits in 64 bits. The ONE increment computation: this
-      /// contract's `request` and `accept`, and every issuer that must know a covered amount is
-      /// acceptable before it sends `request`, use it.
+      /// base units, or `std::nullopt` when the precision is below BOND_INCREMENT_DECIMALS or above
+      /// `bond_increment::max_token_decimals` (18). Delegates to the shared `bond_increment::for_decimals`
+      /// computation used by the native planner; this contract's `request` and `accept`, and issuers
+      /// that validate covered amounts before sending `request`, use this symbol adapter.
       static std::optional<uint64_t> increment_of(symbol sym) {
-         if (sym.precision() < BOND_INCREMENT_DECIMALS) return std::nullopt;
-         uint64_t increment = 1;
-         for (uint8_t d = BOND_INCREMENT_DECIMALS; d < sym.precision(); ++d) increment *= DECIMAL_BASE;
-         return increment;
+         return bond_increment::for_decimals(sym.precision());
       }
 
       /// sha256 over `schema` (its 8-byte value) then the statement bytes: a request's statement digest.
@@ -154,7 +165,8 @@ inline constexpr std::string_view amount_range_msg = "amount exceeds the asset r
       /// Create an OPEN request for `statement` under `schema`, covering `covered` base units of
       /// `token_code` (a positive multiple of the token's increment), with a challenge window of
       /// `window_sec` seconds once fully bonded. Pulls `bounty` of the token from `issuer` into
-      /// escrow. One request per issuer and statement. Auth=issuer.
+      /// escrow. For a shadow token, also reserves the issuer's `wireclaims` row for the WIRE its
+      /// escrows earn. One request per issuer and statement. Auth=issuer.
       [[sysio::action]] void request(name issuer, name schema, std::vector<char> statement,
                                      sysio::slug_name token_code, uint64_t covered, uint64_t bounty,
                                      uint32_t window_sec);
@@ -173,13 +185,19 @@ inline constexpr std::string_view amount_range_msg = "amount exceeds the asset r
       [[sysio::action]] void addbounty(uint64_t request_id, uint64_t amount);
 
       /// Bond `amount` of request `request_id`'s token (a positive multiple of the increment) as
-      /// `underwriter`, reduced to what remains uncovered. The request becomes BONDED when bonded
-      /// reaches covered. Auth=underwriter.
+      /// `underwriter`, reduced to what remains uncovered. An underwriter's first bond on a request is
+      /// at least `covered / MAX_BONDS_PER_REQUEST`, or the whole remainder; its later ones add any
+      /// multiple. The request becomes BONDED when bonded reaches covered. The `bonds` row bills the
+      /// request's issuer, or the `sysio` RAM pool for a privileged issuer, never the underwriter; so
+      /// does the underwriter's `wireclaims` row for this issuer, reserved at its first bond on a
+      /// shadow-token request. Auth=underwriter.
       [[sysio::action]] void accept(name underwriter, uint64_t request_id, uint64_t amount);
 
       /// Hold request `request_id`, OPEN or BONDED, naming `beneficiary`, an existing account other
       /// than this contract, for a forfeit: pulls `covered * hold_bps / BPS_DENOMINATOR` from the
-      /// issuer. The request becomes HELD. Auth=issuer.
+      /// issuer. The request becomes HELD. The hold-bond escrow row bills the beneficiary (the
+      /// `sysio` RAM pool for a privileged one), which therefore signs too. Auth=issuer and
+      /// beneficiary.
       [[sysio::action]] void hold(uint64_t request_id, name beneficiary);
 
       /// Approve request `request_id`, BONDED with its window passed: a state change only, with no
@@ -215,32 +233,50 @@ inline constexpr std::string_view amount_range_msg = "amount exceeds the asset r
       ///     yield of the token, or kept by the contract while the token has no supply;
       ///   - what a ruling awarded it out of an escrow (`escrow_row::payout`);
       ///   - for an escrow it funded, the WIRE the escrow earned.
-      /// LIQ uses callback-free settlement; earned WIRE is recorded for separate `claimwire`.
+      /// LIQ uses callback-free settlement; earned WIRE is recorded on the account's `wireclaims` row
+      /// for the request's issuer, reserved before any WIRE is owed, for separate `claimwire`.
       /// WIRE-denominated requests retain ordinary transfers. Residual unpaid yield prevents pruning.
       /// Refused when nothing is owed, and while the `sysio.andon` cord is pulled (what is owed stays
       /// recorded until the cord clears). Permissionless.
       [[sysio::action]] void claim(uint64_t request_id, name account);
 
-      /// Withdraw the backed WIRE yield balance recorded by LIQ claims. Permissionless, fixed payee;
-      /// a rejecting recipient leaves this balance intact without blocking LIQ settlement.
-      [[sysio::action]] void claimwire(name account);
+      /// Withdraw the backed WIRE yield `claim` recorded for `account` on `issuer`'s requests.
+      /// Erases the row once no live request or bond of `issuer` can credit it again, returning its
+      /// RAM to its payer. Refused while the `sysio.andon` cord is pulled. Permissionless, fixed
+      /// payee; a rejecting recipient leaves this balance intact without blocking LIQ settlement.
+      [[sysio::action]] void claimwire(name account, name issuer);
 
+      /// Key of `wireclaims`: the account paid and the issuer of the requests its WIRE came from.
       struct wire_key {
-         name account;
-         SYSLIB_SERIALIZE(wire_key, (account))
+         name account;   ///< the account the WIRE is owed to
+         name issuer;    ///< the issuer whose requests earned it, and whose RAM the row bills
+         SYSLIB_SERIALIZE(wire_key, (account)(issuer))
       };
+      /// WIRE yield owed to one account from one issuer's requests. Billed like the rows of those
+      /// requests: to the issuer, or to the `sysio` RAM pool for a privileged issuer. A row per issuer
+      /// keeps one issuer's RAM from paying for another's claims.
       struct [[sysio::table("wireclaims")]] wire_claim {
-         name account;
-         uint64_t amount = 0;
-         SYSLIB_SERIALIZE(wire_claim, (account)(amount))
+         name     account;            ///< the account the WIRE is owed to
+         name     issuer;             ///< the issuer whose requests earned it
+         uint64_t amount       = 0;   ///< WIRE base units `claim` recorded and `claimwire` has not paid
+         /// Rows of `issuer` that can still credit this balance: each of its live shadow-token requests
+         /// when `account` is the issuer (for the WIRE its escrows earn), and each live bond row of
+         /// `account` on its requests. The row is erased once this is 0 and nothing is owed.
+         uint64_t reservations = 0;
+         SYSLIB_SERIALIZE(wire_claim, (account)(issuer)(amount)(reservations))
       };
+      /// WIRE yield balances by account and issuer.
       using wireclaims_t = kv::table<"wireclaims"_n, wire_key, wire_claim>;
 
-      /// Walk the terminal requests from id `from_id` up and act on at most `limit` of them. A request
-      /// whose rows are all paid or owe nothing, and that was ruled at least PRUNE_RETENTION_SEC ago, is
-      /// erased with its bond and escrow rows. Any other terminal request keeps its row, but the bond rows
-      /// already paid out are erased, so an unclaimed payout holds no other underwriter's RAM. A request
-      /// whose token no longer resolves is skipped, never touched. Permissionless.
+      /// Examine the requests from id `from_id` up, at most `limit` of them (refused above MAX_PRUNE_LIMIT),
+      /// counting every one whether or not it is pruned. A terminal request whose rows are all paid or owe
+      /// nothing, and that was ruled at least PRUNE_RETENTION_SEC ago, is erased with its bond and escrow
+      /// rows. Any other terminal request keeps its row, but the bond rows already paid out are erased, so
+      /// an unclaimed payout holds no other underwriter's RAM. Each erased request and bond row releases
+      /// the `wireclaims` reservation it held, erasing a row nothing reserves or is owed on. A request
+      /// whose token no longer resolves is skipped, never touched. A crank covers the table by calling
+      /// again from the id after the last request examined, and from 0 once a call reaches the end.
+      /// Permissionless.
       [[sysio::action]] void prune(uint64_t from_id, uint32_t limit);
 
       // -----------------------------------------------------------------------

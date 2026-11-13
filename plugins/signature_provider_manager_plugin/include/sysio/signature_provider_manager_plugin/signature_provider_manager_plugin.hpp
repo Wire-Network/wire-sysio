@@ -19,6 +19,8 @@ using namespace appbase;
  * Result of building a signing provider from a `<provider-type>:<spec_data>` spec body.
  *
  *   - `signer`: the signing closure (required).
+ *   - `raw_signer`: raw-message signing for a remote Ed25519 key, which signs whole Solana messages rather
+ *     than digests; empty otherwise. Becomes the provider's `sign_raw`.
  *   - `private_key`: a local private key, if the scheme exposes one
  *     (e.g. `KEY:`); empty for remote signers (`KIOD:`, `KMS:`, ...).
  *   - `startup_probe`: an optional one-shot callback the plugin runs from
@@ -29,6 +31,7 @@ using namespace appbase;
  */
 struct provider_spec_result {
    fc::crypto::sign_fn                    signer;
+   fc::crypto::sign_raw_fn                raw_signer;     ///< empty unless the key is a remote Ed25519 key
    std::optional<fc::crypto::private_key> private_key;
    std::function<void()>                  startup_probe;  ///< empty if not applicable
 };

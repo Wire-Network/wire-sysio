@@ -1,5 +1,6 @@
 #pragma once
 
+#include <sysio/chain/config.hpp>
 #include <sysio/chain/types.hpp>
 #include <sysio/chain/exceptions.hpp>
 
@@ -91,13 +92,26 @@ namespace sysio { namespace chain {
             : action_base(account, name, std::move(auth)), data(data)  {
       }
 
+      /**
+       * Unpacks the action's data as `T`, the struct of a native action.
+       *
+       * The data must hold exactly a `T`. Bytes left after it fail with action_data_and_struct_mismatch, so a later
+       * version of `T` can give them a meaning.
+       */
       template<typename T>
       T data_as()const {
          SYS_ASSERT( account == T::get_account(), action_type_exception, "account is not consistent with action struct" );
          SYS_ASSERT( name == T::get_name(), action_type_exception, "action name is not consistent with action struct"  );
-         return fc::raw::unpack<T>(data);
+         fc::datastream<const char*> ds( data.data(), data.size() );
+         T value;
+         fc::raw::unpack( ds, value );
+         SYS_ASSERT( ds.remaining() == 0, action_data_and_struct_mismatch,
+                     "action data of {}::{} has {} bytes left after the arguments", account, name, ds.remaining() );
+         return value;
       }
 
+      /// True when the first authorization names an explicit payer (permission sysio_payer_name).
+      bool has_explicit_payer() const;
       // sysio_payer_name actor or contract
       account_name payer() const;
       // first authorization actor (which will be sysio_payer_name actor if exists) or empty() if no authorizer
@@ -111,6 +125,13 @@ namespace sysio { namespace chain {
    inline digest_type generate_action_digest(const action& act, const vector<char>& action_output) {
       const action_base& base = act;
       return fc::sha256::packhash(fc::sha256::packhash(base), fc::sha256::packhash(act.data, action_output));
+   }
+
+   /// True when @p act is the system contract's onblock action. It runs only as the implicit transaction at the start
+   /// of a block: transaction_context::init_for_input_trx rejects it in a signed transaction, and
+   /// apply_context::execute_inline as an inline action.
+   inline bool is_onblock_action( const action_base& act ) {
+      return act.account == config::system_account_name && act.name == config::onblock_action_name;
    }
 
 } } /// namespace sysio::chain

@@ -213,6 +213,7 @@ inline constexpr uint64_t reason_account_key_mismatch = 3;
 inline constexpr uint64_t reason_duplicate            = 4;
 inline constexpr uint64_t reason_link_key_mismatch    = 5;
 inline constexpr uint64_t reason_tier_cap_reached     = 6;
+inline constexpr uint64_t reason_account_exists       = 7;
 } // namespace nodeownerreg
 
 namespace nodeowners {

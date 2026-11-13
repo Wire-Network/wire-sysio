@@ -188,6 +188,38 @@ BOOST_FIXTURE_TEST_CASE( wrap_exec_direct, sysio_wrap_tester ) try {
                          } );
 } FC_LOG_AND_RETHROW()
 
+// exec reads the whole wrapped transaction: bytes after it, or transaction extensions, fail the action
+BOOST_FIXTURE_TEST_CASE( wrap_exec_reads_whole_transaction, sysio_wrap_tester ) try {
+   const auto sign = [&]( signed_transaction& trx ) {
+      trx.sign( get_private_key( "alice"_n, "active" ), control->get_chain_id() );
+      for( const auto& actor : {"prod1"_n, "prod2"_n, "prod3"_n, "prod4"_n} ) {
+         trx.sign( get_private_key( actor, "active" ), control->get_chain_id() );
+      }
+   };
+   auto trx = reqauth( "bob"_n, {permission_level{"bob"_n, config::active_name}} );
+
+   signed_transaction with_tail( wrap_exec( "alice"_n, trx ), {}, {} );
+   with_tail.actions[0].data.push_back( 0 );
+   sign( with_tail );
+   BOOST_REQUIRE_EXCEPTION( push_transaction( with_tail ), sysio_assert_message_exception,
+                            sysio_assert_message_is( "action data has bytes left after the arguments" ) );
+
+   auto extended = trx;
+   extended.transaction_extensions.emplace_back( uint16_t{0}, bytes{} );
+   signed_transaction with_extension( wrap_exec( "alice"_n, extended ), {}, {} );
+   sign( with_extension );
+   BOOST_REQUIRE_EXCEPTION(
+      push_transaction( with_extension ), sysio_assert_message_exception,
+      sysio_assert_message_is( "not allowed to `exec` a transaction with transaction extensions" ) );
+
+   signed_transaction exact( wrap_exec( "alice"_n, trx ), {}, {} );
+   sign( exact );
+   check_traces( push_transaction( exact ), {
+                           {{"receiver", "sysio.wrap"_n}, {"act_name", "exec"_n}},
+                           {{"receiver", config::system_account_name}, {"act_name", "reqauth"_n}}
+                         } );
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( wrap_with_msig, sysio_wrap_tester ) try {
    auto trx = reqauth( "bob"_n, {permission_level{"bob"_n, config::active_name}} );
    auto wrap_trx = wrap_exec( "alice"_n, trx );

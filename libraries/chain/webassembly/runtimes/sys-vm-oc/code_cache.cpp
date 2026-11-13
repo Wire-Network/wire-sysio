@@ -22,7 +22,7 @@ static constexpr size_t total_header_size = header_offset + header_size;
 // renumbered: OC bakes ordinal-derived dispatch offsets into the generated machine code, so a cache produced
 // under any other intrinsic table must be discarded even though its file format is otherwise readable.
 // Bump this (together with current_codegen_version) on ANY change to intrinsic ordinals or gs-region layout.
-static constexpr uint64_t header_id = 0x31434f4d56535953ULL; //"SYSVMOC1" little endian
+static constexpr uint64_t header_id = 0x32434f4d56535953ULL; //"SYSVMOC2" little endian
 
 struct code_cache_header {
    uint64_t id = header_id;
@@ -160,7 +160,7 @@ std::tuple<size_t, size_t> code_cache_async::consume_compile_thread_queue() {
 }
 
 
-const code_descriptor* const
+const code_descriptor*
 code_cache_async::get_descriptor_for_code(mode m, account_name receiver, const digest_type& code_id, const uint8_t& vm_version, get_cd_failure& failure) {
    //if there are any outstanding compiles, process the result queue now
    //When app is in write window, all tasks are running sequentially and read-only threads
@@ -243,14 +243,18 @@ code_cache_sync::~code_cache_sync() {
       elog("unexpected response from SYS VM OC compile monitor during shutdown");
 }
 
-const code_descriptor* const code_cache_sync::get_descriptor_for_code_sync(mode m, account_name receiver, const digest_type& code_id, const uint8_t& vm_version) {
-   //check for entry in cache
+const code_descriptor* code_cache_sync::get_cached_descriptor(mode m, const digest_type& code_id) {
    code_cache_index::index<by_hash>::type::iterator it = _cache_index.get<by_hash>().find(code_id);
-   if(it != _cache_index.get<by_hash>().end()) {
-      if (m.write_window)
-         _cache_index.relocate(_cache_index.begin(), _cache_index.project<0>(it));
-      return &*it;
-   }
+   if(it == _cache_index.get<by_hash>().end())
+      return nullptr;
+   if (m.write_window)
+      _cache_index.relocate(_cache_index.begin(), _cache_index.project<0>(it));
+   return &*it;
+}
+
+const code_descriptor* code_cache_sync::get_descriptor_for_code_sync(mode m, account_name receiver, const digest_type& code_id, const uint8_t& vm_version) {
+   if (const code_descriptor* const cached = get_cached_descriptor(m, code_id))
+      return cached;
    if(!m.write_window)
       return nullptr;
 

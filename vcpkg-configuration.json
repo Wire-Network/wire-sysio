@@ -3,15 +3,15 @@
   "default-registry": {
     "kind": "git",
     "baseline": "74e6536215718009aae747d86d84b78376bf9e09",
-    "reference": "bc71aa640f89933294f16e004b212c7fd3183eed",
+    "reference": "f4a2b74e2c6e4e419a3d26c41b5fd6e64a711de9",
     "repository": "https://github.com/Microsoft/vcpkg"
   },
   "registries": [
     {
       "kind": "git",
       "repository": "https://github.com/wire-network/wire-vcpkg-registry",
-      "baseline": "81b3b4524df8048ff57eb1b72350c63411c1bdcc",
-      "reference": "81b3b4524df8048ff57eb1b72350c63411c1bdcc",
+      "baseline": "e3377ef601ec74db7f0231a8259173c832af34b5",
+      "reference": "e3377ef601ec74db7f0231a8259173c832af34b5",
       "packages": [
         "boost",
         "softfloat",
@@ -24,7 +24,6 @@
         "secp256k1-internal",
         "bn256",
         "bls12-381",
-        "wire-sys-vm",
         "aws-sdk-cpp",
         "aws-c-cal",
         "s2n",

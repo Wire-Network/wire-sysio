@@ -375,8 +375,6 @@ class cluster_generator:
                             'target_block_net_usage_pct': 10000,
                             'max_transaction_net_usage': 524288,
                             'net_usage_leeway': 500,
-                            'context_free_discount_net_usage_num': 0,
-                            'context_free_discount_net_usage_den': 1,
                             'max_block_cpu_usage': 200000 if self.args.max_block_cpu_usage is None else self.args.max_block_cpu_usage,
                             'target_block_cpu_usage_pct': 10,
                             'max_transaction_cpu_usage': 150000 if self.args.max_transaction_cpu_usage is None else self.args.max_transaction_cpu_usage,
@@ -389,7 +387,8 @@ class cluster_generator:
                             'max_action_return_value_size': 1024,
                             'max_kv_key_size': 256,
                             'max_kv_value_size': 262144,
-                            'max_kv_secondary_key_size': 256
+                            'max_kv_secondary_key_size': 256,
+                            'notify_cpu_stipend': 100
                         }
                     }
         else:

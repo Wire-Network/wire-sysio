@@ -125,8 +125,6 @@ constexpr auto kEligibilityBatchOperator = "batchop.a"_n;
 /// Producer account used by focused eligibility tests.
 constexpr auto kEligibilityProducer = "producer.a"_n;
 
-/// Ethereum chain and token codename used by focused collateral tests.
-constexpr std::string_view kEthCodename = "ETH";
 
 /// Native WIRE chain and token codename used by focused collateral tests.
 constexpr std::string_view kWireCodename = "WIRE";
@@ -168,6 +166,15 @@ constexpr uint64_t kShadowFunding = 10 * kWireUnit;
 /// Error raised by the depot-native token resolver for a token it cannot custody.
 constexpr std::string_view kUnsupportedTokenError =
    "assertion failure with message: unsupported depot-native collateral token";
+
+/// Error raised by an operator-scoped action for an account with no operator row.
+constexpr std::string_view kOperatorNotFoundError = "assertion failure with message: operator not found";
+
+/// Withdraw amount `withdraw` rejects as not positive.
+constexpr uint64_t kZeroWithdrawAmount = 0;
+
+/// `recent_actions` error a registered operator's zero-amount withdraw records.
+constexpr std::string_view kZeroWithdrawLogError = "amount must be positive";
 
 /// Error raised by `claimremit` when no claim row exists for the requested token.
 constexpr std::string_view kNoClaimableRemitError =
@@ -305,9 +312,6 @@ constexpr std::string_view kYieldNotCoveredError =
    "assertion failure with message: owed yield is rounding dust the WIRE received from sysio.liq does not "
    "cover; only later slack can cover it";
 
-/// Recent-actions reason `depositinle` records when it drops a credit naming the depot chain.
-constexpr std::string_view kDepotChainCreditReason =
-   "depot-chain collateral is bonded through deposit, never credited from an outpost";
 
 /// Account with no stake in the yield cases that cranks `claimyield` for someone else.
 constexpr auto kYieldKeeper = "uwrit.a"_n;
@@ -1285,6 +1289,31 @@ BOOST_FIXTURE_TEST_CASE(slash_permanent, sysio_opreg_tester) { try {
    );
 } FC_LOG_AND_RETHROW() }
 
+/// WNS-70: `sysio.epoch::advance` reaches `slash` inline, so an operator with nothing left to
+/// slash (no row, already slashed, terminated) is left as it is instead of aborting the caller.
+BOOST_FIXTURE_TEST_CASE(slash_leaves_removed_operator_unchanged, sysio_opreg_tester) { try {
+   constexpr const char* kSlashReason       = "first slash";
+   constexpr const char* kRepeatSlashReason = "repeat slash";
+   constexpr const char* kTerminationReason = "administrative removal";
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+
+   BOOST_REQUIRE(get_operator("batchop.c"_n).is_null());
+   BOOST_REQUIRE_EQUAL(success(), slash("batchop.c"_n, kSlashReason));
+   BOOST_REQUIRE(get_operator("batchop.c"_n).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.a"_n, OPERATOR_TYPE_BATCH, true));
+   BOOST_REQUIRE_EQUAL(success(), slash("batchop.a"_n, kSlashReason));
+   BOOST_REQUIRE_EQUAL(success(), slash("batchop.a"_n, kRepeatSlashReason));
+   BOOST_REQUIRE_EQUAL(kSlashReason, get_operator("batchop.a"_n)["status_reason"].as_string());
+
+   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.b"_n, OPERATOR_TYPE_BATCH, true));
+   BOOST_REQUIRE_EQUAL(success(), terminate("batchop.b"_n, kTerminationReason));
+   BOOST_REQUIRE_EQUAL(success(), slash("batchop.b"_n, kSlashReason));
+   auto terminated = get_operator("batchop.b"_n);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_TERMINATED == terminated["status"].as<OperatorStatus>());
+   BOOST_REQUIRE_EQUAL(kTerminationReason, terminated["status_reason"].as_string());
+} FC_LOG_AND_RETHROW() }
+
 // ── prune ──
 
 BOOST_FIXTURE_TEST_CASE(prune_requires_config, sysio_opreg_tester) { try {
@@ -1937,6 +1966,41 @@ BOOST_FIXTURE_TEST_CASE(withdraw_unknown_token_is_rejected, sysio_opreg_tester) 
 
    BOOST_REQUIRE(get_wtdw(kFirstWithdrawalRequestId).is_null());
    BOOST_REQUIRE_EQUAL(actions_before, get_operator(OPERATOR)["recent_actions"].get_array().size());
+} FC_LOG_AND_RETHROW() }
+
+/// A withdraw by an account with no operator row reverts, whatever the amount: it has nothing to
+/// withdraw and no `recent_actions` row to log into, so succeeding would do nothing at no cost to
+/// the caller.
+BOOST_FIXTURE_TEST_CASE(withdraw_by_non_operator_is_rejected, sysio_opreg_tester) { try {
+   const auto NON_OPERATOR = "uwrit.bob"_n;
+
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE(get_operator(NON_OPERATOR).is_null());
+
+   BOOST_REQUIRE_EQUAL(error(std::string(kOperatorNotFoundError)),
+                       withdraw(NON_OPERATOR, kWireCodename, kWireUnit));
+   BOOST_REQUIRE_EQUAL(error(std::string(kOperatorNotFoundError)),
+                       withdraw(NON_OPERATOR, kWireCodename, kZeroWithdrawAmount));
+
+   BOOST_REQUIRE(get_wtdw(kFirstWithdrawalRequestId).is_null());
+   BOOST_REQUIRE(get_operator(NON_OPERATOR).is_null());
+} FC_LOG_AND_RETHROW() }
+
+/// A registered operator's zero-amount withdraw stays on the logged path: the action succeeds,
+/// queues nothing, and records the failure in `recent_actions`.
+BOOST_FIXTURE_TEST_CASE(withdraw_zero_amount_by_operator_logs_failure, sysio_opreg_tester) { try {
+   const auto OPERATOR = "uwrit.alice"_n;
+
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(), regoperator(OPERATOR, OPERATOR_TYPE_UNDERWRITER, /*is_bootstrapped=*/false));
+
+   BOOST_REQUIRE_EQUAL(success(), withdraw(OPERATOR, kWireCodename, kZeroWithdrawAmount));
+
+   auto entry = latest_action_log(OPERATOR);
+   BOOST_REQUIRE(!entry.is_null());
+   BOOST_REQUIRE_EQUAL(false, entry["success"].as_bool());
+   BOOST_REQUIRE_EQUAL(std::string(kZeroWithdrawLogError), entry["error_message"].as_string());
+   BOOST_REQUIRE(get_wtdw(kFirstWithdrawalRequestId).is_null());
 } FC_LOG_AND_RETHROW() }
 
 /// WIRE and shadow deposits by one operator land in two rows, and `available()` rolls each up

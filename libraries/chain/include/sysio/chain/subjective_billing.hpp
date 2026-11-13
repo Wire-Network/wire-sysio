@@ -16,9 +16,7 @@
 #include <boost/multi_index/ordered_index.hpp>
 
 #include <algorithm>
-#include <array>
 #include <concepts>
-#include <ranges>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -150,6 +148,10 @@ private:
     * never executed and ones in blocks it produced. The charge is dated at the block's time, so a node applying a
     * block late, e.g. while syncing, holds the same charge from then on as a node that applied it live, and a block
     * older than the decay window costs one check. A transaction re-included after a fork switch is charged again.
+    *
+    * A receipt holds one entry per action, then one per contract billed for its own code (see
+    * transaction_receipt_header::cpu_usage_us). Only the action entries are read: the others are paid by a contract
+    * outside sysio.*, from its own CPU limit.
     * @return the number of actions charged
     */
    uint32_t bill_sysio_paid_authorizers( const chain::signed_block& block, uint32_t time_ordinal ) {
@@ -160,13 +162,12 @@ private:
       uint32_t charged = 0;
       for( const auto& receipt : block.transactions ) {
          const transaction& trx = receipt.trx.get_transaction();
-         // Checked against the transaction when the block was applied.
-         assert( receipt.cpu_usage_us.size() == trx.total_actions() );
-         if( receipt.cpu_usage_us.size() != trx.total_actions() ) continue;
+         // Checked against the transaction when the block was applied, which also rejects context-free actions.
+         assert( trx.context_free_actions.empty() && receipt.cpu_usage_us.size() >= trx.actions.size() );
+         if( !trx.context_free_actions.empty() || receipt.cpu_usage_us.size() < trx.actions.size() ) continue;
          const account_name trx_first_authorizer = trx.first_authorizer();
-         std::array all_actions = {std::views::all(trx.context_free_actions), std::views::all(trx.actions)};
          size_t action_index = 0;
-         for( const auto& act : std::views::join(all_actions) ) {
+         for( const auto& act : trx.actions ) {
             const uint64_t cpu_us = receipt.cpu_usage_us[action_index++].value;
             const account_name authorizer = billed_authorizer( act, trx_first_authorizer );
             if( !is_sysio_paid_authorizer( act.payer(), authorizer ) || _disabled_accounts.contains( authorizer ) )

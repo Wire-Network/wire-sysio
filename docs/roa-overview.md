@@ -121,10 +121,6 @@ resources. On a regular action the protocol requires all three of the following 
 - the **same actor** also appears on that action under a real permission, and
 - the transaction carries **signatures** satisfying that paired declared authorization.
 
-A context-free action takes the opposite form. It may carry the marker *alone* — a paired real
-permission there is rejected outright — and only when that same actor is already an explicit payer
-on one of the transaction's regular actions.
-
 The paired permission is not required to be `active`. `authorization_manager` looks for any entry
 whose actor matches the payer and whose permission is not `sysio.payer` itself, then satisfies it
 like any other declared authority — so `owner`, or a custom permission linked to that action, works
@@ -163,8 +159,8 @@ flowchart TD
     F --> H["Actor billed CPU and NET, contract not.<br/>Marker authorizes RAM billed to the actor;<br/>contract may still bill RAM to itself."]
 ```
 
-Declared regular actions only. A context-free action takes the marker alone, as above; inline and
-notification execution differ on both authorization and billing, below.
+Declared actions only. Inline and notification execution differ on both authorization and billing,
+below.
 
 The objective billing map is populated only from the actions a transaction *declares*, and is keyed
 on `payer()` — so two declared actions sharing a payer aggregate into one entry. An authorizing
@@ -235,6 +231,9 @@ inherited: native `newaccount` writes 0/0/0 and transfers the fixed RAM gift, th
 later quota sync by passing `-1, -1` for a `sysio.`-prefixed owner. The prefix alone guarantees
 nothing — `activateroa` deliberately creates
 `sysio.acct` at **zero** CPU and NET, a pure RAM bucket for account creation.
+
+`sysio.msig::propose` is the exception: its data is a caller-supplied transaction, so it requires
+`{proposer, sysio.payer}` first and the proposer pays its CPU and NET.
 
 > **What `-1` means here.** It is a **sentinel** meaning "no limit," not a quantity. The chain
 > tests for it explicitly (`is_unlimited_cpu` returns `cpu_weight == -1`) and substitutes a large
@@ -712,8 +711,7 @@ Two anchors to calibrate against:
 
 - **NET is small and predictable, but it is not just the action.** Each action is billed its own
   serialized size *plus a share of the transaction's overhead* — a fixed 16 bytes, the signatures,
-  the extensions and the header, divided across the actions and rounded up. A context-free action
-  is additionally billed the bytes of its matching `context_free_data` entry:
+  the extensions and the header, divided across the actions and rounded up:
 
   ```cpp
   // libraries/chain/transaction.cpp
@@ -884,8 +882,9 @@ and are omitted.
 | `newuser` | tier-1 node owner | Create a sponsored sub-account |
 | `raiseacctlim` | tier-1 node owner | Raise its own account limit, at most by the configured multiplier |
 | `setacctlim` | `sysio.roa` | Set the default account limit and the raise multiplier |
-| `newnameduser` | `sysio.roa` | Create a vanity account (NFT-claim flow) |
-| `nodeownreg` | `sysio.roa` | Register a node owner from an OPP attestation |
+| `newnameduser` | `sysio.roa` | Privileged vanity-account creation; also called internally by `nodeownreg` |
+| `nodeownreg` | `sysio.roa` | Create and register a fresh node-owner account from an OPP attestation |
+| `nodeownfin` | `sysio.roa`, self-inline only | Allocate a validated claim after native account creation |
 | `forcereg` | `sysio.roa` | Register a node owner directly (governance/bootstrap) |
 | `activateroa` | `sysio.roa` | Activate ROA and set the initial byte price |
 | `setbyteprice` | `sysio.roa` | Change bytes-per-unit on network expansion |
@@ -923,3 +922,22 @@ and are omitted.
 above — contract-as-payer billing, the failure mode of an unprovisioned contract, RAM-free token
 transfers, and multi-issuer policy stacking — were each verified against the code and confirmed
 with executable tests. The transcript blocks reproduce actual test output.*
+
+## NFT registration names
+
+Node-owner NFT claims create **new accounts only**.
+`sysio.msgch` dispatches `nodeownreg`, which rejects an existing name with
+`ACCOUNT_EXISTS` (7), including when the claim copies its public active key.
+Already registered owners retain the `DUPLICATE` outcome. Rejection records an
+audit row without changing the account authority, AuthEx link or owner allocation.
+A fresh accepted claim creates the requested authority, allocates the owner and
+records the depositor's Ethereum link in one atomic Wire transaction.
+Allocation uses the self-inline `nodeownfin` continuation; `forcereg` remains
+the separate privileged governance/bootstrap path. AuthEx `recordlink` remains
+a sibling action of `nodeownfin`, so its DClaim sweep stays within the inline-depth limit.
+
+The Hub checks name availability before BAR commitment; this cannot reserve the
+name against a competing claim. A name taken before depot execution is rejected
+and the NFT remains subject to BAR's existing escrow/recovery rules. This change
+adds no automatic refund or recovery action. Deploy the coupled contracts as
+specified in [contract upgrade order](contract-upgrade-order.md#wire-439-node-owner-registration).

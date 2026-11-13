@@ -22,8 +22,6 @@ struct genesis_state {
       .target_block_net_usage_pct           = config::default_target_block_net_usage_pct,
       .max_transaction_net_usage            = config::default_max_transaction_net_usage,
       .net_usage_leeway                     = config::default_net_usage_leeway,
-      .context_free_discount_net_usage_num  = config::default_context_free_discount_net_usage_num,
-      .context_free_discount_net_usage_den  = config::default_context_free_discount_net_usage_den,
 
       .max_block_cpu_usage                  = config::default_max_block_cpu_usage,
       .target_block_cpu_usage_pct           = config::default_target_block_cpu_usage_pct,
@@ -39,7 +37,9 @@ struct genesis_state {
       .max_action_return_value_size         = config::default_max_action_return_value_size, ///< size limit for action return value
       .max_kv_key_size                      = config::default_max_kv_key_size,               ///< maximum KV primary key size in bytes
       .max_kv_value_size                    = config::default_max_kv_value_size,             ///< maximum KV value size in bytes
-      .max_kv_secondary_key_size            = config::default_max_kv_secondary_key_size     ///< maximum KV secondary key size in bytes
+      .max_kv_secondary_key_size            = config::default_max_kv_secondary_key_size,    ///< maximum KV secondary key size in bytes
+
+      .notify_cpu_stipend                   = config::default_notify_cpu_stipend
    };
 
    static constexpr wasm_config default_initial_wasm_configuration {

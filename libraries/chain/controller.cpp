@@ -3512,7 +3512,7 @@ struct controller_impl {
    {
       action on_block_act;
       on_block_act.account = sysio::chain::config::system_account_name;
-      on_block_act.name = "onblock"_n;
+      on_block_act.name = sysio::chain::config::onblock_action_name;
       on_block_act.authorization = vector<permission_level>{{sysio::chain::config::system_account_name, sysio::chain::config::active_name}};
       on_block_act.data = fc::raw::pack(chain_head.header());
 
@@ -3755,7 +3755,7 @@ subjective_billing& controller::get_mutable_subjective_billing() {
    return my->subjective_bill;
 }
 
-std::tuple<int64_t, bool, bool> controller::get_cpu_limit(account_name a) const {
+std::tuple<int64_t, bool, bool> controller::get_cpu_limit(account_name a, const std::optional<block_timestamp_type>& current_time) const {
    static constexpr int64_t large_number_no_overflow = std::numeric_limits<int64_t>::max()/2;
    // Calculate the new highest network usage and CPU time that the billed account can afford to be billed
    const auto& rl = get_resource_limits_manager();
@@ -3771,7 +3771,7 @@ std::tuple<int64_t, bool, bool> controller::get_cpu_limit(account_name a) const 
          greylist_limit = specified_greylist_limit;
       }
    }
-   auto [cpu_limit, cpu_was_greylisted] = rl.get_account_cpu_limit(a, greylist_limit);
+   auto [cpu_limit, cpu_was_greylisted] = rl.get_account_cpu_limit(a, greylist_limit, current_time);
    if( cpu_limit >= 0 ) {
       account_cpu_limit = cpu_limit;
       greylisted_cpu = cpu_was_greylisted;

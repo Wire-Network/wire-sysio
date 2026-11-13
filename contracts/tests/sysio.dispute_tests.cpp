@@ -77,6 +77,7 @@ std::vector<char> encode_envelope(uint32_t epoch_index, const std::string& tag) 
 
    auto* msg     = env.add_messages();
    auto* payload = msg->mutable_payload();
+   payload->set_version(1); // Dispute candidates must pass the inbound version gate.
    auto* att     = payload->add_attestations();
    att->set_type(AttestationType::ATTESTATION_TYPE_UNSPECIFIED);  // benign: dispatch is a no-op
    att->set_data(tag);
@@ -1052,7 +1053,7 @@ BOOST_FIXTURE_TEST_CASE(chkdispute_unpauses_only_after_last_open_dispute, sysio_
 // No cross-epoch double slash: the ACTIVE-only scheduling filter -- shared verbatim by
 // sysio.epoch::advance's window-slide and schbatchgps -- drops a SLASHED batch op from the eligible
 // pool, so a slashed op is never re-placed into a future group where advance could attempt a second
-// (aborting) slash of it. This exercises that filter directly via schbatchgps (advance's own slide is
+// slash of it. This exercises that filter directly via schbatchgps (advance's own slide is
 // additionally gated by emissions readiness, out of scope here), plus the widened slashop auth
 // (callable by sysio.epoch) and opreg's already-slashed guard. The full delivery-driven slash through
 // advance is covered end-to-end by the TS flow flow-batch-operator-slashing.
@@ -1080,10 +1081,9 @@ BOOST_FIXTURE_TEST_CASE(slashed_op_excluded_from_scheduling_no_double_slash, sys
    BOOST_REQUIRE_EQUAL(success(), slashop(BATCHOP_B));
    BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_SLASHED", operator_status(BATCHOP_B));
 
-   // opreg aborts a second slash -- exactly the abort the scheduling exclusion below must prevent
-   // advance from ever triggering.
-   BOOST_REQUIRE_EQUAL(error("assertion failure with message: operator already slashed"),
-                       slashop(BATCHOP_B));
+   // A second slash returns without effect instead of aborting its caller (WNS-70).
+   BOOST_REQUIRE_EQUAL(success(), slashop(BATCHOP_B));
+   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_SLASHED", operator_status(BATCHOP_B));
 
    // Bring c online so two ACTIVE ops remain, then re-schedule: the filter keeps the live ops
    // (a, c) and drops the slashed one (b).

@@ -288,8 +288,9 @@ namespace sysio::chain {
          const subjective_billing&             get_subjective_billing()const;
          subjective_billing&                   get_mutable_subjective_billing();
 
-         //        limit,greylisted,unlimited
-         std::tuple<int64_t, bool, bool> get_cpu_limit(account_name a) const;
+         /// CPU limit of `a` as (limit_us, greylisted, unlimited). `current_time` decays the account's usage to that
+         /// time first, for an account whose usage window was not updated in this block.
+         std::tuple<int64_t, bool, bool> get_cpu_limit(account_name a, const std::optional<block_timestamp_type>& current_time = {}) const;
 
          const flat_set<account_name>&   get_actor_whitelist() const;
          const flat_set<account_name>&   get_actor_blacklist() const;

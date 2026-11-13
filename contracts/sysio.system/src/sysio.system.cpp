@@ -52,7 +52,7 @@ namespace sysiosystem {
 #ifndef SYSTEM_BLOCKCHAIN_PARAMETERS
       set_blockchain_parameters( params );
 #else
-      constexpr size_t param_count = 19;
+      constexpr size_t param_count = 18;
       // an upper bound on the serialized size
       char buf[1 + sizeof(params) + param_count];
       datastream<char*> stream(buf, sizeof(buf));
@@ -62,24 +62,24 @@ namespace sysiosystem {
              << uint8_t(1) << params.target_block_net_usage_pct
              << uint8_t(2) << params.max_transaction_net_usage
              << uint8_t(3) << params.net_usage_leeway
-             << uint8_t(4) << params.context_free_discount_net_usage_num
-             << uint8_t(5) << params.context_free_discount_net_usage_den
 
-             << uint8_t(6) << params.max_block_cpu_usage
-             << uint8_t(7) << params.target_block_cpu_usage_pct
-             << uint8_t(8) << params.max_transaction_cpu_usage
-             << uint8_t(9) << params.min_transaction_cpu_usage
+             << uint8_t(4) << params.max_block_cpu_usage
+             << uint8_t(5) << params.target_block_cpu_usage_pct
+             << uint8_t(6) << params.max_transaction_cpu_usage
+             << uint8_t(7) << params.min_transaction_cpu_usage
 
-             << uint8_t(10) << params.max_transaction_lifetime
-             << uint8_t(11) << params.max_transaction_delay
-             << uint8_t(12) << params.max_inline_action_size
-             << uint8_t(13) << params.max_inline_action_depth
-             << uint8_t(14) << params.max_authority_depth
+             << uint8_t(8) << params.max_transaction_lifetime
+             << uint8_t(9) << params.max_transaction_delay
+             << uint8_t(10) << params.max_inline_action_size
+             << uint8_t(11) << params.max_inline_action_depth
+             << uint8_t(12) << params.max_authority_depth
 
-             << uint8_t(15) << params.max_action_return_value_size
-             << uint8_t(16) << params.max_kv_key_size
-             << uint8_t(17) << params.max_kv_value_size
-             << uint8_t(18) << params.max_kv_secondary_key_size;
+             << uint8_t(13) << params.max_action_return_value_size
+             << uint8_t(14) << params.max_kv_key_size
+             << uint8_t(15) << params.max_kv_value_size
+             << uint8_t(16) << params.max_kv_secondary_key_size
+
+             << uint8_t(17) << params.notify_cpu_stipend;
 
       set_parameters_packed(buf, stream.tellp());
 #endif

@@ -114,7 +114,6 @@ public:
    void on_end_action();
    void on_require_recipient();
    void on_send_inline();
-   void on_send_context_free_inline();
    void on_kv_set(const kv_row& row, bool is_new, account_name old_payer = account_name(),
                   const char* old_value = nullptr, std::size_t old_value_size = 0);
    void on_kv_erase(const kv_row& row);

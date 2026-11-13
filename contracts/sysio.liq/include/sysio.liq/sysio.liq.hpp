@@ -18,7 +18,8 @@
  * `recredit` remains exceptional privileged supply repair.
  * Yield intake: sysio.swap's tick sells reservoir shadow and pays the proceeds in
  * through `addyield`, which distributes only the supplied WIRE proceeds.
- * Launch: `regliqpool` seeds the swap's yield pool inside the epoch-0 bootstrap window.
+ * Yield pools: `regliqpool` seeds a shadow's yield pool on the swap, from the LCO liq inside the
+ * epoch-0 bootstrap window and from shadow `sysio` already holds after it.
  *
  * Emergency stop: while the `sysio.andon` cord is pulled, `transfer` to anything but a
  * custody contract (sysio.bond, sysio.synd, sysio.opreg), `claim` by anyone but a custody
@@ -76,8 +77,8 @@ namespace sysio {
       /// Requires this contract's authority.
       [[sysio::action]] void create(symbol sym, sysio::slug_name chain_code, sysio::slug_name token_code);
 
-      /// Privileged supply repair requiring this contract's authority; never recover a return
-      /// tracked in sysio.synd::returns, which must use request-keyed refundreturn instead.
+      /// Privileged supply repair requiring this contract's authority; never recover a return that
+      /// still has its row in sysio.synd::returns, which must use request-keyed refundreturn instead.
       [[sysio::action]] void recredit(name holder, asset quantity);
 
       // -----------------------------------------------------------------------
@@ -135,7 +136,6 @@ namespace sysio {
       /// and sysio.bond may debit their own balance. Settles both yield positions, preserves supply,
       /// and requires the Andon cord clear, including self-settlement.
       [[sysio::action]] void settle(name custodian, name beneficiary, asset quantity);
-      [[sysio::action]] void open(name owner, symbol symbol, name ram_payer);
       /// Erase `owner`'s empty row for `symbol`. Refused while the row is still
       /// owed yield, so closing never discards WIRE.
       [[sysio::action]] void close(name owner, symbol symbol);
@@ -149,15 +149,22 @@ namespace sysio {
       [[sysio::action]] void addyield(name from, asset quantity, symbol_code target);
 
       // -----------------------------------------------------------------------
-      //  Launch ingestion (privileged caller, epoch-0 bootstrap window)
+      //  Yield pools (privileged caller)
       // -----------------------------------------------------------------------
 
-      /// Seed the swap's yield pool for `token_code`'s shadow: mint the LCO liq
-      /// (`initial_chain_amount`, already in outpost custody) to `sysio`, deposit
-      /// it with `initial_wire_amount` WIRE from the T5 dex earmark into
-      /// sysio.swap, create the pair with `sysio` as its fee authority and the
-      /// shadow as its yield leg, and set the tick parameters. `fee` is in
-      /// 1/10000 of the traded amount, `locked_shares` in `pair_symbol`.
+      /// Seed the swap's yield pool for `token_code`'s shadow: deposit
+      /// `initial_chain_amount` of the shadow from `sysio` with
+      /// `initial_wire_amount` WIRE from the `sysio` treasury into sysio.swap,
+      /// create the pair with `sysio` as its fee authority and the shadow as its
+      /// yield leg, and set the tick parameters. Inside the epoch-0 bootstrap
+      /// window the shadow seed is the LCO liq, already in outpost custody, and
+      /// is minted to `sysio` first. After the window nothing is minted, so the
+      /// pool adds no shadow beyond what outpost custody already covers: `sysio`
+      /// must already hold the seed, and `initial_wire_amount` must fit the
+      /// treasury's unreserved WIRE (`sysiosystem::treasury::available`), so a
+      /// pool never spends owed pay or committed emissions. The action fails
+      /// otherwise. One pool per shadow. `fee` is in 1/10000 of the traded
+      /// amount, `locked_shares` in `pair_symbol`.
       [[sysio::action]] void regliqpool(sysio::slug_name chain_code, sysio::slug_name token_code, symbol pair_symbol,
                                         uint64_t initial_chain_amount, uint64_t initial_wire_amount, int32_t fee,
                                         int64_t locked_shares, uint32_t conversion_horizon_sec,
@@ -261,9 +268,9 @@ namespace sysio {
       /// The one funnel every balance move goes through: settle `row` at `index`,
       /// stamp it, then apply `delta`. Nothing else writes `balance`.
       static void settle_and_adjust(opp::shadow::account& row, u128 index, const asset& delta);
-      /// Apply `delta` to `owner`'s row for its symbol through the funnel. A row
+      /// Apply `delta` to `owner`'s row for its symbol through the funnel, billed to `sysio`. A row
       /// created here is stamped at the current index, so no history is credited.
-      void adjust_account(name owner, const asset& delta, name payer);
+      void adjust_account(name owner, const asset& delta);
       /// Grow `sym`'s supply by `quantity`; false (and no change) past its headroom.
       bool grow_supply(symbol_code sym, uint64_t quantity);
       /// Advance `sym`'s index by `quantity` WIRE over its supply, carrying the

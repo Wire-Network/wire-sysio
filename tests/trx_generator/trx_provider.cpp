@@ -46,7 +46,7 @@ namespace sysio::testing {
       const uint32_t payload_size = fc::raw::pack_size(net_msg);
       const size_t buffer_size = message_header_size + payload_size;
       // Avoid variable-size encoding for the fixed-width P2P length prefix.
-      const char* const header = reinterpret_cast<const char* const>(&payload_size);
+      const char* const header = reinterpret_cast<const char*>(&payload_size);
 
       auto send_buffer = std::make_shared<std::vector<char>>(buffer_size);
       fc::datastream<char*> ds(send_buffer->data(), buffer_size);
@@ -109,7 +109,7 @@ namespace sysio::testing {
       const size_t buffer_size = message_header_size + payload_size;
 
       // Avoid variable-size encoding for the fixed-width P2P length prefix.
-      const char* const header = reinterpret_cast<const char* const>(&payload_size);
+      const char* const header = reinterpret_cast<const char*>(&payload_size);
 
       auto send_buffer = std::make_shared<std::vector<char>>(buffer_size);
       fc::datastream<char*> ds( send_buffer->data(), buffer_size);

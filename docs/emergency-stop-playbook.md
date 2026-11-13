@@ -108,7 +108,7 @@ Each item is a deploy or upgrade step. An item not done is a freeze that cannot 
 
 | While the cord is pulled | Refused or deferred | Still runs |
 |---|---|---|
-| `sysio.swap` | every action that moves tokens (among them `exchange`, `addliquidity`, `remliquidity`, `withdraw`, `closeext` of a funded deposit, `tickyield` and `accrueyield` with yield owed, `inittoken`) | reads, and actions that move nothing (`sync`, `changefee`, `openext`, `setyield`) |
+| `sysio.swap` | every action that moves tokens (among them `exchange`, `addliquidity`, `remliquidity`, `withdraw`, `closeext` of a funded deposit, `tickyield` and `accrueyield` with yield owed, `inittoken`) | reads, and actions that move nothing (`sync`, `changefee`, `setyield`) |
 | `sysio.liq` | `transfer` to anything but a custody contract (`sysio.bond`, `sysio.synd`, `sysio.opreg`), so holders cannot move shadow LIQ between themselves; `claim` by anyone but a custody contract; `queueyield` | `mint`; transfers into a custody contract; `claim` by a custody contract (it moves WIRE into custody) |
 | `sysio.bond` | `claim` | `request`, `addbounty`, `accept`, `hold`, `approve`, `rslvvalid`, `rslvinvalid`, `sweepyield`, `prune` |
 | `sysio.kicker` | `kick` returns without paying and without writing: `last_kick` stays where it was, so accrual keeps running and the first paying `kick` after the clear covers it, within the 72-hour catch-up | `setconfig`, `addpool`, `setpool`, `rmpool` |
@@ -365,9 +365,10 @@ and `status` on Solana (`liq_sequence`, the pool ATA balance). What to check:
   not guarantee full backing when a tolerated deficit already exists.
 - `syndcursors.last_sequence` for an outpost is at most the outpost's sequence (`liqSequence` /
   `liq_sequence`); the gap is messages the depot has not yet admitted, and so not yet compared.
-- Every `returns` request id the outpost has not paid is still in flight on the depot, stored as a
-  pending payout on the outpost ([Deferred desyndications](#deferred-desyndications)), or skipped by the
-  outpost; a permanently cancelled one is reconciled by the return recovery rule
+- Every desyndication the outpost has not paid is still in flight on the depot (its `returns` row has no
+  `sent_epoch`, or one the outpost has not accepted yet), stored as a pending payout on the outpost
+  ([Deferred desyndications](#deferred-desyndications)), or skipped by the outpost; a permanently
+  cancelled one is reconciled by the return recovery rule
   ([Reconciling](#reconciling-a-desyndication-the-outpost-did-not-pay)).
 - A freeze prevents custody leaving through guarded payouts, but a negative liqETH rebase can still
   reduce the token balance. Monitor custody and its deficit while frozen too.
@@ -379,7 +380,7 @@ after a pull also reserves every stored payout; follow the clearing procedure be
 
 ### Reconciling a desyndication the outpost did not pay
 
-Match every `returns` request id with the outpost's record of it. Each one is paid, stored or skipped
+Match every desyndication request id with the outpost's record of it. Each one is paid, stored or skipped
 ([`sysio-synd.md`](sysio-synd.md), Desyndication):
 
 - **Paid**: Solana logs `opp_outpost: desyndicate_liq: paid ... request_id=<id>` (wire-solana
@@ -389,26 +390,29 @@ Match every `returns` request id with the outpost's record of it. Each one is pa
   `desyndicationsPaid(requestId)` is true.
 - **Stored**: a `PendingPayout` exists at `["pending_desyndication", request_id_le8]` (`npx ts-node scripts/wire-config/emergencyStop.ts
   pending`), or `pendingDesyndications(requestId)` has a non-zero `depotAmount`. Pay it
-  ([Deferred desyndications](#deferred-desyndications)). Keep the depot return row; never refund a pending or still-payable payout.
+  ([Deferred desyndications](#deferred-desyndications)). Never refund a pending or still-payable payout.
 - **Skipped**: Solana logged `opp_outpost: DesyndicateLIQError ... request_id=<id> err_data=<reason>`
   (`inbound.rs:4986-4994`) for a content or configuration refusal; Ethereum emitted
   `DesyndicationDropped(requestId, depotAmount, reason)` with `wrong chain`,
   `wrong token`, `amount out of range` or `unresolvable recipient` (wire-ethereum
   `contracts/outpost/SyndicationPool.sol:594-618` at d4fbb8f8).
 
-**The return recovery rule.** Read the request in `sysio.synd::returns`, which retains its original
-holder, token and net burned amount. Establish the external outcome with transaction finality and
-the outpost's paid/pending records. A timeout, absence of a pending record, a duplicate event or a
-rejected submission alone does not prove cancellation: a queued or replayable payout may still pay.
+**The return recovery rule.** A `sysio.synd::returns` row holds the request's original holder, token and
+net burned amount until the outpost has consumed the envelope that carried it; a later `desyndicate` to
+that outpost then erases it. Establish the external outcome with transaction finality and the outpost's
+paid/pending records. A timeout, absence of a pending record, a duplicate event or a rejected
+submission alone does not prove cancellation: a queued or replayable payout may still pay.
 
-- **Paid and final:** governance calls `finishreturn(request_id)` to erase the depot obligation;
-  it mints nothing.
-- **Pending, stored or still payable:** keep the depot row and pay/retry on the outpost. Never refund.
+- **Paid and final:** nothing to do on the depot; the row expires by itself.
+- **Pending, stored or still payable:** pay/retry on the outpost. Never refund.
 - **Irreversibly rejected or cancelled:** only after proving nothing was paid and no payable external
-  obligation remains, governance calls `refundreturn(request_id)`. It restores exactly the net burned
-  amount to the original holder and erases the row atomically. A duplicate refund fails. The fee
-  stays collected. Governance can resolve returns while the depot is frozen: restoring shadow
-  mints into custody accounting without paying out external assets.
+  obligation remains, governance restores the net burned amount to the original holder. While the
+  `returns` row exists, call `refundreturn(request_id)`: it restores exactly that amount and erases the
+  row atomically, and a duplicate refund fails. Once the row has expired, call
+  `sysio.liq::recredit(holder, quantity)` with the holder and net amount from the request's
+  `desyndicate` trace and the outpost's drop event. The fee stays collected. Governance can do either
+  while the depot is frozen: restoring shadow mints into custody accounting without paying out
+  external assets.
 
 ```bash
 clio -u "$DEPOT_URL" get table sysio.synd returns -S sysio.synd -r -l 50
@@ -417,23 +421,18 @@ cast call --rpc-url "$ETH_RPC_URL" "$SYNDICATION_POOL" 'pendingDesyndications(ui
 ANCHOR_PROVIDER_URL="$SOL_RPC" ANCHOR_WALLET="$SOL_ADMIN_KEYPAIR" npx ts-node scripts/wire-config/emergencyStop.ts pending
 ```
 
-After external payment is final, acknowledge only that outcome:
-
-```bash
-clio -u "$DEPOT_URL" push action sysio.synd finishreturn "[$REQUEST_ID]" -p sysio@active
-```
-
-After irreversible cancellation is independently proven, with nothing paid or still payable, refund instead:
+After irreversible cancellation is independently proven, with nothing paid or still payable, refund a
+request that still has its row:
 
 ```bash
 clio -u "$DEPOT_URL" push action sysio.synd refundreturn "[$REQUEST_ID]" -p sysio@active
 ```
 
-`sysio.liq::recredit` is a separate privileged repair and must not recover a tracked return: it leaves
-the `returns` row open, allowing a later refund to mint the same amount again. The Ethereum drops
+Never `sysio.liq::recredit` a request that still has its `returns` row: the row stays open, allowing a
+later refund to mint the same amount again. The Ethereum drops
 `already paid` / `already pending` and Solana's `DesyndicateLIQAlreadyPending` are duplicate notices,
 never evidence of irreversible cancellation. Retain the incident's paid/cancelled transaction evidence
-externally; completed depot return rows are erased rather than archived.
+externally; depot return rows are erased rather than archived.
 
 ### A shortfall-triggered pull
 
@@ -626,8 +625,8 @@ whoever is owed; nothing they are owed was lost.
 A desyndication an outpost stored instead of paying (while it was frozen, on a custody shortfall, or
 on a refused settlement) was burned on the depot and is held on the outpost. Neither relay pays it:
 paying it is this step, once its cause clears (for a freeze or a shortfall, after the outpost clears).
-Each record is paid exactly once; a second payment fails. Match each one against the depot's
-`returns` by request id.
+Each record is paid exactly once; a second payment fails. Its request id is the depot's desyndication
+request id.
 
 ### Paying on Solana
 

@@ -21,8 +21,6 @@ struct chain_config_v0 {
       target_block_net_usage_pct_id,
       max_transaction_net_usage_id,
       net_usage_leeway_id,
-      context_free_discount_net_usage_num_id,
-      context_free_discount_net_usage_den_id,
       max_block_cpu_usage_id,
       target_block_cpu_usage_pct_id,
       max_transaction_cpu_usage_id,
@@ -36,6 +34,7 @@ struct chain_config_v0 {
       max_kv_key_size_id,
       max_kv_value_size_id,
       max_kv_secondary_key_size_id,
+      notify_cpu_stipend_id,
       PARAMS_COUNT
    };
 
@@ -43,8 +42,6 @@ struct chain_config_v0 {
    uint32_t   target_block_net_usage_pct;          ///< the target percent (1% == 100, 100%= 10,000) of maximum net usage; exceeding this triggers congestion handling
    uint32_t   max_transaction_net_usage;           ///< the maximum objectively measured net usage that the chain will allow regardless of account limits
    uint32_t   net_usage_leeway;
-   uint32_t   context_free_discount_net_usage_num; ///< the numerator for the discount on net usage of context-free data
-   uint32_t   context_free_discount_net_usage_den; ///< the denominator for the discount on net usage of context-free data
 
    uint32_t   max_block_cpu_usage;                 ///< the maxiumum billable cpu usage (in microseconds) for a block
    uint32_t   target_block_cpu_usage_pct;          ///< the target percent (1% == 100, 100%= 10,000) of maximum cpu usage; exceeding this triggers congestion handling
@@ -62,6 +59,11 @@ struct chain_config_v0 {
    uint32_t   max_kv_value_size           = config::default_max_kv_value_size;             ///< maximum KV value size in bytes
    uint32_t   max_kv_secondary_key_size   = config::default_max_kv_secondary_key_size;     ///< maximum KV secondary key size in bytes
 
+   /// CPU (in microseconds) of a notified contract that the entry paying for the notifying frame covers: the contract
+   /// pays only past it, and 0 means no stipend. Applied where CPU is measured; validators bill a receipt's entries as
+   /// given.
+   uint32_t   notify_cpu_stipend          = config::default_notify_cpu_stipend;
+
    void validate()const;
 
    inline const chain_config_v0& v0() const {
@@ -78,8 +80,6 @@ struct chain_config_v0 {
                            lhs.target_block_net_usage_pct,
                            lhs.max_transaction_net_usage,
                            lhs.net_usage_leeway,
-                           lhs.context_free_discount_net_usage_num,
-                           lhs.context_free_discount_net_usage_den,
                            lhs.max_block_cpu_usage,
                            lhs.target_block_cpu_usage_pct,
                            lhs.max_transaction_cpu_usage,
@@ -92,15 +92,14 @@ struct chain_config_v0 {
                            lhs.max_action_return_value_size,
                            lhs.max_kv_key_size,
                            lhs.max_kv_value_size,
-                           lhs.max_kv_secondary_key_size
+                           lhs.max_kv_secondary_key_size,
+                           lhs.notify_cpu_stipend
                         )
                ==
                std::tie(   rhs.max_block_net_usage,
                            rhs.target_block_net_usage_pct,
                            rhs.max_transaction_net_usage,
                            rhs.net_usage_leeway,
-                           rhs.context_free_discount_net_usage_num,
-                           rhs.context_free_discount_net_usage_den,
                            rhs.max_block_cpu_usage,
                            rhs.target_block_cpu_usage_pct,
                            rhs.max_transaction_cpu_usage,
@@ -113,7 +112,8 @@ struct chain_config_v0 {
                            rhs.max_action_return_value_size,
                            rhs.max_kv_key_size,
                            rhs.max_kv_value_size,
-                           rhs.max_kv_secondary_key_size
+                           rhs.max_kv_secondary_key_size,
+                           rhs.notify_cpu_stipend
                         );
    };
 
@@ -126,7 +126,6 @@ protected:
                      << "Target Block Net Usage Percent: " << ((double)target_block_net_usage_pct / (double)config::percent_1) << "%, "
                      << "Max Transaction Net Usage: " << max_transaction_net_usage << ", "
                      << "Net Usage Leeway: " << net_usage_leeway << ", "
-                     << "Context-Free Data Net Usage Discount: " << (double)context_free_discount_net_usage_num * 100.0 / (double)context_free_discount_net_usage_den << "% , "
 
                      << "Max Block CPU Usage: " << max_block_cpu_usage << ", "
                      << "Target Block CPU Usage Percent: " << ((double)target_block_cpu_usage_pct / (double)config::percent_1) << "%, "
@@ -141,7 +140,8 @@ protected:
                      << "Max Action Return Value Size: " << max_action_return_value_size << ", "
                      << "Max KV Key Size: " << max_kv_key_size << ", "
                      << "Max KV Value Size: " << max_kv_value_size << ", "
-                     << "Max KV Secondary Key Size: " << max_kv_secondary_key_size;
+                     << "Max KV Secondary Key Size: " << max_kv_secondary_key_size << ", "
+                     << "Notify CPU Stipend: " << notify_cpu_stipend;
    }
 };
 
@@ -163,7 +163,6 @@ using config_range = data_range<chain_config, config_entry_validator>;
 FC_REFLECT(sysio::chain::chain_config_v0,
            (max_block_net_usage)(target_block_net_usage_pct)
            (max_transaction_net_usage)(net_usage_leeway)
-           (context_free_discount_net_usage_num)(context_free_discount_net_usage_den)
 
            (max_block_cpu_usage)(target_block_cpu_usage_pct)
            (max_transaction_cpu_usage)(min_transaction_cpu_usage)
@@ -173,6 +172,7 @@ FC_REFLECT(sysio::chain::chain_config_v0,
 
            (max_action_return_value_size)
            (max_kv_key_size)(max_kv_value_size)(max_kv_secondary_key_size)
+           (notify_cpu_stipend)
 )
 
 namespace fc {
@@ -204,12 +204,6 @@ inline DataStream &operator<<(DataStream &s, const sysio::chain::data_entry<sysi
       break;
       case chain_config_v0::net_usage_leeway_id:
       fc::raw::pack(s, entry.config.net_usage_leeway);
-      break;
-      case chain_config_v0::context_free_discount_net_usage_num_id:
-      fc::raw::pack(s, entry.config.context_free_discount_net_usage_num);
-      break;
-      case chain_config_v0::context_free_discount_net_usage_den_id:
-      fc::raw::pack(s, entry.config.context_free_discount_net_usage_den);
       break;
       case chain_config_v0::max_block_cpu_usage_id:
       fc::raw::pack(s, entry.config.max_block_cpu_usage);
@@ -250,6 +244,9 @@ inline DataStream &operator<<(DataStream &s, const sysio::chain::data_entry<sysi
       case chain_config_v0::max_kv_secondary_key_size_id:
       fc::raw::pack(s, entry.config.max_kv_secondary_key_size);
       break;
+      case chain_config_v0::notify_cpu_stipend_id:
+      fc::raw::pack(s, entry.config.notify_cpu_stipend);
+      break;
       default:
       FC_THROW_EXCEPTION(config_parse_error, "DataStream& operator<<: no such id: {}", entry.id);
    }
@@ -281,12 +278,6 @@ inline DataStream &operator>>(DataStream &s, sysio::chain::data_entry<sysio::cha
       break;
       case chain_config_v0::net_usage_leeway_id:
       fc::raw::unpack(s, entry.config.net_usage_leeway);
-      break;
-      case chain_config_v0::context_free_discount_net_usage_num_id:
-      fc::raw::unpack(s, entry.config.context_free_discount_net_usage_num);
-      break;
-      case chain_config_v0::context_free_discount_net_usage_den_id:
-      fc::raw::unpack(s, entry.config.context_free_discount_net_usage_den);
       break;
       case chain_config_v0::max_block_cpu_usage_id:
       fc::raw::unpack(s, entry.config.max_block_cpu_usage);
@@ -326,6 +317,9 @@ inline DataStream &operator>>(DataStream &s, sysio::chain::data_entry<sysio::cha
       break;
       case chain_config_v0::max_kv_secondary_key_size_id:
       fc::raw::unpack(s, entry.config.max_kv_secondary_key_size);
+      break;
+      case chain_config_v0::notify_cpu_stipend_id:
+      fc::raw::unpack(s, entry.config.notify_cpu_stipend);
       break;
       default:
       FC_THROW_EXCEPTION(sysio::chain::config_parse_error, "DataStream& operator<<: no such id: {}", entry.id);

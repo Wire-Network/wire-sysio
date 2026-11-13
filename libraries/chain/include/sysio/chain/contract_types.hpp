@@ -3,6 +3,7 @@
 #include <sysio/chain/authority.hpp>
 #include <sysio/chain/types.hpp>
 #include <sysio/chain/asset.hpp> // Included for reducepolicy
+#include <sysio/chain/binary_extension.hpp>
 
 namespace sysio { namespace chain {
 
@@ -28,6 +29,7 @@ struct setcode {
    uint8_t                          vmtype = 0;
    uint8_t                          vmversion = 0;
    bytes                            code;
+   binary_extension<std::string>    memo; ///< Read by the system contract, not by the native handler.
 
    static account_name get_account() {
       return sysio::chain::config::system_account_name;
@@ -41,6 +43,7 @@ struct setcode {
 struct setabi {
    account_name                     account;
    bytes                            abi;
+   binary_extension<std::string>    memo; ///< Read by the system contract, not by the native handler.
 
    static account_name get_account() {
       return sysio::chain::config::system_account_name;
@@ -57,6 +60,7 @@ struct updateauth {
    permission_name                   permission;
    permission_name                   parent;
    authority                         auth;
+   binary_extension<account_name>    authorized_by; ///< Read by the system contract, not by the native handler.
 
    static account_name get_account() {
       return sysio::chain::config::system_account_name;
@@ -75,6 +79,7 @@ struct deleteauth {
 
    account_name                      account;
    permission_name                   permission;
+   binary_extension<account_name>    authorized_by; ///< Read by the system contract, not by the native handler.
 
    static account_name get_account() {
       return sysio::chain::config::system_account_name;
@@ -95,6 +100,7 @@ struct linkauth {
    account_name                      code;
    action_name                       type;
    permission_name                   requirement;
+   binary_extension<account_name>    authorized_by; ///< Read by the system contract, not by the native handler.
 
    static account_name get_account() {
       return sysio::chain::config::system_account_name;
@@ -114,6 +120,7 @@ struct unlinkauth {
    account_name                      account;
    account_name                      code;
    action_name                       type;
+   binary_extension<account_name>    authorized_by; ///< Read by the system contract, not by the native handler.
 
    static account_name get_account() {
       return sysio::chain::config::system_account_name;
@@ -127,9 +134,9 @@ struct unlinkauth {
 } } /// namespace sysio::chain
 
 FC_REFLECT( sysio::chain::newaccount                       , (creator)(name)(owner)(active) )
-FC_REFLECT( sysio::chain::setcode                          , (account)(vmtype)(vmversion)(code) )
-FC_REFLECT( sysio::chain::setabi                           , (account)(abi) )
-FC_REFLECT( sysio::chain::updateauth                       , (account)(permission)(parent)(auth) )
-FC_REFLECT( sysio::chain::deleteauth                       , (account)(permission) )
-FC_REFLECT( sysio::chain::linkauth                         , (account)(code)(type)(requirement) )
-FC_REFLECT( sysio::chain::unlinkauth                       , (account)(code)(type) )
+FC_REFLECT( sysio::chain::setcode                          , (account)(vmtype)(vmversion)(code)(memo) )
+FC_REFLECT( sysio::chain::setabi                           , (account)(abi)(memo) )
+FC_REFLECT( sysio::chain::updateauth                       , (account)(permission)(parent)(auth)(authorized_by) )
+FC_REFLECT( sysio::chain::deleteauth                       , (account)(permission)(authorized_by) )
+FC_REFLECT( sysio::chain::linkauth                         , (account)(code)(type)(requirement)(authorized_by) )
+FC_REFLECT( sysio::chain::unlinkauth                       , (account)(code)(type)(authorized_by) )

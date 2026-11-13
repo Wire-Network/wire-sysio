@@ -68,6 +68,7 @@ Options:
 #include <vector>
 #include <regex>
 #include <iostream>
+#include <limits>
 #include <locale>
 #include <optional>
 #include <tuple>
@@ -324,6 +325,23 @@ vector<chain::permission_level> get_account_permissions(const vector<string>& pe
    } else {
       return get_account_permissions(tx_permission);
    }
+}
+
+/// Authorizations for a multisig action signed by `signer`: the `-p` permissions, or `signer@active` when there
+/// are none, behind the `-P` payer. An empty `signer` is set to the first actor that is not the payer marker.
+vector<chain::permission_level> get_signer_permissions(string& signer, std::string_view signer_param) {
+   auto permissions = signer.empty()
+      ? get_account_permissions(tx_permission)
+      : get_account_permissions(tx_permission, {name(signer), sysio::chain::config::active_name});
+   const auto signer_permission = std::ranges::find_if(permissions, [](const chain::permission_level& p) {
+      return p.permission != sysio::chain::config::sysio_payer_name;
+   });
+   SYS_ASSERT(signer_permission != permissions.end(), missing_auth_exception,
+              "Authority is not provided (either by multisig parameter <{}> or -p)", signer_param);
+   if (signer.empty()) {
+      signer = signer_permission->actor.to_string();
+   }
+   return permissions;
 }
 
 template<typename T>
@@ -640,7 +658,7 @@ fc::variant json_from_file_or_string(const string& file_or_str, fc::json::parse_
    } else if (looks_like_json) {
       try {
          return fc::json::from_string(file_or_str, ptype);
-      } SYS_RETHROW_EXCEPTIONS(json_parse_exception, "Fail to parse JSON from string: {}", ("string", file_or_str));
+      } SYS_RETHROW_EXCEPTIONS(json_parse_exception, "Fail to parse JSON from string: {}", file_or_str);
    } else {
       return file_or_str;
    }
@@ -806,17 +824,6 @@ fc::variant regproducer_variant(const account_name& producer, const public_key_t
             ("url", url)
             ("location", location)
             ;
-}
-
-chain::action create_open(const string& contract, const name& owner, symbol sym, const name& ram_payer) {
-   auto open_ = fc::mutable_variant_object
-      ("owner", owner)
-      ("symbol", sym)
-      ("ram_payer", ram_payer);
-    return action {
-      get_account_permissions(tx_permission, {ram_payer, sysio::chain::config::active_name}),
-      name(contract), "open"_n, variant_to_bin( name(contract), "open"_n, open_ )
-   };
 }
 
 chain::action create_transfer(const string& contract, const name& sender, const name& recipient, asset amount, const string& memo ) {
@@ -2345,7 +2352,8 @@ int main( int argc, char** argv ) {
    auto eth_to_k1_public_cmd = convert_cmd->add_subcommand("eth_to_k1_public",
       localized("Convert an Ethereum uncompressed public key (0x04<128 hex>, or 0x<128 hex> for raw X||Y) to a "
                 "Wire PUB_K1_, plus the matching Ethereum address. Use this to register an account's K1 key "
-                "without handling the private key; signing still requires that private key in a Wire signer."));
+                "without handling the private key; signing needs a Wire signer holding that key, such as a KMS: "
+                "signature provider for a key kept in AWS KMS."));
    eth_to_k1_public_cmd->add_option("public-key", eth_k1_pubhex,
       localized("Ethereum uncompressed public key: 0x04 + 128 hex (65 bytes) or 128 hex (64-byte X||Y)"))->required();
    eth_to_k1_public_cmd->callback([&] {
@@ -2579,7 +2587,8 @@ int main( int argc, char** argv ) {
          } catch (...) {
             // error is handled in assertion below
          }
-         SYSC_ASSERT( block_num.has_value() && (*block_num > 0), "Invalid block num: ${block_num}", ("block_num", params.blockArg) );
+         SYSC_ASSERT( block_num.has_value() && (*block_num > 0) && (*block_num <= std::numeric_limits<uint32_t>::max()),
+                      "Invalid block num: ${block_num}", ("block_num", params.blockArg) );
          const auto arg = fc::variant_object("block_num", static_cast<uint32_t>(*block_num));
          std::cout << fc::json::to_pretty_string(call(get_block_info_func, arg)) << std::endl;
       } else {
@@ -3036,7 +3045,6 @@ int main( int argc, char** argv ) {
    string recipient;
    string amount;
    string memo;
-   bool pay_ram = false;
 
    auto transfer_cmd = app.add_subcommand("transfer", localized("Transfer tokens from account to account"));
    transfer_cmd->add_option("sender", sender, localized("The account sending tokens"))->required();
@@ -3044,18 +3052,12 @@ int main( int argc, char** argv ) {
    transfer_cmd->add_option("amount", amount, localized("The amount of tokens to send"))->required();
    transfer_cmd->add_option("memo", memo, localized("The memo for the transfer"));
    transfer_cmd->add_option("--contract,-c", con, localized("The contract that controls the token, defaults to sysio.token for asset amounts"));
-   transfer_cmd->add_flag("--pay-ram-to-open", pay_ram, localized("Pay RAM to open recipient's token balance row"));
 
    add_standard_transaction_options_plus_signing(transfer_cmd, "sender@active");
    transfer_cmd->callback([&] {
       auto transfer_amount = to_asset(name(con), amount);
       auto transfer = create_transfer(con, name(sender), name(recipient), transfer_amount, memo);
-      if (!pay_ram) {
-         send_actions( { transfer }, signing_keys_opt.get_keys());
-      } else {
-         auto open_ = create_open(con, name(recipient), transfer_amount.get_symbol(), name(sender));
-         send_actions( { open_, transfer }, signing_keys_opt.get_keys());
-      }
+      send_actions( { transfer }, signing_keys_opt.get_keys());
    });
 
    // Net subcommand
@@ -3554,17 +3556,7 @@ int main( int argc, char** argv ) {
          trxperm = transaction_perm_var.as<vector<permission_level>>();
       } SYS_RETHROW_EXCEPTIONS(transaction_type_exception, "Wrong transaction permissions format: '{}'", fc::json::to_log_string(transaction_perm_var));
 
-      auto accountPermissions = get_account_permissions(tx_permission);
-      if (accountPermissions.empty()) {
-         if (!proposer.empty()) {
-            accountPermissions = vector<permission_level>{{name(proposer), sysio::chain::config::active_name}};
-         } else {
-            SYS_THROW(missing_auth_exception, "Authority is not provided (either by multisig parameter <proposer> or -p)");
-         }
-      }
-      if (proposer.empty()) {
-         proposer = name(accountPermissions.at(0).actor).to_string();
-      }
+      auto accountPermissions = get_signer_permissions(proposer, "proposer");
 
       transaction trx;
 
@@ -3623,17 +3615,7 @@ int main( int argc, char** argv ) {
          trx_var = trx; // implicit conversion serializes vector<char> action data as hex
       }
 
-      auto account_permissions = get_account_permissions(tx_permission);
-      if (account_permissions.empty()) {
-         if (!proposer.empty()) {
-            account_permissions = vector<permission_level>{{name(proposer), sysio::chain::config::active_name}};
-         } else {
-            SYS_THROW(missing_auth_exception, "Authority is not provided (either by multisig parameter <proposer> or -p)");
-         }
-      }
-      if (proposer.empty()) {
-         proposer = name(account_permissions.at(0).actor).to_string();
-      }
+      auto account_permissions = get_signer_permissions(proposer, "proposer");
 
       auto args = fc::mutable_variant_object()
          ("proposer", proposer )
@@ -3954,17 +3936,7 @@ int main( int argc, char** argv ) {
    cancel->add_option("proposal_name", proposal_name, localized("The proposal name (string)"))->required();
    cancel->add_option("canceler", canceler, localized("The canceler name (string)"));
    cancel->callback([&]() {
-      auto accountPermissions = get_account_permissions(tx_permission);
-      if (accountPermissions.empty()) {
-         if (!canceler.empty()) {
-            accountPermissions = vector<permission_level>{{name(canceler), sysio::chain::config::active_name}};
-         } else {
-            SYS_THROW(missing_auth_exception, "Authority is not provided (either by multisig parameter <canceler> or -p)");
-         }
-      }
-      if (canceler.empty()) {
-         canceler = name(accountPermissions.at(0).actor).to_string();
-      }
+      auto accountPermissions = get_signer_permissions(canceler, "canceler");
       auto args = fc::mutable_variant_object()
          ("proposer", proposer)
          ("proposal_name", proposal_name)
@@ -3982,17 +3954,7 @@ int main( int argc, char** argv ) {
    exec->add_option("proposal_name", proposal_name, localized("The proposal name (string)"))->required();
    exec->add_option("executer", executer, localized("The account paying for execution (string)"));
    exec->callback([&] {
-      auto accountPermissions = get_account_permissions(tx_permission);
-      if (accountPermissions.empty()) {
-         if (!executer.empty()) {
-            accountPermissions = vector<permission_level>{{name(executer), sysio::chain::config::active_name}};
-         } else {
-            SYS_THROW(missing_auth_exception, "Authority is not provided (either by multisig parameter <executer> or -p)");
-         }
-      }
-      if (executer.empty()) {
-         executer = name(accountPermissions.at(0).actor).to_string();
-      }
+      auto accountPermissions = get_signer_permissions(executer, "executer");
 
       auto args = fc::mutable_variant_object()
          ("proposer", proposer )

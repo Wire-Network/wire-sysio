@@ -6,7 +6,6 @@
 #include <sysio.opp.common/evm_address.hpp>
 #include <sysio.opp.common/secp256k1_point.hpp>
 #include <sysio.opp.common/safe_ops.hpp>   // add_sat_u64 / add_sat_i64 -- never-throw saturating accumulators
-#include <sysio/permission.hpp>   // get_permission -- read an account's active authority in nodeownreg
 
 #include <algorithm>
 #include <limits>
@@ -19,6 +18,8 @@ namespace sysio {
         // literals -- a contract rename is one change here, not scattered across call sites).
         constexpr name AUTHEX_ACCOUNT    = "sysio.authex"_n;
         constexpr name AUTHEX_RECORDLINK = "recordlink"_n;
+        /// Claim allocation continuation, queued after native account creation.
+        constexpr name ROA_NODEOWNFIN = "nodeownfin"_n;
 
         /// Names under this prefix belong to system accounts. The chain refuses them only to non-privileged
         /// creators, and sysio.roa is privileged, so node-owner claims must refuse them here.
@@ -29,6 +30,22 @@ namespace sysio {
 
         /// Maximum number of generated account names checked before newuser gives up.
         constexpr uint32_t MAX_ACCOUNT_NAME_ATTEMPTS{100};
+
+        /// RAM the chain bills per byte of deployed WASM. Mirrors the chain's `config::setcode_ram_bytes_multiplier`.
+        constexpr int64_t SETCODE_RAM_BYTES_MULTIPLIER{10};
+        /// RAM the chain bills once, on an account's first setcode or setabi, for its metadata row. Mirrors the
+        /// chain's `config::billable_size_v<account_metadata_object>`: 88 bytes of fields plus 32 for each of 2 indices,
+        /// rounded up to the chain's 16-byte billing alignment.
+        constexpr int64_t ACCOUNT_METADATA_RAM_BYTES{160};
+
+        /**
+         * Upper bound on the RAM a native setcode or setabi bills an account for a new value billed at
+         * `stored_ram_bytes`: that value plus the metadata row a first deploy creates. The old value it replaces only
+         * lowers the bill.
+         */
+        int64_t native_deploy_ram_bound(int64_t stored_ram_bytes) {
+            return stored_ram_bytes + ACCOUNT_METADATA_RAM_BYTES;
+        }
 
         /// SplitMix64's Weyl-sequence increment, used to decorrelate account-name generator inputs.
         constexpr uint64_t ACCOUNT_NAME_MIX_INCREMENT{0x9E3779B97F4A7C15ULL};
@@ -176,6 +193,17 @@ namespace sysio {
         reslimit.modify(get_self(), key, [&](auto& row) {
             row.ram_bytes -= ram_bytes;
         });
+    }
+
+    int64_t roa::deploy_ram_gift(int64_t stored_ram_bytes) {
+        int64_t sysio_ram = 0, sysio_net = 0, sysio_cpu = 0;
+        get_resource_limits("sysio"_n, sysio_ram, sysio_net, sysio_cpu);
+        reslimit_t reslimit(get_self());
+        const auto sysio_row = reslimit.get(reslimit_key{"sysio"_n.value}, "No resource limit exists for this account.");
+        const int64_t row_ram = static_cast<int64_t>(
+            std::min<uint64_t>(sysio_row.ram_bytes, static_cast<uint64_t>(std::numeric_limits<int64_t>::max())));
+        const int64_t pool = std::min(sysio_ram, row_ram);
+        return std::max<int64_t>(0, std::min(native_deploy_ram_bound(stored_ram_bytes), pool));
     }
 
     void roa::activateroa(const asset& total_sys, const uint64_t& bytes_per_unit) {
@@ -345,9 +373,12 @@ namespace sysio {
         get_resource_limits(account, cur_ram, cur_net, cur_cpu);
         check(cur_ram >= 0, "giftram target must have a finite RAM limit");
 
-        // Reconcile `account`'s gifted RAM to its *exact* current usage. The preceding inline
-        // action (setcode / setabi) already ran, so usage reflects the change. RAM is
-        // checked at transaction end, so the transient over/under in between is fine.
+        // Move `get_ram_usage(account) - usage_before` bytes between sysio's pool and `account`.
+        // setsyscode / setsysabi call this twice: before their inline setcode / setabi, with a
+        // usage_before lowered by the most the change can bill (capped at sysio's pool), which
+        // gifts that ahead (the chain checks the account's quota when setcode / setabi run); then
+        // after it, with usage_before raised by the same amount, which settles the gift to the
+        // exact change.
         //   delta > 0 → gift from sysio's pool;  delta < 0 → reclaim back to it (e.g. re-deploying
         //   a smaller contract returns RAM). Always a *conserving transfer* with sysio — never a
         //   mint — so total RAM stays accounted for on both the reslimit books and chain quota,
@@ -393,19 +424,26 @@ namespace sysio {
         check(is_account(account), "account does not exist");
 
         int64_t usage_before = get_ram_usage(account);
+        // The chain checks the account's RAM quota when setcode runs, so the RAM it bills is gifted first.
+        const int64_t gift = deploy_ram_gift(static_cast<int64_t>(code.size()) * SETCODE_RAM_BYTES_MULTIPLIER);
 
-        // 1) Deploy the code (bills RAM to `account`).
+        // 1) Gift the most the code can bill (capped at sysio's pool) out of sysio's pool. Usage has not moved yet, so
+        //    giftram gifts exactly `gift`.
+        action(permission_level{get_self(), "active"_n}, get_self(), "giftram"_n,
+               std::make_tuple(account, usage_before - gift)).send();
+        // 2) Deploy the code (bills RAM to `account`).
         action(permission_level{account, "active"_n}, "sysio"_n, "setcode"_n,
                std::make_tuple(account, vmtype, vmversion, code)).send();
-        // 2) Make it privileged (system contract). Must run AFTER setcode — the chain rejects
+        // 3) Make it privileged (system contract). Must run AFTER setcode — the chain rejects
         //    setpriv on a codeless account ("setcode must be called before setpriv"). Inline so it
-        //    is ordered after (1); roa is privileged so it can declare sysio's auth. Idempotent.
+        //    is ordered after (2); roa is privileged so it can declare sysio's auth. Idempotent.
         action(permission_level{"sysio"_n, "active"_n}, "sysio"_n, "setpriv"_n,
                std::make_tuple(account, static_cast<uint8_t>(1))).send();
-        // 3) Reconcile `account`'s gifted RAM to its exact new usage out of sysio's pool — giftram
-        //    runs after (1)+(2) (depth-first inline) and reclaims if the new code is smaller.
+        // 4) Settle `account`'s gifted RAM to its exact new usage: measured from usage_before + gift, giftram returns
+        //    what (1) gave beyond the RAM actually used, or adds what is missing, so the net gift is exactly the
+        //    change in usage.
         action(permission_level{get_self(), "active"_n}, get_self(), "giftram"_n,
-               std::make_tuple(account, usage_before)).send();
+               std::make_tuple(account, usage_before + gift)).send();
     }
 
     void roa::setsysabi(const name& account, const bytes& abi) {
@@ -414,13 +452,17 @@ namespace sysio {
         check(roastate.get().is_active, "ROA is not active yet");
         check(is_account(account), "account does not exist");
 
-        // Set the abi (bills RAM to `account`), then reconcile gifted RAM exactly from sysio's
-        // pool — reclaims if the new abi is smaller (or cleared).
+        // Gift the most the abi can bill, capped at sysio's pool (the chain checks the quota when setabi runs), set the
+        // abi (bills RAM to `account`), then settle the gift to the exact change in usage -- returning RAM if the new
+        // abi is smaller (or cleared). See setsyscode.
         int64_t usage_before = get_ram_usage(account);
+        const int64_t gift = deploy_ram_gift(static_cast<int64_t>(abi.size()));
+        action(permission_level{get_self(), "active"_n}, get_self(), "giftram"_n,
+               std::make_tuple(account, usage_before - gift)).send();
         action(permission_level{account, "active"_n}, "sysio"_n, "setabi"_n,
                std::make_tuple(account, abi)).send();
         action(permission_level{get_self(), "active"_n}, get_self(), "giftram"_n,
-               std::make_tuple(account, usage_before)).send();
+               std::make_tuple(account, usage_before + gift)).send();
     }
 
     void roa::addpolicy(const name& owner, const name& issuer, const asset& net_weight, const asset& cpu_weight, const asset& ram_weight,
@@ -710,8 +752,8 @@ namespace sysio {
 
     void roa::forcereg(const name& owner, const uint8_t& tier) {
         // Privileged bootstrap/test registration -- see the header doc. Governance/system-only
-        // (require_auth self); bypasses the OPP claim path (nodeownreg). Beyond the tier-range guard
-        // it does no name-rule / active-key / authex validation and writes no nodeownerreg audit row
+        // (require_auth self); separate from the OPP claim path. Beyond the tier-range guard
+        // it does no name-rule / new-account / authex validation and writes no nodeownerreg audit row
         // -- it just runs the shared tier allocator.
         require_auth(get_self());
 
@@ -723,13 +765,8 @@ namespace sysio {
     void roa::nodeownreg(const name& owner, const uint8_t& tier, const public_key& eth_pub_key,
                          const public_key& wire_pub_key,
                          const bytes& eth_address) {
-        // Dispatched by the OPP depot (sysio.msgch) when it processes an inbound
-        // ATTESTATION_TYPE_NODE_OWNER_REG attestation. msgch inline-sends newnameduser (account
-        // create) and then this action, both declaring permission_level{sysio.roa, active}.
-        // Privileged sysio.msgch may declare that target permission without a cross-contract active
-        // grant, so deployment must preserve msgch's privileged status. Inline actions run
-        // depth-first, so any newaccount has executed before this runs. Invalid names and full
-        // tiers skip creation; this action records their rejection instead.
+        // One authenticated depot claim owns creation and registration. Existing accounts are
+        // never eligible, even when the payload copies their public active key.
         require_auth(get_self());
 
         // ---- Envelope / system invariants (depot misuse) ----
@@ -757,48 +794,28 @@ namespace sysio {
 
         // ---- Claim-payload checks (trust-OPP soft-fail) ----
         // The OPP envelope can be well-formed while the claim inside it is bad (the name the user
-        // chose is invalid, names an account they do not control, or is a replay). Aborting the
+        // chose is invalid, names an existing account, or is a replay). Aborting the
         // dispatching transaction would be bad UX, leave no audit row, and give the batch operator
         // undefined retry semantics. Instead record a REJECTED row with a reason and return, so the
         // transaction commits and the failure is queryable on Wire (no outbound error attestation).
 
-        // (1) the chosen name must be valid for the tier (newnameduser skipped creation otherwise).
         if (!valid_name_for_tier(owner, tier)) {
             record_nodereg(owner, tier, REJECTED, NAME_INVALID, gen);
             return;
         }
 
-        // (2) newnameduser skips creation at capacity to avoid spending sysio's RAM on a rejected
-        // claim. Otherwise a missing account means the creation step did not occur.
-        if (!is_account(owner)) {
-            const auto reason = nodeowner_count(get_self(), gen, tier) >= nodeowner_cap(tier)
-                ? TIER_CAP_REACHED : OWNER_NOT_ACCOUNT;
-            record_nodereg(owner, tier, REJECTED, reason, gen);
+        // Preserve the duplicate outcome for an already registered owner.
+        nodeowners_t nodeowners(get_self(), gen);
+        if (nodeowners.contains(nodeowner_key{owner.value})) {
+            record_nodereg(owner, tier, REJECTED, DUPLICATE, gen);
             return;
         }
-
-        // (3) the account must be controlled by exactly the claimed wire key. For a just-created
-        // account this is the key newnameduser set; for a pre-existing account it proves the claimant
-        // controls it -- an NFT cannot be claimed into an account someone else holds.
-        if (!active_key_matches(owner, wire_pub_key)) {
-            record_nodereg(owner, tier, REJECTED, ACCOUNT_KEY_MISMATCH, gen);
+        if (is_account(owner)) {
+            record_nodereg(owner, tier, REJECTED, ACCOUNT_EXISTS, gen);
             return;
         }
-
-        // (4) must not already be a registered node owner -- a replay / double-claim. Record
-        // DUPLICATE and return so the claim is idempotent and auditable.
-        {
-            nodeowners_t nodeowners(get_self(), gen);
-            if (nodeowners.contains(nodeowner_key{owner.value})) {
-                record_nodereg(owner, tier, REJECTED, DUPLICATE, gen);
-                return;
-            }
-        }
-
-        // (5) the account must not already carry a *different* EVM link than this claim. recordlink is
-        // idempotent per (account, chain) and would silently keep the existing key, so a claim with a
-        // new depositor key would otherwise record CONFIRMED against a stale link. Detect that here and
-        // soft-fail rather than overwrite or mis-record.
+        // A trusted import may have recorded a link before account creation. Never confirm
+        // against a different depositor identity; recordlink intentionally keeps an existing link.
         {
             authex::links_t links(AUTHEX_ACCOUNT);
             auto by_namechain = links.get_index<"bynamechain"_n>();
@@ -808,22 +825,16 @@ namespace sysio {
                 return;
             }
         }
-
-        // (6) capacity exhaustion is a terminal claim outcome, not a malformed envelope. Soft-fail
-        // so another claim in the same consensus envelope cannot roll back every registration and
-        // leave batch operators retrying the deterministically failing envelope forever.
         if (nodeowner_count(get_self(), gen, tier) >= nodeowner_cap(tier)) {
             record_nodereg(owner, tier, REJECTED, TIER_CAP_REACHED, gen);
             return;
         }
 
-        // (7) a pre-existing reslimit row no longer blocks registration. An attacker can plant one on
-        // any account via addpolicy (no target consent), which previously forced this claim into a
-        // permanent OWNER_HAS_RESLIMIT soft-fail -- a valid registration could be griefed indefinitely.
-        // regnodeowner now reconciles instead: it stacks the node-owner allocation onto the existing
-        // row via increase_reslimit rather than creating from scratch. The planted policy stays backed
-        // by its issuer's reserve and remains independently reclaimable via reducepolicy; no value is
-        // stolen and the claim reaches CONFIRMED. (SEC-087)
+        // Allocation must run after the queued native newaccount. All effects, including the
+        // terminal audit below, commit together or roll back if an inline action fails.
+        newnameduser(owner, wire_pub_key, tier);
+        action(permission_level{get_self(), "active"_n}, get_self(), ROA_NODEOWNFIN,
+               std::make_tuple(owner, tier)).send();
 
         // Record the depositor's ETH key as a sysio.authex link via the trusted depot-only path.
         // recordlink requires sysio.authex.active; privileged sysio.roa may declare that permission
@@ -834,9 +845,15 @@ namespace sysio {
                std::make_tuple(owner, opp::types::ChainKind::CHAIN_KIND_EVM, eth_pub_key,
                                eth_address)).send();
 
-        regnodeowner(owner, tier);
         record_nodereg(owner, tier, CONFIRMED, NONE, gen);
     };
+
+    void roa::nodeownfin(const name& owner, const uint8_t& tier) {
+        require_auth(get_self());
+        check(get_sender() == get_self(), "nodeownfin must be sent inline by sysio.roa");
+        check(is_account(owner), "claim account was not created");
+        regnodeowner(owner, tier);
+    }
 
     // ---- Private Helper Function ----
 
@@ -868,21 +885,6 @@ namespace sysio {
         // tier 2/3 take a 1-12 char vanity name.
         if (tier == 1) return len >= 2 && len <= 6;
         return len >= 1 && len <= 12;
-    }
-
-    bool roa::active_key_matches(const name& account, const public_key& key) {
-        // The claim is valid iff `key` can satisfy the account's `active` authority by itself: it
-        // appears among the keys with weight >= threshold. We deliberately do NOT require a single-key
-        // authority or an empty `accounts` list -- a standard account also carries an
-        // <account>@sysio.code entry (benign: it grants the account's own contract inline-action
-        // rights, not external control), and newnameduser-created accounts have neither. A claim into
-        // an account a different key controls still fails: that key won't be among `auth.keys`.
-        auto perm = get_permission(account, "active"_n);
-        if (!perm.has_value() || perm->auth.threshold == 0) return false;
-        for (const auto& kw : perm->auth.keys) {
-            if (kw.key == key && kw.weight >= perm->auth.threshold) return true;
-        }
-        return false;
     }
 
     uint32_t roa::nodeowner_cap(uint8_t tier) {
@@ -978,7 +980,7 @@ namespace sysio {
         // aborting, and never double-counting the gift. Then sync the on-chain quota to the resulting
         // row totals so the reslimit row and the resource limits stay equal on BOTH the fresh and
         // reconcile paths.
-        //   Conservation: production (newnameduser -> nodeownreg) funds newaccount_ram at creation, so
+        //   Conservation: nodeownreg's newnameduser call funds newaccount_ram before nodeownfin, so
         //   the create path stays conservation-exact; the reconcile path adds only the node-owner delta.
         //   forcereg over a pre-existing row now reconciles too (previously threw in set_reslimit) --
         //   acceptable for the governance/bootstrap path.
@@ -1226,29 +1228,25 @@ namespace sysio {
     }
 
     void roa::newnameduser(const name& account, const public_key& pubkey, uint8_t tier) {
-        // Dispatched by the OPP depot (sysio.msgch) in the NFT node-owner claim flow, the same way
-        // as nodeownreg: privileged sysio.msgch sends this inline declaring {sysio.roa, active},
-        // without requiring a cross-contract active grant.
+        // Called directly by nodeownreg, or as a standalone privileged account-creation action.
         require_auth(get_self());
 
         roastate_t roastate(get_self());
         auto state = roastate.get();
         check(state.is_active, "ROA is not active yet");
 
-        // Idempotent: if the account already exists, the create step is already done. A key or tier
-        // mismatch on a pre-existing account is caught downstream by nodeownreg's soft-fail.
+        // Standalone privileged creation remains idempotent. nodeownreg checks nonexistence
+        // before calling this helper; a separately created account is not eligible for a claim.
         if (is_account(account)) return;
 
         // Tier is a depot/system invariant -- a bad value means the dispatch is malformed, so abort
         // (the name charset [a-z1-5.] is already enforced by the name type).
         check(tier >= 1 && tier <= 3, "Tier level must be between 1 and 3");
-        // The chosen name is claim-payload: if it violates the tier's length rule, skip creation
-        // (non-throwing) and let nodeownreg soft-fail with NAME_INVALID. Without this guard a bad
-        // name would either abort the depot dispatch or create an account the claim then rejects.
+        // Standalone creation silently skips invalid names. nodeownreg validates and records
+        // claim rejections before calling this helper.
         if (!valid_name_for_tier(account, tier)) return;
 
-        // A full tier is another soft rejection. Leave the account and sysio's RAM pool untouched;
-        // nodeownreg records TIER_CAP_REACHED even though no account was created.
+        // Standalone creation also skips full tiers without spending sysio's RAM.
         if (nodeowner_count(get_self(), state.network_gen, tier) >= nodeowner_cap(tier)) return;
 
         // Create the account with the holder's key as both owner and active.

@@ -41,8 +41,8 @@ void await(Predicate predicate) {
    }
 }
 
-/// Deadlines for direct evaluation on a real clock: generous, since these tests assert on results and
-/// accounting, never on wall-clock behavior, and sanitizer builds are slow.
+/// Deadlines for queries on a real clock, evaluated directly or through an engine: generous, since these tests
+/// assert on results and accounting, never on wall-clock behavior, and loaded or sanitizer builds are slow.
 inline constexpr auto relaxed_deadline = std::chrono::seconds(60);
 
 /// A config whose request and capture deadlines cannot expire during a test; other limits as given.

@@ -185,8 +185,6 @@ public:
          ("target_block_net_usage_pct", 10 + n )
          ("max_transaction_net_usage", 1000000 + n )
          ("net_usage_leeway", 500 + n )
-         ("context_free_discount_net_usage_num", 1 + n )
-         ("context_free_discount_net_usage_den", 100 + n )
          ("max_block_cpu_usage", 10000000 + n )
          ("target_block_cpu_usage_pct", 10 + n )
          ("max_transaction_cpu_usage", 1000000 + n )
@@ -200,6 +198,7 @@ public:
          ("max_kv_key_size", 256 + n)
          ("max_kv_value_size", 262144 + n)
          ("max_kv_secondary_key_size", 256 + n)
+         ("notify_cpu_stipend", 100 + n)
          ("max_ram_size", (n % 10 + 1) * 1024 * 1024)
          ("ram_reserve_ratio", 100 + n);
    }
@@ -355,6 +354,19 @@ public:
       abi_def msig_abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, msig_abi), true);
       msig_abi_ser.set_abi(msig_abi, fixture_abi_yield_function());
+   }
+
+   /// Pushes a `sysio.msig` action signed by `signer`. `propose` carries `{signer, sysio.payer}` first, as
+   /// msig requires, so `signer` pays; the other msig actions bill the contract.
+   action_result push_action_msig( const account_name& signer, const action_name& name, const variant_object& data ) {
+      action act;
+      act.account = "sysio.msig"_n;
+      act.name = name;
+      act.data = msig_abi_ser.variant_to_binary( msig_abi_ser.get_action_type(name), data, fixture_abi_yield_function() );
+
+      if( name == "propose"_n )
+         return base_tester::push_action( std::move(act), signer.to_uint64_t() );
+      return base_tester::push_contract_paid_action( std::move(act), signer.to_uint64_t() );
    }
 
    /// Compatibility spelling for activate_producers(). Producer registration itself now requires

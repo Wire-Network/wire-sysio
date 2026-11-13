@@ -18,7 +18,13 @@
 #include <fc/io/json.hpp>
 
 #include <array>
+#include <functional>
+#include <limits>
+#include <optional>
+#include <string>
 #include <utility>
+#include <variant>
+#include <vector>
 
 using namespace sysio;
 using namespace sysio::chain;
@@ -132,6 +138,81 @@ BOOST_FIXTURE_TEST_CASE( get_block_with_invalid_abi, validating_tester ) try {
 
 } FC_LOG_AND_RETHROW() /// get_block_with_invalid_abi
 
+// A block_num_or_id that is a decimal integer names a block by number. One that does not fit uint32_t names no
+// block: it is an unknown block, never the block its low 32 bits name.
+BOOST_FIXTURE_TEST_CASE( block_num_string_outside_uint32_is_unknown_block, validating_tester ) try {
+   produce_blocks(5);
+   const uint32_t    head_num = control->head().block_num();
+   const std::string head_id  = control->head().id().str();
+
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   chain_apis::read_only plugin(*control, {}, {}, _tracked_votes, fc::microseconds::maximum(),
+                                fc::microseconds::maximum(), nullptr);
+   const fc::time_point deadline = fc::time_point::maximum();
+
+   // Every endpoint that takes a block_num_or_id string, reduced to the number of the block it returns.
+   using lookup = std::function<uint32_t(const std::string&)>;
+   const std::vector<std::pair<std::string, lookup>> endpoints{
+      {"get_raw_block", [&](const std::string& block_num_or_id) {
+         const chain_apis::read_only::get_raw_block_params params{block_num_or_id};
+         return plugin.get_raw_block(params, deadline)->block_num();
+      }},
+      {"get_block", [&](const std::string& block_num_or_id) {
+         const chain_apis::read_only::get_block_params params{block_num_or_id};
+         auto result = plugin.get_block(params, deadline)();
+         BOOST_REQUIRE(std::holds_alternative<fc::variant>(result));
+         return std::get<fc::variant>(result)["block_num"].as<uint32_t>();
+      }},
+      {"get_block_header", [&](const std::string& block_num_or_id) {
+         const chain_apis::read_only::get_block_header_params params{block_num_or_id, false};
+         return block_header::num_from_id(plugin.get_block_header(params, deadline).id);
+      }},
+      {"get_block_header with extensions", [&](const std::string& block_num_or_id) {
+         const chain_apis::read_only::get_block_header_params params{block_num_or_id, true};
+         return block_header::num_from_id(plugin.get_block_header(params, deadline).id);
+      }},
+      {"get_block_header_state", [&](const std::string& block_num_or_id) {
+         const chain_apis::read_only::get_block_header_state_params params{block_num_or_id};
+         return plugin.get_block_header_state(params, deadline)["block_num"].as<uint32_t>();
+      }},
+   };
+
+   const uint64_t uint32_max = std::numeric_limits<uint32_t>::max();
+   const uint64_t uint64_max = std::numeric_limits<uint64_t>::max();
+
+   // {block_num_or_id, number of the block it names; none when it names no block}
+   const std::vector<std::pair<std::string, std::optional<uint32_t>>> cases{
+      {"1", 1},                                                  // in range, exists
+      {std::to_string(head_num), head_num},                      // in range, exists
+      {head_id, head_num},                                       // a block id
+      {std::to_string(head_num + 1), std::nullopt},              // in range, does not exist
+      {std::to_string(uint32_max), std::nullopt},                // 4294967295: the largest block number
+      {std::to_string(uint32_max + 1), std::nullopt},            // 4294967296: low 32 bits are 0
+      {std::to_string(uint32_max + 2), std::nullopt},            // 4294967297: low 32 bits name block 1
+      {std::to_string(uint32_max + 1 + head_num), std::nullopt}, // low 32 bits name the head block
+      {std::to_string(uint64_max), std::nullopt},                // low 32 bits are 4294967295
+      {"-1", std::nullopt},
+      {"-" + std::to_string(uint32_max), std::nullopt},          // -4294967295: 1 modulo 2^32
+      {"-" + std::to_string(uint64_max), std::nullopt},          // -18446744073709551615: 1 modulo 2^64
+   };
+
+   for (const auto& [endpoint, lookup_block_num] : endpoints) {
+      for (const auto& [block_num_or_id, named] : cases) {
+         BOOST_TEST_CONTEXT(endpoint << " " << block_num_or_id) {
+            if (named) {
+               BOOST_CHECK_EQUAL(lookup_block_num(block_num_or_id), *named);
+            } else {
+               BOOST_CHECK_THROW(lookup_block_num(block_num_or_id), unknown_block_exception);
+            }
+         }
+      }
+      // Neither a number nor a block id.
+      BOOST_TEST_CONTEXT(endpoint) {
+         BOOST_CHECK_THROW(lookup_block_num("nope"), block_id_type_exception);
+      }
+   }
+} FC_LOG_AND_RETHROW() /// block_num_string_outside_uint32_is_unknown_block
+
 BOOST_AUTO_TEST_CASE( get_consensus_parameters ) try {
    tester t{setup_policy::preactivate_feature_and_new_bios};
    t.produce_block();
@@ -149,8 +230,6 @@ BOOST_AUTO_TEST_CASE( get_consensus_parameters ) try {
    BOOST_TEST(v0config.target_block_net_usage_pct == t.control->get_global_properties().configuration.target_block_net_usage_pct);
    BOOST_TEST(v0config.max_transaction_net_usage == t.control->get_global_properties().configuration.max_transaction_net_usage);
    BOOST_TEST(v0config.net_usage_leeway == t.control->get_global_properties().configuration.net_usage_leeway);
-   BOOST_TEST(v0config.context_free_discount_net_usage_num == t.control->get_global_properties().configuration.context_free_discount_net_usage_num);
-   BOOST_TEST(v0config.context_free_discount_net_usage_den == t.control->get_global_properties().configuration.context_free_discount_net_usage_den);
    BOOST_TEST(v0config.max_block_cpu_usage == t.control->get_global_properties().configuration.max_block_cpu_usage);
    BOOST_TEST(v0config.target_block_cpu_usage_pct == t.control->get_global_properties().configuration.target_block_cpu_usage_pct);
    BOOST_TEST(v0config.max_transaction_cpu_usage == t.control->get_global_properties().configuration.max_transaction_cpu_usage);
@@ -164,6 +243,7 @@ BOOST_AUTO_TEST_CASE( get_consensus_parameters ) try {
    BOOST_TEST(v0config.max_kv_key_size == t.control->get_global_properties().configuration.max_kv_key_size);
    BOOST_TEST(v0config.max_kv_value_size == t.control->get_global_properties().configuration.max_kv_value_size);
    BOOST_TEST(v0config.max_kv_secondary_key_size == t.control->get_global_properties().configuration.max_kv_secondary_key_size);
+   BOOST_TEST(v0config.notify_cpu_stipend == t.control->get_global_properties().configuration.notify_cpu_stipend);
 
    BOOST_TEST(!!parms.wasm_config); // enabled at genesis for Wire
 

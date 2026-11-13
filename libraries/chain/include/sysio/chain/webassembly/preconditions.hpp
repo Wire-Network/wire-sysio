@@ -110,16 +110,6 @@ namespace sysio { namespace chain { namespace webassembly {
       return f128_is_nan( f );
    }
 
-   SYS_VM_PRECONDITION(context_free_check,
-         SYS_VM_INVOKE_ONCE([&](auto&&...) {
-            SYS_ASSERT(ctx.get_host().get_context().is_context_free(), unaccessible_api, "this API may only be called from context_free apply");
-         }));
-
-   SYS_VM_PRECONDITION(context_aware_check,
-         SYS_VM_INVOKE_ONCE([&](auto&&...) {
-            SYS_ASSERT(!ctx.get_host().get_context().is_context_free(), unaccessible_api, "only context free api's can be used in this context");
-         }));
-
    SYS_VM_PRECONDITION(privileged_check,
          SYS_VM_INVOKE_ONCE([&](auto&&...) {
             SYS_ASSERT(ctx.get_host().get_context().is_privileged(), unaccessible_api,

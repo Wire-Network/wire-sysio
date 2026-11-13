@@ -12,6 +12,7 @@ documents what it does, how it works, and how to configure it. The plugin lifecy
 
 | Plugin | Description | Docs |
 |---|---|---|
+| `account_watch_plugin` | Writes one JSON record to the `account_watch` logger for every action in an accepted block that a watched authorization signed (include and exclude rules) or that runs at a watched account (receiver rules), plus heartbeats, for a watchdog to alert on | [README](plugins/account_watch_plugin/README.md) |
 | `alert_monitor_plugin` | Ships one `/v1/chain/get_info` snapshot per irreversible block and, with `query_engine_plugin`, configured WireQL query results to an OpenSearch/Elasticsearch `_bulk` endpoint, rendered through an operator JSON template | [README](plugins/alert_monitor_plugin/README.md) |
 | `batch_operator_plugin` | Cranks depot and outpost contracts, ferrying OPP message chains between the WIRE chain and the external blockchains (Ethereum, Solana) on the epoch schedule; can also run an underwriter, which bonds `sysio.synd` envelope requests once the outpost confirms them | [README](plugins/batch_operator_plugin/README.md) |
 | `chain_api_plugin` | Publishes chain_plugin's read and write APIs as the `/v1/chain/*` HTTP endpoints | [README](plugins/chain_api_plugin/README.md) |
@@ -31,7 +32,7 @@ documents what it does, how it works, and how to configure it. The plugin lifecy
 | `prometheus_plugin` | Exposes nodeop's block, p2p, HTTP, and outbound-transport metrics in Prometheus text format at `/v1/prometheus/metrics` | [README](plugins/prometheus_plugin/README.md) |
 | `query_engine_plugin` | Opt-in SQL queries over the node's current chain state, answered by an in-process C++ service and, when HTTP is enabled, `POST /v1/query/execute`; configurable on any node, answers queries where read-only threads exist, in head or irreversible read mode | [README](plugins/query_engine_plugin/README.md) |
 | `resource_monitor_plugin` | Watches free space on every file system nodeop writes to and gracefully shuts the node down before it runs out | [README](plugins/resource_monitor_plugin/README.md) |
-| `signature_provider_kms_plugin` | Adds the `KMS:` signature-provider scheme, signing Ethereum keys remotely through AWS KMS so the key never leaves AWS | [README](plugins/signature_provider_kms_plugin/README.md) |
+| `signature_provider_kms_plugin` | Adds the `KMS:` signature-provider scheme, signing Ethereum, WIRE K1 and Solana keys remotely through AWS KMS so the key never leaves AWS | [README](plugins/signature_provider_kms_plugin/README.md) |
 | `signature_provider_manager_plugin` | Owns every signing key the node uses, parsing each `--signature-provider` spec and publishing the providers to the chain, producer, net, and outpost plugins | [README](plugins/signature_provider_manager_plugin/README.md) |
 | `signature_provider_ssm_plugin` | Adds the `SSM:` signature-provider scheme, fetching a private key once from an AWS SSM Parameter Store SecureString and signing locally thereafter | [README](plugins/signature_provider_ssm_plugin/README.md) |
 | `snapshot_api_plugin` | Public, read-only HTTP endpoints for snapshot discovery and download, so nodes can bootstrap from each other | [README](plugins/snapshot_api_plugin/README.md) |

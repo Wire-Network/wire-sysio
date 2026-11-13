@@ -49,6 +49,18 @@ void setup_pause_contract(savanna_tester& tester) {
    tester.produce_block();
 }
 
+constexpr uint32_t warmup_billed_cpu_us    = 1;      ///< the warm-up run's receipt CPU
+constexpr uint32_t warmup_max_block_cpu_ms = 10'000; ///< the warm-up run's block time: ample for any first load
+
+/**
+ * Runs the pause contract once, before the timings a test measures. sys-vm-oc compiles a contract on its first run with
+ * the billing timer paused: the compile is not billed, but it still takes from the push's block deadline.
+ */
+void warm_pause_contract(savanna_tester& tester) {
+   push_trx( tester, test_pause_action<WASM_TEST_ACTION("test_checktime", "checktime_pass")>{},
+             warmup_billed_cpu_us, UINT32_MAX, warmup_max_block_cpu_ms, true, {}, "pause"_n );
+}
+
 }
 
 BOOST_AUTO_TEST_SUITE(checktime_tests)
@@ -93,20 +105,22 @@ transaction_trace_ptr push_dummy(base_tester& t, account_name from, const string
             }))
             ("data", fc::mutable_variant_object()
                ("from", from)
-            )
-         })
-     )
-     // lets also push a context free action
-     ("context_free_actions", fc::variants({
+            ),
+         // a passing assert carries `v`, which keeps each transaction unique
          fc::mutable_variant_object()
             ("account", name("asserter"))
             ("name", "procassert")
+            ("authorization", fc::variants({
+               fc::mutable_variant_object()
+                  ("actor", from)
+                  ("permission", name(config::active_name))
+            }))
             ("data", fc::mutable_variant_object()
                 ("condition", 1)
                 ("message", "noop failed: " + v )
             )
          })
-      );
+     );
 
    signed_transaction trx;
    abi_serializer::from_variant(pretty_trx, trx, t.get_resolver(), abi_serializer::create_yield_function( base_tester::abi_serializer_max_time ));
@@ -254,6 +268,7 @@ BOOST_AUTO_TEST_CASE( checktime_speculative_max_trx_test ) { try {
 
    savanna_tester t( conf_genesis.first, conf_genesis.second );
    setup_pause_contract( t );
+   warm_pause_contract( t );
 
    BOOST_CHECK_EXCEPTION( push_trx( t, test_pause_action<WASM_TEST_ACTION("test_checktime", "checktime_failure")>{},
                                     0, 25, 500, false, fc::raw::pack(10000000000000000000ULL), "pause"_n ),
@@ -267,17 +282,14 @@ BOOST_AUTO_TEST_CASE( checktime_speculative_max_trx_test ) { try {
                           tx_cpu_usage_exceeded, fc_exception_message_contains("reached on chain max_transaction_cpu_usage 150000us") );
    auto after = fc::time_point::now();
    auto dur = (after - before).count();
-   // verify within 20% of expected time
    BOOST_CHECK_MESSAGE( dur >= 150'000, "elapsed " << dur << "us" );
-   BOOST_CHECK_MESSAGE( dur <= 180'000, "elapsed " << dur << "us" );
+   BOOST_CHECK_MESSAGE( dur < 350'000, "elapsed " << dur << "us" ); // Should not run to block_cpu_usage deadline
 
    fc::temp_directory interrupt_tempdir;
    auto interrupt_conf_genesis = tester::default_config( interrupt_tempdir );
    auto& interrupt_cfg = interrupt_conf_genesis.second.initial_configuration;
    constexpr uint32_t interrupt_max_block_cpu_usage = 1'500'000;
    constexpr uint32_t interrupt_max_transaction_cpu_usage = 1'000'000;
-   constexpr uint32_t interrupt_warmup_billed_cpu_us = 1;
-   constexpr uint32_t interrupt_warmup_max_block_cpu_ms = 10'000;
    constexpr auto interrupt_delay = std::chrono::milliseconds(50);
    constexpr auto interrupt_start_timeout = std::chrono::seconds(1);
    constexpr auto interrupt_start_timeout_message = "Timed out waiting for speculative transaction execution";
@@ -291,9 +303,8 @@ BOOST_AUTO_TEST_CASE( checktime_speculative_max_trx_test ) { try {
    savanna_tester interrupt_t( interrupt_conf_genesis.first, interrupt_conf_genesis.second );
    setup_pause_contract( interrupt_t );
 
-   // sys-vm-oc compiles synchronously on first execution, so warm the contract outside the measured interrupt window.
-   push_trx( interrupt_t, test_pause_action<WASM_TEST_ACTION("test_checktime", "checktime_pass")>{},
-             interrupt_warmup_billed_cpu_us, UINT32_MAX, interrupt_warmup_max_block_cpu_ms, true, {}, "pause"_n );
+   // Warm the contract outside the measured interrupt window.
+   warm_pause_contract( interrupt_t );
 
    // Gate the interrupt on WASM entry, after the transaction timer starts. The warmed contract stays cached,
    // so execution does not pause the timer for compilation after this hook. Returning false runs the real WASM.

@@ -3,12 +3,14 @@
 
 namespace sysio::chain {
 
-account_name action::payer() const {
+bool action::has_explicit_payer() const {
    // sysio_payer_name must be position 0; enforced by validate_referenced_accounts
    // and authorization_manager::check_authorization.
-   if (!authorization.empty() && authorization[0].permission == config::sysio_payer_name)
-      return authorization[0].actor;
-   return account;
+   return !authorization.empty() && authorization[0].permission == config::sysio_payer_name;
+}
+
+account_name action::payer() const {
+   return has_explicit_payer() ? authorization[0].actor : account;
 }
 
 account_name action::first_authorizer() const {

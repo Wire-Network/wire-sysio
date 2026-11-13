@@ -51,12 +51,6 @@
       "version>=": "2022-06-28#3"
     },
     {
-      "name": "wire-sys-vm",
-      "features": [
-        "softfloat-skip-install"
-      ]
-    },
-    {
       "name": "nlohmann-json",
       "version>=": "3.12.0#1"
     },
@@ -67,7 +61,7 @@
     {
       "name": "aws-sdk-cpp",
       "default-features": false,
-      "version>=": "1.11.665",
+      "version>=": "1.11.686",
       "features": [
         "kms",
         "ssm"
@@ -103,7 +97,7 @@
     },
     {
       "name": "llvm",
-      "version": "18.1.6#5"
+      "version": "18.1.6#6"
     },
     {
       "name": "gsl-lite",
@@ -150,10 +144,6 @@
       "version": "3.0.0#3"
     },
     {
-      "name": "wire-sys-vm",
-      "version": "1.2.0#2"
-    },
-    {
       "name": "nlohmann-json",
       "version": "3.12.0#1"
     },
@@ -163,7 +153,7 @@
     },
     {
       "name": "aws-sdk-cpp",
-      "version": "1.11.665"
+      "version": "1.11.686"
     }
   ]
 }

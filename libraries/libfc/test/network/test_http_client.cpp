@@ -680,13 +680,13 @@ private:
 
    /** Write one PEM certificate. */
    void write_certificate(std::string_view name, X509& certificate) {
-      std::unique_ptr<FILE, decltype(&std::fclose)> output(std::fopen(path(name).c_str(), "w"), &std::fclose);
+      std::unique_ptr<FILE, int (*)(std::FILE*)> output(std::fopen(path(name).c_str(), "w"), &std::fclose);
       FC_ASSERT(output && PEM_write_X509(output.get(), &certificate) == 1, "Failed to write TLS test certificate");
    }
 
    /** Write one unencrypted PEM private key. */
    void write_key(std::string_view name, EVP_PKEY& key) {
-      std::unique_ptr<FILE, decltype(&std::fclose)> output(std::fopen(path(name).c_str(), "w"), &std::fclose);
+      std::unique_ptr<FILE, int (*)(std::FILE*)> output(std::fopen(path(name).c_str(), "w"), &std::fclose);
       FC_ASSERT(output && PEM_write_PrivateKey(output.get(), &key, nullptr, nullptr, 0, nullptr, nullptr) == 1,
                 "Failed to write TLS test private key");
    }
@@ -745,7 +745,7 @@ bool supports_ipv6_loopback() {
 
 /** Return the OpenSSL hashed-directory filename for @p certificate. */
 std::string certificate_hash_filename(const std::filesystem::path& certificate) {
-   std::unique_ptr<FILE, decltype(&std::fclose)> input(std::fopen(certificate.c_str(), "r"), &std::fclose);
+   std::unique_ptr<FILE, int (*)(std::FILE*)> input(std::fopen(certificate.c_str(), "r"), &std::fclose);
    BOOST_REQUIRE(input);
    std::unique_ptr<X509, decltype(&X509_free)> parsed(PEM_read_X509(input.get(), nullptr, nullptr, nullptr),
                                                       &X509_free);
@@ -1819,7 +1819,6 @@ BOOST_AUTO_TEST_CASE(slow_response_headers_time_out) {
    });
    fc::http::transport transport;
    auto options = tls_request_options();
-   options.timeouts.connect = fc::milliseconds(10);
    options.timeouts.header = fc::milliseconds(200);
    const auto start = std::chrono::steady_clock::now();
 

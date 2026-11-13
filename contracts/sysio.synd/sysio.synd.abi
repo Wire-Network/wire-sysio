@@ -194,6 +194,16 @@
             ]
         },
         {
+            "name": "emitdesynd",
+            "base": "",
+            "fields": [
+                {
+                    "name": "request_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "envelope_key",
             "base": "",
             "fields": [
@@ -288,16 +298,6 @@
                 {
                     "name": "position",
                     "type": "position"
-                }
-            ]
-        },
-        {
-            "name": "finishreturn",
-            "base": "",
-            "fields": [
-                {
-                    "name": "request_id",
-                    "type": "uint64"
                 }
             ]
         },
@@ -907,6 +907,24 @@
             ]
         },
         {
+            "name": "retsent",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "request_ids",
+                    "type": "uint64[]"
+                }
+            ]
+        },
+        {
             "name": "return_key",
             "base": "",
             "fields": [
@@ -947,6 +965,10 @@
                 {
                     "name": "amount",
                     "type": "uint64"
+                },
+                {
+                    "name": "sent_epoch",
+                    "type": "uint32"
                 }
             ]
         },
@@ -1244,8 +1266,8 @@
             "ricardian_contract": ""
         },
         {
-            "name": "finishreturn",
-            "type": "finishreturn",
+            "name": "emitdesynd",
+            "type": "emitdesynd",
             "ricardian_contract": ""
         },
         {
@@ -1311,6 +1333,11 @@
         {
             "name": "refundreturn",
             "type": "refundreturn",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "retsent",
+            "type": "retsent",
             "ricardian_contract": ""
         },
         {
@@ -1402,7 +1429,14 @@
             "index_type": "i64",
             "key_names": ["request_id"],
             "key_types": ["uint64"],
-            "table_id": 25676
+            "table_id": 25676,
+            "secondary_indexes": [
+                {
+                    "name": "bysentepoch",
+                    "key_type": "uint128",
+                    "table_id": 9914
+                }
+            ]
         },
         {
             "name": "syndconfig",

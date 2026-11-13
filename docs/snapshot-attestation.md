@@ -210,8 +210,9 @@ Operators must restart provider and serving nodes after a change so they adopt t
 snapshot bootstrap checks the loaded height against its own pre-replay configuration. The post-replay
 value is then cached for the running node. Already-attested records remain discoverable after cadence changes.
 
-A producer may retry a pending tuple idempotently while it keeps its operator standing (retrying a
-finalized tuple is a no-op while its height remains eligible under the current cadence), and may vote at
+A producer may retry a pending tuple idempotently while it keeps its operator standing (a vote from a
+registered provider on a finalized tuple is a no-op while its height remains eligible under the current
+cadence; any other account is rejected), and may vote at
 multiple scheduled heights, but cannot submit two
 different tuples at one height. Registration and producer-status churn never removes an accepted
 vote.
@@ -228,6 +229,16 @@ pending rows. Scheduling remains based on block number, never elapsed time or bl
 - When a tuple reaches quorum, the contract writes a `snap_record` to `snaprecords` and
   purges pending votes through that block height. Only compact attested records are retained,
   keeping RAM use negligible over time.
+- Provider, vote and record rows are billed to `sysio`. Only the last `max_pending_vote_heights` (2)
+  scheduled heights at or below the current block take votes, so the vote table stays bounded when
+  quorum never forms: an older height is rejected ("snapshot block is older than the pending vote
+  window") and the next accepted vote purges its rows. Two periods are at least four times the
+  verification grace, so a vote that lands in time for verifiers is never refused.
+- A producer votes once per height, so an open height holds at most one row per distinct producer
+  that held a delegation while it was open. Delegation churn can push a height past
+  `max_snap_providers` rows only by bringing in further collateral-backed producers ranked within
+  `max_snap_provider_rank`, and those rows are purged with the rest of the height once it leaves
+  the window.
 - Once a newer height is attested, a purged unfinished historical height cannot be reopened.
   The latest retained `snaprecords` row acts as the monotonic finalized-height watermark.
 - After a block is attested, any later vote carrying a different block ID or hash for that height

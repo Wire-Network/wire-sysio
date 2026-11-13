@@ -100,16 +100,6 @@ public:
       );
    }
 
-   action_result open( account_name owner,
-                       const string& symbolname,
-                       account_name ram_payer    ) {
-      return push_action( ram_payer, "open"_n, mvo()
-           ( "owner", owner )
-           ( "symbol", symbolname )
-           ( "ram_payer", ram_payer )
-      );
-   }
-
    action_result close( account_name owner,
                         const string& symbolname ) {
       return push_action( owner, "close"_n, mvo()
@@ -258,6 +248,12 @@ BOOST_FIXTURE_TEST_CASE( issue_tests, sysio_token_tester ) try {
                         issue( "alice"_n, asset::from_string("-1.000 TKN"), "hola" )
    );
 
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "tokens can only be issued to issuer account" ),
+                        push_action( "alice"_n, "issue"_n, mvo()
+                                     ( "to",       "bob" )
+                                     ( "quantity", asset::from_string("1.000 TKN") )
+                                     ( "memo",     "" ) ) );
+
    BOOST_REQUIRE_EQUAL( success(),
                         issue( "alice"_n, asset::from_string("1.000 TKN"), "hola" )
    );
@@ -364,50 +360,39 @@ BOOST_FIXTURE_TEST_CASE( transfer_tests, sysio_token_tester ) try {
 
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( open_tests, sysio_token_tester ) try {
+// transfer's data must hold exactly its arguments
+BOOST_FIXTURE_TEST_CASE( transfer_rejects_bytes_after_arguments, sysio_token_tester ) try {
+   create( "alice"_n, asset::from_string("1000 CERO") );
+   issue( "alice"_n, asset::from_string("1000 CERO"), "issue" );
 
-   auto token = create( "alice"_n, asset::from_string("1000 CERO"));
+   const auto push_raw = [&]( bytes data ) {
+      action act;
+      act.account = "sysio.token"_n;
+      act.name    = "transfer"_n;
+      act.data    = std::move(data);
+      return base_tester::push_contract_paid_action( std::move(act), "alice"_n.to_uint64_t() );
+   };
+   const auto with_tail = []( bytes data, size_t tail ) {
+      data.insert( data.end(), tail, 0 );
+      return data;
+   };
+   constexpr size_t large_tail_size = 100'000;
 
-   auto alice_balance = get_account("alice"_n, "0,CERO");
-   BOOST_REQUIRE_EQUAL(true, alice_balance.is_null() );
-   BOOST_REQUIRE_EQUAL( wasm_assert_msg("tokens can only be issued to issuer account"),
-                        push_action( "alice"_n, "issue"_n, mvo()
-                                     ( "to",       "bob")
-                                     ( "quantity", asset::from_string("1000 CERO") )
-                                     ( "memo",     "") ) );
-   BOOST_REQUIRE_EQUAL( success(), issue( "alice"_n, asset::from_string("1000 CERO"), "issue" ) );
+   const auto transfer_data = abi_ser.variant_to_binary( "transfer", mvo()
+      ("from", "alice")
+      ("to", "bob")
+      ("quantity", "300 CERO")
+      ("memo", "hola"), fixture_abi_yield_function() );
 
-   alice_balance = get_account("alice"_n, "0,CERO");
-   REQUIRE_MATCHING_OBJECT( alice_balance, mvo()
-      ("balance", "1000 CERO")
+   const auto left_over = wasm_assert_msg( "action data has bytes left after the arguments" );
+   BOOST_REQUIRE_EQUAL( left_over, push_raw( with_tail( transfer_data, 1 ) ) );
+   BOOST_REQUIRE_EQUAL( left_over, push_raw( with_tail( transfer_data, large_tail_size ) ) );
+   BOOST_REQUIRE_EQUAL( true, get_account( "bob"_n, "0,CERO" ).is_null() );
+
+   BOOST_REQUIRE_EQUAL( success(), push_raw( transfer_data ) );
+   REQUIRE_MATCHING_OBJECT( get_account( "bob"_n, "0,CERO" ), mvo()
+      ("balance", "300 CERO")
    );
-
-   auto bob_balance = get_account("bob"_n, "0,CERO");
-   BOOST_REQUIRE_EQUAL(true, bob_balance.is_null() );
-
-   BOOST_REQUIRE_EQUAL( wasm_assert_msg("owner account does not exist"),
-                        open( "nonexistent"_n, "0,CERO", "alice"_n ) );
-   BOOST_REQUIRE_EQUAL( success(),
-                        open( "bob"_n,         "0,CERO", "alice"_n ) );
-
-   bob_balance = get_account("bob"_n, "0,CERO");
-   REQUIRE_MATCHING_OBJECT( bob_balance, mvo()
-      ("balance", "0 CERO")
-   );
-
-   BOOST_REQUIRE_EQUAL( success(), transfer( "alice"_n, "bob"_n, asset::from_string("200 CERO"), "hola" ) );
-
-   bob_balance = get_account("bob"_n, "0,CERO");
-   REQUIRE_MATCHING_OBJECT( bob_balance, mvo()
-      ("balance", "200 CERO")
-   );
-
-   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "symbol does not exist" ),
-                        open( "carol"_n, "0,INVALID", "alice"_n ) );
-
-   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "symbol precision mismatch" ),
-                        open( "carol"_n, "1,CERO", "alice"_n ) );
-
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( close_tests, sysio_token_tester ) try {

@@ -12,9 +12,14 @@
 #include "contracts.hpp"
 #include "contract_test_support.hpp"
 
+#include <functional>
+#include <limits>
+#include <map>
 #include <optional>
+#include <sstream>
 #include <string>
 #include <string_view>
+#include <tuple>
 #include <vector>
 
 using namespace sysio::testing;
@@ -39,6 +44,7 @@ constexpr std::string_view hold_bps_range_msg    = "hold_bps must be positive an
 constexpr std::string_view amount_positive_msg   = "amount must be positive";
 constexpr std::string_view request_missing_msg   = "request not found";
 constexpr std::string_view fully_bonded_msg      = "request is fully bonded";
+constexpr std::string_view first_bond_msg        = "first bond is below the request's minimum";
 constexpr std::string_view not_accepting_msg     = "request is not accepting bonds";
 constexpr std::string_view terminal_msg          = "request is already resolved";
 constexpr std::string_view not_bonded_msg        = "request is not bonded";
@@ -48,11 +54,8 @@ constexpr std::string_view beneficiary_msg       = "hold beneficiary is not an a
 constexpr std::string_view beneficiary_self_msg  = "hold beneficiary cannot be the contract";
 constexpr std::string_view nothing_msg           = "nothing to claim";
 constexpr std::string_view wire_no_yield_msg     = "WIRE collateral earns no shadow yield";
+constexpr std::string_view prune_limit_msg       = "limit exceeds the most requests one prune examines";
 
-/// The memo of the one transfer that pays the issuer an INVALID request's bonds.
-constexpr std::string_view forfeit_memo = "sysio.bond::forfeit";
-/// The memo of the transfer that pays a claim in the request's token.
-constexpr std::string_view claim_memo = "sysio.bond::claim";
 
 /// `request_state` names as the ABI renders them.
 constexpr std::string_view STATE_OPEN     = "OPEN";
@@ -72,6 +75,11 @@ constexpr size_t MAX_STATEMENT_BYTES = 1024;
 
 /// Mirrors the contract's PRUNE_RETENTION_SEC: seven days.
 constexpr uint32_t PRUNE_RETENTION_SEC = 604'800;
+/// Mirrors the contract's MAX_BONDS_PER_REQUEST.
+constexpr uint64_t MAX_BONDS_PER_REQUEST = 64;
+
+/// Mirrors the contract's MAX_PRUNE_LIMIT.
+constexpr uint32_t MAX_PRUNE_LIMIT = 64;
 
 /// `sysio.liq`'s fixed-point scale of the yield index (`YIELD_INDEX_SCALE`).
 constexpr uint64_t YIELD_INDEX_SCALE = 1'000'000'000'000;
@@ -200,6 +208,18 @@ public:
    action_result push_bond(name signer, name action_name, const variant_object& data) {
       return push(BOND_ACCOUNT, bond_abi_ser, signer, action_name, data);
    }
+   /// Push one sysio.bond action authorized and signed by every one of `signers`, in its own block.
+   action_result push_bond_signed_by(const std::vector<account_name>& signers, name action_name,
+                                     const variant_object& data) {
+      try {
+         last_trace = push_action(BOND_ACCOUNT, action_name, signers, data);
+         produce_block();
+         return success();
+      } catch (const fc::exception& ex) {
+         last_trace.reset();
+         return error(ex.top_message());
+      }
+   }
 
    // --- registries and sysio.liq ---
 
@@ -276,7 +296,16 @@ public:
       return push_bond(underwriter, "accept"_n, mvo()("underwriter", underwriter)("request_id", request_id)
          ("amount", amount));
    }
+   /// `hold` signed by `signer` and, when it is an account, by `beneficiary`, whose RAM the hold-bond
+   /// escrow bills.
    action_result hold(name signer, uint64_t request_id, name beneficiary) {
+      std::vector<account_name> signers{signer};
+      if (beneficiary != signer && control->db().find<account_object, by_name>(beneficiary) != nullptr)
+         signers.push_back(beneficiary);
+      return push_bond_signed_by(signers, "hold"_n, mvo()("request_id", request_id)("beneficiary", beneficiary));
+   }
+   /// `hold` signed by `signer` alone, without the beneficiary's authority.
+   action_result hold_without_beneficiary(name signer, uint64_t request_id, name beneficiary) {
       return push_bond(signer, "hold"_n, mvo()("request_id", request_id)("beneficiary", beneficiary));
    }
    /// `approve` is permissionless; `carol`, a bystander, signs it.
@@ -353,6 +382,20 @@ public:
       append_key_word(key, id);
       return key;
    }
+   /// The ids of at most `count` requests from id `from` up, in id order: what a crank reads to place its
+   /// next prune.
+   std::vector<uint64_t> request_ids_from(uint64_t from, size_t count) {
+      const auto            table_id = compute_table_id("requests"_n.to_uint64_t());
+      std::vector<uint64_t> ids;
+      auto cursor = control->kv().open_row_cursor();
+      chain::kv_row row;
+      for (bool more = cursor->seek_lower({BOND_ACCOUNT, table_id, request_key_of(from)}, row);
+           more && ids.size() < count && row.code == BOND_ACCOUNT && row.table_id == table_id;
+           more = cursor->next(row))
+         ids.push_back(decode(bond_abi_ser, "request_row", std::vector<char>(row.value.begin(), row.value.end()))["id"]
+                          .as_uint64());
+      return ids;
+   }
    /// The account that pays the RAM of the kv row of `table` keyed `key`; the test fails without one.
    name payer_of(name table, const std::string& key) {
       const auto row = find_kv_row(table, key);
@@ -361,6 +404,140 @@ public:
    }
    /// The RAM `account` uses, in bytes.
    int64_t ram_usage(name account) { return control->get_resource_limits_manager().get_account_ram_usage(account); }
+   /// Cap `account`'s RAM at what it uses now, so any further allocation it pays for fails.
+   void exhaust_ram(name account) {
+      control->get_mutable_resource_limits_manager().set_account_limits(account, ram_usage(account), -1, -1, false);
+   }
+
+   // --- the RAM ledger ---
+
+   /// One payer's bill for one KV table: the payer, the contract and the table (or secondary index) id.
+   using bill_key = std::tuple<name, name, uint16_t>;
+   /// Bytes billed per payer, contract and table.
+   using ram_bill = std::map<bill_key, int64_t>;
+
+   /// The bill of payer `payer` for `code`'s table `table`.
+   static bill_key bill_of(name payer, name code, name table) {
+      return {payer, code, compute_table_id(table.to_uint64_t())};
+   }
+   /// The bill of payer `payer` for the secondary index `index` of `code`'s table `table`.
+   static bill_key bill_of(name payer, name code, name table, name index) {
+      return {payer, code, compute_sec_table_id(table.to_uint64_t(), index.to_uint64_t())};
+   }
+   /// Every KV row and secondary index entry of the chain, billed as the chain bills them: the key and
+   /// the value of a row, or both keys of an index entry, plus the fixed per-row overhead.
+   ram_bill ram_bill_now() const {
+      ram_bill bill;
+      auto rows = control->kv().open_row_cursor();
+      chain::kv_row row;
+      for (bool more = rows->seek_lower({name{}, 0, {}, {}}, row); more; more = rows->next(row)) {
+         bill[{row.payer, row.code, row.table_id}] +=
+            static_cast<int64_t>(row.key.size() + row.value.size() + config::kv_row_overhead_ram_bytes);
+      }
+      auto entries = control->kv().open_index_cursor();
+      chain::kv_index_entry entry;
+      for (bool more = entries->seek_lower({name{}, 0, {}, {}}, entry); more; more = entries->next(entry)) {
+         bill[{entry.payer, entry.code, entry.table_id}] += static_cast<int64_t>(
+            entry.sec_key.size() + entry.pri_key.size() + config::kv_index_entry_overhead_ram_bytes);
+      }
+      return bill;
+   }
+   /// A readable list of a bill, for failure messages.
+   static std::string describe(const ram_bill& bill) {
+      std::ostringstream out;
+      for (const auto& [key, bytes] : bill)
+         out << " [" << std::get<0>(key) << " " << std::get<1>(key) << " table " << std::get<2>(key) << ": "
+             << bytes << "]";
+      return out.str();
+   }
+   /// The accounts whose RAM every ledger check reconciles.
+   std::vector<name> ledger_accounts() const {
+      return {SYSIO_ACCOUNT, BOND_ACCOUNT, TOKENS_ACCOUNT, "issuer"_n, "alice"_n, "bob"_n, "carol"_n};
+   }
+   /// Run `step` and return what it billed, per payer and table. Checks first that the ledger closes:
+   /// each of `ledger_accounts()` moved its RAM usage by exactly what the KV delta bills it, so the delta
+   /// is everything the step billed them.
+   ram_bill billed_by(const std::function<void()>& step) {
+      std::map<name, int64_t> usage;
+      for (const name account : ledger_accounts()) usage[account] = ram_usage(account);
+      const ram_bill before = ram_bill_now();
+      step();
+      const ram_bill after = ram_bill_now();
+      ram_bill delta;
+      for (const auto& [key, bytes] : after) {
+         const auto it = before.find(key);
+         const int64_t change = bytes - (it == before.end() ? 0 : it->second);
+         if (change != 0) delta[key] = change;
+      }
+      for (const auto& [key, bytes] : before) {
+         if (!after.contains(key)) delta[key] = -bytes;
+      }
+      for (const name account : ledger_accounts()) {
+         int64_t billed = 0;
+         for (const auto& [key, bytes] : delta) {
+            if (std::get<0>(key) == account) billed += bytes;
+         }
+         BOOST_REQUIRE_MESSAGE(ram_usage(account) - usage[account] == billed,
+                               account << " RAM moved by " << ram_usage(account) - usage[account]
+                                       << " but its KV rows by " << billed << ";" << describe(delta));
+      }
+      return delta;
+   }
+   /// True iff `key` is a row the `sysio` RAM pool pays for as shared infrastructure: sysio.bond's
+   /// configuration, counter and yield pools, and the custody rows sysio.liq and sysio.token keep.
+   bool is_shared(const bill_key& key) const {
+      const auto [payer, code, table] = key;
+      if (payer != SYSIO_ACCOUNT) return false;
+      if (code == LIQ_ACCOUNT || code == TOKEN_ACCOUNT) return true;
+      return code == BOND_ACCOUNT && (table == compute_table_id("bondconfig"_n.to_uint64_t()) ||
+                                      table == compute_table_id("bondcounters"_n.to_uint64_t()) ||
+                                      table == compute_table_id("yieldpool"_n.to_uint64_t()));
+   }
+   /// Require `delta` to bill exactly `activity` -- each table growing (+1) or refunded (-1) -- and
+   /// nothing else but shared rows of the `sysio` RAM pool. Returns those shared rows.
+   ram_bill require_billed(const ram_bill& delta, const std::map<bill_key, int>& activity) {
+      ram_bill shared;
+      for (const auto& [key, bytes] : delta) {
+         const auto it = activity.find(key);
+         if (it != activity.end()) {
+            BOOST_REQUIRE_MESSAGE((bytes > 0 ? 1 : -1) == it->second, "wrong direction:" << describe(delta));
+         } else {
+            BOOST_REQUIRE_MESSAGE(is_shared(key), "unexpected bill [" << std::get<0>(key) << " " << std::get<1>(key)
+                                                     << " table " << std::get<2>(key) << "];" << describe(delta));
+            shared[key] = bytes;
+         }
+      }
+      for (const auto& [key, direction] : activity) {
+         BOOST_REQUIRE_MESSAGE(delta.contains(key), "missing bill [" << std::get<0>(key) << " " << std::get<1>(key)
+                                                      << " table " << std::get<2>(key) << "];" << describe(delta));
+      }
+      return shared;
+   }
+   /// The `wireclaims` row of `account` and `issuer`; null when there is none.
+   fc::variant wire_claim_of(name account, name issuer) {
+      const auto row = find_kv_row("wireclaims"_n, wire_claim_key_of(account, issuer));
+      return row ? decode(bond_abi_ser, "wire_claim", std::vector<char>(row->value.begin(), row->value.end()))
+                 : fc::variant();
+   }
+   /// The kv key of the `wireclaims` row of `account` and `issuer`: both names as big-endian words.
+   static std::string wire_claim_key_of(name account, name issuer) {
+      std::string key;
+      append_key_word(key, account.to_uint64_t());
+      append_key_word(key, issuer.to_uint64_t());
+      return key;
+   }
+   /// The kv key of the `bonds` row of `request_id` and `underwriter`.
+   static std::string bond_key_of(uint64_t request_id, name underwriter) {
+      std::string key = request_key_of(request_id);
+      append_key_word(key, underwriter.to_uint64_t());
+      return key;
+   }
+   /// The kv key of the `escrows` row of `request_id` and `kind`.
+   static std::string escrow_key_of(uint64_t request_id, uint8_t kind) {
+      std::string key = request_key_of(request_id);
+      key.push_back(char(kind));
+      return key;
+   }
    /// Rewrite request `id`'s stored token code to `token_code`, bypassing the contract, to stand for a
    /// token that no longer resolves.
    void rewrite_request_token(uint64_t id, std::string_view token_code) {
@@ -491,8 +668,9 @@ public:
       }
       return seen;
    }
-   action_result claimwire(name account) {
-      return push_bond(account, "claimwire"_n, mvo()("account", account));
+   /// `claimwire` of `account`'s WIRE from `issuer`'s requests, signed by `account`.
+   action_result claimwire(name account, name issuer) {
+      return push_bond(account, "claimwire"_n, mvo()("account", account)("issuer", issuer));
    }
    /// The `sysio.liq::addyield` actions the last pushed transaction executed, as `(from, quantity)`.
    std::vector<std::pair<name, asset>> addyields() {
@@ -641,26 +819,42 @@ BOOST_FIXTURE_TEST_CASE(request_refuses_a_duplicate_statement_for_the_same_issue
    BOOST_REQUIRE_EQUAL("otherschema", request_row_of(3)["schema"].as_string());
 } FC_LOG_AND_RETHROW()
 
-// A request's rows bill the issuer that created them, never the sysio pool: only the id counter,
-// written once, is the contract's own.
+// A request's rows bill the issuer that created them: the request row and its statement index entry,
+// the bounty escrow, and the issuer's `wireclaims` row for the WIRE its escrows will earn. The sysio RAM
+// pool pays only for shared rows: on the first request, the id counter and sysio.bond's holder row of
+// the token on sysio.liq.
 BOOST_FIXTURE_TEST_CASE(request_rows_bill_the_issuer, sysio_bond_tester) try {
-   BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'a'), LIQSOL, 10 * UNIT, 1 * UNIT));
-   BOOST_REQUIRE_EQUAL("issuer"_n, payer_of("requests"_n, request_key_of(1)));
-   std::string bounty_key = request_key_of(1);
-   bounty_key.push_back(char(KIND_BOUNTY_BYTE));
-   BOOST_REQUIRE_EQUAL("issuer"_n, payer_of("escrows"_n, bounty_key));
+   constexpr auto                issuer = "issuer"_n;
+   const std::map<bill_key, int> request_rows{
+      {bill_of(issuer, BOND_ACCOUNT, "requests"_n), +1},
+      {bill_of(issuer, BOND_ACCOUNT, "requests"_n, "bystatement"_n), +1},
+      {bill_of(issuer, BOND_ACCOUNT, "escrows"_n), +1},
+   };
+   auto first_rows = request_rows;
+   first_rows[bill_of(issuer, BOND_ACCOUNT, "wireclaims"_n)] = +1;
+   const auto shared = require_billed(billed_by([&] {
+      BOOST_REQUIRE_EQUAL(success(), request(issuer, "oppenvelope"_n, bytes(32, 'a'), LIQSOL, 10 * UNIT, 1 * UNIT));
+   }), first_rows);
+   BOOST_REQUIRE_MESSAGE(shared.contains(bill_of(SYSIO_ACCOUNT, BOND_ACCOUNT, "bondcounters"_n)), describe(shared));
+   BOOST_REQUIRE_MESSAGE(shared.contains(bill_of(SYSIO_ACCOUNT, LIQ_ACCOUNT, "accounts"_n)), describe(shared));
+   BOOST_REQUIRE_EQUAL(issuer, payer_of("requests"_n, request_key_of(1)));
+   BOOST_REQUIRE_EQUAL(issuer, payer_of("escrows"_n, escrow_key_of(1, KIND_BOUNTY_BYTE)));
+   BOOST_REQUIRE_EQUAL(issuer, payer_of("wireclaims"_n, wire_claim_key_of(issuer, issuer)));
+   BOOST_REQUIRE_EQUAL(1u, wire_claim_of(issuer, issuer)["reservations"].as_uint64());
 
-   // With the counter in place, a second request adds nothing to sysio's RAM and grows the issuer's.
-   const auto sysio_ram  = ram_usage(SYSIO_ACCOUNT);
-   const auto issuer_ram = ram_usage("issuer"_n);
-   BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'b'), LIQSOL, 10 * UNIT, 1 * UNIT));
-   BOOST_REQUIRE_EQUAL(sysio_ram, ram_usage(SYSIO_ACCOUNT));
-   BOOST_REQUIRE_GT(ram_usage("issuer"_n), issuer_ram);
+   // A second request bills the issuer its own rows and reserves the same balance row once more; with
+   // the counter and the holder row in place, the sysio pool pays for nothing.
+   BOOST_REQUIRE(require_billed(billed_by([&] {
+      BOOST_REQUIRE_EQUAL(success(), request(issuer, "oppenvelope"_n, bytes(32, 'b'), LIQSOL, 10 * UNIT, 1 * UNIT));
+   }), request_rows).empty());
+   BOOST_REQUIRE_EQUAL(2u, wire_claim_of(issuer, issuer)["reservations"].as_uint64());
 
-   // A raise by the issuer keeps the rows its own.
-   BOOST_REQUIRE_EQUAL(success(), addbounty("issuer"_n, 2, 1 * UNIT));
-   BOOST_REQUIRE_EQUAL(sysio_ram, ram_usage(SYSIO_ACCOUNT));
-   BOOST_REQUIRE_EQUAL("issuer"_n, payer_of("requests"_n, request_key_of(2)));
+   // A raise writes no new row; a WIRE request earns no WIRE, so it reserves no balance row.
+   BOOST_REQUIRE(billed_by([&] { BOOST_REQUIRE_EQUAL(success(), addbounty(issuer, 2, 1 * UNIT)); }).empty());
+   require_billed(billed_by([&] {
+      BOOST_REQUIRE_EQUAL(success(), request(issuer, "oppenvelope"_n, bytes(32, 'c'), WIRE, 10 * UNIT, 1 * UNIT));
+   }), request_rows);
+   BOOST_REQUIRE_EQUAL(2u, wire_claim_of(issuer, issuer)["reservations"].as_uint64());
 } FC_LOG_AND_RETHROW()
 
 // A privileged account -- a system contract, as sysio.synd is when it issues for its envelopes -- has
@@ -668,23 +862,24 @@ BOOST_FIXTURE_TEST_CASE(request_rows_bill_the_issuer, sysio_bond_tester) try {
 BOOST_FIXTURE_TEST_CASE(a_privileged_issuer_bills_sysio, sysio_bond_tester) try {
    // sysio.tokens, the token registry, is a privileged system contract of the fixture.
    constexpr auto system_contract = TOKENS_ACCOUNT;
-   BOOST_REQUIRE_EQUAL(success(), transfer_wire(SYSIO_ACCOUNT, system_contract, 100 * UNIT));
-   const auto issuer_ram  = ram_usage(system_contract);
-   const auto sysio_ram = ram_usage(SYSIO_ACCOUNT);
+   BOOST_REQUIRE_EQUAL(success(), mint(system_contract, 100 * UNIT));
 
-   BOOST_REQUIRE_EQUAL(success(),
-                       request(system_contract, "oppenvelope"_n, bytes(32, 'a'), WIRE, 10 * UNIT, 1 * UNIT));
+   require_billed(billed_by([&] {
+      BOOST_REQUIRE_EQUAL(success(),
+                          request(system_contract, "oppenvelope"_n, bytes(32, 'a'), LIQSOL, 10 * UNIT, 1 * UNIT));
+   }), {
+      {bill_of(SYSIO_ACCOUNT, BOND_ACCOUNT, "requests"_n), +1},
+      {bill_of(SYSIO_ACCOUNT, BOND_ACCOUNT, "requests"_n, "bystatement"_n), +1},
+      {bill_of(SYSIO_ACCOUNT, BOND_ACCOUNT, "escrows"_n), +1},
+      {bill_of(SYSIO_ACCOUNT, BOND_ACCOUNT, "wireclaims"_n), +1},
+   });
    BOOST_REQUIRE_EQUAL(SYSIO_ACCOUNT, payer_of("requests"_n, request_key_of(1)));
-   std::string bounty_key = request_key_of(1);
-   bounty_key.push_back(char(KIND_BOUNTY_BYTE));
-   BOOST_REQUIRE_EQUAL(SYSIO_ACCOUNT, payer_of("escrows"_n, bounty_key));
-   BOOST_REQUIRE_EQUAL(issuer_ram, ram_usage(system_contract));
-   BOOST_REQUIRE_GT(ram_usage(SYSIO_ACCOUNT), sysio_ram);
+   BOOST_REQUIRE_EQUAL(SYSIO_ACCOUNT, payer_of("escrows"_n, escrow_key_of(1, KIND_BOUNTY_BYTE)));
+   BOOST_REQUIRE_EQUAL(SYSIO_ACCOUNT, payer_of("wireclaims"_n, wire_claim_key_of(system_contract, system_contract)));
 
    // A raise keeps the rows on the pool.
-   BOOST_REQUIRE_EQUAL(success(), addbounty(system_contract, 1, 1 * UNIT));
-   BOOST_REQUIRE_EQUAL(SYSIO_ACCOUNT, payer_of("escrows"_n, bounty_key));
-   BOOST_REQUIRE_EQUAL(issuer_ram, ram_usage(system_contract));
+   BOOST_REQUIRE(billed_by([&] { BOOST_REQUIRE_EQUAL(success(), addbounty(system_contract, 1, 1 * UNIT)); }).empty());
+   BOOST_REQUIRE_EQUAL(SYSIO_ACCOUNT, payer_of("escrows"_n, escrow_key_of(1, KIND_BOUNTY_BYTE)));
 } FC_LOG_AND_RETHROW()
 
 // ---------------------------------------------------------------------------
@@ -789,6 +984,58 @@ BOOST_FIXTURE_TEST_CASE(accept_refuses_once_fully_bonded, sysio_bond_tester) try
    BOOST_REQUIRE(bonded_at == request_row_of(1)["bonded_at"].as<time_point>());
 } FC_LOG_AND_RETHROW()
 
+// An underwriter's first bond is at least covered / MAX_BONDS_PER_REQUEST. A top-up of its own row, and
+// a first bond that takes the whole remainder, may be smaller.
+BOOST_FIXTURE_TEST_CASE(accept_refuses_a_first_bond_below_the_request_minimum, sysio_bond_tester) try {
+   constexpr uint64_t increment = UNIT / 100;
+   const auto         refused   = wasm_assert_msg(std::string(first_bond_msg));
+   // 10 UNIT / 64 is 15.625 increments: the smallest first bond is 16.
+   BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'a'), LIQSOL, 10 * UNIT, 0));
+   const auto before = liq_balance("alice"_n);
+
+   BOOST_REQUIRE_EQUAL(refused, accept("alice"_n, 1, 15 * increment));
+   BOOST_REQUIRE_EQUAL(before, liq_balance("alice"_n));
+   BOOST_REQUIRE(bond_rows_of(1).empty());
+   BOOST_REQUIRE_EQUAL(success(), accept("alice"_n, 1, 16 * increment));
+   BOOST_REQUIRE_EQUAL(success(), accept("alice"_n, 1, increment));
+   BOOST_REQUIRE_EQUAL(17 * increment, bond_amount_of(1, "alice"_n));
+   BOOST_REQUIRE_EQUAL(refused, accept("bob"_n, 1, 15 * increment));
+
+   // alice leaves 15 increments uncovered: bob's first bond takes all of it.
+   BOOST_REQUIRE_EQUAL(success(), accept("alice"_n, 1, 10 * UNIT - 32 * increment));
+   BOOST_REQUIRE_EQUAL(success(), accept("bob"_n, 1, 15 * increment));
+   BOOST_REQUIRE_EQUAL(15 * increment, bond_amount_of(1, "bob"_n));
+   BOOST_REQUIRE_EQUAL(STATE_BONDED, request_state_of(1));
+} FC_LOG_AND_RETHROW()
+
+// Bonded at the minimum by as many underwriters as it admits, a request holds MAX_BONDS_PER_REQUEST
+// rows, and one prune erases it with all of them.
+BOOST_FIXTURE_TEST_CASE(a_request_holds_at_most_the_maximum_bonds, sysio_bond_tester) try {
+   constexpr uint64_t increment  = UNIT / 100;
+   constexpr uint64_t minimum    = 2 * increment;
+   constexpr uint32_t window_sec = 3600;
+   std::vector<name> underwriters;
+   for (uint64_t i = 0; i < MAX_BONDS_PER_REQUEST; ++i)
+      underwriters.push_back(name(std::string("uw") + char('a' + i / 8) + char('a' + i % 8)));
+   create_accounts(underwriters);
+   for (const name underwriter : underwriters) BOOST_REQUIRE_EQUAL(success(), mint(underwriter, minimum));
+
+   BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'a'), LIQSOL,
+                                          MAX_BONDS_PER_REQUEST * minimum, 0, window_sec));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(first_bond_msg)), accept("alice"_n, 1, increment));
+   for (const name underwriter : underwriters) BOOST_REQUIRE_EQUAL(success(), accept(underwriter, 1, minimum));
+   BOOST_REQUIRE_EQUAL(STATE_BONDED, request_state_of(1));
+   BOOST_REQUIRE_EQUAL(MAX_BONDS_PER_REQUEST, bond_rows_of(1).size());
+
+   pass_window(window_sec);
+   BOOST_REQUIRE_EQUAL(success(), approve(1));
+   for (const name underwriter : underwriters) BOOST_REQUIRE_EQUAL(success(), claim(1, underwriter));
+   pass_retention();
+   BOOST_REQUIRE_EQUAL(success(), prune(0, 1));
+   BOOST_REQUIRE(request_row_of(1).is_null());
+   BOOST_REQUIRE(bond_rows_of(1).empty());
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE(accept_twice_by_one_underwriter_adds_to_one_row, sysio_bond_tester) try {
    BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'a'), LIQSOL, 10 * UNIT, 0));
    const auto before = liq_balance("alice"_n);
@@ -840,22 +1087,62 @@ BOOST_FIXTURE_TEST_CASE(accept_and_request_checkpoint_the_live_index, sysio_bond
    BOOST_REQUIRE_EQUAL(0u, wire_bond.yield.owed_wire);
 } FC_LOG_AND_RETHROW()
 
-// A bond row bills its underwriter; the request row the accept updates stays the issuer's.
-BOOST_FIXTURE_TEST_CASE(accept_bills_the_underwriter, sysio_bond_tester) try {
-   // The bounty opens sysio.bond's own LIQSOL holder row on sysio.liq first, which sysio.liq bills.
-   BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'a'), LIQSOL, 10 * UNIT, 1 * UNIT));
-   const auto sysio_ram  = ram_usage(SYSIO_ACCOUNT);
-   const auto issuer_ram = ram_usage("issuer"_n);
-   const auto alice_ram  = ram_usage("alice"_n);
+// A bond on an ordinary issuer's request bills that issuer, never the underwriter: the bond row, and at
+// the underwriter's first bond on a shadow-token request of this issuer its `wireclaims` row, which the
+// claim paying the bond's WIRE only updates. A later bond by the same underwriter writes no new row.
+BOOST_FIXTURE_TEST_CASE(accept_bills_the_issuer, sysio_bond_tester) try {
+   constexpr auto issuer = "issuer"_n;
+   BOOST_REQUIRE_EQUAL(success(), request(issuer, "oppenvelope"_n, bytes(32, 'a'), LIQSOL, 10 * UNIT, 0));
+   const std::map<bill_key, int> bond_rows{
+      {bill_of(issuer, BOND_ACCOUNT, "bonds"_n), +1},
+      {bill_of(issuer, BOND_ACCOUNT, "wireclaims"_n), +1},
+   };
+   require_billed(billed_by([&] { BOOST_REQUIRE_EQUAL(success(), accept("alice"_n, 1, 4 * UNIT)); }), bond_rows);
+   BOOST_REQUIRE_EQUAL(issuer, payer_of("bonds"_n, bond_key_of(1, "alice"_n)));
+   BOOST_REQUIRE_EQUAL(issuer, payer_of("requests"_n, request_key_of(1)));
+   BOOST_REQUIRE_EQUAL(issuer, payer_of("wireclaims"_n, wire_claim_key_of("alice"_n, issuer)));
+   BOOST_REQUIRE_EQUAL(1u, wire_claim_of("alice"_n, issuer)["reservations"].as_uint64());
 
-   BOOST_REQUIRE_EQUAL(success(), accept("alice"_n, 1, 10 * UNIT));
-   std::string bond_key = request_key_of(1);
-   append_key_word(bond_key, "alice"_n.to_uint64_t());
-   BOOST_REQUIRE_EQUAL("alice"_n, payer_of("bonds"_n, bond_key));
-   BOOST_REQUIRE_EQUAL("issuer"_n, payer_of("requests"_n, request_key_of(1)));
-   BOOST_REQUIRE_GT(ram_usage("alice"_n), alice_ram);
-   BOOST_REQUIRE_EQUAL(issuer_ram, ram_usage("issuer"_n));
-   BOOST_REQUIRE_EQUAL(sysio_ram, ram_usage(SYSIO_ACCOUNT));
+   // A second bond by alice adds to her rows; bob's first bills the issuer like alice's.
+   BOOST_REQUIRE(billed_by([&] { BOOST_REQUIRE_EQUAL(success(), accept("alice"_n, 1, 2 * UNIT)); }).empty());
+   BOOST_REQUIRE_EQUAL(1u, wire_claim_of("alice"_n, issuer)["reservations"].as_uint64());
+   require_billed(billed_by([&] { BOOST_REQUIRE_EQUAL(success(), accept("bob"_n, 1, 4 * UNIT)); }), bond_rows);
+   BOOST_REQUIRE_EQUAL(issuer, payer_of("wireclaims"_n, wire_claim_key_of("bob"_n, issuer)));
+
+   // A bond on a WIRE request earns no WIRE, so it reserves no balance row.
+   BOOST_REQUIRE_EQUAL(success(), request(issuer, "oppenvelope"_n, bytes(32, 'b'), WIRE, 10 * UNIT, 0));
+   require_billed(billed_by([&] { BOOST_REQUIRE_EQUAL(success(), accept("alice"_n, 2, 4 * UNIT)); }),
+                  {{bill_of(issuer, BOND_ACCOUNT, "bonds"_n), +1}});
+   BOOST_REQUIRE_EQUAL(1u, wire_claim_of("alice"_n, issuer)["reservations"].as_uint64());
+} FC_LOG_AND_RETHROW()
+
+// An accept the ordinary issuer has no RAM for fails, and the underwriter keeps its tokens.
+BOOST_FIXTURE_TEST_CASE(accept_fails_when_the_issuer_has_no_ram, sysio_bond_tester) try {
+   BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'a'), LIQSOL, 10 * UNIT, 1 * UNIT));
+   exhaust_ram("issuer"_n);
+   const auto alice_balance = liq_balance("alice"_n);
+
+   const auto result = accept("alice"_n, 1, 10 * UNIT);
+   BOOST_REQUIRE_MESSAGE(result.find("account issuer has insufficient ram") != std::string::npos, result);
+   BOOST_REQUIRE_EQUAL(0u, bond_amount_of(1, "alice"_n));
+   BOOST_REQUIRE(wire_claim_of("alice"_n, "issuer"_n).is_null());
+   BOOST_REQUIRE_EQUAL(alice_balance, liq_balance("alice"_n));
+} FC_LOG_AND_RETHROW()
+
+// An accept on a privileged issuer's request -- a system contract's, as sysio.synd's are -- bills the
+// bond row and the underwriter's balance row for that issuer to the sysio RAM pool.
+BOOST_FIXTURE_TEST_CASE(accept_on_a_privileged_issuers_request_bills_sysio, sysio_bond_tester) try {
+   // sysio.tokens, the token registry, is a privileged system contract of the fixture.
+   constexpr auto system_contract = TOKENS_ACCOUNT;
+   BOOST_REQUIRE_EQUAL(success(), request(system_contract, "oppenvelope"_n, bytes(32, 'a'), LIQSOL, 10 * UNIT, 0));
+
+   require_billed(billed_by([&] { BOOST_REQUIRE_EQUAL(success(), accept("alice"_n, 1, 10 * UNIT)); }), {
+      {bill_of(SYSIO_ACCOUNT, BOND_ACCOUNT, "bonds"_n), +1},
+      {bill_of(SYSIO_ACCOUNT, BOND_ACCOUNT, "wireclaims"_n), +1},
+   });
+   BOOST_REQUIRE_EQUAL(SYSIO_ACCOUNT, payer_of("bonds"_n, bond_key_of(1, "alice"_n)));
+   BOOST_REQUIRE_EQUAL(SYSIO_ACCOUNT, payer_of("requests"_n, request_key_of(1)));
+   BOOST_REQUIRE_EQUAL(SYSIO_ACCOUNT, payer_of("wireclaims"_n, wire_claim_key_of("alice"_n, system_contract)));
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE(accept_in_wire_pulls_wire, sysio_bond_tester) try {
@@ -1064,6 +1351,76 @@ BOOST_FIXTURE_TEST_CASE(hold_refuses_a_beneficiary_that_is_not_an_account, sysio
    BOOST_REQUIRE_EQUAL(STATE_OPEN, request_state_of(1));
    BOOST_REQUIRE(escrow_row_of(1, KIND_HOLD_BOND_BYTE).is_null());
    BOOST_REQUIRE_EQUAL(success(), hold("issuer"_n, 1, "carol"_n));
+} FC_LOG_AND_RETHROW()
+
+// The hold-bond escrow is the challenge's row, so it bills the beneficiary, never the issuer: naming an
+// account is no authority to charge it, so a hold without the beneficiary's signature is refused.
+BOOST_FIXTURE_TEST_CASE(hold_bills_the_hold_bond_escrow_to_the_beneficiary, sysio_bond_tester) try {
+   BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'a'), LIQSOL, 10 * UNIT, 1 * UNIT));
+   const auto before = liq_balance("issuer"_n);
+
+   BOOST_REQUIRE_EQUAL(error("missing authority of carol"), hold_without_beneficiary("issuer"_n, 1, "carol"_n));
+   BOOST_REQUIRE_EQUAL(before, liq_balance("issuer"_n));
+   BOOST_REQUIRE_EQUAL(STATE_OPEN, request_state_of(1));
+
+   require_billed(billed_by([&] { BOOST_REQUIRE_EQUAL(success(), hold("issuer"_n, 1, "carol"_n)); }),
+                  {{bill_of("carol"_n, BOND_ACCOUNT, "escrows"_n), +1}});
+   BOOST_REQUIRE_EQUAL("carol"_n, payer_of("escrows"_n, escrow_key_of(1, KIND_HOLD_BOND_BYTE)));
+   BOOST_REQUIRE_EQUAL("issuer"_n, payer_of("escrows"_n, escrow_key_of(1, KIND_BOUNTY_BYTE)));
+   // The issuer still funds the hold bond, and its escrow's WIRE is still the issuer's.
+   BOOST_REQUIRE_EQUAL(before - 1 * UNIT, liq_balance("issuer"_n));
+   BOOST_REQUIRE_EQUAL("issuer", escrow_row_of(1, KIND_HOLD_BOND_BYTE)["funder"].as_string());
+} FC_LOG_AND_RETHROW()
+
+// A hold the beneficiary has no RAM for fails, and the issuer keeps its tokens.
+BOOST_FIXTURE_TEST_CASE(hold_fails_when_the_beneficiary_has_no_ram, sysio_bond_tester) try {
+   BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'a'), LIQSOL, 10 * UNIT, 0));
+   exhaust_ram("carol"_n);
+   const auto before = liq_balance("issuer"_n);
+
+   const auto result = hold("issuer"_n, 1, "carol"_n);
+   BOOST_REQUIRE_MESSAGE(result.find("account carol has insufficient ram") != std::string::npos, result);
+   BOOST_REQUIRE_EQUAL(before, liq_balance("issuer"_n));
+   BOOST_REQUIRE_EQUAL(STATE_OPEN, request_state_of(1));
+   BOOST_REQUIRE(escrow_row_of(1, KIND_HOLD_BOND_BYTE).is_null());
+} FC_LOG_AND_RETHROW()
+
+// An ordinary challenger pays for its hold even on a privileged issuer's request, whose own rows bill the
+// sysio RAM pool; the prune that erases the ruled request returns each row's RAM to the account it billed.
+BOOST_FIXTURE_TEST_CASE(an_ordinary_challenger_pays_for_its_hold_on_a_privileged_issuers_request,
+                        sysio_bond_tester) try {
+   // sysio.tokens, the token registry, is a privileged system contract of the fixture.
+   constexpr auto system_contract = TOKENS_ACCOUNT;
+   BOOST_REQUIRE_EQUAL(success(), mint(system_contract, 100 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), request(system_contract, "oppenvelope"_n, bytes(32, 'a'), LIQSOL, 10 * UNIT, 0));
+   BOOST_REQUIRE_EQUAL(success(), accept("alice"_n, 1, 10 * UNIT));
+   const auto carol_ram = ram_usage("carol"_n);
+
+   require_billed(billed_by([&] { BOOST_REQUIRE_EQUAL(success(), hold(system_contract, 1, "carol"_n)); }),
+                  {{bill_of("carol"_n, BOND_ACCOUNT, "escrows"_n), +1}});
+   BOOST_REQUIRE_EQUAL("carol"_n, payer_of("escrows"_n, escrow_key_of(1, KIND_HOLD_BOND_BYTE)));
+   BOOST_REQUIRE_EQUAL(SYSIO_ACCOUNT, payer_of("requests"_n, request_key_of(1)));
+   BOOST_REQUIRE_EQUAL(SYSIO_ACCOUNT, payer_of("bonds"_n, bond_key_of(1, "alice"_n)));
+
+   // INVALID: the challenger claims the hold bond, the issuer its forfeit; nothing is billed.
+   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(SYSIO_ACCOUNT, 1));
+   const auto carol_liq = liq_balance("carol"_n);
+   require_billed(billed_by([&] { BOOST_REQUIRE_EQUAL(success(), claim(1, "carol"_n)); }), {});
+   BOOST_REQUIRE_EQUAL(carol_liq + 1 * UNIT, liq_balance("carol"_n));
+   require_billed(billed_by([&] { BOOST_REQUIRE_EQUAL(success(), claim(1, system_contract, "carol"_n)); }), {});
+
+   pass_retention();
+   require_billed(billed_by([&] { BOOST_REQUIRE_EQUAL(success(), prune(0, 10)); }), {
+      {bill_of("carol"_n, BOND_ACCOUNT, "escrows"_n), -1},
+      {bill_of(SYSIO_ACCOUNT, BOND_ACCOUNT, "requests"_n), -1},
+      {bill_of(SYSIO_ACCOUNT, BOND_ACCOUNT, "requests"_n, "bystatement"_n), -1},
+      {bill_of(SYSIO_ACCOUNT, BOND_ACCOUNT, "bonds"_n), -1},
+      {bill_of(SYSIO_ACCOUNT, BOND_ACCOUNT, "wireclaims"_n), -1},
+   });
+   BOOST_REQUIRE(request_row_of(1).is_null());
+   BOOST_REQUIRE_EQUAL(carol_ram, ram_usage("carol"_n));
+   BOOST_REQUIRE(wire_claim_of("alice"_n, system_contract).is_null());
+   BOOST_REQUIRE(wire_claim_of(system_contract, system_contract).is_null());
 } FC_LOG_AND_RETHROW()
 
 // ---------------------------------------------------------------------------
@@ -1412,7 +1769,7 @@ BOOST_FIXTURE_TEST_CASE(unbacked_yield_survives_pruning_and_never_repays_princip
    BOOST_REQUIRE_GT(residual, 0u);
    BOOST_REQUIRE(raw_bond_of(1, "alice"_n).paid);
    pass_retention();
-   BOOST_REQUIRE_EQUAL(success(), prune(0, 100));
+   BOOST_REQUIRE_EQUAL(success(), prune(0, 10));
    BOOST_REQUIRE(!request_row_of(1).is_null());
    BOOST_REQUIRE_EQUAL(residual, raw_bond_of(1, "alice"_n).yield.owed_wire);
    // Unattributed custody earns slack that can back the already-recorded residual.
@@ -1422,9 +1779,9 @@ BOOST_FIXTURE_TEST_CASE(unbacked_yield_survives_pruning_and_never_repays_princip
    BOOST_REQUIRE_EQUAL(principal_before + 10 * UNIT, liq_balance("alice"_n));
    BOOST_REQUIRE_EQUAL(0u, raw_bond_of(1, "alice"_n).yield.owed_wire);
    const auto wire_before = wire_balance("alice"_n);
-   BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n));
+   BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n, "issuer"_n));
    BOOST_REQUIRE_EQUAL(wire_before + earned, wire_balance("alice"_n));
-   BOOST_REQUIRE_EQUAL(success(), prune(0, 100));
+   BOOST_REQUIRE_EQUAL(success(), prune(0, 10));
    BOOST_REQUIRE(request_row_of(1).is_null());
 } FC_LOG_AND_RETHROW()
 
@@ -1443,14 +1800,14 @@ BOOST_FIXTURE_TEST_CASE(rejected_wire_cannot_block_liq_or_expire_with_request, s
    BOOST_REQUIRE_EQUAL(before_wire, wire_balance("alice"_n));
    BOOST_REQUIRE(!notified("alice"_n, "settle"_n));
    BOOST_REQUIRE(!notified("alice"_n, "transfer"_n));
-   BOOST_REQUIRE(claimwire("alice"_n) != success());
+   BOOST_REQUIRE(claimwire("alice"_n, "issuer"_n) != success());
    pass_retention();
-   BOOST_REQUIRE_EQUAL(success(), prune(0, 100));
+   BOOST_REQUIRE_EQUAL(success(), prune(0, 10));
    set_code("alice"_n, std::vector<uint8_t>{});
    produce_blocks();
-   BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n));
+   BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n, "issuer"_n));
    BOOST_REQUIRE_EQUAL(before_wire + earned, wire_balance("alice"_n));
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(nothing_msg)), claimwire("alice"_n));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(nothing_msg)), claimwire("alice"_n, "issuer"_n));
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE(bond_yield_is_paid_with_the_bond, sysio_bond_tester) try {
@@ -1474,7 +1831,7 @@ BOOST_FIXTURE_TEST_CASE(bond_yield_is_paid_with_the_bond, sysio_bond_tester) try
    BOOST_REQUIRE_EQUAL(success(), claim(1, "alice"_n));
    BOOST_REQUIRE_EQUAL(alice_liq + 10 * UNIT, liq_balance("alice"_n));
    // alice is the only bond: she is paid exactly what was pulled.
-   BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n));
+   BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n, "issuer"_n));
    BOOST_REQUIRE_EQUAL(alice_wire + owed, wire_balance("alice"_n));
    BOOST_REQUIRE_EQUAL(bond_wire, wire_balance(BOND_ACCOUNT));
    BOOST_REQUIRE_EQUAL(owed, pool_row_of()["pool"]["credited"].as_uint64());
@@ -1498,9 +1855,140 @@ BOOST_FIXTURE_TEST_CASE(claim_pulls_the_yield_itself_up_to_the_claim, sysio_bond
 
    const auto alice_wire = wire_balance("alice"_n);
    BOOST_REQUIRE_EQUAL(success(), claim(1, "alice"_n));
-   BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n));
+   BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n, "issuer"_n));
    BOOST_REQUIRE_EQUAL(alice_wire + at_claim, wire_balance("alice"_n));
    BOOST_REQUIRE_EQUAL(0u, liq_owed(BOND_ACCOUNT));
+} FC_LOG_AND_RETHROW()
+
+// An ordinary issuer pays for everything its request causes, and gets all of it back: the WIRE balance
+// rows are reserved at `request` and `accept`, so the claims that record WIRE on them and the withdrawals
+// need no RAM even from an issuer that has none left, and `prune` and `claimwire` return every byte.
+BOOST_FIXTURE_TEST_CASE(an_ordinary_issuer_pays_for_its_request_through_its_lifecycle, sysio_bond_tester) try {
+   constexpr auto     issuer     = "issuer"_n;
+   constexpr uint32_t window_sec = 3600;
+   const auto         issuer_ram = ram_usage(issuer);
+   const auto         alice_ram  = ram_usage("alice"_n);
+
+   BOOST_REQUIRE_EQUAL(success(), request(issuer, "oppenvelope"_n, bytes(32, 'a'), LIQSOL, 10 * UNIT, 1 * UNIT,
+                                          window_sec));
+   BOOST_REQUIRE_EQUAL(success(), accept("alice"_n, 1, 10 * UNIT));
+   BOOST_REQUIRE_GT(ram_usage(issuer), issuer_ram);
+   BOOST_REQUIRE_EQUAL(alice_ram, ram_usage("alice"_n));
+   BOOST_REQUIRE_EQUAL(success(), addyield("carol"_n, 100 * UNIT));
+   pass_window(window_sec);
+   BOOST_REQUIRE_EQUAL(success(), approve(1));
+
+   // The issuer has no RAM left: the claims still record WIRE on the rows reserved for it.
+   exhaust_ram(issuer);
+   require_billed(billed_by([&] { BOOST_REQUIRE_EQUAL(success(), claim(1, "alice"_n)); }), {});
+   require_billed(billed_by([&] { BOOST_REQUIRE_EQUAL(success(), claim(1, issuer)); }), {});
+   const uint64_t alice_owed  = wire_claim_of("alice"_n, issuer)["amount"].as_uint64();
+   const uint64_t issuer_owed = wire_claim_of(issuer, issuer)["amount"].as_uint64();
+   BOOST_REQUIRE_GT(alice_owed, 0u);
+   BOOST_REQUIRE_GT(issuer_owed, 0u);
+
+   // alice withdraws while her bond row still reserves the balance: it stays, at zero, for later yield.
+   const auto alice_wire = wire_balance("alice"_n);
+   require_billed(billed_by([&] { BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n, issuer)); }), {});
+   BOOST_REQUIRE_EQUAL(alice_wire + alice_owed, wire_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(0u, wire_claim_of("alice"_n, issuer)["amount"].as_uint64());
+   BOOST_REQUIRE_EQUAL(1u, wire_claim_of("alice"_n, issuer)["reservations"].as_uint64());
+
+   // The prune returns the request's rows to the issuer. alice's balance row goes with her bond; the
+   // issuer's own is still owed WIRE, so it stays, reserved by nothing, until withdrawn.
+   pass_retention();
+   require_billed(billed_by([&] { BOOST_REQUIRE_EQUAL(success(), prune(0, 10)); }), {
+      {bill_of(issuer, BOND_ACCOUNT, "requests"_n), -1},
+      {bill_of(issuer, BOND_ACCOUNT, "requests"_n, "bystatement"_n), -1},
+      {bill_of(issuer, BOND_ACCOUNT, "escrows"_n), -1},
+      {bill_of(issuer, BOND_ACCOUNT, "bonds"_n), -1},
+      {bill_of(issuer, BOND_ACCOUNT, "wireclaims"_n), -1},
+   });
+   BOOST_REQUIRE(request_row_of(1).is_null());
+   BOOST_REQUIRE(wire_claim_of("alice"_n, issuer).is_null());
+   BOOST_REQUIRE_EQUAL(0u, wire_claim_of(issuer, issuer)["reservations"].as_uint64());
+
+   const auto issuer_wire = wire_balance(issuer);
+   require_billed(billed_by([&] { BOOST_REQUIRE_EQUAL(success(), claimwire(issuer, issuer)); }),
+                  {{bill_of(issuer, BOND_ACCOUNT, "wireclaims"_n), -1}});
+   BOOST_REQUIRE_EQUAL(issuer_wire + issuer_owed, wire_balance(issuer));
+   BOOST_REQUIRE(wire_claim_of(issuer, issuer).is_null());
+   BOOST_REQUIRE_EQUAL(issuer_ram, ram_usage(issuer));
+   BOOST_REQUIRE_EQUAL(alice_ram, ram_usage("alice"_n));
+} FC_LOG_AND_RETHROW()
+
+// One account's WIRE from several issuers sits on one row per issuer, each billed like that issuer's
+// requests: an ordinary issuer pays for its own, a privileged issuer's bills the sysio RAM pool. A later
+// issuer's request never takes over another's row, a withdrawal pays one issuer's balance only, and each
+// row's RAM returns to the issuer that paid for it.
+BOOST_FIXTURE_TEST_CASE(wire_claims_from_several_issuers_stay_with_each_issuer, sysio_bond_tester) try {
+   constexpr auto     system_contract = TOKENS_ACCOUNT;   // privileged
+   constexpr uint32_t window_sec      = 3600;
+   const auto         issuer_ram      = ram_usage("issuer"_n);
+   const auto         bob_ram         = ram_usage("bob"_n);
+   const auto         alice_ram       = ram_usage("alice"_n);
+   const auto         request_by      = [&](name issuer, uint64_t id, char fill) {
+      BOOST_REQUIRE_EQUAL(success(),
+                          request(issuer, "oppenvelope"_n, bytes(32, fill), LIQSOL, 10 * UNIT, 0, window_sec));
+      BOOST_REQUIRE_EQUAL(success(), accept("alice"_n, id, 10 * UNIT));
+   };
+   request_by("issuer"_n, 1, 'a');
+   request_by(system_contract, 2, 'b');
+   request_by("bob"_n, 3, 'c');
+   BOOST_REQUIRE_EQUAL("issuer"_n, payer_of("wireclaims"_n, wire_claim_key_of("alice"_n, "issuer"_n)));
+   BOOST_REQUIRE_EQUAL(SYSIO_ACCOUNT, payer_of("wireclaims"_n, wire_claim_key_of("alice"_n, system_contract)));
+   BOOST_REQUIRE_EQUAL("bob"_n, payer_of("wireclaims"_n, wire_claim_key_of("alice"_n, "bob"_n)));
+   BOOST_REQUIRE_EQUAL(alice_ram, ram_usage("alice"_n));
+
+   BOOST_REQUIRE_EQUAL(success(), addyield("carol"_n, 100 * UNIT));
+   pass_window(window_sec);
+   for (uint64_t id = 1; id <= 3; ++id) BOOST_REQUIRE_EQUAL(success(), approve(id));
+   // Each claim records on its own issuer's row and bills no one.
+   for (uint64_t id : {3, 2, 1})
+      require_billed(billed_by([&] { BOOST_REQUIRE_EQUAL(success(), claim(id, "alice"_n)); }), {});
+   const uint64_t from_issuer = wire_claim_of("alice"_n, "issuer"_n)["amount"].as_uint64();
+   const uint64_t from_system = wire_claim_of("alice"_n, system_contract)["amount"].as_uint64();
+   const uint64_t from_bob    = wire_claim_of("alice"_n, "bob"_n)["amount"].as_uint64();
+   BOOST_REQUIRE_GT(from_issuer, 0u);
+   BOOST_REQUIRE_GT(from_system, 0u);
+   BOOST_REQUIRE_GT(from_bob, 0u);
+   BOOST_REQUIRE_EQUAL("issuer"_n, payer_of("wireclaims"_n, wire_claim_key_of("alice"_n, "issuer"_n)));
+   BOOST_REQUIRE_EQUAL(SYSIO_ACCOUNT, payer_of("wireclaims"_n, wire_claim_key_of("alice"_n, system_contract)));
+
+   // A withdrawal pays one issuer's balance, and only that one.
+   const auto alice_wire = wire_balance("alice"_n);
+   BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n, "bob"_n));
+   BOOST_REQUIRE_EQUAL(alice_wire + from_bob, wire_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(from_issuer, wire_claim_of("alice"_n, "issuer"_n)["amount"].as_uint64());
+   BOOST_REQUIRE_EQUAL(from_system, wire_claim_of("alice"_n, system_contract)["amount"].as_uint64());
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(nothing_msg)), claimwire("alice"_n, "bob"_n));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(nothing_msg)), claimwire("alice"_n, "carol"_n));
+
+   // The prune returns each issuer its own rows; the balances still owed stay until withdrawn.
+   pass_retention();
+   require_billed(billed_by([&] { BOOST_REQUIRE_EQUAL(success(), prune(0, 10)); }), {
+      {bill_of("issuer"_n, BOND_ACCOUNT, "requests"_n), -1},
+      {bill_of("issuer"_n, BOND_ACCOUNT, "requests"_n, "bystatement"_n), -1},
+      {bill_of("issuer"_n, BOND_ACCOUNT, "bonds"_n), -1},
+      {bill_of("issuer"_n, BOND_ACCOUNT, "wireclaims"_n), -1},
+      {bill_of(SYSIO_ACCOUNT, BOND_ACCOUNT, "requests"_n), -1},
+      {bill_of(SYSIO_ACCOUNT, BOND_ACCOUNT, "requests"_n, "bystatement"_n), -1},
+      {bill_of(SYSIO_ACCOUNT, BOND_ACCOUNT, "bonds"_n), -1},
+      {bill_of(SYSIO_ACCOUNT, BOND_ACCOUNT, "wireclaims"_n), -1},
+      {bill_of("bob"_n, BOND_ACCOUNT, "requests"_n), -1},
+      {bill_of("bob"_n, BOND_ACCOUNT, "requests"_n, "bystatement"_n), -1},
+      {bill_of("bob"_n, BOND_ACCOUNT, "bonds"_n), -1},
+      {bill_of("bob"_n, BOND_ACCOUNT, "wireclaims"_n), -1},
+   });
+   BOOST_REQUIRE(wire_claim_of("alice"_n, "bob"_n).is_null());
+   BOOST_REQUIRE_EQUAL(bob_ram, ram_usage("bob"_n));
+   require_billed(billed_by([&] { BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n, "issuer"_n)); }),
+                  {{bill_of("issuer"_n, BOND_ACCOUNT, "wireclaims"_n), -1}});
+   require_billed(billed_by([&] { BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n, system_contract)); }),
+                  {{bill_of(SYSIO_ACCOUNT, BOND_ACCOUNT, "wireclaims"_n), -1}});
+   BOOST_REQUIRE_EQUAL(alice_wire + from_bob + from_issuer + from_system, wire_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(issuer_ram, ram_usage("issuer"_n));
+   BOOST_REQUIRE_EQUAL(alice_ram, ram_usage("alice"_n));
 } FC_LOG_AND_RETHROW()
 
 // An escrow keeps earning after an APPROVED ruling while it holds shares its underwriters have not
@@ -1523,7 +2011,7 @@ BOOST_FIXTURE_TEST_CASE(escrow_yield_after_approval_reaches_the_funder, sysio_bo
    BOOST_REQUIRE(first > 0);
    auto issuer_wire = wire_balance("issuer"_n);
    BOOST_REQUIRE_EQUAL(success(), claim(1, "issuer"_n));
-   BOOST_REQUIRE_EQUAL(success(), claimwire("issuer"_n));
+   BOOST_REQUIRE_EQUAL(success(), claimwire("issuer"_n, "issuer"_n));
    BOOST_REQUIRE_EQUAL(issuer_wire + first, wire_balance("issuer"_n));
    auto escrow = raw_escrow_of(1, KIND_BOUNTY_BYTE);
    BOOST_REQUIRE_EQUAL(1 * UNIT, escrow.amount);   // alice's share is still held
@@ -1542,7 +2030,7 @@ BOOST_FIXTURE_TEST_CASE(escrow_yield_after_approval_reaches_the_funder, sysio_bo
    issuer_wire = wire_balance("issuer"_n);
    BOOST_REQUIRE_EQUAL(success(), claim(1, "issuer"_n));
    // The pool is first-come-first-served; the last taker may be short one atomic unit of rounding.
-   BOOST_REQUIRE_EQUAL(success(), claimwire("issuer"_n));
+   BOOST_REQUIRE_EQUAL(success(), claimwire("issuer"_n, "issuer"_n));
    const auto second_paid = wire_balance("issuer"_n) - issuer_wire;
    BOOST_REQUIRE(second_paid <= second && second_paid + 1 >= second);
    BOOST_REQUIRE(raw_escrow_of(1, KIND_BOUNTY_BYTE).paid);
@@ -1606,7 +2094,7 @@ BOOST_FIXTURE_TEST_CASE(escrow_is_paid_once_every_bond_is_paid_despite_a_remaind
 
    const auto issuer_wire = wire_balance("issuer"_n);
    BOOST_REQUIRE_EQUAL(success(), claim(1, "issuer"_n));
-   BOOST_REQUIRE_EQUAL(success(), claimwire("issuer"_n));
+   BOOST_REQUIRE_EQUAL(success(), claimwire("issuer"_n, "issuer"_n));
    BOOST_REQUIRE_GT(wire_balance("issuer"_n), issuer_wire);
    escrow = raw_escrow_of(1, KIND_BOUNTY_BYTE);
    BOOST_REQUIRE_EQUAL(1u, escrow.amount);
@@ -1763,6 +2251,75 @@ BOOST_FIXTURE_TEST_CASE(prune_starts_at_from_id, sysio_bond_tester) try {
    BOOST_REQUIRE(request_row_of(1).is_null());
 } FC_LOG_AND_RETHROW()
 
+// `limit` counts every request a call examines, so a run of requests it cannot prune -- open, still
+// retained, or in a token that no longer resolves -- ends the call instead of being walked past.
+BOOST_FIXTURE_TEST_CASE(prune_limit_counts_every_request_it_examines, sysio_bond_tester) try {
+   for (char fill : {'a', 'b', 'c', 'd', 'e', 'f'}) {
+      BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, fill), LIQSOL, 10 * UNIT, 0));
+   }
+   for (uint64_t id = 4; id <= 6; ++id) BOOST_REQUIRE_EQUAL(success(), rslvinvalid(SYSIO_ACCOUNT, id));
+   pass_retention();
+   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(SYSIO_ACCOUNT, 3));
+   rewrite_request_token(4, "NOPE");
+   produce_block();
+   // 1 and 2 are OPEN, 3 is retained, 4's token no longer resolves; 5 and 6 are prunable.
+
+   BOOST_REQUIRE_EQUAL(success(), prune(0, 0));
+   BOOST_REQUIRE_EQUAL(success(), prune(0, 4));
+   for (uint64_t id = 1; id <= 6; ++id) BOOST_REQUIRE(!request_row_of(id).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), prune(5, 4));
+   BOOST_REQUIRE(request_row_of(5).is_null());
+   BOOST_REQUIRE(request_row_of(6).is_null());
+   BOOST_REQUIRE_EQUAL(STATE_OPEN, request_state_of(1));
+   BOOST_REQUIRE_EQUAL(STATE_OPEN, request_state_of(2));
+   BOOST_REQUIRE_EQUAL(STATE_INVALID, request_state_of(3));
+   BOOST_REQUIRE_EQUAL(STATE_INVALID, request_state_of(4));
+} FC_LOG_AND_RETHROW()
+
+// A caller cannot have one call walk more than MAX_PRUNE_LIMIT requests.
+BOOST_FIXTURE_TEST_CASE(prune_refuses_a_limit_above_the_maximum, sysio_bond_tester) try {
+   BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'a'), LIQSOL, 10 * UNIT, 0));
+   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(SYSIO_ACCOUNT, 1));
+   pass_retention();
+
+   const auto refused = wasm_assert_msg(std::string(prune_limit_msg));
+   BOOST_REQUIRE_EQUAL(refused, prune(0, MAX_PRUNE_LIMIT + 1));
+   BOOST_REQUIRE_EQUAL(refused, prune(0, std::numeric_limits<uint32_t>::max()));
+   BOOST_REQUIRE_EQUAL(STATE_INVALID, request_state_of(1));
+   BOOST_REQUIRE_EQUAL(success(), prune(0, MAX_PRUNE_LIMIT));
+   BOOST_REQUIRE(request_row_of(1).is_null());
+} FC_LOG_AND_RETHROW()
+
+// A crank that starts each call at the id after the requests the last one examined, and over at 0 once a
+// call reaches the end, prunes every prunable request in one pass of ceil(rows / limit) calls.
+BOOST_FIXTURE_TEST_CASE(a_crank_resuming_after_each_prune_prunes_every_prunable_request, sysio_bond_tester) try {
+   constexpr uint32_t limit = 2;
+   constexpr uint64_t rows  = 9;
+   const auto         stays_open = [](uint64_t id) { return id % 3 == 0; };
+   for (uint64_t id = 1; id <= rows; ++id) {
+      BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, char('a' + id)), LIQSOL,
+                                             10 * UNIT, 0));
+      if (!stays_open(id)) BOOST_REQUIRE_EQUAL(success(), rslvinvalid(SYSIO_ACCOUNT, id));
+   }
+   pass_retention();
+
+   uint64_t from  = 0;
+   uint32_t calls = 0;
+   do {
+      const auto ids = request_ids_from(from, limit + 1);
+      BOOST_REQUIRE_EQUAL(success(), prune(from, limit));
+      ++calls;
+      from = ids.size() > limit ? ids[limit] : 0;
+   } while (from != 0);
+
+   BOOST_REQUIRE_EQUAL((rows + limit - 1) / limit, calls);
+   for (uint64_t id = 1; id <= rows; ++id) {
+      if (stays_open(id)) BOOST_REQUIRE_EQUAL(STATE_OPEN, request_state_of(id));
+      else BOOST_REQUIRE(request_row_of(id).is_null());
+   }
+} FC_LOG_AND_RETHROW()
+
 // A request whose token no longer resolves cannot be settled: prune skips it instead of failing,
 // and still erases the prunable requests after it.
 BOOST_FIXTURE_TEST_CASE(prune_skips_a_request_whose_token_no_longer_resolves, sysio_bond_tester) try {
@@ -1819,7 +2376,7 @@ BOOST_FIXTURE_TEST_CASE(durable_outcome_requires_issuer_acknowledgement, sysio_b
 } FC_LOG_AND_RETHROW()
 
 // A request still owed a claim keeps its row, but the bond rows already paid out go: one unclaimed
-// payout holds no other underwriter's RAM, and the unpaid rows claim exactly as before.
+// payout holds no other underwriter's row in RAM, and the unpaid rows claim exactly as before.
 BOOST_FIXTURE_TEST_CASE(prune_erases_the_paid_bonds_of_a_request_it_keeps, sysio_bond_tester) try {
    constexpr uint32_t window_sec = 3600;
    BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'a'), LIQSOL, 10 * UNIT, 1 * UNIT,
@@ -1831,12 +2388,16 @@ BOOST_FIXTURE_TEST_CASE(prune_erases_the_paid_bonds_of_a_request_it_keeps, sysio
    BOOST_REQUIRE_EQUAL(success(), claim(1, "alice"_n));
 
    // Within the retention period: alice's paid row goes at once, bob's stays, and so does the request.
-   const auto alice_ram = ram_usage("alice"_n);
-   BOOST_REQUIRE_EQUAL(success(), prune(0, 10));
+   // The issuer gets back the RAM of alice's bond row and of her balance row, which owes nothing.
+   require_billed(billed_by([&] { BOOST_REQUIRE_EQUAL(success(), prune(0, 10)); }), {
+      {bill_of("issuer"_n, BOND_ACCOUNT, "bonds"_n), -1},
+      {bill_of("issuer"_n, BOND_ACCOUNT, "wireclaims"_n), -1},
+   });
    BOOST_REQUIRE_EQUAL(1u, bond_rows_of(1).size());
    BOOST_REQUIRE_EQUAL(6 * UNIT, bond_amount_of(1, "bob"_n));
    BOOST_REQUIRE_EQUAL(STATE_APPROVED, request_state_of(1));
-   BOOST_REQUIRE_LT(ram_usage("alice"_n), alice_ram);
+   BOOST_REQUIRE(wire_claim_of("alice"_n, "issuer"_n).is_null());
+   BOOST_REQUIRE_EQUAL(1u, wire_claim_of("bob"_n, "issuer"_n)["reservations"].as_uint64());
    BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(nothing_msg)), claim(1, "alice"_n));
 
    // Past it, bob's unclaimed bond still keeps the request.

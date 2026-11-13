@@ -292,8 +292,6 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stat
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.target_block_net_usage_pct));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.max_transaction_net_usage));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.net_usage_leeway));
-   fc::raw::pack(ds, as_type<uint32_t>(obj.obj.context_free_discount_net_usage_num));
-   fc::raw::pack(ds, as_type<uint32_t>(obj.obj.context_free_discount_net_usage_den));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.max_block_cpu_usage));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.target_block_cpu_usage_pct));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.max_transaction_cpu_usage));
@@ -307,6 +305,7 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stat
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.max_kv_key_size));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.max_kv_value_size));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.max_kv_secondary_key_size));
+   fc::raw::pack(ds, as_type<uint32_t>(obj.obj.notify_cpu_stipend));
    return ds;
 }
 
@@ -551,7 +550,6 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_context_wrapper_sta
    }
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.receiver.to_uint64_t()));
    fc::raw::pack(ds, make_history_serial_wrapper(as_type<sysio::chain::action>(obj.obj.act)));
-   fc::raw::pack(ds, as_type<bool>(obj.obj.context_free));
    fc::raw::pack(ds, as_type<int64_t>(debug_mode ? obj.obj.elapsed.count() : 0));
    if (debug_mode)
       fc::raw::pack(ds, as_type<std::string>(obj.obj.console));

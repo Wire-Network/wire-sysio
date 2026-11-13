@@ -41,18 +41,20 @@ register a handler from `main()` before `app().initialize(...)` via `register_sp
 
 ## KMS: AWS KMS remote signing (`plugin = sysio::signature_provider_kms_plugin`)
 
-`KMS:<key-ref>` keeps the signing key in AWS KMS and issues a remote `Sign` call per signature —
-the key never appears on the host or in process memory. `<key-ref>` is a full key/alias ARN,
-`<region>:<key-id-or-alias>`, or a region-less `<key-id-or-alias>` (see "Region resolution"
-below). Scope is secp256k1/ethereum keys only — the provider hard-rejects
-every other key type at boot, so a `KMS:` key can never back wire producer or BLS finalizer
-signing; the 30–100 ms per-signature latency therefore only touches ethereum-side submission
-paths, which run at seconds cadence. Every `KMS:` key is probed at startup with a (free)
-`GetPublicKey` call, so a credentials / region / IAM / pinned-key misconfiguration fails at boot
-instead of on the first sign; a transient AWS error at startup is logged and deferred to the
-lazy first-sign check, so an AWS blip never blocks a boot. See
-`plugins/signature_provider_kms_plugin/test/README.md` for key setup, IAM requirements, and
-operational notes.
+`KMS:<key-ref>` keeps the signing key in AWS KMS and issues a remote `Sign` call per signature — the
+key never appears on the host or in process memory. `<key-ref>` is a full key/alias ARN,
+`<region>:<key-id-or-alias>`, or a region-less `<key-id-or-alias>` (see "Region resolution" below).
+Scope is `ethereum` and `wire` K1 keys (secp256k1 KMS keys) and `solana` keys (Ed25519 KMS keys).
+The provider rejects every other key type at boot. A `KMS:` key never backs producer or BLS
+finalizer signing: `producer_plugin` requires a local private key for every WIRE and BLS key on a
+producer node. The 30–100 ms per-signature latency therefore only touches submission paths that run
+at seconds cadence, such as outpost transactions on Ethereum and Solana and a batch operator's WIRE
+actions. Snapshot votes sign only with WIRE keys held locally, so a snapshot provider's account key
+must be `KEY:` or `SSM:`. Every `KMS:` key is probed at startup with a (free) `GetPublicKey` call,
+so a credentials / region / IAM / pinned-key misconfiguration fails at boot instead of on the first
+sign; a transient AWS error at startup is logged and deferred to the lazy first-sign check, so an
+AWS blip never blocks a boot. See `plugins/signature_provider_kms_plugin/test/README.md` for key
+setup, IAM requirements, and operational notes.
 
 ## SSM: AWS SSM Parameter Store keys (`plugin = sysio::signature_provider_ssm_plugin`)
 
@@ -62,7 +64,7 @@ key material ever appearing in config files, command lines, process listings, or
 It works for every key type with a `KEY:` form (the parameter's value is exactly the string that
 would follow `KEY:`), and local signing makes it suitable for all signing paths including
 producer block signing -- unlike `KMS:`, whose per-signature network round-trip is too slow for
-block production (and whose ethereum-only key scope rules that out anyway).
+block production.
 
 `<param-ref>` is the shorthand `<region>:<parameter-name>` (everything after the first colon
 passes to GetParameter verbatim, so SSM's native `:version` / `:label` selectors work), a
