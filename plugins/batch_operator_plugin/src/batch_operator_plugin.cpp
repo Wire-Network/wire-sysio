@@ -922,14 +922,9 @@ struct batch_operator_plugin::impl {
     * in the batch-op log without grep'ing every poll.
     */
    void poll_own_status() {
-      // `sysio.opreg::operators` is a KV table whose PK is a struct
-      // `{account: name}`; the chain_plugin's `lower_bound` / `upper_bound`
-      // expects JSON-shaped key bounds for KV tables, not the bare name
-      // string the v5 multi_index path accepted. Easiest robust fix: scan
-      // all rows and filter in-plugin — the operator count stays bounded
-      // by `op_config.max_available_*` (capped at ~100 for the lifetime
-      // of this plugin), so a linear scan once per `poll_own_status`
-      // period is cheap.
+      // `sysio.opreg::operators` is a KV table whose PK is a struct `{account: name}`; the chain_plugin's
+      // `lower_bound` / `upper_bound` expects JSON-shaped key bounds for KV tables, not the bare name string. This
+      // reads every operator row and filters in-plugin. Nothing caps the table, so the scan grows with it.
       sysio::chain_apis::read_only::get_table_rows_params p;
       p.code        = chain::name(opreg::account);
       p.scope       = opreg::account;
