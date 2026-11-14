@@ -290,10 +290,21 @@ namespace fc
         int64_t                     as_int64()const;
         uint64_t                    as_uint64()const;
         /// @}
+
+        /**
+         * The value as a 128-bit or 256-bit integer: an int64 or uint64, an integer of that width, a string holding
+         * one, a bool, or null as zero.
+         *
+         * @throw parse_error_exception if the value is outside the range of the result type. fc::int256 is
+         *        sign-magnitude, so its range is +/-(2^256 - 1).
+         * @throw bad_cast_exception if the variant holds any other type
+         * @{
+         */
         fc::int128                  as_int128()const;
         fc::uint128                 as_uint128()const;
         fc::int256                  as_int256()const;
         fc::uint256                 as_uint256()const;
+        /// @}
 
         /**
          * Convert variant to an enum value. Handles both integer and string

@@ -40,6 +40,9 @@ public:
    /// if present, call `client->deliver_outbound_envelope` with it. Emits the
    /// `DEPOT_OUTPOST_{ETHEREUM|SOLANA}` debug event when something was sent.
    /// No-op when the epoch window is closed or no envelope is pending.
+   /// Successful submissions remain provisional: after the epoch boundary, retry
+   /// every cron tick until this operator's inbound delivery is recorded by the
+   /// depot. Solana inbound reads use finalized commitment.
    void run_outbound();
 
    /// Read inbound envelopes from the remote chain for the current epoch and,
@@ -58,19 +61,9 @@ private:
    fc::microseconds   _outpost_deadline;
    std::mutex         _state_mx;
 
-   /// Last epoch for which `run_outbound` attempted a delivery — used to
-   /// avoid re-delivering the same envelope inside a single epoch across
-   /// cron re-fires.
+   /// Last successful submission, used to gate retries on the epoch boundary and
+   /// run the outpost's per-epoch cranks once. Success never disables recovery.
    uint32_t _last_outbound_epoch = 0;
-
-   /// Last epoch for which a path-2 consensus-retry re-delivery was issued.
-   /// Bounds the retry at one tx per epoch even when cron fires repeatedly
-   /// after the boundary elapses but before consensus tips. The retry
-   /// itself is idempotent on both the ETH and SOL outpost contracts:
-   /// re-submitting the same envelope from the same operator re-runs the
-   /// dual-path consensus check without re-recording the delivery. See
-   /// .claude/rules/opp-consensus.md.
-   uint32_t _last_consensus_retry_epoch = 0;
 };
 
 } // namespace sysio

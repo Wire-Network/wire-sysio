@@ -18,6 +18,8 @@
 
 #include <boost/hana/equal.hpp>
 
+#include <optional>
+
 #include "IR/Types.h"
 
 #include <asm/prctl.h>
@@ -96,12 +98,25 @@ static intrinsic sysio_exit_intrinsic("env.sysio_exit", IR::FunctionType::get(IR
   require_intrinsic_index<find_intrinsic_index("env.sysio_exit")>::value
 );
 
+/// Stores a copy of `e` for executor::execute() to rethrow once wasm is left with SYSVMOC_EXIT_EXCEPTION.
 template <typename E>
-static void throw_internal_exception(const E& e) {
+static void store_internal_exception(const E& e) {
    *reinterpret_cast<std::exception_ptr*>(sys_vm_oc_get_exception_ptr()) = std::make_exception_ptr(e);
-   siglongjmp(*sys_vm_oc_get_jmp_buf(), SYSVMOC_EXIT_EXCEPTION);
-   __builtin_unreachable();
 }
+
+/**
+ * Leaves wasm from an intrinsic with an `exception_type` built from the FC_LOG_MESSAGE arguments that follow.
+ *
+ * siglongjmp runs no destructors. The exception and its log message are temporaries of the first statement, so they
+ * are destroyed before the jump. Nothing else with a destructor may be alive in any frame up to the sigsetjmp in
+ * executor::execute().
+ */
+#define SYSVMOC_THROW_INTERNAL_EXCEPTION(exception_type, ...)                       \
+   do {                                                                             \
+      store_internal_exception(exception_type(FC_LOG_MESSAGE(error, __VA_ARGS__))); \
+      siglongjmp(*sys_vm_oc_get_jmp_buf(), SYSVMOC_EXIT_EXCEPTION);                 \
+      __builtin_unreachable();                                                      \
+   } while (0)
 
 #define DEFINE_SYSVMOC_TRAP_INTRINSIC(module,name) \
 	void name(); \
@@ -111,23 +126,23 @@ static void throw_internal_exception(const E& e) {
 	void name()
 
 DEFINE_SYSVMOC_TRAP_INTRINSIC(sysvmoc_internal,depth_assert) {
-   throw_internal_exception(wasm_execution_error(FC_LOG_MESSAGE(error, "Exceeded call depth maximum")));
+   SYSVMOC_THROW_INTERNAL_EXCEPTION(wasm_execution_error, "Exceeded call depth maximum");
 }
 
 DEFINE_SYSVMOC_TRAP_INTRINSIC(sysvmoc_internal,div0_or_overflow) {
-   throw_internal_exception(wasm_execution_error(FC_LOG_MESSAGE(error, "Division by 0 or integer overflow trapped")));
+   SYSVMOC_THROW_INTERNAL_EXCEPTION(wasm_execution_error, "Division by 0 or integer overflow trapped");
 }
 
 DEFINE_SYSVMOC_TRAP_INTRINSIC(sysvmoc_internal,indirect_call_mismatch) {
-   throw_internal_exception(wasm_execution_error(FC_LOG_MESSAGE(error, "Indirect call function type mismatch")));
+   SYSVMOC_THROW_INTERNAL_EXCEPTION(wasm_execution_error, "Indirect call function type mismatch");
 }
 
 DEFINE_SYSVMOC_TRAP_INTRINSIC(sysvmoc_internal,indirect_call_oob) {
-   throw_internal_exception(wasm_execution_error(FC_LOG_MESSAGE(error, "Indirect call index out of bounds")));
+   SYSVMOC_THROW_INTERNAL_EXCEPTION(wasm_execution_error, "Indirect call index out of bounds");
 }
 
 DEFINE_SYSVMOC_TRAP_INTRINSIC(sysvmoc_internal,unreachable) {
-   throw_internal_exception(wasm_execution_error(FC_LOG_MESSAGE(error, "Unreachable reached")));
+   SYSVMOC_THROW_INTERNAL_EXCEPTION(wasm_execution_error, "Unreachable reached");
 }
 
 static void sys_vm_oc_check_memcpy_params(int32_t dest, int32_t src, int32_t length) {
@@ -139,7 +154,7 @@ static void sys_vm_oc_check_memcpy_params(int32_t dest, int32_t src, int32_t len
    //this must remain the same behavior as the memcpy host function
    if((size_t)(std::abs((ptrdiff_t)udest - (ptrdiff_t)usrc)) >= ulength)
       return;
-   throw_internal_exception(overlapping_memory_error(FC_LOG_MESSAGE(error, "memcpy can only accept non-aliasing pointers")));
+   SYSVMOC_THROW_INTERNAL_EXCEPTION(overlapping_memory_error, "memcpy can only accept non-aliasing pointers");
 }
 
 static intrinsic check_memcpy_params_intrinsic("sysvmoc_internal.check_memcpy_params", IR::FunctionType::get(IR::ResultType::none,{IR::ValueType::i32,IR::ValueType::i32,IR::ValueType::i32}),
@@ -252,9 +267,13 @@ void executor::execute(const code_descriptor& code, memory& mem, apply_context& 
 
    void(*apply_func)(uint64_t, uint64_t, uint64_t) = (void(*)(uint64_t, uint64_t, uint64_t))(cb->running_code_base + code.apply_offset);
 
-   switch(sigsetjmp(*cb->jmp, 0)) {
-      case 0:
-         stack.run([&]{
+   // Empty when wasm returns normally.
+   std::optional<sysvmoc_exitcode> early_exit;
+   // sigsetjmp is called on the execution stack, so every siglongjmp out of wasm lands in a live frame higher on
+   // that same stack. glibc's fortified longjmp aborts on a jump down to another stack.
+   stack.run([&]{
+      switch(sigsetjmp(*cb->jmp, 0)) {
+         case 0:
             std::visit(overloaded {
                [&](const no_offset&) {},
                [&](const intrinsic_ordinal& i) {
@@ -267,18 +286,37 @@ void executor::execute(const code_descriptor& code, memory& mem, apply_context& 
                }
             }, code.start);
             apply_func(context.get_receiver().to_uint64_t(), context.get_action().account.to_uint64_t(), context.get_action().name.to_uint64_t());
-         });
-         break;
-      //case 1: clean sysio_exit
-      case SYSVMOC_EXIT_CHECKTIME_FAIL:
-         context.trx_context.checktime();
-         break;
-      case SYSVMOC_EXIT_SEGV:
-         SYS_ASSERT(false, wasm_execution_error, "access violation");
-         break;
-      case SYSVMOC_EXIT_EXCEPTION: //exception
-         std::rethrow_exception(*cb->eptr);
-         break;
+            break;
+         case SYSVMOC_EXIT_CLEAN_EXIT:
+            early_exit = SYSVMOC_EXIT_CLEAN_EXIT;
+            break;
+         case SYSVMOC_EXIT_CHECKTIME_FAIL:
+            early_exit = SYSVMOC_EXIT_CHECKTIME_FAIL;
+            break;
+         case SYSVMOC_EXIT_SEGV:
+            early_exit = SYSVMOC_EXIT_SEGV;
+            break;
+         case SYSVMOC_EXIT_EXCEPTION:
+            early_exit = SYSVMOC_EXIT_EXCEPTION;
+            break;
+      }
+   });
+
+   // Reported from the caller's stack: nothing may unwind through execution_stack::run.
+   if(early_exit) {
+      switch(*early_exit) {
+         case SYSVMOC_EXIT_CLEAN_EXIT: //clean sysio_exit
+            break;
+         case SYSVMOC_EXIT_CHECKTIME_FAIL:
+            context.trx_context.checktime();
+            break;
+         case SYSVMOC_EXIT_SEGV:
+            SYS_ASSERT(false, wasm_execution_error, "access violation");
+            break;
+         case SYSVMOC_EXIT_EXCEPTION:
+            std::rethrow_exception(*cb->eptr);
+            break;
+      }
    }
 }
 
