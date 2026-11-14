@@ -4,10 +4,17 @@
 #include <boost/algorithm/string.hpp>
 #include <fc/reflect/variant.hpp>
 #include <fc/safe.hpp>
+#include <fc/string.hpp>
 
 namespace sysio { namespace chain {
 
 using fc::safe;
+
+namespace {
+
+constexpr char minus_sign = '-';
+
+} // anonymous namespace
 
 uint8_t asset::decimals()const {
    return sym.decimals();
@@ -50,6 +57,18 @@ asset asset::from_string(std::string_view from)
          SYS_ASSERT((dot_pos != amount_str.size() - 1), asset_type_exception, "Missing decimal fraction after decimal point");
       }
 
+      // The amount is [-]digits[.digits]: one leading minus is the only sign, and neither part takes anything else
+      const bool negative = amount_str.starts_with(minus_sign);
+      std::string_view int_digits = amount_str.substr(0, dot_pos);
+      if (negative) int_digits.remove_prefix(1);
+      SYS_ASSERT(!int_digits.empty() && fc::all_digits(int_digits), asset_type_exception,
+                 "Asset's integer part should be digits with an optional leading minus sign");
+      if (dot_pos != std::string_view::npos) {
+         // an empty fraction was rejected above
+         SYS_ASSERT(fc::all_digits(amount_str.substr(dot_pos + 1)), asset_type_exception,
+                    "Asset's decimal fraction should be digits only");
+      }
+
       // Parse symbol
       string precision_digit_str;
       if (dot_pos != std::string_view::npos) {
@@ -66,7 +85,7 @@ asset asset::from_string(std::string_view from)
       if (dot_pos != std::string_view::npos) {
          int_part = fc::to_int64(std::string{amount_str.substr(0, dot_pos)});
          fract_part = fc::to_int64(std::string{amount_str.substr(dot_pos + 1)});
-         if (amount_str[0] == '-') fract_part *= -1;
+         if (negative) fract_part *= -1;
       } else {
          int_part = fc::to_int64(std::string{amount_str});
       }

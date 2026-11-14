@@ -34,6 +34,13 @@ struct asset : fc::reflect_init
    const symbol& get_symbol() const { return sym; }
    share_type get_amount()const { return amount; }
 
+   /**
+    * Parse "<amount> <SYMBOL>", e.g. "10.0000 CUR". The amount is `[-]digits[.digits]`: one leading minus is the
+    * only sign accepted, and the number of digits after the decimal point is the symbol's precision.
+    *
+    * @throws asset_type_exception if the amount is not of that form; another fc::exception if the symbol is invalid
+    *         or the amount is out of range
+    */
    static asset from_string(std::string_view from);
    string       to_string()const;
 
