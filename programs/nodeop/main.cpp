@@ -1,4 +1,5 @@
 #include <string>
+#include <sysio/account_watch_plugin/account_watch_plugin.hpp>
 #include <sysio/alert_monitor_plugin/alert_monitor_plugin.hpp>
 #include <sysio/batch_operator_plugin/batch_operator_plugin.hpp>
 #include <sysio/chain/app.hpp>
@@ -38,6 +39,7 @@ int main(int argc, char** argv)
    application_base::register_plugin<test_control_api_plugin>();
    application_base::register_plugin<state_history_plugin>();
    application_base::register_plugin<alert_monitor_plugin>();
+   application_base::register_plugin<account_watch_plugin>();
    application_base::register_plugin<query_engine_plugin>();
    application_base::register_plugin<prometheus_plugin>();
    application_base::register_plugin<chain_api_plugin>();

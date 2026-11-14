@@ -302,16 +302,6 @@
             ]
         },
         {
-            "name": "finishreturn",
-            "base": "",
-            "fields": [
-                {
-                    "name": "request_id",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
             "name": "import_credit",
             "base": "",
             "fields": [
@@ -1281,11 +1271,6 @@
             "ricardian_contract": ""
         },
         {
-            "name": "finishreturn",
-            "type": "finishreturn",
-            "ricardian_contract": ""
-        },
-        {
             "name": "importdone",
             "type": "importdone",
             "ricardian_contract": ""
@@ -1444,7 +1429,14 @@
             "index_type": "i64",
             "key_names": ["request_id"],
             "key_types": ["uint64"],
-            "table_id": 25676
+            "table_id": 25676,
+            "secondary_indexes": [
+                {
+                    "name": "bysentepoch",
+                    "key_type": "uint128",
+                    "table_id": 9914
+                }
+            ]
         },
         {
             "name": "syndconfig",

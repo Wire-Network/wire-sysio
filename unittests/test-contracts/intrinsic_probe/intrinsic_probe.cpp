@@ -88,8 +88,8 @@ int32_t check_transaction_authorization( const char* trx_data,  uint32_t trx_len
                                          const char* perms_data, uint32_t perms_len );
 
 // get_permission_lower_bound: aligned_span<char> out-param (buffer). Wire-specific intrinsic
-// (libraries/chain/webassembly/permission.cpp) backing CDT's sysio::get_permission wrapper, used on-chain by
-// sysio.roa::active_key_matches to read an account's authority. by_owner lower_bound on
+// (libraries/chain/webassembly/permission.cpp) backing CDT's sysio::get_permission wrapper
+// for reading an account's authority. by_owner lower_bound on
 // (account, permission); returns -1 when no permission for `account` exists at/after the key, else the full
 // serialized record size (which may exceed buffer_size -- the size-query-then-fetch contract). The serialized
 // payload is pack(perm_name) ++ pack(parent_name) ++ pack(last_updated) ++ pack(authority).
@@ -324,8 +324,8 @@ constexpr uint64_t U64_MAX        = 0xFFFFFFFFFFFFFFFFULL;
 // -----------------------------------------------------------------------------
 // get_permission_lower_bound record layout. A byte-for-byte mirror of CDT's
 // sysio::permission_record / perm_authority (libraries/sysiolib/contracts/sysio/permission.hpp): the exact
-// shape on-chain consumers (sysio.roa::active_key_matches) unpack from this intrinsic's output.
-// Defined locally so the probe verifies the raw host serialization against the real consumer contract without
+// shape the CDT wrapper unpacks from this intrinsic's output.
+// Defined locally so the probe verifies the raw host serialization against the CDT layout without
 // routing the CALL through the CDT wrapper. Note the host also packs a trailing `waits` vector that the
 // consumer struct intentionally omits -- unpack stops after `accounts` and tolerates the trailing bytes.
 // -----------------------------------------------------------------------------
@@ -1355,7 +1355,7 @@ public:
    // P2 -- get_permission_lower_bound
    //
    // Wire-specific intrinsic backing CDT's sysio::get_permission -- the only host path a contract has to read
-   // another account's authority on-chain (sysio.roa::active_key_matches). These probes pin the
+   // another account's authority on-chain. These probes pin the
    // pieces the CDT wrapper and its callers depend on: the serialized record layout, the size-query /
    // small-buffer contract, the not-found -1 sentinel, and the lower-bound (NOT exact-match) lookup semantics.
    // All queries target get_self(), whose owner/active permissions the Boost driver creates with a single K1

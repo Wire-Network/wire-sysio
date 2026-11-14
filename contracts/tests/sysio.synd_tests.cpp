@@ -846,6 +846,22 @@ public:
       BOOST_REQUIRE(!row.is_null());
       return row["sent_epoch"].as<uint32_t>();
    }
+   /// The request id of every `returns` row, ascending.
+   std::vector<uint64_t> return_ids() {
+      std::vector<uint64_t> ids;
+      for (const auto& value : kv_rows("returns"_n))
+         ids.push_back(decode(synd_abi_ser, "return_row", value)["request_id"].as_uint64());
+      return ids;
+   }
+   /// Record `epoch` as the last epoch sysio.msgch accepted from `chain_code`'s outpost: the `outpcons` row
+   /// its consensus path writes, which this fixture has no operators to drive.
+   void accept_outpost_epoch(std::string_view chain_code, uint32_t epoch) {
+      const mvo row = mvo()("chain_code", slug_value(chain_code))("epoch_index", epoch)("consensus_reached", true)
+         ("winning_checksum", fc::sha256())("envelope_digest", fc::sha256())("message_tip", fc::sha256());
+      sysio_system::test_support::write_kv_row(
+         *this, MSGCH_ACCOUNT, "outpcons"_n, slug_value(chain_code),
+         msgch_abi_ser.variant_to_binary("outpost_consensus_entry", row, fixture_abi_yield_function()));
+   }
    fc::variant pool_row(std::string_view token_code) {
       return decode(synd_abi_ser, "pool_row",
                     get_row_by_id(SYND_ACCOUNT, SYND_ACCOUNT, "yieldpool"_n, slug_value(token_code)));
@@ -1347,6 +1363,9 @@ BOOST_FIXTURE_TEST_CASE(liq_has_none_of_the_moved_actions, sysio_synd_tester) tr
    BOOST_REQUIRE(has_table(synd_abi, "parked"_n));
    BOOST_REQUIRE(!has_table(synd_abi, "desyndlog"_n));
    BOOST_REQUIRE(has_table(synd_abi, "returns"_n));
+   // A return expires by itself; only the refund is an action.
+   BOOST_REQUIRE(has_action(synd_abi, "refundreturn"_n));
+   BOOST_REQUIRE(!has_action(synd_abi, "finishreturn"_n));
    BOOST_REQUIRE(has_table(synd_abi, "syndconfig"_n));
    BOOST_REQUIRE(has_table(synd_abi, "syndstate"_n));
    BOOST_REQUIRE(has_table(synd_abi, "buckets"_n));
@@ -1639,8 +1658,8 @@ BOOST_FIXTURE_TEST_CASE(outstanding_returns_record_the_original_obligation, sysi
                                          ed_bytes(ed_key()), LIQSOL, 3 * UNIT));
 } FC_LOG_AND_RETHROW()
 
-/// Governance closes externally settled returns or refunds a definitively cancelled obligation.
-/// Both consume the pending record exactly once; fees stay charged and refund destinations are immutable.
+/// Governance refunds a definitively cancelled obligation: the pending record is consumed exactly once, the
+/// fee stays charged and the refund goes to the original holder.
 BOOST_FIXTURE_TEST_CASE(return_resolution_is_authorized_exact_and_once, sysio_synd_tester) try {
    BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
    BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_signer()));
@@ -1650,21 +1669,13 @@ BOOST_FIXTURE_TEST_CASE(return_resolution_is_authorized_exact_and_once, sysio_sy
       return push(SYND_ACCOUNT, synd_abi_ser, signer, action, mvo()("request_id", id));
    };
    BOOST_REQUIRE(mentions(resolve("alice"_n, "refundreturn"_n, 1), "missing authority of sysio"));
-   BOOST_REQUIRE(mentions(resolve("alice"_n, "finishreturn"_n, 1), "missing authority of sysio"));
    BOOST_REQUIRE(!return_row(1).is_null());
    BOOST_REQUIRE_EQUAL(success(), resolve(SYSIO_ACCOUNT, "refundreturn"_n, 1));
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(99 * UNIT), liq_balance("alice"_n));
    BOOST_REQUIRE_EQUAL(UNIT, feepot_balance(LIQSOL));
    BOOST_REQUIRE(return_row(1).is_null());
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("outstanding return not found"), resolve(SYSIO_ACCOUNT, "refundreturn"_n, 1));
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg("outstanding return not found"), resolve(SYSIO_ACCOUNT, "finishreturn"_n, 1));
-   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, 10 * UNIT));
-   const auto before = liq_balance("alice"_n);
-   BOOST_REQUIRE_EQUAL(success(), resolve(SYSIO_ACCOUNT, "finishreturn"_n, 2));
-   BOOST_REQUIRE_EQUAL(before, liq_balance("alice"_n));
-   BOOST_REQUIRE(return_row(2).is_null());
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg("outstanding return not found"), resolve(SYSIO_ACCOUNT, "refundreturn"_n, 2));
-   BOOST_REQUIRE_EQUAL(3u, counters_row()["next_request_id"].as_uint64());
+   BOOST_REQUIRE_EQUAL(2u, counters_row()["next_request_id"].as_uint64());
 } FC_LOG_AND_RETHROW()
 
 /// A failed inline restoration leaves the outstanding record available for later recovery.
@@ -1807,7 +1818,7 @@ BOOST_FIXTURE_TEST_CASE(returns_spilled_across_envelopes_record_the_envelope_eac
    BOOST_REQUIRE_EQUAL(4u, sent_epoch(4));
 } FC_LOG_AND_RETHROW()
 
-/// A return governance resolves before its envelope is built leaves the build whole: the notice for its
+/// A return governance refunds before its envelope is built leaves the build whole: the notice for its
 /// request id finds no row and is dropped with a diagnostic.
 BOOST_FIXTURE_TEST_CASE(a_return_resolved_before_its_envelope_is_built_leaves_the_build_whole,
                         sysio_synd_tester) try {
@@ -1817,7 +1828,7 @@ BOOST_FIXTURE_TEST_CASE(a_return_resolved_before_its_envelope_is_built_leaves_th
    BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, 10 * UNIT));
    BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, 5 * UNIT));
    BOOST_REQUIRE_EQUAL(success(),
-      push(SYND_ACCOUNT, synd_abi_ser, SYSIO_ACCOUNT, "finishreturn"_n, mvo()("request_id", 1)));
+      push(SYND_ACCOUNT, synd_abi_ser, SYSIO_ACCOUNT, "refundreturn"_n, mvo()("request_id", 1)));
 
    BOOST_REQUIRE_EQUAL(success(), set_epoch(1));
    BOOST_REQUIRE_EQUAL(success(), buildenv(SOLANA));
@@ -1855,6 +1866,158 @@ BOOST_FIXTURE_TEST_CASE(retsent_stamps_each_return_once_for_its_own_outpost, sys
    BOOST_REQUIRE(
       console_has("sysio.synd::retsent: DROP -- the return already records the envelope that carried it"));
    BOOST_REQUIRE_EQUAL(7u, sent_epoch(1));
+} FC_LOG_AND_RETHROW()
+
+/// A return lives until its outpost has consumed the envelope that carried it. Built but not yet consumed,
+/// it survives a later desyndication; once sysio.msgch has accepted the outpost's envelope for that epoch,
+/// which the outpost emits only after accepting the depot's, the next desyndication erases it.
+BOOST_FIXTURE_TEST_CASE(a_return_expires_once_its_outpost_has_consumed_its_envelope, sysio_synd_tester) try {
+   BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_signer()));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
+   BOOST_REQUIRE_EQUAL(success(), set_epoch(3));
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, 10 * UNIT));
+
+   // `advance` runs once the outpost's epoch-3 envelope is accepted, and builds the depot's for epoch 4.
+   accept_outpost_epoch(SOLANA, 3);
+   BOOST_REQUIRE_EQUAL(success(), set_epoch(4));
+   BOOST_REQUIRE_EQUAL(success(), buildenv(SOLANA));
+   BOOST_REQUIRE_EQUAL(4u, sent_epoch(1));
+
+   // Built, not consumed: the outpost's last accepted epoch is still 3.
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, 5 * UNIT));
+   BOOST_REQUIRE((return_ids() == std::vector<uint64_t>{1, 2}));
+
+   // The outpost's epoch-4 envelope is accepted: request 1 goes, the unsent requests stay.
+   accept_outpost_epoch(SOLANA, 4);
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, 5 * UNIT));
+   BOOST_REQUIRE((return_ids() == std::vector<uint64_t>{2, 3}));
+   BOOST_REQUIRE_EQUAL(0u, sent_epoch(2));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(80 * UNIT), liq_balance("alice"_n));
+} FC_LOG_AND_RETHROW()
+
+/// One desyndication erases at most two consumed returns, oldest envelope first and, within an envelope,
+/// lowest request id first.
+BOOST_FIXTURE_TEST_CASE(a_desyndication_expires_at_most_two_consumed_returns_oldest_first, sysio_synd_tester) try {
+   constexpr uint32_t MAX_RETURNS_EXPIRED_PER_DESYNDICATE = 2;   // mirrors sysio.synd.hpp
+   BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_signer()));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
+
+   // Requests 1-3 ride the epoch-2 envelope, request 4 the epoch-3 one; the outpost has consumed both.
+   BOOST_REQUIRE_EQUAL(success(), set_epoch(1));
+   for (uint32_t i = 0; i < MAX_RETURNS_EXPIRED_PER_DESYNDICATE + 1; ++i)
+      BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, UNIT));
+   BOOST_REQUIRE_EQUAL(success(), set_epoch(2));
+   BOOST_REQUIRE_EQUAL(success(), buildenv(SOLANA));
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, UNIT));
+   BOOST_REQUIRE_EQUAL(success(), set_epoch(3));
+   BOOST_REQUIRE_EQUAL(success(), buildenv(SOLANA));
+   BOOST_REQUIRE_EQUAL(2u, sent_epoch(3));
+   BOOST_REQUIRE_EQUAL(3u, sent_epoch(4));
+   accept_outpost_epoch(SOLANA, 3);
+
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, UNIT));
+   BOOST_REQUIRE((return_ids() == std::vector<uint64_t>{3, 4, 5}));
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, UNIT));
+   BOOST_REQUIRE((return_ids() == std::vector<uint64_t>{5, 6}));
+   // Nothing consumed is left: requests 5 and 6 are still queued.
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, UNIT));
+   BOOST_REQUIRE((return_ids() == std::vector<uint64_t>{5, 6, 7}));
+} FC_LOG_AND_RETHROW()
+
+/// Expiry touches only the consumed returns of the desyndication's own outpost. With no consensus row, with
+/// only another outpost's, or with the outpost's last accepted epoch behind the envelope, nothing goes; unsent
+/// returns never go; and another outpost's consumed return waits for a desyndication to that outpost.
+BOOST_FIXTURE_TEST_CASE(expiry_leaves_unsent_unconsumed_and_other_outposts_returns, sysio_synd_tester) try {
+   BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQETH, 100 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_signer()));
+   BOOST_REQUIRE_EQUAL(success(),
+                       createlink("alice"_n, fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em)));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(ETH, LIQETH, {}));
+
+   // Requests 1 and 2 go to SOLANA, request 3 to ETH; each outpost's epoch-2 envelope carries its own.
+   BOOST_REQUIRE_EQUAL(success(), set_epoch(1));
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, UNIT));
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, UNIT));
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, UNIT, LIQETH_SYM));
+   BOOST_REQUIRE_EQUAL(success(), set_epoch(2));
+   BOOST_REQUIRE_EQUAL(success(), buildenv(SOLANA));
+   BOOST_REQUIRE_EQUAL(success(), buildenv(ETH));
+   for (uint64_t id = 1; id <= 3; ++id) BOOST_REQUIRE_EQUAL(2u, sent_epoch(id));
+
+   // No consensus row for any outpost.
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, UNIT));
+   BOOST_REQUIRE((return_ids() == std::vector<uint64_t>{1, 2, 3, 4}));
+   // ETH has consumed its envelope; SOLANA has no row.
+   accept_outpost_epoch(ETH, 2);
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, UNIT));
+   BOOST_REQUIRE((return_ids() == std::vector<uint64_t>{1, 2, 3, 4, 5}));
+   // SOLANA's last accepted epoch is behind the envelope.
+   accept_outpost_epoch(SOLANA, 1);
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, UNIT));
+   BOOST_REQUIRE((return_ids() == std::vector<uint64_t>{1, 2, 3, 4, 5, 6}));
+
+   // SOLANA has consumed it: its two sent returns go, ETH's and the unsent ones stay.
+   accept_outpost_epoch(SOLANA, 2);
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, UNIT));
+   BOOST_REQUIRE((return_ids() == std::vector<uint64_t>{3, 4, 5, 6, 7}));
+   // A desyndication to ETH expires ETH's.
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, UNIT, LIQETH_SYM));
+   BOOST_REQUIRE((return_ids() == std::vector<uint64_t>{4, 5, 6, 7, 8}));
+} FC_LOG_AND_RETHROW()
+
+/// `refundreturn` reaches any return that still has its row, consumed or not, and none that has expired.
+BOOST_FIXTURE_TEST_CASE(a_refund_reaches_a_live_return_and_not_an_expired_one, sysio_synd_tester) try {
+   BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_signer()));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
+   const auto refund = [&](uint64_t id) {
+      return push(SYND_ACCOUNT, synd_abi_ser, SYSIO_ACCOUNT, "refundreturn"_n, mvo()("request_id", id));
+   };
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, 10 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, 7 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), set_epoch(1));
+   BOOST_REQUIRE_EQUAL(success(), buildenv(SOLANA));
+   accept_outpost_epoch(SOLANA, 1);
+
+   // Consumed, and still there until a desyndication expires it.
+   BOOST_REQUIRE_EQUAL(success(), refund(2));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(90 * UNIT), liq_balance("alice"_n));
+   BOOST_REQUIRE((return_ids() == std::vector<uint64_t>{1}));
+
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, 3 * UNIT));
+   BOOST_REQUIRE((return_ids() == std::vector<uint64_t>{3}));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("outstanding return not found"), refund(1));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(87 * UNIT), liq_balance("alice"_n));
+} FC_LOG_AND_RETHROW()
+
+/// Repeated desyndications do not grow `returns`: while each epoch's envelope is consumed, every call erases
+/// up to two rows for the one it writes, so the table never holds more than one epoch's requests.
+BOOST_FIXTURE_TEST_CASE(repeated_desyndications_leave_returns_bounded, sysio_synd_tester) try {
+   constexpr uint32_t EPOCHS             = 6;
+   constexpr uint32_t REQUESTS_PER_EPOCH = 3;
+   BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_signer()));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
+
+   for (uint32_t epoch = 1; epoch <= EPOCHS; ++epoch) {
+      BOOST_TEST_CONTEXT("epoch " << epoch) {
+         BOOST_REQUIRE_EQUAL(success(), set_epoch(epoch));
+         for (uint32_t i = 0; i < REQUESTS_PER_EPOCH; ++i) {
+            BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, UNIT));
+            BOOST_REQUIRE_LE(return_ids().size(), REQUESTS_PER_EPOCH);
+         }
+         // The next epoch's envelope carries them, and the outpost consumes it.
+         BOOST_REQUIRE_EQUAL(success(), set_epoch(epoch + 1));
+         BOOST_REQUIRE_EQUAL(success(), buildenv(SOLANA));
+         accept_outpost_epoch(SOLANA, epoch + 1);
+      }
+   }
+   BOOST_REQUIRE_EQUAL(uint64_t{EPOCHS} * REQUESTS_PER_EPOCH + 1, counters_row()["next_request_id"].as_uint64());
+   BOOST_REQUIRE_EQUAL(REQUESTS_PER_EPOCH, return_ids().size());
 } FC_LOG_AND_RETHROW()
 
 /// The DESYNDICATE_LIQ attestation `id` queued, decoded.

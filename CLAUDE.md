@@ -106,7 +106,7 @@ sudo apt-get install -y build-essential binutils ccache cmake curl git ninja-bui
     openjdk-21-jre-headless
 
 # Initialize required submodules
-git submodule update --init --recursive vcpkg libraries/appbase
+git submodule update --init vcpkg libraries/appbase libraries/sys-vm
 
 # Bootstrap vcpkg
 ./vcpkg/bootstrap-vcpkg.sh
@@ -122,7 +122,7 @@ rebuilds through CDT, `sys-vm-jit`, `sys-vm-oc`, and `native-module` are out of 
 # it keg-only, so its bin directory has to be on PATH for CMake's find_package(Java) to see it.
 brew install cmake ninja ccache pkgconf autoconf automake libtool openjdk
 export PATH="$(brew --prefix openjdk)/bin:$PATH"
-git submodule update --init --recursive vcpkg libraries/appbase
+git submodule update --init vcpkg libraries/appbase libraries/sys-vm
 ./vcpkg/bootstrap-vcpkg.sh
 
 export BUILD_DIR=$PWD/build/macos-arm64
@@ -398,6 +398,8 @@ The `tests/` directory contains Python integration tests using TestHarness frame
 cd $BUILD_DIR && python3 tests/<test_name>.py
 ```
 Do NOT run from the source root — that would use stale or missing binaries.
+
+Review [contract upgrade order](docs/contract-upgrade-order.md) when changing inline calls between system contracts; unchanged ABIs do not guarantee mixed-version compatibility.
 
 ## Smart Contract Compilation (System Contracts specifically)
 

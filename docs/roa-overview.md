@@ -773,6 +773,12 @@ A **tier-1** node owner can call `roa::newuser`, which mints a sub-account under
 (`<owner>.<generated>`) with a supplied public key, funded with the standard 1,144-byte account
 allocation drawn from the network pool.
 
+A node owner's own name never contains a `.` when it comes through the NFT-claim flow: `nodeownreg`
+creates no account for a dotted name and records the claim as `REJECTED` / `NAME_INVALID`, in every
+tier. A claim therefore cannot take a name under another account's prefix, such as a tier-1
+owner's sub-account namespace or a `sysio.` system name. Tier 1 takes 2–6 characters, tiers 2 and 3
+take 1–12.
+
 The created account has **no CPU/NET policy** — and does not need one, because it transacts
 against contracts that carry their own. A user gets an account at no cost to themselves and can
 immediately use every provisioned contract on the network.
@@ -875,8 +881,9 @@ and are omitted.
 | `newuser` | tier-1 node owner | Create a sponsored sub-account |
 | `raiseacctlim` | tier-1 node owner | Raise its own account limit, at most by the configured multiplier |
 | `setacctlim` | `sysio.roa` | Set the default account limit and the raise multiplier |
-| `newnameduser` | `sysio.roa` | Create a vanity account (NFT-claim flow) |
-| `nodeownreg` | `sysio.roa` | Register a node owner from an OPP attestation |
+| `newnameduser` | `sysio.roa` | Privileged vanity-account creation; also called internally by `nodeownreg` |
+| `nodeownreg` | `sysio.roa` | Create and register a fresh node-owner account from an OPP attestation |
+| `nodeownfin` | `sysio.roa`, self-inline only | Allocate a validated claim after native account creation |
 | `forcereg` | `sysio.roa` | Register a node owner directly (governance/bootstrap) |
 | `activateroa` | `sysio.roa` | Activate ROA and set the initial byte price |
 | `setbyteprice` | `sysio.roa` | Change bytes-per-unit on network expansion |
@@ -914,3 +921,22 @@ and are omitted.
 above — contract-as-payer billing, the failure mode of an unprovisioned contract, RAM-free token
 transfers, and multi-issuer policy stacking — were each verified against the code and confirmed
 with executable tests. The transcript blocks reproduce actual test output.*
+
+## NFT registration names
+
+Node-owner NFT claims create **new accounts only**.
+`sysio.msgch` dispatches `nodeownreg`, which rejects an existing name with
+`ACCOUNT_EXISTS` (7), including when the claim copies its public active key.
+Already registered owners retain the `DUPLICATE` outcome. Rejection records an
+audit row without changing the account authority, AuthEx link or owner allocation.
+A fresh accepted claim creates the requested authority, allocates the owner and
+records the depositor's Ethereum link in one atomic Wire transaction.
+Allocation uses the self-inline `nodeownfin` continuation; `forcereg` remains
+the separate privileged governance/bootstrap path. AuthEx `recordlink` remains
+a sibling action of `nodeownfin`, so its DClaim sweep stays within the inline-depth limit.
+
+The Hub checks name availability before BAR commitment; this cannot reserve the
+name against a competing claim. A name taken before depot execution is rejected
+and the NFT remains subject to BAR's existing escrow/recovery rules. This change
+adds no automatic refund or recovery action. Deploy the coupled contracts as
+specified in [contract upgrade order](contract-upgrade-order.md#wire-439-node-owner-registration).

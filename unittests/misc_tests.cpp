@@ -286,6 +286,57 @@ BOOST_AUTO_TEST_CASE(asset_from_string_overflow)
    });
 }
 
+// A symbol name of up to 7 characters is encoded; a longer one is rejected wherever a symbol is made from a string
+BOOST_AUTO_TEST_CASE(symbol_name_length)
+{
+   const auto too_long = [](const symbol_type_exception& e) {
+      return expect_assert_message(e, "symbol name is longer than 7 characters");
+   };
+
+   BOOST_CHECK_EQUAL(max_symbol_name_length, 7u);
+
+   // compile time; a longer name does not compile
+   static_assert(SY(4, ABCDEFG) == 0x4746454443424104ull);
+   static_assert(string_to_symbol_c(4, "") == 4);
+
+   // string_to_symbol
+   BOOST_CHECK_EQUAL(string_to_symbol(4, "ABCDEFG"), SY(4, ABCDEFG));
+   BOOST_CHECK_EXCEPTION(string_to_symbol(4, "ABCDEFGH"), symbol_type_exception, too_long);
+   BOOST_CHECK_EXCEPTION(string_to_symbol(4, "ABCDEFGHI"), symbol_type_exception, too_long);
+   BOOST_CHECK_EXCEPTION(string_to_symbol(4, std::string(1024, 'A')), symbol_type_exception, too_long);
+
+   // symbol(uint8_t, std::string_view)
+   BOOST_CHECK_EQUAL(symbol(4, "ABCDEFG").to_string(), "4,ABCDEFG");
+   BOOST_CHECK_EXCEPTION(symbol(4, "ABCDEFGH"), symbol_type_exception, too_long);
+   BOOST_CHECK_EXCEPTION(symbol(4, "ABCDEFGHI"), symbol_type_exception, too_long);
+
+   // symbol::from_string
+   BOOST_CHECK_EQUAL(symbol::from_string("4,ABCDEFG").value(), SY(4, ABCDEFG));
+   BOOST_CHECK_EXCEPTION(symbol::from_string("4,ABCDEFGH"), symbol_type_exception, too_long);
+   BOOST_CHECK_EXCEPTION(symbol::from_string("4,ABCDEFGHI"), symbol_type_exception, too_long);
+
+   // asset::from_string
+   BOOST_CHECK_EQUAL(asset::from_string("1.0000 ABCDEFG"), asset(10000, symbol(4, "ABCDEFG")));
+   BOOST_CHECK_EXCEPTION(asset::from_string("1.0000 ABCDEFGH"), symbol_type_exception, too_long);
+   BOOST_CHECK_EXCEPTION(asset::from_string("1.0000 ABCDEFGHI"), symbol_type_exception, too_long);
+
+   // from_variant
+   BOOST_CHECK_EQUAL(fc::variant("ABCDEFG").as<symbol_code>().value, SY(4, ABCDEFG) >> 8);
+   BOOST_CHECK_EXCEPTION(fc::variant("ABCDEFGH").as<symbol_code>(), symbol_type_exception, too_long);
+   BOOST_CHECK_EXCEPTION(fc::variant("ABCDEFGHI").as<symbol_code>(), symbol_type_exception, too_long);
+   BOOST_CHECK_EQUAL(fc::variant("4,ABCDEFG").as<symbol>().value(), SY(4, ABCDEFG));
+   BOOST_CHECK_EXCEPTION(fc::variant("4,ABCDEFGH").as<symbol>(), symbol_type_exception, too_long);
+   BOOST_CHECK_EQUAL(fc::variant("1.0000 ABCDEFG").as<asset>(), asset(10000, symbol(4, "ABCDEFG")));
+   BOOST_CHECK_EXCEPTION(fc::variant("1.0000 ABCDEFGH").as<asset>(), symbol_type_exception, too_long);
+
+   // an empty name is accepted: a zero symbol_code and a symbol without a name convert to a string and back
+   BOOST_CHECK_EQUAL(string_to_symbol(4, ""), 4u);
+   BOOST_CHECK_EQUAL(symbol(4, "").to_string(), "4,");
+   BOOST_CHECK_EQUAL(symbol::from_string("4,").value(), 4u);
+   BOOST_CHECK_EQUAL(fc::variant(symbol_code{0}).as_string(), "");
+   BOOST_CHECK_EQUAL(fc::variant("").as<symbol_code>().value, 0u);
+}
+
 struct permission_visitor {
    std::vector<permission_level> permissions;
    std::vector<size_t> size_stack;

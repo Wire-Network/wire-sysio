@@ -382,3 +382,22 @@ Deploy this `sysio.msgch` on fresh state and regenerate the SDK contract types w
 written before the change has no `byqueue` entry, so `buildenv` never finds it: a queued
 `DESYNDICATE_LIQ` would never ship, and an inbound row would never be erased. There is no migration
 path.
+
+## WIRE-439 node-owner registration
+
+Deploy the matching `sysio.roa` and `sysio.msgch` WASMs together in one transaction,
+or quiesce inbound dispatch until both are installed. ROA's ABI adds the self-inline
+`nodeownfin(owner, tier)` allocation action; stored-row layouts are unchanged.
+Mixed revisions are not compatible: old MSGCH creates
+the account before new ROA rejects it, while new MSGCH leaves creation to ROA.
+Do not process node-owner claims between separate deployments. Preserve both
+contracts' privileged status and the default inline-depth limit.
+
+Claim traces contain `nodeownreg`, native `newaccount`, `nodeownfin` and
+`recordlink`; `newnameduser` is called internally and emits no separate action trace.
+Index registration outcomes from `nodeowners`/`nodeownerreg`, not the presence
+of a `newnameduser` trace. The external `nodeownreg` payload is unchanged.
+
+Deploy the new-account-only Hub and Tools companions with this pair. Existing
+memberships and historical audit reason values remain readable; this update does
+not remediate previously bound links or release escrowed NFTs.
