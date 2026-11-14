@@ -38,6 +38,21 @@ Fetch flights only after VOTING opens and keep their order by original seat ID. 
 
 Read the submitted ballot row back after a transaction succeeds. A rejected, incomplete, duplicate, unauthorized, stale, or late ballot changes neither the stored ballot nor counters/tallies. Public YES totals do not combine repeated occurrences of a candidate across flights. Results are determined after closure in seat order, then T1/T2/T3, then A/B/C, skipping already elected candidates.
 
+## Governance authorities and handoff
+
+`sysio.nodes@active` and `sysio.cncl@active` are written by this contract. Nothing here changes `sysio` itself.
+
+- Any authenticated account calls `syncnodes(caller)` to make `sysio.nodes@active` the current T1 owners. Call it again after every T1 registration; until then the previous roster stays in force.
+- `sysio.cncl@active` becomes the 21 members in the `settle` call that fills the last seat. It keeps that council through retirement and a later election, until that election is DONE.
+
+To hand `sysio` to either authority, the current `sysio` authority signs one transaction that sets `sysio@active`, then `sysio@owner`, to `sysio.nodes@active` or `sysio.cncl@active`. For `sysio.nodes`, put `syncnodes` first in that transaction, so `sysio` lands on the live roster whatever the account held a moment earlier. Before signing:
+
+1. Read the target account's `active` permission. It must list exactly the intended members and no key; an account still showing `sysio.null@active` has not been written and would leave `sysio` unsatisfiable. A supermajority of the listed members can rewrite the permission by hand, so read it again in the block the handoff lands in.
+2. For `sysio.nodes`, the roster is final only once all 21 T1 seats are registered. Before that, registrations after the handoff join at the next `syncnodes` crank without further approval, and enough of them can outvote the owners who were present at the handoff.
+3. Confirm every other `sysio.*` account resolves to `sysio@active` and carries no key of its own.
+
+After the handoff every `sysio` action needs approvals from `floor(2*N/3)+1` members, normally through `sysio.msig`.
+
 ## Abort, retirement, and cleanup
 
 Use authorized `reset()` only for an explicit abort or retirement, never to continue ordinary voting. Aborting during LOADING preserves candidates and the current generation while clearing staged snapshots. Aborting an unfinished election deletes its partial results. Retiring DONE preserves completed council history.

@@ -9,6 +9,8 @@
 #include <sysio/dispatcher.hpp> // For SYSIO_DISPATCH of native action
 #include <sysio/privileged.hpp>
 
+#include <vector>
+
 namespace sysio {
     class [[sysio::contract("sysio.roa")]] roa : public contract {
         public:
@@ -372,6 +374,19 @@ namespace sysio {
                 for (auto it = by_tier.lower_bound(tier); it != by_tier.end() && it->tier == tier; ++it)
                     ++count;
                 return count;
+            }
+
+            /**
+             * List the authoritative node owners of `tier` in one ROA generation, in ascending account
+             * order. Bounded by the tier's registration cap.
+             */
+            static std::vector<name> nodeowners_in_tier(name roa_account, uint8_t network_gen, uint8_t tier) {
+                nodeowners_t owners(roa_account, network_gen);
+                auto by_tier = owners.get_index<"bytier"_n>();
+                std::vector<name> result;
+                for (auto it = by_tier.lower_bound(tier); it != by_tier.end() && it->tier == tier; ++it)
+                    result.push_back(it->owner);
+                return result;
             }
 
         private:
