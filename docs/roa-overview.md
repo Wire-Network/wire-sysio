@@ -596,6 +596,22 @@ traffic history, or different account exemptions can legitimately reach differen
 the same transaction. The recovery path for a dropped transaction is client resubmit, not
 producer-side retry.
 
+### Accounts every node exempts
+
+A batch operator or an underwriter pushes `sysio.*`-paid actions all day and loses some of them to
+races, so it must never be throttled. Every node treats these accounts as
+`disable-subjective-account-billing` would:
+
+- the `sysio.opreg` operators of type batch or underwriter whose status is active: bootstrapped, or
+  holding the role's collateral minimum. Registering alone exempts nobody;
+- the accounts in the `sysio.system` table `subjexempt`. `sysio.bond::accept` adds an underwriter
+  there on its first bond of a request issued by a `sysio.*` contract, and the entry stays after
+  the bond settles. `sysio` adds or removes any account with `addsubjex` and `delsubjex`.
+
+A node reads both from chain state on its first irreversible block and every 120 irreversible
+blocks after it, so a change takes effect about a minute later. A removed underwriter is listed
+again by its next bond.
+
 ### Defaults
 
 Subjective billing ships **on**, and the failure limiter with it — both are gated on the same

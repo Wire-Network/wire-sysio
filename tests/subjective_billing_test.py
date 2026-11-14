@@ -22,6 +22,8 @@ SUBJECTIVE_CPU_ALLOWED_US = 2000
 MAX_STICKY_TRANSFERS = 60
 # A 24 h decay window loses well under 1% of a charge over the minutes this test runs.
 DECAY_TOLERANCE = 0.99
+# A node reloads the accounts chain state exempts every 120 irreversible blocks, which is one minute.
+EXEMPT_RELOAD_TIMEOUT_SEC = 120
 
 Print=Utils.Print
 errorExit=Utils.errorExit
@@ -265,6 +267,18 @@ try:
     # The kept charge decays like any other: gone on the 1 minute node, still held on the 24 h nodes.
     assert subjectiveUsed(fdnode, "account3") == 0
     assert subjectiveUsed(producers[0], "account3") > 0
+
+    Print("Verifying an account on the sysio.system exempt list is accepted over budget once nodes reload the list...")
+    results = wlnode.pushTransaction(transfer("account3", "account1", "still-over-budget"), silentErrors=True)
+    assert not results[0], results[1]
+    trans = producers[0].pushMessage("sysio", "addsubjex", '{"account":"account3"}', "--permission sysio@active")
+    assert trans[0], trans[1]
+    attempts = iter(range(EXEMPT_RELOAD_TIMEOUT_SEC))
+    def exemptAccepted():
+        txn = transfer("account3", "account1", f"exempt-{next(attempts)}")
+        return wlnode.pushTransaction(txn, silentErrors=True)[0]
+    assert Utils.waitForBool(exemptAccepted, timeout=EXEMPT_RELOAD_TIMEOUT_SEC), "node 2 still refuses account3"
+    assert subjectiveUsed(wlnode, "account3") == 0
 
     testSuccessful = True
 finally:

@@ -118,7 +118,9 @@ Subjective billing bounds how much CPU a failing account can consume:
 first authorizer after the transaction lands: every node reads it from each applied block's receipts
 (`disable-subjective-sysio-authorizer-billing` turns this off). Three switches turn the whole mechanism off for
 a class of traffic — contract payers (`disable-subjective-payer-billing`, on by default), P2P transactions, and
-API transactions — and `disable-subjective-account-billing` excludes named accounts.
+API transactions — and `disable-subjective-account-billing` excludes named accounts. Every node also excludes
+the accounts chain state names, reloaded every 120 irreversible blocks: the `sysio.system` table `subjexempt`,
+and the active batch and underwriter operators of `sysio.opreg`.
 
 ## Enabling / configuration
 

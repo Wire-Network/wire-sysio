@@ -918,6 +918,43 @@ BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_billing_disabled_test ) {
    BOOST_TEST( !charge_disabled.is_sysio_authorizer_billing_disabled() );
 }
 
+BOOST_AUTO_TEST_CASE( chain_exempt_accounts_test ) {
+   fc::logger log;
+   const account_name alice = "alice"_n; // exempted by chain state
+   const account_name bob = "bob"_n;
+   const auto now = sysio_paid_now;
+   const auto block = make_block( now, {
+      { make_trx( {make_action( "sysio.token"_n, {{alice, config::active_name}} )}, 1 ), {1000} },
+      { make_trx( {make_action( "sysio.token"_n, {{bob, config::active_name}} )}, 2 ), {1000} },
+   } );
+   const transaction_id_type pending_id = sha256::hash( "pending" );
+
+   // An account chain state exempts is treated like one of disable_account: never charged, billed or limited.
+   subjective_billing sub_bill;
+   sub_bill.set_chain_exempt_accounts( {alice} );
+   BOOST_TEST( sub_bill.is_account_disabled( alice ) );
+   BOOST_TEST( !sub_bill.is_account_disabled( bob ) );
+   BOOST_TEST( sub_bill.is_any_account_disabled( {alice, bob} ) );
+   sub_bill.on_block( log, block, now );
+   sub_bill.subjective_bill( pending_id, fc::time_point_sec{now + fc::days( 1 )}, {},
+                             {{alice, fc::microseconds( 50 )}, {bob, fc::microseconds( 50 )}} );
+   sub_bill.subjective_bill_failure( {}, {{alice, fc::microseconds( 70 )}, {bob, fc::microseconds( 70 )}}, now );
+   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).count() == 0 );
+   BOOST_TEST( sub_bill.get_subjective_bill( bob, now ).count() == 1000 + 50 + 70 );
+   BOOST_TEST( sub_bill.get_account_cache_size() == 1u );
+
+   // The set is replaced as a whole. An account charged before it became exempt is not limited while it is.
+   sub_bill.set_chain_exempt_accounts( {bob} );
+   BOOST_TEST( !sub_bill.is_account_disabled( alice ) );
+   BOOST_TEST( sub_bill.get_subjective_bill( bob, now ).count() == 0 );
+   sub_bill.set_chain_exempt_accounts( {} );
+   BOOST_TEST( sub_bill.get_subjective_bill( bob, now ).count() == 1000 + 50 + 70 );
+
+   sub_bill.set_chain_exempt_accounts( {alice} );
+   sub_bill.reset();
+   BOOST_TEST( sub_bill.get_chain_exempt_accounts().empty() );
+}
+
 BOOST_AUTO_TEST_CASE( prune_decayed_accounts_test ) {
    fc::logger log;
    const account_name alice = "alice"_n;

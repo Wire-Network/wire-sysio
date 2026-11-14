@@ -70,10 +70,17 @@ private:
    trx_cache_index                           _trx_cache_index;
    account_subjective_bill_cache             _account_subjective_bill_cache;
    std::unordered_set<chain::account_name>    _disabled_accounts;
+   /// Accounts exempted by chain state rather than by this node's configuration; see set_chain_exempt_accounts.
+   std::unordered_set<chain::account_name>    _chain_exempt_accounts;
    uint32_t                                  _expired_accumulator_average_window = default_expired_accumulator_average_window;
    uint32_t                                  _next_prune_time_ordinal = 0;
 
 private:
+   /// True if `a` is never billed or limited subjectively, by this node's configuration or by chain state.
+   bool is_exempt( const account_name& a ) const {
+      return _disabled_accounts.contains( a ) || _chain_exempt_accounts.contains( a );
+   }
+
    void _reset() { // for testing
       _disabled = false;
       _disabled_payer_billing = false;
@@ -82,6 +89,7 @@ private:
       _trx_cache_index.clear();
       _account_subjective_bill_cache.clear();
       _disabled_accounts.clear();
+      _chain_exempt_accounts.clear();
       _expired_accumulator_average_window = default_expired_accumulator_average_window;
       _next_prune_time_ordinal = 0;
    }
@@ -170,7 +178,7 @@ private:
          for( const auto& act : trx.actions ) {
             const uint64_t cpu_us = receipt.cpu_usage_us[action_index++].value;
             const account_name authorizer = billed_authorizer( act, trx_first_authorizer );
-            if( !is_sysio_paid_authorizer( act.payer(), authorizer ) || _disabled_accounts.contains( authorizer ) )
+            if( !is_sysio_paid_authorizer( act.payer(), authorizer ) || is_exempt( authorizer ) )
                continue;
             add_dated_charge( _account_subjective_bill_cache[authorizer].expired_accumulator, cpu_us,
                               block_time_ordinal );
@@ -231,10 +239,19 @@ public:
    void disable_sysio_authorizer_billing(bool disable) { _disabled_sysio_authorizer_billing = disable; }
    bool is_sysio_authorizer_billing_disabled() const { return _disabled_sysio_authorizer_billing; }
    void disable_account( chain::account_name a ) { _disabled_accounts.emplace( a ); }
-   bool is_account_disabled(const account_name& a ) const { return _disabled || _disabled_accounts.contains( a ); }
+   /**
+    * Replaces the accounts that chain state exempts from subjective billing, which are treated like the accounts
+    * of disable_account. Call in the write window, as for every other change to this object.
+    */
+   void set_chain_exempt_accounts( std::unordered_set<chain::account_name> accounts ) {
+      _chain_exempt_accounts = std::move( accounts );
+   }
+   /// The accounts of the last set_chain_exempt_accounts.
+   const std::unordered_set<chain::account_name>& get_chain_exempt_accounts() const { return _chain_exempt_accounts; }
+   bool is_account_disabled(const account_name& a ) const { return _disabled || is_exempt( a ); }
    bool is_any_account_disabled(const action_payers_t& accounts ) const {
       if ( _disabled ) return true;
-      return std::ranges::any_of(accounts, [&](const account_name& a) { return _disabled_accounts.contains( a ); });
+      return std::ranges::any_of(accounts, [&](const account_name& a) { return is_exempt( a ); });
    }
 
    void subjective_bill( const chain::transaction_id_type& id, fc::time_point_sec expire,
@@ -245,7 +262,7 @@ public:
       account_subjective_cpu_bill_t account_subjective_cpu_bill;
       if (!_disabled_payer_billing) {
          for (const auto& [a, b] : accounts_billing) {
-            if (!_disabled_accounts.contains(a)) {
+            if (!is_exempt(a)) {
                account_subjective_cpu_bill[a] += fc::microseconds(b.cpu_usage_us);
                _account_subjective_bill_cache[a].pending_cpu_us += b.cpu_usage_us;
             }
@@ -253,7 +270,7 @@ public:
       }
       for (const auto& [a, b] : auth_cpu) {
          assert(b.count() >= 0);
-         if (!_disabled_accounts.contains(a)) {
+         if (!is_exempt(a)) {
             account_subjective_cpu_bill[a] += b;
             _account_subjective_bill_cache[a].pending_cpu_us += b.count();
          }
@@ -271,21 +288,21 @@ public:
       const auto time_ordinal = time_ordinal_for(now);
       if (!_disabled_payer_billing) {
          for (const auto& [a, b] : accounts_billing) {
-            if (!_disabled_accounts.contains(a)) {
+            if (!is_exempt(a)) {
                _account_subjective_bill_cache[a].expired_accumulator.add(b.cpu_usage_us, time_ordinal, _expired_accumulator_average_window);
             }
          }
       }
       for (const auto& [a, b] : auth_cpu) {
          assert(b.count() >= 0);
-         if (!_disabled_accounts.contains(a)) {
+         if (!is_exempt(a)) {
             _account_subjective_bill_cache[a].expired_accumulator.add(b.count(), time_ordinal, _expired_accumulator_average_window);
          }
       }
    }
 
    fc::microseconds get_subjective_bill( const account_name& a, const fc::time_point& now ) const {
-      if( _disabled || _disabled_accounts.contains( a ) ) return fc::microseconds{0};
+      if( _disabled || is_exempt( a ) ) return fc::microseconds{0};
       auto aitr = _account_subjective_bill_cache.find( a );
       if( aitr != _account_subjective_bill_cache.end() ) {
          const subjective_billing_info& sub_bill_info = aitr->second;

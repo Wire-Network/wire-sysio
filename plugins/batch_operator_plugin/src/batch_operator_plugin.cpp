@@ -31,6 +31,7 @@
 #include <sysio/batch_operator_plugin/outpost_opp_job.hpp>
 #include <sysio/opp/depot/chains_registry.hpp>
 #include <sysio/opp/depot/opreg_status.hpp>
+#include <sysio.opreg/opreg_constants.hpp>
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/plugin_interface.hpp>
 #include <sysio/chain/subjective_billing.hpp>
@@ -129,18 +130,9 @@ namespace {
       }
    }
 
-   namespace opreg {
-      constexpr auto account            = "sysio.opreg";
-      constexpr auto table_operators    = "operators";
-      /// Field names on `operator_entry` rows. Used by the awareness poll
-      /// that gates the relay loop on a SLASHED / TERMINATED status flip.
-      namespace field {
-         constexpr auto status = "status";
-      }
-      // `OperatorStatus` enum spellings + the `is_active` decision live
-      // in `sysio/opp/depot/opreg_status.hpp`, beside the other shared depot
-      // row views, so any client reads the same source of truth.
-   }
+   // The awareness poll that gates the relay loop reads `field::status`. The `OperatorStatus` spellings and the
+   // `is_active` decision live in `sysio/opp/depot/opreg_status.hpp`.
+   namespace opreg = sysio::opreg_names;
 
    namespace epoch {
       constexpr auto account            = "sysio.epoch";
