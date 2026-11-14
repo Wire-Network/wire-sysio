@@ -164,6 +164,52 @@ BOOST_AUTO_TEST_CASE(byte_allocation_fast_paths) {
    }
 }
 
+/// Bitset fast and incremental paths preserve reused values and padding across the allocation threshold.
+BOOST_AUTO_TEST_CASE(bitset_allocation_fast_paths) {
+   constexpr size_t chunk_bits = raw::detail::unpack_chunk_bytes * bitset::bits_per_block;
+   for (const size_t count : {size_t{0}, size_t{21}, size_t{1000}, chunk_bits, chunk_bits + 1}) {
+      bitset expected(count);
+      expected.flip();
+      const auto packed = raw::pack(expected);
+      bitset output(count + bitset::bits_per_block);
+      datastream<const char*> memory(packed.data(), packed.size());
+      raw::unpack(memory, output);
+      BOOST_CHECK(output == expected);
+      BOOST_CHECK(output.unused_bits_zeroed());
+
+      message_buffer<65536> buffer;
+      std::memcpy(buffer.write_ptr(), packed.data(), packed.size());
+      buffer.advance_write_ptr(packed.size());
+      auto stream = buffer.create_datastream();
+      output = {};
+      raw::unpack(stream, output);
+      BOOST_CHECK(output == expected);
+      BOOST_CHECK(output.unused_bits_zeroed());
+      BOOST_CHECK_EQUAL(buffer.bytes_to_read(), 0u);
+   }
+}
+
+/// Missing bitset blocks cost at most one small allocation; logical bounds cannot authorize larger allocations.
+BOOST_AUTO_TEST_CASE(bitset_truncated_allocation_is_bounded) {
+   constexpr size_t chunk_bits = raw::detail::unpack_chunk_bytes * bitset::bits_per_block;
+   const auto small = raw::pack(unsigned_int{chunk_bits});
+   datastream<const char*> small_stream(small.data(), small.size());
+   bitset output;
+   BOOST_CHECK_THROW(raw::unpack(small_stream, output), fc::exception);
+   BOOST_CHECK_LE(output.num_blocks(), raw::detail::unpack_chunk_bytes);
+
+   const auto large = raw::pack(unsigned_int{chunk_bits + 1});
+   datastream<const char*> large_stream(large.data(), large.size());
+   output = {};
+   BOOST_CHECK_THROW(raw::unpack(large_stream, output), fc::exception);
+   BOOST_CHECK_EQUAL(output.num_blocks(), 0u);
+
+   large_stream.seekp(0);
+   bounded_datastream logical_bound(large_stream, MAX_SIZE_OF_BYTE_ARRAYS);
+   BOOST_CHECK_THROW(raw::unpack(logical_bound, output), fc::exception);
+   BOOST_CHECK_EQUAL(output.num_blocks(), 0u);
+}
+
 /// Hashed/flat containers and bitsets must not allocate from a count whose first element is missing.
 BOOST_AUTO_TEST_CASE(other_container_counts_do_not_preallocate) {
    const auto packed = raw::pack(unsigned_int{MAX_NUM_ARRAY_ELEMENTS});

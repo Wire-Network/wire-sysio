@@ -557,7 +557,7 @@ namespace fc {
       }
     }
 
-    /// Read bitset blocks before growing storage while retaining the existing bit-count encoding and tail masking.
+    /// Decode bitsets with bounded eager allocation, retaining the bit-count encoding and tail masking.
     template<typename Stream>
     inline void unpack( Stream& s, fc::bitset& value ) {
       // the packed size is the number of bits in the set, not the number of blocks
@@ -565,14 +565,20 @@ namespace fc {
       fc::raw::unpack( s, size );
       const size_t num_blocks = bitset::calc_num_blocks(size);
       FC_ASSERT( num_blocks <= MAX_NUM_ARRAY_ELEMENTS );
-      for (size_t i = 0; i < num_blocks; ++i) {
-         uint8_t block = i < value.num_blocks() ? value.byte(i) : 0;
-         fc::raw::unpack(s, block);
-         if (i == value.num_blocks())
-            value.resize(std::min(size_t(size.value), (i + 1) * bitset::bits_per_block));
-         value.byte(i) = block;
+      if (num_blocks <= detail::unpack_chunk_bytes || detail::has_available_bytes(s, num_blocks)) {
+         value.resize(size);
+         for (size_t i = 0; i < num_blocks; ++i)
+            fc::raw::unpack(s, value.byte(i));
+      } else {
+         for (size_t i = 0; i < num_blocks; ++i) {
+            uint8_t block = i < value.num_blocks() ? value.byte(i) : 0;
+            fc::raw::unpack(s, block);
+            if (i == value.num_blocks())
+               value.resize(std::min(size_t(size.value), (i + 1) * bitset::bits_per_block));
+            value.byte(i) = block;
+         }
+         value.resize(size);
       }
-      value.resize(size);
       if (size > 0) {
          assert(num_blocks == value.num_blocks());
          value.zero_unused_bits();
