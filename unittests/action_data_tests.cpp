@@ -319,7 +319,8 @@ BOOST_AUTO_TEST_CASE(sysio_without_contract_runs_only_chain_actions) try {
    BOOST_CHECK_EXCEPTION(push("nosuchact"_n), action_validate_exception,
                          fc_exception_message_contains("No contract for action nosuchact on account sysio"));
    BOOST_CHECK_EXCEPTION(push(config::onblock_action_name), action_validate_exception,
-                         fc_exception_message_contains("No contract for action onblock on account sysio"));
+                         fc_exception_message_contains(
+                            "sysio::onblock runs only as the implicit transaction at the start of a block"));
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()
