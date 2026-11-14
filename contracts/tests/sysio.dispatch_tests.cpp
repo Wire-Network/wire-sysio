@@ -1245,7 +1245,7 @@ BOOST_FIXTURE_TEST_CASE(node_owner_reg_from_non_evm_outpost_is_dropped, sysio_di
    BOOST_REQUIRE(get_nodeownerreg(CLAIM_ACCOUNT).is_null());
 } FC_LOG_AND_RETHROW() }
 
-/// Node-owner claims on a chain running sysio.system. A tier-2/3 claim lets the NFT holder pick any valid 1-12 char
+/// Node-owner claims on a chain running sysio.system. A tier-2/3 claim lets the NFT holder pick any dot-free 1-12 char
 /// name and control the account created for it; these cases pin what that control must not reach.
 class node_owner_claim_tester : public sysio_dispatch_tester {
 public:
@@ -1256,12 +1256,9 @@ public:
    static constexpr auto     AUTH_EXT_PERMISSION     = "auth.ext"_n;
    static constexpr auto     OTHER_PERMISSION        = "session"_n;
    static constexpr auto     RESERVED_SYSTEM_NAME    = "sysio.pwn"_n;
-   static constexpr auto     PAYER_ACCOUNT           = "payer"_n;
    /// Never created; only names the key a notification offers.
    static constexpr auto     REPLACEMENT_KEY_NAME    = "replacement"_n;
    static constexpr auto     SYSTEM_INIT_ACTION      = "init"_n;
-   static constexpr auto     ADDPOLICY_ACTION        = "addpolicy"_n;
-   static constexpr auto     SELF_POLICY_WEIGHT      = "0.1000 SYS";
 
    /// Parent and authority of each of an account's permissions, keyed by permission name.
    using permission_set = std::map<name, std::pair<name, authority>>;
@@ -1290,22 +1287,21 @@ public:
       produce_blocks(2);
    }
 
-   /// The claimant issues a policy to itself from its tier budget; PAYER_ACCOUNT pays for the transaction.
-   void issue_own_policy(name owner) {
-      signed_transaction trx;
-      trx.actions.emplace_back(get_action(config::roa_account_name, ADDPOLICY_ACTION,
-         vector<permission_level>{{PAYER_ACCOUNT, config::sysio_payer_name}, {PAYER_ACCOUNT, config::active_name},
-                                  {owner, config::active_name}},
-         mvo()("owner", owner)("issuer", owner)("net_weight", SELF_POLICY_WEIGHT)("cpu_weight", SELF_POLICY_WEIGHT)
-              ("ram_weight", SELF_POLICY_WEIGHT)("time_block", 0)("network_gen", ROA_NETWORK_GEN)));
-      set_transaction_headers(trx);
-      trx.sign(get_private_key(PAYER_ACCOUNT, "active"), control->get_chain_id());
-      trx.sign(get_private_key(owner, "active"), control->get_chain_id());
-      push_transaction(trx);
-      produce_block();
+   /// Claim `account` through the depot and assert the rejection every invalid name gets: a REJECTED / NAME_INVALID
+   /// audit row, no registration and no account.
+   void assert_claim_rejected_as_name_invalid(name account) {
+      namespace audit_values = sysio_system::test_support::nodeownerreg;
+      claim_node_owner(account, get_public_key(account, "active"));
+
+      const auto audit = get_nodeownerreg(account);
+      BOOST_REQUIRE(!audit.is_null());
+      BOOST_CHECK_EQUAL(audit["status"].as<uint64_t>(), audit_values::status_rejected);
+      BOOST_CHECK_EQUAL(audit["reason"].as<uint64_t>(), audit_values::reason_name_invalid);
+      BOOST_CHECK(get_nodeowner(account).is_null());
+      BOOST_CHECK(!account_exists(account));
    }
 
-   /// Code a claimant can deploy on its account: it forwards every action it receives to sysio as a notification.
+   /// Code an account can deploy on itself: it forwards every action it receives to sysio as a notification.
    static std::vector<uint8_t> notify_system_account_wasm() {
       std::ostringstream wast;
       wast << R"((module
@@ -1356,20 +1352,15 @@ public:
    }
 };
 
-// A tier-2/3 claim can take the name auth.msg and deploy code there, so an auth.msg::onlinkauth notification is
-// attacker-controlled. It must reach sysio as an ordinary notification and change nothing: not sysio's owner, active,
-// auth.ext or any other permission, and not a user's.
-BOOST_FIXTURE_TEST_CASE(claimed_auth_msg_notification_changes_no_permission, node_owner_claim_tester) { try {
+// auth.msg is not a system account, so whoever holds it controls its onlinkauth notification. That must reach sysio
+// as an ordinary notification and change nothing: not sysio's owner, active, auth.ext or any other permission, and
+// not a user's. A node-owner claim can no longer take the dotted name, so the fixture creates the account itself.
+BOOST_FIXTURE_TEST_CASE(auth_msg_notification_changes_no_permission, node_owner_claim_tester) { try {
    create_account(CLAIM_ACCOUNT);
    bootstrap_for_dispatch(NODE_OWNER_SOURCE_CHAIN);
-   create_account(PAYER_ACCOUNT);
+   create_account(AUTH_MSG_ACCOUNT);
    deploy_system_contract();
 
-   claim_node_owner(AUTH_MSG_ACCOUNT, get_public_key(AUTH_MSG_ACCOUNT, "active"));
-   const auto audit = get_nodeownerreg(AUTH_MSG_ACCOUNT);
-   BOOST_REQUIRE(!audit.is_null());
-   BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), sysio_system::test_support::nodeownerreg::status_confirmed);
-   issue_own_policy(AUTH_MSG_ACCOUNT);
    set_code(AUTH_MSG_ACCOUNT, notify_system_account_wasm());
    produce_block();
 
@@ -1394,14 +1385,16 @@ BOOST_FIXTURE_TEST_CASE(node_owner_claim_rejects_reserved_system_name, node_owne
    bootstrap_for_dispatch(NODE_OWNER_SOURCE_CHAIN);
    deploy_system_contract();
 
-   claim_node_owner(RESERVED_SYSTEM_NAME, get_public_key(RESERVED_SYSTEM_NAME, "active"));
+   assert_claim_rejected_as_name_invalid(RESERVED_SYSTEM_NAME);
+} FC_LOG_AND_RETHROW() }
 
-   const auto audit = get_nodeownerreg(RESERVED_SYSTEM_NAME);
-   BOOST_REQUIRE(!audit.is_null());
-   BOOST_CHECK_EQUAL(audit["status"].as<uint64_t>(), sysio_system::test_support::nodeownerreg::status_rejected);
-   BOOST_CHECK_EQUAL(audit["reason"].as<uint64_t>(), sysio_system::test_support::nodeownerreg::reason_name_invalid);
-   BOOST_CHECK(get_nodeowner(RESERVED_SYSTEM_NAME).is_null());
-   BOOST_CHECK(!account_exists(RESERVED_SYSTEM_NAME));
+// No node owner may claim a dotted name, which would sit under another account's prefix: auth.msg is rejected like
+// any other invalid name.
+BOOST_FIXTURE_TEST_CASE(node_owner_claim_rejects_dotted_name, node_owner_claim_tester) { try {
+   bootstrap_for_dispatch(NODE_OWNER_SOURCE_CHAIN);
+   deploy_system_contract();
+
+   assert_claim_rejected_as_name_invalid(AUTH_MSG_ACCOUNT);
 } FC_LOG_AND_RETHROW() }
 
 /// Regression: a non-advancing advance() must not permanently strand the epoch.
