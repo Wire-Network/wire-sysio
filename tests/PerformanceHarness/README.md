@@ -584,7 +584,7 @@ Performance Test Basic Base:
   --print-missing-transactions
                         Toggles if missing transactions are be printed upon test completion.
   --account-name ACCOUNT_NAME
-                        Name of the account to create and assign a contract to
+                        Name of the account to create and assign a contract to. sysio and sysio.noop keep the contracts the bootstrap deploys
   --contract-dir CONTRACT_DIR
                         Path to contract dir
   --wasm-file WASM_FILE
@@ -742,12 +742,12 @@ Performance Test Basic Base:
   --print-missing-transactions
                         Toggles if missing transactions are be printed upon test completion. (default: False)
   --account-name ACCOUNT_NAME
-                        Name of the account to create and assign a contract to (default: sysio)
+                        Name of the account to create and assign a contract to. sysio and sysio.noop keep the contracts the bootstrap deploys (default: sysio.noop)
   --contract-dir CONTRACT_DIR
-                        Path to contract dir (default: contracts/sysio.system)
+                        Path to contract dir (default: unittests/test-contracts/noop)
   --wasm-file WASM_FILE
-                        WASM file name for contract (default: sysio.system.wasm)
-  --abi-file ABI_FILE   ABI file name for contract (default: sysio.system.abi)
+                        WASM file name for contract (default: noop.wasm)
+  --abi-file ABI_FILE   ABI file name for contract (default: noop.abi)
   --user-trx-data-file USER_TRX_DATA_FILE
                         Path to transaction data JSON file (default: None)
   --wasm-runtime {sys-vm-jit,sys-vm}
@@ -1703,10 +1703,10 @@ Finally, the full detail test report for each of the determined max TPS throughp
       }
     },
     "specifiedContract": {
-      "contractDir": "contracts/sysio.system",
-      "wasmFile": "sysio.system.wasm",
-      "abiFile": "sysio.system.abi",
-      "account": "Name: sysio"
+      "contractDir": "unittests/test-contracts/noop",
+      "wasmFile": "noop.wasm",
+      "abiFile": "noop.abi",
+      "account": "Name: sysio.noop"
     },
     "genesisPath": "tests/PerformanceHarness/genesis.json",
     "maximumP2pPerHost": 5000,
@@ -2359,10 +2359,10 @@ The Performance Test Basic generates, by default, a report that details results 
       }
     },
     "specifiedContract": {
-      "contractDir": "contracts/sysio.system",
-      "wasmFile": "sysio.system.wasm",
-      "abiFile": "sysio.system.abi",
-      "account": "Name: sysio"
+      "contractDir": "unittests/test-contracts/noop",
+      "wasmFile": "noop.wasm",
+      "abiFile": "noop.abi",
+      "account": "Name: sysio.noop"
     },
     "genesisPath": "tests/PerformanceHarness/genesis.json",
     "maximumP2pPerHost": 5000,

@@ -81,7 +81,7 @@ The CDT-generated dispatcher ends every contract's `apply` with
 
 ```c
 default:
-  if (r != "sysio"_n.value) sysio_assert_code(false, 1);
+  sysio::reject_undefined_action(sysio::name{r}, sysio::name{a});
 ```
 
 so an inline action a stale callee does not implement **asserts**, and an assert
@@ -91,10 +91,9 @@ no epoch advances, no envelope is built, no emission accrues, and every
 `advance` cannot abort (`feedback_opp_handlers_never_throw.md`); a version skew
 defeats that discipline from outside the contract.
 
-`sysio` itself is the exception in that dispatcher, and it is the worse one: an
-action `sysio.system` does not implement is **silently ignored** rather than
-asserted. A skew there halts nothing — it drops the effect. An `accrueepoch`
-that never runs looks exactly like a chain that is working.
+The same holds on `sysio`: the dispatcher lets through only the chain's own
+actions there (its native actions and `onblock`), so an action `sysio.system`
+does not implement asserts too.
 
 Table reads carry no dispatcher at all, so they fail differently again — and
 the failure mode depends on whether the ROW exists, not on whether the FIELD
@@ -259,7 +258,7 @@ changes. For the edges on `advance`'s path today:
 | Edge | Why |
 |---|---|
 | `sysio.opreg`, `sysio.chalg`, `sysio.msgch` before `sysio.epoch`, when the release adds or changes an action `advance` inlines into them | Call edge: the new `advance` would otherwise reach a callee that cannot dispatch the action, and every advance aborts. |
-| `sysio` (`sysio.system`) before `sysio.epoch`, when the release adds or changes `accrueepoch` / `rcrdbatch` / `payepoch` | Call edge — but an action `sysio.system` does not implement is silently ignored rather than asserted, so this skew drops the effect instead of stalling. |
+| `sysio` (`sysio.system`) before `sysio.epoch`, when the release adds or changes `accrueepoch` / `rcrdbatch` / `payepoch` | Call edge: the new `advance` would otherwise reach a `sysio.system` that cannot dispatch the action, and every advance aborts. |
 | `sysio.epoch` and `sysio.kicker` before `sysio.system`, when `sysio.system` gains state the emissions gate must reserve (as `payclaimtot` reserves unclaimed `payclaims`) | Table edge: the old gate counts the new backing as spendable, so a later pay period can double-commit it and leave credited claims underfunded; an old kicker counts it as available treasury and `kick` can draw it. |
 | `sysio.epoch` before `sysio.msgch`, when the release adds or changes an action `chkcons` inlines into `sysio.epoch` | Call edge in the other direction. |
 

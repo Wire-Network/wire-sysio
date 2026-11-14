@@ -93,7 +93,7 @@ try:
     targetTpsPerGenerator = 500
     testTrxGenDurationSec=90
     trxGeneratorCnt=1
-    cluster.launchTrxGenerators(contractOwnerAcctName=cluster.sysioAccount.name, acctNamesList=[accounts[0].name,accounts[1].name],
+    cluster.launchTrxGenerators(contractOwnerAcctName=cluster.noopAccount.name, acctNamesList=[accounts[0].name,accounts[1].name],
                                 acctPrivKeysList=[account1PrivKey,account2PrivKey], nodeId=prodNode.nodeId, tpsPerGenerator=targetTpsPerGenerator,
                                 numGenerators=trxGeneratorCnt, durationSec=testTrxGenDurationSec, waitToComplete=True)
 

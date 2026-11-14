@@ -14,6 +14,9 @@ using namespace sysio::chain;
 
 namespace {
 
+/// ROA RAM weight that covers deploying the ram_restrictions_test contract.
+constexpr std::string_view ram_restrictions_contract_ram_weight = "0.1200 SYS";
+
 /**
  * Shared setup for the kv RAM-billing route tests: a contract account funded by a node
  * owner, plus two independently-funded payer accounts (alice, carol). Each test deploys the
@@ -80,7 +83,8 @@ BOOST_AUTO_TEST_SUITE(payer_choice_test)
         c.produce_block();
 
         c.register_node_owner(bob_account, 2);
-        c.add_roa_policy(bob_account, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.1100 SYS", 0, 0);
+        c.add_roa_policy(bob_account, tester1_account, "1.0000 SYS", "1.0000 SYS",
+                         std::string(ram_restrictions_contract_ram_weight), 0, 0);
         c.add_roa_policy(c.NODE_DADDY, alice_account, "100.0000 SYS", "100.0000 SYS", "100.0000 SYS", 0, 0);
         c.produce_block();
 
@@ -206,7 +210,8 @@ BOOST_AUTO_TEST_SUITE(payer_choice_test)
         c.produce_block();
 
         c.register_node_owner(bob_account, 2);
-        c.add_roa_policy(bob_account, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.1100 SYS", 0, 0);
+        c.add_roa_policy(bob_account, tester1_account, "1.0000 SYS", "1.0000 SYS",
+                         std::string(ram_restrictions_contract_ram_weight), 0, 0);
         c.add_roa_policy(c.NODE_DADDY, alice_account, "100.0000 SYS", "100.0000 SYS", "100.0000 SYS", 0, 0);
         c.produce_block();
 

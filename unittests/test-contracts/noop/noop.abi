@@ -30,6 +30,28 @@
                     "type": "string"
                 }
             ]
+        },
+        {
+            "name": "transfer",
+            "base": "",
+            "fields": [
+                {
+                    "name": "from",
+                    "type": "name"
+                },
+                {
+                    "name": "to",
+                    "type": "name"
+                },
+                {
+                    "name": "quantity",
+                    "type": "asset"
+                },
+                {
+                    "name": "memo",
+                    "type": "string"
+                }
+            ]
         }
     ],
     "actions": [
@@ -41,6 +63,11 @@
         {
             "name": "nonce",
             "type": "nonce",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "transfer",
+            "type": "transfer",
             "ricardian_contract": ""
         }
     ],
