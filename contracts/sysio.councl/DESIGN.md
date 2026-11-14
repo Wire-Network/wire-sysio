@@ -73,6 +73,25 @@ There is no manual assignment or reservation of a vacancy for governance, and no
 
 `reset()` is an authorized abort/retirement operation, never continuation. During LOADING it preserves candidate registration and the generation while cleaning staged snapshots. During an unfinished election it deletes partial council results; after DONE it retains completed council history. `purge(max_rows)` performs bounded staged cleanup of candidates, snapshots, flights, ballots, and (for an abort) results, then advances the generation and reopens registration. Generation and round counters reject overflow.
 
+## Governance authorities
+
+The contract maintains two authorities that `sysio` can be delegated to. It never changes `sysio`'s own permissions: a handoff is a separate governance transaction.
+
+| Account | `active` holds | Written |
+|---|---|---|
+| `sysio.nodes` | the current ROA T1 owners | by `syncnodes(caller)`, a public authenticated crank |
+| `sysio.cncl` | the 21 seated members | in the transaction that fills the last seat |
+
+Each member is listed through its own `active` permission with weight 1, and the threshold is `floor(2*N/3)+1`: 15 of 21. The `owner` permission of both accounts stays with `sysio@active`.
+
+`syncnodes` reads the live ROA T1 set of the current network generation, not an election snapshot, so a registration takes effect at the next crank. It fails while no T1 owner is registered. ROA never removes an owner, so the roster only grows and is final only at the 21-owner cap.
+
+This contract writes the council authority only when an election reaches DONE. Partial results, `reset`, `purge`, and a replacement election in progress leave the seated council's authority in place.
+
+Under the chain's native rules a permission can rewrite itself, so a supermajority of an authority's members, like governance through `owner`, can change it by hand. The next `syncnodes` overwrites a hand edit of `sysio.nodes`; nothing overwrites `sysio.cncl` before the next completed election. An account opted into `limitauthchg` with `owner` as its only allowed permission refuses member edits and still accepts the contract's write.
+
+Bootstrap creates both accounts with an `active` nobody can satisfy (`sysio.null@active`) and a RAM limit raised by the 640 bytes that 21 members add. While an account is missing or cannot hold its authority, `syncnodes` fails and the last seat of an election cannot be tabulated. Delegating `sysio` to an account the contract has not written yet leaves `sysio` unsatisfiable until it is written.
+
 ## Storage and integration
 
 | Table | Scope and retention |
@@ -90,4 +109,4 @@ The actual CDT build produces the tracked council ABI/WASM. `contracts/tools/gen
 
 ## Validation
 
-The focused `council_math_tests` and `sysio_councl_tests` suites cover final qualification, reservations and rollback, minimum/maximum candidate pools, shared ballots, snapshot/owner churn, caps, deadlines, batching equivalence, ordered duplicate elimination, repeated continuation, and cleanup. Run contract behavior against the matching generated artifacts with explicit `--sys-vm-jit`. Broader runtime/OS regression coverage belongs to remote CI.
+The focused `council_math_tests` and `sysio_councl_tests` suites cover the governance authorities (roster tracking, ordering, thresholds, RAM, missing accounts, replacement elections, and both handoffs), final qualification, reservations and rollback, minimum/maximum candidate pools, shared ballots, snapshot/owner churn, caps, deadlines, batching equivalence, ordered duplicate elimination, repeated continuation, and cleanup. Run contract behavior against the matching generated artifacts with explicit `--sys-vm-jit`. Broader runtime/OS regression coverage belongs to remote CI.

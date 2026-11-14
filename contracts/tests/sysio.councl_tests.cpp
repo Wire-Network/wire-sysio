@@ -5,7 +5,9 @@
 #include <fc/io/json.hpp>
 #include <fc/variant_object.hpp>
 #include <sysio/chain/abi_serializer.hpp>
+#include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/global_property_object.hpp>
+#include <sysio/chain/permission_object.hpp>
 #include <sysio/chain/resource_limits.hpp>
 #include <sysio/testing/tester.hpp>
 
@@ -16,6 +18,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <map>
+#include <optional>
 #include <set>
 #include <string>
 #include <string_view>
@@ -75,6 +78,12 @@ class sysio_councl_tester : public tester {
 public:
    static constexpr auto COUNCL_ACCOUNT = "sysio.councl"_n;
    static constexpr auto ROA_ACCOUNT = "sysio.roa"_n;
+   static constexpr auto NODE_OWNERS_AUTHORITY = "sysio.nodes"_n;
+   static constexpr auto COUNCIL_AUTHORITY = "sysio.cncl"_n;
+   /// RAM a governance-authority account needs beyond its creation grant: the single placeholder
+   /// entry of its `active` authority becomes one entry per member.
+   static constexpr int64_t AUTHORITY_RAM_HEADROOM =
+      20 * static_cast<int64_t>(config::billable_size_v<permission_level_weight>);
    static constexpr uint64_t GEN0 = 0;
    static constexpr uint64_t TIME_SLOT = 3600; // seconds per attempt window
 
@@ -101,7 +110,7 @@ public:
    int64_t measured_ram_balance = 0;
    int64_t measured_ram_peak = 0;
 
-   explicit sysio_councl_tester(bool configure_emissions = true) {
+   explicit sysio_councl_tester(bool configure_emissions = true, bool with_authority_accounts = true) {
       produce_blocks(2);
 
       create_accounts({COUNCL_ACCOUNT});
@@ -148,6 +157,11 @@ public:
       set_privileged(COUNCL_ACCOUNT);
       produce_blocks();
       load_abi(COUNCL_ACCOUNT, councl_abi);
+
+      if (with_authority_accounts) {
+         create_authority_account(NODE_OWNERS_AUTHORITY);
+         create_authority_account(COUNCIL_AUTHORITY);
+      }
    }
 
    // ── helpers ──────────────────────────────────────────────────────────────
@@ -192,6 +206,154 @@ public:
    void mk(name a) {
       create_account(a, config::system_account_name, false, true, false);
       produce_block();
+   }
+
+   // ── governance authorities ────────────────────────────────────────────────
+
+   /// Authority satisfied only through `account@active`.
+   static authority delegate_to(name account) {
+      return authority(1, {}, {permission_level_weight{{account, config::active_name}, 1}});
+   }
+
+   /// A governance authority nobody can satisfy yet: it delegates to the unsatisfiable sysio.null.
+   static authority unset_authority() { return delegate_to(config::null_account_name); }
+
+   /// The authority the contract writes for `members`: every member's `active`, ascending, at
+   /// floor(2n/3) + 1.
+   static authority supermajority_of(std::vector<name> members) {
+      std::sort(members.begin(), members.end());
+      authority auth(static_cast<uint32_t>(members.size() * 2 / 3 + 1), {}, {});
+      for (const name member : members)
+         auth.accounts.push_back(permission_level_weight{{member, config::active_name}, 1});
+      return auth;
+   }
+
+   /// Create a governance-authority account the way the bootstrap does: `owner` delegates to
+   /// sysio@active, `active` stays unsatisfiable until the contract first writes it, and the RAM
+   /// limit is raised by `ram_headroom`.
+   void create_authority_account(name account, int64_t ram_headroom = AUTHORITY_RAM_HEADROOM) {
+      signed_transaction trx;
+      set_transaction_headers(trx);
+      trx.actions.emplace_back(vector<permission_level>{{config::system_account_name, config::active_name}},
+                               newaccount{.creator = config::system_account_name,
+                                          .name = account,
+                                          .owner = delegate_to(config::system_account_name),
+                                          .active = unset_authority()});
+      trx.sign(get_private_key(config::system_account_name, "active"), control->get_chain_id());
+      push_transaction(trx);
+      produce_block();
+      if (ram_headroom > 0)
+         grant_ram(account, ram_headroom);
+   }
+
+   /// Raise `account`'s RAM limit by `bytes` through `setacctram`, which takes an absolute limit.
+   void grant_ram(name account, int64_t bytes) {
+      int64_t ram = 0, net = 0, cpu = 0;
+      control->get_resource_limits_manager().get_account_limits(account, ram, net, cpu);
+      BOOST_REQUIRE_EQUAL(success(), push(config::system_account_name, system_abi, config::system_account_name,
+                                          "setacctram"_n,
+                                          mvo()("account", account.to_string())("ram_bytes", ram + bytes)));
+   }
+
+   authority permission_authority(name account, name permission) {
+      return control->get_authorization_manager().get_permission({account, permission}).auth.to_authority();
+   }
+   authority active_authority(name account) { return permission_authority(account, config::active_name); }
+   authority owner_authority(name account) { return permission_authority(account, config::owner_name); }
+
+   /// The handoff: one transaction repointing sysio's `active`, then its `owner`, at
+   /// `authority_account@active`. With `sync_nodes_first` the same transaction first refreshes
+   /// sysio.nodes, so sysio cannot land on a roster other than the live one.
+   void hand_sysio_to(name authority_account, bool sync_nodes_first = false) {
+      signed_transaction trx;
+      set_transaction_headers(trx);
+      if (sync_nodes_first)
+         trx.actions.push_back(
+            get_action(COUNCL_ACCOUNT, "syncnodes"_n,
+                       vector<permission_level>{{config::system_account_name, config::active_name}},
+                       mvo()("caller", config::system_account_name.to_string())));
+      const vector<permission_level> by_owner{{config::system_account_name, config::owner_name}};
+      trx.actions.emplace_back(by_owner, updateauth{.account = config::system_account_name,
+                                                    .permission = config::active_name,
+                                                    .parent = config::owner_name,
+                                                    .auth = delegate_to(authority_account)});
+      trx.actions.emplace_back(by_owner, updateauth{.account = config::system_account_name,
+                                                    .permission = config::owner_name,
+                                                    .parent = {},
+                                                    .auth = delegate_to(authority_account)});
+      trx.sign(get_private_key(config::system_account_name, "active"), control->get_chain_id());
+      push_transaction(trx);
+      produce_block();
+   }
+
+   /// Rewrite sysio.nodes@active by hand under its own authority, which the chain lets any
+   /// permission do to itself, signed by the `active` keys of `signers`.
+   action_result hand_edit_node_authority(const std::vector<name>& signers, const authority& auth) {
+      signed_transaction trx;
+      set_transaction_headers(trx);
+      trx.actions.emplace_back(vector<permission_level>{{NODE_OWNERS_AUTHORITY, config::active_name}},
+                               updateauth{.account = NODE_OWNERS_AUTHORITY,
+                                          .permission = config::active_name,
+                                          .parent = config::owner_name,
+                                          .auth = auth});
+      for (const name signer : signers)
+         trx.sign(get_private_key(signer, "active"), control->get_chain_id());
+      action_result result = success();
+      try {
+         push_transaction(trx);
+      } catch (const fc::exception& ex) {
+         result = error(ex.top_message());
+      }
+      produce_block();
+      return result;
+   }
+
+   /// Opt `account` into `limitauthchg` so that only its `owner` may change its permissions.
+   void limit_auth_changes_to_owner(name account) {
+      signed_transaction trx;
+      set_transaction_headers(trx);
+      trx.actions.push_back(get_action(config::system_account_name, "limitauthchg"_n,
+                                       vector<permission_level>{{account, config::owner_name}},
+                                       mvo()("account", account.to_string())(
+                                          "allow_perms", fc::variants{config::owner_name.to_string()})(
+                                          "disallow_perms", fc::variants{})));
+      trx.sign(get_private_key(config::system_account_name, "active"), control->get_chain_id());
+      push_transaction(trx);
+      produce_block();
+   }
+
+   /// Whether an action failed with an error mentioning `text`.
+   static bool failed_with(const action_result& result, std::string_view text) {
+      return result != success() && result.find(text) != std::string::npos;
+   }
+
+   int64_t ram_usage(name account) {
+      return control->get_resource_limits_manager().get_account_ram_usage(account);
+   }
+
+   fc::time_point active_last_updated(name account) {
+      return control->get_authorization_manager().get_permission({account, config::active_name}).last_updated;
+   }
+
+   /// Whether the `active` keys of `signers` together satisfy sysio@active, probed with a
+   /// governance-only action.
+   bool satisfies_sysio(const std::vector<name>& signers) {
+      signed_transaction trx;
+      set_transaction_headers(trx);
+      trx.actions.push_back(
+         get_action(config::system_account_name, "setacctram"_n,
+                    vector<permission_level>{{config::system_account_name, config::active_name}},
+                    mvo()("account", candidates_[0].to_string())("ram_bytes", 4096)));
+      for (const name signer : signers)
+         trx.sign(get_private_key(signer, "active"), control->get_chain_id());
+      bool satisfied = true;
+      try {
+         push_transaction(trx);
+      } catch (const unsatisfied_authorization&) {
+         satisfied = false;
+      }
+      produce_block();
+      return satisfied;
    }
 
    /// Create a candidate account with a finite allowance sufficient for its self-paid row.
@@ -296,9 +458,10 @@ public:
    /// Build a complete, ordered ballot with explicit choices for selected seats and NO elsewhere.
    fc::variants ballot(name voter, const std::map<uint8_t, std::array<bool, 3>>& choices = {}) {
       fc::variants votes;
+      const uint64_t generation = election_gen();
       for (uint8_t seat = 0; seat < t1_owners.size(); ++seat) {
-         const auto flight = get_flight(seat);
-         if (t1_owners[seat] == voter || !council_member(seat).to_string().empty() || flight.is_null() ||
+         const auto flight = get_flight(seat, generation);
+         if (t1_owners[seat] == voter || !council_member(seat, generation).to_string().empty() || flight.is_null() ||
              flight["round_id"].as<uint64_t>() != round_id())
             continue;
          const auto selected = choices.find(seat);
@@ -326,6 +489,10 @@ public:
    /// Contribute entropy without changing frozen flights or an existing generation seed.
    action_result stir(name caller) {
       return push(COUNCL_ACCOUNT, councl_abi, caller, "stir"_n, mvo()("caller", caller.to_string()));
+   }
+   /// Refresh sysio.nodes@active from roa's tier-1 owners.
+   action_result syncnodes(name caller) {
+      return push(COUNCL_ACCOUNT, councl_abi, caller, "syncnodes"_n, mvo()("caller", caller.to_string()));
    }
    /// Read a public flight row.
    fc::variant get_flight(uint8_t seat, uint64_t generation = GEN0) {
@@ -377,6 +544,47 @@ public:
       load_tier_fully(2);
       load_tier_fully(3);
       BOOST_REQUIRE_EQUAL(success(), finalizeinit());
+   }
+
+   /// From open nominations, nominate and approve a flight for every seat so that seat `s` elects
+   /// candidates_[(s + first) % pool], leaving the votes cast and the window still open. A seat
+   /// named in `unapproved` gets no YES and stays vacant.
+   void vote_in_all_seats(size_t first = 0, size_t pool = 23, std::optional<uint8_t> unapproved = std::nullopt) {
+      for (uint8_t seat = 0; seat < 21; ++seat)
+         BOOST_REQUIRE_EQUAL(success(), repcandidate(t1_owners[seat], candidates_[(seat + first) % pool],
+                                                     candidates_[(seat + first + 1) % pool],
+                                                     candidates_[(seat + first + 2) % pool]));
+      open_votes();
+      std::map<uint8_t, std::array<bool, 3>> choices;
+      for (uint8_t seat = 0; seat < 21; ++seat)
+         if (seat != unapproved)
+            choices[seat] = {true, true, true};
+      BOOST_REQUIRE_EQUAL(success(), vote(t2_owners[0], choices));
+   }
+
+   /// After a generation has been retired or aborted, bring the next one to open nominations with
+   /// the whole candidate pool registered.
+   void start_replacement_election() {
+      register_candidates(candidates_.size());
+      BOOST_REQUIRE_EQUAL(success(), startinit(TIME_SLOT, t1_owners));
+      load_tier_fully(2);
+      load_tier_fully(3);
+      BOOST_REQUIRE_EQUAL(success(), finalizeinit());
+   }
+
+   /// Run a whole election from open nominations to DONE; see vote_in_all_seats for who wins.
+   void elect_all_seats(size_t first = 0, size_t pool = 23) {
+      vote_in_all_seats(first, pool);
+      close_votes();
+      BOOST_REQUIRE_EQUAL(phase(), PH_DONE);
+   }
+
+   /// The members seated in `generation`, in seat order.
+   std::vector<name> council_members(uint64_t generation = GEN0) {
+      std::vector<name> members;
+      for (uint8_t seat = 0; seat < 21; ++seat)
+         members.push_back(council_member(seat, generation));
+      return members;
    }
 
    /// Complete a source-read-bounded tier scan across as many calls as necessary.
@@ -479,6 +687,13 @@ class sysio_councl_without_emissions_tester : public sysio_councl_tester {
 public:
    sysio_councl_without_emissions_tester()
       : sysio_councl_tester(false) {}
+};
+
+/// A chain whose bootstrap never created sysio.nodes or sysio.cncl.
+class sysio_councl_without_authority_accounts_tester : public sysio_councl_tester {
+public:
+   sysio_councl_without_authority_accounts_tester()
+      : sysio_councl_tester(true, false) {}
 };
 
 // ===========================================================================
@@ -1087,6 +1302,7 @@ BOOST_FIXTURE_TEST_CASE(partial_election_active_abort, sysio_councl_tester) {
    BOOST_CHECK(push(COUNCL_ACCOUNT, councl_abi, candidates_[0], "reset"_n, mvo()) != success());
    BOOST_REQUIRE_EQUAL(success(), reset());
    finish_cleanup(5);
+   BOOST_CHECK(active_authority(COUNCIL_AUTHORITY) == unset_authority()); // twenty seats grant nothing
    BOOST_CHECK(!state_exists());
    for (uint8_t seat = 0; seat < 21; ++seat)
       BOOST_CHECK(council_member(seat).to_string().empty());
@@ -1336,6 +1552,7 @@ BOOST_FIXTURE_TEST_CASE(sixteen_winners_then_five_vacancies_complete, sysio_coun
    BOOST_REQUIRE_EQUAL(success(), vote(t2_owners[0], choices));
    close_votes(1);
    BOOST_REQUIRE_EQUAL(seats_filled(), 16u);
+   BOOST_CHECK(active_authority(COUNCIL_AUTHORITY) == unset_authority());
    std::vector<std::string> winners;
    for (uint8_t seat = 0; seat < 16; ++seat)
       winners.push_back(json_text(council_seat(seat)));
@@ -1368,6 +1585,276 @@ BOOST_FIXTURE_TEST_CASE(sixteen_winners_then_five_vacancies_complete, sysio_coun
       else
          BOOST_CHECK_EQUAL(council_seat(seat)["round_id"].as_uint64(), 2u);
    }
+   // The seat that completes the council, in a single-step batch of a later round, grants the authority.
+   BOOST_CHECK(active_authority(COUNCIL_AUTHORITY) == supermajority_of(council_members()));
+}
+
+// ===========================================================================
+//  Governance authorities
+// ===========================================================================
+
+/// syncnodes mirrors roa's tier-1 owners, and only them, into sysio.nodes@active.
+BOOST_FIXTURE_TEST_CASE(syncnodes_tracks_tier1_owners, sysio_councl_tester) {
+   BOOST_CHECK(active_authority(NODE_OWNERS_AUTHORITY) == unset_authority());
+   const int64_t ram_with_placeholder = ram_usage(NODE_OWNERS_AUTHORITY);
+
+   // Any account may crank, but only for itself.
+   BOOST_CHECK(push(COUNCL_ACCOUNT, councl_abi, candidates_[0], "syncnodes"_n,
+                    mvo()("caller", candidates_[1].to_string())) != success());
+   BOOST_CHECK(active_authority(NODE_OWNERS_AUTHORITY) == unset_authority());
+
+   // Genesis registered one tier-1 owner: 1-of-1.
+   BOOST_REQUIRE_EQUAL(success(), syncnodes(candidates_[0]));
+   BOOST_CHECK(active_authority(NODE_OWNERS_AUTHORITY) == supermajority_of({NODE_DADDY}));
+
+   // Registration alone changes nothing; the next crank picks it up, in account order whatever
+   // the registration order.
+   forcereg_owner(t1_owners[3], 1);
+   forcereg_owner(t1_owners[1], 1);
+   forcereg_owner(t1_owners[2], 1);
+   BOOST_CHECK(active_authority(NODE_OWNERS_AUTHORITY) == supermajority_of({NODE_DADDY}));
+   BOOST_REQUIRE_EQUAL(success(), syncnodes(t1_owners[1]));
+   const std::vector<name> four{t1_owners.begin(), t1_owners.begin() + 4};
+   BOOST_CHECK(active_authority(NODE_OWNERS_AUTHORITY) == supermajority_of(four));
+   BOOST_CHECK_EQUAL(active_authority(NODE_OWNERS_AUTHORITY).threshold, 3u);
+
+   // Tier-2 and tier-3 owners are not members.
+   const name tier2 = "twoa"_n;
+   const name tier3 = "thra"_n;
+   mk(tier2);
+   mk(tier3);
+   forcereg_owner(tier2, 2);
+   forcereg_owner(tier3, 3);
+   BOOST_REQUIRE_EQUAL(success(), syncnodes(tier2));
+   BOOST_CHECK(active_authority(NODE_OWNERS_AUTHORITY) == supermajority_of(four));
+
+   // A fifth owner moves the threshold.
+   forcereg_owner(t1_owners[4], 1);
+   BOOST_REQUIRE_EQUAL(success(), syncnodes(t1_owners[4]));
+   BOOST_CHECK(active_authority(NODE_OWNERS_AUTHORITY) ==
+               supermajority_of({t1_owners.begin(), t1_owners.begin() + 5}));
+   BOOST_CHECK_EQUAL(active_authority(NODE_OWNERS_AUTHORITY).threshold, 4u);
+
+   // The full complement is 15-of-21, and a repeated crank changes nothing.
+   for (size_t i = 5; i < t1_owners.size(); ++i)
+      forcereg_owner(t1_owners[i], 1);
+   BOOST_REQUIRE_EQUAL(success(), syncnodes(t1_owners[20]));
+   BOOST_CHECK(active_authority(NODE_OWNERS_AUTHORITY) == supermajority_of(t1_owners));
+   BOOST_CHECK_EQUAL(active_authority(NODE_OWNERS_AUTHORITY).threshold, 15u);
+   BOOST_CHECK_EQUAL(active_authority(NODE_OWNERS_AUTHORITY).accounts.size(), 21u);
+   BOOST_CHECK_EQUAL(ram_usage(NODE_OWNERS_AUTHORITY) - ram_with_placeholder, AUTHORITY_RAM_HEADROOM);
+   BOOST_REQUIRE_EQUAL(success(), syncnodes(t1_owners[20]));
+   BOOST_CHECK(active_authority(NODE_OWNERS_AUTHORITY) == supermajority_of(t1_owners));
+
+   // Only sysio.nodes@active is ever written.
+   BOOST_CHECK(owner_authority(NODE_OWNERS_AUTHORITY) == delegate_to(config::system_account_name));
+   BOOST_CHECK(active_authority(COUNCIL_AUTHORITY) == unset_authority());
+}
+
+/// Once sysio delegates to sysio.nodes@active it answers only to a supermajority of the owners,
+/// and follows the roster as it grows.
+BOOST_FIXTURE_TEST_CASE(node_owner_supermajority_governs_sysio, sysio_councl_tester) {
+   for (size_t i = 1; i <= 3; ++i)
+      forcereg_owner(t1_owners[i], 1);
+   BOOST_REQUIRE_EQUAL(success(), syncnodes(t1_owners[1])); // 3-of-4
+   BOOST_REQUIRE(satisfies_sysio({config::system_account_name}));
+   hand_sysio_to(NODE_OWNERS_AUTHORITY);
+
+   BOOST_CHECK(!satisfies_sysio({config::system_account_name})); // the genesis key is gone
+   BOOST_CHECK(!satisfies_sysio({t1_owners[1], t1_owners[2]}));
+   BOOST_CHECK(satisfies_sysio({t1_owners[1], t1_owners[2], t1_owners[3]}));
+
+   // One more owner: still 3-of-4 until someone cranks, then 4-of-5.
+   forcereg_owner(t1_owners[4], 1);
+   BOOST_CHECK(satisfies_sysio({t1_owners[1], t1_owners[2], t1_owners[3]}));
+   BOOST_REQUIRE_EQUAL(success(), syncnodes(t1_owners[4]));
+   BOOST_CHECK(!satisfies_sysio({t1_owners[1], t1_owners[2], t1_owners[3]}));
+   BOOST_CHECK(satisfies_sysio({t1_owners[1], t1_owners[2], t1_owners[3], t1_owners[4]}));
+}
+
+/// Delegating sysio before the first sync leaves it unsatisfiable until anyone cranks syncnodes.
+BOOST_FIXTURE_TEST_CASE(node_handoff_before_first_sync_recovers_on_sync, sysio_councl_tester) {
+   hand_sysio_to(NODE_OWNERS_AUTHORITY);
+   BOOST_CHECK(!satisfies_sysio({config::system_account_name}));
+   BOOST_CHECK(!satisfies_sysio({NODE_DADDY}));
+   BOOST_REQUIRE_EQUAL(success(), syncnodes(candidates_[0]));
+   BOOST_CHECK(satisfies_sysio({NODE_DADDY}));
+}
+
+/// A roster supermajority can rewrite sysio.nodes@active by hand. A handoff that syncs in the same
+/// transaction still delivers sysio to the live roster.
+BOOST_FIXTURE_TEST_CASE(handoff_with_sync_overrides_a_hand_edited_roster, sysio_councl_tester) {
+   BOOST_REQUIRE_EQUAL(success(), syncnodes(candidates_[0])); // 1-of-1
+   const name outsider = candidates_[5];
+   BOOST_REQUIRE_EQUAL(success(), hand_edit_node_authority({NODE_DADDY}, delegate_to(outsider)));
+   BOOST_REQUIRE(active_authority(NODE_OWNERS_AUTHORITY) == delegate_to(outsider));
+
+   for (size_t i = 1; i <= 3; ++i)
+      forcereg_owner(t1_owners[i], 1);
+   hand_sysio_to(NODE_OWNERS_AUTHORITY, true);
+
+   BOOST_CHECK(active_authority(NODE_OWNERS_AUTHORITY) ==
+               supermajority_of({t1_owners.begin(), t1_owners.begin() + 4}));
+   BOOST_CHECK(!satisfies_sysio({outsider}));
+   BOOST_CHECK(satisfies_sysio({t1_owners[1], t1_owners[2], t1_owners[3]}));
+}
+
+/// The contract names `owner` as the authorizer of its write, so the write still lands on an account
+/// that limits permission changes to `owner`, where a member's hand edit no longer does.
+BOOST_FIXTURE_TEST_CASE(syncnodes_writes_through_an_owner_only_auth_limit, sysio_councl_tester) {
+   BOOST_REQUIRE_EQUAL(success(), syncnodes(candidates_[0])); // 1-of-1
+   grant_ram(NODE_OWNERS_AUTHORITY, 512);                     // the limit row is billed to the account
+   limit_auth_changes_to_owner(NODE_OWNERS_AUTHORITY);
+
+   BOOST_CHECK(failed_with(hand_edit_node_authority({NODE_DADDY}, delegate_to(candidates_[5])),
+                           "authorized_by is required"));
+   BOOST_CHECK(active_authority(NODE_OWNERS_AUTHORITY) == supermajority_of({NODE_DADDY}));
+
+   forcereg_owner(t1_owners[1], 1);
+   BOOST_REQUIRE_EQUAL(success(), syncnodes(t1_owners[1]));
+   BOOST_CHECK(active_authority(NODE_OWNERS_AUTHORITY) == supermajority_of({NODE_DADDY, t1_owners[1]}));
+}
+
+/// syncnodes fails cleanly until sysio.nodes exists with room for the authority.
+BOOST_FIXTURE_TEST_CASE(syncnodes_needs_the_authority_account_and_its_ram,
+                        sysio_councl_without_authority_accounts_tester) {
+   register_tiers();
+   BOOST_CHECK(failed_with(syncnodes(t1_owners[1]), "does not exist"));
+
+   create_authority_account(NODE_OWNERS_AUTHORITY, 0);
+   // 21 members do not fit the creation grant.
+   BOOST_CHECK(failed_with(syncnodes(t1_owners[1]), "insufficient ram"));
+   BOOST_CHECK(active_authority(NODE_OWNERS_AUTHORITY) == unset_authority());
+
+   grant_ram(NODE_OWNERS_AUTHORITY, AUTHORITY_RAM_HEADROOM);
+   BOOST_REQUIRE_EQUAL(success(), syncnodes(t1_owners[1]));
+   BOOST_CHECK(active_authority(NODE_OWNERS_AUTHORITY) == supermajority_of(t1_owners));
+}
+
+/// Filling the last seat writes the council into sysio.cncl@active, where a supermajority of the
+/// members can then govern sysio.
+BOOST_FIXTURE_TEST_CASE(completed_election_grants_council_authority, sysio_councl_tester) {
+   init_ready(23, 1, 0);
+   vote_in_all_seats();
+   BOOST_CHECK(active_authority(COUNCIL_AUTHORITY) == unset_authority());
+   close_votes();
+   BOOST_REQUIRE_EQUAL(phase(), PH_DONE);
+
+   const std::vector<name> members = council_members();
+   BOOST_CHECK(active_authority(COUNCIL_AUTHORITY) == supermajority_of(members));
+   BOOST_CHECK_EQUAL(active_authority(COUNCIL_AUTHORITY).threshold, 15u);
+   BOOST_CHECK_EQUAL(active_authority(COUNCIL_AUTHORITY).accounts.size(), 21u);
+   // Only sysio.cncl@active is written, and sysio itself is untouched.
+   BOOST_CHECK(owner_authority(COUNCIL_AUTHORITY) == delegate_to(config::system_account_name));
+   BOOST_CHECK(active_authority(NODE_OWNERS_AUTHORITY) == unset_authority());
+   BOOST_REQUIRE(satisfies_sysio({config::system_account_name}));
+
+   // A crank on the completed election does not write again.
+   const fc::time_point granted_at = active_last_updated(COUNCIL_AUTHORITY);
+   BOOST_REQUIRE_EQUAL(success(), settle());
+   BOOST_CHECK(active_last_updated(COUNCIL_AUTHORITY) == granted_at);
+   BOOST_CHECK(active_authority(COUNCIL_AUTHORITY) == supermajority_of(members));
+
+   hand_sysio_to(COUNCIL_AUTHORITY);
+   BOOST_CHECK(!satisfies_sysio({config::system_account_name}));
+   BOOST_CHECK(!satisfies_sysio({members.begin(), members.begin() + 14}));
+   BOOST_CHECK(satisfies_sysio({members.begin(), members.begin() + 15}));
+}
+
+/// The seated council keeps its authority through cleanup and a replacement election, until that
+/// election fills its own last seat.
+BOOST_FIXTURE_TEST_CASE(replacement_election_keeps_council_until_complete, sysio_councl_tester) {
+   init_ready(23, 1, 0);
+   elect_all_seats();
+   const authority first_council = active_authority(COUNCIL_AUTHORITY);
+   BOOST_REQUIRE(first_council == supermajority_of(council_members()));
+
+   BOOST_REQUIRE_EQUAL(success(), reset());
+   finish_cleanup();
+   BOOST_CHECK(active_authority(COUNCIL_AUTHORITY) == first_council);
+
+   // A replacement election aborted with twenty seats filled changes nothing.
+   start_replacement_election();
+   BOOST_REQUIRE_EQUAL(election_gen(), 1u);
+   vote_in_all_seats(3, candidates_.size(), 20);
+   close_votes();
+   BOOST_REQUIRE_EQUAL(seats_filled(), 20u);
+   BOOST_CHECK(active_authority(COUNCIL_AUTHORITY) == first_council);
+   BOOST_REQUIRE_EQUAL(success(), reset());
+   finish_cleanup();
+   BOOST_CHECK(active_authority(COUNCIL_AUTHORITY) == first_council);
+
+   // One that completes replaces it, and only at its last seat.
+   start_replacement_election();
+   BOOST_REQUIRE_EQUAL(election_gen(), 2u);
+   vote_in_all_seats(3, candidates_.size());
+   BOOST_CHECK(active_authority(COUNCIL_AUTHORITY) == first_council);
+   close_votes();
+   BOOST_REQUIRE_EQUAL(phase(), PH_DONE);
+   const authority second_council = active_authority(COUNCIL_AUTHORITY);
+   BOOST_CHECK(second_council == supermajority_of(council_members(2)));
+   BOOST_CHECK(!(second_council == first_council));
+}
+
+/// Seats fill in roster order, not account order, and the last vacancy can fall in the middle of a
+/// batch in a later round. The authority still lists the members in account order.
+BOOST_FIXTURE_TEST_CASE(council_authority_is_sorted_and_granted_mid_batch, sysio_councl_tester) {
+   init_ready(23, 1, 0);
+   // Seat s puts candidates_[20 - s] first, so the seated members descend in account order.
+   for (uint8_t seat = 0; seat < 21; ++seat)
+      BOOST_REQUIRE_EQUAL(success(), repcandidate(t1_owners[seat], candidates_[20 - seat], candidates_[21 - seat],
+                                                  candidates_[22 - seat]));
+   open_votes();
+   std::map<uint8_t, std::array<bool, 3>> choices;
+   for (uint8_t seat = 0; seat < 21; ++seat)
+      if (seat != 3)
+         choices[seat] = {true, false, false};
+   BOOST_REQUIRE_EQUAL(success(), vote(t2_owners[0], choices));
+   close_votes();
+   BOOST_REQUIRE_EQUAL(seats_filled(), 20u);
+   BOOST_CHECK(active_authority(COUNCIL_AUTHORITY) == unset_authority());
+
+   // Round 2 has one vacancy, the fourth seat of a 21-seat batch.
+   BOOST_REQUIRE_EQUAL(success(), settle());
+   BOOST_REQUIRE_EQUAL(success(), repcandidate(t1_owners[3], candidates_[17], candidates_[21], candidates_[22]));
+   open_votes();
+   BOOST_REQUIRE_EQUAL(success(), vote(t2_owners[0], {{3, {true, false, false}}}));
+   close_votes();
+   BOOST_REQUIRE_EQUAL(phase(), PH_DONE);
+
+   const std::vector<name> members = council_members();
+   BOOST_REQUIRE(!std::is_sorted(members.begin(), members.end()));
+   BOOST_CHECK(active_authority(COUNCIL_AUTHORITY) == supermajority_of(members));
+}
+
+/// Without sysio.cncl, or without room in it, the last seat cannot be filled; the election
+/// resumes where it stopped once the account can hold the authority.
+BOOST_FIXTURE_TEST_CASE(last_seat_waits_for_the_council_authority_account,
+                        sysio_councl_without_authority_accounts_tester) {
+   init_ready(23, 1, 0);
+   vote_in_all_seats();
+   produce_block(fc::seconds(TIME_SLOT + 1));
+   BOOST_REQUIRE_EQUAL(success(), settle());
+   BOOST_REQUIRE_EQUAL(phase(), PH_TABULATING);
+
+   // A batch that would fill the last seat fails whole; the first twenty seats do not need the account.
+   BOOST_CHECK(failed_with(settle(), "does not exist"));
+   BOOST_CHECK_EQUAL(seats_filled(), 0u);
+   BOOST_REQUIRE_EQUAL(success(), settle(20));
+   BOOST_CHECK_EQUAL(seats_filled(), 20u);
+   BOOST_CHECK(failed_with(settle(1), "does not exist"));
+
+   create_authority_account(COUNCIL_AUTHORITY, 0);
+   // 21 members do not fit the creation grant.
+   BOOST_CHECK(failed_with(settle(1), "insufficient ram"));
+   BOOST_CHECK_EQUAL(seats_filled(), 20u);
+   BOOST_CHECK_EQUAL(phase(), PH_TABULATING);
+   BOOST_CHECK(active_authority(COUNCIL_AUTHORITY) == unset_authority());
+
+   grant_ram(COUNCIL_AUTHORITY, AUTHORITY_RAM_HEADROOM);
+   BOOST_REQUIRE_EQUAL(success(), settle(1));
+   BOOST_REQUIRE_EQUAL(phase(), PH_DONE);
+   BOOST_CHECK(active_authority(COUNCIL_AUTHORITY) == supermajority_of(council_members()));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
