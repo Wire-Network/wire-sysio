@@ -35,7 +35,7 @@ T variant::load_payload() const {
 }
 
 template <typename T>
-void variant::store_payload(T value) {
+void variant::store_payload(std::type_identity_t<T> value) {
    static_assert(std::is_trivially_copyable_v<T>);
    static_assert(sizeof(T) < sizeof(_data), "payload must not overwrite the type tag");
    std::memcpy(_data.data(), &value, sizeof(value));
@@ -90,7 +90,7 @@ inline std::string_view read_sso( const variant* v ) {
 
 } // anonymous namespace
 
-void variant::make_string_inline_or_heap(std::string_view src) {
+inline void variant::make_string_inline_or_heap(std::string_view src) {
    if (src.size() <= variant::sso_max_length) {
       write_sso(this, src.data(), src.size());
    } else {
@@ -609,17 +609,17 @@ int64_t variant::as_int64()const
    switch( get_type() )
    {
       case string_type:
-         return to_int64(*load_payload<std::string*>());
+          return to_int64(*load_payload<std::string*>());
       case string_sso_type:
           return to_int64(read_sso(this));
       case double_type:
-         return int64_t(load_payload<double>());
+          return int64_t(load_payload<double>());
       case int64_type:
-         return load_payload<int64_t>();
+          return load_payload<int64_t>();
       case uint64_type:
-         return int64_t(load_payload<uint64_t>());
+          return int64_t(load_payload<uint64_t>());
       case bool_type:
-         return load_payload<bool>();
+          return load_payload<bool>();
       case null_type:
           return 0;
       default:
@@ -632,17 +632,17 @@ uint64_t variant::as_uint64()const
    switch( get_type() )
    {
       case string_type:
-         return to_uint64(*load_payload<std::string*>());
+          return to_uint64(*load_payload<std::string*>());
       case string_sso_type:
           return to_uint64(read_sso(this));
       case double_type:
-         return static_cast<uint64_t>(load_payload<double>());
+          return static_cast<uint64_t>(load_payload<double>());
       case int64_type:
-         return static_cast<uint64_t>(load_payload<int64_t>());
+          return static_cast<uint64_t>(load_payload<int64_t>());
       case uint64_type:
-         return load_payload<uint64_t>();
+          return load_payload<uint64_t>();
       case bool_type:
-         return static_cast<uint64_t>(load_payload<bool>());
+          return static_cast<uint64_t>(load_payload<bool>());
       case null_type:
           return 0;
       default:
@@ -787,17 +787,17 @@ double  variant::as_double()const
    switch( get_type() )
    {
       case string_type:
-         return to_double(*load_payload<std::string*>());
+          return to_double(*load_payload<std::string*>());
       case string_sso_type:
           return to_double(read_sso(this));
       case double_type:
-         return load_payload<double>();
+          return load_payload<double>();
       case int64_type:
-         return static_cast<double>(load_payload<int64_t>());
+          return static_cast<double>(load_payload<int64_t>());
       case uint64_type:
-         return static_cast<double>(load_payload<uint64_t>());
+          return static_cast<double>(load_payload<uint64_t>());
       case bool_type:
-         return load_payload<bool>();
+          return load_payload<bool>();
       case null_type:
           return 0;
       default:
@@ -815,17 +815,17 @@ bool  variant::as_bool()const
    switch( get_type() )
    {
       case string_type:
-         return bool_from_string_view(*load_payload<std::string*>());
+          return bool_from_string_view(*load_payload<std::string*>());
       case string_sso_type:
           return bool_from_string_view( read_sso(this) );
       case double_type:
-         return load_payload<double>() != 0.0;
+          return load_payload<double>() != 0.0;
       case int64_type:
-         return load_payload<int64_t>() != 0;
+          return load_payload<int64_t>() != 0;
       case uint64_type:
-         return load_payload<uint64_t>() != 0;
+          return load_payload<uint64_t>() != 0;
       case bool_type:
-         return load_payload<bool>();
+          return load_payload<bool>();
       case null_type:
           return false;
       default:
@@ -850,17 +850,17 @@ std::string variant::as_string()const
       case uint256_type:
       case int256_type:
       case string_type:
-         return *load_payload<std::string*>();
+          return *load_payload<std::string*>();
       case string_sso_type:
           return std::string{ read_sso(this) };
       case double_type:
-         return s_fc_to_string(load_payload<double>());
+          return s_fc_to_string(load_payload<double>());
       case int64_type:
-         return std::to_string(load_payload<int64_t>());
+          return std::to_string(load_payload<int64_t>());
       case uint64_type:
-         return std::to_string(load_payload<uint64_t>());
+          return std::to_string(load_payload<uint64_t>());
       case bool_type:
-         return load_payload<bool>() ? "true" : "false";
+          return load_payload<bool>() ? "true" : "false";
       case blob_type:
           if( get_blob().data.size() )
              return base64_encode( get_blob().data.data(), get_blob().data.size() );
@@ -1000,8 +1000,8 @@ size_t variant::estimated_size()const
 std::string_view          variant::get_string()const
 {
   switch( get_type() ) {
-  case string_type:
-     return *load_payload<std::string*>();
+     case string_type:
+        return *load_payload<std::string*>();
      case string_sso_type: return read_sso(this);
      default: break;
   }
