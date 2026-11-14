@@ -3,6 +3,7 @@ configure_file(${CMAKE_SOURCE_DIR}/LICENSE.md licenses/sysio/LICENSE.md COPYONLY
 
 # In-tree dependency licenses
 configure_file(${CMAKE_SOURCE_DIR}/libraries/wasm-jit/LICENSE licenses/sysio/LICENSE.wavm COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/libraries/sys-vm/LICENSE.md licenses/sysio/LICENSE.wire-sys-vm COPYONLY)
 
 # vcpkg dependency licenses
 # Collect copyright files from all vcpkg-installed packages into the licenses directory.

@@ -25,6 +25,17 @@ namespace sysio {
         /// creators, and sysio.roa is privileged, so node-owner claims must refuse them here.
         constexpr std::string_view RESERVED_SYSTEM_NAME_PREFIX = "sysio.";
 
+        /// Separates a tier-1 owner's name from the sub-accounts newuser mints under it. A node-owner name
+        /// holding one would read as a sub-account of its prefix, so no tier may claim one.
+        constexpr char ACCOUNT_NAME_SEPARATOR{'.'};
+
+        /// Length range of a tier-1 owner's name, kept short because it prefixes every sub-account.
+        constexpr size_t TIER1_NAME_MIN_LENGTH{2};
+        constexpr size_t TIER1_NAME_MAX_LENGTH{6};
+        /// Length range of a tier-2/3 owner's vanity name.
+        constexpr size_t VANITY_NAME_MIN_LENGTH{1};
+        constexpr size_t VANITY_NAME_MAX_LENGTH{12};
+
         /// sysio's account-creation RAM pool takes 1/10 of every tier-1 allocation, carved out at activateroa.
         constexpr int64_t SYSIO_POOL_SHARE_DIVISOR{10};
 
@@ -879,12 +890,12 @@ namespace sysio {
     }
 
     bool roa::valid_name_for_tier(const name& account, uint8_t tier) {
-        if (account.to_string().rfind(RESERVED_SYSTEM_NAME_PREFIX, 0) == 0) return false;
+        const std::string text = account.to_string();
+        if (text.rfind(RESERVED_SYSTEM_NAME_PREFIX, 0) == 0) return false;
+        if (text.find(ACCOUNT_NAME_SEPARATOR) != std::string::npos) return false;
         const size_t len = account.length();
-        // Tier-1 owners take a short 2-6 char prefix (sub-accounts become <prefix>.<random>);
-        // tier 2/3 take a 1-12 char vanity name.
-        if (tier == 1) return len >= 2 && len <= 6;
-        return len >= 1 && len <= 12;
+        if (tier == 1) return len >= TIER1_NAME_MIN_LENGTH && len <= TIER1_NAME_MAX_LENGTH;
+        return len >= VANITY_NAME_MIN_LENGTH && len <= VANITY_NAME_MAX_LENGTH;
     }
 
     uint32_t roa::nodeowner_cap(uint8_t tier) {
@@ -1082,7 +1093,7 @@ namespace sysio {
 
         // Pre-fill the buffer with "<prefix>."
         std::memcpy(uname_str, prefix_str.c_str(), prefix_len);
-        uname_str[prefix_len] = '.';
+        uname_str[prefix_len] = ACCOUNT_NAME_SEPARATOR;
 
         static constexpr char charmap[] = {'1','2','3','4','5',
            'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o',

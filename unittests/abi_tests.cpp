@@ -3924,6 +3924,77 @@ BOOST_AUTO_TEST_CASE(enum_underlying_type_ranges)
    }
 }
 
+BOOST_AUTO_TEST_CASE(int128_type_ranges)
+{
+   using sysio::testing::fc_exception_message_contains;
+   const std::string uint128_max = "340282366920938463463374607431768211455";
+   const std::string int128_max  = "170141183460469231731687303715884105727";
+   const std::string int128_min  = "-170141183460469231731687303715884105728";
+   const auto quoted = [](const std::string& text) { return "\"" + text + "\""; };
+
+   // An ABI whose only definition is struct "s" with the one field "v" of `type`.
+   const auto serializer = [](const std::string& type) {
+      const std::string abi = R"({"version": "sysio::abi/1.1", "structs": [{"name": "s", "base": "", "fields": )"
+                              R"([{"name": "v", "type": ")" + type + R"("}]}]})";
+      return abi_serializer(fc::json::from_string(abi).as<abi_def>(), yield_fn());
+   };
+   const auto pack = [&](const std::string& type, const fc::variant& value) {
+      return serializer(type).variant_to_binary("s", fc::mutable_variant_object()("v", value), yield_fn());
+   };
+
+   // The JSON value packs as `type` and unpacks as the number `expected`.
+   const auto check_accepted = [&](const std::string& type, const std::string& json, const std::string& expected) {
+      BOOST_TEST_CONTEXT(type << " from " << json) {
+         try {
+            const auto packed = pack(type, fc::json::from_string(json));
+            BOOST_TEST(serializer(type).binary_to_variant("s", packed, yield_fn())["v"].as_string() == expected);
+         } catch( const fc::exception& e ) {
+            BOOST_ERROR(e.top_message());
+         }
+      }
+   };
+   const auto check_out_of_range = [&](const std::string& type, const fc::variant& value) {
+      BOOST_TEST_CONTEXT(type << " from " << value.as_string()) {
+         BOOST_CHECK_EXCEPTION(pack(type, value), fc::parse_error_exception,
+                               fc_exception_message_contains(" is out of range for " + type + "_t ["));
+      }
+   };
+
+   check_accepted("uint128", "0", "0");
+   check_accepted("uint128", "18446744073709551615", "18446744073709551615");
+   check_accepted("uint128", quoted(uint128_max), uint128_max);
+   check_accepted("uint128", quoted("0xffffffffffffffffffffffffffffffff"), uint128_max);
+   check_accepted("int128",  "0", "0");
+   check_accepted("int128",  "-9223372036854775808", "-9223372036854775808");
+   check_accepted("int128",  "18446744073709551615", "18446744073709551615");
+   check_accepted("int128",  quoted(int128_max), int128_max);
+   check_accepted("int128",  quoted(int128_min), int128_min);
+   check_accepted("int128",  quoted("-0"), "0");
+   // Hex without a sign is the bit pattern of the value.
+   check_accepted("int128",  quoted("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF80"), "-128");
+
+   // A negative number is no uint128.
+   check_out_of_range("uint128", fc::json::from_string("-1"));
+   check_out_of_range("uint128", fc::json::from_string("-9223372036854775808"));
+   BOOST_CHECK_THROW(pack("uint128", fc::variant("-1")), fc::exception);
+   BOOST_CHECK_THROW(pack("uint128", fc::variant("+1")), fc::exception);
+   BOOST_CHECK_THROW(pack("int128", fc::variant("+1")), fc::exception);
+
+   // One past either end, and one digit more than fits.
+   check_out_of_range("uint128", fc::variant("340282366920938463463374607431768211456"));
+   check_out_of_range("uint128", fc::variant(uint128_max + "0"));
+   check_out_of_range("uint128", fc::variant("0x100000000000000000000000000000000"));
+   check_out_of_range("int128",  fc::variant("170141183460469231731687303715884105728"));
+   check_out_of_range("int128",  fc::variant("-170141183460469231731687303715884105729"));
+   check_out_of_range("int128",  fc::variant(int128_max + "0"));
+   check_out_of_range("int128",  fc::variant(int128_min + "0"));
+   check_out_of_range("int128",  fc::variant("0x100000000000000000000000000000000"));
+   // A uint128 above the int128 maximum, as a string and as the variant an in-process caller holds.
+   check_out_of_range("int128",  fc::variant(uint128_max));
+   check_out_of_range("int128",  fc::variant(~fc::uint128{0}));
+   check_out_of_range("int128",  fc::variant((fc::uint128{1} << 127)));
+}
+
 // ===================== Protobuf ABI Serialization Tests =====================
 
 // A minimal ABI 1.3 with protobuf_types and protobuf-typed actions

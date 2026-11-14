@@ -14,8 +14,18 @@ namespace fc
   // String conversion helpers (replacement for boost::multiprecision .str())
   std::string to_string( unsigned __int128 v );
   std::string to_string( __int128 v );
+
+  /**
+   * Parse decimal digits, or hex digits after "0x". int128 also takes a leading '-', and reads hex without one as
+   * the bit pattern of the result, so that 32 hex digits may set the sign bit. An empty string is zero.
+   *
+   * @throw parse_error_exception if the number is outside the range of the result type
+   * @throw assert_exception on any other character
+   * @{
+   */
   unsigned __int128 uint128_from_string( const std::string& s );
   __int128 int128_from_string( const std::string& s );
+  /// @}
 
   class variant;
 
@@ -25,9 +35,19 @@ namespace fc
 
 
   void to_variant( const uint128& var,  variant& vo );
-  void from_variant( const variant& var,  uint128& vo );
   void to_variant( const int128& var,  variant& vo );
+
+  /**
+   * Read an int64, uint64, uint128 or string variant, and for int128 an int128 variant. A string reads as
+   * `*_from_string` parses it.
+   *
+   * @throw parse_error_exception if the value is outside the range of `vo`
+   * @throw bad_cast_exception if the variant holds any other type
+   * @{
+   */
+  void from_variant( const variant& var,  uint128& vo );
   void from_variant( const variant& var,  int128& vo );
+  /// @}
 
   namespace raw
   {

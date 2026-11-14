@@ -10,7 +10,8 @@
 # resolves @wireio/opp-*-models from via its .pnpmfile.cjs. See build_defs.bzl.
 #
 # `manual` + requires-network: vcpkg fetches/compiles deps (boost, libsodium,
-# secp256k1, wire-sys-vm, ...) and the node build is large. The CMakeLists
+# secp256k1, softfloat, ...) and the node build is large. eos-vm comes from the
+# pinned libraries/sys-vm submodule. The CMakeLists
 # defaults CMAKE_TOOLCHAIN_FILE to the in-tree vcpkg, so we don't set it.
 #
 # Native equivalent:
@@ -29,6 +30,8 @@ filegroup(
         exclude = [
             "build/**",
             "vcpkg/**",
+            # The VM's standalone vcpkg checkout is not a Sysio build input.
+            "libraries/sys-vm/vcpkg/**",
             ".git/**",
             "node_modules/**",
             "BUILD.bazel",

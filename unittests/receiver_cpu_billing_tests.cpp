@@ -1232,14 +1232,15 @@ BOOST_FIXTURE_TEST_CASE( receiver_frame_stops_at_the_transaction_limit, receiver
 
 BOOST_FIXTURE_TEST_CASE( greylisted_receiver_fails_as_greylisted, receiver_cpu_tester ) try {
    // On a speculative block, a greylisted contract with no CPU fails as greylisted past its stipend, both while its
-   // frame runs and in the final checks.
+   // frame runs and in the final checks. Only a push with a block deadline stops a frame, so the one that has to reach
+   // the final checks has none.
    control->add_resource_greylist( idle );
    const auto memo = long_spin_memo();
    start_speculative_block();
    const auto deadline = fc::time_point::now() + fc::seconds( 10 );
    BOOST_CHECK_EXCEPTION( push_measured( make_trx( { transfer_action( alice, idle, amount, "forever" ) } ), deadline ),
                           greylist_cpu_usage_exceeded, fc_exception_message_contains( greylisted_frame_stopped ) );
-   BOOST_CHECK_EXCEPTION( push_measured( make_trx( { transfer_action( alice, idle, amount, memo ) } ), deadline ),
+   BOOST_CHECK_EXCEPTION( push_measured( make_trx( { transfer_action( alice, idle, amount, memo ) } ) ),
                           greylist_cpu_usage_exceeded, fc_exception_message_contains( idle_over_greylisted_limit ) );
    control->abort_block();
    control->remove_resource_greylist( idle );
