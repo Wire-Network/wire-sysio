@@ -358,7 +358,7 @@ Almost nothing. Managing policies costs a node owner no resources at all:
 - `addpolicy`, `expandpolicy`, `extendpolicy`, and `reducepolicy` are actions on `sysio.roa`, so
   `payer()` resolves to `sysio.roa`, which carries unlimited CPU and NET.
 - Every row the contract writes for registration and policy management is billed to `sysio.roa`
-  as well — `policies`, `reslimit`, and `nodeowners` rows are all `emplace(get_self(), …)`.
+  as well — `policies` and `nodeowners` rows are both `emplace(get_self(), …)`.
 
 An owner reduced to zero CPU, zero NET, and zero spare RAM can still issue a policy. Membership —
 the `nodeowners` row — is what confers the ability to issue, not any allocation the owner holds.
@@ -388,7 +388,7 @@ refuse any caller that is not a registered tier-1 owner.
 
 | Pool | Size at activation | Funds |
 |---|---|---|
-| `sysio.roa` | ~157 MB — half the SYS left over after all tier allocations | The contract's own rows: policies, reslimits, node-owner records |
+| `sysio.roa` | ~157 MB — half the SYS left over after all tier allocations | The contract's own rows: policies, node-owner records |
 | `sysio` | ~6.75 GB — the other half, plus 10% of every tier-1 slot's allocation | The 1,144-byte gift every new account receives |
 
 `sysio`'s pool is fully funded at activation, whether or not any node owner has registered. At
@@ -895,7 +895,6 @@ and are omitted.
 | `roastate` | singleton | Activation flag, `total_sys`, `bytes_per_unit`, `network_gen` |
 | `nodeowners` | `network_gen` | Node owner rows: tier, total and allocated SYS |
 | `policies` | issuer | One row per (issuer, owner) pair |
-| `reslimit` | global | Per-account totals summed across all its policies |
 | `sponsorcount` | `network_gen` | Per tier-1 owner: accounts sponsored and the limit it raised to |
 | `acctlimcfg` | singleton | Default account limit and the raise multiplier |
 

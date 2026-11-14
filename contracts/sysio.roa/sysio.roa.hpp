@@ -41,7 +41,8 @@ namespace sysio {
 
 
             /**
-             * @brief Adds a row to the policies table scoped to 'issuer' ( Node Owner ) and either creates a row in 'reslimit' for 'owner' or increments the values if 'owner' already has a row.
+             * @brief Adds a row to the policies table scoped to 'issuer' ( Node Owner ) and adds the policy's weights
+             * to 'owner's chain resource limits.
              *
              * NOTE: Cannot allocate CPU / NET to system accounts to maintain infinite CPU / NET on these accounts.
              *
@@ -93,7 +94,8 @@ namespace sysio {
              * @brief Decrease the resource limits on an existing policy. Subtracts new weights from
              *        existing values. Only callable once the current block reaches the policy's time_block.
              *
-             * Note: Will reclaim UPTO ram_weight worth of bytes, limited to the pool of unused bytes on 'owner's reslimit and upper bound by the policy ram_weight.
+             * Note: Will reclaim UPTO ram_weight worth of bytes, limited to the unused bytes of 'owner's chain RAM
+             * limit and upper bound by the policy ram_weight.
              *
              * Every weight must be non-negative and no greater than the stored policy weight: the
              * reduction is applied as a subtraction, so a negative weight would ADD quota and break
@@ -404,25 +406,6 @@ namespace sysio {
             using policies_t = kv::scoped_table<"policies"_n, policy_key, policies>;
 
             /**
-             * Scoped to Owner: Holds upper limits of resources an account has access to. This table is used by the Node Operators to maintain usage metrics, replaces 'userres' on sysio.
-             */
-            struct reslimit_key {
-                uint64_t owner;
-                SYSLIB_SERIALIZE(reslimit_key, (owner))
-            };
-
-            struct [[sysio::table("reslimit")]] reslimit {
-                name owner;             // Account name this policy applies to
-                asset net_weight;       // Total NET allocated
-                asset cpu_weight;       // Total CPU allocated
-                uint64_t ram_bytes;     // Total RAM allocated
-
-                SYSLIB_SERIALIZE(reslimit, (owner)(net_weight)(cpu_weight)(ram_bytes))
-            };
-
-            using reslimit_t = kv::table<"reslimit"_n, reslimit_key, reslimit>;
-
-            /**
              * This table is scoped to Node Owner's account names and is used to track all the node registration actions.
              */
             struct nodeownerreg_key {
@@ -540,7 +523,7 @@ namespace sysio {
              *        allotment (net of sysio's tier-1 share, which activateroa already carved out).
              *
              * Every tier gets a `nodeowners` row (the budget and the membership that gates policy
-             * issuance) and a reslimit row.
+             * issuance).
              *
              * Only tier 1 additionally gets a personal self-issued policy. It is the only tier that can
              * call `newuser`, and the `sponsors` / `sponsorcount` rows that `newuser` and
@@ -637,45 +620,13 @@ namespace sysio {
              */
             static uint64_t max_raised_limit(const account_limit_config& config, uint64_t current_limit);
 
-            struct resources_t {
-                asset net;
-                asset cpu;
-                uint64_t ram_bytes;
-            };
-
-            /**
-             * @brief Create and set the initial values of reslimit entry
-             */
-            void set_reslimit(const name& owner, const asset& net_weight, const asset& cpu_weight, int64_t ram_bytes);
-
-            /**
-             * @brief Add the given weights/bytes to an account's reslimit, creating the row if absent.
-             *
-             * When the row is absent and @p require_to_exist is false, the row is created and the
-             * one-time `newaccount_ram` gift is folded into its ram_bytes; when present, only the passed
-             * deltas are added (so the gift is never double-counted). Accumulation saturates rather than
-             * throwing on overflow (see safe_ops): this helper sits on the OPP never-throw dispatch path
-             * (nodeownreg -> nodeownfin -> regnodeowner, and newnameduser).
-             *
-             * @param require_to_exist assert the row already exists (no create); used by callers that
-             *        must only ever top up a known account (e.g. sysio.acct funding).
-             * @return the resulting reslimit totals (net, cpu, ram_bytes) after the increase.
-             */
-            resources_t increase_reslimit(const name& owner, const asset& net_weight, const asset& cpu_weight, int64_t ram_bytes,
-                                          bool require_to_exist);
-
-            /**
-             * @brief Decrease ram_bytes on an existing reslimit entry
-             */
-            void decrease_reslimit(const name& owner, uint64_t ram_bytes);
-
             /**
              * @brief RAM setsyscode / setsysabi gift an account ahead of their inline setcode / setabi.
              *
              * The most a new value billed at @p stored_ram_bytes can add to the account (the value plus the metadata
-             * row a first deploy creates), capped at what sysio's pool holds: its chain RAM quota and its reslimit
-             * row. The value being replaced is already funded, so a deploy whose net change fits the pool never
-             * needs more than the pool holds.
+             * row a first deploy creates), capped at what sysio's pool holds: its chain RAM quota. The value being
+             * replaced is already funded, so a deploy whose net change fits the pool never needs more than the pool
+             * holds.
              */
             int64_t deploy_ram_gift(int64_t stored_ram_bytes);
 

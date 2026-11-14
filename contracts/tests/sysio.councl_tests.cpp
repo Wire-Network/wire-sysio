@@ -106,8 +106,7 @@ public:
 
       create_accounts({COUNCL_ACCOUNT});
 
-      // Node-owner + candidate accounts. Created without a roa policy so regnodeowner's reslimit
-      // creation does not collide (matches sysio.dispute_tests).
+      // Node-owner + candidate accounts. Created without a roa policy (matches sysio.dispute_tests).
       // The tester genesis (init_roa) already forcereg'd NODE_DADDY at tier 1, and startinit
       // requires roa's tier-1 set to be exactly 21 owners — so nodedaddy takes the first roster
       // slot and only 20 fresh accounts are created/registered here.
