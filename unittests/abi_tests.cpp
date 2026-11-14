@@ -3,6 +3,7 @@
 #include <iterator>
 #include <cstdlib>
 #include <limits>
+#include <filesystem>
 
 #include <boost/test/unit_test.hpp>
 
@@ -52,6 +53,78 @@ static fc::time_point get_deadline() {
 }
 
 static auto yield_fn() { return abi_serializer::create_yield_function( max_serialization_time ); }
+
+/// Publication remains opaque: native setabi must accept ABI formats unrelated to packed abi_def.
+BOOST_AUTO_TEST_CASE(setabi_keeps_abi_bytes_opaque)
+{ try {
+   testing::tester chain;
+   const auto account = "abiformat"_n;
+   chain.create_account(account);
+   const std::string json = R"({"version":"future::abi/2.0","types":[]})";
+   const bytes protobuf{0x0a, 0x03, 0x0a, 0x01, 'x'}; // FileDescriptorSet containing a file named x.
+   const auto forged = fc::raw::pack(std::string{"sysio::abi/1.2"}, fc::unsigned_int{MAX_NUM_ARRAY_ELEMENTS});
+   for (const auto& blob : {bytes(json.begin(), json.end()), protobuf, bytes{char(0xff)}, forged, bytes{}}) {
+      signed_transaction trx;
+      trx.actions.emplace_back(std::vector<permission_level>{{account, config::active_name}},
+                               setabi{.account = account, .abi = blob});
+      chain.set_transaction_headers(trx);
+      trx.sign(chain.get_private_key(account, "active"), chain.control->get_chain_id());
+      BOOST_REQUIRE_NO_THROW(chain.push_transaction(trx));
+      const auto* metadata = chain.control->find_account_metadata(account);
+      BOOST_REQUIRE(metadata != nullptr);
+      BOOST_CHECK_EQUAL(metadata->abi.size(), blob.size());
+      if (!blob.empty())
+         BOOST_CHECK(std::equal(blob.begin(), blob.end(), metadata->abi.data()));
+   }
+} FC_LOG_AND_RETHROW() }
+
+/// Shared raw decoding must reject a forged count without allocating the declared ABI containers.
+BOOST_AUTO_TEST_CASE(forged_abi_counts_do_not_bulk_allocate)
+{
+   const auto tiny = fc::raw::pack(std::string{"sysio::abi/1.2"}, fc::unsigned_int{MAX_NUM_ARRAY_ELEMENTS});
+   BOOST_REQUIRE_EQUAL(tiny.size(), 18u);
+   abi_def decoded;
+   fc::datastream<const char*> stream(tiny.data(), tiny.size());
+   BOOST_CHECK_THROW(fc::raw::unpack(stream, decoded), fc::exception);
+   BOOST_CHECK_LE(decoded.types.capacity(), 1u);
+
+   const auto nested = fc::raw::pack(std::string{"sysio::abi/1.2"}, fc::unsigned_int{0}, fc::unsigned_int{1},
+                                    std::string{"entry"}, std::string{}, fc::unsigned_int{MAX_NUM_ARRAY_ELEMENTS});
+   decoded = {};
+   fc::datastream<const char*> nested_stream(nested.data(), nested.size());
+   BOOST_CHECK_THROW(fc::raw::unpack(nested_stream, decoded), fc::exception);
+   BOOST_REQUIRE_EQUAL(decoded.structs.size(), 1u);
+   BOOST_CHECK_LE(decoded.structs.front().fields.capacity(), 1u);
+}
+
+/// Keep existing packed ABI values, legacy varint behavior and large complete definitions accepted.
+BOOST_AUTO_TEST_CASE(abi_raw_decoding_preserves_existing_encodings)
+{
+   const bytes aliased_zero{char(0x80), char(0x80), char(0x80), char(0x80), char(0x10), 0, 0, 0, 0, 0, 0, 0};
+   BOOST_CHECK_NO_THROW(fc::raw::unpack<abi_def>(aliased_zero));
+
+   abi_def large;
+   constexpr size_t typedef_count = 262000;
+   large.types.resize(typedef_count);
+   const auto packed = fc::raw::pack(large);
+   const auto decoded = fc::raw::unpack<abi_def>(packed);
+   BOOST_CHECK_EQUAL(decoded.types.size(), typedef_count);
+   BOOST_CHECK(fc::raw::pack(decoded) == packed);
+
+   const auto contracts = std::filesystem::path(__FILE__).parent_path().parent_path() / "contracts";
+   size_t checked = 0;
+   for (const auto& entry : std::filesystem::recursive_directory_iterator(contracts)) {
+      if (!entry.is_regular_file() || entry.path().extension() != ".abi")
+         continue;
+      BOOST_TEST_CONTEXT(entry.path().string()) {
+         const auto abi = fc::json::from_file(entry.path()).as<abi_def>();
+         const auto bytes = fc::raw::pack(abi);
+         BOOST_CHECK(fc::raw::pack(fc::raw::unpack<abi_def>(bytes)) == bytes);
+         ++checked;
+      }
+   }
+   BOOST_CHECK_GT(checked, 0u);
+}
 
 // Exercise the real fixture path, including account ABI lookup, validation,
 // action packing, and excessive input recursion rejection.

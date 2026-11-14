@@ -171,6 +171,7 @@ namespace fc { namespace raw {
           pack( s, itr->value() );
        }
     }
+    /// Build object entries as they decode instead of reserving from an untrusted packed count.
     template<typename Stream> 
     inline void unpack( Stream& s, variant_object& v ) 
     {
@@ -178,7 +179,6 @@ namespace fc { namespace raw {
        unpack( s, vs );
 
        mutable_variant_object mvo;
-       mvo.reserve(vs.value);
        for( uint32_t i = 0; i < vs.value; ++i )
        {
           std::string key;
