@@ -773,6 +773,12 @@ A **tier-1** node owner can call `roa::newuser`, which mints a sub-account under
 (`<owner>.<generated>`) with a supplied public key, funded with the standard 1,144-byte account
 allocation drawn from the network pool.
 
+A node owner's own name never contains a `.` when it comes through the NFT-claim flow: `nodeownreg`
+creates no account for a dotted name and records the claim as `REJECTED` / `NAME_INVALID`, in every
+tier. A claim therefore cannot take a name under another account's prefix, such as a tier-1
+owner's sub-account namespace or a `sysio.` system name. Tier 1 takes 2–6 characters, tiers 2 and 3
+take 1–12.
+
 The created account has **no CPU/NET policy** — and does not need one, because it transacts
 against contracts that carry their own. A user gets an account at no cost to themselves and can
 immediately use every provisioned contract on the network.
