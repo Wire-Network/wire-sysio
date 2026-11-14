@@ -4,6 +4,8 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <cstdint>
+#include <limits>
 #include <string>
 
 using fc::variant;
@@ -58,6 +60,30 @@ BOOST_AUTO_TEST_CASE(less_and_greater_int64) {
    BOOST_CHECK(variant{int64_t{1}} < variant{int64_t{2}});
    BOOST_CHECK(variant{int64_t{2}} > variant{int64_t{1}});
    BOOST_CHECK(!(variant{int64_t{2}} < variant{int64_t{2}}));
+}
+
+// An int64 and a uint64 compare by value. The uint64 used to be read as an int64, so 2^64 - 1 compared as -1.
+BOOST_AUTO_TEST_CASE(int64_and_uint64_compare_by_value) {
+   const variant negative{int64_t{-1}};
+   const variant huge{std::numeric_limits<uint64_t>::max()};
+
+   BOOST_CHECK(negative != huge);
+   BOOST_CHECK(huge != negative);
+   BOOST_CHECK(negative < huge);
+   BOOST_CHECK(huge > negative);
+   BOOST_CHECK(!(huge < negative));
+   BOOST_CHECK(!(negative > huge));
+
+   BOOST_CHECK(variant{int64_t{5}} == variant{uint64_t{5}});
+   BOOST_CHECK(variant{uint64_t{5}} == variant{int64_t{5}});
+   BOOST_CHECK(variant{int64_t{5}} < variant{uint64_t{1} << 63});
+   BOOST_CHECK(variant{uint64_t{1} << 63} > variant{int64_t{5}});
+   BOOST_CHECK(variant{std::numeric_limits<int64_t>::min()} < variant{uint64_t{0}});
+
+   // A bool or null beside an int64 still compares as 0 or 1.
+   BOOST_CHECK(variant{int64_t{1}} == variant{true});
+   BOOST_CHECK(variant{int64_t{0}} == variant{});
+   BOOST_CHECK(variant{int64_t{-1}} < variant{});
 }
 
 BOOST_AUTO_TEST_CASE(less_and_greater_string) {

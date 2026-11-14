@@ -278,8 +278,18 @@ namespace fc
          */
         bool                        is_integer()const;
 
+        /**
+         * The value as a 64-bit integer: an int64 or uint64, a double truncated toward zero, a decimal string, a
+         * bool, or null as zero.
+         *
+         * @throw parse_error_exception if the value is outside the range of the result type, or a string is not a
+         *        decimal integer
+         * @throw bad_cast_exception if the variant holds any other type
+         * @{
+         */
         int64_t                     as_int64()const;
         uint64_t                    as_uint64()const;
+        /// @}
 
         /**
          * The value as a 128-bit or 256-bit integer: an int64 or uint64, an integer of that width, a string holding
@@ -303,6 +313,7 @@ namespace fc
          *
          * @tparam EnumType A C++ enum type (e.g., sysio::opp::types::ChainKind)
          * @return The enum value cast from the variant's integer value
+         * @throw parse_error_exception if a numeric value is outside the range of int64_t
          */
         template<typename EnumType>
         EnumType as_enum_value() const {
@@ -770,8 +781,9 @@ namespace fc
    template<typename T>
    void to_variant( const safe<T>& s, fc::variant& v ) { v = s.value; }
 
+   /// Reads the value through `T`'s own from_variant.
    template<typename T>
-   void from_variant( const fc::variant& v, safe<T>& s ) { s.value = v.as_uint64(); }
+   void from_variant( const fc::variant& v, safe<T>& s ) { s.value = v.as<T>(); }
 
    template<typename T, typename... Args> void to_variant( const boost::multi_index_container<T,Args...>& c, fc::variant& v )
    {
@@ -801,10 +813,14 @@ namespace fc
    fc::variant operator * ( const fc::variant& a, const fc::variant& b ) = delete;
    fc::variant operator / ( const fc::variant& a, const fc::variant& b ) = delete;
 
+   /// @name Comparison
+   /// An int64 and a uint64 compare by value.
+   /// @{
    bool operator == ( const fc::variant& a, const fc::variant& b );
    bool operator != ( const fc::variant& a, const fc::variant& b );
    bool operator < ( const fc::variant& a, const fc::variant& b );
    bool operator > ( const fc::variant& a, const fc::variant& b );
+   /// @}
    bool operator ! ( const fc::variant& a );
 } // namespace fc
 

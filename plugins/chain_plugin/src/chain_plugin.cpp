@@ -3621,14 +3621,12 @@ read_only::get_producer_schedule_result read_only::get_producer_schedule( const 
 
 namespace {
 
-/// Sign `fc::to_uint64` accepts on a decimal integer; it returns such a value negated modulo 2^64.
-constexpr char negative_sign = '-';
-
 /**
  * Reads a `block_num_or_id` request string as a decimal block number.
  *
- * @return the block number, or std::nullopt when the string is not a decimal integer and so can only be a block id
- * @throws chain::unknown_block_exception when the integer has a minus sign or exceeds uint32_t: no such block number
+ * @return the block number, or std::nullopt when the string is not an unsigned decimal integer and so can only be a
+ *         block id
+ * @throws chain::unknown_block_exception when the integer exceeds uint32_t: no such block number
  */
 std::optional<uint32_t> parse_block_num(std::string_view block_num_or_id) {
    uint64_t block_num = 0;
@@ -3637,8 +3635,8 @@ std::optional<uint32_t> parse_block_num(std::string_view block_num_or_id) {
    } catch( const fc::exception& ) {
       return std::nullopt;
    }
-   SYS_ASSERT( !block_num_or_id.starts_with(negative_sign) && block_num <= std::numeric_limits<uint32_t>::max(),
-               chain::unknown_block_exception, "Could not find block: {}", block_num_or_id );
+   SYS_ASSERT( block_num <= std::numeric_limits<uint32_t>::max(), chain::unknown_block_exception,
+               "Could not find block: {}", block_num_or_id );
    return static_cast<uint32_t>(block_num);
 }
 
