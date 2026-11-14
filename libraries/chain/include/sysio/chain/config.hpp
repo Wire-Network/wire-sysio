@@ -24,6 +24,9 @@ namespace sysio::chain::config {
   static constexpr auto producers_account_name { "sysio.prods"_n };
   static constexpr auto roa_account_name       { "sysio.roa"_n };
 
+  /// The system contract action the implicit transaction at the start of every block runs, and nothing else may.
+  static constexpr auto onblock_action_name { "onblock"_n };
+
   /// True for sysio and every sysio.* account. Callers that grant a system contract more also require it to be
   /// privileged.
   constexpr bool is_system_account( name account ) { return account.prefix() == system_account_name; }

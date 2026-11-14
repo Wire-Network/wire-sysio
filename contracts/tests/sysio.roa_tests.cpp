@@ -3159,6 +3159,48 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_rejects_reserved_system_names, sysio_roa_nod
    }
 } FC_LOG_AND_RETHROW()
 
+// No tier may claim a name containing a `.`, even one inside the tier's length range: nothing is created (sysio's RAM
+// pool is untouched) and nodeownreg records REJECTED/NAME_INVALID. The name without its dot registers.
+BOOST_FIXTURE_TEST_CASE( nodeownreg_rejects_dotted_names, sysio_roa_nodeownreg_tester ) try {
+   constexpr uint8_t tier1 = 1, tier2 = 2, tier3 = 3;
+   auto& rlm = control->get_resource_limits_manager();
+   const auto sysio_pool = [&] {
+      int64_t ram = 0, net = 0, cpu = 0;
+      rlm.get_account_limits(config::system_account_name, ram, net, cpu);
+      return ram;
+   };
+   const auto account_exists = [&](name account) {
+      return control->db().find<account_object, by_name>(account) != nullptr;
+   };
+
+   for (const auto& [dotted, dot_free, tier] : {std::tuple{"ab.cd"_n, "abcd"_n, tier1},
+                                                std::tuple{"acme.ceo"_n, "acmeceo"_n, tier2},
+                                                std::tuple{".lead"_n, "lead"_n, tier2},
+                                                std::tuple{"bond.judge"_n, "bondjudge"_n, tier3}}) {
+      const auto wire_pub = gen_k1_key();
+      const auto pool_before = sysio_pool();
+      BOOST_REQUIRE_EQUAL(success(), newnameduser(dotted, wire_pub, tier));
+      produce_blocks();
+      BOOST_REQUIRE_EQUAL(success(), nodeownreg(dotted, tier, gen_em_key(), wire_pub));
+      produce_blocks();
+      BOOST_CHECK_EQUAL(sysio_pool(), pool_before);
+      BOOST_CHECK(!account_exists(dotted));
+      BOOST_CHECK(get_nodeowner(dotted).is_null());
+      const auto rejected = get_nodeownerreg(dotted);
+      BOOST_REQUIRE(!rejected.is_null());
+      BOOST_CHECK_EQUAL(rejected["status"].as<uint64_t>(), REJECTED);
+      BOOST_CHECK_EQUAL(rejected["reason"].as<uint64_t>(), R_NAME_INVALID);
+
+      BOOST_REQUIRE_EQUAL(success(), nodeownreg(dot_free, tier, gen_em_key(), wire_pub));
+      produce_blocks();
+      BOOST_CHECK(account_exists(dot_free));
+      BOOST_CHECK(!get_nodeowner(dot_free).is_null());
+      const auto confirmed = get_nodeownerreg(dot_free);
+      BOOST_REQUIRE(!confirmed.is_null());
+      BOOST_CHECK_EQUAL(confirmed["status"].as<uint64_t>(), CONFIRMED);
+   }
+} FC_LOG_AND_RETHROW()
+
 // Replay after a successful claim -> REJECTED/DUPLICATE, no abort.
 BOOST_FIXTURE_TEST_CASE( nodeownreg_already_registered, sysio_roa_nodeownreg_tester ) try {
    const auto owner    = "claimacct"_n;

@@ -262,7 +262,7 @@ BOOST_AUTO_TEST_CASE(symbol_precision_range)
 
 // A symbol_code renders as its name; a value that is not the code of a symbol is rejected, never rendered as the
 // name of a different code
-BOOST_AUTO_TEST_CASE(symbol_code_to_string)
+BOOST_AUTO_TEST_CASE(symbol_code_name)
 {
    const auto too_long = [](const symbol_type_exception& e) { return expect_assert_message(e, " is too long"); };
    const auto invalid  = [](const symbol_type_exception& e) { return expect_assert_message(e, "invalid symbol"); };
@@ -270,18 +270,17 @@ BOOST_AUTO_TEST_CASE(symbol_code_to_string)
    const symbol_code seven = symbol(0, "ABCDEFG").to_symbol_code();
    const symbol_code eight{seven.value | (uint64_t{'H'} << 56)};   // "ABCDEFGH": the byte a symbol has no room for
 
-   // symbol_code::to_string
-   BOOST_CHECK_EQUAL(symbol_code{0}.to_string(), "");
-   BOOST_CHECK_EQUAL(symbol(4, "SYS").to_symbol_code().to_string(), "SYS");
-   BOOST_CHECK_EQUAL(seven.to_string(), "ABCDEFG");
-   BOOST_CHECK_EXCEPTION(eight.to_string(), symbol_type_exception, [](const symbol_type_exception& e) {
+   // symbol_code::name
+   BOOST_CHECK_EQUAL(symbol_code{0}.name(), "");
+   BOOST_CHECK_EQUAL(symbol(4, "SYS").to_symbol_code().name(), "SYS");
+   BOOST_CHECK_EQUAL(seven.name(), "ABCDEFG");
+   BOOST_CHECK_EXCEPTION(eight.name(), symbol_type_exception, [](const symbol_type_exception& e) {
       return expect_assert_message(e, "symbol code 0x4847464544434241 is too long");
    });
-   BOOST_CHECK_EXCEPTION(symbol_code{uint64_t{'H'} << 56}.to_string(), symbol_type_exception, too_long);
-   BOOST_CHECK_EXCEPTION(symbol_code{std::numeric_limits<uint64_t>::max()}.to_string(), symbol_type_exception,
-                         too_long);
-   BOOST_CHECK_EXCEPTION(symbol_code{uint64_t{'a'}}.to_string(), symbol_type_exception, invalid);
-   BOOST_CHECK_EXCEPTION(symbol_code{uint64_t{'A'} << 8}.to_string(), symbol_type_exception, invalid);   // "\0A"
+   BOOST_CHECK_EXCEPTION(symbol_code{uint64_t{'H'} << 56}.name(), symbol_type_exception, too_long);
+   BOOST_CHECK_EXCEPTION(symbol_code{std::numeric_limits<uint64_t>::max()}.name(), symbol_type_exception, too_long);
+   BOOST_CHECK_EXCEPTION(symbol_code{uint64_t{'a'}}.name(), symbol_type_exception, invalid);
+   BOOST_CHECK_EXCEPTION(symbol_code{uint64_t{'A'} << 8}.name(), symbol_type_exception, invalid);   // "\0A"
 
    // fc::to_variant, and back
    BOOST_CHECK_EQUAL(fc::variant(seven).as_string(), "ABCDEFG");
@@ -388,6 +387,57 @@ BOOST_AUTO_TEST_CASE(asset_from_string_overflow)
    BOOST_CHECK_EXCEPTION( asset::from_string("-100000000000000000000000.00000000000000000000 CUR") , symbol_type_exception, [](const auto& e) {
       return expect_assert_message(e, "precision 20 should be <= 18");
    });
+}
+
+// A symbol name of up to 7 characters is encoded; a longer one is rejected wherever a symbol is made from a string
+BOOST_AUTO_TEST_CASE(symbol_name_length)
+{
+   const auto too_long = [](const symbol_type_exception& e) {
+      return expect_assert_message(e, "symbol name is longer than 7 characters");
+   };
+
+   BOOST_CHECK_EQUAL(max_symbol_name_length, 7u);
+
+   // compile time; a longer name does not compile
+   static_assert(SY(4, ABCDEFG) == 0x4746454443424104ull);
+   static_assert(string_to_symbol_c(4, "") == 4);
+
+   // string_to_symbol
+   BOOST_CHECK_EQUAL(string_to_symbol(4, "ABCDEFG"), SY(4, ABCDEFG));
+   BOOST_CHECK_EXCEPTION(string_to_symbol(4, "ABCDEFGH"), symbol_type_exception, too_long);
+   BOOST_CHECK_EXCEPTION(string_to_symbol(4, "ABCDEFGHI"), symbol_type_exception, too_long);
+   BOOST_CHECK_EXCEPTION(string_to_symbol(4, std::string(1024, 'A')), symbol_type_exception, too_long);
+
+   // symbol(uint8_t, std::string_view)
+   BOOST_CHECK_EQUAL(symbol(4, "ABCDEFG").to_string(), "4,ABCDEFG");
+   BOOST_CHECK_EXCEPTION(symbol(4, "ABCDEFGH"), symbol_type_exception, too_long);
+   BOOST_CHECK_EXCEPTION(symbol(4, "ABCDEFGHI"), symbol_type_exception, too_long);
+
+   // symbol::from_string
+   BOOST_CHECK_EQUAL(symbol::from_string("4,ABCDEFG").value(), SY(4, ABCDEFG));
+   BOOST_CHECK_EXCEPTION(symbol::from_string("4,ABCDEFGH"), symbol_type_exception, too_long);
+   BOOST_CHECK_EXCEPTION(symbol::from_string("4,ABCDEFGHI"), symbol_type_exception, too_long);
+
+   // asset::from_string
+   BOOST_CHECK_EQUAL(asset::from_string("1.0000 ABCDEFG"), asset(10000, symbol(4, "ABCDEFG")));
+   BOOST_CHECK_EXCEPTION(asset::from_string("1.0000 ABCDEFGH"), symbol_type_exception, too_long);
+   BOOST_CHECK_EXCEPTION(asset::from_string("1.0000 ABCDEFGHI"), symbol_type_exception, too_long);
+
+   // from_variant
+   BOOST_CHECK_EQUAL(fc::variant("ABCDEFG").as<symbol_code>().value, SY(4, ABCDEFG) >> 8);
+   BOOST_CHECK_EXCEPTION(fc::variant("ABCDEFGH").as<symbol_code>(), symbol_type_exception, too_long);
+   BOOST_CHECK_EXCEPTION(fc::variant("ABCDEFGHI").as<symbol_code>(), symbol_type_exception, too_long);
+   BOOST_CHECK_EQUAL(fc::variant("4,ABCDEFG").as<symbol>().value(), SY(4, ABCDEFG));
+   BOOST_CHECK_EXCEPTION(fc::variant("4,ABCDEFGH").as<symbol>(), symbol_type_exception, too_long);
+   BOOST_CHECK_EQUAL(fc::variant("1.0000 ABCDEFG").as<asset>(), asset(10000, symbol(4, "ABCDEFG")));
+   BOOST_CHECK_EXCEPTION(fc::variant("1.0000 ABCDEFGH").as<asset>(), symbol_type_exception, too_long);
+
+   // an empty name is accepted: a zero symbol_code and a symbol without a name convert to a string and back
+   BOOST_CHECK_EQUAL(string_to_symbol(4, ""), 4u);
+   BOOST_CHECK_EQUAL(symbol(4, "").to_string(), "4,");
+   BOOST_CHECK_EQUAL(symbol::from_string("4,").value(), 4u);
+   BOOST_CHECK_EQUAL(fc::variant(symbol_code{0}).as_string(), "");
+   BOOST_CHECK_EQUAL(fc::variant("").as<symbol_code>().value, 0u);
 }
 
 struct permission_visitor {

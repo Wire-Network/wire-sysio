@@ -340,7 +340,7 @@ bool kick_rows(const fc::variants& rows, const kick_settings& settings, const li
       if (!code || !value) continue;
       const auto at = now();
       if (!kick_due(*value, settings, supplies, at)) continue;
-      const auto pool      = code->to_string();
+      const auto pool      = code->name();
       const auto last_kick = *kick_last_kick(*value);   // kick_due parsed it
       if (!backoff.due(pool, last_kick, at)) continue;
       backoff.mark(pool, last_kick, at, base, ceiling);
@@ -400,7 +400,7 @@ bool kick_page(kick_pool_scan& scan, kick_backoff& backoff, const kick_settings&
    if (!supplies) return false;
    if (!kick_rows(page->rows, settings, *supplies, backoff, base, ceiling, push, now, stopping)) return false;
    // Only a finished page's symbols join the sweep's live set: an unfinished one is read again.
-   for (const chain::symbol_code code : page_symbol_codes(page->rows)) scan.observe(code.to_string());
+   for (const chain::symbol_code code : page_symbol_codes(page->rows)) scan.observe(code.name());
    scan.finish_page(page->more, page->next_key, backoff);
    return true;
 }

@@ -20,12 +20,4 @@ namespace sysio::chain {
    } FC_CAPTURE_LOG_AND_RETHROW("{}", from);
 }
 
-std::string symbol_code::to_string() const
-{
-   const uint64_t symbol_value = value << symbol::precision_bits;
-   SYS_ASSERT( (symbol_value >> symbol::precision_bits) == value, symbol_type_exception,
-               "symbol code {:#x} is too long", value);
-   return symbol(symbol_value).name();
-}
-
 } // namespace sysio::chain

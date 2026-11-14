@@ -306,6 +306,9 @@ namespace sysio::chain {
       // transaction no context-free data either.
       SYS_ASSERT( trx.context_free_actions.empty(), transaction_exception,
                   "context-free actions are not supported" );
+      SYS_ASSERT( std::ranges::none_of( trx.actions, is_onblock_action ), action_validate_exception,
+                  "{}::{} runs only as the implicit transaction at the start of a block",
+                  config::system_account_name, config::onblock_action_name );
 
       is_input = true;
       if (!control.skip_trx_checks()) {

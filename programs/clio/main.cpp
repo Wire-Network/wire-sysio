@@ -68,6 +68,7 @@ Options:
 #include <vector>
 #include <regex>
 #include <iostream>
+#include <limits>
 #include <locale>
 #include <optional>
 #include <tuple>
@@ -2586,7 +2587,8 @@ int main( int argc, char** argv ) {
          } catch (...) {
             // error is handled in assertion below
          }
-         SYSC_ASSERT( block_num.has_value() && (*block_num > 0), "Invalid block num: ${block_num}", ("block_num", params.blockArg) );
+         SYSC_ASSERT( block_num.has_value() && (*block_num > 0) && (*block_num <= std::numeric_limits<uint32_t>::max()),
+                      "Invalid block num: ${block_num}", ("block_num", params.blockArg) );
          const auto arg = fc::variant_object("block_num", static_cast<uint32_t>(*block_num));
          std::cout << fc::json::to_pretty_string(call(get_block_info_func, arg)) << std::endl;
       } else {

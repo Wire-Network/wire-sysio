@@ -17,9 +17,17 @@ namespace sysio::chain {
          where the integer represents number of decimals. Number of decimals must be larger than zero.
        */
 
-      static constexpr uint64_t string_to_symbol_c(uint8_t precision, std::string_view str) {
+      /// Longest symbol name: one character in each byte of the `uint64_t` encoding above the precision byte.
+      inline constexpr size_t max_symbol_name_length = sizeof(uint64_t) - 1;
+
+      /**
+       * Encode a symbol at compile time. The characters of the name are not validated. A name longer than
+       * `max_symbol_name_length` does not compile.
+       */
+      static consteval uint64_t string_to_symbol_c(uint8_t precision, std::string_view str) {
+         SYS_ASSERT(str.size() <= max_symbol_name_length, symbol_type_exception,
+                    "symbol name is longer than {} characters", max_symbol_name_length);
          uint64_t result = 0;
-         // No validation is done at compile time
          for (size_t i = 0; i < str.size(); ++i) {
             result |= (uint64_t(str[i]) << (8*(1+i)));
          }
@@ -30,8 +38,16 @@ namespace sysio::chain {
 
 #define SY(P,X) ::sysio::chain::string_to_symbol_c(P,#X)
 
+      /**
+       * Encode a symbol.
+       *
+       * @throws symbol_type_exception if the name is longer than `max_symbol_name_length` or has a character outside
+       *         `A`-`Z`
+       */
       static uint64_t string_to_symbol(uint8_t precision, std::string_view str) {
          try {
+            SYS_ASSERT(str.size() <= max_symbol_name_length, symbol_type_exception,
+                       "symbol name is longer than {} characters", max_symbol_name_length);
             uint64_t result = 0;
             for (size_t i = 0; i < str.size(); ++i) {
                // All characters must be upper case alphabets
@@ -49,12 +65,12 @@ namespace sysio::chain {
          operator uint64_t()const { return value; }
 
          /**
-          * The code's name, e.g. "SYS".
+          * The symbol's uppercase name, independent of precision.
           *
           * @throws symbol_type_exception if the value is not the code of a symbol: a character outside `A`-`Z`, or
           *         a nonzero top byte, which a symbol's precision leaves no room for
           */
-         std::string to_string() const;
+         string name() const;
       };
 
       class symbol : fc::reflect_init {
@@ -74,7 +90,8 @@ namespace sysio::chain {
              * Parse a symbol of the form "4,SYS": the precision, a comma, the name.
              *
              * @throws symbol_type_exception if the string is empty or has no comma, the precision is outside
-             *         0..`max_precision`, or the name has a character outside `A`-`Z`
+             *         0..`max_precision`, or the name is longer than `max_symbol_name_length` or has a character
+             *         outside `A`-`Z`
              * @throws fc::parse_error_exception if the precision is not an integer
              */
             static symbol from_string(std::string_view from);
@@ -144,6 +161,13 @@ namespace sysio::chain {
             friend struct fc::reflector<symbol>;
       }; // class symbol
 
+      inline string symbol_code::name() const {
+         const uint64_t symbol_value = value << symbol::precision_bits;
+         SYS_ASSERT( (symbol_value >> symbol::precision_bits) == value, symbol_type_exception,
+                     "symbol code {:#x} is too long", value );
+         return symbol(symbol_value).name();
+      }
+
       struct extended_symbol {
          symbol       sym;
          account_name contract;
@@ -195,7 +219,9 @@ namespace fc {
 }
 
 namespace fc {
-   inline void to_variant(const sysio::chain::symbol_code& var, fc::variant& vo) { vo = var.to_string(); }
+   inline void to_variant(const sysio::chain::symbol_code& var, fc::variant& vo) {
+      vo = var.name();
+   }
    inline void from_variant(const fc::variant& var, sysio::chain::symbol_code& vo) {
       vo = sysio::chain::symbol(0, var.get_string()).to_symbol_code();
    }

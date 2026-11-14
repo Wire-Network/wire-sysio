@@ -239,7 +239,7 @@ namespace sysio {
              *
              * Standalone creation is privileged and idempotent. An account created separately is
              * not eligible for a later NFT claim.
-             * Tier-based name rules: tier-1 = 2-6 char prefix; tier 2/3 = up to 12 chars.
+             * Tier-based name rules: tier-1 = 2-6 char prefix; tier 2/3 = up to 12 chars; no `.` in any tier.
              * Standalone invalid names and full tiers skip creation without an audit or RAM spend.
              * nodeownreg records those rejections before calling this helper. Capacity comes from
              * the live generation's authoritative owner rows.
@@ -440,7 +440,7 @@ namespace sysio {
             // instead of aborting the dispatching transaction, so the failure is queryable on Wire.
             enum reject_reason : uint8_t {
                 NONE                 = 0,  // not rejected
-                NAME_INVALID         = 1,  // chosen name violates the tier's length rule or is a reserved sysio. name
+                NAME_INVALID         = 1,  // name has a `.`, is a reserved sysio. name, or breaks the tier length rule
                 OWNER_NOT_ACCOUNT    = 2,  // historical: creation did not occur
                 ACCOUNT_KEY_MISMATCH = 3,  // historical: submitted key did not match active authority
                 DUPLICATE            = 4,  // owner is already a registered node owner
@@ -590,8 +590,9 @@ namespace sysio {
             /**
              * @brief Whether `account`'s name satisfies the node-owner naming rules for `tier`.
              *        Tier-1 owners take a short 2-6 char prefix (sub-accounts become <prefix>.<random>);
-             *        tier 2/3 take a 1-12 char vanity name, and no tier may take a name under the reserved
-             *        `sysio.` prefix. Shared by newnameduser (gates creation) and nodeownreg (records
+             *        tier 2/3 take a 1-12 char vanity name. No tier may take a name containing a `.`, which
+             *        would read as a sub-account of its prefix, or a name under the reserved `sysio.`
+             *        prefix. Shared by newnameduser (gates creation) and nodeownreg (records
              *        NAME_INVALID) so the rule lives in one place.
              *
              * @param account The chosen account name.
