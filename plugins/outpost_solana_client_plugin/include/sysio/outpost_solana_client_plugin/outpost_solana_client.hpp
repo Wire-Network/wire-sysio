@@ -782,7 +782,8 @@ void assert_global_state_shape(const fc::network::solana::idl::program& program)
  * chain-agnostic SPI.
  *
  * `deliver_outbound_envelope` stages chunks through `epoch_in`, then sends a
- * zero-data terminal `epoch_in` call. That call records delivery and may reach
+ * zero-data terminal `epoch_in` call. Data chunks confirm at `processed`; the
+ * terminal call waits for `confirmed`, records delivery and may reach
  * consensus; the relay then attempts the separate resumable
  * `dispatch_attestations` drain, which applies effects and emits outbound on
  * its final round. The delivery return value remains the terminal call's
@@ -791,10 +792,11 @@ void assert_global_state_shape(const fc::network::solana::idl::program& program)
  * that staged at least one chunk before its deadline ran out throws
  * `chain::outpost_delivery_incomplete_exception` (progress, retried next tick),
  * and only a tick that staged nothing surfaces the deadline as a failure.
- * A delivery for an epoch the outpost has already settled (a depot consensus
+ * A delivery for an epoch the outpost has already settled (a later delivery
  * retry, possibly after the chunk-buffer sweep closed that epoch's buffer)
  * sends nothing and returns an empty signature, which the caller reads as
- * "outpost already finalized".
+ * "outpost already settled". The job keeps retrying after the epoch boundary
+ * until this operator's inbound reply is recorded by the depot.
  *
  * Constructed by `outpost_solana_client_plugin::create_outpost_client` —
  * `batch_operator_plugin` never builds one directly.

@@ -1,7 +1,7 @@
 #include <sysio.kicker/sysio.kicker.hpp>
 #include <sysio.liq/sysio.liq.hpp>
 #include <sysio.token/sysio.token.hpp>
-#include <sysio.system/emissions.hpp>
+#include <sysio.system/treasury.hpp>
 #include <sysio.andon/sysio.andon.hpp>
 #include <sysio.opp.common/swap_state.hpp>
 #include <sysio.opp.common/wire_asset.hpp>
@@ -18,8 +18,6 @@ constexpr auto missing_swap_pool = "swap pool does not exist";
 constexpr auto invalid_pair = "pool must be LIQ/WIRE with a LIQ yield leg";
 constexpr auto negative_reserve = "negative swap reserve";
 constexpr auto missing_config = "kicker not configured";
-constexpr auto negative_pending = "negative pending emissions";
-constexpr auto invalid_balance = "invalid treasury WIRE balance";
 constexpr auto invalid_rate = "rate exceeds 10000 bps";
 constexpr auto invalid_minimum = "invalid minimum gift";
 constexpr auto invalid_cap = "invalid daily cap";
@@ -61,29 +59,6 @@ opp::twap::cumulative_price current_price(const opp::swap_state::currency_stats&
       opp::twap::accumulate(price, opp::twap::price_fp(pair.pool2.quantity.amount, pair.pool1.quantity.amount),
                             (now - accum.last_update).count());
    return price;
-}
-/// Reserve pending emissions, outstanding claims and the remaining emission ceiling; missing state fails closed.
-uint64_t treasury_available() {
-   using namespace sysiosystem::emissions;
-   const t5state_t treasury(kicker::system_account);
-   const emitcfg_t emission_config(kicker::system_account);
-   if (!treasury.exists() || !emission_config.exists()) return 0;
-   const auto state = treasury.get();
-   check(state.pending_emission_amount >= 0, errors::negative_pending);
-   const auto claims = payclaimtot_t(kicker::system_account).get_or_default(pay_claim_total{});
-   const token::accounts balances(kicker::token_account, kicker::system_account.value);
-   const token::acct_key key{opp::wire::asset_symbol.code().raw()};
-   if (!balances.contains(key)) return 0;
-   const auto balance = balances.get(key).balance;
-   check(balance.symbol == opp::wire::asset_symbol && balance.amount >= 0, errors::invalid_balance);
-   const auto emission = emission_config.get();
-   // Widen before subtraction so malformed or exhausted state cannot wrap a reserve.
-   const auto remaining = std::max<__int128>(0, static_cast<__int128>(emission.t5_distributable) -
-                                               emission.t5_floor - state.total_distributed);
-   const auto reserved = static_cast<uint128_t>(state.pending_emission_amount) + claims.outstanding +
-                         static_cast<uint128_t>(remaining);
-   if (reserved >= static_cast<uint128_t>(balance.amount)) return 0;
-   return static_cast<uint64_t>(static_cast<uint128_t>(balance.amount) - reserved);
 }
 /// Checkpoint without paying: restart the accrual clock now at `supply` and clear the attempt diagnostics, whose
 /// accrual the restart forfeits. The price observation is left as it is.
@@ -211,7 +186,8 @@ void kicker::kick(symbol_code sym) {
    const uint64_t day = static_cast<uint64_t>(now.time_since_epoch().count()) /
                         (kicker_math::day_sec * kicker_math::micros_per_sec);
    const uint128_t spent = day == pool.day ? pool.spent_today : 0;
-   uint64_t available = std::min(cfg.budget_remaining, treasury_available());
+   uint64_t available = std::min(cfg.budget_remaining,
+                                 sysiosystem::treasury::available(system_account, token_account));
    available = std::min(available, pool.max_gift_per_day > spent
                                      ? pool.max_gift_per_day - static_cast<uint64_t>(spent) : 0);
    // Overflow has no exact representable denominator: keep the entire interval open.

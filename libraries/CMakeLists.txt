@@ -1,6 +1,7 @@
 set(APPBASE_INSTALL_COMPONENT "dev")
-set(SYSVM_INSTALL_COMPONENT "dev")
 
+include(add-sys-vm)
+add_sys_vm_submodule("${CMAKE_CURRENT_SOURCE_DIR}/sys-vm" "${CMAKE_CURRENT_BINARY_DIR}/sys-vm" "dev")
 
 add_subdirectory(libfc-lite)
 add_subdirectory(libfc)
@@ -18,8 +19,3 @@ add_subdirectory(opp)
 add_subdirectory(testing)
 add_subdirectory(version)
 add_subdirectory(state_history)
-
-if(sys-vm IN_LIST SYSIO_WASM_RUNTIMES OR sys-vm-jit IN_LIST SYSIO_WASM_RUNTIMES)
-  find_package(sys-vm REQUIRED)
-  # add_library(sys-vm ALIAS sys-vm::sys-vm)
-endif()
