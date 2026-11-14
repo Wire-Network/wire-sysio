@@ -176,10 +176,7 @@ namespace sysio {
       /// each vector, every `(chain, token_kind)` pair must be unique;
       /// duplicates fail the action.
       [[sysio::action]]
-      void setconfig(uint32_t max_available_producers,
-                     uint32_t max_available_batch_ops,
-                     uint32_t max_available_underwriters,
-                     uint64_t terminate_prune_delay_ms,
+      void setconfig(uint64_t terminate_prune_delay_ms,
                      uint32_t terminate_max_consecutive_misses,
                      uint32_t terminate_max_pct_misses_24h,
                      uint64_t terminate_window_ms,
@@ -422,9 +419,6 @@ namespace sysio {
          std::vector<chain_min_bond> req_prod_collat;
          std::vector<chain_min_bond> req_batchop_collat;
          std::vector<chain_min_bond> req_uw_collat;
-         uint32_t max_available_producers          = 21;
-         uint32_t max_available_batch_ops          = 63;
-         uint32_t max_available_underwriters       = 21;
          uint64_t terminate_prune_delay_ms         = 86400000; // 24hrs
          uint32_t terminate_max_consecutive_misses = DEFAULT_TERMINATE_MAX_CONSECUTIVE_MISSES;
          uint32_t terminate_max_pct_misses_24h     = DEFAULT_TERMINATE_MAX_PCT_MISSES_24H;
@@ -432,7 +426,6 @@ namespace sysio {
 
          SYSLIB_SERIALIZE(op_config,
             (req_prod_collat)(req_batchop_collat)(req_uw_collat)
-            (max_available_producers)(max_available_batch_ops)(max_available_underwriters)
             (terminate_prune_delay_ms)
             (terminate_max_consecutive_misses)(terminate_max_pct_misses_24h)(terminate_window_ms))
       };

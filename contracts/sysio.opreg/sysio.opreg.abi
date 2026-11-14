@@ -293,18 +293,6 @@
                     "type": "chain_min_bond[]"
                 },
                 {
-                    "name": "max_available_producers",
-                    "type": "uint32"
-                },
-                {
-                    "name": "max_available_batch_ops",
-                    "type": "uint32"
-                },
-                {
-                    "name": "max_available_underwriters",
-                    "type": "uint32"
-                },
-                {
                     "name": "terminate_prune_delay_ms",
                     "type": "uint64"
                 },
@@ -541,18 +529,6 @@
             "name": "setconfig",
             "base": "",
             "fields": [
-                {
-                    "name": "max_available_producers",
-                    "type": "uint32"
-                },
-                {
-                    "name": "max_available_batch_ops",
-                    "type": "uint32"
-                },
-                {
-                    "name": "max_available_underwriters",
-                    "type": "uint32"
-                },
                 {
                     "name": "terminate_prune_delay_ms",
                     "type": "uint64"
