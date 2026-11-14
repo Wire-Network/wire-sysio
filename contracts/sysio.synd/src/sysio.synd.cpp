@@ -1425,7 +1425,7 @@ void synd::challenge(name challenger, sysio::slug_name chain_code, sysio::slug_n
    check(req.has_value(), no_request_message.data());
    check(req->state != bond::request_state::HELD, challenged_message.data());
    // Only a fully bonded request: nothing releases before then, and a held request takes no more bonds, so
-   // holding an under-bonded one would stop the pair until `sysio` rules.
+   // holding an under-bonded one would stop the pair until a judge rules.
    check(req->state != bond::request_state::OPEN, unbonded_message.data());
    check(req->state == bond::request_state::BONDED, request_final_message.data());
 

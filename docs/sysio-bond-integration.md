@@ -2,7 +2,7 @@
 
 `sysio.bond` underwrites statements on the depot. An issuer registers a statement and the amount of a
 depot-native token that must stand behind it. Underwriters bond that amount. A challenge window runs,
-and the request is either approved or ruled by `sysio`. This guide is for a contract, or an account,
+and the request is either approved or ruled by a judge. This guide is for a contract, or an account,
 that issues requests: what it calls, how it learns what happened, and what it is paid. The contract is
 `contracts/sysio.bond`; the specification is §3 of the syndication underwriting spec.
 
@@ -90,8 +90,36 @@ The syndication contract's queue does this.
 | BONDED | bonded reaches covered; the window starts | APPROVED, HELD, VALID, INVALID |
 | APPROVED | `approve` after the window, with no hold | terminal |
 | HELD | `hold(request_id, beneficiary)` by the issuer and the beneficiary; posts the hold bond | VALID, INVALID |
-| VALID | `rslvvalid` by `sysio` | terminal |
-| INVALID | `rslvinvalid` by `sysio` | terminal |
+| VALID | `rslvvalid` by a judge | terminal |
+| INVALID | `rslvinvalid` by a judge | terminal |
+
+The rulings require `sysio.bond`'s own authority. The bootstrap gives each a native permission of the
+same name (`sysio.bond@rslvvalid`, `sysio.bond@rslvinvalid`), linked to its action and satisfied by the
+judge account or by `sysio@active`. The judge declares that permission; `sysio` keeps the rulings through
+`sysio.bond@active` and can replace the judge or remove the delegation with `updateauth`.
+
+Once `sysio` is held by a governance authority it can do this through `sysio.msig`: propose the
+ruling, or the `updateauth`, declared as `sysio.bond@active`, and execute it once enough members have
+approved. The judge is a faster path for a ruling, not the only one.
+
+```bash
+AUTH=$(jq -cn --arg judge "$JUDGE" '{threshold:1,keys:[],accounts:[{permission:{actor:$judge,permission:"active"},weight:1},{permission:{actor:"sysio",permission:"active"},weight:1}]} | .accounts |= sort_by(.permission.actor)')
+clio -u "$DEPOT_URL" set account permission sysio.bond rslvvalid "$AUTH" active -p sysio.bond@active
+clio -u "$DEPOT_URL" set account permission sysio.bond rslvinvalid "$AUTH" active -p sysio.bond@active
+clio -u "$DEPOT_URL" set action permission sysio.bond sysio.bond rslvvalid rslvvalid -p sysio.bond@active
+clio -u "$DEPOT_URL" set action permission sysio.bond sysio.bond rslvinvalid rslvinvalid -p sysio.bond@active
+clio -u "$DEPOT_URL" push action sysio.bond rslvvalid "[$REQUEST_ID]" -p sysio.bond@rslvvalid
+```
+
+Fund the permission and link rows first with a RAM-only grant to `sysio.bond`; the chain bills them to
+the account. Until a ruling is linked, only `sysio.bond`'s `owner` and `active` can make it. An action
+declaring `sysio@active` is refused: the contract requires its own account, not `sysio`.
+
+Under the native rules a permission can rewrite itself. The judge can therefore change the authority of
+the ruling permission it satisfies, add permissions beneath it, and re-link or unlink that ruling; it
+cannot reach `setconfig` or any other action. `sysio.bond@active` reverts any of it, but replacing the
+two authorities does not: revoking a judge also means restoring both action links and deleting what
+it added. Follow [Replacing the judge account](emergency-stop-playbook.md#replacing-the-judge-account).
 
 The hold bond is `covered * hold_bps / 10000` (`hold_bps` is 1000 until `sysio` sets another). When
 that rounds to zero, the request is held with no hold bond.
