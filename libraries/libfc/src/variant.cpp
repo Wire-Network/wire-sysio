@@ -13,6 +13,7 @@
 #include <cassert>
 #include <cmath>
 #include <concepts>
+#include <format>
 #include <functional>
 #include <limits>
 #include <stdexcept>
@@ -608,11 +609,12 @@ bool variant::is_blob()const
 
 namespace {
 
-/// Throws the parse_error_exception for `value`, which is outside the range of `T`.
+/// Throws the parse_error_exception for `value`, a number outside the range of the 64-bit integer type `T`.
 template<std::integral T>
-[[noreturn]] void throw_out_of_range(const auto value) {
-   FC_THROW_EXCEPTION(parse_error_exception, "{} is out of range for {} [{}, {}]", value, get_typename<T>::name(),
-                      std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
+[[noreturn]] void throw_out_of_64bit_range(const auto value) {
+   detail::throw_out_of_range(std::format("{}", value), get_typename<T>::name(),
+                              std::to_string(std::numeric_limits<T>::min()),
+                              std::to_string(std::numeric_limits<T>::max()));
 }
 
 /// `value` as a `T`.
@@ -620,7 +622,7 @@ template<std::integral T>
 template<std::integral T>
 T checked_cast(const std::integral auto value) {
    if (!std::in_range<T>(value))
-      throw_out_of_range<T>(value);
+      throw_out_of_64bit_range<T>(value);
    return static_cast<T>(value);
 }
 
@@ -633,7 +635,7 @@ T truncating_cast(const double value) {
    constexpr double max_plus_one = 2.0 * static_cast<double>(T{1} << (std::numeric_limits<T>::digits - 1));
    const double     truncated    = std::trunc(value);
    if (!(truncated >= min && truncated < max_plus_one)) // NaN fails both comparisons
-      throw_out_of_range<T>(value);
+      throw_out_of_64bit_range<T>(value);
    return static_cast<T>(truncated);
 }
 
