@@ -398,3 +398,65 @@ BOOST_AUTO_TEST_CASE(test_listen_address_resolver_split) {
       }
    }
 }
+
+// A port is a decimal number from 0 to 65535. The resolver would wrap a larger one into that range and read a name as
+// a service, so both are invalid addresses.
+BOOST_AUTO_TEST_CASE(test_port_number) {
+   using sysio::net_utils::parse_listen_address;
+   using sysio::net_utils::split_host_port_type;
+
+   for (const std::string valid : {"0", "1", "9876", "65535", "09876", "000065535"}) {
+      BOOST_TEST_CONTEXT(valid) {
+         for (const std::string suffix : {"", " - 84c470d", ":trx", ":blk:640KB/s"}) {
+            const auto [host, port, type] = split_host_port_type("0.0.0.0:" + valid + suffix);
+            BOOST_CHECK_EQUAL(host, "0.0.0.0");
+            BOOST_CHECK_EQUAL(port, valid);
+         }
+         BOOST_CHECK_EQUAL(std::get<0>(parse_listen_address("[::1]:" + valid + ":640KB/s")), "[::1]:" + valid);
+      }
+   }
+
+   // Out of range, with and without the sections that may follow a port.
+   for (const std::string invalid : {"65536", "70000", "99999", "4294967296", "18446744073709551616"}) {
+      BOOST_TEST_CONTEXT(invalid) {
+         for (const std::string suffix : {"", " - 84c470d", ":trx", ":blk:640KB/s"}) {
+            for (const std::string host_text : {"0.0.0.0", "localhost", "[::1]"}) {
+               const std::string address = host_text + ":" + invalid + suffix;
+               const auto [host, port, type] = split_host_port_type(address);
+               BOOST_CHECK_EQUAL(host, "");
+               BOOST_CHECK_EQUAL(port, "");
+               BOOST_CHECK_EQUAL(type, "");
+               BOOST_CHECK_EXCEPTION(parse_listen_address(address), sysio::chain::plugin_config_exception,
+                                     [](const sysio::chain::plugin_config_exception& e) {
+                                        return e.top_message().find("port must be a number no greater than 65535") !=
+                                               std::string::npos;
+                                     });
+            }
+         }
+      }
+   }
+
+   // Not a number. Only a port followed by another section can carry these: after a lone colon, text that follows the
+   // port digits is trailing prose.
+   for (const std::string invalid : {"http", "98x6", "x9876", "9876x", "-1", "+80", " 80", "80 ", "0x50", "8.0"}) {
+      BOOST_TEST_CONTEXT(invalid) {
+         for (const std::string suffix : {":trx", ":blk:640KB/s", ":640KB/s"}) {
+            const std::string address = "0.0.0.0:" + invalid + suffix;
+            const auto [host, port, type] = split_host_port_type(address);
+            BOOST_CHECK_EQUAL(host, "");
+            BOOST_CHECK_EQUAL(port, "");
+            BOOST_CHECK_EQUAL(type, "");
+            BOOST_CHECK_EXCEPTION(parse_listen_address(address), sysio::chain::plugin_config_exception,
+                                  [](const sysio::chain::plugin_config_exception& e) {
+                                     return e.top_message().find("port must be a number") != std::string::npos;
+                                  });
+         }
+      }
+   }
+
+   // An empty port keeps its own diagnostic.
+   BOOST_CHECK_EXCEPTION(parse_listen_address("0.0.0.0::trx"), sysio::chain::plugin_config_exception,
+                         [](const sysio::chain::plugin_config_exception& e) {
+                            return e.top_message().find("host or port missing") != std::string::npos;
+                         });
+}

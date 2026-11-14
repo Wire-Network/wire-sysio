@@ -143,6 +143,8 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
    /// finalizes only on a zero-data terminal call where
    /// `chunk_index == total_chunks`. `epoch_index` selects both the per-epoch
    /// EpochDeliveries PDA and the per-(epoch, signer) chunk-buffer PDA.
+   /// Data chunks confirm at `processed`; the terminal call waits for `confirmed`
+   /// so a provisional fork cannot normally consume a successful delivery.
    ///
    /// `extra_remaining_accounts` is appended past the IDL's account list as
    /// Anchor `remaining_accounts`. Production delivery passes an empty slice
@@ -289,7 +291,9 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
            auto accounts = resolve_accounts(instr, params, overrides);
            accounts.reserve(accounts.size() + extra_remaining_accounts.size());
            accounts.insert(accounts.end(), extra_remaining_accounts.begin(), extra_remaining_accounts.end());
-           return execute_tx_and_confirm(instr, accounts, params, pre_ixs);
+           const solana_confirm_options options{
+              .commitment = chunk_index == total_chunks ? commitment_t::confirmed : commitment_t::processed};
+           return execute_tx_and_confirm(instr, accounts, params, pre_ixs, options);
         })
       , cleanup_envelope_chunks([this](uint32_t epoch_index) -> std::string {
            auto& instr = get_idl(outpost_solana_client_detail::CLEANUP_ENVELOPE_CHUNKS_INSTRUCTION);

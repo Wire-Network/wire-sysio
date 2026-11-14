@@ -2321,15 +2321,15 @@ std::string outpost_solana_client::deliver_outbound_envelope(
 
    // An epoch the outpost has already settled has nothing left to deliver: the program answers every `epoch_in` for
    // it with a late no-op. This check has to come before the staged-chunk read, because the sweep closes a settled
-   // epoch's buffer -- a depot consensus retry for that epoch would then find no buffer, read 0 chunks staged, and
+   // epoch's buffer -- a later delivery retry for that epoch would then find no buffer, read 0 chunks staged, and
    // re-send every chunk plus the terminal call as paid no-ops, overrunning the delivery deadline on a large envelope
-   // every tick. An empty tx id tells the job the outpost already finalized the epoch.
+   // every tick. An empty tx id reports settled state; the job still waits for inbound depot delivery.
    //
    // The gates are read at `confirmed`, the commitment the sweep reads them at. A buffer is reaped only after a
    // `confirmed` read showed its epoch settled, and a later `confirmed` read from the same node normally still shows it
    // settled, so a retry for a reaped epoch takes this branch and never reaches the re-upload below. That assumes one
    // RPC node, or nodes that agree: `confirmed` can still revert, and a load-balanced endpoint can answer from a node
-   // that is behind. When such a read shows a reaped epoch open, that one retry re-sends its chunks and terminal call
+   // that is behind. When such a read shows a reaped epoch open, the retry re-sends its chunks and terminal call
    // as paid late no-ops; a later retry reads the cursor past the epoch again and takes this branch.
    if (outpost_solana_client_detail::skip_settled_epoch_delivery(
           epoch_index, [this] {
@@ -2347,8 +2347,8 @@ std::string outpost_solana_client::deliver_outbound_envelope(
 
    // Stream the envelope into the per-(epoch, signer) chunk buffer. Each call
    // goes through `solana_program_client::execute_tx_and_confirm`, which
-   // serialises submission + waits for `processed`-commitment confirmation
-   // before returning. Chunks are submitted sequentially -- the **batch
+   // serialises submission + waits for `processed` on data chunks and `confirmed`
+   // on the terminal delivery. Chunks are submitted sequentially -- the **batch
    // operator's delivery instruction family is `epoch_in`**: all non-empty
    // data chunks stage bytes, then the terminal call triggers the program's
    // `finalize_envelope`. Settlement follows through `dispatch_attestations`.

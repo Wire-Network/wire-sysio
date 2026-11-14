@@ -7,7 +7,10 @@
 #include <boost/asio/ip/address.hpp>
 #include <boost/asio/ip/address_v6.hpp>
 
+#include <charconv>
+#include <cstdint>
 #include <cstdlib>
+#include <limits>
 #include <optional>
 #include <set>
 #include <string>
@@ -25,6 +28,8 @@ namespace sysio::net_utils {
 // Allow for future extentions as well, hence 384.
 constexpr size_t max_p2p_address_length = 253 + 6 + 30;
 constexpr size_t max_handshake_str_length = 384;
+/// Largest TCP port number.
+inline constexpr uint16_t max_port = std::numeric_limits<uint16_t>::max();
 /// Address suffix for transaction-only p2p connections.
 inline constexpr std::string_view trx_connection_type = "trx";
 /// Address suffix for block-only p2p connections.
@@ -81,7 +86,15 @@ namespace detail {
       return block_sync_rate_limit;
    }
 
-   /// @return host, port, remainder
+   /// Whether port is a decimal number no greater than max_port. The resolver keeps the low 16 bits of a larger one.
+   inline bool is_port_number(std::string_view port) {
+      uint32_t value = 0;
+      const char* const end = port.data() + port.size();
+      const std::from_chars_result result = std::from_chars(port.data(), end, value);
+      return result.ec == std::errc{} && result.ptr == end && value <= max_port;
+   }
+
+   /// @return host, port, remainder. A port that is not empty is a decimal number no greater than max_port.
    inline std::tuple<std::string, std::string, std::string> split_host_port_remainder(const std::string& endpoint_input, bool should_throw) {
       using std::string;
       // host:port[:trx|:blk][:<rate>]
@@ -139,6 +152,11 @@ namespace detail {
          }
       } else {
          remainder = endpoint.substr( colon2 + 1 );
+      }
+      if (!port.empty() && !is_port_number(port)) {
+         SYS_ASSERT(!should_throw, chain::plugin_config_exception,
+                    "Invalid address specification {}; port must be a number no greater than {}.", endpoint, max_port);
+         return {};
       }
       return {std::move(host), std::move(port), std::move(remainder)};
    }

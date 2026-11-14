@@ -89,6 +89,40 @@ BOOST_AUTO_TEST_CASE(int128_from_string_values) {
    BOOST_CHECK(fc::int128_from_string("-0xff") == -255);
 }
 
+BOOST_AUTO_TEST_CASE(uint128_from_string_out_of_range) {
+   BOOST_CHECK_THROW(fc::uint128_from_string("340282366920938463463374607431768211456"), fc::parse_error_exception);
+   BOOST_CHECK_THROW(fc::uint128_from_string("3402823669209384634633746074317682114550"), fc::parse_error_exception);
+   BOOST_CHECK_THROW(fc::uint128_from_string("0x100000000000000000000000000000000"), fc::parse_error_exception);
+   // Leading zeros carry no value, however many digits they make.
+   BOOST_CHECK(fc::uint128_from_string("000340282366920938463463374607431768211455") == UINT128_MAX_VAL);
+   BOOST_CHECK(fc::uint128_from_string("0x000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF") == UINT128_MAX_VAL);
+}
+
+BOOST_AUTO_TEST_CASE(from_string_signs_and_empty_digits) {
+   BOOST_CHECK(fc::uint128_from_string("") == 0);
+   BOOST_CHECK(fc::uint128_from_string("0x") == 0);
+   BOOST_CHECK(fc::int128_from_string("-") == 0);
+   BOOST_CHECK(fc::int128_from_string("-0") == 0);
+   BOOST_CHECK(fc::int128_from_string("-0x") == 0);
+   BOOST_CHECK_THROW(fc::uint128_from_string("-0"), fc::assert_exception);
+   BOOST_CHECK_THROW(fc::uint128_from_string("-1"), fc::assert_exception);
+   BOOST_CHECK_THROW(fc::uint128_from_string("+1"), fc::assert_exception);
+   BOOST_CHECK_THROW(fc::int128_from_string("+1"), fc::assert_exception);
+   BOOST_CHECK_THROW(fc::int128_from_string("--1"), fc::assert_exception);
+}
+
+BOOST_AUTO_TEST_CASE(int128_from_string_out_of_range) {
+   BOOST_CHECK_THROW(fc::int128_from_string("170141183460469231731687303715884105728"), fc::parse_error_exception);
+   BOOST_CHECK_THROW(fc::int128_from_string("-170141183460469231731687303715884105729"), fc::parse_error_exception);
+   BOOST_CHECK_THROW(fc::int128_from_string("-340282366920938463463374607431768211455"), fc::parse_error_exception);
+   // Hex without a sign is the bit pattern of the value; hex after a sign is a magnitude.
+   BOOST_CHECK(fc::int128_from_string("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF") == -1);
+   BOOST_CHECK(fc::int128_from_string("0x80000000000000000000000000000000") == INT128_MIN_VAL);
+   BOOST_CHECK(fc::int128_from_string("-0x80000000000000000000000000000000") == INT128_MIN_VAL);
+   BOOST_CHECK_THROW(fc::int128_from_string("-0x80000000000000000000000000000001"), fc::parse_error_exception);
+   BOOST_CHECK_THROW(fc::int128_from_string("0x100000000000000000000000000000000"), fc::parse_error_exception);
+}
+
 BOOST_AUTO_TEST_CASE(uint128_string_roundtrip) {
    auto check = [](unsigned __int128 v) {
       BOOST_CHECK(fc::uint128_from_string(fc::to_string(v)) == v);
