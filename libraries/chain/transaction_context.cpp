@@ -755,6 +755,9 @@ namespace sysio::chain {
 
       account_subjective_cpu_bill_t authorizers_cpu;
       const bool subjectively_bill_payer_disabled = control.get_subjective_billing().is_payer_billing_disabled();
+      // The fallback authorizer of an input action without authorization, looked up once.
+      const account_name trx_first_authorizer =
+         billed_subjectively ? packed_trx.get_transaction().first_authorizer() : account_name{};
       const size_t input_entries = billed_cpu_us.size();
       int64_t receivers_cpu_us = 0;
       // Receiver entries exist only on a receipt, so only a transaction that succeeded gets them. A failed one keeps
@@ -772,7 +775,8 @@ namespace sysio::chain {
                // Subjectively, the input action's first authorizer is billed, as for the input entry, and not twice
                // when it is the receiver and payer billing bills it as a payer.
                if (billed_subjectively) {
-                  const account_name first_auth = input_first_authorizer(e.input);
+                  const account_name first_auth =
+                     subjective_billing::billed_authorizer(trace->action_traces[e.input].act, trx_first_authorizer);
                   if (first_auth != e.account || subjectively_bill_payer_disabled)
                      authorizers_cpu[first_auth] += fc::microseconds{cpu};
                }
@@ -802,7 +806,8 @@ namespace sysio::chain {
                auto payer = act_trace.act.payer();
                accounts_billing[payer].cpu_usage_us += b.value;
                if (billed_subjectively) {
-                  auto first_auth = input_first_authorizer(i);
+                  const account_name first_auth =
+                     subjective_billing::billed_authorizer(act_trace.act, trx_first_authorizer);
                   // validate_referenced_accounts rejects non-read-only, non-implicit trxs with zero
                   // auths (tx_no_auths), so first_auth must be populated by here on the subjective path.
                   assert(!first_auth.empty());
@@ -845,8 +850,8 @@ namespace sysio::chain {
             subjective_bill.subjective_bill_failure(accounts_billing, authorizers_cpu, control.pending_block_time());
          }
       } else if (!control.is_producing_block()) {
-         // if producing then trx is in objective cpu account billing. Also no block will be received to remove the
-         // billing.
+         // If producing, the trx is billed objectively in this block, and subjective_billing::on_block charges the
+         // authorizers of its sysio.*-paid actions once the block is applied, so nothing is held as pending.
          subjective_bill.subjective_bill(packed_trx.id(), packed_trx.expiration(), accounts_billing, authorizers_cpu);
       }
    }
@@ -884,11 +889,6 @@ namespace sysio::chain {
       // A receiver pays CPU only: its NET window is neither updated nor checked.
       auto& bill = accounts_billing.try_emplace(e.account, account_billing{ .pays_net = false }).first->second;
       bill.cpu_usage_us += cpu_us;
-   }
-
-   account_name transaction_context::input_first_authorizer( uint32_t input ) const {
-      auto first_auth = trace->action_traces[input].act.first_authorizer();
-      return first_auth.empty() ? packed_trx.get_transaction().first_authorizer() : first_auth;
    }
 
    bool transaction_context::begin_frame( uint32_t action_ordinal, bool system_receiver, bool receiver_has_code ) {

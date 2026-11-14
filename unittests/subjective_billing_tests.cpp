@@ -715,6 +715,358 @@ BOOST_AUTO_TEST_CASE( subjective_billing_integration_test ) {
                          fc_exception_message_contains("Authorized account other exceeded subjective CPU limit"));
 }
 
+/// A transaction of `actions`; `nonce` makes its id unique.
+signed_transaction make_trx( vector<action> actions, uint16_t nonce ) {
+   signed_transaction trx;
+   trx.ref_block_num = nonce;
+   trx.actions = std::move( actions );
+   return trx;
+}
+
+/// An action of `code`; billing reads only its authorizations.
+action make_action( account_name code, vector<permission_level> auth ) {
+   return action( std::move( auth ), code, "transfer"_n, bytes{} );
+}
+
+/// A block at `time` with one receipt per transaction, billing `cpu_us[i]` to each one's i-th action. Entries past
+/// the actions are receiver entries, billed to contracts reached through a system contract.
+signed_block_ptr make_block( fc::time_point time,
+                             const vector<std::pair<signed_transaction, vector<uint32_t>>>& trxs ) {
+   auto block = std::make_shared<signed_block>();
+   block->timestamp = block_timestamp_type{time};
+   for( const auto& [trx, cpu_us] : trxs ) {
+      BOOST_REQUIRE_GE( cpu_us.size(), trx.actions.size() );
+      auto& receipt = block->transactions.emplace_back( packed_transaction{trx} );
+      for( uint32_t cpu : cpu_us ) receipt.cpu_usage_us.emplace_back( cpu );
+   }
+   return block;
+}
+
+// A year after the block timestamp epoch, on a 5 s subjective billing interval boundary, so block timestamps and
+// `now` share an ordinal.
+const fc::time_point sysio_paid_now = fc::time_point{fc::milliseconds( config::block_timestamp_epoch )} + fc::days( 365 );
+
+/// The time over which a charge decays to nothing.
+fc::microseconds decay_window( const subjective_billing& sub_bill ) {
+   return fc::milliseconds( int64_t{sub_bill.get_expired_accumulator_average_window()} *
+                            subjective_billing::subjective_time_interval_ms );
+}
+
+BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_billing_test ) {
+   fc::logger log;
+   const account_name sysio_token = "sysio.token"_n;
+   const account_name alice = "alice"_n; // calls a sysio.* contract
+   const account_name bob = "bob"_n;     // calls sysio itself
+   const account_name carol = "carol"_n; // pays explicitly with sysio.payer
+   const account_name dave = "dave"_n;   // calls a contract outside sysio.*
+   const auto now = sysio_paid_now;
+
+   subjective_billing sub_bill;
+   const auto window = decay_window( sub_bill );
+   const auto halftime = now + fc::microseconds( window.count() / 2 );
+   const auto endtime = now + window;
+
+   const auto block = make_block( now, {
+      { make_trx( {make_action( sysio_token, {{alice, config::active_name}} )}, 1 ), {1000} },
+      { make_trx( {make_action( config::system_account_name, {{bob, config::active_name}} )}, 2 ), {1000} },
+      { make_trx( {make_action( sysio_token, {{carol, config::sysio_payer_name}, {carol, config::active_name}} )}, 3 ),
+        {1000} },
+      { make_trx( {make_action( "token"_n, {{dave, config::active_name}} )}, 4 ), {1000} },
+   } );
+   sub_bill.on_block( log, block, now );
+
+   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).count() == 1000 );
+   BOOST_TEST( sub_bill.get_subjective_bill( bob, now ).count() == 1000 );
+   BOOST_TEST( sub_bill.get_subjective_bill( carol, now ).count() == 0 ); // the payer, billed objectively
+   BOOST_TEST( sub_bill.get_subjective_bill( dave, now ).count() == 0 );  // the contract has its own CPU limit
+   BOOST_TEST( sub_bill.get_subjective_bill( sysio_token, now ).count() == 0 );
+
+   // The charge outlasts the block and decays over the window.
+   sub_bill.on_block( log, make_block( now, {} ), now );
+   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).count() == 1000 );
+   BOOST_TEST( sub_bill.get_subjective_bill( alice, halftime ).count() == 500 );
+   BOOST_TEST( sub_bill.get_subjective_bill( alice, endtime ).count() == 0 );
+
+   // Each block adds to the decayed total.
+   sub_bill.on_block( log, make_block( halftime, {
+      { make_trx( {make_action( sysio_token, {{alice, config::active_name}} )}, 5 ), {1000} },
+   } ), halftime );
+   BOOST_TEST( sub_bill.get_subjective_bill( alice, halftime ).count() == 500 + 1000 );
+}
+
+BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_billing_actions_test ) {
+   fc::logger log;
+   const account_name sysio_token = "sysio.token"_n;
+   const account_name alice = "alice"_n;
+   const account_name erin = "erin"_n;
+   const auto now = sysio_paid_now;
+
+   subjective_billing sub_bill;
+   // An action without authorization bills the transaction's first authorizer.
+   const signed_transaction trx = make_trx( {
+      make_action( sysio_token, {} ),                                                                // 5 us to alice
+      make_action( sysio_token, {{alice, config::active_name}} ),                                   // 20 us to alice
+      make_action( sysio_token, {{erin, config::sysio_payer_name}, {erin, config::active_name}} ),   // erin pays
+      make_action( "token"_n, {{alice, config::active_name}} ),                                      // token pays
+      make_action( sysio_token, {{erin, config::active_name}} ),                                     // 160 us to erin
+   }, 1 );
+
+   sub_bill.on_block( log, make_block( now, {{ trx, {5, 20, 40, 80, 160} }} ), now );
+   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).count() == 5 + 20 );
+   BOOST_TEST( sub_bill.get_subjective_bill( erin, now ).count() == 160 );
+}
+
+BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_billing_receiver_entries_test ) {
+   fc::logger log;
+   const account_name alice = "alice"_n;
+   const auto now = sysio_paid_now;
+   const signed_transaction trx = make_trx( {make_action( "sysio.token"_n, {{alice, config::active_name}} )}, 1 );
+
+   // The entries after the action's are billed to the contracts sysio.token notified, from their own CPU.
+   subjective_billing sub_bill;
+   sub_bill.on_block( log, make_block( now, {{ trx, {1000, 300, 700} }} ), now );
+   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).count() == 1000 );
+   BOOST_TEST( sub_bill.get_account_cache_size() == 1u );
+}
+
+BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_billing_replaces_pending_test ) {
+   fc::logger log;
+   const account_name alice = "alice"_n;
+   const auto now = sysio_paid_now;
+   const signed_transaction trx = make_trx( {make_action( "sysio.token"_n, {{alice, config::active_name}} )}, 1 );
+
+   // Executed here first: pending until the block, then charged once from the block's receipt.
+   subjective_billing sub_bill;
+   sub_bill.subjective_bill( trx.id(), trx.expiration, {}, {{alice, fc::microseconds( 800 )}} );
+   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).count() == 800 );
+   sub_bill.on_block( log, make_block( now, {{ trx, {1200} }} ), now );
+   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).count() == 1200 );
+
+   // With the charge disabled, inclusion still drops the pending bill.
+   subjective_billing disabled_bill;
+   disabled_bill.disable_sysio_authorizer_billing( true );
+   disabled_bill.subjective_bill( trx.id(), trx.expiration, {}, {{alice, fc::microseconds( 800 )}} );
+   disabled_bill.on_block( log, make_block( now, {{ trx, {1200} }} ), now );
+   BOOST_TEST( disabled_bill.get_subjective_bill( alice, now ).count() == 0 );
+   BOOST_TEST( disabled_bill.get_account_cache_size() == 0u );
+}
+
+BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_billing_block_age_test ) {
+   fc::logger log;
+   const account_name alice = "alice"_n;
+   const auto now = sysio_paid_now;
+   const auto block = make_block( now, {
+      { make_trx( {make_action( "sysio.token"_n, {{alice, config::active_name}} )}, 1 ), {1000} },
+   } );
+
+   subjective_billing live_bill;
+   const auto window = decay_window( live_bill );
+   const auto half = fc::microseconds( window.count() / 2 );
+   const auto three_quarters = fc::microseconds( window.count() * 3 / 4 );
+   live_bill.on_block( log, block, now );
+
+   // A node applying the block half a window late, e.g. while syncing, holds the same charge from then on as the
+   // node that applied it live: the charge decays from the block's time.
+   subjective_billing late_bill;
+   late_bill.on_block( log, block, now + half );
+   BOOST_TEST( late_bill.get_subjective_bill( alice, now + half ).count() == 500 );
+   for( const auto time : {now + half, now + three_quarters, now + window} ) {
+      BOOST_TEST( late_bill.get_subjective_bill( alice, time ).count() ==
+                  live_bill.get_subjective_bill( alice, time ).count() );
+   }
+   BOOST_TEST( late_bill.get_subjective_bill( alice, now + window ).count() == 0 );
+
+   // A charge older than the account's last update is decayed to that update first.
+   subjective_billing updated_bill;
+   updated_bill.subjective_bill_failure( {}, {{alice, fc::microseconds( 1000 )}}, now + half );
+   updated_bill.on_block( log, block, now + half );
+   BOOST_TEST( updated_bill.get_subjective_bill( alice, now + half ).count() == 1000 + 500 );
+
+   // A block older than the decay window charges nothing.
+   subjective_billing old_bill;
+   old_bill.on_block( log, block, now + window );
+   BOOST_TEST( old_bill.get_subjective_bill( alice, now + window ).count() == 0 );
+   BOOST_TEST( old_bill.get_account_cache_size() == 0u );
+}
+
+BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_billing_disabled_test ) {
+   fc::logger log;
+   const account_name alice = "alice"_n;
+   const auto now = sysio_paid_now;
+   const auto block = make_block( now, {
+      { make_trx( {make_action( "sysio.token"_n, {{alice, config::active_name}} )}, 1 ), {1000} },
+   } );
+
+   subjective_billing account_disabled;
+   account_disabled.disable_account( alice );
+   account_disabled.on_block( log, block, now );
+   BOOST_TEST( account_disabled.get_account_cache_size() == 0u );
+
+   subjective_billing all_disabled;
+   all_disabled.set_disabled( true );
+   all_disabled.on_block( log, block, now );
+   all_disabled.set_disabled( false );
+   BOOST_TEST( all_disabled.get_subjective_bill( alice, now ).count() == 0 );
+
+   subjective_billing charge_disabled;
+   charge_disabled.disable_sysio_authorizer_billing( true );
+   BOOST_TEST( charge_disabled.is_sysio_authorizer_billing_disabled() );
+   charge_disabled.on_block( log, block, now );
+   BOOST_TEST( charge_disabled.get_subjective_bill( alice, now ).count() == 0 );
+
+   charge_disabled.reset();
+   BOOST_TEST( !charge_disabled.is_sysio_authorizer_billing_disabled() );
+}
+
+BOOST_AUTO_TEST_CASE( chain_exempt_accounts_test ) {
+   fc::logger log;
+   const account_name alice = "alice"_n; // exempted by chain state
+   const account_name bob = "bob"_n;
+   const auto now = sysio_paid_now;
+   const auto block = make_block( now, {
+      { make_trx( {make_action( "sysio.token"_n, {{alice, config::active_name}} )}, 1 ), {1000} },
+      { make_trx( {make_action( "sysio.token"_n, {{bob, config::active_name}} )}, 2 ), {1000} },
+   } );
+   const transaction_id_type pending_id = sha256::hash( "pending" );
+
+   // An account chain state exempts is treated like one of disable_account: never charged, billed or limited.
+   subjective_billing sub_bill;
+   sub_bill.set_chain_exempt_accounts( {alice} );
+   BOOST_TEST( sub_bill.is_account_disabled( alice ) );
+   BOOST_TEST( !sub_bill.is_account_disabled( bob ) );
+   BOOST_TEST( sub_bill.is_any_account_disabled( {alice, bob} ) );
+   sub_bill.on_block( log, block, now );
+   sub_bill.subjective_bill( pending_id, fc::time_point_sec{now + fc::days( 1 )}, {},
+                             {{alice, fc::microseconds( 50 )}, {bob, fc::microseconds( 50 )}} );
+   sub_bill.subjective_bill_failure( {}, {{alice, fc::microseconds( 70 )}, {bob, fc::microseconds( 70 )}}, now );
+   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).count() == 0 );
+   BOOST_TEST( sub_bill.get_subjective_bill( bob, now ).count() == 1000 + 50 + 70 );
+   BOOST_TEST( sub_bill.get_account_cache_size() == 1u );
+
+   // The set is replaced as a whole. An account charged before it became exempt is not limited while it is.
+   sub_bill.set_chain_exempt_accounts( {bob} );
+   BOOST_TEST( !sub_bill.is_account_disabled( alice ) );
+   BOOST_TEST( sub_bill.get_subjective_bill( bob, now ).count() == 0 );
+   sub_bill.set_chain_exempt_accounts( {} );
+   BOOST_TEST( sub_bill.get_subjective_bill( bob, now ).count() == 1000 + 50 + 70 );
+
+   sub_bill.set_chain_exempt_accounts( {alice} );
+   sub_bill.reset();
+   BOOST_TEST( sub_bill.get_chain_exempt_accounts().empty() );
+}
+
+BOOST_AUTO_TEST_CASE( prune_decayed_accounts_test ) {
+   fc::logger log;
+   const account_name alice = "alice"_n;
+   const account_name bob = "bob"_n;
+   const auto now = sysio_paid_now;
+   transaction_id_type pending_id = sha256::hash( "pending" );
+
+   subjective_billing sub_bill;
+   const auto window = decay_window( sub_bill );
+   const auto endtime = now + window;
+
+   sub_bill.on_block( log, make_block( now, {
+      { make_trx( {make_action( "sysio.token"_n, {{alice, config::active_name}} )}, 1 ), {1000} },
+   } ), now );
+   sub_bill.subjective_bill( pending_id, fc::time_point_sec{endtime + fc::days( 1 )}, {},
+                             {{bob, fc::microseconds( 50 )}} );
+   BOOST_TEST( sub_bill.get_account_cache_size() == 2u );
+
+   // alice's charge has decayed away; bob still has a pending bill.
+   sub_bill.on_block( log, make_block( endtime, {} ), endtime );
+   BOOST_TEST( sub_bill.get_account_cache_size() == 1u );
+   BOOST_TEST( sub_bill.get_subjective_bill( bob, endtime ).count() == 50 );
+}
+
+BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_billing_integration_test ) {
+   validating_tester chain;
+
+   fc::logger log;
+   const account_name sysio_contract = "sysio.assert"_n; // a sysio.* contract, with unlimited CPU
+   const account_name contract = "asserter"_n;           // a contract outside sysio.*
+   const account_name user = "user"_n;                   // no CPU of its own
+   const account_name payer = "payer"_n;                 // has CPU and pays with sysio.payer
+   chain.create_accounts( {sysio_contract, contract, payer} );
+   chain.create_account( user, config::system_account_name, false, false, false, true );
+   for( const auto& [account, ram, weight] : {std::tuple{sysio_contract, int64_t{-1}, int64_t{-1}},
+                                              std::tuple{user, int64_t{base_tester::newaccount_ram}, int64_t{0}}} ) {
+      chain.push_action( config::system_account_name, "setalimits"_n, config::system_account_name,
+                         fc::mutable_variant_object()("account", account)("ram_bytes", ram)
+                                                     ("net_weight", weight)("cpu_weight", weight) );
+   }
+   chain.set_contract( sysio_contract, test_contracts::asserter_wasm(), test_contracts::asserter_abi() );
+   chain.set_contract( contract, test_contracts::asserter_wasm(), test_contracts::asserter_abi() );
+   chain.produce_block();
+
+   auto& sub_bill = chain.control->get_mutable_subjective_billing();
+   auto& validator_bill = chain.validating_node->get_mutable_subjective_billing();
+   sub_bill.set_disabled( false );
+   validator_bill.set_disabled( false );
+
+   // Pushes a successful assertion on `code`, then produces and applies a block holding it on both nodes:
+   // `chain` produced it, the validating node received it. Returns the CPU its receipt billed.
+   uint32_t nonce = 0;
+   auto push_and_apply = [&]( account_name code, vector<permission_level> auth ) {
+      signed_transaction trx;
+      trx.actions.emplace_back( std::move( auth ), code, assertdef::get_name(), fc::raw::pack( assertdef{1, "1"} ) );
+      chain.set_transaction_headers( trx, ++nonce );
+      for( account_name signer : trx.first_authorizers() )
+         trx.sign( tester::get_private_key( signer, "active" ), chain.control->get_chain_id() );
+      auto ptrx = std::make_shared<packed_transaction>( trx );
+      auto meta = transaction_metadata::start_recover_keys( ptrx, chain.control->get_thread_pool(),
+                                                            chain.control->get_chain_id(), fc::microseconds::maximum(),
+                                                            transaction_metadata::trx_type::input ).get();
+      auto trace = chain.control->test_push_transaction( meta, fc::time_point::maximum(), fc::microseconds::maximum(),
+                                                         {}, false );
+      if( trace->except_ptr ) std::rethrow_exception( trace->except_ptr );
+      const auto block = chain.produce_block();
+      sub_bill.on_block( log, block, block->timestamp );
+      validator_bill.on_block( log, block, block->timestamp );
+      const auto receipt = std::ranges::find_if( block->transactions, [&]( const transaction_receipt& r ) {
+         return r.trx.id() == trx.id();
+      } );
+      BOOST_REQUIRE( receipt != block->transactions.end() );
+      return receipt->cpu_usage_us.front().value;
+   };
+   const auto bill_of = [&]( const subjective_billing& bill, account_name account ) {
+      return bill.get_subjective_bill( account, chain.control->head().block_time() ).count();
+   };
+
+   // A contract outside sysio.* pays from its own CPU, and an explicit sysio.payer pays from the payer's.
+   push_and_apply( contract, {{user, config::active_name}} );
+   push_and_apply( sysio_contract, {{payer, config::sysio_payer_name}, {payer, config::active_name}} );
+   BOOST_TEST( bill_of( sub_bill, user ) == 0 );
+   BOOST_TEST( bill_of( sub_bill, payer ) == 0 );
+   BOOST_TEST( bill_of( validator_bill, payer ) == 0 );
+
+   // A sysio.*-paid action stays charged to its authorizer on the producing and on the receiving node.
+   const uint32_t first_cpu = push_and_apply( sysio_contract, {{user, config::active_name}} );
+   BOOST_TEST( first_cpu > 0u );
+   BOOST_TEST( bill_of( sub_bill, user ) == first_cpu );
+   BOOST_TEST( bill_of( validator_bill, user ) == first_cpu );
+   const auto empty_block = chain.produce_block();
+   sub_bill.on_block( log, empty_block, empty_block->timestamp );
+   BOOST_TEST( bill_of( sub_bill, user ) == first_cpu );
+
+   // Once included charges exceed the budget, the authorizer is rejected before execution.
+   sub_bill.set_subjective_account_cpu_allowed( fc::microseconds{bill_of( sub_bill, user ) * 4} );
+   const size_t max_pushes = 1000;
+   size_t pushes = 0;
+   for( ; pushes < max_pushes && bill_of( sub_bill, user ) < sub_bill.get_subjective_account_cpu_allowed().count();
+        ++pushes ) {
+      push_and_apply( sysio_contract, {{user, config::active_name}} );
+   }
+   BOOST_REQUIRE( pushes < max_pushes );
+   BOOST_CHECK_EXCEPTION( push_and_apply( sysio_contract, {{user, config::active_name}} ), tx_cpu_usage_exceeded,
+                          fc_exception_message_contains( "Authorized account user exceeded subjective CPU limit" ) );
+
+   // The charge decays back over the window, and the authorizer is accepted again.
+   chain.produce_block( fc::days( 1 ) );
+   BOOST_TEST( bill_of( sub_bill, user ) == 0 );
+   push_and_apply( sysio_contract, {{user, config::active_name}} );
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 }

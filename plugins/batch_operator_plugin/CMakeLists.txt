@@ -13,9 +13,11 @@ plugin_target(
         opp
         sysio_chain)
 
-# The native planner and CDT contract share the bond increment policy.
+# The native planner and CDT contract share the bond increment policy, and the relay reads the sysio.opreg roster
+# under the names its contract shares.
 target_include_directories(batch_operator_plugin PRIVATE
-        ${CMAKE_SOURCE_DIR}/contracts/sysio.bond/include)
+        ${CMAKE_SOURCE_DIR}/contracts/sysio.bond/include
+        ${CMAKE_SOURCE_DIR}/contracts/sysio.opreg/include)
 
 # The kick crank's tests decode table rows with the committed contract ABIs, the way the node renders them.
 if(TARGET test_batch_operator_plugin)

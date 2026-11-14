@@ -844,11 +844,22 @@ BOOST_FIXTURE_TEST_CASE( subjective_billing_goes_to_the_first_authorizer, receiv
          BOOST_TEST( sub_bill.get_subjective_bill( winner, now ).count() == winner_bill );
          control->abort_block();
 
-         // The block that includes the transaction ends all of its subjective bills.
+         // The block that includes the transaction ends its pending bills. The input entry, paid by sysio.token,
+         // stays charged to its authorizer; the entries the game and the winner pay do not.
          push_measured( trx );
-         sub_bill.on_block( fc::logger::default_logger(), produce_block(), now );
-         for( auto account : { alice, token_account, game, winner } )
-            BOOST_TEST_CONTEXT( account ) { BOOST_TEST( sub_bill.get_subjective_bill( account, now ).count() == 0 ); }
+         const signed_block_ptr block      = produce_block();
+         const fc::time_point   block_time = block->timestamp.to_time_point();
+         sub_bill.on_block( fc::logger::default_logger(), block, now );
+         const auto included = std::ranges::find( block->transactions, trx.id(),
+                                                  []( const transaction_receipt& r ) { return r.trx.id(); } );
+         BOOST_REQUIRE( included != block->transactions.end() );
+         BOOST_REQUIRE_EQUAL( included->cpu_usage_us.size(), 3u );
+         BOOST_TEST( sub_bill.get_subjective_bill( alice, block_time ).count() ==
+                     included->cpu_usage_us.front().value );
+         for( auto account : { token_account, game, winner } )
+            BOOST_TEST_CONTEXT( account ) {
+               BOOST_TEST( sub_bill.get_subjective_bill( account, block_time ).count() == 0 );
+            }
       }
    }
 } FC_LOG_AND_RETHROW()

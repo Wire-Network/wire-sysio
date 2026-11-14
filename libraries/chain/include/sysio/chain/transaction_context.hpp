@@ -332,8 +332,6 @@ namespace sysio::chain {
          /// Bills `cpu_us` of receiver entry `e` to its contract: CPU only, never NET. finalize() reads its CPU limit.
          /// An entry of 0 bills nothing: the contract is not billed, so its CPU window is neither updated nor checked.
          void bill_receiver( const receiver_entry& e, uint32_t cpu_us );
-         /// First authorizer of input action `input`, or the transaction's when it has none.
-         account_name input_first_authorizer( uint32_t input ) const;
    };
 
 } // namespace sysio::chain

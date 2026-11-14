@@ -114,9 +114,13 @@ subscribes to in order to decide whether to relay.
 Subjective billing bounds how much CPU a failing account can consume:
 `subjective-account-max-failures` per `subjective-account-max-failures-window-size` blocks,
 `subjective-account-cpu-allowed-us` of extra CPU above an account's own quota, decaying over
-`subjective-account-decay-time-minutes`. Three switches turn the whole mechanism off for a class of traffic —
-contract payers (`disable-subjective-payer-billing`, on by default), P2P transactions, and API transactions —
-and `disable-subjective-account-billing` excludes named accounts.
+`subjective-account-decay-time-minutes`. The CPU of an action paid by a `sysio.*` contract stays charged to its
+first authorizer after the transaction lands: every node reads it from each applied block's receipts
+(`disable-subjective-sysio-authorizer-billing` turns this off). Three switches turn the whole mechanism off for
+a class of traffic — contract payers (`disable-subjective-payer-billing`, on by default), P2P transactions, and
+API transactions — and `disable-subjective-account-billing` excludes named accounts. Every node also excludes
+the accounts chain state names, reloaded every 120 irreversible blocks: the `sysio.system` table `subjexempt`,
+and the active batch and underwriter operators of `sysio.opreg`.
 
 ## Enabling / configuration
 
@@ -209,6 +213,7 @@ for `enable-stale-production`, and `-x` for `pause-on-startup`.
 | `subjective-account-cpu-allowed-us` | `300000` | Maximum CPU, above the account's own CPU, that one authorizing account may use within `subjective-account-decay-time-minutes`. |
 | `disable-subjective-account-billing` | unset | Account excluded from subjective CPU billing; may be repeated. |
 | `disable-subjective-payer-billing` | `true` | Disable subjective CPU billing for all contract payer accounts. On by default: under contract-pays the payer is the called contract, so billing it for its callers' failures charges the party provisioned to absorb traffic rather than the account causing it. |
+| `disable-subjective-sysio-authorizer-billing` | `false` | Disable keeping the subjective CPU billed to the first authorizer of an action paid by a `sysio.*` contract once its transaction is in a block. Kept by default: `sysio.*` contracts have unlimited CPU, so this charge, read from every block and decaying over `subjective-account-decay-time-minutes`, is what limits their callers to `subjective-account-cpu-allowed-us` plus their own CPU limit. |
 | `disable-subjective-p2p-billing` | `false` | Disable subjective CPU billing for P2P transactions. |
 | `disable-subjective-api-billing` | `false` | Disable subjective CPU billing for API transactions. |
 | `greylist-account` | unset | Account that may not reach extended CPU/NET virtual resources; may be repeated. |
