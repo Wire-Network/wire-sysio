@@ -1,3 +1,4 @@
+#include <fc/io/json.hpp>
 #include <fc/variant.hpp>
 #include <fc/variant_object.hpp>
 #include <fc/int128.hpp>
@@ -5,6 +6,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <limits>
 #include <string>
 
 using fc::variant;
@@ -218,6 +220,69 @@ BOOST_AUTO_TEST_CASE(int128_op_assign_same_and_cross_type) {
       variant a{int64_t{1}};
       a = variant{fc::uint256{0xABCDEF}};
       BOOST_CHECK(a.get_type() == variant::uint256_type);
+   }
+}
+
+/// Every payload kind must survive copying, moving, repeated clearing and reassignment from every other kind.
+BOOST_AUTO_TEST_CASE(payload_reassignment_across_all_types) {
+   constexpr double fractional_value = 1.5;
+   constexpr int64_t signed_big_integer = -12345;
+   constexpr uint64_t unsigned_big_integer = 12345;
+   constexpr int64_t array_integer = -1;
+   constexpr char object_key[] = "value";
+   const std::string sso_boundary(variant::sso_max_length, 's');
+   const std::string heap_string(variant::sso_max_length + 1, 'h');
+   const variants values{variant{},
+                         variant{false},
+                         variant{true},
+                         variant{std::numeric_limits<int64_t>::min()},
+                         variant{std::numeric_limits<uint64_t>::max()},
+                         variant{fractional_value},
+                         variant{sso_boundary},
+                         variant{heap_string},
+                         variant{fc::int128{signed_big_integer}},
+                         variant{fc::uint128{unsigned_big_integer}},
+                         variant{fc::int256{signed_big_integer}},
+                         variant{fc::uint256{unsigned_big_integer}},
+                         variant{blob{{'\0', 'b', '\0'}}},
+                         variant{variants{variant{array_integer}, variant{heap_string}}},
+                         variant{variant_object{mutable_variant_object(object_key, heap_string)}}};
+
+   for (const auto& source : values) {
+      const auto expected_json = fc::json::to_string(source, fc::time_point::maximum());
+      const auto check_value = [&](const variant& value) {
+         BOOST_CHECK_EQUAL(value.get_type(), source.get_type());
+         BOOST_CHECK_EQUAL(fc::json::to_string(value, fc::time_point::maximum()), expected_json);
+      };
+      variant copy{source};
+      check_value(copy);
+      variant moved{std::move(copy)};
+      BOOST_CHECK(copy.is_null());
+      check_value(moved);
+      moved.clear();
+      moved.clear();
+      BOOST_CHECK(moved.is_null());
+      moved = source;
+      check_value(moved);
+
+      for (const auto& initial : values) {
+         BOOST_TEST_CONTEXT("payload transition " << initial.get_type() << " to " << source.get_type()) {
+            variant assigned{initial};
+            assigned = source;
+            check_value(assigned);
+            assigned = source;
+            check_value(assigned);
+
+            variant move_source{source};
+            variant move_assigned{initial};
+            move_assigned = std::move(move_source);
+            BOOST_CHECK(move_source.is_null());
+            move_source.clear();
+            move_source = initial;
+            check_value(move_assigned);
+            check_value(source);
+         }
+      }
    }
 }
 
