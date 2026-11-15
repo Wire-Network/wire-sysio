@@ -2,7 +2,6 @@
 #include <fc/variant_multiprecision.hpp>
 #include <fc/variant_object.hpp>
 #include <fc/exception/exception.hpp>
-#include <string.h>
 #include <fc/crypto/base64.hpp>
 #include <fc/crypto/hex.hpp>
 #include <boost/scoped_array.hpp>
@@ -12,6 +11,7 @@
 #include <algorithm>
 #include <cassert>
 #include <concepts>
+#include <cstring>
 #include <functional>
 #include <limits>
 #include <stdexcept>
@@ -23,6 +23,24 @@
 
 namespace fc
 {
+// _data always contains live characters. Copy representations to and from live typed values; no scalar or pointer
+// object needs to exist in _data, including after byte-wise copy or move.
+template <typename T>
+T variant::load_payload() const {
+   static_assert(std::is_trivially_copyable_v<T>);
+   static_assert(sizeof(T) < sizeof(_data), "payload must not overwrite the type tag");
+   T value;
+   std::memcpy(&value, _data.data(), sizeof(value));
+   return value;
+}
+
+template <typename T>
+void variant::store_payload(std::type_identity_t<T> value) {
+   static_assert(std::is_trivially_copyable_v<T>);
+   static_assert(sizeof(T) < sizeof(_data), "payload must not overwrite the type tag");
+   std::memcpy(_data.data(), &value, sizeof(value));
+}
+
 /**
  *  The TypeID is stored in the 'last byte' of the variant.
  */
@@ -70,16 +88,16 @@ inline std::string_view read_sso( const variant* v ) {
    return std::string_view{ data, len };
 }
 
-inline void make_string_inline_or_heap( variant* v, std::string_view src ) {
+} // anonymous namespace
+
+inline void variant::make_string_inline_or_heap(std::string_view src) {
    if (src.size() <= variant::sso_max_length) {
-      write_sso(v, src.data(), src.size());
+      write_sso(this, src.data(), src.size());
    } else {
-      *reinterpret_cast<std::string**>(v) = new std::string( src );
-      set_variant_type(v, variant::string_type);
+      store_payload<std::string*>(new std::string(src));
+      set_variant_type(this, variant::string_type);
    }
 }
-
-} // anonymous namespace
 
 variant::variant()
 {
@@ -93,101 +111,101 @@ variant::variant( fc::nullptr_t )
 
 variant::variant( uint8_t val )
 {
-   *reinterpret_cast<uint64_t*>(this)  = val;
+   store_payload<uint64_t>(val);
    set_variant_type( this, uint64_type );
 }
 
 variant::variant( int8_t val )
 {
-   *reinterpret_cast<int64_t*>(this)  = val;
+   store_payload<int64_t>(val);
    set_variant_type( this, int64_type );
 }
 
 variant::variant( uint16_t val )
 {
-   *reinterpret_cast<uint64_t*>(this)  = val;
+   store_payload<uint64_t>(val);
    set_variant_type( this, uint64_type );
 }
 
 variant::variant( int16_t val )
 {
-   *reinterpret_cast<int64_t*>(this)  = val;
+   store_payload<int64_t>(val);
    set_variant_type( this, int64_type );
 }
 
 variant::variant( uint32_t val )
 {
-   *reinterpret_cast<uint64_t*>(this)  = val;
+   store_payload<uint64_t>(val);
    set_variant_type( this, uint64_type );
 }
 
 variant::variant( int32_t val )
 {
-   *reinterpret_cast<int64_t*>(this)  = val;
+   store_payload<int64_t>(val);
    set_variant_type( this, int64_type );
 }
 
 variant::variant( uint64_t val )
 {
-   *reinterpret_cast<uint64_t*>(this)  = val;
+   store_payload<uint64_t>(val);
    set_variant_type( this, uint64_type );
 }
 
 variant::variant( int64_t val )
 {
-   *reinterpret_cast<int64_t*>(this)  = val;
+   store_payload<int64_t>(val);
    set_variant_type( this, int64_type );
 }
 
 variant::variant(fc::uint128 val)
 {
-   *reinterpret_cast<std::string**>(this)  = new std::string( fc::to_string(val) );
+   store_payload<std::string*>(new std::string(fc::to_string(val)));
    set_variant_type( this, uint128_type );
 }
 
 variant::variant(fc::int128 val)
 {
-   *reinterpret_cast<std::string**>(this)  = new std::string( fc::to_string(val) );
+   store_payload<std::string*>(new std::string(fc::to_string(val)));
    set_variant_type( this, int128_type );
 }
 
 variant::variant( const int256& val )
 {
-   *reinterpret_cast<std::string**>(this)  = new std::string( val.str() );
+   store_payload<std::string*>(new std::string(val.str()));
    set_variant_type( this, int256_type );
 }
 
 variant::variant(const fc::uint256& val) {
-   *reinterpret_cast<std::string**>(this)  = new std::string( val.str() );
+   store_payload<std::string*>(new std::string(val.str()));
    set_variant_type( this, uint256_type );
 }
 
 variant::variant( float val )
 {
-   *reinterpret_cast<double*>(this)  = val;
+   store_payload<double>(val);
    set_variant_type( this, double_type );
 }
 
 variant::variant( double val )
 {
-   *reinterpret_cast<double*>(this)  = val;
+   store_payload<double>(val);
    set_variant_type( this, double_type );
 }
 
 variant::variant( bool val )
 {
-   *reinterpret_cast<bool*>(this)  = val;
+   store_payload<bool>(val);
    set_variant_type( this, bool_type );
 }
 
 variant::variant( char* str )
 {
-   make_string_inline_or_heap( this, std::string_view{ str } );
+   make_string_inline_or_heap(std::string_view{str});
 }
 
 variant::variant( const char* str )
 {
-   make_string_inline_or_heap( this, std::string_view{ str } );
+   make_string_inline_or_heap(std::string_view{str});
 }
 
 // TODO: do a proper conversion to utf8
@@ -197,7 +215,7 @@ variant::variant( wchar_t* str )
    boost::scoped_array<char> buffer(new char[len]);
    for (unsigned i = 0; i < len; ++i)
      buffer[i] = (char)str[i];
-   make_string_inline_or_heap( this, std::string_view{ buffer.get(), len } );
+   make_string_inline_or_heap(std::string_view{buffer.get(), len});
 }
 
 // TODO: do a proper conversion to utf8
@@ -207,7 +225,7 @@ variant::variant( const wchar_t* str )
    boost::scoped_array<char> buffer(new char[len]);
    for (unsigned i = 0; i < len; ++i)
      buffer[i] = (char)str[i];
-   make_string_inline_or_heap( this, std::string_view{ buffer.get(), len } );
+   make_string_inline_or_heap(std::string_view{buffer.get(), len});
 }
 
 variant::variant( std::string val )
@@ -218,42 +236,37 @@ variant::variant( std::string val )
    if (val.size() <= sso_max_length) {
       write_sso(this, val.data(), val.size());
    } else {
-      *reinterpret_cast<std::string**>(this)  = new std::string( std::move(val) );
+      store_payload<std::string*>(new std::string(std::move(val)));
       set_variant_type( this, string_type );
    }
 }
 variant::variant( std::string_view val )
 {
-   make_string_inline_or_heap( this, val );
+   make_string_inline_or_heap(val);
 }
 variant::variant( blob val )
 {
-   *reinterpret_cast<blob**>(this)  = new blob( std::move(val) );
+   store_payload<blob*>(new blob(std::move(val)));
    set_variant_type( this, blob_type );
 }
 
 variant::variant( variant_object obj)
 {
-   *reinterpret_cast<variant_object**>(this)  = new variant_object(std::move(obj));
+   store_payload<variant_object*>(new variant_object(std::move(obj)));
    set_variant_type(this,  object_type );
 }
 variant::variant( mutable_variant_object obj)
 {
-   *reinterpret_cast<variant_object**>(this)  = new variant_object(std::move(obj));
+   store_payload<variant_object*>(new variant_object(std::move(obj)));
    set_variant_type(this,  object_type );
 }
 
 variant::variant( variants arr )
 {
-   *reinterpret_cast<variants**>(this)  = new variants(std::move(arr));
+   store_payload<variants*>(new variants(std::move(arr)));
    set_variant_type(this,  array_type );
 }
 
-
-typedef const variant_object* const_variant_object_ptr;
-typedef const variants* const_variants_ptr;
-typedef const blob*   const_blob_ptr;
-typedef const std::string* const_string_ptr;
 
 // Direct-aliasing detector for variant::operator=(const variant&).  Aliased self-assignment (rhs refers to storage
 // owned by lhs) is undefined behaviour: operator= writes through lhs while still reading from rhs, which the write
@@ -270,14 +283,14 @@ bool variant::_rhs_not_aliased( const variant* lhs, const variant& v )
 {
    const auto t = lhs->get_type();
    if( t == variant::array_type ) {
-      const variants& dst_vec = **reinterpret_cast<const variants* const*>(lhs);
+      const variants& dst_vec = *lhs->load_payload<variants*>();
       const variant* begin = dst_vec.data();
       const variant* end   = begin + dst_vec.size();
       std::less<const variant*> less;
       return less(&v, begin) || !less(&v, end);
    }
    if( t == variant::object_type ) {
-      const variant_object& dst_vo = **reinterpret_cast<const variant_object* const*>(lhs);
+      const variant_object& dst_vo = *lhs->load_payload<variant_object*>();
       for( const auto& entry : dst_vo ) {
          if( &entry.value() == &v ) return false;
       }
@@ -290,10 +303,10 @@ void variant::clear()
    switch( get_type() )
    {
      case object_type:
-        delete *reinterpret_cast<variant_object**>(this);
+        delete load_payload<variant_object*>();
         break;
      case array_type:
-        delete *reinterpret_cast<variants**>(this);
+        delete load_payload<variants*>();
         break;
      case string_type:
      case int128_type:
@@ -301,10 +314,10 @@ void variant::clear()
      case int256_type:
      case uint256_type:
         // All four use new std::string(...) storage (see ctors above).
-        delete *reinterpret_cast<std::string**>(this);
+        delete load_payload<std::string*>();
         break;
      case blob_type:
-        delete *reinterpret_cast<blob**>(this);
+        delete load_payload<blob*>();
         break;
      case string_sso_type:
         // Inline content; no heap allocation to free.
@@ -321,13 +334,11 @@ variant::variant( const variant& v )
    switch( t )
    {
        case object_type:
-          *reinterpret_cast<variant_object**>(this)  =
-             new variant_object(**reinterpret_cast<const const_variant_object_ptr*>(&v));
+          store_payload<variant_object*>(new variant_object(*v.load_payload<variant_object*>()));
           set_variant_type( this, object_type );
           return;
        case array_type:
-          *reinterpret_cast<variants**>(this)  =
-             new variants(**reinterpret_cast<const const_variants_ptr*>(&v));
+          store_payload<variants*>(new variants(*v.load_payload<variants*>()));
           set_variant_type( this,  array_type );
           return;
        case string_type:
@@ -337,13 +348,11 @@ variant::variant( const variant& v )
        case uint256_type:
           // All four use new std::string(...) storage (see ctors above);
           // deep-copy so destructors don't double-free or leak.
-          *reinterpret_cast<std::string**>(this)  =
-             new std::string(**reinterpret_cast<const const_string_ptr*>(&v) );
+          store_payload<std::string*>(new std::string(*v.load_payload<std::string*>()));
           set_variant_type( this, t );
           return;
        case blob_type:
-          *reinterpret_cast<blob**>(this)  =
-             new blob(**reinterpret_cast<const const_blob_ptr*>(&v) );
+          store_payload<blob*>(new blob(*v.load_payload<blob*>()));
           set_variant_type( this, blob_type );
           return;
        case string_sso_type:
@@ -394,24 +403,20 @@ variant& variant::operator=( const variant& v )
    if( get_type() == src_type ) {
       switch( src_type ) {
          case object_type:
-            **reinterpret_cast<variant_object**>(this) =
-               **reinterpret_cast<const const_variant_object_ptr*>(&v);
+            *load_payload<variant_object*>() = *v.load_payload<variant_object*>();
             return *this;
          case array_type:
-            **reinterpret_cast<variants**>(this) =
-               **reinterpret_cast<const const_variants_ptr*>(&v);
+            *load_payload<variants*>() = *v.load_payload<variants*>();
             return *this;
          case blob_type:
-            **reinterpret_cast<blob**>(this) =
-               **reinterpret_cast<const const_blob_ptr*>(&v);
+            *load_payload<blob*>() = *v.load_payload<blob*>();
             return *this;
          case int128_type:
          case uint128_type:
          case int256_type:
          case uint256_type:
          case string_type:
-            **reinterpret_cast<std::string**>(this) =
-               **reinterpret_cast<const const_string_ptr*>(&v);
+            *load_payload<std::string*>() = *v.load_payload<std::string*>();
             return *this;
          default:
             // Inline (null/int/uint/double/bool/string_sso): bytes-copy.
@@ -425,12 +430,10 @@ variant& variant::operator=( const variant& v )
    clear();
    switch( src_type ) {
       case object_type:
-         *reinterpret_cast<variant_object**>(this) =
-            new variant_object( **reinterpret_cast<const const_variant_object_ptr*>(&v) );
+         store_payload<variant_object*>(new variant_object(*v.load_payload<variant_object*>()));
          break;
       case array_type:
-         *reinterpret_cast<variants**>(this) =
-            new variants( **reinterpret_cast<const const_variants_ptr*>(&v) );
+         store_payload<variants*>(new variants(*v.load_payload<variants*>()));
          break;
       case string_type:
       case int128_type:
@@ -438,12 +441,10 @@ variant& variant::operator=( const variant& v )
       case int256_type:
       case uint256_type:
          // All five share new std::string(...) storage (see ctors above).
-         *reinterpret_cast<std::string**>(this) =
-            new std::string( **reinterpret_cast<const const_string_ptr*>(&v) );
+         store_payload<std::string*>(new std::string(*v.load_payload<std::string*>()));
          break;
       case blob_type:
-         *reinterpret_cast<blob**>(this) =
-            new blob( **reinterpret_cast<const const_blob_ptr*>(&v) );
+         store_payload<blob*>(new blob(*v.load_payload<blob*>()));
          break;
       case string_sso_type:
       default:
@@ -462,44 +463,44 @@ void  variant::visit( const visitor& v )const
          v.handle();
          return;
       case int64_type:
-         v.handle( *reinterpret_cast<const int64_t*>(this) );
+         v.handle(load_payload<int64_t>());
          return;
       case uint64_type:
-         v.handle( *reinterpret_cast<const uint64_t*>(this) );
+         v.handle(load_payload<uint64_t>());
          return;
       case int128_type:
-         v.handle( std::string_view{ **reinterpret_cast<const const_string_ptr*>(this) } );
+         v.handle(std::string_view{*load_payload<std::string*>()});
          return;
       case uint128_type:
-         v.handle( std::string_view{ **reinterpret_cast<const const_string_ptr*>(this) } );
+         v.handle(std::string_view{*load_payload<std::string*>()});
          return;
       case int256_type:
-         v.handle( std::string_view{ **reinterpret_cast<const const_string_ptr*>(this) } );
+         v.handle(std::string_view{*load_payload<std::string*>()});
          return;
       case uint256_type:
-         v.handle( std::string_view{ **reinterpret_cast<const const_string_ptr*>(this) } );
+         v.handle(std::string_view{*load_payload<std::string*>()});
          return;
 
       case double_type:
-         v.handle( *reinterpret_cast<const double*>(this) );
+         v.handle(load_payload<double>());
          return;
       case bool_type:
-         v.handle( *reinterpret_cast<const bool*>(this) );
+         v.handle(load_payload<bool>());
          return;
       case string_type:
-         v.handle( std::string_view{ **reinterpret_cast<const const_string_ptr*>(this) } );
+         v.handle(std::string_view{*load_payload<std::string*>()});
          return;
       case string_sso_type:
          v.handle( read_sso(this) );
          return;
       case array_type:
-         v.handle( **reinterpret_cast<const const_variants_ptr*>(this) );
+         v.handle(*load_payload<variants*>());
          return;
       case object_type:
-         v.handle( **reinterpret_cast<const const_variant_object_ptr*>(this) );
+         v.handle(*load_payload<variant_object*>());
          return;
       case blob_type:
-         v.handle( **reinterpret_cast<const const_blob_ptr*>(this) );
+         v.handle(*load_payload<blob*>());
          return;
       default:
          FC_THROW_EXCEPTION( assert_exception, "Invalid Type / Corrupted Memory" );
@@ -608,17 +609,17 @@ int64_t variant::as_int64()const
    switch( get_type() )
    {
       case string_type:
-          return to_int64(**reinterpret_cast<const const_string_ptr*>(this));
+          return to_int64(*load_payload<std::string*>());
       case string_sso_type:
           return to_int64(read_sso(this));
       case double_type:
-          return int64_t(*reinterpret_cast<const double*>(this));
+          return int64_t(load_payload<double>());
       case int64_type:
-          return *reinterpret_cast<const int64_t*>(this);
+          return load_payload<int64_t>();
       case uint64_type:
-          return int64_t(*reinterpret_cast<const uint64_t*>(this));
+          return int64_t(load_payload<uint64_t>());
       case bool_type:
-          return *reinterpret_cast<const bool*>(this);
+          return load_payload<bool>();
       case null_type:
           return 0;
       default:
@@ -631,17 +632,17 @@ uint64_t variant::as_uint64()const
    switch( get_type() )
    {
       case string_type:
-          return to_uint64(**reinterpret_cast<const const_string_ptr*>(this));
+          return to_uint64(*load_payload<std::string*>());
       case string_sso_type:
           return to_uint64(read_sso(this));
       case double_type:
-          return static_cast<uint64_t>(*reinterpret_cast<const double*>(this));
+          return static_cast<uint64_t>(load_payload<double>());
       case int64_type:
-          return static_cast<uint64_t>(*reinterpret_cast<const int64_t*>(this));
+          return static_cast<uint64_t>(load_payload<int64_t>());
       case uint64_type:
-          return *reinterpret_cast<const uint64_t*>(this);
+          return load_payload<uint64_t>();
       case bool_type:
-          return static_cast<uint64_t>(*reinterpret_cast<const bool*>(this));
+          return static_cast<uint64_t>(load_payload<bool>());
       case null_type:
           return 0;
       default:
@@ -654,16 +655,16 @@ fc::int128 variant::as_int128() const
    switch( get_type() )
    {
    case int64_type:
-      return static_cast<fc::int128>(*reinterpret_cast<const int64_t*>(this));
+      return static_cast<fc::int128>(load_payload<int64_t>());
    case uint64_type:
-      return static_cast<fc::int128>(*reinterpret_cast<const uint64_t*>(this));
+      return static_cast<fc::int128>(load_payload<uint64_t>());
    case int128_type:
    case uint128_type:
    case string_type:
    case string_sso_type:
       return fc::int128_from_string(as_string());
    case bool_type:
-      return static_cast<fc::int128>(*reinterpret_cast<const bool*>(this));
+      return static_cast<fc::int128>(load_payload<bool>());
    case null_type:
       return 0;
    default:
@@ -683,13 +684,13 @@ fc::uint128 fc::variant::as_uint128()const
       return static_cast<fc::uint128>(value);
    }
    case uint64_type:
-      return static_cast<fc::uint128>(*reinterpret_cast<const uint64_t*>(this));
+      return static_cast<fc::uint128>(load_payload<uint64_t>());
    case uint128_type:
    case string_type:
    case string_sso_type:
       return fc::uint128_from_string(as_string());
    case bool_type:
-      return static_cast<fc::uint128>(*reinterpret_cast<const bool*>(this));
+      return static_cast<fc::uint128>(load_payload<bool>());
    case null_type:
       return 0;
    default:
@@ -737,16 +738,16 @@ fc::int256 fc::variant::as_int256()const
    switch( get_type() )
    {
    case int64_type:
-      return fc::int256(*reinterpret_cast<const int64_t*>(this));
+      return fc::int256(load_payload<int64_t>());
    case uint64_type:
-      return fc::int256(*reinterpret_cast<const uint64_t*>(this));
+      return fc::int256(load_payload<uint64_t>());
    case int256_type:
    case uint256_type:
    case string_type:
    case string_sso_type:
       return parse_256bit<fc::int256>(as_string());
    case bool_type:
-      return int256(*reinterpret_cast<const bool*>(this));
+      return int256(load_payload<bool>());
    case null_type:
       return 0;
    default:
@@ -759,20 +760,20 @@ fc::uint256 fc::variant::as_uint256()const
    switch( get_type() )
    {
    case int64_type: {
-      const int64_t value = *reinterpret_cast<const int64_t*>(this);
+      const int64_t value = load_payload<int64_t>();
       if( value < 0 )
          throw_out_of_256bit_range<fc::uint256>( as_string() );
       return fc::uint256(value);
    }
    case uint64_type:
-      return fc::uint256(*reinterpret_cast<const uint64_t*>(this));
+      return fc::uint256(load_payload<uint64_t>());
    case int256_type:
    case uint256_type:
    case string_type:
    case string_sso_type:
       return parse_256bit<fc::uint256>(as_string());
    case bool_type:
-      return uint256(*reinterpret_cast<const bool*>(this));
+      return uint256(load_payload<bool>());
    case null_type:
       return 0;
    default:
@@ -786,17 +787,17 @@ double  variant::as_double()const
    switch( get_type() )
    {
       case string_type:
-          return to_double(**reinterpret_cast<const const_string_ptr*>(this));
+          return to_double(*load_payload<std::string*>());
       case string_sso_type:
           return to_double(read_sso(this));
       case double_type:
-          return *reinterpret_cast<const double*>(this);
+          return load_payload<double>();
       case int64_type:
-          return static_cast<double>(*reinterpret_cast<const int64_t*>(this));
+          return static_cast<double>(load_payload<int64_t>());
       case uint64_type:
-          return static_cast<double>(*reinterpret_cast<const uint64_t*>(this));
+          return static_cast<double>(load_payload<uint64_t>());
       case bool_type:
-          return *reinterpret_cast<const bool*>(this);
+          return load_payload<bool>();
       case null_type:
           return 0;
       default:
@@ -814,17 +815,17 @@ bool  variant::as_bool()const
    switch( get_type() )
    {
       case string_type:
-          return bool_from_string_view( **reinterpret_cast<const const_string_ptr*>(this) );
+          return bool_from_string_view(*load_payload<std::string*>());
       case string_sso_type:
           return bool_from_string_view( read_sso(this) );
       case double_type:
-          return *reinterpret_cast<const double*>(this) != 0.0;
+          return load_payload<double>() != 0.0;
       case int64_type:
-          return *reinterpret_cast<const int64_t*>(this) != 0;
+          return load_payload<int64_t>() != 0;
       case uint64_type:
-          return *reinterpret_cast<const uint64_t*>(this) != 0;
+          return load_payload<uint64_t>() != 0;
       case bool_type:
-          return *reinterpret_cast<const bool*>(this);
+          return load_payload<bool>();
       case null_type:
           return false;
       default:
@@ -849,17 +850,17 @@ std::string variant::as_string()const
       case uint256_type:
       case int256_type:
       case string_type:
-          return **reinterpret_cast<const const_string_ptr*>(this);
+          return *load_payload<std::string*>();
       case string_sso_type:
           return std::string{ read_sso(this) };
       case double_type:
-          return s_fc_to_string(*reinterpret_cast<const double*>(this));
+          return s_fc_to_string(load_payload<double>());
       case int64_type:
-          return std::to_string(*reinterpret_cast<const int64_t*>(this));
+          return std::to_string(load_payload<int64_t>());
       case uint64_type:
-          return std::to_string(*reinterpret_cast<const uint64_t*>(this));
+          return std::to_string(load_payload<uint64_t>());
       case bool_type:
-          return *reinterpret_cast<const bool*>(this) ? "true" : "false";
+          return load_payload<bool>() ? "true" : "false";
       case blob_type:
           if( get_blob().data.size() )
              return base64_encode( get_blob().data.data(), get_blob().data.size() );
@@ -876,21 +877,21 @@ std::string variant::as_string()const
 variants&         variant::get_array()
 {
   if( get_type() == array_type )
-     return **reinterpret_cast<variants**>(this);
+     return *load_payload<variants*>();
 
   FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from {} to Array", get_type() );
 }
 blob&         variant::get_blob()
 {
   if( get_type() == blob_type )
-     return **reinterpret_cast<blob**>(this);
+     return *load_payload<blob*>();
 
   FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from {} to Blob", get_type() );
 }
 const blob&         variant::get_blob()const
 {
   if( get_type() == blob_type )
-     return **reinterpret_cast<const const_blob_ptr*>(this);
+     return *load_payload<blob*>();
 
   FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from {} to Blob", get_type() );
 }
@@ -930,7 +931,7 @@ blob variant::as_blob()const
 const variants&       variant::get_array()const
 {
   if( get_type() == array_type )
-     return **reinterpret_cast<const const_variants_ptr*>(this);
+     return *load_payload<variants*>();
   FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from {} to Array", get_type() );
 }
 
@@ -939,7 +940,7 @@ const variants&       variant::get_array()const
 variant_object&        variant::get_object()
 {
   if( get_type() == object_type )
-     return **reinterpret_cast<variant_object**>(this);
+     return *load_payload<variant_object*>();
   FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from {} to Object", get_type() );
 }
 
@@ -999,7 +1000,8 @@ size_t variant::estimated_size()const
 std::string_view          variant::get_string()const
 {
   switch( get_type() ) {
-     case string_type:     return **reinterpret_cast<const const_string_ptr*>(this);
+     case string_type:
+        return *load_payload<std::string*>();
      case string_sso_type: return read_sso(this);
      default: break;
   }
@@ -1010,7 +1012,7 @@ std::string_view          variant::get_string()const
 const variant_object&  variant::get_object()const
 {
   if( get_type() == object_type )
-     return **reinterpret_cast<const const_variant_object_ptr*>(this);
+     return *load_payload<variant_object*>();
   FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from type '{}' to Object", get_type() );
 }
 
