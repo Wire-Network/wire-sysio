@@ -817,7 +817,7 @@ BOOST_FIXTURE_TEST_CASE( subjective_billing_goes_to_the_first_authorizer, receiv
    transfer( alice, game, amount, "pay:winner" );
    for( auto account : { alice, token_account, game, winner } )
       BOOST_TEST_CONTEXT( account ) {
-         BOOST_TEST( sub_bill.get_subjective_bill( account, control->pending_block_time() ).count() == 0 );
+         BOOST_TEST( sub_bill.get_subjective_bill( account, control->pending_block_time() ).cpu.count() == 0 );
       }
    produce_block();
 
@@ -833,15 +833,15 @@ BOOST_FIXTURE_TEST_CASE( subjective_billing_goes_to_the_first_authorizer, receiv
          auto trace   = push_measured( trx );
          auto receipt = entries( trace );
          BOOST_REQUIRE_EQUAL( receipt.size(), 3u );
-         BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).count() == trace->total_cpu_usage_us.value );
+         BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).cpu.count() == trace->total_cpu_usage_us.value );
          // With payer billing, a contract billed for its own code is billed like any payer; the game is also the
          // inline transfer's authorizer, which bills nothing.
          const int64_t token_bill  = payer_billing_disabled ? 0 : receipt[0];
          const int64_t game_bill   = payer_billing_disabled ? 0 : receipt[1];
          const int64_t winner_bill = payer_billing_disabled ? 0 : receipt[2];
-         BOOST_TEST( sub_bill.get_subjective_bill( token_account, now ).count() == token_bill );
-         BOOST_TEST( sub_bill.get_subjective_bill( game, now ).count() == game_bill );
-         BOOST_TEST( sub_bill.get_subjective_bill( winner, now ).count() == winner_bill );
+         BOOST_TEST( sub_bill.get_subjective_bill( token_account, now ).cpu.count() == token_bill );
+         BOOST_TEST( sub_bill.get_subjective_bill( game, now ).cpu.count() == game_bill );
+         BOOST_TEST( sub_bill.get_subjective_bill( winner, now ).cpu.count() == winner_bill );
          control->abort_block();
 
          // The block that includes the transaction ends its pending bills. The input entry, paid by sysio.token,
@@ -854,11 +854,11 @@ BOOST_FIXTURE_TEST_CASE( subjective_billing_goes_to_the_first_authorizer, receiv
                                                   []( const transaction_receipt& r ) { return r.trx.id(); } );
          BOOST_REQUIRE( included != block->transactions.end() );
          BOOST_REQUIRE_EQUAL( included->cpu_usage_us.size(), 3u );
-         BOOST_TEST( sub_bill.get_subjective_bill( alice, block_time ).count() ==
+         BOOST_TEST( sub_bill.get_subjective_bill( alice, block_time ).cpu.count() ==
                      included->cpu_usage_us.front().value );
          for( auto account : { token_account, game, winner } )
             BOOST_TEST_CONTEXT( account ) {
-               BOOST_TEST( sub_bill.get_subjective_bill( account, block_time ).count() == 0 );
+               BOOST_TEST( sub_bill.get_subjective_bill( account, block_time ).cpu.count() == 0 );
             }
       }
    }
@@ -878,8 +878,8 @@ BOOST_FIXTURE_TEST_CASE( receiver_that_authorized_the_input_is_billed_once, rece
          auto receipt = entries( trace );
          BOOST_REQUIRE_EQUAL( receipt.size(), 2u );
          BOOST_TEST( frame( trace, game, "transfer"_n ).cpu_usage_us->value == receipt[1] );
-         BOOST_TEST( sub_bill.get_subjective_bill( game, now ).count() == trace->total_cpu_usage_us.value );
-         BOOST_TEST( sub_bill.get_subjective_bill( token_account, now ).count() ==
+         BOOST_TEST( sub_bill.get_subjective_bill( game, now ).cpu.count() == trace->total_cpu_usage_us.value );
+         BOOST_TEST( sub_bill.get_subjective_bill( token_account, now ).cpu.count() ==
                      ( payer_billing_disabled ? 0 : receipt[0] ) );
          control->abort_block();
       }
@@ -900,10 +900,11 @@ BOOST_FIXTURE_TEST_CASE( failed_transaction_bills_no_receiver, receiver_cpu_test
                                 transfer_action( alice, bob, max_supply, "" ) } ); // more than alice holds
          BOOST_CHECK_THROW( push_measured( trx ), sysio_assert_message_exception );
          const auto now = control->pending_block_time();
-         BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).count() > 0 );
-         BOOST_TEST( ( sub_bill.get_subjective_bill( token_account, now ).count() > 0 ) == !payer_billing_disabled );
-         BOOST_TEST( sub_bill.get_subjective_bill( game, now ).count() == 0 );
-         BOOST_TEST( sub_bill.get_subjective_bill( winner, now ).count() == 0 );
+         BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).cpu.count() > 0 );
+         BOOST_TEST( ( sub_bill.get_subjective_bill( token_account, now ).cpu.count() > 0 ) ==
+                     !payer_billing_disabled );
+         BOOST_TEST( sub_bill.get_subjective_bill( game, now ).cpu.count() == 0 );
+         BOOST_TEST( sub_bill.get_subjective_bill( winner, now ).cpu.count() == 0 );
       }
    }
    produce_block();
@@ -938,12 +939,13 @@ BOOST_FIXTURE_TEST_CASE( transaction_failing_its_final_checks_bills_no_receiver,
             for( auto receiver : { game, idle } )
                BOOST_TEST_CONTEXT( receiver ) {
                   BOOST_TEST( !frame( failed, receiver, "transfer"_n ).cpu_usage_us );
-                  BOOST_TEST( sub_bill.get_subjective_bill( receiver, now ).count() == 0 );
+                  BOOST_TEST( sub_bill.get_subjective_bill( receiver, now ).cpu.count() == 0 );
                }
             BOOST_TEST( failed->total_cpu_usage_us.value == failed->action_traces[0].cpu_usage_us->value +
                                                            failed->action_traces[1].cpu_usage_us->value );
-            BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).count() > 0 );
-            BOOST_TEST( ( sub_bill.get_subjective_bill( token_account, now ).count() > 0 ) == !payer_billing_disabled );
+            BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).cpu.count() > 0 );
+            BOOST_TEST( ( sub_bill.get_subjective_bill( token_account, now ).cpu.count() > 0 ) ==
+                        !payer_billing_disabled );
             if( speculative )
                control->abort_block();
          }
@@ -988,7 +990,7 @@ BOOST_FIXTURE_TEST_CASE( receiver_subjective_bill_limits_its_frame_past_the_stip
    // stipend runs out.
    const auto pending_id = transaction_id_type::hash( std::string( "pending" ) );
    sub_bill.subjective_bill( pending_id, fc::time_point_sec( now + fc::seconds( pending_bill_lifetime_sec ) ), {},
-                             { { game, fc::microseconds( game_cpu_us + beyond_any_leeway_us ) } } );
+                             { { game, {.cpu = fc::microseconds( game_cpu_us + beyond_any_leeway_us )} } } );
    const auto deadline = fc::time_point::now() + fc::seconds( 10 );
    auto trx = make_trx( { transfer_action( alice, game, amount, memo ) } );
    BOOST_CHECK_EXCEPTION( push_measured( trx, deadline ), tx_cpu_usage_exceeded,
@@ -1142,12 +1144,13 @@ BOOST_FIXTURE_TEST_CASE( entries_follow_their_input_actions, receiver_cpu_tester
          BOOST_REQUIRE_EQUAL( receipt.size(), 4u );
          BOOST_TEST( frame( trace, game, "transfer"_n ).cpu_usage_us->value == receipt[2] );
          BOOST_TEST( frame( trace, winner, "transfer"_n ).cpu_usage_us->value == receipt[3] );
-         BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).count() == receipt[0] + receipt[2] );
-         BOOST_TEST( sub_bill.get_subjective_bill( bob, now ).count() == receipt[1] + receipt[3] );
-         BOOST_TEST( sub_bill.get_subjective_bill( token_account, now ).count() ==
+         BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).cpu.count() == receipt[0] + receipt[2] );
+         BOOST_TEST( sub_bill.get_subjective_bill( bob, now ).cpu.count() == receipt[1] + receipt[3] );
+         BOOST_TEST( sub_bill.get_subjective_bill( token_account, now ).cpu.count() ==
                      ( payer_billing_disabled ? 0 : receipt[0] + receipt[1] ) );
-         BOOST_TEST( sub_bill.get_subjective_bill( game, now ).count() == ( payer_billing_disabled ? 0 : receipt[2] ) );
-         BOOST_TEST( sub_bill.get_subjective_bill( winner, now ).count() ==
+         BOOST_TEST( sub_bill.get_subjective_bill( game, now ).cpu.count() ==
+                     ( payer_billing_disabled ? 0 : receipt[2] ) );
+         BOOST_TEST( sub_bill.get_subjective_bill( winner, now ).cpu.count() ==
                      ( payer_billing_disabled ? 0 : receipt[3] ) );
          control->abort_block();
       }
@@ -1179,7 +1182,7 @@ BOOST_FIXTURE_TEST_CASE( contract_reached_twice_gets_an_entry_each_time, receive
       BOOST_TEST( receipt[2 + occurrence] > 0u );
       BOOST_TEST( receipt[2 + occurrence] <= most_past_stipend( handler.elapsed.count() ) );
    }
-   BOOST_TEST( sub_bill.get_subjective_bill( game, now ).count() == receipt[2] + receipt[3] );
+   BOOST_TEST( sub_bill.get_subjective_bill( game, now ).cpu.count() == receipt[2] + receipt[3] );
    control->abort_block();
 
    auto before = cpu_windows( { token_account, game } );
@@ -1203,7 +1206,7 @@ BOOST_FIXTURE_TEST_CASE( receiver_that_pays_for_another_input_is_billed_once, re
    BOOST_REQUIRE_EQUAL( receipt.size(), 3u );
    BOOST_TEST( frame( trace, game, "transfer"_n ).cpu_usage_us->value == receipt[2] );
    BOOST_TEST( receipt[2] > 0u );
-   BOOST_TEST( sub_bill.get_subjective_bill( game, now ).count() == receipt[0] + receipt[2] );
+   BOOST_TEST( sub_bill.get_subjective_bill( game, now ).cpu.count() == receipt[0] + receipt[2] );
    control->abort_block();
 
    // It pays NET for its input only, which the validator's windows confirm.

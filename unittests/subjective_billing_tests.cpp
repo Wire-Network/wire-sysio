@@ -40,25 +40,25 @@ BOOST_AUTO_TEST_CASE( subjective_bill_test ) {
       sub_bill.subjective_bill( id2, now_sec, {{a, {.cpu_usage_us = 11}}}, {} );
       sub_bill.subjective_bill( id3, now_sec, {{b, {.cpu_usage_us = 9}}}, {} );
 
-      BOOST_CHECK_EQUAL( 13+11, sub_bill.get_subjective_bill(a, now).count() );
-      BOOST_CHECK_EQUAL( 9, sub_bill.get_subjective_bill(b, now).count() );
+      BOOST_CHECK_EQUAL( 13+11, sub_bill.get_subjective_bill(a, now).cpu.count() );
+      BOOST_CHECK_EQUAL( 9, sub_bill.get_subjective_bill(b, now).cpu.count() );
 
       sub_bill.on_block(log, {}, now);
 
-      BOOST_CHECK_EQUAL( 13+11, sub_bill.get_subjective_bill(a, now).count() );
-      BOOST_CHECK_EQUAL( 9, sub_bill.get_subjective_bill(b, now).count() );
+      BOOST_CHECK_EQUAL( 13+11, sub_bill.get_subjective_bill(a, now).cpu.count() );
+      BOOST_CHECK_EQUAL( 9, sub_bill.get_subjective_bill(b, now).cpu.count() );
 
       // expires transactions but leaves them in the decay at full value
       sub_bill.remove_expired( log, now + fc::microseconds(1), now, [](){ return false; } );
 
-      BOOST_CHECK_EQUAL( 13+11, sub_bill.get_subjective_bill(a, now).count() );
-      BOOST_CHECK_EQUAL( 9, sub_bill.get_subjective_bill(b, now).count() );
-      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(c, now).count() ); // c not used
+      BOOST_CHECK_EQUAL( 13+11, sub_bill.get_subjective_bill(a, now).cpu.count() );
+      BOOST_CHECK_EQUAL( 9, sub_bill.get_subjective_bill(b, now).cpu.count() );
+      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(c, now).cpu.count() ); // c not used
 
       // ensure that the value decays away at the window
-      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, endtime).count() );
-      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(b, endtime).count() );
-      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(c, endtime).count() ); // c not used
+      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, endtime).cpu.count() );
+      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(b, endtime).cpu.count() );
+      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(c, endtime).cpu.count() ); // c not used
    }
    {  // db_read_mode HEAD mode, so transactions are immediately reverted
       subjective_billing sub_bill;
@@ -67,35 +67,35 @@ BOOST_AUTO_TEST_CASE( subjective_bill_test ) {
       sub_bill.subjective_bill( id2, now_sec, {{a, {.cpu_usage_us = 19}}}, {} );
       sub_bill.subjective_bill( id3, now_sec, {{b, {.cpu_usage_us = 7}}}, {} );
 
-      BOOST_CHECK_EQUAL( 23+19, sub_bill.get_subjective_bill(a, now).count() );
-      BOOST_CHECK_EQUAL( 7, sub_bill.get_subjective_bill(b, now).count() );
+      BOOST_CHECK_EQUAL( 23+19, sub_bill.get_subjective_bill(a, now).cpu.count() );
+      BOOST_CHECK_EQUAL( 7, sub_bill.get_subjective_bill(b, now).cpu.count() );
 
       sub_bill.on_block(log, {}, now); // have not seen any of the transactions come back yet
 
-      BOOST_CHECK_EQUAL( 23+19, sub_bill.get_subjective_bill(a, now).count() );
-      BOOST_CHECK_EQUAL( 7, sub_bill.get_subjective_bill(b, now).count() );
+      BOOST_CHECK_EQUAL( 23+19, sub_bill.get_subjective_bill(a, now).cpu.count() );
+      BOOST_CHECK_EQUAL( 7, sub_bill.get_subjective_bill(b, now).cpu.count() );
 
       sub_bill.on_block(log, {}, now);
       sub_bill.remove_subjective_billing( id1, 0 ); // simulate seeing id1 come back in block (this is what on_block would do)
 
-      BOOST_CHECK_EQUAL( 19, sub_bill.get_subjective_bill(a, now).count() );
-      BOOST_CHECK_EQUAL( 7, sub_bill.get_subjective_bill(b, now).count() );
+      BOOST_CHECK_EQUAL( 19, sub_bill.get_subjective_bill(a, now).cpu.count() );
+      BOOST_CHECK_EQUAL( 7, sub_bill.get_subjective_bill(b, now).cpu.count() );
    }
    { // failed handling logic, decay with repeated failures should be exponential, single failures should be linear
       subjective_billing sub_bill;
 
       sub_bill.subjective_bill_failure({{a, {.cpu_usage_us = 1024}}}, {}, now);
       sub_bill.subjective_bill_failure({{b, {.cpu_usage_us = 1024}}}, {}, now);
-      BOOST_CHECK_EQUAL( 1024, sub_bill.get_subjective_bill(a, now).count() );
-      BOOST_CHECK_EQUAL( 1024, sub_bill.get_subjective_bill(b, now).count() );
+      BOOST_CHECK_EQUAL( 1024, sub_bill.get_subjective_bill(a, now).cpu.count() );
+      BOOST_CHECK_EQUAL( 1024, sub_bill.get_subjective_bill(b, now).cpu.count() );
 
       sub_bill.subjective_bill_failure({{a, {.cpu_usage_us = 1024}}}, {}, halftime);
-      BOOST_CHECK_EQUAL( 512 + 1024, sub_bill.get_subjective_bill(a, halftime).count() );
-      BOOST_CHECK_EQUAL( 512, sub_bill.get_subjective_bill(b, halftime).count() );
+      BOOST_CHECK_EQUAL( 512 + 1024, sub_bill.get_subjective_bill(a, halftime).cpu.count() );
+      BOOST_CHECK_EQUAL( 512, sub_bill.get_subjective_bill(b, halftime).cpu.count() );
 
       sub_bill.subjective_bill_failure({{a, {.cpu_usage_us = 1024}}}, {}, endtime);
-      BOOST_CHECK_EQUAL( 256 + 512 + 1024, sub_bill.get_subjective_bill(a, endtime).count() );
-      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(b, endtime).count() );
+      BOOST_CHECK_EQUAL( 256 + 512 + 1024, sub_bill.get_subjective_bill(a, endtime).cpu.count() );
+      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(b, endtime).cpu.count() );
    }
 
    { // expired handling logic, full billing until expiration then failed/decay logic
@@ -104,28 +104,28 @@ BOOST_AUTO_TEST_CASE( subjective_bill_test ) {
       sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 1024}}}, {} );
       sub_bill.subjective_bill( id2, fc::time_point_sec{now + fc::seconds(1)}, {{a, {.cpu_usage_us = 1024}}}, {} );
       sub_bill.subjective_bill( id3, now_sec, {{b, {.cpu_usage_us = 1024}}}, {} );
-      BOOST_CHECK_EQUAL( 1024 + 1024, sub_bill.get_subjective_bill(a, now).count() );
-      BOOST_CHECK_EQUAL( 1024, sub_bill.get_subjective_bill(b, now).count() );
+      BOOST_CHECK_EQUAL( 1024 + 1024, sub_bill.get_subjective_bill(a, now).cpu.count() );
+      BOOST_CHECK_EQUAL( 1024, sub_bill.get_subjective_bill(b, now).cpu.count() );
 
       sub_bill.remove_expired( log, now, now, [](){ return false; } );
-      BOOST_CHECK_EQUAL( 1024 + 1024, sub_bill.get_subjective_bill(a, now).count() );
-      BOOST_CHECK_EQUAL( 1024, sub_bill.get_subjective_bill(b, now).count() );
+      BOOST_CHECK_EQUAL( 1024 + 1024, sub_bill.get_subjective_bill(a, now).cpu.count() );
+      BOOST_CHECK_EQUAL( 1024, sub_bill.get_subjective_bill(b, now).cpu.count() );
 
-      BOOST_CHECK_EQUAL( 512 + 1024, sub_bill.get_subjective_bill(a, halftime).count() );
-      BOOST_CHECK_EQUAL( 512, sub_bill.get_subjective_bill(b, halftime).count() );
+      BOOST_CHECK_EQUAL( 512 + 1024, sub_bill.get_subjective_bill(a, halftime).cpu.count() );
+      BOOST_CHECK_EQUAL( 512, sub_bill.get_subjective_bill(b, halftime).cpu.count() );
 
-      BOOST_CHECK_EQUAL( 1024, sub_bill.get_subjective_bill(a, endtime).count() );
-      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(b, endtime).count() );
+      BOOST_CHECK_EQUAL( 1024, sub_bill.get_subjective_bill(a, endtime).cpu.count() );
+      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(b, endtime).cpu.count() );
 
       sub_bill.remove_expired( log, now + fc::seconds(1), now, [](){ return false; } );
-      BOOST_CHECK_EQUAL( 1024 + 1024, sub_bill.get_subjective_bill(a, now).count() );
-      BOOST_CHECK_EQUAL( 1024, sub_bill.get_subjective_bill(b, now).count() );
+      BOOST_CHECK_EQUAL( 1024 + 1024, sub_bill.get_subjective_bill(a, now).cpu.count() );
+      BOOST_CHECK_EQUAL( 1024, sub_bill.get_subjective_bill(b, now).cpu.count() );
 
-      BOOST_CHECK_EQUAL( 512 + 512, sub_bill.get_subjective_bill(a, halftime).count() );
-      BOOST_CHECK_EQUAL( 512, sub_bill.get_subjective_bill(b, halftime).count() );
+      BOOST_CHECK_EQUAL( 512 + 512, sub_bill.get_subjective_bill(a, halftime).cpu.count() );
+      BOOST_CHECK_EQUAL( 512, sub_bill.get_subjective_bill(b, halftime).cpu.count() );
 
-      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, endtime).count() );
-      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(b, endtime).count() );
+      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, endtime).cpu.count() );
+      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(b, endtime).cpu.count() );
    }
 }
 
@@ -153,73 +153,73 @@ BOOST_AUTO_TEST_CASE( subjective_bill_multiple_accounts_test ) {
 
       sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 13}},{c, {.cpu_usage_us = 42}}}, {} );
       sub_bill.subjective_bill( id2, now_sec, {{a, {.cpu_usage_us = 11}},{c, {.cpu_usage_us = 23}}}, {} );
-      sub_bill.subjective_bill( id3, now_sec, {{b, {.cpu_usage_us = 9}}}, {{c, {fc::microseconds(7)}}} );
+      sub_bill.subjective_bill( id3, now_sec, {{b, {.cpu_usage_us = 9}}}, {{c, {.cpu = fc::microseconds(7)}}} );
 
-      BOOST_CHECK_EQUAL( 13+11, sub_bill.get_subjective_bill(a, now).count() );
-      BOOST_CHECK_EQUAL( 9, sub_bill.get_subjective_bill(b, now).count() );
-      BOOST_CHECK_EQUAL( 42+23+7, sub_bill.get_subjective_bill(c, now).count() );
+      BOOST_CHECK_EQUAL( 13+11, sub_bill.get_subjective_bill(a, now).cpu.count() );
+      BOOST_CHECK_EQUAL( 9, sub_bill.get_subjective_bill(b, now).cpu.count() );
+      BOOST_CHECK_EQUAL( 42+23+7, sub_bill.get_subjective_bill(c, now).cpu.count() );
 
       sub_bill.on_block(log, {}, now);
 
-      BOOST_CHECK_EQUAL( 13+11, sub_bill.get_subjective_bill(a, now).count() );
-      BOOST_CHECK_EQUAL( 9, sub_bill.get_subjective_bill(b, now).count() );
+      BOOST_CHECK_EQUAL( 13+11, sub_bill.get_subjective_bill(a, now).cpu.count() );
+      BOOST_CHECK_EQUAL( 9, sub_bill.get_subjective_bill(b, now).cpu.count() );
 
       // expires transactions but leaves them in the decay at full value
       sub_bill.remove_expired( log, now + fc::microseconds(1), now, [](){ return false; } );
 
-      BOOST_CHECK_EQUAL( 13+11, sub_bill.get_subjective_bill(a, now).count() );
-      BOOST_CHECK_EQUAL( 9, sub_bill.get_subjective_bill(b, now).count() );
-      BOOST_CHECK_EQUAL( 42+23+7, sub_bill.get_subjective_bill(c, now).count() );
-      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(x, now).count() );
+      BOOST_CHECK_EQUAL( 13+11, sub_bill.get_subjective_bill(a, now).cpu.count() );
+      BOOST_CHECK_EQUAL( 9, sub_bill.get_subjective_bill(b, now).cpu.count() );
+      BOOST_CHECK_EQUAL( 42+23+7, sub_bill.get_subjective_bill(c, now).cpu.count() );
+      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(x, now).cpu.count() );
 
       // ensure that the value decays away at the window
-      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, endtime).count() );
-      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(b, endtime).count() );
-      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(c, endtime).count() );
-      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(x, endtime).count() );
+      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, endtime).cpu.count() );
+      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(b, endtime).cpu.count() );
+      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(c, endtime).cpu.count() );
+      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(x, endtime).cpu.count() );
    }
    {  // db_read_mode HEAD mode, so transactions are immediately reverted
       subjective_billing sub_bill;
 
       sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 23}},{c, {.cpu_usage_us = 11}}}, {} );
-      sub_bill.subjective_bill( id2, now_sec, {{c, {.cpu_usage_us = 3}}}, {{a, {fc::microseconds(19)}}} );
+      sub_bill.subjective_bill( id2, now_sec, {{c, {.cpu_usage_us = 3}}}, {{a, {.cpu = fc::microseconds(19)}}} );
       sub_bill.subjective_bill( id3, now_sec, {{b, {.cpu_usage_us = 7}},{c, {.cpu_usage_us = 1}}}, {} );
 
-      BOOST_CHECK_EQUAL( 23+19, sub_bill.get_subjective_bill(a, now).count() );
-      BOOST_CHECK_EQUAL( 7, sub_bill.get_subjective_bill(b, now).count() );
-      BOOST_CHECK_EQUAL( 11+3+1, sub_bill.get_subjective_bill(c, now).count() );
+      BOOST_CHECK_EQUAL( 23+19, sub_bill.get_subjective_bill(a, now).cpu.count() );
+      BOOST_CHECK_EQUAL( 7, sub_bill.get_subjective_bill(b, now).cpu.count() );
+      BOOST_CHECK_EQUAL( 11+3+1, sub_bill.get_subjective_bill(c, now).cpu.count() );
 
       sub_bill.on_block(log, {}, now); // have not seen any of the transactions come back yet
 
-      BOOST_CHECK_EQUAL( 23+19, sub_bill.get_subjective_bill(a, now).count() );
-      BOOST_CHECK_EQUAL( 7, sub_bill.get_subjective_bill(b, now).count() );
-      BOOST_CHECK_EQUAL( 11+3+1, sub_bill.get_subjective_bill(c, now).count() );
+      BOOST_CHECK_EQUAL( 23+19, sub_bill.get_subjective_bill(a, now).cpu.count() );
+      BOOST_CHECK_EQUAL( 7, sub_bill.get_subjective_bill(b, now).cpu.count() );
+      BOOST_CHECK_EQUAL( 11+3+1, sub_bill.get_subjective_bill(c, now).cpu.count() );
 
       sub_bill.on_block(log, {}, now);
       sub_bill.remove_subjective_billing( id1, 0 ); // simulate seeing id1 come back in block (this is what on_block would do)
 
-      BOOST_CHECK_EQUAL( 19, sub_bill.get_subjective_bill(a, now).count() );
-      BOOST_CHECK_EQUAL( 7, sub_bill.get_subjective_bill(b, now).count() );
-      BOOST_CHECK_EQUAL( 3+1, sub_bill.get_subjective_bill(c, now).count() );
+      BOOST_CHECK_EQUAL( 19, sub_bill.get_subjective_bill(a, now).cpu.count() );
+      BOOST_CHECK_EQUAL( 7, sub_bill.get_subjective_bill(b, now).cpu.count() );
+      BOOST_CHECK_EQUAL( 3+1, sub_bill.get_subjective_bill(c, now).cpu.count() );
    }
    { // failed handling logic, decay with repeated failures should be exponential, single failures should be linear
       subjective_billing sub_bill;
 
       sub_bill.subjective_bill_failure({{a, {.cpu_usage_us = 1024}},{c, {.cpu_usage_us = 2048}}}, {}, now);
       sub_bill.subjective_bill_failure({{b, {.cpu_usage_us = 1024}},{c, {.cpu_usage_us = 512}}}, {}, now);
-      BOOST_CHECK_EQUAL( 1024, sub_bill.get_subjective_bill(a, now).count() );
-      BOOST_CHECK_EQUAL( 1024, sub_bill.get_subjective_bill(b, now).count() );
-      BOOST_CHECK_EQUAL( 2048+512, sub_bill.get_subjective_bill(c, now).count() );
+      BOOST_CHECK_EQUAL( 1024, sub_bill.get_subjective_bill(a, now).cpu.count() );
+      BOOST_CHECK_EQUAL( 1024, sub_bill.get_subjective_bill(b, now).cpu.count() );
+      BOOST_CHECK_EQUAL( 2048+512, sub_bill.get_subjective_bill(c, now).cpu.count() );
 
       sub_bill.subjective_bill_failure({{a, {.cpu_usage_us = 1024}},{c, {.cpu_usage_us = 256}}}, {}, halftime);
-      BOOST_CHECK_EQUAL( 512 + 1024, sub_bill.get_subjective_bill(a, halftime).count() );
-      BOOST_CHECK_EQUAL( 512, sub_bill.get_subjective_bill(b, halftime).count() );
-      BOOST_CHECK_EQUAL( (2048+512)/2+256, sub_bill.get_subjective_bill(c, halftime).count() );
+      BOOST_CHECK_EQUAL( 512 + 1024, sub_bill.get_subjective_bill(a, halftime).cpu.count() );
+      BOOST_CHECK_EQUAL( 512, sub_bill.get_subjective_bill(b, halftime).cpu.count() );
+      BOOST_CHECK_EQUAL( (2048+512)/2+256, sub_bill.get_subjective_bill(c, halftime).cpu.count() );
 
       sub_bill.subjective_bill_failure({{a, {.cpu_usage_us = 1024}},{c, {.cpu_usage_us = 24}}}, {}, endtime);
-      BOOST_CHECK_EQUAL( 256 + 512 + 1024, sub_bill.get_subjective_bill(a, endtime).count() );
-      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(b, endtime).count() );
-      BOOST_CHECK_EQUAL( (2048+512)/2/2+256/2+24, sub_bill.get_subjective_bill(c, endtime).count() );
+      BOOST_CHECK_EQUAL( 256 + 512 + 1024, sub_bill.get_subjective_bill(a, endtime).cpu.count() );
+      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(b, endtime).cpu.count() );
+      BOOST_CHECK_EQUAL( (2048+512)/2/2+256/2+24, sub_bill.get_subjective_bill(c, endtime).cpu.count() );
    }
 
    { // expired handling logic, full billing until expiration then failed/decay logic
@@ -228,38 +228,38 @@ BOOST_AUTO_TEST_CASE( subjective_bill_multiple_accounts_test ) {
       sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 1024}},{c, {.cpu_usage_us = 256}}}, {} );
       sub_bill.subjective_bill( id2, fc::time_point_sec{now + fc::seconds(1)}, {{a, {.cpu_usage_us = 1024}},{c, {.cpu_usage_us = 128}}}, {} );
       sub_bill.subjective_bill( id3, now_sec, {{b, {.cpu_usage_us = 1024}},{c, {.cpu_usage_us = 64}}}, {} );
-      BOOST_CHECK_EQUAL( 1024 + 1024, sub_bill.get_subjective_bill(a, now).count() );
-      BOOST_CHECK_EQUAL( 1024, sub_bill.get_subjective_bill(b, now).count() );
-      BOOST_CHECK_EQUAL( 256+128+64, sub_bill.get_subjective_bill(c, now).count() );
+      BOOST_CHECK_EQUAL( 1024 + 1024, sub_bill.get_subjective_bill(a, now).cpu.count() );
+      BOOST_CHECK_EQUAL( 1024, sub_bill.get_subjective_bill(b, now).cpu.count() );
+      BOOST_CHECK_EQUAL( 256+128+64, sub_bill.get_subjective_bill(c, now).cpu.count() );
 
       // still billed for expired trxs
       auto num_removed = sub_bill.remove_expired( log, now, now, [](){ return false; } ).second;
       BOOST_CHECK_EQUAL( num_removed, 2 ); // id1, id3
-      BOOST_CHECK_EQUAL( 1024 + 1024, sub_bill.get_subjective_bill(a, now).count() );
-      BOOST_CHECK_EQUAL( 1024, sub_bill.get_subjective_bill(b, now).count() );
-      BOOST_CHECK_EQUAL( 256+128+64, sub_bill.get_subjective_bill(c, now).count() );
+      BOOST_CHECK_EQUAL( 1024 + 1024, sub_bill.get_subjective_bill(a, now).cpu.count() );
+      BOOST_CHECK_EQUAL( 1024, sub_bill.get_subjective_bill(b, now).cpu.count() );
+      BOOST_CHECK_EQUAL( 256+128+64, sub_bill.get_subjective_bill(c, now).cpu.count() );
 
-      BOOST_CHECK_EQUAL( 512 + 1024, sub_bill.get_subjective_bill(a, halftime).count() );
-      BOOST_CHECK_EQUAL( 512, sub_bill.get_subjective_bill(b, halftime).count() );
-      BOOST_CHECK_EQUAL( 128 + 128 + 32, sub_bill.get_subjective_bill(c, halftime).count() );
+      BOOST_CHECK_EQUAL( 512 + 1024, sub_bill.get_subjective_bill(a, halftime).cpu.count() );
+      BOOST_CHECK_EQUAL( 512, sub_bill.get_subjective_bill(b, halftime).cpu.count() );
+      BOOST_CHECK_EQUAL( 128 + 128 + 32, sub_bill.get_subjective_bill(c, halftime).cpu.count() );
 
-      BOOST_CHECK_EQUAL( 1024, sub_bill.get_subjective_bill(a, endtime).count() );
-      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(b, endtime).count() );
-      BOOST_CHECK_EQUAL( 128, sub_bill.get_subjective_bill(c, endtime).count() );
+      BOOST_CHECK_EQUAL( 1024, sub_bill.get_subjective_bill(a, endtime).cpu.count() );
+      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(b, endtime).cpu.count() );
+      BOOST_CHECK_EQUAL( 128, sub_bill.get_subjective_bill(c, endtime).cpu.count() );
 
       num_removed = sub_bill.remove_expired( log, now + fc::seconds(1), now, [](){ return false; } ).second;
       BOOST_CHECK_EQUAL( num_removed, 1 ); // id2
-      BOOST_CHECK_EQUAL( 1024 + 1024, sub_bill.get_subjective_bill(a, now).count() );
-      BOOST_CHECK_EQUAL( 1024, sub_bill.get_subjective_bill(b, now).count() );
-      BOOST_CHECK_EQUAL( 256+128+64, sub_bill.get_subjective_bill(c, now).count() );
+      BOOST_CHECK_EQUAL( 1024 + 1024, sub_bill.get_subjective_bill(a, now).cpu.count() );
+      BOOST_CHECK_EQUAL( 1024, sub_bill.get_subjective_bill(b, now).cpu.count() );
+      BOOST_CHECK_EQUAL( 256+128+64, sub_bill.get_subjective_bill(c, now).cpu.count() );
 
-      BOOST_CHECK_EQUAL( 512 + 512, sub_bill.get_subjective_bill(a, halftime).count() );
-      BOOST_CHECK_EQUAL( 512, sub_bill.get_subjective_bill(b, halftime).count() );
-      BOOST_CHECK_EQUAL( (256+128+64)/2, sub_bill.get_subjective_bill(c, halftime).count() );
+      BOOST_CHECK_EQUAL( 512 + 512, sub_bill.get_subjective_bill(a, halftime).cpu.count() );
+      BOOST_CHECK_EQUAL( 512, sub_bill.get_subjective_bill(b, halftime).cpu.count() );
+      BOOST_CHECK_EQUAL( (256+128+64)/2, sub_bill.get_subjective_bill(c, halftime).cpu.count() );
 
-      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, endtime).count() );
-      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(b, endtime).count() );
-      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(c, endtime).count() );
+      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, endtime).cpu.count() );
+      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(b, endtime).cpu.count() );
+      BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(c, endtime).cpu.count() );
    }
 }
 
@@ -281,9 +281,9 @@ BOOST_AUTO_TEST_CASE( subjective_bill_account_in_both_maps_test ) {
 
    subjective_billing sub_bill;
 
-   sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 10}}}, {{a, fc::microseconds(5)}} );
+   sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 10}}}, {{a, {.cpu = fc::microseconds(5)}}} );
 
-   BOOST_CHECK_EQUAL( 10 + 5, sub_bill.get_subjective_bill(a, now).count() );
+   BOOST_CHECK_EQUAL( 10 + 5, sub_bill.get_subjective_bill(a, now).cpu.count() );
    BOOST_CHECK_EQUAL( 1u, sub_bill.get_account_cache_size() );
 
    // Simulate id1 landing in a block.
@@ -291,7 +291,7 @@ BOOST_AUTO_TEST_CASE( subjective_bill_account_in_both_maps_test ) {
 
    // Full contribution must be cleared; with the overlap bug only 5 would be
    // subtracted, leaving 10 stuck in the cache.
-   BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).count() );
+   BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).cpu.count() );
    // Empty entry should also be evicted from the per-account cache.
    BOOST_CHECK_EQUAL( 0u, sub_bill.get_account_cache_size() );
 }
@@ -313,23 +313,23 @@ BOOST_AUTO_TEST_CASE( disable_payer_billing_test ) {
    sub_bill.disable_payer_billing( true );
    BOOST_CHECK( sub_bill.is_payer_billing_disabled() );
 
-   sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 100}}}, {{b, fc::microseconds(5)}} );
+   sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 100}}}, {{b, {.cpu = fc::microseconds(5)}}} );
 
    // 'a' from accounts_billing is skipped; 'b' from auth_cpu accumulates.
-   BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).count() );
-   BOOST_CHECK_EQUAL( 5, sub_bill.get_subjective_bill(b, now).count() );
+   BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).cpu.count() );
+   BOOST_CHECK_EQUAL( 5, sub_bill.get_subjective_bill(b, now).cpu.count() );
 
    // Same for the failure path.
-   sub_bill.subjective_bill_failure( {{a, {.cpu_usage_us = 100}}}, {{b, fc::microseconds(5)}}, now );
-   BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).count() );
-   BOOST_CHECK_EQUAL( 10, sub_bill.get_subjective_bill(b, now).count() );
+   sub_bill.subjective_bill_failure( {{a, {.cpu_usage_us = 100}}}, {{b, {.cpu = fc::microseconds(5)}}}, now );
+   BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).cpu.count() );
+   BOOST_CHECK_EQUAL( 10, sub_bill.get_subjective_bill(b, now).cpu.count() );
 
    // Re-enable payer billing; future bills do accumulate 'a'.
    sub_bill.disable_payer_billing( false );
    BOOST_CHECK( !sub_bill.is_payer_billing_disabled() );
    transaction_id_type id2 = sha256::hash( "2" );
    sub_bill.subjective_bill( id2, now_sec, {{a, {.cpu_usage_us = 7}}}, {} );
-   BOOST_CHECK_EQUAL( 7, sub_bill.get_subjective_bill(a, now).count() );
+   BOOST_CHECK_EQUAL( 7, sub_bill.get_subjective_bill(a, now).cpu.count() );
 }
 
 BOOST_AUTO_TEST_CASE( disable_account_test ) {
@@ -360,24 +360,24 @@ BOOST_AUTO_TEST_CASE( disable_account_test ) {
    // Disabled account is skipped in subjective_bill (both maps).
    sub_bill.subjective_bill( id1, now_sec,
                              {{a, {.cpu_usage_us = 100}}, {b, {.cpu_usage_us = 11}}},
-                             {{a, fc::microseconds(50)}, {c, fc::microseconds(3)}} );
-   BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).count() );
-   BOOST_CHECK_EQUAL( 11, sub_bill.get_subjective_bill(b, now).count() );
-   BOOST_CHECK_EQUAL( 3, sub_bill.get_subjective_bill(c, now).count() );
+                             {{a, {.cpu = fc::microseconds(50)}}, {c, {.cpu = fc::microseconds(3)}}} );
+   BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).cpu.count() );
+   BOOST_CHECK_EQUAL( 11, sub_bill.get_subjective_bill(b, now).cpu.count() );
+   BOOST_CHECK_EQUAL( 3, sub_bill.get_subjective_bill(c, now).cpu.count() );
 
    // Disabled account is skipped in subjective_bill_failure as well.
    sub_bill.subjective_bill_failure( {{a, {.cpu_usage_us = 100}}},
-                                     {{a, fc::microseconds(50)}}, now );
-   BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).count() );
+                                     {{a, {.cpu = fc::microseconds(50)}}}, now );
+   BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).cpu.count() );
 
    // get_subjective_bill for a disabled account is always zero, even if the cache
    // happened to contain an entry from before the account was disabled.
    transaction_id_type id2 = sha256::hash( "2" );
    subjective_billing sub_bill2;
    sub_bill2.subjective_bill( id2, now_sec, {{a, {.cpu_usage_us = 9}}}, {} );
-   BOOST_CHECK_EQUAL( 9, sub_bill2.get_subjective_bill(a, now).count() );
+   BOOST_CHECK_EQUAL( 9, sub_bill2.get_subjective_bill(a, now).cpu.count() );
    sub_bill2.disable_account( a );
-   BOOST_CHECK_EQUAL( 0, sub_bill2.get_subjective_bill(a, now).count() );
+   BOOST_CHECK_EQUAL( 0, sub_bill2.get_subjective_bill(a, now).cpu.count() );
 }
 
 BOOST_AUTO_TEST_CASE( set_disabled_test ) {
@@ -401,7 +401,7 @@ BOOST_AUTO_TEST_CASE( set_disabled_test ) {
 
    sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 100}}}, {} );
    sub_bill.subjective_bill_failure( {{a, {.cpu_usage_us = 100}}}, {}, now );
-   BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).count() );
+   BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).cpu.count() );
    BOOST_CHECK_EQUAL( 0, sub_bill.get_account_cache_size() );
 
    // on_block / remove_expired are no-ops.
@@ -413,7 +413,7 @@ BOOST_AUTO_TEST_CASE( set_disabled_test ) {
    // Re-enabling does not resurrect the skipped bills (they were never recorded).
    sub_bill.set_disabled( false );
    BOOST_CHECK( !sub_bill.is_disabled() );
-   BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).count() );
+   BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).cpu.count() );
 }
 
 BOOST_AUTO_TEST_CASE( subjective_bill_duplicate_id_test ) {
@@ -429,15 +429,15 @@ BOOST_AUTO_TEST_CASE( subjective_bill_duplicate_id_test ) {
    subjective_billing sub_bill;
 
    sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 13}}}, {} );
-   BOOST_CHECK_EQUAL( 13, sub_bill.get_subjective_bill(a, now).count() );
+   BOOST_CHECK_EQUAL( 13, sub_bill.get_subjective_bill(a, now).cpu.count() );
 
    // Second call with same id - different amount; must be ignored.
    sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 500}}}, {} );
-   BOOST_CHECK_EQUAL( 13, sub_bill.get_subjective_bill(a, now).count() );
+   BOOST_CHECK_EQUAL( 13, sub_bill.get_subjective_bill(a, now).cpu.count() );
 
    // Single removal clears it entirely.
    sub_bill.remove_subjective_billing( id1, 0 );
-   BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).count() );
+   BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).cpu.count() );
    BOOST_CHECK_EQUAL( 0u, sub_bill.get_account_cache_size() );
 }
 
@@ -459,14 +459,14 @@ BOOST_AUTO_TEST_CASE( remove_nonexistent_trx_test ) {
    // Empty cache: no-op, no exception.
    sub_bill.remove_subjective_billing( id1, 0 );
    BOOST_CHECK_EQUAL( 0u, sub_bill.get_account_cache_size() );
-   BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).count() );
+   BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).cpu.count() );
 
    // Populated cache, removing a different id: existing state preserved.
    sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 21}}}, {} );
-   BOOST_CHECK_EQUAL( 21, sub_bill.get_subjective_bill(a, now).count() );
+   BOOST_CHECK_EQUAL( 21, sub_bill.get_subjective_bill(a, now).cpu.count() );
 
    sub_bill.remove_subjective_billing( id2, 0 );
-   BOOST_CHECK_EQUAL( 21, sub_bill.get_subjective_bill(a, now).count() );
+   BOOST_CHECK_EQUAL( 21, sub_bill.get_subjective_bill(a, now).cpu.count() );
    BOOST_CHECK_EQUAL( 1u, sub_bill.get_account_cache_size() );
 }
 
@@ -489,7 +489,7 @@ BOOST_AUTO_TEST_CASE( remove_expired_yield_exhausted_test ) {
       transaction_id_type id = sha256::hash( std::to_string(i) );
       sub_bill.subjective_bill( id, now_sec, {{a, {.cpu_usage_us = 10}}}, {} );
    }
-   BOOST_CHECK_EQUAL( static_cast<int64_t>(10 * total), sub_bill.get_subjective_bill(a, now).count() );
+   BOOST_CHECK_EQUAL( static_cast<int64_t>(10 * total), sub_bill.get_subjective_bill(a, now).cpu.count() );
 
    // Yield after the second iteration. remove_expired checks yield BEFORE each
    // entry, so we let the first 2 through then bail.
@@ -504,7 +504,7 @@ BOOST_AUTO_TEST_CASE( remove_expired_yield_exhausted_test ) {
    // The remaining 3 are still in the trx cache (their pending_cpu_us is intact).
    // Total = 2 transitioned to expired_accumulator + 3 still pending = 50, all
    // visible at `now` (decay window has not elapsed).
-   BOOST_CHECK_EQUAL( static_cast<int64_t>(10 * total), sub_bill.get_subjective_bill(a, now).count() );
+   BOOST_CHECK_EQUAL( static_cast<int64_t>(10 * total), sub_bill.get_subjective_bill(a, now).cpu.count() );
 
    // A follow-up call without yielding finishes the work.
    auto [completed2, num_expired2] = sub_bill.remove_expired(
@@ -525,10 +525,10 @@ BOOST_AUTO_TEST_CASE( on_block_nullptr_test ) {
 
    subjective_billing sub_bill;
    sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 17}}}, {} );
-   BOOST_CHECK_EQUAL( 17, sub_bill.get_subjective_bill(a, now).count() );
+   BOOST_CHECK_EQUAL( 17, sub_bill.get_subjective_bill(a, now).cpu.count() );
 
    sub_bill.on_block( log, {}, now );  // signed_block_ptr default is null
-   BOOST_CHECK_EQUAL( 17, sub_bill.get_subjective_bill(a, now).count() );
+   BOOST_CHECK_EQUAL( 17, sub_bill.get_subjective_bill(a, now).cpu.count() );
    BOOST_CHECK_EQUAL( 1u, sub_bill.get_account_cache_size() );
 }
 
@@ -586,7 +586,7 @@ BOOST_AUTO_TEST_CASE( reset_clears_all_state_test ) {
    BOOST_CHECK_EQUAL( default_allowed.count(), sub_bill.get_subjective_account_cpu_allowed().count() );
    BOOST_CHECK_EQUAL( default_window, sub_bill.get_expired_accumulator_average_window() );
    BOOST_CHECK_EQUAL( 0u, sub_bill.get_account_cache_size() );
-   BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).count() );
+   BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(a, now).cpu.count() );
 }
 
 BOOST_AUTO_TEST_CASE( subjective_billing_integration_test ) {
@@ -639,58 +639,58 @@ BOOST_AUTO_TEST_CASE( subjective_billing_integration_test ) {
 
    auto& sub_bill = chain.control->get_mutable_subjective_billing();
    sub_bill.set_disabled(false);
-   BOOST_TEST(sub_bill.get_subjective_bill(acc, b->timestamp).count() == 0);
-   BOOST_TEST(sub_bill.get_subjective_bill(user, b->timestamp).count() == 0);
-   BOOST_TEST(sub_bill.get_subjective_bill(other, b->timestamp).count() == 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(acc, b->timestamp).cpu.count() == 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(user, b->timestamp).cpu.count() == 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(other, b->timestamp).cpu.count() == 0);
 
    auto ptrx = create_trx(0, {0,1,1,1});
    BOOST_CHECK_THROW(push_trx( ptrx, fc::time_point::maximum(), {}, false ), sysio_assert_message_exception);
 
-   BOOST_TEST(sub_bill.get_subjective_bill(acc, b->timestamp).count() > 0);
-   BOOST_TEST(sub_bill.get_subjective_bill(user, b->timestamp).count() == 0);
-   BOOST_TEST(sub_bill.get_subjective_bill(other, b->timestamp).count() == 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(acc, b->timestamp).cpu.count() > 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(user, b->timestamp).cpu.count() == 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(other, b->timestamp).cpu.count() == 0);
 
    chain.produce_block();
    b = chain.produce_block( fc::days(1) ); // produce for one day to reset account cpu/net
    sub_bill.on_block(log, b, b->timestamp);
-   BOOST_TEST(sub_bill.get_subjective_bill(acc, b->timestamp).count() == 0);
-   BOOST_TEST(sub_bill.get_subjective_bill(user, b->timestamp).count() == 0);
-   BOOST_TEST(sub_bill.get_subjective_bill(other, b->timestamp).count() == 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(acc, b->timestamp).cpu.count() == 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(user, b->timestamp).cpu.count() == 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(other, b->timestamp).cpu.count() == 0);
 
    ptrx = create_trx(0, {1,0,1,1});
    BOOST_CHECK_THROW(push_trx( ptrx, fc::time_point::maximum(), {}, false ), sysio_assert_message_exception);
 
-   BOOST_TEST(sub_bill.get_subjective_bill(acc, b->timestamp).count() > 0);
-   BOOST_TEST(sub_bill.get_subjective_bill(user, b->timestamp).count() > 0);
-   BOOST_TEST(sub_bill.get_subjective_bill(other, b->timestamp).count() == 0); // didn't make it to the final action
+   BOOST_TEST(sub_bill.get_subjective_bill(acc, b->timestamp).cpu.count() > 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(user, b->timestamp).cpu.count() > 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(other, b->timestamp).cpu.count() == 0); // didn't make it to the final action
 
    chain.produce_block();
    b = chain.produce_block( fc::days(1) ); // produce for one day to reset account cpu/net
    sub_bill.on_block(log, b, b->timestamp);
-   BOOST_TEST(sub_bill.get_subjective_bill(acc, b->timestamp).count() == 0);
-   BOOST_TEST(sub_bill.get_subjective_bill(user, b->timestamp).count() == 0);
-   BOOST_TEST(sub_bill.get_subjective_bill(other, b->timestamp).count() == 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(acc, b->timestamp).cpu.count() == 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(user, b->timestamp).cpu.count() == 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(other, b->timestamp).cpu.count() == 0);
 
    ptrx = create_trx(0, {1,1,0,1});
    BOOST_CHECK_THROW(push_trx( ptrx, fc::time_point::maximum(), {}, false ), sysio_assert_message_exception);
 
-   BOOST_TEST(sub_bill.get_subjective_bill(acc, b->timestamp).count() > 0);
-   BOOST_TEST(sub_bill.get_subjective_bill(user, b->timestamp).count() > 0);
-   BOOST_TEST(sub_bill.get_subjective_bill(other, b->timestamp).count() == 0); // didn't make it to the final action
+   BOOST_TEST(sub_bill.get_subjective_bill(acc, b->timestamp).cpu.count() > 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(user, b->timestamp).cpu.count() > 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(other, b->timestamp).cpu.count() == 0); // didn't make it to the final action
 
    chain.produce_block();
    b = chain.produce_block( fc::days(1) ); // produce for one day to reset account cpu/net
    sub_bill.on_block(log, b, b->timestamp);
-   BOOST_TEST(sub_bill.get_subjective_bill(acc, b->timestamp).count() == 0);
-   BOOST_TEST(sub_bill.get_subjective_bill(user, b->timestamp).count() == 0);
-   BOOST_TEST(sub_bill.get_subjective_bill(other, b->timestamp).count() == 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(acc, b->timestamp).cpu.count() == 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(user, b->timestamp).cpu.count() == 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(other, b->timestamp).cpu.count() == 0);
 
    ptrx = create_trx(0, {1,1,1,0});
    BOOST_CHECK_THROW(push_trx( ptrx, fc::time_point::maximum(), {}, false ), sysio_assert_message_exception);
 
-   BOOST_TEST(sub_bill.get_subjective_bill(acc, b->timestamp).count() > 0);
-   BOOST_TEST(sub_bill.get_subjective_bill(user, b->timestamp).count() > 0);
-   BOOST_TEST(sub_bill.get_subjective_bill(other, b->timestamp).count() > 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(acc, b->timestamp).cpu.count() > 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(user, b->timestamp).cpu.count() > 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(other, b->timestamp).cpu.count() > 0);
 
    sub_bill.set_subjective_account_cpu_allowed(fc::microseconds{1000});
    // Push failing transactions until other's subjective bill reaches the threshold.
@@ -704,7 +704,7 @@ BOOST_AUTO_TEST_CASE( subjective_billing_integration_test ) {
    const size_t num_itrs = 5000;
    size_t i = 0;
    for (; i < num_itrs; ++i) {
-      if (sub_bill.get_subjective_bill(other, b->timestamp) >= sub_bill.get_subjective_account_cpu_allowed())
+      if (sub_bill.get_subjective_bill(other, b->timestamp).cpu >= sub_bill.get_subjective_account_cpu_allowed())
          break;
       ptrx = create_trx(0, {1,1,1,0});
       BOOST_CHECK_THROW(push_trx( ptrx, fc::time_point::maximum(), {}, false ), sysio_assert_message_exception);
@@ -775,23 +775,23 @@ BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_billing_test ) {
    } );
    sub_bill.on_block( log, block, now );
 
-   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).count() == 1000 );
-   BOOST_TEST( sub_bill.get_subjective_bill( bob, now ).count() == 1000 );
-   BOOST_TEST( sub_bill.get_subjective_bill( carol, now ).count() == 0 ); // the payer, billed objectively
-   BOOST_TEST( sub_bill.get_subjective_bill( dave, now ).count() == 0 );  // the contract has its own CPU limit
-   BOOST_TEST( sub_bill.get_subjective_bill( sysio_token, now ).count() == 0 );
+   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).cpu.count() == 1000 );
+   BOOST_TEST( sub_bill.get_subjective_bill( bob, now ).cpu.count() == 1000 );
+   BOOST_TEST( sub_bill.get_subjective_bill( carol, now ).cpu.count() == 0 ); // the payer, billed objectively
+   BOOST_TEST( sub_bill.get_subjective_bill( dave, now ).cpu.count() == 0 );  // the contract has its own CPU limit
+   BOOST_TEST( sub_bill.get_subjective_bill( sysio_token, now ).cpu.count() == 0 );
 
    // The charge outlasts the block and decays over the window.
    sub_bill.on_block( log, make_block( now, {} ), now );
-   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).count() == 1000 );
-   BOOST_TEST( sub_bill.get_subjective_bill( alice, halftime ).count() == 500 );
-   BOOST_TEST( sub_bill.get_subjective_bill( alice, endtime ).count() == 0 );
+   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).cpu.count() == 1000 );
+   BOOST_TEST( sub_bill.get_subjective_bill( alice, halftime ).cpu.count() == 500 );
+   BOOST_TEST( sub_bill.get_subjective_bill( alice, endtime ).cpu.count() == 0 );
 
    // Each block adds to the decayed total.
    sub_bill.on_block( log, make_block( halftime, {
       { make_trx( {make_action( sysio_token, {{alice, config::active_name}} )}, 5 ), {1000} },
    } ), halftime );
-   BOOST_TEST( sub_bill.get_subjective_bill( alice, halftime ).count() == 500 + 1000 );
+   BOOST_TEST( sub_bill.get_subjective_bill( alice, halftime ).cpu.count() == 500 + 1000 );
 }
 
 BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_billing_actions_test ) {
@@ -812,8 +812,8 @@ BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_billing_actions_test ) {
    }, 1 );
 
    sub_bill.on_block( log, make_block( now, {{ trx, {5, 20, 40, 80, 160} }} ), now );
-   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).count() == 5 + 20 );
-   BOOST_TEST( sub_bill.get_subjective_bill( erin, now ).count() == 160 );
+   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).cpu.count() == 5 + 20 );
+   BOOST_TEST( sub_bill.get_subjective_bill( erin, now ).cpu.count() == 160 );
 }
 
 BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_billing_receiver_entries_test ) {
@@ -825,7 +825,7 @@ BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_billing_receiver_entries_test ) {
    // The entries after the action's are billed to the contracts sysio.token notified, from their own CPU.
    subjective_billing sub_bill;
    sub_bill.on_block( log, make_block( now, {{ trx, {1000, 300, 700} }} ), now );
-   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).count() == 1000 );
+   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).cpu.count() == 1000 );
    BOOST_TEST( sub_bill.get_account_cache_size() == 1u );
 }
 
@@ -837,18 +837,114 @@ BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_billing_replaces_pending_test ) {
 
    // Executed here first: pending until the block, then charged once from the block's receipt.
    subjective_billing sub_bill;
-   sub_bill.subjective_bill( trx.id(), trx.expiration, {}, {{alice, fc::microseconds( 800 )}} );
-   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).count() == 800 );
+   sub_bill.subjective_bill( trx.id(), trx.expiration, {}, {{alice, {.cpu = fc::microseconds( 800 )}}} );
+   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).cpu.count() == 800 );
    sub_bill.on_block( log, make_block( now, {{ trx, {1200} }} ), now );
-   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).count() == 1200 );
+   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).cpu.count() == 1200 );
 
    // With the charge disabled, inclusion still drops the pending bill.
    subjective_billing disabled_bill;
    disabled_bill.disable_sysio_authorizer_billing( true );
-   disabled_bill.subjective_bill( trx.id(), trx.expiration, {}, {{alice, fc::microseconds( 800 )}} );
+   disabled_bill.subjective_bill( trx.id(), trx.expiration, {}, {{alice, {.cpu = fc::microseconds( 800 )}}} );
    disabled_bill.on_block( log, make_block( now, {{ trx, {1200} }} ), now );
-   BOOST_TEST( disabled_bill.get_subjective_bill( alice, now ).count() == 0 );
+   BOOST_TEST( disabled_bill.get_subjective_bill( alice, now ).cpu.count() == 0 );
    BOOST_TEST( disabled_bill.get_account_cache_size() == 0u );
+}
+
+/// An action of `code` carrying `size` bytes of data, for NET billing.
+action make_action( account_name code, vector<permission_level> auth, size_t size ) {
+   return action( std::move( auth ), code, "transfer"_n, bytes( size, 'x' ) );
+}
+
+BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_net_billing_test ) {
+   fc::logger log;
+   const account_name sysio_token = "sysio.token"_n;
+   const account_name alice = "alice"_n; // calls a sysio.* contract
+   const account_name carol = "carol"_n; // pays explicitly with sysio.payer
+   const account_name dave = "dave"_n;   // calls a contract outside sysio.*
+   const auto now = sysio_paid_now;
+
+   subjective_billing sub_bill;
+   const auto window = decay_window( sub_bill );
+   const auto halftime = now + fc::microseconds( window.count() / 2 );
+   const auto endtime = now + window;
+
+   // Two actions in one transaction: only alice's sysio.*-paid one is charged, at its billable size.
+   const signed_transaction trx = make_trx( {make_action( sysio_token, {{alice, config::active_name}}, 100'000 ),
+                                             make_action( "token"_n, {{dave, config::active_name}}, 50'000 )}, 1 );
+   const packed_transaction ptrx{trx};
+   const uint64_t alice_bytes = ptrx.get_action_billable_size( 0 );
+   BOOST_TEST( alice_bytes > 100'000u );
+
+   const auto block = make_block( now, {
+      { trx, {500, 500} },
+      { make_trx( {make_action( sysio_token, {{carol, config::sysio_payer_name}, {carol, config::active_name}},
+                                10'000 )}, 2 ), {500} },
+   } );
+   sub_bill.on_block( log, block, now );
+
+   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).net_bytes == alice_bytes );
+   BOOST_TEST( sub_bill.get_subjective_bill( dave, now ).net_bytes == 0u );  // the contract pays from its own NET
+   BOOST_TEST( sub_bill.get_subjective_bill( carol, now ).net_bytes == 0u ); // the payer, billed objectively
+   BOOST_TEST( sub_bill.get_subjective_bill( alice, halftime ).net_bytes == ( alice_bytes + 1 ) / 2 );
+   BOOST_TEST( sub_bill.get_subjective_bill( alice, endtime ).net_bytes == 0u );
+   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).cpu.count() == 500 ); // CPU is charged alongside, unchanged
+}
+
+BOOST_AUTO_TEST_CASE( authorizer_net_pending_test ) {
+   fc::logger log;
+   const account_name alice = "alice"_n; // calls a sysio.* contract
+   const account_name dave = "dave"_n;   // calls a contract outside sysio.*
+   const auto now = sysio_paid_now;
+   const signed_transaction sysio_trx =
+      make_trx( {make_action( "sysio.token"_n, {{alice, config::active_name}}, 1000 )}, 1 );
+   const signed_transaction other_trx = make_trx( {make_action( "token"_n, {{dave, config::active_name}}, 1000 )}, 2 );
+   const uint64_t alice_bytes = packed_transaction{sysio_trx}.get_action_billable_size( 0 );
+   const uint64_t dave_bytes = packed_transaction{other_trx}.get_action_billable_size( 0 );
+
+   // Every authorizer's bytes are pending until the block. Inclusion drops them, then the block charges the
+   // authorizer of the sysio.*-paid action.
+   subjective_billing sub_bill;
+   sub_bill.subjective_bill( sysio_trx.id(), sysio_trx.expiration, {},
+                             {{alice, {.cpu = fc::microseconds( 800 ), .net_bytes = alice_bytes}}} );
+   sub_bill.subjective_bill( other_trx.id(), other_trx.expiration, {},
+                             {{dave, {.cpu = fc::microseconds( 800 ), .net_bytes = dave_bytes}}} );
+   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).net_bytes == alice_bytes );
+   BOOST_TEST( sub_bill.get_subjective_bill( dave, now ).net_bytes == dave_bytes );
+   sub_bill.on_block( log, make_block( now, {{ sysio_trx, {1200} }, { other_trx, {1200} }} ), now );
+   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).net_bytes == alice_bytes );
+   BOOST_TEST( sub_bill.get_subjective_bill( dave, now ).net_bytes == 0u );
+
+   // Expiring unincluded moves the pending bytes into the decaying charge.
+   subjective_billing expired_bill;
+   const auto id = sha256::hash( "expires" );
+   expired_bill.subjective_bill( id, fc::time_point_sec{now}, {}, {{dave, {.net_bytes = dave_bytes}}} );
+   expired_bill.remove_expired( log, now + fc::microseconds( 1 ), now, [](){ return false; } );
+   BOOST_TEST( expired_bill.get_subjective_bill( dave, now ).net_bytes == dave_bytes );
+   BOOST_TEST( expired_bill.get_subjective_bill( dave, now + decay_window( expired_bill ) ).net_bytes == 0u );
+
+   // A failure is charged its CPU and NET, decaying from its time.
+   subjective_billing failed_bill;
+   failed_bill.subjective_bill_failure( {}, {{dave, {.cpu = fc::microseconds( 100 ), .net_bytes = dave_bytes}}}, now );
+   BOOST_TEST( failed_bill.get_subjective_bill( dave, now ).cpu.count() == 100 );
+   BOOST_TEST( failed_bill.get_subjective_bill( dave, now ).net_bytes == dave_bytes );
+   BOOST_TEST( failed_bill.get_subjective_bill( dave, now + decay_window( failed_bill ) ).net_bytes == 0u );
+
+   // With the block charge disabled, the bytes are still pending, and inclusion drops them.
+   subjective_billing disabled_bill;
+   disabled_bill.disable_sysio_authorizer_billing( true );
+   disabled_bill.subjective_bill( sysio_trx.id(), sysio_trx.expiration, {}, {{alice, {.net_bytes = alice_bytes}}} );
+   BOOST_TEST( disabled_bill.get_subjective_bill( alice, now ).net_bytes == alice_bytes );
+   disabled_bill.on_block( log, make_block( now, {{ sysio_trx, {1200} }} ), now );
+   BOOST_TEST( disabled_bill.get_subjective_bill( alice, now ).net_bytes == 0u );
+   BOOST_TEST( disabled_bill.get_account_cache_size() == 0u );
+
+   // An exempt account holds nothing.
+   subjective_billing exempt_bill;
+   exempt_bill.disable_account( dave );
+   exempt_bill.subjective_bill( other_trx.id(), other_trx.expiration, {}, {{dave, {.net_bytes = dave_bytes}}} );
+   BOOST_TEST( exempt_bill.get_subjective_bill( dave, now ).net_bytes == 0u );
+   BOOST_TEST( exempt_bill.get_account_cache_size() == 0u );
 }
 
 BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_billing_block_age_test ) {
@@ -869,23 +965,23 @@ BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_billing_block_age_test ) {
    // node that applied it live: the charge decays from the block's time.
    subjective_billing late_bill;
    late_bill.on_block( log, block, now + half );
-   BOOST_TEST( late_bill.get_subjective_bill( alice, now + half ).count() == 500 );
+   BOOST_TEST( late_bill.get_subjective_bill( alice, now + half ).cpu.count() == 500 );
    for( const auto time : {now + half, now + three_quarters, now + window} ) {
-      BOOST_TEST( late_bill.get_subjective_bill( alice, time ).count() ==
-                  live_bill.get_subjective_bill( alice, time ).count() );
+      BOOST_TEST( late_bill.get_subjective_bill( alice, time ).cpu.count() ==
+                  live_bill.get_subjective_bill( alice, time ).cpu.count() );
    }
-   BOOST_TEST( late_bill.get_subjective_bill( alice, now + window ).count() == 0 );
+   BOOST_TEST( late_bill.get_subjective_bill( alice, now + window ).cpu.count() == 0 );
 
    // A charge older than the account's last update is decayed to that update first.
    subjective_billing updated_bill;
-   updated_bill.subjective_bill_failure( {}, {{alice, fc::microseconds( 1000 )}}, now + half );
+   updated_bill.subjective_bill_failure( {}, {{alice, {.cpu = fc::microseconds( 1000 )}}}, now + half );
    updated_bill.on_block( log, block, now + half );
-   BOOST_TEST( updated_bill.get_subjective_bill( alice, now + half ).count() == 1000 + 500 );
+   BOOST_TEST( updated_bill.get_subjective_bill( alice, now + half ).cpu.count() == 1000 + 500 );
 
    // A block older than the decay window charges nothing.
    subjective_billing old_bill;
    old_bill.on_block( log, block, now + window );
-   BOOST_TEST( old_bill.get_subjective_bill( alice, now + window ).count() == 0 );
+   BOOST_TEST( old_bill.get_subjective_bill( alice, now + window ).cpu.count() == 0 );
    BOOST_TEST( old_bill.get_account_cache_size() == 0u );
 }
 
@@ -906,13 +1002,13 @@ BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_billing_disabled_test ) {
    all_disabled.set_disabled( true );
    all_disabled.on_block( log, block, now );
    all_disabled.set_disabled( false );
-   BOOST_TEST( all_disabled.get_subjective_bill( alice, now ).count() == 0 );
+   BOOST_TEST( all_disabled.get_subjective_bill( alice, now ).cpu.count() == 0 );
 
    subjective_billing charge_disabled;
    charge_disabled.disable_sysio_authorizer_billing( true );
    BOOST_TEST( charge_disabled.is_sysio_authorizer_billing_disabled() );
    charge_disabled.on_block( log, block, now );
-   BOOST_TEST( charge_disabled.get_subjective_bill( alice, now ).count() == 0 );
+   BOOST_TEST( charge_disabled.get_subjective_bill( alice, now ).cpu.count() == 0 );
 
    charge_disabled.reset();
    BOOST_TEST( !charge_disabled.is_sysio_authorizer_billing_disabled() );
@@ -937,18 +1033,20 @@ BOOST_AUTO_TEST_CASE( chain_exempt_accounts_test ) {
    BOOST_TEST( sub_bill.is_any_account_disabled( {alice, bob} ) );
    sub_bill.on_block( log, block, now );
    sub_bill.subjective_bill( pending_id, fc::time_point_sec{now + fc::days( 1 )}, {},
-                             {{alice, fc::microseconds( 50 )}, {bob, fc::microseconds( 50 )}} );
-   sub_bill.subjective_bill_failure( {}, {{alice, fc::microseconds( 70 )}, {bob, fc::microseconds( 70 )}}, now );
-   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).count() == 0 );
-   BOOST_TEST( sub_bill.get_subjective_bill( bob, now ).count() == 1000 + 50 + 70 );
+                             {{alice, {.cpu = fc::microseconds( 50 )}}, {bob, {.cpu = fc::microseconds( 50 )}}} );
+   sub_bill.subjective_bill_failure( {},
+                                     {{alice, {.cpu = fc::microseconds( 70 )}}, {bob, {.cpu = fc::microseconds( 70 )}}},
+                                     now );
+   BOOST_TEST( sub_bill.get_subjective_bill( alice, now ).cpu.count() == 0 );
+   BOOST_TEST( sub_bill.get_subjective_bill( bob, now ).cpu.count() == 1000 + 50 + 70 );
    BOOST_TEST( sub_bill.get_account_cache_size() == 1u );
 
    // The set is replaced as a whole. An account charged before it became exempt is not limited while it is.
    sub_bill.set_chain_exempt_accounts( {bob} );
    BOOST_TEST( !sub_bill.is_account_disabled( alice ) );
-   BOOST_TEST( sub_bill.get_subjective_bill( bob, now ).count() == 0 );
+   BOOST_TEST( sub_bill.get_subjective_bill( bob, now ).cpu.count() == 0 );
    sub_bill.set_chain_exempt_accounts( {} );
-   BOOST_TEST( sub_bill.get_subjective_bill( bob, now ).count() == 1000 + 50 + 70 );
+   BOOST_TEST( sub_bill.get_subjective_bill( bob, now ).cpu.count() == 1000 + 50 + 70 );
 
    sub_bill.set_chain_exempt_accounts( {alice} );
    sub_bill.reset();
@@ -970,13 +1068,13 @@ BOOST_AUTO_TEST_CASE( prune_decayed_accounts_test ) {
       { make_trx( {make_action( "sysio.token"_n, {{alice, config::active_name}} )}, 1 ), {1000} },
    } ), now );
    sub_bill.subjective_bill( pending_id, fc::time_point_sec{endtime + fc::days( 1 )}, {},
-                             {{bob, fc::microseconds( 50 )}} );
+                             {{bob, {.cpu = fc::microseconds( 50 )}}} );
    BOOST_TEST( sub_bill.get_account_cache_size() == 2u );
 
    // alice's charge has decayed away; bob still has a pending bill.
    sub_bill.on_block( log, make_block( endtime, {} ), endtime );
    BOOST_TEST( sub_bill.get_account_cache_size() == 1u );
-   BOOST_TEST( sub_bill.get_subjective_bill( bob, endtime ).count() == 50 );
+   BOOST_TEST( sub_bill.get_subjective_bill( bob, endtime ).cpu.count() == 50 );
 }
 
 BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_billing_integration_test ) {
@@ -1030,7 +1128,7 @@ BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_billing_integration_test ) {
       return receipt->cpu_usage_us.front().value;
    };
    const auto bill_of = [&]( const subjective_billing& bill, account_name account ) {
-      return bill.get_subjective_bill( account, chain.control->head().block_time() ).count();
+      return bill.get_subjective_bill( account, chain.control->head().block_time() ).cpu.count();
    };
 
    // A contract outside sysio.* pays from its own CPU, and an explicit sysio.payer pays from the payer's.
@@ -1065,6 +1163,170 @@ BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_billing_integration_test ) {
    chain.produce_block( fc::days( 1 ) );
    BOOST_TEST( bill_of( sub_bill, user ) == 0 );
    push_and_apply( sysio_contract, {{user, config::active_name}} );
+}
+
+BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_net_billing_integration_test ) {
+   validating_tester chain;
+
+   fc::logger log;
+   const account_name sysio_contract = "sysio.assert"_n; // a sysio.* contract, with unlimited CPU and NET
+   const account_name contract = "asserter"_n;           // a contract outside sysio.*
+   const account_name user = "user"_n;                   // no NET of its own
+   const account_name payer = "payer"_n;                 // has NET and pays with sysio.payer
+   chain.create_accounts( {sysio_contract, contract, payer} );
+   chain.create_account( user, config::system_account_name, false, false, false, true );
+   for( const auto& [account, ram, weight] : {std::tuple{sysio_contract, int64_t{-1}, int64_t{-1}},
+                                              std::tuple{user, int64_t{base_tester::newaccount_ram}, int64_t{0}}} ) {
+      chain.push_action( config::system_account_name, "setalimits"_n, config::system_account_name,
+                         fc::mutable_variant_object()("account", account)("ram_bytes", ram)
+                                                     ("net_weight", weight)("cpu_weight", weight) );
+   }
+   chain.set_contract( sysio_contract, test_contracts::asserter_wasm(), test_contracts::asserter_abi() );
+   chain.set_contract( contract, test_contracts::asserter_wasm(), test_contracts::asserter_abi() );
+   chain.produce_block();
+
+   auto& sub_bill = chain.control->get_mutable_subjective_billing();
+   auto& validator_bill = chain.validating_node->get_mutable_subjective_billing();
+   sub_bill.set_disabled( false );
+   validator_bill.set_disabled( false );
+   // Keep the CPU budget out of the way, so only NET can refuse.
+   sub_bill.set_subjective_account_cpu_allowed( fc::seconds( 60 ) );
+
+   // A large message makes an action cheap in CPU and expensive in bytes.
+   const std::string large_message( 50'000, 'x' );
+
+   // Pushes an assertion of `condition` on `code`, then produces and applies a block on both nodes: `chain`
+   // produced it, the validating node received it. Returns the billable NET of the transaction's action.
+   uint32_t nonce = 0;
+   auto push_and_apply = [&]( account_name code, vector<permission_level> auth, int8_t condition = 1 ) {
+      signed_transaction trx;
+      trx.actions.emplace_back( std::move( auth ), code, assertdef::get_name(),
+                                fc::raw::pack( assertdef{condition, large_message} ) );
+      chain.set_transaction_headers( trx, ++nonce );
+      for( account_name signer : trx.first_authorizers() )
+         trx.sign( tester::get_private_key( signer, "active" ), chain.control->get_chain_id() );
+      auto ptrx = std::make_shared<packed_transaction>( trx );
+      const uint32_t bytes = ptrx->get_action_billable_size( 0 );
+      auto meta = transaction_metadata::start_recover_keys( ptrx, chain.control->get_thread_pool(),
+                                                            chain.control->get_chain_id(), fc::microseconds::maximum(),
+                                                            transaction_metadata::trx_type::input ).get();
+      auto trace = chain.control->test_push_transaction( meta, fc::time_point::maximum(), fc::microseconds::maximum(),
+                                                         {}, false );
+      if( trace->except_ptr ) std::rethrow_exception( trace->except_ptr );
+      const auto block = chain.produce_block();
+      sub_bill.on_block( log, block, block->timestamp );
+      validator_bill.on_block( log, block, block->timestamp );
+      return bytes;
+   };
+   const auto net_of = [&]( const subjective_billing& bill, account_name account ) {
+      return bill.get_subjective_bill( account, chain.control->head().block_time() ).net_bytes;
+   };
+
+   // A contract outside sysio.* pays from its own NET, and an explicit sysio.payer pays from the payer's.
+   push_and_apply( contract, {{user, config::active_name}} );
+   push_and_apply( sysio_contract, {{payer, config::sysio_payer_name}, {payer, config::active_name}} );
+   BOOST_TEST( net_of( sub_bill, user ) == 0u );
+   BOOST_TEST( net_of( sub_bill, payer ) == 0u );
+   BOOST_TEST( net_of( validator_bill, payer ) == 0u );
+
+   // A sysio.*-paid action stays charged its billable bytes, on the producing and on the receiving node.
+   const uint32_t bytes = push_and_apply( sysio_contract, {{user, config::active_name}} );
+   BOOST_TEST( bytes > large_message.size() );
+   BOOST_TEST( net_of( sub_bill, user ) == bytes );
+   BOOST_TEST( net_of( validator_bill, user ) == bytes );
+
+   // A failed transaction is charged its bytes like its CPU, whoever pays for its action. The earlier charge decays by
+   // a few bytes if the failure's time is a decay step later.
+   BOOST_CHECK_THROW( push_and_apply( contract, {{user, config::active_name}}, 0 ), sysio_assert_message_exception );
+   const uint64_t after_failure = net_of( sub_bill, user );
+   BOOST_TEST( after_failure <= 2u * bytes );
+   BOOST_TEST( after_failure > 2u * bytes - bytes / 100 );
+   // A trx that fails authorization runs no action, so it charges the authorizer it names nothing.
+   {
+      signed_transaction trx;
+      trx.actions.emplace_back( vector<permission_level>{{user, config::active_name}}, contract,
+                                assertdef::get_name(), fc::raw::pack( assertdef{1, large_message} ) );
+      chain.set_transaction_headers( trx, ++nonce );
+      trx.sign( tester::get_private_key( payer, "active" ), chain.control->get_chain_id() );
+      BOOST_CHECK_THROW( chain.push_transaction( trx ), unsatisfied_authorization );
+   }
+   BOOST_TEST( net_of( sub_bill, user ) == after_failure );
+
+   // The check counts the transaction's own bytes, so it refuses the push that would cross the allowance while
+   // the account is still under it.
+   const uint64_t allowed = net_of( sub_bill, user ) + uint64_t{bytes} * 3 / 2;
+   sub_bill.set_subjective_account_net_allowed( allowed );
+   push_and_apply( sysio_contract, {{user, config::active_name}} );
+   const uint64_t charged = net_of( sub_bill, user );
+   BOOST_TEST( charged < allowed );
+   BOOST_TEST( charged + bytes > allowed );
+   BOOST_CHECK_EXCEPTION( push_and_apply( sysio_contract, {{user, config::active_name}} ), tx_net_usage_exceeded,
+                          fc_exception_message_contains( "Authorized account user exceeded subjective NET limit" ) );
+   BOOST_TEST( net_of( sub_bill, user ) == charged ); // refused before execution: nothing more charged
+
+   // Over the allowance, the authorizer is refused whoever pays for its action; other authorizers are unaffected.
+   BOOST_CHECK_EXCEPTION( push_and_apply( contract, {{user, config::active_name}} ), tx_net_usage_exceeded,
+                          fc_exception_message_contains( "Authorized account user exceeded subjective NET limit" ) );
+   push_and_apply( sysio_contract, {{payer, config::sysio_payer_name}, {payer, config::active_name}} );
+
+   // The charge decays back over the window, and the authorizer is accepted again.
+   chain.produce_block( fc::days( 1 ) );
+   BOOST_TEST( net_of( sub_bill, user ) == 0u );
+   push_and_apply( sysio_contract, {{user, config::active_name}} );
+
+   // With the block charge disabled, a sysio.*-paid action is still checked but not charged once in a block.
+   sub_bill.disable_sysio_authorizer_billing( true );
+   const uint64_t before = net_of( sub_bill, user );
+   push_and_apply( sysio_contract, {{user, config::active_name}} );
+   BOOST_TEST( net_of( sub_bill, user ) <= before );
+}
+
+BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_net_minimal_transfer_test ) {
+   validating_tester chain;
+
+   fc::logger log;
+   const account_name token = "sysio.token"_n;
+   const account_name user = "user"_n;
+   const account_name recipient = "recipient"_n;
+   chain.create_accounts( {token, user, recipient} );
+   chain.push_action( config::system_account_name, "setalimits"_n, config::system_account_name,
+                      fc::mutable_variant_object()("account", token)("ram_bytes", -1)("net_weight", -1)
+                                                  ("cpu_weight", -1) );
+   chain.set_contract( token, test_contracts::sysio_token_wasm(), test_contracts::sysio_token_abi() );
+   chain.set_privileged( token );
+   // sysio.token authorizes its own setup, so none of it is charged to an authorizer.
+   const asset supply = asset::from_string( "1000.0000 SYS" );
+   chain.push_action( token, "create"_n, token,
+                      fc::mutable_variant_object()("issuer", token)("maximum_supply", supply) );
+   chain.push_action( token, "issue"_n, token,
+                      fc::mutable_variant_object()("to", token)("quantity", supply)("memo", "") );
+   chain.push_action( token, "transfer"_n, token,
+                      fc::mutable_variant_object()("from", token)("to", user)("quantity", supply)("memo", "") );
+   chain.produce_block();
+
+   auto& sub_bill = chain.control->get_mutable_subjective_billing();
+   auto& validator_bill = chain.validating_node->get_mutable_subjective_billing();
+   sub_bill.set_disabled( false );
+   validator_bill.set_disabled( false );
+
+   // The transfer config::minimal_transfer_net_usage describes: one authorization, one K1 signature and a
+   // 10-character memo.
+   const std::string memo( 10, 'm' );
+   chain.push_action( token, "transfer"_n, user,
+                      fc::mutable_variant_object()("from", user)("to", recipient)
+                                                  ("quantity", asset::from_string( "0.0001 SYS" ))("memo", memo) );
+   const auto block = chain.produce_block();
+   sub_bill.on_block( log, block, block->timestamp );
+   validator_bill.on_block( log, block, block->timestamp );
+
+   const fc::time_point now = chain.control->head().block_time();
+   const uint64_t charged = sub_bill.get_subjective_bill( user, now ).net_bytes;
+   BOOST_TEST( charged == config::minimal_transfer_net_usage );
+   BOOST_TEST( validator_bill.get_subjective_bill( user, now ).net_bytes == charged );
+   // The default allowance is as many such transfers as the default CPU allowance covers at the minimum
+   // transaction CPU.
+   BOOST_TEST( sub_bill.get_subjective_account_net_allowed() ==
+               config::default_subjective_cpu_us / config::default_min_transaction_cpu_usage * charged );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

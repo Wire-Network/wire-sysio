@@ -475,6 +475,11 @@ class NodeopQueries:
         acct = self.getSysioAccount(account)
         return acct["subjective_cpu_bill_limit"]
 
+    def getAccountSubjectiveNetInfo(self, account):
+        """The account's subjective NET bill: `used` bytes and the node's `max` allowance."""
+        acct = self.getSysioAccount(account)
+        return acct["subjective_net_bill_limit"]
+
     # Gets accounts mapped to key. Returns json object
     def getAccountsByKey(self, key, exitOnError=False):
         cmdDesc = "get accounts"

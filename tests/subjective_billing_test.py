@@ -12,12 +12,14 @@ from TestHarness import Account, Cluster, ReturnType, TestHelper, Utils, WalletM
 # tests to verify subjective billing behavior
 #
 # Nodes 0 and 1 produce. Node 2 exempts account1 and has a small subjective budget, node 3 decays in one
-# minute, and node 4 does not keep the charge for sysio.*-paid actions.
+# minute, node 4 does not keep the charge for sysio.*-paid actions, and node 5 has a small NET allowance.
 #
 ###############################################################
 
 # Node 2's subjective budget: small enough that a few transfers by an account without CPU exhaust it.
 SUBJECTIVE_CPU_ALLOWED_US = 2000
+# Node 5's NET allowance for sysio.*-paid bytes: less than a few transfers.
+SUBJECTIVE_NET_ALLOWED_BYTES = 512
 # Bound on the transfers pushed to exhaust node 2's budget and land in blocks of both producers.
 MAX_STICKY_TRANSFERS = 60
 # A 24 h decay window loses well under 1% of a charge over the minutes this test runs.
@@ -71,7 +73,8 @@ try:
 
     specificArgs = {"2": f"--disable-subjective-account-billing=account1 --subjective-account-cpu-allowed-us={SUBJECTIVE_CPU_ALLOWED_US}",
                     "3": "--subjective-account-decay-time-minutes=1",
-                    "4": "--disable-subjective-sysio-authorizer-billing=true" }
+                    "4": "--disable-subjective-sysio-authorizer-billing=true",
+                    "5": f"--subjective-account-net-allowed-bytes={SUBJECTIVE_NET_ALLOWED_BYTES}" }
 
     Print("Stand up cluster")
     # Deliberately does NOT pass --disable-subjective-api-billing: subjective billing is on by
@@ -186,16 +189,23 @@ try:
                              "compression": "none"}]}
 
     def pushAndWaitForBlock(pushNode, txn, waitNodes):
-        """Push txn through pushNode and wait until every node in waitNodes has it in a block. Returns its id."""
+        """Push txn through pushNode and wait until every node in waitNodes has it in a block. Returns its trace."""
         results = pushNode.pushTransaction(txn)
         assert results[0], results[1]
         transId = pushNode.getTransId(results[1])
         for waitNode in waitNodes:
             assert waitNode.waitForTransactionInBlock(transId), f"{transId} never reached a block on {waitNode.nodeId}"
-        return transId
+        return results[1]
 
     def subjectiveUsed(node, account):
         return node.getAccountSubjectiveInfo(account)["used"]
+
+    def subjectiveNetUsed(node, account):
+        return node.getAccountSubjectiveNetInfo(account)["used"]
+
+    def billableNet(trace):
+        """The NET billed to a trace's input actions: only those carry net_usage."""
+        return sum(t["net_usage"] for t in trace["processed"]["action_traces"] if t["creator_action_ordinal"] == 0)
 
     def producerNames(node):
         """The producer names a node produces for, from its command line."""
@@ -203,6 +213,7 @@ try:
 
     producers = [cluster.nodes[0], cluster.nodes[1]]
     keepOffNode = cluster.nodes[4]
+    netNode = cluster.nodes[5]
 
     Print("Verifying an explicit sysio.payer is not charged after its transfer is in a block...")
     pushAndWaitForBlock(producers[0], transfer("account1", "account2", "payer-0", explicitPayer=True), [producers[1]])
@@ -218,17 +229,26 @@ try:
     account3.ownerPublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
     account3.activePublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
     cluster.createAccountAndVerify(account3, cluster.sysioAccount, stakedDeposit=10000, stakeCPU=0)
+    # No NET of its own either, so node 5's allowance is all account3 gets for sysio.*-paid bytes.
+    results = producers[0].pushMessage("sysio", "setacctnet", '{"account":"account3","net_weight":0}',
+                                       "-p sysio@active")
+    assert results[0], results[1]
+    assert netNode.waitForTransactionInBlock(producers[0].getTransId(results[1]))
+    assert netNode.getSysioAccount("account3")["net_weight"] == 0
 
     # Transfers pushed only to node 3 are charged on every node from the blocks that include them, in the
     # producers' own blocks and in each other's, until node 2 has seen account3 use more than its budget.
     Print("Verifying sysio.token-paid transfers stay charged to their authorizer on every node...")
     allNodes = cluster.getNodes()
     totalCpu = 0
+    totalNet = 0
     includingNodes = set()
     for x in range(MAX_STICKY_TRANSFERS):
         if subjectiveUsed(wlnode, "account3") > SUBJECTIVE_CPU_ALLOWED_US and len(includingNodes) == len(producers):
             break
-        transId = pushAndWaitForBlock(fdnode, transfer("account3", "account1", f"sticky-{x}"), allNodes)
+        trace = pushAndWaitForBlock(fdnode, transfer("account3", "account1", f"sticky-{x}"), allNodes)
+        transId = fdnode.getTransId(trace)
+        totalNet += billableNet(trace)
         blockNum = producers[0].getBlockNumByTransId(transId)
         block = producers[0].getBlock(blockNum)
         includingNodes.update(p.nodeId for p in producers if block["producer"] in producerNames(p))
@@ -237,7 +257,7 @@ try:
     else:
         errorExit(f"account3 did not exceed node 2's budget in blocks of both producer nodes: {includingNodes}, "
                   f"node 2 charged {subjectiveUsed(wlnode, 'account3')}us")
-    Print(f"account3 used {totalCpu}us in blocks produced by nodes {sorted(includingNodes)}")
+    Print(f"account3 used {totalCpu}us and {totalNet} bytes in blocks produced by nodes {sorted(includingNodes)}")
 
     for chargingNode in producers + [wlnode]:
         used = subjectiveUsed(chargingNode, "account3")
@@ -246,10 +266,25 @@ try:
     assert subjectiveUsed(fdnode, "account3") > 0
     assert subjectiveUsed(keepOffNode, "account3") == 0
 
+    # The bytes come from the same blocks, so every node charges the same NET, whatever its allowance.
+    for chargingNode in producers + [wlnode, netNode]:
+        usedNet = subjectiveNetUsed(chargingNode, "account3")
+        Print(f"node {chargingNode.nodeId} charged account3 {usedNet} bytes")
+        assert totalNet * DECAY_TOLERANCE <= usedNet <= totalNet, f"node {chargingNode.nodeId}: {usedNet} vs {totalNet}"
+    assert subjectiveNetUsed(fdnode, "account3") > 0
+    assert subjectiveNetUsed(keepOffNode, "account3") == 0
+    assert netNode.getAccountSubjectiveNetInfo("account3")["max"] == SUBJECTIVE_NET_ALLOWED_BYTES
+
     Print("Verifying an authorizer over budget is rejected, though its transfers are already in blocks...")
     results = wlnode.pushTransaction(transfer("account3", "account1", "over-budget"), silentErrors=True)
     assert not results[0]
     assert "Authorized account account3 exceeded subjective CPU limit" in str(results[1]), results[1]
+
+    Print("Verifying an authorizer over its NET allowance is rejected...")
+    assert subjectiveNetUsed(netNode, "account3") > SUBJECTIVE_NET_ALLOWED_BYTES
+    results = netNode.pushTransaction(transfer("account3", "account1", "over-net"), silentErrors=True)
+    assert not results[0]
+    assert "Authorized account account3 exceeded subjective NET limit" in str(results[1]), results[1]
 
 
     # Sleep for 1 min
@@ -267,6 +302,8 @@ try:
     # The kept charge decays like any other: gone on the 1 minute node, still held on the 24 h nodes.
     assert subjectiveUsed(fdnode, "account3") == 0
     assert subjectiveUsed(producers[0], "account3") > 0
+    assert subjectiveNetUsed(fdnode, "account3") == 0
+    assert subjectiveNetUsed(producers[0], "account3") > 0
 
     Print("Verifying an account on the sysio.system exempt list is accepted over budget once nodes reload the list...")
     results = wlnode.pushTransaction(transfer("account3", "account1", "still-over-budget"), silentErrors=True)
