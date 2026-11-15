@@ -252,6 +252,11 @@ public:
    bool is_disabled() const { return _disabled; }
    void disable_payer_billing(bool disable) { _disabled_payer_billing = disable; }
    bool is_payer_billing_disabled() const { return _disabled_payer_billing; }
+   /// True if `authorizer` is billed subjectively for an action `payer` pays for: unless it is the payer and payer
+   /// billing, which already bills it, is on.
+   bool bills_authorizer( const account_name& payer, const account_name& authorizer ) const {
+      return authorizer != payer || _disabled_payer_billing;
+   }
    /// Stops on_block from charging the authorizers of sysio.*-paid actions in a block (see is_sysio_paid_authorizer).
    void disable_sysio_authorizer_billing(bool disable) { _disabled_sysio_authorizer_billing = disable; }
    bool is_sysio_authorizer_billing_disabled() const { return _disabled_sysio_authorizer_billing; }

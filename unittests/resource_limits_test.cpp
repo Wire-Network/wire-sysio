@@ -428,5 +428,37 @@ BOOST_AUTO_TEST_SUITE(resource_limits_test)
 
    } FC_LOG_AND_RETHROW()
 
+   /// With a time, get_account_net_limit decays the account's usage to it first, as get_account_cpu_limit does, for an
+   /// account whose window is not up to date. Without one it counts the usage as last updated.
+   BOOST_FIXTURE_TEST_CASE(get_account_net_limit_with_current_time, resource_limits_fixture) try {
+      const account_name account("netacc");
+      constexpr uint32_t net_window = config::account_net_usage_average_window_ms / config::block_interval_ms;
+      constexpr uint32_t greylist_limit = config::maximum_elastic_resource_multiplier;
+      constexpr uint32_t update_slot = 1;
+      constexpr int64_t net_usage = 200;
+      initialize_account(account, false);
+      set_account_limits(account, -1, 1024, -1, false);
+      process_account_limit_updates();
+      add_transaction_usage({{account, {.cpu_usage_us = 0, .net_usage = net_usage}}}, 0, net_usage, update_slot);
+
+      const auto [arl, arl_greylisted] = get_account_net_limit_ex(account);
+      const int64_t stale = get_account_net_limit(account).first;
+      BOOST_TEST(arl.used > 0);
+      BOOST_TEST(stale == arl.max - arl.used);
+      // At the update itself, or before it, nothing has decayed.
+      BOOST_TEST(get_account_net_limit(account, greylist_limit, block_timestamp_type(update_slot)).first == stale);
+      // A full window later the usage has decayed away.
+      BOOST_TEST(get_account_net_limit(account, greylist_limit, block_timestamp_type(update_slot + net_window)).first ==
+                 arl.max);
+
+      // An unlimited account stays unlimited.
+      const account_name unlimited_account("unlimited");
+      initialize_account(unlimited_account, false);
+      set_account_limits(unlimited_account, -1, -1, -1, false);
+      process_account_limit_updates();
+      BOOST_TEST(get_account_net_limit(unlimited_account, greylist_limit, block_timestamp_type(net_window)).first ==
+                 -1);
+   } FC_LOG_AND_RETHROW()
+
 
    BOOST_AUTO_TEST_SUITE_END()

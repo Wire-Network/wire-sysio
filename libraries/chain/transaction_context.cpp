@@ -754,7 +754,7 @@ namespace sysio::chain {
       const bool billed_subjectively = bill_objectively && !is_implicit();
 
       account_subjective_bill_t authorizers;
-      const bool subjectively_bill_payer_disabled = control.get_subjective_billing().is_payer_billing_disabled();
+      const subjective_billing& subjective_bill = control.get_subjective_billing();
       // The fallback authorizer of an input action without authorization, looked up once.
       const account_name trx_first_authorizer =
          billed_subjectively ? packed_trx.get_transaction().first_authorizer() : account_name{};
@@ -777,7 +777,7 @@ namespace sysio::chain {
                if (billed_subjectively) {
                   const account_name first_auth =
                      subjective_billing::billed_authorizer(trace->action_traces[e.input].act, trx_first_authorizer);
-                  if (first_auth != e.account || subjectively_bill_payer_disabled)
+                  if (subjective_bill.bills_authorizer(e.account, first_auth))
                      authorizers[first_auth].cpu += fc::microseconds{cpu};
                }
             }
@@ -817,9 +817,9 @@ namespace sysio::chain {
                   // authorizer (e.g. {active, Y} at position 1) is intentionally NOT tracked
                   // separately, matching the objective-billing semantic where the payer absorbs
                   // the full cost.
-                  // don't subjectively bill payer twice if billing payer. Only an executed action has an entry, so
-                  // a trx refused or unauthorized before it runs charges no authorizer.
-                  if (first_auth != payer || subjectively_bill_payer_disabled) {
+                  // Only an executed action has an entry, so a trx refused or unauthorized before it runs charges no
+                  // authorizer.
+                  if (subjective_bill.bills_authorizer(payer, first_auth)) {
                      cpu_net_bill& bill = authorizers[first_auth];
                      bill.cpu += fc::microseconds{b.value};
                      bill.net_bytes += packed_trx.get_action_billable_size(i);
@@ -1021,46 +1021,52 @@ namespace sysio::chain {
       const auto& trx = packed_trx.get_transaction();
       const action_payers_t auths = trx.first_authorizers();
       const action_payers_t payers = trx.payers();
-      std::vector<account_name> auths_not_payers;
-      // payers subjective billing will be handled by transaction_context during exec
-      std::ranges::set_difference(auths, payers, std::back_inserter(auths_not_payers));
-      // The NET this trx bills each authorizer is known before execution, so it counts toward the check.
+      // The NET this trx bills each authorizer, by bill_cpu()'s rule, is known before execution, so it counts toward
+      // the check.
       const account_name trx_first_authorizer = trx.first_authorizer();
       flat_map<account_name, uint64_t> trx_net_bytes;
       for (size_t i = 0; i < trx.actions.size(); ++i) {
-         const account_name authorizer = subjective_billing::billed_authorizer(trx.actions[i], trx_first_authorizer);
-         trx_net_bytes[authorizer] += packed_trx.get_action_billable_size(i);
+         const action& act = trx.actions[i];
+         const account_name authorizer = subjective_billing::billed_authorizer(act, trx_first_authorizer);
+         if (subjective_bill.bills_authorizer(act.payer(), authorizer))
+            trx_net_bytes[authorizer] += packed_trx.get_action_billable_size(i);
       }
-      // verify any auths that are not payers subjective billing
-      for (const auto& a : auths_not_payers) {
+      const block_timestamp_type pending_block_time(control.pending_block_time());
+      for (const auto& a : auths) {
          if (subjective_bill.is_account_disabled(a))
             continue;
          const cpu_net_bill sub_bill = subjective_bill.get_subjective_bill(a, control.pending_block_time());
-         const auto&[cpu_limit, greylisted, unlimited] = get_cpu_limit(a);
-         if (!unlimited) { // else is unlimited
-            const int64_t available = subjective_cpu_allowed.count() + cpu_limit - sub_bill.cpu.count();
-            if (available <= 0) {
-               std::string assert_msg;
-               assert_msg.reserve(256);
-               assert_msg += "Subjectively terminated trx {}. Authorized";
-               if (greylisted)
-                  assert_msg += " greylisted";
-               assert_msg += " account {} exceeded subjective CPU limit {}us by {}us"
-                             " with an objective cpu limit of {}us.";
-               if( greylisted ) {
-                  SYS_THROW_RUNTIME_FORMAT( greylist_cpu_usage_exceeded, std::move(assert_msg),
-                                            packed_trx.id(), a, subjective_cpu_allowed, -available, cpu_limit );
-               } else {
-                  SYS_THROW_RUNTIME_FORMAT( tx_cpu_usage_exceeded, std::move(assert_msg),
-                                            packed_trx.id(), a, subjective_cpu_allowed, -available, cpu_limit );
+         // A payer's CPU is checked as the trx runs, against its CPU limit less its subjective bill.
+         if (payers.count(a) == 0) {
+            const auto&[cpu_limit, greylisted, unlimited] = get_cpu_limit(a);
+            if (!unlimited) { // else is unlimited
+               const int64_t available = subjective_cpu_allowed.count() + cpu_limit - sub_bill.cpu.count();
+               if (available <= 0) {
+                  std::string assert_msg;
+                  assert_msg.reserve(256);
+                  assert_msg += "Subjectively terminated trx {}. Authorized";
+                  if (greylisted)
+                     assert_msg += " greylisted";
+                  assert_msg += " account {} exceeded subjective CPU limit {}us by {}us"
+                                " with an objective cpu limit of {}us.";
+                  if( greylisted ) {
+                     SYS_THROW_RUNTIME_FORMAT( greylist_cpu_usage_exceeded, std::move(assert_msg),
+                                               packed_trx.id(), a, subjective_cpu_allowed, -available, cpu_limit );
+                  } else {
+                     SYS_THROW_RUNTIME_FORMAT( tx_cpu_usage_exceeded, std::move(assert_msg),
+                                               packed_trx.id(), a, subjective_cpu_allowed, -available, cpu_limit );
+                  }
                }
-
             }
          }
-         const auto [net_limit, net_greylisted, net_unlimited] = get_net_limit(a);
+         // Payers too: a payer's objective NET covers only the actions it pays for, not the bytes billed to it here.
+         const auto trx_bytes = trx_net_bytes.find(a);
+         if (trx_bytes == trx_net_bytes.end())
+            continue;
+         // Its usage window was not updated in this block, so its usage decays to the pending block.
+         const auto [net_limit, net_greylisted, net_unlimited] = get_net_limit(a, pending_block_time);
          if (!net_unlimited) {
-            const auto     trx_bytes = trx_net_bytes.find(a);
-            const uint64_t billed    = sub_bill.net_bytes + (trx_bytes != trx_net_bytes.end() ? trx_bytes->second : 0);
+            const uint64_t billed    = sub_bill.net_bytes + trx_bytes->second;
             const uint64_t allowed   = subjective_net_allowed + static_cast<uint64_t>(std::max<int64_t>(net_limit, 0));
             if (billed > allowed) {
                std::string assert_msg;
@@ -1087,7 +1093,8 @@ namespace sysio::chain {
       return control.get_cpu_limit(a, current_time);
    }
 
-   std::tuple<int64_t, bool, bool> transaction_context::get_net_limit(account_name a) const {
+   std::tuple<int64_t, bool, bool>
+   transaction_context::get_net_limit(account_name a, const std::optional<block_timestamp_type>& current_time) const {
       // Calculate the new highest network usage that the billed account can afford to be billed
       const auto& rl = control.get_resource_limits_manager();
       int64_t account_net_limit = large_number_no_overflow;
@@ -1102,7 +1109,7 @@ namespace sysio::chain {
             greylist_limit = specified_greylist_limit;
          }
       }
-      auto [net_limit, net_was_greylisted] = rl.get_account_net_limit(a, greylist_limit);
+      auto [net_limit, net_was_greylisted] = rl.get_account_net_limit(a, greylist_limit, current_time);
       if( net_limit >= 0 ) {
          account_net_limit = net_limit;
          greylisted_net = net_was_greylisted;

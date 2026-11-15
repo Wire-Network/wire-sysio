@@ -182,11 +182,13 @@ namespace sysio::chain {
          /// nothing, so a block receipt that leaves one out differs from the one built here and the block is rejected.
          void bill_explicit_receiver_entries();
 
-         /// The NET `a` can still be billed, whether that limit is greylisted, and whether `a` has unlimited NET.
-         std::tuple<int64_t, bool, bool> get_net_limit(account_name a) const;
+         /// The NET `a` can still be billed, whether that limit is greylisted, and whether `a` has unlimited NET. With
+         /// `current_time`, usage decays to that time first, for an account whose window is not up to date.
+         std::tuple<int64_t, bool, bool>
+         get_net_limit(account_name a, const std::optional<block_timestamp_type>& current_time = {}) const;
 
-         /// Refuses the trx if an authorizer that is not a payer is over its subjective CPU allowance, or would pass
-         /// its subjective NET allowance with the trx's bytes.
+         /// Refuses the trx if an authorizer that is not a payer is over its subjective CPU allowance, or if any
+         /// authorizer would pass its subjective NET allowance with the bytes the trx bills it.
          void verify_init_subjective_billing() const;
          void verify_net_usage(account_name account, int64_t net_usage, uint32_t net_usage_leeway);
 

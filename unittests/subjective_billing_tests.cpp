@@ -1195,13 +1195,17 @@ BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_net_billing_integration_test ) {
    // A large message makes an action cheap in CPU and expensive in bytes.
    const std::string large_message( 50'000, 'x' );
 
-   // Pushes an assertion of `condition` on `code`, then produces and applies a block on both nodes: `chain`
-   // produced it, the validating node received it. Returns the billable NET of the transaction's action.
+   // An assertion of `condition` on `code`, carrying `message`.
+   const auto assert_action = []( account_name code, vector<permission_level> auth, int8_t condition,
+                                  const std::string& message ) {
+      return action( std::move( auth ), code, assertdef::get_name(), fc::raw::pack( assertdef{condition, message} ) );
+   };
+   // Pushes `actions` in one transaction, then produces and applies a block on both nodes: `chain` produced it, the
+   // validating node received it. Returns the billable NET of the transaction's first action.
    uint32_t nonce = 0;
-   auto push_and_apply = [&]( account_name code, vector<permission_level> auth, int8_t condition = 1 ) {
+   auto push_actions_and_apply = [&]( vector<action> actions ) {
       signed_transaction trx;
-      trx.actions.emplace_back( std::move( auth ), code, assertdef::get_name(),
-                                fc::raw::pack( assertdef{condition, large_message} ) );
+      trx.actions = std::move( actions );
       chain.set_transaction_headers( trx, ++nonce );
       for( account_name signer : trx.first_authorizers() )
          trx.sign( tester::get_private_key( signer, "active" ), chain.control->get_chain_id() );
@@ -1217,6 +1221,10 @@ BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_net_billing_integration_test ) {
       sub_bill.on_block( log, block, block->timestamp );
       validator_bill.on_block( log, block, block->timestamp );
       return bytes;
+   };
+   // Pushes an assertion of `condition` on `code` with the large message.
+   auto push_and_apply = [&]( account_name code, vector<permission_level> auth, int8_t condition = 1 ) {
+      return push_actions_and_apply( {assert_action( code, std::move( auth ), condition, large_message )} );
    };
    const auto net_of = [&]( const subjective_billing& bill, account_name account ) {
       return bill.get_subjective_bill( account, chain.control->head().block_time() ).net_bytes;
@@ -1266,6 +1274,14 @@ BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_net_billing_integration_test ) {
 
    // Over the allowance, the authorizer is refused whoever pays for its action; other authorizers are unaffected.
    BOOST_CHECK_EXCEPTION( push_and_apply( contract, {{user, config::active_name}} ), tx_net_usage_exceeded,
+                          fc_exception_message_contains( "Authorized account user exceeded subjective NET limit" ) );
+   // Paying for another action in the same transaction does not exempt it: its objective NET covers only that action,
+   // not the bytes billed to it subjectively.
+   BOOST_CHECK_EXCEPTION( push_actions_and_apply( {
+                             assert_action( sysio_contract, {{user, config::active_name}}, 1, large_message ),
+                             assert_action( contract, {{user, config::sysio_payer_name}, {user, config::active_name}},
+                                            1, "x" )} ),
+                          tx_net_usage_exceeded,
                           fc_exception_message_contains( "Authorized account user exceeded subjective NET limit" ) );
    push_and_apply( sysio_contract, {{payer, config::sysio_payer_name}, {payer, config::active_name}} );
 
