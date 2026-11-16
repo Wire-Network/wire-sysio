@@ -198,10 +198,11 @@ void append_borsh_string(std::vector<uint8_t>& out, const std::string& value) {
 }
 
 /**
- * @brief Test adapter exposing protected decode helpers without RPC.
+ * @brief Test adapter exposing protected encode and decode helpers without RPC.
  */
 struct test_solana_program_client : solana_program_client {
    using solana_program_client::decode_account_data;
+   using solana_program_client::encode_type;
 
    explicit test_solana_program_client(const std::vector<idl::program>& idls = {})
       : solana_program_client(solana_client_ptr{}, make_test_pubkey(700), idls) {}
@@ -1467,6 +1468,48 @@ BOOST_AUTO_TEST_CASE(test_borsh_u256_i256_encode_decode) {
    BOOST_CHECK_EQUAL(dec.read_i256(), i256_zero);
    BOOST_CHECK_EQUAL(dec.read_i256(), i256_pos);
    BOOST_CHECK_EQUAL(dec.read_i256(), i256_neg);
+}
+
+/// An i256 is two's complement: [-2^255, 2^255 - 1]. A fc::int256 outside that range is refused.
+BOOST_AUTO_TEST_CASE(test_borsh_i256_range) {
+   const fc::int256 i256_max = (fc::int256{1} << 255) - 1;
+   const fc::int256 i256_min = -i256_max - 1;
+
+   borsh::encoder enc;
+   enc.write_i256(i256_max);
+   enc.write_i256(i256_min);
+   const auto encoded = enc.finish();
+   borsh::decoder dec(encoded);
+   BOOST_CHECK_EQUAL(dec.read_i256(), i256_max);
+   BOOST_CHECK_EQUAL(dec.read_i256(), i256_min);
+
+   borsh::encoder refused;
+   BOOST_CHECK_THROW(refused.write_i256(fc::int256{i256_max + 1}), fc::parse_error_exception);
+   BOOST_CHECK_THROW(refused.write_i256(fc::int256{i256_min - 1}), fc::parse_error_exception);
+   BOOST_CHECK(refused.finish().empty());
+}
+
+/// IDL u256 / i256 arguments are read as whole numbers: a negative i256 encodes, digits after a leading zero
+/// are decimal, and a u256 past 2^256 - 1 or an i256 past -2^255 is refused instead of wrapping.
+BOOST_AUTO_TEST_CASE(test_encode_type_u256_i256_text) {
+   test_solana_program_client program;
+   const auto u256 = idl::idl_type::make_primitive(idl::primitive_type::u256);
+   const auto i256 = idl::idl_type::make_primitive(idl::primitive_type::i256);
+
+   borsh::encoder enc;
+   program.encode_type(enc, fc::variant("-5"), i256);
+   program.encode_type(enc, fc::variant("010"), u256);
+   const auto encoded = enc.finish();
+   borsh::decoder dec(encoded);
+   BOOST_CHECK_EQUAL(dec.read_i256(), fc::int256{-5});
+   BOOST_CHECK_EQUAL(dec.read_u256(), fc::uint256{10});
+
+   // 10^78 is past 2^256 - 1 (about 1.16 * 10^77).
+   borsh::encoder refused;
+   BOOST_CHECK_THROW(program.encode_type(refused, fc::variant("1" + std::string(78, '0')), u256),
+                     fc::parse_error_exception);
+   const fc::int256 past_i256_min = -(fc::int256{1} << 255) - 1;
+   BOOST_CHECK_THROW(program.encode_type(refused, fc::variant(past_i256_min.str()), i256), fc::parse_error_exception);
 }
 
 BOOST_AUTO_TEST_CASE(test_anchor_idl_account_fields_in_types_section) {
