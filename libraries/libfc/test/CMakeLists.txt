@@ -37,6 +37,7 @@ add_executable( test_fc
         variant/test_variant_assign.cpp
         variant/test_variant_ctor.cpp
         variant/test_variant_enum.cpp
+        variant/test_variant_integer_range.cpp
         variant/test_variant_object_misc.cpp
         variant/test_variant_operators.cpp
         variant/test_variant_visitor.cpp

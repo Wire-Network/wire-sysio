@@ -860,6 +860,148 @@ BOOST_AUTO_TEST_CASE(uint_types)
 
 } FC_LOG_AND_RETHROW() }
 
+// A JSON value outside the range of an integer type narrower than 64 bits is rejected, not packed modulo the type's
+// width. `bool` packs as a uint8.
+BOOST_AUTO_TEST_CASE(narrow_integer_types_reject_out_of_range_values)
+{ try {
+
+   const char* test_abi = R"=====(
+   {
+       "version": "sysio::abi/1.1",
+       "types": [],
+       "structs": [{
+           "name": "narrow",
+           "base": "",
+           "fields": [{
+               "name": "flag",
+               "type": "bool"
+           },{
+               "name": "amount8",
+               "type": "uint8"
+           },{
+               "name": "amount32",
+               "type": "int32"
+           }]
+       }],
+       "actions": [],
+       "tables": [],
+       "ricardian_clauses": [],
+       "enums": [{
+           "name": "color",
+           "type": "uint8",
+           "values": [{"name": "red", "value": 0}, {"name": "green", "value": 255}]
+       }]
+   }
+   )=====";
+
+   abi_serializer abis(fc::json::from_string(test_abi).as<abi_def>(), yield_fn());
+
+   // The hex of `json` packed as `type`, or the name of the exception packing it threw.
+   const auto pack = [&](const std::string& type, const std::string& json) -> std::string {
+      try {
+         return fc::to_hex(abis.variant_to_binary(type, fc::json::from_string(json), yield_fn()));
+      } catch( const fc::exception& e ) {
+         return e.name();
+      }
+   };
+   const std::string rejected = "parse_error_exception";
+
+   // Each type holds its whole range, and nothing one past either end.
+   BOOST_TEST(pack("uint8", "0") == "00");
+   BOOST_TEST(pack("uint8", "255") == "ff");
+   BOOST_TEST(pack("uint8", "-1") == rejected);
+   BOOST_TEST(pack("uint8", "256") == rejected);
+
+   BOOST_TEST(pack("int8", "-128") == "80");
+   BOOST_TEST(pack("int8", "127") == "7f");
+   BOOST_TEST(pack("int8", "-129") == rejected);
+   BOOST_TEST(pack("int8", "128") == rejected);
+
+   BOOST_TEST(pack("uint16", "0") == "0000");
+   BOOST_TEST(pack("uint16", "65535") == "ffff");
+   BOOST_TEST(pack("uint16", "-1") == rejected);
+   BOOST_TEST(pack("uint16", "65536") == rejected);
+
+   BOOST_TEST(pack("int16", "-32768") == "0080");
+   BOOST_TEST(pack("int16", "32767") == "ff7f");
+   BOOST_TEST(pack("int16", "-32769") == rejected);
+   BOOST_TEST(pack("int16", "32768") == rejected);
+
+   BOOST_TEST(pack("uint32", "0") == "00000000");
+   BOOST_TEST(pack("uint32", "4294967295") == "ffffffff");
+   BOOST_TEST(pack("uint32", "-1") == rejected);
+   BOOST_TEST(pack("uint32", "4294967296") == rejected);
+
+   BOOST_TEST(pack("int32", "-2147483648") == "00000080");
+   BOOST_TEST(pack("int32", "2147483647") == "ffffff7f");
+   BOOST_TEST(pack("int32", "-2147483649") == rejected);
+   BOOST_TEST(pack("int32", "2147483648") == rejected);
+
+   // Values that an unchecked narrowing wraps back into range.
+   BOOST_TEST(pack("uint8", "260") == rejected);                    // 4
+   BOOST_TEST(pack("uint8", "18446744073709551615") == rejected);   // 255
+   BOOST_TEST(pack("int8", "255") == rejected);                     // -1
+   BOOST_TEST(pack("int8", "18446744073709551615") == rejected);    // -1
+   BOOST_TEST(pack("int8", "-9223372036854775808") == rejected);    // 0
+   BOOST_TEST(pack("uint16", "65540") == rejected);                 // 4
+   BOOST_TEST(pack("int16", "65535") == rejected);                  // -1
+   BOOST_TEST(pack("uint32", "4294967300") == rejected);            // 4
+   BOOST_TEST(pack("uint32", "9223372036854775807") == rejected);   // 4294967295
+   BOOST_TEST(pack("int32", "4294967295") == rejected);             // -1
+   BOOST_TEST(pack("int32", "18446744073709551615") == rejected);   // -1
+
+   // A number given as a string is held to the same range.
+   BOOST_TEST(pack("uint8", R"("255")") == "ff");
+   BOOST_TEST(pack("uint8", R"("256")") == rejected);
+   BOOST_TEST(pack("uint8", R"("-1")") == rejected);
+   BOOST_TEST(pack("uint8", R"("-18446744073709551361")") == rejected);   // 255 when parsed as a uint64
+   BOOST_TEST(pack("int8", R"("-128")") == "80");
+   BOOST_TEST(pack("int8", R"("128")") == rejected);
+   BOOST_TEST(pack("uint16", R"("65536")") == rejected);
+   BOOST_TEST(pack("int16", R"("-32769")") == rejected);
+   BOOST_TEST(pack("uint32", R"("4294967295")") == "ffffffff");
+   BOOST_TEST(pack("uint32", R"("4294967296")") == rejected);
+   BOOST_TEST(pack("uint32", R"("-1")") == rejected);
+   BOOST_TEST(pack("int32", R"("-2147483648")") == "00000080");
+   BOOST_TEST(pack("int32", R"("2147483648")") == rejected);
+
+   // A fractional number truncates toward zero before it is range-checked.
+   BOOST_TEST(pack("uint8", "255.9") == "ff");
+   BOOST_TEST(pack("uint8", "256.0") == rejected);
+   BOOST_TEST(pack("uint8", "-1.0") == rejected);
+   BOOST_TEST(pack("int8", "-128.9") == "80");
+   BOOST_TEST(pack("int8", "-129.0") == rejected);
+
+   BOOST_TEST(pack("bool", "true") == "01");
+   BOOST_TEST(pack("bool", "false") == "00");
+   BOOST_TEST(pack("bool", "1") == "01");
+   BOOST_TEST(pack("bool", "0") == "00");
+   BOOST_TEST(pack("bool", "256") == rejected);   // 0, false
+   BOOST_TEST(pack("bool", "257") == rejected);   // 1, true
+   BOOST_TEST(pack("bool", "-1") == rejected);
+
+   // Arrays, optionals, struct fields and an enum's integer form all pack through the element type.
+   BOOST_TEST(pack("uint8[]", "[0,255]") == "0200ff");
+   BOOST_TEST(pack("uint8[]", "[0,256]") == rejected);
+   BOOST_TEST(pack("int16[]", "[-32768,32768]") == rejected);
+   BOOST_TEST(pack("uint16?", "65535") == "01ffff");
+   BOOST_TEST(pack("uint16?", "null") == "00");
+   BOOST_TEST(pack("uint16?", "65536") == rejected);
+   BOOST_TEST(pack("narrow", R"({"flag":true,"amount8":255,"amount32":-2147483648})") == "01ff00000080");
+   BOOST_TEST(pack("narrow", R"({"flag":256,"amount8":0,"amount32":0})") == rejected);
+   BOOST_TEST(pack("narrow", R"({"flag":true,"amount8":260,"amount32":0})") == rejected);
+   BOOST_TEST(pack("narrow", R"({"flag":true,"amount8":0,"amount32":2147483648})") == rejected);
+   BOOST_TEST(pack("color", R"("green")") == "ff");
+   BOOST_TEST(pack("color", "255") == "ff");
+   BOOST_TEST(pack("color", "256") == rejected);   // red
+   BOOST_TEST(pack("color", "511") == rejected);   // green
+
+   // Both serialization entry points reject.
+   BOOST_CHECK_THROW(abis.variant_to_binary("uint8", fc::json::from_string("260"), max_serialization_time),
+                     fc::parse_error_exception);
+
+} FC_LOG_AND_RETHROW() }
+
 
 BOOST_AUTO_TEST_CASE(general)
 { try {
