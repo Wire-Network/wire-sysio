@@ -813,7 +813,7 @@ namespace fc
       for( const auto& item : vars )
          c.insert( item.as<T>() );
    }
-   // Generic boost::multiprecision to_variant/from_variant moved to fc/variant_multiprecision.hpp
+   // to_variant/from_variant for the boost::multiprecision UInt<N>/Int<N> aliases live in fc/variant_multiprecision.hpp
 
    // Arithmetic on variants is not supported. The previous implementations
    // were unused dead code and `operator-` contained a never-reached loop bug.

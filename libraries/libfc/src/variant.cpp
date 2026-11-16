@@ -1171,6 +1171,14 @@ void from_variant( const variant& v, UInt<32>& n ) { n = static_cast<uint32_t>(v
 void to_variant( const UInt<64>& n, variant& v ) { v = uint64_t(n); }
 void from_variant( const variant& v, UInt<64>& n ) { n = v.as_uint64(); }
 
+// Assign through the boost base: number's converting operator= is selected for the derived fc::uint256 and
+// fc::int256 and does not compile.
+void to_variant( const UInt<256>& n, variant& v ) { v = n.str(); }
+void from_variant( const variant& v, UInt<256>& n ) { n = static_cast<const UInt<256>&>(v.as_uint256()); }
+
+void to_variant( const Int<256>& n, variant& v ) { v = n.str(); }
+void from_variant( const variant& v, Int<256>& n ) { n = static_cast<const Int<256>&>(v.as_int256()); }
+
 constexpr size_t minimize_max_size = 1024;
 
 // same behavior as std::string::substr only removes invalid utf8, and lower ascii
