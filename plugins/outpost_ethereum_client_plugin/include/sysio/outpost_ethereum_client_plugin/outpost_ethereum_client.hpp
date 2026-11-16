@@ -501,8 +501,8 @@ private:
 
    /// Send one `epochIn` at `gas_budget`, after settling the journal. The call is
    /// journaled once it was sent: landed when its receipt came back, pending
-   /// when its wait failed (the receipt wait ran out, or the send's outcome is
-   /// unknown), which is reported as
+   /// when its wait failed (the receipt wait ran out, the send's outcome is
+   /// unknown, or the client refused the receipt), which is reported as
    /// `chain::outpost_delivery_incomplete_exception`; a node refusal propagates.
    epoch_in_receipt send_epoch_in(uint32_t epoch_index, const std::string& envelope_hex, uint64_t gas_budget,
                                   fc::time_point deadline_abs);
