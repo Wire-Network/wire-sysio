@@ -1903,7 +1903,8 @@ void producer_plugin_impl::plugin_startup() {
             [&](size_t i) {
                chain.init_thread_local_data();
                _ro_timers[i] = &chain.get_thread_local_timer();
-            });
+            },
+            config::contract_thread_stack_size);
 
          _time_tracker.pause(); // start_write_window assumes time_tracker is paused
          start_write_window();

@@ -146,6 +146,10 @@ namespace sysio::chain::config {
   const static sysio::chain::wasm_interface::vm_type default_wasm_runtime = sysio::chain::wasm_interface::vm_type::sys_vm;
 #endif
 
+  /// Stack a thread that runs contracts needs. sys-vm-oc and sys-vm-jit run wasm on the calling thread's stack until
+  /// their bound for it passes 4 MiB, then on a stack they map; the rest is for host functions and the frames below.
+  static constexpr std::size_t contract_thread_stack_size = 8*1024*1024;
+
   static constexpr uint32_t   default_abi_serializer_max_time_us = 15*1000; ///< default deadline for abi serialization methods
 
   /**

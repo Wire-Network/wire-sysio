@@ -155,6 +155,12 @@ endif()
 
 #To run plugin_test with all log from blockchain displayed, put --verbose after --, i.e. plugin_test -- --verbose
 add_p_test(NAME plugin_test COMMAND plugin_test --report_level=detailed --color_output)
+# Under this ulimit -s (KiB) a thread created without a stack size gets less than a thread that runs contracts needs.
+set(SMALL_THREAD_STACK_KIB 2048)
+set(READ_ONLY_THREAD_STACK_CASE read_only_trxs/read_only_threads_get_contract_thread_stack)
+set(READ_ONLY_THREAD_STACK_COMMAND "ulimit -s ${SMALL_THREAD_STACK_KIB} && exec \"$<TARGET_FILE:plugin_test>\"")
+string(APPEND READ_ONLY_THREAD_STACK_COMMAND " --run_test=${READ_ONLY_THREAD_STACK_CASE} --report_level=detailed")
+add_p_test(NAME plugin_test_read_only_thread_stack COMMAND sh -c "${READ_ONLY_THREAD_STACK_COMMAND}")
 add_p_test(NAME bootstrap_order_test COMMAND tests/bootstrap_order_test.py)
 add_p_test(NAME genesis_timestamp_test COMMAND tests/genesis_timestamp_test.py)
 add_p_test(NAME nodeop_irreversible_mode_progress_test COMMAND tests/nodeop_irreversible_mode_progress_test.py)
