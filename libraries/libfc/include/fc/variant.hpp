@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <charconv>
 #include <deque>
 #include <map>
@@ -7,6 +8,7 @@
 #include <set>
 #include <string_view>
 #include <system_error>
+#include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
 #include <variant>
@@ -63,6 +65,15 @@ namespace fc
    template<typename... T> void to_variant( const std::variant<T...>& s, fc::variant& v );
    template<typename... T> void from_variant( const fc::variant& v, std::variant<T...>& s );
 
+   /**
+    * @name Integers narrower than 64 bits
+    *
+    * from_variant accepts an integer, a double (truncated toward zero), a decimal string, a bool, and null as zero.
+    *
+    * @throw parse_error_exception if the value is outside the range of the target type
+    * @throw bad_cast_exception if the variant holds a type that does not convert to an integer
+    * @{
+    */
    void to_variant( const uint8_t& var,  fc::variant& vo );
    void from_variant( const fc::variant& var,  uint8_t& vo );
    void to_variant( const int8_t& var,  fc::variant& vo );
@@ -77,6 +88,7 @@ namespace fc
    void from_variant( const fc::variant& var,  uint32_t& vo );
    void to_variant( const int32_t& var,  fc::variant& vo );
    void from_variant( const fc::variant& var,  int32_t& vo );
+   /// @}
 
    // to_variant/from_variant for __int128 types declared in fc/int128.hpp
 
@@ -437,6 +449,18 @@ namespace fc
         void    clear();
       private:
         void    init();
+
+        /// Read a scalar or pointer value without accessing a typed object inside the character storage.
+        template <typename T>
+        T load_payload() const;
+
+        /// Store the explicitly selected type's representation without changing bytes outside the payload or its tag.
+        template <typename T>
+        void store_payload(std::type_identity_t<T> value);
+
+        /// Select inline or owning heap storage for a string, retaining its existing representation.
+        inline void make_string_inline_or_heap(std::string_view src);
+
         //enough room to store pointers, doubles, uint64s. doubled to allow 1 extra byte to store type at the end
         alignas(double) std::array<char, std::max(sizeof(uintmax_t ), sizeof(double)) * 2> _data = {};
    };

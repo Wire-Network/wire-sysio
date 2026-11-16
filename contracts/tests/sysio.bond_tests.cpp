@@ -685,6 +685,20 @@ public:
       return seen;
    }
 
+   /// The accounts the last pushed transaction asked sysio to exempt from subjective billing, in order. Each
+   /// request is an inline `addsubjex` under sysio.bond's own authority.
+   std::vector<name> exemption_requests() const {
+      std::vector<name> accounts;
+      if (!last_trace) return accounts;
+      const std::vector<permission_level> own_authority{permission_level{BOND_ACCOUNT, config::active_name}};
+      for (const auto& at : last_trace->action_traces) {
+         if (at.act.account != SYSIO_ACCOUNT || at.act.name != "addsubjex"_n || at.receiver != SYSIO_ACCOUNT) continue;
+         BOOST_REQUIRE(at.act.authorization == own_authority);
+         accounts.push_back(fc::raw::unpack<name>(at.act.data));
+      }
+      return accounts;
+   }
+
    abi_serializer bond_abi_ser, liq_abi_ser, token_abi_ser, tokens_abi_ser, chains_abi_ser;
    transaction_trace_ptr last_trace;   ///< trace of the last successful push; null after a failure
 };
@@ -936,6 +950,42 @@ BOOST_FIXTURE_TEST_CASE(accept_pulls_the_bond_and_records_it, sysio_bond_tester)
    const auto rows = bond_rows_of(1);
    BOOST_REQUIRE_EQUAL(1u, rows.size());
    BOOST_REQUIRE_EQUAL(false, rows.front()["paid"].as_bool());
+} FC_LOG_AND_RETHROW()
+
+// A new bond on a system contract's request asks sysio to exempt its underwriter from subjective billing; adding
+// to a bond does not.
+BOOST_FIXTURE_TEST_CASE(accept_asks_sysio_to_exempt_a_new_underwriter, sysio_bond_tester) try {
+   BOOST_REQUIRE_EQUAL(success(), request(SYND_ACCOUNT, "oppenvelope"_n, bytes(32, 'a'), LIQSOL, 10 * UNIT, 0));
+
+   BOOST_REQUIRE_EQUAL(success(), accept("alice"_n, 1, 4 * UNIT));
+   BOOST_REQUIRE(exemption_requests() == std::vector<name>{"alice"_n});
+   BOOST_REQUIRE_EQUAL(success(), accept("alice"_n, 1, 2 * UNIT));
+   BOOST_REQUIRE(exemption_requests().empty());
+   BOOST_REQUIRE_EQUAL(success(), accept("bob"_n, 1, 4 * UNIT));
+   BOOST_REQUIRE(exemption_requests() == std::vector<name>{"bob"_n});
+} FC_LOG_AND_RETHROW()
+
+// Anyone may issue a request and bond it, so a request of an ordinary account exempts nobody.
+BOOST_FIXTURE_TEST_CASE(accept_exempts_nobody_on_an_ordinary_request, sysio_bond_tester) try {
+   BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'a'), LIQSOL, 10 * UNIT, 0));
+   BOOST_REQUIRE_EQUAL(success(), accept("alice"_n, 1, 4 * UNIT));
+   BOOST_REQUIRE(exemption_requests().empty());
+} FC_LOG_AND_RETHROW()
+
+// With sysio.system on sysio the underwriter is listed, so its bond on another request does not ask again.
+BOOST_FIXTURE_TEST_CASE(accept_does_not_ask_again_for_a_listed_underwriter, sysio_bond_tester) try {
+   set_code(SYSIO_ACCOUNT, contracts::system_wasm());
+   set_abi(SYSIO_ACCOUNT, contracts::system_abi().data());
+   produce_block();
+   BOOST_REQUIRE_EQUAL(success(), request(SYND_ACCOUNT, "oppenvelope"_n, bytes(32, 'a'), LIQSOL, 10 * UNIT, 0));
+   BOOST_REQUIRE_EQUAL(success(), request(SYND_ACCOUNT, "oppenvelope"_n, bytes(32, 'b'), LIQSOL, 10 * UNIT, 0));
+
+   BOOST_REQUIRE_EQUAL(success(), accept("alice"_n, 1, 4 * UNIT));
+   BOOST_REQUIRE(exemption_requests() == std::vector<name>{"alice"_n});
+   BOOST_REQUIRE_EQUAL(success(), accept("alice"_n, 2, 4 * UNIT));
+   BOOST_REQUIRE(exemption_requests().empty());
+   BOOST_REQUIRE_EQUAL(success(), accept("bob"_n, 2, 4 * UNIT));
+   BOOST_REQUIRE(exemption_requests() == std::vector<name>{"bob"_n});
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE(accept_refuses_off_increment_and_zero, sysio_bond_tester) try {

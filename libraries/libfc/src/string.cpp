@@ -4,6 +4,8 @@
 #include <fc/string.hpp>
 #include <fc/utf8.hpp>
 #include <fc/variant.hpp>
+#include <algorithm>
+#include <cctype>
 #include <format>
 #include <iomanip>
 #include <limits>
@@ -123,6 +125,10 @@ bool all_digits(const std::string_view& s) {
 
 bool all_digits(const std::string& s) {
    return all_digits(std::string_view{s.data(), s.size()});
+}
+
+bool all_hex_digits(std::string_view s) {
+   return std::ranges::all_of(s, [](unsigned char c) { return std::isxdigit(c) != 0; });
 }
 
 } // namespace fc

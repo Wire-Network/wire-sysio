@@ -2,10 +2,19 @@
 #include <fc/network/solana/solana_borsh.hpp>
 
 #include <cstring>
+#include <string_view>
 
 #include <fc/crypto/sha256.hpp>
+#include <fc/detail/integer_range.hpp>
 
 namespace fc::network::solana::borsh {
+
+namespace {
+
+constexpr std::string_view i256_name = "i256";
+constexpr unsigned i256_bits = 256;
+
+} // namespace
 
 //=============================================================================
 // Encoder implementation
@@ -52,16 +61,15 @@ void encoder::write_i128(const fc::int128& v) {
 }
 
 void encoder::write_i256(const fc::int256& v) {
-   // Write as little-endian using two's complement: 4 x 64-bit chunks
-   // Convert to unsigned for bit manipulation, preserving two's complement representation
-   fc::uint256 uv;
-   if (v >= 0) {
-      uv = fc::uint256(v);
-   } else {
-      // For negative values, we need the two's complement representation
-      // boost::multiprecision handles this correctly when casting
-      uv = fc::uint256(v);
-   }
+   // fc::int256 is sign-magnitude, so it holds values the two's complement i256 cannot.
+   static const fc::int256 max = (fc::int256{1} << (i256_bits - 1)) - 1;
+   static const fc::int256 min = -max - 1;
+   if (v < min || v > max)
+      fc::detail::throw_out_of_range(v.str(), i256_name, min.str(), max.str());
+
+   // Write as little-endian using two's complement: 4 x 64-bit chunks. boost converts a negative value to unsigned
+   // modulo 2^256.
+   const fc::uint256 uv(v);
    fc::uint256 mask64 = std::numeric_limits<uint64_t>::max();
    write_u64(static_cast<uint64_t>(uv & mask64));
    write_u64(static_cast<uint64_t>((uv >> 64) & mask64));

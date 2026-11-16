@@ -545,7 +545,8 @@ std::optional<bond::request_row> find_request(name self, const synd::envelope_ro
 }
 
 /// Snapshot a terminal outcome before acknowledging it. This function moves no funds and includes
-/// DONE envelopes whose release finished before challenge finality. Settlement work rewinds release.
+/// DONE envelopes whose release finished before challenge finality. A ruling on an envelope the release walk
+/// may be past -- finished before an INVALID ruling, or held -- rewinds the pair's `queue_epoch` to it.
 /// True when it changed `row`: a new request id, or a terminal outcome.
 bool synchronize(name self, synd::envelope_row& row) {
    if (row.state == synd::envelope_state::OPEN || row.state == synd::envelope_state::WAITING ||
@@ -563,8 +564,10 @@ bool synchronize(name self, synd::envelope_row& row) {
       row.forfeit = req->bonded;
       row.bounty_returned = req->hold_beneficiary == name{} ? req->bounty : 0;
    } else return identified;
-   if (row.outcome == outcome::INVALID) {
-      if (row.state == synd::envelope_state::DONE) row.state = synd::envelope_state::HELD;
+   if (row.outcome == outcome::INVALID && row.state == synd::envelope_state::DONE) {
+      row.state = synd::envelope_state::HELD;
+   }
+   if (row.outcome == outcome::INVALID || row.state == synd::envelope_state::HELD) {
       synd::ledger_t ledger(self);
       const synd::ledger_key key{row.chain_code.value, row.token_code.value};
       auto lrow = ledger.try_get(key);
@@ -682,7 +685,8 @@ private:
    /// Walk the envelopes of the pair of `st` from its ledger's `queue_epoch`, at most as many as the
    /// budget and the examination cap leave: refresh each issued request, release RELEASABLE envelopes,
    /// issue the oldest WAITING envelope's request when no earlier one is unbonded and unruled, and move
-   /// `queue_epoch` past the finished prefix. Each envelope looked at and each item row read counts one
+   /// `queue_epoch` past the finished prefix. A fully bonded HELD envelope awaiting its ruling counts as
+   /// finished for the release cursor. Each envelope looked at and each item row read counts one
    /// examination. The refresh reads state only and spends no budget, so every issued request the walk
    /// reaches has its outcome recorded, whatever the pair's flows; releasing, burning and requesting
    /// spend the budget. Entry costs one examination, for the ledger and config rows and the first
@@ -716,7 +720,7 @@ private:
       }
 
       uint32_t queue_epoch = underwriting_ ? lrow->underwriting_epoch : lrow->queue_epoch;
-      bool     finished    = true;    // every envelope walked so far is DONE or INVALID
+      bool     finished    = true;    // the cursor can move past every envelope walked so far
       bool     unbonded    = false;   // an earlier request is neither bonded nor ruled: nothing moves past it
       for (const auto& key : keys) {
          if (!look()) break;
@@ -747,17 +751,25 @@ private:
                             (row->state != synd::envelope_state::WAITING &&
                              row->state != synd::envelope_state::OPEN &&
                              row->state != synd::envelope_state::REQUESTED)))
-            : (row->state == synd::envelope_state::DONE || row->state == synd::envelope_state::INVALID);
+            // A fully bonded hold awaiting its ruling keeps back only its own envelope: the walk moves on, and
+            // `synchronize` brings it back when the ruling is recorded.
+            : (row->state == synd::envelope_state::DONE || row->state == synd::envelope_state::INVALID ||
+               (row->state == synd::envelope_state::HELD && row->outcome == synd::request_outcome::PENDING &&
+                !unbonded));
          if (finished && done) {
             queue_epoch = key.epoch_index + 1;
          } else {
             finished = false;
          }
       }
-      if (queue_epoch != (underwriting_ ? lrow->underwriting_epoch : lrow->queue_epoch)) {
-         if (underwriting_) lrow->underwriting_epoch = queue_epoch;
-         else lrow->queue_epoch = queue_epoch;
-         ledger.set(ram_payer, lkey, *lrow);
+      if (queue_epoch != start_epoch) {
+         // Read again: a ruling this walk recorded may have rewound the pair's release cursor.
+         lrow = ledger.try_get(lkey);
+         if (lrow) {
+            if (underwriting_) lrow->underwriting_epoch = queue_epoch;
+            else lrow->queue_epoch = queue_epoch;
+            ledger.set(ram_payer, lkey, *lrow);
+         }
       }
       return true;
    }

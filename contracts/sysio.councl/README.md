@@ -8,6 +8,7 @@ Council elections fill 21 seats through simultaneous prioritized T1 flights and 
 - After closure, each seat evaluates T1, T2, T3 and then A, B, C within each tier. Winners require `floor(2*B/3)+1` YES votes, where B counts that tier's accepted ballots in the round, including a T1 ballot that omits its own flight. All 21 T1 submissions require 15 YES. Zero submissions cannot elect; there is no extra turnout quorum. Already elected candidates are skipped.
 - Continuation preserves winners, registration, and electorates, and starts fresh nominations/ballots and counters for every remaining vacancy until all 21 seats are filled. There is no manual assignment fallback. Explicit reset aborts unfinished elections and deletes partial results.
 - Generation, round, and finalized flight-set commitments bind signed ballots. Generation and tabulation use resumable ordered cursors.
+- The contract keeps the two authorities `sysio` can be delegated to: `syncnodes` writes the current T1 owners into `sysio.nodes@active`, and filling the last seat writes the 21 members into `sysio.cncl@active`, each at `floor(2*N/3)+1`. It never changes `sysio`'s own permissions.
 
 The candidate pool remains 23–1,000 self-registered accounts with short handles. Rich profiles, stronger randomness, new candidacy policy, and Hub UI integration are separate work.
 
