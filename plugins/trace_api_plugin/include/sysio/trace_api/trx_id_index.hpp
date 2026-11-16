@@ -3,6 +3,7 @@
 #include <sysio/trace_api/common.hpp>
 #include <sysio/chain/types.hpp>
 #include <fc/io/cfile.hpp>
+#include <fc/read_only_array_view.hpp>
 #include <fc/reflect/reflect.hpp>
 #include <cstddef>
 #include <cstring>
@@ -54,6 +55,7 @@ struct trx_id_bucket {
    uint32_t reserved  = 0;
 };
 static_assert(sizeof(trx_id_bucket) == 16);
+static_assert(sizeof(trx_id_index_header) % alignof(trx_id_bucket) == 0);
 
 /// 64-bit hash key shared by writer and reader: the first 8 bytes of the trx sha256.
 /// fc::sha256 is a plain struct with no padding before its data.
@@ -100,8 +102,11 @@ private:
 
 class trx_id_index_reader {
 public:
+   /// Validate and map a native index, accessing bucket representations through a read-only view.
    explicit trx_id_index_reader(const std::filesystem::path& path);
+   /// Transfer ownership of the mapping and leave the source invalid.
    trx_id_index_reader(trx_id_index_reader&& other) noexcept;
+   /// Release the current mapping and transfer ownership from the source.
    trx_id_index_reader& operator=(trx_id_index_reader&& other) noexcept;
    trx_id_index_reader(const trx_id_index_reader&)            = delete;
    trx_id_index_reader& operator=(const trx_id_index_reader&) = delete;
@@ -109,17 +114,18 @@ public:
 
    bool valid() const { return _valid; }
 
-   // Returns the block_num for trx_id's prefix, or nullopt if not found.
+   /// Return the block number for trx_id's prefix, or nullopt if not found.
    std::optional<uint32_t> lookup(const chain::transaction_id_type& trx_id) const;
 
 private:
+   /// Release the mapping and clear its bucket view.
    void unmap() noexcept;
 
-   const trx_id_bucket* _buckets      = nullptr; // into the mapping, just past the header
-   uint32_t             _bucket_count = 0;
-   void*                _map_base     = nullptr;
-   std::size_t          _map_size     = 0;
-   bool                 _valid        = false;
+   /// Native bucket representations immediately after the mapped header; reads return live values.
+   fc::read_only_array_view<trx_id_bucket> _buckets;
+   void*       _map_base = nullptr;
+   std::size_t _map_size = 0;
+   bool        _valid    = false;
 };
 
 } // namespace sysio::trace_api
