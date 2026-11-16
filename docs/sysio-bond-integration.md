@@ -117,9 +117,9 @@ declaring `sysio@active` is refused: the contract requires its own account, not 
 
 Under the native rules a permission can rewrite itself. The judge can therefore change the authority of
 the ruling permission it satisfies, add permissions beneath it, and re-link or unlink that ruling; it
-cannot reach `setconfig` or any other action. `sysio.bond@active` reverts any of it, but replacing the
-two authorities does not: revoking a judge also means restoring both action links and deleting what
-it added. Follow [Replacing the judge account](emergency-stop-playbook.md#replacing-the-judge-account).
+cannot reach `setconfig` or any other action. `sysio.bond@owner` reverts any of it, but replacing the
+two authorities does not: revoking a judge also means unlinking and relinking both rulings and removing
+what it added. Follow [Replacing the judge account](emergency-stop-playbook.md#replacing-the-judge-account).
 
 The hold bond is `covered * hold_bps / 10000` (`hold_bps` is 1000 until `sysio` sets another). When
 that rounds to zero, the request is held with no hold bond.

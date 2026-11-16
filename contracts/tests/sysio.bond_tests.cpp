@@ -1,6 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/abi_serializer.hpp>
+#include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/kv_table_objects.hpp>
 #include <sysio/chain/resource_limits.hpp>
 #include <sysio/opp/opp.hpp>
@@ -157,6 +158,8 @@ public:
    static constexpr auto RSLVINVALID    = "rslvinvalid"_n;
    /// A permission a judge adds beneath a ruling permission to keep its hold on the ruling.
    static constexpr auto KEPT_PERMISSION = "kept"_n;
+   /// The same beneath the INVALID ruling's permission.
+   static constexpr auto KEPT_INVALID_PERMISSION = "keptinvalid"_n;
 
    static inline const symbol WIRE_SYM   = symbol::from_string("9,WIRE");
    static inline const symbol LIQSOL_SYM = symbol::from_string("9,LIQSOL");
@@ -1950,6 +1953,105 @@ BOOST_FIXTURE_TEST_CASE(replacing_a_judge_requires_restoring_the_ruling_link, sy
    produce_block();
    require_refusal(rule_through(RSLVVALID, JUDGE_ACCOUNT, KEPT_PERMISSION, 4), missing_permission_msg);
    BOOST_REQUIRE_EQUAL(STATE_OPEN, request_state_of(4));
+} FC_LOG_AND_RETHROW()
+
+/// The playbook's rotation runs as one transaction, as a multisig proposal executes it, from wherever the
+/// judge left the VALID link, and from both links moved. Only an absent link refuses it, and then the
+/// judge has already lost that ruling; the rotation without that unlink completes.
+BOOST_AUTO_TEST_CASE(judge_rotation_is_one_transaction_from_any_link_state) try {
+   using sysio_system::test_support::delegated_link;
+   constexpr auto NEW_JUDGE = "alice"_n;
+   const auto rulings = std::vector<name>{sysio_bond_tester::RSLVVALID, sysio_bond_tester::RSLVINVALID};
+   for (auto state : magic_enum::enum_values<delegated_link>()) {
+      for (bool both_moved : {false, true}) {
+         if (both_moved && state != delegated_link::moved_beneath) continue;
+         BOOST_TEST_CONTEXT("VALID link " << magic_enum::enum_name(state) << (both_moved ? ", INVALID moved too" : "")) {
+            sysio_bond_tester t;
+            const auto RSLVVALID = sysio_bond_tester::RSLVVALID, RSLVINVALID = sysio_bond_tester::RSLVINVALID;
+            const auto JUDGE = sysio_bond_tester::JUDGE_ACCOUNT, KEPT = sysio_bond_tester::KEPT_PERMISSION;
+            t.delegate_rulings();
+            for (char fill : {'a', 'b', 'c'}) t.open_request(fill);
+
+            // The judge leaves its links where `state` says, before it is replaced.
+            const auto move_beneath = [&](name ruling, name kept) {
+               BOOST_REQUIRE_EQUAL(t.success(), t.add_child_permission(JUDGE, ruling, kept, {JUDGE}));
+               BOOST_REQUIRE_EQUAL(t.success(), t.link_ruling_through(JUDGE, ruling, ruling, kept));
+            };
+            switch (state) {
+               case delegated_link::in_place: break;
+               case delegated_link::moved_beneath: move_beneath(RSLVVALID, KEPT); break;
+               case delegated_link::any:
+                  BOOST_REQUIRE_EQUAL(t.success(), t.link_ruling_through(JUDGE, RSLVVALID, RSLVVALID, config::sysio_any_name));
+                  break;
+               case delegated_link::owner:
+                  BOOST_REQUIRE_EQUAL(t.success(), t.link_ruling_through(JUDGE, RSLVVALID, RSLVVALID, config::owner_name));
+                  // `active` no longer reaches the link, which is why the rotation declares `owner`.
+                  require_refusal(t.push_native_through(sysio_bond_tester::BOND_ACCOUNT, config::active_name,
+                                     unlinkauth{sysio_bond_tester::BOND_ACCOUNT, sysio_bond_tester::BOND_ACCOUNT, RSLVVALID}),
+                                  irrelevant_authority_msg);
+                  break;
+               case delegated_link::absent:
+                  BOOST_REQUIRE_EQUAL(t.success(), t.push_native_through(JUDGE, RSLVVALID,
+                     unlinkauth{sysio_bond_tester::BOND_ACCOUNT, sysio_bond_tester::BOND_ACCOUNT, RSLVVALID}));
+                  break;
+            }
+            if (both_moved) move_beneath(RSLVINVALID, sysio_bond_tester::KEPT_INVALID_PERMISSION);
+
+            const auto auth = delegated_authority({NEW_JUDGE, sysio_bond_tester::SYSIO_ACCOUNT});
+            if (state == delegated_link::absent) {
+               // Refused whole: the judge still holds INVALID.
+               require_refusal(sysio_system::test_support::rotate_delegate(t, sysio_bond_tester::BOND_ACCOUNT, rulings, auth),
+                               sysio_system::test_support::no_link_msg);
+               BOOST_REQUIRE_EQUAL(t.success(), t.rule_through(RSLVINVALID, JUDGE, RSLVINVALID, 3));
+               BOOST_REQUIRE_EQUAL(t.success(), sysio_system::test_support::rotate_delegate(
+                                                   t, sysio_bond_tester::BOND_ACCOUNT, rulings, auth, {RSLVVALID}));
+            } else {
+               BOOST_REQUIRE_EQUAL(t.success(),
+                                   sysio_system::test_support::rotate_delegate(t, sysio_bond_tester::BOND_ACCOUNT, rulings, auth));
+            }
+
+            // The former judge reaches neither ruling, through its own permissions or what it added.
+            require_refusal(t.rule_through(RSLVVALID, JUDGE, RSLVVALID, 1), unsatisfied_authority_msg);
+            require_refusal(t.rule_through(RSLVINVALID, JUDGE, RSLVINVALID, 1), unsatisfied_authority_msg);
+            if (state == delegated_link::moved_beneath)
+               require_refusal(t.rule_through(RSLVVALID, JUDGE, KEPT, 1), irrelevant_authority_msg);
+            if (both_moved)
+               require_refusal(t.rule_through(RSLVINVALID, JUDGE, sysio_bond_tester::KEPT_INVALID_PERMISSION, 1),
+                               irrelevant_authority_msg);
+            BOOST_REQUIRE_EQUAL(STATE_OPEN, t.request_state_of(1));
+
+            // The new judge rules each through the permission of its name.
+            BOOST_REQUIRE_EQUAL(t.success(), t.rule_through(RSLVVALID, NEW_JUDGE, RSLVVALID, 1));
+            BOOST_REQUIRE_EQUAL(STATE_VALID, t.request_state_of(1));
+            BOOST_REQUIRE_EQUAL(t.success(), t.rule_through(RSLVINVALID, NEW_JUDGE, RSLVINVALID, 2));
+            BOOST_REQUIRE_EQUAL(STATE_INVALID, t.request_state_of(2));
+         }
+      }
+   }
+} FC_LOG_AND_RETHROW()
+
+/// A permission the judge added stays its own after the rotation and can still grow, each addition
+/// billed to `sysio.bond`'s RAM, until it is rewritten. Then it is deleted, deepest first.
+BOOST_FIXTURE_TEST_CASE(a_rotated_judge_keeps_its_leftovers_until_they_are_rewritten, sysio_bond_tester) try {
+   constexpr auto GROWN = "grown"_n;
+   delegate_rulings();
+   BOOST_REQUIRE_EQUAL(success(), add_child_permission(JUDGE_ACCOUNT, RSLVVALID, KEPT_PERMISSION, {JUDGE_ACCOUNT}));
+   BOOST_REQUIRE_EQUAL(success(), sysio_system::test_support::rotate_delegate(
+                                     *this, BOND_ACCOUNT, {RSLVVALID, RSLVINVALID},
+                                     delegated_authority({"alice"_n, SYSIO_ACCOUNT})));
+
+   // The former judge still holds what it added, and can add beneath it.
+   BOOST_REQUIRE_EQUAL(success(), add_child_permission(JUDGE_ACCOUNT, KEPT_PERMISSION, GROWN, {JUDGE_ACCOUNT}));
+
+   // Rewritten to governance, they are out of its reach; then they go, deepest first.
+   set_authority(BOND_ACCOUNT, KEPT_PERMISSION, delegated_authority({SYSIO_ACCOUNT}), RSLVVALID);
+   set_authority(BOND_ACCOUNT, GROWN, delegated_authority({SYSIO_ACCOUNT}), KEPT_PERMISSION);
+   produce_block();
+   require_refusal(add_child_permission(JUDGE_ACCOUNT, GROWN, "grown2"_n, {JUDGE_ACCOUNT}), unsatisfied_authority_msg);
+   delete_authority(BOND_ACCOUNT, GROWN);
+   delete_authority(BOND_ACCOUNT, KEPT_PERMISSION);
+   produce_block();
+   BOOST_REQUIRE(control->get_authorization_manager().find_permission({BOND_ACCOUNT, KEPT_PERMISSION}) == nullptr);
 } FC_LOG_AND_RETHROW()
 
 // A HOLD_BOND escrow exists only when the hold bond is positive; a hold whose bond rounds to zero

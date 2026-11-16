@@ -176,6 +176,46 @@ typename Tester::action_result push_native_action_and_produce_block(Tester& test
    }
 }
 
+/// The single transaction that hands each of `actions` to `auth`, as the emergency-stop playbook
+/// prescribes: an `updateauth` of the permission named after each action, then per action an
+/// `unlinkauth` and a `linkauth` back to that permission, all declared by `account@owner`.
+/// `relink_only` names actions with no link to undo, which get no `unlinkauth`.
+template <typename Tester>
+typename Tester::action_result rotate_delegate(Tester& tester, name account, const std::vector<name>& actions,
+                                              const authority& auth, const std::vector<name>& relink_only = {}) {
+   try {
+      const std::vector<permission_level> owner{{account, config::owner_name}};
+      signed_transaction trx;
+      for (auto action_name : actions)
+         trx.actions.emplace_back(owner, updateauth{account, action_name, config::active_name, auth});
+      for (auto action_name : actions) {
+         if (std::find(relink_only.begin(), relink_only.end(), action_name) == relink_only.end())
+            trx.actions.emplace_back(owner, unlinkauth{account, account, action_name});
+         trx.actions.emplace_back(owner, linkauth{account, account, action_name, action_name});
+      }
+      tester.set_transaction_headers(trx);
+      trx.sign(tester.get_private_key(account, "owner"), tester.control->get_chain_id());
+      tester.push_transaction(trx);
+      tester.produce_block();
+      return Tester::success();
+   } catch (const fc::exception& ex) {
+      return Tester::error(ex.top_message());
+   }
+}
+
+/// Where a delegate can leave the link of the action it was delegated before it is rotated out.
+enum class delegated_link {
+   in_place,       ///< linked to the permission of its own name, as delegated
+   moved_beneath,  ///< linked to a permission the delegate added beneath that one
+   any,            ///< linked to `sysio.any`, which any permission of the account satisfies
+   owner,          ///< linked to `owner`, which a write declared `active` cannot change
+   absent          ///< unlinked, so the action requires `active`
+};
+
+/// The refusal of an `unlinkauth` for an action that has no link, when pushed directly. Inside a
+/// privileged sender such as `sysio.msig` the same unlink fails later, with "no link found".
+inline constexpr std::string_view no_link_msg = "cannot unlink non-existent permission link";
+
 /// Require `result` to be a refusal whose message contains `fragment`.
 inline void require_refusal(const std::string& result, std::string_view fragment) {
    BOOST_REQUIRE_MESSAGE(!result.empty() && result.find(fragment) != std::string::npos,

@@ -157,6 +157,67 @@ BOOST_FIXTURE_TEST_CASE(replacing_a_delegate_requires_restoring_the_action_link,
    BOOST_REQUIRE(cord()["pulled"].as_bool());
 }
 
+/// The playbook's rotation runs as one transaction, as a multisig proposal executes it, from wherever the
+/// panic account left the pull link. Only an absent link refuses it, and then pull is already out of the
+/// panic account's reach; the rotation without that unlink completes.
+BOOST_AUTO_TEST_CASE(panic_rotation_is_one_transaction_from_any_link_state) {
+   using support::delegated_link;
+   using T = sysio_andon_tester;
+   const auto actions = std::vector<name>{"pull"_n, "clear"_n};
+   for (auto state : magic_enum::enum_values<delegated_link>()) {
+      BOOST_TEST_CONTEXT("pull link " << magic_enum::enum_name(state)) {
+         T t;
+         t.configure();
+         // The cord row exists only once the cord has been pulled.
+         const auto pulled = [&t] { return !t.bytes().empty() && t.cord()["pulled"].as_bool(); };
+         switch (state) {
+            case delegated_link::in_place: break;
+            case delegated_link::moved_beneath:
+               BOOST_REQUIRE_EQUAL(t.success(), t.push_native_through(T::PANIC, "pull"_n,
+                  updateauth{T::ANDON, T::KEPT_PERMISSION, "pull"_n, support::delegated_authority({T::PANIC})}));
+               BOOST_REQUIRE_EQUAL(t.success(), t.push_native_through(T::PANIC, "pull"_n,
+                  linkauth{T::ANDON, T::ANDON, "pull"_n, T::KEPT_PERMISSION}));
+               break;
+            case delegated_link::any:
+               BOOST_REQUIRE_EQUAL(t.success(), t.push_native_through(T::PANIC, "pull"_n,
+                  linkauth{T::ANDON, T::ANDON, "pull"_n, config::sysio_any_name}));
+               break;
+            case delegated_link::owner:
+               BOOST_REQUIRE_EQUAL(t.success(), t.push_native_through(T::PANIC, "pull"_n,
+                  linkauth{T::ANDON, T::ANDON, "pull"_n, config::owner_name}));
+               break;
+            case delegated_link::absent:
+               BOOST_REQUIRE_EQUAL(t.success(), t.push_native_through(T::PANIC, "pull"_n,
+                  unlinkauth{T::ANDON, T::ANDON, "pull"_n}));
+               break;
+         }
+
+         const auto auth = support::delegated_authority({T::ALICE, config::system_account_name});
+         if (state == delegated_link::absent) {
+            // Refused whole: the panic account still holds clear.
+            support::require_refusal(support::rotate_delegate(t, T::ANDON, actions, auth), support::no_link_msg);
+            BOOST_REQUIRE_EQUAL(t.success(), t.call("pull"_n, config::system_account_name, config::active_name));
+            BOOST_REQUIRE_EQUAL(t.success(), t.call("clear"_n, T::PANIC, "clear"_n));
+            BOOST_REQUIRE_EQUAL(t.success(), support::rotate_delegate(t, T::ANDON, actions, auth, {"pull"_n}));
+         } else {
+            BOOST_REQUIRE_EQUAL(t.success(), support::rotate_delegate(t, T::ANDON, actions, auth));
+         }
+
+         // The former panic account and puller reach neither action; the new panic account reaches both.
+         support::require_refusal(t.call("pull"_n, T::PANIC, "pull"_n), support::unsatisfied_authority_msg);
+         support::require_refusal(t.call("pull"_n, T::PULLER, "pull"_n), support::unsatisfied_authority_msg);
+         if (state == delegated_link::moved_beneath)
+            support::require_refusal(t.call("pull"_n, T::PANIC, T::KEPT_PERMISSION), support::irrelevant_authority_msg);
+         BOOST_REQUIRE(!pulled());
+         BOOST_REQUIRE_EQUAL(t.success(), t.call("pull"_n, T::ALICE, "pull"_n));
+         BOOST_REQUIRE(pulled());
+         support::require_refusal(t.call("clear"_n, T::PANIC, "clear"_n), support::unsatisfied_authority_msg);
+         BOOST_REQUIRE_EQUAL(t.success(), t.call("clear"_n, T::ALICE, "clear"_n));
+         BOOST_REQUIRE(!pulled());
+      }
+   }
+}
+
 /// Repeated requests do not change timestamps or notes, and recorded text is bounded.
 BOOST_FIXTURE_TEST_CASE(transitions_are_idempotent_and_text_is_bounded, sysio_andon_tester) {
    configure();
