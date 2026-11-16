@@ -4,22 +4,23 @@
 #include <fc/exception/exception.hpp>
 #include <fc/crypto/base64.hpp>
 #include <fc/crypto/hex.hpp>
+#include <fc/detail/integer_range.hpp>
 #include <boost/scoped_array.hpp>
 #include <fc/reflect/variant.hpp>
 #include <fc/io/json.hpp>
 #include <fc/utf8.hpp>
 #include <algorithm>
 #include <cassert>
-#include <concepts>
 #include <cstring>
+#include <format>
 #include <functional>
 #include <limits>
-#include <stdexcept>
 #include <string_view>
 #include <type_traits>
+#include <utility>
 #include <fc/int256.hpp>
-
-#include "_integer_range_internal.hpp"
+#include <fc/reflect/typename.hpp>
+#include <fc/string.hpp>
 
 namespace fc
 {
@@ -698,77 +699,6 @@ fc::uint128 fc::variant::as_uint128()const
    }
 } FC_CAPTURE_AND_RETHROW( "{}", fc::json::to_log_string(*this) ) }
 
-namespace {
-
-constexpr std::string_view int256_name = "int256_t";
-constexpr std::string_view uint256_name = "uint256_t";
-constexpr char minus_sign = '-';
-constexpr char zero_digit = '0';
-constexpr char nul_character = '\0';
-constexpr std::string_view hex_prefix = "0x";
-constexpr std::string_view upper_hex_prefix = "0X";
-
-/// The name errors give the 256-bit integer type `T`.
-template <typename T>
-constexpr std::string_view int256_type_name = std::same_as<T, fc::int256> ? int256_name : uint256_name;
-
-/// Throws the parse_error_exception for `value`, a number outside the range of the 256-bit integer type `T`.
-template <typename T>
-[[noreturn]] void throw_out_of_256bit_range(std::string_view value) {
-   // A fc 256-bit type has the limits of its boost base.
-   using limits = std::numeric_limits<std::conditional_t<std::same_as<T, fc::int256>, boost::multiprecision::int256_t,
-                                                         boost::multiprecision::uint256_t>>;
-   detail::throw_out_of_range(value, int256_type_name<T>, limits::min().str(), limits::max().str());
-}
-
-/// Throws the parse_error_exception for `text`, which is not a number the 256-bit integer type `T` reads.
-template <typename T>
-[[noreturn]] void throw_not_a_256bit_number(std::string_view text) {
-   FC_THROW_EXCEPTION(parse_error_exception, "Couldn't parse {} from \"{}\"", int256_type_name<T>, text);
-}
-
-/// The number `text` as the 256-bit integer type `T`: an optional '-', then decimal digits, or hex digits after "0x"
-/// or "0X". Digits after a leading zero are decimal. Empty text and a bare "0x" are zero.
-/// @throw parse_error_exception if `text` is not such a number, or the number is outside the range of `T`
-template <typename T>
-T parse_256bit(const std::string& text) {
-   // boost reads up to the first NUL.
-   if (text.find(nul_character) != std::string::npos)
-      throw_not_a_256bit_number<T>(text);
-   std::string_view magnitude = text;
-   const bool negative = magnitude.starts_with(minus_sign);
-   if (negative)
-      magnitude.remove_prefix(1);
-   // boost reads "-" and "-0x" as zero.
-   if (negative && (magnitude.empty() || magnitude == hex_prefix || magnitude == upper_hex_prefix))
-      throw_not_a_256bit_number<T>(text);
-   // boost reads digits after a leading zero as octal.
-   if (all_digits(magnitude)) {
-      while (magnitude.size() > 1 && magnitude.front() == zero_digit)
-         magnitude.remove_prefix(1);
-   }
-   std::string number; // the text boost reads
-   if (negative)
-      number += minus_sign;
-   number += magnitude;
-
-   // Holds every fc::int256 and fc::uint256, and throws where those wrap.
-   boost::multiprecision::checked_int256_t value;
-   try {
-      value = boost::multiprecision::checked_int256_t{number};
-   } catch (const std::overflow_error&) {
-      throw_out_of_256bit_range<T>(text);
-   } catch (const std::runtime_error&) {
-      // A character outside the number's radix. Caught after std::overflow_error, which derives from it.
-      throw_not_a_256bit_number<T>(text);
-   }
-   if (std::same_as<T, fc::uint256> && value < 0)
-      throw_out_of_256bit_range<T>(text);
-   return T{value};
-}
-
-} // anonymous namespace
-
 fc::int256 fc::variant::as_int256()const
 {
    switch( get_type() )
@@ -781,7 +711,7 @@ fc::int256 fc::variant::as_int256()const
    case uint256_type:
    case string_type:
    case string_sso_type:
-      return parse_256bit<fc::int256>(as_string());
+      return detail::parse_256bit<fc::int256>(as_string(), detail::hex_prefix_rule::required);
    case bool_type:
       return int256(load_payload<bool>());
    case null_type:
@@ -798,7 +728,7 @@ fc::uint256 fc::variant::as_uint256()const
    case int64_type: {
       const int64_t value = load_payload<int64_t>();
       if( value < 0 )
-         throw_out_of_256bit_range<fc::uint256>( as_string() );
+         detail::throw_out_of_256bit_range<fc::uint256>( as_string() );
       return fc::uint256(value);
    }
    case uint64_type:
@@ -807,7 +737,7 @@ fc::uint256 fc::variant::as_uint256()const
    case uint256_type:
    case string_type:
    case string_sso_type:
-      return parse_256bit<fc::uint256>(as_string());
+      return detail::parse_256bit<fc::uint256>(as_string(), detail::hex_prefix_rule::required);
    case bool_type:
       return uint256(load_payload<bool>());
    case null_type:
@@ -1064,26 +994,76 @@ void from_variant( const variant& var,  variants& vo )
 
 void from_variant( const variant& var,  variant& vo ) { vo = var; }
 
+namespace {
+
+/// Throws the parse_error_exception for `value`, a number outside the range of the narrow integer type `T`.
+template<std::integral T>
+[[noreturn]] void throw_out_of_narrow_range(const auto value) {
+   detail::throw_out_of_range(std::format("{}", value), get_typename<T>::name(),
+                              std::to_string(int64_t{std::numeric_limits<T>::min()}),
+                              std::to_string(int64_t{std::numeric_limits<T>::max()}));
+}
+
+/**
+ * Converts `var` to `T`, an integer type narrower than the 64 bits a variant holds an integer in.
+ *
+ * Accepts what variant::as_int64() and variant::as_uint64() accept: an integer, a double (truncated toward zero), a
+ * decimal string, a bool, and null as zero.
+ *
+ * @throw parse_error_exception if the value is outside the range of `T`, or a string is not a decimal integer
+ * @throw bad_cast_exception if `var` holds a type that does not convert to an integer
+ */
+template<std::integral T>
+   requires(std::numeric_limits<T>::digits < std::numeric_limits<double>::digits)
+T as_narrow_integer(const variant& var) {
+   const auto narrow = [](const auto value) -> T {
+      if (!std::in_range<T>(value))
+         throw_out_of_narrow_range<T>(value);
+      return static_cast<T>(value);
+   };
+
+   switch (var.get_type()) {
+   case variant::int64_type:
+      return narrow(var.as_int64());
+   case variant::uint64_type:
+      return narrow(var.as_uint64());
+   case variant::double_type: {
+      // One below the minimum and one above the maximum are exact in a double. NaN fails both comparisons.
+      const double value = var.as_double();
+      if (!(value > static_cast<double>(std::numeric_limits<T>::min()) - 1 &&
+            value < static_cast<double>(std::numeric_limits<T>::max()) + 1))
+         throw_out_of_narrow_range<T>(value);
+      return static_cast<T>(value);
+   }
+   case variant::string_type:
+   case variant::string_sso_type: {
+      // to_uint64() reads "-n" as 2^64 - n, so a negative number is parsed as signed.
+      const std::string_view text = var.get_string();
+      return text.starts_with('-') ? narrow(to_int64(text)) : narrow(to_uint64(text));
+   }
+   default: // a bool, or null as zero; any other type throws bad_cast_exception
+      return std::is_signed_v<T> ? narrow(var.as_int64()) : narrow(var.as_uint64());
+   }
+}
+
+} // anonymous namespace
+
 void to_variant( const uint8_t& var,  variant& vo )  { vo = uint64_t(var); }
-// TODO: warn on overflow?
-void from_variant( const variant& var,  uint8_t& vo ){ vo = static_cast<uint8_t>(var.as_uint64()); }
+void from_variant( const variant& var,  uint8_t& vo ){ vo = as_narrow_integer<uint8_t>(var); }
 
 void to_variant( const int8_t& var,  variant& vo )  { vo = int64_t(var); }
-// TODO: warn on overflow?
-void from_variant( const variant& var,  int8_t& vo ){ vo = static_cast<int8_t>(var.as_int64()); }
+void from_variant( const variant& var,  int8_t& vo ){ vo = as_narrow_integer<int8_t>(var); }
 
 void to_variant( const uint16_t& var,  variant& vo )  { vo = uint64_t(var); }
-// TODO: warn on overflow?
-void from_variant( const variant& var,  uint16_t& vo ){ vo = static_cast<uint16_t>(var.as_uint64()); }
+void from_variant( const variant& var,  uint16_t& vo ){ vo = as_narrow_integer<uint16_t>(var); }
 
 void to_variant( const int16_t& var,  variant& vo )  { vo = int64_t(var); }
-// TODO: warn on overflow?
-void from_variant( const variant& var,  int16_t& vo ){ vo = static_cast<int16_t>(var.as_int64()); }
+void from_variant( const variant& var,  int16_t& vo ){ vo = as_narrow_integer<int16_t>(var); }
 
 void to_variant( const uint32_t& var,  variant& vo )  { vo = uint64_t(var); }
 void from_variant( const variant& var,  uint32_t& vo )
 {
-   vo = static_cast<uint32_t>(var.as_uint64());
+   vo = as_narrow_integer<uint32_t>(var);
 }
 
 void to_variant( const int32_t& var,  variant& vo )  {
@@ -1092,7 +1072,7 @@ void to_variant( const int32_t& var,  variant& vo )  {
 
 void from_variant( const variant& var,  int32_t& vo )
 {
-   vo = static_cast<int32_t>(var.as_int64());
+   vo = as_narrow_integer<int32_t>(var);
 }
 
 // to_variant/from_variant for unsigned __int128 and __int128 are now

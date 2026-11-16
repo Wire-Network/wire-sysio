@@ -2,6 +2,7 @@
 
 #include <fc/container/flat_fwd.hpp>
 #include <fc/container/container_detail.hpp>
+#include <fc/io/raw_detail.hpp>
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
 #include <fc/crypto/hex.hpp>
@@ -23,19 +24,19 @@ namespace fc {
          }
       }
 
+      /// Bound eager allocation for nonfundamental vectors while retaining the existing fundamental decoder.
       template<typename Stream, typename T, typename A>
       void unpack( Stream& s, boost::container::vector<T, A>& value ) {
          unsigned_int size;
          unpack( s, size );
          FC_ASSERT( size.value <= MAX_NUM_ARRAY_ELEMENTS );
          value.clear();
-         value.resize( size.value );
-         if( !std::is_fundamental<T>::value ) {
-            for( auto& item : value ) {
-               unpack( s, item );
-            }
-         } else if( value.size() ) {
-            s.read( (char*)value.data(), value.size() );
+         if constexpr (!std::is_fundamental_v<T>)
+            detail::unpack_sequence(s, value, size.value, [&](auto& item) { unpack(s, item); });
+         else {
+            value.resize( size.value );
+            if( value.size() )
+               s.read( (char*)value.data(), value.size() );
          }
       }
 
@@ -47,15 +48,14 @@ namespace fc {
             s.write( (const char*)value.data(), value.size() );
       }
 
+      /// Read directly into storage with bounded growth when the stream's byte count is unknown.
       template<typename Stream, typename A>
       void unpack( Stream& s, boost::container::vector<char, A>& value ) {
          unsigned_int size;
          unpack( s, size );
          FC_ASSERT( size.value <= MAX_SIZE_OF_BYTE_ARRAYS );
          value.clear();
-         value.resize( size.value );
-         if( value.size() )
-            s.read( (char*)value.data(), value.size() );
+         detail::unpack_bytes(s, value, size.value);
       }
 
       template<typename Stream, typename T, typename... U>

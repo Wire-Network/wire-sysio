@@ -342,9 +342,15 @@ BOOST_AUTO_TEST_CASE(as_uint256_rejects_a_value_outside_its_range) {
                          out_of_range_for("uint256_t"));
    BOOST_CHECK_EXCEPTION(variant{"0" + std::string(86, '7')}.as_uint256(), fc::parse_error_exception,
                          out_of_range_for("uint256_t"));
-   // Out of range and then a bad character: refused for either.
-   BOOST_CHECK_THROW(variant{hex_prefix + std::string(64, 'f') + "eg"}.as_uint256(), fc::parse_error_exception);
-   BOOST_CHECK_THROW(variant{uint256_past_max_text + "g"}.as_uint256(), fc::parse_error_exception);
+   // Too long for 256 bits and holding a character that is not a digit: not a number.
+   BOOST_CHECK_EXCEPTION(variant{hex_prefix + std::string(64, 'f') + "eg"}.as_uint256(), fc::parse_error_exception,
+                         not_a_number_for("uint256_t"));
+   BOOST_CHECK_EXCEPTION(variant{hex_prefix + std::string(65, 'g')}.as_uint256(), fc::parse_error_exception,
+                         not_a_number_for("uint256_t"));
+   BOOST_CHECK_EXCEPTION(variant{"0" + std::string(90, 'a')}.as_uint256(), fc::parse_error_exception,
+                         not_a_number_for("uint256_t"));
+   BOOST_CHECK_EXCEPTION(variant{uint256_past_max_text + "g"}.as_uint256(), fc::parse_error_exception,
+                         not_a_number_for("uint256_t"));
 
    BOOST_CHECK_EXCEPTION(variant{int64_t{-1}}.as<fc::uint256>(), fc::parse_error_exception,
                          out_of_range_for("uint256_t"));
@@ -395,8 +401,13 @@ BOOST_AUTO_TEST_CASE(as_int256_rejects_a_value_outside_its_range) {
                          out_of_range_for("int256_t"));
    BOOST_CHECK_EXCEPTION(variant{"0" + std::string(86, '7')}.as_int256(), fc::parse_error_exception,
                          out_of_range_for("int256_t"));
-   BOOST_CHECK_THROW(variant{hex_prefix + std::string(64, 'f') + "eg"}.as_int256(), fc::parse_error_exception);
-   BOOST_CHECK_THROW(variant{"-" + uint256_past_max_text + "g"}.as_int256(), fc::parse_error_exception);
+   // Too long for 256 bits and holding a character that is not a digit: not a number.
+   BOOST_CHECK_EXCEPTION(variant{hex_prefix + std::string(64, 'f') + "eg"}.as_int256(), fc::parse_error_exception,
+                         not_a_number_for("int256_t"));
+   BOOST_CHECK_EXCEPTION(variant{"-" + hex_prefix + std::string(65, 'g')}.as_int256(), fc::parse_error_exception,
+                         not_a_number_for("int256_t"));
+   BOOST_CHECK_EXCEPTION(variant{"-" + uint256_past_max_text + "g"}.as_int256(), fc::parse_error_exception,
+                         not_a_number_for("int256_t"));
 
    BOOST_CHECK_EXCEPTION(variant{uint256_past_max_text}.as<fc::int256>(), fc::parse_error_exception,
                          out_of_range_for("int256_t"));

@@ -329,8 +329,7 @@ bool is_zero_word(std::string_view word) {
 
 /// Whether `word` is exactly one ABI word of hex digits.
 bool is_hex_word(std::string_view word) {
-   return word.size() == EVM_ABI_WORD_HEX_CHARS &&
-          std::ranges::all_of(word, [](unsigned char c) { return std::isxdigit(c) != 0; });
+   return word.size() == EVM_ABI_WORD_HEX_CHARS && fc::all_hex_digits(word);
 }
 
 /// The unsigned integer one normalised ABI word holds, or `std::nullopt` when
