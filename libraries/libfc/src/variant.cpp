@@ -700,34 +700,70 @@ fc::uint128 fc::variant::as_uint128()const
 
 namespace {
 
-constexpr std::string_view int256_name  = "int256_t";
+constexpr std::string_view int256_name = "int256_t";
 constexpr std::string_view uint256_name = "uint256_t";
+constexpr char minus_sign = '-';
+constexpr char zero_digit = '0';
+constexpr char nul_character = '\0';
+constexpr std::string_view hex_prefix = "0x";
+constexpr std::string_view upper_hex_prefix = "0X";
+
+/// The name errors give the 256-bit integer type `T`.
+template <typename T>
+constexpr std::string_view int256_type_name = std::same_as<T, fc::int256> ? int256_name : uint256_name;
 
 /// Throws the parse_error_exception for `value`, a number outside the range of the 256-bit integer type `T`.
-template<typename T>
-[[noreturn]] void throw_out_of_256bit_range( std::string_view value ) {
-   constexpr bool is_signed = std::same_as<T, fc::int256>;
+template <typename T>
+[[noreturn]] void throw_out_of_256bit_range(std::string_view value) {
    // A fc 256-bit type has the limits of its boost base.
-   using limits = std::numeric_limits<
-      std::conditional_t<is_signed, boost::multiprecision::int256_t, boost::multiprecision::uint256_t>>;
-   detail::throw_out_of_range( value, is_signed ? int256_name : uint256_name, limits::min().str(),
-                               limits::max().str() );
+   using limits = std::numeric_limits<std::conditional_t<std::same_as<T, fc::int256>, boost::multiprecision::int256_t,
+                                                         boost::multiprecision::uint256_t>>;
+   detail::throw_out_of_range(value, int256_type_name<T>, limits::min().str(), limits::max().str());
 }
 
-/// The number `text` as the 256-bit integer type `T`, read as boost reads it: decimal, hex after "0x" or octal
-/// after "0".
-/// @throw parse_error_exception if the number is outside the range of `T`
-template<typename T>
-T parse_256bit( const std::string& text ) {
+/// Throws the parse_error_exception for `text`, which is not a number the 256-bit integer type `T` reads.
+template <typename T>
+[[noreturn]] void throw_not_a_256bit_number(std::string_view text) {
+   FC_THROW_EXCEPTION(parse_error_exception, "Couldn't parse {} from \"{}\"", int256_type_name<T>, text);
+}
+
+/// The number `text` as the 256-bit integer type `T`: an optional '-', then decimal digits, or hex digits after "0x"
+/// or "0X". Digits after a leading zero are decimal. Empty text and a bare "0x" are zero.
+/// @throw parse_error_exception if `text` is not such a number, or the number is outside the range of `T`
+template <typename T>
+T parse_256bit(const std::string& text) {
+   // boost reads up to the first NUL.
+   if (text.find(nul_character) != std::string::npos)
+      throw_not_a_256bit_number<T>(text);
+   std::string_view magnitude = text;
+   const bool negative = magnitude.starts_with(minus_sign);
+   if (negative)
+      magnitude.remove_prefix(1);
+   // boost reads "-" and "-0x" as zero.
+   if (negative && (magnitude.empty() || magnitude == hex_prefix || magnitude == upper_hex_prefix))
+      throw_not_a_256bit_number<T>(text);
+   // boost reads digits after a leading zero as octal.
+   if (all_digits(magnitude)) {
+      while (magnitude.size() > 1 && magnitude.front() == zero_digit)
+         magnitude.remove_prefix(1);
+   }
+   std::string number; // the text boost reads
+   if (negative)
+      number += minus_sign;
+   number += magnitude;
+
    // Holds every fc::int256 and fc::uint256, and throws where those wrap.
    boost::multiprecision::checked_int256_t value;
    try {
-      value = boost::multiprecision::checked_int256_t{text};
-   } catch( const std::overflow_error& ) {
-      throw_out_of_256bit_range<T>( text );
+      value = boost::multiprecision::checked_int256_t{number};
+   } catch (const std::overflow_error&) {
+      throw_out_of_256bit_range<T>(text);
+   } catch (const std::runtime_error&) {
+      // A character outside the number's radix. Caught after std::overflow_error, which derives from it.
+      throw_not_a_256bit_number<T>(text);
    }
-   if( std::same_as<T, fc::uint256> && value < 0 )
-      throw_out_of_256bit_range<T>( text );
+   if (std::same_as<T, fc::uint256> && value < 0)
+      throw_out_of_256bit_range<T>(text);
    return T{value};
 }
 
