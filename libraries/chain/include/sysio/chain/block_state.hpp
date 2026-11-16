@@ -5,7 +5,7 @@
 #include <sysio/chain/transaction_metadata.hpp>
 #include <sysio/chain/action_receipt.hpp>
 #include <sysio/chain/incremental_merkle.hpp>
-#include <sysio/chain/thread_utils.hpp>
+#include <fc/thread_utils.hpp>
 
 namespace sysio::chain {
 
@@ -80,7 +80,7 @@ struct block_state : public block_header_state {     // block_header_state provi
 
    // ------ updated for votes, used for fork_db ordering ------------------------------
 private:
-   copyable_atomic<bool>      validated{false};     // We have executed the block's trxs and verified that action merkle root (block id) matches.
+   fc::copyable_atomic<bool>  validated{false};     // We have executed the block's trxs and verified that action merkle root (block id) matches.
 
    // ------ data members caching information available elsewhere ----------------------
    bool                       pub_keys_recovered = false;

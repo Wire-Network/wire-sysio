@@ -9,7 +9,6 @@
 #include <sysio/chain/controller.hpp>
 #include <sysio/chain/fork_database.hpp>
 #include <sysio/chain/genesis_state.hpp>
-#include <sysio/chain/thread_utils.hpp>
 #include <sysio/chain/transaction.hpp>
 #include <sysio/chain/transaction_metadata.hpp>
 #include <sysio/chain/trace.hpp>
@@ -20,6 +19,7 @@
 #include "chain_test_utils.hpp"
 
 #include <fc/scoped_exit.hpp>
+#include <fc/thread_utils.hpp>
 #include <chrono>
 
 

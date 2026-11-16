@@ -1,19 +1,23 @@
 #pragma once
 
-#include <sysio/chain/name.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/log/logger_config.hpp>
+#include <fc/reflect/typename.hpp>
 #include <fc/scoped_exit.hpp>
+#include <fc/variant.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/post.hpp>
 #include <boost/asio/use_future.hpp>
+#include <atomic>
+#include <functional>
 #include <future>
 #include <list>
 #include <memory>
+#include <mutex>
 #include <optional>
 #include <thread>
 
-namespace sysio { namespace chain {
+namespace fc {
 
    // Avoid GCC warning:
    // libraries/chain/include/sysio/chain/thread_utils.hpp:28:15: warning: use of ‘std::hardware_destructive_interference_size’ [-Winterference-size]
@@ -340,11 +344,7 @@ namespace sysio { namespace chain {
       return boost::asio::post( std::forward<E>(ioc), boost::asio::use_future(std::forward<F>(f)) );
    }
 
-} } // sysio::chain
-
-namespace fc {
-
-template<typename T> struct get_typename<sysio::chain::copyable_atomic<T>> {
+template<typename T> struct get_typename<copyable_atomic<T>> {
    static const char* name()  {
       static std::string n = std::string("copyable_atomic<") + get_typename<T>::name() + ">";
       return n.c_str();
@@ -352,7 +352,7 @@ template<typename T> struct get_typename<sysio::chain::copyable_atomic<T>> {
 };
 
 template<typename T>
-void to_variant(const sysio::chain::copyable_atomic<T>& e, fc::variant& v) {
+void to_variant(const copyable_atomic<T>& e, fc::variant& v) {
    T t = e.load();
    if constexpr (std::is_same_v<T, bool>) {
       v = t;
@@ -362,7 +362,7 @@ void to_variant(const sysio::chain::copyable_atomic<T>& e, fc::variant& v) {
 }
 
 template<typename T>
-void from_variant(const fc::variant& v, sysio::chain::copyable_atomic<T>& e) {
+void from_variant(const fc::variant& v, copyable_atomic<T>& e) {
    T t;
    from_variant( v, t );
    e.store(t);

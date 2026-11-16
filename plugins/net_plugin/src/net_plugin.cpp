@@ -15,7 +15,6 @@
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/block.hpp>
 #include <sysio/chain/plugin_interface.hpp>
-#include <sysio/chain/thread_utils.hpp>
 #include <sysio/producer_plugin/producer_plugin.hpp>
 #include <sysio/chain/fork_database.hpp>
 
@@ -24,6 +23,7 @@
 #include <fc/io/json.hpp>
 #include <fc/io/raw.hpp>
 #include <fc/io/datastream.hpp>
+#include <fc/thread_utils.hpp>
 #include <fc/variant_object.hpp>
 #include <fc/crypto/rand.hpp>
 #include <fc/exception/exception.hpp>
@@ -413,7 +413,7 @@ namespace sysio {
                            public auto_bp_peering::bp_connection_manager<net_plugin_impl, connection> {
     public:
       uint16_t                                    thread_pool_size = 4;
-      sysio::chain::named_thread_pool<struct net> thread_pool;
+      fc::named_thread_pool<struct net>           thread_pool;
 
       std::atomic<connection_id_t>     current_connection_id{0};
 

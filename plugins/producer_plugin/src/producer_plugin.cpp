@@ -10,7 +10,6 @@
 #include <sysio/chain/snapshot.hpp>
 #include <sysio/chain/snapshot_scheduler.hpp>
 #include <sysio/chain/subjective_billing.hpp>
-#include <sysio/chain/thread_utils.hpp>
 #include <sysio/chain/unapplied_transaction_queue.hpp>
 #include <sysio/chain/fork_database.hpp>
 #include <sysio/chain/platform_timer.hpp>
@@ -21,6 +20,7 @@
 #include <fc/system_timer.hpp>
 #include <fc/log/logger_config.hpp>
 #include <fc/scoped_exit.hpp>
+#include <fc/thread_utils.hpp>
 #include <fc/time.hpp>
 
 #include <boost/asio.hpp>
@@ -801,7 +801,7 @@ public:
    bool                                  _production_enabled = false;
    bool                                  _pause_production   = false;
 
-   sysio::chain::named_thread_pool<struct prod>      _timer_thread;
+   fc::named_thread_pool<struct prod>                _timer_thread;
    // Runs on the real clock in production; a test engages fc's mock clock via
    // fc::mock_time_traits::set_now() and drives production timing deterministically.
    fc::system_timer                                  _timer{_timer_thread.get_executor()};

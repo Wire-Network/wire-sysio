@@ -1,6 +1,5 @@
 #include <sysio/chain/block_header.hpp>
 #include <sysio/chain/config.hpp>
-#include <sysio/chain/thread_utils.hpp>
 #include <sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>
 #include <sysio/state_history/types.hpp>
 #include <sysio/state_history/log.hpp>
@@ -23,6 +22,7 @@
 #include <mutex>
 
 #include <fc/network/listener.hpp>
+#include <fc/thread_utils.hpp>
 
 namespace sysio {
 using namespace chain;

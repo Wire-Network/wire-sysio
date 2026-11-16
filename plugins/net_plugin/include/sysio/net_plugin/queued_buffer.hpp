@@ -3,8 +3,8 @@
 #include <sysio/net_plugin/protocol.hpp>
 #include <sysio/net_plugin/buffer_factory.hpp>
 #include <sysio/net_plugin/net_logger.hpp>
-#include <sysio/chain/thread_utils.hpp>
 #include <fc/mutex.hpp>
+#include <fc/thread_utils.hpp>
 
 #include <boost/asio/buffer.hpp>
 #include <boost/container/small_vector.hpp>

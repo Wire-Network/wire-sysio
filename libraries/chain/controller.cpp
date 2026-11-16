@@ -25,7 +25,6 @@
 #include <sysio/chain/subjective_billing.hpp>
 #include <sysio/chain/chain_snapshot.hpp>
 #include <sysio/chain/snapshot_detail.hpp>
-#include <sysio/chain/thread_utils.hpp>
 #include <sysio/chain/platform_timer.hpp>
 #include <sysio/chain/deep_mind.hpp>
 #include <sysio/chain/contract_action_match.hpp>
@@ -42,6 +41,7 @@
 #include <fc/io/json.hpp>
 #include <fc/log/logger_config.hpp>
 #include <fc/scoped_exit.hpp>
+#include <fc/thread_utils.hpp>
 #include <fc/variant_object.hpp>
 
 #include <future>
@@ -504,7 +504,7 @@ struct building_block {
       auto [transaction_mroot, action_mroot] = std::visit(
          overloaded{[&](digests_t& trx_receipts) {
                        // calculate_merkle takes 3.2ms for 50,000 digests (legacy version took 11.1ms)
-                       auto trx_f = post_async_task(ioc, [&]() { return calculate_merkle(trx_receipts); });
+                       auto trx_f = fc::post_async_task(ioc, [&]() { return calculate_merkle(trx_receipts); });
                        auto act_mroot = calculate_merkle(action_receipts.digests_s);
                        return std::make_pair(trx_f.get(), act_mroot);
                     },
@@ -751,7 +751,7 @@ struct controller_impl {
    bool                            trusted_producer_light_validation = false;
    uint32_t                        snapshot_head_block = 0;
    struct chain; // chain is a namespace so use an embedded type for the named_thread_pool tag
-   named_thread_pool<chain>        thread_pool;
+   fc::named_thread_pool<chain>    thread_pool;
    deep_mind_handler*              deep_mind_logger = nullptr;
    bool                            okay_to_print_integrity_hash_on_stop = false;
    bool                            testing_allow_voting = false; // used in unit tests to create long forks or simulate not getting votes
@@ -1739,7 +1739,7 @@ struct controller_impl {
                   snapshot_head_block, blog_start, blog_end
       );
 
-      sync_threaded_work<struct snapload> snapshot_load_workqueue;
+      fc::sync_threaded_work<struct snapload> snapshot_load_workqueue;
       boost::asio::io_context& snapshot_load_ctx = snapshot_load_workqueue.io_context();
 
       controller_index_set::walk_indices_via_post(snapshot_load_ctx, [this, &snapshot, &rows_loaded]( auto utils ){
@@ -2947,9 +2947,9 @@ struct controller_impl {
    controller::accepted_block_result create_block_state_i( const block_id_type& id, const signed_block_ptr& b, const block_state& prev,
                                                            fc::time_point received_time ) {
       std::optional<qc_t> qc = verify_basic_block_invariants(id, b, prev);
-      log_and_drop_future<void> verify_qc_future;
+      fc::log_and_drop_future<void> verify_qc_future;
       if (qc) {
-         verify_qc_future = post_async_task(thread_pool.get_executor(), [&qc, &prev] {
+         verify_qc_future = fc::post_async_task(thread_pool.get_executor(), [&qc, &prev] {
             // do both signature verification and basic checks in the async task
             prev.verify_qc(*qc);
          });
