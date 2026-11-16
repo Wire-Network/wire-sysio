@@ -30,6 +30,7 @@ add_executable( test_fc
         network/test_json_rpc_client.cpp
         network/solana/test_solana_client.cpp
         network/test_message_buffer.cpp
+        network/test_to_int256.cpp
         scoped_exit/test_scoped_exit.cpp
         static_variant/test_static_variant.cpp
         variant/test_variant.cpp

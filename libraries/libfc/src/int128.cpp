@@ -1,4 +1,5 @@
 #include <fc/crypto/city.hpp>
+#include <fc/detail/integer_range.hpp>
 #include <fc/int128.hpp>
 #include <fc/variant.hpp>
 #include <fc/log/logger.hpp>
@@ -6,8 +7,6 @@
 
 #include <limits>
 #include <string_view>
-
-#include "_integer_range_internal.hpp"
 
 namespace fc {
 

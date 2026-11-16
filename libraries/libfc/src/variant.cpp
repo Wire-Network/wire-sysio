@@ -4,22 +4,19 @@
 #include <fc/exception/exception.hpp>
 #include <fc/crypto/base64.hpp>
 #include <fc/crypto/hex.hpp>
+#include <fc/detail/integer_range.hpp>
 #include <boost/scoped_array.hpp>
 #include <fc/reflect/variant.hpp>
 #include <fc/io/json.hpp>
 #include <fc/utf8.hpp>
 #include <algorithm>
 #include <cassert>
-#include <concepts>
 #include <cstring>
 #include <functional>
 #include <limits>
-#include <stdexcept>
 #include <string_view>
 #include <type_traits>
 #include <fc/int256.hpp>
-
-#include "_integer_range_internal.hpp"
 
 namespace fc
 {
@@ -698,41 +695,6 @@ fc::uint128 fc::variant::as_uint128()const
    }
 } FC_CAPTURE_AND_RETHROW( "{}", fc::json::to_log_string(*this) ) }
 
-namespace {
-
-constexpr std::string_view int256_name  = "int256_t";
-constexpr std::string_view uint256_name = "uint256_t";
-
-/// Throws the parse_error_exception for `value`, a number outside the range of the 256-bit integer type `T`.
-template<typename T>
-[[noreturn]] void throw_out_of_256bit_range( std::string_view value ) {
-   constexpr bool is_signed = std::same_as<T, fc::int256>;
-   // A fc 256-bit type has the limits of its boost base.
-   using limits = std::numeric_limits<
-      std::conditional_t<is_signed, boost::multiprecision::int256_t, boost::multiprecision::uint256_t>>;
-   detail::throw_out_of_range( value, is_signed ? int256_name : uint256_name, limits::min().str(),
-                               limits::max().str() );
-}
-
-/// The number `text` as the 256-bit integer type `T`, read as boost reads it: decimal, hex after "0x" or octal
-/// after "0".
-/// @throw parse_error_exception if the number is outside the range of `T`
-template<typename T>
-T parse_256bit( const std::string& text ) {
-   // Holds every fc::int256 and fc::uint256, and throws where those wrap.
-   boost::multiprecision::checked_int256_t value;
-   try {
-      value = boost::multiprecision::checked_int256_t{text};
-   } catch( const std::overflow_error& ) {
-      throw_out_of_256bit_range<T>( text );
-   }
-   if( std::same_as<T, fc::uint256> && value < 0 )
-      throw_out_of_256bit_range<T>( text );
-   return T{value};
-}
-
-} // anonymous namespace
-
 fc::int256 fc::variant::as_int256()const
 {
    switch( get_type() )
@@ -745,7 +707,7 @@ fc::int256 fc::variant::as_int256()const
    case uint256_type:
    case string_type:
    case string_sso_type:
-      return parse_256bit<fc::int256>(as_string());
+      return detail::parse_256bit<fc::int256>(as_string());
    case bool_type:
       return int256(load_payload<bool>());
    case null_type:
@@ -762,7 +724,7 @@ fc::uint256 fc::variant::as_uint256()const
    case int64_type: {
       const int64_t value = load_payload<int64_t>();
       if( value < 0 )
-         throw_out_of_256bit_range<fc::uint256>( as_string() );
+         detail::throw_out_of_256bit_range<fc::uint256>( as_string() );
       return fc::uint256(value);
    }
    case uint64_type:
@@ -771,7 +733,7 @@ fc::uint256 fc::variant::as_uint256()const
    case uint256_type:
    case string_type:
    case string_sso_type:
-      return parse_256bit<fc::uint256>(as_string());
+      return detail::parse_256bit<fc::uint256>(as_string());
    case bool_type:
       return uint256(load_payload<bool>());
    case null_type:

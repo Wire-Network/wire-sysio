@@ -55,6 +55,8 @@ namespace fc
 
   bool all_digits(const std::string_view& s);
   bool all_digits(const std::string& s);
+  /// Whether every character of `s` is an ASCII hex digit; true for an empty `s`.
+  bool all_hex_digits(std::string_view s);
 }
 
 
