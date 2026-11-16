@@ -30,7 +30,7 @@ private:
 
    struct trx_cache_entry {
       transaction_id_type            trx_id;
-      account_subjective_cpu_bill_t  account_subjective_cpu_bill;
+      account_subjective_bill_t      account_subjective_bill;
       fc::time_point                 expiry;
    };
    struct by_id;
@@ -47,11 +47,16 @@ private:
    using decaying_accumulator = chain::resource_limits::impl::exponential_decay_accumulator<>;
 
    struct subjective_billing_info {
-      uint64_t              pending_cpu_us = 0;    // tracked cpu us for transactions that may still succeed in a block
-      decaying_accumulator  expired_accumulator;   // accumulator used to account for transactions that have expired
+      uint64_t              pending_cpu_us = 0;    // CPU us of transactions that may still succeed in a block
+      decaying_accumulator  expired_accumulator;   // CPU us of expired and failed transactions, and of sysio.*-paid
+                                                   // actions in blocks, decaying
+      uint64_t              pending_net_bytes = 0; // as pending_cpu_us, in NET bytes
+      decaying_accumulator  net_accumulator;       // as expired_accumulator, in NET bytes
 
       bool empty(uint32_t time_ordinal, uint32_t expired_accumulator_average_window) const {
-         return pending_cpu_us == 0 && expired_accumulator.value_at(time_ordinal, expired_accumulator_average_window) == 0;
+         return pending_cpu_us == 0 && pending_net_bytes == 0 &&
+                expired_accumulator.value_at(time_ordinal, expired_accumulator_average_window) == 0 &&
+                net_accumulator.value_at(time_ordinal, expired_accumulator_average_window) == 0;
       }
    };
 
@@ -67,6 +72,7 @@ private:
    bool                                      _disabled_payer_billing = false;
    bool                                      _disabled_sysio_authorizer_billing = false;
    fc::microseconds                          _subjective_account_cpu_allowed{config::default_subjective_cpu_us};
+   uint64_t                                  _subjective_account_net_allowed = config::default_subjective_net_bytes;
    trx_cache_index                           _trx_cache_index;
    account_subjective_bill_cache             _account_subjective_bill_cache;
    std::unordered_set<chain::account_name>    _disabled_accounts;
@@ -86,6 +92,7 @@ private:
       _disabled_payer_billing = false;
       _disabled_sysio_authorizer_billing = false;
       _subjective_account_cpu_allowed = fc::microseconds{config::default_subjective_cpu_us};
+      _subjective_account_net_allowed = config::default_subjective_net_bytes;
       _trx_cache_index.clear();
       _account_subjective_bill_cache.clear();
       _disabled_accounts.clear();
@@ -100,30 +107,35 @@ private:
       return ordinal;
    }
 
+   /// Takes `bill` out of the pending charges of `info`, which must hold it.
+   static void subtract_pending( subjective_billing_info& info, const account_name& account,
+                                 const cpu_net_bill& bill ) {
+      const auto cpu = bill.cpu.count();
+      SYS_ASSERT( cpu >= 0 && info.pending_cpu_us >= static_cast<uint64_t>(cpu) &&
+                  info.pending_net_bytes >= bill.net_bytes,
+                  chain::tx_resource_exhaustion,
+                  "Logic error in subjective account billing {}", account );
+      info.pending_cpu_us -= cpu;
+      info.pending_net_bytes -= bill.net_bytes;
+   }
+
    void remove_subjective_billing( const trx_cache_entry& entry, uint32_t time_ordinal ) {
-      for (const auto& [account, subjective_cpu_bill] : entry.account_subjective_cpu_bill) {
+      for (const auto& [account, bill] : entry.account_subjective_bill) {
          auto aitr = _account_subjective_bill_cache.find( account );
          if( aitr != _account_subjective_bill_cache.end() ) {
-            const auto bill = subjective_cpu_bill.count();
-            SYS_ASSERT( bill >= 0 && aitr->second.pending_cpu_us >= static_cast<uint64_t>(bill),
-                        chain::tx_resource_exhaustion,
-                        "Logic error in subjective account billing {}", account );
-            aitr->second.pending_cpu_us -= bill;
+            subtract_pending( aitr->second, account, bill );
             if( aitr->second.empty(time_ordinal, _expired_accumulator_average_window) ) _account_subjective_bill_cache.erase( aitr );
          }
       }
    }
 
    void transition_to_expired( const trx_cache_entry& entry, uint32_t time_ordinal ) {
-      for (const auto& [account, subjective_cpu_bill] : entry.account_subjective_cpu_bill) {
+      for (const auto& [account, bill] : entry.account_subjective_bill) {
          auto aitr = _account_subjective_bill_cache.find( account );
          if( aitr != _account_subjective_bill_cache.end() ) {
-            const auto bill = subjective_cpu_bill.count();
-            SYS_ASSERT( bill >= 0 && aitr->second.pending_cpu_us >= static_cast<uint64_t>(bill),
-                        chain::tx_resource_exhaustion,
-                        "Logic error in subjective account billing {}", account );
-            aitr->second.pending_cpu_us -= bill;
-            aitr->second.expired_accumulator.add(bill, time_ordinal, _expired_accumulator_average_window);
+            subtract_pending( aitr->second, account, bill );
+            aitr->second.expired_accumulator.add(bill.cpu.count(), time_ordinal, _expired_accumulator_average_window);
+            aitr->second.net_accumulator.add(bill.net_bytes, time_ordinal, _expired_accumulator_average_window);
          }
       }
    }
@@ -151,13 +163,14 @@ private:
    }
 
    /**
-    * Charges the billed CPU of each sysio.*-paid action in `block` to its authorizer, where it decays like a
-    * failure. Reading it from the block counts every included transaction on every node, including ones this node
-    * never executed and ones in blocks it produced. The charge is dated at the block's time, so a node applying a
-    * block late, e.g. while syncing, holds the same charge from then on as a node that applied it live, and a block
-    * older than the decay window costs one check. A transaction re-included after a fork switch is charged again.
+    * Charges the billed CPU and the billable NET bytes of each sysio.*-paid action in `block` to its authorizer,
+    * where they decay like a failure. Reading them from the block counts every included transaction on every node,
+    * including ones this node never executed and ones in blocks it produced. The charge is dated at the block's time,
+    * so a node applying a block late, e.g. while syncing, holds the same charge from then on as a node that applied
+    * it live, and a block older than the decay window costs one check. A transaction re-included after a fork switch
+    * is charged again.
     *
-    * A receipt holds one entry per action, then one per contract billed for its own code (see
+    * A receipt holds one CPU entry per action, then one per contract billed for its own code (see
     * transaction_receipt_header::cpu_usage_us). Only the action entries are read: the others are paid by a contract
     * outside sysio.*, from its own CPU limit.
     * @return the number of actions charged
@@ -176,12 +189,13 @@ private:
          const account_name trx_first_authorizer = trx.first_authorizer();
          size_t action_index = 0;
          for( const auto& act : trx.actions ) {
-            const uint64_t cpu_us = receipt.cpu_usage_us[action_index++].value;
+            const size_t i = action_index++;
             const account_name authorizer = billed_authorizer( act, trx_first_authorizer );
             if( !is_sysio_paid_authorizer( act.payer(), authorizer ) || is_exempt( authorizer ) )
                continue;
-            add_dated_charge( _account_subjective_bill_cache[authorizer].expired_accumulator, cpu_us,
-                              block_time_ordinal );
+            subjective_billing_info& info = _account_subjective_bill_cache[authorizer];
+            add_dated_charge( info.expired_accumulator, receipt.cpu_usage_us[i].value, block_time_ordinal );
+            add_dated_charge( info.net_accumulator, receipt.trx.get_action_billable_size(i), block_time_ordinal );
             ++charged;
          }
       }
@@ -231,10 +245,18 @@ public:
 
    void set_subjective_account_cpu_allowed( fc::microseconds v ) { _subjective_account_cpu_allowed = v; }
    fc::microseconds get_subjective_account_cpu_allowed() const { return _subjective_account_cpu_allowed; }
+   /// NET bytes, above the account's own NET, one authorizer may use per decay window.
+   void set_subjective_account_net_allowed( uint64_t bytes ) { _subjective_account_net_allowed = bytes; }
+   uint64_t get_subjective_account_net_allowed() const { return _subjective_account_net_allowed; }
    void set_disabled(bool disable) { _disabled = disable; }
    bool is_disabled() const { return _disabled; }
    void disable_payer_billing(bool disable) { _disabled_payer_billing = disable; }
    bool is_payer_billing_disabled() const { return _disabled_payer_billing; }
+   /// True if `authorizer` is billed subjectively for an action `payer` pays for: unless it is the payer and payer
+   /// billing, which already bills it, is on.
+   bool bills_authorizer( const account_name& payer, const account_name& authorizer ) const {
+      return authorizer != payer || _disabled_payer_billing;
+   }
    /// Stops on_block from charging the authorizers of sysio.*-paid actions in a block (see is_sysio_paid_authorizer).
    void disable_sysio_authorizer_billing(bool disable) { _disabled_sysio_authorizer_billing = disable; }
    bool is_sysio_authorizer_billing_disabled() const { return _disabled_sysio_authorizer_billing; }
@@ -254,36 +276,49 @@ public:
       return std::ranges::any_of(accounts, [&](const account_name& a) { return is_exempt( a ); });
    }
 
+   /**
+    * Holds a speculatively executed transaction's charges as pending until it lands in a block or expires: the CPU of
+    * its payers in `accounts_billing`, unless payer billing is disabled, and the CPU and NET in `authorizers`.
+    */
    void subjective_bill( const chain::transaction_id_type& id, fc::time_point_sec expire,
-                         const accounts_billing_t& accounts_billing, const account_subjective_cpu_bill_t& auth_cpu)
+                         const accounts_billing_t& accounts_billing, const account_subjective_bill_t& authorizers )
    {
       if (_disabled) return;
       if (_trx_cache_index.contains(id)) return;
-      account_subjective_cpu_bill_t account_subjective_cpu_bill;
+      account_subjective_bill_t account_subjective_bill;
       if (!_disabled_payer_billing) {
          for (const auto& [a, b] : accounts_billing) {
             if (!is_exempt(a)) {
-               account_subjective_cpu_bill[a] += fc::microseconds(b.cpu_usage_us);
+               account_subjective_bill[a].cpu += fc::microseconds(b.cpu_usage_us);
                _account_subjective_bill_cache[a].pending_cpu_us += b.cpu_usage_us;
             }
          }
       }
-      for (const auto& [a, b] : auth_cpu) {
-         assert(b.count() >= 0);
+      for (const auto& [a, b] : authorizers) {
+         assert(b.cpu.count() >= 0);
          if (!is_exempt(a)) {
-            account_subjective_cpu_bill[a] += b;
-            _account_subjective_bill_cache[a].pending_cpu_us += b.count();
+            cpu_net_bill& bill = account_subjective_bill[a];
+            bill.cpu += b.cpu;
+            bill.net_bytes += b.net_bytes;
+            subjective_billing_info& info = _account_subjective_bill_cache[a];
+            info.pending_cpu_us += b.cpu.count();
+            info.pending_net_bytes += b.net_bytes;
          }
       }
-      if (!account_subjective_cpu_bill.empty()) {
+      if (!account_subjective_bill.empty()) {
          _trx_cache_index.emplace(
             trx_cache_entry{id,
-                            std::move(account_subjective_cpu_bill),
+                            std::move(account_subjective_bill),
                             expire.to_time_point()});
       }
    }
 
-   void subjective_bill_failure( const accounts_billing_t& accounts_billing, const account_subjective_cpu_bill_t& auth_cpu, const fc::time_point& now ) {
+   /**
+    * Charges a failed transaction, decaying from `now`: the CPU of its payers in `accounts_billing`, unless payer
+    * billing is disabled, and the CPU and NET in `authorizers`.
+    */
+   void subjective_bill_failure( const accounts_billing_t& accounts_billing,
+                                 const account_subjective_bill_t& authorizers, const fc::time_point& now ) {
       if (_disabled) return;
       const auto time_ordinal = time_ordinal_for(now);
       if (!_disabled_payer_billing) {
@@ -293,24 +328,27 @@ public:
             }
          }
       }
-      for (const auto& [a, b] : auth_cpu) {
-         assert(b.count() >= 0);
+      for (const auto& [a, b] : authorizers) {
+         assert(b.cpu.count() >= 0);
          if (!is_exempt(a)) {
-            _account_subjective_bill_cache[a].expired_accumulator.add(b.count(), time_ordinal, _expired_accumulator_average_window);
+            subjective_billing_info& info = _account_subjective_bill_cache[a];
+            info.expired_accumulator.add(b.cpu.count(), time_ordinal, _expired_accumulator_average_window);
+            info.net_accumulator.add(b.net_bytes, time_ordinal, _expired_accumulator_average_window);
          }
       }
    }
 
-   fc::microseconds get_subjective_bill( const account_name& a, const fc::time_point& now ) const {
-      if( _disabled || is_exempt( a ) ) return fc::microseconds{0};
+   /// The CPU and NET charged to `a`: pending plus what is still decaying.
+   cpu_net_bill get_subjective_bill( const account_name& a, const fc::time_point& now ) const {
+      if( _disabled || is_exempt( a ) ) return {};
       auto aitr = _account_subjective_bill_cache.find( a );
-      if( aitr != _account_subjective_bill_cache.end() ) {
-         const subjective_billing_info& sub_bill_info = aitr->second;
-         const auto time_ordinal = time_ordinal_for(now);
-         int64_t sub_bill = sub_bill_info.pending_cpu_us + sub_bill_info.expired_accumulator.value_at(time_ordinal, _expired_accumulator_average_window );
-         return fc::microseconds{sub_bill};
-      }
-      return fc::microseconds{0};
+      if( aitr == _account_subjective_bill_cache.end() ) return {};
+      const subjective_billing_info& info = aitr->second;
+      const auto time_ordinal = time_ordinal_for(now);
+      const uint32_t window = _expired_accumulator_average_window;
+      const int64_t cpu_us = info.pending_cpu_us + info.expired_accumulator.value_at(time_ordinal, window);
+      const uint64_t net_bytes = info.pending_net_bytes + info.net_accumulator.value_at(time_ordinal, window);
+      return { .cpu = fc::microseconds{cpu_us}, .net_bytes = net_bytes };
    }
 
    /**

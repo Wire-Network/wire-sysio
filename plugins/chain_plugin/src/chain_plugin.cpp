@@ -4131,9 +4131,15 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
    result.cpu_limit.set( rm.get_account_cpu_limit_ex( result.account_name, greylist_limit, current_usage_time).first );
    result.ram_usage = rm.get_account_ram_usage( result.account_name );
 
+   const auto& sub_bill = db.get_subjective_billing();
+   const auto  bill     = sub_bill.get_subjective_bill( result.account_name, fc::time_point::now() );
    sysio::chain::resource_limits::account_resource_limit subjective_cpu_bill_limit;
-   subjective_cpu_bill_limit.used = db.get_subjective_billing().get_subjective_bill( result.account_name, fc::time_point::now() ).count();
+   subjective_cpu_bill_limit.used = bill.cpu.count();
    result.subjective_cpu_bill_limit = subjective_cpu_bill_limit;
+   sysio::chain::resource_limits::account_resource_limit subjective_net_bill_limit;
+   subjective_net_bill_limit.used = bill.net_bytes;
+   subjective_net_bill_limit.max = sub_bill.get_subjective_account_net_allowed();
+   result.subjective_net_bill_limit = subjective_net_bill_limit;
 
    // Gather permission and linked actions info as before
    const auto linked_action_map = ([&](){

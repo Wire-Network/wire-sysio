@@ -536,8 +536,12 @@ resource_limits_manager::get_account_cpu_limit_ex( const account_name& name, uin
    return {arl, greylisted};
 }
 
-std::pair<int64_t, bool> resource_limits_manager::get_account_net_limit( const account_name& name, uint32_t greylist_limit ) const {
-   auto [arl, greylisted] = get_account_net_limit_ex(name, greylist_limit);
+std::pair<int64_t, bool>
+resource_limits_manager::get_account_net_limit( const account_name& name, uint32_t greylist_limit,
+                                                const std::optional<block_timestamp_type>& current_time ) const {
+   auto [arl, greylisted] = get_account_net_limit_ex(name, greylist_limit, current_time);
+   if( current_time && arl.max >= 0 ) // limited account: available against the decayed usage
+      return {std::max<int64_t>(arl.max - arl.current_used, 0), greylisted};
    return {arl.available, greylisted};
 }
 
