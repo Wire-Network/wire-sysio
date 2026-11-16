@@ -70,7 +70,7 @@ enum class hex_prefix_rule {
 /**
  * The number `text` as the 256-bit integer type `T`: an optional '-', then decimal digits, or hex digits after "0x"
  * or "0X" (or, with `hex_prefix_rule::optional`, without it). Digits after a leading zero are decimal. Empty text and
- * a bare "0x" are zero; "-" and "-0x" are not numbers.
+ * a bare "0x" or "0X" are zero; "-" and "-0x" are not numbers.
  * @throw parse_error_exception if `text` is not such a number, or the number is outside the range of `T`
  */
 template <int256_or_uint256 T>
