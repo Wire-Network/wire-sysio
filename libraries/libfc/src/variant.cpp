@@ -12,11 +12,15 @@
 #include <algorithm>
 #include <cassert>
 #include <cstring>
+#include <format>
 #include <functional>
 #include <limits>
 #include <string_view>
 #include <type_traits>
+#include <utility>
 #include <fc/int256.hpp>
+#include <fc/reflect/typename.hpp>
+#include <fc/string.hpp>
 
 namespace fc
 {
@@ -990,26 +994,76 @@ void from_variant( const variant& var,  variants& vo )
 
 void from_variant( const variant& var,  variant& vo ) { vo = var; }
 
+namespace {
+
+/// Throws the parse_error_exception for `value`, a number outside the range of the narrow integer type `T`.
+template<std::integral T>
+[[noreturn]] void throw_out_of_narrow_range(const auto value) {
+   detail::throw_out_of_range(std::format("{}", value), get_typename<T>::name(),
+                              std::to_string(int64_t{std::numeric_limits<T>::min()}),
+                              std::to_string(int64_t{std::numeric_limits<T>::max()}));
+}
+
+/**
+ * Converts `var` to `T`, an integer type narrower than the 64 bits a variant holds an integer in.
+ *
+ * Accepts what variant::as_int64() and variant::as_uint64() accept: an integer, a double (truncated toward zero), a
+ * decimal string, a bool, and null as zero.
+ *
+ * @throw parse_error_exception if the value is outside the range of `T`, or a string is not a decimal integer
+ * @throw bad_cast_exception if `var` holds a type that does not convert to an integer
+ */
+template<std::integral T>
+   requires(std::numeric_limits<T>::digits < std::numeric_limits<double>::digits)
+T as_narrow_integer(const variant& var) {
+   const auto narrow = [](const auto value) -> T {
+      if (!std::in_range<T>(value))
+         throw_out_of_narrow_range<T>(value);
+      return static_cast<T>(value);
+   };
+
+   switch (var.get_type()) {
+   case variant::int64_type:
+      return narrow(var.as_int64());
+   case variant::uint64_type:
+      return narrow(var.as_uint64());
+   case variant::double_type: {
+      // One below the minimum and one above the maximum are exact in a double. NaN fails both comparisons.
+      const double value = var.as_double();
+      if (!(value > static_cast<double>(std::numeric_limits<T>::min()) - 1 &&
+            value < static_cast<double>(std::numeric_limits<T>::max()) + 1))
+         throw_out_of_narrow_range<T>(value);
+      return static_cast<T>(value);
+   }
+   case variant::string_type:
+   case variant::string_sso_type: {
+      // to_uint64() reads "-n" as 2^64 - n, so a negative number is parsed as signed.
+      const std::string_view text = var.get_string();
+      return text.starts_with('-') ? narrow(to_int64(text)) : narrow(to_uint64(text));
+   }
+   default: // a bool, or null as zero; any other type throws bad_cast_exception
+      return std::is_signed_v<T> ? narrow(var.as_int64()) : narrow(var.as_uint64());
+   }
+}
+
+} // anonymous namespace
+
 void to_variant( const uint8_t& var,  variant& vo )  { vo = uint64_t(var); }
-// TODO: warn on overflow?
-void from_variant( const variant& var,  uint8_t& vo ){ vo = static_cast<uint8_t>(var.as_uint64()); }
+void from_variant( const variant& var,  uint8_t& vo ){ vo = as_narrow_integer<uint8_t>(var); }
 
 void to_variant( const int8_t& var,  variant& vo )  { vo = int64_t(var); }
-// TODO: warn on overflow?
-void from_variant( const variant& var,  int8_t& vo ){ vo = static_cast<int8_t>(var.as_int64()); }
+void from_variant( const variant& var,  int8_t& vo ){ vo = as_narrow_integer<int8_t>(var); }
 
 void to_variant( const uint16_t& var,  variant& vo )  { vo = uint64_t(var); }
-// TODO: warn on overflow?
-void from_variant( const variant& var,  uint16_t& vo ){ vo = static_cast<uint16_t>(var.as_uint64()); }
+void from_variant( const variant& var,  uint16_t& vo ){ vo = as_narrow_integer<uint16_t>(var); }
 
 void to_variant( const int16_t& var,  variant& vo )  { vo = int64_t(var); }
-// TODO: warn on overflow?
-void from_variant( const variant& var,  int16_t& vo ){ vo = static_cast<int16_t>(var.as_int64()); }
+void from_variant( const variant& var,  int16_t& vo ){ vo = as_narrow_integer<int16_t>(var); }
 
 void to_variant( const uint32_t& var,  variant& vo )  { vo = uint64_t(var); }
 void from_variant( const variant& var,  uint32_t& vo )
 {
-   vo = static_cast<uint32_t>(var.as_uint64());
+   vo = as_narrow_integer<uint32_t>(var);
 }
 
 void to_variant( const int32_t& var,  variant& vo )  {
@@ -1018,7 +1072,7 @@ void to_variant( const int32_t& var,  variant& vo )  {
 
 void from_variant( const variant& var,  int32_t& vo )
 {
-   vo = static_cast<int32_t>(var.as_int64());
+   vo = as_narrow_integer<int32_t>(var);
 }
 
 // to_variant/from_variant for unsigned __int128 and __int128 are now

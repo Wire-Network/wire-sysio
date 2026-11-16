@@ -65,6 +65,15 @@ namespace fc
    template<typename... T> void to_variant( const std::variant<T...>& s, fc::variant& v );
    template<typename... T> void from_variant( const fc::variant& v, std::variant<T...>& s );
 
+   /**
+    * @name Integers narrower than 64 bits
+    *
+    * from_variant accepts an integer, a double (truncated toward zero), a decimal string, a bool, and null as zero.
+    *
+    * @throw parse_error_exception if the value is outside the range of the target type
+    * @throw bad_cast_exception if the variant holds a type that does not convert to an integer
+    * @{
+    */
    void to_variant( const uint8_t& var,  fc::variant& vo );
    void from_variant( const fc::variant& var,  uint8_t& vo );
    void to_variant( const int8_t& var,  fc::variant& vo );
@@ -79,6 +88,7 @@ namespace fc
    void from_variant( const fc::variant& var,  uint32_t& vo );
    void to_variant( const int32_t& var,  fc::variant& vo );
    void from_variant( const fc::variant& var,  int32_t& vo );
+   /// @}
 
    // to_variant/from_variant for __int128 types declared in fc/int128.hpp
 
