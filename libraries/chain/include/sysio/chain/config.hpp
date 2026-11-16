@@ -108,8 +108,8 @@ namespace sysio::chain::config {
   static constexpr uint32_t default_max_wasm_func_local_bytes     = 8192;
   static constexpr uint32_t default_max_wasm_nested_structures    = 1024;
   static constexpr uint32_t default_max_wasm_symbol_bytes         = 8192;
-  static constexpr uint32_t default_max_wasm_module_bytes         = 20*1024*1024;
-  static constexpr uint32_t default_max_wasm_code_bytes           = 20*1024*1024;
+  static constexpr uint32_t default_max_wasm_module_bytes         = 4*1024*1024; ///< largest module `setcode` accepts
+  static constexpr uint32_t default_max_wasm_code_bytes           = 4*1024*1024; ///< largest function body `setcode` accepts
   static constexpr uint32_t default_max_wasm_pages                = 528;
   static constexpr uint32_t default_max_wasm_call_depth           = 251;
 
