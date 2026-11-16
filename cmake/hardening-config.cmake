@@ -1,15 +1,14 @@
 # cmake/hardening-config.cmake
-# Normalize glibc fortify across hosts for byte-stable releases.
+# Set glibc fortify the same way on every host, for byte-stable releases.
 
-# 1) Undefine any inherited _FORTIFY_SOURCE from distro flags (needs -U, so use compile *options*)
+# Drop any _FORTIFY_SOURCE inherited from distro or toolchain flags, then set ours. Both are compile *options*, in
+# this order: CMake emits compile definitions ahead of options, so a definition would be undone by the -U.
+# Debug is left out because glibc fortifies optimized code only and warns in every translation unit otherwise.
 add_compile_options(
-  $<$<COMPILE_LANGUAGE:C>:-U_FORTIFY_SOURCE>
-  $<$<COMPILE_LANGUAGE:CXX>:-U_FORTIFY_SOURCE>
+  $<$<COMPILE_LANGUAGE:C,CXX>:-U_FORTIFY_SOURCE>
+  $<$<AND:$<COMPILE_LANGUAGE:C,CXX>,$<NOT:$<CONFIG:Debug>>>:-D_FORTIFY_SOURCE=2>
 )
 
-# 2) Set _FORTIFY_SOURCE to 0 explicitly and make _GNU_SOURCE visible (use compile *definitions*)
-#    If you ever want fortify on, change 0 -> 2 here (on both builds).
 add_compile_definitions(
-  _FORTIFY_SOURCE=2
   _GNU_SOURCE
 )
