@@ -1905,7 +1905,8 @@ BOOST_AUTO_TEST_CASE( billed_cpu_test ) try {
    uint32_t combined_cpu_limit = mgr.get_account_cpu_limit_ex(acc).first.max + leeway.count();
    fc::microseconds subjective_cpu_bill_us = leeway;
    chain.control->get_mutable_subjective_billing().reset();
-   chain.control->get_mutable_subjective_billing().subjective_bill_failure({}, {{acc, subjective_cpu_bill_us}}, fc::time_point::now());
+   chain.control->get_mutable_subjective_billing().subjective_bill_failure({}, {{acc, {.cpu = subjective_cpu_bill_us}}},
+                                                                           fc::time_point::now());
    uint32_t billed_cpu_time_us = SYS_PERCENT( (combined_cpu_limit - subjective_cpu_bill_us.count()), 89 *config::percent_1 );
    push_trx( ptrx, fc::time_point::maximum(), billed_cpu_time_us, false );
 
@@ -1928,7 +1929,8 @@ BOOST_AUTO_TEST_CASE( billed_cpu_test ) try {
    combined_cpu_limit = cpu_limit + leeway.count();
    subjective_cpu_bill_us = fc::microseconds{cpu_limit};
    chain.control->get_mutable_subjective_billing().reset();
-   chain.control->get_mutable_subjective_billing().subjective_bill_failure({}, {{acc, subjective_cpu_bill_us}}, fc::time_point::now());
+   chain.control->get_mutable_subjective_billing().subjective_bill_failure({}, {{acc, {.cpu = subjective_cpu_bill_us}}},
+                                                                           fc::time_point::now());
    billed_cpu_time_us = SYS_PERCENT( combined_cpu_limit - subjective_cpu_bill_us.count(), 90 * config::percent_1 );
    ptrx->prev_accounts_billing = accounts_billing_t{{acc, {.cpu_usage_us = billed_cpu_time_us}}};
    BOOST_CHECK_EXCEPTION(push_trx( ptrx, fc::time_point::maximum(), billed_cpu_time_us, false ), tx_cpu_usage_exceeded,

@@ -1,3 +1,4 @@
+#include <boost/lexical_cast.hpp>
 #include <boost/test/unit_test.hpp>
 #include <sysio/net_plugin/auto_bp_peering.hpp>
 
@@ -17,6 +18,7 @@ struct mock_connection {
    uint32_t connection_id  = ++last_connection_id;
    bool go_away_queued     = false;
    boost::asio::ip::address_v6 address;
+   std::string log_p2p_address; ///< as connection::log_p2p_address, the address mark_configured_bp_connection splits
    mock_connection(bool bp_connection, bool open, bool received)
      : bp_connection(bp_connection ? bp_connection_type::bp_config : bp_connection_type::non_bp)
      , is_open(open)
@@ -429,6 +431,42 @@ BOOST_AUTO_TEST_CASE(test_configured_bp_ip_addresses) {
    BOOST_CHECK_EQUAL(plugin.config.auto_bp_ip_addresses.size(), 2u);
    BOOST_CHECK(plugin.config.auto_bp_ip_addresses.contains(boost::asio::ip::make_address_v6("::ffff:192.0.2.1")));
    BOOST_CHECK(plugin.config.auto_bp_ip_addresses.contains(boost::asio::ip::make_address_v6("2001:db8::2")));
+}
+
+/// A configured bp peer on an IPv6 literal is dialed, and pruned, at an address that splits back into its endpoint.
+/// Host names and IPv4 addresses are dialed as configured.
+BOOST_AUTO_TEST_CASE(test_configured_bp_ipv6_peer_address) {
+   mock_net_plugin plugin;
+   const std::string port = leased_port();
+   const std::vector<std::string> scheduled = { "[::1]:" + port, "[2001:db8::2]:" + port, "192.0.2.1:" + port,
+                                                "p2p.example.com:" + port };
+   const std::string unscheduled = "[2001:db8::3]:" + port;
+   plugin.set_configured_bp_peers({ "proda," + scheduled[0] + ":blk", "prodb," + scheduled[1], "prodc," + scheduled[2],
+                                    "prodd," + scheduled[3], "prodt," + unscheduled }, {});
+
+   BOOST_CHECK_EQUAL(plugin.config.auto_bp_addresses["proda"_n], endpoint("::1", port));
+   BOOST_CHECK_EQUAL(plugin.config.auto_bp_addresses["proda"_n].address(), scheduled[0]);
+   BOOST_CHECK_EQUAL(boost::lexical_cast<std::string>(plugin.config.auto_bp_addresses["prodb"_n]), scheduled[1]);
+
+   std::vector<std::string> dialed;
+   plugin.connections.resolve_and_connect = [&dialed](std::string host, std::string p2p_address) {
+      dialed.push_back(host);
+   };
+   plugin.lib_catchup = false;
+   plugin.on_pending_schedule(test_schedule1);
+
+   BOOST_CHECK_EQUAL(sorted(dialed), sorted(scheduled));
+   for (const std::string& address : dialed) {
+      // the outbound connection constructor marks the connection it dials by the address it was given
+      mock_connection conn(false, true, false);
+      conn.log_p2p_address = address;
+      plugin.mark_configured_bp_connection(&conn);
+      BOOST_CHECK_MESSAGE(conn.bp_connection == mock_connection::bp_connection_type::bp_config,
+                          address << " is not recognized as a configured bp peer");
+   }
+
+   // prodt is configured but not scheduled: the connection monitor prunes the address it was dialed at
+   BOOST_CHECK_EQUAL(sorted(plugin.gossip_bp_addresses_to_drop()), (std::vector<std::string>{ unscheduled }));
 }
 
 BOOST_AUTO_TEST_CASE(test_mark_inbound_configured_bp_by_address) {

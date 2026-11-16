@@ -1821,6 +1821,16 @@ void get_account( const string& accountName, const string& coresym, bool json_fo
          std::cout << std::endl;
       }
 
+      if( res.subjective_net_bill_limit ) {
+         const auto& net_bill = *res.subjective_net_bill_limit;
+         std::cout << "subjective net bandwidth:" << std::endl;
+         std::cout << indent << std::left << std::setw(11) << "used:"
+                   << std::right << std::setw(18) << to_pretty_net( net_bill.used ) << "\n";
+         std::cout << indent << std::left << std::setw(11) << "allowed:"
+                   << std::right << std::setw(18) << to_pretty_net( net_bill.max ) << "\n";
+         std::cout << std::endl;
+      }
+
       if( res.core_liquid_balance ) {
          std::cout << res.core_liquid_balance->get_symbol().name() << " balances: " << std::endl;
          std::cout << indent << std::left << std::setw(11)

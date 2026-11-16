@@ -182,6 +182,13 @@ namespace sysio::chain {
          /// nothing, so a block receipt that leaves one out differs from the one built here and the block is rejected.
          void bill_explicit_receiver_entries();
 
+         /// The NET `a` can still be billed, whether that limit is greylisted, and whether `a` has unlimited NET. With
+         /// `current_time`, usage decays to that time first, for an account whose window is not up to date.
+         std::tuple<int64_t, bool, bool>
+         get_net_limit(account_name a, const std::optional<block_timestamp_type>& current_time = {}) const;
+
+         /// Refuses the trx if an authorizer that is not a payer is over its subjective CPU allowance, or if any
+         /// authorizer would pass its subjective NET allowance with the bytes the trx bills it.
          void verify_init_subjective_billing() const;
          void verify_net_usage(account_name account, int64_t net_usage, uint32_t net_usage_leeway);
 
@@ -321,19 +328,17 @@ namespace sysio::chain {
 
          /// Bills the measured CPU objectively: adds the receiver entries when the transaction succeeded, puts the time
          /// outside any entry's frames on the input entries, and adds each entry to its account in accounts_billing.
-         /// Returns the CPU to bill subjectively to the input actions' first authorizers.
-         account_subjective_cpu_bill_t bill_cpu( fc::time_point now );
+         /// Returns the CPU, and the input actions' billable NET, to bill subjectively to their first authorizers.
+         account_subjective_bill_t bill_cpu( fc::time_point now );
          /// Undoes bill_cpu() for a transaction that fails after it, so that it can be billed as a failed one:
          /// `measured_cpu_us` and `unbilled` are billed_cpu_us and accounts_billing as bill_cpu() found them.
          void unbill_cpu( cpu_usage_t measured_cpu_us, accounts_billing_t unbilled );
-         /// Bills `authorizers_cpu` subjectively, and the accounts in accounts_billing unless payer billing is
+         /// Bills `authorizers` subjectively, and the accounts in accounts_billing unless payer billing is
          /// disabled: pending until a block includes the transaction when it succeeded, or as a failure.
-         void bill_subjectively( const account_subjective_cpu_bill_t& authorizers_cpu );
+         void bill_subjectively( const account_subjective_bill_t& authorizers );
          /// Bills `cpu_us` of receiver entry `e` to its contract: CPU only, never NET. finalize() reads its CPU limit.
          /// An entry of 0 bills nothing: the contract is not billed, so its CPU window is neither updated nor checked.
          void bill_receiver( const receiver_entry& e, uint32_t cpu_us );
-         /// First authorizer of input action `input`, or the transaction's when it has none.
-         account_name input_first_authorizer( uint32_t input ) const;
    };
 
 } // namespace sysio::chain

@@ -3,6 +3,7 @@
 #include <magic_enum/magic_enum.hpp>
 #include <sysio.councl/sysio.councl.hpp>
 #include <sysio.system/emissions.hpp> // shared node-owner caps
+#include <sysio.system/native.hpp>    // authority types and the updateauth wrapper
 
 #include <algorithm>
 #include <array>
@@ -31,6 +32,10 @@ constexpr name ACTION_SETTLE = "settle"_n;
 constexpr name ACTION_STIR = "stir"_n;
 
 constexpr uint32_t INVALID_MEMBER_INDEX = std::numeric_limits<uint32_t>::max();
+
+constexpr name OWNER_PERMISSION = "owner"_n;
+constexpr name ACTIVE_PERMISSION = "active"_n;
+constexpr uint16_t MEMBER_WEIGHT = 1; ///< every member of a governance authority carries one vote
 
 using NodeOwnerTier = opp::types::NodeOwnerTier;
 
@@ -127,6 +132,21 @@ checksum256 hash_args(const Args&... args) {
    auto packed = pack(std::tie(args...));
    return sha256(packed.data(), packed.size());
 }
+
+/// Replace `account@active` with an authority that more than two thirds of `members` satisfy,
+/// each through its own `active` permission. The permission's RAM is billed to `account`.
+void set_supermajority_authority(name account, std::vector<name> members) {
+   // The chain rejects an authority whose accounts are not in ascending order.
+   std::sort(members.begin(), members.end());
+   sysiosystem::authority auth;
+   // The rule that elects a member: floor(2n/3) + 1.
+   auth.threshold = static_cast<uint32_t>(councl_math::win_threshold(members.size()));
+   auth.accounts.reserve(members.size());
+   for (const name member : members)
+      auth.accounts.push_back({permission_level{member, ACTIVE_PERMISSION}, MEMBER_WEIGHT});
+   sysiosystem::native::updateauth_action(councl::SYSTEM_ACCOUNT, permission_level{account, OWNER_PERMISSION})
+      .send(account, ACTIVE_PERMISSION, OWNER_PERMISSION, auth, OWNER_PERMISSION);
+}
 } // namespace
 
 // ===========================================================================
@@ -146,6 +166,10 @@ uint8_t council::roa_network_gen() const {
 
 uint32_t council::tier_count(uint8_t network_gen, councl::election_tier tier) const {
    return roa::nodeowner_count(councl::ROA_ACCOUNT, network_gen, tier_integer(tier));
+}
+
+std::vector<name> council::tier_owners(uint8_t network_gen, councl::election_tier tier) const {
+   return roa::nodeowners_in_tier(councl::ROA_ACCOUNT, network_gen, tier_integer(tier));
 }
 
 // ===========================================================================
@@ -350,8 +374,20 @@ void council::tabulate(election_state& st, const config_state& cfg, uint32_t max
          }
       }
    }
-   if (st.cursor == councl::SEATS && st.phase != councl::election_phase::DONE)
+   if (st.phase == councl::election_phase::DONE)
+      grant_council_authority(cfg);
+   else if (st.cursor == councl::SEATS)
       st.phase = councl::election_phase::CONTINUING;
+}
+
+void council::grant_council_authority(const config_state& cfg) {
+   council_t results(get_self(), cfg.election_gen);
+   std::vector<name> members;
+   members.reserve(councl::SEATS);
+   for (auto it = results.begin(); it != results.end(); ++it)
+      members.push_back(it->member);
+   check(members.size() == councl::SEATS, "council is not fully seated");
+   set_supermajority_authority(councl::COUNCIL_AUTHORITY, std::move(members));
 }
 
 // ===========================================================================
@@ -399,17 +435,9 @@ void council::startinit(uint64_t time_slot_sec, std::vector<name> ordered_owners
    check(ordered_owners.size() == councl::SEATS, "ordered_owners must list every council seat owner");
 
    const uint8_t ng = roa_network_gen();
-   const uint8_t t1_raw = magic_enum::enum_integer(NodeOwnerTier::NODE_OWNER_TIER_T1);
 
-   // Enumerate roa's tier-1 owners (the authoritative set the ordering must permute).
-   roa::nodeowners_t no(councl::ROA_ACCOUNT, ng);
-   auto t1_idx = no.get_index<"bytier"_n>();
-   std::vector<name> t1;
-   for (auto it = t1_idx.lower_bound(t1_raw); it != t1_idx.end(); ++it) {
-      if (it->tier != t1_raw)
-         break;
-      t1.push_back(it->owner);
-   }
+   // roa's tier-1 owners are the authoritative set the ordering must permute.
+   std::vector<name> t1 = tier_owners(ng, councl::election_tier::T1);
    check(t1.size() == councl::SEATS, "roa tier-1 owner count does not match the council seat count");
 
    // Compare sorted in-memory copies once instead of point-reading the byowner index while it is
@@ -768,6 +796,18 @@ void council::stir(name caller) {
    auto st = sg.get("election state missing");
    do_stir(st, ACTION_STIR, caller);
    sg.set(st, RAM_PAYER);
+}
+
+// ===========================================================================
+//  Governance authorities
+// ===========================================================================
+void council::syncnodes(name caller) {
+   require_auth(caller);
+   std::vector<name> owners = tier_owners(roa_network_gen(), councl::election_tier::T1);
+   check(!owners.empty(), "no tier-1 node owner is registered");
+   // Defense in depth; see the tier-2 cap check in loadtier.
+   check(owners.size() <= sysiosystem::emissions::T1_MAX_NODE_OWNERS, "tier-1 count exceeds the system owner cap");
+   set_supermajority_authority(councl::NODE_OWNERS_AUTHORITY, std::move(owners));
 }
 
 } // namespace sysio

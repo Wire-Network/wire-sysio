@@ -284,20 +284,42 @@ public:
       );
    }
 
-   fc::variant get_reslimit( account_name acc )
+   /// An account's chain resource limits.
+   struct account_limits {
+      int64_t ram = 0;
+      int64_t net = 0;
+      int64_t cpu = 0;
+
+      bool operator==(const account_limits&) const = default;
+   };
+
+   account_limits get_limits( account_name acc )
    {
-      // reslimit is kv::table (unscoped) — key is [owner:8B BE]
-      char key_buf[chain::kv_pri_key_size];
-      chain::kv_encode_be64(key_buf, acc.to_uint64_t());
-      std::string_view key_sv(key_buf, chain::kv_pri_key_size);
-      const auto row = control->kv().find_row(ROA, compute_table_id("reslimit"_n.to_uint64_t()), key_sv);
-      if (row) {
-         const vector<char> data(row->value.begin(), row->value.end());
-         if (!data.empty()) {
-            return abi_ser.binary_to_variant( "reslimit", data, fixture_abi_yield_function() );
-         }
-      }
-      return fc::variant();
+      account_limits limits;
+      control->get_resource_limits_manager().get_account_limits( acc, limits.ram, limits.net, limits.cpu );
+      return limits;
+   }
+
+   /// An account's chain RAM limit. For `sysio` it is the pool account creation and deploy gifts draw from.
+   int64_t get_ram_limit( account_name acc ) { return get_limits(acc).ram; }
+
+   /// Sets an account's chain resource limits directly, as governance can outside sysio.roa.
+   void set_limits( account_name acc, const account_limits& limits )
+   {
+      base_tester::push_action(config::system_account_name, "setalimits"_n, config::system_account_name, mvo()
+         ("account", acc)
+         ("ram_bytes", limits.ram)
+         ("net_weight", limits.net)
+         ("cpu_weight", limits.cpu));
+   }
+
+   /// Sets sysio's RAM pool to `ram` bytes in chain state. A transaction cannot: sysio already uses more RAM
+   /// than a nearly empty pool leaves it, and a transaction that bills sysio has its usage checked.
+   void set_sysio_pool( int64_t ram )
+   {
+      const account_limits limits = get_limits(config::system_account_name);
+      control->get_mutable_resource_limits_manager().set_account_limits(config::system_account_name, ram,
+                                                                        limits.net, limits.cpu, false);
    }
 
    fc::variant get_policy( account_name acc, account_name owner )
@@ -708,7 +730,7 @@ BOOST_FIXTURE_TEST_CASE( newuser_stops_at_account_limit, sysio_roa_tester ) try 
    produce_blocks(1);
    BOOST_REQUIRE_EQUAL(2, get_sponsor_count("alice"_n));
 
-   const int64_t sysio_ram = get_reslimit("sysio"_n)["ram_bytes"].as_int64();
+   const int64_t sysio_ram = get_ram_limit("sysio"_n);
    BOOST_REQUIRE_EXCEPTION(newuser("alice"_n, "overlimit"_n, get_public_key("alice"_n, "active")),
                            sysio_assert_message_exception,
                            sysio_assert_message_is(account_limit_reached_message(2)));
@@ -716,7 +738,7 @@ BOOST_FIXTURE_TEST_CASE( newuser_stops_at_account_limit, sysio_roa_tester ) try 
 
    BOOST_REQUIRE(get_sponsorship("alice"_n, "overlimit"_n).is_null());
    BOOST_REQUIRE_EQUAL(2, get_sponsor_count("alice"_n));
-   BOOST_REQUIRE_EQUAL(sysio_ram, get_reslimit("sysio"_n)["ram_bytes"].as_int64());
+   BOOST_REQUIRE_EQUAL(sysio_ram, get_ram_limit("sysio"_n));
 } FC_LOG_AND_RETHROW()
 
 /// Limits are per owner: one owner at its limit does not hold back another.
@@ -960,12 +982,8 @@ BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
    int64_t ram; int64_t net; int64_t cpu;
    control->get_resource_limits_manager().get_account_limits( "sysio"_n, ram, net, cpu );
    const int64_t initial_sysio_ram = ram;
-   auto r = get_reslimit("sysio"_n);
-   BOOST_TEST(r["ram_bytes"].as_int64() == ram);
    control->get_resource_limits_manager().get_account_limits( "sysio.acct"_n, ram, net, cpu );
    BOOST_TEST(ram == newaccount_ram); // just itself
-   r = get_reslimit("sysio.acct"_n);
-   BOOST_TEST(r["ram_bytes"].as_int64() == newaccount_ram); // sysio.acct itself
 
    // create all node owners
    std::array<account_name, 21> node_owners = { NODE_DADDY };
@@ -983,10 +1001,10 @@ BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
 
    // verify initial conditions of ROA accounts
    control->get_resource_limits_manager().get_account_limits( "sysio"_n, ram, net, cpu );
-   // Registration no longer grants sysio anything (activateroa carved its share out up front), so the
-   // reslimit row is unchanged. The quota is lower by the gift each plain newaccount above drew from it.
-   const int64_t roa_sysio_ram = initial_sysio_ram;
-   BOOST_TEST(ram == roa_sysio_ram - (int64_t)(node_owners.size() - 1) * (int64_t)newaccount_ram);
+   // Registration grants sysio nothing (activateroa carved its share out up front). The quota is lower by
+   // the gift each plain newaccount above drew from it.
+   const int64_t roa_sysio_ram = initial_sysio_ram - (int64_t)(node_owners.size() - 1) * (int64_t)newaccount_ram;
+   BOOST_TEST(ram == roa_sysio_ram);
    control->get_resource_limits_manager().get_account_limits( "sysio.roa"_n, ram, net, cpu );
    BOOST_TEST(ram == 157021280); // ram of roa itself
    control->get_resource_limits_manager().get_account_limits( "sysio.acct"_n, ram, net, cpu );
@@ -1001,18 +1019,13 @@ BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
    BOOST_TEST(ram == newaccount_ram); // newuser has gifted amount of ram
    BOOST_TEST(net == 0);
    BOOST_TEST(cpu == 0);
-   r = get_reslimit(newuser);
-   BOOST_TEST(r.is_null()); // no reslimit for newuser
-   r = get_reslimit("sysio.acct"_n);
-   BOOST_TEST(r["ram_bytes"].as_int64() == 2*newaccount_ram); // newuser and sysio.acct itself
    auto p = get_policy("sysio"_n, "sysio"_n);
    BOOST_TEST(p.is_null()); // no policy for sysio
    p = get_policy(newuser, "sysio"_n);
    BOOST_TEST(p.is_null()); // no policy for newuser
    p = get_policy(newuser, node_owners[2]);
    BOOST_TEST(p.is_null()); // no policy for newuser
-   r = get_reslimit("sysio"_n);
-   BOOST_TEST(r["ram_bytes"].as_int64() == roa_sysio_ram-newaccount_ram); // sysio ram gifted to newuser; reflected in sysio.acct
+   BOOST_TEST(get_ram_limit("sysio"_n) == roa_sysio_ram-newaccount_ram); // sysio ram gifted to newuser; recorded on the sysio.acct policy
    p = get_policy("sysio.acct"_n, "sysio"_n);
    BOOST_TEST(p["net_weight"].as_string() == "0.0000 SYS");
    BOOST_TEST(p["cpu_weight"].as_string() == "0.0000 SYS");
@@ -1027,18 +1040,13 @@ BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
    BOOST_TEST(ram == newaccount_ram); // newuser has gifted amount of ram
    BOOST_TEST(net == 0);
    BOOST_TEST(cpu == 0);
-   r = get_reslimit(newuser2);
-   BOOST_TEST(r.is_null()); // no reslimit for newuser
-   r = get_reslimit("sysio.acct"_n);
-   BOOST_TEST(r["ram_bytes"].as_int64() == 3*newaccount_ram); // newuser, newuser2, and sysio.acct itself
    p = get_policy("sysio"_n, "sysio"_n);
    BOOST_TEST(p.is_null()); // no policy for sysio
    p = get_policy(newuser2, "sysio"_n);
    BOOST_TEST(p.is_null()); // no policy for newuser
    p = get_policy(newuser2, node_owners[2]);
    BOOST_TEST(p.is_null()); // no policy for newuser
-   r = get_reslimit("sysio"_n);
-   BOOST_TEST(r["ram_bytes"].as_int64() == roa_sysio_ram-2*newaccount_ram); // sysio ram gifted to newuser & newuser2; reflected in sysio.acct
+   BOOST_TEST(get_ram_limit("sysio"_n) == roa_sysio_ram-2*newaccount_ram); // sysio ram gifted to newuser & newuser2; recorded on the sysio.acct policy
    p = get_policy("sysio.acct"_n, "sysio"_n);
    BOOST_TEST(p["net_weight"].as_string() == "0.0000 SYS");
    BOOST_TEST(p["cpu_weight"].as_string() == "0.0000 SYS");
@@ -1053,12 +1061,6 @@ BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
    BOOST_TEST(ram == newaccount_ram+(320000l*104)); // gifted ram plus the policy ram
    BOOST_TEST(net == 320000l);
    BOOST_TEST(cpu == 320000l);
-   r = get_reslimit(newuser);
-   BOOST_TEST(r["ram_bytes"].as_int64() == newaccount_ram+(320000l*104));
-   BOOST_TEST(r["net_weight"].as_string() == "32.0000 SYS");
-   BOOST_TEST(r["cpu_weight"].as_string() == "32.0000 SYS");
-   r = get_reslimit("sysio.acct"_n);
-   BOOST_TEST(r["ram_bytes"].as_int64() == 3*newaccount_ram); // newuser, newuser2, and sysio.acct itself (nothing for policy)
    p = get_policy("sysio"_n, "sysio"_n);
    BOOST_TEST(p.is_null()); // no policy for sysio
    p = get_policy(newuser, "sysio"_n);
@@ -1067,8 +1069,7 @@ BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
    BOOST_TEST(p["net_weight"].as_string() == "32.0000 SYS");
    BOOST_TEST(p["cpu_weight"].as_string() == "32.0000 SYS");
    BOOST_TEST(p["ram_weight"].as_string() == "32.0000 SYS"); // new policy does not include the gifted RAM from sysio
-   r = get_reslimit("sysio"_n);
-   BOOST_TEST(r["ram_bytes"].as_int64() == roa_sysio_ram-2*newaccount_ram); // sysio ram not changed for a policy, same as before
+   BOOST_TEST(get_ram_limit("sysio"_n) == roa_sysio_ram-2*newaccount_ram); // sysio ram not changed for a policy, same as before
    p = get_policy("sysio.acct"_n, "sysio"_n); // sysio.acct policy not changed for a user policy
    BOOST_TEST(p["net_weight"].as_string() == "0.0000 SYS");
    BOOST_TEST(p["cpu_weight"].as_string() == "0.0000 SYS");
@@ -1083,12 +1084,6 @@ BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
    BOOST_TEST(ram == newaccount_ram+(320000l*104)+(150000l*104)); // gifted ram plus the policy ram
    BOOST_TEST(net == 320000+50000);
    BOOST_TEST(cpu == 320000+100000);
-   r = get_reslimit(newuser);
-   BOOST_TEST(r["ram_bytes"].as_int64() == newaccount_ram+(320000l*104)+(150000l*104));
-   BOOST_TEST(r["net_weight"].as_string() == "37.0000 SYS");
-   BOOST_TEST(r["cpu_weight"].as_string() == "42.0000 SYS");
-   r = get_reslimit("sysio.acct"_n);
-   BOOST_TEST(r["ram_bytes"].as_int64() == 3*newaccount_ram); // newuser, newuser2, and sysio.acct itself (nothing for policy)
    p = get_policy("sysio"_n, "sysio"_n);
    BOOST_TEST(p.is_null()); // no policy for sysio
    p = get_policy(newuser, "sysio"_n);
@@ -1097,8 +1092,7 @@ BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
    BOOST_TEST(p["net_weight"].as_string() == "37.0000 SYS");
    BOOST_TEST(p["cpu_weight"].as_string() == "42.0000 SYS");
    BOOST_TEST(p["ram_weight"].as_string() == "47.0000 SYS"); // policy does not include the gifted RAM from sysio
-   r = get_reslimit("sysio"_n);
-   BOOST_TEST(r["ram_bytes"].as_int64() == roa_sysio_ram-2*newaccount_ram); // sysio ram not changed for a policy, same as before
+   BOOST_TEST(get_ram_limit("sysio"_n) == roa_sysio_ram-2*newaccount_ram); // sysio ram not changed for a policy, same as before
    p = get_policy("sysio.acct"_n, "sysio"_n); // sysio.acct policy not changed for a user policy
    BOOST_TEST(p["net_weight"].as_string() == "0.0000 SYS");
    BOOST_TEST(p["cpu_weight"].as_string() == "0.0000 SYS");
@@ -1113,12 +1107,6 @@ BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
    BOOST_TEST(ram == newaccount_ram+(320000l*104)+(150000l*104)+(30000l*104)); // gifted ram plus the policy ram
    BOOST_TEST(net == 320000l+50000l+10000l);
    BOOST_TEST(cpu == 320000l+100000l+20000l);
-   r = get_reslimit(newuser); // reflects both policies from node_owner 2 & 3
-   BOOST_TEST(r["ram_bytes"].as_int64() == newaccount_ram+(320000l*104)+(150000l*104)+(30000l*104));
-   BOOST_TEST(r["net_weight"].as_string() == "38.0000 SYS");
-   BOOST_TEST(r["cpu_weight"].as_string() == "44.0000 SYS");
-   r = get_reslimit("sysio.acct"_n);
-   BOOST_TEST(r["ram_bytes"].as_int64() == 3*newaccount_ram); // newuser, newuser2, and sysio.acct itself (nothing for policy)
    p = get_policy("sysio"_n, "sysio"_n);
    BOOST_TEST(p.is_null()); // no policy for sysio
    p = get_policy(newuser, "sysio"_n);
@@ -1131,8 +1119,7 @@ BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
    BOOST_TEST(p["net_weight"].as_string() == "1.0000 SYS");
    BOOST_TEST(p["cpu_weight"].as_string() == "2.0000 SYS");
    BOOST_TEST(p["ram_weight"].as_string() == "3.0000 SYS");
-   r = get_reslimit("sysio"_n);
-   BOOST_TEST(r["ram_bytes"].as_int64() == roa_sysio_ram-2*newaccount_ram); // sysio ram not changed for a policy, same as before
+   BOOST_TEST(get_ram_limit("sysio"_n) == roa_sysio_ram-2*newaccount_ram); // sysio ram not changed for a policy, same as before
    p = get_policy("sysio.acct"_n, "sysio"_n); // sysio.acct policy not changed for a user policy
    BOOST_TEST(p["net_weight"].as_string() == "0.0000 SYS");
    BOOST_TEST(p["cpu_weight"].as_string() == "0.0000 SYS");
@@ -1205,7 +1192,7 @@ BOOST_FIXTURE_TEST_CASE( extend_policy_test, sysio_roa_tester ) try {
 
 } FC_LOG_AND_RETHROW()
 
-// Verifies that reducepolicy correctly decreases RAM bytes in the reslimit table.
+// Verifies that reducepolicy decreases the owner's chain RAM limit by exactly the reclaimed bytes.
 BOOST_FIXTURE_TEST_CASE( reducepolicy_ram_accounting, sysio_roa_tester ) try {
    // system contract + init + emission config already done in base constructor
 
@@ -1229,11 +1216,9 @@ BOOST_FIXTURE_TEST_CASE( reducepolicy_ram_accounting, sysio_roa_tester ) try {
    // Record pre-reduce state
    int64_t ram, net, cpu;
    control->get_resource_limits_manager().get_account_limits(user, ram, net, cpu);
-   auto r = get_reslimit(user);
-   int64_t pre_reslimit_ram = r["ram_bytes"].as_int64();
+   const int64_t pre_ram = ram;
 
    // Verify initial state: newaccount_ram + policy RAM (320000 * 104 = 33,280,000)
-   BOOST_TEST(pre_reslimit_ram == ram);
    BOOST_TEST(ram == (int64_t)(newaccount_ram + 320000l * 104));
    BOOST_TEST(net == 320000);
    BOOST_TEST(cpu == 320000);
@@ -1244,15 +1229,9 @@ BOOST_FIXTURE_TEST_CASE( reducepolicy_ram_accounting, sysio_roa_tester ) try {
 
    // Verify post-reduce state
    control->get_resource_limits_manager().get_account_limits(user, ram, net, cpu);
-   r = get_reslimit(user);
-   int64_t post_reslimit_ram = r["ram_bytes"].as_int64();
 
-   // C4 fix: reslimit ram_bytes should decrease, NOT nearly double
-   // Expected: pre_reslimit_ram - (160000 * 104)
-   int64_t expected_ram = pre_reslimit_ram - 160000l * 104;
-   BOOST_TEST(post_reslimit_ram == expected_ram);
-   BOOST_TEST(post_reslimit_ram == ram);  // reslimit table matches system limits
-   BOOST_TEST(post_reslimit_ram < pre_reslimit_ram);
+   // The RAM limit decreases by the reclaimed bytes (160000 * 104)
+   BOOST_TEST(ram == pre_ram - 160000l * 104);
 
    // Verify NET/CPU decreased correctly
    BOOST_TEST(net == 160000);
@@ -1300,11 +1279,9 @@ BOOST_FIXTURE_TEST_CASE( reducepolicy_full_then_second, sysio_roa_tester ) try {
    produce_block();
 
    control->get_resource_limits_manager().get_account_limits(user, ram, net, cpu);
-   auto r = get_reslimit(user);
 
    // Only the second policy's RAM remains plus newaccount_ram
    BOOST_TEST(ram == (int64_t)(newaccount_ram + 200000l * 104));
-   BOOST_TEST(r["ram_bytes"].as_int64() == ram);
    BOOST_TEST(net == 200000);
    BOOST_TEST(cpu == 200000);
 
@@ -1323,16 +1300,14 @@ BOOST_FIXTURE_TEST_CASE( reducepolicy_full_then_second, sysio_roa_tester ) try {
    produce_block();
 
    control->get_resource_limits_manager().get_account_limits(user, ram, net, cpu);
-   r = get_reslimit(user);
 
    BOOST_TEST(ram == (int64_t)(newaccount_ram + 150000l * 104));
-   BOOST_TEST(r["ram_bytes"].as_int64() == ram);
    BOOST_TEST(net == 150000);
    BOOST_TEST(cpu == 150000);
 
 } FC_LOG_AND_RETHROW()
 
-// Verifies that creating multiple users correctly decreases sysio's reslimit RAM.
+// Verifies that creating multiple users draws exactly their account RAM from sysio's pool.
 BOOST_FIXTURE_TEST_CASE( newuser_sysio_ram_decreases, sysio_roa_tester ) try {
    // system contract + init + emission config already done in base constructor
 
@@ -1345,10 +1320,10 @@ BOOST_FIXTURE_TEST_CASE( newuser_sysio_ram_decreases, sysio_roa_tester ) try {
    }
    produce_block();
 
-   // Record sysio's initial RAM
-   auto r = get_reslimit("sysio"_n);
-   int64_t sysio_ram_before = r["ram_bytes"].as_int64();
+   // Record sysio's initial RAM and the RAM recorded as gifted for account creation
+   int64_t sysio_ram_before = get_ram_limit("sysio"_n);
    BOOST_TEST(sysio_ram_before > 0);
+   const int64_t gifted_before = get_policy("sysio.acct"_n, "sysio"_n)["ram_weight"].as<asset>().get_amount();
 
    // Create 5 users - each should subtract newaccount_ram from sysio
    for (int i = 0; i < 5; i++) {
@@ -1356,16 +1331,15 @@ BOOST_FIXTURE_TEST_CASE( newuser_sysio_ram_decreases, sysio_roa_tester ) try {
       produce_block();
    }
 
-   r = get_reslimit("sysio"_n);
-   int64_t sysio_ram_after = r["ram_bytes"].as_int64();
+   int64_t sysio_ram_after = get_ram_limit("sysio"_n);
 
-   // Sysio's reslimit should have decreased by exactly 5 * newaccount_ram
+   // Sysio's pool should have decreased by exactly 5 * newaccount_ram
    BOOST_TEST(sysio_ram_after == sysio_ram_before - 5 * (int64_t)newaccount_ram);
    BOOST_TEST(sysio_ram_after > 0);  // should still be positive
 
-   // sysio.acct's reslimit should have increased by 5 * newaccount_ram (plus its own)
-   r = get_reslimit("sysio.acct"_n);
-   BOOST_TEST(r["ram_bytes"].as_int64() == (int64_t)((5 + 1) * newaccount_ram));  // 5 users + sysio.acct itself
+   // The sysio.acct policy records the same 5 * newaccount_ram, in units of bytes_per_unit (104)
+   const int64_t gifted_after = get_policy("sysio.acct"_n, "sysio"_n)["ram_weight"].as<asset>().get_amount();
+   BOOST_TEST((gifted_after - gifted_before) * 104 == 5 * (int64_t)newaccount_ram);
 
 } FC_LOG_AND_RETHROW()
 
@@ -1803,7 +1777,7 @@ BOOST_FIXTURE_TEST_CASE( addpolicy_wrong_symbol, sysio_roa_full_tester ) try {
       sysio_assert_message_is("policy weights must be denominated in the core SYS symbol"));
 } FC_LOG_AND_RETHROW()
 
-// addpolicy rejects an owner account that does not exist (guards the reslimit / system-resource
+// addpolicy rejects an owner account that does not exist (guards the system-resource
 // writes that follow -- they would otherwise run against a non-account).
 BOOST_FIXTURE_TEST_CASE( addpolicy_nonexistent_owner, sysio_roa_full_tester ) try {
    BOOST_CHECK_EXCEPTION(
@@ -1985,7 +1959,7 @@ BOOST_FIXTURE_TEST_CASE( reducepolicy_below_zero, sysio_roa_full_tester ) try {
 // still satisfying the reduce-below-zero upper bounds (`w <= stored`, true for any negative
 // w whenever the stored weight is positive). Left unguarded it inflates the account's
 // resource limits past the issuer's ROA budget -- bypassing expandpolicy's free-allocation
-// check -- and desynchronises the reslimit row and nodeowners accounting from the policy.
+// check -- and desynchronises the nodeowners accounting from the policy.
 // The NET case is CertiK WNS-03's PoC verbatim: a 10.0000 SYS policy reduced by -5.0000 SYS
 // used to end at 15.0000 SYS.
 BOOST_FIXTURE_TEST_CASE( reducepolicy_negative_weight_rejected, sysio_roa_full_tester ) try {
@@ -2120,8 +2094,8 @@ BOOST_FIXTURE_TEST_CASE( reduce_one_issuer_isolates_other, sysio_roa_full_tester
 
 // Creating many users depletes sysio RAM predictably
 BOOST_FIXTURE_TEST_CASE( newuser_ram_depletion_tracking, sysio_roa_full_tester ) try {
-   auto r = get_reslimit("sysio"_n);
-   int64_t sysio_ram_start = r["ram_bytes"].as_int64();
+   int64_t sysio_ram_start = get_ram_limit("sysio"_n);
+   const int64_t gifted_start = get_policy("sysio.acct"_n, "sysio"_n)["ram_weight"].as<asset>().get_amount();
 
    // Create users from multiple node owners and verify accounting
    auto user1 = create_newuser(node_owners[2]);
@@ -2129,8 +2103,7 @@ BOOST_FIXTURE_TEST_CASE( newuser_ram_depletion_tracking, sysio_roa_full_tester )
    auto user3 = create_newuser(node_owners[4]);
    produce_block();
 
-   r = get_reslimit("sysio"_n);
-   BOOST_TEST(r["ram_bytes"].as_int64() == sysio_ram_start - 3 * (int64_t)newaccount_ram);
+   BOOST_TEST(get_ram_limit("sysio"_n) == sysio_ram_start - 3 * (int64_t)newaccount_ram);
 
    // Each new user should have exactly newaccount_ram
    int64_t ram, net, cpu;
@@ -2141,9 +2114,73 @@ BOOST_FIXTURE_TEST_CASE( newuser_ram_depletion_tracking, sysio_roa_full_tester )
    control->get_resource_limits_manager().get_account_limits(user3, ram, net, cpu);
    BOOST_TEST(ram == (int64_t)newaccount_ram);
 
-   // sysio.acct reslimit tracks all gifted RAM
-   r = get_reslimit("sysio.acct"_n);
-   BOOST_TEST(r["ram_bytes"].as_int64() == (int64_t)((3 + 1) * newaccount_ram));
+   // The sysio.acct policy records the RAM gifted for account creation, in units of bytes_per_unit (104)
+   const int64_t gifted_end = get_policy("sysio.acct"_n, "sysio"_n)["ram_weight"].as<asset>().get_amount();
+   BOOST_TEST((gifted_end - gifted_start) * 104 == 3 * (int64_t)newaccount_ram);
+} FC_LOG_AND_RETHROW()
+
+/// Account creation draws on sysio's chain RAM quota alone. With less than one account's RAM left in the pool,
+/// newuser fails in the native newaccount it sends and records nothing.
+BOOST_FIXTURE_TEST_CASE( newuser_refused_when_sysio_pool_is_short, sysio_roa_full_tester ) try {
+   const account_name creator = node_owners[2];
+   const asset gifted_before = get_policy("sysio.acct"_n, "sysio"_n)["ram_weight"].as<asset>();
+   const uint64_t count_before = get_sponsor_count(creator);
+
+   const int64_t short_pool = static_cast<int64_t>(newaccount_ram) - 1;
+   set_sysio_pool(short_pool);
+
+   BOOST_REQUIRE_EXCEPTION(newuser(creator, "poolshort"_n, get_public_key(creator, "active")),
+                           sysio_assert_message_exception, sysio_assert_message_is("insufficient ram"));
+   BOOST_REQUIRE(get_sponsorship(creator, "poolshort"_n).is_null());
+   BOOST_REQUIRE_EQUAL(count_before, get_sponsor_count(creator));
+   BOOST_REQUIRE_EQUAL(short_pool, get_ram_limit(config::system_account_name));
+   BOOST_REQUIRE_EQUAL(gifted_before, get_policy("sysio.acct"_n, "sysio"_n)["ram_weight"].as<asset>());
+} FC_LOG_AND_RETHROW()
+
+/// expandpolicy and reducepolicy work from the owner's chain limits, including a part set outside sysio.roa.
+BOOST_FIXTURE_TEST_CASE( policy_changes_apply_to_limits_set_outside_roa, sysio_roa_full_tester ) try {
+   const account_name issuer = node_owners[2];
+   const account_name user = create_newuser(issuer);
+   produce_block();
+   add_roa_policy(issuer, user, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
+   produce_block();
+
+   // Governance adds limits of its own on top of the policy's.
+   account_limits limits = get_limits(user);
+   limits.ram += 5'000;
+   limits.net += 7;
+   limits.cpu += 9;
+   set_limits(user, limits);
+   produce_block();
+
+   expand_roa_policy(issuer, user, "0.5000 SYS", "0.5000 SYS", "0.5000 SYS", 0);
+   produce_block();
+   limits.ram += 5'000 * 104;
+   limits.net += 5'000;
+   limits.cpu += 5'000;
+   BOOST_REQUIRE(get_limits(user) == limits);
+
+   reduce_roa_policy(issuer, user, "1.5000 SYS", "1.5000 SYS", "1.5000 SYS", 0);
+   produce_block();
+   limits.ram -= 15'000 * 104;
+   limits.net -= 15'000;
+   limits.cpu -= 15'000;
+   BOOST_REQUIRE(get_limits(user) == limits);
+   BOOST_REQUIRE(get_policy(user, issuer).is_null());
+} FC_LOG_AND_RETHROW()
+
+/// forcereg of an account that was never under ROA (unlimited limits) starts it from the account-creation
+/// RAM: a tier-1 owner ends with that plus its personal allocation, a tier-2 owner with that alone.
+BOOST_FIXTURE_TEST_CASE( forcereg_starts_an_unlimited_account_from_the_account_gift, sysio_roa_tester ) try {
+   for (const account_name owner : {"alice"_n, "bob"_n})
+      BOOST_REQUIRE_LT(get_ram_limit(owner), 0);
+
+   BOOST_REQUIRE_EQUAL(success(), regnodeowner("alice"_n, 1));
+   BOOST_REQUIRE_EQUAL(success(), regnodeowner("bob"_n, 2));
+
+   const int64_t gift = newaccount_ram;
+   BOOST_REQUIRE(get_limits("alice"_n) == (account_limits{.ram = gift + 80 * 104, .net = 500, .cpu = 500}));
+   BOOST_REQUIRE(get_limits("bob"_n) == (account_limits{.ram = gift, .net = 0, .cpu = 0}));
 } FC_LOG_AND_RETHROW()
 
 // Non-tier-1 node owner cannot create users
@@ -2160,8 +2197,8 @@ BOOST_FIXTURE_TEST_CASE( newuser_tier2_fails, sysio_roa_full_tester ) try {
 
 // Only tier 1 is provisioned a personal policy at registration -- it is the sole tier that can call
 // newuser, whose sponsorship rows are the only writes billed to a node owner. Tiers 2 and 3 get the
-// nodeowners budget and a reslimit row, but no allocation of their own,
-// and can still self-issue afterwards because addpolicy costs the issuer nothing.
+// nodeowners budget but no allocation of their own, and can still self-issue afterwards because
+// addpolicy costs the issuer nothing.
 BOOST_FIXTURE_TEST_CASE( regnodeowner_personal_policy_is_tier1_only, sysio_roa_full_tester ) try {
    // The fixture already fills all 21 tier-1 slots, so reuse one rather than registering another.
    const auto t1owner = node_owners[1];
@@ -2223,7 +2260,7 @@ BOOST_FIXTURE_TEST_CASE( regnodeowner_personal_policy_is_tier1_only, sysio_roa_f
    BOOST_TEST(cpu == 100);
 } FC_LOG_AND_RETHROW()
 
-// newuser correctly populates both policies table and reslimit for sysio.acct
+// newuser records the RAM it gifts on the sysio.acct policy
 BOOST_FIXTURE_TEST_CASE( newuser_sysio_acct_policy_tracking, sysio_roa_full_tester ) try {
    auto p = get_policy("sysio.acct"_n, "sysio"_n);
    int64_t initial_ram_weight = p["ram_weight"].as<asset>().get_amount();
@@ -2337,8 +2374,6 @@ BOOST_FIXTURE_TEST_CASE( setsyscode_gifts_exact_from_sysio, sysio_roa_tester ) t
    int64_t sysio_q0;  rlm.get_account_limits("sysio"_n, sysio_q0, n, cpu);
    int64_t alice_q0;  rlm.get_account_limits("alice"_n, alice_q0, n, cpu);
    int64_t alice_u0 = rlm.get_account_ram_usage("alice"_n);
-   int64_t sysio_res0 = get_reslimit("sysio"_n)["ram_bytes"].as<int64_t>();
-   int64_t acct_res0  = get_reslimit("sysio.acct"_n)["ram_bytes"].as<int64_t>();
 
    auto wasm = test_contracts::sysio_token_wasm();
    BOOST_REQUIRE_EQUAL( success(),
@@ -2357,11 +2392,9 @@ BOOST_FIXTURE_TEST_CASE( setsyscode_gifts_exact_from_sysio, sysio_roa_tester ) t
    int64_t alice_q1;  rlm.get_account_limits("alice"_n, alice_q1, n, cpu);
    BOOST_REQUIRE_EQUAL( alice_q1 - alice_q0, delta );
 
-   // conserving transfer out of sysio: chain quota + reslimit pool drop by delta, sysio.acct bucket rises
+   // conserving transfer out of sysio: its chain quota drops by delta
    int64_t sysio_q1;  rlm.get_account_limits("sysio"_n, sysio_q1, n, cpu);
    BOOST_REQUIRE_EQUAL( sysio_q0 - sysio_q1, delta );
-   BOOST_REQUIRE_EQUAL( sysio_res0 - get_reslimit("sysio"_n)["ram_bytes"].as<int64_t>(), delta );
-   BOOST_REQUIRE_EQUAL( get_reslimit("sysio.acct"_n)["ram_bytes"].as<int64_t>() - acct_res0, delta );
 } FC_LOG_AND_RETHROW()
 
 // Re-deploying a smaller contract reclaims the freed RAM back to sysio's pool (delta < 0).
@@ -2436,14 +2469,11 @@ BOOST_FIXTURE_TEST_CASE( setsyscode_rejects_unlimited_ram_target, sysio_roa_test
 // equals its usage, as a new system account's does.
 namespace {
 
-/// The RAM books setsyscode / setsysabi move bytes between: the target's quota and usage, sysio's chain quota, and the
-/// `sysio` / `sysio.acct` reslimit rows.
+/// The RAM books setsyscode / setsysabi move bytes between: the target's quota and usage, and sysio's chain quota.
 struct deploy_ram_books {
    int64_t account_quota  = 0;
    int64_t account_usage  = 0;
    int64_t sysio_quota    = 0;
-   int64_t sysio_reslimit = 0;
-   int64_t acct_reslimit  = 0;
 };
 
 struct sysdeploy_ram_tester : sysio_roa_tester {
@@ -2454,8 +2484,6 @@ struct sysdeploy_ram_tester : sysio_roa_tester {
       rlm.get_account_limits(account, b.account_quota, net, cpu);
       rlm.get_account_limits(config::system_account_name, b.sysio_quota, net, cpu);
       b.account_usage  = rlm.get_account_ram_usage(account);
-      b.sysio_reslimit = get_reslimit(config::system_account_name)["ram_bytes"].as<int64_t>();
-      b.acct_reslimit  = get_reslimit("sysio.acct"_n)["ram_bytes"].as<int64_t>();
       return b;
    }
 
@@ -2514,8 +2542,6 @@ struct sysdeploy_ram_tester : sysio_roa_tester {
       const auto now = books(account);
       BOOST_REQUIRE_EQUAL(now.account_quota, now.account_usage);
       BOOST_REQUIRE_EQUAL(now.account_quota + now.sysio_quota, start.account_quota + start.sysio_quota);
-      BOOST_REQUIRE_EQUAL(now.sysio_reslimit + now.acct_reslimit, start.sysio_reslimit + start.acct_reslimit);
-      BOOST_REQUIRE_EQUAL(start.sysio_reslimit - now.sysio_reslimit, now.account_quota - start.account_quota);
    }
 };
 
@@ -2625,8 +2651,6 @@ BOOST_FIXTURE_TEST_CASE( setsyscode_fails_when_sysio_pool_cannot_cover_the_chang
    BOOST_REQUIRE_EQUAL(after.account_quota, before.account_quota);
    BOOST_REQUIRE_EQUAL(after.account_usage, before.account_usage);
    BOOST_REQUIRE_EQUAL(after.sysio_quota, before.sysio_quota);
-   BOOST_REQUIRE_EQUAL(after.sysio_reslimit, before.sysio_reslimit);
-   BOOST_REQUIRE_EQUAL(after.acct_reslimit, before.acct_reslimit);
    const auto* meta = control->find_account_metadata("alice"_n);
    BOOST_REQUIRE(meta == nullptr || meta->code_hash == digest_type());
 } FC_LOG_AND_RETHROW()
@@ -2830,7 +2854,7 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_rejects_existing_account_with_matching_key, 
    const auto wire_pub = gen_k1_key();
    BOOST_REQUIRE_EQUAL(success(), newnameduser(owner, wire_pub, 2));
    produce_blocks();
-   const auto pool_before = get_reslimit(config::system_account_name);
+   const int64_t pool_before = get_ram_limit(config::system_account_name);
    int64_t ram_before = 0, net_before = 0, cpu_before = 0;
    auto& limits = control->get_resource_limits_manager();
    limits.get_account_limits(owner, ram_before, net_before, cpu_before);
@@ -2849,8 +2873,7 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_rejects_existing_account_with_matching_key, 
    BOOST_CHECK_EQUAL(ram_after, ram_before);
    BOOST_CHECK_EQUAL(net_after, net_before);
    BOOST_CHECK_EQUAL(cpu_after, cpu_before);
-   BOOST_CHECK_EQUAL(get_reslimit(config::system_account_name)["ram_bytes"].as_int64(),
-                     pool_before["ram_bytes"].as_int64());
+   BOOST_CHECK_EQUAL(get_ram_limit(config::system_account_name), pool_before);
 } FC_LOG_AND_RETHROW()
 
 // The depot envelope carries a raw EVM address. Anything other than exactly 20 bytes is a hard
@@ -2892,9 +2915,9 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_rejects_existing_account_with_different_key,
    BOOST_REQUIRE_EQUAL(audit["reason"].as<uint64_t>(), R_ACCOUNT_EXISTS);
 } FC_LOG_AND_RETHROW()
 
-// SEC-087 resource reconciliation remains supported through privileged forcereg.
+// Privileged forcereg of an account that already holds a policy keeps the limits the policy granted.
 // Public NFT claims reject existing accounts.
-BOOST_FIXTURE_TEST_CASE( forcereg_reconciles_existing_reslimit, sysio_roa_nodeownreg_tester ) try {
+BOOST_FIXTURE_TEST_CASE( forcereg_keeps_existing_policy_limits, sysio_roa_nodeownreg_tester ) try {
    const auto owner    = "claimacct"_n;
    const auto wire_pub = gen_k1_key();
 
@@ -2907,38 +2930,27 @@ BOOST_FIXTURE_TEST_CASE( forcereg_reconciles_existing_reslimit, sysio_roa_nodeow
 
    // bytes_per_unit is a fixture constant (cf. verify_ram): the activation price is 104. The claim
    // registers at TIER 2, which regnodeowner provisions with no personal allocation -- the personal
-   // policy is tier-1 only -- so the reconcile stacks nothing on top of the planted policy.
+   // policy is tier-1 only -- so registration stacks nothing on top of the planted policy.
    const int64_t bytes_per_unit    = 104;
    const int64_t planted_ram_bytes = 10000 * bytes_per_unit;   // 1.0000 SYS RAM-only policy
 
-   // Pre-state: the planted row exists with the one-time newaccount_ram gift folded in once (by the
-   // addpolicy create-branch), and net/cpu still zero.
-   auto r = get_reslimit(owner);
-   BOOST_REQUIRE_EQUAL(r.is_null(), false);
-   BOOST_REQUIRE_EQUAL(r["net_weight"].as_string(), "0.0000 SYS");
-   BOOST_REQUIRE_EQUAL(r["cpu_weight"].as_string(), "0.0000 SYS");
-   BOOST_REQUIRE_EQUAL(r["ram_bytes"].as_int64(), planted_ram_bytes + newaccount_ram);
+   // Pre-state: the account's creation gift plus the planted policy's RAM, and net/cpu still zero.
+   const int64_t expected_ram = planted_ram_bytes + newaccount_ram;
+   BOOST_REQUIRE(get_limits(owner) == (account_limits{.ram = expected_ram, .net = 0, .cpu = 0}));
    const auto daddy_before = get_nodeowner(NODE_DADDY);
 
    // Privileged allocation must preserve the existing policy.
    BOOST_REQUIRE_EQUAL(success(), push_action(ROA, "forcereg"_n, mvo()("owner", owner)("tier", 2)));
    produce_blocks();
 
-   // Registration completed (the SEC-087 outcome).
+   // Registration completed.
    auto reg = get_nodeowner(owner);
    BOOST_REQUIRE_EQUAL(reg.is_null(), false);
    BOOST_REQUIRE_EQUAL(reg["tier"].as<uint32_t>(), 2);
    BOOST_REQUIRE(get_nodeownerreg(owner).is_null());
 
-   // reslimit reconciled: the planted row is preserved untouched and the gift is NOT re-added. A
-   // tier-2 registration adds no personal weight, so the row is exactly what addpolicy left.
-   const int64_t expected_ram = planted_ram_bytes + newaccount_ram;
-   r = get_reslimit(owner);
-   BOOST_REQUIRE_EQUAL(r["net_weight"].as_string(), "0.0000 SYS");
-   BOOST_REQUIRE_EQUAL(r["cpu_weight"].as_string(), "0.0000 SYS");
-   BOOST_REQUIRE_EQUAL(r["ram_bytes"].as_int64(), expected_ram);
-
-   // On-chain quota synced to the reconciled row totals (absolute set in regnodeowner).
+   // A tier-2 registration adds no personal weight, so the limits are exactly what addpolicy left: the
+   // creation gift is not added a second time.
    int64_t ram = 0, net = 0, cpu = 0;
    control->get_resource_limits_manager().get_account_limits(owner, ram, net, cpu);
    BOOST_REQUIRE_EQUAL(ram, expected_ram);
@@ -2960,9 +2972,9 @@ BOOST_FIXTURE_TEST_CASE( forcereg_reconciles_existing_reslimit, sysio_roa_nodeow
    BOOST_REQUIRE_EQUAL(daddy_after["allocated_ram"].as_string(), daddy_before["allocated_ram"].as_string());
 } FC_LOG_AND_RETHROW()
 
-// SEC-087 companion: a planted policy can carry NET/CPU as well as RAM. Verify the reconcile leaves
-// them intact (the increase_reslimit MODIFY branch) through privileged registration.
-BOOST_FIXTURE_TEST_CASE( forcereg_reconciles_existing_reslimit_net_cpu, sysio_roa_nodeownreg_tester ) try {
+// Companion: a planted policy can carry NET/CPU as well as RAM. Privileged registration leaves them
+// intact.
+BOOST_FIXTURE_TEST_CASE( forcereg_keeps_existing_policy_net_cpu, sysio_roa_nodeownreg_tester ) try {
    const auto owner    = "claimacct"_n;
    const auto wire_pub = gen_k1_key();
 
@@ -2981,13 +2993,8 @@ BOOST_FIXTURE_TEST_CASE( forcereg_reconciles_existing_reslimit_net_cpu, sysio_ro
    BOOST_REQUIRE(get_nodeownerreg(owner).is_null());
 
    // A tier-2 registration adds no personal weight, so the planted 1.0000 SYS of net/cpu and the
-   // planted RAM (plus the one-time gift) survive the reconcile unchanged.
+   // planted RAM (plus the one-time gift) survive registration unchanged.
    const int64_t expected_ram = planted_ram_bytes + newaccount_ram;
-   auto r = get_reslimit(owner);
-   BOOST_REQUIRE_EQUAL(r["net_weight"].as_string(), "1.0000 SYS");
-   BOOST_REQUIRE_EQUAL(r["cpu_weight"].as_string(), "1.0000 SYS");
-   BOOST_REQUIRE_EQUAL(r["ram_bytes"].as_int64(), expected_ram);
-
    int64_t ram = 0, net = 0, cpu = 0;
    control->get_resource_limits_manager().get_account_limits(owner, ram, net, cpu);
    BOOST_REQUIRE_EQUAL(ram, expected_ram);
@@ -2995,13 +3002,11 @@ BOOST_FIXTURE_TEST_CASE( forcereg_reconciles_existing_reslimit_net_cpu, sysio_ro
    BOOST_REQUIRE_EQUAL(cpu, 10000);
 } FC_LOG_AND_RETHROW()
 
-// SEC-087 at TIER 1, which is the only tier regnodeowner still provisions a personal allocation for.
-// The two tier-2 companions above now pass zero weights into increase_reslimit, so this is the case
-// that exercises its MODIFY branch with non-zero deltas: the planted policy's weights and the
+// TIER 1 is the only tier regnodeowner provisions a personal allocation for. The two tier-2 companions
+// above add nothing, so this is the case with non-zero deltas: the planted policy's weights and the
 // node-owner personal weights must stack, and the one-time newaccount_ram gift must be counted once
-// rather than re-added. Without this the arithmetic that reconcile depends on would go untested on
-// the registration path.
-BOOST_FIXTURE_TEST_CASE( forcereg_tier1_reconcile_stacks_personal_weights, sysio_roa_nodeownreg_tester ) try {
+// rather than re-added.
+BOOST_FIXTURE_TEST_CASE( forcereg_tier1_stacks_personal_weights_on_policy_limits, sysio_roa_nodeownreg_tester ) try {
    const auto owner    = "t1own"_n;   // tier-1 name rule: 2-6 characters
    const auto wire_pub = gen_k1_key();
 
@@ -3014,11 +3019,9 @@ BOOST_FIXTURE_TEST_CASE( forcereg_tier1_reconcile_stacks_personal_weights, sysio
    const int64_t planted_ram_bytes  = 10000 * bytes_per_unit;   // 1.0000 SYS policy
    const int64_t personal_ram_bytes = 80    * bytes_per_unit;   // tier-1 personal RAM (0.0080 SYS)
 
-   // Pre-state: planted policy only, gift folded in once by addpolicy's create branch.
-   auto r = get_reslimit(owner);
-   BOOST_REQUIRE_EQUAL(r.is_null(), false);
-   BOOST_REQUIRE_EQUAL(r["net_weight"].as_string(), "1.0000 SYS");
-   BOOST_REQUIRE_EQUAL(r["ram_bytes"].as_int64(), planted_ram_bytes + newaccount_ram);
+   // Pre-state: the creation gift plus the planted policy only.
+   const int64_t planted_ram = planted_ram_bytes + newaccount_ram;
+   BOOST_REQUIRE(get_limits(owner) == (account_limits{.ram = planted_ram, .net = 10000, .cpu = 10000}));
 
    BOOST_REQUIRE_EQUAL(success(), push_action(ROA, "forcereg"_n, mvo()("owner", owner)("tier", 1)));
    produce_blocks();
@@ -3026,14 +3029,9 @@ BOOST_FIXTURE_TEST_CASE( forcereg_tier1_reconcile_stacks_personal_weights, sysio
    BOOST_REQUIRE_EQUAL(get_nodeowner(owner)["tier"].as<uint32_t>(), 1);
    BOOST_REQUIRE(get_nodeownerreg(owner).is_null());
 
-   // MODIFY branch with non-zero deltas: planted 1.0000 + personal 0.0500 = 1.0500 SYS of net/cpu,
-   // ram = planted + gift + personal, with the gift NOT re-added.
+   // Planted 1.0000 + personal 0.0500 = 1.0500 SYS of net/cpu, ram = planted + gift + personal, with the
+   // gift NOT re-added.
    const int64_t expected_ram = planted_ram_bytes + newaccount_ram + personal_ram_bytes;
-   r = get_reslimit(owner);
-   BOOST_REQUIRE_EQUAL(r["net_weight"].as_string(), "1.0500 SYS");
-   BOOST_REQUIRE_EQUAL(r["cpu_weight"].as_string(), "1.0500 SYS");
-   BOOST_REQUIRE_EQUAL(r["ram_bytes"].as_int64(), expected_ram);
-
    int64_t ram = 0, net = 0, cpu = 0;
    control->get_resource_limits_manager().get_account_limits(owner, ram, net, cpu);
    BOOST_REQUIRE_EQUAL(ram, expected_ram);
@@ -3048,6 +3046,39 @@ BOOST_FIXTURE_TEST_CASE( forcereg_tier1_reconcile_stacks_personal_weights, sysio
    BOOST_REQUIRE_EQUAL(personal.is_null(), false);
    BOOST_REQUIRE_EQUAL(personal["net_weight"].as_string(), "0.0500 SYS");
    BOOST_REQUIRE_EQUAL(personal["ram_weight"].as_string(), "0.0080 SYS");
+} FC_LOG_AND_RETHROW()
+
+/// Registration adds the personal allocation to the limits the account holds, including ones set outside
+/// sysio.roa.
+BOOST_FIXTURE_TEST_CASE( forcereg_adds_to_limits_set_outside_roa, sysio_roa_nodeownreg_tester ) try {
+   const auto owner = "t1own"_n;   // tier-1 name rule: 2-6 characters
+   BOOST_REQUIRE_EQUAL(success(), newnameduser(owner, gen_k1_key(), 1));
+   produce_blocks();
+   const account_limits outside{.ram = 50'000, .net = 7, .cpu = 9};
+   set_limits(owner, outside);
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(success(), push_action(ROA, "forcereg"_n, mvo()("owner", owner)("tier", 1)));
+   produce_blocks();
+
+   BOOST_REQUIRE(get_limits(owner) ==
+                 (account_limits{.ram = outside.ram + 80 * 104, .net = outside.net + 500, .cpu = outside.cpu + 500}));
+} FC_LOG_AND_RETHROW()
+
+/// A claim's account is funded from sysio's pool like any other. With the pool short, the native newaccount
+/// that nodeownreg sends fails and the whole claim rolls back, audit row included.
+BOOST_FIXTURE_TEST_CASE( nodeownreg_fails_whole_when_sysio_pool_is_short, sysio_roa_nodeownreg_tester ) try {
+   const auto owner = "claimacct"_n;
+
+   const int64_t short_pool = static_cast<int64_t>(newaccount_ram) - 1;
+   set_sysio_pool(short_pool);
+
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("insufficient ram"), nodeownreg(owner, 2, gen_em_key(), gen_k1_key()));
+   BOOST_REQUIRE(get_nodeowner(owner).is_null());
+   BOOST_REQUIRE(get_nodeownerreg(owner).is_null());
+   BOOST_REQUIRE(get_authex_link(0).is_null());
+   BOOST_REQUIRE((control->db().find<account_object, by_name>(owner) == nullptr));
+   BOOST_REQUIRE_EQUAL(short_pool, get_ram_limit(config::system_account_name));
 } FC_LOG_AND_RETHROW()
 
 // A tier-2 owner holds no CPU after this change, so it reaches
@@ -3227,7 +3258,7 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_full_tier_has_no_registration_side_effects,
    auto& limits = control->get_resource_limits_manager();
    int64_t ram_before = 0, ram_after = 0, net = 0, cpu = 0;
    limits.get_account_limits(config::system_account_name, ram_before, net, cpu);
-   const auto pool_before = get_reslimit(config::system_account_name);
+   const account_limits alice_before = get_limits("alice"_n);
    const auto bucket_before = get_policy("sysio.acct"_n, config::system_account_name);
 
    for (const auto owner : {"alice"_n, fresh}) {
@@ -3241,15 +3272,13 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_full_tier_has_no_registration_side_effects,
       BOOST_CHECK_EQUAL(audit["status"].as<uint64_t>(), REJECTED);
       BOOST_CHECK_EQUAL(audit["reason"].as<uint64_t>(), owner == fresh ? R_TIER_CAP_REACHED : R_ACCOUNT_EXISTS);
       BOOST_CHECK(get_nodeowner(owner).is_null());
-      BOOST_CHECK(get_reslimit(owner).is_null());
       BOOST_CHECK(get_authex_link(0).is_null());
       BOOST_CHECK_EQUAL(owners::count(*this, abi_ser, owners::tier1), owners::tier1_cap);
    }
    BOOST_CHECK((control->db().find<account_object, by_name>(fresh) == nullptr));
    limits.get_account_limits(config::system_account_name, ram_after, net, cpu);
    BOOST_CHECK_EQUAL(ram_after, ram_before);
-   BOOST_CHECK_EQUAL(get_reslimit(config::system_account_name)["ram_bytes"].as_int64(),
-                     pool_before["ram_bytes"].as_int64());
+   BOOST_CHECK(get_limits("alice"_n) == alice_before);
    BOOST_CHECK_EQUAL(get_policy("sysio.acct"_n, config::system_account_name)["ram_weight"].as<asset>(),
                      bucket_before["ram_weight"].as<asset>());
 } FC_LOG_AND_RETHROW()
@@ -3363,7 +3392,7 @@ public:
 
 // A supply so small that tier rounding makes the node-owner reserve exceed it (total 13 -> reserve 21,
 // leftover -8) must be rejected, not silently underflow the signed->unsigned byte conversion and
-// activate ROA with garbage reslimits.
+// activate ROA with garbage RAM quotas.
 BOOST_FIXTURE_TEST_CASE( activateroa_rejects_tiny_supply, roa_unactivated_tester ) try {
    BOOST_REQUIRE_EXCEPTION(
       activate("0.0013 SYS", 104),  // 13 smallest units; reserve rounds to 21 > 13

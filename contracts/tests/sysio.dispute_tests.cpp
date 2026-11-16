@@ -115,7 +115,7 @@ public:
          CHAINS_ACCOUNT, BATCHOP, "sysio.token"_n
       });
       // Tier-1 voter accounts (node owners) and a Tier-2 account (ineligible voter). Created without
-      // a roa policy so regnodeowner's reslimit creation does not collide.
+      // a roa policy.
       for (auto v : {"voter1"_n, "voter2"_n, "voter3"_n, "voter4"_n, "tier2"_n, "stranger"_n}) {
          create_account(v, config::system_account_name, false, true, /*include_roa_policy=*/false);
       }

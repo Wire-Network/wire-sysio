@@ -31,6 +31,7 @@
 #include <sysio/batch_operator_plugin/outpost_opp_job.hpp>
 #include <sysio/opp/depot/chains_registry.hpp>
 #include <sysio/opp/depot/opreg_status.hpp>
+#include <sysio.opreg/opreg_constants.hpp>
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/plugin_interface.hpp>
 #include <sysio/chain/subjective_billing.hpp>
@@ -129,18 +130,9 @@ namespace {
       }
    }
 
-   namespace opreg {
-      constexpr auto account            = "sysio.opreg";
-      constexpr auto table_operators    = "operators";
-      /// Field names on `operator_entry` rows. Used by the awareness poll
-      /// that gates the relay loop on a SLASHED / TERMINATED status flip.
-      namespace field {
-         constexpr auto status = "status";
-      }
-      // `OperatorStatus` enum spellings + the `is_active` decision live
-      // in `sysio/opp/depot/opreg_status.hpp`, beside the other shared depot
-      // row views, so any client reads the same source of truth.
-   }
+   // The awareness poll that gates the relay loop reads `field::status`. The `OperatorStatus` spellings and the
+   // `is_active` decision live in `sysio/opp/depot/opreg_status.hpp`.
+   namespace opreg = sysio::opreg_names;
 
    namespace epoch {
       constexpr auto account            = "sysio.epoch";
@@ -771,7 +763,7 @@ struct batch_operator_plugin::impl {
          if (!code) continue;
          const auto queued = queued_by_pool.find(code->value);
          if (queued == queued_by_pool.end() || queued->second <= 0) continue;
-         const auto pool = symbol_code_name(*code);
+         const auto pool = code->name();
          if (!yield_tick_spacing.due(pool, now, yield_tick_interval)) continue;
          try {
             push_action(swap::account, swap::action_tickyield, *relay_signer,
@@ -804,7 +796,7 @@ struct batch_operator_plugin::impl {
          } catch (const fc::exception& e) {
             // Expected-transient: another operator queued it first. Persistent while
             // the shadow has no yield pool yet (`regliqpool` still to come).
-            dlog("batch_operator: queueyield({}): {}", symbol_code_name(*code), e.to_string());
+            dlog("batch_operator: queueyield({}): {}", code->name(), e.to_string());
          }
       }
    }
@@ -904,7 +896,7 @@ struct batch_operator_plugin::impl {
          // Expected-transient: governance removed the pool between the scan and
          // the push. Persistent while the pool's LIQ/WIRE swap pair is missing or
          // invalid, which only governance can repair.
-         dlog("batch_operator: kick({}): {}", symbol_code_name(code), e.to_string());
+         dlog("batch_operator: kick({}): {}", code.name(), e.to_string());
       }
    }
 

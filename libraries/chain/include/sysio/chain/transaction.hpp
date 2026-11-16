@@ -6,7 +6,12 @@
 namespace sysio { namespace chain {
 
    using cpu_usage_t = std::vector<fc::unsigned_int>;
-   using account_subjective_cpu_bill_t = flat_map<account_name, fc::microseconds>;
+   /// The subjective CPU and NET billed to one account.
+   struct cpu_net_bill {
+      fc::microseconds cpu{0};        ///< billed CPU
+      uint64_t         net_bytes = 0; ///< billable NET bytes
+   };
+   using account_subjective_bill_t = flat_map<account_name, cpu_net_bill>;
    using action_payers_t = flat_set<account_name>;
 
    // No transaction extensions remain. Keep the type infrastructure for future use.
