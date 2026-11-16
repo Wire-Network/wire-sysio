@@ -14,6 +14,11 @@
 #include <contracts.hpp>
 #include <test_contracts.hpp>
 
+#include <exception>
+
+#include <pthread.h>
+#include <sys/mman.h>
+
 using namespace sysio;
 using namespace sysio::chain;
 using namespace sysio::testing;
@@ -49,6 +54,66 @@ struct wasm_config_tester : T {
    chain::abi_serializer bios_abi_ser;
 };
 
+
+/// A thread whose stack has a large unmapped hole directly above it.
+///
+/// mmap allocates top-down on Linux, so a mapping made while the thread runs lands in that hole or higher: above
+/// the thread's stack.
+class low_stack_thread {
+public:
+   low_stack_thread() {
+      void* reservation = mmap(nullptr, stack_size + hole_size, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+      BOOST_REQUIRE(reservation != MAP_FAILED);
+      stack = static_cast<char*>(reservation);
+      BOOST_REQUIRE_EQUAL(mprotect(stack, stack_size, PROT_READ | PROT_WRITE), 0);
+      BOOST_REQUIRE_EQUAL(munmap(stack + stack_size, hole_size), 0);
+   }
+   low_stack_thread(const low_stack_thread&) = delete;
+   low_stack_thread& operator=(const low_stack_thread&) = delete;
+   ~low_stack_thread() { munmap(stack, stack_size); }
+
+   /// Runs `f` to completion on the thread and rethrows what it threw. `f` must not use Boost.Test assertions.
+   template<typename F>
+   void run(F&& f) {
+      std::exception_ptr error;
+      auto body = [&] {
+         try {
+            f();
+         } catch(...) {
+            error = std::current_exception();
+         }
+      };
+      pthread_attr_t attr;
+      BOOST_REQUIRE_EQUAL(pthread_attr_init(&attr), 0);
+      BOOST_REQUIRE_EQUAL(pthread_attr_setstack(&attr, stack, stack_size), 0);
+      pthread_t thread;
+      const int created = pthread_create(&thread, &attr, [](void* data) -> void* {
+         (*static_cast<decltype(body)*>(data))();
+         return nullptr;
+      }, &body);
+      pthread_attr_destroy(&attr);
+      BOOST_REQUIRE_EQUAL(created, 0);
+      BOOST_REQUIRE_EQUAL(pthread_join(thread, nullptr), 0);
+      if(error)
+         std::rethrow_exception(error);
+   }
+
+   /// Whether a mapping the size of a wasm stack, made now, lands above the thread's stack.
+   bool maps_above_stack() const {
+      void* probe = mmap(nullptr, probe_size, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+      if(probe == MAP_FAILED)
+         return false;
+      munmap(probe, probe_size);
+      return static_cast<char*>(probe) >= stack + stack_size;
+   }
+
+private:
+   static constexpr size_t stack_size = size_t{8} * 1024 * 1024;
+   static constexpr size_t hole_size  = size_t{4} * 1024 * 1024 * 1024;
+   static constexpr size_t probe_size = size_t{32} * 1024 * 1024;
+
+   char* stack = nullptr;
+};
 
 std::string make_locals_wasm(int n_params, int n_locals, int n_stack)
 {
@@ -498,6 +563,87 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( max_stack, T, wasm_config_testers ) {
    params.max_call_depth = 1024;
    chain.set_wasm_params(params);
    pushit();
+}
+
+// With a raised max_call_depth wasm runs on its own mapped stack, and each way of stopping early is a siglongjmp
+// off it. glibc's fortified longjmp refuses that jump when it goes down to another stack, which is the layout a
+// read-only thread can end up with.
+BOOST_AUTO_TEST_CASE_TEMPLATE( early_exit_from_mapped_stack, T, wasm_config_testers ) {
+   enum class push_result { accepted, assert_failed, execution_error };
+
+   std::string code;
+   {
+      auto name_const = [](name n) { return std::to_string(static_cast<int64_t>(n.to_uint64_t())); };
+      std::stringstream ss;
+      ss << "(module "
+         << " (import \"env\" \"sysio_assert\" (func $assert (param i32 i32)))"
+         << " (import \"env\" \"sysio_exit\" (func $exit (param i32)))"
+         << " (memory 1)"
+         << " (func (export \"apply\") (param i64 i64 i64)"
+         << "   (if (i64.eq (get_local 2) (i64.const " << name_const("assert"_n) << "))"
+         << "     (then (call $assert (i32.const 0) (i32.const 0))))"
+         << "   (if (i64.eq (get_local 2) (i64.const " << name_const("exit"_n) << "))"
+         << "     (then (call $exit (i32.const 0))))"
+         << "   (if (i64.eq (get_local 2) (i64.const " << name_const("trap"_n) << "))"
+         << "     (then (unreachable)))"
+         << "   (if (i64.eq (get_local 2) (i64.const " << name_const("fault"_n) << "))"
+         << "     (then (drop (i32.load (i32.const -1))))))";
+      // Never called. A frame this large is what moves sys-vm-jit off the caller's stack at this call depth.
+      ss << " (func ";
+      for(int i = 0; i < 1000; ++i)
+         ss << "(local i64)";
+      ss << " )";
+      ss << ")";
+      code = ss.str();
+   }
+
+   low_stack_thread thread;
+   push_result      assert_result = push_result::accepted;
+   push_result      exit_result   = push_result::assert_failed;
+   push_result      trap_result   = push_result::accepted;
+   push_result      fault_result  = push_result::accepted;
+   bool             mapped_above  = false;
+   thread.run([&] {
+      T chain;
+      chain.produce_block();
+      chain.create_accounts({"exits"_n});
+      chain.produce_block();
+      chain.set_code("exits"_n, code.c_str());
+      chain.produce_block();
+
+      auto params = genesis_state::default_initial_wasm_configuration;
+      params.max_call_depth = 1024;
+      chain.set_wasm_params(params);
+      chain.produce_block();
+
+      auto push = [&](name action) {
+         signed_transaction trx;
+         trx.actions.push_back({{{"exits"_n,config::active_name}}, "exits"_n, action, {}});
+         chain.set_transaction_headers(trx);
+         trx.sign(chain.get_private_key( "exits"_n, "active" ), chain.get_chain_id());
+         try {
+            chain.push_transaction(trx);
+         } catch(const sysio_assert_message_exception&) {
+            return push_result::assert_failed;
+         } catch(const wasm_execution_error&) {
+            return push_result::execution_error;
+         }
+         return push_result::accepted;
+      };
+      assert_result = push("assert"_n);
+      exit_result   = push("exit"_n);
+      trap_result   = push("trap"_n);
+      fault_result  = push("fault"_n);
+      mapped_above  = thread.maps_above_stack();
+   });
+
+#if defined(__linux__)
+   BOOST_REQUIRE(mapped_above);
+#endif
+   BOOST_CHECK(assert_result == push_result::assert_failed);
+   BOOST_CHECK(exit_result == push_result::accepted);
+   BOOST_CHECK(trap_result == push_result::execution_error);
+   BOOST_CHECK(fault_result == push_result::execution_error);
 }
 
 

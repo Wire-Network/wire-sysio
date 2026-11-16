@@ -3,6 +3,7 @@
 #include <iterator>
 #include <cstdlib>
 #include <limits>
+#include <filesystem>
 
 #include <boost/test/unit_test.hpp>
 
@@ -52,6 +53,78 @@ static fc::time_point get_deadline() {
 }
 
 static auto yield_fn() { return abi_serializer::create_yield_function( max_serialization_time ); }
+
+/// Publication remains opaque: native setabi must accept ABI formats unrelated to packed abi_def.
+BOOST_AUTO_TEST_CASE(setabi_keeps_abi_bytes_opaque)
+{ try {
+   testing::tester chain;
+   const auto account = "abiformat"_n;
+   chain.create_account(account);
+   const std::string json = R"({"version":"future::abi/2.0","types":[]})";
+   const bytes protobuf{0x0a, 0x03, 0x0a, 0x01, 'x'}; // FileDescriptorSet containing a file named x.
+   const auto forged = fc::raw::pack(std::string{"sysio::abi/1.2"}, fc::unsigned_int{MAX_NUM_ARRAY_ELEMENTS});
+   for (const auto& blob : {bytes(json.begin(), json.end()), protobuf, bytes{char(0xff)}, forged, bytes{}}) {
+      signed_transaction trx;
+      trx.actions.emplace_back(std::vector<permission_level>{{account, config::active_name}},
+                               setabi{.account = account, .abi = blob});
+      chain.set_transaction_headers(trx);
+      trx.sign(chain.get_private_key(account, "active"), chain.control->get_chain_id());
+      BOOST_REQUIRE_NO_THROW(chain.push_transaction(trx));
+      const auto* metadata = chain.control->find_account_metadata(account);
+      BOOST_REQUIRE(metadata != nullptr);
+      BOOST_CHECK_EQUAL(metadata->abi.size(), blob.size());
+      if (!blob.empty())
+         BOOST_CHECK(std::equal(blob.begin(), blob.end(), metadata->abi.data()));
+   }
+} FC_LOG_AND_RETHROW() }
+
+/// Shared raw decoding must reject a forged count without allocating the declared ABI containers.
+BOOST_AUTO_TEST_CASE(forged_abi_counts_do_not_bulk_allocate)
+{
+   const auto tiny = fc::raw::pack(std::string{"sysio::abi/1.2"}, fc::unsigned_int{MAX_NUM_ARRAY_ELEMENTS});
+   BOOST_REQUIRE_EQUAL(tiny.size(), 18u);
+   abi_def decoded;
+   fc::datastream<const char*> stream(tiny.data(), tiny.size());
+   BOOST_CHECK_THROW(fc::raw::unpack(stream, decoded), fc::exception);
+   BOOST_CHECK_LE(decoded.types.capacity(), 1u);
+
+   const auto nested = fc::raw::pack(std::string{"sysio::abi/1.2"}, fc::unsigned_int{0}, fc::unsigned_int{1},
+                                    std::string{"entry"}, std::string{}, fc::unsigned_int{MAX_NUM_ARRAY_ELEMENTS});
+   decoded = {};
+   fc::datastream<const char*> nested_stream(nested.data(), nested.size());
+   BOOST_CHECK_THROW(fc::raw::unpack(nested_stream, decoded), fc::exception);
+   BOOST_REQUIRE_EQUAL(decoded.structs.size(), 1u);
+   BOOST_CHECK_LE(decoded.structs.front().fields.capacity(), 1u);
+}
+
+/// Keep existing packed ABI values, legacy varint behavior and large complete definitions accepted.
+BOOST_AUTO_TEST_CASE(abi_raw_decoding_preserves_existing_encodings)
+{
+   const bytes aliased_zero{char(0x80), char(0x80), char(0x80), char(0x80), char(0x10), 0, 0, 0, 0, 0, 0, 0};
+   BOOST_CHECK_NO_THROW(fc::raw::unpack<abi_def>(aliased_zero));
+
+   abi_def large;
+   constexpr size_t typedef_count = 262000;
+   large.types.resize(typedef_count);
+   const auto packed = fc::raw::pack(large);
+   const auto decoded = fc::raw::unpack<abi_def>(packed);
+   BOOST_CHECK_EQUAL(decoded.types.size(), typedef_count);
+   BOOST_CHECK(fc::raw::pack(decoded) == packed);
+
+   const auto contracts = std::filesystem::path(__FILE__).parent_path().parent_path() / "contracts";
+   size_t checked = 0;
+   for (const auto& entry : std::filesystem::recursive_directory_iterator(contracts)) {
+      if (!entry.is_regular_file() || entry.path().extension() != ".abi")
+         continue;
+      BOOST_TEST_CONTEXT(entry.path().string()) {
+         const auto abi = fc::json::from_file(entry.path()).as<abi_def>();
+         const auto bytes = fc::raw::pack(abi);
+         BOOST_CHECK(fc::raw::pack(fc::raw::unpack<abi_def>(bytes)) == bytes);
+         ++checked;
+      }
+   }
+   BOOST_CHECK_GT(checked, 0u);
+}
 
 // Exercise the real fixture path, including account ABI lookup, validation,
 // action packing, and excessive input recursion rejection.
@@ -3922,6 +3995,77 @@ BOOST_AUTO_TEST_CASE(enum_underlying_type_ranges)
       check_rejected(type, {}, "invalid underlying type");
       check_rejected(type, {0}, "invalid underlying type");
    }
+}
+
+BOOST_AUTO_TEST_CASE(int128_type_ranges)
+{
+   using sysio::testing::fc_exception_message_contains;
+   const std::string uint128_max = "340282366920938463463374607431768211455";
+   const std::string int128_max  = "170141183460469231731687303715884105727";
+   const std::string int128_min  = "-170141183460469231731687303715884105728";
+   const auto quoted = [](const std::string& text) { return "\"" + text + "\""; };
+
+   // An ABI whose only definition is struct "s" with the one field "v" of `type`.
+   const auto serializer = [](const std::string& type) {
+      const std::string abi = R"({"version": "sysio::abi/1.1", "structs": [{"name": "s", "base": "", "fields": )"
+                              R"([{"name": "v", "type": ")" + type + R"("}]}]})";
+      return abi_serializer(fc::json::from_string(abi).as<abi_def>(), yield_fn());
+   };
+   const auto pack = [&](const std::string& type, const fc::variant& value) {
+      return serializer(type).variant_to_binary("s", fc::mutable_variant_object()("v", value), yield_fn());
+   };
+
+   // The JSON value packs as `type` and unpacks as the number `expected`.
+   const auto check_accepted = [&](const std::string& type, const std::string& json, const std::string& expected) {
+      BOOST_TEST_CONTEXT(type << " from " << json) {
+         try {
+            const auto packed = pack(type, fc::json::from_string(json));
+            BOOST_TEST(serializer(type).binary_to_variant("s", packed, yield_fn())["v"].as_string() == expected);
+         } catch( const fc::exception& e ) {
+            BOOST_ERROR(e.top_message());
+         }
+      }
+   };
+   const auto check_out_of_range = [&](const std::string& type, const fc::variant& value) {
+      BOOST_TEST_CONTEXT(type << " from " << value.as_string()) {
+         BOOST_CHECK_EXCEPTION(pack(type, value), fc::parse_error_exception,
+                               fc_exception_message_contains(" is out of range for " + type + "_t ["));
+      }
+   };
+
+   check_accepted("uint128", "0", "0");
+   check_accepted("uint128", "18446744073709551615", "18446744073709551615");
+   check_accepted("uint128", quoted(uint128_max), uint128_max);
+   check_accepted("uint128", quoted("0xffffffffffffffffffffffffffffffff"), uint128_max);
+   check_accepted("int128",  "0", "0");
+   check_accepted("int128",  "-9223372036854775808", "-9223372036854775808");
+   check_accepted("int128",  "18446744073709551615", "18446744073709551615");
+   check_accepted("int128",  quoted(int128_max), int128_max);
+   check_accepted("int128",  quoted(int128_min), int128_min);
+   check_accepted("int128",  quoted("-0"), "0");
+   // Hex without a sign is the bit pattern of the value.
+   check_accepted("int128",  quoted("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF80"), "-128");
+
+   // A negative number is no uint128.
+   check_out_of_range("uint128", fc::json::from_string("-1"));
+   check_out_of_range("uint128", fc::json::from_string("-9223372036854775808"));
+   BOOST_CHECK_THROW(pack("uint128", fc::variant("-1")), fc::exception);
+   BOOST_CHECK_THROW(pack("uint128", fc::variant("+1")), fc::exception);
+   BOOST_CHECK_THROW(pack("int128", fc::variant("+1")), fc::exception);
+
+   // One past either end, and one digit more than fits.
+   check_out_of_range("uint128", fc::variant("340282366920938463463374607431768211456"));
+   check_out_of_range("uint128", fc::variant(uint128_max + "0"));
+   check_out_of_range("uint128", fc::variant("0x100000000000000000000000000000000"));
+   check_out_of_range("int128",  fc::variant("170141183460469231731687303715884105728"));
+   check_out_of_range("int128",  fc::variant("-170141183460469231731687303715884105729"));
+   check_out_of_range("int128",  fc::variant(int128_max + "0"));
+   check_out_of_range("int128",  fc::variant(int128_min + "0"));
+   check_out_of_range("int128",  fc::variant("0x100000000000000000000000000000000"));
+   // A uint128 above the int128 maximum, as a string and as the variant an in-process caller holds.
+   check_out_of_range("int128",  fc::variant(uint128_max));
+   check_out_of_range("int128",  fc::variant(~fc::uint128{0}));
+   check_out_of_range("int128",  fc::variant((fc::uint128{1} << 127)));
 }
 
 // ===================== Protobuf ABI Serialization Tests =====================

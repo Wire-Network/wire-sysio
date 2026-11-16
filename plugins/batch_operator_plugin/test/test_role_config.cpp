@@ -31,23 +31,99 @@ BOOST_AUTO_TEST_CASE(a_permission_level_needs_an_account_and_a_permission) {
    BOOST_CHECK_THROW(parse_permission_level("uw.acct@Active"), fc::exception);   // not a name
 }
 
-BOOST_AUTO_TEST_CASE(exposure_caps_are_keyed_by_symbol_code) {
-   const auto caps = parse_exposure_caps({"100.000000000 LIQETH", "5.000000000 LIQSOL"});
-   BOOST_REQUIRE_EQUAL(2u, caps.size());
+BOOST_AUTO_TEST_CASE(exposure_policies_are_keyed_by_symbol_code) {
+   const auto policies = parse_exposure_policies({"100.000000000 LIQETH", "5.000000000 LIQSOL"}, {});
+   BOOST_REQUIRE_EQUAL(2u, policies.size());
    const auto liqeth = sysio::chain::asset::from_string("100.000000000 LIQETH");
-   const auto found  = caps.find(liqeth.get_symbol().to_symbol_code());
-   BOOST_REQUIRE(found != caps.end());
-   BOOST_CHECK(liqeth == found->second);
-   BOOST_CHECK(parse_exposure_caps({}).empty());
+   const auto found  = policies.find(liqeth.get_symbol().to_symbol_code());
+   BOOST_REQUIRE(found != policies.end());
+   BOOST_CHECK(liqeth == std::get<sysio::chain::asset>(found->second));
+   BOOST_CHECK(parse_exposure_policies({}, {}).empty());
 }
 
 BOOST_AUTO_TEST_CASE(an_exposure_cap_must_be_positive_well_formed_and_named_once) {
-   BOOST_CHECK_THROW(parse_exposure_caps({"0.000000000 LIQETH"}), fc::exception);
-   BOOST_CHECK_THROW(parse_exposure_caps({"-1.000000000 LIQETH"}), fc::exception);
-   BOOST_CHECK_THROW(parse_exposure_caps({"100 liqeth"}), fc::exception);
-   BOOST_CHECK_THROW(parse_exposure_caps({"many LIQETH"}), fc::exception);
+   BOOST_CHECK_THROW(parse_exposure_policies({"0.000000000 LIQETH"}, {}), fc::exception);
+   BOOST_CHECK_THROW(parse_exposure_policies({"-1.000000000 LIQETH"}, {}), fc::exception);
+   BOOST_CHECK_THROW(parse_exposure_policies({"100 liqeth"}, {}), fc::exception);
+   BOOST_CHECK_THROW(parse_exposure_policies({"many LIQETH"}, {}), fc::exception);
    // The same symbol twice, even at another precision.
-   BOOST_CHECK_THROW(parse_exposure_caps({"1.000000000 LIQETH", "2.0 LIQETH"}), fc::exception);
+   BOOST_CHECK_THROW(parse_exposure_policies({"1.000000000 LIQETH", "2.0 LIQETH"}, {}), fc::exception);
+}
+
+/// Unlimited is explicit per symbol and may coexist with a finite cap for a different symbol.
+BOOST_AUTO_TEST_CASE(unlimited_exposure_is_distinct_from_a_cap_and_an_absent_token) {
+   const auto policies = parse_exposure_policies({"100.000000000 LIQETH"}, {"LIQSOL", "LIQBTC"});
+   BOOST_REQUIRE_EQUAL(3u, policies.size());
+   BOOST_CHECK(std::holds_alternative<sysio::chain::asset>(
+      policies.at(sysio::chain::symbol(9, "LIQETH").to_symbol_code())));
+   BOOST_CHECK(std::holds_alternative<unlimited_exposure>(
+      policies.at(sysio::chain::symbol(9, "LIQSOL").to_symbol_code())));
+   BOOST_CHECK(std::holds_alternative<unlimited_exposure>(
+      policies.at(sysio::chain::symbol(9, "LIQBTC").to_symbol_code())));
+   BOOST_CHECK(!policies.contains(sysio::chain::symbol(9, "OTHER").to_symbol_code()));
+   BOOST_CHECK(parse_exposure_policies({}, {}).empty());
+}
+
+/// Reject ambiguous policies and malformed symbols before the node starts, even without an underwriter account.
+BOOST_AUTO_TEST_CASE(unlimited_exposure_requires_unique_valid_symbols_without_finite_caps) {
+   BOOST_CHECK_THROW(parse_exposure_policies({"100.000000000 LIQETH"}, {"LIQETH"}), fc::exception);
+   BOOST_CHECK_THROW(parse_exposure_policies({"1.0 LIQETH"}, {"LIQETH"}), fc::exception);
+   BOOST_CHECK_THROW(parse_exposure_policies({}, {"LIQETH", "LIQETH"}), fc::exception);
+   for (const std::string spec : {"", "liqeth", "LIQ1", "LIQETH ", " LIQETH", "9,LIQETH", "1 LIQETH", "ABCDEFGH"}) {
+      BOOST_CHECK_THROW(parse_exposure_policies({}, {spec}), fc::exception);
+   }
+   BOOST_CHECK_EQUAL(2u, parse_exposure_policies({}, {"A", "ABCDEFG"}).size());
+}
+
+/// Registry resolution preserves unlimited policies across precisions and refuses mismatched finite caps.
+BOOST_AUTO_TEST_CASE(exposure_policies_resolve_to_shadow_token_codes) {
+   const auto configured = parse_exposure_policies({"10.000 LIQSOL", "3.000 LIQBTC"}, {"LIQETH"});
+   const fc::slug_name liqeth("ETHLIQ"), liqsol("SOLLIQ"), liqbtc("BTCLIQ");
+   for (const uint8_t precision : {uint8_t{2}, uint8_t{9}, uint8_t{18}}) {
+      unsigned mismatches = 0;
+      const auto resolved = resolve_exposure_policies(
+         configured, {{liqeth, sysio::chain::symbol(precision, "LIQETH")},
+                      {liqsol, sysio::chain::symbol(9, "LIQSOL")}, {liqbtc, sysio::chain::symbol(3, "LIQBTC")}},
+         [&](const sysio::chain::asset& cap, const sysio::chain::symbol& shadow) {
+            ++mismatches;
+            BOOST_CHECK_EQUAL(cap.to_string(), "10.000 LIQSOL");
+            BOOST_CHECK_EQUAL(shadow.to_string(), "9,LIQSOL");
+         },
+         [](const char*, const std::string&) { BOOST_FAIL("all configured symbols name shadows"); });
+      BOOST_REQUIRE_EQUAL(resolved.size(), 2u);
+      BOOST_CHECK(std::holds_alternative<unlimited_exposure>(resolved.at(liqeth)));
+      BOOST_CHECK_EQUAL(std::get<sysio::chain::asset>(resolved.at(liqbtc)).to_string(), "3.000 LIQBTC");
+      BOOST_CHECK(!resolved.contains(liqsol));
+      BOOST_CHECK_EQUAL(mismatches, 1u);
+   }
+}
+
+/// Unknown finite and unlimited symbols report the option and value that the operator must correct.
+BOOST_AUTO_TEST_CASE(unknown_exposure_symbols_report_their_own_option) {
+   const auto configured = parse_exposure_policies({"10.000 LIQSOL"}, {"LIQETH"});
+   std::map<std::string, std::string> diagnostics;
+   const auto resolved = resolve_exposure_policies(
+      configured, {},
+      [](const sysio::chain::asset&, const sysio::chain::symbol&) { BOOST_FAIL("there are no shadows"); },
+      [&](const char* option, const std::string& value) { BOOST_CHECK(diagnostics.emplace(option, value).second); });
+   BOOST_CHECK(resolved.empty());
+   BOOST_REQUIRE_EQUAL(diagnostics.size(), 2u);
+   BOOST_CHECK_EQUAL(diagnostics.at("batch-underwriter-max-exposure"), "10.000 LIQSOL");
+   BOOST_CHECK_EQUAL(diagnostics.at("batch-underwriter-unlimited-exposure"), "LIQETH");
+}
+
+/// A symbol-code name is precision-free and is also the canonical variant representation.
+BOOST_AUTO_TEST_CASE(symbol_code_names_match_variant_serialization) {
+   for (const std::string name : {"A", "LIQETH", "ABCDEFG"}) {
+      const auto code = sysio::chain::symbol(9, name).to_symbol_code();
+      BOOST_CHECK_EQUAL(code.name(), name);
+      fc::variant serialized;
+      fc::to_variant(code, serialized);
+      BOOST_CHECK_EQUAL(serialized.as_string(), code.name());
+      sysio::chain::symbol_code decoded;
+      fc::from_variant(serialized, decoded);
+      BOOST_CHECK_EQUAL(decoded.value, code.value);
+   }
 }
 
 BOOST_AUTO_TEST_CASE(a_signer_is_chosen_only_when_exactly_one_provider_qualifies) {

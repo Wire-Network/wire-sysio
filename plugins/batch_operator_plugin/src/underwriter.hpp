@@ -6,6 +6,8 @@
  *        the plugin's tests drive them without a chain.
  */
 
+#include "exposure_policy.hpp"
+
 #include <algorithm>
 #include <cstdint>
 #include <cstring>
@@ -384,7 +386,7 @@ enum class wait_reason : uint8_t {
    TOKEN_MISMATCH,   ///< the statement's token is not the request's bond token
    UNVERIFIED,       ///< the outpost holds no final record of an envelope for that epoch
    CONTRADICTED,     ///< the outpost recorded another digest for that epoch: the statement is false
-   NO_CAP,           ///< no exposure cap is configured for the token
+   NO_CAP,           ///< neither capped nor unlimited exposure is configured for the token
    INVALID_PRECISION, ///< the token cannot represent the contract's bond increment
    PENDING_ACCEPT,   ///< a submitted contribution is not yet visible in the irreversible view
    STARTUP_FINALITY, ///< pre-restart transactions may still be live beyond the irreversible view
@@ -439,7 +441,8 @@ struct plan_inputs {
    std::set<request_id_t>                bonded;
    /// The digest each outpost recorded for the envelope it emitted, for the (chain, epoch) pairs read this pass.
    std::map<envelope_key, fc::sha256> emitted;
-   std::map<fc::slug_name, chain::asset> caps;       ///< token code -> most the underwriter may have bonded at once
+   /// Token code -> exposure policy. Absent and default-created policies permit no new underwriting.
+   std::map<fc::slug_name, exposure_policy> exposure_policies;
    std::map<fc::slug_name, chain::asset> balances;   ///< token code -> the underwriter's balance
    pending_accept_map                 pending_accepts;
    /// On startup, wait until LIB passes one transaction lifetime after the later of startup LIB and wall time.
@@ -513,15 +516,20 @@ inline plan plan_actions(const plan_inputs& in) {
          const auto emitted = in.emitted.find({s->chain_code, s->epoch_index});
          if (emitted == in.emitted.end()) { wait(wait_reason::UNVERIFIED); break; }
          if (emitted->second != s->digest) { wait(wait_reason::CONTRADICTED); break; }
-         const auto cap = in.caps.find(r->token_code);
-         if (cap == in.caps.end()) { wait(wait_reason::NO_CAP); break; }
+         const auto policy = in.exposure_policies.find(r->token_code);
+         if (policy == in.exposure_policies.end() || std::holds_alternative<disabled_exposure>(policy->second)) {
+            wait(wait_reason::NO_CAP); break;
+         }
          chain::asset& used = outstanding.try_emplace(r->token_code, 0, remainder.get_symbol()).first->second;
          const auto step = bond_increment::for_decimals(remainder.get_symbol().decimals());
          if (!step) { wait(wait_reason::INVALID_PRECISION); break; }
          const int64_t increment = static_cast<int64_t>(*step);
-         if (used >= cap->second) { wait(wait_reason::OVER_CAP); break; }
-         const chain::asset available = cap->second - used;
-         if (available.get_amount() < increment) { wait(wait_reason::OVER_CAP); break; }
+         chain::asset available = remainder;
+         if (const auto* cap = std::get_if<chain::asset>(&policy->second)) {
+            if (used >= *cap) { wait(wait_reason::OVER_CAP); break; }
+            available = *cap - used;
+            if (available.get_amount() < increment) { wait(wait_reason::OVER_CAP); break; }
+         }
          const auto balance = balances.find(r->token_code);
          if (balance == balances.end() || balance->second.get_amount() < increment) {
             wait(wait_reason::LOW_BALANCE); break;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <sysio/chain/config.hpp>
 #include <sysio/chain/types.hpp>
 #include <sysio/chain/exceptions.hpp>
 
@@ -124,6 +125,13 @@ namespace sysio { namespace chain {
    inline digest_type generate_action_digest(const action& act, const vector<char>& action_output) {
       const action_base& base = act;
       return fc::sha256::packhash(fc::sha256::packhash(base), fc::sha256::packhash(act.data, action_output));
+   }
+
+   /// True when @p act is the system contract's onblock action. It runs only as the implicit transaction at the start
+   /// of a block: transaction_context::init_for_input_trx rejects it in a signed transaction, and
+   /// apply_context::execute_inline as an inline action.
+   inline bool is_onblock_action( const action_base& act ) {
+      return act.account == config::system_account_name && act.name == config::onblock_action_name;
    }
 
 } } /// namespace sysio::chain

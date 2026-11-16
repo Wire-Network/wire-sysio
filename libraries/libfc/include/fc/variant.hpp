@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <charconv>
 #include <deque>
 #include <map>
@@ -7,6 +8,7 @@
 #include <set>
 #include <string_view>
 #include <system_error>
+#include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
 #include <variant>
@@ -280,10 +282,21 @@ namespace fc
 
         int64_t                     as_int64()const;
         uint64_t                    as_uint64()const;
+
+        /**
+         * The value as a 128-bit or 256-bit integer: an int64 or uint64, an integer of that width, a string holding
+         * one, a bool, or null as zero.
+         *
+         * @throw parse_error_exception if the value is outside the range of the result type. fc::int256 is
+         *        sign-magnitude, so its range is +/-(2^256 - 1).
+         * @throw bad_cast_exception if the variant holds any other type
+         * @{
+         */
         fc::int128                  as_int128()const;
         fc::uint128                 as_uint128()const;
         fc::int256                  as_int256()const;
         fc::uint256                 as_uint256()const;
+        /// @}
 
         /**
          * Convert variant to an enum value. Handles both integer and string
@@ -415,6 +428,18 @@ namespace fc
         void    clear();
       private:
         void    init();
+
+        /// Read a scalar or pointer value without accessing a typed object inside the character storage.
+        template <typename T>
+        T load_payload() const;
+
+        /// Store the explicitly selected type's representation without changing bytes outside the payload or its tag.
+        template <typename T>
+        void store_payload(std::type_identity_t<T> value);
+
+        /// Select inline or owning heap storage for a string, retaining its existing representation.
+        inline void make_string_inline_or_heap(std::string_view src);
+
         //enough room to store pointers, doubles, uint64s. doubled to allow 1 extra byte to store type at the end
         alignas(double) std::array<char, std::max(sizeof(uintmax_t ), sizeof(double)) * 2> _data = {};
    };

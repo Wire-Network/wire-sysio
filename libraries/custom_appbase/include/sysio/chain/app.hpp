@@ -15,6 +15,7 @@
 #include <fc/log/logger.hpp>
 #include <fc/log/logger_config.hpp>
 #include <fc/exception/exception.hpp>
+#include <fc/thread_stack.hpp>
 
 /*
  * Standard setup for wire applications.
@@ -43,6 +44,10 @@ struct application_config {
    uint16_t default_http_port = 8888;
 
    std::vector<application_base::extra_program_options_provider> extra_program_options_providers{};
+
+   /// Bytes the main thread's stack must be able to grow to: init raises the soft RLIMIT_STACK to it, or fails when the
+   /// hard limit is lower. Set by a program whose main thread runs exec() and contracts.
+   std::optional<std::size_t> main_thread_stack_size{};
 };
 
 // use namespace exit_code instead of enum class to allow simple conversion to int in main return statements
@@ -210,6 +215,16 @@ public:
                last_result_ = exit_code::INITIALIZE_FAIL;
             }
             return last_result_;
+         }
+
+         if (cfg_.main_thread_stack_size) {
+            try {
+               fc::raise_main_thread_stack_limit(*cfg_.main_thread_stack_size);
+            } catch (const fc::exception& e) {
+               elog("{}", e.top_message());
+               last_result_ = exit_code::INITIALIZE_FAIL;
+               return last_result_;
+            }
          }
 
          ilog("{} started", exe_name_);

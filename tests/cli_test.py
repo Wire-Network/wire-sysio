@@ -144,6 +144,25 @@ def clio_sign_test():
     assert(b'signatures' in output)
     assert(b'"signatures": []' not in output)
 
+def clio_get_block_info_range_test():
+    """Test that get block --info takes only a block number that fits uint32_t"""
+    def get_block_info(block_num):
+        return subprocess.run(['./programs/clio/clio', '--no-auto-kiod', '-u', unboundNodeopUrl + '/',
+                               'get', 'block', '--info', block_num],
+                              check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    # The largest block number is accepted: the command gets as far as the request to nodeop.
+    completed = get_block_info('4294967295')
+    assert completed.returncode != 0
+    assert b'Failed http request to nodeop' in completed.stderr, completed.stderr.decode()
+
+    # One past it, and 2^32 + 1 whose low 32 bits are block 1, are refused before any request.
+    for block_num in ['4294967296', '4294967297']:
+        completed = get_block_info(block_num)
+        assert completed.returncode != 0
+        assert b'Invalid block num: ' + block_num.encode() in completed.stderr, completed.stderr.decode()
+        assert b'Failed http request to nodeop' not in completed.stderr, completed.stderr.decode()
+
 def processClioCommand(cmd):
     outs = None
     errs = None
@@ -530,6 +549,7 @@ cli11_optional_option_arg_test()
 clio_sign_test()
 
 clio_convert_name_test()
+clio_get_block_info_range_test()
 
 clio_abi_file_test()
 clio_protobuf_abi_test()

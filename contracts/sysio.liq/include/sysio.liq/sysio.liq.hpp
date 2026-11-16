@@ -77,8 +77,8 @@ namespace sysio {
       /// Requires this contract's authority.
       [[sysio::action]] void create(symbol sym, sysio::slug_name chain_code, sysio::slug_name token_code);
 
-      /// Privileged supply repair requiring this contract's authority; never recover a return
-      /// tracked in sysio.synd::returns, which must use request-keyed refundreturn instead.
+      /// Privileged supply repair requiring this contract's authority; never recover a return that
+      /// still has its row in sysio.synd::returns, which must use request-keyed refundreturn instead.
       [[sysio::action]] void recredit(name holder, asset quantity);
 
       // -----------------------------------------------------------------------

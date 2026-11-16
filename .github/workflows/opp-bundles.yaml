@@ -26,6 +26,8 @@ on:
         type: string
         required: false
         default: ""
+  # Release branches get PR validation only. A push to one must not publish:
+  # their bundles ship through the tag dispatch above, like every release's.
   push:
     branches:
       - master
@@ -35,6 +37,7 @@ on:
     types: [opened, synchronize, reopened]
     branches:
       - master
+      - "release/*"
     paths:
       - "libraries/opp/**"
 

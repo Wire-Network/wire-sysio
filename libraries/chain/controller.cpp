@@ -3512,7 +3512,7 @@ struct controller_impl {
    {
       action on_block_act;
       on_block_act.account = sysio::chain::config::system_account_name;
-      on_block_act.name = "onblock"_n;
+      on_block_act.name = sysio::chain::config::onblock_action_name;
       on_block_act.authorization = vector<permission_level>{{sysio::chain::config::system_account_name, sysio::chain::config::active_name}};
       on_block_act.data = fc::raw::pack(chain_head.header());
 

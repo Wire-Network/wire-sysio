@@ -367,6 +367,9 @@ void apply_context::require_recipient( account_name recipient ) {
  *   can better understand the security risk.
  */
 void apply_context::execute_inline( action&& a ) {
+   SYS_ASSERT( !is_onblock_action(a), action_validate_exception,
+               "{}::{} runs only as the implicit transaction at the start of a block, never inline",
+               config::system_account_name, config::onblock_action_name );
    auto* code = control.db().find<account_object, by_name>(a.account);
    SYS_ASSERT( code != nullptr, action_validate_exception,
                "inline action's code account {} does not exist", a.account );

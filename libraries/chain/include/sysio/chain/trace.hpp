@@ -100,14 +100,14 @@ namespace sysio::chain {
    };
 
    /**
-    * Deduce if transaction_trace is the trace of an onblock system transaction
+    * True when @p tt is the trace of the implicit onblock transaction at the start of a block. Exact, because no other
+    * transaction can run the onblock action (see is_onblock_action).
     */
    inline bool is_onblock( const transaction_trace& tt ) {
       if (tt.action_traces.empty())
          return false;
       const auto& act = tt.action_traces[0].act;
-      if (act.account != sysio::chain::config::system_account_name || act.name != "onblock"_n ||
-          act.authorization.size() != 1)
+      if (!is_onblock_action(act) || act.authorization.size() != 1)
          return false;
       const auto& auth = act.authorization[0];
       return auth.actor == sysio::chain::config::system_account_name &&

@@ -13,14 +13,21 @@ Clone this repo as follows:
 
 ```bash
 # Clone with HTTP
-git clone --recursive https://github.com/Wire-Network/wire-sysio.git
+git clone https://github.com/Wire-Network/wire-sysio.git
 
 # Clone with SSH (if you have SSH keys set up)
-# git clone --recursive git@github.com:Wire-Network/wire-sysio.git
+# git clone git@github.com:Wire-Network/wire-sysio.git
 
 # Enter the repo directory
 cd wire-sysio
+
+# Initialize (or refresh) the pinned top-level submodules
+git submodule update --init vcpkg libraries/appbase libraries/sys-vm
 ```
+
+The eos-vm headers are built from the pinned `libraries/sys-vm` submodule. Softfloat and the other
+third-party packages continue to come from vcpkg. Initialize only the top-level submodules: the VM's
+standalone `libraries/sys-vm/vcpkg` checkout is not used by Sysio.
 
 # On Host Machine
 

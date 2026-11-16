@@ -24,6 +24,9 @@ namespace sysio::chain::config {
   static constexpr auto producers_account_name { "sysio.prods"_n };
   static constexpr auto roa_account_name       { "sysio.roa"_n };
 
+  /// The system contract action the implicit transaction at the start of every block runs, and nothing else may.
+  static constexpr auto onblock_action_name { "onblock"_n };
+
   /// True for sysio and every sysio.* account. Callers that grant a system contract more also require it to be
   /// privileged.
   constexpr bool is_system_account( name account ) { return account.prefix() == system_account_name; }
@@ -71,6 +74,13 @@ namespace sysio::chain::config {
   static constexpr uint32_t   default_subjective_cpu_us                    = 300000; /// default subjective cpu given to each account
   /// Genesis value of chain_config::notify_cpu_stipend, in microseconds
   static constexpr uint32_t   default_notify_cpu_stipend                   = 100;
+  /// Billable NET of a minimal sysio.token::transfer: 98 bytes of transaction overhead with one K1 signature, plus the
+  /// 77-byte action with one authorization and a 10-character memo.
+  static constexpr uint32_t   minimal_transfer_net_usage                   = 175;
+  /// Default subjective NET given to each account: as many minimal transfers as the default subjective CPU covers at
+  /// the minimum transaction CPU (300 ms / 100 us = 3,000 transfers, 525,000 bytes).
+  static constexpr uint32_t   default_subjective_net_bytes                 =
+     default_subjective_cpu_us / default_min_transaction_cpu_usage * minimal_transfer_net_usage;
 
   static constexpr uint32_t   default_max_trx_lifetime                     = 60*60; // 1 hour
   static constexpr uint32_t   default_max_trx_delay                        = 45*24*3600; // 45 days
@@ -142,6 +152,10 @@ namespace sysio::chain::config {
 #else
   const static sysio::chain::wasm_interface::vm_type default_wasm_runtime = sysio::chain::wasm_interface::vm_type::sys_vm;
 #endif
+
+  /// Stack a thread that runs contracts needs. sys-vm-oc and sys-vm-jit run wasm on the calling thread's stack until
+  /// their bound for it passes 4 MiB, then on a stack they map; the rest is for host functions and the frames below.
+  static constexpr std::size_t contract_thread_stack_size = 8*1024*1024;
 
   static constexpr uint32_t   default_abi_serializer_max_time_us = 15*1000; ///< default deadline for abi serialization methods
 

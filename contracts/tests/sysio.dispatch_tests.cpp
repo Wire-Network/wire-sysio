@@ -1245,7 +1245,7 @@ BOOST_FIXTURE_TEST_CASE(node_owner_reg_from_non_evm_outpost_is_dropped, sysio_di
    BOOST_REQUIRE(get_nodeownerreg(CLAIM_ACCOUNT).is_null());
 } FC_LOG_AND_RETHROW() }
 
-/// Node-owner claims on a chain running sysio.system. A tier-2/3 claim lets the NFT holder pick any valid 1-12 char
+/// Node-owner claims on a chain running sysio.system. A tier-2/3 claim lets the NFT holder pick any dot-free 1-12 char
 /// name and control the account created for it; these cases pin what that control must not reach.
 class node_owner_claim_tester : public sysio_dispatch_tester {
 public:
@@ -1256,12 +1256,9 @@ public:
    static constexpr auto     AUTH_EXT_PERMISSION     = "auth.ext"_n;
    static constexpr auto     OTHER_PERMISSION        = "session"_n;
    static constexpr auto     RESERVED_SYSTEM_NAME    = "sysio.pwn"_n;
-   static constexpr auto     PAYER_ACCOUNT           = "payer"_n;
    /// Never created; only names the key a notification offers.
    static constexpr auto     REPLACEMENT_KEY_NAME    = "replacement"_n;
    static constexpr auto     SYSTEM_INIT_ACTION      = "init"_n;
-   static constexpr auto     ADDPOLICY_ACTION        = "addpolicy"_n;
-   static constexpr auto     SELF_POLICY_WEIGHT      = "0.1000 SYS";
 
    /// Parent and authority of each of an account's permissions, keyed by permission name.
    using permission_set = std::map<name, std::pair<name, authority>>;
@@ -1290,22 +1287,21 @@ public:
       produce_blocks(2);
    }
 
-   /// The claimant issues a policy to itself from its tier budget; PAYER_ACCOUNT pays for the transaction.
-   void issue_own_policy(name owner) {
-      signed_transaction trx;
-      trx.actions.emplace_back(get_action(config::roa_account_name, ADDPOLICY_ACTION,
-         vector<permission_level>{{PAYER_ACCOUNT, config::sysio_payer_name}, {PAYER_ACCOUNT, config::active_name},
-                                  {owner, config::active_name}},
-         mvo()("owner", owner)("issuer", owner)("net_weight", SELF_POLICY_WEIGHT)("cpu_weight", SELF_POLICY_WEIGHT)
-              ("ram_weight", SELF_POLICY_WEIGHT)("time_block", 0)("network_gen", ROA_NETWORK_GEN)));
-      set_transaction_headers(trx);
-      trx.sign(get_private_key(PAYER_ACCOUNT, "active"), control->get_chain_id());
-      trx.sign(get_private_key(owner, "active"), control->get_chain_id());
-      push_transaction(trx);
-      produce_block();
+   /// Claim `account` through the depot and assert the rejection every invalid name gets: a REJECTED / NAME_INVALID
+   /// audit row, no registration and no account.
+   void assert_claim_rejected_as_name_invalid(name account) {
+      namespace audit_values = sysio_system::test_support::nodeownerreg;
+      claim_node_owner(account, get_public_key(account, "active"));
+
+      const auto audit = get_nodeownerreg(account);
+      BOOST_REQUIRE(!audit.is_null());
+      BOOST_CHECK_EQUAL(audit["status"].as<uint64_t>(), audit_values::status_rejected);
+      BOOST_CHECK_EQUAL(audit["reason"].as<uint64_t>(), audit_values::reason_name_invalid);
+      BOOST_CHECK(get_nodeowner(account).is_null());
+      BOOST_CHECK(!account_exists(account));
    }
 
-   /// Code a claimant can deploy on its account: it forwards every action it receives to sysio as a notification.
+   /// Code an account can deploy on itself: it forwards every action it receives to sysio as a notification.
    static std::vector<uint8_t> notify_system_account_wasm() {
       std::ostringstream wast;
       wast << R"((module
@@ -1356,20 +1352,15 @@ public:
    }
 };
 
-// A tier-2/3 claim can take the name auth.msg and deploy code there, so an auth.msg::onlinkauth notification is
-// attacker-controlled. It must reach sysio as an ordinary notification and change nothing: not sysio's owner, active,
-// auth.ext or any other permission, and not a user's.
-BOOST_FIXTURE_TEST_CASE(claimed_auth_msg_notification_changes_no_permission, node_owner_claim_tester) { try {
+// auth.msg is not a system account, so whoever holds it controls its onlinkauth notification. That must reach sysio
+// as an ordinary notification and change nothing: not sysio's owner, active, auth.ext or any other permission, and
+// not a user's. A node-owner claim can no longer take the dotted name, so the fixture creates the account itself.
+BOOST_FIXTURE_TEST_CASE(auth_msg_notification_changes_no_permission, node_owner_claim_tester) { try {
    create_account(CLAIM_ACCOUNT);
    bootstrap_for_dispatch(NODE_OWNER_SOURCE_CHAIN);
-   create_account(PAYER_ACCOUNT);
+   create_account(AUTH_MSG_ACCOUNT);
    deploy_system_contract();
 
-   claim_node_owner(AUTH_MSG_ACCOUNT, get_public_key(AUTH_MSG_ACCOUNT, "active"));
-   const auto audit = get_nodeownerreg(AUTH_MSG_ACCOUNT);
-   BOOST_REQUIRE(!audit.is_null());
-   BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), sysio_system::test_support::nodeownerreg::status_confirmed);
-   issue_own_policy(AUTH_MSG_ACCOUNT);
    set_code(AUTH_MSG_ACCOUNT, notify_system_account_wasm());
    produce_block();
 
@@ -1394,14 +1385,16 @@ BOOST_FIXTURE_TEST_CASE(node_owner_claim_rejects_reserved_system_name, node_owne
    bootstrap_for_dispatch(NODE_OWNER_SOURCE_CHAIN);
    deploy_system_contract();
 
-   claim_node_owner(RESERVED_SYSTEM_NAME, get_public_key(RESERVED_SYSTEM_NAME, "active"));
+   assert_claim_rejected_as_name_invalid(RESERVED_SYSTEM_NAME);
+} FC_LOG_AND_RETHROW() }
 
-   const auto audit = get_nodeownerreg(RESERVED_SYSTEM_NAME);
-   BOOST_REQUIRE(!audit.is_null());
-   BOOST_CHECK_EQUAL(audit["status"].as<uint64_t>(), sysio_system::test_support::nodeownerreg::status_rejected);
-   BOOST_CHECK_EQUAL(audit["reason"].as<uint64_t>(), sysio_system::test_support::nodeownerreg::reason_name_invalid);
-   BOOST_CHECK(get_nodeowner(RESERVED_SYSTEM_NAME).is_null());
-   BOOST_CHECK(!account_exists(RESERVED_SYSTEM_NAME));
+// No node owner may claim a dotted name, which would sit under another account's prefix: auth.msg is rejected like
+// any other invalid name.
+BOOST_FIXTURE_TEST_CASE(node_owner_claim_rejects_dotted_name, node_owner_claim_tester) { try {
+   bootstrap_for_dispatch(NODE_OWNER_SOURCE_CHAIN);
+   deploy_system_contract();
+
+   assert_claim_rejected_as_name_invalid(AUTH_MSG_ACCOUNT);
 } FC_LOG_AND_RETHROW() }
 
 /// Regression: a non-advancing advance() must not permanently strand the epoch.
@@ -2151,6 +2144,82 @@ BOOST_FIXTURE_TEST_CASE(a_custody_shortfall_pulls_the_cord_and_the_epoch_advance
    BOOST_REQUIRE_EQUAL(success(), chkcons());
    produce_block();
    BOOST_CHECK_EQUAL(current_epoch(), epoch + 1);
+} FC_LOG_AND_RETHROW() }
+
+// A desyndication's `returns` row lives until the outpost has consumed the envelope that carried it, through
+// the real consensus path. `advance` builds the depot's envelope for the new epoch; the row survives a later
+// desyndication until sysio.msgch accepts the outpost's envelope for that epoch, which the outpost emits only
+// after accepting the depot's.
+BOOST_FIXTURE_TEST_CASE(a_desyndication_return_expires_after_the_outposts_next_accepted_envelope,
+                        sysio_dispatch_tester) { try {
+   constexpr auto USER = "synd.user"_n;
+   bootstrap_for_dispatch();
+   setup_liq_for_dispatch();
+   create_accounts({USER});
+   produce_blocks();
+   create_eth_authex_link(USER, fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em));
+   BOOST_REQUIRE_EQUAL(success(), push(SYND_ACCOUNT, synd_abi, config::system_account_name, "setconfig"_n, mvo()
+      ("chain_code", codename_mvo("ETH"))("token_code", codename_mvo("LIQETH"))("synd_fee_bps", 0)
+      ("desynd_fee_bps", 0)("synd_burst", 0)("synd_refill", 0)("desynd_burst", 1'000'000 * LIQ_UNIT)
+      ("desynd_refill", 1'000'000 * LIQ_UNIT)("window_sec", 10800)("bounty", 0)("challenge_extra", 0)
+      ("min_desyndicate", 1)("desynd_fee_flat", 0)("custody_shortfall_bps", 0)));
+   setup_wire_token();
+   enable_epoch_advancement();
+   BOOST_REQUIRE_EQUAL(success(), mint_shadow(USER, 10 * LIQ_UNIT));
+
+   const auto eth = fc::slug_name{"ETH"}.value;
+   const auto desyndicate = [&] {
+      return push(SYND_ACCOUNT, synd_abi, USER, "desyndicate"_n, mvo()
+         ("holder", USER)("quantity", asset(LIQ_UNIT, LIQETH_SYM))("max_fee", 0));
+   };
+   // The request id and `sent_epoch` of every `returns` row, in id order.
+   using return_rows = std::vector<std::pair<uint64_t, uint32_t>>;
+   const auto returns = [&] {
+      return_rows rows;
+      for (const auto& value : synd_rows("returns"_n)) {
+         const auto row = synd_decode("return_row", value);
+         rows.emplace_back(row["request_id"].as_uint64(), row["sent_epoch"].as<uint32_t>());
+      }
+      return rows;
+   };
+   // An attestation the depot drops: the outpost's envelopes only have to reach consensus here.
+   const std::vector<typed_attestation> filler{
+      {ATTESTATION_TYPE_OPERATOR_ACTION,
+       encode_operator_action(sysio::opp::attestations::OperatorAction::ACTION_TYPE_DEPOSIT_REQUEST,
+                              ChainKind::CHAIN_KIND_EVM, uwrit_op_eth_pubkey, eth, eth, 1'000'000)}};
+
+   const uint32_t first_epoch = current_epoch();
+   BOOST_REQUIRE_EQUAL(success(), desyndicate());
+   BOOST_REQUIRE((returns() == return_rows{{1, 0}}));
+
+   // The outpost's envelope for the first epoch reaches consensus, and `advance` builds the depot's envelope
+   // for the next epoch with request 1 in it.
+   const auto first = encode_envelope_with_mixed_attestations(first_epoch, filler);
+   BOOST_REQUIRE_EQUAL(success(), deliver(eth, first));
+   produce_block();   // land the delivery before the clock is moved past its expiration
+   produce_block(fc::seconds(120));
+   produce_block();
+   BOOST_REQUIRE_EQUAL(success(), chkcons());
+   produce_block();
+   const uint32_t second_epoch = current_epoch();
+   BOOST_REQUIRE_EQUAL(first_epoch + 1, second_epoch);
+   BOOST_REQUIRE((returns() == return_rows{{1, second_epoch}}));
+
+   // Built, not consumed: the last envelope accepted from the outpost is still the first epoch's.
+   BOOST_REQUIRE_EQUAL(success(), desyndicate());
+   produce_block();
+   BOOST_REQUIRE((returns() == return_rows{{1, second_epoch}, {2, 0}}));
+
+   // The outpost's envelope for the second epoch is accepted: the next desyndication erases request 1.
+   sysio::opp::Envelope accepted;
+   BOOST_REQUIRE(accepted.ParseFromArray(first.data(), static_cast<int>(first.size())));
+   const auto second = encode_envelope_with_mixed_attestations(
+      second_epoch, filler, oracle::digest_bytes(oracle::epoch_digest(accepted)),
+      accepted.messages(0).header().message_id());
+   BOOST_REQUIRE_EQUAL(success(), deliver(eth, second));
+   produce_block();
+   BOOST_REQUIRE_EQUAL(success(), desyndicate());
+   BOOST_REQUIRE((returns() == return_rows{{2, 0}, {3, 0}}));
 } FC_LOG_AND_RETHROW() }
 
 // Review focus 4 with work pending: the cord a shortfall pulls inline from `onsynd` freezes the very

@@ -73,7 +73,8 @@ permission then need not be linked for `sysio.kicker::kick`.
 | `--batch-delivery-timeout-ms` | 60000 | Max time for one outbound delivery, every transaction and confirmation wait included (ms). On Ethereum a single receipt wait may use whatever of it is left, so size it past the outpost chain's block time. |
 | `--batch-yield-tick-interval-ms` | 60000 | Minimum spacing between this operator's `sysio.swap::tickyield` pushes per yield pool (ms) |
 | `--batch-underwriter-account` | none | `account` or `account@permission` (default `active`) the underwriter bonds from. Configuring it enables the underwriter |
-| `--batch-underwriter-max-exposure` | none | Most the underwriter may have bonded at once in one shadow token, as an asset (`100.000000000 LIQETH`). Repeat per token; a token without one is not underwritten |
+| `--batch-underwriter-max-exposure` | none | Most the underwriter may have bonded at once in one shadow token, as a positive asset (`100.000000000 LIQETH`). Repeat per token; cannot name the same token as unlimited exposure |
+| `--batch-underwriter-unlimited-exposure` | none | Allow exposure without a cap for one shadow token, as its symbol code (`LIQETH`, without amount or precision). Repeat per token; balance and verification checks still apply. Startup fails if max exposure names the same token |
 | `--batch-kick-crank` | true | Push `sysio.kicker::kick` for every kicker pool that could pay. Off, the relay's permission need not authorize `kick` |
 | `--batch-kick-interval-ms` | 60000 | First wait before this operator retries a `sysio.kicker::kick` that did not pay (ms); doubles per unpaid attempt, up to an hour. Must be 1 to 3600000; startup fails otherwise |
 
@@ -147,7 +148,9 @@ requests `sysio.synd` issues for syndication envelopes. Each poll it:
    schema, oldest first (`sysio.bond::accept`). Each contribution is the minimum of
    the uncovered remainder, the token's remaining exposure allowance (bonds not
    yet claimed count), and the account's `sysio.liq` balance, rounded down to a
-   0.01-token increment. An account's first contribution to a request must be
+   0.01-token increment. Explicit unlimited exposure removes only the exposure
+   allowance limit; a token with neither exposure option is not underwritten.
+   An account's first contribution to a request must be
    at least 1/64 of its coverage or take the whole remainder (`sysio.bond`
    refuses a smaller one); until it can, the request waits.
    Multiple underwriters can contribute to the same request;
@@ -185,7 +188,7 @@ those lines is left to log tooling:
 | The outpost holds no final record for the statement's epoch | The request waits |
 | The outpost recorded another digest for that epoch | Never bonded; an error log names both digests |
 | The node cannot serve a chain (no RPC client, wrong chain id) | That chain's requests wait; the others go on |
-| No cap, or remaining exposure allowance or balance below one 0.01-token increment | The request waits |
+| Neither exposure option for the token, or remaining finite exposure allowance or balance below one 0.01-token increment | The request waits |
 | A first contribution would be below 1/64 of the request's coverage and not the whole remainder | The request waits |
 | An accept is submitted but not yet accounted for by the irreversible view | Its funds stay reserved and that request waits |
 | Startup finality wait | New accepts wait; approvals and claims continue |
@@ -225,6 +228,29 @@ other means: a cap counts only the bonds its node makes.
 
 Size each cap for the most the token syndicates in one challenge window
 (`window_sec`, 3 hours by default) plus the time it takes to claim.
+
+Alternatively, explicitly allow unlimited exposure for selected shadow symbols:
+
+```sh
+--batch-underwriter-account uw.acct \
+--batch-underwriter-unlimited-exposure LIQETH \
+--batch-underwriter-max-exposure '5.000000000 LIQSOL'
+```
+
+This permits LIQETH bonds up to the account's available balance while limiting
+outstanding LIQSOL bonds to 5 LIQSOL. Repeat the unlimited option for additional
+symbols. Neither option enables other tokens, and both require an underwriter
+account to have any effect. Naming the same symbol in both options is a startup
+error, regardless of argument order or whether it comes from the command line or
+configuration file. Duplicate unlimited symbols are also rejected. Unlimited
+exposure removes only the cap: contribution rounding and minimums, pending balance
+reservations, startup finality, outpost verification, emergency-stop and
+forfeiture-halt checks still apply.
+
+A finite cap bounds the token inventory that can be bonded at once. Unlimited
+exposure can bond the account's entire inventory of that token within one
+challenge window, before a forfeiture triggers the halt. Fund an unlimited
+underwriter account with only what you are prepared to have bonded at once.
 
 ## Dependencies
 

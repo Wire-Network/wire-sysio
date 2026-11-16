@@ -379,6 +379,28 @@ BOOST_AUTO_TEST_CASE(rejections) {
       codec::build_key_shapes(deep, {"k"}, {"level" + std::to_string(too_deep)}), fc::exception);
 }
 
+BOOST_AUTO_TEST_CASE(int128_bound_outside_its_range_is_rejected) {
+   const abi_def     abi        = make_test_abi();
+   const fc::uint128 uint128_max = ~fc::uint128{0};
+   const fc::uint128 int128_max  = uint128_max >> 1;
+
+   // A negative number is no uint128 bound, and a uint128 above the int128 maximum no int128 one.
+   BOOST_CHECK_THROW(encode_single(abi, "uint128", fc::variant(int64_t{-1})), fc::parse_error_exception);
+   BOOST_CHECK_THROW(encode_single(abi, "uint128", fc::variant("340282366920938463463374607431768211456")),
+                     fc::parse_error_exception);
+   BOOST_CHECK_THROW(encode_single(abi, "int128", fc::variant(int128_max + 1)), fc::parse_error_exception);
+   BOOST_CHECK_THROW(encode_single(abi, "int128", fc::variant("170141183460469231731687303715884105728")),
+                     fc::parse_error_exception);
+   BOOST_CHECK_THROW(encode_single(abi, "int128", fc::variant("-170141183460469231731687303715884105729")),
+                     fc::parse_error_exception);
+
+   // The ends of each range encode, in order.
+   BOOST_CHECK(key_less(encode_single(abi, "uint128", fc::variant(int64_t{0})),
+                        encode_single(abi, "uint128", fc::variant(uint128_max))));
+   BOOST_CHECK(key_less(encode_single(abi, "int128", fc::variant("-170141183460469231731687303715884105728")),
+                        encode_single(abi, "int128", fc::variant(int128_max))));
+}
+
 // Pins the leaf_key_spellings table as the single source of truth: every
 // spelling must resolve (via leaf_kind_of) to a key_leaf_kind handled by BOTH
 // the encode_field and decode_field switches. A representative value is encoded

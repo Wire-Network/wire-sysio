@@ -358,7 +358,7 @@ Almost nothing. Managing policies costs a node owner no resources at all:
 - `addpolicy`, `expandpolicy`, `extendpolicy`, and `reducepolicy` are actions on `sysio.roa`, so
   `payer()` resolves to `sysio.roa`, which carries unlimited CPU and NET.
 - Every row the contract writes for registration and policy management is billed to `sysio.roa`
-  as well — `policies`, `reslimit`, and `nodeowners` rows are all `emplace(get_self(), …)`.
+  as well — `policies` and `nodeowners` rows are both `emplace(get_self(), …)`.
 
 An owner reduced to zero CPU, zero NET, and zero spare RAM can still issue a policy. Membership —
 the `nodeowners` row — is what confers the ability to issue, not any allocation the owner holds.
@@ -388,7 +388,7 @@ refuse any caller that is not a registered tier-1 owner.
 
 | Pool | Size at activation | Funds |
 |---|---|---|
-| `sysio.roa` | ~157 MB — half the SYS left over after all tier allocations | The contract's own rows: policies, reslimits, node-owner records |
+| `sysio.roa` | ~157 MB — half the SYS left over after all tier allocations | The contract's own rows: policies, node-owner records |
 | `sysio` | ~6.75 GB — the other half, plus 10% of every tier-1 slot's allocation | The 1,144-byte gift every new account receives |
 
 `sysio`'s pool is fully funded at activation, whether or not any node owner has registered. At
@@ -557,9 +557,15 @@ objective bill went to the contract.
 
 Two properties keep this landing on abusers rather than on ordinary users:
 
-- **Successful transactions do not accumulate.** A subjective bill is held as `pending_cpu_us` and
-  removed when the transaction appears in a block. Traffic that lands costs the signer nothing over
-  time.
+- **Successful transactions do not accumulate, unless a `sysio.*` contract pays.** A subjective bill
+  is held as `pending_cpu_us` and removed when the transaction appears in a block. Traffic that lands
+  costs the signer nothing over time. The exception is an action whose payer is a `sysio.*` account
+  (no explicit `sysio.payer`): those contracts have unlimited CPU, so nothing else would limit their
+  callers. When a block is applied, every node charges the billed CPU of each such action, from the
+  block's receipts, to the action's first authorizer, where it decays like a failure. A signer can
+  therefore use `subjective-account-cpu-allowed-us` plus its own CPU limit of `sysio.*`-paid CPU per
+  `subjective-account-decay-time-minutes`, wherever it submits. Signing with `sysio.payer` moves the
+  cost to the signer's own objective CPU instead.
 - **Most failures accumulate and decay slowly.** A failed transaction moves its bill into a
   decaying accumulator whose window is `subjective-account-decay-time-minutes` — 24 hours by
   default. Repeatedly submitting transactions that fail is what burns the budget.
@@ -590,6 +596,22 @@ traffic history, or different account exemptions can legitimately reach differen
 the same transaction. The recovery path for a dropped transaction is client resubmit, not
 producer-side retry.
 
+### Accounts every node exempts
+
+A batch operator or an underwriter pushes `sysio.*`-paid actions all day and loses some of them to
+races, so it must never be throttled. Every node treats these accounts as
+`disable-subjective-account-billing` would:
+
+- the `sysio.opreg` operators of type batch or underwriter whose status is active: bootstrapped, or
+  holding the role's collateral minimum. Registering alone exempts nobody;
+- the accounts in the `sysio.system` table `subjexempt`. `sysio.bond::accept` adds an underwriter
+  there on its first bond of a request issued by a `sysio.*` contract, and the entry stays after
+  the bond settles. `sysio` adds or removes any account with `addsubjex` and `delsubjex`.
+
+A node reads both from chain state on its first irreversible block and every 120 irreversible
+blocks after it, so a change takes effect about a minute later. A removed underwriter is listed
+again by its next bond.
+
 ### Defaults
 
 Subjective billing ships **on**, and the failure limiter with it — both are gated on the same
@@ -606,6 +628,7 @@ failures would point the cost at the wrong account. The signer still is.
 | `subjective-account-max-failures` | `3` | Failures allowed per account per window |
 | `subjective-account-max-failures-window-size` | `1` | Window size in blocks for the failure limit |
 | `disable-subjective-payer-billing` | `true` | Set false to also meter the payer (the contract) |
+| `disable-subjective-sysio-authorizer-billing` | `false` | Set true to stop charging signers for `sysio.*`-paid actions that land in a block |
 | `disable-subjective-account-billing <acct>` | — | Disables subjective billing for the **whole transaction** when any first authorizer matches — including the failure-limit precheck, and for every co-authorizer |
 
 Independent of all of it, `incoming-transaction-queue-size-mb` (default `1024`) subjectively drops
@@ -773,6 +796,12 @@ A **tier-1** node owner can call `roa::newuser`, which mints a sub-account under
 (`<owner>.<generated>`) with a supplied public key, funded with the standard 1,144-byte account
 allocation drawn from the network pool.
 
+A node owner's own name never contains a `.` when it comes through the NFT-claim flow: `nodeownreg`
+creates no account for a dotted name and records the claim as `REJECTED` / `NAME_INVALID`, in every
+tier. A claim therefore cannot take a name under another account's prefix, such as a tier-1
+owner's sub-account namespace or a `sysio.` system name. Tier 1 takes 2–6 characters, tiers 2 and 3
+take 1–12.
+
 The created account has **no CPU/NET policy** — and does not need one, because it transacts
 against contracts that carry their own. A user gets an account at no cost to themselves and can
 immediately use every provisioned contract on the network.
@@ -889,7 +918,6 @@ and are omitted.
 | `roastate` | singleton | Activation flag, `total_sys`, `bytes_per_unit`, `network_gen` |
 | `nodeowners` | `network_gen` | Node owner rows: tier, total and allocated SYS |
 | `policies` | issuer | One row per (issuer, owner) pair |
-| `reslimit` | global | Per-account totals summed across all its policies |
 | `sponsorcount` | `network_gen` | Per tier-1 owner: accounts sponsored and the limit it raised to |
 | `acctlimcfg` | singleton | Default account limit and the raise multiplier |
 

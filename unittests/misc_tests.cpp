@@ -194,6 +194,109 @@ BOOST_AUTO_TEST_CASE(variant_format_string_limited)
    }
 }
 
+// A precision outside 0..symbol::max_precision is rejected with the value that was parsed; it is not narrowed to
+// uint8_t first, where 256 and above (or a negative) would wrap into range
+BOOST_AUTO_TEST_CASE(symbol_precision_range)
+{
+   const auto above_max = [](int64_t precision) {
+      return [precision](const symbol_type_exception& e) {
+         return expect_assert_message(e, "precision " + std::to_string(precision) + " should be <= 18");
+      };
+   };
+   const auto negative = [](int64_t precision) {
+      return [precision](const symbol_type_exception& e) {
+         return expect_assert_message(e, "precision " + std::to_string(precision) + " should be >= 0");
+      };
+   };
+   const auto not_an_int64 = [](const fc::parse_error_exception& e) {
+      return expect_assert_message(e, "Couldn't parse int64_t");
+   };
+
+   static_assert(symbol::max_precision == 18);
+
+   // symbol::from_string
+   BOOST_CHECK_EQUAL(symbol::from_string("0,SYS").to_string(), "0,SYS");
+   BOOST_CHECK_EQUAL(symbol::from_string("4,SYS").to_string(), "4,SYS");
+   BOOST_CHECK_EQUAL(symbol::from_string("18,SYS").to_string(), "18,SYS");
+   BOOST_CHECK_EQUAL(symbol::from_string("+4,SYS").to_string(), "4,SYS");   // a sign on an in-range value
+   BOOST_CHECK_EQUAL(symbol::from_string("-0,SYS").to_string(), "0,SYS");
+   BOOST_CHECK_EXCEPTION(symbol::from_string("19,SYS"), symbol_type_exception, above_max(19));
+   BOOST_CHECK_EXCEPTION(symbol::from_string("255,SYS"), symbol_type_exception, above_max(255));
+   BOOST_CHECK_EXCEPTION(symbol::from_string("256,SYS"), symbol_type_exception, above_max(256));   // 0 as uint8_t
+   BOOST_CHECK_EXCEPTION(symbol::from_string("260,SYS"), symbol_type_exception, above_max(260));   // 4 as uint8_t
+   BOOST_CHECK_EXCEPTION(symbol::from_string("274,SYS"), symbol_type_exception, above_max(274));   // 18 as uint8_t
+   BOOST_CHECK_EXCEPTION(symbol::from_string("-1,SYS"), symbol_type_exception, negative(-1));      // 255 as uint8_t
+   BOOST_CHECK_EXCEPTION(symbol::from_string("-252,SYS"), symbol_type_exception, negative(-252));  // 4 as uint8_t
+   BOOST_CHECK_EXCEPTION(symbol::from_string("-256,SYS"), symbol_type_exception, negative(-256));  // 0 as uint8_t
+   BOOST_CHECK_EXCEPTION(symbol::from_string("9223372036854775807,SYS"), symbol_type_exception,
+                         above_max(std::numeric_limits<int64_t>::max()));
+   BOOST_CHECK_EXCEPTION(symbol::from_string("-9223372036854775808,SYS"), symbol_type_exception,
+                         negative(std::numeric_limits<int64_t>::min()));
+   BOOST_CHECK_EXCEPTION(symbol::from_string("9223372036854775808,SYS"), fc::parse_error_exception, not_an_int64);
+   BOOST_CHECK_EXCEPTION(symbol::from_string(",SYS"), fc::parse_error_exception, not_an_int64);
+   BOOST_CHECK_EXCEPTION(symbol::from_string("4.0,SYS"), fc::parse_error_exception, not_an_int64);
+
+   // fc::from_variant for symbol
+   BOOST_CHECK_EQUAL(fc::variant("18,SYS").as<symbol>().to_string(), "18,SYS");
+   BOOST_CHECK_EXCEPTION(fc::variant("19,SYS").as<symbol>(), symbol_type_exception, above_max(19));
+   BOOST_CHECK_EXCEPTION(fc::variant("260,SYS").as<symbol>(), symbol_type_exception, above_max(260));
+   BOOST_CHECK_EXCEPTION(fc::variant("-252,SYS").as<symbol>(), symbol_type_exception, negative(-252));
+
+   // An asset takes its precision from the number of fraction digits.
+   const auto with_fraction_digits = [](size_t digits) { return "0." + std::string(digits - 1, '0') + "5 SYS"; };
+   const asset smallest_unit(5, symbol(symbol::max_precision, "SYS"));
+
+   // asset::from_string
+   BOOST_CHECK_EQUAL(asset::from_string(with_fraction_digits(18)), smallest_unit);
+   BOOST_CHECK_EXCEPTION(asset::from_string(with_fraction_digits(19)), symbol_type_exception, above_max(19));
+   BOOST_CHECK_EXCEPTION(asset::from_string(with_fraction_digits(256)), symbol_type_exception, above_max(256));
+   BOOST_CHECK_EXCEPTION(asset::from_string(with_fraction_digits(260)), symbol_type_exception, above_max(260));
+   BOOST_CHECK_EXCEPTION(asset::from_string(with_fraction_digits(274)), symbol_type_exception, above_max(274));
+
+   // fc::from_variant for asset
+   BOOST_CHECK_EQUAL(fc::variant(with_fraction_digits(18)).as<asset>(), smallest_unit);
+   BOOST_CHECK_EXCEPTION(fc::variant(with_fraction_digits(19)).as<asset>(), symbol_type_exception, above_max(19));
+   BOOST_CHECK_EXCEPTION(fc::variant(with_fraction_digits(256)).as<asset>(), symbol_type_exception, above_max(256));
+   BOOST_CHECK_EXCEPTION(fc::variant(with_fraction_digits(260)).as<asset>(), symbol_type_exception, above_max(260));
+}
+
+// A symbol_code renders as its name; a value that is not the code of a symbol is rejected, never rendered as the
+// name of a different code
+BOOST_AUTO_TEST_CASE(symbol_code_name)
+{
+   const auto too_long = [](const symbol_type_exception& e) { return expect_assert_message(e, " is too long"); };
+   const auto invalid  = [](const symbol_type_exception& e) { return expect_assert_message(e, "invalid symbol"); };
+
+   const symbol_code seven = symbol(0, "ABCDEFG").to_symbol_code();
+   const symbol_code eight{seven.value | (uint64_t{'H'} << 56)};   // "ABCDEFGH": the byte a symbol has no room for
+
+   // symbol_code::name
+   BOOST_CHECK_EQUAL(symbol_code{0}.name(), "");
+   BOOST_CHECK_EQUAL(symbol(4, "SYS").to_symbol_code().name(), "SYS");
+   BOOST_CHECK_EQUAL(seven.name(), "ABCDEFG");
+   BOOST_CHECK_EXCEPTION(eight.name(), symbol_type_exception, [](const symbol_type_exception& e) {
+      return expect_assert_message(e, "symbol code 0x4847464544434241 is too long");
+   });
+   BOOST_CHECK_EXCEPTION(symbol_code{uint64_t{'H'} << 56}.name(), symbol_type_exception, too_long);
+   BOOST_CHECK_EXCEPTION(symbol_code{std::numeric_limits<uint64_t>::max()}.name(), symbol_type_exception, too_long);
+   BOOST_CHECK_EXCEPTION(symbol_code{uint64_t{'a'}}.name(), symbol_type_exception, invalid);
+   BOOST_CHECK_EXCEPTION(symbol_code{uint64_t{'A'} << 8}.name(), symbol_type_exception, invalid);   // "\0A"
+
+   // fc::to_variant, and back
+   BOOST_CHECK_EQUAL(fc::variant(seven).as_string(), "ABCDEFG");
+   BOOST_CHECK_EQUAL(fc::variant(seven).as<symbol_code>().value, seven.value);
+   BOOST_CHECK_EXCEPTION(fc::variant(eight).as_string(), symbol_type_exception, too_long);
+
+   // binary to JSON
+   const abi_serializer::yield_function_t yield = abi_serializer::create_yield_function(fc::microseconds::maximum());
+   const abi_serializer abis(sysio_contract_abi(abi_def()), yield);
+   const auto to_json = [&](symbol_code code) {
+      return abis.binary_to_variant("symbol_code", fc::raw::pack(code), yield);
+   };
+   BOOST_CHECK_EQUAL(to_json(seven).as_string(), "ABCDEFG");
+   BOOST_CHECK_EXCEPTION(to_json(eight), symbol_type_exception, too_long);
+}
+
 // Test overflow handling in asset::from_string
 BOOST_AUTO_TEST_CASE(asset_from_string_overflow)
 {
@@ -284,6 +387,144 @@ BOOST_AUTO_TEST_CASE(asset_from_string_overflow)
    BOOST_CHECK_EXCEPTION( asset::from_string("-100000000000000000000000.00000000000000000000 CUR") , symbol_type_exception, [](const auto& e) {
       return expect_assert_message(e, "precision 20 should be <= 18");
    });
+}
+
+// The amount of an asset string is [-]digits[.digits]: one leading minus is the only sign, and neither part takes
+// any other character. Checked through asset::from_string and through a variant.
+BOOST_AUTO_TEST_CASE(asset_from_string_amount_format)
+{
+   const auto bad_integer = [](const asset_type_exception& e) {
+      return expect_assert_message(e, "Asset's integer part should be digits with an optional leading minus sign");
+   };
+   const auto bad_fraction = [](const asset_type_exception& e) {
+      return expect_assert_message(e, "Asset's decimal fraction should be digits only");
+   };
+
+   const auto check_accepted = [](const std::string& from, int64_t amount, uint8_t decimals) {
+      BOOST_TEST_CONTEXT("asset string " << fc::json::to_string(from, fc::time_point::maximum())) {
+         const asset expected(amount, symbol(decimals, "SYS"));
+         BOOST_CHECK_EQUAL(asset::from_string(from), expected);
+         BOOST_CHECK_EQUAL(fc::variant(from).as<asset>(), expected);
+      }
+   };
+   const auto check_rejected = [](const std::string& from, const auto& expected_message) {
+      BOOST_TEST_CONTEXT("asset string " << fc::json::to_string(from, fc::time_point::maximum())) {
+         BOOST_CHECK_EXCEPTION(asset::from_string(from), asset_type_exception, expected_message);
+         BOOST_CHECK_EXCEPTION(fc::variant(from).as<asset>(), asset_type_exception, expected_message);
+      }
+   };
+
+   // well-formed amounts; the leading minus applies to the whole amount, including when the integer part is zero
+   check_accepted("7 SYS", 7, 0);
+   check_accepted("-7 SYS", -7, 0);
+   check_accepted("1.05 SYS", 105, 2);
+   check_accepted("-1.05 SYS", -105, 2);
+   check_accepted("0.5 SYS", 5, 1);
+   check_accepted("-0.5 SYS", -5, 1);
+   check_accepted("-0.05 SYS", -5, 2);
+   check_accepted("0 SYS", 0, 0);
+   check_accepted("-0 SYS", 0, 0);
+   check_accepted("-0.00 SYS", 0, 2);
+   check_accepted("007.50 SYS", 750, 2);
+   check_accepted("-007.50 SYS", -750, 2);
+   BOOST_CHECK_EQUAL(asset::from_string("-0.5 SYS").to_string(), "-0.5 SYS");
+
+   // a sign inside the fraction; these parsed as 0.95, 1.05, -0.95, -1.05 and 0.00
+   check_rejected("1.-5 SYS", bad_fraction);
+   check_rejected("1.+5 SYS", bad_fraction);
+   check_rejected("-1.-5 SYS", bad_fraction);
+   check_rejected("-1.+5 SYS", bad_fraction);
+   check_rejected("0.-0 SYS", bad_fraction);
+
+   // a plus sign on the amount; these parsed as 1.5, 1, 0.5 and 0
+   check_rejected("+1.5 SYS", bad_integer);
+   check_rejected("+1 SYS", bad_integer);
+   check_rejected("+0.5 SYS", bad_integer);
+   check_rejected("+0 SYS", bad_integer);
+
+   // any other character in the fraction
+   check_rejected("1.5- SYS", bad_fraction);
+   check_rejected("1.5.5 SYS", bad_fraction);
+   check_rejected("1..5 SYS", bad_fraction);
+   check_rejected("1.5e1 SYS", bad_fraction);
+   check_rejected("1.0x5 SYS", bad_fraction);
+   check_rejected("1.5\t SYS", bad_fraction);
+
+   // a second sign, or a sign after the first digit, in the integer part
+   check_rejected("--1.5 SYS", bad_integer);
+   check_rejected("-+1.5 SYS", bad_integer);
+   check_rejected("+-1.5 SYS", bad_integer);
+   check_rejected("1-.5 SYS", bad_integer);
+   check_rejected("1-2 SYS", bad_integer);
+
+   // no digits in the integer part
+   check_rejected(".5 SYS", bad_integer);
+   check_rejected("-.5 SYS", bad_integer);
+   check_rejected("- SYS", bad_integer);
+
+   // any other character in the integer part
+   check_rejected("1e3 SYS", bad_integer);
+   check_rejected("0x10 SYS", bad_integer);
+   check_rejected("1,000 SYS", bad_integer);
+   check_rejected("1,000.00 SYS", bad_integer);
+
+   // bytes that are not ASCII digits: an embedded NUL, a newline, a high-bit byte, a UTF-8 Arabic-Indic digit
+   check_rejected(std::string("1\0 SYS", 6), bad_integer);
+   check_rejected(std::string("1.5\0 SYS", 8), bad_fraction);
+   check_rejected("1\n SYS", bad_integer);
+   check_rejected("1.\xb2 SYS", bad_fraction);
+   check_rejected("\xd9\xa3 SYS", bad_integer);
+}
+
+// A symbol name of up to 7 characters is encoded; a longer one is rejected wherever a symbol is made from a string
+BOOST_AUTO_TEST_CASE(symbol_name_length)
+{
+   const auto too_long = [](const symbol_type_exception& e) {
+      return expect_assert_message(e, "symbol name is longer than 7 characters");
+   };
+
+   BOOST_CHECK_EQUAL(max_symbol_name_length, 7u);
+
+   // compile time; a longer name does not compile
+   static_assert(SY(4, ABCDEFG) == 0x4746454443424104ull);
+   static_assert(string_to_symbol_c(4, "") == 4);
+
+   // string_to_symbol
+   BOOST_CHECK_EQUAL(string_to_symbol(4, "ABCDEFG"), SY(4, ABCDEFG));
+   BOOST_CHECK_EXCEPTION(string_to_symbol(4, "ABCDEFGH"), symbol_type_exception, too_long);
+   BOOST_CHECK_EXCEPTION(string_to_symbol(4, "ABCDEFGHI"), symbol_type_exception, too_long);
+   BOOST_CHECK_EXCEPTION(string_to_symbol(4, std::string(1024, 'A')), symbol_type_exception, too_long);
+
+   // symbol(uint8_t, std::string_view)
+   BOOST_CHECK_EQUAL(symbol(4, "ABCDEFG").to_string(), "4,ABCDEFG");
+   BOOST_CHECK_EXCEPTION(symbol(4, "ABCDEFGH"), symbol_type_exception, too_long);
+   BOOST_CHECK_EXCEPTION(symbol(4, "ABCDEFGHI"), symbol_type_exception, too_long);
+
+   // symbol::from_string
+   BOOST_CHECK_EQUAL(symbol::from_string("4,ABCDEFG").value(), SY(4, ABCDEFG));
+   BOOST_CHECK_EXCEPTION(symbol::from_string("4,ABCDEFGH"), symbol_type_exception, too_long);
+   BOOST_CHECK_EXCEPTION(symbol::from_string("4,ABCDEFGHI"), symbol_type_exception, too_long);
+
+   // asset::from_string
+   BOOST_CHECK_EQUAL(asset::from_string("1.0000 ABCDEFG"), asset(10000, symbol(4, "ABCDEFG")));
+   BOOST_CHECK_EXCEPTION(asset::from_string("1.0000 ABCDEFGH"), symbol_type_exception, too_long);
+   BOOST_CHECK_EXCEPTION(asset::from_string("1.0000 ABCDEFGHI"), symbol_type_exception, too_long);
+
+   // from_variant
+   BOOST_CHECK_EQUAL(fc::variant("ABCDEFG").as<symbol_code>().value, SY(4, ABCDEFG) >> 8);
+   BOOST_CHECK_EXCEPTION(fc::variant("ABCDEFGH").as<symbol_code>(), symbol_type_exception, too_long);
+   BOOST_CHECK_EXCEPTION(fc::variant("ABCDEFGHI").as<symbol_code>(), symbol_type_exception, too_long);
+   BOOST_CHECK_EQUAL(fc::variant("4,ABCDEFG").as<symbol>().value(), SY(4, ABCDEFG));
+   BOOST_CHECK_EXCEPTION(fc::variant("4,ABCDEFGH").as<symbol>(), symbol_type_exception, too_long);
+   BOOST_CHECK_EQUAL(fc::variant("1.0000 ABCDEFG").as<asset>(), asset(10000, symbol(4, "ABCDEFG")));
+   BOOST_CHECK_EXCEPTION(fc::variant("1.0000 ABCDEFGH").as<asset>(), symbol_type_exception, too_long);
+
+   // an empty name is accepted: a zero symbol_code and a symbol without a name convert to a string and back
+   BOOST_CHECK_EQUAL(string_to_symbol(4, ""), 4u);
+   BOOST_CHECK_EQUAL(symbol(4, "").to_string(), "4,");
+   BOOST_CHECK_EQUAL(symbol::from_string("4,").value(), 4u);
+   BOOST_CHECK_EQUAL(fc::variant(symbol_code{0}).as_string(), "");
+   BOOST_CHECK_EQUAL(fc::variant("").as<symbol_code>().value, 0u);
 }
 
 struct permission_visitor {

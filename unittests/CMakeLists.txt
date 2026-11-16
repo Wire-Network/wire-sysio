@@ -86,6 +86,8 @@ endif()
 add_p_test(NAME protocol_feature_digest_unit_test COMMAND unit_test --run_test=protocol_feature_digest_tests --report_level=detailed --log_level=all --color_output)
 add_p_test(NAME sysvmoc_signal_handler_unit_test
            COMMAND unit_test --run_test=sysvmoc_signal_handler_tests --report_level=detailed --log_level=all --color_output)
+add_p_test(NAME thread_stack_size_unit_test
+           COMMAND unit_test --run_test=thread_stack_size_tests --report_level=detailed --log_level=all --color_output)
 # One entry per suite per runtime, <suite without _tests>_unit_test_<runtime>, discovered from the built executable.
 # To run unit_test with all log from blockchain displayed, put "--verbose" after "--", i.e. "unit_test -- --verbose".
 # COST starts the longest suites first, even on a fresh run before ctest has measured them.
@@ -93,7 +95,7 @@ boost_test_discover_tests(unit_test
         NAME @NAME@_unit_test_@RUNTIME@
         NAME_STRIP "s$" "_test$"
         RUNTIMES ${UNIT_TEST_RUNTIMES}
-        EXCLUDE "^(protocol_feature_digest|sysvmoc_signal_handler)_tests$" # registered above without a runtime
+        EXCLUDE "^(protocol_feature_digest|sysvmoc_signal_handler|thread_stack_size)_tests$" # registered above without a runtime
         ARGS --report_level=detailed --log_level=all --color_output
         COST_BY_NAME "^(api_part[1-3]|checktime|wasm_part[1-3]|wasm_config_part[1-5])$" 5000
              "^(snapshot_part[12]|finality)$" 4000
@@ -129,7 +131,7 @@ add_test(NAME kv_doc_links_unit_test_check
                  ${CMAKE_SOURCE_DIR}/docs/kv-behavior-spec.md ${CMAKE_SOURCE_DIR}/docs/kv-security-audit.md)
 # Include every unit_test entry, including the runtime-independent suites.
 set(ctest_tests
-    "'_unit_test_|^(protocol_feature_digest|sysvmoc_signal_handler)_unit_test' -LE wasm_spec_tests -j8")
+    "'_unit_test_|^(protocol_feature_digest|sysvmoc_signal_handler|thread_stack_size)_unit_test' -LE wasm_spec_tests -j8")
 
 ### COVERAGE TESTING ###
 if(ENABLE_COVERAGE_TESTING)

@@ -4178,6 +4178,7 @@ namespace chunk_rpc_fixture {
    constexpr auto skip_preflight_key = "skipPreflight";
    constexpr auto send_method = "sendTransaction";
    constexpr auto confirmed = "confirmed";
+   constexpr auto processed = "processed";
    constexpr auto signature = "cleanup-signature";
    constexpr auto timeout_error = "settled check scoped deadline expired";
    constexpr char payload = 'e';
@@ -4501,6 +4502,38 @@ BOOST_FIXTURE_TEST_CASE(cleanup_binding_sends_confirmed_preflight, chunk_member_
    const auto& config = request[chunk_rpc_fixture::params_key].get_array()[1].get_object();
    BOOST_CHECK_EQUAL(config[chunk_rpc_fixture::preflight_key].as_string(), chunk_rpc_fixture::confirmed);
    BOOST_CHECK(!config[chunk_rpc_fixture::skip_preflight_key].as_bool());
+} FC_LOG_AND_RETHROW();
+
+/// Data chunks return at processed; the terminal binding must wait through processed for confirmed.
+BOOST_FIXTURE_TEST_CASE(epoch_in_binding_confirms_only_terminal_delivery, chunk_member_fixture) try {
+   constexpr uint16_t total_chunks = 1;
+   constexpr std::string_view processed_status =
+      R"({"context":{"slot":1},"value":[{"slot":1,"confirmations":0,"err":null,"confirmationStatus":"processed"}]})";
+   constexpr auto delivery_budget = fc::seconds(8);
+   for (const bool terminal : {false, true}) {
+      auto replies = chunk_transaction_replies(1);
+      const auto confirmed_reply = chunk_transaction_replies(2).back();
+      replies.back() = chunk_rpc_reply(processed_status, chunk_rpc_fixture::requests_per_transaction);
+      if (terminal)
+         replies.push_back(confirmed_reply);
+      fc::test::capture_http_server server(std::move(replies));
+      entry->client = std::make_shared<solana_client>(entry->signature_provider, server.url());
+      sysio::opp_solana_outpost_client program(entry->client, resume_program_id,
+                                              {load_idl_fixture(opp_outpost_idl_fixture)});
+      const std::vector<uint8_t> data = terminal ? std::vector<uint8_t>{}
+                                                 : std::vector<uint8_t>{chunk_rpc_fixture::payload};
+      fc::task::deadline_scope deadline(fc::time_point::now() + delivery_budget);
+      BOOST_CHECK_EQUAL(program.epoch_in(reap_scenario::buffer_epoch, terminal ? total_chunks : 0,
+                                          total_chunks, sizeof(chunk_rpc_fixture::payload), data, {}),
+                        chunk_rpc_fixture::signature);
+      // An extra status request proves the terminal call did not accept processed success.
+      BOOST_REQUIRE_EQUAL(server.request_count(), chunk_rpc_fixture::requests_per_transaction + terminal);
+      const auto request = fc::json::from_string(server.request(1).body).get_object();
+      const auto& config = request[chunk_rpc_fixture::params_key].get_array()[1].get_object();
+      BOOST_CHECK_EQUAL(config[chunk_rpc_fixture::preflight_key].as_string(),
+                        terminal ? chunk_rpc_fixture::confirmed : chunk_rpc_fixture::processed);
+      BOOST_CHECK(!config[chunk_rpc_fixture::skip_preflight_key].as_bool());
+   }
 } FC_LOG_AND_RETHROW();
 
 /// A timed-out optional gate read restores the delivery scope and still sends the data and terminal transactions.

@@ -34,6 +34,9 @@ inline constexpr uint64_t MAX_TIME_SLOT_SEC = 30 * 24 * 60 * 60; ///< thirty-day
 constexpr name ROA_ACCOUNT = "sysio.roa"_n; ///< owner of the nodeowners / roastate tables
 constexpr name SYSTEM_ACCOUNT = "sysio"_n;  ///< system RAM pool payer
 
+constexpr name NODE_OWNERS_AUTHORITY = "sysio.nodes"_n; ///< `active` is a supermajority of the roa tier-1 owners
+constexpr name COUNCIL_AUTHORITY = "sysio.cncl"_n;      ///< `active` is a supermajority of the seated council
+
 /// Lifecycle phase of the shared election round.
 enum class election_phase : uint8_t {
    NOMINATING = 0, ///< vacant T1 owners may replace their flights
@@ -85,6 +88,11 @@ static_assert(SLATE_SIZE == 3, "the fixed action and state schema require a thre
  * (`startinit`/`loadtier`/`finalizeinit`, plus `reset`/`purge`), and the election
  * (`repcandidate`/`vote`/`settle`). `stir` is a public,
  * caller-authenticated entropy crank.
+ *
+ * The contract also maintains the two governance authorities `sysio` can be delegated to:
+ * `sysio.nodes@active` (the tier-1 node owners, refreshed by `syncnodes`) and `sysio.cncl@active`
+ * (the seated council, written when an election fills its last seat). It never changes `sysio`'s
+ * own permissions.
  */
 class [[sysio::contract("sysio.councl")]] council : public contract {
 public:
@@ -157,6 +165,14 @@ public:
    /// Authenticated entropy contribution. Never alters a seed already frozen for generation.
    [[sysio::action]]
    void stir(name caller);
+
+   // ---- Governance authorities ---------------------------------------------
+
+   /// Authenticated public crank. Replace `sysio.nodes@active` with the current roa tier-1 node
+   /// owners, each through its `active` permission, at a threshold of more than two thirds.
+   /// Fails while no tier-1 owner is registered.
+   [[sysio::action]]
+   void syncnodes(name caller);
 
    // -----------------------------------------------------------------------
    //  Tables
@@ -322,15 +338,21 @@ private:
    void open_voting(election_state& st, const config_state& cfg);
    /// Process a bounded prefix of remaining seats using tier/position priority and each tier's
    /// round-wide submitted-ballot denominator, including T1 ballots omitting their own flight.
+   /// Filling the last seat also grants the council its authority.
    void tabulate(election_state& st, const config_state& cfg, uint32_t max_steps);
    /// Persist a unique member/result without advancing any unrelated seat.
    void seat_member(election_state& st, const config_state& cfg, uint8_t seat, name member,
                     councl::election_tier filled_tier);
+   /// Replace `sysio.cncl@active` with the generation's 21 seated members, each through its
+   /// `active` permission, at a threshold of more than two thirds.
+   void grant_council_authority(const config_state& cfg);
    // roa helpers
    /// Read the current ROA network generation.
    uint8_t roa_network_gen() const;
    /// Count generation-scoped ROA owners in a tier.
    uint32_t tier_count(uint8_t network_gen, councl::election_tier tier) const;
+   /// List generation-scoped ROA owners in a tier.
+   std::vector<name> tier_owners(uint8_t network_gen, councl::election_tier tier) const;
 
    // convenience
    /// Return the frozen tier-1 owner associated with a council seat.

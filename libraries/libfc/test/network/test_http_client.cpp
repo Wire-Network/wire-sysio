@@ -1819,7 +1819,6 @@ BOOST_AUTO_TEST_CASE(slow_response_headers_time_out) {
    });
    fc::http::transport transport;
    auto options = tls_request_options();
-   options.timeouts.connect = fc::milliseconds(10);
    options.timeouts.header = fc::milliseconds(200);
    const auto start = std::chrono::steady_clock::now();
 

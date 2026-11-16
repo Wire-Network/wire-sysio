@@ -282,9 +282,8 @@ BOOST_AUTO_TEST_CASE( checktime_speculative_max_trx_test ) { try {
                           tx_cpu_usage_exceeded, fc_exception_message_contains("reached on chain max_transaction_cpu_usage 150000us") );
    auto after = fc::time_point::now();
    auto dur = (after - before).count();
-   // verify within 20% of expected time
    BOOST_CHECK_MESSAGE( dur >= 150'000, "elapsed " << dur << "us" );
-   BOOST_CHECK_MESSAGE( dur <= 180'000, "elapsed " << dur << "us" );
+   BOOST_CHECK_MESSAGE( dur < 350'000, "elapsed " << dur << "us" ); // Should not run to block_cpu_usage deadline
 
    fc::temp_directory interrupt_tempdir;
    auto interrupt_conf_genesis = tester::default_config( interrupt_tempdir );

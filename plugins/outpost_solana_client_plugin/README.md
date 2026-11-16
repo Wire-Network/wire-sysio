@@ -473,6 +473,10 @@ than on the first drain.
 
 ### Solana Transaction Budgets
 
+Data chunk uploads confirm at `processed`; the terminal `epoch_in` waits for
+`confirmed`. The job retries after the depot epoch boundary until this operator's
+inbound reply, read at `finalized`, is recorded by the depot.
+
 Envelope data chunks stay bare so the full 668-byte chunk remains within Solana's
 1,232-byte packet limit. The separate zero-data terminal `epoch_in` call and every
 `dispatch_attestations` round use the producer's ordered ComputeBudget preamble:

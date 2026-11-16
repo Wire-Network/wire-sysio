@@ -51,6 +51,10 @@ include(boost-test-discovery)
 add_p_test(NAME boost_test_discovery_test
            COMMAND ${CMAKE_COMMAND} -DGENERATOR=${CMAKE_GENERATOR} -DCXX=${CMAKE_CXX_COMPILER} -DCONFIG=$<CONFIG>
                    -P ${CMAKE_SOURCE_DIR}/cmake/test/boost-test-discovery-test.cmake)
+add_p_test(NAME sys_vm_submodule_test
+           COMMAND ${CMAKE_COMMAND} -DGENERATOR=${CMAKE_GENERATOR} -DCXX=${CMAKE_CXX_COMPILER} -DCONFIG=$<CONFIG>
+                   -DSOURCE_DIR=${CMAKE_SOURCE_DIR} -DWORK_DIR=${CMAKE_BINARY_DIR}/cmake-test/sys-vm-submodule
+                   -DSOFTFLOAT_DIR=${softfloat_DIR} -P ${CMAKE_SOURCE_DIR}/cmake/test/sys-vm-submodule-test.cmake)
 
 set(CLI_CLIENT_EXECUTABLE_NAME clio)
 set(NODE_EXECUTABLE_NAME nodeop)

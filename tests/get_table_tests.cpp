@@ -2818,6 +2818,50 @@ BOOST_FIXTURE_TEST_CASE( get_table_scope_zero_test, validating_tester ) try {
 
 } FC_LOG_AND_RETHROW()
 
+// A scope or symbol longer than a symbol name is rejected, not read as the symbol its first 7 characters name
+BOOST_FIXTURE_TEST_CASE( symbol_name_length_test, validating_tester ) try {
+   produce_block();
+   create_accounts({"sysio.token"_n});
+   produce_block();
+
+   set_code("sysio.token"_n, test_contracts::sysio_token_wasm());
+   set_abi("sysio.token"_n, test_contracts::sysio_token_abi());
+   set_privileged("sysio.token"_n);
+   produce_block();
+
+   push_action("sysio.token"_n, "create"_n, "sysio.token"_n, mutable_variant_object()
+      ("issuer", "sysio")("maximum_supply", "1000000000.0000 ABCDEFG"));
+   produce_block();
+
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   chain_apis::read_only plugin(*(this->control), {}, {}, _tracked_votes,
+                                fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+
+   const uint64_t code = chain::symbol(0, "ABCDEFG").to_symbol_code();
+   BOOST_CHECK_EQUAL(code, chain_apis::convert_to_type<uint64_t>("ABCDEFG", "scope"));
+   BOOST_CHECK_THROW(chain_apis::convert_to_type<uint64_t>("ABCDEFGH", "scope"), chain_type_exception);
+   BOOST_CHECK_THROW(chain_apis::convert_to_type<uint64_t>("ABCDEFGHI", "scope"), chain_type_exception);
+
+   chain_apis::read_only::get_table_rows_params p;
+   p.json = true;
+   p.code = "sysio.token"_n;
+   p.table = "stat";
+   p.scope = "ABCDEFG";
+   BOOST_REQUIRE_EQUAL(1u, get_table_rows_full(plugin, p, fc::time_point::maximum()).rows.size());
+   p.scope = "ABCDEFGH";
+   BOOST_CHECK_THROW(plugin.get_table_rows(p, fc::time_point::maximum()), chain_type_exception);
+   p.scope = "ABCDEFGHI";
+   BOOST_CHECK_THROW(plugin.get_table_rows(p, fc::time_point::maximum()), chain_type_exception);
+
+   const fc::variant stats = plugin.get_currency_stats({"sysio.token"_n, "ABCDEFG"}, fc::time_point::maximum());
+   BOOST_CHECK(stats.get_object().contains("ABCDEFG"));
+   BOOST_CHECK_THROW(plugin.get_currency_stats({"sysio.token"_n, "ABCDEFGH"}, fc::time_point::maximum()),
+                     symbol_type_exception);
+   BOOST_CHECK_THROW(plugin.get_currency_stats({"sysio.token"_n, "ABCDEFGHI"}, fc::time_point::maximum()),
+                     symbol_type_exception);
+
+} FC_LOG_AND_RETHROW()
+
 // Gap 2: find + upper_bound should error (just like find + lower_bound)
 BOOST_FIXTURE_TEST_CASE( get_table_find_upper_bound_error_test, validating_tester ) try {
    produce_block();

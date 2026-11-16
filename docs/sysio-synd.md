@@ -59,7 +59,8 @@ independent bounded phases:
 Syndication uses bond's durable `requestkeep` interface. A terminal request cannot be pruned before
 syndication records and acknowledges its outcome, even when all payouts were claimed and seven days
 have passed. There is no polling deadline. Delayed synchronization delays progress, not recoverability.
-An INVALID outcome discovered after DONE rewinds settlement to that envelope.
+A ruling recorded for an envelope the release walk is past, an INVALID one after DONE or either one on a
+held envelope, rewinds `queue_epoch` to that envelope.
 
 The stable request identity is `(issuer, schema, statement)`, resolved through bond's public accessor.
 An inline `syncenv` after creation records the actual numeric ID; syndication never predicts bond's
@@ -98,9 +99,9 @@ bonded can be challenged, since the bond exists for exactly that case. The chall
 request's hold bond plus the pair's `challenge_extra`; a charge of zero is refused (`challenge charge is
 zero; configure challenge_extra`). The extra stays in the fee pot, and `sysio.synd` holds the request
 through `sysio.bond::hold` naming the challenger as beneficiary. The envelope is HELD until a judge
-rules (the `sysio.bond` judge account or `sysio`), and the pair's `queue_epoch` is rewound to it so
-the ruling is processed. One challenge per request; contract accounts may challenge. The hold
-carries the challenger's authority, and its
+rules (the `sysio.bond` judge account or `sysio`). The release walk moves on past it, and recording the
+ruling rewinds the pair's `queue_epoch` to it so the ruling is processed. One challenge per request;
+contract accounts may challenge. The hold carries the challenger's authority, and its
 hold-bond escrow on `sysio.bond` bills the challenger's RAM, so a challenger without that RAM cannot
 challenge. The fee pot row bills `sysio`.
 
@@ -108,7 +109,8 @@ A request that is not yet fully bonded cannot be challenged (`the envelope's req
 bonded; it cannot be challenged yet`). Nothing has been released while it is OPEN, and a held request
 takes no more bonds, so holding it would stop every later envelope of the pair until a judge rules. An
 unbonded envelope in doubt is ruled INVALID directly (`sysio.bond::rslvinvalid`). A request
-held by a challenge is therefore always fully bonded, and holds back only its own envelope.
+held by a challenge is therefore always fully bonded, and holds back only its own envelope, however many
+later envelopes the pair has.
 
 - **VALID:** release resumes. The hold bond goes to the request's bonds, claimed with each underwriter's
   bond from `sysio.bond`; the challenger gets none of it back, and `challenge_extra` stays in the fee pot.
@@ -168,7 +170,7 @@ fee increase between quoting and execution.
    nothing would reach the outpost.
 6. The net rest is burned with `sysio.liq::burn` and queued to the outpost as `DESYNDICATE_LIQ`, with
    the next request id from `syndcounters`. `returns` retains the original holder, destination key,
-   outpost, token and exact net amount until its external outcome is established. The attestation
+   outpost, token and exact net amount until the outpost has consumed the envelope that carries it. The attestation
    carries `total_syndicated`, the live outstanding shadow after the burn; no historical total is stored.
    While the outpost already has `sysio.msgch`'s `MAX_QUEUED_ATTESTATIONS` (512) outbound attestations
    waiting, `queueout` refuses it and the whole `desyndicate` reverts, burn included.
@@ -193,26 +195,25 @@ The burn is final. An outpost either pays the release, stores it and pays it lat
   `amount out of range` and `unresolvable recipient` (`SyndicationPool.sol:594-618`), each a
   `DesyndicationDropped(requestId, depotAmount, reason)` event (`:220`).
 
-**Return resolution.** Both actions below require `sysio` and an existing outstanding request:
+**Return lifetime.** A `returns` row lives until the outpost has consumed the envelope that carried it.
+`sysio.msgch::buildenv` stamps the row with that envelope's epoch (`sent_epoch`), and an outpost emits its
+envelope for an epoch only after accepting the depot's, so the row is consumed once `sysio.msgch`'s
+`outpcons` epoch for the outpost reaches `sent_epoch`. Each `desyndicate` erases up to two consumed rows
+of its outpost, oldest first, before writing its own. Nothing else erases them: the rows left when
+desyndication to an outpost stops stay until the next one.
 
-- `finishreturn(request_id)` attests the external obligation was paid/completed and removes it without
-  any depot credit.
-- `refundreturn(request_id)` attests irreversible external rejection/cancellation: nothing was paid and
-  no payable external obligation remains. It restores the exact stored net amount to the original
-  holder, then consumes the obligation atomically. The fee stays charged. A failed mint rolls back the
-  removal. Repeating either action on an already resolved ID fails; IDs are never reused.
+**Repairing a release.** Paying and storing need nothing on the depot. A release the outpost dropped, or
+one an outpost never consumes, is repaired by governance (`sysio`):
 
-These are trusted governance determinations based on external evidence, not on-chain verification of
-external finality. A queued or pending payout, timeout, transient refusal, or duplicate-request response
-never justifies a refund: the external obligation may still pay. Governance must establish irreversible
-rejection/cancellation, including no stored payout and no prior payment. In particular an `already paid`
-or `already pending` response is not rejection of the underlying obligation.
+- `refundreturn(request_id)`, while the row exists: restores the exact stored net amount to the original
+  holder and erases the row in the same action. The fee stays charged, a failed mint rolls back the
+  erase, and a repeat fails.
+- `sysio.liq::recredit(holder, quantity)`, once the row has expired: the holder and net amount come from
+  the request's `desyndicate` trace and the outpost's drop event. It has no request-level deduplication,
+  so never use it for a request that still has a row.
 
-No receipt protocol, automatic timeout refund, or permanent return history is introduced. The original
-holder and destination are retained while needed; governance does not reconstruct them from old traces.
-`sysio.liq::recredit(holder, quantity)` remains its existing exceptional privileged supply-repair facility,
-with unchanged authorization. It is not the normal return recovery interface and has no request-level
-deduplication; operators must use `refundreturn` for these outstanding obligations.
+Either is a trusted governance determination from external evidence. A queued or pending payout, a
+timeout, or an `already paid` / `already pending` response is not a rejection: the release may still pay.
 
 ## The solvency check
 
@@ -309,8 +310,8 @@ Every writer of the depot outstanding is matched by custody, or is a launch or g
 | `mintyield` (pending) | `:138-150` | the yield the outpost claimed into custody before it reported it |
 | `queueyield` | `:205` | moves pending into supply; the outstanding is unchanged |
 | `burn` | `:118` | lowers the outstanding: a desyndication, an INVALID ruling, `dropenv` |
-| `mint` (from `refundreturn`) | governance | restores a tracked return only after irreversible external cancellation; erases the return atomically |
-| `recredit` | privileged repair | exceptional repair only; never recover a tracked return through this action |
+| `mint` (from `refundreturn`) | governance | restores a return that still has its row, only after irreversible external cancellation; erases the row atomically |
+| `recredit` | privileged repair | exceptional repair only; never for a return that still has its row |
 | `regliqpool` | `:355` | launch: the LCO liquidity, "already in outpost custody" (`:353-354`) |
 
 ### What happens on each side
@@ -521,7 +522,7 @@ Repeated freezes cannot raise capacity beyond that cap.
 | `parked` | token, key family, pubkey | balance, yield position, active principal batch id and unattributed imported principal of an unlinked pubkey |
 | `buckets` | outpost, token, direction | level and the depot epoch last ticked, one per direction (SYNDICATION, DESYNDICATION) |
 | `ledger` | outpost, token | release and underwriting cursors; `retained_from_epoch` replay floor |
-| `returns` | request id | original holder, destination family/key, outpost, token and exact net burned amount; erased upon explicit resolution |
+| `returns` | request id | original holder, destination family/key, outpost, token, exact net burned amount and `sent_epoch`; erased by a later `desyndicate` once the outpost has consumed its envelope, or by `refundreturn` |
 | `feepot` | token | collected fees, with a yield position; bounties are paid from it, and its yield goes to `sysio` |
 | `yieldpool` | token | the WIRE `sysio.synd`'s holder row earned, pulled from `sysio.liq` and credited out to held, parked and fee positions |
 | `syndcursors` | outpost | the highest sequence admitted (replay guard) |
