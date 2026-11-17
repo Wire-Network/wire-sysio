@@ -413,6 +413,20 @@ auto abi_serializer_resolver_empty = [](const name& account) -> std::optional<ab
    return std::optional<abi_serializer>();
 };
 
+/// Builds a packed transaction from its JSON form through the constructors, which inflate a zlib-compressed one.
+/// `signatures` and `compression` may be omitted.
+packed_transaction to_packed_transaction(const fc::variant& var) {
+   fc::mutable_variant_object mvo(var);
+   if (!mvo.contains("signatures"))
+      mvo("signatures", fc::variants());
+   if (!mvo.contains("compression"))
+      mvo("compression", packed_transaction::compression_type::none);
+   packed_transaction ptrx;
+   abi_serializer::from_variant(fc::variant(std::move(mvo)), ptrx, abi_serializer_resolver_empty,
+                                abi_serializer::create_yield_function(abi_serializer_max_time));
+   return ptrx;
+}
+
 void prompt_for_wallet_password(string& pw, const string& name) {
    if(pw.size() == 0 && name != "SecureEnclave") {
       std::cout << localized("password: ");
@@ -2061,7 +2075,7 @@ int main( int argc, char** argv ) {
       fc::variant packed_trx_var = json_from_file_or_string( packed_transaction_json );
       packed_transaction packed_trx;
       try {
-         fc::from_variant<packed_transaction>( packed_trx_var, packed_trx );
+         packed_trx = to_packed_transaction( packed_trx_var );
       } SYS_RETHROW_EXCEPTIONS( transaction_type_exception, "Invalid packed transaction format: '{}'",
                                 fc::json::to_string(packed_trx_var, fc::time_point::maximum()))
       signed_transaction strx = packed_trx.get_signed_transaction();
@@ -3377,7 +3391,7 @@ int main( int argc, char** argv ) {
          if( vo.contains("packed_trx") ) {
             packed_transaction packed_trx;
             try {
-              fc::from_variant<packed_transaction>( trx_var, packed_trx );
+              packed_trx = to_packed_transaction( trx_var );
             } SYS_RETHROW_EXCEPTIONS( transaction_type_exception, "Invalid packed transaction format: '{}'",
                                       fc::json::to_string(trx_var, fc::time_point::maximum()))
            const signed_transaction& strx = packed_trx.get_signed_transaction();

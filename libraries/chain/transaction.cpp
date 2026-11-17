@@ -384,9 +384,12 @@ void packed_transaction::reflector_init()
    static_assert(fc::raw::has_feature_reflector_init_on_unpacked_reflected_types,
                  "FC unpack needs to call reflector_init otherwise unpacked_trx will not be initialized");
    SYS_ASSERT( unpacked_trx.expiration == time_point_sec(), tx_decompression_error, "packed_transaction already unpacked" );
+   // The wire format has no compression and no context-free data: p2p messages and blocks never carry them.
+   // Compression is accepted only from HTTP clients, through the constructors.
+   SYS_ASSERT( compression == compression_type::none, tx_compression_not_allowed,
+               "packed transaction cannot be compressed" );
+   SYS_ASSERT( packed_context_free_data.empty(), transaction_exception, "context-free data is not supported" );
    local_unpack_transaction({});
-   local_unpack_context_free_data();
-   decompress();
    init();
 }
 
@@ -422,6 +425,10 @@ void packed_transaction::local_unpack_context_free_data()
          default:
             SYS_THROW( unknown_transaction_compression, "Unknown transaction compression algorithm" );
       }
+      // The JavaScript SDK sends the packed empty list (0x00) with every transaction; clearing it keeps those
+      // transactions valid while no context-free data reaches binary form.
+      if( unpacked_trx.context_free_data.empty() )
+         packed_context_free_data.clear();
    } FC_CAPTURE_AND_RETHROW( "{}", compression.to_string() )
 }
 
