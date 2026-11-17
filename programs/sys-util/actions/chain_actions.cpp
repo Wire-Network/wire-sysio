@@ -1,7 +1,6 @@
 #include "chain_actions.hpp"
 
 #include <filesystem>
-#include <fstream>
 #include <iostream>
 
 #include <fc/io/json.hpp>
@@ -79,20 +78,16 @@ int chain_actions::run_subcommand_sstate() {
 
   auto shared_mem_path = state_dir / "shared_memory.bin";
 
-  if (!std::filesystem::exists(shared_mem_path)) {
-    std::cerr << "Unable to read database status: file not found: " << shared_mem_path << std::endl;
-    return -1;
-  }
-
-  char header[chainbase::header_size];
-  std::ifstream hs(shared_mem_path.generic_string(), std::ifstream::binary);
-  hs.read(header, chainbase::header_size);
-  if (hs.fail()) {
+  const std::optional<chainbase::db_header> dbheader = chainbase::read_db_header(shared_mem_path);
+  if (!dbheader) {
+    if (!std::filesystem::exists(shared_mem_path)) {
+      std::cerr << "Unable to read database status: file not found: " << shared_mem_path << std::endl;
+      return -1;
+    }
     std::cerr << "Unable to read database status: file invalid or corrupt" << shared_mem_path << std::endl;
     return -1;
   }
 
-  auto dbheader = reinterpret_cast<chainbase::db_header*>(header);
   if (dbheader->id != chainbase::header_id) {
     std::string what_str(
       "\"" + state_dir.generic_string() + "\" database format not compatible with this version of chainbase."
