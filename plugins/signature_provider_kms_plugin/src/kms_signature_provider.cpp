@@ -74,9 +74,6 @@ const secp256k1_context* kms_secp_ctx() {
    return ctx;
 }
 
-/// `fc::ecc::compact_signature` header base: 27 + 4 (compressed-key flag), plus the recovery id.
-constexpr unsigned char k1_compact_header_base = 31;
-
 /// How a signature from a secp256k1 KMS key is packed for the key type the spec names.
 enum class secp256k1_signature_format {
    ethereum, ///< `der_to_eth_signature`, held in an `fc::em::signature_shim`
@@ -597,7 +594,7 @@ fc::ecc::compact_signature der_to_wire_k1_signature(
    const unsigned char rec_id = recover_v(compact, digest, expected_pubkey);
 
    fc::ecc::compact_signature out{};
-   out[0] = static_cast<unsigned char>(k1_compact_header_base + rec_id);
+   out[0] = static_cast<unsigned char>(fc::ecc::compact_signature_compressed_header + rec_id);
    std::ranges::copy(compact, out.begin() + 1);
    return out;
 }

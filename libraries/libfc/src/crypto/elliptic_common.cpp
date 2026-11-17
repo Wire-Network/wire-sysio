@@ -118,13 +118,6 @@ namespace fc { namespace ecc {
         return (fp[0] << 24) | (fp[1] << 16) | (fp[2] << 8) | fp[3];
     }
 
-    bool public_key::is_canonical( const compact_signature& c ) {
-        return !(c[1] & 0x80)
-               && !(c[1] == 0 && !(c[2] & 0x80))
-               && !(c[33] & 0x80)
-               && !(c[33] == 0 && !(c[34] & 0x80));
-    }
-
     private_key_secret private_key::get_secret( const EC_KEY * const k )
     {
        if( !k )
