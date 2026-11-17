@@ -171,7 +171,7 @@ private:
                reason += "other";
             }
             fc_dlog(_log, "Failed {} trxs, account: {}, sub bill: {}us, reason: {}",
-                    e.second.num_failures, e.first, sub_bill.get_subjective_bill(e.first, now), reason);
+                    e.second.num_failures, e.first, sub_bill.get_subjective_bill(e.first, now).cpu, reason);
          }
       }
    }
@@ -1488,19 +1488,24 @@ void producer_plugin::set_program_options(
           "Sets the time to return full subjective cpu for accounts")
          ("subjective-account-cpu-allowed-us", bpo::value<int64_t>()->default_value( config::default_subjective_cpu_us ),
           "Sets the maximum allowed CPU, above account CPU, that can be used by an authorizing account within subjective-account-decay-time-minutes")
+         ("subjective-account-net-allowed-bytes",
+          bpo::value<uint64_t>()->default_value( config::default_subjective_net_bytes ),
+          "Sets the maximum allowed NET bytes, above account NET, that can be used by an authorizing account within "
+          "subjective-account-decay-time-minutes")
          ("incoming-transaction-queue-size-mb", bpo::value<uint16_t>()->default_value( 1024 ),
           "Maximum size (in MiB) of the incoming transaction queue. Exceeding this value will subjectively drop transaction with resource exhaustion.")
          ("disable-subjective-account-billing", boost::program_options::value<vector<string>>()->composing()->multitoken(),
-          "Account which is excluded from subjective CPU billing")
+          "Account which is excluded from subjective CPU and NET billing")
          ("disable-subjective-payer-billing", bpo::value<bool>()->default_value(true),
           "Disable subjective CPU billing for all contract payer accounts. On by default: under "
           "contract-pays the payer is the called contract, so billing it for its callers' failures "
           "charges the party provisioned to absorb traffic rather than the account causing it")
          ("disable-subjective-sysio-authorizer-billing", bpo::value<bool>()->default_value(false),
-          "Disable keeping the subjective CPU billed to the first authorizer of an action paid by a sysio.* "
-          "contract once its transaction is in a block. Kept by default: sysio.* contracts have unlimited CPU, so this "
-          "charge, read from every block and decaying over subjective-account-decay-time-minutes, is what limits "
-          "their callers to subjective-account-cpu-allowed-us plus their own CPU limit")
+          "Disable keeping the subjective CPU and NET billed to the first authorizer of an action paid by a sysio.* "
+          "contract once its transaction is in a block. Kept by default: sysio.* contracts have unlimited CPU and NET, "
+          "so these charges, read from every block and decaying over subjective-account-decay-time-minutes, are what "
+          "limit their callers to subjective-account-cpu-allowed-us and subjective-account-net-allowed-bytes plus "
+          "their own limits")
          ("disable-subjective-p2p-billing", bpo::value<bool>()->default_value(false),
           "Disable subjective CPU billing for P2P transactions")
          ("disable-subjective-api-billing", bpo::value<bool>()->default_value(false),
@@ -1628,6 +1633,8 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
    _unapplied_transactions.set_max_transaction_queue_size(max_incoming_transaction_queue_size);
 
    chain.get_mutable_subjective_billing().set_subjective_account_cpu_allowed(fc::microseconds(options.at("subjective-account-cpu-allowed-us").as<int64_t>()));
+   chain.get_mutable_subjective_billing().set_subjective_account_net_allowed(
+      options.at("subjective-account-net-allowed-bytes").as<uint64_t>());
    _disable_subjective_p2p_billing = options.at("disable-subjective-p2p-billing").as<bool>();
    _disable_subjective_api_billing = options.at("disable-subjective-api-billing").as<bool>();
    chain.get_mutable_subjective_billing().disable_payer_billing(options.at("disable-subjective-payer-billing").as<bool>());
@@ -1903,7 +1910,8 @@ void producer_plugin_impl::plugin_startup() {
             [&](size_t i) {
                chain.init_thread_local_data();
                _ro_timers[i] = &chain.get_thread_local_timer();
-            });
+            },
+            config::contract_thread_stack_size);
 
          _time_tracker.pause(); // start_write_window assumes time_tracker is paused
          start_write_window();

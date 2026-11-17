@@ -1,20 +1,15 @@
+#include <fc/detail/integer_range.hpp>
 #include <fc/int256.hpp>
-#include <fc/crypto/hex.hpp>
+#include <fc/variant.hpp>
 
 namespace fc {
-fc::uint256 to_uint256(const fc::variant& v) {
-   auto s = v.as_string();
-   if (all_digits(s))
-      return fc::uint256(s);
 
-   return fc::uint256(fc::from_hex(s));
+fc::uint256 to_uint256(const fc::variant& v) {
+   return detail::parse_256bit<fc::uint256>(v.as_string(), detail::hex_prefix_rule::optional);
 }
 
 fc::int256 to_int256(const fc::variant& v) {
-   auto s = v.as_string();
-   if (all_digits(s))
-      return fc::int256(s);
+   return detail::parse_256bit<fc::int256>(v.as_string(), detail::hex_prefix_rule::optional);
+}
 
-   return fc::int256(fc::from_hex(s));
-}
-}
+} // namespace fc

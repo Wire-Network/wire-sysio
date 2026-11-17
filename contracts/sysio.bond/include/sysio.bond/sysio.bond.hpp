@@ -7,9 +7,13 @@
  * depot-native token and an optional bounty. Underwriters bond the statement in increments of 0.01
  * token until the bonded amount reaches the covered amount; a challenge window then runs. When it
  * passes with no hold the request is APPROVED. The issuer may instead hold the request by posting a
- * hold bond, and `sysio` rules it VALID or INVALID. Approval and the rulings only change state and
+ * hold bond, and a judge rules it VALID or INVALID. Approval and the rulings only change state and
  * record what each party may claim; they send no transfer and notify no one. Every payout is pulled
  * one account at a time through `claim`, so no party can block another's.
+ *
+ * The rulings are authorized through native account permissions: they require this contract's own
+ * account, and bootstrap links each to a `sysio.bond` permission whose authority delegates to
+ * governance and the judge account.
  *
  * Depot-native tokens only: WIRE on `sysio.token`, or a shadow LIQ symbol on `sysio.liq`. Every bond
  * and escrow of a shadow token embeds a shadow-custody `position`, so the WIRE yield the contract's
@@ -140,8 +144,8 @@ inline constexpr std::string_view amount_range_msg = "amount exceeds the asset r
          BONDED,     ///< bonded equals covered; the challenge window runs from `bonded_at`
          APPROVED,   ///< the window passed with no hold
          HELD,       ///< the issuer posted a hold bond; awaiting a ruling
-         VALID,      ///< `sysio` ruled the statement true
-         INVALID     ///< `sysio` ruled the statement false
+         VALID,      ///< a judge ruled the statement true
+         INVALID     ///< a judge ruled the statement false
       };
 
       /// What an escrow row holds for a request.
@@ -207,13 +211,13 @@ inline constexpr std::string_view amount_range_msg = "amount exceeds the asset r
       /// Rule request `request_id`, not terminal and bonded or not, VALID. Sends nothing: the bonds
       /// stay for their underwriters to claim with their stake's share of the bounty and the hold
       /// bond, and the escrows record the unbonded share of the bounty for `sysio` and the unbonded
-      /// share of the hold bond for the issuer, each to claim. Auth=sysio.
+      /// share of the hold bond for the issuer, each to claim. Auth=get_self().
       [[sysio::action]] void rslvvalid(uint64_t request_id);
 
       /// Rule request `request_id`, not terminal and bonded or not, INVALID. Sends nothing: the
       /// request records the whole bonded amount as the issuer's forfeit, and the escrows record the
       /// hold bond and the bounty for the hold beneficiary after a hold, otherwise the bounty for the
-      /// issuer, each to claim. Auth=sysio.
+      /// issuer, each to claim. Auth=get_self().
       [[sysio::action]] void rslvinvalid(uint64_t request_id);
 
       // -----------------------------------------------------------------------

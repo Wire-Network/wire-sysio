@@ -21,7 +21,8 @@
  *   1. `sync(limit)` advances a persistent envelope cursor, including DONE envelopes awaiting finality.
  *      `syncenv` targets one envelope. Terminal outcomes and settlement snapshots are recorded before
  *      acknowledging bond. This phase moves no funds and operates while the cord is pulled.
- *   2. FIFO release advances from `queue_epoch`. BONDED makes an envelope RELEASABLE; HELD pauses it.
+ *   2. FIFO release advances from `queue_epoch`. BONDED makes an envelope RELEASABLE; HELD pauses it, and
+ *      the walk moves on past a fully bonded hold.
  *      Syndications pass through the bucket and fee into linked accounts or parked balances. Yield
  *      reports use mintyield. INVALID burns from the snapshotted settlement, which does not run while
  *      frozen. Empty item sets become DONE.
@@ -30,7 +31,8 @@
  *      requestkeep retains outcomes until acknowledged. A queued syncenv records the real assigned ID.
  * Each of phases 2 and 3 has its own `limit` work budget and `4 * limit` examination cap, with separate
  * pair cursors. Outcome consumption therefore does not require a large release budget or a polling
- * deadline. Late settlement discovered after DONE rewinds the release cursor to that envelope. `limit`
+ * deadline. A ruling recorded for an envelope the release walk is past, DONE or held, rewinds the release
+ * cursor to that envelope. `limit`
  * is clamped to MAX_CRANK_LIMIT, so a caller cannot choose the CPU this contract pays.
  *
  * Challenge. Any account may `challenge` an envelope that is REQUESTED, RELEASABLE or DONE while its
@@ -38,9 +40,10 @@
  * envelope's token (a charge of zero is refused), the extra stays in `feepot`, and this contract, the
  * issuer, holds the request through `sysio.bond::hold` naming the challenger as the beneficiary, with
  * the challenger's authority, so the hold-bond escrow bills the challenger's RAM. The envelope is HELD
- * and releases nothing more until `sysio` rules, and the pair's queue is rewound to it. One challenge
+ * and releases nothing more until a judge rules; later envelopes of the pair keep releasing, and the pair's
+ * queue is rewound to it when the ruling is recorded. One challenge
  * per request. An OPEN request cannot be challenged: nothing has released, and a held
- * request takes no more bonds, so it would stop the pair until `sysio` rules. A VALID ruling pays the
+ * request takes no more bonds, so it would stop the pair until a judge rules. A VALID ruling pays the
  * hold bond to the request's bonds; an INVALID one pays it and the bounty to the challenger.
  *
  * An envelope ruled INVALID. The step that first sees the ruling snapshots the forfeit (the bonded
@@ -181,7 +184,7 @@ namespace sysio {
          WAITING,      ///< closed by `closeenv`; waiting for its underwriting request
          REQUESTED,    ///< its `sysio.bond` request is issued and not yet bonded or ruled
          RELEASABLE,   ///< the request is BONDED, APPROVED or VALID: items may be released
-         HELD,         ///< the request is held; nothing releases until `sysio` rules
+         HELD,         ///< the request is held; nothing releases until a judge rules
          INVALID,      ///< the request was ruled INVALID: the envelope is burned and its forfeit pulled
          DONE          ///< every item is released
       };
@@ -265,8 +268,8 @@ namespace sysio {
       enum class request_outcome : uint8_t {
          PENDING,    ///< not seen terminal yet: the request row is read on every step
          APPROVED,   ///< the challenge window passed with no hold
-         VALID,      ///< `sysio` ruled the statement true
-         INVALID     ///< `sysio` ruled the statement false
+         VALID,      ///< a judge ruled the statement true
+         INVALID     ///< a judge ruled the statement false
       };
 
       /// Which flow a leaky bucket limits.
@@ -392,8 +395,8 @@ namespace sysio {
       /// bond (`sysio.bond::hold_bond_of` at `sysio.bond`'s `hold_bps`) plus the pair's `challenge_extra` in
       /// the envelope's token; the extra goes to `feepot`, and `sysio.bond::hold` holds the request,
       /// pulling the hold bond back out of this contract and naming `challenger` as the beneficiary of an
-      /// INVALID ruling. The envelope becomes HELD, and the pair's `queue_epoch` is rewound to it so the
-      /// queue processes the ruling even for an envelope it had finished. A charge of zero (a hold bond
+      /// INVALID ruling. The envelope becomes HELD and holds back only itself: the release walk moves on past
+      /// it, and recording the ruling rewinds the pair's `queue_epoch` to it. A charge of zero (a hold bond
       /// that rounds to zero and no `challenge_extra`) is refused, and so is a request not yet fully
       /// bonded. One challenge per request. `challenger` may not be this contract or `sysio.bond`.
       /// Challenger's authority, which the `hold` carries too: the hold-bond escrow it creates on
@@ -586,8 +589,8 @@ namespace sysio {
       struct [[sysio::table("ledger")]] ledger_row {
          sysio::slug_name chain_code;            ///< the outpost
          sysio::slug_name token_code;            ///< the liq token
-         /// The queue's cursor: no envelope of an earlier epoch is left to refresh or release, so the
-         /// queue step starts here.
+         /// The queue's cursor: every envelope of an earlier epoch is finished or is a fully bonded hold
+         /// awaiting its ruling, so the queue step starts here.
          uint32_t         queue_epoch      = 0;
          uint32_t         underwriting_epoch = 0; ///< oldest envelope still gating issuance, independent of release
          uint64_t retained_from_epoch = 0; ///< epochs below this floor were compacted and cannot reopen

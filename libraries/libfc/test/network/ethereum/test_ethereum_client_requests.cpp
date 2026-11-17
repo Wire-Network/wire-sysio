@@ -301,4 +301,14 @@ BOOST_AUTO_TEST_CASE(chain_reads_send_canonical_addresses_blocks_and_hashes) try
                      std::string(test_tx_hash));
 } FC_LOG_AND_RETHROW();
 
+/// A network version is decimal even after a leading zero, and a block number past 2^256 - 1 is refused
+/// instead of wrapping.
+BOOST_AUTO_TEST_CASE(network_version_and_block_number_are_read_whole) try {
+   const std::string past_max_block_number = "\"0x1" + std::string(64, '0') + "\"";
+   recorded_client recorded({reply("\"010\""), reply(past_max_block_number, 2)});
+
+   BOOST_CHECK_EQUAL(recorded.client->get_network_version(), fc::uint256{10});
+   BOOST_CHECK_THROW(recorded.client->get_block_number(), fc::parse_error_exception);
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_SUITE_END()
