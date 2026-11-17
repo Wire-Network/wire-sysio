@@ -13,6 +13,13 @@ using namespace sysio::trace_api::test_common;
 
 namespace {
 
+/// Distinct records used to verify that moving a reader transfers the intended mapping.
+constexpr uint64_t first_move_prefix = 1;
+constexpr uint64_t second_move_prefix = 2;
+constexpr uint32_t first_move_block = 10;
+constexpr uint32_t second_move_block = 20;
+constexpr uint32_t missing_move_block = 0;
+
 struct trx_id_index_fixture {
    fc::temp_directory tempdir;
 
@@ -28,34 +35,38 @@ BOOST_AUTO_TEST_SUITE(trx_id_index_tests)
 /// Moving a reader transfers its bucket view and prevents further lookups through the source.
 BOOST_FIXTURE_TEST_CASE(move_constructor_transfers_mapping, trx_id_index_fixture) {
    trx_id_index_writer writer;
-   writer.add(make_trx_id(1), 10);
+   writer.add(make_trx_id(first_move_prefix), first_move_block);
    writer.write(index_path());
    trx_id_index_reader source(index_path());
    trx_id_index_reader destination(std::move(source));
    BOOST_REQUIRE(destination.valid());
-   BOOST_CHECK_EQUAL(destination.lookup(make_trx_id(1)).value_or(0), 10u);
+   BOOST_CHECK_EQUAL(destination.lookup(make_trx_id(first_move_prefix)).value_or(missing_move_block),
+                     first_move_block);
    BOOST_CHECK(!source.valid());
-   BOOST_CHECK(!source.lookup(make_trx_id(1)));
+   BOOST_CHECK(!source.lookup(make_trx_id(first_move_prefix)));
 }
 
 /// Move assignment releases an existing mapping, retains the new records, and tolerates self assignment.
 BOOST_FIXTURE_TEST_CASE(move_assignment_replaces_mapping, trx_id_index_fixture) {
    trx_id_index_writer writer;
-   writer.add(make_trx_id(1), 10);
+   writer.add(make_trx_id(first_move_prefix), first_move_block);
    writer.write(index_path());
    trx_id_index_reader destination(index_path());
-   writer.add(make_trx_id(2), 20);
+   writer.add(make_trx_id(second_move_prefix), second_move_block);
    writer.write(index_path());
    trx_id_index_reader source(index_path());
    destination = std::move(source);
    BOOST_REQUIRE(destination.valid());
-   BOOST_CHECK_EQUAL(destination.lookup(make_trx_id(1)).value_or(0), 10u);
-   BOOST_CHECK_EQUAL(destination.lookup(make_trx_id(2)).value_or(0), 20u);
+   BOOST_CHECK_EQUAL(destination.lookup(make_trx_id(first_move_prefix)).value_or(missing_move_block),
+                     first_move_block);
+   BOOST_CHECK_EQUAL(destination.lookup(make_trx_id(second_move_prefix)).value_or(missing_move_block),
+                     second_move_block);
    BOOST_CHECK(!source.valid());
-   BOOST_CHECK(!source.lookup(make_trx_id(2)));
+   BOOST_CHECK(!source.lookup(make_trx_id(second_move_prefix)));
    auto* same = &destination;
    destination = std::move(*same);
-   BOOST_CHECK_EQUAL(destination.lookup(make_trx_id(2)).value_or(0), 20u);
+   BOOST_CHECK_EQUAL(destination.lookup(make_trx_id(second_move_prefix)).value_or(missing_move_block),
+                     second_move_block);
 }
 
 /// Rebuilding replaces existing bytes and ignores crash leftovers instead of appending stale index data.

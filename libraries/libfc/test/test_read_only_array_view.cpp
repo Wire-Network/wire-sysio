@@ -45,12 +45,17 @@ static_assert(!has_read_only_view<record[]>);
 static_assert(fc::read_only_array_view<record>{}.empty());
 
 #if defined(__unix__) || defined(__APPLE__)
+/// Anonymous mappings have no backing file descriptor or file offset.
+constexpr int anonymous_mapping_fd = -1;
+constexpr off_t anonymous_mapping_offset = 0;
+
 /// Release a guarded mapping even when a test assertion aborts the case.
 struct guarded_mapping {
    static constexpr std::size_t page_count = 3;
    std::size_t page_size = static_cast<std::size_t>(::sysconf(_SC_PAGESIZE));
    std::size_t size = page_count * page_size;
-   void* base = ::mmap(nullptr, size, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+   void* base =
+      ::mmap(nullptr, size, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, anonymous_mapping_fd, anonymous_mapping_offset);
 
    ~guarded_mapping() {
       if (base != MAP_FAILED)

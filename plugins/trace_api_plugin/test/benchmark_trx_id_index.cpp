@@ -3,6 +3,7 @@
 
 #include <chrono>
 #include <iostream>
+#include <limits>
 #include <random>
 #include <stdexcept>
 #include <string>
@@ -17,6 +18,7 @@ constexpr std::size_t open_count = 1u << 10;
 constexpr std::size_t sample_count = 7;
 constexpr std::size_t collision_group_size = 32;
 constexpr std::size_t collision_group_stride = collision_group_size * 2;
+constexpr auto prefix_low_bits = std::numeric_limits<std::uint32_t>::digits;
 constexpr std::uint64_t random_seed = 0x7472616365696478;
 constexpr std::uint64_t missing_prefix_bit = std::uint64_t{1} << 63;
 constexpr std::string_view normal_file = "normal.log";
@@ -62,7 +64,7 @@ void measure_table(const std::filesystem::path& path, bool collisions) {
       const auto high = collisions ? index % collision_group_size : index + 1;
       const auto low =
          collisions ? (index / collision_group_size) * collision_group_stride : static_cast<std::uint32_t>(random());
-      const auto prefix = (std::uint64_t{high} << 32) | low;
+      const auto prefix = (std::uint64_t{high} << prefix_low_bits) | low;
       prefixes.push_back(prefix);
       writer.add(sysio::trace_api::test_common::make_trx_id(prefix), static_cast<std::uint32_t>(index + 1));
    }
