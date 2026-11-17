@@ -188,7 +188,8 @@ BOOST_FIXTURE_TEST_CASE( wrap_exec_direct, sysio_wrap_tester ) try {
                          } );
 } FC_LOG_AND_RETHROW()
 
-// exec reads the whole wrapped transaction: bytes after it, or transaction extensions, fail the action
+// exec reads the whole wrapped transaction: bytes after it, transaction extensions, or an encoding other than the
+// canonical one fail the action
 BOOST_FIXTURE_TEST_CASE( wrap_exec_reads_whole_transaction, sysio_wrap_tester ) try {
    const auto sign = [&]( signed_transaction& trx ) {
       trx.sign( get_private_key( "alice"_n, "active" ), control->get_chain_id() );
@@ -211,6 +212,20 @@ BOOST_FIXTURE_TEST_CASE( wrap_exec_reads_whole_transaction, sysio_wrap_tester ) 
    BOOST_REQUIRE_EXCEPTION(
       push_transaction( with_extension ), sysio_assert_message_exception,
       sysio_assert_message_is( "not allowed to `exec` a transaction with transaction extensions" ) );
+
+   // max_net_usage_words is zero and packs as one byte; write the same zero in two bytes
+   constexpr char continuation = '\x80';
+   const size_t max_net_usage_words_pos = fc::raw::pack_size( "alice"_n ) + fc::raw::pack_size( trx.expiration ) +
+                                          fc::raw::pack_size( trx.ref_block_num ) +
+                                          fc::raw::pack_size( trx.ref_block_prefix );
+   signed_transaction two_byte_zero( wrap_exec( "alice"_n, trx ), {}, {} );
+   auto& two_byte_zero_data = two_byte_zero.actions[0].data;
+   BOOST_REQUIRE( two_byte_zero_data.at( max_net_usage_words_pos ) == 0 );
+   two_byte_zero_data[max_net_usage_words_pos] = continuation;
+   two_byte_zero_data.insert( two_byte_zero_data.begin() + max_net_usage_words_pos + 1, 0 );
+   sign( two_byte_zero );
+   BOOST_REQUIRE_EXCEPTION( push_transaction( two_byte_zero ), sysio_assert_message_exception,
+                            sysio_assert_message_is( "transaction is not canonically serialized" ) );
 
    signed_transaction exact( wrap_exec( "alice"_n, trx ), {}, {} );
    sign( exact );

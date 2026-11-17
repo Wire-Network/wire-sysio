@@ -19,8 +19,11 @@
 
 #include <magic_enum/magic_enum.hpp>
 
+#include <algorithm>
 #include <array>
 #include <string>
+#include <string_view>
+#include <vector>
 
 namespace sysio_system::test_support {
 
@@ -130,6 +133,93 @@ typename Tester::action_result push_contract_action_and_produce_block(
    transaction_trace_ptr trace;
    return push_contract_action_and_produce_block(tester, contract, serializer, signer, action_name, data, trace,
                                                  std::move(authorization));
+}
+
+// ---------------------------------------------------------------------------
+//  Native permission delegation
+//
+//  A system contract delegates an action through a native child permission named after it and a
+//  `linkauth`. These act on such a permission the way a delegate does, and name the chain's own
+//  refusals so a negative test asserts why it was refused.
+// ---------------------------------------------------------------------------
+
+// The authorization manager's refusals of a declared authority, as it words them.
+inline constexpr std::string_view unsatisfied_authority_msg = "but does not have signatures for it";
+inline constexpr std::string_view irrelevant_authority_msg  = "declares irrelevant authority";
+inline constexpr std::string_view missing_permission_msg    = "authorizations include a non-existent permission";
+
+/// The authority any one of `delegates` satisfies alone through its `active`, in chain name order.
+inline authority delegated_authority(std::vector<name> delegates) {
+   std::sort(delegates.begin(), delegates.end());
+   authority auth{1, {}, {}};
+   for (auto delegate : delegates) auth.accounts.push_back({{delegate, config::active_name}, 1});
+   return auth;
+}
+
+/// Push one native permission action (`updateauth`, `linkauth`, ...) declared by `account@declared`
+/// and signed with `signer`'s active key, in its own block: what a delegate can do to the account
+/// through the permission it satisfies.
+template <typename Tester, typename NativeAction>
+typename Tester::action_result push_native_action_and_produce_block(Tester& tester, name account, name declared,
+                                                                    name signer, NativeAction&& native_action) {
+   try {
+      signed_transaction trx;
+      trx.actions.emplace_back(std::vector<permission_level>{{account, declared}},
+                               std::forward<NativeAction>(native_action));
+      tester.set_transaction_headers(trx);
+      trx.sign(tester.get_private_key(signer, "active"), tester.control->get_chain_id());
+      tester.push_transaction(trx);
+      tester.produce_block();
+      return Tester::success();
+   } catch (const fc::exception& ex) {
+      return Tester::error(ex.top_message());
+   }
+}
+
+/// The single transaction that hands each of `actions` to `auth`, as the emergency-stop playbook
+/// prescribes: an `updateauth` of the permission named after each action, then per action an
+/// `unlinkauth` and a `linkauth` back to that permission, all declared by `account@owner`.
+/// `relink_only` names actions with no link to undo, which get no `unlinkauth`.
+template <typename Tester>
+typename Tester::action_result rotate_delegate(Tester& tester, name account, const std::vector<name>& actions,
+                                              const authority& auth, const std::vector<name>& relink_only = {}) {
+   try {
+      const std::vector<permission_level> owner{{account, config::owner_name}};
+      signed_transaction trx;
+      for (auto action_name : actions)
+         trx.actions.emplace_back(owner, updateauth{account, action_name, config::active_name, auth});
+      for (auto action_name : actions) {
+         if (std::find(relink_only.begin(), relink_only.end(), action_name) == relink_only.end())
+            trx.actions.emplace_back(owner, unlinkauth{account, account, action_name});
+         trx.actions.emplace_back(owner, linkauth{account, account, action_name, action_name});
+      }
+      tester.set_transaction_headers(trx);
+      trx.sign(tester.get_private_key(account, "owner"), tester.control->get_chain_id());
+      tester.push_transaction(trx);
+      tester.produce_block();
+      return Tester::success();
+   } catch (const fc::exception& ex) {
+      return Tester::error(ex.top_message());
+   }
+}
+
+/// Where a delegate can leave the link of the action it was delegated before it is rotated out.
+enum class delegated_link {
+   in_place,       ///< linked to the permission of its own name, as delegated
+   moved_beneath,  ///< linked to a permission the delegate added beneath that one
+   any,            ///< linked to `sysio.any`, which any permission of the account satisfies
+   owner,          ///< linked to `owner`, which a write declared `active` cannot change
+   absent          ///< unlinked, so the action requires `active`
+};
+
+/// The refusal of an `unlinkauth` for an action that has no link, when pushed directly. Inside a
+/// privileged sender such as `sysio.msig` the same unlink fails later, with "no link found".
+inline constexpr std::string_view no_link_msg = "cannot unlink non-existent permission link";
+
+/// Require `result` to be a refusal whose message contains `fragment`.
+inline void require_refusal(const std::string& result, std::string_view fragment) {
+   BOOST_REQUIRE_MESSAGE(!result.empty() && result.find(fragment) != std::string::npos,
+                         "expected a refusal containing '" << fragment << "', got: " << result);
 }
 
 // ---------------------------------------------------------------------------
