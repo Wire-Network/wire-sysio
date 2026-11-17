@@ -1,8 +1,8 @@
 #pragma once
 
 // Boost multiprecision variant support.
-// Include this header only in files that need UInt<N>/Int<N> aliases
-// or generic boost::multiprecision::number serialization.
+// Include this header only in files that need the UInt<N>/Int<N> aliases
+// or their variant conversions, declared for UInt<8/16/32/64/256> and Int<256>.
 // Most code should NOT need this — prefer fc/variant.hpp alone.
 
 #include <boost/multiprecision/cpp_int.hpp>
@@ -29,11 +29,18 @@ namespace fc
    void to_variant( const UInt<64>& n, fc::variant& v );
    void from_variant( const fc::variant& v, UInt<64>& n );
 
-   template<typename T> void to_variant( const boost::multiprecision::number<T>& n, fc::variant& v ) {
-      v = n.str();
-   }
-   template<typename T> void from_variant( const fc::variant& v, boost::multiprecision::number<T>& n ) {
-      n = boost::multiprecision::number<T>(v.get_string());
-   }
+   /// Stores the decimal text of `n`.
+   void to_variant( const UInt<256>& n, fc::variant& v );
+   /// Reads `v` as variant::as_uint256() does.
+   /// @throw parse_error_exception if `v` holds a number outside the range of `n`
+   /// @throw bad_cast_exception if `v` holds a type variant::as_uint256() does not read
+   void from_variant( const fc::variant& v, UInt<256>& n );
+
+   /// Stores the decimal text of `n`.
+   void to_variant( const Int<256>& n, fc::variant& v );
+   /// Reads `v` as variant::as_int256() does.
+   /// @throw parse_error_exception if `v` holds a number outside the range of `n`
+   /// @throw bad_cast_exception if `v` holds a type variant::as_int256() does not read
+   void from_variant( const fc::variant& v, Int<256>& n );
 
 } // namespace fc

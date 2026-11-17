@@ -3,6 +3,10 @@
 #include <iomanip>
 #include <fc/variant.hpp>
 #include <fc/io/raw.hpp>
+#include <algorithm>
+#include <optional>
+#include <string_view>
+#include <type_traits>
 
 consteval uint64_t operator""_u64str(const char* s, const size_t size) {
    assert(size == 8);
@@ -26,8 +30,10 @@ constexpr size_t header_size = 1024;
 constexpr uint64_t header_id = 0x3230424e49414843ULL; //"CHAINB02" little endian
 
 struct environment  {
-   environment() {
-      strncpy(compiler.data(), __VERSION__, compiler.size()-1);
+   /// Preserve the native bounded compiler-name encoding while permitting constant initialization.
+   constexpr environment() {
+      constexpr std::string_view compiler_version = __VERSION__;
+      std::copy_n(compiler_version.begin(), std::min(compiler_version.size(), compiler.size() - 1), compiler.begin());
    }
 
    enum os_t : unsigned char {
@@ -101,19 +107,60 @@ struct environment  {
    }
 };
 
+/// Native header with trivially copyable allocator storage, preserving the persisted relative-offset representation.
 struct db_header  {
+   using allocator_pointer = bip::offset_ptr<char>;
+   using allocator_offset = allocator_pointer::offset_type;
+
+   /// Boost offset_ptr reserves the relative offset one for its null representation.
+   static constexpr allocator_offset null_allocator_offset = 1;
+
    uint64_t id = header_id;
    bool dirty = false;
-   bip::offset_ptr<char> small_size_allocator;
+   alignas(allocator_pointer) allocator_offset small_size_allocator_storage = null_allocator_offset;
    environment dbenviron;
+
+   /**
+    * Decode the allocator relative to this mapped header without modifying storage.
+    * The allocator and header must share the original mapping or a relocated complete database image.
+    */
+   char* small_size_allocator_address() const noexcept {
+      if (small_size_allocator_storage == null_allocator_offset)
+         return nullptr;
+      return reinterpret_cast<char*>(reinterpret_cast<allocator_offset>(&small_size_allocator_storage) +
+                                     small_size_allocator_storage);
+   }
+
+   /// Store a non-null pointee relative to this field, retaining offset_ptr's existing native representation.
+   void set_small_size_allocator_address(char* pointer) noexcept {
+      assert(pointer);
+      small_size_allocator_storage = reinterpret_cast<allocator_offset>(pointer) -
+                                     reinterpret_cast<allocator_offset>(&small_size_allocator_storage);
+      assert(small_size_allocator_storage != null_allocator_offset);
+   }
 };
 
+static_assert(sizeof(db_header::allocator_offset) == sizeof(db_header::allocator_pointer));
+static_assert(std::is_trivially_copyable_v<db_header>);
+
 constexpr size_t header_dirty_bit_offset = offsetof(db_header, dirty);
+static_assert(std::is_standard_layout_v<db_header>);
+/// Guard the one-byte dirty-flag stores into the mapped header.
+static_assert(sizeof(bool) == sizeof(uint8_t));
 //older implementations had a packed db_header; double check that non-packed db_header struct still has this in the right spot. Reconsider post-CHAINB01
 static_assert(header_dirty_bit_offset == 8, "DB dirty byte is expected to be at offset 8");
 
 //really what we want to check here is the pack_size() of a db_header, but that isn't constexpr. Reconsider post-CHAINB01
 static_assert(sizeof(db_header) <= header_size, "DB header struct too large");
+
+/// Minimum file extent required before accessing the native segment manager after the reserved header prefix.
+inline constexpr size_t minimum_database_file_size = header_size + sizeof(segment_manager);
+
+/**
+ * Read a native header from a file containing the reserved prefix and segment-manager storage.
+ * Return nullopt for read or file-size failures; callers retain their magic, dirty, and environment checks.
+ */
+std::optional<db_header> read_db_header(const std::filesystem::path& path);
 
 }
 
