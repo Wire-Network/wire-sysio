@@ -32,15 +32,10 @@ system account only has a small creation allowance.
 
 *The root `sysio` account* — which holds `sysio.system` and **is the RAM pool
 itself** — deploys with the **native `setcode` / `setabi`**. `giftram` cannot
-self-target: with `account == sysio` and a positive delta it moves the delta
-from sysio's reslimit row into `sysio.acct`, then calls
-`set_resource_limits(sysio, sram - delta)` and `add_system_resources(sysio,
-delta)` — both against the same account, so the chain quota is restored while
-the ROA ledger has already been decremented. The result is a ledger that reads
-lower than the actual quota, and it fails silently: sysio's limit is finite, so
-`giftram`'s own `cur_ram >= 0` guard does not catch it. This is why the
-production bootstrap deploys `system` on `sysio` natively (the harness encodes
-the same split as `ContractSteps.DeployMode.raw` for bios/system/roa).
+self-target: with `account == sysio` it moves the delta out of sysio's quota
+and straight back, so it funds nothing. This is why the production bootstrap
+deploys `system` on `sysio` natively (the harness encodes the same split as
+`ContractSteps.DeployMode.raw` for bios/system/roa).
 
 So an atomic transaction that includes `sysio.system` carries **native
 `setcode`/`setabi` for `sysio`** plus **ROA `setsyscode`/`setsysabi` for every
@@ -253,7 +248,7 @@ state that aborts every advance.
 ## Staged rollout (when one transaction is not possible)
 
 Derive the order from the two rules above for the edges a release actually
-changes. For the edges on `advance`'s path today:
+changes. For the edges on `advance`'s path today, and the one `sysio.bond::accept` adds:
 
 | Edge | Why |
 |---|---|
@@ -261,6 +256,7 @@ changes. For the edges on `advance`'s path today:
 | `sysio` (`sysio.system`) before `sysio.epoch`, when the release adds or changes `accrueepoch` / `rcrdbatch` / `payepoch` | Call edge: the new `advance` would otherwise reach a `sysio.system` that cannot dispatch the action, and every advance aborts. |
 | `sysio.epoch` and `sysio.kicker` before `sysio.system`, when `sysio.system` gains state the emissions gate must reserve (as `payclaimtot` reserves unclaimed `payclaims`) | Table edge: the old gate counts the new backing as spendable, so a later pay period can double-commit it and leave credited claims underfunded; an old kicker counts it as available treasury and `kick` can draw it. |
 | `sysio.epoch` before `sysio.msgch`, when the release adds or changes an action `chkcons` inlines into `sysio.epoch` | Call edge in the other direction. |
+| `sysio` (`sysio.system`) before `sysio.bond` | Call edge: `accept` on a request from a `sysio.*` issuer sends `sysio::addsubjex`, and the dispatcher rejects an action the deployed contract does not define, so every such `accept` aborts. |
 
 When a release changes both directions of one pair, the two contracts are a
 compatibility-coupled set and must deploy in one transaction; if they do not fit,

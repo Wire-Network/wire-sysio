@@ -122,12 +122,6 @@ inline std::optional<chain::symbol_code> row_symbol_code(const fc::variant_objec
    return chain::symbol_code{ code->value().as_uint64() };
 }
 
-/// The name of a symbol code -- the spelling `tickyield` / `queueyield` take and
-/// the logs use.
-inline std::string symbol_code_name(chain::symbol_code code) {
-   return chain::symbol(code.value << 8).name();
-}
-
 /// The `value` of a `{key, value}` row, or nullopt when the row carries none.
 inline std::optional<fc::variant_object> row_value(const fc::variant_object& row) {
    auto value = row.find(kv_row::value);
@@ -346,7 +340,7 @@ bool kick_rows(const fc::variants& rows, const kick_settings& settings, const li
       if (!code || !value) continue;
       const auto at = now();
       if (!kick_due(*value, settings, supplies, at)) continue;
-      const auto pool      = symbol_code_name(*code);
+      const auto pool      = code->name();
       const auto last_kick = *kick_last_kick(*value);   // kick_due parsed it
       if (!backoff.due(pool, last_kick, at)) continue;
       backoff.mark(pool, last_kick, at, base, ceiling);
@@ -406,7 +400,7 @@ bool kick_page(kick_pool_scan& scan, kick_backoff& backoff, const kick_settings&
    if (!supplies) return false;
    if (!kick_rows(page->rows, settings, *supplies, backoff, base, ceiling, push, now, stopping)) return false;
    // Only a finished page's symbols join the sweep's live set: an unfinished one is read again.
-   for (const chain::symbol_code code : page_symbol_codes(page->rows)) scan.observe(symbol_code_name(code));
+   for (const chain::symbol_code code : page_symbol_codes(page->rows)) scan.observe(code.name());
    scan.finish_page(page->more, page->next_key, backoff);
    return true;
 }

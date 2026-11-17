@@ -8,6 +8,7 @@
 #include <sysio/system.hpp>
 #include <sysio/opp/types/types.pb.hpp>
 #include <sysio/slug_name.hpp>
+#include <sysio.opreg/opreg_constants.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
 #include <sysio.opp.common/wire_asset.hpp>
 #include <sysio.opp.common/shadow_custody_types.hpp>
@@ -416,6 +417,11 @@ namespace sysio {
          sysio::kv::index<"bystatus"_n,
             sysio::const_mem_fun<operator_entry, uint64_t, &operator_entry::by_status>>
       >;
+
+      static_assert(name{opreg_names::table_operators} == "operators"_n &&
+                    name{opreg_names::index_bytype} == "bytype"_n &&
+                    name{opreg_names::index_bystatus} == "bystatus"_n,
+                    "the host reads the roster under the shared names");
 
       /// Operator registry configuration singleton.
       struct [[sysio::table("opconfig")]] op_config {

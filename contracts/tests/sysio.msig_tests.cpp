@@ -298,8 +298,8 @@ BOOST_FIXTURE_TEST_CASE( propose_rejects_bytes_after_transaction, sysio_msig_tes
 
    auto with_tail = data;
    with_tail.push_back( 0 );
-   BOOST_REQUIRE_EXCEPTION( push_raw( with_tail ), wasm_execution_error,
-                            fc_exception_message_contains( "check_transaction_authorization: 1 trailing bytes" ) );
+   BOOST_REQUIRE_EXCEPTION( push_raw( with_tail ), sysio_assert_message_exception,
+                            sysio_assert_message_is( "action data has bytes left after the arguments" ) );
 
    push_raw( data );
    produce_block();
@@ -307,6 +307,31 @@ BOOST_FIXTURE_TEST_CASE( propose_rejects_bytes_after_transaction, sysio_msig_tes
                   ("proposer",      "alice")
                   ("proposal_name", "first")
                   ("level",         permission_level{ "alice"_n, config::active_name })
+   );
+} FC_LOG_AND_RETHROW()
+
+// propose refuses a transaction that carries transaction extensions; the same transaction without them is accepted
+BOOST_FIXTURE_TEST_CASE( propose_rejects_transaction_extensions, sysio_msig_tester ) try {
+   constexpr uint16_t extension_id = 0;
+   auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}} );
+   auto with_extension = trx;
+   with_extension.transaction_extensions.emplace_back( extension_id, bytes{} );
+
+   BOOST_REQUIRE_EXCEPTION( push_action( "alice"_n, "propose"_n, mvo()
+                                          ("proposer",      "alice")
+                                          ("proposal_name", "first")
+                                          ("trx",           with_extension)
+                                          ("requested", vector<permission_level>{{ "alice"_n, config::active_name }})
+                            ),
+                            sysio_assert_message_exception,
+                            sysio_assert_message_is( "not allowed to `propose` a transaction with transaction extensions" )
+   );
+
+   push_action( "alice"_n, "propose"_n, mvo()
+                  ("proposer",      "alice")
+                  ("proposal_name", "first")
+                  ("trx",           trx)
+                  ("requested", vector<permission_level>{{ "alice"_n, config::active_name }})
    );
 } FC_LOG_AND_RETHROW()
 

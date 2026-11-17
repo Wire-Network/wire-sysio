@@ -32,6 +32,9 @@ filegroup(
             "vcpkg/**",
             # The VM's standalone vcpkg checkout is not a Sysio build input.
             "libraries/sys-vm/vcpkg/**",
+            # AFL run outputs contain filenames that are invalid Bazel labels.
+            "libraries/sys-vm/tests/fuzz/afl_out/**",
+            "libraries/sys-vm/tests/fuzz/old_afl_out/**",
             ".git/**",
             "node_modules/**",
             "BUILD.bazel",

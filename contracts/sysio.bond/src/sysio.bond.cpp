@@ -9,6 +9,7 @@
 #include <sysio.opp.common/safe_ops.hpp>
 #include <sysio.opp.common/shadow_custody.hpp>
 #include <sysio.opp.common/wire_asset.hpp>
+#include <sysio.system/subjective_exempt.hpp>
 
 #include <magic_enum/magic_enum.hpp>
 
@@ -169,6 +170,15 @@ void reserve_wire_claim(name self, name account, name issuer) {
       claims.set(payer_for(issuer), key,
                  bond::wire_claim{.account = account, .issuer = issuer, .amount = 0, .reservations = 1});
    }
+}
+
+/// Add `underwriter` to the sysio list of accounts every node exempts from subjective CPU billing, unless it is
+/// listed. The entry outlasts the bond, so an underwriter is never refused the `accept` of its next one.
+void exempt_from_subjective_billing(name self, name underwriter) {
+   const sysiosystem::subj_exempt_table list(bond::SYSTEM_ACCOUNT);
+   if (list.contains(sysiosystem::subjexempt_key{underwriter})) return;
+   sysiosystem::subjective_exempt::addsubjex_action(bond::SYSTEM_ACCOUNT, permission_level{self, active_permission})
+      .send(underwriter);
 }
 
 /// Count one fewer row of `issuer` that can credit `account`'s WIRE: its request or bond row is being
@@ -538,6 +548,9 @@ void bond::accept(name underwriter, uint64_t request_id, uint64_t amount) {
    });
 
    pull_depot_native(get_self(), underwriter, *custody, bonded_amount, accept_memo);
+
+   // Only a system contract's request exempts its underwriters: anyone may issue a request and bond it.
+   if (!existing && req->issuer.prefix() == SYSTEM_ACCOUNT) exempt_from_subjective_billing(get_self(), underwriter);
 }
 
 void bond::hold(uint64_t request_id, name beneficiary) {
@@ -595,7 +608,7 @@ void bond::approve(uint64_t request_id) {
 // their payees to claim: the bounty's for `sysio`, the hold bond's for the issuer who posted it.
 // Nothing is sent and no one is notified, so no party can make the ruling fail.
 void bond::rslvvalid(uint64_t request_id) {
-   require_auth(SYSTEM_ACCOUNT);
+   require_auth(get_self());
    requests_t requests(get_self());
    const auto req = requests.try_get(request_key{request_id});
    check(req.has_value(), request_missing_msg);
@@ -619,7 +632,7 @@ void bond::rslvvalid(uint64_t request_id) {
 // one the bounty is awarded back to the issuer. Nothing is sent and no one is notified. The bonds'
 // positions stop at the ruling's index: the forfeit is no longer theirs.
 void bond::rslvinvalid(uint64_t request_id) {
-   require_auth(SYSTEM_ACCOUNT);
+   require_auth(get_self());
    requests_t requests(get_self());
    const auto req = requests.try_get(request_key{request_id});
    check(req.has_value(), request_missing_msg);

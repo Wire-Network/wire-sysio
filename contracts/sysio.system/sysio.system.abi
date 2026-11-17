@@ -1888,6 +1888,46 @@
             ]
         },
         {
+            "name": "addsubjex",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "delsubjex",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "subj_exempt",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "subjexempt_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "addtrxp",
             "base": "",
             "fields": [
@@ -2209,6 +2249,16 @@
             "ricardian_contract": ""
         },
         {
+            "name": "addsubjex",
+            "type": "addsubjex",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "delsubjex",
+            "type": "delsubjex",
+            "ricardian_contract": ""
+        },
+        {
             "name": "addtrxp",
             "type": "addtrxp",
             "ricardian_contract": ""
@@ -2468,6 +2518,14 @@
             "key_names": ["account"],
             "key_types": ["uint64"],
             "table_id": 40639
+        },
+        {
+            "name": "subjexempt",
+            "type": "subj_exempt",
+            "index_type": "i64",
+            "key_names": ["account"],
+            "key_types": ["name"],
+            "table_id": 39843
         },
         {
             "name": "trxpglobal",

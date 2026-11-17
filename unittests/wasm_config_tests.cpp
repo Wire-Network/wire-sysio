@@ -1224,8 +1224,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( get_wasm_parameters_test, T, validating_testers )
          .max_func_local_bytes     = 8192,
          .max_nested_structures    = 1024,
          .max_symbol_bytes         = 8192,
-         .max_module_bytes         = 20971520,
-         .max_code_bytes           = 20971520,
+         .max_module_bytes         = 4194304,
+         .max_code_bytes           = 4194304,
          .max_pages                = 528,
          .max_call_depth           = 251
    };

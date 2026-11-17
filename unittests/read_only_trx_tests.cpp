@@ -336,8 +336,8 @@ BOOST_FIXTURE_TEST_CASE(read_only_throw_no_subjective_billing, read_only_trx_tes
 
    // Baseline: no subjective billing for any account that could plausibly be billed
    // (alice as the test signer for non-read-only trxs, noauthtable as the contract).
-   BOOST_CHECK_EQUAL( 0, subj_bill.get_subjective_bill("alice"_n,       now).count() );
-   BOOST_CHECK_EQUAL( 0, subj_bill.get_subjective_bill("noauthtable"_n, now).count() );
+   BOOST_CHECK_EQUAL( 0, subj_bill.get_subjective_bill("alice"_n,       now).cpu.count() );
+   BOOST_CHECK_EQUAL( 0, subj_bill.get_subjective_bill("noauthtable"_n, now).cpu.count() );
 
    // Read-only `getage` against a non-existent record throws inside the contract with
    // an empty trx-level and action-level first_authorizer.  Pre-fix this aborted via
@@ -350,8 +350,8 @@ BOOST_FIXTURE_TEST_CASE(read_only_throw_no_subjective_billing, read_only_trx_tes
 
    // After the read-only failure, subjective billing must still be zero: read-only
    // trxs are never billed (objective or subjective), even when they fail.
-   BOOST_CHECK_EQUAL( 0, subj_bill.get_subjective_bill("alice"_n,       now).count() );
-   BOOST_CHECK_EQUAL( 0, subj_bill.get_subjective_bill("noauthtable"_n, now).count() );
+   BOOST_CHECK_EQUAL( 0, subj_bill.get_subjective_bill("alice"_n,       now).cpu.count() );
+   BOOST_CHECK_EQUAL( 0, subj_bill.get_subjective_bill("noauthtable"_n, now).cpu.count() );
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()
