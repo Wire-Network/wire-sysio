@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-import math
+"""Verify sync throttling from sender metrics while both peers complete the same backlog."""
+
 import re
 import signal
 import sys
 import time
-import urllib
 
 from TestHarness import Cluster, TestHelper, Utils, WalletMgr, CORE_SYMBOL, createAccountKeys, ReturnType
 from TestHarness.TestHelper import AppArgs
@@ -19,6 +19,34 @@ from TestHarness.TestHelper import AppArgs
 
 Print=Utils.Print
 errorExit=Utils.errorExit
+
+SYNC_RATE_CAP = '200KB/s'
+SYNC_RATE_BYTES_PER_SECOND = 200_000
+UNTHROTTLED_RATE_CAP = '1TB/s'
+METRICS_INTERVAL_SECONDS = 1
+TRANSACTION_GENERATION_SECONDS = 30
+
+
+def peer_sync_metrics(node, peer_ports):
+    """Read the sender's sync counters and throttle state for peers identified by their advertised ports."""
+    connections = node.processUrllibRequest('net', 'connections', exitOnError=True)['payload']
+    metrics = node.processUrllibRequest('prometheus', 'metrics', returnType=ReturnType.raw,
+                                      method='GET', exitOnError=True).decode()
+    result = {port: {'throttling': False, 'bytes_sent': 0} for port in peer_ports}
+    for connection in connections:
+        address = connection['last_handshake']['p2p_address'].split(' - ', 1)[0]
+        port = address.rsplit(':', 1)[-1]
+        if port not in result:
+            continue
+        connection_id = connection['connection_id']
+        for metric, field in [('nodeop_p2p_block_sync_throttling', 'throttling'),
+                              ('nodeop_p2p_block_sync_bytes_sent', 'bytes_sent')]:
+            pattern = rf'^{metric}\{{[^\n]*connection_id="{connection_id}"[^\n]*\}}\s+(\S+)$'
+            match = re.search(pattern, metrics, re.MULTILINE)
+            if match:
+                result[port][field] = max(result[port][field], float(match[1]))
+    return result
+
 
 appArgs = AppArgs()
 appArgs.add(flag='--plugin',action='append',type=str,help='Run nodes with additional plugins')
@@ -52,12 +80,17 @@ try:
     Print("Stand up cluster")
     # Custom topology:
     #    prodNode <-> nonProdNode
-    #                             <-> throttlingNode <-> throttledNode  (20KB/s)
+    #                             <-> throttlingNode <-> throttledNode  (200KB/s)
     #                                                <-> unThrottledNode (1TB/s)
     #
-    # Compare the sync time of throttledNode and unThrottledNode
+    # Observe the capped connection's throttle state while both peers sync the same backlog.
     if cluster.launch(pnodes=pnodes, unstartedNodes=3, totalNodes=total_nodes, prodCount=prod_count,
                       extraNodeopArgs="--sync-fetch-span 5",
+                      specificExtraNodeopArgs={
+                          2: f'--plugin sysio::net_api_plugin --plugin sysio::prometheus_plugin '
+                             f'--connection-cleanup-period {METRICS_INTERVAL_SECONDS}',
+                          3: '--plugin sysio::net_api_plugin',
+                          4: '--plugin sysio::net_api_plugin'},
                       topo='./tests/p2p_sync_throttle_test_shape.json', delay=delay, activateIF=activateIF) is False:
         errorExit("Failed to stand up sys cluster.")
 
@@ -91,7 +124,7 @@ try:
 
     Print("Configure and launch txn generators")
     targetTpsPerGenerator = 500
-    testTrxGenDurationSec=90
+    testTrxGenDurationSec=TRANSACTION_GENERATION_SECONDS
     trxGeneratorCnt=1
     cluster.launchTrxGenerators(contractOwnerAcctName=cluster.sysioAccount.name, acctNamesList=[accounts[0].name,accounts[1].name],
                                 acctPrivKeysList=[account1PrivKey,account2PrivKey], nodeId=prodNode.nodeId, tpsPerGenerator=targetTpsPerGenerator,
@@ -102,14 +135,13 @@ try:
     throttlingNode = cluster.unstartedNodes[0]
     i = throttlingNode.cmd.index('--p2p-listen-endpoint')
     throttleListenAddr = throttlingNode.cmd[i+1]
-    # Using 20 Kilobytes per second to allow syncing of ~250 transaction blocks at ~175 bytes per transaction
-    # (250*175=43750 per block or 87500 per second)
-    # resulting from the trx generators in a reasonable amount of time
-    throttlingNode.cmd[i+1] = throttlingNode.cmd[i+1] + ':20KB/s'
+    # Keep large bootstrap blocks within the peer's five-second sync-response timeout. This is the approximate
+    # effective rate of the old 20 KB/s setting, whose rate calculation understated bytes per second by ten.
+    throttlingNode.cmd[i+1] = f'{throttleListenAddr}:{SYNC_RATE_CAP}'
     throttleListenIP, throttleListenPort = throttleListenAddr.split(':')
     throttlingNode.cmd.append('--p2p-listen-endpoint')
     unThrottleListenAddr = f'{throttleListenIP}:{Utils.getPort(Utils.PortAlternateP2P, 0)}'
-    throttlingNode.cmd.append(f'{unThrottleListenAddr}:1TB/s')
+    throttlingNode.cmd.append(f'{unThrottleListenAddr}:{UNTHROTTLED_RATE_CAP}')
 
     cluster.biosNode.kill(signal.SIGTERM)
 
@@ -120,15 +152,7 @@ try:
     # Throttling node was offline during block generation and once online receives blocks as fast as possible
     assert throttlingNode.waitForBlock(endLargeBlocksHeadBlock, timeout=endLargeBlocksHeadBlock/2), f'wait for block {endLargeBlocksHeadBlock}  on throttled node timed out'
 
-    throttledNode = cluster.unstartedNodes[0]
-    throttledNode.cmd.append('--p2p-peer-address')
-    throttledNode.cmd.append(throttleListenAddr)
-    unThrottledNode = cluster.unstartedNodes[1]
-    unThrottledNode.cmd.append('--p2p-peer-address')
-    unThrottledNode.cmd.append(unThrottleListenAddr)
-
     Print("Launch throttled and un-throttled nodes")
-    clusterStart = time.time()
     cluster.launchUnstarted(2)
 
     throttledNode = cluster.getNode(3)
@@ -136,18 +160,34 @@ try:
     assert throttledNode.verifyAlive(), "throttled node did not launch"
     assert unThrottledNode.verifyAlive(), "un-throttled node did not launch"
 
-    assert unThrottledNode.waitForBlock(endLargeBlocksHeadBlock), f'wait for block {endLargeBlocksHeadBlock}  on un-throttled node timed out'
-    endUnThrottledSync = time.time()
+    peers = {'throttled': throttledNode, 'unthrottled': unThrottledNode}
+    peer_ports = {name: node.cmd[node.cmd.index('--p2p-listen-endpoint') + 1].rsplit(':', 1)[-1]
+                  for name, node in peers.items()}
+    observations = {name: {'throttling': False, 'bytes_sent': 0, 'completed_at': None} for name in peers}
 
-    assert throttledNode.waitForBlock(endLargeBlocksHeadBlock, timeout=endLargeBlocksHeadBlock*2), f'Wait for block {endLargeBlocksHeadBlock} on throttled node timed out'
-    endThrottledSync = time.time()
+    # Connect after both HTTP endpoints are ready, so startup time is excluded from the diagnostic timings.
+    clusterStart = time.monotonic()
+    throttledNode.processUrllibRequest('net', 'connect', payload=throttleListenAddr, exitOnError=True)
+    unThrottledNode.processUrllibRequest('net', 'connect', payload=unThrottleListenAddr, exitOnError=True)
 
-    throttledElapsed = endThrottledSync - clusterStart
-    unThrottledElapsed = endUnThrottledSync - clusterStart
-    Print(f'Un-throttled sync time: {unThrottledElapsed} seconds')
-    Print(f'Throttled sync time: {throttledElapsed} seconds')
+    def both_peers_synced():
+        """Poll both peers together, retaining throttle observations and each peer's first completion time."""
+        metrics = peer_sync_metrics(throttlingNode, peer_ports.values())
+        for name, node in peers.items():
+            observation = observations[name]
+            sample = metrics[peer_ports[name]]
+            observation['throttling'] |= bool(sample['throttling'])
+            observation['bytes_sent'] = max(observation['bytes_sent'], sample['bytes_sent'])
+            if observation['completed_at'] is None and node.getHeadBlockNum() >= endLargeBlocksHeadBlock:
+                observation['completed_at'] = time.monotonic() - clusterStart
+        return all(value['completed_at'] is not None and value['bytes_sent'] >= SYNC_RATE_BYTES_PER_SECOND
+                   for value in observations.values())
 
-    assert throttledElapsed > 1.5 * unThrottledElapsed, f'Throttled node did not sync slower {throttledElapsed} <= {1.5 * unThrottledElapsed}'
+    assert Utils.waitForBool(both_peers_synced, timeout=endLargeBlocksHeadBlock*2), \
+        f'Peers did not sync block {endLargeBlocksHeadBlock} and report sync bytes: {observations}'
+    Print(f'Sync observations: {observations}')
+    assert observations['throttled']['throttling'], 'The capped sync connection never reported throttling'
+    assert not observations['unthrottled']['throttling'], 'The 1 TB/s sync connection unexpectedly throttled'
 
     testSuccessful=True
 finally:

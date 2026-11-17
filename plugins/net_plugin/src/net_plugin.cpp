@@ -1,4 +1,5 @@
 #include <sysio/net_plugin/net_plugin.hpp>
+#include <sysio/net_plugin/block_sync_rate_limit.hpp>
 #include <sysio/net_plugin/buffer_factory.hpp>
 #include <sysio/net_plugin/gossip_bps_index.hpp>
 #include <sysio/net_plugin/protocol.hpp>
@@ -1804,11 +1805,11 @@ namespace sysio {
             // Check rate limit before each enqueue (preserves existing throttle behavior)
             if( block_sync_rate_limit > 0 && block_sync_frame_bytes_sent > 0 && peer_syncing_from_us ) {
                auto now = get_time();
-               auto elapsed_us = std::chrono::duration_cast<std::chrono::microseconds>(now - block_sync_send_start);
-               double current_rate_sec = (double(block_sync_frame_bytes_sent) / elapsed_us.count()) * 100000;
-               peer_dlog(p2p_blk_log, this, "start enqueue block time {}, now {}, elapsed {}, rate {}, limit {}",
-                         block_sync_send_start.count(), now.count(), elapsed_us.count(), current_rate_sec, block_sync_rate_limit);
-               if( current_rate_sec >= block_sync_rate_limit ) {
+               const auto elapsed = now - block_sync_send_start;
+               peer_dlog(p2p_blk_log, this, "start enqueue block time {}, now {}, elapsed {}ns, bytes {}, limit {}B/s",
+                         block_sync_send_start.count(), now.count(), elapsed.count(), block_sync_frame_bytes_sent,
+                         block_sync_rate_limit);
+               if( block_sync_rate_limit_reached(block_sync_frame_bytes_sent, elapsed, block_sync_rate_limit) ) {
                   block_sync_throttling = true;
                   peer_dlog( p2p_blk_log, this, "throttling block sync to peer {}:{}", log_remote_endpoint_ip, log_remote_endpoint_port);
                   // Discard remaining pre-fetched blocks; timer callback re-fetches from peer_requested->last + 1
