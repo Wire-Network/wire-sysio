@@ -65,6 +65,14 @@ struct contracts {
       static std::vector<char> reenter_desyndicate_abi() {
          return read_abi("${CMAKE_SOURCE_DIR}/contracts/test_contracts/reenter_desyndicate/reenter_desyndicate.abi");
       }
+      /// sysio.msig built before propose and exec required canonical transaction bytes, to store proposals with it.
+      static std::vector<uint8_t> msig_wasm_old() {
+         return read_wasm("${CMAKE_SOURCE_DIR}/contracts/test_contracts/old_versions/sysio.msig/sysio.msig.wasm");
+      }
+      /// ABI paired with msig_wasm_old().
+      static std::vector<char> msig_abi_old() {
+         return read_abi("${CMAKE_SOURCE_DIR}/contracts/test_contracts/old_versions/sysio.msig/sysio.msig.abi");
+      }
       static std::vector<uint8_t> block_transfer_wasm()  { return read_wasm("${CMAKE_SOURCE_DIR}/contracts/test_contracts/block_transfer/block_transfer.wasm"); }
       static std::vector<char>    block_transfer_abi()   { return read_abi("${CMAKE_SOURCE_DIR}/contracts/test_contracts/block_transfer/block_transfer.abi"); }
       static std::vector<uint8_t> epoch_stub_wasm()      { return read_wasm("${CMAKE_SOURCE_DIR}/contracts/test_contracts/epoch_stub/epoch_stub.wasm"); }
