@@ -81,6 +81,12 @@ fc::microseconds transaction::get_signature_keys( const vector<signature_type>& 
    return fc::time_point::now() - start;
 } FC_CAPTURE_AND_RETHROW("") }
 
+void assert_signature_variable_size( const signature_type& sig ) {
+   SYS_ASSERT( sig.variable_size() <= config::max_signature_variable_size, sig_variable_size_limit_exception,
+               "signature variable length component size ({}) greater than maximum ({})",
+               sig.variable_size(), config::max_signature_variable_size );
+}
+
 account_name transaction::first_authorizer()const {
    for( const auto& a : actions ) {
       for( const auto& u : a.authorization )

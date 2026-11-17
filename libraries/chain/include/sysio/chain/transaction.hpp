@@ -120,6 +120,13 @@ namespace sysio { namespace chain {
                                                     bool allow_duplicate_keys = false )const;
    };
 
+   /**
+    * Enforces config::max_signature_variable_size on a signature.
+    * @param sig the signature to check
+    * @throws sig_variable_size_limit_exception if `sig.variable_size()` is larger than the limit
+    */
+   void assert_signature_variable_size( const signature_type& sig );
+
    struct packed_transaction : fc::reflect_init {
       enum class compression_type {
          none = 0,

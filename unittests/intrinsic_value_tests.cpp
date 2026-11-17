@@ -1,15 +1,18 @@
 #include <sysio/chain/account_object.hpp>
+#include <sysio/chain/apply_context.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/kv_context.hpp>
 #include <sysio/chain/producer_schedule.hpp>
 #include <sysio/chain/transaction.hpp>
+#include <sysio/chain/wasm_interface.hpp>
 #include <sysio/chain/webassembly/common.hpp>
 #include <sysio/testing/tester.hpp>
 
 #include "test_utils.hpp"
 
 #include <fc/io/raw.hpp>
+#include <fc/scoped_exit.hpp>
 #include <fmt/format.h>
 #include <magic_enum/magic_enum.hpp>
 
@@ -92,6 +95,18 @@ bytes pack_with_junk(const T& value) {
    bytes packed = fc::raw::pack(value);
    packed.push_back(junk_byte);
    return packed;
+}
+
+/// Where recover_key writes the key it recovers, in the zeroed memory below data_offset, and the room it has there.
+constexpr uint32_t recovered_key_offset   = 512;
+constexpr int32_t  recovered_key_capacity = 128;
+
+/// What recover_key returns when it recovers no key.
+constexpr int32_t recover_key_failure = -1;
+
+/// The WebAuthn key the signature size tests sign with.
+mock::webauthn_private_key webauthn_key() {
+   return base_tester::get_private_key<mock::webauthn_private_key>(contract, "active");
 }
 
 struct value_tester : validating_tester {
@@ -678,6 +693,64 @@ BOOST_FIXTURE_TEST_CASE(recover_key_returns_failure_on_trailing_bytes, value_tes
    const auto key = get_private_key(contract, "active");
    run(recover(fc::raw::pack(key.sign(digest_type{})), recovered));
    run(recover(pack_with_junk(key.sign(digest_type{})), not_recovered));
+} FC_LOG_AND_RETHROW() }
+
+// Correct WebAuthn signatures on both sides of config::max_signature_variable_size isolate the size rule. run()
+// executes each call on the producer and again on the validating node.
+BOOST_FIXTURE_TEST_CASE(recover_key_fails_past_signature_variable_size_limit, value_tester) { try {
+   const mock::webauthn_private_key key = webauthn_key();
+   const int32_t key_size = static_cast<int32_t>(fc::raw::pack_size(key.get_public_key()));
+   BOOST_REQUIRE_LE(key_size, recovered_key_capacity);
+
+   const auto recover = [&](size_t variable_size, int32_t expected) {
+      const bytes sig = fc::raw::pack(key.sign_with_variable_size(digest_type{}, variable_size));
+      return wast_calling("recover_key", "(param i32 i32 i32 i32 i32) (result i32)",
+                          fmt::format("(if (i32.ne (call $f (i32.const {}) (i32.const {}) (i32.const {}) "
+                                      "(i32.const {}) (i32.const {})) (i32.const {})) (then (unreachable)))",
+                                      digest_offset, data_offset, sig.size(), recovered_key_offset,
+                                      recovered_key_capacity, expected),
+                          sig);
+   };
+
+   run(recover(config::max_signature_variable_size, key_size));
+   run(recover(config::max_signature_variable_size + 1, recover_key_failure));
+} FC_LOG_AND_RETHROW() }
+
+// assert_recover_key aborts on a correct WebAuthn signature past config::max_signature_variable_size on the producer
+// and on the validating node. The producer would abort the transaction, so to put it in a block the producer skips
+// the contract; the validating node then runs it.
+BOOST_FIXTURE_TEST_CASE(assert_recover_key_aborts_past_signature_variable_size_limit, value_tester) { try {
+   const mock::webauthn_private_key key = webauthn_key();
+   const bytes public_key = fc::raw::pack(key.get_public_key());
+
+   const auto assert_recover = [&](size_t variable_size) {
+      bytes data = fc::raw::pack(key.sign_with_variable_size(digest_type{}, variable_size));
+      const size_t sig_size = data.size();
+      data.insert(data.end(), public_key.begin(), public_key.end());
+      return wast_calling("assert_recover_key", "(param i32 i32 i32 i32 i32)",
+                          fmt::format("(call $f (i32.const {}) (i32.const {}) (i32.const {}) (i32.const {}) "
+                                      "(i32.const {}))",
+                                      digest_offset, data_offset, sig_size, data_offset + sig_size, public_key.size()),
+                          data);
+   };
+
+   run(assert_recover(config::max_signature_variable_size));
+
+   const std::string oversized = assert_recover(config::max_signature_variable_size + 1);
+   set_code(contract, oversized.c_str());
+   produce_block();
+   signed_transaction trx = call_to_contract();
+   BOOST_CHECK_THROW(push_transaction(trx), sig_variable_size_limit_exception);
+
+   auto& substitute_apply = control->get_wasm_interface().substitute_apply;
+   auto reset_substitute_apply = fc::make_scoped_exit([&]() { substitute_apply = {}; });
+   substitute_apply = [](const digest_type&, uint8_t, uint8_t, apply_context& context) {
+      return context.get_receiver() == contract;
+   };
+   push_transaction(trx);
+   const signed_block_ptr block = produce_block_no_validation();
+   BOOST_CHECK_THROW(validate_push_block(block), sig_variable_size_limit_exception);
+   skip_validate = true;
 } FC_LOG_AND_RETHROW() }
 
 // Each of these has a host check already. They hold every call to it, with the values a narrowing would let through.
