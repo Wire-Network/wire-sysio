@@ -9,6 +9,8 @@
 #include <fc/io/json.hpp>
 #include <iostream>
 #include <fstream>
+#include <algorithm>
+#include <cstring>
 
 #ifdef __linux__
 #include <linux/mman.h>
@@ -81,6 +83,30 @@ static bool on_tempfs_filesystem(std::filesystem::path& path) {
    return false;
 }
 
+std::optional<db_header> read_db_header(const std::filesystem::path& path) {
+   std::optional<db_header> header(std::in_place);
+   std::ifstream hs(path.generic_string(), std::ifstream::binary);
+   hs.read(reinterpret_cast<char*>(&*header), sizeof(db_header));
+   std::error_code error;
+   if (hs.fail() || std::filesystem::file_size(path, error) < minimum_database_file_size || error)
+      header.reset();
+   return header;
+}
+
+/// Return the native manager only when its metadata and recorded extent fit the mapped file.
+static segment_manager* checked_segment_manager(const bip::mapped_region& region) {
+   const size_t file_size = region.get_size();
+   if (file_size < minimum_database_file_size)
+      BOOST_THROW_EXCEPTION(std::system_error(make_error_code(db_error_code::bad_header)));
+
+   segment_manager* manager =
+      reinterpret_cast<segment_manager*>(static_cast<char*>(region.get_address()) + header_size);
+   // Subtract the fixed prefix to avoid overflow from an invalid recorded size.
+   if (manager->get_size() > file_size - header_size)
+      BOOST_THROW_EXCEPTION(std::system_error(make_error_code(db_error_code::bad_header)));
+   return manager;
+}
+
 pinnable_mapped_file::pinnable_mapped_file(const std::filesystem::path& dir, bool writable, uint64_t shared_file_size, bool allow_dirty, map_mode mode) :
    _data_file_path(std::filesystem::absolute(dir/"shared_memory.bin")),
    _database_name(dir.filename().string()),
@@ -103,14 +129,7 @@ pinnable_mapped_file::pinnable_mapped_file(const std::filesystem::path& dir, boo
 
    std::filesystem::create_directories(dir);
 
-   if(std::filesystem::exists(_data_file_path)) {
-      char header[header_size];
-      std::ifstream hs(_data_file_path.generic_string(), std::ifstream::binary);
-      hs.read(header, header_size);
-      if(hs.fail())
-         BOOST_THROW_EXCEPTION(std::system_error(make_error_code(db_error_code::bad_header)));
-
-      db_header* dbheader = reinterpret_cast<db_header*>(header);
+   if (const std::optional<db_header> dbheader = read_db_header(_data_file_path)) {
       if(dbheader->id != header_id) {
          std::string what_str("\"" + _database_name + "\" database format not compatible with this version of chainbase.");
          BOOST_THROW_EXCEPTION(std::system_error(make_error_code(db_error_code::incorrect_db_version), what_str));
@@ -126,6 +145,8 @@ pinnable_mapped_file::pinnable_mapped_file(const std::filesystem::path& dir, boo
               _database_name, fc::json::to_log_string(environment()), fc::json::to_log_string(dbheader->dbenviron));
          BOOST_THROW_EXCEPTION(std::system_error(make_error_code(db_error_code::incompatible)));
       }
+   } else if (std::filesystem::exists(_data_file_path)) {
+      BOOST_THROW_EXCEPTION(std::system_error(make_error_code(db_error_code::bad_header)));
    }
 
    segment_manager* file_mapped_segment_manager = nullptr;
@@ -139,27 +160,30 @@ pinnable_mapped_file::pinnable_mapped_file(const std::filesystem::path& dir, boo
       new (_file_mapped_region.get_address()) db_header;
    }
    else if(_writable) {
-         auto existing_file_size = std::filesystem::file_size(_data_file_path);
-         size_t grow = 0;
+         _file_mapping = bip::file_mapping(_data_file_path.generic_string().c_str(), bip::read_write);
+         _file_mapped_region = bip::mapped_region(_file_mapping, bip::read_write);
+         file_mapped_segment_manager = checked_segment_manager(_file_mapped_region);
+         const size_t existing_file_size = _file_mapped_region.get_size();
          if(shared_file_size > existing_file_size) {
-            grow = shared_file_size - existing_file_size;
+            const size_t grow = shared_file_size - existing_file_size;
+            _file_mapped_region = bip::mapped_region();
+            _file_mapping = bip::file_mapping();
             std::filesystem::resize_file(_data_file_path, shared_file_size);
+            _file_mapping = bip::file_mapping(_data_file_path.generic_string().c_str(), bip::read_write);
+            _file_mapped_region = bip::mapped_region(_file_mapping, bip::read_write);
+            file_mapped_segment_manager = checked_segment_manager(_file_mapped_region);
+            file_mapped_segment_manager->grow(grow);
          }
          else if(shared_file_size < existing_file_size) {
             _database_size = existing_file_size;
             wlog("\"{}\" requested size of {} is less than existing size of {}. This database will not be shrunk and will remain at {}",
                  _database_name, shared_file_size, existing_file_size, existing_file_size);
          }
-         _file_mapping = bip::file_mapping(_data_file_path.generic_string().c_str(), bip::read_write);
-         _file_mapped_region = bip::mapped_region(_file_mapping, bip::read_write);
-         file_mapped_segment_manager = reinterpret_cast<segment_manager*>((char*)_file_mapped_region.get_address()+header_size);
-         if(grow)
-            file_mapped_segment_manager->grow(grow);
    }
    else {
          _file_mapping = bip::file_mapping(_data_file_path.generic_string().c_str(), bip::read_only);
          _file_mapped_region = bip::mapped_region(_file_mapping, bip::read_only);
-         file_mapped_segment_manager = reinterpret_cast<segment_manager*>((char*)_file_mapped_region.get_address()+header_size);
+         file_mapped_segment_manager = checked_segment_manager(_file_mapped_region);
    }
 
    if(_writable) {
@@ -257,7 +281,8 @@ pinnable_mapped_file::pinnable_mapped_file(const std::filesystem::path& dir, boo
    if (!ss_alloc && _writable) {
       // create the unique `small_size_allocator` for this `segment_manager`
       db_header* header = reinterpret_cast<db_header*>(start - header_size);
-      header->small_size_allocator = (char *)make_small_size_allocator<byte_segment_allocator_t>(_segment_manager);
+      header->set_small_size_allocator_address(
+         reinterpret_cast<char*>(make_small_size_allocator<byte_segment_allocator_t>(_segment_manager)));
    }
 
    _segment_manager_map[start] = seg_info_t{start + _segment_manager->get_size()};
@@ -265,7 +290,7 @@ pinnable_mapped_file::pinnable_mapped_file(const std::filesystem::path& dir, boo
 
 ss_allocator_t* pinnable_mapped_file::get_small_size_allocator(std::byte* seg_mgr) {
    db_header* header = reinterpret_cast<db_header*>(seg_mgr - header_size);
-   return header->small_size_allocator ? (ss_allocator_t*)&*header->small_size_allocator : nullptr;
+   return reinterpret_cast<ss_allocator_t*>(header->small_size_allocator_address());
 }
 
 void pinnable_mapped_file::setup_copy_on_write_mapping() {
@@ -540,6 +565,7 @@ void to_variant(const chainbase::environment& bi, variant& v) {
                                    ("os", bi.os)
                                    ("arch", bi.arch)
                                    ("boost_version", bi.boost_version)
-                                   ("compiler", bi.compiler.data());
+                                   ("compiler", std::string(bi.compiler.begin(),
+                                                            std::find(bi.compiler.begin(), bi.compiler.end(), '\0')));
 }
 }

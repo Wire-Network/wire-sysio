@@ -1,4 +1,9 @@
+#include <cstdlib>
 #include <filesystem>
+
+#ifdef __APPLE__
+#include <unistd.h>
+#endif
 
 class temp_directory {
    std::filesystem::path tmp_path;
