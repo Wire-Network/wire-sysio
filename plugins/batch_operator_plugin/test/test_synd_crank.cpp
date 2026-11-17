@@ -252,4 +252,31 @@ BOOST_AUTO_TEST_CASE(retry_spacing_tracks_progress_and_refill) {
    BOOST_CHECK(retry.wait <= synd_crank_retry::maximum_wait);
 }
 
+/// One pair may spend the entire contract budget; its progress and eventual drainage must wake an untouched pair.
+BOOST_AUTO_TEST_CASE(global_crank_progress_wakes_pairs_left_outside_the_budget) {
+   synd_fixture fixture;
+   const synd_pair other{fc::slug_name{"SOL"}, fc::slug_name{"LIQSOL"}};
+   std::map<synd_pair, synd_work> work{{pair, *fixture.observe(refill_epoch + 1)},
+                                      {other, *fixture.observe(refill_epoch + 1)}};
+   std::map<synd_pair, synd_crank_retry> retries;
+   auto now = fc::time_point::from_iso_string("2026-11-17T00:00:00");
+   BOOST_CHECK(synd_crank_due(work, retries, now));
+   // Pair A keeps consuming the whole budget. B's unchanged view cannot tell whether the contract reached it.
+   for (int pass = 0; pass < 10; ++pass) {
+      for (const auto& [key, observed] : work) retries[key].note(observed, now);
+      now += fc::seconds(1);
+      BOOST_CHECK(!synd_crank_due(work, retries, now));
+      work.at(pair).positions.front().released += 1;
+      BOOST_CHECK(synd_crank_due(work, retries, now));
+   }
+   for (const auto& [key, observed] : work) retries[key].note(observed, now);
+   work.at(pair) = {}; // A just drained; B is ready but unchanged and must not inherit a five-minute pause
+   now += fc::seconds(1);
+   BOOST_CHECK(synd_crank_due(work, retries, now));
+   for (const auto& [key, observed] : work) retries[key].note(observed, now);
+   BOOST_CHECK(!synd_crank_due(work, retries, now + fc::seconds(1)));
+   work.at(other) = {};
+   BOOST_CHECK(!synd_crank_due(work, retries, now + fc::hours(1)));
+}
+
 BOOST_AUTO_TEST_SUITE_END()

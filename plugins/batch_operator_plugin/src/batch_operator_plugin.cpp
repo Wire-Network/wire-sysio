@@ -1466,9 +1466,7 @@ struct batch_operator_plugin::impl {
       // Synchronization has its own persisted cursor through retained history; each pass can advance it even
       // before any request is acknowledged. Keep its existing polling cadence until the terminal set clears.
       crank_due = crank_due || sync_work.ready;
-      for (const auto& [pair, work] : *release_work) {
-         crank_due = crank_due || underwriter_release_retries[pair].due(work, crank_now);
-      }
+      crank_due = crank_due || uw::synd_crank_due(*release_work, underwriter_release_retries, crank_now);
       if (!in->frozen && (crank_due || crank_now - underwriter_cranked_at >= UNDERWRITER_IDLE_CRANK_INTERVAL)) {
          crank_due = true;
       } else {
@@ -1565,7 +1563,7 @@ struct batch_operator_plugin::impl {
       if (crank_due) {
          underwriter_cranked_at = fc::time_point::now();
          for (const auto& [pair, work] : release_work) {
-            if (work.ready) underwriter_release_retries[pair].note(work, underwriter_cranked_at);
+            underwriter_release_retries[pair].note(work, underwriter_cranked_at);
          }
          underwriter_push(uw::synd::account, uw::synd::action_crank,
                           fc::mutable_variant_object()(uw::synd::field::limit, UNDERWRITER_CRANK_LIMIT));

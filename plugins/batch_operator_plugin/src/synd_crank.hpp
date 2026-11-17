@@ -255,4 +255,27 @@ struct synd_crank_retry {
    }
 };
 
+/**
+ * A crank's budget is shared across pairs. Progress in any observed pair wakes the ready set, including when the
+ * progressing pair just drained and an unchanged pair was never reached. Record every observed snapshot on an
+ * attempt, including empty queues, so that drained progress wakes another pair once rather than on every poll.
+ */
+inline bool synd_crank_due(const std::map<synd_pair, synd_work>& work,
+                            const std::map<synd_pair, synd_crank_retry>& retries, fc::time_point now) {
+   bool ready = false;
+   bool progress = false;
+   bool retry_due = false;
+   for (const auto& [pair, observed] : work) {
+      ready = ready || observed.ready;
+      const auto retry = retries.find(pair);
+      if (retry == retries.end()) {
+         progress = true;
+         continue;
+      }
+      progress = progress || !retry->second.attempted || *retry->second.attempted != observed;
+      retry_due = retry_due || retry->second.due(observed, now);
+   }
+   return retry_due || (ready && progress);
+}
+
 } // namespace sysio::batch_operator_detail::underwriter
