@@ -338,4 +338,88 @@ BOOST_AUTO_TEST_CASE(qc_state_transitions) try {
 
 } FC_LOG_AND_RETHROW();
 
+// In the `strong` state the by_state form carries the strong votes only and the strong_and_weak form carries the
+// weak votes too, unless there are none. Below `strong` both forms carry strong and weak votes, and without a
+// quorum neither yields a qc_sig_t.
+BOOST_AUTO_TEST_CASE(aggregated_qc_sig_forms) try {
+   using namespace sysio::chain;
+   using namespace fc::crypto::bls;
+   using state_t    = aggregating_qc_sig_t::state_t;
+   using sig_form_t = aggregating_qc_sig_t::sig_form_t;
+
+   digest_type d(fc::sha256("0000000000000000000000000000001"));
+   std::vector<uint8_t> digest(d.data(), d.data() + d.data_size());
+
+   const std::vector<bls_private_key> sk {
+      bls_private_key("PVT_BLS_0d8dsux83r42Qg8CHgAqIuSsn9AV-QdCzx3tPj0K8yOJA_qb"),
+      bls_private_key("PVT_BLS_Wfs3KzfTI2P5F85PnoHXLnmYgSbp-XpebIdS6BUCHXOKmKXK"),
+      bls_private_key("PVT_BLS_74crPc__6BlpoQGvWjkHmUdzcDKh8QaiN_GtU4SD0QAi4BHY")
+   };
+   constexpr size_t   strong_index_0 = 0;
+   constexpr size_t   weak_index     = 1;
+   constexpr size_t   strong_index_1 = 2;
+   constexpr uint64_t weight         = 1;
+   constexpr uint64_t quorum         = 2;
+   constexpr uint64_t max_weak_sum_before_weak_final = 1; // weight sum 3 - quorum 2
+   constexpr std::array all_forms{sig_form_t::by_state, sig_form_t::strong_and_weak};
+
+   const bls_signature strong_sig_0 = sk[strong_index_0].sign_raw(digest);
+   const bls_signature weak_sig     = sk[weak_index].sign_raw(digest);
+   const bls_signature strong_sig_1 = sk[strong_index_1].sign_raw(digest);
+
+   bls_aggregate_signature strong_agg;
+   strong_agg.aggregate(strong_sig_0);
+   strong_agg.aggregate(strong_sig_1);
+   bls_aggregate_signature strong_and_weak_agg = strong_agg;
+   strong_and_weak_agg.aggregate(weak_sig);
+
+   {  // `strong` without weak votes: both forms are strong-only
+      aggregating_qc_sig_t qc(sk.size(), quorum, max_weak_sum_before_weak_final);
+      qc.add_vote(0, 0, true, strong_index_0, strong_sig_0, weight);
+      qc.add_vote(0, 0, true, strong_index_1, strong_sig_1, weight);
+      BOOST_REQUIRE_EQUAL(qc.state(), state_t::strong);
+      for (sig_form_t form : all_forms) {
+         const std::optional<qc_sig_t> sig = qc.aggregated_qc_sig(form);
+         BOOST_REQUIRE(sig);
+         BOOST_CHECK(sig->is_strong());
+         BOOST_CHECK(sig->strong_votes && (*sig->strong_votes)[strong_index_0] &&
+                     (*sig->strong_votes)[strong_index_1]);
+         BOOST_CHECK(sig->sig.equal(strong_agg));
+      }
+   }
+
+   aggregating_qc_sig_t qc(sk.size(), quorum, max_weak_sum_before_weak_final);
+   for (sig_form_t form : all_forms)
+      BOOST_CHECK(!qc.aggregated_qc_sig(form));
+
+   qc.add_vote(0, 0, true, strong_index_0, strong_sig_0, weight);
+   qc.add_vote(0, 0, false, weak_index, weak_sig, weight);
+   BOOST_REQUIRE_EQUAL(qc.state(), state_t::weak_achieved);
+   for (sig_form_t form : all_forms) {
+      const std::optional<qc_sig_t> sig = qc.aggregated_qc_sig(form);
+      BOOST_REQUIRE(sig);
+      BOOST_CHECK(sig->strong_votes && (*sig->strong_votes)[strong_index_0]);
+      BOOST_CHECK(sig->weak_votes && (*sig->weak_votes)[weak_index]);
+   }
+
+   qc.add_vote(0, 0, true, strong_index_1, strong_sig_1, weight);
+   BOOST_REQUIRE_EQUAL(qc.state(), state_t::strong);
+
+   const std::optional<qc_sig_t> by_state = qc.aggregated_qc_sig(sig_form_t::by_state);
+   BOOST_REQUIRE(by_state);
+   BOOST_CHECK(by_state->is_strong());
+   BOOST_CHECK(by_state->strong_votes && (*by_state->strong_votes)[strong_index_0] &&
+               (*by_state->strong_votes)[strong_index_1]);
+   BOOST_CHECK(by_state->sig.equal(strong_agg));
+
+   const std::optional<qc_sig_t> strong_and_weak = qc.aggregated_qc_sig(sig_form_t::strong_and_weak);
+   BOOST_REQUIRE(strong_and_weak);
+   BOOST_CHECK(strong_and_weak->is_weak());
+   BOOST_CHECK(strong_and_weak->strong_votes && (*strong_and_weak->strong_votes)[strong_index_0] &&
+               (*strong_and_weak->strong_votes)[strong_index_1]);
+   BOOST_CHECK(strong_and_weak->weak_votes && (*strong_and_weak->weak_votes)[weak_index]);
+   BOOST_CHECK(strong_and_weak->sig.equal(strong_and_weak_agg));
+
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_SUITE_END()
