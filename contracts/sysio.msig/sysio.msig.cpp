@@ -4,6 +4,8 @@
 
 #include "sysio.msig.hpp"
 
+#include <sysio.system/canonical_transaction.hpp>
+
 namespace sysio {
 
 namespace {
@@ -131,14 +133,14 @@ void multisig::propose( name proposer,
    auto& ds = get_datastream();
 
    const char* trx_pos = ds.pos();
-   size_t size = ds.remaining();
+   const transaction proposed_trx = sysiosystem::unpack_canonical_transaction( ds );
+   check_action_data_consumed( ds );
+   const size_t size = static_cast<size_t>( ds.pos() - trx_pos );
 
-   transaction_header trx_header;
-   std::vector<action> context_free_actions;
-   ds >> trx_header;
-   check( trx_header.expiration >= sysio::time_point_sec(current_time_point()), "transaction expired" );
-   ds >> context_free_actions;
-   check( context_free_actions.empty(), "not allowed to `propose` a transaction with context-free actions" );
+   check( proposed_trx.expiration >= sysio::time_point_sec(current_time_point()), "transaction expired" );
+   check( proposed_trx.context_free_actions.empty(), "not allowed to `propose` a transaction with context-free actions" );
+   check( proposed_trx.transaction_extensions.empty(),
+          "not allowed to `propose` a transaction with transaction extensions" );
 
    proposals proptable( get_self(), proposer.value );
    auto pk = proposal_key{proposal_name.value};
@@ -428,21 +430,17 @@ void multisig::exec( name proposer, name proposal_name, name executer ) {
    // below operates on `packed`.
    const auto packed = assemble_packed_trx(std::move(prop), get_self(), proposer);
 
-   transaction_header trx_header;
-   std::vector<action> context_free_actions;
-   std::vector<action> actions;
-   datastream<const char*> ds( packed.data(), packed.size() );
-   ds >> trx_header;
-   check( trx_header.expiration >= sysio::time_point_sec(current_time_point()), "transaction expired" );
-   ds >> context_free_actions;
-   check( context_free_actions.empty(), "not allowed to `exec` a transaction with context-free actions" );
-   ds >> actions;
+   // Validated here, not only at propose, so rows stored by an earlier contract version are covered.
+   const transaction trx = sysiosystem::unpack_canonical_transaction( packed.data(), packed.size() );
+   check( trx.expiration >= sysio::time_point_sec(current_time_point()), "transaction expired" );
+   check( trx.context_free_actions.empty(), "not allowed to `exec` a transaction with context-free actions" );
+   check( trx.transaction_extensions.empty(), "not allowed to `exec` a transaction with transaction extensions" );
 
    auto table_op = [](auto&& table, auto&& key) { table.erase(key); };
    bool ok = trx_is_authorized(get_approvals_and_adjust_table(get_self(), proposer, proposal_name, table_op), packed);
    check( ok, "transaction authorization failed" );
 
-   if ( trx_header.delay_sec.value > 0 ) {
+   if ( trx.delay_sec.value > 0 ) {
       // The authorization recheck above establishes that the proposal is authorized NOW,
       // not that it has been authorized for the whole delay. Only `approve` can record the
       // deadline, and only on the approval that made the proposal authorized, so a missing
@@ -453,7 +451,7 @@ void multisig::exec( name proposer, name proposal_name, name executer ) {
       check( **earliest_exec_time <= current_time_point(), "too early to execute" );
    }
 
-   for (const auto& act : actions) {
+   for (const auto& act : trx.actions) {
       act.send();
    }
 
