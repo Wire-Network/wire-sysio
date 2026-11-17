@@ -1,5 +1,6 @@
 #include <boost/test/unit_test.hpp>
 
+#include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/subjective_billing.hpp>
 #include <sysio/testing/tester.hpp>
 #include <test_common.hpp>
@@ -1183,6 +1184,17 @@ BOOST_AUTO_TEST_CASE( sysio_paid_authorizer_net_billing_integration_test ) {
    }
    chain.set_contract( sysio_contract, test_contracts::asserter_wasm(), test_contracts::asserter_abi() );
    chain.set_contract( contract, test_contracts::asserter_wasm(), test_contracts::asserter_abi() );
+   /** Allow sanitizer and scheduler overhead in this NET test while retaining measured CPU billing, which keeps
+    *  the subjective NET checks active. Retain the default block CPU allowance as headroom above the transaction limit.
+    */
+   constexpr uint32_t transaction_cpu_limit_us = 1'000'000;
+   constexpr action_name setparams_action = "setparams"_n;
+   constexpr const char* params_field = "params";
+   auto parameters = chain.control->get_global_properties().configuration;
+   parameters.max_transaction_cpu_usage = transaction_cpu_limit_us;
+   parameters.max_block_cpu_usage = transaction_cpu_limit_us + config::default_max_block_cpu_usage;
+   chain.push_action( config::system_account_name, setparams_action, config::system_account_name,
+                      fc::mutable_variant_object()( params_field, parameters ) );
    chain.produce_block();
 
    auto& sub_bill = chain.control->get_mutable_subjective_billing();
