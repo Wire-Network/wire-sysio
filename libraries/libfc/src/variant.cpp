@@ -711,7 +711,7 @@ fc::int256 fc::variant::as_int256()const
    case uint256_type:
    case string_type:
    case string_sso_type:
-      return detail::parse_256bit<fc::int256>(as_string());
+      return detail::parse_256bit<fc::int256>(as_string(), detail::hex_prefix_rule::required);
    case bool_type:
       return int256(load_payload<bool>());
    case null_type:
@@ -737,7 +737,7 @@ fc::uint256 fc::variant::as_uint256()const
    case uint256_type:
    case string_type:
    case string_sso_type:
-      return detail::parse_256bit<fc::uint256>(as_string());
+      return detail::parse_256bit<fc::uint256>(as_string(), detail::hex_prefix_rule::required);
    case bool_type:
       return uint256(load_payload<bool>());
    case null_type:
@@ -1170,6 +1170,14 @@ void from_variant( const variant& v, UInt<32>& n ) { n = static_cast<uint32_t>(v
 
 void to_variant( const UInt<64>& n, variant& v ) { v = uint64_t(n); }
 void from_variant( const variant& v, UInt<64>& n ) { n = v.as_uint64(); }
+
+// Assign through the boost base: number's converting operator= is selected for the derived fc::uint256 and
+// fc::int256 and does not compile.
+void to_variant( const UInt<256>& n, variant& v ) { v = n.str(); }
+void from_variant( const variant& v, UInt<256>& n ) { n = static_cast<const UInt<256>&>(v.as_uint256()); }
+
+void to_variant( const Int<256>& n, variant& v ) { v = n.str(); }
+void from_variant( const variant& v, Int<256>& n ) { n = static_cast<const Int<256>&>(v.as_int256()); }
 
 constexpr size_t minimize_max_size = 1024;
 

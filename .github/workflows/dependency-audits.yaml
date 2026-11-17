@@ -16,7 +16,7 @@ defaults:
 jobs:
   root-node-tooling:
     name: Root Node tooling audit
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # actions/checkout@v5
 
@@ -52,7 +52,7 @@ jobs:
 
   opp-tools:
     name: OPP tools audit
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # actions/checkout@v5
 

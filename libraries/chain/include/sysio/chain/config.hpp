@@ -108,8 +108,8 @@ namespace sysio::chain::config {
   static constexpr uint32_t default_max_wasm_func_local_bytes     = 8192;
   static constexpr uint32_t default_max_wasm_nested_structures    = 1024;
   static constexpr uint32_t default_max_wasm_symbol_bytes         = 8192;
-  static constexpr uint32_t default_max_wasm_module_bytes         = 20*1024*1024;
-  static constexpr uint32_t default_max_wasm_code_bytes           = 20*1024*1024;
+  static constexpr uint32_t default_max_wasm_module_bytes         = 4*1024*1024; ///< largest module `setcode` accepts
+  static constexpr uint32_t default_max_wasm_code_bytes           = 4*1024*1024; ///< largest function body `setcode` accepts
   static constexpr uint32_t default_max_wasm_pages                = 528;
   static constexpr uint32_t default_max_wasm_call_depth           = 251;
 
@@ -136,6 +136,9 @@ namespace sysio::chain::config {
 
   /// Consensus limit bounding one uninterrupted libsodium Ed25519 verification.
   static constexpr uint32_t   max_ed25519_message_size          = 65'536;
+
+  /// Consensus limit, in bytes, on each of the base and the modulus that mod_exp accepts.
+  static constexpr uint32_t   max_mod_exp_operand_size          = 8'192;
 
   // KV default limits — on-chain consensus values are in chain_config
   static constexpr uint32_t   default_max_kv_key_size           = 256;       ///< maximum KV primary key size in bytes

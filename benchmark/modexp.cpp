@@ -38,7 +38,7 @@ void modexp_benchmarking() {
       auto modulus  = generate_random_bytes(r, n);
 
       auto f = [&]() {
-         fc::modexp(base, exponent, modulus);
+         fc::modexp(base, exponent, modulus, {});
       };
 
       auto even_and_odd = [&](const std::string& bm) {

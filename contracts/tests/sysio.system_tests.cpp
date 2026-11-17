@@ -522,6 +522,8 @@ BOOST_FIXTURE_TEST_CASE( wasmcfg, sysio_system_tester ) try {
    // make sure that changed parameters were applied
    auto active_params = control->get_global_properties().wasm_configuration;
    BOOST_REQUIRE_EQUAL( active_params.max_table_elements, 8192 );
+   BOOST_REQUIRE_EQUAL( active_params.max_module_bytes, 4194304 );
+   BOOST_REQUIRE_EQUAL( active_params.max_code_bytes, 4194304 );
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_CASE( setabi_bios ) try {
