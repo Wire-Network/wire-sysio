@@ -22,6 +22,7 @@
 #include "async_action_completion.hpp"
 #include "group_election.hpp"
 #include "role_config.hpp"
+#include "synd_crank.hpp"
 #include "underwriter.hpp"
 #include "yield_cranks.hpp"
 
@@ -322,6 +323,9 @@ struct batch_operator_plugin::impl {
    fc::time_point                           underwriter_clients_at;   ///< last rebuild of `underwriter_clients`
    fc::time_point                           underwriter_housekeeping_at;   ///< last housekeeping
    fc::time_point                           underwriter_cranked_at;   ///< last crank
+   /// Round-robin release observation and per-pair retry state, independent of the request scan window.
+   std::optional<fc::slug_name> underwriter_release_from;
+   std::map<uw::synd_pair, uw::synd_crank_retry> underwriter_release_retries;
    /// The lowest `sysio.bond::requests` id the next pass reads (`underwriter::next_scan_start`); 0 reads them all.
    uw::request_id_t                         underwriter_scan_from = 0;
    /// Where the underwriter's prunes are in their walk of `sysio.bond::requests` (`underwriter::prune_sweep`).
@@ -1438,6 +1442,8 @@ struct batch_operator_plugin::impl {
       if (!tokens) return;
       std::optional<uw::plan_inputs> in = read_underwriter_state(*tokens, head_time);
       if (!in || shutting_down) return;
+      const auto release_work = read_underwriter_release_work(*tokens, in->requests);
+      if (!release_work || shutting_down) return;
       uw::remember_bonded(underwriter_bonded, in->bonds, in->requests);
       if (underwriter_forfeits.note(uw::forfeited_requests(in->requests, underwriter_bonded))) {
          elog("batch_operator: underwriter stops bonding until the node is restarted: request {} was ruled INVALID "
@@ -1454,7 +1460,24 @@ struct batch_operator_plugin::impl {
       const uw::plan plan = uw::plan_actions(*in);
       underwriter_pending_accepts = plan.pending_accepts;
       report_plan(*in, plan);
-      push_plan(plan, uw::synd_has_work(in->requests), now);
+      const auto crank_now = fc::time_point::now();
+      bool crank_due = !plan.accepts.empty() || !plan.approves.empty();
+      const auto sync_work = uw::synd_sync_work(in->requests);
+      // Synchronization has its own persisted cursor through retained history; each pass can advance it even
+      // before any request is acknowledged. Keep its existing polling cadence until the terminal set clears.
+      crank_due = crank_due || sync_work.ready;
+      for (const auto& [pair, work] : *release_work) {
+         crank_due = crank_due || underwriter_release_retries[pair].due(work, crank_now);
+      }
+      if (!in->frozen && (crank_due || crank_now - underwriter_cranked_at >= UNDERWRITER_IDLE_CRANK_INTERVAL)) {
+         crank_due = true;
+      } else {
+         crank_due = false;
+         if (in->frozen) {
+            underwriter_release_retries.clear();
+         }
+      }
+      push_plan(plan, crank_due, *release_work);
       underwriter_scan_from = uw::next_scan_start(underwriter_scan_from, in->requests, in->bonds, underwriter_bonded,
                                                 underwriter_pending_accepts);
 
@@ -1520,8 +1543,10 @@ struct batch_operator_plugin::impl {
    /// Push what the plan decided: accepts first, so their releases start this pass, then the crank, approves and
    /// claims. Reserve each submitted accept until the irreversible view accounts for it or its transaction expires;
    /// a partial accept leaves the request OPEN, so the contract cannot refuse a repeated contribution for us.
-   /// `synd_busy` says `sysio.synd` has an envelope request in play or an outcome to acknowledge.
-   void push_plan(const uw::plan& plan, bool synd_busy, fc::time_point now) {
+   /// `crank_due` includes eligible release work, outcome synchronization and idle recovery, with freeze/backoff
+   /// applied.
+   void push_plan(const uw::plan& plan, bool crank_due,
+                    const std::map<uw::synd_pair, uw::synd_work>& release_work) {
       for (const uw::accept_action& accept : plan.accepts) {
          std::optional<fc::time_point_sec> submitted_until;
          const bool accepted = underwriter_push(uw::bond::account, uw::bond::action_accept,
@@ -1536,10 +1561,12 @@ struct batch_operator_plugin::impl {
                  accept.amount.to_string());
          }
       }
-      // One crank moves a bounded amount of work. Every pass while synd is busy; otherwise now and then, for what a
-      // bucket refill or a cleared cord lets through.
-      if (synd_busy || now - underwriter_cranked_at >= UNDERWRITER_IDLE_CRANK_INTERVAL) {
-         underwriter_cranked_at = now;
+      // The release observer checks refill capacity separately from underwriting request activity.
+      if (crank_due) {
+         underwriter_cranked_at = fc::time_point::now();
+         for (const auto& [pair, work] : release_work) {
+            if (work.ready) underwriter_release_retries[pair].note(work, underwriter_cranked_at);
+         }
          underwriter_push(uw::synd::account, uw::synd::action_crank,
                           fc::mutable_variant_object()(uw::synd::field::limit, UNDERWRITER_CRANK_LIMIT));
       }
@@ -1684,6 +1711,68 @@ struct batch_operator_plugin::impl {
       if (!frozen) return std::nullopt;
       in.frozen = *frozen;
       return in;
+   }
+
+   /**
+    * Observe at most eight registered pairs, with at most sixteen envelopes, three point reads and sixteen item
+    * rows per reached yield/invalidating envelope, plus one epoch singleton read. The persisted cursor skips finished
+    * history. Move the pair cursor only after every
+    * selected read succeeds; retry markers are retained only for registered pairs. A failed read withholds this pass.
+    */
+   std::optional<std::map<uw::synd_pair, uw::synd_work>>
+   read_underwriter_release_work(const std::map<fc::slug_name, liq_token>& tokens,
+                                  const std::vector<uw::request>& requests) {
+      try {
+         const auto started = fc::time_point::now();
+         uint32_t reads = 1;
+         sysio::chain_apis::read_only::get_table_rows_params state;
+         state.code = chain::name(epoch::account);
+         state.scope = epoch::account;
+         state.table = epoch::table_epochstate;
+         state.limit = SINGLETON_ROW_LIMIT;
+         state.values_only = true;
+         const auto epoch_rows = read_table_checked(std::move(state));
+         if (!epoch_rows || epoch_rows->rows.empty()) return std::nullopt;
+         uint32_t rows_read = epoch_rows->rows.size();
+         const auto current = epoch_rows->rows.front().get_object()[epoch::field::current_epoch_index].as<uint32_t>();
+         std::map<uw::synd_pair, uw::synd_work> out;
+         auto it = underwriter_release_from ? tokens.lower_bound(*underwriter_release_from) : tokens.begin();
+         if (it == tokens.end()) it = tokens.begin();
+         for (uint32_t count = 0; it != tokens.end() && count < uw::synd::pairs_per_poll; ++count, ++it) {
+            const uw::synd_pair pair{it->second.chain_code, it->first};
+            auto work = uw::read_synd_work(pair, current, requests,
+               [this, &reads, &rows_read](const char* table, const fc::variant_object& key, bool exact, uint32_t limit)
+                  -> std::optional<fc::variants> {
+                  sysio::chain_apis::read_only::get_table_rows_params query;
+                  query.code = chain::name(uw::synd::account);
+                  query.scope = uw::synd::account;
+                  query.table = table;
+                  query.limit = limit;
+                  query.values_only = true;
+                  const auto bound = fc::json::to_string(key, fc::json::yield_function_t{});
+                  if (exact) query.find = bound;
+                  else query.lower_bound = bound;
+                  ++reads;
+                  auto rows = read_table_checked(std::move(query));
+                  if (!rows) return std::nullopt;
+                  rows_read += rows->rows.size();
+                  return std::move(rows->rows);
+               });
+            if (!work) return std::nullopt;
+            out.emplace(pair, std::move(*work));
+         }
+         underwriter_release_from = it == tokens.end() ? std::nullopt : std::optional{it->first};
+         std::erase_if(underwriter_release_retries, [&](const auto& entry) {
+            const auto found = tokens.find(entry.first.second);
+            return found == tokens.end() || found->second.chain_code != entry.first.first;
+         });
+         dlog("batch_operator: underwriter release observation: {} pairs, {} table reads, {} rows, {} us",
+              out.size(), reads, rows_read, (fc::time_point::now() - started).count());
+         return out;
+      } catch (const fc::exception& error) {
+         elog("batch_operator: underwriter cannot observe syndication release queues: {}", error.top_message());
+         return std::nullopt;
+      }
    }
 
    /// The symbol of every token a request can be bonded in: each `sysio.liq` shadow, and WIRE.
