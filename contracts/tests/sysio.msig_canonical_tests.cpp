@@ -23,8 +23,8 @@ constexpr auto trailing_bytes_message = "action data has bytes left after the ar
 constexpr auto read_past_end_message = "datastream attempted to read past the end";
 /// The contract decoder rejects bytes that end before the single byte it is reading.
 constexpr auto read_byte_past_end_message = "get";
-/// The node's check_transaction_authorization rejects bytes left after the transaction it decodes.
-constexpr auto node_trailing_bytes_message = "trailing bytes after the packed argument";
+/// The node's decoder rejects a variable-length integer longer than five bytes.
+constexpr auto node_overlong_integer_message = "unsigned_int is longer than five bytes";
 
 /**
  * True when the contract refused bytes that are not one canonically encoded transaction: its decode ran out of data,
@@ -156,7 +156,10 @@ public:
       return out;
    }
 
-   /// Bytes the node reads as one action, `outer`, while carrying `inner` after it in a non-canonical layout.
+   /**
+    * Bytes that carry `inner` after one action, `outer`, using variable-length integers longer than five bytes. A
+    * decoder that stops each integer at five bytes reads only `outer`.
+    */
    std::vector<char> nested_trx( const action& outer, const action& inner ) const {
       const std::vector<char> zero = { '\x80', '\x80', '\x80', '\x80', '\x80' };
       const std::vector<char> one  = { '\x81', '\x80', '\x80', '\x80', '\x80' };
@@ -371,7 +374,8 @@ BOOST_FIXTURE_TEST_CASE( propose_rejects_wrong_length, sysio_msig_canonical_test
    propose_packed( numbered_name( n++ ), { level }, packed );
 } FC_LOG_AND_RETHROW()
 
-// A layout the node reads as one action on packer, and that is not canonical, is rejected at propose.
+// A layout that hides an action behind integers longer than five bytes does not decode on the node, and the contract
+// rejects it at propose before asking the node to check it.
 BOOST_FIXTURE_TEST_CASE( propose_rejects_nested_layout, sysio_msig_canonical_tester ) try {
    const permission_level level{ packer, packer };
    const action outer( vector<permission_level>{ level }, packer, packer, bytes{} );
@@ -379,18 +383,16 @@ BOOST_FIXTURE_TEST_CASE( propose_rejects_nested_layout, sysio_msig_canonical_tes
                        fc::raw::pack( "alice"_n ) );
    const auto packed = nested_trx( outer, inner );
 
-   const auto authorized = fc::raw::unpack<transaction>( packed );
-   BOOST_REQUIRE_EQUAL( authorized.actions.size(), 1u );
-   BOOST_REQUIRE_EQUAL( authorized.actions[0].account, packer );
-   BOOST_REQUIRE( authorized.actions[0].authorization == vector<permission_level>{ level } );
-   BOOST_REQUIRE( !is_canonical( packed ) );
+   BOOST_REQUIRE_EXCEPTION( fc::raw::unpack<transaction>( packed ),
+                            fc::assert_exception,
+                            fc_exception_message_contains( node_overlong_integer_message ) );
 
    BOOST_REQUIRE_EXCEPTION( propose_packed( "nested"_n, { level }, packed ),
                             sysio_assert_message_exception,
                             is_non_canonical_rejection );
 } FC_LOG_AND_RETHROW()
 
-// The earlier contract cannot store that layout either: the node's authorization check refuses it at propose.
+// The earlier contract cannot store that layout either: the node's authorization check refuses to decode it at propose.
 BOOST_FIXTURE_TEST_CASE( earlier_contract_refuses_nested_layout, sysio_msig_canonical_tester ) try {
    const permission_level level{ packer, packer };
    const action outer( vector<permission_level>{ level }, packer, packer, bytes{} );
@@ -399,8 +401,8 @@ BOOST_FIXTURE_TEST_CASE( earlier_contract_refuses_nested_layout, sysio_msig_cano
 
    deploy_msig( contracts::util::msig_wasm_old(), contracts::util::msig_abi_old() );
    BOOST_REQUIRE_EXCEPTION( propose_packed( "nested"_n, { level }, nested_trx( outer, inner ) ),
-                            wasm_execution_error,
-                            fc_exception_message_contains( node_trailing_bytes_message ) );
+                            fc::assert_exception,
+                            fc_exception_message_contains( node_overlong_integer_message ) );
 } FC_LOG_AND_RETHROW()
 
 // Proposals with a padded integer, stored by the earlier contract at every integer position, cannot be executed after

@@ -83,8 +83,9 @@ using uint256_t = uint256;
 using int256_t = int256;
 
 /**
- * The text of `v` as a 256-bit integer: an optional '-', then decimal digits, or hex digits with or without a "0x"
- * prefix. Digits after a leading zero are decimal. Empty text and a bare "0x" are zero.
+ * The text of `v` as a 256-bit integer: an optional '-', then decimal digits, or hex digits with or without "0x" or
+ * "0X" before them. Digits without the prefix are decimal when they all are. Digits after a leading zero are decimal.
+ * Empty text and a bare "0x" or "0X" are zero; "-" and "-0x" are not numbers.
  * @throw parse_error_exception if the text is not such a number, or the number is outside the range of the result
  */
 fc::uint256 to_uint256(const fc::variant& v);
