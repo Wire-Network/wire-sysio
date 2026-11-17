@@ -259,24 +259,53 @@ BOOST_AUTO_TEST_CASE(global_crank_progress_wakes_pairs_left_outside_the_budget) 
    std::map<synd_pair, synd_work> work{{pair, *fixture.observe(refill_epoch + 1)},
                                       {other, *fixture.observe(refill_epoch + 1)}};
    std::map<synd_pair, synd_crank_retry> retries;
+   bool progress = false;
    auto now = fc::time_point::from_iso_string("2026-11-17T00:00:00");
-   BOOST_CHECK(synd_crank_due(work, retries, now));
+   BOOST_CHECK(synd_crank_due(work, retries, progress, now));
    // Pair A keeps consuming the whole budget. B's unchanged view cannot tell whether the contract reached it.
    for (int pass = 0; pass < 10; ++pass) {
       for (const auto& [key, observed] : work) retries[key].note(observed, now);
+      progress = false;
       now += fc::seconds(1);
-      BOOST_CHECK(!synd_crank_due(work, retries, now));
+      BOOST_CHECK(!synd_crank_due(work, retries, progress, now));
       work.at(pair).positions.front().released += 1;
-      BOOST_CHECK(synd_crank_due(work, retries, now));
+      BOOST_CHECK(synd_crank_due(work, retries, progress, now));
    }
    for (const auto& [key, observed] : work) retries[key].note(observed, now);
+   progress = false;
    work.at(pair) = {}; // A just drained; B is ready but unchanged and must not inherit a five-minute pause
    now += fc::seconds(1);
-   BOOST_CHECK(synd_crank_due(work, retries, now));
+   BOOST_CHECK(synd_crank_due(work, retries, progress, now));
    for (const auto& [key, observed] : work) retries[key].note(observed, now);
-   BOOST_CHECK(!synd_crank_due(work, retries, now + fc::seconds(1)));
+   progress = false;
+   BOOST_CHECK(!synd_crank_due(work, retries, progress, now + fc::seconds(1)));
    work.at(other) = {};
-   BOOST_CHECK(!synd_crank_due(work, retries, now + fc::hours(1)));
+   BOOST_CHECK(!synd_crank_due(work, retries, progress, now + fc::hours(1)));
+}
+
+/// With more pairs than fit one poll, drainage on an empty page must wake ready work on the following page once.
+BOOST_AUTO_TEST_CASE(global_progress_survives_disjoint_observation_pages) {
+   synd_fixture fixture;
+   const synd_pair other{fc::slug_name{"SOL"}, fc::slug_name{"LIQSOL"}};
+   std::map<synd_pair, synd_work> first{{pair, *fixture.observe(refill_epoch + 1)}};
+   std::map<synd_pair, synd_work> second{{other, *fixture.observe(refill_epoch + 1)}};
+   std::map<synd_pair, synd_crank_retry> retries;
+   bool progress = false;
+   const auto now = fc::time_point::from_iso_string("2026-11-17T00:00:00");
+   BOOST_CHECK(synd_crank_due(first, retries, progress, now));
+   retries[pair].note(first.at(pair), now);
+   progress = false;
+   BOOST_CHECK(synd_crank_due(second, retries, progress, now));
+   for (int attempt = 0; attempt < 10; ++attempt) retries[other].note(second.at(other), now);
+   progress = false;
+   first.at(pair) = {};
+   BOOST_CHECK(!synd_crank_due(first, retries, progress, now + fc::seconds(1)));
+   BOOST_CHECK(progress);
+   BOOST_CHECK(synd_crank_due(second, retries, progress, now + fc::seconds(1)));
+   retries[other].note(second.at(other), now + fc::seconds(1));
+   progress = false;
+   BOOST_CHECK(!synd_crank_due(first, retries, progress, now + fc::seconds(2)));
+   BOOST_CHECK(!synd_crank_due(second, retries, progress, now + fc::seconds(2)));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

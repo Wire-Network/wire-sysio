@@ -239,6 +239,7 @@ struct synd_crank_retry {
    static constexpr auto initial_wait = fc::seconds(30);
    static constexpr auto maximum_wait = fc::minutes(5);
    std::optional<synd_work> attempted;
+   std::optional<synd_work> observed; ///< last bounded-page observation, independent of transaction attempts
    fc::time_point retry_at;
    fc::microseconds wait = initial_wait;
 
@@ -257,23 +258,20 @@ struct synd_crank_retry {
 
 /**
  * A crank's budget is shared across pairs. Progress in any observed pair wakes the ready set, including when the
- * progressing pair just drained and an unchanged pair was never reached. Record every observed snapshot on an
- * attempt, including empty queues, so that drained progress wakes another pair once rather than on every poll.
+ * progressing pair just drained and an unchanged pair was never reached. Remember changes across bounded pages
+ * until an actual global attempt clears `progress`. Keep the last observation separately from the last attempt so
+ * an empty pair on a different page contributes its drainage once, without repeatedly waking blocked work.
  */
 inline bool synd_crank_due(const std::map<synd_pair, synd_work>& work,
-                            const std::map<synd_pair, synd_crank_retry>& retries, fc::time_point now) {
+                            std::map<synd_pair, synd_crank_retry>& retries, bool& progress, fc::time_point now) {
    bool ready = false;
-   bool progress = false;
    bool retry_due = false;
    for (const auto& [pair, observed] : work) {
       ready = ready || observed.ready;
-      const auto retry = retries.find(pair);
-      if (retry == retries.end()) {
-         progress = true;
-         continue;
-      }
-      progress = progress || !retry->second.attempted || *retry->second.attempted != observed;
-      retry_due = retry_due || retry->second.due(observed, now);
+      auto& retry = retries[pair];
+      progress = progress || !retry.observed || *retry.observed != observed;
+      retry.observed = observed;
+      retry_due = retry_due || retry.due(observed, now);
    }
    return retry_due || (ready && progress);
 }

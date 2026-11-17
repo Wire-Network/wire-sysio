@@ -326,6 +326,7 @@ struct batch_operator_plugin::impl {
    /// Round-robin release observation and per-pair retry state, independent of the request scan window.
    std::optional<fc::slug_name> underwriter_release_from;
    std::map<uw::synd_pair, uw::synd_crank_retry> underwriter_release_retries;
+   bool underwriter_release_progress = false; ///< unconsumed progress carried across bounded observation pages
    /// The lowest `sysio.bond::requests` id the next pass reads (`underwriter::next_scan_start`); 0 reads them all.
    uw::request_id_t                         underwriter_scan_from = 0;
    /// Where the underwriter's prunes are in their walk of `sysio.bond::requests` (`underwriter::prune_sweep`).
@@ -1466,13 +1467,16 @@ struct batch_operator_plugin::impl {
       // Synchronization has its own persisted cursor through retained history; each pass can advance it even
       // before any request is acknowledged. Keep its existing polling cadence until the terminal set clears.
       crank_due = crank_due || sync_work.ready;
-      crank_due = crank_due || uw::synd_crank_due(*release_work, underwriter_release_retries, crank_now);
+      const bool release_due = uw::synd_crank_due(*release_work, underwriter_release_retries,
+                                                 underwriter_release_progress, crank_now);
+      crank_due = crank_due || release_due;
       if (!in->frozen && (crank_due || crank_now - underwriter_cranked_at >= UNDERWRITER_IDLE_CRANK_INTERVAL)) {
          crank_due = true;
       } else {
          crank_due = false;
          if (in->frozen) {
             underwriter_release_retries.clear();
+            underwriter_release_progress = false;
          }
       }
       push_plan(plan, crank_due, *release_work);
@@ -1562,6 +1566,7 @@ struct batch_operator_plugin::impl {
       // The release observer checks refill capacity separately from underwriting request activity.
       if (crank_due) {
          underwriter_cranked_at = fc::time_point::now();
+         underwriter_release_progress = false;
          for (const auto& [pair, work] : release_work) {
             underwriter_release_retries[pair].note(work, underwriter_cranked_at);
          }
