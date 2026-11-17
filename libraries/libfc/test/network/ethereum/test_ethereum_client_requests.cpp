@@ -398,10 +398,19 @@ BOOST_AUTO_TEST_CASE(quantity_reads_refuse_non_canonical_forms) try {
    BOOST_CHECK_EQUAL(receipts.server.request_count(), 1u);
 } FC_LOG_AND_RETHROW();
 
-/// `net_version` answers in decimal, not as a QUANTITY.
+/// `net_version` answers in decimal, not as a QUANTITY, even after a leading zero.
 BOOST_AUTO_TEST_CASE(network_version_is_read_as_decimal) try {
-   recorded_client recorded({reply(sepolia_network_version)});
+   recorded_client recorded({reply(sepolia_network_version), reply("\"010\"", 2)});
    BOOST_CHECK_EQUAL(recorded.client->get_network_version(), fc::uint256{sepolia_network_id});
+   BOOST_CHECK_EQUAL(recorded.client->get_network_version(), fc::uint256{10});
+} FC_LOG_AND_RETHROW();
+
+/// A block number past 2^256 - 1 is refused instead of wrapping.
+BOOST_AUTO_TEST_CASE(block_number_past_uint256_is_refused) try {
+   const std::string past_max_block_number = "\"0x1" + std::string(64, '0') + "\"";
+   recorded_client recorded({reply(past_max_block_number)});
+   BOOST_CHECK_EXCEPTION((void) recorded.client->get_block_number(), ethereum_transaction_policy_exception,
+                         refuses(ethereum_transaction_policy_reason::rpc_quantity_out_of_range, block_number_field));
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_SUITE_END()

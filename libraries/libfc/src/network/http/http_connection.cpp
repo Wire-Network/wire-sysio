@@ -4,12 +4,13 @@
 #include <boost/asio/ssl/host_name_verification.hpp>
 #include <boost/beast/version.hpp>
 
+#include <fc/string.hpp>
+
 #include <openssl/pem.h>
 #include <openssl/ssl.h>
 
-#include <algorithm>
-#include <cctype>
 #include <filesystem>
+#include <string_view>
 
 namespace fc {
 namespace http {
@@ -28,10 +29,8 @@ bool contains_hashed_ca_certificate(const std::filesystem::path& directory) {
       if (!entry.is_regular_file(type_error) || type_error)
          continue;
       const auto name = entry.path().filename().string();
-      if (name.size() < 10 || name[8] != '.' ||
-          !std::all_of(name.begin(), name.begin() + 8,
-                       [](unsigned char character) { return std::isxdigit(character); }) ||
-          !std::all_of(name.begin() + 9, name.end(), [](unsigned char character) { return std::isdigit(character); })) {
+      if (name.size() < 10 || name[8] != '.' || !fc::all_hex_digits(std::string_view{name}.substr(0, 8)) ||
+          !fc::all_digits(std::string_view{name}.substr(9))) {
          continue;
       }
 
