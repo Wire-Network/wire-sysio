@@ -108,8 +108,8 @@ namespace sysio::chain::config {
   static constexpr uint32_t default_max_wasm_func_local_bytes     = 8192;
   static constexpr uint32_t default_max_wasm_nested_structures    = 1024;
   static constexpr uint32_t default_max_wasm_symbol_bytes         = 8192;
-  static constexpr uint32_t default_max_wasm_module_bytes         = 20*1024*1024;
-  static constexpr uint32_t default_max_wasm_code_bytes           = 20*1024*1024;
+  static constexpr uint32_t default_max_wasm_module_bytes         = 4*1024*1024; ///< largest module `setcode` accepts
+  static constexpr uint32_t default_max_wasm_code_bytes           = 4*1024*1024; ///< largest function body `setcode` accepts
   static constexpr uint32_t default_max_wasm_pages                = 528;
   static constexpr uint32_t default_max_wasm_call_depth           = 251;
 
@@ -152,6 +152,10 @@ namespace sysio::chain::config {
 #else
   const static sysio::chain::wasm_interface::vm_type default_wasm_runtime = sysio::chain::wasm_interface::vm_type::sys_vm;
 #endif
+
+  /// Stack a thread that runs contracts needs. sys-vm-oc and sys-vm-jit run wasm on the calling thread's stack until
+  /// their bound for it passes 4 MiB, then on a stack they map; the rest is for host functions and the frames below.
+  static constexpr std::size_t contract_thread_stack_size = 8*1024*1024;
 
   static constexpr uint32_t   default_abi_serializer_max_time_us = 15*1000; ///< default deadline for abi serialization methods
 

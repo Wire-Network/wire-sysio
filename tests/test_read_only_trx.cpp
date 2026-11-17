@@ -19,6 +19,7 @@
 #include "chain_test_utils.hpp"
 
 #include <fc/scoped_exit.hpp>
+#include <fc/thread_stack.hpp>
 #include <fc/thread_utils.hpp>
 #include <chrono>
 
@@ -311,6 +312,76 @@ BOOST_AUTO_TEST_CASE(irreversible_with_1_read_only_threads) {
 BOOST_AUTO_TEST_CASE(irreversible_with_3_read_only_threads) {
    std::vector<const char*> specific_args = { "--read-only-threads=3" };
    test_irreversible_read_window(specific_args);
+}
+
+/// Read-only threads run contracts, so they get config::contract_thread_stack_size whatever ulimit -s gives other
+/// threads. ctest also runs this case under a small ulimit -s (plugin_test_read_only_thread_stack).
+BOOST_AUTO_TEST_CASE(read_only_threads_get_contract_thread_stack) {
+   try {
+      using namespace std::chrono_literals;
+      fc::temp_directory temp;
+      appbase::scoped_app app;
+      const std::string temp_dir_str = temp.path().string();
+      const std::string genesis_file = (temp.path() / "genesis.json").string();
+      fc::json::save_to_file(sysio::testing::base_tester::default_genesis(), genesis_file);
+
+      constexpr uint32_t num_tasks = 16;
+      // declared before on_exit so they outlive every posted task
+      std::atomic<uint32_t> num_executed = 0;
+      std::atomic<std::size_t> smallest_stack = std::numeric_limits<std::size_t>::max();
+      std::atomic<bool> ran_on_main_thread = false;
+
+      std::promise<void> started;
+      std::future<void> started_fut = started.get_future();
+      std::thread app_thread( [&]() {
+         try {
+            std::vector<const char*> argv = {
+               "test",  // dummy executible name
+               "--data-dir", temp_dir_str.c_str(),
+               "--config-dir", temp_dir_str.c_str(),
+               "--genesis-json", genesis_file.c_str(),
+               "--read-only-threads=2",
+               "--read-only-write-window-time-us=100000",
+               "--read-only-read-window-time-us=100000"
+            };
+            app->initialize<chain_plugin, producer_plugin>(argv.size(), (char**)&argv[0]);
+            app->startup();
+            // Capture this thread as main_thread_id_ before releasing the promise; scoped_app was constructed on the
+            // outer thread.
+            app->executor().set_main_thread_id();
+            started.set_value();
+            app->exec();
+            return;
+         } FC_LOG_AND_DROP()
+         BOOST_CHECK(!"app threw exception see logged error");
+      } );
+      auto on_exit = fc::make_scoped_exit([&](){
+         app->quit();
+         if (app_thread.joinable())
+            app_thread.join();
+      });
+
+      BOOST_REQUIRE(started_fut.wait_for(30s) == std::future_status::ready);
+
+      for (uint32_t i = 0; i < num_tasks; ++i) {
+         app->executor().post( priority::low, exec_queue::read_exclusive, [&]() {
+            const std::size_t stack = fc::current_thread_stack_size();
+            std::size_t smallest = smallest_stack.load();
+            while (stack < smallest && !smallest_stack.compare_exchange_weak(smallest, stack)) {}
+            if (app->executor().get_main_thread_id() == std::this_thread::get_id())
+               ran_on_main_thread = true;
+            ++num_executed;
+         } );
+      }
+
+      const auto deadline = fc::time_point::now() + fc::seconds(10);
+      while (num_executed < num_tasks && fc::time_point::now() < deadline) {
+         std::this_thread::sleep_for(10ms);
+      }
+      BOOST_REQUIRE_EQUAL( num_executed.load(), num_tasks );
+      BOOST_TEST( !ran_on_main_thread.load() );
+      BOOST_TEST( smallest_stack.load() >= config::contract_thread_stack_size );
+   } FC_LOG_AND_RETHROW()
 }
 
 BOOST_AUTO_TEST_SUITE_END()

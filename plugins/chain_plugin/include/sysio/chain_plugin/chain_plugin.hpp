@@ -413,6 +413,8 @@ public:
 
       vector<permission>         permissions;
 
+      /// With `sysio.roa` deployed, the limits above as `owner`, `net_weight` and `cpu_weight` (assets in the chain's
+      /// core symbol, an unlimited weight as 0) and `ram_bytes`. Null when the RAM limit is unlimited.
       fc::variant                total_resources;
 
       std::optional<sysio::chain::resource_limits::account_resource_limit> subjective_cpu_bill_limit;

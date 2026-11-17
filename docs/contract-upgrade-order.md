@@ -32,15 +32,10 @@ system account only has a small creation allowance.
 
 *The root `sysio` account* — which holds `sysio.system` and **is the RAM pool
 itself** — deploys with the **native `setcode` / `setabi`**. `giftram` cannot
-self-target: with `account == sysio` and a positive delta it moves the delta
-from sysio's reslimit row into `sysio.acct`, then calls
-`set_resource_limits(sysio, sram - delta)` and `add_system_resources(sysio,
-delta)` — both against the same account, so the chain quota is restored while
-the ROA ledger has already been decremented. The result is a ledger that reads
-lower than the actual quota, and it fails silently: sysio's limit is finite, so
-`giftram`'s own `cur_ram >= 0` guard does not catch it. This is why the
-production bootstrap deploys `system` on `sysio` natively (the harness encodes
-the same split as `ContractSteps.DeployMode.raw` for bios/system/roa).
+self-target: with `account == sysio` it moves the delta out of sysio's quota
+and straight back, so it funds nothing. This is why the production bootstrap
+deploys `system` on `sysio` natively (the harness encodes the same split as
+`ContractSteps.DeployMode.raw` for bios/system/roa).
 
 So an atomic transaction that includes `sysio.system` carries **native
 `setcode`/`setabi` for `sysio`** plus **ROA `setsyscode`/`setsysabi` for every

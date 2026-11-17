@@ -21,6 +21,7 @@ add_executable( test_fc
         io/test_json_variant.cpp
         io/test_random_access_file.cpp
         io/test_raw.cpp
+        io/test_unsigned_int.cpp
         io/test_tracked_storage.cpp
         network/es/test_es_client.cpp
         network/ethereum/test_ethereum_client_and_rlp.cpp
@@ -30,6 +31,7 @@ add_executable( test_fc
         network/test_json_rpc_client.cpp
         network/solana/test_solana_client.cpp
         network/test_message_buffer.cpp
+        network/test_to_int256.cpp
         scoped_exit/test_scoped_exit.cpp
         static_variant/test_static_variant.cpp
         variant/test_variant.cpp
@@ -37,6 +39,7 @@ add_executable( test_fc
         variant/test_variant_assign.cpp
         variant/test_variant_ctor.cpp
         variant/test_variant_enum.cpp
+        variant/test_variant_integer_range.cpp
         variant/test_variant_object_misc.cpp
         variant/test_variant_operators.cpp
         variant/test_variant_visitor.cpp
@@ -50,6 +53,7 @@ add_executable( test_fc
         test_bitset.cpp
         test_ordered_diff.cpp
         test_system_timer.cpp
+        test_thread_stack.cpp
         test_time.cpp
         parallel/test_worker_task_queue.cpp
         parallel/test_batch_task_queue.cpp

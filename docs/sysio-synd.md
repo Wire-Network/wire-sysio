@@ -59,7 +59,8 @@ independent bounded phases:
 Syndication uses bond's durable `requestkeep` interface. A terminal request cannot be pruned before
 syndication records and acknowledges its outcome, even when all payouts were claimed and seven days
 have passed. There is no polling deadline. Delayed synchronization delays progress, not recoverability.
-An INVALID outcome discovered after DONE rewinds settlement to that envelope.
+A ruling recorded for an envelope the release walk is past, an INVALID one after DONE or either one on a
+held envelope, rewinds `queue_epoch` to that envelope.
 
 The stable request identity is `(issuer, schema, statement)`, resolved through bond's public accessor.
 An inline `syncenv` after creation records the actual numeric ID; syndication never predicts bond's
@@ -97,17 +98,19 @@ envelope whose request is BONDED: an envelope released whole while its request i
 bonded can be challenged, since the bond exists for exactly that case. The challenger pays the
 request's hold bond plus the pair's `challenge_extra`; a charge of zero is refused (`challenge charge is
 zero; configure challenge_extra`). The extra stays in the fee pot, and `sysio.synd` holds the request
-through `sysio.bond::hold` naming the challenger as beneficiary. The envelope is HELD until `sysio`
-rules, and the pair's `queue_epoch` is rewound to it so the ruling is processed. One challenge per
-request; contract accounts may challenge. The hold carries the challenger's authority, and its
+through `sysio.bond::hold` naming the challenger as beneficiary. The envelope is HELD until a judge
+rules (the `sysio.bond` judge account or `sysio`). The release walk moves on past it, and recording the
+ruling rewinds the pair's `queue_epoch` to it so the ruling is processed. One challenge per request;
+contract accounts may challenge. The hold carries the challenger's authority, and its
 hold-bond escrow on `sysio.bond` bills the challenger's RAM, so a challenger without that RAM cannot
 challenge. The fee pot row bills `sysio`.
 
 A request that is not yet fully bonded cannot be challenged (`the envelope's request is not fully
 bonded; it cannot be challenged yet`). Nothing has been released while it is OPEN, and a held request
-takes no more bonds, so holding it would stop every later envelope of the pair until `sysio` rules. An
-unbonded envelope in doubt is ruled INVALID by `sysio` directly (`sysio.bond::rslvinvalid`). A request
-held by a challenge is therefore always fully bonded, and holds back only its own envelope.
+takes no more bonds, so holding it would stop every later envelope of the pair until a judge rules. An
+unbonded envelope in doubt is ruled INVALID directly (`sysio.bond::rslvinvalid`). A request
+held by a challenge is therefore always fully bonded, and holds back only its own envelope, however many
+later envelopes the pair has.
 
 - **VALID:** release resumes. The hold bond goes to the request's bonds, claimed with each underwriter's
   bond from `sysio.bond`; the challenger gets none of it back, and `challenge_extra` stays in the fee pot.

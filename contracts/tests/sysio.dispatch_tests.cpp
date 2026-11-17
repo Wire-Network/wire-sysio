@@ -2285,7 +2285,7 @@ BOOST_FIXTURE_TEST_CASE(a_shortfall_freezes_the_same_envelopes_queue_step, sysio
    const int64_t hold_bond = 10 * LIQ_UNIT / 10;           // 1000 bps of the 10 covered
    const int64_t challenger_before = liq_balance(CHALLENGER);
    BOOST_REQUIRE_EQUAL(5 * LIQ_UNIT - hold_bond, challenger_before);
-   BOOST_REQUIRE_EQUAL(success(), push(BOND_ACCOUNT, bond_abi, config::system_account_name, "rslvvalid"_n,
+   BOOST_REQUIRE_EQUAL(success(), push(BOND_ACCOUNT, bond_abi, BOND_ACCOUNT, "rslvvalid"_n,
                                        mvo()("request_id", id)));
    produce_block();   // land the pushes above before the clock is moved past their expiration
    BOOST_REQUIRE_EQUAL("HELD", synd_envelope("ETH", "LIQETH", first_epoch)["state"].as_string());

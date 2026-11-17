@@ -8,6 +8,7 @@
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/post.hpp>
 #include <boost/asio/use_future.hpp>
+#include <boost/thread/thread_only.hpp>
 #include <atomic>
 #include <functional>
 #include <future>
@@ -165,8 +166,10 @@ namespace fc {
       ///                  if an empty function then logs and rethrows exception on thread which will terminate. Not called
       ///                  for exceptions during the init function (such exceptions are rethrown from start())
       /// @param init is an optional function to call at startup to initialize any data.
+      /// @param stack_size is the stack of each thread in bytes; empty for the platform's default: on Linux the soft
+      ///                   ulimit -s at process start, or 2 MiB when it is unlimited.
       /// @throw assert_exception if already started and not stopped.
-      void start( size_t num_threads, on_except_t on_except, init_t init = {} ) {
+      void start( size_t num_threads, on_except_t on_except, init_t init = {}, std::optional<size_t> stack_size = {} ) {
          FC_ASSERT( !_ioc_work, "Thread pool already started" );
          if (num_threads == 0)
             return;
@@ -179,14 +182,21 @@ namespace fc {
          std::exception_ptr pending_exception;
          std::mutex pending_exception_mutex;
 
+         boost::thread::attributes attributes;
+         if (stack_size)
+            attributes.set_stack_size(*stack_size);
+
          try {
             for( size_t i = 0; i < num_threads; ++i ) {
-               _thread_pool.emplace_back( std::thread( &named_thread_pool::run_thread, this, i, on_except, init, std::ref(start_complete),
-                                                       std::ref(threads_remaining), std::ref(pending_exception), std::ref(pending_exception_mutex) ) );
+               _thread_pool.emplace_back( attributes, [this, i, on_except, init, &start_complete, &threads_remaining,
+                                                       &pending_exception, &pending_exception_mutex]() {
+                  run_thread( i, on_except, init, start_complete, threads_remaining, pending_exception,
+                              pending_exception_mutex );
+               } );
             }
          }
          catch( ... ) {
-            /// only an exception from std::thread's ctor should end up here. shut down all threads to ensure no
+            /// only an exception from the thread's ctor should end up here. shut down all threads to ensure no
             ///  potential access to the promise, atomic, etc above performed after throwing out of start
             stop();
             throw;
@@ -280,7 +290,7 @@ namespace fc {
       using ioc_work_t = boost::asio::executor_work_guard<boost::asio::io_context::executor_type>;
 
       boost::asio::io_context        _ioc;
-      std::vector<std::thread>       _thread_pool;
+      std::vector<boost::thread>     _thread_pool; // boost::thread, unlike std::thread, takes a stack size
       std::optional<ioc_work_t>      _ioc_work;
    };
 

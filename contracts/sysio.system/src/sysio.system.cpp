@@ -101,6 +101,9 @@ namespace sysiosystem {
       uint32_t max_call_depth;
    };
 
+   /// Largest wasm module, and largest function body, `setcode` accepts under every preset.
+   static constexpr uint32_t max_wasm_bytes = 4*1024*1024;
+
    static constexpr wasm_parameters default_limits = {
        .max_mutable_global_bytes = 1024,
        .max_table_elements = 1024,
@@ -109,8 +112,8 @@ namespace sysiosystem {
        .max_func_local_bytes = 8192,
        .max_nested_structures = 1024,
        .max_symbol_bytes = 8192,
-       .max_module_bytes = 20*1024*1024,
-       .max_code_bytes = 20*1024*1024,
+       .max_module_bytes = max_wasm_bytes,
+       .max_code_bytes = max_wasm_bytes,
        .max_pages = 528,
        .max_call_depth = 251
    };
@@ -123,8 +126,8 @@ namespace sysiosystem {
        .max_func_local_bytes = 8192,
        .max_nested_structures = 1024,
        .max_symbol_bytes = 8192,
-       .max_module_bytes = 20*1024*1024,
-       .max_code_bytes = 20*1024*1024,
+       .max_module_bytes = max_wasm_bytes,
+       .max_code_bytes = max_wasm_bytes,
        .max_pages = 528,
        .max_call_depth = 1024
    };
