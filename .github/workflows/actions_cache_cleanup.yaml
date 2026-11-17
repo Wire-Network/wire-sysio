@@ -30,7 +30,7 @@ defaults:
 jobs:
   prune-ccache:
     name: Prune ccache entries
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       CACHE_CLEANUP_DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
       GH_REPO: ${{ github.repository }}

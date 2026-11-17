@@ -49,7 +49,7 @@ defaults:
 jobs:
   tag:
     name: Tag the branch and start the release builds
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # Required reviewers on this Environment are gate 2 -- nothing below runs until
     # a human approves the deployment.
     environment: release
