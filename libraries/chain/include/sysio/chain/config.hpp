@@ -1,5 +1,6 @@
 #pragma once
 #include <sysio/chain/wasm_interface.hpp>
+#include <fc/time.hpp>
 #include <fc/utility.hpp>
 
 namespace sysio::chain::config {
@@ -47,6 +48,8 @@ namespace sysio::chain::config {
   static constexpr int      block_interval_ms = 500;
   static constexpr int      block_interval_us = block_interval_ms*1000;
   static constexpr uint64_t block_timestamp_epoch = 1735689600000ull; // epoch is year 2025.
+  /// Clock skew tolerated between nodes. A block timestamped more than this after the local clock is from the future.
+  static constexpr fc::microseconds allowed_clock_skew = fc::seconds(15);
 
   /** Percentages are fixed point with a denominator of 10,000 */
   static constexpr int percent_100 = 10000;

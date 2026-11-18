@@ -125,10 +125,18 @@ public:
    // extract the qc_claim from block header finality_extension
    qc_claim_t extract_qc_claim() const;
 
-   // heuristic for determination if we are syncing or replaying for optimizations
-   bool is_recent() const {
-      return timestamp() > fc::time_point::now() - fc::seconds(30);
+   /// Age past which a block is not recent.
+   static constexpr fc::microseconds recent_block_max_age = fc::seconds(30);
+
+   /// Whether this block is recent at `now`: younger than recent_block_max_age, so finalizers skip voting while
+   /// syncing or replaying, and not from the future (block_header::is_from_the_future). Finalizers vote only on
+   /// recent blocks. Compares time points, since `now - recent_block_max_age` may precede the block timestamp epoch.
+   bool is_recent(fc::time_point now) const {
+      return timestamp().to_time_point() > now - recent_block_max_age && !header.is_from_the_future(now);
    }
+
+   /// Whether this block is recent at the current time.
+   bool is_recent() const { return is_recent(fc::time_point::now()); }
 
    // use the cached `finality_digest`
    block_ref make_block_ref() const {
