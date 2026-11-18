@@ -1577,8 +1577,7 @@ class Cluster(object):
         if trans is None:
             Utils.Print("ERROR: Failed to set sysio.opreg as privileged")
             return None
-        opregConfig=('{"max_available_producers":21,"max_available_batch_ops":63,"max_available_underwriters":21,'
-                     '"terminate_prune_delay_ms":600000,"terminate_max_consecutive_misses":5,'
+        opregConfig=('{"terminate_prune_delay_ms":600000,"terminate_max_consecutive_misses":5,'
                      '"terminate_max_pct_misses_24h":5,"terminate_window_ms":86400000,'
                      '"req_prod_collat":[],"req_batchop_collat":[],"req_uw_collat":[]}')
         trans=biosNode.pushMessage('sysio.opreg', 'setconfig', opregConfig, '--permission sysio.opreg@active')
