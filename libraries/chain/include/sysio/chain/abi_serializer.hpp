@@ -151,6 +151,10 @@ struct abi_serializer {
    /// Input object entries a struct's field lookup reads between two checks of the conversion's deadline.
    static constexpr size_t struct_keys_per_deadline_check = 1024;
 
+   /// Elements of a built-in array (such as `signature[]`) packed or decoded between two calls of the conversion's
+   /// yield. A conversion overruns its deadline by at most this many elements before the yield throws.
+   static constexpr size_t built_in_array_elements_per_yield = 32;
+
    // create standard yield function that checks for max_serialization_time and max_recursion_depth.
    // restricts serialization time from creation of yield function until serialization is complete.
    // now() deadline captured at time of this call
