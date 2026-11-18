@@ -130,7 +130,7 @@ namespace sysio { namespace chain {
    struct packed_transaction : fc::reflect_init {
       enum class compression_type {
          none = 0,
-         zlib = 1, // not allowed in consensus, can be used by clients or on p2p network
+         zlib = 1, // accepted from clients by the constructors; rejected in binary form and in consensus
       };
 
       packed_transaction() = default;
@@ -188,6 +188,7 @@ namespace sysio { namespace chain {
    private:
       void init();
       void local_unpack_transaction(vector<bytes>&& context_free_data);
+      /// Unpacks packed_context_free_data; packed data that holds no entries is cleared.
       void local_unpack_context_free_data();
       void local_pack_transaction();
       void local_pack_context_free_data();
