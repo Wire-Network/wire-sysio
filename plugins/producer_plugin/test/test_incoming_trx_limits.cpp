@@ -15,17 +15,22 @@
 #include <future>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <vector>
 
 using namespace sysio;
 using namespace sysio::chain;
-using namespace sysio::chain::literals;
 
 namespace {
 
-/// Action of the transactions pushed by these tests. sysio has no contract, so it executes as a no-op.
-constexpr action_name test_action = "testit"_n;
+/// Prefix of the accounts the test transactions create. Each transaction is a native newaccount by sysio, which runs
+/// on a chain with no contracts; a unique account name makes every transaction unique.
+constexpr std::string_view new_account_prefix = "inctrx";
+/// Letters after new_account_prefix, which fill an account name's 12 characters.
+constexpr size_t new_account_suffix_length = 6;
+/// Letters a name suffix is spelled with.
+constexpr std::string_view new_account_letters = "abcdefghijklmnopqrstuvwxyz";
 /// How long a node may take to start, to deliver a transaction result, or to apply the blocks it is given.
 constexpr std::chrono::seconds node_timeout{60};
 /// How often a test polls a node's head while waiting for it to apply blocks.
@@ -61,13 +66,27 @@ authority all_keys_authority(const std::vector<private_key_type>& keys) {
    return auth;
 }
 
-/// @return a transaction of one test_action authorized by sysio@active, made unique by a counter
-signed_transaction make_trx() {
+/// @return a name for an account no earlier call returned
+account_name next_new_account() {
    static uint64_t next_id = 0;
+   std::string name(new_account_prefix);
+   std::string suffix(new_account_suffix_length, new_account_letters.front());
+   uint64_t    id = next_id++;
+   for (size_t i = suffix.size(); i-- > 0; id /= new_account_letters.size())
+      suffix[i] = new_account_letters[id % new_account_letters.size()];
+   return account_name(name + suffix);
+}
+
+/// @return a transaction, authorized by sysio@active, of a native newaccount by sysio for a new account
+signed_transaction make_trx() {
+   const authority new_account_auth(sysio_key().get_public_key());
    signed_transaction trx;
    trx.expiration = fc::time_point_sec{fc::time_point::now() + trx_lifetime};
    trx.actions.emplace_back(vector<permission_level>{{config::system_account_name, config::active_name}},
-                            config::system_account_name, test_action, fc::raw::pack(++next_id));
+                            newaccount{.creator = config::system_account_name,
+                                       .name    = next_new_account(),
+                                       .owner   = new_account_auth,
+                                       .active  = new_account_auth});
    return trx;
 }
 
