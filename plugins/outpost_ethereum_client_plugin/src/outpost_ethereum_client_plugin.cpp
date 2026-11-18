@@ -270,10 +270,10 @@ uint32_t resolve_rpc_chain_id(const pending_client& pending,
    fc::task::deadline_scope deadline(fc::time_point::now() + chain_id_request_timeout);
    auto rpc = fc::network::json_rpc::json_rpc_client::create(pending.url, rpc_options);
    const auto response = rpc.call_idempotent(std::string(ethereum_rpc_method::chain_id), fc::variants{});
-   const auto chain_id = fc::network::ethereum::parse_rpc_quantity(response, transaction_policy_field::chain_id);
-   FC_ASSERT(chain_id > 0 && chain_id <= std::numeric_limits<uint32_t>::max(),
-             "Invalid discovered Ethereum chain ID");
-   return chain_id.convert_to<uint32_t>();
+   const uint32_t chain_id =
+      fc::network::ethereum::parse_rpc_quantity_as<uint32_t>(response, transaction_policy_field::chain_id);
+   FC_ASSERT(chain_id > 0, "Invalid discovered Ethereum chain ID");
+   return chain_id;
 }
 
 /** Resolve an explicitly named Ethereum signature provider for one configured client. */

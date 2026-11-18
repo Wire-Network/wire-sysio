@@ -342,10 +342,11 @@ vote_result_t aggregating_qc_sig_t::add_vote(uint32_t connection_id, block_num_t
 }
 
 // called by aggregated_qc_sig which acquires a mutex
-qc_sig_t aggregating_qc_sig_t::extract_qc_sig_from_aggregating() const {
+qc_sig_t aggregating_qc_sig_t::extract_qc_sig_from_aggregating(sig_form_t form) const {
    qc_sig_t qc_sig;
 
-   if( aggregating_state == state_t::strong ) {
+   // a strong part without weak votes is strong-only in either form
+   if( aggregating_state == state_t::strong && (form == sig_form_t::by_state || weak_votes.bitset.none()) ) {
       qc_sig.strong_votes = strong_votes.bitset;
       qc_sig.sig          = strong_votes.sig;
    } else if (is_quorum_met_no_lock()) {
@@ -364,12 +365,12 @@ std::optional<qc_sig_t> aggregating_qc_sig_t::received_qc_sig_copy() const {
    return received_qc_sig;
 }
 
-std::optional<qc_sig_t> aggregating_qc_sig_t::aggregated_qc_sig() const {
+std::optional<qc_sig_t> aggregating_qc_sig_t::aggregated_qc_sig(sig_form_t form) const {
    std::lock_guard g(*_mtx);
    if( !is_quorum_met_no_lock() ) {
       return {};
    }
-   return extract_qc_sig_from_aggregating();
+   return extract_qc_sig_from_aggregating(form);
 }
 
 bool aggregating_qc_sig_t::has_received_qc_sig() const {
@@ -415,22 +416,39 @@ std::optional<qc_t> aggregating_qc_t::get_best_qc(block_num_type block_num) cons
          assert(pending);
          if (!pending)
             return {};
-         return qc_t{block_num, std::move(*active), std::move(pending)};
+         return std::optional<qc_t>{std::in_place, block_num, std::move(*active), std::move(pending)};
       }
-      return qc_t{block_num, std::move(*active), {}};
+      return std::optional<qc_t>{std::in_place, block_num, std::move(*active), std::nullopt};
    };
 
+   // A dual finalizer's vote is in both aggregated parts, so weak votes are dropped from both parts or from
+   // neither: strong votes only when both parts are strong, strong and weak votes otherwise. Votes are added only
+   // under the outer mutex held here, so the states read below and both extractions see the same votes.
    auto make_aggregated = [&]() -> std::optional<qc_t> {
-      std::optional<qc_sig_t> active = active_policy_sig.aggregated_qc_sig();
-      if (!active) // active is always required
-         return {};
-      if (pending_policy_sig) {
-         std::optional<qc_sig_t> pending = pending_policy_sig->aggregated_qc_sig();
-         if (!pending)
-            return {}; // no quorum on pending_policy_sig so no aggregated qc for this block
-         return qc_t{block_num, std::move(*active), std::move(pending)};
+      using state_t    = aggregating_qc_sig_t::state_t;
+      using sig_form_t = aggregating_qc_sig_t::sig_form_t;
+
+      if (!pending_policy_sig) {
+         std::optional<qc_sig_t> active = active_policy_sig.aggregated_qc_sig(sig_form_t::by_state);
+         if (!active)
+            return {};
+         return std::optional<qc_t>{std::in_place, block_num, std::move(*active), std::nullopt};
       }
-      return qc_t{block_num, std::move(*active), {}};
+
+      const state_t active_state  = active_policy_sig.state();
+      const state_t pending_state = pending_policy_sig->state();
+      if (!aggregating_qc_sig_t::is_quorum_met(active_state) || !aggregating_qc_sig_t::is_quorum_met(pending_state))
+         return {}; // both parts need a quorum for an aggregated qc
+
+      const sig_form_t form = (active_state == state_t::strong && pending_state == state_t::strong)
+                                 ? sig_form_t::by_state
+                                 : sig_form_t::strong_and_weak;
+      std::optional<qc_sig_t> active  = active_policy_sig.aggregated_qc_sig(form);
+      std::optional<qc_sig_t> pending = pending_policy_sig->aggregated_qc_sig(form);
+      assert(active && pending); // a quorum, once met, stays met
+      if (!active || !pending)
+         return {};
+      return std::optional<qc_t>{std::in_place, block_num, std::move(*active), std::move(pending)};
    };
 
    std::optional<qc_t> received   = make_received();

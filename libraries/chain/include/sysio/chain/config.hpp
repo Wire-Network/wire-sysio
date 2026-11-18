@@ -92,7 +92,6 @@ namespace sysio::chain::config {
   static constexpr uint32_t   default_production_pause_vote_timeout_ms     = 6u*1000u; // 6 seconds
   static constexpr uint16_t   default_controller_thread_pool_size          = 4;
   static constexpr uint16_t   default_vote_thread_pool_size                = 4;
-  static constexpr uint32_t   default_max_variable_signature_length        = 16384u;
   static constexpr uint32_t   default_max_action_return_value_size         = 1024;
   static constexpr uint32_t   default_max_reversible_blocks                = 3600u;
   static constexpr uint32_t   default_incoming_trx_max_signatures          = 256u; ///< default most signatures a transaction received over p2p or the API may carry
@@ -137,6 +136,10 @@ namespace sysio::chain::config {
 
   /// Consensus limit bounding one uninterrupted libsodium Ed25519 verification.
   static constexpr uint32_t   max_ed25519_message_size          = 65'536;
+
+  /// Consensus limit, in bytes, on a signature's variable-size component (`fc::crypto::signature::variable_size()`:
+  /// WebAuthn authenticator data plus client data JSON).
+  static constexpr uint32_t   max_signature_variable_size       = 16'384;
 
   /// Consensus limit, in bytes, on each of the base and the modulus that mod_exp accepts.
   static constexpr uint32_t   max_mod_exp_operand_size          = 8'192;

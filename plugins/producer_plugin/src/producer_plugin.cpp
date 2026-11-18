@@ -1265,8 +1265,7 @@ public:
                  transaction_metadata_ptr trx_meta;
                  int priority = priority::low;
                  try {
-                    trx_meta = transaction_metadata::recover_keys(trx, chain.get_chain_id(), time_limit, trx_type,
-                                                                  chain.configured_subjective_signature_length_limit());
+                    trx_meta = transaction_metadata::recover_keys(trx, chain.get_chain_id(), time_limit, trx_type);
                     priority = _trx_priority_db.get_trx_priority(trx->get_transaction());
                  } catch (...) {
                     post_incoming_trx_failure(std::move(trx), std::current_exception(), is_transient, std::move(next));

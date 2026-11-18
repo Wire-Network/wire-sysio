@@ -23,6 +23,8 @@ namespace sysio {
              *
              * Reserves every node-owner tier slot and carves 1/10 of each tier-1 slot's allocation out to
              * `sysio` up front as the account-creation RAM pool; node owners later register against the rest.
+             * `sysio` also takes the SYS left over after the tier allocations. `sysio.roa` holds no pool: its
+             * RAM quota is set to what it already uses, since its rows bill the issuing node owner or `sysio`.
              *
              * @param total_sys The total starting SYS of the network.
              * @param bytes_per_unit The amount of bytes .0001 SYS is worth, set in roastate table. If SYS precision is different, same concept applies, the single smallest unit of the core token.
@@ -45,6 +47,9 @@ namespace sysio {
             /**
              * @brief Adds a row to the policies table scoped to 'issuer' ( Node Owner ) and adds the policy's weights
              * to 'owner's chain resource limits.
+             *
+             * The row is billed to 'issuer', which needs the spare RAM for it; expand, extend and reduce keep that
+             * payer, and a reduce that erases the row refunds it.
              *
              * NOTE: Cannot allocate CPU / NET to system accounts to maintain infinite CPU / NET on these accounts.
              *
@@ -488,8 +493,7 @@ namespace sysio {
             // creator from the username by string arithmetic alone -- cheaper than any index read.
             // The only lookup the contract performs is the point read of the (creator, nonce)
             // replay guard, which the primary key already serves. Dropping the index halves the
-            // sponsoring owner's RAM cost per user (~296 -> ~144 bytes), which matters because
-            // these are the only rows in the contract billed to a node owner.
+            // sponsoring owner's RAM cost per user (~296 -> ~144 bytes), which the owner pays.
             using sponsors_t = kv::scoped_table<"sponsors"_n, sponsor_key, sponsor>;
 
             /**
@@ -538,16 +542,12 @@ namespace sysio {
              *        allotment (net of sysio's tier-1 share, which activateroa already carved out).
              *
              * Every tier gets a `nodeowners` row (the budget and the membership that gates policy
-             * issuance).
+             * issuance), billed to `sysio`.
              *
-             * Only tier 1 additionally gets a personal self-issued policy. It is the only tier that can
-             * call `newuser`, and the `sponsors` / `sponsorcount` rows that `newuser` and
-             * `raiseacctlim` write are the sole rows in this contract billed to a node owner instead of
-             * to `sysio.roa`. Tiers 2 and 3 need no
-             * allocation of their own: a policy action that does not name an explicit `sysio.payer`
-             * resolves `action::payer()` to `sysio.roa` and bills its rows to `sysio.roa`, so it draws
-             * nothing from the issuer. They can self-issue on demand with `addpolicy` against the
-             * recorded tier budget.
+             * Only tier 1 additionally gets a personal self-issued policy, billed to the owner. Its RAM pays
+             * for the policy rows the owner issues and the `sponsors` / `sponsorcount` rows `newuser` and
+             * `raiseacctlim` write. Tiers 2 and 3 get none: before issuing to another account, such an owner
+             * funds itself with a self-issued `addpolicy` whose RAM weight covers that policy's own row.
              *
              * NOTE: Can only register for the current generation of the network.
              *

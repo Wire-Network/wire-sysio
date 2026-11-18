@@ -4,6 +4,8 @@
 
 #include <cstdint>
 #include <functional>
+#include <limits>
+#include <optional>
 #include <string>
 #include <type_traits>
 
@@ -110,6 +112,41 @@ BOOST_AUTO_TEST_CASE(rpc_quantities_are_canonical_and_non_truncating) {
    check_rejection_reason(
       [] { parse_rpc_quantity(fc::variant(uint64_t{1}), "nonce"); },
       ethereum_transaction_policy_reason::rpc_quantity_invalid);
+}
+
+BOOST_AUTO_TEST_CASE(bounded_rpc_quantities_refuse_values_past_their_type) {
+   constexpr std::string_view field = "log_index";
+   BOOST_CHECK_EQUAL(parse_rpc_quantity_as<uint32_t>(fc::variant("0x0"), field), 0u);
+   BOOST_CHECK_EQUAL(parse_rpc_quantity_as<uint32_t>(fc::variant("0xffffffff"), field),
+                     std::numeric_limits<uint32_t>::max());
+   BOOST_CHECK_EQUAL(parse_rpc_quantity_as<uint64_t>(fc::variant("0xffffffffffffffff"), field),
+                     std::numeric_limits<uint64_t>::max());
+   BOOST_CHECK_EQUAL(parse_rpc_quantity(fc::variant("0x10"), field, fc::uint256{16}), fc::uint256{16});
+
+   // 2^32 + 5 and 2^64 + 5 keep their low bits when truncated; whole, they are out of range.
+   try {
+      parse_rpc_quantity_as<uint32_t>(fc::variant("0x100000005"), field);
+      BOOST_FAIL("expected an out-of-range RPC quantity rejection");
+   } catch (const ethereum_transaction_policy_exception& rejection) {
+      BOOST_CHECK(rejection.reason() == ethereum_transaction_policy_reason::rpc_quantity_out_of_range);
+      BOOST_CHECK_EQUAL(rejection.field(), field);
+      BOOST_CHECK_EQUAL(rejection.observed(), "0x100000005");
+      BOOST_CHECK(rejection.allowed() == std::optional<std::string>{"0xffffffff"});
+   }
+   check_rejection_reason([] { parse_rpc_quantity_as<uint64_t>(fc::variant("0x10000000000000005"), "nonce"); },
+                          ethereum_transaction_policy_reason::rpc_quantity_out_of_range);
+   check_rejection_reason([] { parse_rpc_quantity(fc::variant("0x11"), "nonce", fc::uint256{16}); },
+                          ethereum_transaction_policy_reason::rpc_quantity_out_of_range);
+   check_rejection_reason([] { parse_rpc_quantity_as<uint32_t>(fc::variant("0x" + std::string(65, '1')), "nonce"); },
+                          ethereum_transaction_policy_reason::rpc_quantity_out_of_range);
+
+   // The canonical form is required as it is unbounded.
+   check_rejection_reason([] { parse_rpc_quantity_as<uint32_t>(fc::variant("0x01"), "nonce"); },
+                          ethereum_transaction_policy_reason::rpc_quantity_invalid);
+   check_rejection_reason([] { parse_rpc_quantity_as<uint32_t>(fc::variant("1"), "nonce"); },
+                          ethereum_transaction_policy_reason::rpc_quantity_invalid);
+   check_rejection_reason([] { parse_rpc_quantity_as<uint32_t>(fc::variant(uint64_t{1}), "nonce"); },
+                          ethereum_transaction_policy_reason::rpc_quantity_invalid);
 }
 
 BOOST_AUTO_TEST_CASE(rpc_quantity_reasons_are_classified_as_response_faults) {
