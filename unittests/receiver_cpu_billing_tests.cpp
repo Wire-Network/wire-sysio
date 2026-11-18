@@ -65,6 +65,9 @@ constexpr uint32_t    short_spin_count   = 10;
 constexpr uint32_t    many_notifications = 50;
 constexpr auto        frame_pause        = std::chrono::milliseconds( 200 ); ///< a pause in a frame, past any stipend
 constexpr uint8_t     short_trx_max_cpu_ms = 20; ///< a transaction limit that frame_pause runs past
+/// long_spins() times this runs past short_trx_max_cpu_ms even when a frame runs several times faster than calibrated.
+constexpr uint32_t    overrun_spin_factor = 20;
+static_assert( overrun_spin_factor * long_frame_us >= 4 * int64_t{ short_trx_max_cpu_ms } * 1000 );
 constexpr uint8_t     paused_trx_max_cpu_ms = 100; ///< the transaction's limit when a pause outlasts the block
 constexpr auto        paused_block_time  = std::chrono::milliseconds( 200 ); ///< that push's block deadline
 constexpr auto        block_pause        = std::chrono::milliseconds( 400 ); ///< a pause past that block deadline
@@ -83,6 +86,8 @@ constexpr const char* stipend_over_trx_limit   = "notify cpu stipend cannot exce
 constexpr const char* idle_over_greylisted_limit = "greylisted billable CPU time for the account idle";
 constexpr const char* greylisted_frame_stopped = "greylisted transaction";
 constexpr const char* trx_max_cpu_reached      = "reached trx specified max_cpu_usage_ms";
+/// The final checks' message for a transaction past its limit; a frame stopped by its deadline reports otherwise.
+constexpr const char* trx_limit_in_final_checks = "maximum billable CPU time for the transaction";
 constexpr const char* spun                     = "spun"; ///< what cpu_receiver_test::spin prints
 constexpr int64_t     beyond_any_leeway_us     = 10'000'000; ///< more than the subjective CPU leeway
 constexpr uint32_t    pending_bill_lifetime_sec = 3600;
@@ -539,7 +544,6 @@ BOOST_FIXTURE_TEST_CASE( cold_module_load_takes_none_of_the_stipend, receiver_cp
    produce_block();
    transfer( alice, bob, amount, "" ); // warms everything but cold's module
 
-   // A block deadline, as a producer and a speculative node push every transaction with, enables the billing pause.
    auto before  = cpu_windows( { token_account, cold } );
    auto trace   = push_measured( make_trx( { transfer_action( alice, cold, amount, "" ) } ),
                                  fc::time_point::now() + fc::seconds( 10 ) );
@@ -554,41 +558,66 @@ BOOST_FIXTURE_TEST_CASE( cold_module_load_takes_none_of_the_stipend, receiver_cp
 BOOST_FIXTURE_TEST_CASE( pause_in_a_frame_is_left_out_of_its_cpu_and_deadline, receiver_cpu_tester ) try {
    // A hook pauses a frame the way a first run's load does, the same on every runtime: first the input action's frame,
    // under a transaction limit shorter than the pause, then a notified contract's that has no CPU, with no leeway. Each
-   // push succeeds only if the paused frame's deadline moves past the pause and its CPU leaves the pause out.
+   // push succeeds only if the paused frame's CPU leaves the pause out and, when the push enforces a deadline, that
+   // deadline moves past the pause. A producer and a speculative node push with a block deadline; a push without one
+   // enforces no deadline but still bills the CPU it measures.
    const int64_t pause_us = std::chrono::microseconds( frame_pause ).count();
    BOOST_REQUIRE( pause_us > ample_stipend() ); // a pause billed to idle's frame would run past its stipend
    set_notify_cpu_stipend( ample_stipend() );
    transfer( alice, idle, amount, "" ); // loads the modules, so the hook's are the frames' only pauses
    produce_block();
-   // A block deadline, as a producer and a speculative node push every transaction with, enables the billing pause.
-   const auto block_deadline = [] { return fc::time_point::now() + fc::seconds( 10 ); };
-   uint32_t   pauses         = 0;
+   uint32_t pauses = 0;
+   for( const bool with_block_deadline : { true, false } ) {
+      const std::string memo = with_block_deadline ? "block deadline" : "no deadline"; // distinct transactions
+      BOOST_TEST_CONTEXT( memo ) {
+         const auto deadline = [with_block_deadline] {
+            return with_block_deadline ? fc::time_point::now() + fc::seconds( 10 ) : fc::time_point::maximum();
+         };
+         {
+            const uint32_t pauses_before = pauses;
+            auto           hook          = pause_frames_of( token_account, frame_pause, pauses );
+            auto           trx           = make_trx( { transfer_action( alice, idle, amount, memo ) } );
+            trx.max_cpu_usage_ms = short_trx_max_cpu_ms;
+            sign( trx );
+            auto trace = push_measured( trx, deadline() );
+            BOOST_TEST( pauses == pauses_before + 1 );
+            auto receipt = entries( trace );
+            BOOST_REQUIRE_EQUAL( receipt.size(), 2u );
+            BOOST_TEST( receipt[0] < pause_us );
+            BOOST_TEST( frame( trace, token_account, "transfer"_n ).elapsed.count() >= pause_us ); // paused in the frame
+         }
+         control->set_subjective_cpu_leeway( fc::microseconds( 0 ) );
+         {
+            const uint32_t pauses_before = pauses;
+            auto           hook          = pause_frames_of( idle, frame_pause, pauses );
+            auto           before        = cpu_windows( { token_account, idle } );
+            auto trace = push_measured( make_trx( { transfer_action( alice, idle, amount, memo ) } ), deadline() );
+            BOOST_TEST( pauses == pauses_before + 1 );
+            auto receipt = entries( trace );
+            BOOST_REQUIRE_EQUAL( receipt.size(), 2u );
+            BOOST_TEST( receipt[1] == 0u );
+            BOOST_TEST( frame( trace, idle, "transfer"_n ).elapsed.count() >= pause_us ); // paused in the frame
+            check_billed( before, { token_account } );
+         }
+         control->set_subjective_cpu_leeway( fc::microseconds( config::default_subjective_cpu_leeway_us ) );
+         produce_and_check_validator( { token_account, alice, idle } );
+      }
+   }
+   // Without a block deadline the pause arms no deadline either: a frame that then runs past the transaction's limit
+   // is not stopped, and the transaction fails in the final checks.
    {
-      auto hook = pause_frames_of( token_account, frame_pause, pauses );
-      auto trx  = make_trx( { transfer_action( alice, idle, amount, "" ) } );
+      BOOST_REQUIRE( long_spins() <= std::numeric_limits<uint32_t>::max() / overrun_spin_factor );
+      const auto     memo          = spin_command + std::to_string( long_spins() * overrun_spin_factor );
+      const uint32_t pauses_before = pauses;
+      auto           hook          = pause_frames_of( token_account, frame_pause, pauses );
+      auto           trx           = make_trx( { transfer_action( alice, game, amount, memo ) } );
       trx.max_cpu_usage_ms = short_trx_max_cpu_ms;
       sign( trx );
-      auto trace = push_measured( trx, block_deadline() );
-      BOOST_TEST( pauses == 1u );
-      auto receipt = entries( trace );
-      BOOST_REQUIRE_EQUAL( receipt.size(), 2u );
-      BOOST_TEST( receipt[0] < pause_us );
-      BOOST_TEST( frame( trace, token_account, "transfer"_n ).elapsed.count() >= pause_us ); // paused inside the frame
+      BOOST_CHECK_EXCEPTION( push_measured( trx ), tx_cpu_usage_exceeded,
+                             fc_exception_message_contains( trx_limit_in_final_checks ) );
+      BOOST_TEST( pauses == pauses_before + 1 );
    }
-   control->set_subjective_cpu_leeway( fc::microseconds( 0 ) );
-   {
-      auto hook   = pause_frames_of( idle, frame_pause, pauses );
-      auto before = cpu_windows( { token_account, idle } );
-      auto trace  = push_measured( make_trx( { transfer_action( alice, idle, amount, "" ) } ), block_deadline() );
-      BOOST_TEST( pauses == 2u );
-      auto receipt = entries( trace );
-      BOOST_REQUIRE_EQUAL( receipt.size(), 2u );
-      BOOST_TEST( receipt[1] == 0u );
-      BOOST_TEST( frame( trace, idle, "transfer"_n ).elapsed.count() >= pause_us ); // paused inside the frame
-      check_billed( before, { token_account } );
-   }
-   control->set_subjective_cpu_leeway( fc::microseconds( config::default_subjective_cpu_leeway_us ) );
-   produce_and_check_validator( { token_account, alice, idle } );
+   produce_block();
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( pause_past_the_block_deadline_stops_at_the_block_deadline, receiver_cpu_tester ) try {
