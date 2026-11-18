@@ -1625,6 +1625,16 @@ class Cluster(object):
             Utils.Print("ERROR: carl is persona non gratis (tx %s missing)" % transId)
             return None
 
+        # An issuer pays for its policy rows. carl issues one per harness account, more than its personal RAM covers,
+        # so it funds them first by expanding its own policy.
+        data='{"owner": "carl", "issuer": "carl", "net_weight": "0.0000 %s", "cpu_weight": "0.0000 %s", ' \
+             '"ram_weight": "1.0000 %s", "network_gen": 0}' % (CORE_SYMBOL, CORE_SYMBOL, CORE_SYMBOL)
+        trans=biosNode.pushMessage('sysio.roa', 'expandpolicy', data, '-p carl@active')
+        transId=Node.getTransId(trans[1])
+        if not biosNode.waitForTransactionInBlock(transId):
+            Utils.Print("ERROR: carl could not fund its policy rows (tx %s missing)" % transId)
+            return None
+
         # Only call init if the system contract is loaded
         if loadSystemContract:
             if not self.initializeSystemContract(biosNode, sysioAccount):
