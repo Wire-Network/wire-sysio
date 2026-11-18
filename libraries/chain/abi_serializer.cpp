@@ -662,13 +662,23 @@ namespace sysio::chain {
       auto fixed_array_sz = is_szarray(rtype);
 
       auto read_array = [&](fc::unsigned_int::base_uint sz) {
+         SYS_ASSERT( sz <= stream.remaining() + ctx.zero_size_elements_left, unpack_exception,
+                     "Array '{}' declares {} elements but only {} bytes remain", ctx.get_path_string(), sz,
+                     stream.remaining() );
          ctx.hint_array_type_if_in_array();
          fc::variants vars;
          vars.reserve(std::min(sz, 1024u)); // limit the maximum size that can be reserved before data is read
          auto h1 = ctx.push_to_path( impl::array_index_path_item{} );
          for( fc::unsigned_int::base_uint i = 0; i < sz; ++i ) {
             ctx.set_array_index_of_path_back(i);
+            const size_t remaining = stream.remaining();
             auto v = _binary_to_variant(ftype, stream, ctx);
+            if( stream.remaining() == remaining ) {
+               SYS_ASSERT( ctx.zero_size_elements_left > 0, unpack_exception,
+                           "Array '{}' holds more than {} elements that decode from no bytes", ctx.get_path_string(),
+                           max_zero_size_array_elements );
+               --ctx.zero_size_elements_left;
+            }
             // The exception below is commented out to allow array of optional as input data
             //SYS_ASSERT( !v.is_null(), unpack_exception, "Invalid packed array '${p}'", ("p", ctx.get_path_string()) );
             vars.emplace_back(std::move(v));

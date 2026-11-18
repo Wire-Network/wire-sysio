@@ -143,6 +143,11 @@ struct abi_serializer {
 
    static constexpr size_t max_recursion_depth = 32; // arbitrary depth to prevent infinite recursion
 
+   /// Array elements that decode from no bytes (zero-length fixed arrays, and structs made only of them) one conversion
+   /// may produce. Every other array element consumes at least one byte, so an array may declare no more elements than
+   /// the bytes left plus what remains of this allowance.
+   static constexpr uint32_t max_zero_size_array_elements = 1024;
+
    // create standard yield function that checks for max_serialization_time and max_recursion_depth.
    // restricts serialization time from creation of yield function until serialization is complete.
    // now() deadline captured at time of this call
@@ -346,6 +351,9 @@ namespace impl {
 
    struct binary_to_variant_context : public abi_traverse_context_with_path {
       using abi_traverse_context_with_path::abi_traverse_context_with_path;
+
+      /// Array elements that decode from no bytes this conversion may still produce.
+      uint32_t zero_size_elements_left = abi_serializer::max_zero_size_array_elements;
    };
 
    /// Decodes one action's data within the per-action time limit.

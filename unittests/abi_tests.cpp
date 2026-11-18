@@ -5033,6 +5033,71 @@ BOOST_AUTO_TEST_CASE(variant_to_binary_scales_with_object_keys)
       BOOST_REQUIRE_EQUAL(static_cast<uint8_t>(packed[i]), i % byte_values);
 } FC_LOG_AND_RETHROW() }
 
+/// ABI whose `nothing` type decodes from no bytes, with arrays and structs built from it.
+static const char* zero_size_abi = R"=====(
+{
+   "version": "sysio::abi/1.0",
+   "types": [
+      {"new_type_name": "nothing", "type": "int8[0]"},
+      {"new_type_name": "many_nothing", "type": "nothing[100000]"},
+      {"new_type_name": "row", "type": "nothing[100]"},
+      {"new_type_name": "grid", "type": "row[100]"}
+   ],
+   "structs": [
+      {"name": "holder", "base": "", "fields": [{"name": "items", "type": "nothing[]"}]},
+      {"name": "hollow", "base": "", "fields": [{"name": "n", "type": "nothing"}]},
+      {"name": "hollows", "base": "", "fields": [{"name": "items", "type": "hollow[]"}]},
+      {"name": "point", "base": "", "fields": [{"name": "v", "type": "uint8"}]},
+      {"name": "points", "base": "", "fields": [{"name": "items", "type": "point[]"}]}
+   ],
+   "actions": [{"name": "holder", "type": "holder", "ricardian_contract": ""}]
+}
+)=====";
+
+/// An array may not declare more elements than the bytes left to decode could hold, so a short input cannot make
+/// the decoder loop over a huge count.
+BOOST_AUTO_TEST_CASE(read_array_bounds_count_by_remaining_bytes)
+{ try {
+   abi_serializer abis(fc::json::from_string(zero_size_abi).as<abi_def>(), yield_fn());
+   const auto decode = [&](std::string_view type, const bytes& data) {
+      return abis.binary_to_variant(type, data, abi_serializer::create_yield_function(fc::seconds(1)));
+   };
+
+   const bytes max_count = fc::raw::pack(fc::unsigned_int(std::numeric_limits<uint32_t>::max()));
+   BOOST_CHECK_THROW(decode("holder", max_count), unpack_exception);
+
+   bytes short_points = fc::raw::pack(fc::unsigned_int(1000));
+   short_points.resize(short_points.size() + 10);
+   BOOST_CHECK_THROW(decode("points", short_points), unpack_exception);
+
+   const fc::variant three = decode("holder", fc::raw::pack(fc::unsigned_int(3)));
+   BOOST_CHECK_EQUAL(fc::json::to_string(three, get_deadline()), R"({"items":[[],[],[]]})");
+} FC_LOG_AND_RETHROW() }
+
+/// Elements that decode from no bytes are capped per conversion, whether they come from one long array, nested
+/// arrays, or a struct made only of zero-length fields.
+BOOST_AUTO_TEST_CASE(read_array_caps_zero_size_elements)
+{ try {
+   abi_serializer abis(fc::json::from_string(zero_size_abi).as<abi_def>(), yield_fn());
+
+   BOOST_CHECK_THROW(abis.binary_to_variant("many_nothing", bytes{}, yield_fn()), unpack_exception);
+   BOOST_CHECK_THROW(abis.binary_to_variant("grid", bytes{}, yield_fn()), unpack_exception);
+
+   constexpr uint32_t hollow_count = 2000;
+   bytes hollows = fc::raw::pack(fc::unsigned_int(hollow_count));
+   hollows.push_back(0); // a struct field needs a byte left to read, though `nothing` consumes none
+   BOOST_CHECK_THROW(abis.binary_to_variant("hollows", hollows, yield_fn()), unpack_exception);
+
+   const fc::variant row = abis.binary_to_variant("row", bytes{}, yield_fn());
+   BOOST_CHECK_EQUAL(row.get_array().size(), 100u);
+
+   constexpr uint32_t cap = abi_serializer::max_zero_size_array_elements;
+   const fc::variant at_cap = abis.binary_to_variant("holder", fc::raw::pack(fc::unsigned_int(cap)), yield_fn());
+   BOOST_CHECK_EQUAL(at_cap["items"].get_array().size(), cap);
+   BOOST_CHECK_THROW(abis.binary_to_variant("holder", fc::raw::pack(fc::unsigned_int(cap + 1)), yield_fn()),
+                     unpack_exception);
+} FC_LOG_AND_RETHROW() }
+
 /// The protobuf descriptors an ABI carries are parsed under the ABI's deadline, which is checked before parsing.
 BOOST_AUTO_TEST_CASE(protobuf_types_parse_runs_under_deadline)
 { try {
