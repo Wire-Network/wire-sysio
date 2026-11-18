@@ -783,6 +783,7 @@ void assert_global_state_shape(const fc::network::solana::idl::program& program)
  *
  * `deliver_outbound_envelope` stages chunks through `epoch_in`, then sends a
  * zero-data terminal `epoch_in` call. Data chunks confirm at `processed`; the
+ * complete buffer is read at `confirmed` before terminal preflight. The
  * terminal call waits for `confirmed`, records delivery and may reach
  * consensus; the relay then attempts the separate resumable
  * `dispatch_attestations` drain, which applies effects and emits outbound on
@@ -874,6 +875,12 @@ private:
    /// the caller checks the deadline after this returns.
    virtual uint16_t read_first_unstaged_chunk(uint32_t epoch_index, uint16_t total_chunks, uint32_t total_bytes);
 
+   /// Wait under the delivery deadline until this upload's exact buffer is complete at terminal preflight's
+   /// `confirmed` commitment. Returns false when confirmed settlement makes the delivery a late no-op.
+   /// RPC/decoding failures and deadline expiry leave delivery incomplete for a later tick; no terminal is sent.
+   bool wait_for_confirmed_envelope_chunks(uint32_t epoch_index, uint16_t total_chunks, uint32_t total_bytes,
+                                           fc::time_point deadline_abs);
+
    /// Send ONE `dispatch_attestations(epoch_index, dispatch_limit)` call,
    /// appending `extra_remaining_accounts` (the packed effect-account batch)
    /// past the IDL account list as Anchor `remaining_accounts`. Built on the
@@ -913,7 +920,8 @@ protected:
    /// first (`getProgramAccounts`, header-only slice).
    virtual std::vector<outpost_solana_client_detail::envelope_chunk_buffer> read_own_envelope_chunk_buffers();
 
-   /// Read the exact failed-close buffer at the caller's commitment, under the active sweep deadline.
+   /// Read an exact buffer at the caller's commitment, under the active delivery or sweep deadline.
+   /// Used for confirmed terminal dependencies and processed failed-close reconciliation.
    /// nullopt means absent or a malformed libfc reply; treating it as closed may delay recovery to discovery.
    /// Empty data still means the account is present; no rent is attributed for nullopt.
    virtual std::optional<fc::network::solana::account_info> read_envelope_chunk_buffer(

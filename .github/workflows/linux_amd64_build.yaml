@@ -35,7 +35,7 @@ defaults:
 jobs:
   root-node-tooling:
     name: Root Node tooling audit
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # actions/checkout@v5
 
@@ -561,7 +561,7 @@ jobs:
 
   v:
     name: Discover Versions
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       # `cdt-release` / `cdt-channel` name the RELEASE whose asset a tag build
       # installs. The former `.cicd/defaults.json` pin is gone: an explicit
@@ -667,7 +667,8 @@ jobs:
   verify-packages:
     name: Verify packages (S1-S6)
     needs: [build-test-package]
-    runs-on: ubuntu-latest
+    # The packages are built in the ubuntu24 container; install and lint them on the same release.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # actions/checkout@v5
 
@@ -690,7 +691,7 @@ jobs:
     # skipped, so both must be named here or the report blames a job that never ran.
     needs: [ platform-cache, v, build-test-package, root-node-tooling, verify-packages ]
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Send Notification
         if: always()

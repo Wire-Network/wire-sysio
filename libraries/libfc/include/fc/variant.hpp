@@ -305,10 +305,13 @@ namespace fc
 
         /**
          * The value as a 128-bit or 256-bit integer: an int64 or uint64, an integer of that width, a string holding
-         * one, a bool, or null as zero.
+         * one, a bool, or null as zero. A 256-bit result reads a string as an optional '-', then decimal digits, or
+         * hex digits after "0x" or "0X". Digits after a leading zero are decimal. Empty text and a bare "0x" or
+         * "0X" are zero; "-" and "-0x" are not numbers.
          *
-         * @throw parse_error_exception if the value is outside the range of the result type. fc::int256 is
-         *        sign-magnitude, so its range is +/-(2^256 - 1).
+         * @throw parse_error_exception if the value is outside the range of the result type, or a string is not a
+         *        number a 256-bit result reads. fc::int256 is sign-magnitude, so its range is +/-(2^256 - 1).
+         * @throw assert_exception if a string is not a number a 128-bit result reads
          * @throw bad_cast_exception if the variant holds any other type
          * @{
          */

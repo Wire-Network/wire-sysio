@@ -51,7 +51,7 @@ permissions:
 jobs:
   opp-bundles:
     name: Generate OPP Bundles
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # actions/checkout@v5
 
