@@ -55,12 +55,6 @@ class transaction_metadata {
    private:
       struct private_type{};
 
-      static void check_variable_sig_size(const packed_transaction_ptr& trx, uint32_t max) {
-         for(const signature_type& sig : trx->get_signed_transaction().signatures)
-            SYS_ASSERT(sig.variable_size() <= max, sig_variable_size_limit_exception,
-                  "signature variable length component size ({}) greater than subjective maximum ({})", sig.variable_size(), max);
-      }
-
    public:
       // creation of tranaction_metadata restricted to start_recover_keys and create_no_recover_keys below, public for make_shared
       explicit transaction_metadata( const private_type& pt, packed_transaction_ptr ptrx,
@@ -90,18 +84,20 @@ class transaction_metadata {
       bool is_read_only() const { return _trx_type == trx_type::read_only; };
       bool is_transient() const { return _trx_type == trx_type::read_only || _trx_type == trx_type::dry_run; };
 
-      /// Thread safe.
+      /// Thread safe. Runs recover_keys() on @p thread_pool.
       /// @returns transaction_metadata_ptr or exception via future
       static recover_keys_future
       start_recover_keys( packed_transaction_ptr trx, boost::asio::io_context& thread_pool,
                           const chain_id_type& chain_id, fc::microseconds time_limit,
-                          trx_type t, uint32_t max_variable_sig_size = UINT32_MAX );
-      /// Thread safe.
+                          trx_type t );
+      /// Thread safe. Recovers the keys of @p trx's signatures after checking each against
+      /// config::max_signature_variable_size.
       /// @returns transaction_metadata_ptr or throws
+      /// @throws sig_variable_size_limit_exception if a signature's variable-size component is over the limit
       static transaction_metadata_ptr
       recover_keys( packed_transaction_ptr trx,
                     const chain_id_type& chain_id, fc::microseconds time_limit,
-                    trx_type t, uint32_t max_variable_sig_size = UINT32_MAX );
+                    trx_type t );
 
       /// @returns constructed transaction_metadata with no key recovery (sig_cpu_usage=0, recovered_pub_keys=empty)
       static transaction_metadata_ptr

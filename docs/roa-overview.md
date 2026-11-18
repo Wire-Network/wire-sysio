@@ -320,8 +320,9 @@ node owner has exactly the same policy powers as a tier-1 node owner. What diffe
 is the tier that creates accounts — so a tier-1 owner's budget (`nodeowners.total_sys`) is the other
 90%. Tiers 2 and 3 contribute nothing and keep their whole allocation. Registration then spends a flat
 personal policy for the owner's own account: 0.0080 SYS of RAM and 0.0500 SYS each of NET and CPU,
-0.1080 SYS in total — **tier 1 only**. Tiers 2 and 3 receive no personal policy: managing policies
-costs an owner nothing, so they need no allocation of their own and keep the whole budget issuable.
+0.1080 SYS in total — **tier 1 only**. Tiers 2 and 3 receive no personal policy and keep the whole
+budget issuable; they fund their own policy rows ([What a node owner needs to
+operate](#what-a-node-owner-needs-to-operate)).
 Using the launch configuration of 75,496 SYS `total_sys`:
 
 | Tier | Tier allocation | Owner budget (`total_sys`) | ≈ RAM if spent entirely on RAM |
@@ -344,29 +345,34 @@ node.allocated_sys`. A node owner cannot issue more than they hold.
 | Personal CPU | 0.0500 SYS | Tier 1 only |
 
 The three land in a self-issued policy — `issuer == owner` — carrying `time_block = 1`, so the
-owner can reshape or reclaim them immediately with `expandpolicy` or `reducepolicy`. Tier 1 gets
-them because it is the only tier that can call `newuser`. The `sponsors` and `sponsorcount` rows
-that `newuser` and `raiseacctlim` write are the only rows in the contract billed to a node owner.
+owner can reshape or reclaim them immediately with `expandpolicy` or `reducepolicy`. The policy's
+own row is billed to the owner, and the personal RAM pays for the policy rows the owner issues and
+the sponsorship rows `newuser` and `raiseacctlim` write.
 
 Registration writes no policy for `sysio`. Its tier-1 share was carved out at activation, so an
 owner's `allocated_sys` is exactly the sum of the policies it has issued.
 
 ### What a node owner needs to operate
 
-Almost nothing. Managing policies costs a node owner no resources at all:
+**No CPU or NET.** `addpolicy`, `expandpolicy`, `extendpolicy`, and `reducepolicy` are actions on
+`sysio.roa`, so `payer()` resolves to `sysio.roa`, which carries unlimited CPU and NET.
 
-- `addpolicy`, `expandpolicy`, `extendpolicy`, and `reducepolicy` are actions on `sysio.roa`, so
-  `payer()` resolves to `sysio.roa`, which carries unlimited CPU and NET.
-- Every row the contract writes for registration and policy management is billed to `sysio.roa`
-  as well — `policies` and `nodeowners` rows are both `emplace(get_self(), …)`.
+**RAM for the rows it causes.** Each policy row (204 bytes) is billed to its issuer.
+`expandpolicy`, `extendpolicy` and a partial `reducepolicy` keep that payer; the `reducepolicy`
+that erases the row refunds it. An issuer without the spare RAM for the row cannot issue the
+policy, so each owner's own RAM, not a shared pool, bounds how many policies it holds open.
+`newuser` and `raiseacctlim` likewise bill the `sponsors` and `sponsorcount` rows to the tier-1
+owner.
 
-An owner reduced to zero CPU, zero NET, and zero spare RAM can still issue a policy. Membership —
-the `nodeowners` row — is what confers the ability to issue, not any allocation the owner holds.
+- A fresh tier-1 owner's personal RAM covers 40 policy rows, fewer once it sponsors accounts. For
+  more, it adds RAM to its personal policy with `expandpolicy`.
+- A tier-2 or tier-3 owner holds only its 1,144-byte account gift, too little for one row. Before
+  issuing, it funds itself with a self-issued `addpolicy` (owner and issuer both itself): 0.0001 SYS
+  of `ram_weight` pays for that policy's own row, and 0.0002 SYS more for each policy it then
+  issues.
 
-The one exception is tier-1 account sponsorship. `newuser` bills its `sponsors` and `sponsorcount`
-rows to `creator`, and `raiseacctlim` bills the same `sponsorcount` row to the owner. Those are the
-only rows in the contract charged to a node owner, so a tier-1 owner needs RAM headroom before its
-first `newuser` or `raiseacctlim` call.
+Every other `sysio.roa` row — `roastate`, `acctlimcfg`, `nodeowners`, `nodeownerreg` — is billed
+to `sysio`. Membership, the `nodeowners` row, is what confers the ability to issue.
 
 ### What differs between tiers
 
@@ -384,27 +390,24 @@ refuse any caller that is not a registered tier-1 owner.
 
 ### Where network RAM comes from
 
-`activateroa` funds two pools:
+`activateroa` funds one pool:
 
 | Pool | Size at activation | Funds |
 |---|---|---|
-| `sysio.roa` | ~157 MB — half the SYS left over after all tier allocations | The contract's own rows: policies, node-owner records |
-| `sysio` | ~6.75 GB — the other half, plus 10% of every tier-1 slot's allocation | The 1,144-byte gift every new account receives |
+| `sysio` | ~6.9 GB — the SYS left over after all tier allocations, plus 10% of every tier-1 slot's allocation | The 1,144-byte gift every new account receives, system contract code and rows, and the `sysio.roa` rows no node owner pays for |
+
+`sysio.roa` gets no pool: `activateroa` sets its RAM quota to the code, ABI and account rows it
+already holds, and takes those bytes out of `sysio`'s share. A later redeploy goes through
+`setsyscode`, which gifts the difference from `sysio`'s pool.
 
 `sysio`'s pool is fully funded at activation, whether or not any node owner has registered. At
-1,144 bytes per account it supports roughly 5.90 million accounts.
+1,144 bytes per account it supports roughly 6.04 million accounts.
 
-The gap between those two pools is why `newuser` bills its sponsorship rows to the sponsoring
-tier-1 owner rather than to the contract. Billed to the contract, `sysio.roa`'s ~157 MB would cap
-sponsorship near **1.09 million** users, well short of what `sysio`'s account pool can create. A
-tier-1 owner's own free budget of ~2.83 GB is the only one that scales with how many users it
-actually onboards.
-
-A sponsorship costs **144 bytes** (a 16-byte key and 16-byte value over
-`billable_size_v<kv_object>` of 112) plus a one-time 152-byte `sponsorcount` row (a 24-byte value:
-owner, count, raised limit) on a creator's first `newuser` or `raiseacctlim`. Neither pool is a ceiling: `addpolicy` refuses CPU and NET to a `sysio.`-prefixed
-account but not RAM, so a node owner can extend either with a RAM-only policy. The ~157 MB is
-where `activateroa` starts `sysio.roa`.
+Rows a node owner causes bill that owner: a policy costs **204 bytes** (a 16-byte key and a 76-byte
+value over `billable_size_v<kv_object>` of 112), a sponsorship **144 bytes** (a 16-byte key and
+16-byte value), plus a one-time 152-byte `sponsorcount` row on a creator's first `newuser` or
+`raiseacctlim`. `sysio`'s pool is not a ceiling either: `addpolicy` refuses CPU and NET to a
+`sysio.`-prefixed account but not RAM, so a node owner can extend it with a RAM-only policy.
 
 ### The four policy actions
 
@@ -917,7 +920,7 @@ and are omitted.
 |---|---|---|
 | `roastate` | singleton | Activation flag, `total_sys`, `bytes_per_unit`, `network_gen` |
 | `nodeowners` | `network_gen` | Node owner rows: tier, total and allocated SYS |
-| `policies` | issuer | One row per (issuer, owner) pair |
+| `policies` | issuer | One row per (issuer, owner) pair, billed to the issuer |
 | `sponsorcount` | `network_gen` | Per tier-1 owner: accounts sponsored and the limit it raised to |
 | `acctlimcfg` | singleton | Default account limit and the raise multiplier |
 
@@ -930,6 +933,7 @@ and are omitted.
 | `Only Node Owners can issue policies for this generation.` | Issuer is not registered in that `network_gen` |
 | `Not enough unallocated SYS for this policy.` | Issuer's budget is exhausted |
 | `A policy for this owner already exists from this issuer.` | Use `expandpolicy` |
+| `account X has insufficient ram` on a policy action | Issuer X lacks the spare RAM for the policy row; add RAM to its own policy first |
 | `Cannot reduce policy before time_block` | The policy's committed term has not elapsed |
 | `Cannot allocate CPU/NET to sysio accounts.` | ROA refuses CPU/NET policies for any `sysio.`-prefixed owner. It does not mean the account is unlimited — `sysio.acct` is at zero |
 | `Only privileged accounts can create new accounts` | The declared creator is not privileged. Ordinary accounts cannot call native `newaccount`; `sysio.roa::newuser` is the supported flow, and only for a registered tier-1 sponsor |

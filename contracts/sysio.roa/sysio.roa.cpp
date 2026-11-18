@@ -21,6 +21,11 @@ namespace sysio {
         /// Claim allocation continuation, queued after native account creation.
         constexpr name ROA_NODEOWNFIN = "nodeownfin"_n;
 
+        /// The account whose RAM quota is the pool that funds account creation and system contract state.
+        constexpr name SYSIO_ACCOUNT = "sysio"_n;
+        /// Payer of every sysio.roa row not billed to a node owner. sysio.roa holds no RAM pool of its own.
+        constexpr name RAM_PAYER = SYSIO_ACCOUNT;
+
         /// Names under this prefix belong to system accounts. The chain refuses them only to non-privileged
         /// creators, and sysio.roa is privileged, so node-owner claims must refuse them here.
         constexpr std::string_view RESERVED_SYSTEM_NAME_PREFIX = "sysio.";
@@ -160,7 +165,7 @@ namespace sysio {
         state.total_sys = total_sys;
         state.bytes_per_unit = bytes_per_unit;
         state.network_gen = 0;
-        roastate.set(state, get_self());
+        roastate.set(state, RAM_PAYER);
 
         // Per-node tier allocations via the shared helper (single source of truth for the fractions
         // and rounding; see tier_sys_allocation). Tier counts come from the shared constants in
@@ -193,33 +198,30 @@ namespace sysio {
         // (positivity and the upper bound are already checked above), so `leftover` is non-negative.
         check(allocated <= total_amount, "Total SYS too small: node-owner reserve exceeds supply");
 
-        // Partition so the RAM handed out stays exactly total_sys * bytes_per_unit, nothing is minted
-        // on top:
-        //   T = node-owner budgets (allocated - sysio_carve) + roa allocation + sysio pool.
-        // sysio.roa keeps half the leftover for its own (growing) bookkeeping tables. sysio gets the
-        // other half plus sysio_carve as THE pool that funds account creation and every other system
-        // contract's RAM (setsyscode/setsysabi gift the exact bytes out of it). The sysio.acct
-        // account-creation bucket seed is taken out of sysio's share so it stays conserved.
-        // bytes_per_unit divides newaccount_ram, so these products stay far inside uint64/int64.
-        uint64_t leftover_bytes = (uint64_t)leftover * bytes_per_unit;  // leftover >= 0, guarded above
-        uint64_t roa_ram_bytes = leftover_bytes / 2;
+        // Partition so the RAM handed out stays exactly total_sys * bytes_per_unit, nothing is minted on top:
+        //   T = node-owner budgets (allocated - sysio_carve) + sysio.roa usage + sysio pool + sysio.acct seed.
+        // sysio.roa holds no pool: its rows bill the issuing node owner or sysio, so its quota is pinned to the code,
+        // ABI and account rows it already holds (nothing in this action bills it). sysio's pool, which funds account
+        // creation and every other system contract's RAM, takes the leftover plus sysio_carve, less those bytes and
+        // the sysio.acct seed. bytes_per_unit divides newaccount_ram, so these products stay far inside uint64/int64.
+        const uint64_t leftover_bytes = static_cast<uint64_t>(leftover) * bytes_per_unit; // leftover >= 0 above
+        const uint64_t roa_ram_bytes = static_cast<uint64_t>(get_ram_usage(get_self()));
         const uint64_t acct_seed_bytes = sysiosystem::newaccount_ram;
-        uint64_t sysio_gross = leftover_bytes - roa_ram_bytes + (uint64_t)sysio_carve * bytes_per_unit;
-        check(sysio_gross > acct_seed_bytes, "Leftover RAM too small for the account-creation seed");
-        uint64_t sysio_ram_bytes = sysio_gross - acct_seed_bytes;
+        const uint64_t sysio_gross = leftover_bytes + static_cast<uint64_t>(sysio_carve) * bytes_per_unit;
+        check(sysio_gross > roa_ram_bytes + acct_seed_bytes,
+              "Leftover RAM too small for sysio.roa and the account-creation seed");
+        const uint64_t sysio_ram_bytes = sysio_gross - roa_ram_bytes - acct_seed_bytes;
 
-        // Set sysio.roas new account limits.
-        set_resource_limits(get_self(), roa_ram_bytes, -1, -1);
+        set_resource_limits(get_self(), static_cast<int64_t>(roa_ram_bytes), -1, -1);
 
-        // Set sysio new account limits: its RAM quota is the funding pool.
-        name sys_account = "sysio"_n;
-        set_resource_limits(sys_account, sysio_ram_bytes, -1, -1);
+        // sysio's RAM quota is the funding pool.
+        set_resource_limits(SYSIO_ACCOUNT, static_cast<int64_t>(sysio_ram_bytes), -1, -1);
 
-        // Add policy for sys_account for tracking RAM provided to accounts for account creation
-        policies_t policies(get_self(), sys_account.value);
-        policies.emplace(get_self(), policy_key{"sysio.acct"_n.value}, roa::policies{
+        // Tracks the RAM sysio gifts for account creation. Issued by sysio, so billed to sysio.
+        policies_t policies(get_self(), SYSIO_ACCOUNT.value);
+        policies.emplace(SYSIO_ACCOUNT, policy_key{"sysio.acct"_n.value}, roa::policies{
             .owner = "sysio.acct"_n,
-            .issuer = sys_account,
+            .issuer = SYSIO_ACCOUNT,
             .net_weight = asset(0, total_sys.symbol),
             .cpu_weight = asset(0, total_sys.symbol),
             .ram_weight = asset(0, total_sys.symbol),
@@ -248,7 +250,7 @@ namespace sysio {
         state.bytes_per_unit = bytes_per_unit;
 
         // Set values to table.
-        roastate.set(state, get_self());
+        roastate.set(state, RAM_PAYER);
     };
 
     /// Add `net`, `cpu` and `ram` to `owner`'s chain resource limits. An unlimited NET or CPU limit counts as 0
@@ -434,8 +436,8 @@ namespace sysio {
         // Update the system resource limits
         add_system_resources(owner, net_weight.amount, cpu_weight.amount, ram_bytes_to_allocate);
 
-        // Add the new policy
-        policies.emplace(get_self(), pol_key, roa::policies{
+        // The issuer pays for the row, so its own RAM bounds how many policies it can hold open.
+        policies.emplace(issuer, pol_key, roa::policies{
             .owner = owner,
             .issuer = issuer,
             .net_weight = net_weight,
@@ -446,7 +448,7 @@ namespace sysio {
         });
 
         // Update the issuer's allocations
-        nodeowners.modify(get_self(), node_key, [&](auto& row) {
+        nodeowners.modify(RAM_PAYER, node_key, [&](auto& row) {
             row.allocated_sys.amount += total_new_allocation.amount;
             row.allocated_bw.amount += (net_weight.amount + cpu_weight.amount);
             row.allocated_ram.amount += ram_weight.amount;
@@ -502,8 +504,8 @@ namespace sysio {
         // Convert RAM weight to bytes
         int64_t ram_bytes_to_allocate = (int64_t)ram_weight.amount * (int64_t)pol.bytes_per_unit;
 
-        // Update the policy weights
-        policies.modify(get_self(), pol_key, [&](auto& row) {
+        // Update the policy weights; the row stays billed to whoever created it.
+        policies.modify(same_payer, pol_key, [&](auto& row) {
             if (!sysio_acct) {
                 row.net_weight.amount += net_weight.amount;
                 row.cpu_weight.amount += cpu_weight.amount;
@@ -512,7 +514,7 @@ namespace sysio {
         });
 
         // Update issuer's allocations in nodeowners
-        nodeowners.modify(get_self(), node_key, [&](auto& row) {
+        nodeowners.modify(RAM_PAYER, node_key, [&](auto& row) {
             row.allocated_sys.amount += total_new_allocation.amount;
             row.allocated_bw.amount += (net_weight.amount + cpu_weight.amount);
             row.allocated_ram.amount += ram_weight.amount;
@@ -533,7 +535,7 @@ namespace sysio {
         check(new_time_block > pol.time_block, "Cannot reduce a policies existing time_block");
         check(new_time_block > current_block_number(), "You cannot set a time_block lower than the current block");
 
-        policies.modify(get_self(), pol_key, [&](auto& row) {
+        policies.modify(same_payer, pol_key, [&](auto& row) {
             row.time_block = new_time_block;
         });
     };
@@ -627,9 +629,9 @@ namespace sysio {
                          pol_row.cpu_weight.amount == 0 &&
                          pol_row.ram_weight.amount == 0);
         if (all_zero) {
-            policies.erase(pol_key);
+            policies.erase(pol_key); // refunds the row's payer
         } else {
-            policies.modify(get_self(), pol_key, [&](auto& row) {
+            policies.modify(same_payer, pol_key, [&](auto& row) {
                 if (!sysio_acct) {
                     row.net_weight.amount = pol_row.net_weight.amount;
                     row.cpu_weight.amount = pol_row.cpu_weight.amount;
@@ -640,7 +642,7 @@ namespace sysio {
 
         // Update nodeowners row
         int64_t total_reclaimed_sys_amount = net_weight.amount + cpu_weight.amount + reclaimed_ram_weight.amount;
-        nodeowners.modify(get_self(), node_key, [&](auto &row) {
+        nodeowners.modify(RAM_PAYER, node_key, [&](auto &row) {
             row.allocated_sys.amount -= total_reclaimed_sys_amount;
             row.allocated_bw.amount -= (net_weight.amount + cpu_weight.amount);
             row.allocated_ram.amount -= reclaimed_ram_weight.amount;
@@ -766,12 +768,13 @@ namespace sysio {
             row.reason = reason;
         };
 
+        // Billed to sysio: rejected claims have no account of their own to bill.
         if (nodereg.contains(reg_key)) {
-            nodereg.modify(get_self(), reg_key, write);
+            nodereg.modify(RAM_PAYER, reg_key, write);
         } else {
             nodeownerreg row{};
             write(row);
-            nodereg.emplace(get_self(), reg_key, row);
+            nodereg.emplace(RAM_PAYER, reg_key, row);
         }
     }
 
@@ -817,22 +820,10 @@ namespace sysio {
         // The owner's budget: the tier allocation net of sysio's carve-out
         asset total_sys_allocation = get_allocation_for_tier(tier);
 
-        // Only a tier-1 owner is provisioned a personal allocation here. Tier 1 is the sole tier
-        // that can call newuser, and the `sponsors` / `sponsorcount` rows that newuser and
-        // raiseacctlim write are the only rows in this contract billed to a node owner rather than
-        // to sysio.roa -- so a tier-1 owner needs RAM headroom before its first sponsorship or
-        // raise. No other node-owner capability draws on
-        // the owner's own resources: addpolicy / expandpolicy / extendpolicy / reducepolicy are
-        // actions on sysio.roa, so unless the caller names an explicit sysio.payer, action::payer()
-        // resolves to sysio.roa (unlimited CPU/NET), and every row those actions write is emplaced
-        // with get_self() as the RAM payer. A tier-2 or tier-3 owner can therefore issue policies --
-        // including to itself -- while holding nothing but what native::newaccount granted it,
-        // drawing on the tier budget the nodeowners row records.
-        //
-        // Granting it anyway was disproportionate: the personal weights are a flat constant while the
-        // tier budgets are a fraction of supply, so the same grant lands very differently -- tier 1
-        // draws 4% of supply against tier 3's 0.003%, making an identical deduction roughly three
-        // orders of magnitude more significant for a tier-3 owner.
+        // Only a tier-1 owner is provisioned a personal allocation: its RAM pays for the policy rows it issues and
+        // the sponsorship rows newuser and raiseacctlim write. A tier-2 or tier-3 owner funds its first policy row
+        // itself, with a self-issued addpolicy whose ram_weight covers the row. A flat grant would weigh unevenly
+        // across tiers whose budgets are fractions of supply.
         const bool provision_personal = (tier == 1);
 
         // We will track how much is allocated to bandwidth (CPU/NET) and RAM separately
@@ -857,8 +848,9 @@ namespace sysio {
         auto pol_key = policy_key{owner.value};
 
         if (provision_personal && !policies.contains(pol_key)) {
-            // Create personal policy
-            policies.emplace(get_self(), pol_key, roa::policies{
+            // Self-issued, so billed to the owner. The chain checks RAM at transaction end, after the personal RAM
+            // below is added to the owner's limit.
+            policies.emplace(owner, pol_key, roa::policies{
                 .owner = owner,
                 .issuer = owner,
                 .net_weight = net_cpu_weight,
@@ -875,8 +867,8 @@ namespace sysio {
         add_system_resources(owner, net_cpu_weight.amount, net_cpu_weight.amount,
                              static_cast<int64_t>(personal_ram_bytes), sysiosystem::newaccount_ram);
 
-        // Finally, record the node owner entry with the new fields
-        nodeowners.emplace(get_self(), node_key, roa::nodeowners{
+        // Billed to sysio: a tier-2 or tier-3 owner holds no spare RAM at registration.
+        nodeowners.emplace(RAM_PAYER, node_key, roa::nodeowners{
             .owner = owner,
             .tier = tier,
             .total_sys = total_sys_allocation,
@@ -1030,7 +1022,7 @@ namespace sysio {
         // moved state.bytes_per_unit since activation, but sysio.acct's ram_weight is denominated at
         // its creation price, so units must use that to keep ram_weight * price == bytes moved.
         int64_t ram_weight_amount = sysiosystem::newaccount_ram / acct_pol.bytes_per_unit;
-        policies.modify(get_self(), pol_key, [&](auto& row) {
+        policies.modify(same_payer, pol_key, [&](auto& row) {
             row.ram_weight.amount += ram_weight_amount;
         });
 
@@ -1049,7 +1041,7 @@ namespace sysio {
         config.set(account_limit_config{
             .default_limit            = default_limit,
             .max_raise_multiplier_bps = max_raise_multiplier_bps,
-        }, get_self());
+        }, RAM_PAYER);
     }
 
     void roa::raiseacctlim(const name& owner, uint64_t new_limit) {
@@ -1142,7 +1134,7 @@ namespace sysio {
         // moved state.bytes_per_unit since activation, but sysio.acct's ram_weight is denominated at
         // its creation price, so units must use that to keep ram_weight * price == bytes moved.
         int64_t ram_weight_amount = sysiosystem::newaccount_ram / acct_pol.bytes_per_unit;
-        policies.modify(get_self(), pol_key, [&](auto& row) {
+        policies.modify(same_payer, pol_key, [&](auto& row) {
             row.ram_weight.amount += ram_weight_amount;
         });
     }

@@ -1957,8 +1957,7 @@ struct controller_impl {
              || (code == contract_whitelist_exception::code_value)
              || (code == contract_blacklist_exception::code_value)
              || (code == action_blacklist_exception::code_value)
-             || (code == key_blacklist_exception::code_value)
-             || (code == sig_variable_size_limit_exception::code_value);
+             || (code == key_blacklist_exception::code_value);
    }
 
    bool scheduled_failure_is_subjective( const fc::exception& e ) const {
@@ -4523,10 +4522,6 @@ bool controller::is_speculative_block()const {
 
 bool controller::is_producing_block() const {
    return my->is_producing_block();
-}
-
-uint32_t controller::configured_subjective_signature_length_limit()const {
-   return my->conf.maximum_variable_signature_length;
 }
 
 void controller::validate_expiration( const transaction& trx )const { try {
