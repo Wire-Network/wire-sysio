@@ -12,17 +12,6 @@
 #include <bls12-381/bls12-381.hpp>
 #include <openssl/blake2.h>
 
-// local helpers
-namespace {
-    uint32_t ceil_log2(uint32_t n)
-    {
-        if (n <= 1) {
-            return 0;
-        }
-        return 32 - __builtin_clz(n - 1);
-    };
-}
-
 // bls implementation
 namespace {
    using sysio::chain::span;
@@ -212,29 +201,12 @@ namespace sysio::chain::webassembly {
                               span<const char> exp,
                               span<const char> modulus,
                               span<char> out) const {
-      if (context.control.is_speculative_block()) {
-         unsigned int base_modulus_size = std::max(base.size(), modulus.size());
+      if (base.size() > config::max_mod_exp_operand_size || modulus.size() > config::max_mod_exp_operand_size)
+         return return_code::failure;
 
-         if (base_modulus_size < exp.size()) {
-            SYS_THROW(subjective_block_production_exception,
-                      "mod_exp restriction: exponent bit size cannot exceed bit size of either base or modulus");
-         }
+      auto checktime = [this]() { context.trx_context.checktime(); };
 
-         static constexpr uint64_t bit_calc_limit = 106;
-
-         uint64_t bit_calc = 5 * ceil_log2(exp.size()) + 8 * ceil_log2(base_modulus_size);
-
-         if (bit_calc_limit < bit_calc) {
-            SYS_THROW(subjective_block_production_exception,
-                      "mod_exp restriction: bit size too large for input arguments");
-         }
-      }
-
-      bytes bbase(base.data(), base.data() + base.size());
-      bytes bexp(exp.data(), exp.data() + exp.size());
-      bytes bmod(modulus.data(), modulus.data() + modulus.size());
-
-      auto maybe_err = fc::modexp(bbase, bexp, bmod);
+      auto maybe_err = fc::modexp(base, exp, modulus, checktime);
       if(std::holds_alternative<fc::modular_arithmetic_error>(maybe_err)) {
          return return_code::failure;
       }
