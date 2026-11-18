@@ -4938,6 +4938,43 @@ BOOST_AUTO_TEST_CASE(action_data_expansion_stops_at_deadline)
                      abi_serialization_deadline_exception);
 } FC_LOG_AND_RETHROW() }
 
+/// Decoding action data stops at the conversion's action-data deadline: actions reached after it keep their data as
+/// hex, as undecodable data does, and hex_data and return_value_hex_data stay present.
+BOOST_AUTO_TEST_CASE(to_variant_leaves_hex_past_action_data_deadline)
+{ try {
+   const abi_def abi = fc::json::from_string(bulk_action_abi).as<abi_def>();
+   constexpr uint32_t action_count = 3;
+   signed_transaction trx;
+   abi_serializer::from_variant(bulk_transaction(action_count, 2), trx, get_resolver(abi), fc::microseconds::maximum());
+   BOOST_REQUIRE_EQUAL(trx.actions.size(), action_count);
+
+   fc::variant decoded;
+   abi_serializer::to_variant(trx, decoded, get_resolver(abi), fc::microseconds::maximum(), fc::time_point::maximum());
+   fc::variant spent;
+   abi_serializer::to_variant(trx, spent, get_resolver(abi), fc::microseconds::maximum(), fc::time_point::now());
+   for (uint32_t i = 0; i < action_count; ++i) {
+      const std::string hex = fc::to_hex(trx.actions[i].data);
+      BOOST_CHECK(decoded["actions"][i]["data"].is_object());
+      BOOST_CHECK_EQUAL(decoded["actions"][i]["hex_data"].as_string(), hex);
+      BOOST_CHECK_EQUAL(spent["actions"][i]["data"].as_string(), hex);
+      BOOST_CHECK_EQUAL(spent["actions"][i]["hex_data"].as_string(), hex);
+   }
+
+   action_trace at;
+   at.act          = trx.actions[0];
+   at.return_value = fc::raw::pack(uint16_t{7});
+   fc::variant trace_decoded;
+   abi_serializer::to_variant(at, trace_decoded, get_resolver(abi), fc::microseconds::maximum(),
+                              fc::time_point::maximum());
+   BOOST_CHECK_EQUAL(trace_decoded["return_value_data"].as_uint64(), 7u);
+   BOOST_CHECK(trace_decoded["act"]["data"].is_object());
+   fc::variant trace_spent;
+   abi_serializer::to_variant(at, trace_spent, get_resolver(abi), fc::microseconds::maximum(), fc::time_point::now());
+   BOOST_CHECK(!trace_spent.get_object().contains("return_value_data"));
+   BOOST_CHECK_EQUAL(trace_spent["return_value_hex_data"].as_string(), fc::to_hex(at.return_value));
+   BOOST_CHECK_EQUAL(trace_spent["act"]["data"].as_string(), fc::to_hex(at.act.data));
+} FC_LOG_AND_RETHROW() }
+
 /// A struct field takes the first occurrence of its key in the input object: later duplicates, unknown keys and key
 /// order do not matter, and a field name a struct declares twice takes that value both times.
 BOOST_AUTO_TEST_CASE(variant_to_binary_first_key_occurrence_wins)

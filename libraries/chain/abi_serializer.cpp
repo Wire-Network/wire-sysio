@@ -991,9 +991,11 @@ namespace sysio::chain {
       }
 
       void abi_traverse_context::limit_to_one_action() {
-         if( max_action_serialization_time.count() <= 0 )
+         fc::time_point deadline = action_data_deadline;
+         if( max_action_serialization_time.count() > 0 )
+            deadline = std::min( deadline, fc::time_point::now().safe_add( max_action_serialization_time ) );
+         if( deadline == fc::time_point::maximum() )
             return;
-         const fc::time_point deadline = fc::time_point::now().safe_add( max_action_serialization_time );
          yield = [deadline, y = yield, max = max_action_serialization_time]( size_t depth ) {
             y( depth ); // the provided yield, which may bound the whole conversion
             SYS_ASSERT( fc::time_point::now() < deadline, abi_serialization_deadline_exception,

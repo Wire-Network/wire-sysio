@@ -6,6 +6,7 @@
 #include <boost/container/flat_set.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <fc/time.hpp>
+#include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -30,6 +31,7 @@
 #include <sysio/chain_plugin/trx_finality_status_processing.hpp>
 #include <sysio/chain_plugin/trx_retry_db.hpp>
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
+#include <variant>
 #include <vector>
 
 namespace fc { class variant; }
@@ -785,6 +787,25 @@ public:
    };
    void send_transaction2(send_transaction2_params params, chain::plugin_interface::next_function<send_transaction_results> next);
 
+private:
+   /// A pushed transaction's trace with the ABIs of the accounts its actions name, read on the main thread when the
+   /// transaction completed. Converting it to push_transaction_results can then run on any thread.
+   struct pushed_trace {
+      chain::transaction_trace_ptr trace;
+      abi_resolver                 resolver;
+   };
+   /// The error that ended a push, or its pushed_trace.
+   using pushed_trace_or_error = std::variant<fc::exception_ptr, pushed_trace>;
+
+   /// Packs `params` and pushes it; calls `next` on the main thread with the trace and its ABIs, or the error.
+   void push_transaction_trace(const push_transaction_params& params,
+                               chain::plugin_interface::next_function<pushed_trace> next);
+
+   /// Pushes `(*params)[index]` and the transactions after it one at a time, collecting their outcomes in `pushed`,
+   /// then calls `next` with a function that decodes all of them within one abi_serializer_max_time.
+   void push_remaining(size_t index, std::shared_ptr<const push_transactions_params> params,
+                       std::shared_ptr<std::vector<pushed_trace_or_error>> pushed,
+                       chain::plugin_interface::next_function<push_transactions_results> next);
 };
 
  //support for --key_types [sha256,ripemd160] and --encoding [dec/hex]

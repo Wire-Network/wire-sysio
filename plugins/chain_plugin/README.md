@@ -196,7 +196,7 @@ them change how the node starts or make it print something and exit.
 | `chain-state-db-guard-size-mb` | `128` | Shut the node down safely when free space in the chain state database drops below this size in MiB. |
 | `chain-threads` | `4` | Number of worker threads in the controller thread pool. Must be greater than 0. |
 | `vote-threads` | unset | Number of worker threads in the vote processor pool. On a node with `producer-name` both an unset value and an explicit 0 are replaced by 4, so voting cannot be disabled there. Elsewhere, unset leaves the pool at 0 and the node neither accepts nor propagates votes on P2P. |
-| `abi-serializer-max-time-ms` | `15` | Maximum ABI serialization time allowed, in milliseconds. |
+| `abi-serializer-max-time-ms` | `15` | Maximum ABI serialization time allowed, in milliseconds, for each action's data and for all the action data one API response decodes. Actions left once a response's time is spent are returned as hex only. |
 | `signature-cpu-billable-pct` | `50` | Percentage of actual signature-recovery CPU to bill, as a whole number. |
 | `maximum-variable-signature-length` | `16384` | Subjective limit, in bytes, on the variable components of a variable-length signature. |
 

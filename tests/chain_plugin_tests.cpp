@@ -470,4 +470,120 @@ BOOST_FIXTURE_TEST_CASE( get_required_keys_honors_request_deadline, validating_t
                      abi_serialization_deadline_exception);
 } FC_LOG_AND_RETHROW()
 
+/// push_transaction and push_transactions hand decoding their traces to the function they return, which runs on the
+/// http thread pool rather than on the thread that executed the transactions. abi_serializer_max_time bounds that
+/// decoding as a whole; with none, the data stays hex.
+BOOST_FIXTURE_TEST_CASE( push_transaction_defers_trace_decode, validating_tester ) try {
+   create_accounts({"asserter"_n});
+   set_code("asserter"_n, test_contracts::asserter_wasm());
+   set_abi("asserter"_n, test_contracts::asserter_abi());
+   produce_block();
+
+   signed_transaction trx;
+   trx.actions.emplace_back(std::vector<permission_level>{{"asserter"_n, config::active_name}}, "asserter"_n,
+                            "procassert"_n, fc::raw::pack(int8_t{1}, std::string("fine")));
+   set_transaction_headers(trx);
+   trx.sign(get_private_key("asserter"_n, "active"), control->get_chain_id());
+   const fc::variant params{packed_transaction(trx)};
+   const transaction_trace_ptr trace = push_transaction(trx);
+   const std::string hex_data = fc::to_hex(trx.actions[0].data);
+
+   using incoming_method = plugin_interface::incoming::methods::transaction_async;
+   appbase::scoped_app app;
+   size_t              provided = 0;
+   // The provider stays registered while its handle lives.
+   incoming_method::method_type::handle provider = app->get_method<incoming_method>().register_provider(
+      [&trace, &provided](const packed_transaction_ptr&, bool, transaction_metadata::trx_type, bool,
+                          next_function<transaction_trace_ptr> next) {
+         ++provided;
+         next(transaction_trace_ptr(trace));
+      });
+
+   std::optional<chain_apis::trx_retry_db> no_retry;
+   using results_t  = chain_apis::read_write::push_transaction_results;
+   using deferred_t = std::function<t_or_exception<results_t>()>;
+   const auto push = [&](const fc::microseconds& max_time) {
+      chain_apis::read_write rw(*control, no_retry, max_time, fc::microseconds::maximum(), true);
+      std::optional<next_function_variant<results_t>> pushed;
+      rw.push_transaction(params.get_object(), [&pushed](next_function_variant<results_t>&& result) {
+         pushed = std::move(result);
+      });
+      BOOST_REQUIRE(pushed);
+      BOOST_REQUIRE(std::holds_alternative<deferred_t>(*pushed));
+      t_or_exception<results_t> decoded = std::get<deferred_t>(*pushed)();
+      BOOST_REQUIRE(std::holds_alternative<results_t>(decoded));
+      return std::get<results_t>(std::move(decoded));
+   };
+
+   const results_t results = push(fc::microseconds::maximum());
+   BOOST_CHECK(results.transaction_id == trx.id());
+   const fc::variant& act = results.processed["action_traces"][size_t(0)]["act"];
+   BOOST_REQUIRE(act["data"].is_object());
+   BOOST_CHECK_EQUAL(act["data"]["message"].as_string(), "fine");
+
+   // With no time to decode, the data stays hex.
+   const results_t spent = push(fc::microseconds(0));
+   BOOST_CHECK_EQUAL(spent.processed["action_traces"][size_t(0)]["act"]["data"].as_string(), hex_data);
+   BOOST_CHECK_EQUAL(spent.processed["action_traces"][size_t(0)]["act"]["hex_data"].as_string(), hex_data);
+
+   using batch_results_t  = chain_apis::read_write::push_transactions_results;
+   using batch_deferred_t = std::function<t_or_exception<batch_results_t>()>;
+   const auto push_batch = [&](const fc::microseconds& max_time) {
+      chain_apis::read_write rw(*control, no_retry, max_time, fc::microseconds::maximum(), true);
+      std::optional<next_function_variant<batch_results_t>> pushed;
+      rw.push_transactions({params.get_object(), params.get_object()},
+                           [&pushed](next_function_variant<batch_results_t>&& result) { pushed = std::move(result); });
+      BOOST_REQUIRE(pushed);
+      BOOST_REQUIRE(std::holds_alternative<batch_deferred_t>(*pushed));
+      t_or_exception<batch_results_t> decoded = std::get<batch_deferred_t>(*pushed)();
+      BOOST_REQUIRE(std::holds_alternative<batch_results_t>(decoded));
+      return std::get<batch_results_t>(std::move(decoded));
+   };
+
+   const batch_results_t batch = push_batch(fc::microseconds::maximum());
+   BOOST_REQUIRE_EQUAL(batch.size(), 2u);
+   for (const results_t& result : batch)
+      BOOST_CHECK(result.processed["action_traces"][size_t(0)]["act"]["data"].is_object());
+
+   const batch_results_t batch_spent = push_batch(fc::microseconds(0));
+   BOOST_REQUIRE_EQUAL(batch_spent.size(), 2u);
+   for (const results_t& result : batch_spent)
+      BOOST_CHECK_EQUAL(result.processed["action_traces"][size_t(0)]["act"]["data"].as_string(), hex_data);
+
+   BOOST_CHECK_EQUAL(provided, 6u);
+} FC_LOG_AND_RETHROW()
+
+/// get_block decodes a block's action data within abi_serializer_max_time as a whole; with none, the data stays hex.
+BOOST_FIXTURE_TEST_CASE( get_block_honors_response_budget, validating_tester ) try {
+   create_accounts({"asserter"_n});
+   set_code("asserter"_n, test_contracts::asserter_wasm());
+   set_abi("asserter"_n, test_contracts::asserter_abi());
+   produce_block();
+
+   signed_transaction trx;
+   trx.actions.emplace_back(std::vector<permission_level>{{"asserter"_n, config::active_name}}, "asserter"_n,
+                            "procassert"_n, fc::raw::pack(int8_t{1}, std::string("fine")));
+   set_transaction_headers(trx);
+   trx.sign(get_private_key("asserter"_n, "active"), control->get_chain_id());
+   push_transaction(trx);
+   produce_block();
+
+   const chain_apis::read_only::get_raw_block_params param{std::to_string(control->head().block_num())};
+   std::optional<chain_apis::tracked_votes> tracked_votes;
+   const auto block_json = [&](const fc::microseconds& max_time) {
+      chain_apis::read_only plugin(*control, {}, {}, tracked_votes, max_time, fc::microseconds::maximum(), nullptr);
+      const signed_block_ptr block = plugin.get_raw_block(param, fc::time_point::maximum());
+      abi_resolver resolver = plugin.get_block_serializers(block, fc::microseconds::maximum());
+      return json::to_string(plugin.convert_block(block, resolver), fc::time_point::maximum());
+   };
+
+   const std::string hex_data = fc::to_hex(trx.actions[0].data);
+   const std::string decoded  = block_json(fc::microseconds::maximum());
+   BOOST_CHECK(decoded.find("\"message\":\"fine\"") != std::string::npos);
+   const std::string spent = block_json(fc::microseconds(0));
+   BOOST_CHECK(spent.find("\"message\":\"fine\"") == std::string::npos);
+   BOOST_CHECK(spent.find("\"data\":\"" + hex_data + "\"") != std::string::npos);
+   BOOST_CHECK(spent.find("\"hex_data\":\"" + hex_data + "\"") != std::string::npos);
+} FC_LOG_AND_RETHROW()
+
 BOOST_AUTO_TEST_SUITE_END()

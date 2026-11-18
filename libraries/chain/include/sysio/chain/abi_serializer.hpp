@@ -87,6 +87,15 @@ struct abi_serializer {
    static void to_variant( const T& o, fc::variant& vo, const Resolver& resolver, const yield_function_t& yield );
    template<typename T, typename Resolver>
    static void to_variant( const T& o, fc::variant& vo, const Resolver& resolver, const fc::microseconds& max_action_data_serialization_time );
+   /**
+    * Converts `o` to `vo`, decoding each action's data within `max_action_data_serialization_time` and all of it by
+    * `action_data_deadline`. An action whose data is not decoded by then keeps its data as hex, as one whose data fails
+    * to decode does; its `hex_data` is always present.
+    */
+   template<typename T, typename Resolver>
+   static void to_variant( const T& o, fc::variant& vo, const Resolver& resolver,
+                           const fc::microseconds& max_action_data_serialization_time,
+                           const fc::time_point& action_data_deadline );
 
    template<typename T, typename Resolver>
    static void to_log_variant( const T& o, fc::variant& vo, const Resolver& resolver, const yield_function_t& yield );
@@ -243,15 +252,25 @@ namespace impl {
       /// one after that share it.
       abi_serializer::pack_stream& action_data_scratch();
 
+      /// Stops decoding action data at `deadline` for the rest of this conversion; see action_data_deadline.
+      void set_action_data_deadline( const fc::time_point& deadline ) { action_data_deadline = deadline; }
+
+      /// True once action_data_deadline has passed: action data reached from now on is left as hex.
+      bool action_data_budget_spent()const {
+         return action_data_deadline != fc::time_point::maximum() && fc::time_point::now() >= action_data_deadline;
+      }
+
    protected:
       /// Bounds this context to converting one action's data: from now on its yield also throws
-      /// abi_serialization_deadline_exception once `max_action_serialization_time` has passed. No change when that
-      /// limit is unset.
+      /// abi_serialization_deadline_exception once `max_action_serialization_time` has passed, or action_data_deadline
+      /// if that is sooner. No change when neither is set.
       void limit_to_one_action();
 
       abi_serializer::yield_function_t  yield;
       // if set then restricts each individual action data serialization
       fc::microseconds                  max_action_serialization_time;
+      /// Decoding action data across the whole conversion ends here; maximum() when the conversion has no such budget.
+      fc::time_point                    action_data_deadline = fc::time_point::maximum();
       size_t                            recursion_depth = 1;
       bool                              log = false;
       std::shared_ptr<abi_serializer::pack_stream> action_data_scratch_stream;
@@ -512,6 +531,15 @@ namespace impl {
          mvo(name, std::move(obj_mvo["_"]));
       }
 
+      /// The ABI `resolver` gives `account`, or none once the conversion's action-data budget is spent, so that the
+      /// action's data stays hex without resolving an ABI.
+      template<typename Resolver>
+      static auto resolve_for_action_data( const Resolver& resolver, const account_name& account,
+                                           const abi_traverse_context& ctx ) {
+         using resolved_t = std::remove_cvref_t<decltype(resolver(account))>;
+         return ctx.action_data_budget_spent() ? resolved_t{} : resolved_t(resolver(account));
+      }
+
       template<typename Resolver>
       static bool add_special_logging( mutable_variant_object& mvo, const char* name, const action& act, const Resolver& resolver, abi_traverse_context& ctx ) {
          if( !ctx.is_logging() ) return false;
@@ -572,7 +600,7 @@ namespace impl {
          };
 
          try {
-            auto abi_optional = resolver(act.account);
+            auto abi_optional = resolve_for_action_data(resolver, act.account, ctx);
             if (abi_optional) {
                const abi_serializer& abi = *abi_optional;
                auto type = abi.get_action_type(act.name);
@@ -634,7 +662,7 @@ namespace impl {
          mvo("return_value_hex_data", act_trace.return_value);
          auto act = act_trace.act;
          try {
-            auto abi_optional = resolver(act.account);
+            auto abi_optional = resolve_for_action_data(resolver, act.account, ctx);
             if (abi_optional) {
                const abi_serializer& abi = *abi_optional;
                auto type = abi.get_action_result_type(act.name);
@@ -1019,9 +1047,17 @@ void abi_serializer::to_variant( const T& o, fc::variant& vo, const Resolver& re
 } FC_RETHROW_EXCEPTIONS(error, "Failed to serialize: {}", boost::core::demangle( typeid(o).name() ))
 
 template<typename T, typename Resolver>
-void abi_serializer::to_variant( const T& o, fc::variant& vo, const Resolver& resolver, const fc::microseconds& max_action_data_serialization_time ) try {
+void abi_serializer::to_variant( const T& o, fc::variant& vo, const Resolver& resolver, const fc::microseconds& max_action_data_serialization_time ) {
+   to_variant( o, vo, resolver, max_action_data_serialization_time, fc::time_point::maximum() );
+}
+
+template<typename T, typename Resolver>
+void abi_serializer::to_variant( const T& o, fc::variant& vo, const Resolver& resolver,
+                                 const fc::microseconds& max_action_data_serialization_time,
+                                 const fc::time_point& action_data_deadline ) try {
    mutable_variant_object mvo;
    impl::abi_traverse_context ctx( create_depth_yield_function(), max_action_data_serialization_time );
+   ctx.set_action_data_deadline( action_data_deadline );
    impl::abi_to_variant::add(mvo, "_", o, resolver, ctx);
    vo = std::move(mvo["_"]);
 } FC_RETHROW_EXCEPTIONS(error, "Failed to serialize: {}", boost::core::demangle( typeid(o).name() ))
