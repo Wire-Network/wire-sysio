@@ -112,7 +112,8 @@ namespace sysio::chain {
 
    template <typename T>
    auto pack_function() {
-      return []( const fc::variant& var, fc::datastream<char*>& ds, bool is_array, bool is_optional, const abi_serializer::yield_function_t& yield ){
+      return []( const fc::variant& var, abi_serializer::pack_stream& ds, bool is_array, bool is_optional,
+                 const abi_serializer::yield_function_t& yield ){
          if( is_array )
             fc::raw::pack( ds, var.as<vector<T>>() );
          else if ( is_optional )
@@ -406,7 +407,8 @@ namespace sysio::chain {
       return pb_message_to_variant(*msg);
    }
 
-   void abi_serializer::pb_variant_to_binary(const std::string_view& type, const fc::variant& var, fc::datastream<char*>& ds) const {
+   void abi_serializer::pb_variant_to_binary(const std::string_view& type, const fc::variant& var,
+                                             pack_stream& ds) const {
       auto desc = get_pb_descriptor(type);
       SYS_ASSERT( desc, pack_exception, "Unknown protobuf type '{}'", impl::limit_size(type) );
 
@@ -761,7 +763,8 @@ namespace sysio::chain {
       return _binary_to_variant(type, binary, ctx);
    }
 
-   void abi_serializer::_variant_to_binary( const std::string_view& type, const fc::variant& var, fc::datastream<char *>& ds, impl::variant_to_binary_context& ctx )const
+   void abi_serializer::_variant_to_binary( const std::string_view& type, const fc::variant& var, pack_stream& ds,
+                                            impl::variant_to_binary_context& ctx )const
    { try {
       auto h = ctx.enter_scope();
       auto rtype = resolve_type(type);
@@ -902,17 +905,25 @@ namespace sysio::chain {
    } FC_CAPTURE_AND_RETHROW("") }
 
    bytes abi_serializer::_variant_to_binary( const std::string_view& type, const fc::variant& var, impl::variant_to_binary_context& ctx )const
+   {
+      pack_stream scratch;
+      return _variant_to_binary_with_scratch(type, var, scratch, ctx);
+   }
+
+   bytes abi_serializer::_variant_to_binary_with_scratch( const std::string_view& type, const fc::variant& var,
+                                                          pack_stream& scratch,
+                                                          impl::variant_to_binary_context& ctx )const
    { try {
       auto h = ctx.enter_scope();
       if( !_is_type(type, ctx) ) {
          return var.as<bytes>();
       }
 
-      bytes temp( 1024*1024 );
-      fc::datastream<char*> ds(temp.data(), temp.size() );
-      _variant_to_binary(type, var, ds, ctx);
-      temp.resize(ds.tellp());
-      return temp;
+      scratch.seekp(0);
+      scratch.storage().clear();
+      _variant_to_binary(type, var, scratch, ctx);
+      const bytes& packed = scratch.storage();
+      return bytes(packed.begin(), packed.begin() + scratch.tellp());
    } FC_CAPTURE_AND_RETHROW("") }
 
    bytes abi_serializer::variant_to_binary( const std::string_view& type, const fc::variant& var, const yield_function_t& yield, bool short_path )const {
@@ -930,13 +941,17 @@ namespace sysio::chain {
    void  abi_serializer::variant_to_binary( const std::string_view& type, const fc::variant& var, fc::datastream<char*>& ds, const yield_function_t& yield, bool short_path )const {
       impl::variant_to_binary_context ctx(*this, yield, fc::microseconds{}, type);
       ctx.short_path = short_path;
-      _variant_to_binary(type, var, ds, ctx);
+      pack_stream packed;
+      _variant_to_binary(type, var, packed, ctx);
+      ds.write(packed.storage().data(), packed.tellp());
    }
 
    void  abi_serializer::variant_to_binary( const std::string_view& type, const fc::variant& var, fc::datastream<char*>& ds, const fc::microseconds& max_action_data_serialization_time, bool short_path ) const {
       impl::variant_to_binary_context ctx(*this, create_depth_yield_function(), max_action_data_serialization_time, type);
       ctx.short_path = short_path;
-      _variant_to_binary(type, var, ds, ctx);
+      pack_stream packed;
+      _variant_to_binary(type, var, packed, ctx);
+      ds.write(packed.storage().data(), packed.tellp());
    }
 
    type_name abi_serializer::get_action_type(name action)const {
@@ -984,6 +999,12 @@ namespace sysio::chain {
             SYS_ASSERT( fc::time_point::now() < deadline, abi_serialization_deadline_exception,
                         "serialization action data time limit {}us exceeded", max );
          };
+      }
+
+      abi_serializer::pack_stream& abi_traverse_context::action_data_scratch() {
+         if( !action_data_scratch_stream )
+            action_data_scratch_stream = std::make_shared<abi_serializer::pack_stream>();
+         return *action_data_scratch_stream;
       }
 
       void abi_traverse_context_with_path::set_path_root( const std::string_view& type ) {

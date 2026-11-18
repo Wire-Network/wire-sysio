@@ -123,8 +123,12 @@ struct abi_serializer {
       return false;
    }
 
+   /// Stream that packing writes into; it grows to fit what is written.
+   using pack_stream = fc::datastream<bytes>;
+
    typedef std::function<fc::variant(fc::datastream<const char*>&, bool, bool, const abi_serializer::yield_function_t&)>  unpack_function;
-   typedef std::function<void(const fc::variant&, fc::datastream<char*>&, bool, bool, const abi_serializer::yield_function_t&)>  pack_function;
+   typedef std::function<void(const fc::variant&, pack_stream&, bool, bool, const abi_serializer::yield_function_t&)>
+      pack_function;
 
    void add_specialized_unpack_pack( const string& name, std::pair<abi_serializer::unpack_function, abi_serializer::pack_function> unpack_pack );
 
@@ -180,7 +184,7 @@ private:
    bool is_protobuf_type(const std::string_view& type) const;
    const google::protobuf::Descriptor* get_pb_descriptor(const std::string_view& type) const;
    fc::variant pb_binary_to_variant(const std::string_view& type, fc::datastream<const char*>& stream) const;
-   void pb_variant_to_binary(const std::string_view& type, const fc::variant& var, fc::datastream<char*>& ds) const;
+   void pb_variant_to_binary(const std::string_view& type, const fc::variant& var, pack_stream& ds) const;
 
    fc::variant _binary_to_variant( const std::string_view& type, const bytes& binary, impl::binary_to_variant_context& ctx )const;
    fc::variant _binary_to_variant( const std::string_view& type, fc::datastream<const char*>& binary, impl::binary_to_variant_context& ctx )const;
@@ -188,8 +192,12 @@ private:
                                    fc::mutable_variant_object& obj, impl::binary_to_variant_context& ctx )const;
 
    bytes       _variant_to_binary( const std::string_view& type, const fc::variant& var, impl::variant_to_binary_context& ctx )const;
+   /// Packs `var` into `scratch` from its start and returns a copy of exactly the packed bytes. `scratch` keeps its
+   /// capacity for the next value.
+   bytes       _variant_to_binary_with_scratch( const std::string_view& type, const fc::variant& var,
+                                                pack_stream& scratch, impl::variant_to_binary_context& ctx )const;
    void        _variant_to_binary( const std::string_view& type, const fc::variant& var,
-                                   fc::datastream<char*>& ds, impl::variant_to_binary_context& ctx )const;
+                                   pack_stream& ds, impl::variant_to_binary_context& ctx )const;
 
    static std::string_view _remove_bin_extension(const std::string_view& type);
    bool _is_type( const std::string_view& type, impl::abi_traverse_context& ctx )const;
@@ -231,6 +239,10 @@ namespace impl {
 
       fc::scoped_exit<std::function<void()>> enter_scope();
 
+      /// Stream the actions of one conversion pack their data into, created on first use. Contexts copied from this
+      /// one after that share it.
+      abi_serializer::pack_stream& action_data_scratch();
+
    protected:
       /// Bounds this context to converting one action's data: from now on its yield also throws
       /// abi_serialization_deadline_exception once `max_action_serialization_time` has passed. No change when that
@@ -242,6 +254,7 @@ namespace impl {
       fc::microseconds                  max_action_serialization_time;
       size_t                            recursion_depth = 1;
       bool                              log = false;
+      std::shared_ptr<abi_serializer::pack_stream> action_data_scratch_stream;
    };
 
    struct empty_path_root {};
@@ -873,7 +886,7 @@ namespace impl {
                   auto type = abi.get_action_type(act.name);
                   if (!type.empty()) {
                      action_data_to_binary_context _ctx(abi, ctx, type);
-                     act.data = abi._variant_to_binary( type, data, _ctx );
+                     act.data = abi._variant_to_binary_with_scratch( type, data, ctx.action_data_scratch(), _ctx );
                      valid_empty_data = act.data.empty();
                   }
                }

@@ -4801,6 +4801,143 @@ BOOST_AUTO_TEST_CASE(from_variant_honors_request_deadline)
                      abi_serialization_deadline_exception);
 } FC_LOG_AND_RETHROW() }
 
+/// ABI with one action, `store`, whose data is an id and a memo.
+static const char* store_action_abi = R"=====(
+{
+   "version": "sysio::abi/1.0",
+   "structs": [
+      {"name": "store", "base": "", "fields": [{"name": "id", "type": "uint32"}, {"name": "memo", "type": "string"}]}
+   ],
+   "actions": [{"name": "store", "type": "store", "ricardian_contract": ""}]
+}
+)=====";
+
+/// A `store` action variant for account `hello` with data `{id, memo}`.
+static fc::variant store_action(uint32_t id, const std::string& memo) {
+   return fc::mutable_variant_object()
+      ("account", "hello")
+      ("name", "store")
+      ("authorization", fc::variants{fc::mutable_variant_object()("actor", "hello")("permission", "active")})
+      ("data", fc::mutable_variant_object()("id", id)("memo", memo));
+}
+
+/// JSON action data packs to exactly its own bytes for every action of a transaction, in any order of sizes, and
+/// variant_to_binary returns exactly the packed bytes.
+BOOST_AUTO_TEST_CASE(action_data_from_variant_is_exact_size)
+{ try {
+   const abi_serializer abis(fc::json::from_string(store_action_abi).as<abi_def>(), yield_fn());
+   const auto resolver = [&abis](const account_name&) -> std::optional<abi_serializer> { return abis; };
+
+   constexpr uint32_t action_count = 64;
+   constexpr uint32_t memo_stride  = 37; // varies memo sizes up and down across the actions
+   constexpr uint32_t memo_period  = 200;
+   const auto memo_of = [](uint32_t i) { return std::string((i * memo_stride) % memo_period, 'x'); };
+
+   fc::variants actions;
+   for (uint32_t i = 0; i < action_count; ++i)
+      actions.emplace_back(store_action(i, memo_of(i)));
+   const fc::variant trx_var = fc::mutable_variant_object()("actions", std::move(actions));
+
+   signed_transaction trx;
+   abi_serializer::from_variant(trx_var, trx, resolver, yield_fn());
+   BOOST_REQUIRE_EQUAL(trx.actions.size(), action_count);
+   for (uint32_t i = 0; i < action_count; ++i) {
+      BOOST_TEST_CONTEXT("action " << i) {
+         const bytes& data = trx.actions[i].data;
+         BOOST_CHECK(data == fc::raw::pack(std::make_tuple(i, memo_of(i))));
+         BOOST_TEST(data.capacity() == data.size());
+      }
+   }
+
+   const bytes packed = abis.variant_to_binary("store", trx_var["actions"][size_t(1)]["data"], yield_fn());
+   BOOST_CHECK(packed == fc::raw::pack(std::make_tuple(uint32_t{1}, memo_of(1))));
+   BOOST_TEST(packed.capacity() == packed.size());
+} FC_LOG_AND_RETHROW() }
+
+/// Action data has no fixed size limit: an action that packs to more than 1 MiB converts exactly between smaller
+/// actions, and variant_to_binary writes it into a caller's stream that fits it but not into one that does not.
+BOOST_AUTO_TEST_CASE(action_data_larger_than_one_mib_converts)
+{ try {
+   const abi_serializer abis(fc::json::from_string(store_action_abi).as<abi_def>(), yield_fn());
+   const auto resolver = [&abis](const account_name&) -> std::optional<abi_serializer> { return abis; };
+
+   constexpr size_t               one_mib = 1024 * 1024;
+   const std::vector<std::string> memos{"before", std::string(one_mib + 4096, 'x'), "after"};
+   fc::variants actions;
+   for (uint32_t i = 0; i < memos.size(); ++i)
+      actions.emplace_back(store_action(i, memos[i]));
+   const fc::variant trx_var = fc::mutable_variant_object()("actions", std::move(actions));
+
+   signed_transaction trx;
+   abi_serializer::from_variant(trx_var, trx, resolver, fc::microseconds::maximum());
+   BOOST_REQUIRE_EQUAL(trx.actions.size(), memos.size());
+   for (uint32_t i = 0; i < memos.size(); ++i) {
+      BOOST_TEST_CONTEXT("action " << i) {
+         const bytes& data = trx.actions[i].data;
+         BOOST_CHECK(data == fc::raw::pack(std::make_tuple(i, memos[i])));
+         BOOST_TEST(data.capacity() == data.size());
+      }
+   }
+   BOOST_TEST(trx.actions[1].data.size() > one_mib);
+
+   const fc::variant& large  = trx_var["actions"][size_t(1)]["data"];
+   const bytes        packed = abis.variant_to_binary("store", large, fc::microseconds::maximum());
+   BOOST_CHECK(packed == trx.actions[1].data);
+   BOOST_TEST(packed.capacity() == packed.size());
+
+   bytes                 fits(packed.size());
+   fc::datastream<char*> fits_ds(fits.data(), fits.size());
+   abis.variant_to_binary("store", large, fits_ds, fc::microseconds::maximum());
+   BOOST_TEST(fits_ds.tellp() == packed.size());
+   BOOST_CHECK(fits == packed);
+
+   bytes                 too_small(packed.size() - 1);
+   fc::datastream<char*> too_small_ds(too_small.data(), too_small.size());
+   BOOST_CHECK_THROW(abis.variant_to_binary("store", large, too_small_ds, fc::microseconds::maximum()),
+                     fc::out_of_range_exception);
+} FC_LOG_AND_RETHROW() }
+
+/// Packing can write far more than its JSON: an absent optional field packs a one-byte flag, so `{}` for a struct
+/// with many optional fields packs to that many bytes. The per-action limit and the request deadline stop such a
+/// conversion.
+BOOST_AUTO_TEST_CASE(action_data_expansion_stops_at_deadline)
+{ try {
+   constexpr uint32_t field_count = 128;
+   constexpr uint32_t item_count  = 1024;
+   abi_def abi;
+   abi.version = "sysio::abi/1.0";
+   std::vector<field_def> fields;
+   for (uint32_t i = 0; i < field_count; ++i)
+      fields.push_back(field_def{"f" + std::to_string(i), "uint8?"});
+   abi.structs.emplace_back("opts", "", std::move(fields));
+   abi.structs.emplace_back("wide", "", std::vector<field_def>{{"items", "opts[]"}});
+   abi.actions.emplace_back("wide"_n, "wide", "");
+   const abi_serializer abis(abi, yield_fn());
+   const auto resolver = [&abis](const account_name&) -> std::optional<abi_serializer> { return abis; };
+
+   const fc::variant data =
+      fc::mutable_variant_object()("items", fc::variants(item_count, fc::variant(fc::variant_object())));
+   const fc::variant trx_var = fc::mutable_variant_object()("actions", fc::variants{fc::mutable_variant_object()
+      ("account", "hello")("name", "wide")("authorization", fc::variants{})("data", data)});
+
+   signed_transaction trx;
+   abi_serializer::from_variant(trx_var, trx, resolver, fc::microseconds::maximum());
+   BOOST_REQUIRE_EQUAL(trx.actions.size(), 1u);
+   const bytes& packed = trx.actions[0].data;
+   BOOST_CHECK_EQUAL(packed.size(),
+                     fc::raw::pack_size(fc::unsigned_int(item_count)) + size_t(field_count) * item_count);
+   BOOST_TEST(packed.size() > 10 * fc::json::to_string(data, fc::time_point::maximum()).size());
+
+   signed_transaction per_action;
+   BOOST_CHECK_THROW(abi_serializer::from_variant(trx_var, per_action, resolver, fc::microseconds(1)),
+                     abi_serialization_deadline_exception);
+   signed_transaction request;
+   BOOST_CHECK_THROW(abi_serializer::from_variant(trx_var, request, resolver,
+                                                  abi_serializer::create_yield_function(fc::microseconds(1)),
+                                                  fc::microseconds::maximum()),
+                     abi_serialization_deadline_exception);
+} FC_LOG_AND_RETHROW() }
+
 /// A struct field takes the first occurrence of its key in the input object: later duplicates, unknown keys and key
 /// order do not matter, and a field name a struct declares twice takes that value both times.
 BOOST_AUTO_TEST_CASE(variant_to_binary_first_key_occurrence_wins)
