@@ -2297,6 +2297,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( memory_mapping_test, T, validating_testers ) try 
    }
    )=====";
 
+   // NODE_DADDY pays for the policy row it issues each contract below, so it funds those rows first.
+   chain.expand_roa_policy(chain.NODE_DADDY, chain.NODE_DADDY, "0.0000 SYS", "0.0000 SYS", "0.5000 SYS", 0);
    chain.produce_block();
 
    auto num_mappings_before = get_num_memory_mappings();

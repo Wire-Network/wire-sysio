@@ -423,9 +423,6 @@ public:
    /// wallet whose balances the dispatch cases assert stay untouched.
    action_result opreg_setconfig() {
       return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "setconfig"_n, mvo()
-         ("max_available_producers",          21)
-         ("max_available_batch_ops",          63)
-         ("max_available_underwriters",       21)
          ("terminate_prune_delay_ms",         TERMINATE_PRUNE_DELAY_MS)
          ("terminate_max_consecutive_misses", 5)
          ("terminate_max_pct_misses_24h",     5)
