@@ -1153,11 +1153,12 @@ namespace webassembly {
           * returns an output (BASE**EXPONENT) % MODULUS as a byte array {{{{ with the same length as the modulus }}}}
           *
           * @ingroup crypto
-          * @param base        - a span containing BASE.
+          * @param base        - a span containing BASE, at most config::max_mod_exp_operand_size bytes.
           * @param exp         - a span containing EXPONENT.
-          * @param modulus     - a span containing MODULUS.
+          * @param modulus     - a span containing MODULUS, at most config::max_mod_exp_operand_size bytes.
           * @param[out] out    - the result (BASE**EXPONENT) % MODULUS. Must be exactly the size of modulus.
           * @return              -1 if there was an error, 0 otherwise
+          * @note The computation calls checktime between steps, so the transaction deadline bounds the exponent.
          */
          int32_t mod_exp(span<const char> base, span<const char> exp, span<const char> modulus, span<char> out) const;
 

@@ -137,6 +137,9 @@ namespace sysio::chain::config {
   /// Consensus limit bounding one uninterrupted libsodium Ed25519 verification.
   static constexpr uint32_t   max_ed25519_message_size          = 65'536;
 
+  /// Consensus limit, in bytes, on each of the base and the modulus that mod_exp accepts.
+  static constexpr uint32_t   max_mod_exp_operand_size          = 8'192;
+
   // KV default limits — on-chain consensus values are in chain_config
   static constexpr uint32_t   default_max_kv_key_size           = 256;       ///< maximum KV primary key size in bytes
   static constexpr uint32_t   default_max_kv_value_size         = 256*1024;  ///< maximum KV value size (256 KiB)

@@ -5,6 +5,9 @@
 #include <fc/crypto/modular_arithmetic.hpp>
 #include <fc/utility.hpp>
 
+#include <gmp.h>
+
+#include <algorithm>
 #include <chrono>
 #include <random>
 #include <limits>
@@ -22,6 +25,67 @@ std::ostream& operator<<(std::ostream& st, const std::variant<fc::modular_arithm
     return st;
 }
 }
+
+namespace {
+
+/// What fc::modexp returns.
+using modexp_result = std::variant<fc::modular_arithmetic_error, bytes>;
+
+/// `size` uniformly random bytes.
+bytes random_bytes(std::mt19937& rng, size_t size) {
+   std::uniform_int_distribution<int> byte_value(0, 0xff);
+   bytes result(size);
+   for (char& c : result)
+      c = static_cast<char>(byte_value(rng));
+   return result;
+}
+
+/// Random big-endian bytes whose first byte is nonzero, so the value has exactly `size * 8 - k` bits for some k < 8.
+bytes random_significant_bytes(std::mt19937& rng, size_t size) {
+   bytes result = random_bytes(rng, size);
+   if (!result.empty() && result.front() == 0)
+      result.front() = 1;
+   return result;
+}
+
+/// One mpz_powm over the operands, formatted as modexp formats its result: the reference modexp must match.
+bytes reference_modexp(const bytes& base, const bytes& exponent, const bytes& modulus) {
+   bytes output(modulus.size(), '\0');
+   mpz_t b, e, m, r;
+   mpz_inits(b, e, m, r, nullptr);
+   if (!base.empty())
+      mpz_import(b, base.size(), 1, 1, 0, 0, base.data());
+   if (!exponent.empty())
+      mpz_import(e, exponent.size(), 1, 1, 0, 0, exponent.data());
+   if (!modulus.empty())
+      mpz_import(m, modulus.size(), 1, 1, 0, 0, modulus.data());
+   if (mpz_sgn(m) != 0) {
+      mpz_powm(r, b, e, m);
+      mpz_export(output.data(), nullptr, -1, 1, 0, 0, r);
+      std::reverse(output.begin(), output.end());
+   }
+   mpz_clears(b, e, m, r, nullptr);
+   return output;
+}
+
+/// Run modexp, check it against reference_modexp, and return how many times it yielded.
+size_t check_against_reference(const bytes& base, const bytes& exponent, const bytes& modulus) {
+   size_t yields = 0;
+   const modexp_result result = fc::modexp(base, exponent, modulus, [&yields]() { ++yields; });
+   BOOST_REQUIRE(std::holds_alternative<bytes>(result));
+   BOOST_CHECK_MESSAGE(std::get<bytes>(result) == reference_modexp(base, exponent, modulus),
+                       "base " << fc::to_hex(base) << " exponent " << exponent.size() << " bytes modulus "
+                               << fc::to_hex(modulus));
+   return yields;
+}
+
+/// Thrown from a yield to stop modexp.
+struct stop_modexp {};
+
+/// An exponent long enough that modexp computes it in yielding steps for every nonzero modulus.
+constexpr size_t stepped_exponent_size = 2100;
+
+} // namespace
 
 
 BOOST_AUTO_TEST_SUITE(modular_arithmetic)
@@ -112,7 +176,7 @@ BOOST_AUTO_TEST_CASE(modexp) try {
         auto exponent = to_bytes(parts[1]);
         auto modulus = to_bytes(parts[2]);
 
-        auto res = fc::modexp(base, exponent, modulus);
+        auto res = fc::modexp(base, exponent, modulus, {});
         BOOST_CHECK_EQUAL(res, expected_result);
     }
 
@@ -945,9 +1009,146 @@ BOOST_AUTO_TEST_CASE(modexp_boringssl_vectors) try {
       //the host function's result is always length of modulus; pad expected result with enough 0x00s to match up
       expected_result.insert(expected_result.begin(), modulus.size() - expected_result.size(), 0x00);
 
-      BOOST_CHECK_EQUAL(std::get<bytes>(fc::modexp(base, exponent, modulus)), expected_result);
+      BOOST_CHECK_EQUAL(std::get<bytes>(fc::modexp(base, exponent, modulus, {})), expected_result);
    }
 
+} FC_LOG_AND_RETHROW();
+
+/// Edge cases give the same bytes as one mpz_powm, both for a short exponent and for one computed in steps.
+BOOST_AUTO_TEST_CASE(modexp_edge_cases_match_single_powm) try {
+   std::mt19937 rng(0x5eed0001);
+
+   const bytes long_exponent = random_significant_bytes(rng, stepped_exponent_size);
+   bytes       long_exponent_leading_zeros(3, '\0');
+   long_exponent_leading_zeros.insert(long_exponent_leading_zeros.end(), long_exponent.begin(), long_exponent.end());
+   const std::vector<bytes> long_exponents = {long_exponent, long_exponent_leading_zeros};
+
+   bytes odd_modulus  = random_significant_bytes(rng, 32);
+   bytes even_modulus = random_significant_bytes(rng, 32);
+   odd_modulus.back() |= 1;
+   even_modulus.back() &= ~1;
+   bytes       padded_modulus(4, '\0');
+   padded_modulus.insert(padded_modulus.end(), odd_modulus.begin(), odd_modulus.end());
+
+   const std::vector<bytes> moduli = {
+      to_bytes("01"), to_bytes("0001"), to_bytes("02"), to_bytes("0f"), to_bytes("10"), to_bytes("ffffffffffffffff"),
+      to_bytes("010000000000000000"), odd_modulus, even_modulus, padded_modulus,
+   };
+   const std::vector<bytes> bases = {
+      {}, to_bytes("00"), to_bytes("01"), to_bytes("05"), to_bytes("0000000005"), odd_modulus,
+      random_significant_bytes(rng, 64), random_significant_bytes(rng, 31),
+   };
+   const std::vector<bytes> short_exponents = {
+      {}, to_bytes("00"), to_bytes("0000"), to_bytes("01"), to_bytes("02"), to_bytes("000003"), to_bytes("010001"),
+   };
+
+   for (const bytes& modulus : moduli) {
+      for (const bytes& base : bases) {
+         for (const bytes& exponent : short_exponents)
+            check_against_reference(base, exponent, modulus);
+         for (const bytes& exponent : long_exponents)
+            BOOST_CHECK_GT(check_against_reference(base, exponent, modulus), 0u);
+      }
+   }
+
+   // Values that follow from the definition, independent of the reference.
+   for (const bytes& exponent : long_exponents) {
+      BOOST_CHECK_EQUAL(fc::modexp(to_bytes("05"), exponent, to_bytes("0001"), {}),
+                        modexp_result(to_bytes("0000")));
+      BOOST_CHECK_EQUAL(fc::modexp(to_bytes("05"), exponent, to_bytes("0000"), {}),
+                        modexp_result(to_bytes("0000")));
+      BOOST_CHECK_EQUAL(fc::modexp(to_bytes("05"), exponent, {}, {}),
+                        modexp_result(modular_arithmetic_error::modulus_len_zero));
+      BOOST_CHECK_EQUAL(fc::modexp({}, exponent, to_bytes("0f"), {}),
+                        modexp_result(to_bytes("00")));
+      BOOST_CHECK_EQUAL(fc::modexp(to_bytes("01"), exponent, to_bytes("0f"), {}),
+                        modexp_result(to_bytes("01")));
+   }
+   for (const bytes& exponent : {bytes{}, to_bytes("00"), to_bytes("0000")}) {
+      BOOST_CHECK_EQUAL(fc::modexp({}, exponent, to_bytes("000f"), {}),
+                        modexp_result(to_bytes("0001")));
+      BOOST_CHECK_EQUAL(fc::modexp(to_bytes("05"), exponent, to_bytes("01"), {}),
+                        modexp_result(to_bytes("00")));
+   }
+} FC_LOG_AND_RETHROW();
+
+/// Random operands of sizes up to the largest mod_exp accepts give the same bytes as one mpz_powm.
+BOOST_AUTO_TEST_CASE(modexp_random_matches_single_powm) try {
+   std::mt19937 rng(0x5eed0002);
+
+   struct size_case {
+      size_t              modulus_size;
+      std::vector<size_t> exponent_sizes;
+   };
+   const std::vector<size_case> cases = {
+      {1, {1, 8, 64, 600, stepped_exponent_size}},
+      {7, {1, 8, 64, 600}},
+      {8, {1, 8, 64, 600}},
+      {9, {1, 8, 64, 600}},
+      {32, {1, 32, 64, 600}},
+      {33, {1, 32, 600}},
+      {64, {1, 64, 600}},
+      {255, {1, 3, 64, 300}},
+      {256, {1, 3, 64, 300}},
+      {512, {1, 3, 64, 300}},
+      {1024, {1, 2, 32}},
+      {4096, {1, 4}},
+      {8192, {1, 2, 4}},
+   };
+
+   size_t stepped = 0;
+   size_t single  = 0;
+   for (const size_case& c : cases) {
+      for (const size_t exponent_size : c.exponent_sizes) {
+         for (const bool even : {false, true}) {
+            bytes modulus = random_significant_bytes(rng, c.modulus_size);
+            if (even)
+               modulus.back() &= ~1;
+            else
+               modulus.back() |= 1;
+            const size_t base_size = std::uniform_int_distribution<size_t>(0, c.modulus_size * 2)(rng);
+            const bytes  base      = random_bytes(rng, std::min<size_t>(base_size, 8192));
+            const bytes  exponent  = random_bytes(rng, exponent_size);
+            if (check_against_reference(base, exponent, modulus) > 0)
+               ++stepped;
+            else
+               ++single;
+         }
+      }
+   }
+   BOOST_CHECK_GT(stepped, 0u);
+   BOOST_CHECK_GT(single, 0u);
+} FC_LOG_AND_RETHROW();
+
+/// A long exponent is computed in many steps, with a yield after each.
+BOOST_AUTO_TEST_CASE(modexp_yields_during_long_exponent) try {
+   std::mt19937 rng(0x5eed0003);
+   const bytes  modulus  = random_significant_bytes(rng, 256);
+   const bytes  base     = random_bytes(rng, 256);
+   const bytes  exponent = random_significant_bytes(rng, 512);
+
+   const size_t yields = check_against_reference(base, exponent, modulus);
+   BOOST_CHECK_GE(yields, exponent.size() * 8);
+} FC_LOG_AND_RETHROW();
+
+/// An exception thrown by the yield stops the computation and propagates to the caller.
+BOOST_AUTO_TEST_CASE(modexp_yield_exception_propagates) try {
+   std::mt19937 rng(0x5eed0004);
+   const bytes  modulus  = random_significant_bytes(rng, 256);
+   const bytes  base     = random_bytes(rng, 256);
+   const bytes  exponent = random_significant_bytes(rng, 512);
+
+   constexpr size_t stop_at = 10;
+   size_t           yields  = 0;
+   const fc::yield_function_t stop = [&yields]() {
+      if (++yields == stop_at)
+         throw stop_modexp{};
+   };
+   BOOST_CHECK_THROW(fc::modexp(base, exponent, modulus, stop), stop_modexp);
+   BOOST_CHECK_EQUAL(yields, stop_at);
+
+   // A later computation is unaffected.
+   check_against_reference(base, exponent, modulus);
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(modexp_benchmarking) try {
@@ -973,10 +1174,9 @@ BOOST_AUTO_TEST_CASE(modexp_benchmarking) try {
 
     static_assert(num_trials > 0);
 
-    static constexpr unsigned int bit_calc_limit = 101; // 120
-
-    static constexpr unsigned int start_num_bytes = 1;
-    static constexpr unsigned int end_num_bytes   = 1 << ((bit_calc_limit + 7)/8);
+    static constexpr unsigned int start_num_bytes        = 1;
+    static constexpr unsigned int end_num_bytes          = 512;
+    static constexpr unsigned int max_exponent_num_bytes = 256;
 
     static_assert(start_num_bytes <= end_num_bytes);
 
@@ -990,28 +1190,10 @@ BOOST_AUTO_TEST_CASE(modexp_benchmarking) try {
 
     std::vector<statistics> stats;
 
-    auto ceil_log2 = [](uint32_t n) -> uint32_t {
-        if (n <= 1) {
-            return 0;
-        }
-        return 32 - __builtin_clz(n - 1);
-    };
-
-    BOOST_CHECK(ceil_log2(0) == 0);
-    BOOST_CHECK(ceil_log2(1) == 0);
-    BOOST_CHECK(ceil_log2(2) == 1);
-    BOOST_CHECK(ceil_log2(3) == 2);
-    BOOST_CHECK(ceil_log2(4) == 2);
-    BOOST_CHECK(ceil_log2(5) == 3);
-    BOOST_CHECK(ceil_log2(15) == 4);
-    BOOST_CHECK(ceil_log2(16) == 4);
-    BOOST_CHECK(ceil_log2(17) == 5);
-
     for (unsigned int n = start_num_bytes; n <= end_num_bytes; n *= 2) {
-        unsigned int bit_calc = 8 * ceil_log2(n);
-        for (unsigned int exponent_num_bytes = 1; 
-             exponent_num_bytes <= 2*n && bit_calc <= bit_calc_limit; 
-             exponent_num_bytes *= 2, bit_calc += 5) 
+        for (unsigned int exponent_num_bytes = 1;
+             exponent_num_bytes <= std::min(2*n, max_exponent_num_bytes);
+             exponent_num_bytes *= 2)
         {
             int64_t min_duration_ns = std::numeric_limits<int64_t>::max();
             int64_t max_duration_ns = 0;
@@ -1024,7 +1206,7 @@ BOOST_AUTO_TEST_CASE(modexp_benchmarking) try {
 
                 auto start_time = std::chrono::steady_clock::now();
 
-                auto res = fc::modexp(base, exponent, modulus);
+                auto res = fc::modexp(base, exponent, modulus, {});
 
                 auto end_time = std::chrono::steady_clock::now();
 
@@ -1067,62 +1249,6 @@ BOOST_AUTO_TEST_CASE(modexp_benchmarking) try {
     }
 
     ilog("{}", stats_output);
-
-    // Running the above benchmark (using commented values for num_trials and bit_calc_limit) with a release build on 
-    // an AMD 3.4 GHz CPU provides average durations for executing mod_exp for varying bit sizes for the values 
-    // (but with base and modulus bit sizes kept equal to one another).
-
-    // Holding the base/modulus bit size constant and increasing the exponent bit size shows a linear relationship with increasing bit
-    // size on the average time to execute the modular exponentiation. The slope of the best fit line to the empirical data appears
-    // to scale super-linearly with base/modulus size. A quadratic (degree 2) fit works okay, but it appears that a better fit is to
-    // model the slope of the linear relationship between average time and exponent bit size as a the base/modulus bit size taken to
-    // the 1.6 power and then scaled by some constant.
-
-    // Holding the exponent bit size constant and increasing the base/modulus bit size shows a super-linear relationship with
-    // increasing bit size on the average time to execute the modular exponentiation. A quadratic relationship works pretty well
-    // but perhaps a fractional exponent between 1 and 2 (e.g. 1.6) would work well as well.
-    
-    // What is particularly revealing is plotting the average time with respect to some combination of the bit sizes of base/modulus and
-    // exponent. If the independent variable is the product of the exponent bit size and the base/modulus bit size, the correlation is
-    // not great. Even if the independent variable is the product of the exponent bit size and the base/modulus bit size taken to some power,
-    // the correlation is still not great.
-    // It seems that trying to capture all the data using a model like that breaks down when the exponent bit size is greater than the
-    // base/modulus bit size.
-    // If we filter out all the data points where the exponent bit size is greater than the base/modulus bit size, and then choose as
-    // then independent variable the product of the exponent bit size and the base/modulus bit size taken to some power, then we get
-    // a pretty good linear correlation when a power of 1.6 is chosen.
-
-    // TODO: See if theoretical analysis of the modular exponentiation algorithm also justifies these scaling properties.
-
-    // Example results for average time:
-    // | Modulus/Base Bit Size | Exponent Bit Size | Average Time (ns) |
-    // | --------------------- | ----------------- | ----------------- |
-    // | 2048                  | 32                |             33826 |
-    // | 2048                  | 256               |            250067 |
-    // | 2048                  | 2048              |           1891095 |
-    // | 4096                  | 32                |            129181 |
-    // | 4096                  | 256               |            954024 |
-    // | 4096                  | 2048              |           7205115 |
-    // | 8192                  | 32                |            347938 |
-    // | 8192                  | 256               |           2503652 |
-    // | 8192                  | 2048              |          19199775 |
-
-    // The empirical results show that the average time stays well below 5 ms if the exponent bit size does not exceed the
-    // modulus/base bit size and the product of the exponent bit size and the 
-    // (modulus/base bit size)^1.6 does not exceed 550,000,000.
-    // Another way of satisfying that constraint is to require that the 5*ceil(log2(exponent bit size)) + 8*ceil(log2(modulus bit size)) 
-    // be less than or equal to 5*floor(log2(500000000)) = 145.
-    // Or equivalently, assuming the bit sizes are multiples of 8:
-    // 5*ceil(log2(exponent bit size/8)) + 8*ceil(log2(modulus bit size/8)) <= 106.
-
-    // Take, as an example, a 8192-bit modulus/base and a 128-bit exponent (which on average took 1.29 ms).
-    // 5*ceil(log2(128)) + 8*ceil(log2(8192)) = 5*7 + 8*13 = 139 which is less than the limit of 145.
-    // 
-    // Or, as an other example, a 2048-bit modulus/base and a 2048-bit exponent (which on average took 1.89 ms).
-    // 5*ceil(log2(2048)) + 8*ceil(log2(2048)) = 5*11 + 8*11 = 143 which is less than the limit of 145.
-    //
-    // On the other hand, consider a 4096-bit modulus/base and a 1024-bit exponent (which on average took 3.69 ms).
-    // 5*ceil(log2(1024)) + 8*ceil(log2(4096)) = 5*10 + 8*12 = 146 which is greater than the limit of 145.
 
 } FC_LOG_AND_RETHROW();
 

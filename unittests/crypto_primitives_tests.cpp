@@ -14,8 +14,10 @@
 #include "fork_test_utilities.hpp"
 #include "test_utils.hpp"
 
+#include <chrono>
 #include <string>
 #include <string_view>
+#include <tuple>
 #include <vector>
 
 using namespace sysio::chain;
@@ -123,6 +125,42 @@ std::string wast_with_output_size(const output_size_case& call, uint32_t output_
                       fmt::arg("input_at", input_offset),
                       fmt::arg("input", sysio::test_utils::to_wast_string(input)), fmt::arg("arguments", arguments),
                       fmt::arg("output", output_offset), fmt::arg("size", output_size), fmt::arg("expected", expected));
+}
+
+/// The account the mod_exp tests deploy crypto_primitives_test to.
+constexpr account_name modexp_account = "tester1"_n;
+
+/// Byte size of the largest base and modulus mod_exp accepts.
+constexpr size_t mod_exp_operand_limit = config::max_mod_exp_operand_size;
+
+/// CPU limits of the transaction modexp_deadline_test expects to be stopped, and how long stopping it may take.
+constexpr uint32_t modexp_timeout_ms       = 100;
+constexpr uint32_t modexp_block_timeout_ms = 1'000;
+constexpr int64_t  modexp_stop_bound_ms    = 5'000;
+
+/// Selects the testmodexp action of the contract on modexp_account for push_trx.
+struct testmodexp_call {
+   static account_name get_account() { return modexp_account; }
+   static action_name  get_name() { return "testmodexp"_n; }
+};
+
+/// The bytes of `value` with one zero byte in front: the same big-endian integer, one byte longer.
+bytes zero_prefixed(const bytes& value) {
+   bytes result{'\0'};
+   result.insert(result.end(), value.begin(), value.end());
+   return result;
+}
+
+/// Push testmodexp, which aborts unless mod_exp returns `expected_error` and writes `expected_result`.
+void push_testmodexp(base_tester& c, const bytes& base, const bytes& exp, const bytes& modulus, int32_t expected_error,
+                     const bytes& expected_result) {
+   c.push_action( modexp_account, "testmodexp"_n, modexp_account, mutable_variant_object()
+      ("base", base)
+      ("exp", exp)
+      ("modulo", modulus)
+      ("expected_error", expected_error)
+      ("expected_result", expected_result)
+   );
 }
 
 } // anonymous namespace
@@ -562,84 +600,99 @@ BOOST_AUTO_TEST_CASE( modexp_test ) { try {
 } FC_LOG_AND_RETHROW() }
 
 
-BOOST_AUTO_TEST_CASE( modexp_subjective_limit_test ) { try {
+/// A producing node and a validating node applying its block return the same codes at and past the operand size limit;
+/// a zero byte in front of an operand at the limit fails although its value is unchanged.
+BOOST_AUTO_TEST_CASE( modexp_operand_size_limit_test ) { try {
+   validating_tester c;
 
-   // Given the need to respect the deadline timer and the current limitation that the deadline timer is not plumbed into the
-   // inner loops of the implementation of mod_exp (which currently exists in the gmp shared library), only a small enough duration for
-   // mod_exp can be tolerated to avoid going over the deadline timer by too much. A good threshold for small may be less than 5 ms.
-   // Based on benchmarks within the test_modular_arithmetic test within fc, the following constraints are subjectively enforced on the
-   // base, exp, and modulus input arguments of the mod_exp host function:
-   //    1. exp.size() <= std::max(base.size(), modulus.size())
-   //    2. 5 * ceil(log2(exp.size())) + 8 * ceil(log2(std::max(base.size(), modulus.size()))) <= 101
+   c.create_accounts( {modexp_account} );
+   c.produce_block();
+   c.set_code( modexp_account, test_contracts::crypto_primitives_test_wasm() );
+   c.set_abi( modexp_account, test_contracts::crypto_primitives_test_abi() );
+   c.produce_block();
 
-   // This test case verifies that the above constraints on mod_exp are subjectively enforced properly within libchain.
+   // Operands that fill every byte: modulus 2^(8 * (limit - 1)) and base modulus + 5, so the result is 5^3.
+   bytes modulus(mod_exp_operand_limit, '\0');
+   modulus.front() = 0x01;
+   bytes base = modulus;
+   base.back() = 0x05;
+   const bytes exponent = h2bin("03");
+   bytes at_limit_result(mod_exp_operand_limit, '\0');
+   at_limit_result.back() = 0x7d;
 
-   // To allow mod_exp to be more useful, the limits on bit size need to be removed and the deadline timer plumbing into the implementation
-   // needs to occur. When that happens, this test case can be removed.
+   const bytes padded_base    = zero_prefixed(base);
+   const bytes padded_modulus = zero_prefixed(modulus);
 
+   push_testmodexp(c, base, exponent, modulus, return_code::success, at_limit_result);
+   push_testmodexp(c, padded_base, exponent, modulus, return_code::failure, bytes(modulus.size(), '\0'));
+   push_testmodexp(c, base, exponent, padded_modulus, return_code::failure, bytes(padded_modulus.size(), '\0'));
+   push_testmodexp(c, padded_base, exponent, padded_modulus, return_code::failure,
+                   bytes(padded_modulus.size(), '\0'));
+   push_testmodexp(c, padded_base, exponent, h2bin("0f"), return_code::failure, h2bin("00"));
+
+   c.produce_block();
+   BOOST_CHECK_EQUAL( c.validating_node->head().id(), c.control->head().id() );
+
+} FC_LOG_AND_RETHROW() }
+
+/// The exponent may be longer than the base and the modulus, and moduli of any size up to the limit are computed.
+BOOST_AUTO_TEST_CASE( modexp_long_exponent_and_large_modulus_test ) { try {
+   validating_tester c;
+
+   c.create_accounts( {modexp_account} );
+   c.produce_block();
+   c.set_code( modexp_account, test_contracts::crypto_primitives_test_wasm() );
+   c.set_abi( modexp_account, test_contracts::crypto_primitives_test_abi() );
+   c.produce_block();
+
+   const bytes exponent = h2bin("010001");
+   push_testmodexp(c, h2bin("01"), exponent, h2bin("0f"), return_code::success, h2bin("01"));
+
+   // 2^4 = 1 mod 15, so 2^e = 2^(e mod 4) mod 15; e = 2^512 - 1 is 3 mod 4.
+   push_testmodexp(c, h2bin("02"), bytes(64, '\xff'), h2bin("0f"), return_code::success, h2bin("08"));
+
+   for (const size_t size : {4096u, 4097u, 8191u}) {
+      bytes modulus(size - 1, '\0');
+      modulus.push_back(0x0f);
+      bytes expected_result(size - 1, '\0');
+      expected_result.push_back(0x01);
+      push_testmodexp(c, h2bin("01"), exponent, modulus, return_code::success, expected_result);
+   }
+
+   c.produce_block();
+   BOOST_CHECK_EQUAL( c.validating_node->head().id(), c.control->head().id() );
+
+} FC_LOG_AND_RETHROW() }
+
+/// An exponent within the operand limits that would run far past the transaction deadline is stopped by it.
+BOOST_AUTO_TEST_CASE( modexp_deadline_test ) { try {
    tester c( setup_policy::full );
 
-   const auto& tester1_account = account_name("tester1");
-   c.create_accounts( {tester1_account} );
+   c.create_accounts( {modexp_account} );
+   c.produce_block();
+   c.set_code( modexp_account, test_contracts::crypto_primitives_test_wasm() );
+   c.set_abi( modexp_account, test_contracts::crypto_primitives_test_abi() );
    c.produce_block();
 
-   c.set_code( tester1_account, test_contracts::crypto_primitives_test_wasm() );
-   c.set_abi( tester1_account, test_contracts::crypto_primitives_test_abi() );
+   // Load the contract before the timed transaction.
+   push_testmodexp(c, h2bin("03"), h2bin("02"), h2bin("0f"), return_code::success, h2bin("09"));
+
+   const bytes modulus(mod_exp_operand_limit, '\xff');
+   const bytes base(mod_exp_operand_limit, '\x5a');
+   const bytes exponent(2 * mod_exp_operand_limit, '\xa5');
+   const bytes payload = fc::raw::pack(std::make_tuple(base, exponent, modulus, int32_t{return_code::success},
+                                                       bytes(modulus.size(), '\0')));
+
+   const std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+   BOOST_CHECK_EXCEPTION( sysio::test_utils::push_trx(c, testmodexp_call{}, 0, modexp_timeout_ms,
+                                                      modexp_block_timeout_ms, false, payload, modexp_account),
+                          tx_cpu_usage_exceeded, sysio::test_utils::is_tx_cpu_usage_exceeded );
+   const int64_t elapsed_ms =
+      std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start).count();
+   BOOST_CHECK_LT( elapsed_ms, modexp_stop_bound_ms );
+
+   push_testmodexp(c, h2bin("02"), h2bin("03"), h2bin("0f"), return_code::success, h2bin("08"));
    c.produce_block();
-
-   auto exponent = h2bin("010001");
-
-   BOOST_CHECK_EXCEPTION(c.push_action(tester1_account, "testmodexp"_n, tester1_account, mutable_variant_object()
-                                       ("base", h2bin("01"))
-                                       ("exp", exponent)
-                                       ("modulo", h2bin("0F"))
-                                       ("expected_error", static_cast<int32_t>(return_code::success))
-                                       ("expected_result", h2bin("01"))),
-                         sysio::chain::subjective_block_production_exception,
-                         fc_exception_message_is("mod_exp restriction: exponent bit size cannot exceed bit size of either base or modulus")
-   );
-
-   std::vector<char> modulus(4096 - 1);
-   std::vector<char> expected_result(modulus.size());
-   modulus.push_back(0x0F);
-   expected_result.push_back(0x01);
-
-    auto ceil_log2 = [](uint32_t n) -> uint32_t {
-        if (n <= 1) {
-            return 0;
-        }
-        return 32 - __builtin_clz(n - 1);
-    };
-
-   BOOST_CHECK(5 * ceil_log2(exponent.size()) + 8 * ceil_log2(modulus.size()) == 106);
-
-   c.push_action( tester1_account, "testmodexp"_n, tester1_account, mutable_variant_object()
-      ("base", h2bin("01"))
-      ("exp", exponent)
-      ("modulo", modulus)
-      ("expected_error", static_cast<int32_t>(return_code::success))
-      ("expected_result", expected_result)
-   );
-
-   modulus.pop_back();
-   expected_result.pop_back();
-
-   modulus.resize(4096);
-   expected_result.resize(modulus.size());
-   modulus.push_back(0x0F);
-   expected_result.push_back(0x01);
-
-   BOOST_CHECK(5 * ceil_log2(exponent.size()) + 8 * ceil_log2(modulus.size()) == 114);
-
-   BOOST_CHECK_EXCEPTION(c.push_action(tester1_account, "testmodexp"_n, tester1_account, mutable_variant_object()
-                                       ("base", h2bin("01"))
-                                       ("exp", exponent)
-                                       ("modulo", modulus)
-                                       ("expected_error", static_cast<int32_t>(return_code::success))
-                                       ("expected_result", expected_result)),
-                         sysio::chain::subjective_block_production_exception,
-                         fc_exception_message_is("mod_exp restriction: bit size too large for input arguments")
-   );
 
 } FC_LOG_AND_RETHROW() }
 
