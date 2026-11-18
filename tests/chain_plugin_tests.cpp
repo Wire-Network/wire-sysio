@@ -586,4 +586,54 @@ BOOST_FIXTURE_TEST_CASE( get_block_honors_response_budget, validating_tester ) t
    BOOST_CHECK(spent.find("\"hex_data\":\"" + hex_data + "\"") != std::string::npos);
 } FC_LOG_AND_RETHROW()
 
+/// A resolver made for one request returns the serializer an earlier request built for the same ABI.
+BOOST_FIXTURE_TEST_CASE( make_resolver_reuses_serializer_across_requests, validating_tester ) try {
+   create_accounts({"asserter"_n});
+   set_code("asserter"_n, test_contracts::asserter_wasm());
+   set_abi("asserter"_n, test_contracts::asserter_abi());
+   produce_block();
+
+   const auto first  = make_resolver(*control, abi_serializer_max_time, throw_on_yield::yes)("asserter"_n);
+   const auto second = make_resolver(*control, abi_serializer_max_time, throw_on_yield::yes)("asserter"_n);
+   BOOST_REQUIRE(first);
+   BOOST_REQUIRE(second);
+   BOOST_CHECK(&*first == &*second);
+   BOOST_CHECK(!make_resolver(*control, abi_serializer_max_time, throw_on_yield::yes)("nosuchacct"_n));
+} FC_LOG_AND_RETHROW()
+
+/// Two forks that give one account different ABIs at the same ABI sequence each decode with their own ABI.
+BOOST_AUTO_TEST_CASE( make_resolver_keys_serializers_by_abi_bytes ) try {
+   std::string renamed_abi = test_contracts::asserter_abi();
+   const auto  field       = renamed_abi.find("condition");
+   BOOST_REQUIRE(field != std::string::npos);
+   renamed_abi.replace(field, std::string_view("condition").size(), "verdict");
+
+   tester fork_a;
+   tester fork_b;
+   const std::string original_abi = test_contracts::asserter_abi();
+   for (const auto& [chain, abi] : {std::pair<tester*, const std::string*>{&fork_a, &original_abi},
+                                    std::pair<tester*, const std::string*>{&fork_b, &renamed_abi}}) {
+      chain->create_accounts({"asserter"_n});
+      chain->set_code("asserter"_n, test_contracts::asserter_wasm());
+      chain->set_abi("asserter"_n, *abi);
+      chain->produce_block();
+   }
+   BOOST_REQUIRE_EQUAL(fork_a.control->find_account_metadata("asserter"_n)->abi_sequence,
+                       fork_b.control->find_account_metadata("asserter"_n)->abi_sequence);
+
+   const bytes data = fc::raw::pack(int8_t{1}, std::string("text"));
+   const auto  decode = [&](tester& chain) {
+      const fc::microseconds max_time = base_tester::abi_serializer_max_time;
+      const auto abis = make_resolver(*chain.control, max_time, throw_on_yield::yes)("asserter"_n);
+      BOOST_REQUIRE(abis);
+      return abis->binary_to_variant(abis->get_action_type("procassert"_n), data, max_time);
+   };
+   const fc::variant on_a = decode(fork_a);
+   const fc::variant on_b = decode(fork_b);
+   BOOST_CHECK(on_a.get_object().contains("condition"));
+   BOOST_CHECK(!on_a.get_object().contains("verdict"));
+   BOOST_CHECK(on_b.get_object().contains("verdict"));
+   BOOST_CHECK(!on_b.get_object().contains("condition"));
+} FC_LOG_AND_RETHROW()
+
 BOOST_AUTO_TEST_SUITE_END()

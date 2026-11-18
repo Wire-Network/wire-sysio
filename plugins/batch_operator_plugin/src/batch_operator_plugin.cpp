@@ -1890,13 +1890,13 @@ struct batch_operator_plugin::impl {
       const chain::controller& chain = chain_plug->chain();
       try {
          auto resolver = make_resolver(chain, delivery_timeout, throw_on_yield::no);
-         std::optional<chain::abi_serializer> abis_opt = resolver(chain::name(contract));
-         if (!abis_opt) {
+         const chain::abi_serializer_ptr abis = resolver(chain::name(contract));
+         if (!abis) {
             elog("batch_operator: no ABI found for {}", contract);
             return std::nullopt;
          }
-         const chain::type_name action_type = abis_opt->get_action_type(chain::name(action_name));
-         chain::bytes action_data = abis_opt->variant_to_binary(
+         const chain::type_name action_type = abis->get_action_type(chain::name(action_name));
+         chain::bytes action_data = abis->variant_to_binary(
             action_type, fc::variant(data), chain::abi_serializer::create_yield_function(delivery_timeout));
          unsigned_trx out;
          out.trx.actions.emplace_back(std::vector<chain::permission_level>{auth}, chain::name(contract),

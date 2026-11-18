@@ -287,15 +287,19 @@ namespace sysio::chain {
       pb_pool.reset();
       pb_factory.reset();
       if( !abi.protobuf_types.value.empty() ) {
+         // Parsing and building the descriptors runs under the same deadline as validate(), checked between steps.
          namespace gpb = google::protobuf;
          gpb::FileDescriptorSet fds;
          gpb::util::JsonParseOptions opts;
          opts.ignore_unknown_fields = true;
+         ctx.check_deadline();
          auto status = gpb::util::JsonStringToMessage(abi.protobuf_types.value, &fds, opts);
+         ctx.check_deadline();
          SYS_ASSERT( status.ok(), invalid_type_inside_abi,
                      "Failed to parse protobuf_types: {}", std::string(status.message()) );
          pb_pool = std::make_shared<gpb::DescriptorPool>();
          for( int i = 0; i < fds.file_size(); ++i ) {
+            ctx.check_deadline();
             auto* fd = pb_pool->BuildFile(fds.file(i));
             SYS_ASSERT( fd != nullptr, invalid_type_inside_abi,
                         "Failed to build protobuf file descriptor: {}", fds.file(i).name() );

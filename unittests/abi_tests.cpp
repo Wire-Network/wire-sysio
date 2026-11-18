@@ -5033,4 +5033,15 @@ BOOST_AUTO_TEST_CASE(variant_to_binary_scales_with_object_keys)
       BOOST_REQUIRE_EQUAL(static_cast<uint8_t>(packed[i]), i % byte_values);
 } FC_LOG_AND_RETHROW() }
 
+/// The protobuf descriptors an ABI carries are parsed under the ABI's deadline, which is checked before parsing.
+BOOST_AUTO_TEST_CASE(protobuf_types_parse_runs_under_deadline)
+{ try {
+   abi_def abi;
+   abi.version              = "sysio::abi/1.3";
+   abi.protobuf_types.value = "not json";
+   BOOST_CHECK_THROW(abi_serializer expired(abi, abi_serializer::create_yield_function(fc::microseconds(0))),
+                     abi_serialization_deadline_exception);
+   BOOST_CHECK_THROW(abi_serializer unlimited(abi, yield_fn()), invalid_type_inside_abi);
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_SUITE_END()

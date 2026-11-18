@@ -25,6 +25,7 @@
 #include <sysio/chain/resource_limits.hpp>
 #include <sysio/chain/transaction.hpp>
 #include <sysio/chain/types.hpp>
+#include <sysio/chain_plugin/abi_serializer_cache.hpp>
 #include <sysio/chain_plugin/account_query_db.hpp>
 #include <sysio/chain_plugin/get_info_db.hpp>
 #include <sysio/chain_plugin/tracked_votes.hpp>
@@ -201,15 +202,19 @@ namespace sysio {
       });
    }
 
+   /**
+    * A resolver from an account to the serializer for its current ABI, null when it has none. Serializers come from
+    * shared_abi_serializer_cache(), which builds one on a miss within `abi_serializer_max_time`. A failed build
+    * throws when `yield_throw` is yes and resolves to null otherwise.
+    */
    inline auto make_resolver(const controller& control, fc::microseconds abi_serializer_max_time, throw_on_yield yield_throw ) {
-      return [&control, abi_serializer_max_time, yield_throw](const account_name& name) -> std::optional<abi_serializer> {
+      return [&control, abi_serializer_max_time, yield_throw](const account_name& name) -> chain::abi_serializer_ptr {
          if (name.good()) {
             const auto* accnt = control.find_account_metadata( name );
             if( accnt != nullptr ) {
                try {
-                  if( abi_def abi; abi_serializer::to_abi( accnt->abi, abi ) ) {
-                     return abi_serializer( std::move( abi ), abi_serializer::create_yield_function( abi_serializer_max_time ) );
-                  }
+                  return chain_apis::shared_abi_serializer_cache().get( {accnt->abi.data(), accnt->abi.size()},
+                                                                        abi_serializer_max_time );
                } catch( ... ) {
                   if( yield_throw == throw_on_yield::yes )
                      throw;

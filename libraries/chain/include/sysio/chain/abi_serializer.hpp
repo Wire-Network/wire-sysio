@@ -1097,8 +1097,12 @@ void abi_serializer::from_variant( const fc::variant& v, T& o, const Resolver& r
    impl::abi_from_variant::extract(v, o, resolver, ctx);
 } FC_RETHROW_EXCEPTIONS(error, "Failed to deserialize variant {}", fc::json::to_log_string(v))
 
-using abi_serializer_cache_t = std::unordered_map<account_name, std::optional<abi_serializer>>;
-using resolver_fn_t = std::function<std::optional<abi_serializer>(const account_name& name)>;
+/// Serializers shared between conversions; a serializer is never modified once built.
+using abi_serializer_ptr = std::shared_ptr<const abi_serializer>;
+/// Each account's serializer, null when it has none.
+using abi_serializer_cache_t = std::unordered_map<account_name, abi_serializer_ptr>;
+/// An account's serializer, null when it has none.
+using resolver_fn_t = std::function<abi_serializer_ptr(const account_name& name)>;
 
 class abi_resolver {
 public:
@@ -1187,13 +1191,11 @@ public:
             return *it->second;
          return {};
       }
-      auto serializer = resolver_(account);
-      auto& dest = abi_serializers[account]; // add entry regardless
-      if (serializer) {
-         // we got a serializer, so move it into the cache
-         dest = abi_serializer_cache_t::mapped_type{std::move(*serializer)};
-         return *dest; // and return a reference to it
-      }
+      abi_serializer_ptr serializer = resolver_(account);
+      abi_serializer_ptr& dest = abi_serializers[account]; // add entry regardless
+      dest = std::move(serializer);
+      if (dest)
+         return *dest;
       return {};
    };
 
