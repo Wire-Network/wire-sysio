@@ -808,17 +808,17 @@ sysio::gossip_bp_peers_message received(std::vector<signed_bp_peer> peers) {
 
 /// A node gossiping as prodt, beside the on-chain peer key of each producer the tests sign an entry for
 struct gossip_fixture {
-   /// Port of the gossiped server endpoints; nothing binds or dials it
-   static constexpr std::string_view port = "9876";
    /// Head block slot the fixture starts at
    static constexpr uint32_t start_slot = 1'000'000;
 
+   /// Port of the gossiped server endpoints, from this test's lease
+   const std::string                              port = leased_port();
    mock_net_plugin                                plugin;
    std::map<sysio::name, fc::crypto::private_key> peer_keys;
    sysio::block_timestamp_type                    head{start_slot};
 
    gossip_fixture() {
-      plugin.set_bp_producer_peers({ "prodt,127.0.0.1:" + std::string(port) + ",127.0.0.1" });
+      plugin.set_bp_producer_peers({ "prodt,127.0.0.1:" + port + ",127.0.0.1" });
       set_head(head);
    }
 
@@ -847,7 +847,7 @@ struct gossip_fixture {
    signed_bp_peer entry(sysio::name producer, const std::string& host, const std::string& outbound_ip_address,
                         sysio::block_timestamp_type expiration) {
       signed_bp_peer peer{{ .producer_name = producer }};
-      peer.cached_bp_peer_info.emplace(host + ":" + std::string(port), outbound_ip_address, expiration);
+      peer.cached_bp_peer_info.emplace(host + ":" + port, outbound_ip_address, expiration);
       peer.bp_peer_info = fc::raw::pack(*peer.cached_bp_peer_info);
       peer.sig = peer_key(producer).sign(peer.digest(plugin.chain_id));
       return peer;
@@ -1007,7 +1007,7 @@ BOOST_AUTO_TEST_CASE(test_gossip_bp_expired_entries_rejected_and_evicted) {
    });
    BOOST_CHECK(f.plugin.validate_gossip_bp_peers_message(msg));
    BOOST_REQUIRE_EQUAL(msg.peers.size(), 1u);
-   BOOST_CHECK_EQUAL(msg.peers[0].server_endpoint(), "p2p2.proda.example.com:" + std::string(gossip_fixture::port));
+   BOOST_CHECK_EQUAL(msg.peers[0].server_endpoint(), "p2p2.proda.example.com:" + f.port);
 
    // a held entry is checked again when it arrives after it has expired
    const signed_bp_peer expiring =
