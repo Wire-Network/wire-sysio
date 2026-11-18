@@ -3,6 +3,7 @@
 
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/abi_serializer.hpp>
+#include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/wasm_sysio_constraints.hpp>
 #include <sysio/chain/resource_limits.hpp>
 #include <sysio/chain/exceptions.hpp>
@@ -497,6 +498,61 @@ BOOST_FIXTURE_TEST_CASE( get_required_keys_duplicate_declarations, validating_te
    BOOST_CHECK_THROW(plugin.get_required_keys(request({{alice}}, all_keys), passed), deadline_exception);
    BOOST_CHECK_THROW(plugin.get_required_keys(request(repeated(many, {alice}, {bob}), all_keys), passed),
                      deadline_exception);
+} FC_LOG_AND_RETHROW()
+
+/// get_required_keys stops at the request deadline while it evaluates one declared authority: its checktime reaches
+/// the authority evaluation, not only the points between evaluations.
+BOOST_FIXTURE_TEST_CASE( get_required_keys_deadline_inside_evaluation, validating_tester ) try {
+   produce_block();
+   create_accounts({"wide"_n}, false, false);
+   produce_block();
+
+   // A threshold-1 authority whose only available key sorts last, so evaluating it visits every key.
+   constexpr uint32_t key_count = 12000;
+   std::vector<public_key_type> keys;
+   keys.reserve(key_count);
+   for (uint32_t i = 0; i < key_count; ++i)
+      keys.push_back(get_public_key("wide"_n, std::to_string(i)));
+   std::sort(keys.begin(), keys.end());
+   std::vector<key_weight> weights;
+   weights.reserve(key_count);
+   for (const public_key_type& key : keys)
+      weights.push_back(key_weight{key, 1});
+   const permission_level wide{"wide"_n, "wide"_n};
+   set_authority(wide.actor, wide.permission, authority(1, std::move(weights)), config::active_name);
+   produce_block();
+
+   const flat_set<public_key_type> available{keys.back()};
+   signed_transaction              trx;
+   set_transaction_headers(trx);
+   trx.actions.emplace_back(std::vector<permission_level>{wide}, wide.actor, "doit"_n, bytes{});
+
+   // Beyond the two calls get_required_keys makes itself (one for the declared authorization, one before the
+   // permission is evaluated), the checktime is called during the evaluation.
+   uint32_t                    checktime_calls = 0;
+   const std::function<void()> count_calls     = [&checktime_calls]() { ++checktime_calls; };
+   BOOST_CHECK(control->get_authorization_manager().get_required_keys(trx, available, count_calls) == available);
+   BOOST_TEST(checktime_calls > 2u);
+
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   chain_apis::read_only plugin(*control, {}, {}, _tracked_votes, fc::microseconds::maximum(),
+                                fc::microseconds::maximum(), nullptr);
+   const chain_apis::read_only::get_required_keys_params params{fc::variant(trx), available};
+
+   // Without a deadline the request succeeds; the fastest of a few runs measures how long it takes.
+   constexpr int timing_runs = 3;
+   fc::microseconds unbounded = fc::microseconds::maximum();
+   for (int run = 0; run < timing_runs; ++run) {
+      const fc::time_point start = fc::time_point::now();
+      BOOST_CHECK(plugin.get_required_keys(params, fc::time_point::maximum()).required_keys == available);
+      unbounded = std::min(unbounded, fc::time_point::now() - start);
+   }
+   BOOST_TEST_MESSAGE("unbounded get_required_keys " << unbounded.count() << "us");
+
+   // A deadline this fraction of the way through falls inside the evaluation, which takes nearly all of the request.
+   constexpr int64_t deadline_fraction = 8;
+   const fc::time_point deadline = fc::time_point::now() + fc::microseconds(unbounded.count() / deadline_fraction);
+   BOOST_CHECK_THROW(plugin.get_required_keys(params, deadline), deadline_exception);
 } FC_LOG_AND_RETHROW()
 
 /// get_transaction_id reads each action from `hex_data` when it also has `data`, rejects malformed requests, and

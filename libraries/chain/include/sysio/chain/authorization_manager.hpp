@@ -109,8 +109,8 @@ namespace sysio { namespace chain {
           *
           *  @param trx - the transaction whose declared authorizations are evaluated
           *  @param candidate_keys - the keys that may be used
-          *  @param checktime - called before each declared authorization is checked and each permission is evaluated;
-          *                     it throws to stop the evaluation
+          *  @param checktime - called before each declared authorization is checked, before each permission is
+          *                     evaluated, and during each evaluation; it throws to stop the evaluation
           *  @throws irrelevant_auth_exception when an action declares more than one payer or a payer that is not first
           *  @throws unsatisfied_authorization when a payer is not paired with a permission of the same actor on its
           *          action, or `candidate_keys` cannot satisfy a declared permission
