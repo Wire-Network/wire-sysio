@@ -4306,6 +4306,34 @@ void read_only::send_read_only_transaction(send_read_only_transaction_params par
    } CATCH_AND_CALL(next);
 }
 
+read_only::get_transaction_id_params read_only::to_get_transaction_id_params( fc::variant request ) {
+   SYS_ASSERT( request.is_object(), chain::invalid_http_request, "Transaction object is missing or invalid" );
+   fc::mutable_variant_object trx( request.get_object() );
+   const fc::mutable_variant_object::iterator actions = trx.find( "actions" );
+   SYS_ASSERT( actions != trx.end() && actions->value().is_array(), chain::invalid_http_request,
+               "Transaction actions are missing or invalid" );
+   // Actions are rewritten in place, so the transaction is assembled once whatever the number of actions.
+   for( fc::variant& action : actions->value().get_array() ) {
+      SYS_ASSERT( action.is_object(), chain::invalid_http_request, "Transaction contains invalid or empty action" );
+      const fc::variant_object&        action_vo = action.get_object();
+      const fc::variant_object::iterator data     = action_vo.find( "data" );
+      if( data == action_vo.end() )
+         continue;
+      const fc::variant_object::iterator hex_data = action_vo.find( "hex_data" );
+      if( hex_data == action_vo.end() ) {
+         SYS_ASSERT( data->value().is_string(), chain::invalid_http_request,
+                     "Request supports only un-exploded 'data' (hex form)" );
+         continue;
+      }
+      fc::mutable_variant_object rewritten( action_vo );
+      rewritten["data"] = hex_data->value();
+      action = fc::variant( std::move( rewritten ) );
+   }
+   get_transaction_id_params result = fc::variant( std::move( trx ) ).as<get_transaction_id_params>();
+   SYS_ASSERT( result.id() != transaction().id(), chain::invalid_http_request, "Invalid transaction object" );
+   return result;
+}
+
 read_only::get_transaction_id_result read_only::get_transaction_id( const read_only::get_transaction_id_params& params, const fc::time_point& ) const {
    return params.id();
 }

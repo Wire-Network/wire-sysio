@@ -12,12 +12,15 @@
 
 #include <test_contracts.hpp>
 
+#include <fc/crypto/hex.hpp>
 #include <fc/io/fstream.hpp>
 
 #include <fc/variant_object.hpp>
 #include <fc/io/json.hpp>
 
+#include <algorithm>
 #include <array>
+#include <cstdint>
 #include <functional>
 #include <limits>
 #include <optional>
@@ -417,6 +420,90 @@ BOOST_FIXTURE_TEST_CASE( permission_satisfies_link_follows_linkauth, validating_
 
    // A permission that does not exist satisfies nothing.
    BOOST_CHECK(!permission_satisfies_link(*control, {"alice"_n, "nosuch"_n}, "bob"_n, "accept"_n));
+} FC_LOG_AND_RETHROW()
+
+/// get_transaction_id reads each action from `hex_data` when it also has `data`, rejects malformed requests, and
+/// converts a request in time proportional to its size.
+BOOST_AUTO_TEST_CASE( get_transaction_id_many_actions ) try {
+   using chain_apis::read_only;
+   constexpr uint32_t action_count = 8000;
+   // Converting a request may take at most this many times as long as parsing its JSON, which is linear in its size.
+   constexpr int64_t max_convert_to_parse_ratio = 10;
+   constexpr int     timing_runs                = 3;
+
+   signed_transaction trx;
+   trx.expiration       = fc::time_point_sec(fc::time_point::from_iso_string("2030-01-01T00:00:00"));
+   trx.ref_block_num    = 1;
+   trx.ref_block_prefix = 2;
+   for (uint32_t i = 0; i < action_count; ++i)
+      trx.actions.emplace_back(std::vector<permission_level>{{"alice"_n, config::active_name}}, "alice"_n, "doit"_n,
+                               fc::raw::pack(i));
+
+   // Every action carries the exploded `data` the endpoint cannot use alongside the `hex_data` it reads.
+   fc::mutable_variant_object request(fc::variant(static_cast<const transaction&>(trx)).get_object());
+   fc::variants                actions;
+   for (uint32_t i = 0; i < action_count; ++i) {
+      const action& act = trx.actions[i];
+      actions.emplace_back(fc::mutable_variant_object()
+         ("account", act.account)
+         ("name", act.name)
+         ("authorization", act.authorization)
+         ("data", fc::mutable_variant_object()("value", i))
+         ("hex_data", fc::to_hex(act.data.data(), act.data.size())));
+   }
+   request["actions"] = std::move(actions);
+   const std::string body = fc::json::to_string(fc::variant(std::move(request)), fc::time_point::maximum());
+
+   BOOST_CHECK(read_only::to_get_transaction_id_params(fc::json::from_string(body)).id() == trx.id());
+
+   const auto elapsed_us = [](const auto& f) {
+      const fc::time_point start = fc::time_point::now();
+      f();
+      return (fc::time_point::now() - start).count();
+   };
+   int64_t parse_us   = std::numeric_limits<int64_t>::max();
+   int64_t convert_us = std::numeric_limits<int64_t>::max();
+   for (int run = 0; run < timing_runs; ++run) {
+      fc::variant                          parsed;
+      read_only::get_transaction_id_params converted;
+      parse_us   = std::min(parse_us, elapsed_us([&] { parsed = fc::json::from_string(body); }));
+      convert_us = std::min(convert_us, elapsed_us([&] {
+         converted = read_only::to_get_transaction_id_params(std::move(parsed));
+      }));
+      BOOST_TEST(converted.actions.size() == action_count);
+   }
+   BOOST_TEST_MESSAGE("parse " << parse_us << "us, convert " << convert_us << "us");
+   BOOST_TEST(convert_us < parse_us * max_convert_to_parse_ratio);
+
+   // `hex_data` wins over a `data` string; a `data` string alone is used as is.
+   const fc::variant first_action = fc::variant(trx.actions[0]);
+   const auto with_actions = [&](fc::variants acts) {
+      fc::mutable_variant_object single(fc::variant(static_cast<const transaction&>(trx)).get_object());
+      single["actions"] = std::move(acts);
+      return fc::variant(std::move(single));
+   };
+   transaction one_action = trx;
+   one_action.actions.resize(1);
+   const fc::variant          hex_data = first_action["data"];
+   fc::mutable_variant_object stale_data(first_action.get_object());
+   stale_data["hex_data"] = hex_data;
+   stale_data["data"]     = "00";
+   BOOST_CHECK(read_only::to_get_transaction_id_params(with_actions({fc::variant(std::move(stale_data))})).id() ==
+              one_action.id());
+   BOOST_CHECK(read_only::to_get_transaction_id_params(with_actions({first_action})).id() == one_action.id());
+
+   // Malformed requests.
+   fc::mutable_variant_object exploded_only(first_action.get_object());
+   exploded_only["data"] = fc::mutable_variant_object()("value", 0);
+   fc::mutable_variant_object no_actions(fc::variant(static_cast<const transaction&>(trx)).get_object());
+   no_actions.erase("actions");
+   BOOST_CHECK_THROW(read_only::to_get_transaction_id_params(fc::variant("not an object")), invalid_http_request);
+   BOOST_CHECK_THROW(read_only::to_get_transaction_id_params(fc::variant(std::move(no_actions))),
+                     invalid_http_request);
+   BOOST_CHECK_THROW(read_only::to_get_transaction_id_params(with_actions({fc::variant(1)})), invalid_http_request);
+   BOOST_CHECK_THROW(read_only::to_get_transaction_id_params(with_actions({fc::variant(std::move(exploded_only))})),
+                     invalid_http_request);
+   BOOST_CHECK_THROW(read_only::to_get_transaction_id_params(fc::variant(transaction())), invalid_http_request);
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()
