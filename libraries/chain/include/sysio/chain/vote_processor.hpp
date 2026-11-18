@@ -78,7 +78,7 @@ public:
       size_t           max_votes_per_connection = vote_limits::max_votes_per_connection(vote_limits::min_finalizers);
       /// Votes queued from all connections at which further votes from peers are dropped.
       size_t           max_queued_votes         = vote_limits::max_queued_votes(1);
-      /// Parked votes at which further votes for unknown blocks are dropped.
+      /// Parked votes at which further votes from peers for unknown blocks are dropped.
       size_t           max_parked_votes         = vote_limits::max_parked_votes(vote_limits::min_finalizers);
       /// Votes from peers for blocks more than this many blocks beyond the newest known block are dropped.
       block_num_type   park_lead_blocks         = vote_limits::park_lead_blocks;
@@ -90,7 +90,8 @@ public:
    using fetch_block_func_t      = std::function<block_state_ptr(const block_id_type&)>;
 
 private:
-   /// Connection id of votes from this node's finalizers: never limited, rejected or reported.
+   /// Connection id of votes from this node's finalizers: exempt from the caps and the parking lead, never rejected
+   /// or reported. Its parked votes still expire and are discarded at lib.
    static constexpr uint32_t local_connection_id = 0;
 
    struct by_block_id;
@@ -231,7 +232,7 @@ private:
          return bsp;
       if (c.session != session)
          return {}; // votes of a closed session are aggregated when their block is known, never parked
-      if (index.size() >= limits.max_parked_votes) {
+      if (it->first != local_connection_id && index.size() >= limits.max_parked_votes) {
          ilog("Exceeded max parked votes {}, dropping vote from {}", limits.max_parked_votes, it->first);
          return {};
       }
@@ -291,13 +292,13 @@ private:
       std::vector<vote> ready;
       {
          std::lock_guard g(mtx);
+         discard_unmatched(); // first, so that expired votes and votes at or below lib for bsp are not aggregated
          if (index.empty())
             return;
          auto& idx = index.get<by_block_id>();
          auto [first, last] = idx.equal_range(bsp->id());
          ready.assign(first, last);
          erase_parked(idx, first, last);
-         discard_unmatched();
       }
       for (const vote& v : ready) {
          if (stopped)

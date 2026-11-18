@@ -451,12 +451,12 @@ BOOST_AUTO_TEST_CASE( rejected_connection_skips_queued_votes ) {
    BOOST_TEST(bsp->has_voted(bls_priv_keys.at(2).get_public_key()) == vote_status_t::not_voted);
 }
 
-// Votes held across connections are capped; this node's own votes are exempt.
+// Votes held across connections are capped; this node's own votes are exempt from both caps.
 BOOST_AUTO_TEST_CASE( queued_votes_are_capped_globally ) {
    constexpr uint32_t per_connection = 4;
    constexpr uint32_t global         = 10;
    constexpr uint32_t local          = 0;
-   constexpr uint32_t local_votes    = 2;
+   constexpr uint32_t local_votes    = per_connection + 1;
    vote_processor_fixture f{vote_processor_t::limits_t{.max_votes_per_connection = per_connection,
                                                        .max_queued_votes         = global}};
 
@@ -641,6 +641,60 @@ BOOST_AUTO_TEST_CASE( closing_connection_purges_parked_votes ) {
    BOOST_TEST(f.vp.parked_size() == 0u);
    BOOST_TEST(f.count(closing) == 1u);
    BOOST_TEST(f.vp.connection_count() == 2u); // the staying and gate connections remain open
+}
+
+// This node's votes are parked when peers have filled the parked set, and aggregated when their block is reported.
+BOOST_AUTO_TEST_CASE( local_votes_are_parked_beyond_the_cap ) {
+   constexpr uint32_t peer  = 1;
+   constexpr uint32_t local = 0;
+   vote_processor_fixture f{vote_processor_t::limits_t{.max_parked_votes = 1}};
+
+   block_state_ptr genesis = create_genesis_block_state();
+   block_state_ptr unknown = create_test_block_state(genesis);
+   block_state_ptr own     = create_test_block_state(genesis);
+
+   f.vp.process_vote_message(peer, make_vote(unknown, 0), async_t::no);
+   BOOST_TEST(f.vp.parked_size() == 1u);
+
+   // the controller can vote on a block before adding it to the fork database
+   f.vp.process_vote_message(local, make_vote(own, 1), async_t::no);
+   BOOST_TEST(f.vp.parked_size() == 2u);
+
+   f.add_block(own);
+   f.vp.notify_new_block(own, async_t::no);
+   BOOST_TEST(own->has_voted(bls_priv_keys.at(1).get_public_key()) == vote_status_t::voted);
+   BOOST_TEST(f.vp.parked_size() == 1u);
+}
+
+// Parked votes that have expired, or whose block is at or below lib, when their block is reported are discarded
+// without being verified.
+BOOST_AUTO_TEST_CASE( stale_parked_votes_are_not_drained ) {
+   constexpr uint32_t         expiring = 1;
+   constexpr uint32_t         passed   = 2;
+   constexpr fc::microseconds expiry   = fc::milliseconds(50);
+   vote_processor_fixture f{vote_processor_t::limits_t{.parked_vote_expiry = expiry}};
+   const bls_public_key key = bls_priv_keys.at(0).get_public_key();
+
+   block_state_ptr genesis = create_genesis_block_state();
+   block_state_ptr late    = create_test_block_state(genesis);
+   f.vp.process_vote_message(expiring, make_vote(late, 0), async_t::no);
+   BOOST_TEST(f.vp.parked_size() == 1u);
+   std::this_thread::sleep_for(std::chrono::microseconds{2 * expiry.count()});
+   f.add_block(late);
+   f.vp.notify_new_block(late, async_t::no);
+   BOOST_TEST(f.vp.parked_size() == 0u);
+   BOOST_TEST(f.count(expiring) == 0u);
+   BOOST_TEST(late->has_voted(key) == vote_status_t::not_voted);
+
+   block_state_ptr irreversible = create_test_block_state(genesis);
+   f.vp.process_vote_message(passed, make_vote(irreversible, 0), async_t::no);
+   BOOST_TEST(f.vp.parked_size() == 1u);
+   f.vp.notify_lib(irreversible->block_num());
+   f.add_block(irreversible);
+   f.vp.notify_new_block(irreversible, async_t::no);
+   BOOST_TEST(f.vp.parked_size() == 0u);
+   BOOST_TEST(f.count(passed) == 0u);
+   BOOST_TEST(irreversible->has_voted(key) == vote_status_t::not_voted);
 }
 
 // Unless fixed, the limits are sized for the vote threads and the distinct finalizers of the reported block's active
