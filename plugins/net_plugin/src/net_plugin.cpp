@@ -303,7 +303,6 @@ namespace sysio {
    // Since both notice and trx are sent when peer does not have a trx, set a minimum requirement for sending the notice.
    // 4096 chosen as an arbitrary threshold where an additional small notice adds little additional overhead.
    constexpr auto     def_trx_notice_min_size = 4096;
-   constexpr auto     def_allowed_clock_skew = fc::seconds(15);
 
    class connections_manager {
    public:
@@ -2765,7 +2764,7 @@ namespace sysio {
       {
          fc::lock_guard g( local_txns_mtx );
          start_size = local_txns.size();
-         const std::size_t removed = local_txns.expire(fc::time_point_sec{now - def_allowed_clock_skew}, // allow for some clock-skew
+         const std::size_t removed = local_txns.expire(fc::time_point_sec{now - config::allowed_clock_skew},
                                                        fc::time_point_sec{now});
          end_size = start_size - removed;
       }
@@ -4235,10 +4234,10 @@ namespace sysio {
          bool unlinkable = false;
          sync_manager::closing_mode close_mode = sync_manager::closing_mode::immediately;
          try {
-            if (cc.is_producer_node()) {
-               SYS_ASSERT(ptr->timestamp < (fc::time_point::now() + def_allowed_clock_skew), block_from_the_future,
-                          "received a block from the future, rejecting it: {}", id);
-            }
+            const bool from_the_future = net_utils::rejects_block_from_the_future(
+               cc.is_producer_node(), cc.is_finalizer_node(), *ptr, fc::time_point::now());
+            SYS_ASSERT(!from_the_future, block_from_the_future,
+                       "received a block from the future, rejecting it: {}", id);
             // this will return empty optional<block_handle> if block is not linkable
             controller::accepted_block_result abh = cc.accept_block( id, ptr, received_time );
             fork_db_add_result = abh.add_result;

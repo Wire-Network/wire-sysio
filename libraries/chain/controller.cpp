@@ -4724,6 +4724,10 @@ bool controller::is_producer_node()const {
    return my->is_producer_node;
 }
 
+bool controller::is_finalizer_node() const {
+   return !my->my_finalizers.empty();
+}
+
 void controller::set_pause_at_block_num(block_num_type block_num) {
    my->pause_at_block_num = block_num;
 }

@@ -1,5 +1,6 @@
 add_executable( test_net_plugin
         auto_bp_peering_unittest.cpp
+        block_from_the_future_unittest.cpp
         block_nack_default_unittest.cpp
         block_notice_unittest.cpp
         connection_type_unittest.cpp

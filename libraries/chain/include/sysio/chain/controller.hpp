@@ -537,6 +537,8 @@ namespace sysio::chain {
 
       void set_producer_node(bool is_producer_node);
       bool is_producer_node()const; // thread safe, set at program initialization
+      /// Whether this node has finalizer keys configured. Thread safe, set at program initialization.
+      bool is_finalizer_node() const;
 
       void set_pause_at_block_num(block_num_type block_num);
       block_num_type get_pause_at_block_num()const;
