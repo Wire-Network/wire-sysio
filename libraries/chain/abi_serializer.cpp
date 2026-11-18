@@ -324,7 +324,8 @@ namespace sysio::chain {
    }
 
    std::vector<const fc::variant*> abi_serializer::struct_field_values( const struct_def& st,
-                                                                        const fc::variant_object& vo )const {
+                                                                        const fc::variant_object& vo,
+                                                                        const impl::abi_traverse_context& ctx )const {
       const auto order_itr = struct_fields_by_name.find( st.name );
       SYS_ASSERT( order_itr != struct_fields_by_name.end(), abi_exception,
                   "invariant failure: struct '{}' has no field index", impl::limit_size(st.name) );
@@ -332,13 +333,17 @@ namespace sysio::chain {
       const auto field_name_of = [&fields = st.fields]( uint32_t i ) -> std::string_view { return fields[i].name; };
 
       std::vector<const fc::variant*> values( st.fields.size(), nullptr );
+      size_t entries_read = 0;
       for( const auto& entry : vo ) {
+         if( ++entries_read % struct_keys_per_deadline_check == 0 )
+            ctx.check_deadline();
          const std::string_view key = entry.key();
-         for( auto itr = std::ranges::lower_bound( order, key, {}, field_name_of );
-              itr != order.end() && field_name_of( *itr ) == key; ++itr ) {
-            if( values[*itr] == nullptr )
-               values[*itr] = &entry.value();
-         }
+         auto itr = std::ranges::lower_bound( order, key, {}, field_name_of );
+         // The fields a key names all take its first occurrence, so a key seen before has nothing left to set.
+         if( itr == order.end() || field_name_of( *itr ) != key || values[*itr] != nullptr )
+            continue;
+         for( ; itr != order.end() && field_name_of( *itr ) == key; ++itr )
+            values[*itr] = &entry.value();
       }
       return values;
    }
@@ -867,7 +872,7 @@ namespace sysio::chain {
                auto h2 = ctx.disallow_extensions_unless(false);
                _variant_to_binary(resolve_type(st.base), var, ds, ctx);
             }
-            const std::vector<const fc::variant*> values = struct_field_values( st, vo );
+            const std::vector<const fc::variant*> values = struct_field_values( st, vo, ctx );
             const fc::variant absent;
             bool disallow_additional_fields = false;
             for( uint32_t i = 0; i < st.fields.size(); ++i ) {

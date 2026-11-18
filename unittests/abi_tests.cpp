@@ -5033,6 +5033,36 @@ BOOST_AUTO_TEST_CASE(variant_to_binary_scales_with_object_keys)
       BOOST_REQUIRE_EQUAL(static_cast<uint8_t>(packed[i]), i % byte_values);
 } FC_LOG_AND_RETHROW() }
 
+/// A key repeated in the input object visits the fields it names once: 5,000 fields named `a` pack from an object
+/// repeating `"a"` 50,000 times well within a small budget, every field taking the first occurrence.
+BOOST_AUTO_TEST_CASE(variant_to_binary_repeated_key_visits_fields_once)
+{ try {
+   constexpr uint32_t field_count      = 5000;
+   constexpr uint32_t occurrence_count = 50000;
+   constexpr char     first_value      = 1;
+   constexpr auto     budget           = fc::milliseconds(200);
+
+   abi_def abi;
+   abi.version = "sysio::abi/1.0";
+   struct_def same("same", "", {});
+   for (uint32_t i = 0; i < field_count; ++i)
+      same.fields.emplace_back("a", "uint8");
+   abi.structs.push_back(std::move(same));
+   const abi_serializer abis(std::move(abi), yield_fn());
+
+   std::string json = R"({"a":1)";
+   for (uint32_t i = 1; i < occurrence_count; ++i)
+      json += R"(,"a":2)";
+   json += "}";
+   const fc::variant input = fc::json::from_string(json);
+   BOOST_REQUIRE_EQUAL(input.get_object().size(), occurrence_count);
+
+   bytes packed;
+   BOOST_REQUIRE_NO_THROW(packed = abis.variant_to_binary("same", input,
+                                                          abi_serializer::create_yield_function(budget)));
+   BOOST_CHECK(packed == bytes(field_count, first_value));
+} FC_LOG_AND_RETHROW() }
+
 /// ABI whose `nothing` type decodes from no bytes, with arrays and structs built from it.
 static const char* zero_size_abi = R"=====(
 {
