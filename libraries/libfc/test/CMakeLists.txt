@@ -1,5 +1,6 @@
 
 add_executable( test_fc
+        container/test_flat.cpp
         crypto/test_base58.cpp
         crypto/test_blake2.cpp
         crypto/test_bls.cpp
