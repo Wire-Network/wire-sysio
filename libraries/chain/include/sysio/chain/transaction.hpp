@@ -120,10 +120,17 @@ namespace sysio { namespace chain {
                                                     bool allow_duplicate_keys = false )const;
    };
 
+   /**
+    * Enforces config::max_signature_variable_size on a signature.
+    * @param sig the signature to check
+    * @throws sig_variable_size_limit_exception if `sig.variable_size()` is larger than the limit
+    */
+   void assert_signature_variable_size( const signature_type& sig );
+
    struct packed_transaction : fc::reflect_init {
       enum class compression_type {
          none = 0,
-         zlib = 1, // not allowed in consensus, can be used by clients or on p2p network
+         zlib = 1, // accepted from clients by the constructors; rejected in binary form and in consensus
       };
 
       packed_transaction() = default;
@@ -181,6 +188,7 @@ namespace sysio { namespace chain {
    private:
       void init();
       void local_unpack_transaction(vector<bytes>&& context_free_data);
+      /// Unpacks packed_context_free_data; packed data that holds no entries is cleared.
       void local_unpack_context_free_data();
       void local_pack_transaction();
       void local_pack_context_free_data();

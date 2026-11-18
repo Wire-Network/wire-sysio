@@ -130,7 +130,7 @@ try:
         nonProdNode.transferFunds(cluster.sysioAccount, account, transferAmount, "test transfer", waitForTransBlock=True)
 
     Print("Configure and launch txn generators")
-    cluster.launchTrxGenerators(contractOwnerAcctName=cluster.sysioAccount.name,
+    cluster.launchTrxGenerators(contractOwnerAcctName=cluster.noopAccount.name,
                                 acctNamesList=[account.name for account in accounts],
                                 acctPrivKeysList=[account.activePrivateKey for account in accounts], nodeId=prodNode.nodeId,
                                 tpsPerGenerator=trxGenTps, numGenerators=1, durationSec=trxGenDurationSec, waitToComplete=True)

@@ -465,6 +465,9 @@ struct building_block {
       return bb.parent.pending_producers();
    }
 
+   /// QC data for a block built on `parent`: the best QC of the nearest ancestor that has one, when it advances
+   /// the parent's claim and passes the structural checks receiving nodes apply; otherwise the parent's claim with
+   /// no QC.
    qc_data_t get_qc_data(fork_database_t& fork_db, const block_state& parent) {
       // find most recent ancestor block that has a QC by traversing fork db
       // branch from parent
@@ -478,6 +481,14 @@ struct building_block {
                         qc->block_num, block_header::num_from_id(parent.id()) );
             auto qc_claim = qc->to_qc_claim();
             if( parent.is_needed(qc_claim) ) {
+               // receiving nodes run the same check against the same parent
+               try {
+                  parent.verify_qc_basic(*qc);
+               } catch( const fc::exception& e ) {
+                  elog( "Omitting QC for block #{} from block #{}, QC fails basic verification: {}",
+                        qc->block_num, parent.block_num() + 1, e.to_detail_string() );
+                  return qc_data_t{ {},  parent.core.latest_qc_claim() };
+               }
                return qc_data_t{ *qc, qc_claim };
             } else {
                // no new qc info, repeat existing
@@ -1957,8 +1968,7 @@ struct controller_impl {
              || (code == contract_whitelist_exception::code_value)
              || (code == contract_blacklist_exception::code_value)
              || (code == action_blacklist_exception::code_value)
-             || (code == key_blacklist_exception::code_value)
-             || (code == sig_variable_size_limit_exception::code_value);
+             || (code == key_blacklist_exception::code_value);
    }
 
    bool scheduled_failure_is_subjective( const fc::exception& e ) const {
@@ -4525,10 +4535,6 @@ bool controller::is_producing_block() const {
    return my->is_producing_block();
 }
 
-uint32_t controller::configured_subjective_signature_length_limit()const {
-   return my->conf.maximum_variable_signature_length;
-}
-
 void controller::validate_expiration( const transaction& trx )const { try {
    const auto& chain_configuration = get_global_properties().configuration;
 
@@ -4722,6 +4728,10 @@ void controller::set_producer_node(bool is_producer_node) {
 
 bool controller::is_producer_node()const {
    return my->is_producer_node;
+}
+
+bool controller::is_finalizer_node() const {
+   return !my->my_finalizers.empty();
 }
 
 void controller::set_pause_at_block_num(block_num_type block_num) {

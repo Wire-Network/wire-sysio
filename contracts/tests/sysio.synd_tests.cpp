@@ -252,6 +252,8 @@ public:
          sysio_system::test_support::andon::deploy(*this, andon_abi_ser, contracts::andon_wasm(),
                                                    contracts::andon_abi());
       }
+      // After every system account is created: sysio.bond's accept sends sysio.system `addsubjex`.
+      sysio_system::test_support::system_contract::deploy(*this, contracts::system_wasm(), contracts::system_abi());
 
       // WIRE: the treasury supply on sysio and a funder for yield distributions.
       BOOST_REQUIRE_EQUAL(success(), push(TOKEN_ACCOUNT, token_abi_ser, TOKEN_ACCOUNT, "create"_n, mvo()
@@ -453,13 +455,17 @@ public:
       BOOST_REQUIRE(last_trace && !last_trace->action_traces.empty());
       return fc::raw::unpack<std::pair<uint64_t, uint64_t>>(last_trace->action_traces.front().return_value);
    }
-   /// Capture all KV rows plus the liquid ledger and request counter to detect quote/refusal writes.
+   /// Capture all KV rows plus the liquid ledger and request counter to detect quote/refusal writes. The
+   /// rolling log of recent blocks sysio.system writes on every block is left out.
    auto desynd_state() {
+      const uint16_t block_log_table = compute_table_id("blockinfo"_n.to_uint64_t());
       std::vector<std::vector<char>> rows;
       auto cursor = control->kv().open_row_cursor();
       chain::kv_row row;
-      for (bool more = cursor->seek_lower({}, row); more; more = cursor->next(row))
+      for (bool more = cursor->seek_lower({}, row); more; more = cursor->next(row)) {
+         if (row.code == SYSIO_ACCOUNT && row.table_id == block_log_table) continue;
          rows.emplace_back(row.value.begin(), row.value.end());
+      }
       return std::make_tuple(rows, liq_balance("alice"_n), liq_balance(SYND_ACCOUNT), supply(),
          get_row_by_account(SYND_ACCOUNT, SYND_ACCOUNT, "syndcounters"_n, "syndcounters"_n));
    }

@@ -214,6 +214,11 @@ public:
       produce_blocks();
       sysio_system::test_support::load_account_abi(*this, account, ser);
    }
+   /// Put sysio.system on sysio, for a case whose accept on a system contract's request sends `addsubjex`
+   /// there: the fixture's sysio.bios does not define it.
+   void deploy_system_contract() {
+      sysio_system::test_support::system_contract::deploy(*this, contracts::system_wasm(), contracts::system_abi());
+   }
 
    /// Push one action in its own block, keeping its trace in `last_trace` (null after a failure).
    action_result push(name code, abi_serializer& ser, name signer, name action_name, const variant_object& data) {
@@ -558,11 +563,13 @@ public:
       return delta;
    }
    /// True iff `key` is a row the `sysio` RAM pool pays for as shared infrastructure: sysio.bond's
-   /// configuration, counter and yield pools, and the custody rows sysio.liq and sysio.token keep.
+   /// configuration, counter and yield pools, the custody rows sysio.liq and sysio.token keep, and the
+   /// rolling log of recent blocks sysio.system keeps when a case deploys it.
    bool is_shared(const bill_key& key) const {
       const auto [payer, code, table] = key;
       if (payer != SYSIO_ACCOUNT) return false;
       if (code == LIQ_ACCOUNT || code == TOKEN_ACCOUNT) return true;
+      if (code == SYSIO_ACCOUNT) return table == compute_table_id("blockinfo"_n.to_uint64_t());
       return code == BOND_ACCOUNT && (table == compute_table_id("bondconfig"_n.to_uint64_t()) ||
                                       table == compute_table_id("bondcounters"_n.to_uint64_t()) ||
                                       table == compute_table_id("yieldpool"_n.to_uint64_t()));
@@ -1029,6 +1036,7 @@ BOOST_FIXTURE_TEST_CASE(accept_pulls_the_bond_and_records_it, sysio_bond_tester)
 // A new bond on a system contract's request asks sysio to exempt its underwriter from subjective billing; adding
 // to a bond does not.
 BOOST_FIXTURE_TEST_CASE(accept_asks_sysio_to_exempt_a_new_underwriter, sysio_bond_tester) try {
+   deploy_system_contract();
    BOOST_REQUIRE_EQUAL(success(), request(SYND_ACCOUNT, "oppenvelope"_n, bytes(32, 'a'), LIQSOL, 10 * UNIT, 0));
 
    BOOST_REQUIRE_EQUAL(success(), accept("alice"_n, 1, 4 * UNIT));
@@ -1048,9 +1056,7 @@ BOOST_FIXTURE_TEST_CASE(accept_exempts_nobody_on_an_ordinary_request, sysio_bond
 
 // With sysio.system on sysio the underwriter is listed, so its bond on another request does not ask again.
 BOOST_FIXTURE_TEST_CASE(accept_does_not_ask_again_for_a_listed_underwriter, sysio_bond_tester) try {
-   set_code(SYSIO_ACCOUNT, contracts::system_wasm());
-   set_abi(SYSIO_ACCOUNT, contracts::system_abi().data());
-   produce_block();
+   deploy_system_contract();
    BOOST_REQUIRE_EQUAL(success(), request(SYND_ACCOUNT, "oppenvelope"_n, bytes(32, 'a'), LIQSOL, 10 * UNIT, 0));
    BOOST_REQUIRE_EQUAL(success(), request(SYND_ACCOUNT, "oppenvelope"_n, bytes(32, 'b'), LIQSOL, 10 * UNIT, 0));
 
@@ -1254,8 +1260,10 @@ BOOST_FIXTURE_TEST_CASE(accept_fails_when_the_issuer_has_no_ram, sysio_bond_test
 } FC_LOG_AND_RETHROW()
 
 // An accept on a privileged issuer's request -- a system contract's, as sysio.synd's are -- bills the
-// bond row and the underwriter's balance row for that issuer to the sysio RAM pool.
+// bond row and the underwriter's balance row for that issuer to the sysio RAM pool, as it does the
+// underwriter's entry on sysio.system's subjective billing exempt list.
 BOOST_FIXTURE_TEST_CASE(accept_on_a_privileged_issuers_request_bills_sysio, sysio_bond_tester) try {
+   deploy_system_contract();
    // sysio.tokens, the token registry, is a privileged system contract of the fixture.
    constexpr auto system_contract = TOKENS_ACCOUNT;
    BOOST_REQUIRE_EQUAL(success(), request(system_contract, "oppenvelope"_n, bytes(32, 'a'), LIQSOL, 10 * UNIT, 0));
@@ -1263,6 +1271,7 @@ BOOST_FIXTURE_TEST_CASE(accept_on_a_privileged_issuers_request_bills_sysio, sysi
    require_billed(billed_by([&] { BOOST_REQUIRE_EQUAL(success(), accept("alice"_n, 1, 10 * UNIT)); }), {
       {bill_of(SYSIO_ACCOUNT, BOND_ACCOUNT, "bonds"_n), +1},
       {bill_of(SYSIO_ACCOUNT, BOND_ACCOUNT, "wireclaims"_n), +1},
+      {bill_of(SYSIO_ACCOUNT, SYSIO_ACCOUNT, "subjexempt"_n), +1},
    });
    BOOST_REQUIRE_EQUAL(SYSIO_ACCOUNT, payer_of("bonds"_n, bond_key_of(1, "alice"_n)));
    BOOST_REQUIRE_EQUAL(SYSIO_ACCOUNT, payer_of("requests"_n, request_key_of(1)));
@@ -1513,6 +1522,7 @@ BOOST_FIXTURE_TEST_CASE(hold_fails_when_the_beneficiary_has_no_ram, sysio_bond_t
 // sysio RAM pool; the prune that erases the ruled request returns each row's RAM to the account it billed.
 BOOST_FIXTURE_TEST_CASE(an_ordinary_challenger_pays_for_its_hold_on_a_privileged_issuers_request,
                         sysio_bond_tester) try {
+   deploy_system_contract();
    // sysio.tokens, the token registry, is a privileged system contract of the fixture.
    constexpr auto system_contract = TOKENS_ACCOUNT;
    BOOST_REQUIRE_EQUAL(success(), mint(system_contract, 100 * UNIT));
@@ -2305,6 +2315,7 @@ BOOST_FIXTURE_TEST_CASE(an_ordinary_issuer_pays_for_its_request_through_its_life
 // issuer's request never takes over another's row, a withdrawal pays one issuer's balance only, and each
 // row's RAM returns to the issuer that paid for it.
 BOOST_FIXTURE_TEST_CASE(wire_claims_from_several_issuers_stay_with_each_issuer, sysio_bond_tester) try {
+   deploy_system_contract();
    constexpr auto     system_contract = TOKENS_ACCOUNT;   // privileged
    constexpr uint32_t window_sec      = 3600;
    const auto         issuer_ram      = ram_usage("issuer"_n);
