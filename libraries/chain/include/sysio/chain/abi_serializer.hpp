@@ -97,6 +97,14 @@ struct abi_serializer {
    static void from_variant( const fc::variant& v, T& o, const Resolver& resolver, const yield_function_t& yield );
    template<typename T, typename Resolver>
    static void from_variant( const fc::variant& v, T& o, const Resolver& resolver, const fc::microseconds& max_action_data_serialization_time );
+   /**
+    * Packs `v` into `o`. `yield` bounds the whole conversion, e.g. by a request deadline; packing each action's data
+    * is further bounded by `max_action_data_serialization_time`. Either limit throws
+    * abi_serialization_deadline_exception.
+    */
+   template<typename T, typename Resolver>
+   static void from_variant( const fc::variant& v, T& o, const Resolver& resolver, const yield_function_t& yield,
+                             const fc::microseconds& max_action_data_serialization_time );
 
    template<typename Vec>
    static bool is_empty_abi(const Vec& abi_vec)
@@ -188,6 +196,19 @@ private:
 
    void validate( impl::abi_traverse_context& ctx )const;
 
+   /// Fills `struct_fields_by_name` from `structs`.
+   void index_struct_fields( impl::abi_traverse_context& ctx );
+
+   /**
+    * The value each field of `st` takes from `vo`: the first entry whose key is the field's name, else nullptr.
+    * Reads each entry of `vo` once.
+    */
+   std::vector<const fc::variant*> struct_field_values( const struct_def& st, const fc::variant_object& vo )const;
+
+   /// Each struct's field ordinals sorted by field name, ties in declaration order, to find the fields an input
+   /// object's keys name by binary search.
+   map<type_name, vector<uint32_t>, std::less<>> struct_fields_by_name;
+
    friend struct impl::abi_from_variant;
    friend struct impl::abi_to_variant;
    friend struct impl::abi_traverse_context_with_path;
@@ -211,6 +232,11 @@ namespace impl {
       fc::scoped_exit<std::function<void()>> enter_scope();
 
    protected:
+      /// Bounds this context to converting one action's data: from now on its yield also throws
+      /// abi_serialization_deadline_exception once `max_action_serialization_time` has passed. No change when that
+      /// limit is unset.
+      void limit_to_one_action();
+
       abi_serializer::yield_function_t  yield;
       // if set then restricts each individual action data serialization
       fc::microseconds                  max_action_serialization_time;
@@ -290,19 +316,13 @@ namespace impl {
       using abi_traverse_context_with_path::abi_traverse_context_with_path;
    };
 
+   /// Decodes one action's data within the per-action time limit.
    struct action_data_to_variant_context : public binary_to_variant_context {
       action_data_to_variant_context( const abi_serializer& abis, const abi_traverse_context& ctx, const std::string_view& type )
             : binary_to_variant_context(abis, ctx, type)
       {
          short_path = true; // Just to be safe while avoiding the complexity of threading an override boolean all over the place
-         if (max_action_serialization_time.count() > 0) {
-            fc::time_point deadline = fc::time_point::now().safe_add(max_action_serialization_time);
-            yield = [deadline, y=yield, max=max_action_serialization_time](size_t depth) {
-               y(depth); // call provided yield that might include an overall time limit or not
-               SYS_ASSERT( fc::time_point::now() < deadline, abi_serialization_deadline_exception,
-                           "serialization action data time limit {}us exceeded", max );
-            };
-         }
+         limit_to_one_action();
       }
    };
 
@@ -315,6 +335,17 @@ namespace impl {
 
    protected:
       bool                   allow_extensions = true;
+   };
+
+   /// Packs one action's data within the same per-action time limit as decoding it.
+   struct action_data_to_binary_context : public variant_to_binary_context {
+      action_data_to_binary_context( const abi_serializer& abis, const abi_traverse_context& ctx,
+                                     const std::string_view& type )
+            : variant_to_binary_context(abis, ctx, type)
+      {
+         short_path = true; // as in action_data_to_variant_context
+         limit_to_one_action();
+      }
    };
 
    /// limits the string size to default max_length of output_name
@@ -841,8 +872,7 @@ namespace impl {
                   const abi_serializer& abi = *abi_optional;
                   auto type = abi.get_action_type(act.name);
                   if (!type.empty()) {
-                     variant_to_binary_context _ctx(abi, ctx, type);
-                     _ctx.short_path = true; // Just to be safe while avoiding the complexity of threading an override boolean all over the place
+                     action_data_to_binary_context _ctx(abi, ctx, type);
                      act.data = abi._variant_to_binary( type, data, _ctx );
                      valid_empty_data = act.data.empty();
                   }
@@ -1002,14 +1032,19 @@ void abi_serializer::to_log_variant( const T& o, fc::variant& vo, const Resolver
 } FC_RETHROW_EXCEPTIONS(error, "Failed to serialize: {}", boost::core::demangle( typeid(o).name() ))
 
 template<typename T, typename Resolver>
-void abi_serializer::from_variant( const fc::variant& v, T& o, const Resolver& resolver, const yield_function_t& yield ) try {
-   impl::abi_traverse_context ctx( yield, fc::microseconds{} );
-   impl::abi_from_variant::extract(v, o, resolver, ctx);
-} FC_RETHROW_EXCEPTIONS(error, "Failed to deserialize variant {}", fc::json::to_log_string(v))
+void abi_serializer::from_variant( const fc::variant& v, T& o, const Resolver& resolver, const yield_function_t& yield ) {
+   from_variant( v, o, resolver, yield, fc::microseconds{} );
+}
 
 template<typename T, typename Resolver>
-void abi_serializer::from_variant( const fc::variant& v, T& o, const Resolver& resolver, const fc::microseconds& max_action_data_serialization_time ) try {
-   impl::abi_traverse_context ctx( create_depth_yield_function(), max_action_data_serialization_time );
+void abi_serializer::from_variant( const fc::variant& v, T& o, const Resolver& resolver, const fc::microseconds& max_action_data_serialization_time ) {
+   from_variant( v, o, resolver, create_depth_yield_function(), max_action_data_serialization_time );
+}
+
+template<typename T, typename Resolver>
+void abi_serializer::from_variant( const fc::variant& v, T& o, const Resolver& resolver, const yield_function_t& yield,
+                                   const fc::microseconds& max_action_data_serialization_time ) try {
+   impl::abi_traverse_context ctx( yield, max_action_data_serialization_time );
    impl::abi_from_variant::extract(v, o, resolver, ctx);
 } FC_RETHROW_EXCEPTIONS(error, "Failed to deserialize variant {}", fc::json::to_log_string(v))
 

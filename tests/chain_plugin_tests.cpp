@@ -419,4 +419,55 @@ BOOST_FIXTURE_TEST_CASE( permission_satisfies_link_follows_linkauth, validating_
    BOOST_CHECK(!permission_satisfies_link(*control, {"alice"_n, "nosuch"_n}, "bob"_n, "accept"_n));
 } FC_LOG_AND_RETHROW()
 
+/// Packing a pushed transaction runs under the request deadline: past it, the push fails before reaching the node.
+BOOST_FIXTURE_TEST_CASE( push_transaction_honors_request_deadline, validating_tester ) try {
+   signed_transaction trx;
+   trx.actions.emplace_back(std::vector<permission_level>{{config::system_account_name, config::active_name}},
+                            config::system_account_name, "noop"_n, bytes{});
+   set_transaction_headers(trx);
+   const fc::variant params{packed_transaction(trx)};
+
+   std::optional<chain_apis::trx_retry_db> no_retry;
+   chain_apis::read_write expired(*control, no_retry, fc::microseconds::maximum(), fc::microseconds(0), true);
+   using results_t = chain_apis::read_write::push_transaction_results;
+   std::optional<next_function_variant<results_t>> refused;
+   expired.push_transaction(params.get_object(), [&refused](next_function_variant<results_t>&& result) {
+      refused = std::move(result);
+   });
+   BOOST_REQUIRE(refused);
+   BOOST_REQUIRE(std::holds_alternative<fc::exception_ptr>(*refused));
+   BOOST_CHECK_EQUAL(std::get<fc::exception_ptr>(*refused)->code(), abi_serialization_deadline_exception::code_value);
+} FC_LOG_AND_RETHROW()
+
+/// get_required_keys packs its transaction under the request deadline as well as the per-action limit: past the
+/// deadline it fails before returning keys.
+BOOST_FIXTURE_TEST_CASE( get_required_keys_honors_request_deadline, validating_tester ) try {
+   create_accounts({"asserter"_n});
+   set_code("asserter"_n, test_contracts::asserter_wasm());
+   set_abi("asserter"_n, test_contracts::asserter_abi());
+   produce_block();
+
+   signed_transaction trx;
+   trx.actions.emplace_back(std::vector<permission_level>{{"asserter"_n, config::active_name}}, "asserter"_n,
+                            "procassert"_n, fc::raw::pack(int8_t{1}, std::string("fine")));
+   set_transaction_headers(trx);
+   fc::variant trx_var;
+   abi_serializer::to_variant(trx, trx_var, get_resolver(), abi_serializer_max_time);
+   BOOST_REQUIRE(trx_var["actions"][size_t(0)]["data"].is_object());
+
+   const public_key_type key = get_public_key("asserter"_n, "active");
+   const chain_apis::read_only::get_required_keys_params params{trx_var, {key}};
+   std::optional<chain_apis::tracked_votes> tracked_votes;
+
+   chain_apis::read_only unlimited(*control, {}, {}, tracked_votes, fc::microseconds::maximum(),
+                                   fc::microseconds::maximum(), nullptr);
+   BOOST_CHECK(unlimited.get_required_keys(params, fc::time_point::maximum()).required_keys ==
+               flat_set<public_key_type>{key});
+
+   chain_apis::read_only expired(*control, {}, {}, tracked_votes, fc::microseconds::maximum(), fc::microseconds(0),
+                                 nullptr);
+   BOOST_CHECK_THROW(expired.get_required_keys(params, fc::time_point::maximum()),
+                     abi_serialization_deadline_exception);
+} FC_LOG_AND_RETHROW()
+
 BOOST_AUTO_TEST_SUITE_END()

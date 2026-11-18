@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <array>
 #include <limits>
+#include <numeric>
 #include <optional>
 
 namespace sysio::chain {
@@ -233,6 +234,7 @@ namespace sysio::chain {
 
       typedefs.clear();
       structs.clear();
+      struct_fields_by_name.clear();
       actions.clear();
       tables.clear();
       error_messages.clear();
@@ -301,6 +303,39 @@ namespace sysio::chain {
       }
 
       validate(ctx);
+      index_struct_fields(ctx);
+   }
+
+   void abi_serializer::index_struct_fields( impl::abi_traverse_context& ctx ) {
+      for( const auto& [name, st] : structs ) {
+         ctx.check_deadline();
+         vector<uint32_t> order( st.fields.size() );
+         std::iota( order.begin(), order.end(), uint32_t{0} );
+         std::ranges::stable_sort( order, {}, [&fields = st.fields]( uint32_t i ) -> std::string_view {
+            return fields[i].name;
+         } );
+         struct_fields_by_name.emplace( name, std::move(order) );
+      }
+   }
+
+   std::vector<const fc::variant*> abi_serializer::struct_field_values( const struct_def& st,
+                                                                        const fc::variant_object& vo )const {
+      const auto order_itr = struct_fields_by_name.find( st.name );
+      SYS_ASSERT( order_itr != struct_fields_by_name.end(), abi_exception,
+                  "invariant failure: struct '{}' has no field index", impl::limit_size(st.name) );
+      const vector<uint32_t>& order = order_itr->second;
+      const auto field_name_of = [&fields = st.fields]( uint32_t i ) -> std::string_view { return fields[i].name; };
+
+      std::vector<const fc::variant*> values( st.fields.size(), nullptr );
+      for( const auto& entry : vo ) {
+         const std::string_view key = entry.key();
+         for( auto itr = std::ranges::lower_bound( order, key, {}, field_name_of );
+              itr != order.end() && field_name_of( *itr ) == key; ++itr ) {
+            if( values[*itr] == nullptr )
+               values[*itr] = &entry.value();
+         }
+      }
+      return values;
    }
 
    void abi_serializer::set_abi(const abi_def& abi, const fc::microseconds& max_serialization_time) {
@@ -815,10 +850,12 @@ namespace sysio::chain {
                auto h2 = ctx.disallow_extensions_unless(false);
                _variant_to_binary(resolve_type(st.base), var, ds, ctx);
             }
+            const std::vector<const fc::variant*> values = struct_field_values( st, vo );
+            const fc::variant absent;
             bool disallow_additional_fields = false;
             for( uint32_t i = 0; i < st.fields.size(); ++i ) {
                const auto& field = st.fields[i];
-               bool present = vo.contains(string(field.name).c_str());
+               bool present = values[i] != nullptr;
                if( present || is_optional(field.type) ) {
                   if( disallow_additional_fields )
                      SYS_THROW( pack_exception, "Unexpected field '{}' found in input object while processing struct '{}'",
@@ -826,7 +863,7 @@ namespace sysio::chain {
                   {
                      auto h1 = ctx.push_to_path( impl::field_path_item{ .parent_struct_itr = s_itr, .field_ordinal = i } );
                      auto h2 = ctx.disallow_extensions_unless( &field == &st.fields.back() );
-                     _variant_to_binary(_remove_bin_extension(field.type), present ? vo[field.name] : fc::variant(nullptr), ds, ctx);
+                     _variant_to_binary(_remove_bin_extension(field.type), present ? *values[i] : absent, ds, ctx);
                   }
                } else if( field.type.ends_with("$") && ctx.extensions_allowed() ) {
                   disallow_additional_fields = true;
@@ -936,6 +973,17 @@ namespace sysio::chain {
          yield( recursion_depth );
 
          return {std::move(callback)};
+      }
+
+      void abi_traverse_context::limit_to_one_action() {
+         if( max_action_serialization_time.count() <= 0 )
+            return;
+         const fc::time_point deadline = fc::time_point::now().safe_add( max_action_serialization_time );
+         yield = [deadline, y = yield, max = max_action_serialization_time]( size_t depth ) {
+            y( depth ); // the provided yield, which may bound the whole conversion
+            SYS_ASSERT( fc::time_point::now() < deadline, abi_serialization_deadline_exception,
+                        "serialization action data time limit {}us exceeded", max );
+         };
       }
 
       void abi_traverse_context_with_path::set_path_root( const std::string_view& type ) {

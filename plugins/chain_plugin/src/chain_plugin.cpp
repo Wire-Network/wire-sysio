@@ -3788,7 +3788,9 @@ void read_write::push_transaction(const read_write::push_transaction_params& par
       auto ptrx = std::make_shared<packed_transaction>();
       auto resolver = caching_resolver(make_resolver(db, abi_serializer_max_time, throw_on_yield::yes));
       try {
-         abi_serializer::from_variant(params, *ptrx, resolver, abi_serializer_max_time);
+         abi_serializer::from_variant(params, *ptrx, resolver,
+                                      abi_serializer::create_yield_function(http_max_response_time),
+                                      abi_serializer_max_time);
       } SYS_RETHROW_EXCEPTIONS(chain::packed_transaction_type_exception, "Invalid packed transaction")
       ptrx->decompress();
 
@@ -3913,7 +3915,9 @@ void api_base::send_transaction_gen(API &api, send_transaction_params_t params, 
       auto ptrx = std::make_shared<packed_transaction>();
       auto resolver = caching_resolver(make_resolver(api.db, api.abi_serializer_max_time, throw_on_yield::yes));
       try {
-         abi_serializer::from_variant(params.transaction, *ptrx, resolver, api.abi_serializer_max_time);
+         abi_serializer::from_variant(params.transaction, *ptrx, resolver,
+                                      abi_serializer::create_yield_function(api.http_max_response_time),
+                                      api.abi_serializer_max_time);
       } SYS_RETHROW_EXCEPTIONS(packed_transaction_type_exception, "Invalid packed transaction")
       ptrx->decompress();
 
@@ -4265,7 +4269,9 @@ read_only::get_required_keys_result read_only::get_required_keys( const get_requ
    transaction pretty_input;
    auto resolver = caching_resolver(make_resolver(db, abi_serializer_max_time, throw_on_yield::yes));
    try {
-      abi_serializer::from_variant(params.transaction, pretty_input, resolver, abi_serializer_max_time);
+      abi_serializer::from_variant(params.transaction, pretty_input, resolver,
+                                   abi_serializer::create_yield_function(http_max_response_time),
+                                   abi_serializer_max_time);
    } SYS_RETHROW_EXCEPTIONS(chain::transaction_type_exception, "Invalid transaction")
 
    SYS_ASSERT( pretty_input.delay_sec.value == 0, chain::transaction_type_exception, "delay_sec must be 0");

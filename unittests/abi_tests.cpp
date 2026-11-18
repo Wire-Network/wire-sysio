@@ -4729,4 +4729,134 @@ BOOST_AUTO_TEST_CASE(abi_serializer_long_table_name) { try {
 
 } FC_LOG_AND_RETHROW() }
 
+/// ABI with an action whose data is an array of structs, so packing it yields once per element.
+static const char* bulk_action_abi = R"=====(
+{
+   "version": "sysio::abi/1.0",
+   "structs": [
+      {"name": "item", "base": "", "fields": [{"name": "v", "type": "uint16"}]},
+      {"name": "bulk", "base": "", "fields": [{"name": "items", "type": "item[]"}]}
+   ],
+   "actions": [{"name": "bulk", "type": "bulk", "ricardian_contract": ""}],
+   "action_results": [{"name": "bulk", "result_type": "uint16"}]
+}
+)=====";
+
+/// A transaction variant holding `action_count` bulk actions, each with `item_count` items in its data object.
+static fc::variant bulk_transaction(uint32_t action_count, uint32_t item_count) {
+   fc::variants items;
+   for (uint32_t i = 0; i < item_count; ++i)
+      items.emplace_back(fc::mutable_variant_object()("v", i));
+   fc::variants actions;
+   for (uint32_t i = 0; i < action_count; ++i)
+      actions.emplace_back(fc::mutable_variant_object()
+                              ("account", "bulkacct")
+                              ("name", "bulk")
+                              ("authorization", fc::variants{})
+                              ("data", fc::mutable_variant_object()("items", items)));
+   return fc::mutable_variant_object()("actions", std::move(actions));
+}
+
+/// Packing one action's data from JSON stops at the per-action time limit, as decoding it does. It throws rather
+/// than return partial data.
+BOOST_AUTO_TEST_CASE(action_data_to_binary_honors_per_action_limit)
+{ try {
+   const abi_def abi = fc::json::from_string(bulk_action_abi).as<abi_def>();
+   constexpr uint32_t item_count = 10000;
+   const fc::variant input = bulk_transaction(1, item_count);
+
+   signed_transaction packed;
+   abi_serializer::from_variant(input, packed, get_resolver(abi), fc::microseconds::maximum());
+   BOOST_REQUIRE_EQUAL(packed.actions.size(), 1u);
+   BOOST_CHECK_EQUAL(packed.actions[0].data.size(),
+                     fc::raw::pack_size(fc::unsigned_int(item_count)) + item_count * sizeof(uint16_t));
+
+   signed_transaction limited;
+   BOOST_CHECK_THROW(abi_serializer::from_variant(input, limited, get_resolver(abi), fc::microseconds(1)),
+                     abi_serialization_deadline_exception);
+} FC_LOG_AND_RETHROW() }
+
+/// A yield bounding the whole conversion, such as a request deadline, applies alongside the per-action limit.
+BOOST_AUTO_TEST_CASE(from_variant_honors_request_deadline)
+{ try {
+   const abi_def     abi   = fc::json::from_string(bulk_action_abi).as<abi_def>();
+   const fc::variant input = bulk_transaction(2, 1000);
+
+   signed_transaction packed;
+   abi_serializer::from_variant(input, packed, get_resolver(abi),
+                                abi_serializer::create_yield_function(fc::microseconds::maximum()),
+                                fc::microseconds::maximum());
+   BOOST_CHECK_EQUAL(packed.actions.size(), 2u);
+
+   signed_transaction expired;
+   BOOST_CHECK_THROW(abi_serializer::from_variant(input, expired, get_resolver(abi),
+                                                  abi_serializer::create_yield_function(fc::microseconds(0)),
+                                                  fc::microseconds::maximum()),
+                     abi_serialization_deadline_exception);
+
+   signed_transaction per_action;
+   BOOST_CHECK_THROW(abi_serializer::from_variant(input, per_action, get_resolver(abi),
+                                                  abi_serializer::create_yield_function(fc::microseconds::maximum()),
+                                                  fc::microseconds(1)),
+                     abi_serialization_deadline_exception);
+} FC_LOG_AND_RETHROW() }
+
+/// A struct field takes the first occurrence of its key in the input object: later duplicates, unknown keys and key
+/// order do not matter, and a field name a struct declares twice takes that value both times.
+BOOST_AUTO_TEST_CASE(variant_to_binary_first_key_occurrence_wins)
+{ try {
+   abi_serializer abis(fc::json::from_string(R"=====(
+   {
+      "version": "sysio::abi/1.0",
+      "structs": [
+         {"name": "pair", "base": "", "fields": [{"name": "a", "type": "uint8"}, {"name": "b", "type": "uint8"}]},
+         {"name": "twice", "base": "", "fields": [{"name": "a", "type": "uint8"}, {"name": "a", "type": "uint16"}]},
+         {"name": "child", "base": "pair", "fields": [{"name": "c", "type": "uint8"}]},
+         {"name": "maybe", "base": "", "fields": [{"name": "a", "type": "uint8?"}, {"name": "b", "type": "uint8"}]}
+      ]
+   }
+   )=====").as<abi_def>(), yield_fn());
+
+   const auto pack = [&](std::string_view type, std::string_view json) {
+      return fc::to_hex(abis.variant_to_binary(type, fc::json::from_string(std::string(json)), yield_fn()));
+   };
+   BOOST_CHECK_EQUAL(pack("pair", R"({"a":1,"b":2,"a":3})"), "0102");
+   BOOST_CHECK_EQUAL(pack("pair", R"({"junk":9,"b":2,"a":1,"b":7})"), "0102");
+   BOOST_CHECK_EQUAL(pack("twice", R"({"a":5})"), "050500");
+   BOOST_CHECK_EQUAL(pack("child", R"({"c":3,"b":2,"a":1,"a":7,"c":8})"), "010203");
+   BOOST_CHECK_EQUAL(pack("maybe", R"({"b":4})"), "0004");
+   BOOST_CHECK_EQUAL(pack("maybe", R"({"b":4,"a":6,"a":null})"), "010604");
+   BOOST_CHECK_THROW(pack("pair", R"({"b":2,"junk":1})"), pack_exception);
+} FC_LOG_AND_RETHROW() }
+
+/// Packing a struct from an object costs time linear in the object's keys, not fields times keys: a wide struct
+/// packs from an object led by many unknown keys well within a generous limit.
+BOOST_AUTO_TEST_CASE(variant_to_binary_scales_with_object_keys)
+{ try {
+   constexpr uint32_t field_count   = 2000;
+   constexpr uint32_t unknown_count = 50000;
+   constexpr uint32_t byte_values   = 256;
+
+   abi_def abi;
+   abi.version = "sysio::abi/1.0";
+   struct_def wide("wide", "", {});
+   for (uint32_t i = 0; i < field_count; ++i)
+      wide.fields.emplace_back("f" + std::to_string(i), "uint8");
+   abi.structs.push_back(std::move(wide));
+   abi_serializer abis(std::move(abi), yield_fn());
+
+   fc::mutable_variant_object input;
+   for (uint32_t i = 0; i < unknown_count; ++i)
+      input("unknown" + std::to_string(i), 0);
+   for (uint32_t i = field_count; i-- > 0;)
+      input("f" + std::to_string(i), i % byte_values);
+
+   bytes packed;
+   BOOST_REQUIRE_NO_THROW(packed = abis.variant_to_binary("wide", fc::variant(std::move(input)),
+                                                          abi_serializer::create_yield_function(fc::seconds(1))));
+   BOOST_REQUIRE_EQUAL(packed.size(), field_count);
+   for (uint32_t i = 0; i < field_count; ++i)
+      BOOST_REQUIRE_EQUAL(static_cast<uint8_t>(packed[i]), i % byte_values);
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_SUITE_END()
