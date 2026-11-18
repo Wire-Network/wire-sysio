@@ -12,6 +12,9 @@ WebAssembly spec.
     - Tests are split up into `sub_apply` functions based on the rules defined below.
     - An `apply` function is written that switches on the third parameter to decide which `sub_apply` function to run.
     - A map of the function name and the index in order is created to be used for merging.
+    - `f32`/`f64` results are checked by exact bit pattern. `assert_return_canonical_nan` and
+      `assert_return_arithmetic_nan` results are checked against the spec's NaN class masks, except the pinned cases
+      under Known Issues.
 3. Unit Tests are generated based on the rules below.
 4. The generated C++ files are compiled and linked, without optimizations to prevent the empty functions from being optimized out.
 5. The generated WASM is combined with the original test wasm.
@@ -35,7 +38,14 @@ WebAssembly spec.
 
 
 ### How to generate tests
-- Run the `setup_sysio_tests.py` script with no options to see the help text.
+- Run the `setup_sysio_tests.py` script with no options to see the help text. It runs the generator from
+  `build/generator/sysio_test_generator` under this directory (`cmake -S generator -B build/generator && cmake --build
+  build/generator`) and needs the CDT tools on `PATH`.
+- Inputs: the `<suite>.json` files and module wasms that `wast2json` from WABT 1.0.12 writes for that release's
+  `third_party/testsuite`. They match `EOSIO/eos-vm-test-wasms` byte for byte. Later `wast2json` releases write NaN
+  expectations as `assert_return` values (`nan:canonical`), which the generator does not read.
+- Modules in `generator/altered-wasms/` are copied unchanged. When the generated code of one changes, rebuild it from
+  the spec module with the edits described in its `notes.md`.
 
 
 ### Known Issues
@@ -54,3 +64,9 @@ WebAssembly spec.
 - globals.14 -- Delete from generated tests or it segfaults due to missing wasm.
     - Imports "global_i32" from "spectest".
         - Unclear what an appropriate substition would be.
+
+- f32/f64 `min`, `max`, `floor`, `ceil`, `trunc`, `nearest` -- return a NaN operand unchanged, so a signaling NaN stays
+  signaling where the spec requires an arithmetic NaN.
+    - The generator pins that result for these `assert_return_arithmetic_nan` cases, so a change to it in
+      `libraries/sys-vm/include/sysio/vm/softfloat.hpp` (interpreter, JIT) or
+      `libraries/chain/webassembly/softfloat.cpp` (OC) fails the tests.
