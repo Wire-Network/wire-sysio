@@ -499,6 +499,10 @@ public:
       flat_set<public_key_type> required_keys;
    };
 
+   /**
+    * The keys among `available_keys` that satisfy the authorizations the transaction declares.
+    * @throws chain::deadline_exception once `deadline` passes while the authorizations are evaluated
+    */
    get_required_keys_result get_required_keys( const get_required_keys_params& params, const fc::time_point& deadline)const;
 
    using get_transaction_id_params = transaction;

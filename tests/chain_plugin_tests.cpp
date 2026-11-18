@@ -422,6 +422,80 @@ BOOST_FIXTURE_TEST_CASE( permission_satisfies_link_follows_linkauth, validating_
    BOOST_CHECK(!permission_satisfies_link(*control, {"alice"_n, "nosuch"_n}, "bob"_n, "accept"_n));
 } FC_LOG_AND_RETHROW()
 
+/// get_required_keys returns the keys of every declared permission however often and in whatever order actions
+/// declare them, applies the payer rules to each action on its own, and stops at the request deadline.
+BOOST_FIXTURE_TEST_CASE( get_required_keys_duplicate_declarations, validating_tester ) try {
+   produce_block();
+   create_accounts({"alice"_n, "bob"_n}, false, false);
+   produce_block();
+
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   chain_apis::read_only plugin(*control, {}, {}, _tracked_votes, fc::microseconds::maximum(),
+                                fc::microseconds::maximum(), nullptr);
+   const fc::time_point no_deadline = fc::time_point::maximum();
+
+   const public_key_type alice_key = get_public_key("alice"_n, "active");
+   const public_key_type bob_key   = get_public_key("bob"_n, "active");
+   const public_key_type bob_owner = get_public_key("bob"_n, "owner");
+   const public_key_type unrelated = get_public_key("nobody"_n, "active");
+   const flat_set<public_key_type> all_keys{alice_key, bob_key, bob_owner, unrelated};
+
+   const permission_level alice{"alice"_n, config::active_name};
+   const permission_level bob{"bob"_n, config::active_name};
+   const permission_level bob_as_owner{"bob"_n, config::owner_name};
+   const permission_level bob_payer{"bob"_n, config::sysio_payer_name};
+
+   using declarations = std::vector<std::vector<permission_level>>;
+   const auto request = [&](const declarations& actions, const flat_set<public_key_type>& available) {
+      signed_transaction trx;
+      set_transaction_headers(trx);
+      for (const std::vector<permission_level>& authorization : actions)
+         trx.actions.emplace_back(authorization, "alice"_n, "doit"_n, bytes{});
+      return chain_apis::read_only::get_required_keys_params{fc::variant(trx), available};
+   };
+   const auto required_keys = [&](const declarations& actions) {
+      return plugin.get_required_keys(request(actions, all_keys), no_deadline).required_keys;
+   };
+   /// `copies` actions, alternating between the two authorization lists.
+   const auto repeated = [](uint32_t copies, const std::vector<permission_level>& even,
+                            const std::vector<permission_level>& odd) {
+      declarations actions;
+      for (uint32_t i = 0; i < copies; ++i)
+         actions.push_back(i % 2 == 0 ? even : odd);
+      return actions;
+   };
+   constexpr uint32_t many = 2000;
+
+   BOOST_CHECK(required_keys({{alice}}) == (flat_set<public_key_type>{alice_key}));
+   BOOST_CHECK(required_keys({{bob}}) == (flat_set<public_key_type>{bob_key}));
+   BOOST_CHECK(required_keys({{bob_as_owner}}) == (flat_set<public_key_type>{bob_owner}));
+
+   // Duplicates within and across actions, in either order, require each key once.
+   const flat_set<public_key_type> alice_and_bob{alice_key, bob_key};
+   BOOST_CHECK(required_keys({{alice, bob, alice}}) == alice_and_bob);
+   BOOST_CHECK(required_keys(repeated(many, {alice, bob}, {bob, alice})) == alice_and_bob);
+   BOOST_CHECK(required_keys(repeated(many, {bob}, {alice, bob_as_owner})) ==
+              (flat_set<public_key_type>{alice_key, bob_key, bob_owner}));
+
+   // A payer marker needs no key of its own; its pairing is checked on every action.
+   BOOST_CHECK(required_keys({{bob_payer, bob}}) == (flat_set<public_key_type>{bob_key}));
+   BOOST_CHECK(required_keys(repeated(many, {bob_payer, bob}, {alice})) == alice_and_bob);
+   BOOST_CHECK_THROW(required_keys({{bob_payer, alice}, {bob}}), unsatisfied_authorization);
+   BOOST_CHECK_THROW(required_keys(repeated(many, {bob_payer, bob}, {bob_payer, alice})), unsatisfied_authorization);
+   BOOST_CHECK_THROW(required_keys({{alice, bob_payer, bob}}), irrelevant_auth_exception);
+   BOOST_CHECK_THROW(required_keys({{bob_payer, bob_payer, bob}}), irrelevant_auth_exception);
+
+   // A permission the available keys cannot satisfy fails however many times it is declared.
+   BOOST_CHECK_THROW(plugin.get_required_keys(request(repeated(many, {alice}, {bob}), {alice_key}), no_deadline),
+                     unsatisfied_authorization);
+
+   // A deadline already passed stops the request.
+   const fc::time_point passed = fc::time_point::now() - fc::microseconds(1);
+   BOOST_CHECK_THROW(plugin.get_required_keys(request({{alice}}, all_keys), passed), deadline_exception);
+   BOOST_CHECK_THROW(plugin.get_required_keys(request(repeated(many, {alice}, {bob}), all_keys), passed),
+                     deadline_exception);
+} FC_LOG_AND_RETHROW()
+
 /// get_transaction_id reads each action from `hex_data` when it also has `data`, rejects malformed requests, and
 /// converts a request in time proportional to its size.
 BOOST_AUTO_TEST_CASE( get_transaction_id_many_actions ) try {

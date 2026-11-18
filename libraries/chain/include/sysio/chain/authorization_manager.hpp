@@ -101,8 +101,23 @@ namespace sysio { namespace chain {
                               bool                                 allow_unused_keys = false
                             )const;
 
+         /**
+          *  @brief The keys among `candidate_keys` that satisfy the authorizations `trx` declares
+          *
+          *  Each distinct declared permission is evaluated once, however many actions declare it. The explicit payer
+          *  rules are checked on each action.
+          *
+          *  @param trx - the transaction whose declared authorizations are evaluated
+          *  @param candidate_keys - the keys that may be used
+          *  @param checktime - called before each declared authorization is checked and each permission is evaluated;
+          *                     it throws to stop the evaluation
+          *  @throws irrelevant_auth_exception when an action declares more than one payer or a payer that is not first
+          *  @throws unsatisfied_authorization when a payer is not paired with a permission of the same actor on its
+          *          action, or `candidate_keys` cannot satisfy a declared permission
+          */
          flat_set<public_key_type> get_required_keys( const transaction& trx,
-                                                      const flat_set<public_key_type>& candidate_keys
+                                                      const flat_set<public_key_type>& candidate_keys,
+                                                      const std::function<void()>& checktime = std::function<void()>()
                                                     )const;
 
 
