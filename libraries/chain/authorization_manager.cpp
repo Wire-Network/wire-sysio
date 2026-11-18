@@ -540,7 +540,7 @@ namespace sysio { namespace chain {
       // The permission_levels are traversed in ascending order, which is:
       // ascending order of the actor name with ties broken by ascending order of the permission name.
       for( const auto& p : permissions_to_satisfy ) {
-         checktime(); // TODO: this should eventually move into authority_checker instead
+         checktime();
          SYS_ASSERT( checker.satisfied( p ) || check_but_dont_fail, unsatisfied_authorization,
                      "transaction declares authority '{}', "
                      "but does not have signatures for it, "
