@@ -1352,6 +1352,124 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( import_signature, T, validating_testers ) try {
    chain.produce_block();
 } FC_LOG_AND_RETHROW()
 
+namespace {
+
+/// Parameter count of the callee of `make_unreachable_wide_calls_wasm`.
+constexpr uint32_t wide_callee_param_count = 1u << 17;
+/// Number of calls `make_unreachable_wide_calls_wasm` makes to that callee in unreachable code.
+constexpr uint32_t wide_callee_call_count = 1u << 17;
+/// Upper bound on one validation of that module when each call costs constant time.
+constexpr fc::microseconds unreachable_wide_calls_time_limit = fc::seconds(5);
+
+/// Appends `value` to `out` as unsigned LEB128.
+void append_varuint32(std::vector<uint8_t>& out, uint32_t value) {
+   constexpr uint32_t payload_bits = 7;
+   constexpr uint8_t  payload_mask = 0x7f;
+   constexpr uint8_t  continuation = 0x80;
+   do {
+      uint8_t byte = value & payload_mask;
+      value >>= payload_bits;
+      if (value != 0)
+         byte |= continuation;
+      out.push_back(byte);
+   } while (value != 0);
+}
+
+/// Appends a section with identifier `id` holding `contents` to `out`.
+void append_section(std::vector<uint8_t>& out, uint8_t id, const std::vector<uint8_t>& contents) {
+   out.push_back(id);
+   append_varuint32(out, contents.size());
+   out.insert(out.end(), contents.begin(), contents.end());
+}
+
+/// Builds a contract whose `apply` executes `unreachable`, then calls a function taking `wide_callee_param_count` i32
+/// parameters `wide_callee_call_count` times.
+std::vector<uint8_t> make_unreachable_wide_calls_wasm() {
+   constexpr uint8_t type_section_id     = 1;
+   constexpr uint8_t function_section_id = 3;
+   constexpr uint8_t export_section_id   = 7;
+   constexpr uint8_t code_section_id     = 10;
+   constexpr uint8_t func_type_form      = 0x60;
+   constexpr uint8_t i32_type            = 0x7f;
+   constexpr uint8_t i64_type            = 0x7e;
+   constexpr uint8_t no_result           = 0x00;
+   constexpr uint8_t export_kind_func    = 0x00;
+   constexpr uint8_t no_locals           = 0x00;
+   constexpr uint8_t op_unreachable      = 0x00;
+   constexpr uint8_t op_end              = 0x0b;
+   constexpr uint8_t op_call             = 0x10;
+   constexpr uint8_t apply_type          = 0;
+   constexpr uint8_t wide_type           = 1;
+   constexpr uint8_t wide_callee         = 0;
+   constexpr uint8_t apply_function      = 1;
+   constexpr std::string_view apply_name = "apply";
+
+   std::vector<uint8_t> wasm = { 0x00, 'a', 's', 'm', 0x01, 0x00, 0x00, 0x00 };
+
+   // type 0: (i64, i64, i64) -> (); type 1: (i32 x wide_callee_param_count) -> ()
+   std::vector<uint8_t> types = { 2, func_type_form, 3, i64_type, i64_type, i64_type, no_result, func_type_form };
+   append_varuint32(types, wide_callee_param_count);
+   types.insert(types.end(), wide_callee_param_count, i32_type);
+   types.push_back(no_result);
+   append_section(wasm, type_section_id, types);
+
+   // function 0: the wide callee; function 1: apply
+   append_section(wasm, function_section_id, { 2, wide_type, apply_type });
+
+   std::vector<uint8_t> exports = { 1, static_cast<uint8_t>(apply_name.size()) };
+   exports.insert(exports.end(), apply_name.begin(), apply_name.end());
+   exports.push_back(export_kind_func);
+   exports.push_back(apply_function);
+   append_section(wasm, export_section_id, exports);
+
+   const std::vector<uint8_t> callee_body = { no_locals, op_unreachable, op_end };
+   std::vector<uint8_t> apply_body = { no_locals, op_unreachable };
+   for (uint32_t i = 0; i < wide_callee_call_count; ++i) {
+      apply_body.push_back(op_call);
+      apply_body.push_back(wide_callee);
+   }
+   apply_body.push_back(op_end);
+
+   std::vector<uint8_t> code = { 2 };
+   append_varuint32(code, callee_body.size());
+   code.insert(code.end(), callee_body.begin(), callee_body.end());
+   append_varuint32(code, apply_body.size());
+   code.insert(code.end(), apply_body.begin(), apply_body.end());
+   append_section(wasm, code_section_id, code);
+
+   return wasm;
+}
+
+} // namespace
+
+// Validating a call in unreachable code takes constant time whatever the callee's parameter count
+BOOST_AUTO_TEST_CASE_TEMPLATE( unreachable_wide_calls, T, validating_testers ) try {
+   T chain;
+
+   chain.produce_block();
+   chain.create_accounts( {"widecalls"_n} );
+   chain.produce_block();
+
+   const std::vector<uint8_t> wasm = make_unreachable_wide_calls_wasm();
+
+   const fc::time_point setcode_start = fc::time_point::now();
+   chain.set_code("widecalls"_n, wasm);
+   const fc::microseconds setcode_elapsed = fc::time_point::now() - setcode_start;
+   BOOST_CHECK_LT(setcode_elapsed.count(), unreachable_wide_calls_time_limit.count());
+
+   // The validating node validates the module again when it applies the block
+   const fc::time_point block_start = fc::time_point::now();
+   chain.produce_block();
+   const fc::microseconds block_elapsed = fc::time_point::now() - block_start;
+   BOOST_CHECK_LT(block_elapsed.count(), unreachable_wide_calls_time_limit.count());
+
+   const account_metadata_object& metadata =
+      chain.control->db().template get<account_metadata_object, by_name>("widecalls"_n);
+   const fc::sha256 code_hash =
+      fc::sha256::hash(reinterpret_cast<const char*>(wasm.data()), static_cast<uint32_t>(wasm.size()));
+   BOOST_CHECK_EQUAL(metadata.code_hash, code_hash);
+} FC_LOG_AND_RETHROW()
+
 BOOST_AUTO_TEST_CASE_TEMPLATE( mem_growth_memset, T, validating_testers ) try {
    T chain;
 
