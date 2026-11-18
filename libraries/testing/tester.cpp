@@ -36,6 +36,11 @@ namespace {
    constexpr std::string_view kv_engine_map      = "map";
    constexpr auto             state_file_name    = "shared_memory.bin";
 
+   /// RAM NODE_DADDY self-issues at bootstrap. An issuer pays for its policy rows, and a tier-1 owner's personal RAM
+   /// covers 40 of them, fewer than many tests issue with the default account policy.
+   constexpr std::string_view node_daddy_self_funded_ram = "0.1000 SYS";
+   constexpr std::string_view zero_sys                   = "0.0000 SYS";
+
 } // namespace
 
    kv_engine default_kv_engine() {
@@ -1358,6 +1363,8 @@ namespace {
       // Setup default node daddy for easier resource allocation during testing
       create_account(NODE_DADDY, sysio::chain::config::system_account_name, false, false, false, false);
       register_node_owner(NODE_DADDY, 1);
+      expand_roa_policy(NODE_DADDY, NODE_DADDY, std::string(zero_sys), std::string(zero_sys),
+                        std::string(node_daddy_self_funded_ram), 0);
       has_roa = true;
    }
 

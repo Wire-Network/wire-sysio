@@ -180,6 +180,17 @@ fc::uint256 parse_rpc_quantity(const fc::variant& value, std::string_view field)
    return fc::uint256(fc::from_hex(encoded));
 }
 
+fc::uint256 parse_rpc_quantity(const fc::variant& value, std::string_view field, const fc::uint256& maximum) {
+   fc::uint256 parsed = parse_rpc_quantity(value, field);
+   if (parsed > maximum) {
+      throw_transaction_policy_exception(ethereum_transaction_policy_reason::rpc_quantity_out_of_range,
+                                         field,
+                                         diagnostic_value(value.as_string()),
+                                         format_rpc_quantity(maximum));
+   }
+   return parsed;
+}
+
 std::string format_rpc_quantity(const fc::uint256& value) {
    return std::string(hex_quantity_prefix) + value.str(0, std::ios_base::hex);
 }

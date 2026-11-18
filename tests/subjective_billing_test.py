@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import math
 import time
 import random
 import re
@@ -22,10 +23,19 @@ SUBJECTIVE_CPU_ALLOWED_US = 2000
 SUBJECTIVE_NET_ALLOWED_BYTES = 512
 # Bound on the transfers pushed to exhaust node 2's budget and land in blocks of both producers.
 MAX_STICKY_TRANSFERS = 60
+# Node 2's charges decay linearly to zero over this window, the default.
+SUBJECTIVE_DECAY_WINDOW_SEC = 24 * 60 * 60
 # A 24 h decay window loses well under 1% of a charge over the minutes this test runs.
 DECAY_TOLERANCE = 0.99
+# Lets node 3's one-minute decay window pass.
+FAST_DECAY_WAIT_SEC = 72
 # A node reloads the accounts chain state exempts every 120 irreversible blocks, which is one minute.
 EXEMPT_RELOAD_TIMEOUT_SEC = 120
+# Bounds the time from charging account3 to the exempt-list check: both waits, and a minute for the calls around them.
+CHARGE_TO_EXEMPT_CHECK_SEC = FAST_DECAY_WAIT_SEC + EXEMPT_RELOAD_TIMEOUT_SEC + 60
+# account3 is charged past node 2's budget by more than a bill of that size decays before the exempt-list check.
+SUBJECTIVE_CPU_MARGIN_US = math.ceil(SUBJECTIVE_CPU_ALLOWED_US * CHARGE_TO_EXEMPT_CHECK_SEC
+                                     / SUBJECTIVE_DECAY_WINDOW_SEC)
 
 Print=Utils.Print
 errorExit=Utils.errorExit
@@ -237,14 +247,15 @@ try:
     assert netNode.getSysioAccount("account3")["net_weight"] == 0
 
     # Transfers pushed only to node 3 are charged on every node from the blocks that include them, in the
-    # producers' own blocks and in each other's, until node 2 has seen account3 use more than its budget.
+    # producers' own blocks and in each other's, until node 2 has seen account3 use more than its budget and margin.
     Print("Verifying sysio.token-paid transfers stay charged to their authorizer on every node...")
     allNodes = cluster.getNodes()
     totalCpu = 0
     totalNet = 0
     includingNodes = set()
     for x in range(MAX_STICKY_TRANSFERS):
-        if subjectiveUsed(wlnode, "account3") > SUBJECTIVE_CPU_ALLOWED_US and len(includingNodes) == len(producers):
+        if (subjectiveUsed(wlnode, "account3") > SUBJECTIVE_CPU_ALLOWED_US + SUBJECTIVE_CPU_MARGIN_US
+                and len(includingNodes) == len(producers)):
             break
         trace = pushAndWaitForBlock(fdnode, transfer("account3", "account1", f"sticky-{x}"), allNodes)
         transId = fdnode.getTransId(trace)
@@ -255,8 +266,8 @@ try:
         receipt = next(r for r in block["transactions"] if r["trx"]["id"] == transId)
         totalCpu += sum(receipt["cpu_usage_us"])
     else:
-        errorExit(f"account3 did not exceed node 2's budget in blocks of both producer nodes: {includingNodes}, "
-                  f"node 2 charged {subjectiveUsed(wlnode, 'account3')}us")
+        errorExit(f"account3 did not exceed node 2's budget by {SUBJECTIVE_CPU_MARGIN_US}us in blocks of both "
+                  f"producer nodes: {includingNodes}, node 2 charged {subjectiveUsed(wlnode, 'account3')}us")
     Print(f"account3 used {totalCpu}us and {totalNet} bytes in blocks produced by nodes {sorted(includingNodes)}")
 
     for chargingNode in producers + [wlnode]:
@@ -287,8 +298,7 @@ try:
     assert "Authorized account account3 exceeded subjective NET limit" in str(results[1]), results[1]
 
 
-    # Sleep for 1 min
-    time.sleep(72)
+    time.sleep(FAST_DECAY_WAIT_SEC)
 
     # Verify subjective decay
     acct1 = fdnode.getAccountSubjectiveInfo("account1")
@@ -310,11 +320,11 @@ try:
     assert not results[0], results[1]
     trans = producers[0].pushMessage("sysio", "addsubjex", '{"account":"account3"}', "--permission sysio@active")
     assert trans[0], trans[1]
-    attempts = iter(range(EXEMPT_RELOAD_TIMEOUT_SEC))
-    def exemptAccepted():
-        txn = transfer("account3", "account1", f"exempt-{next(attempts)}")
-        return wlnode.pushTransaction(txn, silentErrors=True)[0]
-    assert Utils.waitForBool(exemptAccepted, timeout=EXEMPT_RELOAD_TIMEOUT_SEC), "node 2 still refuses account3"
+    # Node 2 reports no bill for an account it exempts; the margin keeps account3 over budget through this check.
+    assert Utils.waitForBool(lambda: subjectiveUsed(wlnode, "account3") == 0, timeout=EXEMPT_RELOAD_TIMEOUT_SEC), \
+        "node 2 never reloaded the exempt list"
+    results = wlnode.pushTransaction(transfer("account3", "account1", "exempt"), silentErrors=True)
+    assert results[0], results[1]
     assert subjectiveUsed(wlnode, "account3") == 0
 
     testSuccessful = True
