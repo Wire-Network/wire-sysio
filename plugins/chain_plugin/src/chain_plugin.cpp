@@ -723,8 +723,6 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
           "In \"light\" mode all incoming blocks headers will be fully validated; transactions in those validated blocks will be trusted \n")
          ("disable-ram-billing-notify-checks", bpo::bool_switch()->default_value(false),
           "Disable the check which subjectively fails a transaction if a contract bills more RAM to another account within the context of a notification handler (i.e. when the receiver is not the code of the action).")
-         ("maximum-variable-signature-length", bpo::value<uint32_t>()->default_value(16384u),
-          "Subjectively limit the maximum length of variable components in a variable legnth signature to this size in bytes")
          ("trusted-producer", bpo::value<vector<string>>()->composing(), "Indicate a producer whose blocks headers signed by it will be fully validated, but transactions in those validated blocks will be trusted.")
          ("database-map-mode", bpo::value<chainbase::pinnable_mapped_file::map_mode>()->default_value(chainbase::pinnable_mapped_file::map_mode::mapped),
           "Database map mode (\"mapped\", \"mapped_private\", \"heap\", or \"locked\").\n"
@@ -1106,8 +1104,6 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
       chain_config->disable_replay_opts = options.at( "disable-replay-opts" ).as<bool>();
       chain_config->contracts_console = options.at( "contracts-console" ).as<bool>();
       chain_config->allow_ram_billing_in_notify = options.at( "disable-ram-billing-notify-checks" ).as<bool>();
-
-      chain_config->maximum_variable_signature_length = options.at( "maximum-variable-signature-length" ).as<uint32_t>();
 
       chain_config->terminate_at_block = options.at( "terminate-at-block" ).as<uint32_t>();
       chain_config->truncate_at_block = options.at( "truncate-at-block" ).as<uint32_t>();
