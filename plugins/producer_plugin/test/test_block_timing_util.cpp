@@ -3,6 +3,9 @@
 #include <sysio/producer_plugin/block_timing_util.hpp>
 #include <fc/mock_time.hpp>
 
+#include <chrono>
+#include <thread>
+
 namespace fc {
 std::ostream& boost_test_print_type(std::ostream& os, const time_point& t) { return os << t.to_iso_string(); }
 std::ostream& boost_test_print_type(std::ostream& os, const std::optional<time_point>& t) { return os << (t ? t->to_iso_string() : "null"); }
@@ -14,6 +17,9 @@ constexpr auto       block_interval = fc::microseconds(sysio::chain::config::blo
 constexpr auto       cpu_effort_us  = 400000;
 constexpr auto       cpu_effort     = fc::microseconds(cpu_effort_us);
 constexpr auto       production_round_1st_block_slot = 100 * sysio::chain::config::producer_repetitions;
+
+/// How long the real clock gets to move before the clock-restore check gives up. Bounds a failure only.
+constexpr std::chrono::seconds real_clock_patience{1};
 
 
 BOOST_AUTO_TEST_SUITE(block_timing_util)
@@ -33,13 +39,15 @@ BOOST_AUTO_TEST_CASE(test_calculate_block_deadline) {
    using namespace sysio::block_timing_util;
    const fc::time_point production_round_1st_block_time =
       sysio::chain::block_timestamp_type(production_round_1st_block_slot).to_time_point();
+   // Deadlines must not depend on now; the scenarios move it only to show that. Scoped so the cases after this one get
+   // the real clock back.
+   const fc::scoped_mock_clock mock_clock(production_round_1st_block_time - block_interval + fc::milliseconds(10));
 
    {
       // Scenario 1:
       // In producing mode, the deadline of a block will be ahead of its block_time from 100, 200, 300, ...ms,
       // depending on the its index to the starting block of a production round. These deadlines are referred
       // as optimized deadlines.
-      fc::mock_time_traits::set_now(production_round_1st_block_time - block_interval + fc::milliseconds(10));
       for (int i = 0; i < sysio::chain::config::producer_repetitions; ++i) {
          auto block_time        = sysio::chain::block_timestamp_type(production_round_1st_block_slot + i);
          auto expected_deadline = block_time.to_time_point() - fc::milliseconds((i + 1) * 100);
@@ -124,6 +132,22 @@ BOOST_AUTO_TEST_CASE(test_calculate_block_deadline) {
       fc::time_point block_deadline = calculate_producing_block_deadline(default_cpu_effort, block_time);
       BOOST_CHECK_EQUAL(block_deadline.to_iso_string(), fc::time_point::from_iso_string("2025-10-31T13:37:34.587").to_iso_string());
    }
+}
+
+/// test_calculate_block_deadline must hand the real clock back. depends_on runs this case after it, including under
+/// --random and when this case is selected alone, and skips this case if that one fails.
+BOOST_AUTO_TEST_CASE(test_real_clock_restored_after_calculate_block_deadline,
+                     *boost::unit_test::depends_on("block_timing_util/test_calculate_block_deadline")) {
+   BOOST_REQUIRE_MESSAGE(!fc::mock_time_traits::is_set(), "the mock clock is still engaged");
+
+   const fc::time_point start = fc::time_point::now();
+   const std::chrono::steady_clock::time_point give_up = std::chrono::steady_clock::now() + real_clock_patience;
+   fc::time_point latest = start;
+   while (latest <= start && std::chrono::steady_clock::now() < give_up) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      latest = fc::time_point::now();
+   }
+   BOOST_CHECK_GT(latest, start);
 }
 
 BOOST_AUTO_TEST_CASE(test_calculate_producer_wake_up_time) {
