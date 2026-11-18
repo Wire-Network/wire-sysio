@@ -1,0 +1,66 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "notify",
+            "base": "",
+            "fields": [
+                {
+                    "name": "to",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "payout",
+            "base": "",
+            "fields": [
+                {
+                    "name": "to",
+                    "type": "name"
+                },
+                {
+                    "name": "quantity",
+                    "type": "asset"
+                },
+                {
+                    "name": "memo",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "spin",
+            "base": "",
+            "fields": [
+                {
+                    "name": "n",
+                    "type": "uint32"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "notify",
+            "type": "notify",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "payout",
+            "type": "payout",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "spin",
+            "type": "spin",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": []
+}

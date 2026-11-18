@@ -49,6 +49,7 @@ void globals_validation_visitor::validate( const Module& m ) {
          case ValueType::i64:
          case ValueType::f64:
             mutable_globals_total_size += 4;
+            [[fallthrough]];
          case ValueType::i32:
          case ValueType::f32:
             mutable_globals_total_size += 4;

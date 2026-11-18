@@ -55,6 +55,9 @@ constexpr auto action_onsynd   = "onsynd"_n;
 constexpr auto action_onyield  = "onyield"_n;
 /// Sent once after the envelope's last attestation, only when one of them reached `sysio.synd`.
 constexpr auto action_closeenv = "closeenv"_n;
+/// Sent once per outbound envelope that carried a DESYNDICATE_LIQ, with the envelope's epoch and the
+/// request ids it carried.
+constexpr auto action_retsent = "retsent"_n;
 } // namespace synd
 
 // System-owned rows bill to the sysio RAM pool, not this contract account (privileged-contract
@@ -469,6 +472,17 @@ bool dispatch_syndicate_liq(name self, const std::vector<char>& data, uint64_t c
    return true;
 }
 
+/// The request id of the DESYNDICATE_LIQ attestation `data`, or `std::nullopt` when the bytes do not decode
+/// or carry no id (0, which the outpost reads as "no id"). `sysio.synd` queues every DESYNDICATE_LIQ with a
+/// nonzero id. Anything else is skipped rather than aborting, because `buildenv` runs inside
+/// `sysio.epoch::advance`.
+std::optional<uint64_t> desyndication_request_id(const std::vector<char>& data) {
+   opp::attestations::DesyndicateLIQ desyndication;
+   auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
+   if (in(desyndication) != zpp::bits::errc{} || desyndication.request_id == 0) return std::nullopt;
+   return desyndication.request_id;
+}
+
 /// LIQ_YIELD: the outpost claimed yield for its syndicated pool since its last report. After the
 /// same checks as a syndication it goes to `sysio.synd::onyield` with the envelope's identity,
 /// which holds the amount as a number until the envelope is underwritten; nothing is minted on this
@@ -571,16 +585,13 @@ std::optional<em_identity> em_identity_from_uncompressed_key(const std::vector<c
    };
 }
 
-/// Decode an inbound NodeOwnerRegistration attestation and drive the NFT node-owner claim: create
-/// the vanity-named Wire account from the claim's wire_pub_key, then register the owner and record
-/// the depositor's ETH link. Both steps are inline-sent to sysio.roa declaring {sysio.roa, active}
-/// (permitted because sysio.msgch is privileged; no cross-contract active grant is required),
-/// newnameduser first so any newaccount runs depth-first before nodeownreg. Invalid names and full
-/// tiers skip creation; nodeownreg records the rejection without allocating an account.
+/// Decode an inbound NodeOwnerRegistration and send one claim to sysio.roa::nodeownreg.
+/// ROA rejects existing accounts before creating the chosen name, allocating the tier and
+/// recording the depositor's ETH link atomically. Privileged msgch declares {sysio.roa, active}.
 ///
 /// Trust-OPP: a malformed envelope (undecodable proto, unparseable name, unusable key bytes,
 /// out-of-range tier) is silently dropped here -- nothing is sent. A well-formed envelope whose
-/// *claim* is rejected (name wrong length for tier, account held by a different key, already registered,
+/// *claim* is rejected (name wrong length for tier, account already exists, already registered,
 /// tier at capacity)
 /// is soft-failed inside nodeownreg, which records a REJECTED audit row. Neither path aborts the
 /// dispatching transaction.
@@ -621,11 +632,7 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
    auto eth_identity = em_identity_from_uncompressed_key(reg.actor_pub_key);
    if (!eth_identity) return;                     // unusable depositor ETH key; drop
 
-   // 1) Create the account (idempotent; soft-skips a name that breaks the tier rule).
-   action(permission_level{ROA_ACCOUNT, "active"_n}, ROA_ACCOUNT, "newnameduser"_n,
-          std::make_tuple(*owner, *wire_pk, tier)).send();
-
-   // 2) Register the owner + record the ETH link, with claim-payload soft-fail + audit recording.
+   // ROA owns the nonexistence check and account creation within the same claim.
    action(permission_level{ROA_ACCOUNT, "active"_n}, ROA_ACCOUNT, "nodeownreg"_n,
           std::make_tuple(*owner, tier, eth_identity->key, *wire_pk, eth_identity->address)).send();
 }
@@ -1707,9 +1714,15 @@ void msgch::buildenv(uint64_t chain_code) {
    // The shipped rows' bytes are in `packed` now: erase them, and count the general-lane ones out of the
    // outpost's queue. Rows the walk stopped before, or the trim loop popped, stay READY for the next
    // epoch's `buildenv` call.
-   uint32_t general_shipped = 0;
+   uint32_t              general_shipped = 0;
+   std::vector<uint64_t> shipped_returns;
    for (size_t i = 0; i < included_ids.size(); ++i) {
       if (lane_of(entries[i].type) == queue_lane::general) ++general_shipped;
+      if (entries[i].type == AttestationType::ATTESTATION_TYPE_DESYNDICATE_LIQ) {
+         if (const auto request_id = desyndication_request_id(entries[i].data)) {
+            shipped_returns.push_back(*request_id);
+         }
+      }
       atts.erase(id_key{included_ids[i]});
    }
    if (general_shipped > 0) {
@@ -1718,6 +1731,12 @@ void msgch::buildenv(uint64_t chain_code) {
       // Saturating: the count only bounds `queueout`, and a short one must not abort `advance`.
       queue.queued -= std::min(queue.queued, general_shipped);
       queues.set(ram_payer, outbound_queue_key{chain_code}, queue);
+   }
+   // sysio.synd records this envelope's epoch on each shipped desyndication's `returns` row. A row can wait
+   // in the queue past several envelopes, so only this build knows which envelope carried it.
+   if (!shipped_returns.empty()) {
+      action(permission_level{get_self(), "active"_n}, synd::account, synd::action_retsent,
+             std::make_tuple(sysio::slug_name{chain_code}, epoch, shipped_returns)).send();
    }
 
    // This envelope's canonical epoch digest: keccak256 over the packed bytes, which equal the

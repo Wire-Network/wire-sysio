@@ -2,7 +2,7 @@
 
 `sysio.bond` underwrites statements on the depot. An issuer registers a statement and the amount of a
 depot-native token that must stand behind it. Underwriters bond that amount. A challenge window runs,
-and the request is either approved or ruled by `sysio`. This guide is for a contract, or an account,
+and the request is either approved or ruled by a judge. This guide is for a contract, or an account,
 that issues requests: what it calls, how it learns what happened, and what it is paid. The contract is
 `contracts/sysio.bond`; the specification is §3 of the syndication underwriting spec.
 
@@ -32,11 +32,27 @@ The id the request will take is `bondcounters.next_request_id`, read before send
 from one action take consecutive ids from there. An issuer that must not depend on that ordering finds
 its request afterwards through the `bystatement` key instead, as the syndication contract's queue does.
 
-The issuer pays the RAM of its request's `requests` and `escrows` rows, and each underwriter the RAM
-of its `bonds` row. A privileged issuer or underwriter is the exception: a system contract (the
-syndication contract, issuing for its envelopes) has no RAM quota of its own, so the rows created on
-its behalf bill the `sysio` RAM pool instead. Later writes by other signers (a ruling, a claim) keep
-those payers. `prune` releases the RAM.
+RAM is paid by whoever causes it:
+
+| Rows | Paid by |
+|---|---|
+| The `requests` row, its bounty escrow, each underwriter's `bonds` row, and the `wireclaims` rows that hold the WIRE they earn | The issuer; the `sysio` RAM pool for a privileged issuer |
+| The hold-bond escrow | The hold beneficiary, who signs `hold`; the `sysio` RAM pool for a privileged one |
+| The configuration and counter singletons and the per-token yield pools | The `sysio` RAM pool |
+
+An underwriter needs no RAM. An ordinary issuer needs RAM for its request and, for every underwriter
+that bonds it, a `bonds` row and (for a shadow token, once per underwriter and issuer) a `wireclaims`
+row; an `accept` it cannot pay for fails. A privileged issuer -- a system contract, such as the
+syndication contract issuing for its envelopes -- has no RAM quota of its own, so these rows bill the
+`sysio` RAM pool instead. A challenger pays for its own hold-bond escrow, even on a privileged issuer's
+request, and a `hold` it cannot pay for fails.
+
+The `wireclaims` rows are reserved when the obligation is taken: the issuer's own at `request`, for the
+WIRE its escrows earn, and an underwriter's at its first `accept`. A `claim` only updates them, so it
+never needs RAM, and an issuer that has since run out of RAM cannot hold up a payment. Each row holds
+one account's WIRE from one issuer's requests, so one issuer never pays for another's. Later writes by
+other signers (a ruling, a claim) keep every row's payer. `prune` and `claimwire` return each row's RAM
+to the account it billed.
 
 ## The increment
 
@@ -44,6 +60,10 @@ Bonds move in steps of 0.01 token. For a token of precision `p` that is `10^(p -
 token with a precision below 2 is refused. `covered` and every `accept` amount must be positive
 multiples of it. An `accept` larger than what remains uncovered is reduced to the remainder, and only
 the reduced amount is pulled.
+
+An underwriter's first bond on a request must be at least `covered / 64` (`MAX_BONDS_PER_REQUEST`), or
+take the whole remainder; its later bonds on that request add any multiple of the increment. A request
+therefore never holds more than 64 bond rows, which bounds the work of `claim` and `prune`.
 
 ## Following a request
 
@@ -69,9 +89,37 @@ The syndication contract's queue does this.
 | OPEN | `request` | BONDED, HELD, VALID, INVALID |
 | BONDED | bonded reaches covered; the window starts | APPROVED, HELD, VALID, INVALID |
 | APPROVED | `approve` after the window, with no hold | terminal |
-| HELD | `hold(request_id, beneficiary)` by the issuer; posts the hold bond | VALID, INVALID |
-| VALID | `rslvvalid` by `sysio` | terminal |
-| INVALID | `rslvinvalid` by `sysio` | terminal |
+| HELD | `hold(request_id, beneficiary)` by the issuer and the beneficiary; posts the hold bond | VALID, INVALID |
+| VALID | `rslvvalid` by a judge | terminal |
+| INVALID | `rslvinvalid` by a judge | terminal |
+
+The rulings require `sysio.bond`'s own authority. The bootstrap gives each a native permission of the
+same name (`sysio.bond@rslvvalid`, `sysio.bond@rslvinvalid`), linked to its action and satisfied by the
+judge account or by `sysio@active`. The judge declares that permission; `sysio` keeps the rulings through
+`sysio.bond@active` and can replace the judge or remove the delegation with `updateauth`.
+
+Once `sysio` is held by a governance authority it can do this through `sysio.msig`: propose the
+ruling, or the `updateauth`, declared as `sysio.bond@active`, and execute it once enough members have
+approved. The judge is a faster path for a ruling, not the only one.
+
+```bash
+AUTH=$(jq -cn --arg judge "$JUDGE" '{threshold:1,keys:[],accounts:[{permission:{actor:$judge,permission:"active"},weight:1},{permission:{actor:"sysio",permission:"active"},weight:1}]} | .accounts |= sort_by(.permission.actor)')
+clio -u "$DEPOT_URL" set account permission sysio.bond rslvvalid "$AUTH" active -p sysio.bond@active
+clio -u "$DEPOT_URL" set account permission sysio.bond rslvinvalid "$AUTH" active -p sysio.bond@active
+clio -u "$DEPOT_URL" set action permission sysio.bond sysio.bond rslvvalid rslvvalid -p sysio.bond@active
+clio -u "$DEPOT_URL" set action permission sysio.bond sysio.bond rslvinvalid rslvinvalid -p sysio.bond@active
+clio -u "$DEPOT_URL" push action sysio.bond rslvvalid "[$REQUEST_ID]" -p sysio.bond@rslvvalid
+```
+
+Fund the permission and link rows first with a RAM-only grant to `sysio.bond`; the chain bills them to
+the account. Until a ruling is linked, only `sysio.bond`'s `owner` and `active` can make it. An action
+declaring `sysio@active` is refused: the contract requires its own account, not `sysio`.
+
+Under the native rules a permission can rewrite itself. The judge can therefore change the authority of
+the ruling permission it satisfies, add permissions beneath it, and re-link or unlink that ruling; it
+cannot reach `setconfig` or any other action. `sysio.bond@owner` reverts any of it, but replacing the
+two authorities does not: revoking a judge also means unlinking and relinking both rulings and removing
+what it added. Follow [Replacing the judge account](emergency-stop-playbook.md#replacing-the-judge-account).
 
 The hold bond is `covered * hold_bps / 10000` (`hold_bps` is 1000 until `sysio` sets another). When
 that rounds to zero, the request is held with no hold bond.
@@ -94,7 +142,8 @@ Every payment is pulled by `claim(request_id, account)`, one account per call, s
 over the underwriters and no party's refusal blocks another. Anyone may call it; the payment goes to
 `account`. A claim with nothing owed is refused with `nothing to claim`.
 
-- **Underwriters** settle the bond and its shares with `claim`, then withdraw earned WIRE with `claimwire`.
+- **Underwriters** settle the bond and its shares with `claim`, then withdraw earned WIRE with
+  `claimwire(account, issuer)`, once per issuer whose requests they bonded.
 - **The issuer** of an INVALID request claims the forfeit, in its own transfer (below), and the
   bounty back when there was no hold. On VALID after a hold of a partly bonded request it claims the
   unbonded share of the hold bond; the hold bond of a fully bonded request is all the underwriters'.
@@ -186,9 +235,10 @@ Andon clear even for a custody recipient or self-settlement. Ordinary token tran
 notifications and existing behavior.
 
 `claim(request_id, account)` credits LIQ immediately and records earned WIRE in the account's
-backed `wireclaims` balance. `claimwire(account)` withdraws that WIRE separately to the named
-account. It is permissionless and respects Andon; a failed recipient transfer rolls back only the
-WIRE withdrawal. The WIRE balance survives request pruning and never expires. Checked additions
+backed `wireclaims` balance for the request's issuer. `claimwire(account, issuer)` withdraws that
+WIRE separately to the named account. It is permissionless and respects Andon; a failed recipient
+transfer rolls back only the WIRE withdrawal. The WIRE balance survives request pruning and never
+expires: a row no live request or bond reserves any more stays until it is withdrawn. Checked additions
 reject overflow atomically. Yield the pool cannot cover remains on the original bond or escrow row;
 that residual prevents pruning and can be retried without paying principal twice or earning yield
 on returned principal. WIRE-denominated requests retain their ordinary, per-recipient claims.

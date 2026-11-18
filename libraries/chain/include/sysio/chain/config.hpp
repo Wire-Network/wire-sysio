@@ -1,5 +1,6 @@
 #pragma once
 #include <sysio/chain/wasm_interface.hpp>
+#include <fc/time.hpp>
 #include <fc/utility.hpp>
 
 namespace sysio::chain::config {
@@ -24,6 +25,13 @@ namespace sysio::chain::config {
   static constexpr auto producers_account_name { "sysio.prods"_n };
   static constexpr auto roa_account_name       { "sysio.roa"_n };
 
+  /// The system contract action the implicit transaction at the start of every block runs, and nothing else may.
+  static constexpr auto onblock_action_name { "onblock"_n };
+
+  /// True for sysio and every sysio.* account. Callers that grant a system contract more also require it to be
+  /// privileged.
+  constexpr bool is_system_account( name account ) { return account.prefix() == system_account_name; }
+
   // Active permission of producers account requires greater than 2/3 of the producers to authorize
   static constexpr auto majority_producers_permission_name { "prod.major"_n }; // greater than 1/2 of producers needed to authorize
   static constexpr auto minority_producers_permission_name { "prod.minor"_n }; // greater than 1/3 of producers needed to authorize0
@@ -40,6 +48,8 @@ namespace sysio::chain::config {
   static constexpr int      block_interval_ms = 500;
   static constexpr int      block_interval_us = block_interval_ms*1000;
   static constexpr uint64_t block_timestamp_epoch = 1735689600000ull; // epoch is year 2025.
+  /// Clock skew tolerated between nodes. A block timestamped more than this after the local clock is from the future.
+  static constexpr fc::microseconds allowed_clock_skew = fc::seconds(15);
 
   /** Percentages are fixed point with a denominator of 10,000 */
   static constexpr int percent_100 = 10000;
@@ -65,6 +75,15 @@ namespace sysio::chain::config {
   static constexpr uint32_t   default_min_transaction_cpu_usage            = 100; /// min trx cpu usage in microseconds (10000 TPS equiv)
   static constexpr uint32_t   default_subjective_cpu_leeway_us             = 31000; /// default subjective cpu leeway in microseconds
   static constexpr uint32_t   default_subjective_cpu_us                    = 300000; /// default subjective cpu given to each account
+  /// Genesis value of chain_config::notify_cpu_stipend, in microseconds
+  static constexpr uint32_t   default_notify_cpu_stipend                   = 100;
+  /// Billable NET of a minimal sysio.token::transfer: 98 bytes of transaction overhead with one K1 signature, plus the
+  /// 77-byte action with one authorization and a 10-character memo.
+  static constexpr uint32_t   minimal_transfer_net_usage                   = 175;
+  /// Default subjective NET given to each account: as many minimal transfers as the default subjective CPU covers at
+  /// the minimum transaction CPU (300 ms / 100 us = 3,000 transfers, 525,000 bytes).
+  static constexpr uint32_t   default_subjective_net_bytes                 =
+     default_subjective_cpu_us / default_min_transaction_cpu_usage * minimal_transfer_net_usage;
 
   static constexpr uint32_t   default_max_trx_lifetime                     = 60*60; // 1 hour
   static constexpr uint32_t   default_max_trx_delay                        = 45*24*3600; // 45 days
@@ -76,7 +95,6 @@ namespace sysio::chain::config {
   static constexpr uint32_t   default_production_pause_vote_timeout_ms     = 6u*1000u; // 6 seconds
   static constexpr uint16_t   default_controller_thread_pool_size          = 4;
   static constexpr uint16_t   default_vote_thread_pool_size                = 4;
-  static constexpr uint32_t   default_max_variable_signature_length        = 16384u;
   static constexpr uint32_t   default_max_action_return_value_size         = 1024;
   static constexpr uint32_t   default_max_reversible_blocks                = 3600u;
 
@@ -92,8 +110,8 @@ namespace sysio::chain::config {
   static constexpr uint32_t default_max_wasm_func_local_bytes     = 8192;
   static constexpr uint32_t default_max_wasm_nested_structures    = 1024;
   static constexpr uint32_t default_max_wasm_symbol_bytes         = 8192;
-  static constexpr uint32_t default_max_wasm_module_bytes         = 20*1024*1024;
-  static constexpr uint32_t default_max_wasm_code_bytes           = 20*1024*1024;
+  static constexpr uint32_t default_max_wasm_module_bytes         = 4*1024*1024; ///< largest module `setcode` accepts
+  static constexpr uint32_t default_max_wasm_code_bytes           = 4*1024*1024; ///< largest function body `setcode` accepts
   static constexpr uint32_t default_max_wasm_pages                = 528;
   static constexpr uint32_t default_max_wasm_call_depth           = 251;
 
@@ -121,6 +139,13 @@ namespace sysio::chain::config {
   /// Consensus limit bounding one uninterrupted libsodium Ed25519 verification.
   static constexpr uint32_t   max_ed25519_message_size          = 65'536;
 
+  /// Consensus limit, in bytes, on a signature's variable-size component (`fc::crypto::signature::variable_size()`:
+  /// WebAuthn authenticator data plus client data JSON).
+  static constexpr uint32_t   max_signature_variable_size       = 16'384;
+
+  /// Consensus limit, in bytes, on each of the base and the modulus that mod_exp accepts.
+  static constexpr uint32_t   max_mod_exp_operand_size          = 8'192;
+
   // KV default limits — on-chain consensus values are in chain_config
   static constexpr uint32_t   default_max_kv_key_size           = 256;       ///< maximum KV primary key size in bytes
   static constexpr uint32_t   default_max_kv_value_size         = 256*1024;  ///< maximum KV value size (256 KiB)
@@ -136,6 +161,10 @@ namespace sysio::chain::config {
 #else
   const static sysio::chain::wasm_interface::vm_type default_wasm_runtime = sysio::chain::wasm_interface::vm_type::sys_vm;
 #endif
+
+  /// Stack a thread that runs contracts needs. sys-vm-oc and sys-vm-jit run wasm on the calling thread's stack until
+  /// their bound for it passes 4 MiB, then on a stack they map; the rest is for host functions and the frames below.
+  static constexpr std::size_t contract_thread_stack_size = 8*1024*1024;
 
   static constexpr uint32_t   default_abi_serializer_max_time_us = 15*1000; ///< default deadline for abi serialization methods
 

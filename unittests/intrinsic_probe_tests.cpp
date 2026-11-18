@@ -150,10 +150,10 @@ struct intrinsic_probe_shared_tester : validating_tester {
       ed_wrong_digest_payload = pack_sig_hash_key(wrong_digest, sig, pub);
    }
 
-   // Build a raw WA-variant signature blob whose auth_data + client_json variable-size components exceed the
-   // subjective 16 KiB default. The bytes do not need to be a cryptographically valid sig -- fc::raw::unpack must
-   // succeed so variable_size() is computed, after which the recover_key subjective-size guard fires before any
-   // secp256k1 math runs. Layout:
+   // Build a raw WA-variant signature blob whose auth_data + client_json variable-size components exceed
+   // config::max_signature_variable_size. The bytes do not need to be a cryptographically valid sig -- fc::raw::unpack
+   // must succeed so variable_size() is computed, after which recover_key returns -1 before any secp256r1 math runs.
+   // Layout:
    //   byte 0            : fc::raw variant tag = 2 (webauthn)
    //   bytes 1-65        : r1::compact_signature (65 zero bytes)
    //   <varint> + bytes  : auth_data  (WA_AUTH_DATA_BYTES bytes of zero)
@@ -161,9 +161,9 @@ struct intrinsic_probe_shared_tester : validating_tester {
    void build_oversized_wa_payload() {
       constexpr size_t wa_compact_sig_bytes = 65;
       constexpr size_t wa_variant_tag = 2;
-      // 17 KiB total -- 1 KiB over the 16 KiB default configured_subjective_signature_length_limit.
       constexpr size_t wa_auth_data_bytes   = 8'700;
       constexpr size_t wa_client_json_bytes = 8'700;
+      static_assert(wa_auth_data_bytes + wa_client_json_bytes > config::max_signature_variable_size);
 
       auto pack_varint = [](bytes& b, uint32_t v) {
          while (v > 0x7F) { b.push_back(static_cast<char>((v & 0x7F) | 0x80)); v >>= 7; }
@@ -355,13 +355,13 @@ BOOST_FIXTURE_TEST_CASE(recover_key_size_query, intrinsic_probe_fixture) {
    BOOST_CHECK_NO_THROW(t.run_with_data("recqsize"_n, t.recover_key_payload));
 }
 
-// Pins the ONE throw recover_key still raises after the never-throw cleanup: subjective DoS guard on WebAuthn
-// variable-size (auth_data + client_json) in speculative-block mode. See the DEFERRED note in
-// libraries/chain/webassembly/crypto.cpp::recover_key for why this stays throwing rather than returning -1.
+// recover_key returns to the contract, without throwing, for a WebAuthn signature past
+// config::max_signature_variable_size. recbigwa does not read the result: once recover_key returns it aborts on its own
+// trailing check. intrinsic_value_tests pins the returned -1.
 BOOST_FIXTURE_TEST_CASE(recover_key_wa_oversized_variable_size, intrinsic_probe_fixture) {
-   BOOST_CHECK_THROW(
+   BOOST_CHECK_EXCEPTION(
       t.run_with_data("recbigwa"_n, t.oversized_wa_payload),
-      sig_variable_size_limit_exception);
+      sysio_assert_message_exception, fc_exception_message_contains("recover_key with WA sig exceeding"));
 }
 
 BOOST_FIXTURE_TEST_CASE(assert_recover_key_ok, intrinsic_probe_fixture) {
@@ -546,7 +546,7 @@ BOOST_FIXTURE_TEST_CASE(set_action_return_value_empty, intrinsic_probe_fixture) 
 // I. get_permission_lower_bound (P2)
 //
 // Wire-specific intrinsic (libraries/chain/webassembly/permission.cpp) backing CDT's sysio::get_permission --
-// the only host path a contract has to read another account's authority on-chain (sysio.roa::active_key_matches).
+// the host path a contract uses to read another account's authority on-chain.
 // Each probe queries get_self()'s owner/active permissions (created with a single K1 key at
 // threshold 1) and self-verifies the record via in-contract check(); the driver asserts the host stays silent,
 // so any layout / size-query / sentinel / lower-bound-semantics regression surfaces as a

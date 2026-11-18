@@ -154,7 +154,6 @@ namespace sysio::chain {
             bool                     disable_replay_opts    =  false;
             bool                     contracts_console      =  false;
             bool                     allow_ram_billing_in_notify = false;
-            uint32_t                 maximum_variable_signature_length = chain::config::default_max_variable_signature_length;
             uint32_t                 terminate_at_block     = 0;
             uint32_t                 truncate_at_block      = 0;
             uint32_t                 num_configured_p2p_peers = 0;
@@ -288,8 +287,9 @@ namespace sysio::chain {
          const subjective_billing&             get_subjective_billing()const;
          subjective_billing&                   get_mutable_subjective_billing();
 
-         //        limit,greylisted,unlimited
-         std::tuple<int64_t, bool, bool> get_cpu_limit(account_name a) const;
+         /// CPU limit of `a` as (limit_us, greylisted, unlimited). `current_time` decays the account's usage to that
+         /// time first, for an account whose usage window was not updated in this block.
+         std::tuple<int64_t, bool, bool> get_cpu_limit(account_name a, const std::optional<block_timestamp_type>& current_time = {}) const;
 
          const flat_set<account_name>&   get_actor_whitelist() const;
          const flat_set<account_name>&   get_actor_blacklist() const;
@@ -432,11 +432,6 @@ namespace sysio::chain {
          // returns true for block_status::incomplete block
          bool is_producing_block()const;
 
-         //This is only an accessor to the user configured subjective limit: i.e. it does not do a
-         // check similar to is_ram_billing_in_notify_allowed() to check if controller is currently
-         // producing a block
-         uint32_t configured_subjective_signature_length_limit()const;
-
          void add_resource_greylist(const account_name &name);
          void remove_resource_greylist(const account_name &name);
          bool is_resource_greylisted(const account_name &name) const;
@@ -536,6 +531,8 @@ namespace sysio::chain {
 
       void set_producer_node(bool is_producer_node);
       bool is_producer_node()const; // thread safe, set at program initialization
+      /// Whether this node has finalizer keys configured. Thread safe, set at program initialization.
+      bool is_finalizer_node() const;
 
       void set_pause_at_block_num(block_num_type block_num);
       block_num_type get_pause_at_block_num()const;

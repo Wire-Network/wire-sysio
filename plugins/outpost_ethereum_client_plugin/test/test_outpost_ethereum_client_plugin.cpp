@@ -179,9 +179,6 @@ constexpr std::string_view emit_outbound_envelope_abi_name = "emitOutboundEnvelo
 constexpr std::string_view emit_outbound_envelope_selector = "a3ad9cc3";
 constexpr std::string_view test_opp_address = "5FbDB2315678afecb367f032d93F642f64180aa3";
 const std::string latest_slot_test_rpc_url = startup_test::unused_url();
-constexpr std::string_view http_scheme_prefix = "http://";
-/** Prefix identifying the bounded transport category in chain-id startup diagnostics. */
-constexpr std::string_view last_failure_detail_prefix = "last_failure=";
 constexpr std::string_view latest_slot_test_entry_id = "latest-slot-test";
 constexpr std::string_view latest_slot_test_private_key =
    "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
@@ -199,7 +196,6 @@ constexpr size_t emit_outbound_envelope_call_hex_chars =
    evm_function_selector_hex_chars + evm_abi_word_hex_chars;
 constexpr uint64_t test_outpost_chain_code = 1;
 constexpr uint32_t test_evm_chain_id = 31337;
-constexpr size_t transient_chain_id_failures = 1;
 constexpr uint32_t test_wire_epoch = 7;
 constexpr uint32_t test_stale_wire_epoch = test_wire_epoch - 1;
 constexpr uint32_t test_different_wire_epoch = test_wire_epoch + 1;
@@ -392,6 +388,8 @@ constexpr int test_refused_send_rpc_code = -32000;
 
 /// The block parameter a read pinned to `block` carries.
 std::string pinned_block_hex(uint64_t block) { return format_rpc_quantity(fc::uint256{block}); }
+/// A receipt block number with a leading zero, which the execution API does not allow.
+constexpr auto non_canonical_block_quantity = "0x01";
 /// Event topics of the `OPPInbound` events a delivery receipt carries —
 /// `keccak256` of each signature, written out so the tests pin the client's own
 /// hashing rather than restate it.
@@ -702,6 +700,9 @@ struct whole_envelope_delivery_fixture {
    /// Delivery calls (1-based) whose send a backend refuses as already known:
    /// the stub fills the submission and throws the refusal, as `epochIn` does.
    std::set<size_t> already_known_calls;
+   /// Delivery calls (1-based) whose receipt carries a block number the client
+   /// refuses: the stub fills the submission and parses that receipt, as `epochIn` does.
+   std::set<size_t> refused_receipt_calls;
    /// Run after each delivery call (1-based) confirms: what the chain does next.
    std::function<void(size_t)> on_confirm;
    /// What the views answer at the read confirmation's block. Unset: the last
@@ -945,6 +946,10 @@ create_whole_envelope_delivery_fixture(ethereum_transaction_policy transaction_p
       }
       if (raw->already_known_calls.contains(call)) {
          throw fc::network::json_rpc::json_rpc_error(test_refused_send_rpc_code, "already known");
+      }
+      if (raw->refused_receipt_calls.contains(call)) {
+         return sysio::parse_epoch_in_receipt(
+            hash, fc::mutable_variant_object("status", "0x1")("blockNumber", non_canonical_block_quantity));
       }
       sysio::epoch_in_receipt receipt;
       receipt.tx_hash      = hash;
@@ -2054,6 +2059,15 @@ BOOST_AUTO_TEST_CASE(delivery_receipts_summarise_the_outposts_events) try {
    BOOST_CHECK(sysio::parse_epoch_in_receipt("0x1", fc::mutable_variant_object("blockNumber", "0x1")).logs.empty());
    BOOST_CHECK_THROW(sysio::parse_epoch_in_receipt("0x1", fc::mutable_variant_object("logs", full)), fc::exception);
    BOOST_CHECK_THROW(sysio::parse_epoch_in_receipt("0x1", fc::variant("0x1")), fc::exception);
+   // The block number is a canonical QUANTITY: no leading zero, and the `0x` prefix.
+   for (const auto block : {non_canonical_block_quantity, "1"}) {
+      try {
+         sysio::parse_epoch_in_receipt("0x1", fc::mutable_variant_object("blockNumber", block));
+         BOOST_FAIL("expected a non-canonical receipt block number to be refused");
+      } catch (const ethereum_transaction_policy_exception& rejection) {
+         BOOST_CHECK(rejection.reason() == ethereum_transaction_policy_reason::rpc_quantity_invalid);
+      }
+   }
 
    // The digest the relay compares against the settled one is keccak256 of the bytes.
    BOOST_CHECK_EQUAL(detail::envelope_digest_word({}), keccak256_of_empty);
@@ -2905,6 +2919,21 @@ BOOST_AUTO_TEST_CASE(an_epoch_in_without_a_receipt_stays_pending_in_the_journal)
    BOOST_REQUIRE(!attempt.raw_hex.empty());
    BOOST_CHECK_EQUAL(attempt.tx_hash,
                      "0x" + fc::crypto::keccak256::hash(std::span<const uint8_t>(fc::from_hex(attempt.raw_hex))).str());
+} FC_LOG_AND_RETHROW();
+
+/// A call whose receipt the client refuses after the send stays in the journal,
+/// pending, as one without a receipt does: the node may hold it.
+BOOST_AUTO_TEST_CASE(an_epoch_in_with_a_refused_receipt_stays_pending_in_the_journal) try {
+   auto fixture  = create_whole_envelope_delivery_fixture();
+   auto envelope = make_envelope(mid_envelope_bytes);
+   fixture->refused_receipt_calls = {1};
+
+   BOOST_CHECK_THROW(deliver(*fixture, envelope), sysio::chain::outpost_delivery_incomplete_exception);
+   check_delivery_calls(fixture->delivery_calls, envelope, test_wire_epoch, 1);
+   const auto submission = fixture->only_submission();
+   BOOST_CHECK(submission.purpose == sysio::submission_purpose::epoch_in);
+   BOOST_CHECK(submission.state == sysio::submission_state::pending);
+   BOOST_CHECK_EQUAL(submission.attempts.size(), 1u);
 } FC_LOG_AND_RETHROW();
 
 /// The next tick finds the pending call's receipt, reads the outpost from the

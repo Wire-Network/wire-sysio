@@ -34,7 +34,6 @@ constexpr std::string_view max_priority_fee_per_gas_wei = "max_priority_fee_per_
 constexpr std::string_view max_fee_per_gas_wei = "max_fee_per_gas_wei";
 constexpr std::string_view max_gas_limit = "max_gas_limit";
 constexpr std::string_view max_total_native_cost_wei = "max_total_native_cost_wei";
-constexpr std::string_view read_confirmation = "read_confirmation";
 constexpr std::string_view block_tag = "block_tag";
 constexpr std::string_view confirmations = "confirmations";
 constexpr std::string_view max_finality_lag_sec = "max_finality_lag_sec";

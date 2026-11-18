@@ -13,6 +13,7 @@
 #include <sysio.chains/sysio.chains.hpp>
 #include <sysio.epoch/sysio.epoch.hpp>
 #include <sysio.liq/sysio.liq.hpp>
+#include <sysio.msgch/sysio.msgch.hpp>
 #include <sysio.opp.common/depot_native_token.hpp>
 #include <sysio.opp.common/envelope_statement.hpp>
 #include <sysio.opp.common/require_privileged.hpp>
@@ -69,6 +70,8 @@ constexpr name creditowed_action = "creditowed"_n;
 constexpr name transfer_action   = "transfer"_n;
 /// `sysio.msgch`'s outbound queue.
 constexpr name queueout_action = "queueout"_n;
+/// Final desyndication emission, after the holder's transfer notifications and the burn.
+constexpr name emitdesynd_action = "emitdesynd"_n;
 /// `sysio.liq::mintyield`, which a released yield item sends.
 constexpr name mintyield_action = "mintyield"_n;
 /// `sysio.bond::hold`, which a challenge sends, and `sysio.bond::claim`, which pulls what a ruling awards
@@ -128,10 +131,11 @@ constexpr std::string_view desynd_net_message    = "desyndication net of the fee
 constexpr std::string_view desynd_fee_flat_message =
    "flat desyndication fee must fit an asset and be below the minimum desyndication";
 
-/// Diagnostic path names of the intake actions.
-constexpr std::string_view onsynd_path   = "onsynd";
-constexpr std::string_view onyield_path  = "onyield";
-constexpr std::string_view closeenv_path = "closeenv";
+/// Diagnostic path names of the intake actions and of `retsent`.
+constexpr std::string_view onsynd_path     = "onsynd";
+constexpr std::string_view onyield_path    = "onyield";
+constexpr std::string_view closeenv_path   = "closeenv";
+constexpr std::string_view retsent_path = "retsent";
 
 /// Drop reasons, one per rule an intake message can fail.
 constexpr std::string_view pubkey_misfit_reason   = "pubkey does not fit the chain family";
@@ -146,6 +150,11 @@ constexpr std::string_view envelope_yield_reason  = "the envelope's yield would 
 constexpr std::string_view envelope_closed_reason = "envelope already closed or of another digest";
 constexpr std::string_view replay_reason          = "replayed sequence";
 constexpr std::string_view digest_reason          = "envelope digest does not match; left OPEN";
+
+/// Why `retsent` left a request id's row as it was.
+constexpr std::string_view return_resolved_reason = "no outstanding return for the request id";
+constexpr std::string_view return_outpost_reason  = "the return belongs to another outpost";
+constexpr std::string_view return_stamped_reason  = "the return already records the envelope that carried it";
 
 /// Why one step of the queue left an envelope or an item where it was.
 constexpr std::string_view no_bond_reason         = "sysio.bond is not deployed; the envelope stays WAITING";
@@ -344,6 +353,27 @@ std::optional<std::vector<char>> linked_pubkey(name account, ChainKind chain_kin
    return pubkey_to_bytes(it->pub_key);
 }
 
+/// The first epoch an outbound envelope is built for; `sent_epoch` 0 marks a return not yet sent.
+constexpr uint32_t first_sent_epoch = 1;
+
+/// Erase up to `synd::MAX_RETURNS_EXPIRED_PER_DESYNDICATE` of `chain_code`'s oldest `returns` rows whose
+/// envelope the outpost has consumed: rows sent at or before the last epoch `sysio.msgch` accepted from that
+/// outpost, which emits an epoch's envelope only after accepting the depot's. Never throws.
+void expire_consumed_returns(name self, sysio::slug_name chain_code) {
+   msgch::outpost_consensus_t consensus(synd::MSGCH_ACCOUNT);
+   const std::optional<msgch::outpost_consensus_entry> accepted =
+      consensus.try_get(msgch::outpost_consensus_key{chain_code.value});
+   if (!accepted) return;
+   synd::returns_t pending(self);
+   auto            by_sent = pending.get_index<"bysentepoch"_n>();
+   auto            it      = by_sent.lower_bound(opp::outpost_epoch_key(chain_code.value, first_sent_epoch));
+   for (uint32_t erased = 0; erased < synd::MAX_RETURNS_EXPIRED_PER_DESYNDICATE && it != by_sent.end() &&
+                             it->chain_code == chain_code && it->sent_epoch <= accepted->epoch_index;
+        ++erased) {
+      it = by_sent.erase(std::move(it));
+   }
+}
+
 /// `account`'s `active` authority: this contract's own on every inline action it sends, and the
 /// holder's on the transfer a desyndication makes on the holder's behalf.
 permission_level active_of(name account) { return permission_level{account, active_permission}; }
@@ -515,7 +545,8 @@ std::optional<bond::request_row> find_request(name self, const synd::envelope_ro
 }
 
 /// Snapshot a terminal outcome before acknowledging it. This function moves no funds and includes
-/// DONE envelopes whose release finished before challenge finality. Settlement work rewinds release.
+/// DONE envelopes whose release finished before challenge finality. A ruling on an envelope the release walk
+/// may be past -- finished before an INVALID ruling, or held -- rewinds the pair's `queue_epoch` to it.
 /// True when it changed `row`: a new request id, or a terminal outcome.
 bool synchronize(name self, synd::envelope_row& row) {
    if (row.state == synd::envelope_state::OPEN || row.state == synd::envelope_state::WAITING ||
@@ -533,8 +564,10 @@ bool synchronize(name self, synd::envelope_row& row) {
       row.forfeit = req->bonded;
       row.bounty_returned = req->hold_beneficiary == name{} ? req->bounty : 0;
    } else return identified;
-   if (row.outcome == outcome::INVALID) {
-      if (row.state == synd::envelope_state::DONE) row.state = synd::envelope_state::HELD;
+   if (row.outcome == outcome::INVALID && row.state == synd::envelope_state::DONE) {
+      row.state = synd::envelope_state::HELD;
+   }
+   if (row.outcome == outcome::INVALID || row.state == synd::envelope_state::HELD) {
       synd::ledger_t ledger(self);
       const synd::ledger_key key{row.chain_code.value, row.token_code.value};
       auto lrow = ledger.try_get(key);
@@ -652,7 +685,8 @@ private:
    /// Walk the envelopes of the pair of `st` from its ledger's `queue_epoch`, at most as many as the
    /// budget and the examination cap leave: refresh each issued request, release RELEASABLE envelopes,
    /// issue the oldest WAITING envelope's request when no earlier one is unbonded and unruled, and move
-   /// `queue_epoch` past the finished prefix. Each envelope looked at and each item row read counts one
+   /// `queue_epoch` past the finished prefix. A fully bonded HELD envelope awaiting its ruling counts as
+   /// finished for the release cursor. Each envelope looked at and each item row read counts one
    /// examination. The refresh reads state only and spends no budget, so every issued request the walk
    /// reaches has its outcome recorded, whatever the pair's flows; releasing, burning and requesting
    /// spend the budget. Entry costs one examination, for the ledger and config rows and the first
@@ -686,7 +720,7 @@ private:
       }
 
       uint32_t queue_epoch = underwriting_ ? lrow->underwriting_epoch : lrow->queue_epoch;
-      bool     finished    = true;    // every envelope walked so far is DONE or INVALID
+      bool     finished    = true;    // the cursor can move past every envelope walked so far
       bool     unbonded    = false;   // an earlier request is neither bonded nor ruled: nothing moves past it
       for (const auto& key : keys) {
          if (!look()) break;
@@ -717,17 +751,25 @@ private:
                             (row->state != synd::envelope_state::WAITING &&
                              row->state != synd::envelope_state::OPEN &&
                              row->state != synd::envelope_state::REQUESTED)))
-            : (row->state == synd::envelope_state::DONE || row->state == synd::envelope_state::INVALID);
+            // A fully bonded hold awaiting its ruling keeps back only its own envelope: the walk moves on, and
+            // `synchronize` brings it back when the ruling is recorded.
+            : (row->state == synd::envelope_state::DONE || row->state == synd::envelope_state::INVALID ||
+               (row->state == synd::envelope_state::HELD && row->outcome == synd::request_outcome::PENDING &&
+                !unbonded));
          if (finished && done) {
             queue_epoch = key.epoch_index + 1;
          } else {
             finished = false;
          }
       }
-      if (queue_epoch != (underwriting_ ? lrow->underwriting_epoch : lrow->queue_epoch)) {
-         if (underwriting_) lrow->underwriting_epoch = queue_epoch;
-         else lrow->queue_epoch = queue_epoch;
-         ledger.set(ram_payer, lkey, *lrow);
+      if (queue_epoch != start_epoch) {
+         // Read again: a ruling this walk recorded may have rewound the pair's release cursor.
+         lrow = ledger.try_get(lkey);
+         if (lrow) {
+            if (underwriting_) lrow->underwriting_epoch = queue_epoch;
+            else lrow->queue_epoch = queue_epoch;
+            ledger.set(ram_payer, lkey, *lrow);
+         }
       }
       return true;
    }
@@ -1322,14 +1364,6 @@ void synd::reconcile(sysio::slug_name chain_code, sysio::slug_name token_code, u
    incidents.erase(key);
 }
 
-void synd::finishreturn(uint64_t request_id) {
-   require_auth(SYSTEM_ACCOUNT);
-   returns_t pending(get_self());
-   const return_key key{request_id};
-   check(pending.contains(key), outstanding_return_not_found_msg);
-   pending.erase(key);
-}
-
 void synd::refundreturn(uint64_t request_id) {
    require_auth(SYSTEM_ACCOUNT);
    returns_t pending(get_self());
@@ -1403,7 +1437,7 @@ void synd::challenge(name challenger, sysio::slug_name chain_code, sysio::slug_n
    check(req.has_value(), no_request_message.data());
    check(req->state != bond::request_state::HELD, challenged_message.data());
    // Only a fully bonded request: nothing releases before then, and a held request takes no more bonds, so
-   // holding an under-bonded one would stop the pair until `sysio` rules.
+   // holding an under-bonded one would stop the pair until a judge rules.
    check(req->state != bond::request_state::OPEN, unbonded_message.data());
    check(req->state == bond::request_state::BONDED, request_final_message.data());
 
@@ -1424,8 +1458,11 @@ void synd::challenge(name challenger, sysio::slug_name chain_code, sysio::slug_n
           std::make_tuple(challenger, get_self(), asset{static_cast<int64_t>(charge), st->supply.symbol},
                           std::string{challenge_memo}))
       .send();
-   // sysio.bond pulls the hold bond back out of this contract's row, where the charge put it.
-   action(active_of(get_self()), BOND_ACCOUNT, hold_action, std::make_tuple(req->id, challenger)).send();
+   // sysio.bond pulls the hold bond back out of this contract's row, where the charge put it. The
+   // challenger signs the hold too: it is the beneficiary, and the hold-bond escrow bills its RAM.
+   action(std::vector<permission_level>{active_of(get_self()), active_of(challenger)}, BOND_ACCOUNT, hold_action,
+          std::make_tuple(req->id, challenger))
+      .send();
 
    row->state = envelope_state::HELD;
    envelopes.set(same_payer, key, *row);
@@ -1542,10 +1579,6 @@ void synd::desyndicate(name holder, asset quantity, uint64_t max_fee) {
    // quantity or more leaves nothing to release and is refused before the subtraction.
    const uint64_t fee    = quote.fee;
    const uint64_t amount = quote.net;
-   // The depot's outstanding shadow once the burn below has run, read from `st` before it: the burn is
-   // inline, so nothing has moved supply yet. The net was part of the holder's balance, so it is within
-   // the supply and the difference cannot underflow.
-   const uint64_t total_syndicated = liq::outstanding_of(LIQ_ACCOUNT, st) - amount;
 
    // The fee pot's position settles before the transfer that backs the fee arrives; no distribution runs
    // between this action and its inline transfer, so both settle at one index. The quantity moves to this
@@ -1562,6 +1595,7 @@ void synd::desyndicate(name holder, asset quantity, uint64_t max_fee) {
    const uint64_t request_id = c.next_request_id++;
    counters.set(c, ram_payer);
 
+   expire_consumed_returns(get_self(), st.chain_code);
    returns_t(get_self()).set(ram_payer, return_key{request_id}, return_row{
       .request_id = request_id,
       .holder = holder,
@@ -1572,12 +1606,23 @@ void synd::desyndicate(name holder, asset quantity, uint64_t max_fee) {
       .amount = amount,
    });
 
+   // send() queues children: the transfer may re-enter desyndicate before either burn has run.
+   // Read outstanding only in the final child, after this request's transfer and burn finish.
+   action(active_of(get_self()), get_self(), emitdesynd_action, std::make_tuple(request_id)).send();
+}
+
+void synd::emitdesynd(uint64_t request_id) {
+   require_receipt_origin(get_self());
+   const auto row = returns_t(get_self()).get(return_key{request_id}, outstanding_return_not_found_msg);
+   const auto st = liq::find_stat_by_token(LIQ_ACCOUNT, row.token_code);
+   check(st.has_value(), no_shadow_reason.data());
+
    opp::attestations::DesyndicateLIQ msg;
-   msg.chain_code = st.chain_code.value;
-   msg.user       = opp::types::ChainAddress{*kind, *pubkey};
-   msg.amount     = opp::types::TokenAmount{st.token_code.value, static_cast<int64_t>(amount)};
+   msg.chain_code = row.chain_code.value;
+   msg.user       = opp::types::ChainAddress{row.chain_kind, row.pubkey};
+   msg.amount     = opp::types::TokenAmount{row.token_code.value, static_cast<int64_t>(row.amount)};
    msg.request_id = request_id;
-   msg.total_syndicated = total_syndicated;
+   msg.total_syndicated = liq::outstanding_of(LIQ_ACCOUNT, *st);
    // `no_size{}`: raw protobuf bytes, the form the outpost decodes the attestation `data` field as
    // (the same encoding sysio.opreg's emitters use).
    std::vector<char> encoded;
@@ -1585,8 +1630,31 @@ void synd::desyndicate(name holder, asset quantity, uint64_t max_fee) {
    (void)out(msg);
 
    action(active_of(get_self()), MSGCH_ACCOUNT, queueout_action,
-          std::make_tuple(st.chain_code.value, AttestationType::ATTESTATION_TYPE_DESYNDICATE_LIQ, encoded))
+          std::make_tuple(row.chain_code.value, AttestationType::ATTESTATION_TYPE_DESYNDICATE_LIQ, encoded))
       .send();
+}
+
+void synd::retsent(sysio::slug_name chain_code, uint32_t epoch_index, std::vector<uint64_t> request_ids) {
+   require_auth(MSGCH_ACCOUNT);
+   returns_t pending(get_self());
+   for (const uint64_t request_id : request_ids) {
+      const return_key key{request_id};
+      auto             row = pending.try_get(key);
+      if (!row.has_value()) {
+         drop(retsent_path, return_resolved_reason);
+         continue;
+      }
+      if (row->chain_code != chain_code) {
+         drop(retsent_path, return_outpost_reason);
+         continue;
+      }
+      if (row->sent_epoch != 0) {
+         drop(retsent_path, return_stamped_reason);
+         continue;
+      }
+      row->sent_epoch = epoch_index;
+      pending.set(ram_payer, key, *row);
+   }
 }
 
 // ---------------------------------------------------------------------------

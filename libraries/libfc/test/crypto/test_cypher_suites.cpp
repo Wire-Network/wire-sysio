@@ -708,6 +708,54 @@ BOOST_AUTO_TEST_CASE(test_sol_client_signer_sign_verify) try {
    BOOST_TEST(!s.verify(sig, bad));
 } FC_LOG_AND_RETHROW();
 
+BOOST_AUTO_TEST_CASE(test_sol_client_signer_signs_via_sign_raw_without_private_key) try {
+   // A provider with no local key signs through `sign_raw`, as an AWS KMS Ed25519 provider does. Ed25519 is
+   // deterministic, so the result must equal the local-key signature.
+   const private_key               key    = private_key::generate(private_key::key_type::ed);
+   const ed::private_key_shim      ed_key = key.get<ed::private_key_shim>();
+   const std::span<const uint8_t>  payload = ethereum::to_uint8_span("solana transaction bytes");
+
+   signature_provider_t remote;
+   remote.key_type   = chain_key_type_solana;
+   remote.public_key = key.get_public_key();
+   remote.sign_raw   = [ed_key](std::span<const uint8_t> data) {
+      return signature(signature::storage_type(ed_key.sign_raw(data.data(), data.size())));
+   };
+
+   const sol_client_signer s(remote);
+   const signature         sig = s.sign(payload);
+   BOOST_TEST(s.verify(sig, payload));
+   BOOST_TEST(remote.self_verified->load());
+   BOOST_CHECK_EQUAL(sig.to_string({}), sol_client_signer(make_provider(key, chain_key_type_solana)).sign(payload)
+                                           .to_string({}));
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(test_sol_client_signer_rejects_sign_raw_for_another_key) try {
+   const private_key              advertised = private_key::generate(private_key::key_type::ed);
+   const ed::private_key_shim other =
+      private_key::generate(private_key::key_type::ed).get<ed::private_key_shim>();
+   const std::span<const uint8_t> payload    = ethereum::to_uint8_span("solana transaction bytes");
+
+   signature_provider_t remote;
+   remote.key_type   = chain_key_type_solana;
+   remote.public_key = advertised.get_public_key();
+   remote.sign_raw   = [other](std::span<const uint8_t> data) {
+      return signature(signature::storage_type(other.sign_raw(data.data(), data.size())));
+   };
+
+   BOOST_CHECK_THROW(sol_client_signer(remote).sign(payload), fc::assert_exception);
+   BOOST_TEST(!remote.self_verified->load());
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(test_sol_client_signer_requires_private_key_or_sign_raw) try {
+   const private_key    key = private_key::generate(private_key::key_type::ed);
+   signature_provider_t provider;
+   provider.key_type   = chain_key_type_solana;
+   provider.public_key = key.get_public_key();
+
+   BOOST_CHECK_THROW(sol_client_signer(provider).sign(ethereum::to_uint8_span("bytes")), fc::assert_exception);
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_CASE(test_wire_signer_k1) try {
    auto key      = private_key::generate();
    auto pub      = key.get_public_key();

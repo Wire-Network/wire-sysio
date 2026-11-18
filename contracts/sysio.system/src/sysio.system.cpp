@@ -52,7 +52,7 @@ namespace sysiosystem {
 #ifndef SYSTEM_BLOCKCHAIN_PARAMETERS
       set_blockchain_parameters( params );
 #else
-      constexpr size_t param_count = 17;
+      constexpr size_t param_count = 18;
       // an upper bound on the serialized size
       char buf[1 + sizeof(params) + param_count];
       datastream<char*> stream(buf, sizeof(buf));
@@ -77,7 +77,9 @@ namespace sysiosystem {
              << uint8_t(13) << params.max_action_return_value_size
              << uint8_t(14) << params.max_kv_key_size
              << uint8_t(15) << params.max_kv_value_size
-             << uint8_t(16) << params.max_kv_secondary_key_size;
+             << uint8_t(16) << params.max_kv_secondary_key_size
+
+             << uint8_t(17) << params.notify_cpu_stipend;
 
       set_parameters_packed(buf, stream.tellp());
 #endif
@@ -99,6 +101,9 @@ namespace sysiosystem {
       uint32_t max_call_depth;
    };
 
+   /// Largest wasm module, and largest function body, `setcode` accepts under every preset.
+   static constexpr uint32_t max_wasm_bytes = 4*1024*1024;
+
    static constexpr wasm_parameters default_limits = {
        .max_mutable_global_bytes = 1024,
        .max_table_elements = 1024,
@@ -107,8 +112,8 @@ namespace sysiosystem {
        .max_func_local_bytes = 8192,
        .max_nested_structures = 1024,
        .max_symbol_bytes = 8192,
-       .max_module_bytes = 20*1024*1024,
-       .max_code_bytes = 20*1024*1024,
+       .max_module_bytes = max_wasm_bytes,
+       .max_code_bytes = max_wasm_bytes,
        .max_pages = 528,
        .max_call_depth = 251
    };
@@ -121,8 +126,8 @@ namespace sysiosystem {
        .max_func_local_bytes = 8192,
        .max_nested_structures = 1024,
        .max_symbol_bytes = 8192,
-       .max_module_bytes = 20*1024*1024,
-       .max_code_bytes = 20*1024*1024,
+       .max_module_bytes = max_wasm_bytes,
+       .max_code_bytes = max_wasm_bytes,
        .max_pages = 528,
        .max_call_depth = 1024
    };

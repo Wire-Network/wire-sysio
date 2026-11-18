@@ -59,8 +59,9 @@ COPY <<-EOF /extras.cmake
   set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "" FORCE)
   set(CMAKE_C_COMPILER "gcc-14" CACHE STRING "")
   set(CMAKE_CXX_COMPILER "g++-14" CACHE STRING "")
-  set(CMAKE_C_FLAGS "-Wall -Wextra -fdiagnostics-color=always" CACHE STRING "")
-  set(CMAKE_CXX_FLAGS "-Wall -Wextra -fdiagnostics-color=always" CACHE STRING "")
+  # Permit unused callback parameters and partial aggregates that use member defaults.
+  set(CMAKE_C_FLAGS "-Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -fdiagnostics-color=always" CACHE STRING "")
+  set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -fdiagnostics-color=always" CACHE STRING "")
 EOF
 
 ENV SYSIO_PLATFORM_HAS_EXTRAS_CMAKE=1

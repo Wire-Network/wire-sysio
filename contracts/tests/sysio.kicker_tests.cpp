@@ -110,8 +110,6 @@ BOOST_AUTO_TEST_CASE(call_pattern_independence) {
 BOOST_FIXTURE_TEST_CASE(twap_after_trade_and_current_supply, kicker_tester) {
    wait(math::day_sec);
    const auto old_gift = expected();
-   BOOST_REQUIRE_EQUAL(success(), openext("bob"_n, "bob"_n, extended_symbol{WIRE_SYM, TOKEN_ACCOUNT}));
-   BOOST_REQUIRE_EQUAL(success(), openext("bob"_n, "bob"_n, extended_symbol{LIQSOL_SYM, LIQ_ACCOUNT}));
    BOOST_REQUIRE_EQUAL(success(), transfer_wire(SYSIO_ACCOUNT, "bob"_n, seed));
    BOOST_REQUIRE_EQUAL(success(), transfer_wire("bob"_n, SWAP_ACCOUNT, seed));
    BOOST_REQUIRE_EQUAL(success(), exchange("bob"_n, POOL_SYM, extended_asset{asset(seed, WIRE_SYM), TOKEN_ACCOUNT},
@@ -137,8 +135,6 @@ BOOST_FIXTURE_TEST_CASE(twap_after_trade_and_current_supply, kicker_tester) {
 BOOST_FIXTURE_TEST_CASE(large_same_block_trade_cannot_amplify_gift, kicker_tester) {
    constexpr uint64_t attack = 10'000'000 * UNIT;
    wait(3 * math::day_sec);
-   BOOST_REQUIRE_EQUAL(success(), openext("bob"_n, "bob"_n, extended_symbol{WIRE_SYM, TOKEN_ACCOUNT}));
-   BOOST_REQUIRE_EQUAL(success(), openext("bob"_n, "bob"_n, extended_symbol{LIQSOL_SYM, LIQ_ACCOUNT}));
    BOOST_REQUIRE_EQUAL(success(), transfer_wire(SYSIO_ACCOUNT, "bob"_n, attack));
    BOOST_REQUIRE_EQUAL(success(), transfer_wire("bob"_n, SWAP_ACCOUNT, attack));
    const auto baseline = expected();
@@ -743,8 +739,6 @@ BOOST_AUTO_TEST_CASE(one_block_spike_cashed_in_one_block_pays_the_inflated_gift)
          BOOST_REQUIRE_EQUAL(t.success(), t.change(200, 1, cap));
          BOOST_REQUIRE_EQUAL(t.success(), t.configure(t.budget, 1, t.SYSIO_ACCOUNT, math::min_twap_window_sec,
                                                       tightest));
-         BOOST_REQUIRE_EQUAL(t.success(), t.openext("bob"_n, "bob"_n, extended_symbol{t.WIRE_SYM, t.TOKEN_ACCOUNT}));
-         BOOST_REQUIRE_EQUAL(t.success(), t.openext("bob"_n, "bob"_n, extended_symbol{t.LIQSOL_SYM, t.LIQ_ACCOUNT}));
          BOOST_REQUIRE_EQUAL(t.success(), t.transfer_wire(t.SYSIO_ACCOUNT, "bob"_n, pump));
          BOOST_REQUIRE_EQUAL(t.success(), t.transfer_wire("bob"_n, t.SWAP_ACCOUNT, pump));
          t.wait(math::min_twap_window_sec);
@@ -826,7 +820,7 @@ BOOST_AUTO_TEST_CASE(spot_deviation_threshold_is_inclusive) {
             BOOST_CHECK_EQUAL(0, t.paid());
             BOOST_CHECK(after.deviation);
             BOOST_CHECK_EQUAL(gift, after.shortfall);
-            BOOST_CHECK(after.observed == t.control->head_block_time());
+            BOOST_CHECK(after.observed == t.control->head().block_time());
             // The clock and the observation are held.
             BOOST_CHECK(after.clock == observation.clock);
             BOOST_CHECK(after.price_time == observation.price_time);
@@ -871,8 +865,6 @@ BOOST_FIXTURE_TEST_CASE(pump_straddling_a_checkpoint_funds_no_payout, kicker_tes
    };
    BOOST_REQUIRE_EQUAL(success(), configure(budget, 1, SYSIO_ACCOUNT, window));
    BOOST_REQUIRE_EQUAL(100'000 * UNIT, supply());
-   BOOST_REQUIRE_EQUAL(success(), openext("bob"_n, "bob"_n, extended_symbol{WIRE_SYM, TOKEN_ACCOUNT}));
-   BOOST_REQUIRE_EQUAL(success(), openext("bob"_n, "bob"_n, extended_symbol{LIQSOL_SYM, LIQ_ACCOUNT}));
    BOOST_REQUIRE_EQUAL(success(), transfer_wire(SYSIO_ACCOUNT, "bob"_n, pump));
    BOOST_REQUIRE_EQUAL(success(), transfer_wire("bob"_n, SWAP_ACCOUNT, pump));
 

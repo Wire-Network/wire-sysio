@@ -2,6 +2,7 @@
 
 #include <cstring>               // for memset
 #include <span>
+#include <string>
 #include <cstddef>
 #include <ostream>               // for std::ostream
 #include <sodium.h>              // for ED25519 methods
@@ -181,6 +182,12 @@ bool is_zero(const public_key_shim& pk);
  * small-order (torsion) points still count as on-curve.
  */
 bool is_on_curve(const public_key_shim& pk);
+
+/**
+ * The message an Ed25519 key signs for a 256-bit digest: the digest's lowercase hex, the payload Phantom wallets
+ * sign. `private_key_shim::sign_sha256` and `signature_shim::verify` use it, and so must a remote Ed25519 signer.
+ */
+std::string digest_signing_message(const sha256& digest);
 
 }}} // namespace fc::crypto::ed
 

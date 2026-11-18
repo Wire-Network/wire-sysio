@@ -98,6 +98,9 @@ std::vector<uint8_t> encode_static_value(const abi::component_type& component, c
          return be_uint_from_decimal(value.as_string());
       }
 
+      // Two's complement: a negative value of a signed type is 2^256 less its magnitude.
+      if (abi::is_data_type_numeric_signed(type))
+         return be_uint_from_decimal(fc::uint256(value.as_int256()).str());
       return be_uint_from_decimal(value.as_uint256().str());
    }
 

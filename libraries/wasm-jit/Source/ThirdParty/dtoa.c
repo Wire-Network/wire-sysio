@@ -1865,7 +1865,7 @@ gethex( CONST char **sp, U *rvp, int rounding, int sign)
 		switch(*++s) {
 		  case '-':
 			esign = 1;
-			/* no break */
+			/* fall through */
 		  case '+':
 			s++;
 		  }
@@ -2532,11 +2532,11 @@ strtod
 	for(s = s00;;s++) switch(*s) {
 		case '-':
 			sign = 1;
-			/* no break */
+			/* fall through */
 		case '+':
 			if (*++s)
 				goto break2;
-			/* no break */
+			/* fall through */
 		case 0:
 			goto ret0;
 		case '\t':
@@ -2644,6 +2644,7 @@ strtod
 		switch(c = *++s) {
 			case '-':
 				esign = 1;
+				/* fall through */
 			case '+':
 				c = *++s;
 			}
@@ -3898,7 +3899,7 @@ dtoa
 			break;
 		case 2:
 			leftright = 0;
-			/* no break */
+			/* fall through */
 		case 4:
 			if (ndigits <= 0)
 				ndigits = 1;
@@ -3906,7 +3907,7 @@ dtoa
 			break;
 		case 3:
 			leftright = 0;
-			/* no break */
+			/* fall through */
 		case 5:
 			i = ndigits + k + 1;
 			ilim = i;

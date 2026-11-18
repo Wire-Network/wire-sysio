@@ -93,6 +93,7 @@ fc::em::public_key to_em_public_key(const std::string& pubkey_hex) {
    switch (pubkey_byte_count) {
    case 64:
       copy_to_offset = 1;
+      [[fallthrough]];
    case 65: {
       em::public_key_data_uncompressed pubkey_data;
       std::copy_n(pubkey_bytes.data(), pubkey_bytes.size(), pubkey_data.data() + copy_to_offset);

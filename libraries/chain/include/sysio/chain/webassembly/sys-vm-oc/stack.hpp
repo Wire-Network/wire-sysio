@@ -25,6 +25,9 @@ struct execution_stack {
    void reset(std::size_t max_call_depth);
    void reset();
 
+   /// Run `f` on the execution stack, or on the caller's stack when none is mapped.
+   /// `f` must return normally: the stack switch carries no unwind information, so an exception cannot cross it.
+   /// A `siglongjmp` out of `f` must target a `sigsetjmp` called inside `f`, never one on the caller's stack.
    template<typename F>
    void run(F&& f) {
       if (stack_top) {

@@ -2,6 +2,7 @@
 #include <sysio.andon/sysio.andon.hpp>
 #include <sysio.chains/sysio.chains.hpp>
 #include <sysio.epoch/sysio.epoch.hpp>
+#include <sysio.system/treasury.hpp>
 #include <sysio.tokens/sysio.tokens.hpp>
 #include <sysio.opp.common/require_privileged.hpp>
 #include <sysio.opp.common/safe_ops.hpp>
@@ -18,6 +19,7 @@ constexpr auto invalid_quantity_msg = "invalid quantity";
 constexpr auto must_settle_positive_quantity_msg = "must settle positive quantity";
 constexpr auto symbol_precision_mismatch_msg = "symbol precision mismatch";
 constexpr auto overdrawn_balance_msg = "overdrawn balance";
+constexpr auto wire_seed_reserved_msg = "the WIRE seed exceeds the treasury's unreserved balance";
 constexpr name bond_account = "sysio.bond"_n;
 
 
@@ -36,9 +38,6 @@ constexpr std::string_view CLAIM_MEMO  = "sysio.liq claim";
 /// Memo of the transfer that brings the WIRE `creditowed` credits in from sysio.synd.
 constexpr std::string_view CREDIT_MEMO = "sysio.liq creditowed";
 
-/// The `sysio.payer` seat: an inline action to an unprivileged contract that bills a
-/// row to `actor` must carry it beside `actor`'s active permission.
-permission_level payer_of(name actor) { return permission_level{ actor, "sysio.payer"_n }; }
 permission_level active_of(name actor) { return permission_level{ actor, "active"_n }; }
 
 void drop(const char* path, const char* reason) {
@@ -86,7 +85,7 @@ void liq::recredit(name holder, asset quantity) {
    const currency_stats st = stat_of(quantity.symbol.code());
    check(quantity.symbol == st.supply.symbol, symbol_precision_mismatch_msg);
    check(grow_supply(quantity.symbol.code(), static_cast<uint64_t>(quantity.amount)), "supply exceeds the asset range");
-   adjust_account(holder, quantity, ram_payer);
+   adjust_account(holder, quantity);
 }
 
 // ---------------------------------------------------------------------------
@@ -100,7 +99,7 @@ void liq::mint(name to, sysio::slug_name token_code, uint64_t amount) {
    const currency_stats st  = stat_by_token(token_code);
    const symbol_code    sym = st.supply.symbol.code();
    check(grow_supply(sym, amount), "supply exceeds the asset range");
-   adjust_account(to, asset{ static_cast<int64_t>(amount), st.supply.symbol }, ram_payer);
+   adjust_account(to, asset{ static_cast<int64_t>(amount), st.supply.symbol });
 }
 
 void liq::burn(sysio::slug_name token_code, uint64_t amount) {
@@ -109,7 +108,7 @@ void liq::burn(sysio::slug_name token_code, uint64_t amount) {
    const currency_stats st = stat_by_token(token_code);
    const asset quantity{ static_cast<int64_t>(amount), st.supply.symbol };
    // Settle, then burn: the row keeps every subunit of yield accrued to now.
-   adjust_account(SYND_ACCOUNT, -quantity, ram_payer);
+   adjust_account(SYND_ACCOUNT, -quantity);
    stats statstable(get_self());
    statstable.modify(ram_payer, symbol_key{ st.supply.symbol.code().raw() }, [&](currency_stats& s) {
       s.supply -= quantity;
@@ -200,10 +199,9 @@ void liq::queueyield(symbol_code sym) {
    // Minted to this contract and handed on in the same transaction, so its row is
    // settled at one index and accrues nothing on the way through.
    check(grow_supply(sym, static_cast<uint64_t>(quantity.amount)), "supply exceeds the asset range");
-   adjust_account(get_self(), quantity, ram_payer);
+   adjust_account(get_self(), quantity);
 
-   action(std::vector<permission_level>{ payer_of(get_self()), active_of(get_self()) },
-          SWAP_ACCOUNT, "fundyield"_n,
+   action(active_of(get_self()), SWAP_ACCOUNT, "fundyield"_n,
           std::make_tuple(get_self(), st.pair_symbol, quantity)).send();
    action(active_of(get_self()), get_self(), "transfer"_n,
           std::make_tuple(get_self(), SWAP_ACCOUNT, quantity, std::string{})).send();
@@ -230,8 +228,8 @@ void liq::transfer(name from, name to, asset quantity, string memo) {
    check(quantity.symbol == st.supply.symbol, symbol_precision_mismatch_msg);
    check(memo.size() <= MAX_MEMO_BYTES, "memo has more than 256 bytes");
 
-   adjust_account(from, -quantity, ram_payer);
-   adjust_account(to, quantity, ram_payer);
+   adjust_account(from, -quantity);
+   adjust_account(to, quantity);
 }
 
 void liq::settle(name custodian, name beneficiary, asset quantity) {
@@ -246,21 +244,10 @@ void liq::settle(name custodian, name beneficiary, asset quantity) {
    if (custodian == beneficiary) {
       const auto row = accounts(get_self(), custodian.value).try_get(symbol_key{quantity.symbol.code().raw()});
       check(row && row->balance.amount >= quantity.amount, overdrawn_balance_msg);
-      adjust_account(custodian, asset{0, quantity.symbol}, ram_payer);
+      adjust_account(custodian, asset{0, quantity.symbol});
    } else {
-      adjust_account(custodian, -quantity, ram_payer);
-      adjust_account(beneficiary, quantity, ram_payer);
-   }
-}
-
-void liq::open(name owner, symbol symbol, name ram_payer_) {
-   require_auth(ram_payer_);
-   check(is_account(owner), "owner account does not exist");
-   const currency_stats st = stat_of(symbol.code());
-   check(st.supply.symbol == symbol, symbol_precision_mismatch_msg);
-   accounts holdings(get_self(), owner.value);
-   if (!holdings.contains(symbol_key{ symbol.code().raw() })) {
-      adjust_account(owner, asset{ 0, symbol }, ram_payer_);
+      adjust_account(custodian, -quantity);
+      adjust_account(beneficiary, quantity);
    }
 }
 
@@ -323,7 +310,6 @@ void liq::regliqpool(sysio::slug_name chain_code, sysio::slug_name token_code, s
                      int64_t locked_shares, uint32_t conversion_horizon_sec, uint32_t depth_cap_bps,
                      int64_t clip_floor) {
    opp::require_privileged_self();
-   check(epoch::in_bootstrap_window(), "regliqpool is bootstrap-window only");
    const auto st = find_stat_by_token(get_self(), token_code);
    check(st.has_value(), "token_code has no shadow symbol");
    check(st->chain_code == chain_code, "token_code belongs to another chain");
@@ -337,22 +323,23 @@ void liq::regliqpool(sysio::slug_name chain_code, sysio::slug_name token_code, s
    const asset           shadow{ static_cast<int64_t>(initial_chain_amount), sym };
    const asset           wire  { static_cast<int64_t>(initial_wire_amount),  WIRE_SYM };
    const extended_symbol shadow_symbol{ sym, get_self() };
-   const extended_symbol wire_symbol  { WIRE_SYM, TOKEN_ACCOUNT };
 
-   // The LCO liq is protocol-owned and already in outpost custody: its shadow is
-   // minted to sysio, which seeds the pool with it and holds the pool's shares.
-   check(grow_supply(sym.code(), initial_chain_amount), "supply exceeds the asset range");
-   adjust_account(SYSTEM_ACCOUNT, shadow, ram_payer);
+   // sysio seeds the pool and holds its shares. In the bootstrap window the seed is the LCO liq,
+   // protocol-owned and already in outpost custody, so its shadow is minted, and its WIRE is the T5
+   // dex earmark. After the window nothing is minted: the shadow is what sysio already holds (the
+   // transfer below fails without it), and the WIRE may not touch what the treasury has reserved.
+   if (epoch::in_bootstrap_window()) {
+      check(grow_supply(sym.code(), initial_chain_amount), "supply exceeds the asset range");
+      adjust_account(SYSTEM_ACCOUNT, shadow);
+   } else {
+      check(initial_wire_amount <= sysiosystem::treasury::available(SYSTEM_ACCOUNT, TOKEN_ACCOUNT),
+            wire_seed_reserved_msg);
+   }
    stats statstable(get_self());
    statstable.modify(ram_payer, symbol_key{ sym.code().raw() }, [&](currency_stats& s) {
       s.pair_symbol = pair_symbol.code();
    });
 
-   const std::vector<permission_level> sysio_billed{ payer_of(SYSTEM_ACCOUNT), active_of(SYSTEM_ACCOUNT) };
-   action(sysio_billed, SWAP_ACCOUNT, "openext"_n,
-          std::make_tuple(SYSTEM_ACCOUNT, SYSTEM_ACCOUNT, shadow_symbol)).send();
-   action(sysio_billed, SWAP_ACCOUNT, "openext"_n,
-          std::make_tuple(SYSTEM_ACCOUNT, SYSTEM_ACCOUNT, wire_symbol)).send();
    // The shadow has no pair yet, so its seed carries the swap's own authority.
    action(std::vector<permission_level>{ active_of(SYSTEM_ACCOUNT), active_of(SWAP_ACCOUNT) },
           get_self(), "transfer"_n,
@@ -360,7 +347,7 @@ void liq::regliqpool(sysio::slug_name chain_code, sysio::slug_name token_code, s
    // The WIRE side is the T5 dex earmark, drained from the treasury.
    action(active_of(SYSTEM_ACCOUNT), TOKEN_ACCOUNT, "transfer"_n,
           std::make_tuple(SYSTEM_ACCOUNT, SWAP_ACCOUNT, wire, std::string{})).send();
-   action(std::vector<permission_level>{ payer_of(SYSTEM_ACCOUNT), active_of(SYSTEM_ACCOUNT), active_of(SWAP_ACCOUNT) },
+   action(std::vector<permission_level>{ active_of(SYSTEM_ACCOUNT), active_of(SWAP_ACCOUNT) },
           SWAP_ACCOUNT, "inittoken"_n,
           std::make_tuple(SYSTEM_ACCOUNT, pair_symbol, extended_asset{ shadow, get_self() },
                           extended_asset{ wire, TOKEN_ACCOUNT }, fee, SYSTEM_ACCOUNT,
@@ -403,19 +390,19 @@ void liq::settle_and_adjust(opp::shadow::account& row, u128 index, const asset& 
    check(row.balance.amount >= 0, overdrawn_balance_msg);
 }
 
-void liq::adjust_account(name owner, const asset& delta, name payer) {
+void liq::adjust_account(name owner, const asset& delta) {
    accounts holdings(get_self(), owner.value);
    const symbol_key key{ delta.symbol.code().raw() };
    const u128 index = current_index(delta.symbol.code());
    const auto row = holdings.try_get(key);
    if (!row) {
       check(delta.amount >= 0, "no balance object found");
-      holdings.emplace(payer, key, opp::shadow::account{ delta, index, 0 });
+      holdings.emplace(ram_payer, key, opp::shadow::account{ delta, index, 0 });
       return;
    }
    opp::shadow::account updated = *row;
    settle_and_adjust(updated, index, delta);
-   holdings.modify(payer, key, [&](opp::shadow::account& a) { a = updated; });
+   holdings.modify(ram_payer, key, [&](opp::shadow::account& a) { a = updated; });
 }
 
 bool liq::grow_supply(symbol_code sym, uint64_t quantity) {

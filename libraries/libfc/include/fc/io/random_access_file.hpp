@@ -371,11 +371,12 @@ public:
          return write(&c, sizeof(char));
       }
 
+      /// Flush pending bytes, dropping write errors and retaining fail-fast shared-memory OOM handling.
       ~write_datastream() {
          try {
             if(ctx)
                do_write();
-         } FC_LOG_AND_DROP("write failure ignored");
+         } FC_LOG_AND_DROP_NOEXCEPT("write failure ignored");
       }
 
    private:

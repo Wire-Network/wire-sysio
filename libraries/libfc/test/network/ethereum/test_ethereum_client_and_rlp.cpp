@@ -468,6 +468,26 @@ BOOST_AUTO_TEST_CASE(abi_decode_sole_static_array) try {
 }
 FC_LOG_AND_RETHROW();
 
+/** A negative value of a signed type encodes as two's complement; an unsigned type refuses it. */
+BOOST_AUTO_TEST_CASE(abi_encode_negative_integers) try {
+   using namespace abi_decode_fixture;
+   const std::string minus_one(word_hex_size, 'f');
+   const std::string minus_128 = std::string(word_hex_size - hex_chars_per_byte, 'f') + "80";
+   const fc::variants negative_pair{fc::variant(fc::variants{fc::variant(int64_t{-1}), fc::variant(int64_t{-128})})};
+
+   for (const eth::abi::data_type type : {eth::abi::data_type::int8, eth::abi::data_type::int64}) {
+      const auto contract = array_contract(type, pair_size);
+      const auto encoded  = eth::contract_encode_data(contract, negative_pair);
+      BOOST_CHECK_EQUAL(encoded.substr(selector.size()), minus_one + minus_128);
+      check_pair(eth::contract_decode_data(contract, encoded, true), "-1", "-128");
+   }
+   for (const eth::abi::data_type type : {eth::abi::data_type::uint8, eth::abi::data_type::uint64}) {
+      BOOST_CHECK_THROW(eth::contract_encode_data(array_contract(type, pair_size), negative_pair),
+                        fc::parse_error_exception);
+   }
+}
+FC_LOG_AND_RETHROW();
+
 /** A fixed array of static tuples is inline, with each tuple occupying two consecutive words. */
 BOOST_AUTO_TEST_CASE(abi_decode_sole_static_tuple_array) try {
    using namespace abi_decode_fixture;

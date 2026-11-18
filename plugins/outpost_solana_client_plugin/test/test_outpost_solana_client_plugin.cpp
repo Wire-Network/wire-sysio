@@ -4165,6 +4165,7 @@ namespace chunk_rpc_fixture {
    constexpr auto context_key = "context";
    constexpr auto slot_key = "slot";
    constexpr auto value_key = "value";
+   constexpr auto result_key = "result";
    constexpr auto commitment_key = "commitment";
    constexpr auto finalized = "finalized";
    constexpr auto account_method = "getAccountInfo";
@@ -4178,6 +4179,7 @@ namespace chunk_rpc_fixture {
    constexpr auto skip_preflight_key = "skipPreflight";
    constexpr auto send_method = "sendTransaction";
    constexpr auto confirmed = "confirmed";
+   constexpr auto processed = "processed";
    constexpr auto signature = "cleanup-signature";
    constexpr auto timeout_error = "settled check scoped deadline expired";
    constexpr char payload = 'e';
@@ -4317,7 +4319,262 @@ std::vector<fc::test::capture_http_server::scripted_response> chunk_transaction_
            chunk_rpc_reply(status, first_id + 2)};
 }
 
+/// Visibility regressions use the real resume, buffer RPC, signing, and confirmation paths.
+struct chunk_visibility_client : sysio::outpost_solana_client {
+   /// Use the production batch-operator IDL and signer with the fixture's RPC endpoint.
+   explicit chunk_visibility_client(sysio::solana_client_entry_ptr entry)
+      : outpost_solana_client(std::move(entry), resume_program_id, {load_idl_fixture(opp_outpost_idl_fixture)},
+                              1, 1, sysio::solana_outpost_role::batch_operator) {}
+
+   /// Gate calls include the initial optional settled check and checks while visibility is unresolved.
+   uint32_t gate_reads = 0;
+   /// Simulate another operator settling the epoch on this gate read.
+   std::optional<uint32_t> settle_on_gate;
+   /// Fail the required settled check after the initial optional check succeeded.
+   bool fail_wait_gate = false;
+   /// Delivery deadline observed at each real confirmed-buffer RPC.
+   std::vector<std::optional<fc::time_point>> buffer_deadlines;
+
+   /// Keep the epoch open unless the scenario explicitly settles it.
+   reap_detail::envelope_chunk_reap_gates read_envelope_chunk_reap_gates() override {
+      ++gate_reads;
+      if (fail_wait_gate && gate_reads > 1)
+         FC_THROW_EXCEPTION(fc::exception, chunk_rpc_fixture::timeout_error);
+      const bool settled = settle_on_gate && gate_reads >= *settle_on_gate;
+      return {.next_epoch_index = reap_scenario::buffer_epoch + settled,
+              .latest_outbound_epoch = reap_scenario::buffer_epoch - !settled};
+   }
+
+   /// No older buffers need cleanup in these delivery scenarios.
+   std::vector<reap_detail::envelope_chunk_buffer> read_own_envelope_chunk_buffers() override { return {}; }
+
+   /// Preserve the real HTTP boundary and observe that every visibility read shares the delivery scope.
+   std::optional<account_info> read_envelope_chunk_buffer(const solana_public_key& address,
+                                                          commitment_t commitment) override {
+      BOOST_CHECK(commitment == commitment_t::confirmed);
+      buffer_deadlines.push_back(fc::task::current_deadline());
+      return outpost_solana_client::read_envelope_chunk_buffer(address, commitment);
+   }
+};
+
+/// Slot skew from WIRE-444; a later slot without the required buffer must also keep the terminal blocked.
+constexpr uint32_t chunk_visibility_slot = 1175;
+/// Enough for ordinary fixture success and bounded retry backoff, without a live validator.
+constexpr auto chunk_visibility_budget = fc::seconds(5);
+/// Processed data success must not release the dependent terminal transaction.
+constexpr std::string_view chunk_processed_status =
+   R"({"context":{"slot":1175},"value":[{"slot":1175,"confirmations":0,"err":null,"confirmationStatus":"processed"}]})";
+
+/// A full getAccountInfo result, including its context slot and the account's actual owner.
+fc::test::capture_http_server::scripted_response chunk_buffer_reply(
+   const std::optional<account_info>& buffer, uint32_t id, uint32_t slot = chunk_visibility_slot) {
+   using namespace chunk_rpc_fixture;
+   fc::variant value;
+   if (buffer) {
+      fc::mutable_variant_object account(program_accounts_entry(
+         resume_program_id, buffer->data, buffer->lamports).get_object()[account_key].get_object());
+      constexpr auto owner_key = "owner";
+      account(rent_epoch_key, 0)(owner_key, buffer->owner.to_string(fc::yield_function_t{}));
+      value = fc::variant(account);
+   }
+   return chunk_rpc_reply(fc::json::to_string(
+      fc::mutable_variant_object()(context_key, fc::mutable_variant_object()(slot_key, slot))(value_key, value),
+      fc::json::yield_function_t{}), id);
+}
+
+/// Assert the commitment and exact per-operator buffer on a captured real account RPC.
+void check_chunk_buffer_request(const fc::test::capture_http_server& server, size_t index,
+                                 const solana_public_key& signer, std::string_view commitment) {
+   using namespace chunk_rpc_fixture;
+   const auto request = fc::json::from_string(server.request(index).body).get_object();
+   BOOST_CHECK_EQUAL(request[method_key].as_string(), account_method);
+   const auto& params = request[params_key].get_array();
+   const auto buffer = program_chunk_buffer_pda(resume_program_id, reap_scenario::buffer_epoch, signer);
+   BOOST_CHECK_EQUAL(params[0].as_string(), buffer.to_string(fc::yield_function_t{}));
+   BOOST_CHECK_EQUAL(params[1][commitment_key].as_string(), commitment);
+}
+
 } // anonymous namespace
+
+/// Fresh, partial, and terminal-only uploads must wait through lagging and unrelated higher-slot views.
+BOOST_FIXTURE_TEST_CASE(chunk_delivery_waits_for_confirmed_buffer, chunk_member_fixture) try {
+   using namespace chunk_rpc_fixture;
+   for (const uint16_t chunks : {1, 3}) {
+      for (const uint16_t staged : {uint16_t{0}, chunks}) {
+         const auto signer = entry->client->get_pubkey();
+         const uint32_t bytes = (chunks - 1) * sysio::SOLANA_MAX_CHUNK_BYTES + sizeof(payload);
+         const auto complete = envelope_chunks_account(reap_scenario::buffer_epoch, chunks, bytes, chunks,
+                                                       signer, bytes);
+         std::vector replies{chunk_buffer_reply(staged ? complete : std::nullopt, 1)};
+         for (uint16_t chunk = staged; chunk < chunks; ++chunk) {
+            auto tx = chunk_transaction_replies(replies.size() + 1);
+            tx.back() = chunk_rpc_reply(chunk_processed_status, replies.size() + requests_per_transaction);
+            replies.insert(replies.end(), tx.begin(), tx.end());
+         }
+         const auto first_gate = replies.size();
+         replies.push_back(chunk_buffer_reply(std::nullopt, replies.size() + 1, chunk_visibility_slot - 1));
+         replies.push_back(chunk_buffer_reply(envelope_chunks_account(reap_scenario::buffer_epoch, chunks, bytes,
+            chunks - 1, signer, (chunks - 1) * sysio::SOLANA_MAX_CHUNK_BYTES),
+            replies.size() + 1, chunk_visibility_slot + 1));
+         replies.push_back(chunk_buffer_reply(complete, replies.size() + 1, chunk_visibility_slot + 2));
+         const auto terminal_start = replies.size();
+         auto terminal = chunk_transaction_replies(replies.size() + 1);
+         const auto confirmed_status = fc::json::from_string(terminal.back().body).get_object()[result_key];
+         terminal.back() = chunk_rpc_reply(chunk_processed_status, replies.size() + requests_per_transaction);
+         replies.insert(replies.end(), terminal.begin(), terminal.end());
+         replies.push_back(chunk_rpc_reply(fc::json::to_string(confirmed_status, fc::json::yield_function_t{}),
+                                            replies.size() + 1));
+         fc::test::capture_http_server server(std::move(replies));
+         entry->client = std::make_shared<solana_client>(entry->signature_provider, server.url());
+         chunk_visibility_client client(entry);
+         BOOST_CHECK_EQUAL(client.deliver_outbound_envelope(reap_scenario::buffer_epoch,
+                              std::vector<char>(bytes, payload), chunk_visibility_budget), signature);
+         BOOST_REQUIRE_EQUAL(server.request_count(), terminal_start + requests_per_transaction + 1);
+         check_chunk_buffer_request(server, 0, signer, processed);
+         for (size_t index = first_gate; index < terminal_start; ++index)
+            check_chunk_buffer_request(server, index, signer, confirmed);
+         for (size_t index = 2; index < first_gate; index += requests_per_transaction) {
+            const auto request = fc::json::from_string(server.request(index).body).get_object();
+            BOOST_CHECK_EQUAL(request[method_key].as_string(), send_method);
+            BOOST_CHECK_EQUAL(request[params_key].get_array()[1][preflight_key].as_string(), processed);
+         }
+         const auto request = fc::json::from_string(server.request(terminal_start + 1).body).get_object();
+         BOOST_CHECK_EQUAL(request[method_key].as_string(), send_method);
+         BOOST_CHECK_EQUAL(request[params_key].get_array()[1][preflight_key].as_string(), confirmed);
+         BOOST_CHECK(!request[params_key].get_array()[1][skip_preflight_key].as_bool());
+         BOOST_REQUIRE_EQUAL(client.buffer_deadlines.size(), 3u);
+         for (const auto& deadline : client.buffer_deadlines) BOOST_CHECK(deadline.has_value());
+         BOOST_CHECK(!fc::task::current_deadline());
+      }
+   }
+} FC_LOG_AND_RETHROW();
+
+/// A partial processed resume uploads only its suffix and an immediately complete confirmed buffer needs no wait.
+BOOST_FIXTURE_TEST_CASE(chunk_delivery_confirms_partial_resume, chunk_member_fixture) try {
+   using namespace chunk_rpc_fixture;
+   constexpr uint16_t chunks = 2;
+   constexpr uint32_t bytes = sysio::SOLANA_MAX_CHUNK_BYTES + sizeof(payload);
+   const auto signer = entry->client->get_pubkey();
+   auto replies = std::vector{chunk_buffer_reply(envelope_chunks_account(
+      reap_scenario::buffer_epoch, chunks, bytes, 1, signer, sysio::SOLANA_MAX_CHUNK_BYTES), 1)};
+   auto tx = chunk_transaction_replies(replies.size() + 1);
+   tx.back() = chunk_rpc_reply(chunk_processed_status, replies.size() + requests_per_transaction);
+   replies.insert(replies.end(), tx.begin(), tx.end());
+   replies.push_back(chunk_buffer_reply(envelope_chunks_account(
+      reap_scenario::buffer_epoch, chunks, bytes, chunks, signer, bytes), replies.size() + 1));
+   const auto terminal = chunk_transaction_replies(replies.size() + 1);
+   replies.insert(replies.end(), terminal.begin(), terminal.end());
+   fc::test::capture_http_server server(std::move(replies));
+   entry->client = std::make_shared<solana_client>(entry->signature_provider, server.url());
+   chunk_visibility_client client(entry);
+   BOOST_CHECK_EQUAL(client.deliver_outbound_envelope(reap_scenario::buffer_epoch,
+                        std::vector<char>(bytes, payload), chunk_visibility_budget), signature);
+   BOOST_REQUIRE_EQUAL(server.request_count(), 2 + 2 * requests_per_transaction);
+   BOOST_CHECK_EQUAL(client.buffer_deadlines.size(), 1u);
+   check_chunk_buffer_request(server, 1 + requests_per_transaction, signer, confirmed);
+} FC_LOG_AND_RETHROW();
+
+/// Neither an unrelated/malformed confirmed buffer nor a read failure may release the terminal.
+BOOST_FIXTURE_TEST_CASE(chunk_delivery_rejects_unproven_confirmed_buffers, chunk_member_fixture) try {
+   using namespace chunk_rpc_fixture;
+   constexpr uint16_t chunks = 1;
+   constexpr uint32_t bytes = 2;
+   constexpr uint32_t other_signer_seed = 99;
+   constexpr unsigned service_unavailable_status = 503;
+   const auto signer = entry->client->get_pubkey();
+   const auto complete = envelope_chunks_account(reap_scenario::buffer_epoch, chunks, bytes, chunks, signer, bytes);
+   auto wrong_owner = complete;
+   wrong_owner->owner = measurement_pubkey(other_signer_seed);
+   auto bad_discriminator = complete;
+   bad_discriminator->data.front() ^= staged_payload_fill;
+   auto truncated = complete;
+   truncated->data.resize(1);
+   const std::vector<std::optional<account_info>> invalid = {
+      std::nullopt, wrong_owner, bad_discriminator, truncated,
+      envelope_chunks_account(reap_scenario::buffer_epoch + 1, chunks, bytes, chunks, signer, bytes),
+      envelope_chunks_account(reap_scenario::buffer_epoch, chunks, bytes, chunks,
+                              measurement_pubkey(other_signer_seed), bytes),
+      envelope_chunks_account(reap_scenario::buffer_epoch, chunks + 1, bytes, chunks, signer, bytes),
+      envelope_chunks_account(reap_scenario::buffer_epoch, chunks, bytes + 1, chunks, signer, bytes),
+      envelope_chunks_account(reap_scenario::buffer_epoch, chunks, bytes, chunks + 1, signer, bytes),
+      envelope_chunks_account(reap_scenario::buffer_epoch, chunks, bytes, chunks, signer, bytes - 1),
+      envelope_chunks_account(reap_scenario::buffer_epoch, chunks, bytes, 0, signer, bytes)};
+   const fc::test::capture_http_server::scripted_response rpc_failure{.status = service_unavailable_status};
+   for (const auto& buffer : invalid) {
+      fc::test::capture_http_server server({chunk_buffer_reply(complete, 1), chunk_buffer_reply(buffer, 2),
+                                           rpc_failure});
+      entry->client = std::make_shared<solana_client>(entry->signature_provider, server.url());
+      chunk_visibility_client client(entry);
+      BOOST_CHECK_THROW(client.deliver_outbound_envelope(reap_scenario::buffer_epoch,
+                           std::vector<char>(bytes, payload), chunk_visibility_budget),
+                        sysio::chain::outpost_delivery_incomplete_exception);
+      for (size_t index = 0; index < server.request_count(); ++index)
+         check_chunk_buffer_request(server, index, signer, index == 0 ? processed : confirmed);
+      BOOST_CHECK(!fc::task::current_deadline());
+   }
+   for (const bool fail_gate : {false, true}) {
+      fc::test::capture_http_server server({chunk_buffer_reply(complete, 1),
+         fail_gate ? chunk_buffer_reply(std::nullopt, 2) : rpc_failure});
+      entry->client = std::make_shared<solana_client>(entry->signature_provider, server.url());
+      chunk_visibility_client client(entry);
+      client.fail_wait_gate = fail_gate;
+      BOOST_CHECK_THROW(client.deliver_outbound_envelope(reap_scenario::buffer_epoch,
+                           std::vector<char>(bytes, payload), chunk_visibility_budget),
+                        sysio::chain::outpost_delivery_incomplete_exception);
+      BOOST_CHECK_EQUAL(server.request_count(), 2u);
+   }
+} FC_LOG_AND_RETHROW();
+
+/// Waiting and a stalled RPC share the delivery deadline, and the next tick can resume the same complete upload.
+BOOST_FIXTURE_TEST_CASE(chunk_delivery_visibility_deadline_and_retry, chunk_member_fixture) try {
+   using namespace chunk_rpc_fixture;
+   constexpr auto budget = fc::milliseconds(80);
+   constexpr auto stalled_read = std::chrono::milliseconds(160);
+   constexpr auto call_overhead = fc::milliseconds(20);
+   constexpr auto max_elapsed = fc::seconds(1);
+   for (const auto delay : {std::chrono::milliseconds(0), stalled_read}) {
+      const auto signer = entry->client->get_pubkey();
+      const auto complete = envelope_chunks_account(reap_scenario::buffer_epoch, 1, sizeof(payload), 1, signer,
+                                                     sizeof(payload));
+      auto missing = chunk_buffer_reply(std::nullopt, 2);
+      missing.delay = delay;
+      std::vector replies{chunk_buffer_reply(complete, 1), missing, chunk_buffer_reply(complete, 3),
+                          chunk_buffer_reply(complete, 4)};
+      const auto terminal = chunk_transaction_replies(replies.size() + 1);
+      replies.insert(replies.end(), terminal.begin(), terminal.end());
+      fc::test::capture_http_server server(std::move(replies));
+      entry->client = std::make_shared<solana_client>(entry->signature_provider, server.url());
+      chunk_visibility_client client(entry);
+      const auto start = fc::time_point::now();
+      BOOST_CHECK_THROW(client.deliver_outbound_envelope(reap_scenario::buffer_epoch, {payload}, budget),
+                        sysio::chain::outpost_delivery_incomplete_exception);
+      BOOST_CHECK(fc::time_point::now() - start < max_elapsed);
+      BOOST_REQUIRE_EQUAL(server.request_count(), 2u);
+      BOOST_REQUIRE_EQUAL(client.buffer_deadlines.size(), 1u);
+      BOOST_REQUIRE(client.buffer_deadlines.front());
+      BOOST_CHECK(*client.buffer_deadlines.front() <= start + budget + call_overhead);
+      BOOST_CHECK(!fc::task::current_deadline());
+      BOOST_CHECK_EQUAL(client.deliver_outbound_envelope(reap_scenario::buffer_epoch, {payload},
+                           chunk_visibility_budget), signature);
+      BOOST_CHECK_EQUAL(server.request_count(), 4 + requests_per_transaction);
+   }
+} FC_LOG_AND_RETHROW();
+
+/// A buffer reaped after another operator settles must not turn a late delivery into a visibility timeout.
+BOOST_FIXTURE_TEST_CASE(chunk_delivery_settles_during_visibility_wait, chunk_member_fixture) try {
+   using namespace chunk_rpc_fixture;
+   const auto signer = entry->client->get_pubkey();
+   fc::test::capture_http_server server({chunk_buffer_reply(envelope_chunks_account(
+      reap_scenario::buffer_epoch, 1, sizeof(payload), 1, signer, sizeof(payload)), 1),
+      chunk_buffer_reply(std::nullopt, 2)});
+   entry->client = std::make_shared<solana_client>(entry->signature_provider, server.url());
+   chunk_visibility_client client(entry);
+   client.settle_on_gate = 2;
+   BOOST_CHECK(client.deliver_outbound_envelope(reap_scenario::buffer_epoch, {payload},
+                  chunk_visibility_budget).empty());
+   BOOST_CHECK_EQUAL(server.request_count(), 2u);
+   BOOST_CHECK(!fc::task::current_deadline());
+} FC_LOG_AND_RETHROW();
 
 /// Discovery offsets must round-trip through the real fixture, and drift must fail during construction.
 BOOST_FIXTURE_TEST_CASE(chunk_boot_checks_discovery_offsets, chunk_member_fixture) try {
@@ -4503,6 +4760,38 @@ BOOST_FIXTURE_TEST_CASE(cleanup_binding_sends_confirmed_preflight, chunk_member_
    BOOST_CHECK(!config[chunk_rpc_fixture::skip_preflight_key].as_bool());
 } FC_LOG_AND_RETHROW();
 
+/// Data chunks return at processed; the terminal binding must wait through processed for confirmed.
+BOOST_FIXTURE_TEST_CASE(epoch_in_binding_confirms_only_terminal_delivery, chunk_member_fixture) try {
+   constexpr uint16_t total_chunks = 1;
+   constexpr std::string_view processed_status =
+      R"({"context":{"slot":1},"value":[{"slot":1,"confirmations":0,"err":null,"confirmationStatus":"processed"}]})";
+   constexpr auto delivery_budget = fc::seconds(8);
+   for (const bool terminal : {false, true}) {
+      auto replies = chunk_transaction_replies(1);
+      const auto confirmed_reply = chunk_transaction_replies(2).back();
+      replies.back() = chunk_rpc_reply(processed_status, chunk_rpc_fixture::requests_per_transaction);
+      if (terminal)
+         replies.push_back(confirmed_reply);
+      fc::test::capture_http_server server(std::move(replies));
+      entry->client = std::make_shared<solana_client>(entry->signature_provider, server.url());
+      sysio::opp_solana_outpost_client program(entry->client, resume_program_id,
+                                              {load_idl_fixture(opp_outpost_idl_fixture)});
+      const std::vector<uint8_t> data = terminal ? std::vector<uint8_t>{}
+                                                 : std::vector<uint8_t>{chunk_rpc_fixture::payload};
+      fc::task::deadline_scope deadline(fc::time_point::now() + delivery_budget);
+      BOOST_CHECK_EQUAL(program.epoch_in(reap_scenario::buffer_epoch, terminal ? total_chunks : 0,
+                                          total_chunks, sizeof(chunk_rpc_fixture::payload), data, {}),
+                        chunk_rpc_fixture::signature);
+      // An extra status request proves the terminal call did not accept processed success.
+      BOOST_REQUIRE_EQUAL(server.request_count(), chunk_rpc_fixture::requests_per_transaction + terminal);
+      const auto request = fc::json::from_string(server.request(1).body).get_object();
+      const auto& config = request[chunk_rpc_fixture::params_key].get_array()[1].get_object();
+      BOOST_CHECK_EQUAL(config[chunk_rpc_fixture::preflight_key].as_string(),
+                        terminal ? chunk_rpc_fixture::confirmed : chunk_rpc_fixture::processed);
+      BOOST_CHECK(!config[chunk_rpc_fixture::skip_preflight_key].as_bool());
+   }
+} FC_LOG_AND_RETHROW();
+
 /// A timed-out optional gate read restores the delivery scope and still sends the data and terminal transactions.
 BOOST_FIXTURE_TEST_CASE(chunk_member_settled_check_timeout_still_uploads, chunk_member_fixture) try {
    auto replies = chunk_transaction_replies(1);
@@ -4513,6 +4802,8 @@ BOOST_FIXTURE_TEST_CASE(chunk_member_settled_check_timeout_still_uploads, chunk_
    chunk_member_client client(entry);
    client.gate_timeout = true;
    client.allow_upload = true;
+   client.buffer_account = envelope_chunks_account(reap_scenario::buffer_epoch, 1, sizeof(chunk_rpc_fixture::payload),
+      1, entry->client->get_pubkey(), sizeof(chunk_rpc_fixture::payload));
    constexpr auto delivery_budget = fc::seconds(8);
    BOOST_CHECK_EQUAL(client.deliver_outbound_envelope(reap_scenario::buffer_epoch,
                                                        {chunk_rpc_fixture::payload}, delivery_budget),

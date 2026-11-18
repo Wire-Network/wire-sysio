@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <charconv>
 #include <deque>
 #include <map>
@@ -7,6 +8,7 @@
 #include <set>
 #include <string_view>
 #include <system_error>
+#include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
 #include <variant>
@@ -63,6 +65,15 @@ namespace fc
    template<typename... T> void to_variant( const std::variant<T...>& s, fc::variant& v );
    template<typename... T> void from_variant( const fc::variant& v, std::variant<T...>& s );
 
+   /**
+    * @name Integers narrower than 64 bits
+    *
+    * from_variant accepts an integer, a double (truncated toward zero), a decimal string, a bool, and null as zero.
+    *
+    * @throw parse_error_exception if the value is outside the range of the target type
+    * @throw bad_cast_exception if the variant holds a type that does not convert to an integer
+    * @{
+    */
    void to_variant( const uint8_t& var,  fc::variant& vo );
    void from_variant( const fc::variant& var,  uint8_t& vo );
    void to_variant( const int8_t& var,  fc::variant& vo );
@@ -77,6 +88,7 @@ namespace fc
    void from_variant( const fc::variant& var,  uint32_t& vo );
    void to_variant( const int32_t& var,  fc::variant& vo );
    void from_variant( const fc::variant& var,  int32_t& vo );
+   /// @}
 
    // to_variant/from_variant for __int128 types declared in fc/int128.hpp
 
@@ -278,12 +290,36 @@ namespace fc
          */
         bool                        is_integer()const;
 
+        /**
+         * The value as a 64-bit integer: an int64 or uint64, a double truncated toward zero, a decimal string, a
+         * bool, or null as zero.
+         *
+         * @throw parse_error_exception if the value is outside the range of the result type, or a string is not a
+         *        decimal integer
+         * @throw bad_cast_exception if the variant holds any other type
+         * @{
+         */
         int64_t                     as_int64()const;
         uint64_t                    as_uint64()const;
+        /// @}
+
+        /**
+         * The value as a 128-bit or 256-bit integer: an int64 or uint64, an integer of that width, a string holding
+         * one, a bool, or null as zero. A 256-bit result reads a string as an optional '-', then decimal digits, or
+         * hex digits after "0x" or "0X". Digits after a leading zero are decimal. Empty text and a bare "0x" or
+         * "0X" are zero; "-" and "-0x" are not numbers.
+         *
+         * @throw parse_error_exception if the value is outside the range of the result type, or a string is not a
+         *        number a 256-bit result reads. fc::int256 is sign-magnitude, so its range is +/-(2^256 - 1).
+         * @throw assert_exception if a string is not a number a 128-bit result reads
+         * @throw bad_cast_exception if the variant holds any other type
+         * @{
+         */
         fc::int128                  as_int128()const;
         fc::uint128                 as_uint128()const;
         fc::int256                  as_int256()const;
         fc::uint256                 as_uint256()const;
+        /// @}
 
         /**
          * Convert variant to an enum value. Handles both integer and string
@@ -292,6 +328,7 @@ namespace fc
          *
          * @tparam EnumType A C++ enum type (e.g., sysio::opp::types::ChainKind)
          * @return The enum value cast from the variant's integer value
+         * @throw parse_error_exception if a numeric value is outside the range of int64_t
          */
         template<typename EnumType>
         EnumType as_enum_value() const {
@@ -415,6 +452,18 @@ namespace fc
         void    clear();
       private:
         void    init();
+
+        /// Read a scalar or pointer value without accessing a typed object inside the character storage.
+        template <typename T>
+        T load_payload() const;
+
+        /// Store the explicitly selected type's representation without changing bytes outside the payload or its tag.
+        template <typename T>
+        void store_payload(std::type_identity_t<T> value);
+
+        /// Select inline or owning heap storage for a string, retaining its existing representation.
+        inline void make_string_inline_or_heap(std::string_view src);
+
         //enough room to store pointers, doubles, uint64s. doubled to allow 1 extra byte to store type at the end
         alignas(double) std::array<char, std::max(sizeof(uintmax_t ), sizeof(double)) * 2> _data = {};
    };
@@ -759,8 +808,9 @@ namespace fc
    template<typename T>
    void to_variant( const safe<T>& s, fc::variant& v ) { v = s.value; }
 
+   /// Reads the value through `T`'s own from_variant.
    template<typename T>
-   void from_variant( const fc::variant& v, safe<T>& s ) { s.value = v.as_uint64(); }
+   void from_variant( const fc::variant& v, safe<T>& s ) { s.value = v.as<T>(); }
 
    template<typename T, typename... Args> void to_variant( const boost::multi_index_container<T,Args...>& c, fc::variant& v )
    {
@@ -778,7 +828,7 @@ namespace fc
       for( const auto& item : vars )
          c.insert( item.as<T>() );
    }
-   // Generic boost::multiprecision to_variant/from_variant moved to fc/variant_multiprecision.hpp
+   // to_variant/from_variant for the boost::multiprecision UInt<N>/Int<N> aliases live in fc/variant_multiprecision.hpp
 
    // Arithmetic on variants is not supported. The previous implementations
    // were unused dead code and `operator-` contained a never-reached loop bug.
@@ -790,10 +840,14 @@ namespace fc
    fc::variant operator * ( const fc::variant& a, const fc::variant& b ) = delete;
    fc::variant operator / ( const fc::variant& a, const fc::variant& b ) = delete;
 
+   /// @name Comparison
+   /// An int64 and a uint64 compare by value.
+   /// @{
    bool operator == ( const fc::variant& a, const fc::variant& b );
    bool operator != ( const fc::variant& a, const fc::variant& b );
    bool operator < ( const fc::variant& a, const fc::variant& b );
    bool operator > ( const fc::variant& a, const fc::variant& b );
+   /// @}
    bool operator ! ( const fc::variant& a );
 } // namespace fc
 

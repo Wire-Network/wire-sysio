@@ -99,6 +99,9 @@ void apply_context::exec_one()
          receiver_account = &db.get<account_object,by_name>( receiver );
          receiver_account_metadata = db.find<account_metadata_object,by_name>( receiver );
          privileged = receiver_account_metadata != nullptr && receiver_account_metadata->is_privileged();
+         const bool measured_frame = trx_context.begin_frame(
+            action_ordinal, config::is_system_account( receiver ) && privileged,
+            receiver_account_metadata != nullptr && receiver_account_metadata->code_hash != digest_type() );
          auto native = control.find_apply_handler( receiver, act->account, act->name );
          if( native ) {
             if( trx_context.enforce_whiteblacklist && control.is_speculative_block() ) {
@@ -120,14 +123,19 @@ void apply_context::exec_one()
                                                    *this );
             } catch( const wasm_exit& ) {}
          } else {
-            // allow inline and notify to non-existing contracts
-            // allow onblock and native actions when no sysio system contract by allowing no contract on sysio
-            if (receiver != sysio::chain::config::system_account_name && act->account == receiver && get_sender().empty()) {
-               SYS_ASSERT(false, action_validate_exception,
+            // Allow inline and notify to accounts without a contract. With no contract on sysio, the chain still
+            // runs its native actions there, and its own onblock, and nothing else.
+            if (act->account == receiver && get_sender().empty()) {
+               const bool own_onblock = is_onblock_action(*act) && trx_context.is_implicit();
+               const bool chain_action = receiver == config::system_account_name &&
+                                         (native != nullptr || own_onblock);
+               SYS_ASSERT(chain_action, action_validate_exception,
                           "No contract for action {} on account {}", act->name, receiver);
             }
          }
          validate_account_ram_deltas();
+         if( measured_frame )
+            trx_context.end_frame( action_ordinal );
       } FC_RETHROW_EXCEPTIONS( warn, "{} <= {}::{} pending console output: {}",
                                receiver, act->account, act->name, _pending_console_output )
 
@@ -215,7 +223,7 @@ void apply_context::validate_account_ram_deltas() {
       auto& payer = itr->account;
       auto& ram_delta = itr->delta;
       if (payer != receiver && ram_delta > 0) {
-         if (receiver.prefix() == sysio::chain::config::system_account_name && is_privileged()) {
+         if (config::is_system_account(receiver) && is_privileged()) {
             // sysio.* contracts allowed
          } else if (payer == sysio::chain::config::system_account_name && is_privileged()) {
             // explicit sysio payer allowed when privileged
@@ -362,6 +370,9 @@ void apply_context::require_recipient( account_name recipient ) {
  *   can better understand the security risk.
  */
 void apply_context::execute_inline( action&& a ) {
+   SYS_ASSERT( !is_onblock_action(a), action_validate_exception,
+               "{}::{} runs only as the implicit transaction at the start of a block, never inline",
+               config::system_account_name, config::onblock_action_name );
    auto* code = control.db().find<account_object, by_name>(a.account);
    SYS_ASSERT( code != nullptr, action_validate_exception,
                "inline action's code account {} does not exist", a.account );
@@ -534,7 +545,7 @@ action_name apply_context::get_sender() const {
 }
 
 bool apply_context::is_sys_vm_oc_whitelisted() const {
-   return receiver.prefix() == sysio::chain::config::system_account_name || // "sysio"_n
+   return config::is_system_account(receiver) ||
           control.is_sys_vm_oc_whitelisted(receiver);
 }
 

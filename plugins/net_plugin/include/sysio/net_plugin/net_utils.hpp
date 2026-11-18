@@ -1,5 +1,6 @@
 #pragma once
 
+#include <sysio/chain/block_header.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -7,7 +8,10 @@
 #include <boost/asio/ip/address.hpp>
 #include <boost/asio/ip/address_v6.hpp>
 
+#include <charconv>
+#include <cstdint>
 #include <cstdlib>
+#include <limits>
 #include <optional>
 #include <set>
 #include <string>
@@ -25,12 +29,20 @@ namespace sysio::net_utils {
 // Allow for future extentions as well, hence 384.
 constexpr size_t max_p2p_address_length = 253 + 6 + 30;
 constexpr size_t max_handshake_str_length = 384;
+/// Largest TCP port number.
+inline constexpr uint16_t max_port = std::numeric_limits<uint16_t>::max();
 /// Address suffix for transaction-only p2p connections.
 inline constexpr std::string_view trx_connection_type = "trx";
 /// Address suffix for block-only p2p connections.
 inline constexpr std::string_view blk_connection_type = "blk";
 /// Length of a recognized p2p connection type suffix.
 inline constexpr size_t connection_type_length = 3;
+/// Separates the host, port, connection type and rate sections of a p2p address.
+inline constexpr char address_section_separator = ':';
+/// Opens the square brackets that enclose an IPv6 literal host in a p2p address.
+inline constexpr char ipv6_literal_open = '[';
+/// Closes the square brackets that enclose an IPv6 literal host in a p2p address.
+inline constexpr char ipv6_literal_close = ']';
 
 namespace detail {
 
@@ -75,7 +87,15 @@ namespace detail {
       return block_sync_rate_limit;
    }
 
-   /// @return host, port, remainder
+   /// Whether port is a decimal number no greater than max_port. The resolver keeps the low 16 bits of a larger one.
+   inline bool is_port_number(std::string_view port) {
+      uint32_t value = 0;
+      const char* const end = port.data() + port.size();
+      const std::from_chars_result result = std::from_chars(port.data(), end, value);
+      return result.ec == std::errc{} && result.ptr == end && value <= max_port;
+   }
+
+   /// @return host, port, remainder. A port that is not empty is a decimal number no greater than max_port.
    inline std::tuple<std::string, std::string, std::string> split_host_port_remainder(const std::string& endpoint_input, bool should_throw) {
       using std::string;
       // host:port[:trx|:blk][:<rate>]
@@ -134,18 +154,48 @@ namespace detail {
       } else {
          remainder = endpoint.substr( colon2 + 1 );
       }
+      if (!port.empty() && !is_port_number(port)) {
+         SYS_ASSERT(!should_throw, chain::plugin_config_exception,
+                    "Invalid address specification {}; port must be a number no greater than {}.", endpoint, max_port);
+         return {};
+      }
       return {std::move(host), std::move(port), std::move(remainder)};
    }
 
 } // namespace detail
 
+   /**
+    * Join a host and a port into the `host:port` address that `split_host_port_type` splits.
+    *
+    * A host holding a colon, as an IPv6 literal does, gets back the square brackets `split_host_port_type` strips, so
+    * the address splits again at the port. Host names and IPv4 addresses hold no colon and are joined as they are.
+    *
+    * @param host host name or IP address literal, without brackets
+    * @param port port
+    * @return `host:port`, or `[host]:port` when host holds a colon
+    */
+   inline std::string join_host_port(std::string_view host, std::string_view port) {
+      const bool  needs_brackets = host.find(address_section_separator) != std::string_view::npos;
+      std::string address;
+      if (needs_brackets)
+         address += ipv6_literal_open;
+      address += host;
+      if (needs_brackets)
+         address += ipv6_literal_close;
+      address += address_section_separator;
+      address += port;
+      return address;
+   }
+
    struct endpoint {
       std::string host;
       std::string port;
 
-      std::string address() const { return host + ":" + port; }
+      /// @return the endpoint as `join_host_port` joins it
+      std::string address() const { return join_host_port(host, port); }
 
-      friend std::ostream& operator<<(std::ostream& os, const endpoint& e) { return os << e.host << ":" << e.port; }
+      /// Writes the endpoint as address() returns it.
+      friend std::ostream& operator<<(std::ostream& os, const endpoint& e) { return os << e.address(); }
 
       bool operator==(const endpoint& lhs) const = default;
       auto operator<=>(const endpoint& lhs) const = default;
@@ -227,6 +277,18 @@ namespace detail {
       return explicitly_set ? configured : configured_producer;
    }
 
+   /// Whether this node rejects a received block as from the future (block_header::is_from_the_future). A node that
+   /// produces blocks or has finalizer keys rejects it; any other node accepts and relays it.
+   ///
+   /// @param producer_node whether this node has at least one producer configured
+   /// @param finalizer_node whether this node has at least one finalizer key configured
+   /// @param header header of the received block
+   /// @param now this node's current time
+   inline bool rejects_block_from_the_future(bool producer_node, bool finalizer_node,
+                                             const chain::block_header& header, fc::time_point now) {
+      return (producer_node || finalizer_node) && header.is_from_the_future(now);
+   }
+
    /// De-duplicate listen endpoints while preserving first-seen order so positionally paired
    /// p2p-server-address values remain aligned with their p2p-listen-endpoint.
    inline std::vector<std::string> dedupe_preserve_order(const std::vector<std::string>& addresses) {
@@ -263,14 +325,14 @@ namespace detail {
       return current == connection_type::both ? type_from_address(peer_addr) : current;
    }
 
-   /// @return listen address and block sync rate limit (in bytes/sec) of address string
+   /// @return listen address, as `join_host_port` joins it, and block sync rate limit (in bytes/sec) of address string
    /// @throws chain::plugin_config_exception on invalid address
    inline std::tuple<std::string, size_t> parse_listen_address( const std::string& address ) {
       constexpr bool should_throw = true;
       auto [host, port, remainder] = detail::split_host_port_remainder(address, should_throw);
       SYS_ASSERT(!host.empty() && !port.empty(), chain::plugin_config_exception,
                  "Invalid address specification {}; host or port missing.", address);
-      auto listen_addr = host + ":" + port;
+      std::string listen_addr = join_host_port(host, port);
       auto limit = remainder;
       auto last_colon_location = remainder.rfind(':');
       if (last_colon_location != std::string::npos) {

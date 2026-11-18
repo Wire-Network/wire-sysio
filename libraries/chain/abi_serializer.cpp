@@ -44,7 +44,7 @@ namespace sysio::chain {
       };
 
       /// An unpacked enum value as a member value, or nullopt when it is not an integer within int64 and so is no
-      /// member's. as_int64() alone would reject the 128-bit variants and wrap uint64 ones.
+      /// member's. as_int64() alone would throw for the 128-bit variants and for a uint64 above int64_max.
       std::optional<int64_t> enum_member_value(const fc::variant& v) {
          if( v.is_int64() )
             return v.as_int64();

@@ -34,6 +34,7 @@ struct chain_config_v0 {
       max_kv_key_size_id,
       max_kv_value_size_id,
       max_kv_secondary_key_size_id,
+      notify_cpu_stipend_id,
       PARAMS_COUNT
    };
 
@@ -57,6 +58,11 @@ struct chain_config_v0 {
    uint32_t   max_kv_key_size             = config::default_max_kv_key_size;               ///< maximum KV primary key size in bytes
    uint32_t   max_kv_value_size           = config::default_max_kv_value_size;             ///< maximum KV value size in bytes
    uint32_t   max_kv_secondary_key_size   = config::default_max_kv_secondary_key_size;     ///< maximum KV secondary key size in bytes
+
+   /// CPU (in microseconds) of a notified contract that the entry paying for the notifying frame covers: the contract
+   /// pays only past it, and 0 means no stipend. Applied where CPU is measured; validators bill a receipt's entries as
+   /// given.
+   uint32_t   notify_cpu_stipend          = config::default_notify_cpu_stipend;
 
    void validate()const;
 
@@ -86,7 +92,8 @@ struct chain_config_v0 {
                            lhs.max_action_return_value_size,
                            lhs.max_kv_key_size,
                            lhs.max_kv_value_size,
-                           lhs.max_kv_secondary_key_size
+                           lhs.max_kv_secondary_key_size,
+                           lhs.notify_cpu_stipend
                         )
                ==
                std::tie(   rhs.max_block_net_usage,
@@ -105,7 +112,8 @@ struct chain_config_v0 {
                            rhs.max_action_return_value_size,
                            rhs.max_kv_key_size,
                            rhs.max_kv_value_size,
-                           rhs.max_kv_secondary_key_size
+                           rhs.max_kv_secondary_key_size,
+                           rhs.notify_cpu_stipend
                         );
    };
 
@@ -132,7 +140,8 @@ protected:
                      << "Max Action Return Value Size: " << max_action_return_value_size << ", "
                      << "Max KV Key Size: " << max_kv_key_size << ", "
                      << "Max KV Value Size: " << max_kv_value_size << ", "
-                     << "Max KV Secondary Key Size: " << max_kv_secondary_key_size;
+                     << "Max KV Secondary Key Size: " << max_kv_secondary_key_size << ", "
+                     << "Notify CPU Stipend: " << notify_cpu_stipend;
    }
 };
 
@@ -163,6 +172,7 @@ FC_REFLECT(sysio::chain::chain_config_v0,
 
            (max_action_return_value_size)
            (max_kv_key_size)(max_kv_value_size)(max_kv_secondary_key_size)
+           (notify_cpu_stipend)
 )
 
 namespace fc {
@@ -234,6 +244,9 @@ inline DataStream &operator<<(DataStream &s, const sysio::chain::data_entry<sysi
       case chain_config_v0::max_kv_secondary_key_size_id:
       fc::raw::pack(s, entry.config.max_kv_secondary_key_size);
       break;
+      case chain_config_v0::notify_cpu_stipend_id:
+      fc::raw::pack(s, entry.config.notify_cpu_stipend);
+      break;
       default:
       FC_THROW_EXCEPTION(config_parse_error, "DataStream& operator<<: no such id: {}", entry.id);
    }
@@ -304,6 +317,9 @@ inline DataStream &operator>>(DataStream &s, sysio::chain::data_entry<sysio::cha
       break;
       case chain_config_v0::max_kv_secondary_key_size_id:
       fc::raw::unpack(s, entry.config.max_kv_secondary_key_size);
+      break;
+      case chain_config_v0::notify_cpu_stipend_id:
+      fc::raw::unpack(s, entry.config.notify_cpu_stipend);
       break;
       default:
       FC_THROW_EXCEPTION(sysio::chain::config_parse_error, "DataStream& operator<<: no such id: {}", entry.id);

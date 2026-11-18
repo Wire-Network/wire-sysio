@@ -6,7 +6,12 @@
 namespace sysio { namespace chain {
 
    using cpu_usage_t = std::vector<fc::unsigned_int>;
-   using account_subjective_cpu_bill_t = flat_map<account_name, fc::microseconds>;
+   /// The subjective CPU and NET billed to one account.
+   struct cpu_net_bill {
+      fc::microseconds cpu{0};        ///< billed CPU
+      uint64_t         net_bytes = 0; ///< billable NET bytes
+   };
+   using account_subjective_bill_t = flat_map<account_name, cpu_net_bill>;
    using action_payers_t = flat_set<account_name>;
 
    // No transaction extensions remain. Keep the type infrastructure for future use.
@@ -115,10 +120,17 @@ namespace sysio { namespace chain {
                                                     bool allow_duplicate_keys = false )const;
    };
 
+   /**
+    * Enforces config::max_signature_variable_size on a signature.
+    * @param sig the signature to check
+    * @throws sig_variable_size_limit_exception if `sig.variable_size()` is larger than the limit
+    */
+   void assert_signature_variable_size( const signature_type& sig );
+
    struct packed_transaction : fc::reflect_init {
       enum class compression_type {
          none = 0,
-         zlib = 1, // not allowed in consensus, can be used by clients or on p2p network
+         zlib = 1, // accepted from clients by the constructors; rejected in binary form and in consensus
       };
 
       packed_transaction() = default;
@@ -176,6 +188,7 @@ namespace sysio { namespace chain {
    private:
       void init();
       void local_unpack_transaction(vector<bytes>&& context_free_data);
+      /// Unpacks packed_context_free_data; packed data that holds no entries is cleared.
       void local_unpack_context_free_data();
       void local_pack_transaction();
       void local_pack_context_free_data();

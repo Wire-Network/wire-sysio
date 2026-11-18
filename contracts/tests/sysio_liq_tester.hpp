@@ -64,7 +64,7 @@ public:
       deploy(CHAINS_ACCOUNT, contracts::chains_wasm(), contracts::chains_abi(), chains_abi_ser, true);
       deploy(TOKENS_ACCOUNT, contracts::tokens_wasm(), contracts::tokens_abi(), tokens_abi_ser, true);
       deploy(TOKEN_ACCOUNT,  contracts::token_wasm(),  contracts::token_abi(),  token_abi_ser,  true);
-      deploy(SWAP_ACCOUNT,   contracts::swap_wasm(),   contracts::swap_abi(),   swap_abi_ser,   false);
+      deploy(SWAP_ACCOUNT,   contracts::swap_wasm(),   contracts::swap_abi(),   swap_abi_ser,   true);
       deploy(LIQ_ACCOUNT,    contracts::liq_wasm(),    contracts::liq_abi(),    liq_abi_ser,    true);
 
       // WIRE: the treasury supply on sysio, and working balances for the funders.
@@ -161,9 +161,6 @@ public:
    action_result transfer_shadow(name from, name to, int64_t amount, const std::string& memo = "") {
       return push_liq(from, "transfer"_n, mvo()("from", from)("to", to)("quantity", asset(amount, LIQSOL_SYM))("memo", memo));
    }
-   action_result open(name owner, symbol sym, name ram_payer) {
-      return push_liq(ram_payer, "open"_n, mvo()("owner", owner)("symbol", sym)("ram_payer", ram_payer));
-   }
    action_result close(name owner, symbol sym) {
       return push_liq(owner, "close"_n, mvo()("owner", owner)("symbol", sym));
    }
@@ -195,25 +192,15 @@ public:
    action_result tickyield(symbol pair = POOL_SYM, name signer = "alice"_n) {
       return push(SWAP_ACCOUNT, swap_abi_ser, signer, "tickyield"_n, mvo()("pair_token", pair.to_symbol_code()));
    }
-   // The swap is unprivileged and bills a user's rows to the user, so these carry the
-   // user's `sysio.payer` beside `active`, as the swap suite's own pushes do.
-   /// A user's deposit row on the swap for one token, RAM billed to `payer`.
-   action_result openext(name user, name payer, const extended_symbol& ext_symbol) {
-      return push(SWAP_ACCOUNT, swap_abi_ser, payer, "openext"_n, mvo()
-         ("user", user)("payer", payer)("ext_symbol", ext_symbol),
-         sysio_system::test_support::payer_authorization(payer));
-   }
    /// Sell `ext_asset_in` from the user's deposit into `pair` for at least `min_expected`.
    action_result exchange(name user, symbol pair, const extended_asset& ext_asset_in, const asset& min_expected) {
       return push(SWAP_ACCOUNT, swap_abi_ser, user, "exchange"_n, mvo()
-         ("user", user)("pair_token", pair.to_symbol_code())("ext_asset_in", ext_asset_in)("min_expected", min_expected),
-         sysio_system::test_support::payer_authorization(user));
+         ("user", user)("pair_token", pair.to_symbol_code())("ext_asset_in", ext_asset_in)("min_expected", min_expected));
    }
    /// Move `to_withdraw` from the user's deposit on the swap to `to`'s wallet.
    action_result withdraw(name user, name to, const extended_asset& to_withdraw) {
       return push(SWAP_ACCOUNT, swap_abi_ser, user, "withdraw"_n, mvo()
-         ("user", user)("to", to)("to_withdraw", to_withdraw)("memo", ""),
-         sysio_system::test_support::payer_authorization(user));
+         ("user", user)("to", to)("to_withdraw", to_withdraw)("memo", ""));
    }
 
    // --- rows ---

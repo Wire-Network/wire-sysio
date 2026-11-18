@@ -26,6 +26,8 @@ on:
         type: string
         required: false
         default: ""
+  # Release branches get PR validation only. A push to one must not publish:
+  # their bundles ship through the tag dispatch above, like every release's.
   push:
     branches:
       - master
@@ -35,6 +37,7 @@ on:
     types: [opened, synchronize, reopened]
     branches:
       - master
+      - "release/*"
     paths:
       - "libraries/opp/**"
 
@@ -48,7 +51,7 @@ permissions:
 jobs:
   opp-bundles:
     name: Generate OPP Bundles
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # actions/checkout@v5
 

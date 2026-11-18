@@ -3,8 +3,9 @@
 This directory hosts the Boost.Test suite for the signature-provider plugin,
 including the AWS KMS provider tests. Most of those cases are offline — they
 exercise the spec parser, DER → raw conversion, low-S normalisation, and
-v-recovery using locally generated secp256k1 keys, so they need no AWS
-credentials and no network.
+v-recovery using locally generated secp256k1 keys, and drive the signing
+closure through a `KMSClient` double, so they need no AWS credentials and no
+network.
 
 The one case that does touch AWS is
 `kms_signature_provider_tests/kms_live_sign_round_trip`. This README is the
@@ -22,6 +23,9 @@ minimum runbook to make it pass.
 4. Recover the public key from the resulting signature **locally** (no
    `kms:Verify` call) and `BOOST_CHECK` that it matches `KMS_LIVE_PUBKEY`
    byte-for-byte.
+5. Repeat through a WIRE K1 spec for the same key: sign
+   `sha256("wire-sysio kms live k1 test 2026")`, pack the K1 form, and check
+   the recovered K1 key. A run therefore makes two `Sign` calls.
 
 So "KMS is working" here means: KMS returned a valid ECDSA signature over
 your digest, and the key it signed with matches the public key you pinned.
@@ -123,7 +127,7 @@ ninja -C $BUILD_DIR test_signature_provider_kms_plugin
 ## Run
 
 Export the two env vars and the AWS credentials, then invoke the binary with
-a `--run_test` filter so you only pay for the one Sign call:
+a `--run_test` filter so you only pay for that case's two Sign calls:
 
 ```bash
 export KMS_LIVE_SPEC='us-east-1:alias/wire-ci-test-secp256k1'
@@ -148,11 +152,32 @@ If you want to confirm the skip path works without spending money, unset the
 env vars and run the same command — Boost prints
 `skipping live KMS test` and the case still reports `No errors detected`.
 
+## Ed25519 (Solana) live case
+
+`kms_signature_provider_tests/kms_live_ed25519_sign_round_trip` does the same for
+an `ECC_NIST_EDWARDS25519` key: it pins the key, signs one fixed message through
+`sol_client_signer` (`ED25519_SHA_512`, `MessageType=RAW`) and verifies the
+signature locally. One `Sign` call.
+
+```bash
+aws kms create-key --region us-east-1 --key-spec ECC_NIST_EDWARDS25519 \
+   --key-usage SIGN_VERIFY --description "wire-sysio KMS live Ed25519 test"
+
+export KMS_LIVE_ED25519_SPEC='us-east-1:alias/wire-ci-test-ed25519'
+export KMS_LIVE_ED25519_PUBKEY='<base58 public key>'   # last 32 bytes of get-public-key
+
+$BUILD_DIR/plugins/signature_provider_kms_plugin/test/test_signature_provider_kms_plugin \
+   --run_test=kms_signature_provider_tests/kms_live_ed25519_sign_round_trip \
+   --log_level=test_suite
+```
+
+The IAM grants are the same as above (`kms:Sign`, `kms:GetPublicKey`).
+
 ## Cost & rate-limit notes
 
 `KMS::Sign` is billed at roughly $0.03 per 10 000 calls, plus the per-key
-monthly storage fee for the asymmetric key. A single live run is one Sign
-call. KMS throttles at 10 000 req/s per region, far above what a single
+monthly storage fee for the asymmetric key. A single live run is two Sign
+calls. KMS throttles at 10 000 req/s per region, far above what a single
 test needs.
 
 ## Common failure modes
@@ -163,4 +188,5 @@ test needs.
 | `AccessDeniedException: not authorized to perform: kms:Sign` | IAM policy missing — see Prereq #2                |
 | `NotFoundException: Invalid keyId`                 | Wrong region in `KMS_LIVE_SPEC`, or alias not created    |
 | `BOOST_CHECK(recovered == em_expected) failed`     | `KMS_LIVE_PUBKEY` does not match the key KMS holds       |
+| K1 `recover(...) == k1_pub` check failed            | The K1 path packed a bad signature; if the Ethereum check passed, the key is right |
 | `parse_kms_spec` exception at startup              | Spec body malformed — check the `KMS:` spec format       |

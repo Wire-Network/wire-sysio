@@ -1,20 +1,37 @@
 #include <fc/variant.hpp>
+#include <fc/variant_multiprecision.hpp>
 #include <fc/variant_object.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/int128.hpp>
 #include <fc/int256.hpp>
+#include <fc/io/json.hpp>
+#include <fc/io/varint.hpp>
+#include <fc/reflect/variant.hpp>
+#include <fc/safe.hpp>
+#include <fc/time.hpp>
 
 #include <boost/test/unit_test.hpp>
 
+#include <cmath>
 #include <cstdint>
 #include <limits>
+#include <optional>
 #include <string>
+#include <type_traits>
+#include <vector>
 
 using fc::variant;
 using fc::variant_object;
 using fc::mutable_variant_object;
 using fc::variants;
 using fc::blob;
+using namespace std::string_literals;
+
+namespace {
+constexpr int64_t  int64_min  = std::numeric_limits<int64_t>::min();
+constexpr int64_t  int64_max  = std::numeric_limits<int64_t>::max();
+constexpr uint64_t uint64_max = std::numeric_limits<uint64_t>::max();
+} // namespace
 
 BOOST_AUTO_TEST_SUITE(variant_as_suite)
 
@@ -45,6 +62,162 @@ BOOST_AUTO_TEST_CASE(as_uint64_from_each_compatible_source) {
    BOOST_CHECK_EQUAL(variant{std::string{"77"}}.as_uint64(), 77u);
 }
 
+BOOST_AUTO_TEST_CASE(as_uint64_holds_its_whole_range) {
+   BOOST_CHECK_EQUAL(variant{uint64_t{0}}.as_uint64(), 0u);
+   BOOST_CHECK_EQUAL(variant{uint64_max}.as_uint64(), uint64_max);
+   BOOST_CHECK_EQUAL(variant{int64_t{0}}.as_uint64(), 0u);
+   BOOST_CHECK_EQUAL(variant{int64_max}.as_uint64(), static_cast<uint64_t>(int64_max));
+}
+
+// A negative integer is outside the range of uint64_t. It used to convert to its two's complement.
+BOOST_AUTO_TEST_CASE(as_uint64_throws_on_a_negative_integer) {
+   BOOST_CHECK_THROW(variant{int64_t{-1}}.as_uint64(), fc::parse_error_exception); // 2^64 - 1
+   BOOST_CHECK_THROW(variant{int64_min}.as_uint64(), fc::parse_error_exception);   // 2^63
+}
+
+BOOST_AUTO_TEST_CASE(as_int64_holds_its_whole_range) {
+   BOOST_CHECK_EQUAL(variant{int64_min}.as_int64(), int64_min);
+   BOOST_CHECK_EQUAL(variant{int64_max}.as_int64(), int64_max);
+   BOOST_CHECK_EQUAL(variant{uint64_t{0}}.as_int64(), 0);
+   BOOST_CHECK_EQUAL(variant{static_cast<uint64_t>(int64_max)}.as_int64(), int64_max);
+}
+
+// A uint64 above the maximum of int64_t used to convert to a negative number.
+BOOST_AUTO_TEST_CASE(as_int64_throws_on_a_uint64_above_its_maximum) {
+   BOOST_CHECK_THROW(variant{static_cast<uint64_t>(int64_max) + 1}.as_int64(), fc::parse_error_exception); // -2^63
+   BOOST_CHECK_THROW(variant{uint64_max}.as_int64(), fc::parse_error_exception);                           // -1
+}
+
+// The longer strings are held on the heap and the shorter ones in place; each is parsed the same way.
+BOOST_AUTO_TEST_CASE(as_uint64_from_a_string) {
+   BOOST_CHECK_EQUAL(variant{std::string{"0"}}.as_uint64(), 0u);
+   BOOST_CHECK_EQUAL(variant{std::string{"18446744073709551615"}}.as_uint64(), uint64_max);
+   BOOST_CHECK_EQUAL(variant{std::string{"+5"}}.as_uint64(), 5u);
+   BOOST_CHECK_EQUAL(variant{std::string{"+18446744073709551615"}}.as_uint64(), uint64_max);
+   BOOST_CHECK_EQUAL(variant{std::string{"-0"}}.as_uint64(), 0u);
+
+   BOOST_CHECK_THROW(variant{std::string{"-1"}}.as_uint64(), fc::parse_error_exception);                    // 2^64 - 1
+   BOOST_CHECK_THROW(variant{std::string{"-18446744073709551361"}}.as_uint64(), fc::parse_error_exception); // 255
+   BOOST_CHECK_THROW(variant{std::string{"18446744073709551616"}}.as_uint64(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(variant{std::string{"1.5"}}.as_uint64(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(variant{std::string{""}}.as_uint64(), fc::parse_error_exception);
+}
+
+BOOST_AUTO_TEST_CASE(as_int64_from_a_string) {
+   BOOST_CHECK_EQUAL(variant{std::string{"-9223372036854775808"}}.as_int64(), int64_min);
+   BOOST_CHECK_EQUAL(variant{std::string{"9223372036854775807"}}.as_int64(), int64_max);
+   BOOST_CHECK_EQUAL(variant{std::string{"+5"}}.as_int64(), 5);
+   BOOST_CHECK_EQUAL(variant{std::string{"-0"}}.as_int64(), 0);
+
+   BOOST_CHECK_THROW(variant{std::string{"9223372036854775808"}}.as_int64(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(variant{std::string{"18446744073709551615"}}.as_int64(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(variant{std::string{"-9223372036854775809"}}.as_int64(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(variant{std::string{"1.5"}}.as_int64(), fc::parse_error_exception);
+}
+
+// A double truncates toward zero and is then held to the range. Converting one outside it was undefined behaviour.
+BOOST_AUTO_TEST_CASE(as_uint64_from_a_double) {
+   BOOST_CHECK_EQUAL(variant{0.0}.as_uint64(), 0u);
+   BOOST_CHECK_EQUAL(variant{-0.0}.as_uint64(), 0u);
+   BOOST_CHECK_EQUAL(variant{-0.9}.as_uint64(), 0u);
+   BOOST_CHECK_EQUAL(variant{1.9}.as_uint64(), 1u);
+   BOOST_CHECK_EQUAL(variant{0x1p63}.as_uint64(), uint64_t{1} << 63);
+   BOOST_CHECK_EQUAL(variant{std::nextafter(0x1p64, 0.0)}.as_uint64(), 18446744073709549568u); // the largest below 2^64
+
+   BOOST_CHECK_THROW(variant{-1.0}.as_uint64(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(variant{0x1p64}.as_uint64(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(variant{1e30}.as_uint64(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(variant{-1e30}.as_uint64(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(variant{std::numeric_limits<double>::quiet_NaN()}.as_uint64(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(variant{std::numeric_limits<double>::infinity()}.as_uint64(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(variant{-std::numeric_limits<double>::infinity()}.as_uint64(), fc::parse_error_exception);
+}
+
+BOOST_AUTO_TEST_CASE(as_int64_from_a_double) {
+   BOOST_CHECK_EQUAL(variant{-0.0}.as_int64(), 0);
+   BOOST_CHECK_EQUAL(variant{-0.9}.as_int64(), 0);
+   BOOST_CHECK_EQUAL(variant{-1.9}.as_int64(), -1);
+   BOOST_CHECK_EQUAL(variant{-0x1p63}.as_int64(), int64_min);
+   BOOST_CHECK_EQUAL(variant{std::nextafter(0x1p63, 0.0)}.as_int64(), 9223372036854774784); // the largest below 2^63
+
+   BOOST_CHECK_THROW(variant{0x1p63}.as_int64(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(variant{std::nextafter(-0x1p63, -0x1p64)}.as_int64(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(variant{1e30}.as_int64(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(variant{-1e30}.as_int64(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(variant{std::numeric_limits<double>::quiet_NaN()}.as_int64(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(variant{std::numeric_limits<double>::infinity()}.as_int64(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(variant{-std::numeric_limits<double>::infinity()}.as_int64(), fc::parse_error_exception);
+}
+
+BOOST_AUTO_TEST_CASE(out_of_range_message_names_the_value_and_the_range) {
+   const auto message_has = [](const std::string& text) {
+      return [text](const fc::exception& e) { return e.to_detail_string().find(text) != std::string::npos; };
+   };
+   BOOST_CHECK_EXCEPTION(variant{int64_t{-1}}.as_uint64(), fc::parse_error_exception,
+                         message_has("-1 is out of range for uint64_t [0, 18446744073709551615]"));
+   BOOST_CHECK_EXCEPTION(
+      variant{uint64_max}.as_int64(), fc::parse_error_exception,
+      message_has("18446744073709551615 is out of range for int64_t [-9223372036854775808, 9223372036854775807]"));
+   BOOST_CHECK_EXCEPTION(variant{1e30}.as_uint64(), fc::parse_error_exception,
+                         message_has("1e+30 is out of range for uint64_t [0, 18446744073709551615]"));
+}
+
+// Every integer from_variant reads through as_int64() or as_uint64().
+BOOST_AUTO_TEST_CASE(integer_from_variant_checks_the_64_bit_range) {
+   const variant negative{int64_t{-1}};
+   const variant huge{uint64_max};
+
+   BOOST_CHECK_EQUAL(huge.as<uint64_t>(), uint64_max);
+   BOOST_CHECK_EQUAL(variant{int64_min}.as<int64_t>(), int64_min);
+   BOOST_CHECK_THROW(negative.as<uint64_t>(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(huge.as<int64_t>(), fc::parse_error_exception);
+
+   BOOST_CHECK_THROW(negative.as<uint32_t>(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(negative.as<uint16_t>(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(negative.as<uint8_t>(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(huge.as<int32_t>(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(huge.as<int16_t>(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(huge.as<int8_t>(), fc::parse_error_exception);
+
+   BOOST_CHECK_THROW(negative.as<fc::unsigned_int>(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(huge.as<fc::signed_int>(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(negative.as<fc::UInt<64>>(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(huge.as<fc::microseconds>(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(huge.as<variant::type_id>(), fc::parse_error_exception); // a reflected enum
+   BOOST_CHECK_THROW(huge.as_enum_value<variant::type_id>(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(negative.as<std::optional<uint64_t>>(), fc::parse_error_exception);
+   BOOST_CHECK_THROW((variant{variants{variant{uint64_t{1}}, negative}}.as<std::vector<uint64_t>>()),
+                     fc::parse_error_exception);
+   BOOST_CHECK_THROW((variant{variants{variant{int64_t{1}}, huge}}.as<std::vector<int64_t>>()),
+                     fc::parse_error_exception);
+}
+
+BOOST_AUTO_TEST_CASE(safe_from_variant_reads_its_own_integer_type) {
+   variant packed;
+   fc::to_variant(fc::safe<int64_t>{-5}, packed);
+   BOOST_CHECK_EQUAL(packed.as<fc::safe<int64_t>>().value, -5);
+   BOOST_CHECK_EQUAL(variant{int64_min}.as<fc::safe<int64_t>>().value, int64_min);
+   BOOST_CHECK_EQUAL(variant{uint64_max}.as<fc::safe<uint64_t>>().value, uint64_max);
+   BOOST_CHECK_THROW(variant{int64_t{-1}}.as<fc::safe<uint64_t>>(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(variant{uint64_max}.as<fc::safe<int64_t>>(), fc::parse_error_exception);
+}
+
+// A JSON integer parses to a uint64, or to an int64 when it has a minus sign; one with a fraction to a double.
+BOOST_AUTO_TEST_CASE(json_number_checks_the_64_bit_range) {
+   BOOST_CHECK_EQUAL(fc::json::from_string("18446744073709551615").as<uint64_t>(), uint64_max);
+   BOOST_CHECK_EQUAL(fc::json::from_string("-9223372036854775808").as<int64_t>(), int64_min);
+   BOOST_CHECK_EQUAL(fc::json::from_string("-0").as<uint64_t>(), 0u);
+   BOOST_CHECK_EQUAL(fc::json::from_string("-0.5").as<uint64_t>(), 0u);
+
+   BOOST_CHECK_THROW(fc::json::from_string("-1").as<uint64_t>(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(fc::json::from_string("18446744073709551615").as<int64_t>(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(fc::json::from_string("-1.0").as<uint64_t>(), fc::parse_error_exception);
+   BOOST_CHECK_THROW(fc::json::from_string("1000000000000000000000000000000.0").as<uint64_t>(),
+                     fc::parse_error_exception);
+   BOOST_CHECK_THROW(fc::json::from_string("1000000000000000000000000000000.0").as<int64_t>(),
+                     fc::parse_error_exception);
+}
+
 BOOST_AUTO_TEST_CASE(as_int128_from_each_compatible_source) {
    variant vi128{fc::int128{-1}};
    variant vu128{fc::uint128{42}};
@@ -71,6 +244,463 @@ BOOST_AUTO_TEST_CASE(as_int256_and_as_uint256) {
    BOOST_CHECK_EQUAL(vi.as_int256().str(), "-7");
    BOOST_CHECK_EQUAL(vu.as_uint256().str(), "11");
    BOOST_CHECK_EQUAL(variant{}.as_int256().str(), "0");
+}
+
+namespace {
+
+constexpr fc::uint128 uint128_max = std::numeric_limits<fc::uint128>::max();
+constexpr fc::int128  int128_max  = std::numeric_limits<fc::int128>::max();
+constexpr fc::int128  int128_min  = std::numeric_limits<fc::int128>::min();
+constexpr int64_t     int64_max   = std::numeric_limits<int64_t>::max();
+constexpr int64_t     int64_min   = std::numeric_limits<int64_t>::min();
+constexpr uint64_t    uint64_max  = std::numeric_limits<uint64_t>::max();
+
+const std::string uint128_max_text       = "340282366920938463463374607431768211455";
+const std::string uint128_past_max_text  = "340282366920938463463374607431768211456";
+const std::string int128_max_text        = "170141183460469231731687303715884105727";
+const std::string int128_past_max_text   = "170141183460469231731687303715884105728";
+const std::string int128_min_text        = "-170141183460469231731687303715884105728";
+const std::string int128_past_min_text   = "-170141183460469231731687303715884105729";
+// 2^256 - 1, the maximum of fc::uint256 and the largest magnitude of the sign-magnitude fc::int256.
+const std::string uint256_max_text =
+   "115792089237316195423570985008687907853269984665640564039457584007913129639935";
+const std::string uint256_past_max_text =
+   "115792089237316195423570985008687907853269984665640564039457584007913129639936";
+const std::string hex_prefix = "0x";
+
+/// Matches the parse_error_exception a value outside the range of `type` raises.
+auto out_of_range_for(const std::string& type) {
+   return [type](const fc::parse_error_exception& e) {
+      return e.to_detail_string().find(" is out of range for " + type + " [") != std::string::npos;
+   };
+}
+
+/// Matches the parse_error_exception text that is not a number of `type` raises.
+auto not_a_number_for(const std::string& type) {
+   return [type](const fc::parse_error_exception& e) {
+      return e.to_detail_string().find("Couldn't parse " + type + " from \"") != std::string::npos;
+   };
+}
+
+/// Text that is not a 256-bit integer. boost rejects some of it with a std::runtime_error, reads "-" and "-0x" as
+/// zero, reads only up to a NUL, and would read "0-1" as -1 and "00x1" as 1 if a leading zero were dropped.
+const std::vector<std::string> not_256bit_numbers = {"abc", "1a",  "+1",   "--1",     "-+1",     " 1",  "1 ",
+                                                     "1.5", "1e3", "0abc", "0xg",     "0x-1",    "0-1", "00x1",
+                                                     "-",   "-0x", "-0X",  "12\0ab"s, "0x12\0"s, "\0"s, "\xd9\xa1"};
+
+} // namespace
+
+BOOST_AUTO_TEST_CASE(as_uint128_holds_its_whole_range) {
+   BOOST_CHECK_EQUAL(fc::to_string(variant{int64_t{0}}.as_uint128()), "0");
+   BOOST_CHECK_EQUAL(fc::to_string(variant{std::string{"0"}}.as_uint128()), "0");
+   BOOST_CHECK_EQUAL(fc::to_string(variant{int64_max}.as_uint128()), std::to_string(int64_max));
+   BOOST_CHECK_EQUAL(fc::to_string(variant{uint64_max}.as_uint128()), std::to_string(uint64_max));
+   BOOST_CHECK(variant{uint128_max}.as_uint128() == uint128_max);
+   BOOST_CHECK(variant{uint128_max_text}.as_uint128() == uint128_max);
+   BOOST_CHECK(variant{fc::int128{7}}.as_uint128() == 7);
+   BOOST_CHECK(variant{int128_max}.as_uint128() == static_cast<fc::uint128>(int128_max));
+   BOOST_CHECK(variant{hex_prefix + std::string(32, 'f')}.as_uint128() == uint128_max);
+   // Leading zeros carry no value, however many digits they make.
+   BOOST_CHECK(variant{std::string(50, '0') + uint128_max_text}.as_uint128() == uint128_max);
+   BOOST_CHECK(variant{hex_prefix + std::string(50, '0') + std::string(32, 'F')}.as_uint128() == uint128_max);
+}
+
+BOOST_AUTO_TEST_CASE(as_uint128_rejects_a_negative_value) {
+   BOOST_CHECK_EXCEPTION(variant{int64_t{-1}}.as_uint128(), fc::parse_error_exception, out_of_range_for("uint128_t"));
+   BOOST_CHECK_EXCEPTION(variant{int64_min}.as_uint128(), fc::parse_error_exception, out_of_range_for("uint128_t"));
+   BOOST_CHECK_EXCEPTION(variant{fc::int128{-1}}.as_uint128(), fc::parse_error_exception,
+                         out_of_range_for("uint128_t"));
+   BOOST_CHECK_EXCEPTION(variant{int128_min}.as_uint128(), fc::parse_error_exception, out_of_range_for("uint128_t"));
+   // A sign is not part of an unsigned number's text.
+   BOOST_CHECK_THROW(variant{std::string{"-1"}}.as_uint128(), fc::exception);
+   BOOST_CHECK_THROW(variant{std::string{"-0"}}.as_uint128(), fc::exception);
+   BOOST_CHECK_THROW(variant{std::string{"+1"}}.as_uint128(), fc::exception);
+}
+
+BOOST_AUTO_TEST_CASE(as_uint128_rejects_text_past_the_maximum) {
+   BOOST_CHECK_EXCEPTION(variant{uint128_past_max_text}.as_uint128(), fc::parse_error_exception,
+                         out_of_range_for("uint128_t"));
+   BOOST_CHECK_EXCEPTION(variant{uint128_max_text + "0"}.as_uint128(), fc::parse_error_exception,
+                         out_of_range_for("uint128_t"));
+   BOOST_CHECK_EXCEPTION(variant{hex_prefix + "1" + std::string(32, '0')}.as_uint128(), fc::parse_error_exception,
+                         out_of_range_for("uint128_t"));
+   BOOST_CHECK_EXCEPTION(variant{hex_prefix + std::string(33, 'f')}.as_uint128(), fc::parse_error_exception,
+                         out_of_range_for("uint128_t"));
+   // Out of range and then a bad character: refused for either.
+   BOOST_CHECK_THROW(variant{uint128_max_text + "0x"}.as_uint128(), fc::exception);
+}
+
+BOOST_AUTO_TEST_CASE(as_uint128_range_error_names_the_value_and_the_range) {
+   BOOST_CHECK_EXCEPTION(variant{int64_t{-1}}.as_uint128(), fc::parse_error_exception,
+                         [](const fc::parse_error_exception& e) {
+                            return e.to_detail_string().find("-1 is out of range for uint128_t [0, " +
+                                                             uint128_max_text + "]") != std::string::npos;
+                         });
+}
+
+BOOST_AUTO_TEST_CASE(as_int128_holds_its_whole_range) {
+   BOOST_CHECK_EQUAL(fc::to_string(variant{int64_t{0}}.as_int128()), "0");
+   BOOST_CHECK_EQUAL(fc::to_string(variant{std::string{"0"}}.as_int128()), "0");
+   BOOST_CHECK_EQUAL(fc::to_string(variant{std::string{"-0"}}.as_int128()), "0");
+   BOOST_CHECK_EQUAL(fc::to_string(variant{int64_min}.as_int128()), std::to_string(int64_min));
+   BOOST_CHECK_EQUAL(fc::to_string(variant{int64_max}.as_int128()), std::to_string(int64_max));
+   BOOST_CHECK_EQUAL(fc::to_string(variant{uint64_max}.as_int128()), std::to_string(uint64_max));
+   BOOST_CHECK(variant{int128_max}.as_int128() == int128_max);
+   BOOST_CHECK(variant{int128_min}.as_int128() == int128_min);
+   BOOST_CHECK(variant{int128_max_text}.as_int128() == int128_max);
+   BOOST_CHECK(variant{int128_min_text}.as_int128() == int128_min);
+   BOOST_CHECK(variant{static_cast<fc::uint128>(int128_max)}.as_int128() == int128_max);
+   BOOST_CHECK(variant{std::string(50, '0') + int128_max_text}.as_int128() == int128_max);
+   BOOST_CHECK(variant{"-" + std::string(50, '0') + int128_min_text.substr(1)}.as_int128() == int128_min);
+}
+
+BOOST_AUTO_TEST_CASE(as_int128_reads_hex_as_a_bit_pattern) {
+   // Unsigned hex is the bit pattern of the result; signed hex is a magnitude.
+   BOOST_CHECK(variant{hex_prefix + "7" + std::string(31, 'f')}.as_int128() == int128_max);
+   BOOST_CHECK(variant{hex_prefix + "8" + std::string(31, '0')}.as_int128() == int128_min);
+   BOOST_CHECK(variant{hex_prefix + std::string(32, 'F')}.as_int128() == -1);
+   BOOST_CHECK(variant{std::string{"-0xff"}}.as_int128() == -255);
+   BOOST_CHECK(variant{"-" + hex_prefix + "8" + std::string(31, '0')}.as_int128() == int128_min);
+   BOOST_CHECK_EXCEPTION(variant{"-" + hex_prefix + "8" + std::string(30, '0') + "1"}.as_int128(),
+                         fc::parse_error_exception, out_of_range_for("int128_t"));
+   BOOST_CHECK_EXCEPTION(variant{hex_prefix + "1" + std::string(32, '0')}.as_int128(), fc::parse_error_exception,
+                         out_of_range_for("int128_t"));
+   BOOST_CHECK_EXCEPTION(variant{hex_prefix + std::string(33, 'f')}.as_int128(), fc::parse_error_exception,
+                         out_of_range_for("int128_t"));
+}
+
+BOOST_AUTO_TEST_CASE(as_int128_rejects_a_value_outside_its_range) {
+   BOOST_CHECK_EXCEPTION(variant{uint128_max}.as_int128(), fc::parse_error_exception, out_of_range_for("int128_t"));
+   BOOST_CHECK_EXCEPTION(variant{static_cast<fc::uint128>(int128_max) + 1}.as_int128(), fc::parse_error_exception,
+                         out_of_range_for("int128_t"));
+   BOOST_CHECK_EXCEPTION(variant{int128_past_max_text}.as_int128(), fc::parse_error_exception,
+                         out_of_range_for("int128_t"));
+   BOOST_CHECK_EXCEPTION(variant{int128_past_min_text}.as_int128(), fc::parse_error_exception,
+                         out_of_range_for("int128_t"));
+   BOOST_CHECK_EXCEPTION(variant{uint128_max_text}.as_int128(), fc::parse_error_exception,
+                         out_of_range_for("int128_t"));
+   BOOST_CHECK_EXCEPTION(variant{"-" + uint128_max_text}.as_int128(), fc::parse_error_exception,
+                         out_of_range_for("int128_t"));
+   BOOST_CHECK_EXCEPTION(variant{int128_max_text + "0"}.as_int128(), fc::parse_error_exception,
+                         out_of_range_for("int128_t"));
+   BOOST_CHECK_EXCEPTION(variant{int128_min_text + "0"}.as_int128(), fc::parse_error_exception,
+                         out_of_range_for("int128_t"));
+   BOOST_CHECK_THROW(variant{std::string{"+1"}}.as_int128(), fc::exception);
+   BOOST_CHECK_THROW(variant{std::string{"--1"}}.as_int128(), fc::exception);
+}
+
+BOOST_AUTO_TEST_CASE(as_int128_range_error_names_the_value_and_the_range) {
+   BOOST_CHECK_EXCEPTION(variant{uint128_max}.as_int128(), fc::parse_error_exception,
+                         [](const fc::parse_error_exception& e) {
+                            return e.to_detail_string().find(uint128_max_text + " is out of range for int128_t [" +
+                                                             int128_min_text + ", " + int128_max_text + "]") !=
+                                   std::string::npos;
+                         });
+}
+
+BOOST_AUTO_TEST_CASE(from_variant_uint128_rejects_a_value_outside_its_range) {
+   BOOST_CHECK(variant{int64_t{0}}.as<fc::uint128>() == 0);
+   BOOST_CHECK(variant{int64_max}.as<fc::uint128>() == static_cast<fc::uint128>(int64_max));
+   BOOST_CHECK(variant{uint64_max}.as<fc::uint128>() == uint64_max);
+   BOOST_CHECK(variant{uint128_max}.as<fc::uint128>() == uint128_max);
+   BOOST_CHECK(variant{uint128_max_text}.as<fc::uint128>() == uint128_max);
+
+   BOOST_CHECK_EXCEPTION(variant{int64_t{-1}}.as<fc::uint128>(), fc::parse_error_exception,
+                         out_of_range_for("uint128_t"));
+   BOOST_CHECK_EXCEPTION(variant{int64_min}.as<fc::uint128>(), fc::parse_error_exception,
+                         out_of_range_for("uint128_t"));
+   BOOST_CHECK_EXCEPTION(variant{uint128_past_max_text}.as<fc::uint128>(), fc::parse_error_exception,
+                         out_of_range_for("uint128_t"));
+   BOOST_CHECK_THROW(variant{std::string{"-1"}}.as<fc::uint128>(), fc::exception);
+   BOOST_CHECK_THROW(variant{std::string{"+1"}}.as<fc::uint128>(), fc::exception);
+
+   // Only the integer and string variants convert.
+   BOOST_CHECK_THROW(variant{fc::int128{1}}.as<fc::uint128>(), fc::bad_cast_exception);
+   BOOST_CHECK_THROW(variant{true}.as<fc::uint128>(), fc::bad_cast_exception);
+   BOOST_CHECK_THROW(variant{1.0}.as<fc::uint128>(), fc::bad_cast_exception);
+   BOOST_CHECK_THROW(variant{}.as<fc::uint128>(), fc::bad_cast_exception);
+}
+
+BOOST_AUTO_TEST_CASE(from_variant_int128_rejects_a_value_outside_its_range) {
+   BOOST_CHECK(variant{int64_t{0}}.as<fc::int128>() == 0);
+   BOOST_CHECK(variant{int64_min}.as<fc::int128>() == int64_min);
+   BOOST_CHECK(variant{uint64_max}.as<fc::int128>() == uint64_max);
+   BOOST_CHECK(variant{int128_max}.as<fc::int128>() == int128_max);
+   BOOST_CHECK(variant{int128_min}.as<fc::int128>() == int128_min);
+   BOOST_CHECK(variant{static_cast<fc::uint128>(int128_max)}.as<fc::int128>() == int128_max);
+   BOOST_CHECK(variant{int128_min_text}.as<fc::int128>() == int128_min);
+
+   BOOST_CHECK_EXCEPTION(variant{uint128_max}.as<fc::int128>(), fc::parse_error_exception,
+                         out_of_range_for("int128_t"));
+   BOOST_CHECK_EXCEPTION(variant{static_cast<fc::uint128>(int128_max) + 1}.as<fc::int128>(),
+                         fc::parse_error_exception, out_of_range_for("int128_t"));
+   BOOST_CHECK_EXCEPTION(variant{int128_past_max_text}.as<fc::int128>(), fc::parse_error_exception,
+                         out_of_range_for("int128_t"));
+   BOOST_CHECK_EXCEPTION(variant{int128_past_min_text}.as<fc::int128>(), fc::parse_error_exception,
+                         out_of_range_for("int128_t"));
+
+   BOOST_CHECK_THROW(variant{true}.as<fc::int128>(), fc::bad_cast_exception);
+   BOOST_CHECK_THROW(variant{1.0}.as<fc::int128>(), fc::bad_cast_exception);
+   BOOST_CHECK_THROW(variant{}.as<fc::int128>(), fc::bad_cast_exception);
+}
+
+BOOST_AUTO_TEST_CASE(as_uint256_holds_its_whole_range) {
+   BOOST_CHECK_EQUAL(variant{int64_t{0}}.as_uint256().str(), "0");
+   BOOST_CHECK_EQUAL(variant{std::string{"0"}}.as_uint256().str(), "0");
+   BOOST_CHECK_EQUAL(variant{std::string{"-0"}}.as_uint256().str(), "0");
+   BOOST_CHECK_EQUAL(variant{int64_max}.as_uint256().str(), std::to_string(int64_max));
+   BOOST_CHECK_EQUAL(variant{uint64_max}.as_uint256().str(), std::to_string(uint64_max));
+   BOOST_CHECK_EQUAL(variant{fc::uint256{uint256_max_text}}.as_uint256().str(), uint256_max_text);
+   BOOST_CHECK_EQUAL(variant{uint256_max_text}.as_uint256().str(), uint256_max_text);
+   BOOST_CHECK_EQUAL(variant{fc::int256{uint256_max_text}}.as_uint256().str(), uint256_max_text);
+   BOOST_CHECK_EQUAL(variant{hex_prefix + std::string(64, 'f')}.as_uint256().str(), uint256_max_text);
+   BOOST_CHECK_EQUAL(variant{hex_prefix + std::string(50, '0') + std::string(64, 'f')}.as_uint256().str(),
+                     uint256_max_text);
+   BOOST_CHECK_EQUAL(variant{std::string{""}}.as_uint256().str(), "0");
+   BOOST_CHECK_EQUAL(variant{std::string{"0x"}}.as_uint256().str(), "0");
+   BOOST_CHECK_EQUAL(variant{std::string{"0X"}}.as_uint256().str(), "0");
+   BOOST_CHECK_EQUAL(variant{std::string{"-0x0"}}.as_uint256().str(), "0");
+}
+
+BOOST_AUTO_TEST_CASE(as_uint256_reads_digits_after_a_leading_zero_as_decimal) {
+   BOOST_CHECK_EQUAL(variant{std::string{"010"}}.as_uint256().str(), "10");
+   BOOST_CHECK_EQUAL(variant{std::string{"09"}}.as_uint256().str(), "9");
+   BOOST_CHECK_EQUAL(variant{std::string{"00"}}.as_uint256().str(), "0");
+   BOOST_CHECK_EQUAL(variant{std::string{"-00"}}.as_uint256().str(), "0");
+   BOOST_CHECK_EQUAL(variant{"000" + uint256_max_text}.as_uint256().str(), uint256_max_text);
+   BOOST_CHECK_EQUAL(variant{std::string{"010"}}.as<fc::uint256>().str(), "10");
+   // Hex is unchanged.
+   BOOST_CHECK_EQUAL(variant{std::string{"0x010"}}.as_uint256().str(), "16");
+   BOOST_CHECK_EQUAL(variant{std::string{"0X0f"}}.as_uint256().str(), "15");
+
+   BOOST_CHECK_EXCEPTION(variant{"0" + uint256_past_max_text}.as_uint256(), fc::parse_error_exception,
+                         out_of_range_for("uint256_t"));
+   BOOST_CHECK_EXCEPTION(variant{std::string{"-01"}}.as_uint256(), fc::parse_error_exception,
+                         out_of_range_for("uint256_t"));
+}
+
+BOOST_AUTO_TEST_CASE(as_uint256_rejects_text_that_is_not_a_number) {
+   for (std::size_t i = 0; i < not_256bit_numbers.size(); ++i) {
+      BOOST_TEST_CONTEXT("not_256bit_numbers[" << i << "]") {
+         const variant text{not_256bit_numbers[i]};
+         BOOST_CHECK_EXCEPTION(text.as_uint256(), fc::parse_error_exception, not_a_number_for("uint256_t"));
+         BOOST_CHECK_EXCEPTION(text.as<fc::uint256>(), fc::parse_error_exception, not_a_number_for("uint256_t"));
+      }
+   }
+}
+
+BOOST_AUTO_TEST_CASE(as_uint256_parse_error_names_the_text) {
+   BOOST_CHECK_EXCEPTION(
+      variant{std::string{"abc"}}.as_uint256(), fc::parse_error_exception, [](const fc::parse_error_exception& e) {
+         return e.to_detail_string().find("Couldn't parse uint256_t from \"abc\"") != std::string::npos;
+      });
+}
+
+BOOST_AUTO_TEST_CASE(as_uint256_rejects_a_value_outside_its_range) {
+   BOOST_CHECK_EXCEPTION(variant{int64_t{-1}}.as_uint256(), fc::parse_error_exception, out_of_range_for("uint256_t"));
+   BOOST_CHECK_EXCEPTION(variant{int64_min}.as_uint256(), fc::parse_error_exception, out_of_range_for("uint256_t"));
+   BOOST_CHECK_EXCEPTION(variant{fc::int256{-1}}.as_uint256(), fc::parse_error_exception,
+                         out_of_range_for("uint256_t"));
+   BOOST_CHECK_EXCEPTION(variant{std::string{"-1"}}.as_uint256(), fc::parse_error_exception,
+                         out_of_range_for("uint256_t"));
+   BOOST_CHECK_EXCEPTION(variant{"-" + uint256_max_text}.as_uint256(), fc::parse_error_exception,
+                         out_of_range_for("uint256_t"));
+   BOOST_CHECK_EXCEPTION(variant{uint256_past_max_text}.as_uint256(), fc::parse_error_exception,
+                         out_of_range_for("uint256_t"));
+   BOOST_CHECK_EXCEPTION(variant{uint256_max_text + "0"}.as_uint256(), fc::parse_error_exception,
+                         out_of_range_for("uint256_t"));
+   BOOST_CHECK_EXCEPTION(variant{hex_prefix + "1" + std::string(64, '0')}.as_uint256(), fc::parse_error_exception,
+                         out_of_range_for("uint256_t"));
+   BOOST_CHECK_EXCEPTION(variant{"0" + std::string(86, '7')}.as_uint256(), fc::parse_error_exception,
+                         out_of_range_for("uint256_t"));
+   // Too long for 256 bits and holding a character that is not a digit: not a number.
+   BOOST_CHECK_EXCEPTION(variant{hex_prefix + std::string(64, 'f') + "eg"}.as_uint256(), fc::parse_error_exception,
+                         not_a_number_for("uint256_t"));
+   BOOST_CHECK_EXCEPTION(variant{hex_prefix + std::string(65, 'g')}.as_uint256(), fc::parse_error_exception,
+                         not_a_number_for("uint256_t"));
+   BOOST_CHECK_EXCEPTION(variant{"0" + std::string(90, 'a')}.as_uint256(), fc::parse_error_exception,
+                         not_a_number_for("uint256_t"));
+   BOOST_CHECK_EXCEPTION(variant{uint256_past_max_text + "g"}.as_uint256(), fc::parse_error_exception,
+                         not_a_number_for("uint256_t"));
+
+   BOOST_CHECK_EXCEPTION(variant{int64_t{-1}}.as<fc::uint256>(), fc::parse_error_exception,
+                         out_of_range_for("uint256_t"));
+   BOOST_CHECK_EXCEPTION(variant{uint256_past_max_text}.as<fc::uint256>(), fc::parse_error_exception,
+                         out_of_range_for("uint256_t"));
+}
+
+BOOST_AUTO_TEST_CASE(as_uint256_range_error_names_the_value_and_the_range) {
+   BOOST_CHECK_EXCEPTION(variant{int64_t{-1}}.as_uint256(), fc::parse_error_exception,
+                         [](const fc::parse_error_exception& e) {
+                            return e.to_detail_string().find("-1 is out of range for uint256_t [0, " +
+                                                             uint256_max_text + "]") != std::string::npos;
+                         });
+}
+
+BOOST_AUTO_TEST_CASE(as_int256_holds_its_whole_range) {
+   // fc::int256 is sign-magnitude: it holds every uint256 and its negation.
+   BOOST_CHECK_EQUAL(variant{int64_t{0}}.as_int256().str(), "0");
+   BOOST_CHECK_EQUAL(variant{std::string{"0"}}.as_int256().str(), "0");
+   BOOST_CHECK_EQUAL(variant{std::string{"-0"}}.as_int256().str(), "0");
+   BOOST_CHECK_EQUAL(variant{int64_min}.as_int256().str(), std::to_string(int64_min));
+   BOOST_CHECK_EQUAL(variant{int64_max}.as_int256().str(), std::to_string(int64_max));
+   BOOST_CHECK_EQUAL(variant{uint64_max}.as_int256().str(), std::to_string(uint64_max));
+   BOOST_CHECK_EQUAL(variant{fc::int256{uint256_max_text}}.as_int256().str(), uint256_max_text);
+   BOOST_CHECK_EQUAL(variant{fc::int256{"-" + uint256_max_text}}.as_int256().str(), "-" + uint256_max_text);
+   BOOST_CHECK_EQUAL(variant{fc::uint256{uint256_max_text}}.as_int256().str(), uint256_max_text);
+   BOOST_CHECK_EQUAL(variant{uint256_max_text}.as_int256().str(), uint256_max_text);
+   BOOST_CHECK_EQUAL(variant{"-" + uint256_max_text}.as_int256().str(), "-" + uint256_max_text);
+   BOOST_CHECK_EQUAL(variant{hex_prefix + std::string(64, 'f')}.as_int256().str(), uint256_max_text);
+   BOOST_CHECK_EQUAL(variant{std::string{"-0xff"}}.as_int256().str(), "-255");
+   BOOST_CHECK_EQUAL(variant{std::string{""}}.as_int256().str(), "0");
+   BOOST_CHECK_EQUAL(variant{std::string{"0x"}}.as_int256().str(), "0");
+   BOOST_CHECK_EQUAL(variant{std::string{"0X"}}.as_int256().str(), "0");
+   BOOST_CHECK_EQUAL(variant{std::string{"-0x0"}}.as_int256().str(), "0");
+   BOOST_CHECK_EQUAL(variant{std::string{"-0X0"}}.as_int256().str(), "0");
+}
+
+BOOST_AUTO_TEST_CASE(as_int256_rejects_a_value_outside_its_range) {
+   BOOST_CHECK_EXCEPTION(variant{uint256_past_max_text}.as_int256(), fc::parse_error_exception,
+                         out_of_range_for("int256_t"));
+   BOOST_CHECK_EXCEPTION(variant{"-" + uint256_past_max_text}.as_int256(), fc::parse_error_exception,
+                         out_of_range_for("int256_t"));
+   BOOST_CHECK_EXCEPTION(variant{uint256_max_text + "0"}.as_int256(), fc::parse_error_exception,
+                         out_of_range_for("int256_t"));
+   BOOST_CHECK_EXCEPTION(variant{"-" + uint256_max_text + "0"}.as_int256(), fc::parse_error_exception,
+                         out_of_range_for("int256_t"));
+   BOOST_CHECK_EXCEPTION(variant{hex_prefix + "1" + std::string(64, '0')}.as_int256(), fc::parse_error_exception,
+                         out_of_range_for("int256_t"));
+   BOOST_CHECK_EXCEPTION(variant{"0" + std::string(86, '7')}.as_int256(), fc::parse_error_exception,
+                         out_of_range_for("int256_t"));
+   // Too long for 256 bits and holding a character that is not a digit: not a number.
+   BOOST_CHECK_EXCEPTION(variant{hex_prefix + std::string(64, 'f') + "eg"}.as_int256(), fc::parse_error_exception,
+                         not_a_number_for("int256_t"));
+   BOOST_CHECK_EXCEPTION(variant{"-" + hex_prefix + std::string(65, 'g')}.as_int256(), fc::parse_error_exception,
+                         not_a_number_for("int256_t"));
+   BOOST_CHECK_EXCEPTION(variant{"-" + uint256_past_max_text + "g"}.as_int256(), fc::parse_error_exception,
+                         not_a_number_for("int256_t"));
+
+   BOOST_CHECK_EXCEPTION(variant{uint256_past_max_text}.as<fc::int256>(), fc::parse_error_exception,
+                         out_of_range_for("int256_t"));
+}
+
+BOOST_AUTO_TEST_CASE(as_int256_reads_digits_after_a_leading_zero_as_decimal) {
+   BOOST_CHECK_EQUAL(variant{std::string{"010"}}.as_int256().str(), "10");
+   BOOST_CHECK_EQUAL(variant{std::string{"-010"}}.as_int256().str(), "-10");
+   BOOST_CHECK_EQUAL(variant{std::string{"09"}}.as_int256().str(), "9");
+   BOOST_CHECK_EQUAL(variant{std::string{"-09"}}.as_int256().str(), "-9");
+   BOOST_CHECK_EQUAL(variant{std::string{"-00"}}.as_int256().str(), "0");
+   BOOST_CHECK_EQUAL(variant{"-000" + uint256_max_text}.as_int256().str(), "-" + uint256_max_text);
+   BOOST_CHECK_EQUAL(variant{std::string{"-010"}}.as<fc::int256>().str(), "-10");
+   // Hex is unchanged.
+   BOOST_CHECK_EQUAL(variant{std::string{"-0x010"}}.as_int256().str(), "-16");
+
+   BOOST_CHECK_EXCEPTION(variant{"-0" + uint256_past_max_text}.as_int256(), fc::parse_error_exception,
+                         out_of_range_for("int256_t"));
+}
+
+BOOST_AUTO_TEST_CASE(as_int256_rejects_text_that_is_not_a_number) {
+   for (std::size_t i = 0; i < not_256bit_numbers.size(); ++i) {
+      BOOST_TEST_CONTEXT("not_256bit_numbers[" << i << "]") {
+         const variant text{not_256bit_numbers[i]};
+         BOOST_CHECK_EXCEPTION(text.as_int256(), fc::parse_error_exception, not_a_number_for("int256_t"));
+         BOOST_CHECK_EXCEPTION(text.as<fc::int256>(), fc::parse_error_exception, not_a_number_for("int256_t"));
+      }
+   }
+}
+
+BOOST_AUTO_TEST_CASE(as_int256_parse_error_names_the_text) {
+   BOOST_CHECK_EXCEPTION(
+      variant{std::string{"abc"}}.as_int256(), fc::parse_error_exception, [](const fc::parse_error_exception& e) {
+         return e.to_detail_string().find("Couldn't parse int256_t from \"abc\"") != std::string::npos;
+      });
+}
+
+BOOST_AUTO_TEST_CASE(as_int256_range_error_names_the_value_and_the_range) {
+   BOOST_CHECK_EXCEPTION(variant{uint256_past_max_text}.as_int256(), fc::parse_error_exception,
+                         [](const fc::parse_error_exception& e) {
+                            const std::string message = uint256_past_max_text + " is out of range for int256_t [-" +
+                                                        uint256_max_text + ", " + uint256_max_text + "]";
+                            return e.to_detail_string().find(message) != std::string::npos;
+                         });
+}
+
+// fc::UInt<256> and fc::Int<256> are boost's uint256_t and int256_t, the bases of fc::uint256 and fc::int256.
+static_assert(std::is_same_v<fc::UInt<256>, boost::multiprecision::uint256_t>);
+static_assert(std::is_same_v<fc::Int<256>, boost::multiprecision::int256_t>);
+static_assert(std::is_base_of_v<fc::UInt<256>, fc::uint256>);
+static_assert(std::is_base_of_v<fc::Int<256>, fc::int256>);
+
+BOOST_AUTO_TEST_CASE(uint_256_alias_holds_its_whole_range) {
+   BOOST_CHECK_EQUAL(variant{int64_t{0}}.as<fc::UInt<256>>().str(), "0");
+   BOOST_CHECK_EQUAL(variant{int64_max}.as<fc::UInt<256>>().str(), std::to_string(int64_max));
+   BOOST_CHECK_EQUAL(variant{uint64_max}.as<fc::UInt<256>>().str(), std::to_string(uint64_max));
+   BOOST_CHECK_EQUAL(variant{fc::uint256{uint256_max_text}}.as<fc::UInt<256>>().str(), uint256_max_text);
+   BOOST_CHECK_EQUAL(variant{uint256_max_text}.as<fc::UInt<256>>().str(), uint256_max_text);
+   BOOST_CHECK_EQUAL(variant{hex_prefix + std::string(64, 'f')}.as<fc::UInt<256>>().str(), uint256_max_text);
+}
+
+BOOST_AUTO_TEST_CASE(uint_256_alias_rejects_a_value_outside_its_range) {
+   BOOST_CHECK_EXCEPTION(variant{int64_t{-1}}.as<fc::UInt<256>>(), fc::parse_error_exception,
+                         out_of_range_for("uint256_t"));
+   BOOST_CHECK_EXCEPTION(variant{fc::int256{-1}}.as<fc::UInt<256>>(), fc::parse_error_exception,
+                         out_of_range_for("uint256_t"));
+   BOOST_CHECK_EXCEPTION(variant{std::string{"-1"}}.as<fc::UInt<256>>(), fc::parse_error_exception,
+                         out_of_range_for("uint256_t"));
+   BOOST_CHECK_EXCEPTION(variant{uint256_past_max_text}.as<fc::UInt<256>>(), fc::parse_error_exception,
+                         out_of_range_for("uint256_t"));
+   BOOST_CHECK_EXCEPTION(variant{uint256_max_text + "0"}.as<fc::UInt<256>>(), fc::parse_error_exception,
+                         out_of_range_for("uint256_t"));
+   BOOST_CHECK_EXCEPTION(variant{hex_prefix + "1" + std::string(64, '0')}.as<fc::UInt<256>>(),
+                         fc::parse_error_exception, out_of_range_for("uint256_t"));
+   // 258 bits of octal.
+   BOOST_CHECK_EXCEPTION(variant{"0" + std::string(86, '7')}.as<fc::UInt<256>>(), fc::parse_error_exception,
+                         out_of_range_for("uint256_t"));
+}
+
+BOOST_AUTO_TEST_CASE(int_256_alias_holds_its_whole_range) {
+   BOOST_CHECK_EQUAL(variant{int64_min}.as<fc::Int<256>>().str(), std::to_string(int64_min));
+   BOOST_CHECK_EQUAL(variant{uint64_max}.as<fc::Int<256>>().str(), std::to_string(uint64_max));
+   BOOST_CHECK_EQUAL(variant{fc::int256{"-" + uint256_max_text}}.as<fc::Int<256>>().str(), "-" + uint256_max_text);
+   BOOST_CHECK_EQUAL(variant{uint256_max_text}.as<fc::Int<256>>().str(), uint256_max_text);
+   BOOST_CHECK_EQUAL(variant{"-" + uint256_max_text}.as<fc::Int<256>>().str(), "-" + uint256_max_text);
+   BOOST_CHECK_EQUAL(variant{std::string{"-0xff"}}.as<fc::Int<256>>().str(), "-255");
+}
+
+BOOST_AUTO_TEST_CASE(int_256_alias_rejects_a_value_outside_its_range) {
+   BOOST_CHECK_EXCEPTION(variant{uint256_past_max_text}.as<fc::Int<256>>(), fc::parse_error_exception,
+                         out_of_range_for("int256_t"));
+   BOOST_CHECK_EXCEPTION(variant{"-" + uint256_past_max_text}.as<fc::Int<256>>(), fc::parse_error_exception,
+                         out_of_range_for("int256_t"));
+   BOOST_CHECK_EXCEPTION(variant{"-" + uint256_max_text + "0"}.as<fc::Int<256>>(), fc::parse_error_exception,
+                         out_of_range_for("int256_t"));
+   BOOST_CHECK_EXCEPTION(variant{hex_prefix + "1" + std::string(64, '0')}.as<fc::Int<256>>(),
+                         fc::parse_error_exception, out_of_range_for("int256_t"));
+   // 258 bits of octal.
+   BOOST_CHECK_EXCEPTION(variant{"0" + std::string(86, '7')}.as<fc::Int<256>>(), fc::parse_error_exception,
+                         out_of_range_for("int256_t"));
+}
+
+BOOST_AUTO_TEST_CASE(int_256_aliases_reject_a_type_they_do_not_read) {
+   BOOST_CHECK_THROW(variant{1.0}.as<fc::UInt<256>>(), fc::bad_cast_exception);
+   BOOST_CHECK_THROW(variant{1.0}.as<fc::Int<256>>(), fc::bad_cast_exception);
+   BOOST_CHECK_THROW(variant{variants{}}.as<fc::UInt<256>>(), fc::bad_cast_exception);
+   BOOST_CHECK_THROW(variant{variants{}}.as<fc::Int<256>>(), fc::bad_cast_exception);
+}
+
+BOOST_AUTO_TEST_CASE(int_256_aliases_round_trip_their_bounds_as_decimal_text) {
+   for (const std::string& text : {std::string{"0"}, uint256_max_text}) {
+      const fc::UInt<256> value{text};
+      const variant v{value};
+      BOOST_CHECK_EQUAL(v.get_string(), text);
+      BOOST_CHECK(v.as<fc::UInt<256>>() == value);
+   }
+   for (const std::string& text : {"-" + uint256_max_text, std::string{"0"}, uint256_max_text}) {
+      const fc::Int<256> value{text};
+      const variant v{value};
+      BOOST_CHECK_EQUAL(v.get_string(), text);
+      BOOST_CHECK(v.as<fc::Int<256>>() == value);
+   }
 }
 
 BOOST_AUTO_TEST_CASE(as_double_from_each_compatible_source) {

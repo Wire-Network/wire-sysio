@@ -26,6 +26,8 @@ namespace fc {
       safe( O o ):value(o){}
       safe(){}
       safe( const safe& o ):value(o.value){}
+      /// Assign the checked value without changing its representation.
+      safe& operator=(const safe&) = default;
 
       static safe min()
       {

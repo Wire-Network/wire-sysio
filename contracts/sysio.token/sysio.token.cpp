@@ -50,7 +50,7 @@ void token::issue( const name& to, const asset& quantity, const string& memo )
        s.supply += quantity;
     });
 
-    add_balance( st.issuer, quantity, ram_payer );
+    add_balance( st.issuer, quantity );
 }
 
 void token::retire( const asset& quantity, const string& memo )
@@ -96,7 +96,7 @@ void token::transfer( const name&    from,
     check( memo.size() <= 256, "memo has more than 256 bytes" );
 
     sub_balance( from, quantity );
-    add_balance( to, quantity, ram_payer );
+    add_balance( to, quantity );
 }
 
 void token::sub_balance( const name& owner, const asset& value ) {
@@ -107,29 +107,12 @@ void token::sub_balance( const name& owner, const asset& value ) {
    });
 }
 
-void token::add_balance( const name& owner, const asset& value, const name& ram_payer )
+void token::add_balance( const name& owner, const asset& value )
 {
    accounts to_acnts( get_self(), owner.value );
    to_acnts.upsert( ram_payer, acct_key{value.symbol.code().raw()},
       account{value},                               // default if new
       [&]( auto& a ) { a.balance += value; } );     // updater if exists
-}
-
-void token::open( const name& owner, const symbol& symbol, const name& ram_payer )
-{
-   require_auth( ram_payer );
-
-   check( is_account( owner ), "owner account does not exist" );
-
-   auto sym_code_raw = symbol.code().raw();
-   stats statstable( get_self(), sym_code_raw );
-   const auto& st = statstable.get( stat_key{sym_code_raw}, "symbol does not exist" );
-   check( st.supply.symbol == symbol, "symbol precision mismatch" );
-
-   accounts acnts( get_self(), owner.value );
-   if( !acnts.contains( acct_key{sym_code_raw} ) ) {
-      acnts.emplace( ram_payer, acct_key{sym_code_raw}, account{asset{0, symbol}} );
-   }
 }
 
 void token::close( const name& owner, const symbol& symbol )

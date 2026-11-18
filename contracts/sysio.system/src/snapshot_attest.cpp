@@ -29,6 +29,7 @@ constexpr char snapshot_config_unset_error[] = "snapshot attestation configurati
 constexpr char invalid_block_id_error[] = "invalid block_id";
 constexpr char unscheduled_block_id_error[] = "snapshot block is not a scheduled attestation height";
 constexpr char historical_block_id_error[] = "snapshot block is older than latest attested snapshot height";
+constexpr char stale_block_id_error[] = "snapshot block is older than the pending vote window";
 constexpr char future_block_id_error[] = "snapshot block cannot be in the future";
 constexpr char min_providers_range_error[] = "min_providers must be at least 1";
 constexpr char min_providers_capacity_error[] = "min_providers exceeds the maximum registrable providers";
@@ -37,6 +38,10 @@ constexpr char snapshot_record_not_found_error[] = "no attested snapshot record 
 constexpr char stale_provider_prune_log_prefix[] = "regsnapprov: pruned stale mapping for producer ";
 constexpr char stale_provider_prune_log_infix[] = " and snapshot provider ";
 constexpr char log_line_ending[] = "\n";
+
+/// Stale vote rows one vote may erase: a full window, so a steady cadence clears its backlog in one call while
+/// rows a cadence change strands drain over later votes.
+constexpr uint32_t max_stale_vote_purge_rows = max_snap_providers * snapshot_attestation::max_pending_vote_heights;
 
 /// Classifies the producer-table state gating a producer that currently holds no mapping.
 enum class snapshot_producer_eligibility {
@@ -214,9 +219,23 @@ bool matches_final_snapshot_record(snap_records_table& records, snap_record_key_
    return true;
 }
 
-/// Writes one final attestation and removes every pending tuple through its height.
+/// Erases pending rows below the window, at most max_stale_vote_purge_rows per call.
+void purge_stale_snapshot_votes(snap_votes_table& votes, uint64_t pending_floor) {
+   auto     by_block_num = votes.get_index<snapshot_index::by_block_num>();
+   auto     purge_itr    = by_block_num.begin();
+   uint32_t purged_rows  = 0;
+   while (purge_itr != by_block_num.end() && purge_itr->block_num < pending_floor
+          && purged_rows < max_stale_vote_purge_rows) {
+      purge_itr = by_block_num.erase(std::move(purge_itr));
+      ++purged_rows;
+   }
+}
+
+/// Writes one final attestation and removes the pending tuples from the window floor through its height.
+///
+/// Starts at the floor so the work stays bounded by the window; anything below it is the stale purge's.
 void finalize_snapshot_vote(name self, uint32_t block_num, const checksum256& block_id,
-                            const checksum256& snapshot_hash) {
+                            const checksum256& snapshot_hash, uint64_t pending_floor) {
    snap_records_table records(self);
    const uint32_t     current_block = static_cast<uint32_t>(sysio::current_block_number());
    records.emplace(self, snap_record_key_t{static_cast<uint64_t>(block_num)}, [&](auto& row) {
@@ -228,7 +247,7 @@ void finalize_snapshot_vote(name self, uint32_t block_num, const checksum256& bl
 
    snap_votes_table votes(self);
    auto             by_block_num = votes.get_index<snapshot_index::by_block_num>();
-   auto             purge_itr = by_block_num.begin();
+   auto             purge_itr = by_block_num.lower_bound(pending_floor);
    while (purge_itr != by_block_num.end() && purge_itr->block_num <= block_num) {
       purge_itr = by_block_num.erase(std::move(purge_itr));
    }
@@ -268,7 +287,8 @@ void snapshot_attest::regsnapprov(name producer, name snap_account) {
    }
    check(count_snapshot_providers(providers) < max_snap_providers, provider_capacity_error);
 
-   providers.emplace(producer, snap_provider_key_t{snap_account.value}, [&](auto& row) {
+   // Contract-paid: the table is capped at max_snap_providers and gated on rank, so no spam path.
+   providers.emplace(get_self(), snap_provider_key_t{snap_account.value}, [&](auto& row) {
       row.snap_account = snap_account;
       row.producer     = producer;
    });
@@ -301,7 +321,8 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
    check(config.min_providers > 0, snapshot_config_unset_error);
    check(snapshot_attestation::is_scheduled_block(block_num, config.block_spacing),
          unscheduled_block_id_error);
-   check(block_num <= sysio::current_block_number(), future_block_id_error);
+   const uint32_t current_block = static_cast<uint32_t>(sysio::current_block_number());
+   check(block_num <= current_block, future_block_id_error);
 
    snap_records_table records(get_self());
    const snap_record_key_t record_key{static_cast<uint64_t>(block_num)};
@@ -321,6 +342,9 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
       const auto latest_record = --records.cend();
       check(block_num > latest_record->block_num, historical_block_id_error);
    }
+   // sysio pays for vote rows, so heights older than the window are closed: that bounds what a withheld quorum leaves.
+   const uint64_t pending_floor = snapshot_attestation::pending_vote_floor(current_block, config.block_spacing);
+   check(block_num >= pending_floor, stale_block_id_error);
 
    const name producer = provider_itr->producer;
    // Each vote re-checks the producer's live operator standing: ACTIVE in sysio.opreg and clear of the live
@@ -329,6 +353,7 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
    check(producer_rank::has_live_producer_standing(producer), producer_no_live_standing_error);
 
    snap_votes_table votes(get_self());
+   purge_stale_snapshot_votes(votes, pending_floor);
    auto             by_block_num = votes.get_index<snapshot_index::by_block_num>();
    std::optional<uint64_t> matching_vote_id;
    uint32_t                voter_count = 0;
@@ -352,7 +377,7 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
    if (exact_retry) {
       if (voter_count >= config.min_providers) {
          credit_snapshot_attestations(get_self(), quorum_voters);
-         finalize_snapshot_vote(get_self(), block_num, block_id, snapshot_hash);
+         finalize_snapshot_vote(get_self(), block_num, block_id, snapshot_hash, pending_floor);
       }
       return;
    }
@@ -361,13 +386,14 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
    if (matching_vote_id) {
       const auto matching_vote = votes.get(snap_vote_key_t{*matching_vote_id});
       voter_count = static_cast<uint32_t>(matching_vote.voters.size()) + 1;
-      votes.modify(same_payer, snap_vote_key_t{*matching_vote_id}, [&](auto& row) {
+      // Billed to sysio, not to whoever opened the row.
+      votes.modify(get_self(), snap_vote_key_t{*matching_vote_id}, [&](auto& row) {
          row.voters.push_back(producer);
          quorum_voters = row.voters;
       });
    } else {
       const uint64_t new_id = votes.available_primary_key();
-      votes.emplace(snap_account, snap_vote_key_t{new_id}, [&](auto& row) {
+      votes.emplace(get_self(), snap_vote_key_t{new_id}, [&](auto& row) {
          row.id            = new_id;
          row.block_num     = block_num;
          row.block_id      = block_id;
@@ -379,7 +405,7 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
 
    if (voter_count >= config.min_providers) {
       credit_snapshot_attestations(get_self(), quorum_voters);
-      finalize_snapshot_vote(get_self(), block_num, block_id, snapshot_hash);
+      finalize_snapshot_vote(get_self(), block_num, block_id, snapshot_hash, pending_floor);
    }
 }
 

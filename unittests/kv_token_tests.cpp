@@ -41,11 +41,6 @@ struct kv_token_tester : validating_tester {
          fc::mutable_variant_object()("quantity", quantity)("memo", memo));
    }
 
-   void open(name owner, symbol sym, name payer) {
-      push_action("sysio.token"_n, "open"_n, payer,
-         fc::mutable_variant_object()("owner", owner)("symbol", sym)("ram_payer", payer));
-   }
-
    void close(name owner, symbol sym) {
       push_action("sysio.token"_n, "close"_n, owner,
          fc::mutable_variant_object()("owner", owner)("symbol", sym));
@@ -96,21 +91,20 @@ BOOST_FIXTURE_TEST_CASE(kv_token_retire, kv_token_tester) {
    BOOST_TEST_MESSAGE("Token retire succeeded with KV-backed sysio.token");
 }
 
-BOOST_FIXTURE_TEST_CASE(kv_token_open_close, kv_token_tester) {
+BOOST_FIXTURE_TEST_CASE(kv_token_close, kv_token_tester) {
    auto sym = symbol(SY(4, WIRE));
 
    create_token("alice"_n, asset(1000000000, sym));
+   issue("alice"_n, asset(10000, sym));
    produce_block();
 
-   // Open account for bob (alice pays)
-   open("bob"_n, sym, "alice"_n);
+   // Empty alice's balance, then close the zero-balance row
+   transfer("alice"_n, "bob"_n, asset(10000, sym));
+   produce_block();
+   close("alice"_n, sym);
    produce_block();
 
-   // Close bob's zero-balance account
-   close("bob"_n, sym);
-   produce_block();
-
-   BOOST_TEST_MESSAGE("Token open/close succeeded with KV-backed sysio.token");
+   BOOST_TEST_MESSAGE("Token close succeeded with KV-backed sysio.token");
 }
 
 BOOST_FIXTURE_TEST_CASE(kv_token_overdrawn_check, kv_token_tester) {

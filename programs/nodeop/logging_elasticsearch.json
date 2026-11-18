@@ -100,6 +100,19 @@
       }
     },
     "_comment": "Forwards logs to ES/OpenSearch via the _bulk API. Point `url`/`index` at YOUR endpoint and write index/alias, and change `app`/`principal` to values identifying your deployment before enabling. `layout` is a token template (tokens: timestamp[:iso8601|epoch_millis], level[:upper|lower], message, logger, file, line, func, thread, extra_flat, extra_object); this value reproduces fc::log::es_default_layout and is also the sink's default when the format block is omitted -- though then without extra_fields. ${extra_flat} splices extra_fields at that spot, which is how env/app/principal/logStream identity is stamped into every document."
+  },{
+    "name": "account_watch_file",
+    "type": "rotating_file_sink",
+    "args": {
+      "base_filename": "./logs/account_watch.jsonl",
+      "max_size": 10,
+      "max_files": 10
+    },
+    "format": {
+      "type": "pattern",
+      "args": { "pattern": "%v" }
+    },
+    "_comment": "account_watch_plugin records: the bare message, one JSON object per line, for a watchdog to read; rotates at max_size MB."
   }
   ],
   "loggers": [{
@@ -252,6 +265,14 @@
     "enabled": false,
     "sinks": [
       "stderr_color",
+      "es"
+    ]
+  },{
+    "name": "account_watch",
+    "level": "info",
+    "enabled": true,
+    "sinks": [
+      "account_watch_file",
       "es"
     ]
   },{

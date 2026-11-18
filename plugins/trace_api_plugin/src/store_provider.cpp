@@ -372,7 +372,7 @@ namespace sysio::trace_api {
             result.open();
          }
 
-         return std::move(result);
+         return result;
       } else {
          return {};
       }

@@ -68,6 +68,7 @@ Options:
 #include <vector>
 #include <regex>
 #include <iostream>
+#include <limits>
 #include <locale>
 #include <optional>
 #include <tuple>
@@ -412,6 +413,20 @@ auto abi_serializer_resolver_empty = [](const name& account) -> std::optional<ab
    return std::optional<abi_serializer>();
 };
 
+/// Builds a packed transaction from its JSON form through the constructors, which inflate a zlib-compressed one.
+/// `signatures` and `compression` may be omitted.
+packed_transaction to_packed_transaction(const fc::variant& var) {
+   fc::mutable_variant_object mvo(var);
+   if (!mvo.contains("signatures"))
+      mvo("signatures", fc::variants());
+   if (!mvo.contains("compression"))
+      mvo("compression", packed_transaction::compression_type::none);
+   packed_transaction ptrx;
+   abi_serializer::from_variant(fc::variant(std::move(mvo)), ptrx, abi_serializer_resolver_empty,
+                                abi_serializer::create_yield_function(abi_serializer_max_time));
+   return ptrx;
+}
+
 void prompt_for_wallet_password(string& pw, const string& name) {
    if(pw.size() == 0 && name != "SecureEnclave") {
       std::cout << localized("password: ");
@@ -657,7 +672,7 @@ fc::variant json_from_file_or_string(const string& file_or_str, fc::json::parse_
    } else if (looks_like_json) {
       try {
          return fc::json::from_string(file_or_str, ptype);
-      } SYS_RETHROW_EXCEPTIONS(json_parse_exception, "Fail to parse JSON from string: {}", ("string", file_or_str));
+      } SYS_RETHROW_EXCEPTIONS(json_parse_exception, "Fail to parse JSON from string: {}", file_or_str);
    } else {
       return file_or_str;
    }
@@ -823,17 +838,6 @@ fc::variant regproducer_variant(const account_name& producer, const public_key_t
             ("url", url)
             ("location", location)
             ;
-}
-
-chain::action create_open(const string& contract, const name& owner, symbol sym, const name& ram_payer) {
-   auto open_ = fc::mutable_variant_object
-      ("owner", owner)
-      ("symbol", sym)
-      ("ram_payer", ram_payer);
-    return action {
-      get_account_permissions(tx_permission, {ram_payer, sysio::chain::config::active_name}),
-      name(contract), "open"_n, variant_to_bin( name(contract), "open"_n, open_ )
-   };
 }
 
 chain::action create_transfer(const string& contract, const name& sender, const name& recipient, asset amount, const string& memo ) {
@@ -1831,6 +1835,16 @@ void get_account( const string& accountName, const string& coresym, bool json_fo
          std::cout << std::endl;
       }
 
+      if( res.subjective_net_bill_limit ) {
+         const auto& net_bill = *res.subjective_net_bill_limit;
+         std::cout << "subjective net bandwidth:" << std::endl;
+         std::cout << indent << std::left << std::setw(11) << "used:"
+                   << std::right << std::setw(18) << to_pretty_net( net_bill.used ) << "\n";
+         std::cout << indent << std::left << std::setw(11) << "allowed:"
+                   << std::right << std::setw(18) << to_pretty_net( net_bill.max ) << "\n";
+         std::cout << std::endl;
+      }
+
       if( res.core_liquid_balance ) {
          std::cout << res.core_liquid_balance->get_symbol().name() << " balances: " << std::endl;
          std::cout << indent << std::left << std::setw(11)
@@ -2061,7 +2075,7 @@ int main( int argc, char** argv ) {
       fc::variant packed_trx_var = json_from_file_or_string( packed_transaction_json );
       packed_transaction packed_trx;
       try {
-         fc::from_variant<packed_transaction>( packed_trx_var, packed_trx );
+         packed_trx = to_packed_transaction( packed_trx_var );
       } SYS_RETHROW_EXCEPTIONS( transaction_type_exception, "Invalid packed transaction format: '{}'",
                                 fc::json::to_string(packed_trx_var, fc::time_point::maximum()))
       signed_transaction strx = packed_trx.get_signed_transaction();
@@ -2362,7 +2376,8 @@ int main( int argc, char** argv ) {
    auto eth_to_k1_public_cmd = convert_cmd->add_subcommand("eth_to_k1_public",
       localized("Convert an Ethereum uncompressed public key (0x04<128 hex>, or 0x<128 hex> for raw X||Y) to a "
                 "Wire PUB_K1_, plus the matching Ethereum address. Use this to register an account's K1 key "
-                "without handling the private key; signing still requires that private key in a Wire signer."));
+                "without handling the private key; signing needs a Wire signer holding that key, such as a KMS: "
+                "signature provider for a key kept in AWS KMS."));
    eth_to_k1_public_cmd->add_option("public-key", eth_k1_pubhex,
       localized("Ethereum uncompressed public key: 0x04 + 128 hex (65 bytes) or 128 hex (64-byte X||Y)"))->required();
    eth_to_k1_public_cmd->callback([&] {
@@ -2596,7 +2611,8 @@ int main( int argc, char** argv ) {
          } catch (...) {
             // error is handled in assertion below
          }
-         SYSC_ASSERT( block_num.has_value() && (*block_num > 0), "Invalid block num: ${block_num}", ("block_num", params.blockArg) );
+         SYSC_ASSERT( block_num.has_value() && (*block_num > 0) && (*block_num <= std::numeric_limits<uint32_t>::max()),
+                      "Invalid block num: ${block_num}", ("block_num", params.blockArg) );
          const auto arg = fc::variant_object("block_num", static_cast<uint32_t>(*block_num));
          std::cout << fc::json::to_pretty_string(call(get_block_info_func, arg)) << std::endl;
       } else {
@@ -3053,7 +3069,6 @@ int main( int argc, char** argv ) {
    string recipient;
    string amount;
    string memo;
-   bool pay_ram = false;
 
    auto transfer_cmd = app.add_subcommand("transfer", localized("Transfer tokens from account to account"));
    transfer_cmd->add_option("sender", sender, localized("The account sending tokens"))->required();
@@ -3061,18 +3076,12 @@ int main( int argc, char** argv ) {
    transfer_cmd->add_option("amount", amount, localized("The amount of tokens to send"))->required();
    transfer_cmd->add_option("memo", memo, localized("The memo for the transfer"));
    transfer_cmd->add_option("--contract,-c", con, localized("The contract that controls the token, defaults to sysio.token for asset amounts"));
-   transfer_cmd->add_flag("--pay-ram-to-open", pay_ram, localized("Pay RAM to open recipient's token balance row"));
 
    add_standard_transaction_options_plus_signing(transfer_cmd, "sender@active");
    transfer_cmd->callback([&] {
       auto transfer_amount = to_asset(name(con), amount);
       auto transfer = create_transfer(con, name(sender), name(recipient), transfer_amount, memo);
-      if (!pay_ram) {
-         send_actions( { transfer }, signing_keys_opt.get_keys());
-      } else {
-         auto open_ = create_open(con, name(recipient), transfer_amount.get_symbol(), name(sender));
-         send_actions( { open_, transfer }, signing_keys_opt.get_keys());
-      }
+      send_actions( { transfer }, signing_keys_opt.get_keys());
    });
 
    // Net subcommand
@@ -3382,7 +3391,7 @@ int main( int argc, char** argv ) {
          if( vo.contains("packed_trx") ) {
             packed_transaction packed_trx;
             try {
-              fc::from_variant<packed_transaction>( trx_var, packed_trx );
+              packed_trx = to_packed_transaction( trx_var );
             } SYS_RETHROW_EXCEPTIONS( transaction_type_exception, "Invalid packed transaction format: '{}'",
                                       fc::json::to_string(trx_var, fc::time_point::maximum()))
            const signed_transaction& strx = packed_trx.get_signed_transaction();

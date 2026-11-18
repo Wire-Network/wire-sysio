@@ -349,7 +349,7 @@ requested window has been recorded yet, the response carries
 | `data` | Raw action payload as hex. |
 | `return_value` | Raw return value as hex (empty string when none). |
 | `account_ram_deltas` | Array of `{account, delta}` objects capturing RAM allocation changes. |
-| `cpu_usage_us` | Producer-set CPU in microseconds for this action (present only for input/top-level actions). |
+| `cpu_usage_us` | Producer-set CPU in microseconds for this action's receipt entry: present for input/top-level actions and for actions where billing switched to a contract paying for its own code (that contract's CPU past the notification stipend, often 0). |
 | `net_usage` | Producer-set NET usage in bytes for this action (present only for input/top-level actions). |
 | `params` | ABI-decoded action payload (omitted when ABI unavailable or decode failed). |
 | `return_data` | ABI-decoded return value (omitted when ABI unavailable or no return type defined). |

@@ -28,19 +28,16 @@ code/abi AND reconcile the account's gifted RAM to its exact new usage out of
 sysio's pool via `giftram`, measured after the write (re-callable: a smaller
 re-deploy reclaims). A raw `setcode` here skips that reconciliation and leaves
 the account paying for any growth out of a finite quota it does not have — a
-system account only has a small creation allowance.
+system account only has a small creation allowance. That includes `sysio.roa`
+once active: `activateroa` pins its quota to its usage, so only its bootstrap
+deploy is raw.
 
 *The root `sysio` account* — which holds `sysio.system` and **is the RAM pool
 itself** — deploys with the **native `setcode` / `setabi`**. `giftram` cannot
-self-target: with `account == sysio` and a positive delta it moves the delta
-from sysio's reslimit row into `sysio.acct`, then calls
-`set_resource_limits(sysio, sram - delta)` and `add_system_resources(sysio,
-delta)` — both against the same account, so the chain quota is restored while
-the ROA ledger has already been decremented. The result is a ledger that reads
-lower than the actual quota, and it fails silently: sysio's limit is finite, so
-`giftram`'s own `cur_ram >= 0` guard does not catch it. This is why the
-production bootstrap deploys `system` on `sysio` natively (the harness encodes
-the same split as `ContractSteps.DeployMode.raw` for bios/system/roa).
+self-target: with `account == sysio` it moves the delta out of sysio's quota
+and straight back, so it funds nothing. This is why the production bootstrap
+deploys `system` on `sysio` natively (the harness encodes the same split as
+`ContractSteps.DeployMode.raw` for bios/system/roa).
 
 So an atomic transaction that includes `sysio.system` carries **native
 `setcode`/`setabi` for `sysio`** plus **ROA `setsyscode`/`setsysabi` for every
@@ -81,7 +78,7 @@ The CDT-generated dispatcher ends every contract's `apply` with
 
 ```c
 default:
-  if (r != "sysio"_n.value) sysio_assert_code(false, 1);
+  sysio::reject_undefined_action(sysio::name{r}, sysio::name{a});
 ```
 
 so an inline action a stale callee does not implement **asserts**, and an assert
@@ -91,10 +88,9 @@ no epoch advances, no envelope is built, no emission accrues, and every
 `advance` cannot abort (`feedback_opp_handlers_never_throw.md`); a version skew
 defeats that discipline from outside the contract.
 
-`sysio` itself is the exception in that dispatcher, and it is the worse one: an
-action `sysio.system` does not implement is **silently ignored** rather than
-asserted. A skew there halts nothing — it drops the effect. An `accrueepoch`
-that never runs looks exactly like a chain that is working.
+The same holds on `sysio`: the dispatcher lets through only the chain's own
+actions there (its native actions and `onblock`), so an action `sysio.system`
+does not implement asserts too.
 
 Table reads carry no dispatcher at all, so they fail differently again — and
 the failure mode depends on whether the ROW exists, not on whether the FIELD
@@ -149,7 +145,7 @@ WIRE-352 adds separate inline edges whose failure behavior depends on the caller
 | `sysio.synd::linkswept`, `sysio.synd::sweep` | `sysio.liq::transfer`, `sysio.liq::creditowed` | Deploy `sysio.liq` before or with `sysio.synd`. | A `sysio.liq` without `creditowed` aborts the delivery: the user's `createlink` then fails as a whole and can be retried once the set is whole. |
 | `sysio.synd` queue step (`closeenv`, `crank`) | `sysio.bond::request`, `sysio.bond::claim`, `sysio.liq::transfer`, `sysio.liq::mintyield`, `sysio.liq::burn`, `sysio.liq::creditowed` | Deploy `sysio.bond` before or with `sysio.synd`. | With no code on `sysio.bond` the step leaves each envelope WAITING and prints why; a later step requests it. `sysio.synd` checks every condition `request` checks before sending it, so the current `sysio.bond` never aborts the envelope path, but a `sysio.bond` without that action would abort `closeenv` and with it the inbound envelope. The current `sysio.bond` bills the request and escrow rows of a privileged issuer to the `sysio` RAM pool; an older build would bill them to `sysio.synd`, which has no RAM quota of its own, and abort `closeenv` the same way. |
 | `sysio.synd` queue step, an envelope ruled INVALID or VALID after a challenge | `sysio.bond::claim` | Deploy `sysio.bond` before or with `sysio.synd`. | The step reads the `requests` and `escrows` rows first and sends `claim` only when `sysio.bond` records a forfeit or an award for `sysio.synd`, so the current `sysio.bond` never refuses it with `nothing to claim`. A `sysio.bond` whose rows or claim differ would abort `closeenv` and with it the inbound envelope; the two are one compatibility-coupled set. |
-| `sysio.synd::challenge` | `sysio.liq::transfer`, `sysio.bond::hold` | Deploy `sysio.bond` before or with `sysio.synd`. | A signed action: a missing or refusing callee fails only the challenge, which the challenger can retry. |
+| `sysio.synd::challenge` | `sysio.liq::transfer`, `sysio.bond::hold` | Deploy `sysio.bond` and `sysio.synd` together. | A signed action: a missing or refusing callee fails only the challenge, which the challenger can retry. The current `sysio.bond::hold` requires the beneficiary's authority, which the current `sysio.synd` sends; with an older `sysio.synd`, every challenge fails until both are deployed. |
 | Andon custody readers: swap, liq, bond, synd, kicker | Three-field `cord` row | Deploy all six from the same revision on a fresh deployment; configure native pull/clear permissions. | Existing cord rows use an incompatible layout; no in-place migration is supplied. |
 | Syndication custody shortfall | Andon `pull(reason)` with `sysio.andon@active` | Deploy Andon before syndication carries traffic. Privileged syndication needs no custom pull permission. | Missing account/permission or incompatible code fails the transaction atomically. |
 | `sysio.synd` reading its own `mismatch` rows | its own table: `mismatch` is new | Deploy this `sysio.synd` fresh, as the row below requires. | One latest incident per chain/token; a new shortfall overwrites it. Snapshot evidence externally before governance reconciliation erases it. |
@@ -254,14 +250,15 @@ state that aborts every advance.
 ## Staged rollout (when one transaction is not possible)
 
 Derive the order from the two rules above for the edges a release actually
-changes. For the edges on `advance`'s path today:
+changes. For the edges on `advance`'s path today, and the one `sysio.bond::accept` adds:
 
 | Edge | Why |
 |---|---|
 | `sysio.opreg`, `sysio.chalg`, `sysio.msgch` before `sysio.epoch`, when the release adds or changes an action `advance` inlines into them | Call edge: the new `advance` would otherwise reach a callee that cannot dispatch the action, and every advance aborts. |
-| `sysio` (`sysio.system`) before `sysio.epoch`, when the release adds or changes `accrueepoch` / `rcrdbatch` / `payepoch` | Call edge — but an action `sysio.system` does not implement is silently ignored rather than asserted, so this skew drops the effect instead of stalling. |
+| `sysio` (`sysio.system`) before `sysio.epoch`, when the release adds or changes `accrueepoch` / `rcrdbatch` / `payepoch` | Call edge: the new `advance` would otherwise reach a `sysio.system` that cannot dispatch the action, and every advance aborts. |
 | `sysio.epoch` and `sysio.kicker` before `sysio.system`, when `sysio.system` gains state the emissions gate must reserve (as `payclaimtot` reserves unclaimed `payclaims`) | Table edge: the old gate counts the new backing as spendable, so a later pay period can double-commit it and leave credited claims underfunded; an old kicker counts it as available treasury and `kick` can draw it. |
 | `sysio.epoch` before `sysio.msgch`, when the release adds or changes an action `chkcons` inlines into `sysio.epoch` | Call edge in the other direction. |
+| `sysio` (`sysio.system`) before `sysio.bond` | Call edge: `accept` on a request from a `sysio.*` issuer sends `sysio::addsubjex`, and the dispatcher rejects an action the deployed contract does not define, so every such `accept` aborts. |
 
 When a release changes both directions of one pair, the two contracts are a
 compatibility-coupled set and must deploy in one transaction; if they do not fit,
@@ -309,7 +306,7 @@ roll back, the claim tables may hold value that only the NEW code can pay out:
 | Table | Contract | Paid out by | Stranded when that contract rolls back |
 |---|---|---|---|
 | `payclaims` | `sysio.system` | `claimpay` | earned epoch pay |
-| `wireclaims` | `sysio.bond` | `claimwire` | WIRE yield earned by underwriters and banked at `claim` |
+| `wireclaims` | `sysio.bond` | `claimwire` | WIRE yield earned by underwriters and issuers, banked at `claim` per account and issuer |
 | `remitclaims` | `sysio.opreg` | `claimremit` | debited operator collateral |
 | `yielddebts` | `sysio.opreg` | `claimyield`, then `claimremit` | banked yield retained after operator removal |
 | `pclaims`, `unmapped` | `sysio.dclaim` | `claim`, after `linkswept` for unlinked credits | rewards and imported credits |
@@ -383,3 +380,22 @@ Deploy this `sysio.msgch` on fresh state and regenerate the SDK contract types w
 written before the change has no `byqueue` entry, so `buildenv` never finds it: a queued
 `DESYNDICATE_LIQ` would never ship, and an inbound row would never be erased. There is no migration
 path.
+
+## WIRE-439 node-owner registration
+
+Deploy the matching `sysio.roa` and `sysio.msgch` WASMs together in one transaction,
+or quiesce inbound dispatch until both are installed. ROA's ABI adds the self-inline
+`nodeownfin(owner, tier)` allocation action; stored-row layouts are unchanged.
+Mixed revisions are not compatible: old MSGCH creates
+the account before new ROA rejects it, while new MSGCH leaves creation to ROA.
+Do not process node-owner claims between separate deployments. Preserve both
+contracts' privileged status and the default inline-depth limit.
+
+Claim traces contain `nodeownreg`, native `newaccount`, `nodeownfin` and
+`recordlink`; `newnameduser` is called internally and emits no separate action trace.
+Index registration outcomes from `nodeowners`/`nodeownerreg`, not the presence
+of a `newnameduser` trace. The external `nodeownreg` payload is unchanged.
+
+Deploy the new-account-only Hub and Tools companions with this pair. Existing
+memberships and historical audit reason values remain readable; this update does
+not remediate previously bound links or release escrowed NFTs.

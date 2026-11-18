@@ -92,10 +92,10 @@ class PerformanceTestBasic:
 
         @dataclass
         class SpecifiedContract:
-            contractDir: str = "contracts/sysio.system"
-            wasmFile: str = "sysio.system.wasm"
-            abiFile: str = "sysio.system.abi"
-            account: Account = Account("sysio")
+            contractDir: str = "unittests/test-contracts/noop"
+            wasmFile: str = "noop.wasm"
+            abiFile: str = "noop.abi"
+            account: Account = Account("sysio.noop")
 
         producerNodeCount: int = 1
         validationNodeCount: int = 1
@@ -456,7 +456,13 @@ class PerformanceTestBasic:
             self.userTrxDataDict = json.load(f)
 
     def setupContract(self):
-        if self.clusterConfig.specifiedContract.account.name != self.cluster.sysioAccount.name:
+        """Creates the specified contract's account and publishes the contract to it.
+
+        The bootstrap already deploys a contract to sysio and the noop test contract to sysio.noop, so those two
+        accounts are used as they are.
+        """
+        bootstrapContractAccounts = {self.cluster.sysioAccount.name, self.cluster.noopAccount.name}
+        if self.clusterConfig.specifiedContract.account.name not in bootstrapContractAccounts:
             self.cluster.populateWallet(accountsCount=1, wallet=self.wallet, accountNames=[self.clusterConfig.specifiedContract.account.name], createProducerAccounts=False)
             self.cluster.createAccounts(self.cluster.sysioAccount, stakedDeposit=0, validationNodeIndex=self.validationNodeId)
             self.clusterConfig.specifiedContract.account = self.cluster.accounts[0]
@@ -814,10 +820,10 @@ class PtbArgumentsHandler(object):
         ptbBaseParserGroup.add_argument("--quiet", help=argparse.SUPPRESS if suppressHelp else "Whether to quiet printing intermediate results and reports to stdout", action='store_true')
         ptbBaseParserGroup.add_argument("--prods-enable-trace-api", help=argparse.SUPPRESS if suppressHelp else "Determines whether producer nodes should have sysio::trace_api_plugin enabled", action='store_true')
         ptbBaseParserGroup.add_argument("--print-missing-transactions", type=bool, help=argparse.SUPPRESS if suppressHelp else "Print missing transactions upon test completion.", default=True)
-        ptbBaseParserGroup.add_argument("--account-name", type=str, help=argparse.SUPPRESS if suppressHelp else "Name of the account to create and assign a contract to", default="sysio")
-        ptbBaseParserGroup.add_argument("--contract-dir", type=str, help=argparse.SUPPRESS if suppressHelp else "Path to contract dir", default="contracts/sysio.system")
-        ptbBaseParserGroup.add_argument("--wasm-file", type=str, help=argparse.SUPPRESS if suppressHelp else "WASM file name for contract", default="sysio.system.wasm")
-        ptbBaseParserGroup.add_argument("--abi-file", type=str, help=argparse.SUPPRESS if suppressHelp else "ABI file name for contract", default="sysio.system.abi")
+        ptbBaseParserGroup.add_argument("--account-name", type=str, help=argparse.SUPPRESS if suppressHelp else "Name of the account to create and assign a contract to. sysio and sysio.noop keep the contracts the bootstrap deploys", default="sysio.noop")
+        ptbBaseParserGroup.add_argument("--contract-dir", type=str, help=argparse.SUPPRESS if suppressHelp else "Path to contract dir", default="unittests/test-contracts/noop")
+        ptbBaseParserGroup.add_argument("--wasm-file", type=str, help=argparse.SUPPRESS if suppressHelp else "WASM file name for contract", default="noop.wasm")
+        ptbBaseParserGroup.add_argument("--abi-file", type=str, help=argparse.SUPPRESS if suppressHelp else "ABI file name for contract", default="noop.abi")
         ptbBaseParserGroup.add_argument("--user-trx-data-file", type=str, help=argparse.SUPPRESS if suppressHelp else "Path to transaction data JSON file")
         supportedWasmRuntimeHelp=", ".join(Utils.supportedWasmRuntimes())
         ptbBaseParserGroup.add_argument("--wasm-runtime", type=str, help=argparse.SUPPRESS if suppressHelp else f"Override default WASM runtime ({supportedWasmRuntimeHelp}).\

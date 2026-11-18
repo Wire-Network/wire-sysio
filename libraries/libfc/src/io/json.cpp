@@ -319,6 +319,7 @@ namespace fc
                  if (dot)
                     FC_THROW_EXCEPTION(parse_error_exception, "Can't parse a number with two decimal places");
                  dot = true;
+                 [[fallthrough]];
               case '0':
               case '1':
               case '2':
@@ -563,26 +564,31 @@ namespace fc
                   out += "\\t";
                   break;
                }
+               [[fallthrough]];
             case '\n':        // \x0a
                if( escape_control_chars ) {
                   out += "\\n";
                   break;
                }
+               [[fallthrough]];
             case '\r':        // \x0d
                if( escape_control_chars ) {
                   out += "\\r";
                   break;
                }
+               [[fallthrough]];
             case '\\':
                if( escape_control_chars ) {
                   out += "\\\\";
                   break;
                }
+               [[fallthrough]];
             case '\"':
                if( escape_control_chars ) {
                   out += "\\\"";
                   break;
                }
+               [[fallthrough]];
             default:
                out += *itr;
          }

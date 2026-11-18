@@ -320,8 +320,9 @@ node owner has exactly the same policy powers as a tier-1 node owner. What diffe
 is the tier that creates accounts — so a tier-1 owner's budget (`nodeowners.total_sys`) is the other
 90%. Tiers 2 and 3 contribute nothing and keep their whole allocation. Registration then spends a flat
 personal policy for the owner's own account: 0.0080 SYS of RAM and 0.0500 SYS each of NET and CPU,
-0.1080 SYS in total — **tier 1 only**. Tiers 2 and 3 receive no personal policy: managing policies
-costs an owner nothing, so they need no allocation of their own and keep the whole budget issuable.
+0.1080 SYS in total — **tier 1 only**. Tiers 2 and 3 receive no personal policy and keep the whole
+budget issuable; they fund their own policy rows ([What a node owner needs to
+operate](#what-a-node-owner-needs-to-operate)).
 Using the launch configuration of 75,496 SYS `total_sys`:
 
 | Tier | Tier allocation | Owner budget (`total_sys`) | ≈ RAM if spent entirely on RAM |
@@ -344,29 +345,34 @@ node.allocated_sys`. A node owner cannot issue more than they hold.
 | Personal CPU | 0.0500 SYS | Tier 1 only |
 
 The three land in a self-issued policy — `issuer == owner` — carrying `time_block = 1`, so the
-owner can reshape or reclaim them immediately with `expandpolicy` or `reducepolicy`. Tier 1 gets
-them because it is the only tier that can call `newuser`. The `sponsors` and `sponsorcount` rows
-that `newuser` and `raiseacctlim` write are the only rows in the contract billed to a node owner.
+owner can reshape or reclaim them immediately with `expandpolicy` or `reducepolicy`. The policy's
+own row is billed to the owner, and the personal RAM pays for the policy rows the owner issues and
+the sponsorship rows `newuser` and `raiseacctlim` write.
 
 Registration writes no policy for `sysio`. Its tier-1 share was carved out at activation, so an
 owner's `allocated_sys` is exactly the sum of the policies it has issued.
 
 ### What a node owner needs to operate
 
-Almost nothing. Managing policies costs a node owner no resources at all:
+**No CPU or NET.** `addpolicy`, `expandpolicy`, `extendpolicy`, and `reducepolicy` are actions on
+`sysio.roa`, so `payer()` resolves to `sysio.roa`, which carries unlimited CPU and NET.
 
-- `addpolicy`, `expandpolicy`, `extendpolicy`, and `reducepolicy` are actions on `sysio.roa`, so
-  `payer()` resolves to `sysio.roa`, which carries unlimited CPU and NET.
-- Every row the contract writes for registration and policy management is billed to `sysio.roa`
-  as well — `policies`, `reslimit`, and `nodeowners` rows are all `emplace(get_self(), …)`.
+**RAM for the rows it causes.** Each policy row (204 bytes) is billed to its issuer.
+`expandpolicy`, `extendpolicy` and a partial `reducepolicy` keep that payer; the `reducepolicy`
+that erases the row refunds it. An issuer without the spare RAM for the row cannot issue the
+policy, so each owner's own RAM, not a shared pool, bounds how many policies it holds open.
+`newuser` and `raiseacctlim` likewise bill the `sponsors` and `sponsorcount` rows to the tier-1
+owner.
 
-An owner reduced to zero CPU, zero NET, and zero spare RAM can still issue a policy. Membership —
-the `nodeowners` row — is what confers the ability to issue, not any allocation the owner holds.
+- A fresh tier-1 owner's personal RAM covers 40 policy rows, fewer once it sponsors accounts. For
+  more, it adds RAM to its personal policy with `expandpolicy`.
+- A tier-2 or tier-3 owner holds only its 1,144-byte account gift, too little for one row. Before
+  issuing, it funds itself with a self-issued `addpolicy` (owner and issuer both itself): 0.0001 SYS
+  of `ram_weight` pays for that policy's own row, and 0.0002 SYS more for each policy it then
+  issues.
 
-The one exception is tier-1 account sponsorship. `newuser` bills its `sponsors` and `sponsorcount`
-rows to `creator`, and `raiseacctlim` bills the same `sponsorcount` row to the owner. Those are the
-only rows in the contract charged to a node owner, so a tier-1 owner needs RAM headroom before its
-first `newuser` or `raiseacctlim` call.
+Every other `sysio.roa` row — `roastate`, `acctlimcfg`, `nodeowners`, `nodeownerreg` — is billed
+to `sysio`. Membership, the `nodeowners` row, is what confers the ability to issue.
 
 ### What differs between tiers
 
@@ -384,27 +390,24 @@ refuse any caller that is not a registered tier-1 owner.
 
 ### Where network RAM comes from
 
-`activateroa` funds two pools:
+`activateroa` funds one pool:
 
 | Pool | Size at activation | Funds |
 |---|---|---|
-| `sysio.roa` | ~157 MB — half the SYS left over after all tier allocations | The contract's own rows: policies, reslimits, node-owner records |
-| `sysio` | ~6.75 GB — the other half, plus 10% of every tier-1 slot's allocation | The 1,144-byte gift every new account receives |
+| `sysio` | ~6.9 GB — the SYS left over after all tier allocations, plus 10% of every tier-1 slot's allocation | The 1,144-byte gift every new account receives, system contract code and rows, and the `sysio.roa` rows no node owner pays for |
+
+`sysio.roa` gets no pool: `activateroa` sets its RAM quota to the code, ABI and account rows it
+already holds, and takes those bytes out of `sysio`'s share. A later redeploy goes through
+`setsyscode`, which gifts the difference from `sysio`'s pool.
 
 `sysio`'s pool is fully funded at activation, whether or not any node owner has registered. At
-1,144 bytes per account it supports roughly 5.90 million accounts.
+1,144 bytes per account it supports roughly 6.04 million accounts.
 
-The gap between those two pools is why `newuser` bills its sponsorship rows to the sponsoring
-tier-1 owner rather than to the contract. Billed to the contract, `sysio.roa`'s ~157 MB would cap
-sponsorship near **1.09 million** users, well short of what `sysio`'s account pool can create. A
-tier-1 owner's own free budget of ~2.83 GB is the only one that scales with how many users it
-actually onboards.
-
-A sponsorship costs **144 bytes** (a 16-byte key and 16-byte value over
-`billable_size_v<kv_object>` of 112) plus a one-time 152-byte `sponsorcount` row (a 24-byte value:
-owner, count, raised limit) on a creator's first `newuser` or `raiseacctlim`. Neither pool is a ceiling: `addpolicy` refuses CPU and NET to a `sysio.`-prefixed
-account but not RAM, so a node owner can extend either with a RAM-only policy. The ~157 MB is
-where `activateroa` starts `sysio.roa`.
+Rows a node owner causes bill that owner: a policy costs **204 bytes** (a 16-byte key and a 76-byte
+value over `billable_size_v<kv_object>` of 112), a sponsorship **144 bytes** (a 16-byte key and
+16-byte value), plus a one-time 152-byte `sponsorcount` row on a creator's first `newuser` or
+`raiseacctlim`. `sysio`'s pool is not a ceiling either: `addpolicy` refuses CPU and NET to a
+`sysio.`-prefixed account but not RAM, so a node owner can extend it with a RAM-only policy.
 
 ### The four policy actions
 
@@ -557,9 +560,15 @@ objective bill went to the contract.
 
 Two properties keep this landing on abusers rather than on ordinary users:
 
-- **Successful transactions do not accumulate.** A subjective bill is held as `pending_cpu_us` and
-  removed when the transaction appears in a block. Traffic that lands costs the signer nothing over
-  time.
+- **Successful transactions do not accumulate, unless a `sysio.*` contract pays.** A subjective bill
+  is held as `pending_cpu_us` and removed when the transaction appears in a block. Traffic that lands
+  costs the signer nothing over time. The exception is an action whose payer is a `sysio.*` account
+  (no explicit `sysio.payer`): those contracts have unlimited CPU, so nothing else would limit their
+  callers. When a block is applied, every node charges the billed CPU of each such action, from the
+  block's receipts, to the action's first authorizer, where it decays like a failure. A signer can
+  therefore use `subjective-account-cpu-allowed-us` plus its own CPU limit of `sysio.*`-paid CPU per
+  `subjective-account-decay-time-minutes`, wherever it submits. Signing with `sysio.payer` moves the
+  cost to the signer's own objective CPU instead.
 - **Most failures accumulate and decay slowly.** A failed transaction moves its bill into a
   decaying accumulator whose window is `subjective-account-decay-time-minutes` — 24 hours by
   default. Repeatedly submitting transactions that fail is what burns the budget.
@@ -590,6 +599,22 @@ traffic history, or different account exemptions can legitimately reach differen
 the same transaction. The recovery path for a dropped transaction is client resubmit, not
 producer-side retry.
 
+### Accounts every node exempts
+
+A batch operator or an underwriter pushes `sysio.*`-paid actions all day and loses some of them to
+races, so it must never be throttled. Every node treats these accounts as
+`disable-subjective-account-billing` would:
+
+- the `sysio.opreg` operators of type batch or underwriter whose status is active: bootstrapped, or
+  holding the role's collateral minimum. Registering alone exempts nobody;
+- the accounts in the `sysio.system` table `subjexempt`. `sysio.bond::accept` adds an underwriter
+  there on its first bond of a request issued by a `sysio.*` contract, and the entry stays after
+  the bond settles. `sysio` adds or removes any account with `addsubjex` and `delsubjex`.
+
+A node reads both from chain state on its first irreversible block and every 120 irreversible
+blocks after it, so a change takes effect about a minute later. A removed underwriter is listed
+again by its next bond.
+
 ### Defaults
 
 Subjective billing ships **on**, and the failure limiter with it — both are gated on the same
@@ -606,6 +631,7 @@ failures would point the cost at the wrong account. The signer still is.
 | `subjective-account-max-failures` | `3` | Failures allowed per account per window |
 | `subjective-account-max-failures-window-size` | `1` | Window size in blocks for the failure limit |
 | `disable-subjective-payer-billing` | `true` | Set false to also meter the payer (the contract) |
+| `disable-subjective-sysio-authorizer-billing` | `false` | Set true to stop charging signers for `sysio.*`-paid actions that land in a block |
 | `disable-subjective-account-billing <acct>` | — | Disables subjective billing for the **whole transaction** when any first authorizer matches — including the failure-limit precheck, and for every co-authorizer |
 
 Independent of all of it, `incoming-transaction-queue-size-mb` (default `1024`) subjectively drops
@@ -773,6 +799,12 @@ A **tier-1** node owner can call `roa::newuser`, which mints a sub-account under
 (`<owner>.<generated>`) with a supplied public key, funded with the standard 1,144-byte account
 allocation drawn from the network pool.
 
+A node owner's own name never contains a `.` when it comes through the NFT-claim flow: `nodeownreg`
+creates no account for a dotted name and records the claim as `REJECTED` / `NAME_INVALID`, in every
+tier. A claim therefore cannot take a name under another account's prefix, such as a tier-1
+owner's sub-account namespace or a `sysio.` system name. Tier 1 takes 2–6 characters, tiers 2 and 3
+take 1–12.
+
 The created account has **no CPU/NET policy** — and does not need one, because it transacts
 against contracts that carry their own. A user gets an account at no cost to themselves and can
 immediately use every provisioned contract on the network.
@@ -875,8 +907,9 @@ and are omitted.
 | `newuser` | tier-1 node owner | Create a sponsored sub-account |
 | `raiseacctlim` | tier-1 node owner | Raise its own account limit, at most by the configured multiplier |
 | `setacctlim` | `sysio.roa` | Set the default account limit and the raise multiplier |
-| `newnameduser` | `sysio.roa` | Create a vanity account (NFT-claim flow) |
-| `nodeownreg` | `sysio.roa` | Register a node owner from an OPP attestation |
+| `newnameduser` | `sysio.roa` | Privileged vanity-account creation; also called internally by `nodeownreg` |
+| `nodeownreg` | `sysio.roa` | Create and register a fresh node-owner account from an OPP attestation |
+| `nodeownfin` | `sysio.roa`, self-inline only | Allocate a validated claim after native account creation |
 | `forcereg` | `sysio.roa` | Register a node owner directly (governance/bootstrap) |
 | `activateroa` | `sysio.roa` | Activate ROA and set the initial byte price |
 | `setbyteprice` | `sysio.roa` | Change bytes-per-unit on network expansion |
@@ -887,8 +920,7 @@ and are omitted.
 |---|---|---|
 | `roastate` | singleton | Activation flag, `total_sys`, `bytes_per_unit`, `network_gen` |
 | `nodeowners` | `network_gen` | Node owner rows: tier, total and allocated SYS |
-| `policies` | issuer | One row per (issuer, owner) pair |
-| `reslimit` | global | Per-account totals summed across all its policies |
+| `policies` | issuer | One row per (issuer, owner) pair, billed to the issuer |
 | `sponsorcount` | `network_gen` | Per tier-1 owner: accounts sponsored and the limit it raised to |
 | `acctlimcfg` | singleton | Default account limit and the raise multiplier |
 
@@ -901,6 +933,7 @@ and are omitted.
 | `Only Node Owners can issue policies for this generation.` | Issuer is not registered in that `network_gen` |
 | `Not enough unallocated SYS for this policy.` | Issuer's budget is exhausted |
 | `A policy for this owner already exists from this issuer.` | Use `expandpolicy` |
+| `account X has insufficient ram` on a policy action | Issuer X lacks the spare RAM for the policy row; add RAM to its own policy first |
 | `Cannot reduce policy before time_block` | The policy's committed term has not elapsed |
 | `Cannot allocate CPU/NET to sysio accounts.` | ROA refuses CPU/NET policies for any `sysio.`-prefixed owner. It does not mean the account is unlimited — `sysio.acct` is at zero |
 | `Only privileged accounts can create new accounts` | The declared creator is not privileged. Ordinary accounts cannot call native `newaccount`; `sysio.roa::newuser` is the supported flow, and only for a registered tier-1 sponsor |
@@ -914,3 +947,22 @@ and are omitted.
 above — contract-as-payer billing, the failure mode of an unprovisioned contract, RAM-free token
 transfers, and multi-issuer policy stacking — were each verified against the code and confirmed
 with executable tests. The transcript blocks reproduce actual test output.*
+
+## NFT registration names
+
+Node-owner NFT claims create **new accounts only**.
+`sysio.msgch` dispatches `nodeownreg`, which rejects an existing name with
+`ACCOUNT_EXISTS` (7), including when the claim copies its public active key.
+Already registered owners retain the `DUPLICATE` outcome. Rejection records an
+audit row without changing the account authority, AuthEx link or owner allocation.
+A fresh accepted claim creates the requested authority, allocates the owner and
+records the depositor's Ethereum link in one atomic Wire transaction.
+Allocation uses the self-inline `nodeownfin` continuation; `forcereg` remains
+the separate privileged governance/bootstrap path. AuthEx `recordlink` remains
+a sibling action of `nodeownfin`, so its DClaim sweep stays within the inline-depth limit.
+
+The Hub checks name availability before BAR commitment; this cannot reserve the
+name against a competing claim. A name taken before depot execution is rejected
+and the NFT remains subject to BAR's existing escrow/recovery rules. This change
+adds no automatic refund or recovery action. Deploy the coupled contracts as
+specified in [contract upgrade order](contract-upgrade-order.md#wire-439-node-owner-registration).

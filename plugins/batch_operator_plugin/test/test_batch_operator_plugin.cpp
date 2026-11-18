@@ -1,4 +1,5 @@
 #include "../src/async_action_completion.hpp"
+#include "../src/role_config.hpp"
 
 #include <boost/test/unit_test.hpp>
 
@@ -9,6 +10,7 @@
 #include <memory>
 #include <optional>
 #include <set>
+#include <sstream>
 #include <stdexcept>
 #include <thread>
 
@@ -60,6 +62,8 @@ BOOST_AUTO_TEST_CASE(plugin_options_are_registered) try {
    BOOST_CHECK(option_names.count("batch-epoch-poll-ms") > 0);
    BOOST_CHECK(option_names.count("batch-delivery-timeout-ms") > 0);
    BOOST_CHECK(option_names.count("batch-yield-tick-interval-ms") > 0);
+   BOOST_CHECK(option_names.count("batch-underwriter-max-exposure") > 0);
+   BOOST_CHECK(option_names.count("batch-underwriter-unlimited-exposure") > 0);
    BOOST_CHECK(option_names.count("batch-kick-crank") > 0);
    BOOST_CHECK(option_names.count("batch-kick-interval-ms") > 0);
    // Configuring batch-operator-account is what enables the relay. A separate
@@ -94,7 +98,85 @@ BOOST_AUTO_TEST_CASE(default_options_are_correct) try {
    BOOST_CHECK_EQUAL(vm["batch-kick-interval-ms"].as<uint32_t>(), 60000u);
    // No default account: an unconfigured node leaves the relay off.
    BOOST_CHECK_EQUAL(vm.count("batch-operator-account"), 0u);
+   BOOST_CHECK_EQUAL(vm.count("batch-underwriter-max-exposure"), 0u);
+   BOOST_CHECK_EQUAL(vm.count("batch-underwriter-unlimited-exposure"), 0u);
 } FC_LOG_AND_RETHROW();
+
+/// Repeated unlimited symbols compose across command-line and configuration-file options.
+BOOST_AUTO_TEST_CASE(unlimited_exposure_options_compose) {
+   namespace bpo = boost::program_options;
+   sysio::batch_operator_plugin plugin;
+   bpo::options_description cli, cfg;
+   plugin.set_program_options(cli, cfg);
+   bpo::variables_map vm;
+   const std::vector<std::string> args{"--batch-underwriter-unlimited-exposure", "LIQETH",
+                                       "--batch-underwriter-unlimited-exposure", "LIQSOL"};
+   bpo::store(bpo::command_line_parser(args).options(cfg).run(), vm);
+   std::istringstream config("batch-underwriter-unlimited-exposure = LIQBTC\n");
+   bpo::store(bpo::parse_config_file(config, cfg), vm);
+   bpo::notify(vm);
+   const std::vector<std::string> expected{"LIQETH", "LIQSOL", "LIQBTC"};
+   BOOST_CHECK(vm["batch-underwriter-unlimited-exposure"].as<std::vector<std::string>>() == expected);
+}
+
+/// Capped and unlimited options for the same symbol conflict, regardless of argument order or source.
+/// Exercise the parser directly so a regression fails an assertion without reaching node dependencies.
+BOOST_AUTO_TEST_CASE(conflicting_exposure_options_are_rejected) {
+   namespace bpo = boost::program_options;
+   const std::vector<std::string> capped{"--batch-underwriter-max-exposure", "100.000000000 LIQETH"};
+   const std::vector<std::string> unlimited{"--batch-underwriter-unlimited-exposure", "LIQETH"};
+   for (const bool capped_first : {false, true}) {
+      sysio::batch_operator_plugin plugin;
+      bpo::options_description cli, cfg;
+      plugin.set_program_options(cli, cfg);
+      auto args = capped_first ? capped : unlimited;
+      const auto& second = capped_first ? unlimited : capped;
+      args.insert(args.end(), second.begin(), second.end());
+      bpo::variables_map vm;
+      bpo::store(bpo::command_line_parser(args).options(cfg).run(), vm);
+      bpo::notify(vm);
+      BOOST_CHECK_EXCEPTION(sysio::batch_operator_detail::parse_exposure_policies(
+         vm["batch-underwriter-max-exposure"].as<std::vector<std::string>>(),
+         vm["batch-underwriter-unlimited-exposure"].as<std::vector<std::string>>()),
+         fc::exception, [](const fc::exception& e) {
+            return e.to_detail_string().find("both name LIQETH") != std::string::npos;
+      });
+   }
+
+   sysio::batch_operator_plugin plugin;
+   bpo::options_description cli, cfg;
+   plugin.set_program_options(cli, cfg);
+   bpo::variables_map vm;
+   bpo::store(bpo::command_line_parser(capped).options(cfg).run(), vm);
+   std::istringstream config("batch-underwriter-unlimited-exposure = LIQETH\n");
+   bpo::store(bpo::parse_config_file(config, cfg), vm);
+   bpo::notify(vm);
+   BOOST_CHECK_EXCEPTION(sysio::batch_operator_detail::parse_exposure_policies(
+      vm["batch-underwriter-max-exposure"].as<std::vector<std::string>>(),
+      vm["batch-underwriter-unlimited-exposure"].as<std::vector<std::string>>()),
+      fc::exception, [](const fc::exception& e) {
+         return e.to_detail_string().find("both name LIQETH") != std::string::npos;
+   });
+}
+
+/// Unlimited-only configuration is validated during initialization, even without an underwriter account.
+/// An invalid kick interval stops initialization before app() if exposure parsing regresses, yielding a normal
+/// assertion failure on the wrong diagnostic instead of crashing the test process on missing dependencies.
+BOOST_AUTO_TEST_CASE(invalid_unlimited_only_exposure_fails_initialization) {
+   namespace bpo = boost::program_options;
+   sysio::batch_operator_plugin plugin;
+   bpo::options_description cli, cfg;
+   plugin.set_program_options(cli, cfg);
+   const std::vector<std::string> args{"--batch-underwriter-unlimited-exposure", "liqeth",
+                                       "--batch-kick-interval-ms", "0"};
+   bpo::variables_map vm;
+   bpo::store(bpo::command_line_parser(args).options(cfg).run(), vm);
+   bpo::notify(vm);
+   BOOST_CHECK_EQUAL(vm.count("batch-underwriter-max-exposure"), 0u);
+   BOOST_CHECK_EXCEPTION(plugin.plugin_initialize(vm), fc::exception, [](const fc::exception& e) {
+      return e.to_detail_string().find("unlimited exposure symbol 'liqeth'") != std::string::npos;
+   });
+}
 
 /// A normal push result invokes its callback and wakes the waiting relay job.
 BOOST_AUTO_TEST_CASE(async_action_completion_handles_normal_completion) {

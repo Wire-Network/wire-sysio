@@ -1,4 +1,5 @@
 #include "sysio_liq_tester.hpp"
+#include "kicker_tester.hpp"
 
 BOOST_AUTO_TEST_SUITE(sysio_liq_tests)
 
@@ -115,15 +116,14 @@ BOOST_FIXTURE_TEST_CASE(settle_before_mutate_conserves_every_subunit, sysio_liq_
    BOOST_REQUIRE_EQUAL(0u, pot());
    BOOST_REQUIRE_EQUAL(0, owed("alice"_n));
 
-   // A row opened after the index moved is stamped, not zeroed: nothing is owed,
-   // claiming sends nothing, and a later credit accrues only from here.
-   BOOST_REQUIRE_EQUAL(success(), open("dave"_n, LIQSOL_SYM, "dave"_n));
+   // A row created after the index moved is stamped, not zeroed: nothing is owed,
+   // claiming sends nothing, and later yield accrues only from here.
+   BOOST_REQUIRE_EQUAL(success(), mint("dave"_n, 100 * UNIT));
    BOOST_REQUIRE_EQUAL(index(), account_row("dave"_n)["index_checkpoint"].as_uint128());
+   BOOST_REQUIRE_EQUAL(0, owed("dave"_n));
    const int64_t dave_before = wire_balance("dave"_n);
    BOOST_REQUIRE_EQUAL(success(), claim("dave"_n));
    BOOST_REQUIRE_EQUAL(dave_before, wire_balance("dave"_n));
-   BOOST_REQUIRE_EQUAL(success(), mint("dave"_n, 100 * UNIT));
-   BOOST_REQUIRE_EQUAL(0, owed("dave"_n));
    BOOST_REQUIRE_EQUAL(success(), addyield("carol"_n, 50 * UNIT));   // 500 supply: dave holds a fifth
    BOOST_REQUIRE_EQUAL(10 * UNIT, owed("dave"_n));
 
@@ -192,7 +192,6 @@ BOOST_FIXTURE_TEST_CASE(the_index_grows_past_64_bits, sysio_liq_tester) try {
 BOOST_FIXTURE_TEST_CASE(addyield_distributes_only_supplied_wire, sysio_liq_tester) try {
    constexpr int64_t intake = 100 * UNIT;
    BOOST_REQUIRE_EQUAL(success(), mint("alice"_n, 100 * UNIT));
-   BOOST_REQUIRE_EQUAL(success(), openext("alice"_n, "alice"_n, extended_symbol{WIRE_SYM, TOKEN_ACCOUNT}));
    BOOST_REQUIRE_EQUAL(success(), transfer_wire("alice"_n, SWAP_ACCOUNT, intake));
    const auto treasury_before = wire_balance(SYSIO_ACCOUNT);
    const auto holder_before = wire_balance("alice"_n);
@@ -328,11 +327,6 @@ BOOST_FIXTURE_TEST_CASE(a_holder_can_sell_shadow_into_the_yield_pool_for_wire, s
    BOOST_REQUIRE_EQUAL(success(), mint("alice"_n, 100 * UNIT));
    BOOST_REQUIRE_EQUAL(success(), regliqpool(SOLANA, LIQSOL, POOL_SYM, 1000 * UNIT, 1000 * UNIT));
 
-   const extended_symbol shadow_ext{ LIQSOL_SYM, LIQ_ACCOUNT };
-   const extended_symbol wire_ext{ WIRE_SYM, TOKEN_ACCOUNT };
-   BOOST_REQUIRE_EQUAL(success(), openext("alice"_n, "alice"_n, shadow_ext));
-   BOOST_REQUIRE_EQUAL(success(), openext("alice"_n, "alice"_n, wire_ext));
-
    constexpr int64_t sold = 50 * UNIT;
    BOOST_REQUIRE_EQUAL(success(), transfer_shadow("alice"_n, SWAP_ACCOUNT, sold));
    BOOST_REQUIRE_EQUAL(50 * UNIT, shadow_balance("alice"_n));
@@ -435,6 +429,83 @@ BOOST_FIXTURE_TEST_CASE(a_freeze_admits_transfers_into_custody_and_refuses_the_r
    const int64_t alice_wire = wire_balance("alice"_n);
    BOOST_REQUIRE_EQUAL(success(), claim("alice"_n));
    BOOST_REQUIRE_EQUAL(alice_wire + alice_owed, wire_balance("alice"_n));
+} FC_LOG_AND_RETHROW()
+
+// ---------------------------------------------------------------------------
+// A yield pool registered after the bootstrap window
+// ---------------------------------------------------------------------------
+
+// A shadow opened after epoch 0 gets its pool from shadow sysio already holds and WIRE the treasury has
+// not reserved: regliqpool mints nothing, fails without either, and the yield that waited in liqpending
+// queues once the pool exists.
+BOOST_FIXTURE_TEST_CASE(a_pool_registered_after_the_bootstrap_window_is_seeded_from_held_shadow,
+                        kicker_test_support::kicker_tester) try {
+   const symbol  eth_pool  = symbol::from_string("9,ETHPOOL");
+   const int64_t held      = 100 * UNIT;   // syndicated LIQETH, all of it backed by outpost custody
+   const int64_t pool_seed = 40 * UNIT;
+   const int64_t yield     = 10 * UNIT;
+   const auto give_sysio = [&](int64_t amount) {
+      return push_liq("alice"_n, "transfer"_n, mvo()("from", "alice"_n)("to", SYSIO_ACCOUNT)
+         ("quantity", asset(amount, LIQETH_SYM))("memo", ""));
+   };
+   const auto eth_supply = [&] { return stat_row(LIQETH_SYM)["supply"].as<asset>().get_amount(); };
+
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH, epoch_ser, EPOCH, "advance"_n, mvo()));
+   BOOST_REQUIRE_EQUAL(1u, decode(epoch_ser, "epoch_state", get_row_by_id(EPOCH, EPOCH, "epochstate"_n,
+                                                                         "epochstate"_n.value))
+                              ["current_epoch_index"].as_uint64());
+
+   BOOST_REQUIRE_EQUAL(success(), create(LIQETH_SYM, ETH, LIQETH));
+   BOOST_REQUIRE_EQUAL(success(), mint("alice"_n, held, LIQETH));
+   BOOST_REQUIRE_EQUAL(success(), mintyield(ETH, LIQETH, yield));
+   BOOST_REQUIRE_EQUAL(yield, pending_row(LIQETH_SYM)["quantity"].as<asset>().get_amount());
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("no yield pool registered for this shadow"), queueyield(LIQETH_SYM));
+
+   // Without the whole seed in sysio's row the seed transfer fails, and no pool is registered.
+   BOOST_REQUIRE(mentions(regliqpool(ETH, LIQETH, eth_pool, pool_seed, pool_seed), "no balance object found"));
+   BOOST_REQUIRE_EQUAL(success(), give_sysio(pool_seed - 1));
+   BOOST_REQUIRE(mentions(regliqpool(ETH, LIQETH, eth_pool, pool_seed, pool_seed), "overdrawn balance"));
+   BOOST_REQUIRE_EQUAL("", stat_row(LIQETH_SYM)["pair_symbol"].as_string());
+   BOOST_REQUIRE(swap_pool_row(eth_pool).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), give_sysio(1));
+
+   // The WIRE side must fit what the treasury has not reserved. Here its balance covers the seed, but
+   // owed pay, pending emissions and the emission ceiling leave one subunit too little: nothing changes.
+   const int64_t pending = 5 * UNIT, claims = 60 * UNIT, ceiling = 7 * UNIT;
+   auto emission = mvo(treasury("emitcfg"_n, "emission_config").get_object());
+   emission("t5_distributable", emission["t5_floor"].as_int64() +
+                                   treasury("t5state"_n, "t5_state")["total_distributed"].as_int64() + ceiling);
+   write_global("emitcfg"_n, "emission_config", emission);
+   reserves(pending, claims);
+   BOOST_REQUIRE_EQUAL(success(), transfer_wire(SYSIO_ACCOUNT, "carol"_n, wire_balance(SYSIO_ACCOUNT) - pending -
+                                                                           claims - ceiling - (pool_seed - 1)));
+   const int64_t treasury_before = wire_balance(SYSIO_ACCOUNT);
+   BOOST_REQUIRE_GT(treasury_before, pool_seed);
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("the WIRE seed exceeds the treasury's unreserved balance"),
+                       regliqpool(ETH, LIQETH, eth_pool, pool_seed, pool_seed));
+   BOOST_REQUIRE_EQUAL(treasury_before, wire_balance(SYSIO_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(pool_seed, account_row(SYSIO_ACCOUNT, LIQETH_SYM)["balance"].as<asset>().get_amount());
+   BOOST_REQUIRE_EQUAL(yield, pending_row(LIQETH_SYM)["quantity"].as<asset>().get_amount());
+   BOOST_REQUIRE_EQUAL("", stat_row(LIQETH_SYM)["pair_symbol"].as_string());
+   BOOST_REQUIRE(swap_pool_row(eth_pool).is_null());
+
+   // With one subunit less owed the seed fits exactly: the pool takes sysio's shadow and that WIRE,
+   // and the supply does not move.
+   reserves(pending, claims - 1);
+   BOOST_REQUIRE_EQUAL(success(), regliqpool(ETH, LIQETH, eth_pool, pool_seed, pool_seed));
+   BOOST_REQUIRE_EQUAL(treasury_before - pool_seed, wire_balance(SYSIO_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(held, eth_supply());
+   BOOST_REQUIRE_EQUAL("ETHPOOL", stat_row(LIQETH_SYM)["pair_symbol"].as_string());
+   BOOST_REQUIRE_EQUAL(0, account_row(SYSIO_ACCOUNT, LIQETH_SYM)["balance"].as<asset>().get_amount());
+   BOOST_REQUIRE_EQUAL(pool_seed, swap_pool_row(eth_pool)["pool1"]["quantity"].as<asset>().get_amount());
+
+   // The yield that waited queues into the new pool's reservoir.
+   BOOST_REQUIRE_EQUAL(success(), queueyield(LIQETH_SYM));
+   BOOST_REQUIRE(pending_row(LIQETH_SYM).is_null());
+   BOOST_REQUIRE_EQUAL(held + yield, eth_supply());
+   BOOST_REQUIRE_EQUAL(yield, swap_row("reservoirs"_n, "reservoir", SWAP_ACCOUNT, eth_pool.to_symbol_code().value)
+                                 ["balance"]["quantity"].as<asset>().get_amount());
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()

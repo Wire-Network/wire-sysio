@@ -139,6 +139,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeownreg_test.py ${CMAKE_CURRENT_BI
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clio_set_syscode_test.py ${CMAKE_CURRENT_BINARY_DIR}/clio_set_syscode_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/interrupt_trx_test.py ${CMAKE_CURRENT_BINARY_DIR}/interrupt_trx_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/trace_plugin_test.py ${CMAKE_CURRENT_BINARY_DIR}/trace_plugin_test.py COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/account_watch_plugin_test.py ${CMAKE_CURRENT_BINARY_DIR}/account_watch_plugin_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nested_container_multi_index_test.py ${CMAKE_CURRENT_BINARY_DIR}/nested_container_multi_index_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/auto_bp_peering_test.py ${CMAKE_CURRENT_BINARY_DIR}/auto_bp_peering_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/auto_bp_peering_test_shape.json ${CMAKE_CURRENT_BINARY_DIR}/auto_bp_peering_test_shape.json COPYONLY)
@@ -154,6 +155,12 @@ endif()
 
 #To run plugin_test with all log from blockchain displayed, put --verbose after --, i.e. plugin_test -- --verbose
 add_p_test(NAME plugin_test COMMAND plugin_test --report_level=detailed --color_output)
+# Under this ulimit -s (KiB) a thread created without a stack size gets less than a thread that runs contracts needs.
+set(SMALL_THREAD_STACK_KIB 2048)
+set(READ_ONLY_THREAD_STACK_CASE read_only_trxs/read_only_threads_get_contract_thread_stack)
+set(READ_ONLY_THREAD_STACK_COMMAND "ulimit -s ${SMALL_THREAD_STACK_KIB} && exec \"$<TARGET_FILE:plugin_test>\"")
+string(APPEND READ_ONLY_THREAD_STACK_COMMAND " --run_test=${READ_ONLY_THREAD_STACK_CASE} --report_level=detailed")
+add_p_test(NAME plugin_test_read_only_thread_stack COMMAND sh -c "${READ_ONLY_THREAD_STACK_COMMAND}")
 add_p_test(NAME bootstrap_order_test COMMAND tests/bootstrap_order_test.py)
 add_p_test(NAME genesis_timestamp_test COMMAND tests/genesis_timestamp_test.py)
 add_p_test(NAME nodeop_irreversible_mode_progress_test COMMAND tests/nodeop_irreversible_mode_progress_test.py)
@@ -227,7 +234,7 @@ set(READ_ONLY_TRX_TESTS
 )
 set_tests_properties(${READ_ONLY_TRX_TESTS} PROPERTIES RESOURCE_LOCK read_only_trx)
 
-add_np_test(NAME subjective_billing_test COMMAND tests/subjective_billing_test.py -v -p 2 -n 4)
+add_np_test(NAME subjective_billing_test COMMAND tests/subjective_billing_test.py -v -p 2 -n 6)
 add_np_test(NAME get_account_test COMMAND tests/get_account_test.py -v -p 2 -n 3)
 add_np_test(NAME multisig_review_test COMMAND tests/multisig_review_test.py -v -p 1 -n 1)
 add_np_test(NAME pause_at_block_test COMMAND tests/pause_at_block_test.py -v)
@@ -334,6 +341,7 @@ add_np_test(NAME plugin_http_category_api_test COMMAND tests/plugin_http_api_tes
             PLUGIN_HTTP_TEST_CATEGORY=ON)
 
 add_np_test(NAME trace_plugin_test COMMAND tests/trace_plugin_test.py -v TIMEOUT 400)
+add_np_test(NAME account_watch_plugin_test COMMAND tests/account_watch_plugin_test.py -v TIMEOUT 300)
 
 add_lr_test(NAME resource_monitor_plugin_test COMMAND tests/resource_monitor_plugin_test.py -v)
 
@@ -358,7 +366,7 @@ add_lr_test(NAME performance_test_cpu_trx_spec COMMAND tests/PerformanceHarnessS
 add_np_test(NAME performance_test_basic_p2p COMMAND tests/PerformanceHarnessScenarioRunner.py singleTest -v --producer-nodes 1 --validation-nodes 1 --target-tps 20 --tps-limit-per-generator 10 --test-duration-sec 5 --chain-state-db-size-mb 200)
 add_np_test(NAME performance_test_basic_http COMMAND tests/PerformanceHarnessScenarioRunner.py singleTest -v --endpoint-mode http --producer-nodes 1 --validation-nodes 1 --api-nodes 1 --target-tps 10 --tps-limit-per-generator 10 --test-duration-sec 5 --chain-state-db-size-mb 200)
 add_np_test(NAME performance_test_basic_transfer_trx_spec COMMAND tests/PerformanceHarnessScenarioRunner.py singleTest -v --producer-nodes 1 --validation-nodes 1 --target-tps 20 --tps-limit-per-generator 10 --test-duration-sec 5 --chain-state-db-size-mb 200 --user-trx-data-file tests/PerformanceHarness/userTrxDataTransfer.json)
-add_np_test(NAME performance_test_basic_new_acct_trx_spec COMMAND tests/PerformanceHarnessScenarioRunner.py singleTest -v --producer-nodes 1 --validation-nodes 1 --target-tps 20 --tps-limit-per-generator 10 --test-duration-sec 5 --chain-state-db-size-mb 200 --user-trx-data-file tests/PerformanceHarness/userTrxDataNewAccount.json)
+add_np_test(NAME performance_test_basic_new_acct_trx_spec COMMAND tests/PerformanceHarnessScenarioRunner.py singleTest -v --producer-nodes 1 --validation-nodes 1 --target-tps 20 --tps-limit-per-generator 10 --test-duration-sec 5 --chain-state-db-size-mb 200 --account-name "sysio" --abi-file sysio.system.abi --wasm-file sysio.system.wasm --contract-dir contracts/sysio.system --user-trx-data-file tests/PerformanceHarness/userTrxDataNewAccount.json)
 add_np_test(NAME performance_test_basic_cpu_trx_spec COMMAND tests/PerformanceHarnessScenarioRunner.py singleTest -v --producer-nodes 1 --validation-nodes 1 --target-tps 20 --tps-limit-per-generator 10 --test-duration-sec 5 --chain-state-db-size-mb 200 --account-name "c" --abi-file sysmechanics.abi --wasm-file sysmechanics.wasm --contract-dir unittests/system-test-contracts/sysio.mechanics --user-trx-data-file tests/PerformanceHarness/cpuTrxData.json)
 add_np_test(NAME performance_test_basic_ram_trx_spec COMMAND tests/PerformanceHarnessScenarioRunner.py singleTest -v --producer-nodes 1 --validation-nodes 1 --target-tps 20 --tps-limit-per-generator 10 --test-duration-sec 5 --chain-state-db-size-mb 200 --account-name "r" --abi-file sysmechanics.abi --wasm-file sysmechanics.wasm --contract-dir unittests/system-test-contracts/sysio.mechanics --user-trx-data-file tests/PerformanceHarness/ramTrxData.json)
 add_np_test(NAME performance_test_basic_net_trx_spec COMMAND tests/PerformanceHarnessScenarioRunner.py singleTest -v --producer-nodes 1 --validation-nodes 1 --target-tps 20 --tps-limit-per-generator 10 --test-duration-sec 5 --chain-state-db-size-mb 200 --account-name "n" --abi-file sysmechanics.abi --wasm-file sysmechanics.wasm --contract-dir unittests/system-test-contracts/sysio.mechanics --user-trx-data-file tests/PerformanceHarness/netTrxData.json)

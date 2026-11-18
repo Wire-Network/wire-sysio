@@ -131,10 +131,62 @@ BOOST_FIXTURE_TEST_CASE(account_results_total_resources_test, chain_plugin_teste
 
     read_only::get_account_results results = get_account_info(name("alice1111111"));
     BOOST_CHECK(results.total_resources.get_type() != fc::variant::type_id::null_type);
+    BOOST_CHECK_EQUAL("alice1111111", results.total_resources["owner"].as_string());
     BOOST_CHECK_EQUAL(core_from_string("0.0010"), results.total_resources["net_weight"].as<asset>());
     BOOST_CHECK_EQUAL(core_from_string("0.0010"), results.total_resources["cpu_weight"].as<asset>());
     BOOST_CHECK_EQUAL(results.total_resources["ram_bytes"].as_int64(), 10401144); // 100000*104+newaccount_ram(1144)
 
+    // total_resources is the account's chain limits, reported natively in the same response
+    BOOST_CHECK_EQUAL(results.total_resources["ram_bytes"].as_int64(), results.ram_quota);
+    BOOST_CHECK_EQUAL(results.total_resources["net_weight"].as<asset>().get_amount(), results.net_weight);
+    BOOST_CHECK_EQUAL(results.total_resources["cpu_weight"].as<asset>().get_amount(), results.cpu_weight);
+
+} FC_LOG_AND_RETHROW() }
+
+/// total_resources needs a finite RAM limit; unlimited NET and CPU weights are reported as zero.
+BOOST_FIXTURE_TEST_CASE(account_results_total_resources_unlimited_limits_test, chain_plugin_tester) { try {
+    produce_blocks(10);
+    // created before the system contract is deployed and without a RAM gift or ROA policy: every limit unlimited
+    create_account("nolimits1111"_n, config::system_account_name, false, false, false, false);
+    setup_system_accounts();
+    produce_blocks();
+
+    const read_only::get_account_results unlimited = get_account_info("nolimits1111"_n);
+    BOOST_REQUIRE_LT(unlimited.ram_quota, 0);
+    BOOST_CHECK(unlimited.total_resources.is_null());
+
+    // sysio.roa gives sysio a finite RAM limit and leaves its NET and CPU unlimited
+    const read_only::get_account_results system = get_account_info(config::system_account_name);
+    BOOST_REQUIRE_GE(system.ram_quota, 0);
+    BOOST_REQUIRE_LT(system.net_weight, 0);
+    BOOST_REQUIRE_LT(system.cpu_weight, 0);
+    BOOST_REQUIRE(!system.total_resources.is_null());
+    BOOST_CHECK_EQUAL(config::system_account_name.to_string(), system.total_resources["owner"].as_string());
+    BOOST_CHECK_EQUAL(core_from_string("0.0000"), system.total_resources["net_weight"].as<asset>());
+    BOOST_CHECK_EQUAL(core_from_string("0.0000"), system.total_resources["cpu_weight"].as<asset>());
+    BOOST_CHECK_EQUAL(system.total_resources["ram_bytes"].as_int64(), system.ram_quota);
+} FC_LOG_AND_RETHROW() }
+
+/// A weight beyond the asset range is reported at the range's maximum instead of failing the request.
+BOOST_FIXTURE_TEST_CASE(account_results_total_resources_caps_weight_at_asset_range_test, chain_plugin_tester) { try {
+    produce_blocks(10);
+    setup_system_accounts();
+    produce_blocks();
+    create_account("alice1111111"_n, config::system_account_name);
+
+    const int64_t ram_bytes = get_account_info("alice1111111"_n).ram_quota;
+    const int64_t beyond_asset_range = asset::max_amount + 1;
+    BOOST_REQUIRE_EQUAL(success(), push_action(config::system_account_name, "setalimits"_n, mvo()
+                                                  ("account", "alice1111111")
+                                                  ("ram_bytes", ram_bytes)
+                                                  ("net_weight", beyond_asset_range)
+                                                  ("cpu_weight", 10)));
+
+    const read_only::get_account_results results = get_account_info("alice1111111"_n);
+    BOOST_REQUIRE_EQUAL(results.net_weight, beyond_asset_range);
+    BOOST_REQUIRE(!results.total_resources.is_null());
+    BOOST_CHECK_EQUAL(results.total_resources["net_weight"].as<asset>().get_amount(), asset::max_amount);
+    BOOST_CHECK_EQUAL(results.total_resources["cpu_weight"].as<asset>().get_amount(), 10);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

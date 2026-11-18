@@ -237,10 +237,7 @@ bool holds_schedule_seat(name account) {
 // ---------------------------------------------------------------------------
 //  setconfig
 // ---------------------------------------------------------------------------
-void opreg::setconfig(uint32_t max_available_producers,
-                      uint32_t max_available_batch_ops,
-                      uint32_t max_available_underwriters,
-                      uint64_t terminate_prune_delay_ms,
+void opreg::setconfig(uint64_t terminate_prune_delay_ms,
                       uint32_t terminate_max_consecutive_misses,
                       uint32_t terminate_max_pct_misses_24h,
                       uint64_t terminate_window_ms,
@@ -249,9 +246,6 @@ void opreg::setconfig(uint32_t max_available_producers,
                       std::vector<chain_min_bond> req_uw_collat) {
    require_auth(get_self());
 
-   check(max_available_producers > 0, "max_available_producers must be positive");
-   check(max_available_batch_ops > 0, "max_available_batch_ops must be positive");
-   check(max_available_underwriters > 0, "max_available_underwriters must be positive");
    check(terminate_prune_delay_ms > 0, "terminate_prune_delay_ms must be positive");
    check(terminate_max_consecutive_misses >= MIN_TERMINATE_MAX_CONSECUTIVE_MISSES &&
          terminate_max_consecutive_misses <= MAX_TERMINATE_MAX_CONSECUTIVE_MISSES,
@@ -313,9 +307,6 @@ void opreg::setconfig(uint32_t max_available_producers,
 
    opconfig_t cfg_tbl(get_self());
    op_config cfg = cfg_tbl.get_or_default(op_config{});
-   cfg.max_available_producers          = max_available_producers;
-   cfg.max_available_batch_ops          = max_available_batch_ops;
-   cfg.max_available_underwriters       = max_available_underwriters;
    cfg.terminate_prune_delay_ms         = terminate_prune_delay_ms;
    cfg.terminate_max_consecutive_misses = terminate_max_consecutive_misses;
    cfg.terminate_max_pct_misses_24h     = terminate_max_pct_misses_24h;
@@ -1301,11 +1292,11 @@ void opreg::slash(name account, std::string reason) {
 
    operators_t ops(get_self());
    auto op_pk = operator_key{account.value};
-   auto op = ops.get(op_pk, operator_not_found_msg.data());
-   check(op.status != OperatorStatus::OPERATOR_STATUS_SLASHED,
-         "operator already slashed");
-   check(op.status != OperatorStatus::OPERATOR_STATUS_TERMINATED,
-         "operator already terminated");
+   // Nothing is left to slash on a pruned, slashed or terminated operator. Reached inline from
+   // `sysio.epoch::advance`, so this returns rather than aborting the epoch advance.
+   if (!ops.contains(op_pk)) return;
+   auto op = ops.get(op_pk);
+   if (op.has_terminal_status()) return;
 
    auto now = current_time_ms();
 

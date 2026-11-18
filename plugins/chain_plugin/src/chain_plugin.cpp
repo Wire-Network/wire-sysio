@@ -723,8 +723,6 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
           "In \"light\" mode all incoming blocks headers will be fully validated; transactions in those validated blocks will be trusted \n")
          ("disable-ram-billing-notify-checks", bpo::bool_switch()->default_value(false),
           "Disable the check which subjectively fails a transaction if a contract bills more RAM to another account within the context of a notification handler (i.e. when the receiver is not the code of the action).")
-         ("maximum-variable-signature-length", bpo::value<uint32_t>()->default_value(16384u),
-          "Subjectively limit the maximum length of variable components in a variable legnth signature to this size in bytes")
          ("trusted-producer", bpo::value<vector<string>>()->composing(), "Indicate a producer whose blocks headers signed by it will be fully validated, but transactions in those validated blocks will be trusted.")
          ("database-map-mode", bpo::value<chainbase::pinnable_mapped_file::map_mode>()->default_value(chainbase::pinnable_mapped_file::map_mode::mapped),
           "Database map mode (\"mapped\", \"mapped_private\", \"heap\", or \"locked\").\n"
@@ -1095,7 +1093,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
       }
 
       chain_config->sig_cpu_bill_pct = options.at("signature-cpu-billable-pct").as<uint32_t>();
-      SYS_ASSERT( chain_config->sig_cpu_bill_pct >= 0 && chain_config->sig_cpu_bill_pct <= 100, plugin_config_exception,
+      SYS_ASSERT( chain_config->sig_cpu_bill_pct <= 100, plugin_config_exception,
                   "signature-cpu-billable-pct must be 0 - 100, {}", chain_config->sig_cpu_bill_pct );
       chain_config->sig_cpu_bill_pct *= config::percent_1;
 
@@ -1106,8 +1104,6 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
       chain_config->disable_replay_opts = options.at( "disable-replay-opts" ).as<bool>();
       chain_config->contracts_console = options.at( "contracts-console" ).as<bool>();
       chain_config->allow_ram_billing_in_notify = options.at( "disable-ram-billing-notify-checks" ).as<bool>();
-
-      chain_config->maximum_variable_signature_length = options.at( "maximum-variable-signature-length" ).as<uint32_t>();
 
       chain_config->terminate_at_block = options.at( "terminate-at-block" ).as<uint32_t>();
       chain_config->truncate_at_block = options.at( "truncate-at-block" ).as<uint32_t>();
@@ -3619,18 +3615,38 @@ read_only::get_producer_schedule_result read_only::get_producer_schedule( const 
    return result;
 }
 
+namespace {
+
+/**
+ * Reads a `block_num_or_id` request string as a decimal block number.
+ *
+ * @return the block number, or std::nullopt when the string is not an unsigned decimal integer and so can only be a
+ *         block id
+ * @throws chain::unknown_block_exception when the integer exceeds uint32_t: no such block number
+ */
+std::optional<uint32_t> parse_block_num(std::string_view block_num_or_id) {
+   uint64_t block_num = 0;
+   try {
+      block_num = fc::to_uint64(block_num_or_id);
+   } catch( const fc::exception& ) {
+      return std::nullopt;
+   }
+   SYS_ASSERT( block_num <= std::numeric_limits<uint32_t>::max(), chain::unknown_block_exception,
+               "Could not find block: {}", block_num_or_id );
+   return static_cast<uint32_t>(block_num);
+}
+
+} // anonymous namespace
+
 chain::signed_block_ptr read_only::get_raw_block(const read_only::get_raw_block_params& params, const fc::time_point&) const {
    signed_block_ptr block;
-   std::optional<uint64_t> block_num;
 
    SYS_ASSERT( !params.block_num_or_id.empty() && params.block_num_or_id.size() <= 64,
                chain::block_id_type_exception,
                "Invalid Block number or ID, must be greater than 0 and less than 65 characters"
    );
 
-   try {
-      block_num = fc::to_uint64(params.block_num_or_id);
-   } catch( ... ) {}
+   const std::optional<uint32_t> block_num = parse_block_num(params.block_num_or_id);
 
    if( block_num ) {
       block = db.fetch_block_by_number( *block_num );
@@ -3659,16 +3675,12 @@ std::function<chain::t_or_exception<fc::variant>()> read_only::get_block(const g
 }
 
 read_only::get_block_header_result read_only::get_block_header(const read_only::get_block_header_params& params, const fc::time_point& deadline) const{
-   std::optional<uint64_t> block_num;
-
    SYS_ASSERT( !params.block_num_or_id.empty() && params.block_num_or_id.size() <= 64,
                chain::block_id_type_exception,
                "Invalid Block number or ID, must be greater than 0 and less than 65 characters"
    );
 
-   try {
-      block_num = fc::to_uint64(params.block_num_or_id);
-   } catch( ... ) {}
+   const std::optional<uint32_t> block_num = parse_block_num(params.block_num_or_id);
 
    if (!params.include_extensions) {
       std::optional<signed_block_header> header;
@@ -3744,11 +3756,7 @@ fc::variant read_only::get_block_info(const read_only::get_block_info_params& pa
 
 fc::variant read_only::get_block_header_state(const get_block_header_state_params& params, const fc::time_point&) const {
    signed_block_ptr sbp;
-   std::optional<uint64_t> block_num;
-
-   try {
-      block_num = fc::to_uint64(params.block_num_or_id);
-   } catch( ... ) {}
+   const std::optional<uint32_t> block_num = parse_block_num(params.block_num_or_id);
 
    if( block_num ) {
       sbp = db.fetch_block_by_number(*block_num);
@@ -4090,6 +4098,46 @@ read_only::get_raw_abi_results read_only::get_raw_abi( const get_raw_abi_params&
    } SYS_RETHROW_EXCEPTIONS(chain::account_query_exception, "unable to retrieve account abi")
 }
 
+namespace {
+
+/// Field names of `get_account`'s `total_resources`.
+namespace total_resources_field {
+const std::string owner = "owner";
+const std::string net_weight = "net_weight";
+const std::string cpu_weight = "cpu_weight";
+const std::string ram_bytes = "ram_bytes";
+} // namespace total_resources_field
+
+/// A chain resource weight as an asset amount: an unlimited (negative) weight is 0, and the rest is capped at the
+/// asset range.
+int64_t resource_weight_amount(int64_t weight) {
+   constexpr int64_t no_weight = 0;
+   return std::clamp(weight, no_weight, asset::max_amount);
+}
+
+/**
+ * An account's chain resource limits as `get_account`'s `total_resources`.
+ *
+ * The weights are in the chain's core symbol, the unit `sysio.roa` grants them in.
+ *
+ * @return `owner`, `net_weight` and `cpu_weight` as assets, and `ram_bytes`; null when the RAM limit is unlimited
+ */
+fc::variant total_resources_of(const read_only::get_account_results& account) {
+   if (account.ram_quota < 0)
+      return {};
+   const symbol core_symbol;
+   const asset net_weight(resource_weight_amount(account.net_weight), core_symbol);
+   const asset cpu_weight(resource_weight_amount(account.cpu_weight), core_symbol);
+   fc::mutable_variant_object resources;
+   resources(total_resources_field::owner, account.account_name);
+   resources(total_resources_field::net_weight, net_weight);
+   resources(total_resources_field::cpu_weight, cpu_weight);
+   resources(total_resources_field::ram_bytes, static_cast<uint64_t>(account.ram_quota));
+   return fc::variant(std::move(resources));
+}
+
+} // anonymous namespace
+
 read_only::get_account_return_t read_only::get_account( const get_account_params& params, const fc::time_point& ) const {
    try {
    get_account_results result;
@@ -4117,9 +4165,15 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
    result.cpu_limit.set( rm.get_account_cpu_limit_ex( result.account_name, greylist_limit, current_usage_time).first );
    result.ram_usage = rm.get_account_ram_usage( result.account_name );
 
+   const auto& sub_bill = db.get_subjective_billing();
+   const auto  bill     = sub_bill.get_subjective_bill( result.account_name, fc::time_point::now() );
    sysio::chain::resource_limits::account_resource_limit subjective_cpu_bill_limit;
-   subjective_cpu_bill_limit.used = db.get_subjective_billing().get_subjective_bill( result.account_name, fc::time_point::now() ).count();
+   subjective_cpu_bill_limit.used = bill.cpu.count();
    result.subjective_cpu_bill_limit = subjective_cpu_bill_limit;
+   sysio::chain::resource_limits::account_resource_limit subjective_net_bill_limit;
+   subjective_net_bill_limit.used = bill.net_bytes;
+   subjective_net_bill_limit.max = sub_bill.get_subjective_account_net_allowed();
+   result.subjective_net_bill_limit = subjective_net_bill_limit;
 
    // Gather permission and linked actions info as before
    const auto linked_action_map = ([&](){
@@ -4168,13 +4222,8 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
    // add sysio.any linked authorizations
    result.sysio_any_linked_actions = get_linked_actions(chain::config::sysio_any_name);
 
-   // Load ROA account code/ABI
+   // With ROA deployed, report the core balance and the resource limits ROA manages.
    const auto* code_account = db.find_account_metadata(config::roa_account_name);
-   struct http_params_t {
-      std::optional<vector<char>> total_resources;
-   };
-   http_params_t http_params;
-
    if( abi_def abi; code_account != nullptr && abi_serializer::to_abi(code_account->abi, abi) ) {
 
       const auto token_code = "sysio.token"_n;
@@ -4198,31 +4247,7 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
          }
       }
 
-      // ROA reslimit is a flat kv::table (no scope): reslimit_t reslimit(get_self()).
-      // KV key layout is [pk=owner:8B BE].
-      auto lookup_object = [&](const name& table_name, const name& account_name) -> std::optional<vector<char>> {
-         const uint16_t tid = chain::compute_table_id(table_name.to_uint64_t());
-         char key_buf[chain::kv_pri_key_size];
-         chain::kv_encode_be64(key_buf, account_name.to_uint64_t());
-         std::string_view key_sv(key_buf, chain::kv_pri_key_size);
-         const auto row = db.kv().find_row(config::roa_account_name, tid, key_sv);
-         if (row) {
-            return vector<char>(row->value.begin(), row->value.end());
-         }
-         return {};
-      };
-
-      http_params.total_resources          = lookup_object("reslimit"_n, params.account_name);
-
-      return [http_params = std::move(http_params), result = std::move(result), abi=std::move(abi), shorten_abi_errors=shorten_abi_errors,
-              abi_serializer_max_time=abi_serializer_max_time]() mutable ->  chain::t_or_exception<read_only::get_account_results> {
-         auto yield = [&]() { return abi_serializer::create_yield_function(abi_serializer_max_time); };
-         abi_serializer abis(std::move(abi), yield());
-
-         if (http_params.total_resources)
-            result.total_resources = abis.binary_to_variant("reslimit", *http_params.total_resources, yield(), shorten_abi_errors);
-         return std::move(result);
-      };
+      result.total_resources = total_resources_of(result);
    }
    return [result = std::move(result)]() mutable -> chain::t_or_exception<read_only::get_account_results> {
       return std::move(result);

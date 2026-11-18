@@ -218,7 +218,7 @@ inline auto make_http_response_handler(http_plugin_state& plugin_state, detail::
                               if (content_type == http_content_type::plaintext && !plaintext_body)
                                  session_ptr->set_content_type_header(http_content_type::json);
                               // HTTP 204 never carries a body, including JSON-RPC notifications.
-                              if (code == magic_enum::enum_integer(boost::beast::http::status::no_content)) {
+                              if (code == static_cast<int>(magic_enum::enum_integer(boost::beast::http::status::no_content))) {
                                  session_ptr->send_response({}, code);
                               } else if (response.has_value()) {
                                  std::string json = plaintext_body

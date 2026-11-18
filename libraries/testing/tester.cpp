@@ -36,6 +36,11 @@ namespace {
    constexpr std::string_view kv_engine_map      = "map";
    constexpr auto             state_file_name    = "shared_memory.bin";
 
+   /// RAM NODE_DADDY self-issues at bootstrap. An issuer pays for its policy rows, and a tier-1 owner's personal RAM
+   /// covers 40 of them, fewer than many tests issue with the default account policy.
+   constexpr std::string_view node_daddy_self_funded_ram = "0.1000 SYS";
+   constexpr std::string_view zero_sys                   = "0.0000 SYS";
+
 } // namespace
 
    kv_engine default_kv_engine() {
@@ -659,7 +664,7 @@ namespace {
                                 });
 
       include_ram_gift &= has_roa;
-      include_ram_gift &= a.prefix() != sysio::chain::config::system_account_name;
+      include_ram_gift &= !sysio::chain::config::is_system_account(a);
       if (include_ram_gift) {
          // if bios contract with setalimits available then provide ram for account which is similar to what sysio.system contract does
          const auto* acnt = control->find_account_metadata(sysio::chain::config::system_account_name);
@@ -677,7 +682,7 @@ namespace {
       }
 
       include_roa_policy &= has_roa;
-      include_roa_policy &= a.prefix() != sysio::chain::config::system_account_name;
+      include_roa_policy &= !sysio::chain::config::is_system_account(a);
       if( include_roa_policy ) {
          // ramWeight of 4 SYS needed to cover wasmtest contract use
          trx.actions.emplace_back(get_action(config::roa_account_name, "addpolicy"_n,
@@ -1358,6 +1363,8 @@ namespace {
       // Setup default node daddy for easier resource allocation during testing
       create_account(NODE_DADDY, sysio::chain::config::system_account_name, false, false, false, false);
       register_node_owner(NODE_DADDY, 1);
+      expand_roa_policy(NODE_DADDY, NODE_DADDY, std::string(zero_sys), std::string(zero_sys),
+                        std::string(node_daddy_self_funded_ram), 0);
       has_roa = true;
    }
 

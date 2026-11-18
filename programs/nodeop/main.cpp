@@ -1,7 +1,9 @@
 #include <string>
+#include <sysio/account_watch_plugin/account_watch_plugin.hpp>
 #include <sysio/alert_monitor_plugin/alert_monitor_plugin.hpp>
 #include <sysio/batch_operator_plugin/batch_operator_plugin.hpp>
 #include <sysio/chain/app.hpp>
+#include <sysio/chain/config.hpp>
 #include <sysio/chain_api_plugin/chain_api_plugin.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/db_size_api_plugin/db_size_api_plugin.hpp>
@@ -26,7 +28,7 @@ using namespace sysio;
 
 int main(int argc, char** argv)
 {
-   chain::application exe{application_config{}};
+   chain::application exe{application_config{.main_thread_stack_size = chain::config::contract_thread_stack_size}};
    application_base::register_plugin<trace_api_plugin>();
    application_base::register_plugin<db_size_api_plugin>();
    application_base::register_plugin<http_client_plugin>();
@@ -38,6 +40,7 @@ int main(int argc, char** argv)
    application_base::register_plugin<test_control_api_plugin>();
    application_base::register_plugin<state_history_plugin>();
    application_base::register_plugin<alert_monitor_plugin>();
+   application_base::register_plugin<account_watch_plugin>();
    application_base::register_plugin<query_engine_plugin>();
    application_base::register_plugin<prometheus_plugin>();
    application_base::register_plugin<chain_api_plugin>();

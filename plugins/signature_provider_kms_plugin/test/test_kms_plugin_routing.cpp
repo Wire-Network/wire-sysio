@@ -4,8 +4,8 @@
  * confirm the integration seam without invoking any real KMS API: the sign
  * closure is built and inspected for shape, never called.
  *
- * The real KMS::Sign round-trip is covered by `kms_live_sign_round_trip` in
- * `test_kms_signature_provider.cpp`, which is env-gated.
+ * The signing closures are exercised in `test_kms_signature_provider.cpp`,
+ * through a `KMSClient` double and the env-gated `kms_live_sign_round_trip`.
  */
 
 #include <boost/test/unit_test.hpp>
@@ -93,10 +93,33 @@ BOOST_AUTO_TEST_CASE(create_provider_ethereum_kms_spec_routes_through_parser) {
    BOOST_CHECK(!provider->private_key.has_value());
 }
 
-BOOST_AUTO_TEST_CASE(create_provider_kms_spec_rejects_solana) {
-   // The KMS handler must reject a non-secp256k1 chain at parse time, not at
-   // first sign -- operators should learn early that KMS can't sign Solana
-   // ed25519.
+BOOST_AUTO_TEST_CASE(create_provider_wire_k1_kms_spec_routes_through_parser) {
+   // A WIRE K1 spec routes through the KMS handler like an Ethereum one and yields a remote provider. The closure is
+   // not invoked here.
+   using namespace fc::test;
+   using namespace fc::crypto;
+
+   auto clean_app = gsl_lite::finally([]() {
+      appbase::application::reset_app_singleton();
+   });
+
+   const keygen_result fixture       = load_keygen_fixture("wire", 1);
+   const std::string   provider_spec = to_signature_provider_spec(
+      "kms-wire-01", chain_kind_wire, chain_key_type_wire, fixture.public_key, "KMS:us-east-1:alias/wire-operator-01");
+
+   std::unique_ptr<kms_routing_tester> tester = create_kms_routing_app();
+   const signature_provider_ptr        provider = tester->plugin().create_provider(provider_spec);
+
+   BOOST_CHECK_EQUAL(provider->key_name, "kms-wire-01");
+   BOOST_TEST((provider->target_chain == chain_kind_wire));
+   BOOST_TEST((provider->key_type == chain_key_type_wire));
+   BOOST_CHECK(provider->public_key.contains<fc::ecc::public_key_shim>());
+   BOOST_CHECK(static_cast<bool>(provider->sign));
+   BOOST_CHECK(!provider->private_key.has_value());
+}
+
+BOOST_AUTO_TEST_CASE(create_provider_kms_spec_routes_solana_with_raw_signer) {
+   // A Solana spec routes through the KMS handler and yields a remote provider that signs raw messages.
    using namespace fc::test;
    using namespace fc::crypto;
 
@@ -110,11 +133,14 @@ BOOST_AUTO_TEST_CASE(create_provider_kms_spec_rejects_solana) {
       "kms-sol-01", chain_kind_solana, chain_key_type_solana,
       fixture.public_key, kms_provider);
 
-   auto  tester = create_kms_routing_app();
-   auto& mgr    = tester->plugin();
+   std::unique_ptr<kms_routing_tester> tester   = create_kms_routing_app();
+   const signature_provider_ptr        provider = tester->plugin().create_provider(provider_spec);
 
-   BOOST_CHECK_THROW(mgr.create_provider(provider_spec),
-                     sysio::chain::pending_impl_exception);
+   BOOST_TEST((provider->target_chain == chain_kind_solana));
+   BOOST_TEST((provider->key_type == chain_key_type_solana));
+   BOOST_CHECK(static_cast<bool>(provider->sign));
+   BOOST_CHECK(static_cast<bool>(provider->sign_raw));
+   BOOST_CHECK(!provider->private_key.has_value());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

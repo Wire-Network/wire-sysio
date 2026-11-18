@@ -23,10 +23,14 @@
 #include <secp256k1.h>
 #include <secp256k1_recovery.h>
 
+#include <algorithm>
 #include <array>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <span>
+#include <string>
+#include <variant>
 
 // KMSErrors codes begin at 129 (SERVICE_EXTENSION_START_RANGE + 1) and run to
 // 176, above magic_enum's default ceiling of 127, so enum_name() returns "" for
@@ -70,6 +74,62 @@ const secp256k1_context* kms_secp_ctx() {
    return ctx;
 }
 
+/// `fc::ecc::compact_signature` header base: 27 + 4 (compressed-key flag), plus the recovery id.
+constexpr unsigned char k1_compact_header_base = 31;
+
+/// How a signature from a secp256k1 KMS key is packed for the key type the spec names.
+enum class secp256k1_signature_format {
+   ethereum, ///< `der_to_eth_signature`, held in an `fc::em::signature_shim`
+   wire_k1,  ///< `der_to_wire_k1_signature`, held in an `fc::ecc::signature_shim`
+};
+
+/// The secp256k1 point a KMS key must hold, and how its signatures are packed.
+struct secp256k1_kms_key {
+   fc::em::public_key         pubkey;
+   secp256k1_signature_format format;
+};
+
+/// The Ed25519 key a KMS key must hold (`ECC_NIST_EDWARDS25519`), for Solana keys.
+struct ed25519_kms_key {
+   fc::crypto::ed::public_key_shim pubkey;
+};
+
+/// The key a KMS signer is pinned to. Code that branches on it handles exactly these two alternatives.
+using kms_key = std::variant<secp256k1_kms_key, ed25519_kms_key>;
+static_assert(std::variant_size_v<kms_key> == 2, "update every branch on kms_key for the new alternative");
+
+/// Map the spec's key type and public key onto the KMS key it requires. Offline; throws before any client exists.
+kms_key resolve_kms_key(fc::crypto::chain_key_type_t key_type, const fc::crypto::public_key& expected_pubkey) {
+   switch (key_type) {
+   case fc::crypto::chain_key_type_ethereum: {
+      SYS_ASSERT(expected_pubkey.contains<fc::em::public_key_shim>(), chain::plugin_config_exception,
+                 "KMS spec key_type={} does not match the public key variant (expected em::public_key_shim)",
+                 fc::crypto::chain_key_type_reflector::to_fc_string(key_type));
+      return secp256k1_kms_key{expected_pubkey.get<fc::em::public_key_shim>().unwrapped(),
+                               secp256k1_signature_format::ethereum};
+   }
+   case fc::crypto::chain_key_type_wire: {
+      SYS_ASSERT(expected_pubkey.contains<fc::ecc::public_key_shim>(), chain::pending_impl_exception,
+                 "KMS signing supports only K1 keys for key_type={}",
+                 fc::crypto::chain_key_type_reflector::to_fc_string(key_type));
+      // Same curve: the compressed K1 bytes are a valid compressed secp256k1 point for `fc::em::public_key`.
+      const fc::ecc::public_key_data& k1_data = expected_pubkey.get<fc::ecc::public_key_shim>().serialize();
+      return secp256k1_kms_key{fc::em::public_key{k1_data}, secp256k1_signature_format::wire_k1};
+   }
+   case fc::crypto::chain_key_type_solana: {
+      SYS_ASSERT(expected_pubkey.contains<fc::crypto::ed::public_key_shim>(), chain::plugin_config_exception,
+                 "KMS spec key_type={} does not match the public key variant (expected ed::public_key_shim)",
+                 fc::crypto::chain_key_type_reflector::to_fc_string(key_type));
+      return ed25519_kms_key{expected_pubkey.get<fc::crypto::ed::public_key_shim>()};
+   }
+   default:
+      FC_THROW_EXCEPTION(chain::pending_impl_exception,
+                         "KMS signing supports only chain_key_type_ethereum, chain_key_type_wire and "
+                         "chain_key_type_solana, got {}",
+                         fc::crypto::chain_key_type_reflector::to_fc_string(key_type));
+   }
+}
+
 /// Per-closure state for a KMS-backed signer. Captured by `std::shared_ptr`
 /// so that `std::function` copies remain cheap and the same `KMSClient` /
 /// expected pubkey are shared across copies of the closure.
@@ -80,17 +140,16 @@ const secp256k1_context* kms_secp_ctx() {
 struct kms_signer_state {
    kms_signer_state(std::shared_ptr<Aws::KMS::KMSClient> client_,
                     std::string                         key_id_,
-                    fc::em::public_key                  expected_em_pubkey_)
+                    kms_key                             key_)
       : client(std::move(client_))
       , key_id(std::move(key_id_))
-      , expected_em_pubkey(std::move(expected_em_pubkey_)) {}
+      , key(std::move(key_)) {}
 
    std::shared_ptr<Aws::KMS::KMSClient> client;
    std::string                          key_id;
-   /// secp256k1 uncompressed public key the spec pinned. Verified once against
-   /// the live KMS key by `verify_kms_pubkey`, then used by `recover_v` to
-   /// discriminate between recovery_id 0 and 1.
-   fc::em::public_key                   expected_em_pubkey;
+   /// The key the spec pinned. Verified once against the live KMS key by `verify_kms_pubkey`, then checked against
+   /// every signature: `recover_v` for secp256k1, an Ed25519 verify for Ed25519.
+   kms_key                              key;
    /// Guard for the GetPublicKey pinning check. The check runs on the first
    /// `Sign` (or the startup probe) and never again once it has passed.
    ///
@@ -109,10 +168,10 @@ struct kms_signer_state {
 //
 // AWS KMS `GetPublicKey` returns the key as a DER-encoded SubjectPublicKeyInfo
 // (RFC 5280 section 4.1). We walk just enough of that structure to verify the key is
-// secp256k1 and to lift out the raw EC point.
+// secp256k1 or Ed25519 and to lift out the raw key.
 // ---------------------------------------------------------------------------
 
-/// ASN.1 DER universal tags that appear inside an EC SubjectPublicKeyInfo.
+/// ASN.1 DER universal tags that appear inside a SubjectPublicKeyInfo.
 constexpr unsigned char der_tag_sequence   = 0x30;
 constexpr unsigned char der_tag_oid        = 0x06;
 constexpr unsigned char der_tag_bit_string = 0x03;
@@ -130,9 +189,19 @@ constexpr std::array<unsigned char, 7> oid_ec_public_key = {
 constexpr std::array<unsigned char, 5> oid_secp256k1 = {
    0x2B, 0x81, 0x04, 0x00, 0x0A};
 
+/// DER OBJECT IDENTIFIER body of `1.3.101.112` id-Ed25519 (RFC 8410), whose AlgorithmIdentifier has no parameters.
+constexpr std::array<unsigned char, 3> oid_ed25519 = {0x2B, 0x65, 0x70};
+
 /// An uncompressed secp256k1 EC point is `0x04 || X[32] || Y[32]`.
 constexpr unsigned char ec_point_uncompressed_prefix = 0x04;
 constexpr std::size_t   ec_point_uncompressed_len    = 65;
+
+/// A detached Ed25519 signature; `ed::signature_shim` stores it after the 32-byte public key.
+constexpr std::size_t ed25519_signature_len =
+   fc::crypto::ed::signature_shim::size - fc::crypto::ed::public_key_shim::size;
+
+/// Largest message KMS accepts for `MessageType=RAW`.
+constexpr std::size_t kms_max_raw_message_len = 4096;
 
 /// Minimal ASN.1 DER reader over a byte span. DER is a canonical, unambiguous
 /// encoding, so a structural tag-length-value walk is a genuine parse -- not a
@@ -184,15 +253,18 @@ struct der_reader {
    }
 };
 
-/// Walk a DER X.509 SubjectPublicKeyInfo and return its raw uncompressed
-/// secp256k1 EC point (`0x04 || X || Y`). Verifies the algorithm is
-/// `id-ecPublicKey` over the `secp256k1` named curve, so an operator who
-/// pointed the spec at an RSA key, a P-256 key, etc. gets a precise error
-/// instead of a downstream surprise.
-std::array<unsigned char, ec_point_uncompressed_len>
-parse_spki_ec_point(std::span<const unsigned char> spki_der) {
+/// The parts of a DER SubjectPublicKeyInfo the pin check reads. The spans view the input buffer.
+struct spki_fields {
+   std::span<const unsigned char>     algorithm;  ///< algorithm OID body
+   std::optional<der_reader::element> parameters; ///< AlgorithmIdentifier parameters, when present
+   std::span<const unsigned char>     key;        ///< subjectPublicKey bits after the unused-bits octet
+};
+
+/// Walk a DER X.509 SubjectPublicKeyInfo (RFC 5280 section 4.1) into its algorithm OID, optional parameters and key
+/// bits, rejecting any structural deviation.
+spki_fields parse_spki(std::span<const unsigned char> spki_der) {
    der_reader top{spki_der};
-   const auto spki = top.next();
+   const der_reader::element spki = top.next();
    SYS_ASSERT(spki.tag == der_tag_sequence, chain::plugin_config_exception,
               "KMS public-key DER: expected outer SEQUENCE, got tag {:#x}",
               static_cast<unsigned>(spki.tag));
@@ -202,8 +274,8 @@ parse_spki_ec_point(std::span<const unsigned char> spki_der) {
    // SubjectPublicKeyInfo ::= SEQUENCE { algorithm AlgorithmIdentifier,
    //                                     subjectPublicKey BIT STRING }
    der_reader body{spki.content};
-   const auto algorithm  = body.next();
-   const auto subject_pk = body.next();
+   const der_reader::element algorithm  = body.next();
+   const der_reader::element subject_pk = body.next();
    SYS_ASSERT(algorithm.tag == der_tag_sequence, chain::plugin_config_exception,
               "KMS public-key DER: expected AlgorithmIdentifier SEQUENCE, got tag {:#x}",
               static_cast<unsigned>(algorithm.tag));
@@ -213,28 +285,45 @@ parse_spki_ec_point(std::span<const unsigned char> spki_der) {
    SYS_ASSERT(body.at_end(), chain::plugin_config_exception,
               "KMS public-key DER: unexpected trailing bytes inside SubjectPublicKeyInfo");
 
-   // AlgorithmIdentifier ::= SEQUENCE { algorithm OID, parameters (curve OID) }
+   // AlgorithmIdentifier ::= SEQUENCE { algorithm OID, parameters OPTIONAL }
    der_reader alg{algorithm.content};
-   const auto algo_oid  = alg.next();
-   const auto curve_oid = alg.next();
-   SYS_ASSERT(algo_oid.tag == der_tag_oid && curve_oid.tag == der_tag_oid,
+   const der_reader::element algo_oid = alg.next();
+   SYS_ASSERT(algo_oid.tag == der_tag_oid, chain::plugin_config_exception,
+              "KMS public-key DER: AlgorithmIdentifier does not start with an OBJECT IDENTIFIER");
+   std::optional<der_reader::element> parameters;
+   if (!alg.at_end()) {
+      parameters = alg.next();
+      SYS_ASSERT(alg.at_end(), chain::plugin_config_exception,
+                 "KMS public-key DER: unexpected trailing bytes inside AlgorithmIdentifier");
+   }
+
+   // subjectPublicKey BIT STRING: a leading "unused bits" octet (0 for a
+   // byte-aligned key) followed by the key itself.
+   SYS_ASSERT(!subject_pk.content.empty() && subject_pk.content.front() == 0x00,
               chain::plugin_config_exception,
-              "KMS public-key DER: AlgorithmIdentifier is not a pair of OBJECT IDENTIFIERs");
-   SYS_ASSERT(std::ranges::equal(algo_oid.content, oid_ec_public_key),
+              "KMS public-key DER: subjectPublicKey BIT STRING has a non-zero unused-bit count");
+   return {algo_oid.content, parameters, subject_pk.content.subspan(1)};
+}
+
+/// Walk a DER X.509 SubjectPublicKeyInfo and return its raw uncompressed
+/// secp256k1 EC point (`0x04 || X || Y`). Verifies the algorithm is
+/// `id-ecPublicKey` over the `secp256k1` named curve, so an operator who
+/// pointed the spec at an RSA key, a P-256 key, etc. gets a precise error
+/// instead of a downstream surprise.
+std::array<unsigned char, ec_point_uncompressed_len>
+parse_spki_ec_point(std::span<const unsigned char> spki_der) {
+   const spki_fields spki = parse_spki(spki_der);
+   SYS_ASSERT(std::ranges::equal(spki.algorithm, oid_ec_public_key),
               chain::plugin_config_exception,
               "KMS public-key DER: algorithm is not id-ecPublicKey -- the KMS key is not an "
               "elliptic-curve key");
-   SYS_ASSERT(std::ranges::equal(curve_oid.content, oid_secp256k1),
+   SYS_ASSERT(spki.parameters && spki.parameters->tag == der_tag_oid &&
+                 std::ranges::equal(spki.parameters->content, oid_secp256k1),
               chain::plugin_config_exception,
               "KMS public-key DER: EC curve is not secp256k1 -- the KMS key must be created "
               "with key spec ECC_SECG_P256K1");
 
-   // subjectPublicKey BIT STRING: a leading "unused bits" octet (0 for a
-   // byte-aligned key) followed by the EC point itself.
-   SYS_ASSERT(!subject_pk.content.empty() && subject_pk.content.front() == 0x00,
-              chain::plugin_config_exception,
-              "KMS public-key DER: subjectPublicKey BIT STRING has a non-zero unused-bit count");
-   const auto point = subject_pk.content.subspan(1);
+   const std::span<const unsigned char> point = spki.key;
    SYS_ASSERT(point.size() == ec_point_uncompressed_len, chain::plugin_config_exception,
               "KMS public-key DER: EC point is {} bytes, expected {} (uncompressed 0x04 form)",
               point.size(), ec_point_uncompressed_len);
@@ -266,8 +355,13 @@ void verify_kms_pubkey(kms_signer_state& state) {
    const std::span<const unsigned char> spki_der{
       spki_buf.GetUnderlyingData(), spki_buf.GetLength()};
 
-   const auto kms_pubkey = spki_der_to_public_key(spki_der);
-   SYS_ASSERT(kms_pubkey == state.expected_em_pubkey, chain::plugin_config_exception,
+   bool matches = false;
+   if (const secp256k1_kms_key* secp = std::get_if<secp256k1_kms_key>(&state.key)) {
+      matches = spki_der_to_public_key(spki_der) == secp->pubkey;
+   } else {
+      matches = spki_der_to_ed25519_public_key(spki_der) == std::get<ed25519_kms_key>(state.key).pubkey;
+   }
+   SYS_ASSERT(matches, chain::plugin_config_exception,
               "AWS KMS key \"{}\" holds a public key that does not match the public key "
               "pinned in the signature-provider spec. Correct the spec's <public-key> to the "
               "key this KMS key actually holds, or point the spec at the intended KMS key.",
@@ -477,7 +571,7 @@ unsigned char recover_v(const std::array<unsigned char, 64>& compact,
       }
    }
    FC_THROW_EXCEPTION(chain::plugin_config_exception,
-                      "Could not recover v: signature does not match expected public key");
+                      "Could not find a recovery id: signature does not match expected public key");
 }
 
 fc::em::compact_signature der_to_eth_signature(
@@ -491,6 +585,20 @@ fc::em::compact_signature der_to_eth_signature(
    fc::em::compact_signature out{};
    std::ranges::copy(compact, out.begin());
    out[64] = static_cast<unsigned char>(fc::crypto::ethereum::v_offset + rec_id);
+   return out;
+}
+
+fc::ecc::compact_signature der_to_wire_k1_signature(
+   std::span<const unsigned char>      der,
+   std::span<const std::uint8_t, 32>   digest,
+   const fc::em::public_key&           expected_pubkey) {
+   std::array<unsigned char, 64> compact = der_to_compact(der);
+   normalise_low_s(compact);
+   const unsigned char rec_id = recover_v(compact, digest, expected_pubkey);
+
+   fc::ecc::compact_signature out{};
+   out[0] = static_cast<unsigned char>(k1_compact_header_base + rec_id);
+   std::ranges::copy(compact, out.begin() + 1);
    return out;
 }
 
@@ -515,31 +623,27 @@ fc::em::public_key spki_der_to_public_key(std::span<const unsigned char> spki_de
    }
 }
 
-kms_signer make_kms_signature_provider(const kms_key_ref&             ref,
-                                       fc::crypto::chain_key_type_t   key_type,
-                                       const fc::crypto::public_key&  expected_pubkey) {
-   // v1 only supports secp256k1 keys held as Ethereum-flavoured public keys
-   // (ECC_SECG_P256K1 in KMS, signed with ECDSA_SHA_256). Wire K1 (sysio's
-   // own secp256k1 path), R1, BLS, Ed25519, and webauthn use different key
-   // shapes or curves and need separate plumbing, so they are out of scope
-   // for v1.
-   SYS_ASSERT(key_type == fc::crypto::chain_key_type_ethereum,
-              chain::pending_impl_exception,
-              "KMS signing currently supports only chain_key_type_ethereum, got {}",
-              fc::crypto::chain_key_type_reflector::to_string(key_type));
+fc::crypto::ed::public_key_shim spki_der_to_ed25519_public_key(std::span<const unsigned char> spki_der) {
+   const spki_fields spki = parse_spki(spki_der);
+   SYS_ASSERT(std::ranges::equal(spki.algorithm, oid_ed25519), chain::plugin_config_exception,
+              "KMS public-key DER: algorithm is not Ed25519 -- the KMS key must be created with key spec "
+              "ECC_NIST_EDWARDS25519");
+   SYS_ASSERT(!spki.parameters, chain::plugin_config_exception,
+              "KMS public-key DER: Ed25519 AlgorithmIdentifier carries parameters, which RFC 8410 forbids");
+   SYS_ASSERT(spki.key.size() == fc::crypto::ed::public_key_shim::size, chain::plugin_config_exception,
+              "KMS public-key DER: Ed25519 key is {} bytes, expected {}", spki.key.size(),
+              fc::crypto::ed::public_key_shim::size);
 
-   SYS_ASSERT(expected_pubkey.contains<fc::em::public_key_shim>(),
-              chain::plugin_config_exception,
-              "KMS spec key_type={} does not match the public key variant "
-              "(expected em::public_key_shim)",
-              fc::crypto::chain_key_type_reflector::to_string(key_type));
+   fc::crypto::ed::public_key_shim out;
+   std::ranges::copy(spki.key, out._data.begin());
+   return out;
+}
 
-   const auto& shim = expected_pubkey.get<fc::em::public_key_shim>();
+namespace {
 
-   auto state = std::make_shared<kms_signer_state>(
-      get_kms_client(ref.region), ref.key_id, shim.unwrapped());
-
-   fc::crypto::sign_fn sign = [state](const chain::digest_type& digest) -> chain::signature_type {
+/// The digest-signing closure of a secp256k1 key (Ethereum or WIRE K1).
+fc::crypto::sign_fn make_secp256k1_sign_fn(const std::shared_ptr<kms_signer_state>& state) {
+   return [state](const chain::digest_type& digest) -> chain::signature_type {
       // Public-key pinning. Before any billable Sign, fetch the KMS key's own
       // public key with the free GetPublicKey API and assert it matches the
       // key pinned in the spec; the first success is cached, so later signs
@@ -589,21 +693,70 @@ kms_signer make_kms_signature_provider(const kms_key_ref&             ref,
       const std::span<const unsigned char> der{
          der_buf.GetUnderlyingData(), der_buf.GetLength()};
 
-      // `der_to_eth_signature` -> `recover_v` recovers the signer to pick the
+      // Both packers run `recover_v`, which recovers the signer to pick the
       // recovery id AND throws if it does not match the pinned key. That runs on
       // every sign and is the per-signature guarantee that KMS signed with the
-      // expected key -- keep it. `em_sign_keccak` (the caller) recovers once more,
-      // but only on the first sign per provider (gated by
+      // expected key -- keep it. For an Ethereum key, `em_sign_keccak` (the caller)
+      // recovers once more, but only on the first sign per provider (gated by
       // `signature_provider_t::self_verified`): a one-time structural check that
-      // the keccak digest survived the `sha256`-typed closure boundary. So the
-      // first sign does two recoveries and every later sign one; this is the
-      // external-chain submission path, not a hot loop, so neither cost matters.
-      const auto compact = der_to_eth_signature(
-         der, digest.to_uint8_span(), state->expected_em_pubkey);
-
-      return fc::crypto::signature(
-         fc::crypto::signature::storage_type{fc::em::signature_shim{compact}});
+      // the keccak digest survived the `sha256`-typed closure boundary.
+      const secp256k1_kms_key& key = std::get<secp256k1_kms_key>(state->key);
+      switch (key.format) {
+      case secp256k1_signature_format::ethereum: {
+         const fc::em::compact_signature eth_sig = der_to_eth_signature(der, digest.to_uint8_span(), key.pubkey);
+         return fc::crypto::signature(fc::crypto::signature::storage_type{fc::em::signature_shim{eth_sig}});
+      }
+      case secp256k1_signature_format::wire_k1: {
+         const fc::ecc::compact_signature k1_sig = der_to_wire_k1_signature(der, digest.to_uint8_span(), key.pubkey);
+         return fc::crypto::signature(fc::crypto::signature::storage_type{fc::ecc::signature_shim{k1_sig}});
+      }
+      }
+      FC_THROW_EXCEPTION(chain::plugin_config_exception, "KMS signer has an unknown signature format {}",
+                         magic_enum::enum_integer(key.format));
    };
+}
+
+/// The raw-message signing closure of an Ed25519 key (Solana): one `ED25519_SHA_512` / `MessageType=RAW` Sign per
+/// message, which is pure Ed25519 (RFC 8032) over the message bytes, as Solana signs.
+fc::crypto::sign_raw_fn make_ed25519_sign_raw_fn(const std::shared_ptr<kms_signer_state>& state) {
+   return [state](std::span<const uint8_t> message) -> chain::signature_type {
+      SYS_ASSERT(!message.empty() && message.size() <= kms_max_raw_message_len, fc::invalid_arg_exception,
+                 "KMS signs messages of 1 to {} bytes, got {}", kms_max_raw_message_len, message.size());
+      ensure_kms_pubkey_pinned(*state);
+
+      Aws::KMS::Model::SignRequest req;
+      req.SetKeyId(Aws::String{state->key_id});
+      req.SetMessage(Aws::Utils::ByteBuffer{message.data(), message.size()});
+      req.SetMessageType(Aws::KMS::Model::MessageType::RAW);
+      req.SetSigningAlgorithm(Aws::KMS::Model::SigningAlgorithmSpec::ED25519_SHA_512);
+
+      Aws::KMS::Model::SignOutcome outcome = state->client->Sign(req);
+      if (!outcome.IsSuccess()) {
+         throw_kms_error("Sign", state->key_id, outcome.GetError());
+      }
+
+      const Aws::Utils::ByteBuffer& sig_buf = outcome.GetResult().GetSignature();
+      SYS_ASSERT(sig_buf.GetLength() == ed25519_signature_len, chain::plugin_config_exception,
+                 "KMS returned a {}-byte Ed25519 signature, expected {}", sig_buf.GetLength(), ed25519_signature_len);
+
+      // `ed::signature_shim` is the 32-byte public key followed by the detached signature.
+      const fc::crypto::ed::public_key_shim& pubkey = std::get<ed25519_kms_key>(state->key).pubkey;
+      fc::crypto::ed::signature_shim         shim;
+      std::ranges::copy(pubkey._data, shim._data.begin());
+      std::copy_n(sig_buf.GetUnderlyingData(), ed25519_signature_len, shim._data.begin() + pubkey._data.size());
+
+      // The counterpart of `recover_v` for secp256k1: every signature must verify against the pinned key.
+      SYS_ASSERT(shim.verify_solana(message.data(), message.size(), pubkey), chain::plugin_config_exception,
+                 "AWS KMS key \"{}\" produced an Ed25519 signature that does not verify against the pinned public key",
+                 state->key_id);
+      return fc::crypto::signature(fc::crypto::signature::storage_type{shim});
+   };
+}
+
+/// Build the signing closures and startup probe for `key`, signing through `client`.
+kms_signer make_kms_signer(std::shared_ptr<Aws::KMS::KMSClient> client, std::string key_id, kms_key key) {
+   const std::shared_ptr<kms_signer_state> state =
+      std::make_shared<kms_signer_state>(std::move(client), std::move(key_id), std::move(key));
 
    // Startup probe: runs the same pinning check as the sign path (cached
    // after its first success), issuing only the free GetPublicKey -- no
@@ -616,7 +769,36 @@ kms_signer make_kms_signature_provider(const kms_key_ref&             ref,
    // failure leaves it pending, and the first Sign runs it.
    std::function<void()> warm_up = [state] { ensure_kms_pubkey_pinned(*state); };
 
-   return kms_signer{.sign = std::move(sign), .warm_up = std::move(warm_up)};
+   if (std::holds_alternative<secp256k1_kms_key>(state->key)) {
+      return kms_signer{.sign = make_secp256k1_sign_fn(state), .warm_up = std::move(warm_up)};
+   }
+
+   fc::crypto::sign_raw_fn sign_raw = make_ed25519_sign_raw_fn(state);
+   // Digest signing for an Ed25519 key signs the message `ed::private_key_shim::sign_sha256` signs.
+   fc::crypto::sign_fn sign = [sign_raw](const chain::digest_type& digest) -> chain::signature_type {
+      const std::string message = fc::crypto::ed::digest_signing_message(digest);
+      return sign_raw(std::span<const uint8_t>{reinterpret_cast<const uint8_t*>(message.data()), message.size()});
+   };
+   return kms_signer{.sign = std::move(sign), .sign_raw = std::move(sign_raw), .warm_up = std::move(warm_up)};
+}
+
+} // namespace
+
+kms_signer make_kms_signature_provider(const kms_key_ref&             ref,
+                                       fc::crypto::chain_key_type_t   key_type,
+                                       const fc::crypto::public_key&  expected_pubkey) {
+   // Resolve the key before the client: a region-less ref resolves its region from the environment, possibly IMDS.
+   kms_key key = resolve_kms_key(key_type, expected_pubkey);
+   return make_kms_signer(get_kms_client(ref.region), ref.key_id, std::move(key));
+}
+
+kms_signer make_kms_signature_provider(std::shared_ptr<Aws::KMS::KMSClient> client,
+                                       std::string                          key_id,
+                                       fc::crypto::chain_key_type_t         key_type,
+                                       const fc::crypto::public_key&        expected_pubkey) {
+   SYS_ASSERT(client, chain::plugin_config_exception, "KMS signer requires a KMS client");
+   kms_key key = resolve_kms_key(key_type, expected_pubkey);
+   return make_kms_signer(std::move(client), std::move(key_id), std::move(key));
 }
 
 std::shared_ptr<Aws::KMS::KMSClient> get_kms_client(const std::string& region) {
@@ -643,6 +825,7 @@ sysio::provider_spec_result create_kms_provider(
    auto ref = parse_kms_spec(spec_data);
    auto kms = make_kms_signature_provider(ref, key_type, expected_pub);
    return {.signer        = std::move(kms.sign),
+           .raw_signer    = std::move(kms.sign_raw),
            .private_key   = std::nullopt,
            .startup_probe = std::move(kms.warm_up)};
 }

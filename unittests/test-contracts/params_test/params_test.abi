@@ -57,6 +57,11 @@
             "name": "throwrvia2",
             "base": "",
             "fields": []
+        },
+        {
+            "name": "throwstipend",
+            "base": "",
+            "fields": []
         }
     ],
     "actions": [
@@ -113,6 +118,11 @@
         {
             "name": "throwrvia2",
             "type": "throwrvia2",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "throwstipend",
+            "type": "throwstipend",
             "ricardian_contract": ""
         }
     ],

@@ -166,6 +166,8 @@ namespace sysio {
       /// destination's `sysio.chains` `{kind, external_chain_id}`) so the
       /// receiving outpost can reject an envelope a misconfigured relay
       /// delivered to the wrong same-kind chain.
+      /// When the envelope carries DESYNDICATE_LIQ attestations, sends one inline
+      /// `sysio.synd::retsent` with the envelope's epoch and their request ids.
       [[sysio::action]]
       void buildenv(uint64_t chain_code);
 

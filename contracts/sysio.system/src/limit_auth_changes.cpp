@@ -1,7 +1,29 @@
 #include <sysio.system/limit_auth_changes.hpp>
 #include <sysio.system/sysio.system.hpp>
 
+#include <string>
+
 namespace sysiosystem {
+
+   namespace {
+      /**
+       * Requires `account` to be within its RAM quota now. Called after an action has grown the account's
+       * RAM usage, so the account must have room for the new data when it is written, not only once the
+       * transaction ends. An unlimited quota (negative) always passes.
+       */
+      void check_ram_within_quota(const name& account) {
+         int64_t ram_bytes  = 0;
+         int64_t net_weight = 0;
+         int64_t cpu_weight = 0;
+         sysio::get_resource_limits(account, ram_bytes, net_weight, cpu_weight);
+         if (ram_bytes < 0)
+            return;
+         const int64_t ram_usage = sysio::get_ram_usage(account);
+         if (ram_usage > ram_bytes)
+            sysio::check(false, "account " + account.to_string() + " has insufficient ram; needs " +
+                                std::to_string(ram_usage) + " bytes has " + std::to_string(ram_bytes) + " bytes");
+      }
+   } // namespace
 
    void system_contract::limitauthchg(const name& account, const std::vector<name>& allow_perms,
                                       const std::vector<name>& disallow_perms) {
@@ -16,6 +38,8 @@ namespace sysiosystem {
                    "disallow_perms contains owner");
       auto key = limitauthchg_key{account.value};
       if(!allow_perms.empty() || !disallow_perms.empty()) {
+         // The row is billed to `account`. A row that grows must fit the account's quota as soon as it is written.
+         const int64_t ram_usage_before = sysio::get_ram_usage(account);
          table.upsert(account, key,
             limit_auth_change{
                .version = 0,
@@ -27,6 +51,8 @@ namespace sysiosystem {
                row.allow_perms = allow_perms;
                row.disallow_perms = disallow_perms;
             });
+         if (sysio::get_ram_usage(account) > ram_usage_before)
+            check_ram_within_quota(account);
       } else {
          if(table.contains(key))
             table.erase(key);

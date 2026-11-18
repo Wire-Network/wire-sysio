@@ -412,14 +412,15 @@ namespace sysio::chain_apis {
                const auto& authorizer = itr->first.value;
                auto weight = itr->first.weight;
 
-               result.accounts.emplace_back(result_t::account_result{
+               // Construct the aggregate in place, including disengaged optional authorizers.
+               result.accounts.emplace_back(
                      pi.owner,
                      pi.name,
                      make_optional_authorizer<chain::permission_level>(authorizer),
                      make_optional_authorizer<chain::public_key_type>(authorizer),
                      weight,
                      pi.threshold
-               });
+               );
             }
          };
 

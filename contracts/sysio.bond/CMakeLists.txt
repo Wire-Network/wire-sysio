@@ -34,6 +34,7 @@ if(BUILD_SYSTEM_CONTRACTS)
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.andon/include>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.chains/include>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.liq/include>
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.system/include>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.token/include>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.tokens/include>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.opp.common/include>

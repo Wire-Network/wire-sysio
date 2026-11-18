@@ -25,6 +25,20 @@ constexpr uint32_t snapshot_attestation_grace_blocks(uint32_t block_spacing) {
    return (block_spacing < default_block_spacing ? block_spacing : default_block_spacing) / 2;
 }
 
+/// Most recent scheduled heights that may hold pending votes; older heights are closed and their rows purged.
+/// Two periods keep a height votable for at least 4x the verification grace above, which already bounds how
+/// late an honest attestation is expected.
+inline constexpr uint32_t max_pending_vote_heights = 2;
+
+/**
+ * Return the lowest height still open for pending votes at `current_block`: the window holds the last
+ * `max_pending_vote_heights` scheduled heights at or below it. 64-bit so a large cadence cannot wrap.
+ */
+constexpr uint64_t pending_vote_floor(uint32_t current_block, uint32_t block_spacing) {
+   const uint64_t window_blocks = uint64_t{max_pending_vote_heights} * block_spacing;
+   return current_block >= window_blocks ? current_block - window_blocks + 1 : 0;
+}
+
 /// Contract error code emitted when a provider's local tuple conflicts with a final record.
 inline constexpr uint64_t disagreement_error_code = 9001;
 

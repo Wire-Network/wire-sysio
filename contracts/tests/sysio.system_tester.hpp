@@ -198,6 +198,7 @@ public:
          ("max_kv_key_size", 256 + n)
          ("max_kv_value_size", 262144 + n)
          ("max_kv_secondary_key_size", 256 + n)
+         ("notify_cpu_stipend", 100 + n)
          ("max_ram_size", (n % 10 + 1) * 1024 * 1024)
          ("ram_reserve_ratio", 100 + n);
    }

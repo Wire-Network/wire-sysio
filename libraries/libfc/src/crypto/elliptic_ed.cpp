@@ -54,8 +54,8 @@ namespace fc { namespace crypto { namespace ed {
       // 1) Ensure libsodium is initialized
       sodium_init_guard();
 
-      // 2) Hex‑encode the 32‑byte digest as ASCII (lower‑case)
-      const std::string hex = fc::to_hex(digest.data(), digest.data_size());
+      // 2) The message for a digest is its ASCII lower-case hex
+      const std::string hex = digest_signing_message(digest);
 
       // 3) Detached‑sign that ASCII hex payload
       unsigned char sigbuf[crypto_sign_BYTES];
@@ -81,8 +81,7 @@ namespace fc { namespace crypto { namespace ed {
    }
 
    bool signature_shim::verify(const sha256& digest, const public_key_shim& pub) const {
-      // Preserve the ASCII-hex payload used by Phantom wallets for transaction signatures.
-      const std::string hex = fc::to_hex(digest.data(), digest.data_size());
+      const std::string hex = digest_signing_message(digest);
 
       return verify_detached(std::as_bytes(std::span{_data}.subspan(crypto_sign_PUBLICKEYBYTES)),
                              std::as_bytes(std::span{hex}), std::as_bytes(std::span{pub._data}));
@@ -130,6 +129,10 @@ namespace fc { namespace crypto { namespace ed {
    bool signature_shim::verify_solana(const uint8_t* data, size_t len, const public_key_shim& pub) const {
       return verify_detached(std::as_bytes(std::span{_data}.subspan(crypto_sign_PUBLICKEYBYTES)),
                              std::as_bytes(std::span{data, len}), std::as_bytes(std::span{pub._data}));
+   }
+
+   std::string digest_signing_message(const sha256& digest) {
+      return fc::to_hex(digest.data(), digest.data_size());
    }
 
    bool is_zero(const public_key_shim& pk) {

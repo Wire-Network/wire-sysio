@@ -1,6 +1,7 @@
 #include <fc/network/ethereum/ethereum_transaction_policy.hpp>
 
 #include <fc/crypto/hex.hpp>
+#include <fc/string.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -67,18 +68,6 @@ std::string diagnostic_value(std::string_view value) {
    return std::string(value.substr(0, max_diagnostic_value_chars)) + truncated_diagnostic_suffix;
 }
 
-/** Check whether every character is an ASCII decimal digit. */
-bool is_decimal(std::string_view value) {
-   return std::ranges::all_of(value, [](unsigned char c) { return c >= '0' && c <= '9'; });
-}
-
-/** Check whether every character is an ASCII hexadecimal digit. */
-bool is_hexadecimal(std::string_view value) {
-   return std::ranges::all_of(value, [](unsigned char c) {
-      return (c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f');
-   });
-}
-
 } // namespace
 
 const fc::uint256& maximum_ethereum_transaction_policy_value() {
@@ -138,7 +127,7 @@ void throw_transaction_policy_exception(ethereum_transaction_policy_reason reaso
 fc::uint256 parse_canonical_uint256_decimal(std::string_view value,
                                             std::string_view field,
                                             bool             allow_zero) {
-   const bool numeric_value = is_decimal(value);
+   const bool numeric_value = fc::all_digits(value);
    const auto invalid = [&] {
       throw_transaction_policy_exception(
          ethereum_transaction_policy_reason::configuration_value_invalid,
@@ -175,7 +164,7 @@ fc::uint256 parse_rpc_quantity(const fc::variant& value, std::string_view field)
 
    const std::string_view digits{encoded.data() + hex_quantity_prefix.size(),
                                  encoded.size() - hex_quantity_prefix.size()};
-   const bool hexadecimal_value = is_hexadecimal(digits);
+   const bool hexadecimal_value = fc::all_hex_digits(digits);
    if (digits.empty() || !hexadecimal_value || (digits.size() > 1 && digits.front() == '0')) {
       throw_transaction_policy_exception(
          ethereum_transaction_policy_reason::rpc_quantity_invalid,
@@ -189,6 +178,17 @@ fc::uint256 parse_rpc_quantity(const fc::variant& value, std::string_view field)
    }
 
    return fc::uint256(fc::from_hex(encoded));
+}
+
+fc::uint256 parse_rpc_quantity(const fc::variant& value, std::string_view field, const fc::uint256& maximum) {
+   fc::uint256 parsed = parse_rpc_quantity(value, field);
+   if (parsed > maximum) {
+      throw_transaction_policy_exception(ethereum_transaction_policy_reason::rpc_quantity_out_of_range,
+                                         field,
+                                         diagnostic_value(value.as_string()),
+                                         format_rpc_quantity(maximum));
+   }
+   return parsed;
 }
 
 std::string format_rpc_quantity(const fc::uint256& value) {

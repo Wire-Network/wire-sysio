@@ -5,6 +5,7 @@
 # CLI-related checks as well as test cases for CLI bugfixes.
 
 import datetime
+import json
 import subprocess
 import re
 import os
@@ -12,6 +13,7 @@ import time
 import shlex
 import shutil
 import signal
+import zlib
 from pathlib import Path
 
 from TestHarness import Account, Node, ReturnType, TestHelper, Utils, WalletMgr
@@ -143,6 +145,47 @@ def clio_sign_test():
     # Make sure signatures not empty
     assert(b'signatures' in output)
     assert(b'"signatures": []' not in output)
+
+def clio_zlib_packed_trx_test():
+    """Test that convert unpack_transaction and sign accept a zlib-compressed packed transaction"""
+    chain = 'cf057bbfb72640471fd910bcb67639c22df9f92470936cddc1ade0e2f2e7dc4f'
+    key = '5Jgfqh3svgBZvCAQkcnUX8sKmVUkaUekYDGqFakm52Ttkc5MBA4'
+    packed_trx_hex = 'a591425d4188b19d31b1000000000100a6823403eab0c7000000572d3ccdcd010000000000eab0c700000000a8ed323222000000000000a6690000000000ea305501000000000000000453595300000000016d00'
+    # The transaction and the packed empty context-free data list, each zlib-compressed.
+    packed_trx = json.dumps({
+        'signatures': [],
+        'compression': 'zlib',
+        'packed_context_free_data': zlib.compress(bytes.fromhex('00')).hex(),
+        'packed_trx': zlib.compress(bytes.fromhex(packed_trx_hex)).hex(),
+    })
+
+    outs, errs = processClioCommand(['./programs/clio/clio', '--no-auto-kiod', 'convert', 'unpack_transaction', packed_trx])
+    assert b'"ref_block_num": 34881' in outs, errs
+    assert b'"name": "transfer"' in outs, errs
+
+    output = subprocess.check_output(['./programs/clio/clio', '--no-auto-kiod', 'sign',
+                                      '-c', chain, '-k', key, packed_trx])
+    assert b'"compression": "none"' in output
+    assert b'"signatures": []' not in output
+
+def clio_get_block_info_range_test():
+    """Test that get block --info takes only a block number that fits uint32_t"""
+    def get_block_info(block_num):
+        return subprocess.run(['./programs/clio/clio', '--no-auto-kiod', '-u', unboundNodeopUrl + '/',
+                               'get', 'block', '--info', block_num],
+                              check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    # The largest block number is accepted: the command gets as far as the request to nodeop.
+    completed = get_block_info('4294967295')
+    assert completed.returncode != 0
+    assert b'Failed http request to nodeop' in completed.stderr, completed.stderr.decode()
+
+    # One past it, and 2^32 + 1 whose low 32 bits are block 1, are refused before any request.
+    for block_num in ['4294967296', '4294967297']:
+        completed = get_block_info(block_num)
+        assert completed.returncode != 0
+        assert b'Invalid block num: ' + block_num.encode() in completed.stderr, completed.stderr.decode()
+        assert b'Failed http request to nodeop' not in completed.stderr, completed.stderr.decode()
 
 def processClioCommand(cmd):
     outs = None
@@ -528,8 +571,10 @@ cli11_bugfix_test()
 
 cli11_optional_option_arg_test()
 clio_sign_test()
+clio_zlib_packed_trx_test()
 
 clio_convert_name_test()
+clio_get_block_info_range_test()
 
 clio_abi_file_test()
 clio_protobuf_abi_test()

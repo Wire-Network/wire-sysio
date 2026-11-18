@@ -16,8 +16,9 @@ The properties that follow from that choice:
 - **Resolve at build, record at release.** The tag build's `v` job resolves the
   wire-cdt release itself: an explicit `wire-cdt-release` dispatch input (on
   `tag-release.yaml`, forwarded to `linux_amd64_build.yaml`) wins; otherwise the
-  latest **published** wire-cdt release in the same channel as the version being
-  built is used. The build downloads that release's
+  highest **published** wire-cdt release in the same channel as the version
+  being built, at or below its `<major>.<minor>` line, is used. The build
+  downloads that release's
   `wire-cdt_<version>_amd64.deb` asset, records the resolved tag in its
   `build-metadata.json` artifact, and `release.yaml` writes it durably into the
   release's `wire-sysio-versions-<version>.json` asset — the record of what the
@@ -33,7 +34,7 @@ The properties that follow from that choice:
   rate limit. (The `.cicd/platforms` images all bake the GitHub CLI, so the
   download is a plain `gh release download`.)
 - **The version's suffix IS the channel.** `-dev` / `-rcN` means prerelease; no
-  suffix means stable. One input (`version`) decides everything downstream —
+  suffix means stable. The `version` input alone decides the channel downstream —
   the release's prerelease flag, which wire-cdt channel the build resolves in,
   and which channel the OPP model bundles publish under (`-dev` bundle versions
   on prerelease, bare versions on stable).
@@ -70,18 +71,89 @@ resolve under the home.
 
 | Workflow | Trigger | What it does |
 |---|---|---|
-| `prepare-release.yaml` | `workflow_dispatch(version)` | Validates the version, writes `VERSION_*` into `CMakeLists.txt`, opens the `release/prep-v<version>` PR. |
-| `tag-release.yaml` | `workflow_dispatch(version, wire-cdt-release?)`, `environment: release` | Asserts master HEAD carries the version, creates the annotated tag (`POST /git/tags` then `POST /git/refs`), creates the DRAFT release with generated notes, dispatches both platform builds AND `opp-bundles.yaml` (with the version's channel) on the tag ref, dispatches `release.yaml`. |
-| `linux_amd64_build.yaml` | tag ref (dispatched or pushed) | Resolves the wire-cdt release (explicit input or latest published in the channel), installs its deb, builds with system contracts ON, assembles deb + rpm + portable tgz, bundles the contracts, records `build-metadata.json`, uploads `wire-sysio-packages-amd64`. |
+| `prepare-release.yaml` | `workflow_dispatch(version, branch)` | Validates the version and branch, writes `VERSION_*` into the branch's `CMakeLists.txt`, opens the `release/prep-v<version>` PR against the branch. |
+| `tag-release.yaml` | `workflow_dispatch(version, branch, wire-cdt-release?)`, `environment: release` | Asserts the branch HEAD carries the version, creates the annotated tag (`POST /git/tags` then `POST /git/refs`), creates the DRAFT release with generated notes, dispatches both platform builds AND `opp-bundles.yaml` (with the version's channel) on the tag ref, dispatches `release.yaml`. |
+| `linux_amd64_build.yaml` | tag ref (dispatched or pushed) | Resolves the wire-cdt release (explicit input, or the highest published in the channel at or below the version's line), installs its deb, builds with system contracts ON, assembles deb + rpm + portable tgz, bundles the contracts, records `build-metadata.json`, uploads `wire-sysio-packages-amd64`. |
 | `macos_arm64_build.yaml` | tag ref (dispatched or pushed) | Builds, tests, produces the portable tarball, verifies it in `--no-service` mode, uploads `wire-sysio-packages-macos-arm64`. |
 | `opp-bundles.yaml` | tag ref (dispatched, `channel` input) | Generates the OPP model bundles from the tag's protos, publishes `@wireio/opp-{typescript,solidity}-models` to npm and `wire-opp-solana-models` to the WIRE cargo registry (channel `dev` → `-dev` versions), uploads `opp-published-versions-<tag>`. |
-| `release.yaml` | `workflow_dispatch(tag)`; `release: published` as a manual fallback | Awaits both tag-ref builds, downloads both artifacts, verifies each one explicitly, resolves the tag's opp-bundles run, generates `wire-sysio-versions-<version>.json` + `wire-sysio-source-refs-<version>.json`, attaches assets + checksums, appends the component-version/source-ref tables to the notes, then flips the draft public. |
+| `release.yaml` | `workflow_dispatch(tag)`; `release: published` as a manual fallback | Awaits both tag-ref builds, downloads both artifacts, verifies each one explicitly, resolves the tag's opp-bundles run, generates `wire-sysio-versions-<version>.json` + `wire-sysio-source-refs-<version>.json`, attaches assets + checksums, appends the component-version/source-ref tables to the notes. Its `publish-release` job, in one queue shared by every tag, then flips the draft public and gives the `latest` label to the highest published stable version. |
 
 ### Post-bump
 
-After a **stable** release lands, dispatch `prepare-release.yaml` again with the
-next `-dev` version to restore the development suffix on master. It is the same
-workflow and the same single input; the PR is labelled `post-bump`.
+After a **stable** release lands, dispatch `prepare-release.yaml` again on the
+branch it shipped from to restore the development suffix: master moves to its
+next `-dev` version, and a release branch to its next patch's (`1.1.0` →
+`1.1.1-dev`). It is the same workflow and the same inputs; the PR is labelled
+`post-bump`.
+
+## Release branches
+
+A `release/<major>.<minor>` branch carries one line's releases (`1.1.0-rc1`,
+`1.1.0`, `1.1.1`, …) while master moves on. The same workflows prepare and tag
+on it.
+
+- **Cutting one.** Create `release/<major>.<minor>` from master once master holds
+  everything the line ships. From then on a change reaches the line only through
+  a PR into the branch. Its first bump (say `1.1.0-rc1`) goes through
+  `prepare-release.yaml` with `branch: release/1.1`. Master can then move to the
+  next line's `-dev` version the same way, with `branch: master`.
+- **Preparing and tagging.** Dispatch `prepare-release.yaml` and then
+  `tag-release.yaml` on master, with `branch: release/<major>.<minor>`.
+  `tag-release.yaml` has to run on master, because the `release` Environment only
+  deploys from master. Both keep master's checkout at the workspace root and
+  check the target branch out into `target/` (always as `refs/heads/<branch>`,
+  never a tag of the same name). Master's `cmake-version.py` validates the
+  inputs and reads and writes the target's version, so no code from the target
+  branch runs in either job.
+- **Which versions go where.** A release branch takes only its own line's
+  versions (`release/1.1` refuses `1.2.0`). Master takes any version whose line
+  has no release branch yet: once `release/1.1` exists, `1.1.*` is refused on
+  master.
+- **Forwarding.** Every PR merged into a release branch is merged forward through
+  each newer line to master: `release/1.1` into `release/1.2`, then
+  `release/1.2` into master. Nothing is merged the other way, so a release
+  branch never picks up a newer line's work.
+  - Branch from the target, outside `release/`, merge the source release branch
+    without committing, and open a PR into the target:
+
+    ```bash
+    git switch -c forward/release-1.1-to-master origin/master
+    git merge --no-ff --no-commit origin/release/1.1
+    # Resolve any conflicts, then confirm the version is still master's:
+    python3 .github/scripts/cmake-version.py read
+    git commit
+    ```
+
+  - The target keeps its own `VERSION_*` lines. A bump on the source does not
+    always conflict: when the two sides changed different lines, git merges them
+    silently (master at `1.2.0-dev` plus `release/1.1` going `1.1.0-dev` to
+    `1.1.0` merges to `1.2.0`). CI fails any PR that changes its base branch's
+    version, except the `release/prep-v<version>` bump PR for a version that
+    branch may carry.
+  - Merge the PR with a merge commit. A squash or rebase leaves the release
+    branch's commits unmerged, so every later forward merges them again.
+  - Never use GitHub's "Resolve conflicts" on a PR whose head is the release
+    branch: it commits the target into the release branch.
+- **Protection.** `tag-release.yaml` refuses a branch whose rules do not require
+  a pull request: the bump PR shows only the version change, so every other
+  commit on the branch must already have been reviewed. `release/*` gets the
+  same branch ruleset as master (approved PRs, no force-push, no deletion), with
+  `release/prep-*` excluded because `prepare-release.yaml` pushes, and on a
+  re-run force-pushes, its bump branches there.
+- **CI.** Pushes to a release branch run the linux and macOS builds, and PRs into
+  one run the same checks as PRs into master. Pushes to `release/prep-*` build
+  nothing; their PRs run the checks. A push never publishes OPP bundles: a
+  release-branch release publishes them through its tag dispatch, like every
+  release.
+- **The `latest` label.** It goes to the highest published stable version, so a
+  `1.1.1` cut after `1.2.0` leaves `1.2.0` as latest. Releases publish one at a
+  time, in the `publish-releases` queue, so two published together cannot
+  leave it on the lower one.
+- **Wire CDT.** A tag build resolves the highest published wire-cdt release in
+  its channel at or below its own `<major>.<minor>` line, so a `1.1.1` built
+  after wire-cdt `1.2.0` ships still uses the newest `1.1.x` wire-cdt (or older,
+  if wire-cdt has no `1.1` release). `wire-cdt-release` on `tag-release.yaml`
+  overrides it.
 
 ### Why the builds are dispatched explicitly
 
@@ -102,6 +174,11 @@ would attach a package set with no contracts bundle.
   approval-required state — gate 1 includes an "Approve and run" click.
 - Branch protection on master must require the packaging checks, or gate 1 is
   decorative.
+- `generate-notes` picks the previous release itself, so the notes of a patch
+  cut from an older release branch can start from a newer line's release.
+- OPP bundle versions are resolved from npm, not from the release. A stable
+  release from an older line publishes the next bundle version and moves npm's
+  `latest` dist-tag.
 
 ## Human vs system
 
@@ -112,12 +189,12 @@ flowchart TD
     classDef gate fill:#FFD9D9,stroke:#a83232,color:#1a1a1a
 
     H1[/"Human: pick version — its suffix IS the channel<br>(-dev/-rcN = prerelease, none = stable)"/]:::human
-    H2[/"Human: dispatch prepare-release (input: version)"/]:::human
+    H2[/"Human: dispatch prepare-release (inputs: version, branch)"/]:::human
     S1["System: edit VERSION_*, open bump PR"]:::system
     G1{{"GATE 1 — Human: 'Approve and run' the PR checks,<br>review, merge"}}:::gate
-    H3[/"Human: dispatch tag-release (input: version,<br>optional wire-cdt-release)"/]:::human
+    H3[/"Human: dispatch tag-release (inputs: version, branch,<br>optional wire-cdt-release)"/]:::human
     G2{{"GATE 2 — Human: approve 'release' Environment"}}:::gate
-    S3["System: assert version == master HEAD,<br>create annotated tag + DRAFT release,<br>DISPATCH linux + macos builds + opp-bundles<br>(channel from the suffix) on the tag ref"]:::system
+    S3["System: assert version == branch HEAD,<br>create annotated tag + DRAFT release,<br>DISPATCH linux + macos builds + opp-bundles<br>(channel from the suffix) on the tag ref"]:::system
     S4["System: tag builds produce packages<br>(sysio: resolves + installs wire-cdt release deb,<br>builds + asserts system contracts, bundles them,<br>records build-metadata.json);<br>opp-bundles publishes the model packages"]:::system
     S6["System: release.yaml — await tag-ref builds,<br>download, verify each artifact explicitly,<br>generate versions + source-refs manifests"]:::system
     S7["System: attach assets + checksums,<br>append component tables to the notes,<br>flip draft to public"]:::system

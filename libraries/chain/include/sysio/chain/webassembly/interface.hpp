@@ -323,7 +323,8 @@ namespace webassembly {
           *
           * @ingroup crypto
           * @param digest - digest of the message that was signed.
-          * @param sig - signature. Trailing bytes abort.
+          * @param sig - signature. Trailing bytes abort, as does a variable-size component larger than
+          *    config::max_signature_variable_size (sig_variable_size_limit_exception).
           * @param pub - public key. Trailing bytes abort.
          */
          void assert_recover_key(aligned_ptr<const fc::sha256> digest, span<const char> sig, span<const char> pub) const;
@@ -333,7 +334,8 @@ namespace webassembly {
           *
           * @ingroup crypto
           * @param digest - digest of the message that was signed.
-          * @param sig - signature. Trailing bytes are a malformed signature and return -1.
+          * @param sig - signature. Trailing bytes are a malformed signature and return -1, as does a variable-size
+          *    component larger than config::max_signature_variable_size.
           * @param[out] pub - output buffer for the public key result.
           *
           * @return the packed size of the public key, or -1 if no key could be recovered.
@@ -1153,11 +1155,12 @@ namespace webassembly {
           * returns an output (BASE**EXPONENT) % MODULUS as a byte array {{{{ with the same length as the modulus }}}}
           *
           * @ingroup crypto
-          * @param base        - a span containing BASE.
+          * @param base        - a span containing BASE, at most config::max_mod_exp_operand_size bytes.
           * @param exp         - a span containing EXPONENT.
-          * @param modulus     - a span containing MODULUS.
+          * @param modulus     - a span containing MODULUS, at most config::max_mod_exp_operand_size bytes.
           * @param[out] out    - the result (BASE**EXPONENT) % MODULUS. Must be exactly the size of modulus.
           * @return              -1 if there was an error, 0 otherwise
+          * @note The computation calls checktime between steps, so the transaction deadline bounds the exponent.
          */
          int32_t mod_exp(span<const char> base, span<const char> exp, span<const char> modulus, span<char> out) const;
 

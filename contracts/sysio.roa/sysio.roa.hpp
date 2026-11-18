@@ -9,6 +9,8 @@
 #include <sysio/dispatcher.hpp> // For SYSIO_DISPATCH of native action
 #include <sysio/privileged.hpp>
 
+#include <vector>
+
 namespace sysio {
     class [[sysio::contract("sysio.roa")]] roa : public contract {
         public:
@@ -21,6 +23,8 @@ namespace sysio {
              *
              * Reserves every node-owner tier slot and carves 1/10 of each tier-1 slot's allocation out to
              * `sysio` up front as the account-creation RAM pool; node owners later register against the rest.
+             * `sysio` also takes the SYS left over after the tier allocations. `sysio.roa` holds no pool: its
+             * RAM quota is set to what it already uses, since its rows bill the issuing node owner or `sysio`.
              *
              * @param total_sys The total starting SYS of the network.
              * @param bytes_per_unit The amount of bytes .0001 SYS is worth, set in roastate table. If SYS precision is different, same concept applies, the single smallest unit of the core token.
@@ -41,7 +45,11 @@ namespace sysio {
 
 
             /**
-             * @brief Adds a row to the policies table scoped to 'issuer' ( Node Owner ) and either creates a row in 'reslimit' for 'owner' or increments the values if 'owner' already has a row.
+             * @brief Adds a row to the policies table scoped to 'issuer' ( Node Owner ) and adds the policy's weights
+             * to 'owner's chain resource limits.
+             *
+             * The row is billed to 'issuer', which needs the spare RAM for it; expand, extend and reduce keep that
+             * payer, and a reduce that erases the row refunds it.
              *
              * NOTE: Cannot allocate CPU / NET to system accounts to maintain infinite CPU / NET on these accounts.
              *
@@ -93,7 +101,8 @@ namespace sysio {
              * @brief Decrease the resource limits on an existing policy. Subtracts new weights from
              *        existing values. Only callable once the current block reaches the policy's time_block.
              *
-             * Note: Will reclaim UPTO ram_weight worth of bytes, limited to the pool of unused bytes on 'owner's reslimit and upper bound by the policy ram_weight.
+             * Note: Will reclaim UPTO ram_weight worth of bytes, limited to the unused bytes of 'owner's chain RAM
+             * limit and upper bound by the policy ram_weight.
              *
              * Every weight must be non-negative and no greater than the stored policy weight: the
              * reduction is applied as a subtraction, so a negative weight would ADD quota and break
@@ -115,19 +124,17 @@ namespace sysio {
 
 
             /**
-             * @brief Directly register `owner` as a node owner at `tier`, bypassing the OPP claim
-             *        flow. Privileged bootstrap/test path -- NOT the production registration route.
+             * @brief Directly register an existing account for governance/bootstrap and tests.
              *
              * Requires `sysio.roa` active authority, so it is governance/system-only and never
              * user-callable. It exists to seed node owners where the full OPP machinery is absent or
              * unnecessary: the C++ unit-test base tester (registers `nodedaddy` as the default policy
              * issuer for the suite), emissions tests, the TestHarness bios bootstrap, and dev clusters.
              *
-             * Production node-owner registration goes through `nodeownreg` instead -- dispatched by
-             * the OPP depot (sysio.msgch) on an inbound NodeOwnerRegistration attestation, or
-             * governance-signed during bootstrap. Beyond the tier-range check, `forcereg` performs
-             * none of `nodeownreg`'s claim-payload validation (no tier name-rule check, no active-key
-             * match, no sysio.authex link) and writes no `nodeownerreg` audit row -- it simply
+             * Production NFT registration enters through `nodeownreg`, dispatched by sysio.msgch,
+             * and allocates through the self-inline `nodeownfin` action. Beyond the tier-range check,
+             * `forcereg` performs none of `nodeownreg`'s claim-payload validation (no tier name-rule or new-account
+             * check, no sysio.authex link) and writes no `nodeownerreg` audit row -- it simply
              * allocates the tier's SYS via the shared `regnodeowner` helper.
              *
              * @param owner The account to register as a node owner.
@@ -137,32 +144,33 @@ namespace sysio {
             void forcereg(const name& owner, const uint8_t& tier);
 
             /**
-             * @brief Registers a node owner when the depot (sysio.msgch) processes an inbound OPP
-             *        NodeOwnerRegistration attestation. The register step of the NFT claim flow; the
-             *        depot inline-sends newnameduser immediately before this. It creates a missing
-             *        account only when the name is valid and the tier has registration capacity.
+             * @brief Create and register a new node-owner account from an authenticated OPP claim.
              *
-             * Trust-OPP: the OPP envelope is the deposit proof, so this RECORDS the depositor's ETH
-             * key as a sysio.authex link (inline recordlink) rather than verifying a pre-existing
-             * createlink. Claim-payload problems (bad name, account controlled by a different key,
-             * already registered, tier full) are soft-failed -- recorded in `nodeownerreg` with a reject_reason
-             * and returned -- never thrown, so the dispatching transaction commits. Depot/system
-             * invariants (tier range, ETH key type and curve membership, ROA active) stay hard checks:
-             * sysio.msgch drops a depositor key that is not a secp256k1 point before dispatch, and
-             * one that still arrived would leave recordlink skipping the link this action confirms.
+             * Requires sysio.roa authority. Existing accounts are rejected even if wire_pub_key
+             * matches a public active key. Valid claims queue native account creation, tier allocation
+             * through nodeownfin, and the depositor's AuthEx link in one atomic transaction.
+             * Claim-payload errors record a terminal rejection without aborting depot dispatch.
+             * Tier range, depositor key/address validity and ROA activation remain hard invariants.
              *
-             * @param owner        The Wire account to register as node owner (created in-flow if absent).
-             * @param tier         Node owner tier: 1, 2, or 3.
-             * @param eth_pub_key  The depositor's ETH public key (Wire PUB_EM format); recorded as the link.
-             * @param wire_pub_key The Wire account owner/active key the claim specified; an existing
-             *                     account must be controlled by exactly this key or the claim is rejected.
-             * @param eth_address  Depositor 20-byte ETH address used to sweep DClaim rewards
-             *                     deposited before the link existed.
+             * @param owner        New Wire account name, valid for the claimed tier.
+             * @param tier         Node-owner tier 1, 2 or 3.
+             * @param eth_pub_key  Depositor EM public key, recorded as the account's Ethereum link.
+             * @param wire_pub_key Owner and active key for the newly created account.
+             * @param eth_address  Depositor's 20-byte address, used to sweep pre-link DClaim rewards.
              */
             [[sysio::action]]
             void nodeownreg(const name& owner, const uint8_t& tier, const public_key& eth_pub_key,
                             const public_key& wire_pub_key,
                             const bytes& eth_address);
+
+            /**
+             * @brief Allocate a validated claim after its queued native account creation.
+             * Requires sysio.roa authority and an inline sender of sysio.roa; top-level calls fail.
+             * @param owner Newly created claim account.
+             * @param tier  Node-owner tier already validated by nodeownreg.
+             */
+            [[sysio::action]]
+            void nodeownfin(const name& owner, const uint8_t& tier);
 
             /**
              * @brief Creates a new user account on the network and records the sponsor mapping.
@@ -236,14 +244,14 @@ namespace sysio {
             /**
              * @brief Create a node-owner account with a user-chosen (vanity) name and the holder's
              * K1 key as owner/active, funded with the fixed newaccount_ram from sysio's pool. The
-             * create step of the OPP NFT claim flow (newnameduser -> nodeownreg, whose inline
-             * recordlink records the external-chain link and sweeps pre-link rewards).
+             * creation helper called internally by nodeownreg before its queued allocation and AuthEx link.
              *
-             * Dispatched by privileged sysio.msgch as {sysio.roa, active}, without a cross-contract
-             * active grant, like nodeownreg. Idempotent: a no-op if the account already exists.
-             * Tier-based name rules: tier-1 = 2-6 char prefix; tier 2/3 = up to 12 chars.
-             * Invalid names and full tiers skip creation without spending RAM; nodeownreg records
-             * the rejection. Capacity comes from the live generation's authoritative owner rows.
+             * Standalone creation is privileged and idempotent. An account created separately is
+             * not eligible for a later NFT claim.
+             * Tier-based name rules: tier-1 = 2-6 char prefix; tier 2/3 = up to 12 chars; no `.` in any tier.
+             * Standalone invalid names and full tiers skip creation without an audit or RAM spend.
+             * nodeownreg records those rejections before calling this helper. Capacity comes from
+             * the live generation's authoritative owner rows.
              *
              * @param account The user-chosen account name.
              * @param pubkey  The holder's K1 public key (becomes owner and active).
@@ -257,12 +265,16 @@ namespace sysio {
              *
              * Authorized by `sysio.roa` itself: it gifts `get_ram_usage(account) - usage_before`
              * (drawn from sysio's pool), so a change adds only the RAM it actually used.
-             * RAM is checked at transaction end, so usage already reflects the change when this
-             * runs. The reconciliation is bidirectional: `delta > 0` gifts from sysio's pool,
+             * The reconciliation is bidirectional: `delta > 0` gifts from sysio's pool,
              * `delta < 0` reclaims back to it (e.g. re-deploying a smaller contract). Inline-called
-             * by setsyscode/setsysabi (a follow-on PR drives per-contract gifting). createlink no
-             * longer calls giftram -- it records the external-chain link only and bills the row to
-             * sysio -- so `sysio.authex` is not an authorizer.
+             * by setsyscode/setsysabi twice: before their setcode/setabi with `usage_before` lowered
+             * by the most the change can bill, capped at sysio's pool, which gifts that ahead (the
+             * chain checks the account's quota when setcode/setabi run), and after it with
+             * `usage_before` raised by the same amount, which settles the gift to the exact change
+             * (a follow-on PR drives
+             * per-contract gifting). createlink no longer calls giftram -- it records the
+             * external-chain link only and bills the row to sysio -- so `sysio.authex` is not an
+             * authorizer.
              *
              * @param account      The account to reconcile.
              * @param usage_before The account's `get_ram_usage` snapshot before the change.
@@ -272,8 +284,9 @@ namespace sysio {
 
             /**
              * @brief Deploy a system contract's code to `account`, making it privileged, and gift
-             * the exact RAM the code consumes out of sysio's pool (via giftram, measured after).
-             * Re-callable: a smaller re-deploy reclaims the freed RAM. Callable by `sysio`.
+             * the exact RAM the code consumes out of sysio's pool (via giftram: the most the code
+             * can bill, capped at sysio's pool, before the deploy, settled to the measured change
+             * after it). Re-callable: a smaller re-deploy reclaims the freed RAM. Callable by `sysio`.
              *
              * @param account   The account to set code on.
              * @param vmtype    VM type (0 for wasm).
@@ -285,8 +298,9 @@ namespace sysio {
 
             /**
              * @brief Set a system contract's abi on `account` and gift the exact RAM it consumes
-             * out of sysio's pool (via giftram, measured after). Re-callable: a smaller/cleared abi
-             * reclaims the freed RAM. Callable by `sysio`.
+             * out of sysio's pool (via giftram: the most the abi can bill, capped at sysio's pool,
+             * before setabi, settled to the measured change after it). Re-callable: a smaller/cleared
+             * abi reclaims the freed RAM. Callable by `sysio`.
              *
              * @param account The account to set the abi on.
              * @param abi     The serialized abi bytes.
@@ -369,6 +383,19 @@ namespace sysio {
                 return count;
             }
 
+            /**
+             * List the authoritative node owners of `tier` in one ROA generation, in ascending account
+             * order. Bounded by the tier's registration cap.
+             */
+            static std::vector<name> nodeowners_in_tier(name roa_account, uint8_t network_gen, uint8_t tier) {
+                nodeowners_t owners(roa_account, network_gen);
+                auto by_tier = owners.get_index<"bytier"_n>();
+                std::vector<name> result;
+                for (auto it = by_tier.lower_bound(tier); it != by_tier.end() && it->tier == tier; ++it)
+                    result.push_back(it->owner);
+                return result;
+            }
+
         private:
 
             /**
@@ -399,25 +426,6 @@ namespace sysio {
             using policies_t = kv::scoped_table<"policies"_n, policy_key, policies>;
 
             /**
-             * Scoped to Owner: Holds upper limits of resources an account has access to. This table is used by the Node Operators to maintain usage metrics, replaces 'userres' on sysio.
-             */
-            struct reslimit_key {
-                uint64_t owner;
-                SYSLIB_SERIALIZE(reslimit_key, (owner))
-            };
-
-            struct [[sysio::table("reslimit")]] reslimit {
-                name owner;             // Account name this policy applies to
-                asset net_weight;       // Total NET allocated
-                asset cpu_weight;       // Total CPU allocated
-                uint64_t ram_bytes;     // Total RAM allocated
-
-                SYSLIB_SERIALIZE(reslimit, (owner)(net_weight)(cpu_weight)(ram_bytes))
-            };
-
-            using reslimit_t = kv::table<"reslimit"_n, reslimit_key, reslimit>;
-
-            /**
              * This table is scoped to Node Owner's account names and is used to track all the node registration actions.
              */
             struct nodeownerreg_key {
@@ -433,20 +441,15 @@ namespace sysio {
             // Rejection reason for `nodeownerreg::reason` (only meaningful when status == REJECTED).
             // Under trust-OPP, nodeownreg soft-fails claim-payload errors by recording one of these
             // instead of aborting the dispatching transaction, so the failure is queryable on Wire.
-            // (Values renumbered for the create-in-flow model: the ETH link is now *recorded* via
-            // sysio.authex::recordlink rather than verified against a pre-existing createlink, so the
-            // former NO_AUTHEX_LINK / KEY_MISMATCH reasons no longer apply. Pre-launch: no stored rows
-            // to migrate.)
             enum reject_reason : uint8_t {
                 NONE                 = 0,  // not rejected
-                NAME_INVALID         = 1,  // chosen name violates the tier's length rule or is a reserved sysio. name
-                OWNER_NOT_ACCOUNT    = 2,  // account does not exist (creation did not occur)
-                ACCOUNT_KEY_MISMATCH = 3,  // existing account's active authority != the single claimed wire key
+                NAME_INVALID         = 1,  // name has a `.`, is a reserved sysio. name, or breaks the tier length rule
+                OWNER_NOT_ACCOUNT    = 2,  // historical: creation did not occur
+                ACCOUNT_KEY_MISMATCH = 3,  // historical: submitted key did not match active authority
                 DUPLICATE            = 4,  // owner is already a registered node owner
                 LINK_KEY_MISMATCH    = 5,  // account already carries a different external-chain link key
-                TIER_CAP_REACHED     = 6   // the claimed tier has no remaining registration capacity
-                // (OWNER_HAS_RESLIMIT removed: a pre-existing reslimit row no longer rejects registration --
-                //  regnodeowner reconciles it via increase_reslimit. Pre-launch: no stored rows to migrate. SEC-087.)
+                TIER_CAP_REACHED     = 6,  // the claimed tier has no remaining registration capacity
+                ACCOUNT_EXISTS       = 7   // the target existed before this claim; registration requires a new account
             };
 
             // Under trust-OPP the OPP envelope is the deposit proof, so this audit row records only
@@ -490,8 +493,7 @@ namespace sysio {
             // creator from the username by string arithmetic alone -- cheaper than any index read.
             // The only lookup the contract performs is the point read of the (creator, nonce)
             // replay guard, which the primary key already serves. Dropping the index halves the
-            // sponsoring owner's RAM cost per user (~296 -> ~144 bytes), which matters because
-            // these are the only rows in the contract billed to a node owner.
+            // sponsoring owner's RAM cost per user (~296 -> ~144 bytes), which the owner pays.
             using sponsors_t = kv::scoped_table<"sponsors"_n, sponsor_key, sponsor>;
 
             /**
@@ -540,16 +542,12 @@ namespace sysio {
              *        allotment (net of sysio's tier-1 share, which activateroa already carved out).
              *
              * Every tier gets a `nodeowners` row (the budget and the membership that gates policy
-             * issuance) and a reslimit row.
+             * issuance), billed to `sysio`.
              *
-             * Only tier 1 additionally gets a personal self-issued policy. It is the only tier that can
-             * call `newuser`, and the `sponsors` / `sponsorcount` rows that `newuser` and
-             * `raiseacctlim` write are the sole rows in this contract billed to a node owner instead of
-             * to `sysio.roa`. Tiers 2 and 3 need no
-             * allocation of their own: a policy action that does not name an explicit `sysio.payer`
-             * resolves `action::payer()` to `sysio.roa` and bills its rows to `sysio.roa`, so it draws
-             * nothing from the issuer. They can self-issue on demand with `addpolicy` against the
-             * recorded tier budget.
+             * Only tier 1 additionally gets a personal self-issued policy, billed to the owner. Its RAM pays
+             * for the policy rows the owner issues and the `sponsors` / `sponsorcount` rows `newuser` and
+             * `raiseacctlim` write. Tiers 2 and 3 get none: before issuing to another account, such an owner
+             * funds itself with a self-issued `addpolicy` whose RAM weight covers that policy's own row.
              *
              * NOTE: Can only register for the current generation of the network.
              *
@@ -590,8 +588,9 @@ namespace sysio {
             /**
              * @brief Whether `account`'s name satisfies the node-owner naming rules for `tier`.
              *        Tier-1 owners take a short 2-6 char prefix (sub-accounts become <prefix>.<random>);
-             *        tier 2/3 take a 1-12 char vanity name, and no tier may take a name under the reserved
-             *        `sysio.` prefix. Shared by newnameduser (gates creation) and nodeownreg (records
+             *        tier 2/3 take a 1-12 char vanity name. No tier may take a name containing a `.`, which
+             *        would read as a sub-account of its prefix, or a name under the reserved `sysio.`
+             *        prefix. Shared by newnameduser (gates creation) and nodeownreg (records
              *        NAME_INVALID) so the rule lives in one place.
              *
              * @param account The chosen account name.
@@ -599,20 +598,6 @@ namespace sysio {
              * @return true if the name is valid for the tier.
              */
             static bool valid_name_for_tier(const name& account, uint8_t tier);
-
-            /**
-             * @brief Whether `key` can satisfy `account`'s `active` authority by itself -- i.e. it
-             *        appears among the active keys with weight >= threshold. Passes for a
-             *        newnameduser-created account ({key}) and for a standard account that also carries
-             *        the benign <account>@sysio.code entry; rejects an account a different key controls
-             *        (that key won't be present) and a multi-sig where `key` alone is insufficient.
-             *
-             * @param account The account whose active permission to inspect.
-             * @param key     The claimed owner/active public key.
-             * @return true if `key` alone controls `account`'s active permission.
-             */
-            static bool active_key_matches(const name& account, const public_key& key);
-
 
             /**
              * @brief A node owner's SYS budget for tier 1, 2, or 3: the tier allocation, net of sysio's
@@ -650,37 +635,15 @@ namespace sysio {
              */
             static uint64_t max_raised_limit(const account_limit_config& config, uint64_t current_limit);
 
-            struct resources_t {
-                asset net;
-                asset cpu;
-                uint64_t ram_bytes;
-            };
-
             /**
-             * @brief Create and set the initial values of reslimit entry
-             */
-            void set_reslimit(const name& owner, const asset& net_weight, const asset& cpu_weight, int64_t ram_bytes);
-
-            /**
-             * @brief Add the given weights/bytes to an account's reslimit, creating the row if absent.
+             * @brief RAM setsyscode / setsysabi gift an account ahead of their inline setcode / setabi.
              *
-             * When the row is absent and @p require_to_exist is false, the row is created and the
-             * one-time `newaccount_ram` gift is folded into its ram_bytes; when present, only the passed
-             * deltas are added (so the gift is never double-counted). Accumulation saturates rather than
-             * throwing on overflow (see safe_ops): this helper sits on the OPP never-throw dispatch path
-             * (nodeownreg -> regnodeowner, newnameduser).
-             *
-             * @param require_to_exist assert the row already exists (no create); used by callers that
-             *        must only ever top up a known account (e.g. sysio.acct funding).
-             * @return the resulting reslimit totals (net, cpu, ram_bytes) after the increase.
+             * The most a new value billed at @p stored_ram_bytes can add to the account (the value plus the metadata
+             * row a first deploy creates), capped at what sysio's pool holds: its chain RAM quota. The value being
+             * replaced is already funded, so a deploy whose net change fits the pool never needs more than the pool
+             * holds.
              */
-            resources_t increase_reslimit(const name& owner, const asset& net_weight, const asset& cpu_weight, int64_t ram_bytes,
-                                          bool require_to_exist);
-
-            /**
-             * @brief Decrease ram_bytes on an existing reslimit entry
-             */
-            void decrease_reslimit(const name& owner, uint64_t ram_bytes);
+            int64_t deploy_ram_gift(int64_t stored_ram_bytes);
 
     }; // namespace roa
 } // namespace sysio

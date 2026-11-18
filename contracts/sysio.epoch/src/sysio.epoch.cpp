@@ -442,8 +442,7 @@ void epoch::advance() {
 
       // Operators that delivered a NON-canonical envelope for ANY outpost this epoch (deduped).
       // Slashed once, after the per-outpost loop: an operator that is non-canonical on multiple
-      // outposts must be slashed a single time (opreg::slash throws on a second slash of the same
-      // operator, which would abort advance and stall the chain).
+      // outposts is slashed a single time.
       std::vector<name> to_slash;
 
       /// One member's delivery result for the expiring epoch, accumulated across
@@ -530,15 +529,12 @@ void epoch::advance() {
       // holds opreg::slash authority): the slashable bond is moved to the matching LP and the
       // operator is marked SLASHED.
       //
-      // Invariant — no cross-epoch double slash: opreg::slash THROWS on an already-SLASHED operator,
-      // which would abort advance and stall OPP epoch advancement. These inline slashes execute only
-      // after advance returns. The finishadv continuation waits for those mutations before
-      // selecting the new tail. A removed member cannot create a later non-canonical
-      // observation: sysio.msgch::deliver requires its current sysio.opreg status
-      // to be ACTIVE before accepting delivery. Once the slash has executed, the scheduled SLASHED
-      // member cannot deliver or be queued for another non-canonical-delivery slash. The collection
-      // above also deduplicates multiple non-canonical observations for one member in this advance.
-      // Keep the deliver status gate and this single-slash path in sync if either behavior changes.
+      // A member slashed, terminated or pruned after its delivery is still collected above from its
+      // delivery row; opreg::slash returns without effect for it, so it cannot abort advance.
+      // These inline slashes execute only after advance returns. The finishadv continuation waits
+      // for those mutations before selecting the new tail. A removed member cannot create a later
+      // non-canonical observation: sysio.msgch::deliver requires its current sysio.opreg status
+      // to be ACTIVE before accepting delivery.
       for (const auto& member : to_slash) {
          action(
             permission_level{get_self(), "owner"_n},

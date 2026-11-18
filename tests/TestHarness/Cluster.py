@@ -104,6 +104,9 @@ class Cluster(object):
         self.defproduceraAccount=self.defProducerAccounts["defproducera"]= Account("defproducera")
         self.defproducerbAccount=self.defProducerAccounts["defproducerb"]= Account("defproducerb")
         self.sysioAccount=self.defProducerAccounts["sysio"]= Account("sysio")
+        # bootstrap() deploys the noop test contract here. trx_generator sends its nonce action here, and tests send
+        # its transfer load here too, since the noop contract's transfer only checks the sender's authority.
+        self.noopAccount=Account("sysio.noop")
         self.carlAccount=None
 
         self.defproduceraAccount.ownerPrivateKey=defproduceraPrvtKey
@@ -1323,8 +1326,7 @@ class Cluster(object):
                 return None
             return trans
 
-        # sysio.noop used by trx_generator for noop action
-        systemAccounts = ['sysio.noop', 'sysio.bpay', 'sysio.msig', 'sysio.names', 'sysio.token', 'sysio.vpay', 'sysio.wrap', 'sysio.roa', 'sysio.acct', 'sysio.authex', 'sysio.dclaim', 'sysio.opreg', 'carl']
+        systemAccounts = [self.noopAccount.name, 'sysio.bpay', 'sysio.msig', 'sysio.names', 'sysio.token', 'sysio.vpay', 'sysio.wrap', 'sysio.roa', 'sysio.acct', 'sysio.authex', 'sysio.dclaim', 'sysio.opreg', 'carl']
         acctTrans = list(map(createSystemAccount, systemAccounts))
 
         for trans in acctTrans:
@@ -1339,8 +1341,10 @@ class Cluster(object):
         #         if activateIF:
         #             self.activateInstantFinality()
 
+        # The noop account was created with sysio's keys, which publishing needs.
         noopAccount = copy.deepcopy(self.sysioAccount)
-        noopAccount.name = 'sysio.noop'
+        noopAccount.name = self.noopAccount.name
+        self.noopAccount = noopAccount
         contract="noop"
         contractDir=str(self.unittestsTestContractsPath / contract)
         wasmFile="%s.wasm" % (contract)
@@ -1577,8 +1581,7 @@ class Cluster(object):
         if trans is None:
             Utils.Print("ERROR: Failed to set sysio.opreg as privileged")
             return None
-        opregConfig=('{"max_available_producers":21,"max_available_batch_ops":63,"max_available_underwriters":21,'
-                     '"terminate_prune_delay_ms":600000,"terminate_max_consecutive_misses":5,'
+        opregConfig=('{"terminate_prune_delay_ms":600000,"terminate_max_consecutive_misses":5,'
                      '"terminate_max_pct_misses_24h":5,"terminate_window_ms":86400000,'
                      '"req_prod_collat":[],"req_batchop_collat":[],"req_uw_collat":[]}')
         trans=biosNode.pushMessage('sysio.opreg', 'setconfig', opregConfig, '--permission sysio.opreg@active')
@@ -1624,6 +1627,16 @@ class Cluster(object):
         Utils.Print("Wait for carl.")
         if not biosNode.waitForTransactionInBlock(transId):
             Utils.Print("ERROR: carl is persona non gratis (tx %s missing)" % transId)
+            return None
+
+        # An issuer pays for its policy rows. carl issues one per harness account, more than its personal RAM covers,
+        # so it funds them first by expanding its own policy.
+        data='{"owner": "carl", "issuer": "carl", "net_weight": "0.0000 %s", "cpu_weight": "0.0000 %s", ' \
+             '"ram_weight": "1.0000 %s", "network_gen": 0}' % (CORE_SYMBOL, CORE_SYMBOL, CORE_SYMBOL)
+        trans=biosNode.pushMessage('sysio.roa', 'expandpolicy', data, '-p carl@active')
+        transId=Node.getTransId(trans[1])
+        if not biosNode.waitForTransactionInBlock(transId):
+            Utils.Print("ERROR: carl could not fund its policy rows (tx %s missing)" % transId)
             return None
 
         # Only call init if the system contract is loaded

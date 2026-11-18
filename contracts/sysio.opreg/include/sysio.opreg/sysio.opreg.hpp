@@ -8,6 +8,7 @@
 #include <sysio/system.hpp>
 #include <sysio/opp/types/types.pb.hpp>
 #include <sysio/slug_name.hpp>
+#include <sysio.opreg/opreg_constants.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
 #include <sysio.opp.common/wire_asset.hpp>
 #include <sysio.opp.common/shadow_custody_types.hpp>
@@ -177,10 +178,7 @@ namespace sysio {
       /// duplicates fail the action. Every chain, token, and chain/token binding
       /// must already be registered; these records need not be active yet.
       [[sysio::action]]
-      void setconfig(uint32_t max_available_producers,
-                     uint32_t max_available_batch_ops,
-                     uint32_t max_available_underwriters,
-                     uint64_t terminate_prune_delay_ms,
+      void setconfig(uint64_t terminate_prune_delay_ms,
                      uint32_t terminate_max_consecutive_misses,
                      uint32_t terminate_max_pct_misses_24h,
                      uint64_t terminate_window_ms,
@@ -418,14 +416,16 @@ namespace sysio {
             sysio::const_mem_fun<operator_entry, uint64_t, &operator_entry::by_status>>
       >;
 
+      static_assert(name{opreg_names::table_operators} == "operators"_n &&
+                    name{opreg_names::index_bytype} == "bytype"_n &&
+                    name{opreg_names::index_bystatus} == "bystatus"_n,
+                    "the host reads the roster under the shared names");
+
       /// Operator registry configuration singleton.
       struct [[sysio::table("opconfig")]] op_config {
          std::vector<chain_min_bond> req_prod_collat;
          std::vector<chain_min_bond> req_batchop_collat;
          std::vector<chain_min_bond> req_uw_collat;
-         uint32_t max_available_producers          = 21;
-         uint32_t max_available_batch_ops          = 63;
-         uint32_t max_available_underwriters       = 21;
          uint64_t terminate_prune_delay_ms         = 86400000; // 24hrs
          uint32_t terminate_max_consecutive_misses = DEFAULT_TERMINATE_MAX_CONSECUTIVE_MISSES;
          uint32_t terminate_max_pct_misses_24h     = DEFAULT_TERMINATE_MAX_PCT_MISSES_24H;
@@ -433,7 +433,6 @@ namespace sysio {
 
          SYSLIB_SERIALIZE(op_config,
             (req_prod_collat)(req_batchop_collat)(req_uw_collat)
-            (max_available_producers)(max_available_batch_ops)(max_available_underwriters)
             (terminate_prune_delay_ms)
             (terminate_max_consecutive_misses)(terminate_max_pct_misses_24h)(terminate_window_ms))
       };

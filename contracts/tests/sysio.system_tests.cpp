@@ -359,7 +359,8 @@ fc::mutable_variant_object config_to_variant( const sysio::chain::chain_config& 
       ( "max_action_return_value_size", config.max_action_return_value_size )
       ( "max_kv_key_size", config.max_kv_key_size )
       ( "max_kv_value_size", config.max_kv_value_size )
-      ( "max_kv_secondary_key_size", config.max_kv_secondary_key_size );
+      ( "max_kv_secondary_key_size", config.max_kv_secondary_key_size )
+      ( "notify_cpu_stipend", config.notify_cpu_stipend );
 }
 
 BOOST_FIXTURE_TEST_CASE( setparams, sysio_system_tester ) try {
@@ -521,6 +522,8 @@ BOOST_FIXTURE_TEST_CASE( wasmcfg, sysio_system_tester ) try {
    // make sure that changed parameters were applied
    auto active_params = control->get_global_properties().wasm_configuration;
    BOOST_REQUIRE_EQUAL( active_params.max_table_elements, 8192 );
+   BOOST_REQUIRE_EQUAL( active_params.max_module_bytes, 4194304 );
+   BOOST_REQUIRE_EQUAL( active_params.max_code_bytes, 4194304 );
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_CASE( setabi_bios ) try {
@@ -585,8 +588,8 @@ BOOST_FIXTURE_TEST_CASE( setabi, sysio_system_tester ) try {
 
 } FC_LOG_AND_RETHROW()
 
-// Action data with bytes after the arguments fails
-BOOST_FIXTURE_TEST_CASE( action_data_checked, sysio_system_tester ) try {
+// An action name the system contract does not define fails, and so does action data with bytes after the arguments
+BOOST_FIXTURE_TEST_CASE( action_data_and_names_checked, sysio_system_tester ) try {
    const auto push_raw = [&]( name action_name, bytes data ) {
       action act;
       act.account = config::system_account_name;
@@ -599,6 +602,11 @@ BOOST_FIXTURE_TEST_CASE( action_data_checked, sysio_system_tester ) try {
       return data;
    };
    constexpr size_t large_tail_size = 100'000;
+   constexpr uint64_t undefined_action_error_code = 1;
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_code( undefined_action_error_code ), push_raw( "nosuchact"_n, {} ) );
+   BOOST_REQUIRE_EQUAL( wasm_assert_code( undefined_action_error_code ),
+                        push_raw( "nosuchact"_n, bytes( large_tail_size ) ) );
 
    // limitauthchg reads exactly its arguments.
    add_roa_policy( NODE_DADDY, "alice1111111"_n, "32.0000 SYS", "32.0000 SYS", "32.0000 SYS", 0, 0 );
@@ -610,6 +618,10 @@ BOOST_FIXTURE_TEST_CASE( action_data_checked, sysio_system_tester ) try {
    BOOST_REQUIRE_EQUAL( left_over, push_raw( "limitauthchg"_n, with_tail( limitauthchg, 1 ) ) );
    BOOST_REQUIRE_EQUAL( left_over, push_raw( "limitauthchg"_n, with_tail( limitauthchg, large_tail_size ) ) );
    BOOST_REQUIRE_EQUAL( success(), push_raw( "limitauthchg"_n, limitauthchg ) );
+
+   // The chain's own actions still reach the contract.
+   produce_blocks( 2 );
+   create_account( "dave11111111"_n, config::system_account_name, false, false, false, false );
 } FC_LOG_AND_RETHROW()
 
 // setabi and setcode accept the memo the system contract declares, and no byte after it

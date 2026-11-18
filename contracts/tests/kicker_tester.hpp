@@ -5,6 +5,7 @@
 #include "sysio_liq_tester.hpp"
 #include <sysio.kicker/kicker_math.hpp>
 #include "kicker_test_reference.hpp"
+#include <utility>
 namespace kicker_test_support {
 namespace math = sysio::kicker_math;
 using kicker_test_reference::wide;
@@ -168,7 +169,8 @@ public:
       const auto row = stat_row(sym);
       const auto observation = pool(sym);
       const auto span = (control->pending_block_time() - observation["price_time"].as<time_point>()).count();
-      if (span < configuration()[kicker::field::twap_window_sec].as_uint64() * math::micros_per_sec) return 0;
+      const auto window_us = configuration()[kicker::field::twap_window_sec].as_uint64() * math::micros_per_sec;
+      if (std::cmp_less(span, window_us)) return 0;
       const auto sized_supply = std::min(observation["supply_snapshot"].as_int64(),
                                          row["supply"].as<asset>().get_amount());
       const wide accrued = wide(sized_supply) * observation["rate_bps"].as_uint64() *

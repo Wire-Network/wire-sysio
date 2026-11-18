@@ -21,7 +21,7 @@ int32_t sys_vm_oc_grow_memory(int32_t grow, int32_t max) {
    uint64_t previous_page_count = cb_ptr->current_linear_memory_pages;
    int32_t grow_amount = grow;
    uint64_t max_pages = max;
-   if(max_pages > cb_ptr->max_linear_memory_pages)
+   if(max_pages > (uint64_t)cb_ptr->max_linear_memory_pages)
       max_pages = cb_ptr->max_linear_memory_pages;
    if(grow == 0)
       return (int32_t)cb_ptr->current_linear_memory_pages;
@@ -29,8 +29,8 @@ int32_t sys_vm_oc_grow_memory(int32_t grow, int32_t max) {
       return (int32_t)-1;
 
    int64_t max_segments = cb_ptr->execution_thread_memory_length / SYS_VM_OC_MEMORY_STRIDE - 1;
-   int was_extended = previous_page_count > max_segments;
-   int will_be_extended = previous_page_count + grow_amount > max_segments;
+   int was_extended = previous_page_count > (uint64_t)max_segments;
+   int will_be_extended = previous_page_count + grow_amount > (uint64_t)max_segments;
    char* extended_memory_start = cb_ptr->full_linear_memory_start + max_segments * 64*1024;
    int64_t gs_diff;
    if(will_be_extended && grow_amount > 0) {

@@ -372,7 +372,7 @@ class cluster_generator:
                         'initial_finalizer_key': self.network.nodes['bios'].keys[0].blspubkey,
                         'initial_configuration': {
                             'max_block_net_usage': 1048576,
-                            'target_block_net_usage_pct': 10000,
+                            'target_block_net_usage_pct': 10,
                             'max_transaction_net_usage': 524288,
                             'net_usage_leeway': 500,
                             'max_block_cpu_usage': 200000 if self.args.max_block_cpu_usage is None else self.args.max_block_cpu_usage,
@@ -387,7 +387,8 @@ class cluster_generator:
                             'max_action_return_value_size': 1024,
                             'max_kv_key_size': 256,
                             'max_kv_value_size': 262144,
-                            'max_kv_secondary_key_size': 256
+                            'max_kv_secondary_key_size': 256,
+                            'notify_cpu_stipend': 100
                         }
                     }
         else:

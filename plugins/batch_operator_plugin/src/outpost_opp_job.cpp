@@ -7,9 +7,14 @@
 
 #include <sysio/chain/exceptions.hpp>
 
+#include <utility>
+
 namespace sysio {
 
 namespace {
+
+constexpr auto OUTBOUND_RETRY_LABEL = "retry";
+constexpr auto OUTBOUND_DELIVERED_LABEL = "delivered";
 
 /// Pick the debug-event endpoint enum for the direction WIRE -> outpost,
 /// given the outpost's chain kind.
@@ -67,82 +72,56 @@ void outpost_opp_job::run_outbound() {
       // Genesis epoch is handled by the depot's bootstrap path, not here.
       return;
    }
-   // Path-2 fallback consensus retry. When the initial delivery happened
-   // but consensus didn't tip (only majority delivered, e.g. freshop is
-   // in the current group with no cranker), the outpost waits for the
-   // boundary to elapse before path-2 can fire. The contract's check
-   // only re-runs when a tx hits it, so the cranker must re-deliver
-   // post-boundary. Both ETH `OPPInbound::epochIn` and SOL
-   // `opp_outpost::epoch_in` are idempotent on same-hash re-deliveries
-   // from the same operator — they re-run the consensus tip without
-   // re-recording. See .claude/rules/opp-consensus.md.
-   //
-   // Gating:
-   //   - Only one retry per epoch (`_last_consensus_retry_epoch`)
-   //   - Only after WIRE depot's boundary has elapsed
-   //     (`_depot.is_epoch_boundary_past()` — proxies the outpost-side
-   //      boundary check since both sides share `epoch_duration_sec`)
-   //
-   // Without the boundary gate, the cranker would re-deliver every tick
-   // and burn gas on no-op consensus checks before path-2 is eligible.
-   const bool retry_pending = epoch == _last_outbound_epoch
-                            && epoch != _last_consensus_retry_epoch
-                            && _depot.is_epoch_boundary_past();
-   if (epoch == _last_outbound_epoch && !retry_pending) {
-      // Already attempted this epoch and either the boundary hasn't
-      // elapsed yet or a retry already fired for it.
+   const bool retry_pending = epoch == _last_outbound_epoch;
+   // A recorded delivery cannot tip consensus again before the boundary. After
+   // it elapses, the cron tick rate-limits retries until the round trip finishes.
+   if (retry_pending && !_depot.is_epoch_boundary_past())
       return;
-   }
-
-   auto pending = _depot.read_pending_outbound(_client->chain_code(), epoch);
-   if (!pending) {
-      dlog("outpost_opp_job[{}]: no pending outbound for epoch {}",
-           _client->to_string(), epoch);
-      // No envelope this cycle — don't burn the epoch slot; next tick can retry
-      // once one is queued.
-      return;
-   }
-
-   // Emit the debug event BEFORE delivery so failed attempts are still
-   // captured by the external_debugging sink. The captured `.data` file is
-   // the only path to root-causing a Solana RPC reject when the validator's
-   // error body is opaque (e.g., -32602 with empty message). Wrapped in its
-   // own try/log-and-drop so a misbehaving signal slot can never break the
-   // producer cluster.
-   try {
-      _depot.emit_debug_envelope(sysio::opp::debugging::DebugEnvelopeEvent{
-         epoch,
-         depot_outpost_direction_for(_client->chain_kind()),
-         ::sysio::chain::name{}, // batch_op_name filled in by the depot
-         pending->raw_envelope
-      });
-   } FC_LOG_AND_DROP("outpost_opp_job[{}]: emit_debug_envelope threw", _client->to_string());
 
    try {
+      // This is completion evidence, not the outbound signature. Solana's
+      // inbound bytes are read at finalized commitment before depot delivery.
+      // Re-read instead of latching so a WIRE-side rollback also permits recovery.
+      if (_depot.has_delivered_envelope(_client->chain_code(), epoch))
+         return;
+
+      auto pending = _depot.read_pending_outbound(_client->chain_code(), epoch);
+      if (!pending) {
+         dlog("outpost_opp_job[{}]: no pending outbound for epoch {}",
+              _client->to_string(), epoch);
+         // No envelope yet: leave the next tick eligible.
+         return;
+      }
+
+      // Emit before submission so failed attempts remain visible. A broken
+      // debug sink must never prevent delivery.
+      try {
+         _depot.emit_debug_envelope(sysio::opp::debugging::DebugEnvelopeEvent{
+            epoch,
+            depot_outpost_direction_for(_client->chain_kind()),
+            ::sysio::chain::name{}, // batch_op_name filled in by the depot
+            pending->raw_envelope
+         });
+      } FC_LOG_AND_DROP("outpost_opp_job[{}]: emit_debug_envelope threw", _client->to_string());
+
       // An EMPTY tx id is not a failure: the relay had nothing to send. The
-      // outpost already finalized the epoch, or on Ethereum it tipped on
+      // outpost already settled the epoch, or on Ethereum it tipped on
       // another relay's digest or this relay's delivery is recorded and waits
-      // on the rest of the group. The epoch is marked handled below; the relay's own
-      // ilog records which case. An epoch the relay could NOT finish (outpost
+      // on the rest of the group. These returns remain provisional until the
+      // inbound path establishes completion. An epoch the relay could NOT finish (outpost
       // behind, continuation bound reached, a call at the gas ceiling that
       // advanced nothing) arrives as `outpost_delivery_incomplete_exception`
       // and is retried next tick.
       auto tx_id = _client->deliver_outbound_envelope(epoch, pending->raw_envelope, _outpost_deadline);
-      ilog("outpost_opp_job[{}]: {} outbound envelope ({} bytes) tx={}",
-           _client->to_string(),
-           retry_pending ? "consensus-retry"
-                         : "delivered",
-           pending->raw_envelope.size(),
-           tx_id);
+      ilog("outpost_opp_job[{}]: {} outbound envelope ({} bytes) tx={}", _client->to_string(),
+           retry_pending ? OUTBOUND_RETRY_LABEL : OUTBOUND_DELIVERED_LABEL, pending->raw_envelope.size(), tx_id);
 
-      if (retry_pending) {
-         _last_consensus_retry_epoch = epoch;
-      } else {
+      if (!retry_pending) {
          _last_outbound_epoch = epoch;
       }
    } catch (const chain::outpost_delivery_incomplete_exception& e) {
-      // Expected while an epoch spans ticks; not marked handled, so the next
-      // tick resumes it from the outpost's cursor.
+      // Incomplete deliveries remain eligible on the next tick. This may also
+      // report an outpost that is behind, without establishing any progress.
       ilog("outpost_opp_job[{}]: outbound delivery for epoch {} continues next tick: {}",
            _client->to_string(), epoch, e.top_message());
    } catch (const fc::network::json_rpc::json_rpc_error& e) {

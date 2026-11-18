@@ -305,6 +305,7 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stat
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.max_kv_key_size));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.max_kv_value_size));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.max_kv_secondary_key_size));
+   fc::raw::pack(ds, as_type<uint32_t>(obj.obj.notify_cpu_stipend));
    return ds;
 }
 

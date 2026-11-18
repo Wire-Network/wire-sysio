@@ -84,6 +84,19 @@
       "args": { "extra_fields": {} }
     },
     "_comment": "JSONL output to stderr; formatter and sink are independently swappable."
+  },{
+    "name": "account_watch_file",
+    "type": "rotating_file_sink",
+    "args": {
+      "base_filename": "./logs/account_watch.jsonl",
+      "max_size": 10,
+      "max_files": 10
+    },
+    "format": {
+      "type": "pattern",
+      "args": { "pattern": "%v" }
+    },
+    "_comment": "account_watch_plugin records: the bare message, one JSON object per line, for a watchdog to read; rotates at max_size MB."
   }
   ],
   "loggers": [{
@@ -218,6 +231,13 @@
     "enabled": false,
     "sinks": [
       "stderr_color"
+    ]
+  },{
+    "name": "account_watch",
+    "level": "info",
+    "enabled": true,
+    "sinks": [
+      "account_watch_file"
     ]
   },{
     "name": "dmlog",

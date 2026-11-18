@@ -2,6 +2,7 @@
 #include <fc/bitset.hpp>
 
 #include <boost/test/unit_test.hpp>
+#include <limits>
 
 using namespace fc;
 
@@ -165,6 +166,31 @@ BOOST_AUTO_TEST_CASE(bitset_test)
    test_bitset("01110011010100101001001001100000010000110");
    test_bitset("0111001101010010111011001001001100000000000000110");
    test_bitset("01110011010100101111001101100100100111111111111111111001");
+}
+
+/// Extreme sizes must not wrap the byte count to zero before allocating storage.
+BOOST_AUTO_TEST_CASE(storage_size_overflow) {
+   using size_type = fc::bitset::size_type;
+   constexpr auto max_bits = std::numeric_limits<size_type>::max();
+   constexpr auto max_blocks = size_type{1} << (std::numeric_limits<size_type>::digits - 3);
+   BOOST_CHECK_EQUAL(fc::bitset::calc_num_blocks(max_bits), max_blocks);
+   BOOST_CHECK_EQUAL(fc::bitset::calc_num_blocks(max_bits - 6), max_blocks);
+   BOOST_CHECK_EQUAL(fc::bitset::calc_num_blocks(max_bits - 7), max_blocks - 1);
+
+   // Exercise the same masking path with no block, a partial block, and a full block.
+   fc::bitset bits("111111111");
+   bits.resize(1);
+   bits.resize(9);
+   BOOST_CHECK_EQUAL(bits.to_string(), "000000001");
+   BOOST_CHECK(bits.unused_bits_zeroed());
+   bits.resize(0);
+   bits.flip();
+   BOOST_CHECK_EQUAL(bits.num_blocks(), 0u);
+   BOOST_CHECK(bits.unused_bits_zeroed());
+   bits.resize(8);
+   bits.flip();
+   BOOST_CHECK_EQUAL(bits.to_string(), "11111111");
+   BOOST_CHECK(bits.unused_bits_zeroed());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

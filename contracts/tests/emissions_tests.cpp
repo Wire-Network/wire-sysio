@@ -5907,9 +5907,6 @@ struct producer_score_tester : public producer_eligibility_tester {
                                          uint64_t prune_delay_ms = 600'000) {
       sysio_system::test_support::registry::seed_depot_pair(*this);
       return push_opreg_action(OPREG, "setconfig"_n, mvo()
-         ("max_available_producers",          uint32_t{21})
-         ("max_available_batch_ops",          uint32_t{63})
-         ("max_available_underwriters",       uint32_t{21})
          ("terminate_prune_delay_ms",         prune_delay_ms)
          ("terminate_max_consecutive_misses", uint32_t{5})
          ("terminate_max_pct_misses_24h",     uint32_t{5})
@@ -6162,9 +6159,6 @@ struct producer_score_tester : public producer_eligibility_tester {
    /// Attestable heights for `credit_snapshot_attestation` are multiples of this.
    static constexpr uint32_t snapshot_test_spacing = 10;
 
-   /// RAM a producer needs for the snapshot-provider rows `regsnapprov` bills to it.
-   static constexpr int64_t snapshot_provider_ram_bytes = 1'000'000;
-
    /// A synthetic block id carrying `block_num` big-endian in its first four bytes, where
    /// `votesnaphash` reads the height from.
    static fc::sha256 snapshot_block_id(uint32_t block_num) {
@@ -6186,8 +6180,6 @@ struct producer_score_tester : public producer_eligibility_tester {
          create_accounts({snap_account}, false, false, false, true);
          produce_blocks(1);
       }
-      BOOST_REQUIRE_EQUAL(success(), push_system_action(config::system_account_name, "setacctram"_n, mvo()
-         ("account", producer)("ram_bytes", snapshot_provider_ram_bytes)));
       BOOST_REQUIRE_EQUAL(success(), push_system_action(producer, "regsnapprov"_n, mvo()
          ("producer", producer)("snap_account", snap_account)));
       BOOST_REQUIRE_EQUAL(success(), push_system_action(config::system_account_name, "setsnpcfg"_n, mvo()

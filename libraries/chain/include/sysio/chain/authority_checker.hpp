@@ -11,14 +11,54 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstddef>
 #include <functional>
+#include <map>
+#include <utility>
+#include <vector>
 
 namespace sysio { namespace chain {
 
 namespace detail {
-   using meta_permission_key = std::tuple<uint32_t, int>;
-   using meta_permission_value = std::function<uint32_t()>;
-   using meta_permission_map = boost::container::flat_multimap<meta_permission_key, meta_permission_value, std::greater<>>;
+   /// The list of an authority that an @ref authority_entry indexes.
+   enum class authority_entry_kind : uint8_t { key, account };
+
+   /// One key or account entry of an authority, identified by its declaration index within its list.
+   struct authority_entry {
+      std::size_t          index  = 0;
+      weight_type          weight = 0;
+      authority_entry_kind kind   = authority_entry_kind::key;
+   };
+
+   /**
+    * @brief Strict total order in which @ref authority_checker visits the entries of an authority
+    *
+    * Weight descending, then keys before accounts, then declaration index ascending. The visit order decides which
+    * provided keys are marked used and which nested permissions are evaluated and cached, so it is part of consensus.
+    */
+   inline bool authority_entry_visited_before( const authority_entry& lhs, const authority_entry& rhs ) {
+      if( lhs.weight != rhs.weight )
+         return lhs.weight > rhs.weight;
+      if( lhs.kind != rhs.kind )
+         return lhs.kind == authority_entry_kind::key;
+      return lhs.index < rhs.index;
+   }
+
+   /// The key and account entries of @p authority in the order @ref authority_entry_visited_before defines.
+   template<typename AuthorityType>
+   std::vector<authority_entry> authority_visit_order( const AuthorityType& authority ) {
+      std::vector<authority_entry> entries;
+      entries.reserve( authority.keys.size() + authority.accounts.size() );
+      for( std::size_t i = 0; i < authority.keys.size(); ++i )
+         entries.push_back( { i, authority.keys[i].weight, authority_entry_kind::key } );
+      for( std::size_t i = 0; i < authority.accounts.size(); ++i )
+         entries.push_back( { i, authority.accounts[i].weight, authority_entry_kind::account } );
+      std::sort( entries.begin(), entries.end(), authority_entry_visited_before );
+      return entries;
+   }
+
+   /// Entries of one authority visited between consecutive calls to the checktime callable.
+   inline constexpr std::size_t entries_per_checktime = 256;
 
 } /// namespace detail
 
@@ -29,6 +69,9 @@ namespace detail {
     * then determine whether that list of keys is sufficient to satisfy the authority. This class takes a list of keys and
     * provides the @ref satisfied method to determine whether that list of keys satisfies a provided authority.
     *
+    * The checktime callable is called once per authority evaluated and once every
+    * @ref detail::entries_per_checktime entries visited within one authority.
+    *
     * @tparam F A callable which takes a single argument of type @ref AccountPermission and returns a pointer to
     * the corresponding authority if it exists, or a nullptr.
     */
@@ -36,27 +79,31 @@ namespace detail {
    class authority_checker {
       private:
          PermissionToAuthorityFunc            permission_to_authority;
-         const std::function<void()>&         checktime;
+         std::function<void()>                checktime;
          vector<public_key_type>              provided_keys; // Making this a flat_set<public_key_type> causes runtime problems with utilities::filter_data_by_marker for some reason. TODO: Figure out why.
          flat_set<permission_level>           provided_permissions;
          vector<bool>                         _used_keys;
          uint16_t                             recursion_depth_limit;
 
       public:
+         /**
+          * @param checktime called during the walk to enforce the caller's deadline; throws to abort the walk. Must
+          *                  not be empty.
+          */
          authority_checker( PermissionToAuthorityFunc            permission_to_authority,
                             uint16_t                             recursion_depth_limit,
                             const flat_set<public_key_type>&     provided_keys,
                             const flat_set<permission_level>&    provided_permissions,
-                            const std::function<void()>&         checktime
+                            std::function<void()>                checktime
                          )
          :permission_to_authority(permission_to_authority)
-         ,checktime( checktime )
+         ,checktime( std::move(checktime) )
          ,provided_keys(provided_keys.begin(), provided_keys.end())
          ,provided_permissions(provided_permissions)
          ,_used_keys(provided_keys.size(), false)
          ,recursion_depth_limit(recursion_depth_limit)
          {
-            SYS_ASSERT( static_cast<bool>(checktime), authorization_exception, "checktime cannot be empty" );
+            SYS_ASSERT( static_cast<bool>(this->checktime), authorization_exception, "checktime cannot be empty" );
          }
 
          enum permission_cache_status {
@@ -65,7 +112,8 @@ namespace detail {
             permission_satisfied
          };
 
-         typedef flat_map<permission_level, permission_cache_status> permission_cache_type;
+         /// Evaluation status of each permission reached by a walk, plus the provided permissions.
+         using permission_cache_type = std::map<permission_level, permission_cache_status>;
 
          bool satisfied( const permission_level& permission, permission_cache_type* cached_perms = nullptr ) {
             permission_cache_type cached_permissions;
@@ -126,10 +174,23 @@ namespace detail {
             return &cached_permissions;
          }
 
+         /// Calls checktime after every @ref detail::entries_per_checktime entries visited within one authority.
+         void checktime_after_entry( std::size_t entries_visited ) const {
+            if( entries_visited % detail::entries_per_checktime == 0 )
+               checktime();
+         }
+
+         /**
+          * Evaluates @p authority at nesting level @p depth. Entries are visited in the order of
+          * @ref detail::authority_entry_visited_before until their weight reaches the threshold. The keys marked used
+          * while evaluating an authority that is not satisfied are unmarked again.
+          */
          template<typename AuthorityType>
          bool satisfied( const AuthorityType& authority, permission_cache_type& cached_permissions, uint16_t depth ) {
+            checktime();
+
             // Fast paths for keys-only authorities (no account references, no recursion possible)
-            // Avoids meta_permission_map allocation and rollback overhead entirely
+            // Avoid the visit order allocation and rollback overhead entirely
             if( authority.accounts.empty() ) {
                // Single-key authority: direct check
                if( authority.keys.size() == 1 && authority.threshold <= authority.keys[0].weight ) {
@@ -144,24 +205,26 @@ namespace detail {
                // Threshold-1 multi-key (e.g. 1-of-3): find a matching key with sufficient weight.
                // No rollback needed since we only mark a key when returning success.
                // The general path visits keys in descending weight order (declaration
-               // order for equal weights) via the meta_permission_map, so when several
-               // provided keys could satisfy the authority it marks the highest-weight
-               // one as used. Select the same key here so the used/unused key sets are
-               // identical no matter which path evaluates the authority.
+               // order for equal weights), so when several provided keys could satisfy
+               // the authority it marks the highest-weight one as used. Select the same
+               // key here so the used/unused key sets are identical no matter which path
+               // evaluates the authority.
                if( authority.threshold == 1 ) {
                   auto best = provided_keys.end();
                   uint32_t best_weight = 0;
-                  for( const auto& k : authority.keys ) {
+                  for( std::size_t i = 0; i < authority.keys.size(); ++i ) {
+                     const auto& k = authority.keys[i];
                      // only a strictly greater weight can replace the current best,
                      // keeping the earliest-declared key among equal weights
-                     if( k.weight < authority.threshold || k.weight <= best_weight )
-                        continue;
-                     const auto& search_key = resolve_key(k.key);
-                     auto itr = std::lower_bound( provided_keys.begin(), provided_keys.end(), search_key );
-                     if( itr != provided_keys.end() && *itr == search_key ) {
-                        best = itr;
-                        best_weight = k.weight;
+                     if( k.weight >= authority.threshold && k.weight > best_weight ) {
+                        const auto& search_key = resolve_key(k.key);
+                        auto itr = std::lower_bound( provided_keys.begin(), provided_keys.end(), search_key );
+                        if( itr != provided_keys.end() && *itr == search_key ) {
+                           best = itr;
+                           best_weight = k.weight;
+                        }
                      }
+                     checktime_after_entry( i + 1 );
                   }
                   if( best != provided_keys.end() ) {
                      _used_keys[best - provided_keys.begin()] = true;
@@ -178,29 +241,20 @@ namespace detail {
 
             weight_tally_visitor visitor(*this, cached_permissions, depth);
 
-            // Sort key permissions and account permissions together into a single set of meta_permissions
-            detail::meta_permission_map permissions;
-
-            auto emplace_permission = [&permissions, &visitor](int priority, const auto& mp) {
-               permissions.emplace(
-                     std::make_tuple(mp.weight, priority),
-                     [&mp, &visitor]() {
-                        return visitor(mp);
-                     }
-               );
-            };
-
-            permissions.reserve(authority.keys.size() + authority.accounts.size());
-            std::for_each(authority.accounts.begin(), authority.accounts.end(), std::bind(emplace_permission, 1, std::placeholders::_1));
-            std::for_each(authority.keys.begin(), authority.keys.end(), std::bind(emplace_permission, 2, std::placeholders::_1));
-
             // Check all permissions, from highest weight to lowest, seeing if provided authorization factors satisfies them or not
-            for( const auto& p: permissions )
+            const std::vector<detail::authority_entry> entries = detail::authority_visit_order( authority );
+            for( std::size_t i = 0; i < entries.size(); ++i ) {
+               const detail::authority_entry& entry = entries[i];
+               const uint32_t total_weight = entry.kind == detail::authority_entry_kind::key
+                                                ? visitor( authority.keys[entry.index] )
+                                                : visitor( authority.accounts[entry.index] );
                // If we've got enough weight, to satisfy the authority, return!
-               if( p.second() >= authority.threshold ) {
+               if( total_weight >= authority.threshold ) {
                   KeyReverter.cancel();
                   return true;
                }
+               checktime_after_entry( i + 1 );
+            }
             return false;
          }
 
@@ -233,8 +287,6 @@ namespace detail {
                auto status = authority_checker::permission_status_in_cache( cached_permissions, permission.permission );
                if( !status ) {
                   if( recursion_depth < checker.recursion_depth_limit ) {
-                     bool r = false;
-
                      std::invoke_result_t<decltype(checker.permission_to_authority), const permission_level> auth = nullptr;
                      try {
                         auth = checker.permission_to_authority( permission.permission );
@@ -244,12 +296,10 @@ namespace detail {
                      if(!auth)
                         return total_weight;
 
-                     cached_permissions.emplace( permission.permission, being_evaluated );
-                     r = checker.satisfied( *auth, cached_permissions, recursion_depth + 1 );
+                     // map iterators stay valid across the insertions of the nested evaluation
+                     const auto cache_itr = cached_permissions.emplace( permission.permission, being_evaluated ).first;
+                     const bool r = checker.satisfied( *auth, cached_permissions, recursion_depth + 1 );
 
-                     // Re-lookup after recursive call (flat_map iterators may be invalidated)
-                     auto cache_itr = cached_permissions.find( permission.permission );
-                     assert( cache_itr != cached_permissions.end() );
                      if( r ) {
                         total_weight += permission.weight;
                         cache_itr->second = permission_satisfied;
@@ -266,21 +316,24 @@ namespace detail {
 
    }; /// authority_checker
 
+   /**
+    * Creates an @ref authority_checker. An empty @p checktime is replaced by a callable that does nothing.
+    */
    template<typename PermissionToAuthorityFunc>
    auto make_auth_checker( PermissionToAuthorityFunc&&          pta,
                            uint16_t                             recursion_depth_limit,
                            const flat_set<public_key_type>&     provided_keys,
                            const flat_set<permission_level>&    provided_permissions = flat_set<permission_level>(),
-                           const std::function<void()>&         _checktime = std::function<void()>()
+                           std::function<void()>                checktime = std::function<void()>()
                          )
    {
-      auto noop_checktime = []() {};
-      const auto& checktime = ( static_cast<bool>(_checktime) ? _checktime : noop_checktime );
+      if( !checktime )
+         checktime = []() {};
       return authority_checker< PermissionToAuthorityFunc>( std::forward<PermissionToAuthorityFunc>(pta),
                                                             recursion_depth_limit,
                                                             provided_keys,
                                                             provided_permissions,
-                                                            checktime );
+                                                            std::move(checktime) );
    }
 
 } } // namespace sysio::chain

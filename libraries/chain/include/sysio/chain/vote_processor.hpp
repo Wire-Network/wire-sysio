@@ -115,7 +115,7 @@ private:
       for (auto i = idx.begin(); i != idx.end();) {
          if (stopped)
             return;
-         vote v = std::move(*i);
+         vote v = *i;
          idx.erase(i);
          auto bsp = get_block(v.msg->block_id, g);
          // g is unlocked

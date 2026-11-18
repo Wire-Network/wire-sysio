@@ -31,6 +31,7 @@
 #include <sysio/batch_operator_plugin/outpost_opp_job.hpp>
 #include <sysio/opp/depot/chains_registry.hpp>
 #include <sysio/opp/depot/opreg_status.hpp>
+#include <sysio.opreg/opreg_constants.hpp>
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/plugin_interface.hpp>
 #include <sysio/chain/subjective_billing.hpp>
@@ -129,18 +130,9 @@ namespace {
       }
    }
 
-   namespace opreg {
-      constexpr auto account            = "sysio.opreg";
-      constexpr auto table_operators    = "operators";
-      /// Field names on `operator_entry` rows. Used by the awareness poll
-      /// that gates the relay loop on a SLASHED / TERMINATED status flip.
-      namespace field {
-         constexpr auto status = "status";
-      }
-      // `OperatorStatus` enum spellings + the `is_active` decision live
-      // in `sysio/opp/depot/opreg_status.hpp`, beside the other shared depot
-      // row views, so any client reads the same source of truth.
-   }
+   // The awareness poll that gates the relay loop reads `field::status`. The `OperatorStatus` spellings and the
+   // `is_active` decision live in `sysio/opp/depot/opreg_status.hpp`.
+   namespace opreg = sysio::opreg_names;
 
    namespace epoch {
       constexpr auto account            = "sysio.epoch";
@@ -308,8 +300,8 @@ struct batch_operator_plugin::impl {
    /// Derived from `underwriter_auth` at plugin_initialize: the underwriter runs iff an account was configured,
    /// with or without the relay.
    bool                    underwriter_enabled = false;
-   /// `batch-underwriter-max-exposure`, by shadow symbol code: the most the underwriter may have bonded at once.
-   std::map<chain::symbol_code, chain::asset> underwriter_caps;
+   /// Explicit exposure policies by shadow symbol code; default-created entries disable underwriting.
+   std::map<chain::symbol_code, batch_operator_detail::exposure_policy> underwriter_exposure_policies;
 
    /// The relay's and the underwriter's signers, resolved by `resolve_signers` once the node is synced.
    std::optional<signer> relay_signer;
@@ -336,6 +328,10 @@ struct batch_operator_plugin::impl {
    uw::prune_sweep                          underwriter_prune_sweep;
    /// Every request the underwriter bonded, until its request row is pruned (`underwriter::remember_bonded`).
    std::set<uw::request_id_t>               underwriter_bonded;
+   /// Submitted accepts not yet accounted for by the irreversible view, including uncertain submissions.
+   uw::pending_accept_map                  underwriter_pending_accepts;
+   /// Startup quarantine in LIB time: transactions from a previous process may still be live.
+   std::optional<fc::time_point_sec>        underwriter_accepts_after;
    /// Which forfeit stops bonding (`underwriter::forfeit_watch`).
    uw::forfeit_watch                        underwriter_forfeits;
    /// `--batch-kick-crank`: whether this operator pushes `sysio.kicker::kick`.
@@ -767,7 +763,7 @@ struct batch_operator_plugin::impl {
          if (!code) continue;
          const auto queued = queued_by_pool.find(code->value);
          if (queued == queued_by_pool.end() || queued->second <= 0) continue;
-         const auto pool = symbol_code_name(*code);
+         const auto pool = code->name();
          if (!yield_tick_spacing.due(pool, now, yield_tick_interval)) continue;
          try {
             push_action(swap::account, swap::action_tickyield, *relay_signer,
@@ -800,7 +796,7 @@ struct batch_operator_plugin::impl {
          } catch (const fc::exception& e) {
             // Expected-transient: another operator queued it first. Persistent while
             // the shadow has no yield pool yet (`regliqpool` still to come).
-            dlog("batch_operator: queueyield({}): {}", symbol_code_name(*code), e.to_string());
+            dlog("batch_operator: queueyield({}): {}", code->name(), e.to_string());
          }
       }
    }
@@ -900,7 +896,7 @@ struct batch_operator_plugin::impl {
          // Expected-transient: governance removed the pool between the scan and
          // the push. Persistent while the pool's LIQ/WIRE swap pair is missing or
          // invalid, which only governance can repair.
-         dlog("batch_operator: kick({}): {}", symbol_code_name(code), e.to_string());
+         dlog("batch_operator: kick({}): {}", code.name(), e.to_string());
       }
    }
 
@@ -918,14 +914,9 @@ struct batch_operator_plugin::impl {
     * in the batch-op log without grep'ing every poll.
     */
    void poll_own_status() {
-      // `sysio.opreg::operators` is a KV table whose PK is a struct
-      // `{account: name}`; the chain_plugin's `lower_bound` / `upper_bound`
-      // expects JSON-shaped key bounds for KV tables, not the bare name
-      // string the v5 multi_index path accepted. Easiest robust fix: scan
-      // all rows and filter in-plugin — the operator count stays bounded
-      // by `op_config.max_available_*` (capped at ~100 for the lifetime
-      // of this plugin), so a linear scan once per `poll_own_status`
-      // period is cheap.
+      // `sysio.opreg::operators` is a KV table whose PK is a struct `{account: name}`; the chain_plugin's
+      // `lower_bound` / `upper_bound` expects JSON-shaped key bounds for KV tables, not the bare name string. This
+      // reads every operator row and filters in-plugin. Nothing caps the table, so the scan grows with it.
       sysio::chain_apis::read_only::get_table_rows_params p;
       p.code        = chain::name(opreg::account);
       p.scope       = opreg::account;
@@ -1375,24 +1366,9 @@ struct batch_operator_plugin::impl {
               "{}@{}, found {}", role, level.actor.to_string(), level.permission.to_string(), choice.matches);
          return std::nullopt;
       }
-      if (!signs_for_its_key(role, **choice.chosen) || !linked) return std::nullopt;
-      return signer{.auth = level, .provider = *choice.chosen};
-   }
-
-   /// Whether `provider`'s signature over a probe digest recovers to its own key, which is how the chain checks a
-   /// transaction signature. Logs why not.
-   static bool signs_for_its_key(std::string_view role, const fc::crypto::signature_provider_t& provider) {
       const fc::sha256 probe = fc::sha256::hash(SIGNER_PROBE.data(), SIGNER_PROBE.size());
-      try {
-         if (fc::crypto::public_key::recover(provider.sign(probe), probe) == provider.public_key) return true;
-         elog("batch_operator: {}'s signature provider {} makes signatures that do not recover to its key", role,
-              provider.key_name);
-      } catch (const fc::exception& e) {
-         elog("batch_operator: {}'s signature provider {} cannot sign: {}", role, provider.key_name, e.top_message());
-      } catch (const std::exception& e) {
-         elog("batch_operator: {}'s signature provider {} cannot sign: {}", role, provider.key_name, e.what());
-      }
-      return false;
+      if (!batch_operator_detail::signs_for_its_key(role, **choice.chosen, probe) || !linked) return std::nullopt;
+      return signer{.auth = level, .provider = *choice.chosen};
    }
 
    /// Resolve the signer of every enabled role. False when one cannot be resolved, after both are reported.
@@ -1444,7 +1420,7 @@ struct batch_operator_plugin::impl {
          report_stale_signer(*underwriter_signer, "the underwriter");
          return;
       }
-      // Chain time, which the contracts judge windows by; the wall clock only spaces this node's own housekeeping.
+      // Chain time governs contract windows and reservation expiry; wall time also guards startup after failover.
       const fc::time_point head_time = underwriter_head_time.load();
       if (head_time == fc::time_point()) return;
       const fc::time_point now = fc::time_point::now();
@@ -1464,11 +1440,18 @@ struct batch_operator_plugin::impl {
       }
       in->bonded = underwriter_bonded;
       in->halted = underwriter_forfeits.halted_by.has_value();
+      if (!underwriter_accepts_after) {
+         underwriter_accepts_after = uw::startup_accept_deadline(in->now, now, PUSH_EXPIRATION);
+      }
+      in->accepts_after = underwriter_accepts_after;
+      in->pending_accepts = underwriter_pending_accepts;
       if (!in->frozen && !in->halted) in->emitted = read_emitted_digests(in->requests);
       const uw::plan plan = uw::plan_actions(*in);
+      underwriter_pending_accepts = plan.pending_accepts;
       report_plan(*in, plan);
       push_plan(plan, uw::synd_has_work(in->requests), now);
-      underwriter_scan_from = uw::next_scan_start(underwriter_scan_from, in->requests, in->bonds, underwriter_bonded);
+      underwriter_scan_from = uw::next_scan_start(underwriter_scan_from, in->requests, in->bonds, underwriter_bonded,
+                                                underwriter_pending_accepts);
 
       if (now - underwriter_housekeeping_at >= UNDERWRITER_HOUSEKEEPING_INTERVAL) {
          underwriter_housekeeping_at = now;
@@ -1515,10 +1498,12 @@ struct batch_operator_plugin::impl {
 
    /// Push one action as the underwriter. True when the transaction was accepted; a refusal is logged by the push
    /// callback.
-   bool underwriter_push(const char* contract, const char* action, const fc::variant_object& data) {
+   /// `submitted_until` is set once queued, even if acceptance later times out or fails.
+   bool underwriter_push(const char* contract, const char* action, const fc::variant_object& data,
+                          std::optional<fc::time_point_sec>* submitted_until = nullptr) {
       if (shutting_down) return false;
       try {
-         return push_action(contract, action, *underwriter_signer, data);
+         return push_action(contract, action, *underwriter_signer, data, submitted_until);
       } catch (const fc::exception& e) {
          wlog("batch_operator: underwriter {}::{}: {}", contract, action, e.to_string());
       } catch (const std::exception& e) {
@@ -1528,16 +1513,20 @@ struct batch_operator_plugin::impl {
    }
 
    /// Push what the plan decided: accepts first, so their releases start this pass, then the crank, approves and
-   /// claims. A push the irreversible view does not show yet is planned, and refused, again next pass. `synd_busy`
-   /// says `sysio.synd` has an envelope request in play or an outcome to acknowledge.
+   /// claims. Reserve each submitted accept until the irreversible view accounts for it or its transaction expires;
+   /// a partial accept leaves the request OPEN, so the contract cannot refuse a repeated contribution for us.
+   /// `synd_busy` says `sysio.synd` has an envelope request in play or an outcome to acknowledge.
    void push_plan(const uw::plan& plan, bool synd_busy, fc::time_point now) {
       for (const uw::accept_action& accept : plan.accepts) {
-         // Accepted by this node only: it can still fail where it lands, so the bond is known from its row.
-         if (underwriter_push(uw::bond::account, uw::bond::action_accept,
+         std::optional<fc::time_point_sec> submitted_until;
+         const bool accepted = underwriter_push(uw::bond::account, uw::bond::action_accept,
                               fc::mutable_variant_object()
                                  (uw::bond::field::underwriter, underwriter_auth.actor)
                                  (uw::bond::field::request_id,  accept.request_id)
-                                 (uw::bond::field::amount,      accept.amount.get_amount()))) {
+                                 (uw::bond::field::amount,      accept.amount.get_amount()), &submitted_until);
+         // A timeout does not cancel the queued submission. Reserve it regardless of the callback result.
+         uw::remember_submitted_accept(underwriter_pending_accepts, accept, submitted_until);
+         if (accepted) {
             ilog("batch_operator: underwriter pushed an accept of request {} ({})", accept.request_id,
                  accept.amount.to_string());
          }
@@ -1565,7 +1554,7 @@ struct batch_operator_plugin::impl {
    }
 
    /// Report what the plan leaves to people: a freeze, a halt, challenged and forfeited requests, and requests left
-   /// unbonded.
+   /// awaiting further coverage.
    void report_plan(const uw::plan_inputs& in, const uw::plan& plan) {
       std::map<uw::request_id_t, const uw::request*> by_id;
       for (const uw::request& r : in.requests) by_id.emplace(r.id, &r);
@@ -1587,7 +1576,7 @@ struct batch_operator_plugin::impl {
       }
       for (const uw::request_id_t id : plan.blocked) {
          elog("batch_operator: underwriter {} was challenged (HELD) before it was bonded: its pair releases nothing "
-              "until sysio rules it", name_of(id));
+              "until a judge rules it", name_of(id));
       }
       for (const uw::request_id_t id : plan.forfeited) {
          elog("batch_operator: underwriter {} was ruled INVALID: our bond on it is forfeited", name_of(id));
@@ -1597,8 +1586,13 @@ struct batch_operator_plugin::impl {
             report_contradiction(in, waiting.request_id);
             continue;
          }
-         wlog("batch_operator: underwriter left {} unbonded: {}", name_of(waiting.request_id),
-              magic_enum::enum_name(waiting.reason));
+         if (waiting.reason == uw::wait_reason::PENDING_ACCEPT || waiting.reason == uw::wait_reason::STARTUP_FINALITY) {
+            ilog("batch_operator: underwriter left the rest of {} awaiting coverage: {}", name_of(waiting.request_id),
+                 magic_enum::enum_name(waiting.reason));
+         } else {
+            wlog("batch_operator: underwriter left the rest of {} awaiting coverage: {}", name_of(waiting.request_id),
+                 magic_enum::enum_name(waiting.reason));
+         }
       }
    }
 
@@ -1667,6 +1661,8 @@ struct batch_operator_plugin::impl {
    std::optional<uw::plan_inputs> read_underwriter_state(const std::map<fc::slug_name, liq_token>& tokens,
                                                          fc::time_point now) {
       uw::plan_inputs in;
+      // Separate LIB read windows: time must precede requests, then bonds, then balances so retiring a reservation
+      // on request state or expiry cannot omit its landed contribution from the later exposure and balance reads.
       in.now        = now;
       std::optional<std::vector<uw::request>> requests = read_bond_requests(underwriter_scan_from, symbols_of(tokens));
       if (!requests) return std::nullopt;
@@ -1675,7 +1671,7 @@ struct batch_operator_plugin::impl {
          read_own_bonds(underwriter_scan_from, in.requests);
       if (!bonds) return std::nullopt;
       in.bonds = std::move(*bonds);
-      in.caps  = caps_by_token(tokens);
+      in.exposure_policies = exposure_policies_by_token(tokens);
       std::optional<std::map<fc::slug_name, chain::asset>> balances = read_own_balances(tokens);
       if (!balances) return std::nullopt;
       in.balances                     = std::move(*balances);
@@ -1786,28 +1782,23 @@ struct batch_operator_plugin::impl {
       return out;
    }
 
-   /// The configured exposure caps keyed by registry token code. A cap whose precision differs from its shadow's is
-   /// not applied, so that token's requests wait with no cap until the configuration is fixed; a cap that names no
-   /// shadow is reported.
-   std::map<fc::slug_name, chain::asset> caps_by_token(const std::map<fc::slug_name, liq_token>& tokens) {
-      std::map<fc::slug_name, chain::asset> out;
-      std::set<chain::symbol_code>          named;   // the caps that name a shadow
+   /// Exposure policies keyed by registry token code, preserving explicit unlimited entries. A finite cap whose
+   /// precision differs from its shadow's is not applied; a policy that names no shadow is reported.
+   std::map<fc::slug_name, batch_operator_detail::exposure_policy>
+   exposure_policies_by_token(const std::map<fc::slug_name, liq_token>& tokens) {
+      std::map<fc::slug_name, chain::symbol> shadows;
       for (const auto& [token_code, token] : tokens) {
-         const auto cap = underwriter_caps.find(token.symbol.to_symbol_code());
-         if (cap == underwriter_caps.end()) continue;
-         named.insert(cap->first);
-         if (cap->second.get_symbol() != token.symbol) {
+         shadows.emplace(token_code, token.symbol);
+      }
+      return batch_operator_detail::resolve_exposure_policies(
+         underwriter_exposure_policies, shadows,
+         [](const chain::asset& cap, const chain::symbol& shadow) {
             elog("batch_operator: batch-underwriter-max-exposure {} does not match the shadow's symbol {}; not "
-                 "underwriting it", cap->second.to_string(), token.symbol.to_string());
-            continue;
-         }
-         out.emplace(token_code, cap->second);
-      }
-      for (const auto& [code, cap] : underwriter_caps) {
-         if (named.contains(code)) continue;
-         wlog("batch_operator: batch-underwriter-max-exposure {} names no sysio.liq shadow", cap.to_string());
-      }
-      return out;
+                 "underwriting it", cap.to_string(), shadow.to_string());
+         },
+         [](const char* option, const std::string& value) {
+            wlog("batch_operator: {} {} names no sysio.liq shadow", option, value);
+         });
    }
 
    /// The underwriter's `sysio.liq` balances by registry token code, or nullopt when the read failed.
@@ -1954,11 +1945,14 @@ struct batch_operator_plugin::impl {
    ///
    /// Called from cron threads, which may not read chain state: the build runs in a read window and the submission
    /// on the main thread, while the signature, possibly a remote signer, stays here. The waits do not cancel
-   /// anything: each posted task owns what it uses, so returning on a timeout is safe.
+   /// anything: each posted task owns what it uses, so returning on a timeout is safe. `submitted_until`, when
+   /// supplied, records the exact signed expiration before submission and remains set on a callback timeout.
    bool push_action(const std::string& contract,
                     const std::string& action_name,
                     const signer& by,
-                    const fc::variant_object& data) {
+                    const fc::variant_object& data,
+                    std::optional<fc::time_point_sec>* submitted_until = nullptr) {
+      if (submitted_until) submitted_until->reset();
       if (shutting_down) return false;
       const fc::time_point deadline = fc::time_point::now() + delivery_timeout;
       const bool           on_main  = std::this_thread::get_id() == app().executor().get_main_thread_id();
@@ -1988,6 +1982,7 @@ struct batch_operator_plugin::impl {
       }
       if (!trx) return false;
       trx->trx.signatures.push_back(by.provider->sign(trx->digest));
+      const fc::time_point_sec expiration = trx->trx.expiration;
 
       fc::variant packed_var;
       chain::to_variant(
@@ -1996,6 +1991,7 @@ struct batch_operator_plugin::impl {
       std::shared_ptr<batch_operator_detail::async_action_completion> completion =
          std::make_shared<batch_operator_detail::async_action_completion>();
       std::future<void> future = completion->get_future();
+      if (submitted_until) *submitted_until = expiration;
       if (on_main) {
          submit(completion, contract, action_name, packed_var);
       } else {
@@ -2165,7 +2161,11 @@ void batch_operator_plugin::set_program_options(options_description& cli,
         "It signs with the one configured WIRE signature provider whose key alone satisfies that permission.");
    opts("batch-underwriter-max-exposure", bpo::value<std::vector<std::string>>()->composing(),
         "Most the underwriter may have bonded at once in one shadow token, as an asset such as "
-        "100.000000000 LIQETH. Repeat for each token; requests in a token without one are not bonded.");
+        "100.000000000 LIQETH. Repeat for each token; cannot name the same token as unlimited exposure.");
+   opts("batch-underwriter-unlimited-exposure", bpo::value<std::vector<std::string>>()->composing(),
+        "Allow unlimited exposure in one shadow token, as a symbol code such as LIQETH. Repeat for each token; "
+        "balance and verification checks still apply. Cannot name the same token as max exposure. "
+        "Tokens without either exposure option are not bonded.");
    opts("batch-kick-crank", bpo::value<bool>()->default_value(KICK_CRANK_ENABLED),
         "Push sysio.kicker::kick for every kicker pool that could pay");
    opts("batch-kick-interval-ms", bpo::value<uint32_t>()->default_value(whole_milliseconds(KICK_INTERVAL)),
@@ -2187,17 +2187,23 @@ void batch_operator_plugin::plugin_initialize(const variables_map& options) {
       } FC_RETHROW_EXCEPTIONS(error, "invalid batch-underwriter-account '{}'", spec)
    }
    _impl->underwriter_enabled = _impl->underwriter_auth.actor.good();
-   if (options.count("batch-underwriter-max-exposure")) {
+   if (options.count("batch-underwriter-max-exposure") || options.count("batch-underwriter-unlimited-exposure")) {
       try {
-         _impl->underwriter_caps = batch_operator_detail::parse_exposure_caps(
-            options["batch-underwriter-max-exposure"].as<std::vector<std::string>>());
-      } FC_RETHROW_EXCEPTIONS(error, "invalid batch-underwriter-max-exposure")
+         _impl->underwriter_exposure_policies = batch_operator_detail::parse_exposure_policies(
+            options.count("batch-underwriter-max-exposure")
+               ? options["batch-underwriter-max-exposure"].as<std::vector<std::string>>()
+               : std::vector<std::string>{},
+            options.count("batch-underwriter-unlimited-exposure")
+               ? options["batch-underwriter-unlimited-exposure"].as<std::vector<std::string>>()
+               : std::vector<std::string>{});
+      } FC_RETHROW_EXCEPTIONS(error, "invalid batch-underwriter exposure options")
    }
-   if (_impl->underwriter_enabled && _impl->underwriter_caps.empty()) {
-      wlog("batch_operator_plugin: batch-underwriter-account without batch-underwriter-max-exposure bonds nothing");
+   if (_impl->underwriter_enabled && _impl->underwriter_exposure_policies.empty()) {
+      wlog("batch_operator_plugin: batch-underwriter-account without batch-underwriter-max-exposure or "
+           "batch-underwriter-unlimited-exposure bonds nothing");
    }
-   if (!_impl->underwriter_enabled && !_impl->underwriter_caps.empty()) {
-      wlog("batch_operator_plugin: batch-underwriter-max-exposure has no effect without batch-underwriter-account");
+   if (!_impl->underwriter_enabled && !_impl->underwriter_exposure_policies.empty()) {
+      wlog("batch_operator_plugin: exposure options have no effect without batch-underwriter-account");
    }
    _impl->kick_crank_enabled = options["batch-kick-crank"].as<bool>();
    const uint32_t kick_interval_ms = options["batch-kick-interval-ms"].as<uint32_t>();

@@ -79,6 +79,36 @@ BOOST_AUTO_TEST_CASE(host_registered_scheme_creates_eagerly) {
    BOOST_CHECK_EQUAL(seen, "hostdata");
 }
 
+BOOST_AUTO_TEST_CASE(handler_raw_signer_becomes_provider_sign_raw) {
+   // A remote Ed25519 scheme hands back a raw signer; the created provider must carry it as `sign_raw`.
+   auto clean_app = gsl_lite::finally([] { appbase::application::reset_app_singleton(); });
+
+   const keygen_result fixture = fc::test::load_keygen_fixture("solana", 1);
+
+   auto  tester = std::make_unique<sig_provider_tester>();
+   auto& mgr    = tester->app->_register_plugin<signature_provider_manager_plugin>();
+   int   raw_calls = 0;
+   mgr.register_spec_handler("RAWX", [&raw_calls](fc::crypto::chain_key_type_t, const fc::crypto::public_key&,
+                                                  std::string_view) -> sysio::provider_spec_result {
+      return {.signer     = [](const fc::sha256&) { return fc::crypto::signature{}; },
+              .raw_signer = [&raw_calls](std::span<const uint8_t>) {
+                 ++raw_calls;
+                 return fc::crypto::signature{};
+              }};
+   });
+
+   const std::string spec = std::format("rawkey,solana,solana,{},RAWX:data", fixture.public_key);
+   std::vector<const char*> argv{"test_signature_provider_manager_plugin", "--signature-provider", spec.c_str()};
+   BOOST_REQUIRE(tester->app->initialize<signature_provider_manager_plugin>(argv.size(),
+                                                                            const_cast<char**>(argv.data())));
+
+   const fc::crypto::signature_provider_ptr provider = tester->plugin().get_provider(std::string{"rawkey"});
+   BOOST_REQUIRE(static_cast<bool>(provider->sign_raw));
+   provider->sign_raw(std::span<const uint8_t>{});
+   BOOST_CHECK_EQUAL(raw_calls, 1);
+   BOOST_CHECK(!provider->private_key.has_value());
+}
+
 BOOST_AUTO_TEST_CASE(plugin_scheme_created_when_enabled) {
    // A scheme registered in the sigprov registry (provider-plugin path) is created when its owning plugin is enabled
    // via --plugin.

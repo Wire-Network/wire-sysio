@@ -8,12 +8,18 @@
 #include <sysio/chain/wasm_sysio_constraints.hpp>
 //sys-vm includes
 #include <sysio/vm/backend.hpp>
+#include <sysio/vm/config.hpp>
 #include <sysio/chain/webassembly/preconditions.hpp>
 #ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
 #include <sysio/chain/webassembly/sys-vm-oc.hpp>
 #endif
 #include <boost/hana/string.hpp>
 #include <boost/hana/equal.hpp>
+
+/// Consensus execution requires deterministic software floating-point operations in the actual chain build.
+static_assert(sysio::vm::use_softfloat, "Sysio requires VM software floating-point operations");
+/// Preserve the VM memory-alignment behavior independently of caller cache or toolchain settings.
+static_assert(!sysio::vm::should_align_memory_ops, "Sysio requires VM memory-alignment hints to be disabled");
 
 namespace sysio { namespace chain { namespace webassembly { namespace sys_vm_runtime {
 

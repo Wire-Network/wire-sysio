@@ -3,6 +3,7 @@
 #include <iterator>
 #include <cstdlib>
 #include <limits>
+#include <filesystem>
 
 #include <boost/test/unit_test.hpp>
 
@@ -52,6 +53,78 @@ static fc::time_point get_deadline() {
 }
 
 static auto yield_fn() { return abi_serializer::create_yield_function( max_serialization_time ); }
+
+/// Publication remains opaque: native setabi must accept ABI formats unrelated to packed abi_def.
+BOOST_AUTO_TEST_CASE(setabi_keeps_abi_bytes_opaque)
+{ try {
+   testing::tester chain;
+   const auto account = "abiformat"_n;
+   chain.create_account(account);
+   const std::string json = R"({"version":"future::abi/2.0","types":[]})";
+   const bytes protobuf{0x0a, 0x03, 0x0a, 0x01, 'x'}; // FileDescriptorSet containing a file named x.
+   const auto forged = fc::raw::pack(std::string{"sysio::abi/1.2"}, fc::unsigned_int{MAX_NUM_ARRAY_ELEMENTS});
+   for (const auto& blob : {bytes(json.begin(), json.end()), protobuf, bytes{char(0xff)}, forged, bytes{}}) {
+      signed_transaction trx;
+      trx.actions.emplace_back(std::vector<permission_level>{{account, config::active_name}},
+                               setabi{.account = account, .abi = blob});
+      chain.set_transaction_headers(trx);
+      trx.sign(chain.get_private_key(account, "active"), chain.control->get_chain_id());
+      BOOST_REQUIRE_NO_THROW(chain.push_transaction(trx));
+      const auto* metadata = chain.control->find_account_metadata(account);
+      BOOST_REQUIRE(metadata != nullptr);
+      BOOST_CHECK_EQUAL(metadata->abi.size(), blob.size());
+      if (!blob.empty())
+         BOOST_CHECK(std::equal(blob.begin(), blob.end(), metadata->abi.data()));
+   }
+} FC_LOG_AND_RETHROW() }
+
+/// Shared raw decoding must reject a forged count without allocating the declared ABI containers.
+BOOST_AUTO_TEST_CASE(forged_abi_counts_do_not_bulk_allocate)
+{
+   const auto tiny = fc::raw::pack(std::string{"sysio::abi/1.2"}, fc::unsigned_int{MAX_NUM_ARRAY_ELEMENTS});
+   BOOST_REQUIRE_EQUAL(tiny.size(), 18u);
+   abi_def decoded;
+   fc::datastream<const char*> stream(tiny.data(), tiny.size());
+   BOOST_CHECK_THROW(fc::raw::unpack(stream, decoded), fc::exception);
+   BOOST_CHECK_LE(decoded.types.capacity(), 1u);
+
+   const auto nested = fc::raw::pack(std::string{"sysio::abi/1.2"}, fc::unsigned_int{0}, fc::unsigned_int{1},
+                                    std::string{"entry"}, std::string{}, fc::unsigned_int{MAX_NUM_ARRAY_ELEMENTS});
+   decoded = {};
+   fc::datastream<const char*> nested_stream(nested.data(), nested.size());
+   BOOST_CHECK_THROW(fc::raw::unpack(nested_stream, decoded), fc::exception);
+   BOOST_REQUIRE_EQUAL(decoded.structs.size(), 1u);
+   BOOST_CHECK_LE(decoded.structs.front().fields.capacity(), 1u);
+}
+
+/// Keep existing packed ABI values, legacy varint behavior and large complete definitions accepted.
+BOOST_AUTO_TEST_CASE(abi_raw_decoding_preserves_existing_encodings)
+{
+   const bytes aliased_zero{char(0x80), char(0x80), char(0x80), char(0x80), char(0x10), 0, 0, 0, 0, 0, 0, 0};
+   BOOST_CHECK_NO_THROW(fc::raw::unpack<abi_def>(aliased_zero));
+
+   abi_def large;
+   constexpr size_t typedef_count = 262000;
+   large.types.resize(typedef_count);
+   const auto packed = fc::raw::pack(large);
+   const auto decoded = fc::raw::unpack<abi_def>(packed);
+   BOOST_CHECK_EQUAL(decoded.types.size(), typedef_count);
+   BOOST_CHECK(fc::raw::pack(decoded) == packed);
+
+   const auto contracts = std::filesystem::path(__FILE__).parent_path().parent_path() / "contracts";
+   size_t checked = 0;
+   for (const auto& entry : std::filesystem::recursive_directory_iterator(contracts)) {
+      if (!entry.is_regular_file() || entry.path().extension() != ".abi")
+         continue;
+      BOOST_TEST_CONTEXT(entry.path().string()) {
+         const auto abi = fc::json::from_file(entry.path()).as<abi_def>();
+         const auto bytes = fc::raw::pack(abi);
+         BOOST_CHECK(fc::raw::pack(fc::raw::unpack<abi_def>(bytes)) == bytes);
+         ++checked;
+      }
+   }
+   BOOST_CHECK_GT(checked, 0u);
+}
 
 // Exercise the real fixture path, including account ABI lookup, validation,
 // action packing, and excessive input recursion rejection.
@@ -811,6 +884,122 @@ BOOST_AUTO_TEST_CASE(slug_name_builtin_type)
 
 } FC_LOG_AND_RETHROW() }
 
+// A JSON value outside the range of a 64-bit integer type is rejected, not packed as its two's complement.
+BOOST_AUTO_TEST_CASE(integer_64_bit_types_reject_out_of_range_values)
+{ try {
+
+   const char* test_abi = R"=====(
+   {
+       "version": "sysio::abi/1.1",
+       "types": [],
+       "structs": [{
+           "name": "wide",
+           "base": "",
+           "fields": [{
+               "name": "unsigned64",
+               "type": "uint64"
+           },{
+               "name": "signed64",
+               "type": "int64"
+           }]
+       }],
+       "actions": [],
+       "tables": [],
+       "ricardian_clauses": [],
+       "enums": [{
+           "name": "level",
+           "type": "uint64",
+           "values": [{"name": "low", "value": 0}, {"name": "high", "value": 9223372036854775807}]
+       }]
+   }
+   )=====";
+
+   abi_serializer abis(fc::json::from_string(test_abi).as<abi_def>(), yield_fn());
+
+   // The hex of `json` packed as `type`, or the name of the exception packing it threw.
+   const auto pack = [&](const std::string& type, const std::string& json) -> std::string {
+      try {
+         return fc::to_hex(abis.variant_to_binary(type, fc::json::from_string(json), yield_fn()));
+      } catch( const fc::exception& e ) {
+         return e.name();
+      }
+   };
+   const std::string rejected = "parse_error_exception";
+
+   // Each type holds its whole range. The values past either end used to pack as the bytes in the comments.
+   for( const std::string type : {"uint64", "varint_uint64"} ) {
+      BOOST_TEST_CONTEXT(type) {
+         BOOST_TEST(pack(type, "0") == "0000000000000000");
+         BOOST_TEST(pack(type, "9223372036854775807") == "ffffffffffffff7f");
+         BOOST_TEST(pack(type, "9223372036854775808") == "0000000000000080");
+         BOOST_TEST(pack(type, "18446744073709551615") == "ffffffffffffffff");
+         BOOST_TEST(pack(type, "-1") == rejected);                     // ffffffffffffffff
+         BOOST_TEST(pack(type, "-9223372036854775808") == rejected);   // 0000000000000080
+      }
+   }
+   for( const std::string type : {"int64", "varint_int64"} ) {
+      BOOST_TEST_CONTEXT(type) {
+         BOOST_TEST(pack(type, "-9223372036854775808") == "0000000000000080");
+         BOOST_TEST(pack(type, "-1") == "ffffffffffffffff");
+         BOOST_TEST(pack(type, "0") == "0000000000000000");
+         BOOST_TEST(pack(type, "9223372036854775807") == "ffffffffffffff7f");
+         BOOST_TEST(pack(type, "9223372036854775808") == rejected);    // 0000000000000080
+         BOOST_TEST(pack(type, "18446744073709551615") == rejected);   // ffffffffffffffff
+      }
+   }
+
+   // A number given as a string is held to the same range. A leading '+' is accepted, and "-0" is zero.
+   BOOST_TEST(pack("uint64", R"("18446744073709551615")") == "ffffffffffffffff");
+   BOOST_TEST(pack("uint64", R"("+1")") == "0100000000000000");
+   BOOST_TEST(pack("uint64", R"("-0")") == "0000000000000000");
+   BOOST_TEST(pack("uint64", R"("-1")") == rejected);                      // ffffffffffffffff
+   BOOST_TEST(pack("uint64", R"("-18446744073709551361")") == rejected);   // ff00000000000000
+   BOOST_TEST(pack("uint64", R"("18446744073709551616")") == rejected);
+   BOOST_TEST(pack("int64", R"("-9223372036854775808")") == "0000000000000080");
+   BOOST_TEST(pack("int64", R"("+1")") == "0100000000000000");
+   BOOST_TEST(pack("int64", R"("9223372036854775808")") == rejected);
+   BOOST_TEST(pack("int64", R"("-9223372036854775809")") == rejected);
+
+   // A number with a fraction truncates toward zero before it is range-checked.
+   BOOST_TEST(pack("uint64", "1.9") == "0100000000000000");
+   BOOST_TEST(pack("uint64", "-0.9") == "0000000000000000");
+   BOOST_TEST(pack("uint64", "-1.0") == rejected);
+   BOOST_TEST(pack("uint64", "18446744073709551616.0") == rejected);
+   BOOST_TEST(pack("uint64", "1000000000000000000000000000000.0") == rejected);
+   BOOST_TEST(pack("int64", "-1.9") == "ffffffffffffffff");
+   BOOST_TEST(pack("int64", "9223372036854775808.0") == rejected);
+   BOOST_TEST(pack("int64", "-1000000000000000000000000000000.0") == rejected);
+
+   // Arrays, optionals, struct fields and an enum's integer form pack through the element type.
+   BOOST_TEST(pack("uint64[]", "[0,18446744073709551615]") == "020000000000000000ffffffffffffffff");
+   BOOST_TEST(pack("uint64[]", "[0,-1]") == rejected);
+   BOOST_TEST(pack("int64[]", "[-1,18446744073709551615]") == rejected);
+   BOOST_TEST(pack("uint64?", "null") == "00");
+   BOOST_TEST(pack("uint64?", "-1") == rejected);
+   BOOST_TEST(pack("int64?", "18446744073709551615") == rejected);
+   BOOST_TEST(pack("wide", R"({"unsigned64":18446744073709551615,"signed64":-9223372036854775808})") ==
+              "ffffffffffffffff0000000000000080");
+   BOOST_TEST(pack("wide", R"({"unsigned64":-1,"signed64":0})") == rejected);
+   BOOST_TEST(pack("wide", R"({"unsigned64":0,"signed64":18446744073709551615})") == rejected);
+   BOOST_TEST(pack("level", R"("high")") == "ffffffffffffff7f");
+   BOOST_TEST(pack("level", "9223372036854775807") == "ffffffffffffff7f");
+   BOOST_TEST(pack("level", "-1") == rejected);
+
+   // The narrower integer types read through the same 64-bit conversions. `bool` packs as a uint8.
+   for( const std::string type : {"uint8", "uint16", "uint32", "varuint32", "bool"} )
+      BOOST_TEST(pack(type, "-1") == rejected, type);
+   for( const std::string type : {"int8", "int16", "int32", "varint32"} )
+      BOOST_TEST(pack(type, "18446744073709551615") == rejected, type);
+
+   // Both serialization entry points reject.
+   BOOST_CHECK_THROW(abis.variant_to_binary("uint64", fc::json::from_string("-1"), max_serialization_time),
+                     fc::parse_error_exception);
+   BOOST_CHECK_THROW(abis.variant_to_binary("int64", fc::json::from_string("18446744073709551615"),
+                                            max_serialization_time),
+                     fc::parse_error_exception);
+
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_CASE(uint_types)
 { try {
 
@@ -857,6 +1046,148 @@ BOOST_AUTO_TEST_CASE(uint_types)
 
    auto var = fc::json::from_string(test_data);
    verify_byte_round_trip_conversion(abi_serializer{std::move(abi), yield_fn()}, "transfer", var);
+
+} FC_LOG_AND_RETHROW() }
+
+// A JSON value outside the range of an integer type narrower than 64 bits is rejected, not packed modulo the type's
+// width. `bool` packs as a uint8.
+BOOST_AUTO_TEST_CASE(narrow_integer_types_reject_out_of_range_values)
+{ try {
+
+   const char* test_abi = R"=====(
+   {
+       "version": "sysio::abi/1.1",
+       "types": [],
+       "structs": [{
+           "name": "narrow",
+           "base": "",
+           "fields": [{
+               "name": "flag",
+               "type": "bool"
+           },{
+               "name": "amount8",
+               "type": "uint8"
+           },{
+               "name": "amount32",
+               "type": "int32"
+           }]
+       }],
+       "actions": [],
+       "tables": [],
+       "ricardian_clauses": [],
+       "enums": [{
+           "name": "color",
+           "type": "uint8",
+           "values": [{"name": "red", "value": 0}, {"name": "green", "value": 255}]
+       }]
+   }
+   )=====";
+
+   abi_serializer abis(fc::json::from_string(test_abi).as<abi_def>(), yield_fn());
+
+   // The hex of `json` packed as `type`, or the name of the exception packing it threw.
+   const auto pack = [&](const std::string& type, const std::string& json) -> std::string {
+      try {
+         return fc::to_hex(abis.variant_to_binary(type, fc::json::from_string(json), yield_fn()));
+      } catch( const fc::exception& e ) {
+         return e.name();
+      }
+   };
+   const std::string rejected = "parse_error_exception";
+
+   // Each type holds its whole range, and nothing one past either end.
+   BOOST_TEST(pack("uint8", "0") == "00");
+   BOOST_TEST(pack("uint8", "255") == "ff");
+   BOOST_TEST(pack("uint8", "-1") == rejected);
+   BOOST_TEST(pack("uint8", "256") == rejected);
+
+   BOOST_TEST(pack("int8", "-128") == "80");
+   BOOST_TEST(pack("int8", "127") == "7f");
+   BOOST_TEST(pack("int8", "-129") == rejected);
+   BOOST_TEST(pack("int8", "128") == rejected);
+
+   BOOST_TEST(pack("uint16", "0") == "0000");
+   BOOST_TEST(pack("uint16", "65535") == "ffff");
+   BOOST_TEST(pack("uint16", "-1") == rejected);
+   BOOST_TEST(pack("uint16", "65536") == rejected);
+
+   BOOST_TEST(pack("int16", "-32768") == "0080");
+   BOOST_TEST(pack("int16", "32767") == "ff7f");
+   BOOST_TEST(pack("int16", "-32769") == rejected);
+   BOOST_TEST(pack("int16", "32768") == rejected);
+
+   BOOST_TEST(pack("uint32", "0") == "00000000");
+   BOOST_TEST(pack("uint32", "4294967295") == "ffffffff");
+   BOOST_TEST(pack("uint32", "-1") == rejected);
+   BOOST_TEST(pack("uint32", "4294967296") == rejected);
+
+   BOOST_TEST(pack("int32", "-2147483648") == "00000080");
+   BOOST_TEST(pack("int32", "2147483647") == "ffffff7f");
+   BOOST_TEST(pack("int32", "-2147483649") == rejected);
+   BOOST_TEST(pack("int32", "2147483648") == rejected);
+
+   // Values that an unchecked narrowing wraps back into range.
+   BOOST_TEST(pack("uint8", "260") == rejected);                    // 4
+   BOOST_TEST(pack("uint8", "18446744073709551615") == rejected);   // 255
+   BOOST_TEST(pack("int8", "255") == rejected);                     // -1
+   BOOST_TEST(pack("int8", "18446744073709551615") == rejected);    // -1
+   BOOST_TEST(pack("int8", "-9223372036854775808") == rejected);    // 0
+   BOOST_TEST(pack("uint16", "65540") == rejected);                 // 4
+   BOOST_TEST(pack("int16", "65535") == rejected);                  // -1
+   BOOST_TEST(pack("uint32", "4294967300") == rejected);            // 4
+   BOOST_TEST(pack("uint32", "9223372036854775807") == rejected);   // 4294967295
+   BOOST_TEST(pack("int32", "4294967295") == rejected);             // -1
+   BOOST_TEST(pack("int32", "18446744073709551615") == rejected);   // -1
+
+   // A number given as a string is held to the same range.
+   BOOST_TEST(pack("uint8", R"("255")") == "ff");
+   BOOST_TEST(pack("uint8", R"("256")") == rejected);
+   BOOST_TEST(pack("uint8", R"("-1")") == rejected);
+   BOOST_TEST(pack("uint8", R"("-18446744073709551361")") == rejected);   // 255 when parsed as a uint64
+   BOOST_TEST(pack("int8", R"("-128")") == "80");
+   BOOST_TEST(pack("int8", R"("128")") == rejected);
+   BOOST_TEST(pack("uint16", R"("65536")") == rejected);
+   BOOST_TEST(pack("int16", R"("-32769")") == rejected);
+   BOOST_TEST(pack("uint32", R"("4294967295")") == "ffffffff");
+   BOOST_TEST(pack("uint32", R"("4294967296")") == rejected);
+   BOOST_TEST(pack("uint32", R"("-1")") == rejected);
+   BOOST_TEST(pack("int32", R"("-2147483648")") == "00000080");
+   BOOST_TEST(pack("int32", R"("2147483648")") == rejected);
+
+   // A fractional number truncates toward zero before it is range-checked.
+   BOOST_TEST(pack("uint8", "255.9") == "ff");
+   BOOST_TEST(pack("uint8", "256.0") == rejected);
+   BOOST_TEST(pack("uint8", "-1.0") == rejected);
+   BOOST_TEST(pack("int8", "-128.9") == "80");
+   BOOST_TEST(pack("int8", "-129.0") == rejected);
+
+   BOOST_TEST(pack("bool", "true") == "01");
+   BOOST_TEST(pack("bool", "false") == "00");
+   BOOST_TEST(pack("bool", "1") == "01");
+   BOOST_TEST(pack("bool", "0") == "00");
+   BOOST_TEST(pack("bool", "256") == rejected);   // 0, false
+   BOOST_TEST(pack("bool", "257") == rejected);   // 1, true
+   BOOST_TEST(pack("bool", "-1") == rejected);
+
+   // Arrays, optionals, struct fields and an enum's integer form all pack through the element type.
+   BOOST_TEST(pack("uint8[]", "[0,255]") == "0200ff");
+   BOOST_TEST(pack("uint8[]", "[0,256]") == rejected);
+   BOOST_TEST(pack("int16[]", "[-32768,32768]") == rejected);
+   BOOST_TEST(pack("uint16?", "65535") == "01ffff");
+   BOOST_TEST(pack("uint16?", "null") == "00");
+   BOOST_TEST(pack("uint16?", "65536") == rejected);
+   BOOST_TEST(pack("narrow", R"({"flag":true,"amount8":255,"amount32":-2147483648})") == "01ff00000080");
+   BOOST_TEST(pack("narrow", R"({"flag":256,"amount8":0,"amount32":0})") == rejected);
+   BOOST_TEST(pack("narrow", R"({"flag":true,"amount8":260,"amount32":0})") == rejected);
+   BOOST_TEST(pack("narrow", R"({"flag":true,"amount8":0,"amount32":2147483648})") == rejected);
+   BOOST_TEST(pack("color", R"("green")") == "ff");
+   BOOST_TEST(pack("color", "255") == "ff");
+   BOOST_TEST(pack("color", "256") == rejected);   // red
+   BOOST_TEST(pack("color", "511") == rejected);   // green
+
+   // Both serialization entry points reject.
+   BOOST_CHECK_THROW(abis.variant_to_binary("uint8", fc::json::from_string("260"), max_serialization_time),
+                     fc::parse_error_exception);
 
 } FC_LOG_AND_RETHROW() }
 
@@ -3922,6 +4253,77 @@ BOOST_AUTO_TEST_CASE(enum_underlying_type_ranges)
       check_rejected(type, {}, "invalid underlying type");
       check_rejected(type, {0}, "invalid underlying type");
    }
+}
+
+BOOST_AUTO_TEST_CASE(int128_type_ranges)
+{
+   using sysio::testing::fc_exception_message_contains;
+   const std::string uint128_max = "340282366920938463463374607431768211455";
+   const std::string int128_max  = "170141183460469231731687303715884105727";
+   const std::string int128_min  = "-170141183460469231731687303715884105728";
+   const auto quoted = [](const std::string& text) { return "\"" + text + "\""; };
+
+   // An ABI whose only definition is struct "s" with the one field "v" of `type`.
+   const auto serializer = [](const std::string& type) {
+      const std::string abi = R"({"version": "sysio::abi/1.1", "structs": [{"name": "s", "base": "", "fields": )"
+                              R"([{"name": "v", "type": ")" + type + R"("}]}]})";
+      return abi_serializer(fc::json::from_string(abi).as<abi_def>(), yield_fn());
+   };
+   const auto pack = [&](const std::string& type, const fc::variant& value) {
+      return serializer(type).variant_to_binary("s", fc::mutable_variant_object()("v", value), yield_fn());
+   };
+
+   // The JSON value packs as `type` and unpacks as the number `expected`.
+   const auto check_accepted = [&](const std::string& type, const std::string& json, const std::string& expected) {
+      BOOST_TEST_CONTEXT(type << " from " << json) {
+         try {
+            const auto packed = pack(type, fc::json::from_string(json));
+            BOOST_TEST(serializer(type).binary_to_variant("s", packed, yield_fn())["v"].as_string() == expected);
+         } catch( const fc::exception& e ) {
+            BOOST_ERROR(e.top_message());
+         }
+      }
+   };
+   const auto check_out_of_range = [&](const std::string& type, const fc::variant& value) {
+      BOOST_TEST_CONTEXT(type << " from " << value.as_string()) {
+         BOOST_CHECK_EXCEPTION(pack(type, value), fc::parse_error_exception,
+                               fc_exception_message_contains(" is out of range for " + type + "_t ["));
+      }
+   };
+
+   check_accepted("uint128", "0", "0");
+   check_accepted("uint128", "18446744073709551615", "18446744073709551615");
+   check_accepted("uint128", quoted(uint128_max), uint128_max);
+   check_accepted("uint128", quoted("0xffffffffffffffffffffffffffffffff"), uint128_max);
+   check_accepted("int128",  "0", "0");
+   check_accepted("int128",  "-9223372036854775808", "-9223372036854775808");
+   check_accepted("int128",  "18446744073709551615", "18446744073709551615");
+   check_accepted("int128",  quoted(int128_max), int128_max);
+   check_accepted("int128",  quoted(int128_min), int128_min);
+   check_accepted("int128",  quoted("-0"), "0");
+   // Hex without a sign is the bit pattern of the value.
+   check_accepted("int128",  quoted("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF80"), "-128");
+
+   // A negative number is no uint128.
+   check_out_of_range("uint128", fc::json::from_string("-1"));
+   check_out_of_range("uint128", fc::json::from_string("-9223372036854775808"));
+   BOOST_CHECK_THROW(pack("uint128", fc::variant("-1")), fc::exception);
+   BOOST_CHECK_THROW(pack("uint128", fc::variant("+1")), fc::exception);
+   BOOST_CHECK_THROW(pack("int128", fc::variant("+1")), fc::exception);
+
+   // One past either end, and one digit more than fits.
+   check_out_of_range("uint128", fc::variant("340282366920938463463374607431768211456"));
+   check_out_of_range("uint128", fc::variant(uint128_max + "0"));
+   check_out_of_range("uint128", fc::variant("0x100000000000000000000000000000000"));
+   check_out_of_range("int128",  fc::variant("170141183460469231731687303715884105728"));
+   check_out_of_range("int128",  fc::variant("-170141183460469231731687303715884105729"));
+   check_out_of_range("int128",  fc::variant(int128_max + "0"));
+   check_out_of_range("int128",  fc::variant(int128_min + "0"));
+   check_out_of_range("int128",  fc::variant("0x100000000000000000000000000000000"));
+   // A uint128 above the int128 maximum, as a string and as the variant an in-process caller holds.
+   check_out_of_range("int128",  fc::variant(uint128_max));
+   check_out_of_range("int128",  fc::variant(~fc::uint128{0}));
+   check_out_of_range("int128",  fc::variant((fc::uint128{1} << 127)));
 }
 
 // ===================== Protobuf ABI Serialization Tests =====================

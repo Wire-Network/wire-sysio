@@ -4,7 +4,7 @@
  * `action::data_as` fails with action_data_and_struct_mismatch when bytes are left after the struct. The native
  * structs end in the optional fields the system contract adds (`memo` on setcode and setabi, `authorized_by` on
  * the permission actions), so those fields are accepted and anything after them is not. Also covers the host's
- * binary_extension.
+ * binary_extension, and which actions an account `sysio` without a contract accepts.
  */
 #include <sysio/chain/binary_extension.hpp>
 #include <sysio/chain/contract_types.hpp>
@@ -284,6 +284,43 @@ BOOST_FIXTURE_TEST_CASE(permission_actions_accept_authorized_by_and_reject_bytes
    produce_block();
    BOOST_CHECK(!has_permission(alice, "first"_n));
    BOOST_CHECK(!has_permission(alice, "second"_n));
+} FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_CASE(sysio_without_contract_runs_only_chain_actions) try {
+   validating_tester chain({}, nullptr, setup_policy::none);
+
+   // The chain's own onblock runs in every block.
+   bool onblock_ran = false;
+   {
+      boost::signals2::scoped_connection conn = chain.control->applied_transaction().connect(
+         [&](std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> x) {
+            const auto& trace = std::get<0>(x);
+            if (is_onblock(*trace)) {
+               BOOST_CHECK_MESSAGE(!trace->except, (trace->except ? trace->except->to_detail_string() : std::string{}));
+               onblock_ran = true;
+            }
+         });
+      chain.produce_block();
+   }
+   BOOST_CHECK(onblock_ran);
+
+   // Native actions still run with no contract on sysio.
+   chain.create_accounts({"alice"_n});
+   chain.produce_block();
+   BOOST_CHECK(chain.control->find_account("alice"_n) != nullptr);
+
+   // Nothing else does: no other action name, and no onblock outside the chain's own transaction.
+   const auto push = [&](name action_name) {
+      return push_with_tail(chain,
+                            action{vector<permission_level>{{config::system_account_name, config::active_name}},
+                                   config::system_account_name, action_name, bytes{}},
+                            {});
+   };
+   BOOST_CHECK_EXCEPTION(push("nosuchact"_n), action_validate_exception,
+                         fc_exception_message_contains("No contract for action nosuchact on account sysio"));
+   BOOST_CHECK_EXCEPTION(push(config::onblock_action_name), action_validate_exception,
+                         fc_exception_message_contains(
+                            "sysio::onblock runs only as the implicit transaction at the start of a block"));
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -116,7 +116,7 @@ public:
          CHAINS_ACCOUNT, BATCHOP, "sysio.token"_n
       });
       // Tier-1 voter accounts (node owners) and a Tier-2 account (ineligible voter). Created without
-      // a roa policy so regnodeowner's reslimit creation does not collide.
+      // a roa policy.
       for (auto v : {"voter1"_n, "voter2"_n, "voter3"_n, "voter4"_n, "tier2"_n, "stranger"_n}) {
          create_account(v, config::system_account_name, false, true, /*include_roa_policy=*/false);
       }
@@ -201,7 +201,6 @@ public:
          ("epoch_retention_envelope_log_count", 200)));
 
       BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "setconfig"_n, mvo()
-         ("max_available_producers", 21)("max_available_batch_ops", 63)("max_available_underwriters", 21)
          ("terminate_prune_delay_ms", 600000)("terminate_max_consecutive_misses", 5)
          ("terminate_max_pct_misses_24h", 5)("terminate_window_ms", uint64_t{24ULL*60*60*1000})
          ("req_prod_collat", fc::variants{})("req_batchop_collat", fc::variants{})
@@ -1054,7 +1053,7 @@ BOOST_FIXTURE_TEST_CASE(chkdispute_unpauses_only_after_last_open_dispute, sysio_
 // No cross-epoch double slash: the ACTIVE-only scheduling filter -- shared verbatim by
 // sysio.epoch::advance's window-slide and schbatchgps -- drops a SLASHED batch op from the eligible
 // pool, so a slashed op is never re-placed into a future group where advance could attempt a second
-// (aborting) slash of it. This exercises that filter directly via schbatchgps (advance's own slide is
+// slash of it. This exercises that filter directly via schbatchgps (advance's own slide is
 // additionally gated by emissions readiness, out of scope here), plus the widened slashop auth
 // (callable by sysio.epoch) and opreg's already-slashed guard. The full delivery-driven slash through
 // advance is covered end-to-end by the TS flow flow-batch-operator-slashing.
@@ -1082,10 +1081,9 @@ BOOST_FIXTURE_TEST_CASE(slashed_op_excluded_from_scheduling_no_double_slash, sys
    BOOST_REQUIRE_EQUAL(success(), slashop(BATCHOP_B));
    BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_SLASHED", operator_status(BATCHOP_B));
 
-   // opreg aborts a second slash -- exactly the abort the scheduling exclusion below must prevent
-   // advance from ever triggering.
-   BOOST_REQUIRE_EQUAL(error("assertion failure with message: operator already slashed"),
-                       slashop(BATCHOP_B));
+   // A second slash returns without effect instead of aborting its caller (WNS-70).
+   BOOST_REQUIRE_EQUAL(success(), slashop(BATCHOP_B));
+   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_SLASHED", operator_status(BATCHOP_B));
 
    // Bring c online so two ACTIVE ops remain, then re-schedule: the filter keeps the live ops
    // (a, c) and drops the slashed one (b).
@@ -1168,7 +1166,6 @@ BOOST_FIXTURE_TEST_CASE(deliver_rejects_decollateralized_unknown_group_member, s
 
    // Require an ETH bond so a non-bootstrapped op's status tracks its collateral.
    BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "setconfig"_n, mvo()
-      ("max_available_producers", 21)("max_available_batch_ops", 63)("max_available_underwriters", 21)
       ("terminate_prune_delay_ms", 600000)("terminate_max_consecutive_misses", 5)
       ("terminate_max_pct_misses_24h", 5)("terminate_window_ms", uint64_t{24ULL * 60 * 60 * 1000})
       ("req_prod_collat", fc::variants{})

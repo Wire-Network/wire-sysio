@@ -22,6 +22,8 @@
 #include <fc/network/ethereum/ethereum_transaction_policy.hpp>
 
 #include <chrono>
+#include <cstdint>
+#include <limits>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -45,6 +47,20 @@ constexpr std::string_view set_number_calldata =
 constexpr std::string_view total_supply_name = "totalSupply";
 constexpr std::string_view total_supply_selector = "18160ddd";
 constexpr std::string_view rpc_hex_prefix = "0x";
+constexpr std::string_view ping_event_name = "Ping";
+/// The largest log and transaction index, and 2^32 + 5, which truncates to 5.
+constexpr std::string_view max_uint32_quantity  = "0xffffffff";
+constexpr std::string_view past_uint32_quantity = "0x100000005";
+/// QUANTITY forms the execution API does not allow: a leading zero, and no `0x` prefix.
+constexpr std::string_view leading_zero_quantity = "\"0x0010\"";
+constexpr std::string_view unprefixed_quantity   = "\"16\"";
+/// The Sepolia network id, which `net_version` reports in decimal.
+constexpr std::string_view sepolia_network_version = "\"11155111\"";
+constexpr uint64_t         sepolia_network_id      = 11155111;
+/// The diagnostic field names the client reports a refused quantity under.
+constexpr std::string_view block_number_field      = "block_number";
+constexpr std::string_view log_index_field         = "log_index";
+constexpr std::string_view transaction_index_field = "transaction_index";
 
 /// One JSON-RPC result body echoing the client's first request id.
 std::string rpc_result(std::string_view result_json, int64_t id = 1) {
@@ -91,6 +107,30 @@ eth::abi::contract set_number_abi() {
       .type = eth::abi::invoke_target_type::function,
       .inputs = {value},
       .outputs = {},
+   };
+}
+
+/// `event Ping()`: no fields, so a log of it needs nothing past its position.
+eth::abi::contract ping_event_abi() {
+   return eth::abi::contract{
+      .name = std::string(ping_event_name),
+      .type = eth::abi::invoke_target_type::event,
+      .inputs = {},
+      .outputs = {},
+   };
+}
+
+/// An `eth_getLogs` result of one log at the given position.
+std::string one_log(std::string_view block_number, std::string_view log_index, std::string_view transaction_index) {
+   const fc::mutable_variant_object log = fc::mutable_variant_object("blockNumber", std::string(block_number))(
+      "logIndex", std::string(log_index))("transactionIndex", std::string(transaction_index));
+   return fc::json::to_string(fc::variants{log}, fc::time_point::maximum());
+}
+
+/// A predicate matching the rejection of the response field `field` for `reason`.
+auto refuses(ethereum_transaction_policy_reason reason, std::string_view field) {
+   return [reason, field](const ethereum_transaction_policy_exception& rejection) {
+      return rejection.reason() == reason && rejection.field() == field;
    };
 }
 
@@ -299,6 +339,78 @@ BOOST_AUTO_TEST_CASE(chain_reads_send_canonical_addresses_blocks_and_hashes) try
    (void) recorded.client->get_transaction_receipt(std::string(test_tx_hash));
    BOOST_CHECK_EQUAL(recorded.conformant_params(3, "eth_getTransactionReceipt").at(0).as_string(),
                      std::string(test_tx_hash));
+} FC_LOG_AND_RETHROW();
+
+/// A log's index is read whole: the largest uint32 is kept, and one past it is refused rather than
+/// truncated to its low 32 bits.
+BOOST_AUTO_TEST_CASE(log_indexes_past_uint32_are_refused_not_truncated) try {
+   recorded_client recorded({reply(one_log("0x1a", max_uint32_quantity, max_uint32_quantity)),
+                             reply(one_log("0x1a", past_uint32_quantity, "0x0"), 2),
+                             reply(one_log("0x1a", "0x0", past_uint32_quantity), 3)});
+   const auto query = [&] {
+      return recorded.client->get_events(std::string(test_contract), {std::string(ping_event_name)},
+                                         {ping_event_abi()}, format_rpc_quantity(fc::uint256{0}));
+   };
+
+   const auto events = query();
+   BOOST_REQUIRE_EQUAL(events.size(), 1u);
+   BOOST_CHECK_EQUAL(events.front().block_number, fc::uint256{26});
+   BOOST_CHECK_EQUAL(events.front().log_index, std::numeric_limits<uint32_t>::max());
+   BOOST_CHECK_EQUAL(events.front().transaction_index, std::numeric_limits<uint32_t>::max());
+
+   BOOST_CHECK_EXCEPTION(query(), ethereum_transaction_policy_exception,
+                         refuses(ethereum_transaction_policy_reason::rpc_quantity_out_of_range, log_index_field));
+   BOOST_CHECK_EXCEPTION(
+      query(), ethereum_transaction_policy_exception,
+      refuses(ethereum_transaction_policy_reason::rpc_quantity_out_of_range, transaction_index_field));
+} FC_LOG_AND_RETHROW();
+
+/// The block number and log position reads take only a canonical QUANTITY: no leading zero, and the
+/// `0x` prefix.
+BOOST_AUTO_TEST_CASE(quantity_reads_refuse_non_canonical_forms) try {
+   const auto invalid = [](std::string_view field) {
+      return refuses(ethereum_transaction_policy_reason::rpc_quantity_invalid, field);
+   };
+
+   recorded_client block_numbers({reply(leading_zero_quantity), reply(unprefixed_quantity, 2)});
+   BOOST_CHECK_EXCEPTION((void) block_numbers.client->get_block_number(), ethereum_transaction_policy_exception,
+                         invalid(block_number_field));
+   BOOST_CHECK_EXCEPTION((void) block_numbers.client->get_block_number(), ethereum_transaction_policy_exception,
+                         invalid(block_number_field));
+
+   recorded_client logs({reply(one_log("0x01a", "0x0", "0x0")), reply(one_log("0x1a", "7", "0x0"), 2),
+                         reply(one_log("0x1a", "0x0", "0x07"), 3)});
+   const auto query = [&] {
+      return logs.client->get_events(std::string(test_contract), {std::string(ping_event_name)},
+                                     {ping_event_abi()}, format_rpc_quantity(fc::uint256{0}));
+   };
+   BOOST_CHECK_EXCEPTION(query(), ethereum_transaction_policy_exception, invalid(block_number_field));
+   BOOST_CHECK_EXCEPTION(query(), ethereum_transaction_policy_exception, invalid(log_index_field));
+   BOOST_CHECK_EXCEPTION(query(), ethereum_transaction_policy_exception, invalid(transaction_index_field));
+
+   // A receipt read past its first confirmation counts blocks from its own; the head is never asked.
+   const std::string receipt = R"({"status":"0x1","blockNumber":)" + std::string(leading_zero_quantity) + "}";
+   recorded_client receipts({reply(receipt), reply("\"0x20\"", 2)});
+   ethereum_confirm_options two_deep = ethereum_confirm_option_defaults;
+   two_deep.confirmations            = 2;
+   BOOST_CHECK_EXCEPTION((void) receipts.client->wait_for_receipt(std::string(test_tx_hash), two_deep),
+                         ethereum_transaction_policy_exception, invalid(block_number_field));
+   BOOST_CHECK_EQUAL(receipts.server.request_count(), 1u);
+} FC_LOG_AND_RETHROW();
+
+/// `net_version` answers in decimal, not as a QUANTITY, even after a leading zero.
+BOOST_AUTO_TEST_CASE(network_version_is_read_as_decimal) try {
+   recorded_client recorded({reply(sepolia_network_version), reply("\"010\"", 2)});
+   BOOST_CHECK_EQUAL(recorded.client->get_network_version(), fc::uint256{sepolia_network_id});
+   BOOST_CHECK_EQUAL(recorded.client->get_network_version(), fc::uint256{10});
+} FC_LOG_AND_RETHROW();
+
+/// A block number past 2^256 - 1 is refused instead of wrapping.
+BOOST_AUTO_TEST_CASE(block_number_past_uint256_is_refused) try {
+   const std::string past_max_block_number = "\"0x1" + std::string(64, '0') + "\"";
+   recorded_client recorded({reply(past_max_block_number)});
+   BOOST_CHECK_EXCEPTION((void) recorded.client->get_block_number(), ethereum_transaction_policy_exception,
+                         refuses(ethereum_transaction_policy_reason::rpc_quantity_out_of_range, block_number_field));
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_SUITE_END()

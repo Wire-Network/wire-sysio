@@ -146,7 +146,7 @@ public:
       ASSERT_EQ(old_way_params.target_block_net_usage_pct, 30*100);
       ASSERT_EQ(old_way_params.max_authority_depth, 10);
 
-      // All 17 params (IDs 0-16, no deferred_trx_expiration_window)
+      // All 18 params (IDs 0-17, no deferred_trx_expiration_window)
       // 0:max_block_net_usage 1:target_block_net_usage_pct 2:max_transaction_net_usage
       // 3:net_usage_leeway
       // 4:max_block_cpu_usage 5:target_block_cpu_usage_pct
@@ -154,8 +154,8 @@ public:
       // 8:max_transaction_lifetime 9:max_transaction_delay
       // 10:max_inline_action_size 11:max_inline_action_depth(u16) 12:max_authority_depth(u16)
       // 13:max_action_return_value_size 14:max_kv_key_size 15:max_kv_value_size
-      // 16:max_kv_secondary_key_size
-      params_object(17_ui) (0_ui)(1024*1024*4_64)
+      // 16:max_kv_secondary_key_size 17:notify_cpu_stipend
+      params_object(18_ui) (0_ui)(1024*1024*4_64)
                            (1_ui)(35*100_32)
                            (2_ui)(1024*1024*2_32)
                            (3_ui)(700_32)
@@ -171,13 +171,14 @@ public:
                            (13_ui)(1024_32)
                            (14_ui)(256_32)
                            (15_ui)(262144_32)
-                           (16_ui)(256_32).set();
+                           (16_ui)(256_32)
+                           (17_ui)(150_32).set();
       get_blockchain_parameters(old_way_params);
-      ASSERT_EQ(params_object({17_ui,0_ui,1_ui,2_ui,3_ui,4_ui,
+      ASSERT_EQ(params_object({18_ui,0_ui,1_ui,2_ui,3_ui,4_ui,
                                      5_ui,6_ui,7_ui,8_ui,9_ui,
                                      10_ui,11_ui,12_ui,13_ui,
-                                     14_ui,15_ui,16_ui}).get(),
-                params_object(17_ui)(0_ui)(1024*1024*4_64)
+                                     14_ui,15_ui,16_ui,17_ui}).get(),
+                params_object(18_ui)(0_ui)(1024*1024*4_64)
                                     (1_ui)(35*100_32)
                                     (2_ui)(1024*1024*2_32)
                                     (3_ui)(700_32)
@@ -193,7 +194,8 @@ public:
                                     (13_ui)(1024_32)
                                     (14_ui)(256_32)
                                     (15_ui)(262144_32)
-                                    (16_ui)(256_32));
+                                    (16_ui)(256_32)
+                                    (17_ui)(150_32));
       ASSERT_EQ(old_way_params.max_block_net_usage, 1024*1024*4);
       ASSERT_EQ(old_way_params.target_block_net_usage_pct, 35*100);
       ASSERT_EQ(old_way_params.max_transaction_net_usage, 1024*1024*2);
@@ -211,6 +213,7 @@ public:
       ASSERT_EQ(old_way_params.max_kv_key_size, 256);
       ASSERT_EQ(old_way_params.max_kv_value_size, 262144);
       ASSERT_EQ(old_way_params.max_kv_secondary_key_size, 256);
+      ASSERT_EQ(old_way_params.notify_cpu_stipend, 150);
 
       //max_kv_key_size
       ASSERT_EQ(params_object(1_ui)(14_ui).get(),
@@ -224,6 +227,14 @@ public:
       params_object(1_ui)(16_ui)(512_32).set();
       ASSERT_EQ(params_object(1_ui)(16_ui).get(),
                 params_object(1_ui)(16_ui)(512_32));
+
+      //notify_cpu_stipend: 0 turns it off, and it may reach max_transaction_cpu_usage
+      params_object(1_ui)(17_ui)(0_32).set();
+      ASSERT_EQ(params_object(1_ui)(17_ui).get(),
+                params_object(1_ui)(17_ui)(0_32));
+      params_object(1_ui)(17_ui)(230'000_32).set();
+      ASSERT_EQ(params_object(1_ui)(17_ui).get(),
+                params_object(1_ui)(17_ui)(230'000_32));
    }
 
    [[sysio::action]] void setthrow1(){
@@ -249,6 +260,13 @@ public:
    [[sysio::action]] void setthrow5(){
       //max_kv_secondary_key_size one past config::max_kv_key_size_limit
       params_object(1_ui)(16_ui)(513_32).set();
+   }
+
+   [[sysio::action]] void throwstipend(){
+      //notify_cpu_stipend one past max_transaction_cpu_usage
+      blockchain_parameters params;
+      get_blockchain_parameters(params);
+      params_object(1_ui)(17_ui)(uint32_t(params.max_transaction_cpu_usage + 1)).set();
    }
 
    [[sysio::action]] void getthrow1(){

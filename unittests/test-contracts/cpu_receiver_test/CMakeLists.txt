@@ -1,0 +1,6 @@
+if( BUILD_TEST_CONTRACTS )
+   add_contract( cpu_receiver_test cpu_receiver_test cpu_receiver_test.cpp )
+else()
+   configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/cpu_receiver_test.wasm ${CMAKE_CURRENT_BINARY_DIR}/cpu_receiver_test.wasm COPYONLY )
+   configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/cpu_receiver_test.abi  ${CMAKE_CURRENT_BINARY_DIR}/cpu_receiver_test.abi  COPYONLY )
+endif()

@@ -804,6 +804,11 @@ class PluginHttpTest(unittest.TestCase):
         ret_json = self.nodeop.processUrllibRequest(resource, command, payload, endpoint=endpoint)
         self.assertEqual(ret_json["code"], 201)
         self.assertEqual(ret_json["payload"], 'invalid peer address')
+        # connect with a port that is out of range or not a number
+        for payload in ("localhost:65536", "localhost:99999:trx", "localhost:http:trx"):
+            ret_json = self.nodeop.processUrllibRequest(resource, command, payload, endpoint=endpoint)
+            self.assertEqual(ret_json["code"], 201)
+            self.assertEqual(ret_json["payload"], 'invalid peer address')
         payload = f"localhost:{Utils.getPort(Utils.PortP2P, 1)}"
         ret_str = self.nodeop.processUrllibRequest(resource, command, payload, returnType=ReturnType.raw, endpoint=endpoint).decode('ascii')
         self.assertEqual("\"added connection\"", ret_str)

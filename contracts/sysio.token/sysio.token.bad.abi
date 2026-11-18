@@ -78,24 +78,6 @@
             ]
         },
         {
-            "name": "open",
-            "base": "",
-            "fields": [
-                {
-                    "name": "owner",
-                    "type": "name"
-                },
-                {
-                    "name": "symbol",
-                    "type": "symbol"
-                },
-                {
-                    "name": "ram_payer",
-                    "type": "name"
-                }
-            ]
-        },
-        {
             "name": "retire",
             "base": "",
             "fields": [
@@ -146,11 +128,6 @@
         {
             "name": "issue",
             "type": "issue",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "open",
-            "type": "open",
             "ricardian_contract": ""
         },
         {

@@ -254,6 +254,20 @@
             ]
         },
         {
+            "name": "nodeownfin",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "tier",
+                    "type": "uint8"
+                }
+            ]
+        },
+        {
             "name": "nodeownreg",
             "base": "",
             "fields": [
@@ -364,38 +378,6 @@
                 {
                     "name": "network_gen",
                     "type": "uint8"
-                }
-            ]
-        },
-        {
-            "name": "reslimit",
-            "base": "",
-            "fields": [
-                {
-                    "name": "owner",
-                    "type": "name"
-                },
-                {
-                    "name": "net_weight",
-                    "type": "asset"
-                },
-                {
-                    "name": "cpu_weight",
-                    "type": "asset"
-                },
-                {
-                    "name": "ram_bytes",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
-            "name": "reslimit_key",
-            "base": "",
-            "fields": [
-                {
-                    "name": "owner",
-                    "type": "uint64"
                 }
             ]
         },
@@ -576,6 +558,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "nodeownfin",
+            "type": "nodeownfin",
+            "ricardian_contract": ""
+        },
+        {
             "name": "nodeownreg",
             "type": "nodeownreg",
             "ricardian_contract": ""
@@ -662,14 +649,6 @@
             "key_names": ["scope","owner"],
             "key_types": ["name","uint64"],
             "table_id": 7465
-        },
-        {
-            "name": "reslimit",
-            "type": "reslimit",
-            "index_type": "i64",
-            "key_names": ["owner"],
-            "key_types": ["uint64"],
-            "table_id": 39017
         },
         {
             "name": "roastate",

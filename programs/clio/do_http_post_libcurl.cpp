@@ -51,6 +51,7 @@ namespace sysio { namespace client { namespace http {
 
       switch (type) {
          case CURLINFO_TEXT: fprintf(stderr, "== Info: %s", data);
+            [[fallthrough]];
          default: /* in case a new one is introduced to shock us */ return 0;
 
          case CURLINFO_HEADER_OUT: text = "=> Send header"; break;

@@ -1,19 +1,3 @@
-<h1 class="contract">openext</h1>
-
----
-spec_version: "0.2.0"
-title: Open extended Balance
-summary: 'Open a zero quantity extended balance for {{nowrap user}}'
----
-
-{{ram_payer}} agrees to establish a zero quantity extended balance for {{user}} 
-for the {{ext_symbol}} extended symbol. 
-
-If {{user}} does not have an extended balance for {{ext_symbol}}, {{ram_payer}} will be designated as the RAM payer of {{user}}'s extended balance for {{ext_symbol}}. As a result, RAM will be deducted from {{ram_payer}}’s resources to create the necessary records.
-
-The authorization of {{ram_payer}} is required.
-
-
 <h1 class="contract">closeext</h1>
 
 ---
@@ -28,7 +12,7 @@ If the extended balance is nonzero, it will be transfered to {{to}} before closi
 
 In order to function properly, it is necessary that the contract of {{ext_symbol}} permanently has a transfer action that satisfies the conditions (1), (2), (6) of the present contract's transfer action.
 
-RAM will be refunded to the RAM payer of {{user}}'s extended balance for {{ext_symbol}}.
+RAM will be refunded to sysio, which pays for every extended balance.
 
 The authorization of {{user}} is required.
 
@@ -45,9 +29,9 @@ This action is executed as a response to a notification of a transfer action wit
 
 The transfer is accepted only if the extended symbol formed by the transfer's contract and the symbol {{asset_to_symbol quantity}} is the system token set by setconfig, or is the first leg of the pair it forms with the system token, or the transfer carries this contract's authority (the authority that creates pairs, so that a pair's first leg can be seeded before the pair exists). Any other transfer fails.
 
-The default response is to deposit {{quantity}} to {{from}}'s extended balance for that extended symbol. This is only possible if such extended balance previously exists.
+The default response is to deposit {{quantity}} to {{from}}'s extended balance for that extended symbol. If {{from}} does not have that extended balance, it is created, and its RAM is billed to sysio.
 
-If {{memo}} starts with "deposit to:", the account {{from}} will be replaced by the subsequent content of {{memo}} whenever it is possible.
+If {{memo}} starts with "deposit to:", the account {{from}} will be replaced by the subsequent content of {{memo}} whenever it is possible. The named account must exist.
 
 Two typed routes take precedence over the memo, and each accepts exactly one transfer. If {{from}} is a shadow token from which this contract has a yield payout outstanding (see accrueyield), {{quantity}} must be that payout, which was already credited to the pool; the receipt is retired and nothing else is deposited. Otherwise, if {{from}} has a yield funding pending (see fundyield), {{quantity}} must be the announced amount, which fills the announced pair's reservoir. In either case any other transfer from {{from}} fails.
 
@@ -87,7 +71,7 @@ The pair token supply minted is the square root of the product of the two initia
 
 If {{yield_leg}} is given it must be the first leg, and the pair becomes a yield pool on that shadow token: the yield the contract is owed on the shadow it holds is settled into the second leg without minting, before every addliquidity and remliquidity and on accrueyield. Without {{yield_leg}} the pair is a plain pool.
 
-RAM will be deducted from {{user}}’s resources to create the necessary records.
+The RAM of the necessary records is billed to sysio.
 Authorization of {{user}} and of the contract is required.
 
 
@@ -210,7 +194,7 @@ summary: 'Announce {{nowrap quantity}} of shadow for the reservoir of {{nowrap p
 
 {{from}} announces the transfer of exactly {{quantity}}, in the shadow symbol of the yield pool {{pair_token}}, to this contract. The transfer of {{quantity}} from {{from}} that follows, in this transaction or a later one, is added to the reservoir of {{pair_token}}, the shadow queued to be sold through the pool, and not to {{from}}'s extended balance. While the announcement is pending, any other transfer from {{from}} to this contract is refused. A new announcement by {{from}} replaces the pending one. When the delivery fills a reservoir that was empty, the pair's tick clock restarts.
 
-RAM for the record of the announcement will be deducted from {{from}}'s resources, and returned by cancelyield or by the delivery.
+The RAM of the record of the announcement is billed to sysio, and returned by cancelyield or by the delivery.
 
 Authorization of {{from}} is required.
 
@@ -223,7 +207,7 @@ title: Cancel yield funding
 summary: 'Drop the pending funding announcement of {{nowrap from}}'
 ---
 
-{{from}} agrees to withdraw their pending fundyield announcement. The record is erased and its RAM returned to {{from}}, and transfers from {{from}} to this contract are treated as ordinary deposits again. The action fails if {{from}} has no pending announcement.
+{{from}} agrees to withdraw their pending fundyield announcement. The record is erased and its RAM returned to sysio, and transfers from {{from}} to this contract are treated as ordinary deposits again. The action fails if {{from}} has no pending announcement.
 
 Authorization of {{from}} is required.
 
@@ -276,20 +260,7 @@ summary: 'Close {{nowrap owner}}’s zero quantity balance'
 
 {{owner}} agree to close their zero quantity balance for the {{symbol_to_symbol_code symbol}} token.
 
-RAM will be refunded to the RAM payer of the {{symbol_to_symbol_code symbol}} token balance for {{owner}}.
-
-
-<h1 class="contract">open</h1>
-
----
-spec_version: "0.2.0"
-title: Open Token Balance
-summary: 'Open a zero quantity balance for {{nowrap owner}}'
----
-
-{{ram_payer}} agrees to establish a zero quantity balance for {{owner}} for the {{symbol_to_symbol_code symbol}} token.
-
-If {{owner}} does not have a balance for {{symbol_to_symbol_code symbol}}, {{ram_payer}} will be designated as the RAM payer of the {{symbol_to_symbol_code symbol}} token balance for {{owner}}. As a result, RAM will be deducted from {{ram_payer}}’s resources to create the necessary records.
+RAM will be refunded to sysio, which pays for every {{symbol_to_symbol_code symbol}} token balance.
 
 
 <h1 class="contract">transfer</h1>
@@ -305,9 +276,7 @@ summary: 'Send {{nowrap quantity}} from {{nowrap from}} to {{nowrap to}}'
 (2) {{#if memo}} There is a memo attached to the transfer stating: {{memo}}
 {{/if}}
 
-(3) If {{from}} is not already the RAM payer of their {{asset_to_symbol_code quantity}} token balance, {{from}} will be designated as such. As a result, RAM will be deducted from {{from}}’s resources to refund the original RAM payer.
+(3) If {{to}} does not have a balance for {{asset_to_symbol_code quantity}}, one is created. The RAM of both balances is billed to sysio, not to {{from}} or {{to}}.
 
-(4) If {{to}} does not have a balance for {{asset_to_symbol_code quantity}}, {{from}} will be designated as the RAM payer of the {{asset_to_symbol_code quantity}} token balance for {{to}}. As a result, RAM will be deducted from {{from}}’s resources to create the necessary records.
-
-(5) The account {{from}} is notified.
-(6) The account {{to}} is notified.
+(4) The account {{from}} is notified.
+(5) The account {{to}} is notified.

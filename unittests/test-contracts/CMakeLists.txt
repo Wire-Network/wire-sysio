@@ -23,6 +23,7 @@ elseif( USE_SYSIO_CDT_1_8_X )
 endif()
 
 add_subdirectory( asserter )
+add_subdirectory( cpu_receiver_test )
 add_subdirectory( get_sender_test )
 add_subdirectory( get_table_test )
 add_subdirectory( integration_test )

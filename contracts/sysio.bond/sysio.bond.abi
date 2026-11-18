@@ -136,6 +136,10 @@
                 {
                     "name": "account",
                     "type": "name"
+                },
+                {
+                    "name": "issuer",
+                    "type": "name"
                 }
             ]
         },
@@ -470,7 +474,15 @@
                     "type": "name"
                 },
                 {
+                    "name": "issuer",
+                    "type": "name"
+                },
+                {
                     "name": "amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "reservations",
                     "type": "uint64"
                 }
             ]
@@ -481,6 +493,10 @@
             "fields": [
                 {
                     "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "issuer",
                     "type": "name"
                 }
             ]
@@ -632,8 +648,8 @@
             "name": "wireclaims",
             "type": "wire_claim",
             "index_type": "i64",
-            "key_names": ["account"],
-            "key_types": ["name"],
+            "key_names": ["account","issuer"],
+            "key_types": ["name","name"],
             "table_id": 22082
         },
         {

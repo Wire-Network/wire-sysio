@@ -32,7 +32,7 @@ constexpr long   minimum_long_filename_name_max = 64;
 /**
  * Owns an open file stream and closes its underlying descriptor when a test scope exits.
  */
-using file_stream_ptr = std::unique_ptr<std::FILE, decltype(&std::fclose)>;
+using file_stream_ptr = std::unique_ptr<std::FILE, int (*)(std::FILE*)>;
 
 /**
  * Restores the process umask when a test scope exits.
