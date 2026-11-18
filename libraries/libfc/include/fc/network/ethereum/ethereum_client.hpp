@@ -474,7 +474,8 @@ public:
 
    /**
     * @brief Retrieves the latest block number.
-    * @return The block number as a string in hexadecimal format.
+    * @return The latest block number.
+    * @throws ethereum_transaction_policy_exception if the answer is not a canonical QUANTITY.
     */
    fc::uint256 get_block_number();
 
@@ -624,6 +625,8 @@ public:
     * @return The `eth_getTransactionReceipt` object, as the node returned it.
     * @throws fc::timeout_exception on deadline expiry, fc::exception on an
     *         on-chain revert (`status == 0`).
+    * @throws ethereum_transaction_policy_exception when a confirmation depth over one
+    *         reads a receipt `blockNumber` that is not a canonical QUANTITY.
     */
    fc::variant wait_for_receipt(const std::string& tx_hash,
                                 const ethereum_confirm_options& opts = ethereum_confirm_option_defaults);
@@ -649,6 +652,8 @@ public:
     * @param to_block Ending block for the query range
     * @return Vector of ethereum_event_data structs sorted by block number and log index
     * @throws fc::network::json_rpc::json_rpc_exception if the RPC call fails
+    * @throws ethereum_transaction_policy_exception if a log's `blockNumber`, `logIndex` or
+    *         `transactionIndex` is not a canonical QUANTITY, or an index exceeds uint32
     */
    std::vector<ethereum_event_data> get_events(const address_compat_type& contract_address,
                                                 const std::vector<std::string>& event_names,

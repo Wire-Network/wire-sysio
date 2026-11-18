@@ -5905,9 +5905,6 @@ struct producer_score_tester : public producer_eligibility_tester {
    action_result set_producer_collateral(const fc::variants& req_prod_collat,
                                          uint64_t prune_delay_ms = 600'000) {
       return push_opreg_action(OPREG, "setconfig"_n, mvo()
-         ("max_available_producers",          uint32_t{21})
-         ("max_available_batch_ops",          uint32_t{63})
-         ("max_available_underwriters",       uint32_t{21})
          ("terminate_prune_delay_ms",         prune_delay_ms)
          ("terminate_max_consecutive_misses", uint32_t{5})
          ("terminate_max_pct_misses_24h",     uint32_t{5})

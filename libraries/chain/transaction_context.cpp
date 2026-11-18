@@ -571,16 +571,17 @@ namespace sysio::chain {
    }
 
    void transaction_context::pause_billing_timer() {
-      if( !enforce_deadline || explicit_billed_cpu_time ) return; // irrelevant
+      if( explicit_billed_cpu_time ) return; // explicit CPU, not measured
       assert(!paused_timer);
 
       paused_time = fc::time_point::now();
       paused_timer = true;
-      transaction_timer.stop();
+      if( enforce_deadline )
+         transaction_timer.stop();
    }
 
    void transaction_context::resume_billing_timer(fc::time_point resume_from) {
-      if( !enforce_deadline || explicit_billed_cpu_time ) return; // irrelevant
+      if( explicit_billed_cpu_time ) return; // explicit CPU, not measured
       if (resume_from != fc::time_point()) {
          paused_time = resume_from;
       } else {
@@ -590,8 +591,13 @@ namespace sysio::chain {
       auto now = fc::time_point::now();
       auto paused = now - paused_time;
 
+      // The measured CPU leaves the pause out, with or without an enforced deadline.
       pseudo_start += paused;
       action_start += paused;
+      paused_timer = false;
+
+      if( !enforce_deadline ) return; // no deadline to move; the timer was left running
+
       active_deadline += paused;
       trx_deadline += paused;
 
@@ -605,7 +611,6 @@ namespace sysio::chain {
          trx_deadline = block_deadline;
       }
 
-      paused_timer = false;
       transaction_timer.start(active_deadline);
    }
 

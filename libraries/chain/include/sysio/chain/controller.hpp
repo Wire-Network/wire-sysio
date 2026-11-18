@@ -154,7 +154,6 @@ namespace sysio::chain {
             bool                     disable_replay_opts    =  false;
             bool                     contracts_console      =  false;
             bool                     allow_ram_billing_in_notify = false;
-            uint32_t                 maximum_variable_signature_length = chain::config::default_max_variable_signature_length;
             uint32_t                 terminate_at_block     = 0;
             uint32_t                 truncate_at_block      = 0;
             uint32_t                 num_configured_p2p_peers = 0;
@@ -432,11 +431,6 @@ namespace sysio::chain {
          bool is_speculative_block()const;
          // returns true for block_status::incomplete block
          bool is_producing_block()const;
-
-         //This is only an accessor to the user configured subjective limit: i.e. it does not do a
-         // check similar to is_ram_billing_in_notify_allowed() to check if controller is currently
-         // producing a block
-         uint32_t configured_subjective_signature_length_limit()const;
 
          void add_resource_greylist(const account_name &name);
          void remove_resource_greylist(const account_name &name);

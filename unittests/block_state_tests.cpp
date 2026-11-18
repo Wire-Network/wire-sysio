@@ -12,6 +12,14 @@
 using namespace sysio::chain;
 using namespace fc::crypto::bls;
 
+// Accessor reaches into block_handle's private internal() for tests that need
+// the underlying block_state_ptr. block_handle declares friend block_handle_accessor.
+namespace sysio::chain {
+   struct block_handle_accessor {
+      static const block_state_ptr& get_bsp(const block_handle& h) { return h.internal(); }
+   };
+}
+
 BOOST_AUTO_TEST_SUITE(block_state_tests)
 
 BOOST_AUTO_TEST_CASE(aggregate_vote_test) try {
@@ -1203,7 +1211,7 @@ BOOST_AUTO_TEST_CASE(get_best_qc_dual_finalizer_consistency) try {
 
 namespace {
 
-// Shared fixture state for the cross-source get_best_qc tests below.
+// Shared fixture state for the get_best_qc tests below.
 // Active policy: { dual(w1), A1(w2), A2(w9) }, pending policy: { P0(w1), dual(w2), P2(w9) },
 // threshold 8 on both. The dual finalizer is active index 0 and pending index 1.
 struct dual_policy_fixture {
@@ -1214,6 +1222,14 @@ struct dual_policy_fixture {
    static constexpr size_t num_finalizers = 3;
    static constexpr uint32_t generation = 1;
    static constexpr uint64_t threshold = 8; // 2/3 of total weights of 12
+
+   static constexpr size_t active_dual_index  = 0; ///< dual finalizer in the active policy
+   static constexpr size_t pending_dual_index = 1; ///< dual finalizer in the pending policy
+   static constexpr size_t pending_only_index = 0; ///< P0, pending policy only, weight 1
+   static constexpr size_t heavy_index        = 2; ///< A2 / P2, single-policy finalizers with weight 9
+
+   /// Strength of a vote aggregated by vote().
+   enum class strength_t { strong, weak };
 
    std::vector<bls_private_key> active_private_keys {
       bls_private_key("PVT_BLS_tNAkC5MnI-fjHWSX7la1CPC2GIYgzW5TBfuKFPagmwVVsOeW"), // dual finalizer
@@ -1249,6 +1265,14 @@ struct dual_policy_fixture {
       bsp->strong_digest = strong_digest;
       bsp->weak_digest = weak_digest;
       bsp->aggregating_qc = aggregating_qc_t{ bsp->active_finalizer_policy, bsp->pending_finalizer_policy->second };
+   }
+
+   /// Signs and aggregates a vote from `key` into bsp, which applies it to every policy holding the key.
+   void vote(const bls_private_key& key, strength_t strength) {
+      const bool strong = strength == strength_t::strong;
+      const bls_signature sig = strong ? key.sign_sha256(strong_digest) : key.sign_raw(weak_digest);
+      const vote_message msg{ block_id, strong, key.get_public_key(), sig };
+      BOOST_REQUIRE(bsp->aggregate_vote(0, msg).result == vote_result_t::success);
    }
 
    // Builds a receiver-valid weak-unit qc_t: both parts meet quorum with one
@@ -1410,6 +1434,75 @@ BOOST_FIXTURE_TEST_CASE(set_received_qc_strong_unit_replaces_weak_unit, dual_pol
    BOOST_CHECK(best->is_strong());
 } FC_LOG_AND_RETHROW();
 
+// A dual finalizer votes weak, the active part reaches strong and the pending part stays weak. The aggregated
+// qc carries the weak vote in both parts, so the strong active part is emitted with its weak votes.
+BOOST_FIXTURE_TEST_CASE(get_best_qc_dual_weak_vote_active_strong_pending_weak, dual_policy_fixture) try {
+   vote(active_private_keys[active_dual_index], strength_t::weak); // active weak 1, pending weak 2
+   vote(active_private_keys[heavy_index], strength_t::strong);     // active strong 9: strong
+   vote(pending_private_keys[heavy_index], strength_t::weak);      // pending weak 11: weak_final
+
+   std::optional<qc_t> best = bsp->get_best_qc();
+   BOOST_REQUIRE(best.has_value());
+   BOOST_REQUIRE(best->pending_policy_sig.has_value());
+   BOOST_CHECK_NO_THROW(bsp->verify_qc(*best));
+   BOOST_CHECK(best->is_weak());
+
+   const std::optional<vote_bitset_t>& active_weak  = best->active_policy_sig.weak_votes;
+   const std::optional<vote_bitset_t>& pending_weak = best->pending_policy_sig->weak_votes;
+   BOOST_CHECK(active_weak && (*active_weak)[active_dual_index]);
+   BOOST_CHECK(pending_weak && (*pending_weak)[pending_dual_index]);
+} FC_LOG_AND_RETHROW();
+
+// Mirror of the case above: the pending part reaches strong and the active part stays weak.
+BOOST_FIXTURE_TEST_CASE(get_best_qc_dual_weak_vote_pending_strong_active_weak, dual_policy_fixture) try {
+   vote(active_private_keys[active_dual_index], strength_t::weak); // active weak 1, pending weak 2
+   vote(active_private_keys[heavy_index], strength_t::weak);       // active weak 10: weak_final
+   vote(pending_private_keys[heavy_index], strength_t::strong);    // pending strong 9: strong
+
+   std::optional<qc_t> best = bsp->get_best_qc();
+   BOOST_REQUIRE(best.has_value());
+   BOOST_REQUIRE(best->pending_policy_sig.has_value());
+   BOOST_CHECK_NO_THROW(bsp->verify_qc(*best));
+   BOOST_CHECK(best->is_weak());
+
+   const std::optional<vote_bitset_t>& active_weak  = best->active_policy_sig.weak_votes;
+   const std::optional<vote_bitset_t>& pending_weak = best->pending_policy_sig->weak_votes;
+   BOOST_CHECK(active_weak && (*active_weak)[active_dual_index]);
+   BOOST_CHECK(pending_weak && (*pending_weak)[pending_dual_index]);
+} FC_LOG_AND_RETHROW();
+
+// Both parts reach strong while a dual finalizer voted weak. Both parts are emitted strong-only, which drops the
+// weak vote from both, and the qc is strong.
+BOOST_FIXTURE_TEST_CASE(get_best_qc_dual_weak_vote_both_strong, dual_policy_fixture) try {
+   vote(active_private_keys[active_dual_index], strength_t::weak); // active weak 1, pending weak 2
+   vote(active_private_keys[heavy_index], strength_t::strong);     // active strong 9: strong
+   vote(pending_private_keys[heavy_index], strength_t::strong);    // pending strong 9: strong
+
+   std::optional<qc_t> best = bsp->get_best_qc();
+   BOOST_REQUIRE(best.has_value());
+   BOOST_REQUIRE(best->pending_policy_sig.has_value());
+   BOOST_CHECK_NO_THROW(bsp->verify_qc(*best));
+   BOOST_CHECK(best->is_strong());
+   BOOST_CHECK(!best->active_policy_sig.weak_votes);
+   BOOST_CHECK(!best->pending_policy_sig->weak_votes);
+} FC_LOG_AND_RETHROW();
+
+// A strong part with no weak votes stays strong-only when the other part is weak, and the qc verifies.
+BOOST_FIXTURE_TEST_CASE(get_best_qc_strong_part_without_weak_votes, dual_policy_fixture) try {
+   vote(active_private_keys[heavy_index], strength_t::strong);        // active strong 9: strong
+   vote(pending_private_keys[pending_only_index], strength_t::weak);  // pending weak 1
+   vote(pending_private_keys[heavy_index], strength_t::weak);         // pending weak 10: weak_final
+
+   std::optional<qc_t> best = bsp->get_best_qc();
+   BOOST_REQUIRE(best.has_value());
+   BOOST_REQUIRE(best->pending_policy_sig.has_value());
+   BOOST_CHECK_NO_THROW(bsp->verify_qc(*best));
+   BOOST_CHECK(best->is_weak());
+   BOOST_CHECK(best->active_policy_sig.is_strong());
+   BOOST_CHECK(!best->active_policy_sig.weak_votes);
+   BOOST_CHECK(best->pending_policy_sig->weak_votes.has_value());
+} FC_LOG_AND_RETHROW();
+
 // Concurrency test: verify that get_best_qc never observes a dual finalizer
 // vote in one policy without the other. One thread adds votes while another
 // repeatedly snapshots via get_best_qc and checks consistency.
@@ -1541,6 +1634,59 @@ BOOST_FIXTURE_TEST_CASE(get_finality_data_test, finality_test_cluster<4>) try {
    process_votes(1, num_nodes - 1); // all non-producing nodes (starting from node1) vote
    finality_data = node0.control->head_finality_data();
    BOOST_REQUIRE(!finality_data.pending_finalizer_policy.has_value());
+} FC_LOG_AND_RETHROW();
+
+// The producer includes a qc only if it passes the structural checks receiving nodes apply. The qc stored for
+// the head block below has dual finalizers voting strong in the active part and weak in the pending part, so
+// the next block carries no qc and repeats its parent's qc claim.
+BOOST_FIXTURE_TEST_CASE(produce_block_omits_qc_failing_basic_verification, finality_test_cluster<4>) try {
+   // node0 moves to another key; node1..node3 keep theirs and are dual finalizers while the new policy is pending.
+   std::array<size_t, num_nodes> key_indices = fin_policy_indices_0;
+   key_indices[0] = 1;
+   node0.finkeys.set_finalizer_policy(key_indices);
+
+   for (size_t i = 0; i < sysio::testing::num_chains_to_final; ++i) {
+      produce_and_push_block();
+      process_votes(1, num_nodes - 1);
+   }
+   produce_and_push_block(); // the proposed policy becomes pending in this block, no votes processed for it
+
+   const block_handle head = node0.control->head();
+   const block_state_ptr& head_bsp = block_handle_accessor::get_bsp(head);
+   BOOST_REQUIRE(head_bsp->pending_finalizer_policy);
+
+   const size_t num_active  = head_bsp->active_finalizer_policy->finalizers.size();
+   const size_t num_pending = head_bsp->pending_finalizer_policy->second->finalizers.size();
+   vote_bitset_t all_active(num_active);
+   all_active.flip();
+   vote_bitset_t all_pending(num_pending);
+   all_pending.flip();
+
+   // Every finalizer votes strong in the active part and weak in the pending part. The signatures are never
+   // checked: the structural checks reject the qc first.
+   const qc_t inconsistent_qc{head_bsp->block_num(),
+                              qc_sig_t{all_active, {}, bls_aggregate_signature{}},
+                              qc_sig_t{vote_bitset_t(num_pending), all_pending, bls_aggregate_signature{}}};
+   BOOST_CHECK_EXCEPTION(
+      head_bsp->verify_qc_basic(inconsistent_qc), invalid_qc,
+      sysio::testing::fc_exception_message_contains("does not vote the same on active and pending policies"));
+
+   BOOST_REQUIRE(head_bsp->set_received_qc(inconsistent_qc));
+   const std::optional<qc_t> best = head_bsp->get_best_qc();
+   BOOST_REQUIRE(best.has_value());
+   BOOST_REQUIRE(best->to_qc_claim() > head_bsp->core.latest_qc_claim()); // the qc would advance the claim
+
+   const qc_claim_t parent_claim = head_bsp->core.latest_qc_claim();
+   const signed_block_ptr b = produce_and_push_block(); // node1..node3 reject a block carrying the qc
+   BOOST_CHECK(!b->qc);
+   BOOST_CHECK_EQUAL(b->qc_claim, parent_claim);
+
+   // Votes on the new head form a valid qc, which the following block includes.
+   process_votes(1, num_nodes - 1);
+   const signed_block_ptr next = produce_and_push_block();
+   BOOST_REQUIRE(next->qc);
+   BOOST_CHECK_EQUAL(next->qc->block_num, b->block_num());
+   BOOST_CHECK(next->qc->is_strong());
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_SUITE_END()

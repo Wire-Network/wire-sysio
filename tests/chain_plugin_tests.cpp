@@ -191,10 +191,12 @@ BOOST_FIXTURE_TEST_CASE( block_num_string_outside_uint32_is_unknown_block, valid
       {std::to_string(uint32_max + 2), std::nullopt},            // 4294967297: low 32 bits name block 1
       {std::to_string(uint32_max + 1 + head_num), std::nullopt}, // low 32 bits name the head block
       {std::to_string(uint64_max), std::nullopt},                // low 32 bits are 4294967295
-      {"-1", std::nullopt},
-      {"-" + std::to_string(uint32_max), std::nullopt},          // -4294967295: 1 modulo 2^32
-      {"-" + std::to_string(uint64_max), std::nullopt},          // -18446744073709551615: 1 modulo 2^64
    };
+
+   // Neither a number nor a block id. A minus sign makes no block number: "-4294967295" is 1 modulo 2^32 and
+   // "-18446744073709551615" is 1 modulo 2^64.
+   const std::vector<std::string> not_block_num_or_id{
+      "nope", "-1", "-" + std::to_string(uint32_max), "-" + std::to_string(uint64_max)};
 
    for (const auto& [endpoint, lookup_block_num] : endpoints) {
       for (const auto& [block_num_or_id, named] : cases) {
@@ -206,9 +208,10 @@ BOOST_FIXTURE_TEST_CASE( block_num_string_outside_uint32_is_unknown_block, valid
             }
          }
       }
-      // Neither a number nor a block id.
-      BOOST_TEST_CONTEXT(endpoint) {
-         BOOST_CHECK_THROW(lookup_block_num("nope"), block_id_type_exception);
+      for (const std::string& block_num_or_id : not_block_num_or_id) {
+         BOOST_TEST_CONTEXT(endpoint << " " << block_num_or_id) {
+            BOOST_CHECK_THROW(lookup_block_num(block_num_or_id), block_id_type_exception);
+         }
       }
    }
 } FC_LOG_AND_RETHROW() /// block_num_string_outside_uint32_is_unknown_block

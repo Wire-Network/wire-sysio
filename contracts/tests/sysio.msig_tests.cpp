@@ -6,9 +6,13 @@
 #include <sysio/chain/resource_limits_private.hpp>
 #include <sysio/chain/wast_to_wasm.hpp>
 
+#include <fc/crypto/sha256.hpp>
 #include <fc/variant_object.hpp>
 #include "contracts.hpp"
 #include "test_symbol.hpp"
+
+#include <algorithm>
+#include <cstring>
 
 using namespace sysio::testing;
 using namespace sysio;
@@ -668,6 +672,70 @@ BOOST_FIXTURE_TEST_CASE( big_transaction, sysio_msig_tester ) try {
 } FC_LOG_AND_RETHROW()
 
 
+
+namespace {
+
+/// Deterministic K1 public key from raw bytes. The authority walk only orders and compares keys, so no curve point
+/// is needed.
+public_key_type make_raw_test_key( uint64_t seed ) {
+   const fc::sha256 digest = fc::sha256::hash( seed );
+   fc::ecc::public_key_data data{};
+   data[0] = 0x02; // compressed-point prefix
+   std::memcpy( data.data() + 1, digest.data(), sizeof(digest) );
+   return public_key_type( public_key_type::storage_type( fc::ecc::public_key_shim( data ) ) );
+}
+
+} // namespace
+
+// `exec` rechecks the proposal against its declared authority. That authority fills an updateauth transaction with
+// keys whose weights ascend in declaration order, and the requested approver carries the lowest weight, so every
+// entry is visited; exec still runs within the transaction CPU limit.
+BOOST_FIXTURE_TEST_CASE( exec_with_large_declared_authority, sysio_msig_tester ) try {
+   const permission_level approver{ "bob"_n, config::active_name };
+
+   constexpr size_t header_margin  = 4096;
+   const size_t     key_entry_size = fc::raw::pack_size( key_weight{ make_raw_test_key( 0 ), 1 } );
+   const uint32_t   max_trx_net    = control->get_global_properties().configuration.max_transaction_net_usage;
+   const size_t     key_count      = ( max_trx_net - header_margin ) / key_entry_size;
+
+   authority large( 1, {}, { { approver, 1 } } );
+   large.keys.reserve( key_count );
+   for( size_t i = 0; i < key_count; ++i )
+      large.keys.push_back( { make_raw_test_key( i ), 0 } );
+   std::sort( large.keys.begin(), large.keys.end() );
+   for( size_t i = 0; i < key_count; ++i )
+      large.keys[i].weight = static_cast<weight_type>( i + 2 );
+   BOOST_REQUIRE( sysio::chain::validate( large ) );
+   set_authority( "alice"_n, config::active_name, std::move( large ) );
+   produce_block();
+
+   const transaction proposed = reqauth( "alice"_n, { permission_level{ "alice"_n, config::active_name } } );
+   push_action( "carol"_n, "propose"_n, mvo()
+                  ("proposer",      "carol")
+                  ("proposal_name", "large")
+                  ("trx",           proposed)
+                  ("requested",     vector<permission_level>{ approver })
+   );
+   push_action( "bob"_n, "approve"_n, mvo()
+                  ("proposer",      "carol")
+                  ("proposal_name", "large")
+                  ("level",         approver)
+   );
+
+   signed_transaction exec_trx = create_signed_trx( "sysio.msig"_n, "exec"_n, { { "carol"_n, config::active_name } },
+                                                    mvo()
+                                                       ("proposer",      "carol")
+                                                       ("proposal_name", "large")
+                                                       ("executer",      "carol") );
+   const transaction_trace_ptr trace =
+      base_tester::push_transaction( exec_trx, fc::time_point::maximum(), measured_cpu );
+   produce_block();
+   BOOST_REQUIRE( chain_has_transaction( trace->id ) );
+   check_traces( trace, {
+                        {{"receiver", "sysio.msig"_n}, {"act_name", "exec"_n}},
+                        {{"receiver", config::system_account_name}, {"act_name", "reqauth"_n}}
+                        } );
+} FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( update_system_contract_all_approve, sysio_msig_tester ) try {
 

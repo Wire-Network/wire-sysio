@@ -200,7 +200,6 @@ public:
          ("epoch_retention_envelope_log_count", 200)));
 
       BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "setconfig"_n, mvo()
-         ("max_available_producers", 21)("max_available_batch_ops", 63)("max_available_underwriters", 21)
          ("terminate_prune_delay_ms", 600000)("terminate_max_consecutive_misses", 5)
          ("terminate_max_pct_misses_24h", 5)("terminate_window_ms", uint64_t{24ULL*60*60*1000})
          ("req_prod_collat", fc::variants{})("req_batchop_collat", fc::variants{})
@@ -1164,7 +1163,6 @@ BOOST_FIXTURE_TEST_CASE(deliver_rejects_decollateralized_unknown_group_member, s
 
    // Require an ETH bond so a non-bootstrapped op's status tracks its collateral.
    BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "setconfig"_n, mvo()
-      ("max_available_producers", 21)("max_available_batch_ops", 63)("max_available_underwriters", 21)
       ("terminate_prune_delay_ms", 600000)("terminate_max_consecutive_misses", 5)
       ("terminate_max_pct_misses_24h", 5)("terminate_window_ms", uint64_t{24ULL * 60 * 60 * 1000})
       ("req_prod_collat", fc::variants{})

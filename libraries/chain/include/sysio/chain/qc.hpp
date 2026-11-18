@@ -125,6 +125,12 @@ namespace sysio::chain {
          strong         // Enough `strong` votes to have a valid `strong` QC
       };
 
+      /// Form of a qc_sig_t built from the aggregated votes. A part without weak votes is strong-only in either form.
+      enum class sig_form_t {
+         by_state,       ///< strong votes only in the `strong` state, strong and weak votes in other quorate states
+         strong_and_weak ///< strong and weak votes in every quorate state
+      };
+
       struct votes_t : fc::reflect_init {
       private:
          friend struct fc::reflector<votes_t>;
@@ -193,8 +199,8 @@ namespace sysio::chain {
       // source into a qc_t; parts from different sources must never be mixed
       // (see aggregating_qc_t::get_best_qc).
       std::optional<qc_sig_t> received_qc_sig_copy() const;
-      // aggregated votes as a qc_sig_t, or nullopt when quorum has not been met
-      std::optional<qc_sig_t> aggregated_qc_sig() const;
+      /// Aggregated votes as a qc_sig_t in `form`, or nullopt when quorum has not been met.
+      std::optional<qc_sig_t> aggregated_qc_sig(sig_form_t form) const;
       bool has_received_qc_sig() const;
       // Unconditional store. Whether a received qc replaces the stored one is
       // decided by aggregating_qc_t::set_received_qc for the whole qc_t unit.
@@ -221,7 +227,8 @@ namespace sysio::chain {
       vote_result_t add_weak_vote(size_t index, const bls_signature& sig, uint64_t weight);
 
       bool is_quorum_met_no_lock() const;
-      qc_sig_t extract_qc_sig_from_aggregating() const;
+      /// Aggregated votes as a qc_sig_t in `form`. Called with the mutex held and quorum met.
+      qc_sig_t extract_qc_sig_from_aggregating(sig_form_t form) const;
    };
 
    // finalizer authority of strong, weak, or missing votes
@@ -263,6 +270,8 @@ namespace sysio::chain {
 
       aggregating_qc_t() = default;
 
+      /// Best qc for block `block_num` built from a single source, received or aggregated, or nullopt when there is
+      /// none. An aggregated qc keeps weak votes in both parts or drops them from both.
       std::optional<qc_t> get_best_qc(block_num_type block_num) const;
 
       qc_vote_metrics_t vote_metrics(const qc_t& qc) const;
