@@ -28,7 +28,9 @@ code/abi AND reconcile the account's gifted RAM to its exact new usage out of
 sysio's pool via `giftram`, measured after the write (re-callable: a smaller
 re-deploy reclaims). A raw `setcode` here skips that reconciliation and leaves
 the account paying for any growth out of a finite quota it does not have — a
-system account only has a small creation allowance.
+system account only has a small creation allowance. That includes `sysio.roa`
+once active: `activateroa` pins its quota to its usage, so only its bootstrap
+deploy is raw.
 
 *The root `sysio` account* — which holds `sysio.system` and **is the RAM pool
 itself** — deploys with the **native `setcode` / `setabi`**. `giftram` cannot

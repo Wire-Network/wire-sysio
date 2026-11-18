@@ -129,9 +129,6 @@ constexpr const char* STILL_SEATED_REGISTRATION_ERROR =
 
 /// sysio.opreg configuration ABI field identifiers used by the WNS-16 fixture.
 namespace opreg_config_fields {
-constexpr const char* MAX_AVAILABLE_PRODUCERS          = "max_available_producers";
-constexpr const char* MAX_AVAILABLE_BATCH_OPERATORS    = "max_available_batch_ops";
-constexpr const char* MAX_AVAILABLE_UNDERWRITERS       = "max_available_underwriters";
 constexpr const char* TERMINATE_PRUNE_DELAY_MS         = "terminate_prune_delay_ms";
 constexpr const char* TERMINATE_MAX_CONSECUTIVE_MISSES = "terminate_max_consecutive_misses";
 constexpr const char* TERMINATE_MAX_PERCENT_MISSES_24H = "terminate_max_pct_misses_24h";
@@ -437,9 +434,6 @@ public:
 
       BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
          "setconfig"_n, mvo()
-            ("max_available_producers",          21)
-            ("max_available_batch_ops",          63)
-            ("max_available_underwriters",       21)
             ("terminate_prune_delay_ms",         600000)
             ("terminate_max_consecutive_misses", 5)
             ("terminate_max_pct_misses_24h",     5)
@@ -1096,17 +1090,11 @@ public:
    /// collateral requirements. This lets the test build real history under a permissive policy,
    /// then demonstrate that deferred slashing wins when the same history becomes terminating.
    void set_termination_thresholds(uint32_t max_consecutive_misses, uint32_t max_percent_misses) {
-      constexpr uint32_t MAX_AVAILABLE_PRODUCERS    = 21;
-      constexpr uint32_t MAX_AVAILABLE_BATCH_OPERATORS = 63;
-      constexpr uint32_t MAX_AVAILABLE_UNDERWRITERS = 21;
       constexpr uint64_t TERMINATE_PRUNE_DELAY_MS   = 600'000;
       constexpr uint64_t TERMINATE_WINDOW_MS        = 24ULL * 60 * 60 * 1000;
 
       BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
          opreg_actions::SET_CONFIG, mvo()
-            (opreg_config_fields::MAX_AVAILABLE_PRODUCERS,          MAX_AVAILABLE_PRODUCERS)
-            (opreg_config_fields::MAX_AVAILABLE_BATCH_OPERATORS,    MAX_AVAILABLE_BATCH_OPERATORS)
-            (opreg_config_fields::MAX_AVAILABLE_UNDERWRITERS,       MAX_AVAILABLE_UNDERWRITERS)
             (opreg_config_fields::TERMINATE_PRUNE_DELAY_MS,         TERMINATE_PRUNE_DELAY_MS)
             (opreg_config_fields::TERMINATE_MAX_CONSECUTIVE_MISSES, max_consecutive_misses)
             (opreg_config_fields::TERMINATE_MAX_PERCENT_MISSES_24H, max_percent_misses)
@@ -1157,9 +1145,6 @@ public:
          ("start_time", fc::time_point_sec(control->head().block_time()))));
 
       BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "setconfig"_n, mvo()
-         ("max_available_producers",          21)
-         ("max_available_batch_ops",          63)
-         ("max_available_underwriters",       21)
          ("terminate_prune_delay_ms",         600000)
          ("terminate_max_consecutive_misses", ROTATION_MAX_CONSECUTIVE_MISSES)
          ("terminate_max_pct_misses_24h",     ROTATION_MAX_PERCENT_MISSES)

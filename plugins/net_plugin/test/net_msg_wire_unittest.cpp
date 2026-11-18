@@ -86,8 +86,8 @@ BOOST_AUTO_TEST_CASE(test_transaction_message_wire_roundtrip) {
    BOOST_CHECK( unpacked_pt.id() == expected_id );
 }
 
-// Same test with zlib compression — the peeked ID must still work
-// because the ID is outside the compressed payload.
+// A zlib-compressed transaction is rejected when its payload is unpacked; the peeked ID, outside the payload, still
+// reads.
 BOOST_AUTO_TEST_CASE(test_transaction_message_zlib) {
    auto pt = make_packed_trx( packed_transaction::compression_type::zlib );
    const auto expected_id = pt.id();
@@ -116,8 +116,7 @@ BOOST_AUTO_TEST_CASE(test_transaction_message_zlib) {
 
    // Full unpack.
    packed_transaction unpacked_pt;
-   fc::raw::unpack( peek_ds, unpacked_pt );
-   BOOST_CHECK( unpacked_pt.id() == expected_id );
+   BOOST_CHECK_THROW( fc::raw::unpack( peek_ds, unpacked_pt ), tx_compression_not_allowed );
 }
 
 // Multiple k1 signatures — verify larger payload doesn't affect peek.

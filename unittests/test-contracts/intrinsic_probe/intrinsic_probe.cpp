@@ -274,9 +274,9 @@ struct sig_hash_key_header {
 };
 constexpr uint32_t RECOVER_BUF_CAPACITY = 512;
 constexpr uint32_t MAX_RECOVERED_PUB    = 128;
-// Large buffer for the recbigwa probe -- WA sig with auth_data + client_json > 16 KiB (the subjective
-// variable-size default). Lives at file scope rather than on the wasm stack because CDT's stack is not
-// configured for >8 KiB per-frame allocations.
+// Large buffer for the recbigwa probe -- WA sig with auth_data + client_json > 16 KiB
+// (config::max_signature_variable_size). Lives at file scope rather than on the wasm stack because CDT's stack is
+// not configured for >8 KiB per-frame allocations.
 constexpr uint32_t BIG_WA_BUF_CAPACITY  = 32 * 1024;
 
 // -----------------------------------------------------------------------------
@@ -866,11 +866,9 @@ public:
              "recover_key with zero-size pub buffer must return the full required key size" );
    }
 
-   // WebAuthn signature whose auth_data + client_json exceeds the subjective variable-size limit (default 16 KiB
-   // from controller_config::maximum_variable_signature_length). Pins the ONE throw recover_key still raises
-   // after the never-throw-for-contract-observable-failures cleanup: the subjective per-node DoS guard against
-   // WA-sig variable-size abuse during speculative block production. See the DEFERRED note in
-   // libraries/chain/webassembly/crypto.cpp::recover_key for the full rationale and the path to removing it.
+   // WebAuthn signature whose auth_data + client_json exceeds config::max_signature_variable_size (16 KiB).
+   // recover_key returns -1 for it without throwing; this probe does not read the result and aborts on its trailing
+   // check once recover_key returns. The trailing check's message names the earlier speculative-only throw.
    //
    // Raw WA sig bytes are passed as action data with no header framing; the driver constructs a WA-variant
    // blob large enough to trigger the cap but small enough to fit in max_transaction_net_usage.
