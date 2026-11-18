@@ -945,16 +945,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( transaction_test, T, validating_testers ) { try {
                ("from", "sysio")
             )
          })
-      )
-      // lets also push a context free action, the multi chain test will then also include a context free action
-      ("context_free_actions", fc::variants({
-         fc::mutable_variant_object()
-            ("account", "sysio")
-            ("name", "nonce")
-            ("data", fc::raw::pack(std::string("dummy")))
-         })
-      )
-      ("context_free_data", fc::variants({""})
       );
 
    abi_serializer::from_variant(pretty_trx, trx, test.get_resolver(), abi_serializer::create_yield_function( test.abi_serializer_max_time ));

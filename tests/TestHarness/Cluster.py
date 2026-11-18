@@ -1581,8 +1581,7 @@ class Cluster(object):
         if trans is None:
             Utils.Print("ERROR: Failed to set sysio.opreg as privileged")
             return None
-        opregConfig=('{"max_available_producers":21,"max_available_batch_ops":63,"max_available_underwriters":21,'
-                     '"terminate_prune_delay_ms":600000,"terminate_max_consecutive_misses":5,'
+        opregConfig=('{"terminate_prune_delay_ms":600000,"terminate_max_consecutive_misses":5,'
                      '"terminate_max_pct_misses_24h":5,"terminate_window_ms":86400000,'
                      '"req_prod_collat":[],"req_batchop_collat":[],"req_uw_collat":[]}')
         trans=biosNode.pushMessage('sysio.opreg', 'setconfig', opregConfig, '--permission sysio.opreg@active')
@@ -1628,6 +1627,16 @@ class Cluster(object):
         Utils.Print("Wait for carl.")
         if not biosNode.waitForTransactionInBlock(transId):
             Utils.Print("ERROR: carl is persona non gratis (tx %s missing)" % transId)
+            return None
+
+        # An issuer pays for its policy rows. carl issues one per harness account, more than its personal RAM covers,
+        # so it funds them first by expanding its own policy.
+        data='{"owner": "carl", "issuer": "carl", "net_weight": "0.0000 %s", "cpu_weight": "0.0000 %s", ' \
+             '"ram_weight": "1.0000 %s", "network_gen": 0}' % (CORE_SYMBOL, CORE_SYMBOL, CORE_SYMBOL)
+        trans=biosNode.pushMessage('sysio.roa', 'expandpolicy', data, '-p carl@active')
+        transId=Node.getTransId(trans[1])
+        if not biosNode.waitForTransactionInBlock(transId):
+            Utils.Print("ERROR: carl could not fund its policy rows (tx %s missing)" % transId)
             return None
 
         # Only call init if the system contract is loaded

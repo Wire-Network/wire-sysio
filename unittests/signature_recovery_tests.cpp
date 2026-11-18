@@ -6,6 +6,7 @@
 
 #include <sysio/chain/transaction.hpp>
 #include <sysio/chain/exceptions.hpp>
+#include <sysio/chain/merkle.hpp>
 #include <sysio/testing/tester.hpp>
 #include <fc/crypto/private_key.hpp>
 #include <fc/crypto/public_key.hpp>
@@ -18,6 +19,44 @@ using namespace sysio::chain;
 using namespace sysio::testing;
 using fc::crypto::private_key;
 using fc::crypto::public_key;
+
+namespace {
+
+/// The account whose active authority is a WebAuthn key.
+constexpr account_name webauthn_account = "wasigner"_n;
+
+/// The sysio.bios action that requires the authorization of the account it names.
+constexpr action_name reqauth_action = "reqauth"_n;
+
+/// A chain on which webauthn_account's active authority is a WebAuthn key.
+struct webauthn_signer_tester : validating_tester {
+   webauthn_signer_tester() {
+      create_account(webauthn_account);
+      set_authority(webauthn_account, config::active_name, authority(key().get_public_key()));
+      produce_block();
+   }
+
+   /// The WebAuthn key of webauthn_account's active authority.
+   static mock::webauthn_private_key key() {
+      return get_private_key<mock::webauthn_private_key>(webauthn_account, "active");
+   }
+
+   /// An unsigned transaction whose one action requires webauthn_account's active authority.
+   signed_transaction reqauth() {
+      signed_transaction trx;
+      trx.actions.emplace_back(vector<permission_level>{{webauthn_account, config::active_name}},
+                               config::system_account_name, reqauth_action, fc::raw::pack(webauthn_account));
+      set_transaction_headers(trx);
+      return trx;
+   }
+
+   /// A WebAuthn signature of @p trx by key() whose variable-size component is @p variable_size bytes.
+   signature_type sign(const signed_transaction& trx, size_t variable_size) const {
+      return key().sign_with_variable_size(trx.sig_digest(get_chain_id()), variable_size);
+   }
+};
+
+} // anonymous namespace
 
 BOOST_AUTO_TEST_SUITE(signature_recovery_tests)
 
@@ -325,6 +364,58 @@ BOOST_AUTO_TEST_CASE(recovered_keys_dedup_in_set) try {
       (void)iter; (void)inserted;
    }
    BOOST_REQUIRE_EQUAL(keys2.size(), 1u);
+} FC_LOG_AND_RETHROW()
+
+/// A WebAuthn signature whose variable-size component is exactly config::max_signature_variable_size authorizes a
+/// transaction, on the producer and on the validating node.
+BOOST_FIXTURE_TEST_CASE(webauthn_signature_at_variable_size_limit_accepted, webauthn_signer_tester) try {
+   signed_transaction trx = reqauth();
+   trx.signatures.push_back(sign(trx, config::max_signature_variable_size));
+   BOOST_REQUIRE_EQUAL(trx.signatures.back().variable_size(), config::max_signature_variable_size);
+
+   push_transaction(trx);
+   produce_block();
+} FC_LOG_AND_RETHROW()
+
+/// A transaction carrying a signature one byte over config::max_signature_variable_size is rejected before its keys are
+/// recovered.
+BOOST_FIXTURE_TEST_CASE(webauthn_signature_over_variable_size_limit_rejected, webauthn_signer_tester) try {
+   constexpr size_t oversized = config::max_signature_variable_size + 1;
+
+   signed_transaction trx = reqauth();
+   trx.signatures.push_back(sign(trx, oversized));
+   BOOST_CHECK_THROW(push_transaction(trx), sig_variable_size_limit_exception);
+
+   // Empty client data JSON fails recovery, so this throw shows the size is checked first.
+   signed_transaction unrecoverable = reqauth();
+   unrecoverable.signatures.emplace_back(signature_type::storage_type(
+      fc::crypto::webauthn::signature(fc::crypto::r1::compact_signature{}, std::vector<uint8_t>(oversized), {})));
+   BOOST_CHECK_THROW(push_transaction(unrecoverable), sig_variable_size_limit_exception);
+} FC_LOG_AND_RETHROW()
+
+/// A validating node rejects a block holding a transaction with a signature over config::max_signature_variable_size.
+/// The producer would refuse that transaction, so its block is rebuilt around the same transaction re-signed by the
+/// same key, with the signature's variable-size component one byte over the limit, then re-merkled and re-signed.
+/// The original block, with the signature at the limit, is accepted afterwards.
+BOOST_FIXTURE_TEST_CASE(block_with_webauthn_signature_over_variable_size_limit_rejected, webauthn_signer_tester) try {
+   signed_transaction trx = reqauth();
+   trx.signatures.push_back(sign(trx, config::max_signature_variable_size));
+   push_transaction(trx);
+   const signed_block_ptr block = produce_block_no_validation();
+   BOOST_REQUIRE_EQUAL(block->transactions.size(), 1u);
+
+   mutable_block_ptr oversized = block->clone();
+   trx.signatures = {sign(trx, config::max_signature_variable_size + 1)};
+   oversized->transactions.front().trx = packed_transaction(trx);
+   deque<digest_type> receipt_digests;
+   for (const transaction_receipt& receipt : oversized->transactions)
+      receipt_digests.emplace_back(receipt.digest());
+   oversized->transaction_mroot   = calculate_merkle(receipt_digests);
+   oversized->producer_signatures = {get_private_key(oversized->producer, "active").sign(oversized->calculate_id())};
+
+   BOOST_CHECK_THROW(validate_push_block(signed_block::create_signed_block(std::move(oversized))),
+                     sig_variable_size_limit_exception);
+   validate_push_block(block);
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()

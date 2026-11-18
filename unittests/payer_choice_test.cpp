@@ -35,6 +35,8 @@ struct kv_billing_fixture : tester {
       create_accounts({CONTRACT, ALICE, CAROL, OWNER}, false, true, false, true);
       produce_block();
       register_node_owner(OWNER, 2);
+      // A tier-2 owner holds no spare RAM; it funds the policy rows it pays for before issuing.
+      add_roa_policy(OWNER, OWNER, "0.0000 SYS", "0.0000 SYS", "0.0010 SYS", 0, 0);
       add_roa_policy(OWNER, CONTRACT, "10.0000 SYS", "10.0000 SYS", "1.3000 SYS", 0, 0);
       add_roa_policy(NODE_DADDY, ALICE, "100.0000 SYS", "100.0000 SYS", "100.0000 SYS", 0, 0);
       add_roa_policy(NODE_DADDY, CAROL, "100.0000 SYS", "100.0000 SYS", "100.0000 SYS", 0, 0);
@@ -83,6 +85,8 @@ BOOST_AUTO_TEST_SUITE(payer_choice_test)
         c.produce_block();
 
         c.register_node_owner(bob_account, 2);
+        // A tier-2 owner holds no spare RAM; it funds the policy rows it pays for before issuing.
+        c.add_roa_policy(bob_account, bob_account, "0.0000 SYS", "0.0000 SYS", "0.0010 SYS", 0, 0);
         c.add_roa_policy(bob_account, tester1_account, "1.0000 SYS", "1.0000 SYS",
                          std::string(ram_restrictions_contract_ram_weight), 0, 0);
         c.add_roa_policy(c.NODE_DADDY, alice_account, "100.0000 SYS", "100.0000 SYS", "100.0000 SYS", 0, 0);
@@ -142,6 +146,8 @@ BOOST_AUTO_TEST_SUITE(payer_choice_test)
         // ROA: give kvtest enough RAM for contract deployment (WASM × 10 multiplier),
         // alice enough for data storage.
         c.register_node_owner(bob_account, 2);
+        // A tier-2 owner holds no spare RAM; it funds the policy rows it pays for before issuing.
+        c.add_roa_policy(bob_account, bob_account, "0.0000 SYS", "0.0000 SYS", "0.0010 SYS", 0, 0);
         c.add_roa_policy(bob_account, contract_account, "10.0000 SYS", "10.0000 SYS", "1.3000 SYS", 0, 0);
         c.add_roa_policy(c.NODE_DADDY, alice_account, "100.0000 SYS", "100.0000 SYS", "100.0000 SYS", 0, 0);
         c.produce_block();
@@ -210,6 +216,8 @@ BOOST_AUTO_TEST_SUITE(payer_choice_test)
         c.produce_block();
 
         c.register_node_owner(bob_account, 2);
+        // A tier-2 owner holds no spare RAM; it funds the policy rows it pays for before issuing.
+        c.add_roa_policy(bob_account, bob_account, "0.0000 SYS", "0.0000 SYS", "0.0010 SYS", 0, 0);
         c.add_roa_policy(bob_account, tester1_account, "1.0000 SYS", "1.0000 SYS",
                          std::string(ram_restrictions_contract_ram_weight), 0, 0);
         c.add_roa_policy(c.NODE_DADDY, alice_account, "100.0000 SYS", "100.0000 SYS", "100.0000 SYS", 0, 0);
