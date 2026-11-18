@@ -13,6 +13,7 @@
 #include <fc/int256.hpp>
 #include <fc/network/ethereum/ethereum_abi.hpp>
 #include <fc/network/ethereum/ethereum_client.hpp>
+#include <fc/network/ethereum/ethereum_transaction_policy.hpp>
 #include <fc/time.hpp>
 
 namespace sysio {
@@ -329,6 +330,8 @@ struct epoch_in_receipt {
  * @param receipt The receipt object as `ethereum_client::wait_for_receipt` returned it.
  * @return The block number and logs the relay acts on.
  * @throws fc::exception when the receipt is not an object or carries no block number.
+ * @throws fc::network::ethereum::ethereum_transaction_policy_exception when the block number is not a canonical
+ *         QUANTITY.
  */
 inline epoch_in_receipt parse_epoch_in_receipt(std::string tx_hash, const fc::variant& receipt) {
    FC_ASSERT(receipt.is_object(), "transaction receipt for {} is not an object", tx_hash);
@@ -336,7 +339,8 @@ inline epoch_in_receipt parse_epoch_in_receipt(std::string tx_hash, const fc::va
    FC_ASSERT(object.contains(ethereum_receipt_field::block_number),
              "transaction receipt for {} carries no blockNumber", tx_hash);
    epoch_in_receipt parsed{.tx_hash      = std::move(tx_hash),
-                           .block_number = fc::to_uint256(object[ethereum_receipt_field::block_number]),
+                           .block_number = fc::network::ethereum::parse_rpc_quantity(
+                              object[ethereum_receipt_field::block_number], ethereum_receipt_field::block_number),
                            .logs         = {}};
    if (object.contains(ethereum_receipt_field::logs) && object[ethereum_receipt_field::logs].is_array()) {
       parsed.logs = object[ethereum_receipt_field::logs].get_array();

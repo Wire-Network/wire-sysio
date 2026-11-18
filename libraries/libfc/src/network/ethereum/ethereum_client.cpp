@@ -32,6 +32,8 @@ constexpr std::string_view gas_limit_floor = "gas_limit_floor";
 constexpr std::string_view gas_limit_cap = "gas_limit_cap";
 constexpr std::string_view block_number = "block_number";
 constexpr std::string_view block_timestamp = "block_timestamp";
+constexpr std::string_view log_index = "log_index";
+constexpr std::string_view transaction_index = "transaction_index";
 } // namespace transaction_policy_field
 
 namespace ethereum_rpc_field {
@@ -41,6 +43,9 @@ constexpr std::string_view max_fee_per_gas = "maxFeePerGas";
 constexpr std::string_view gas = "gas";
 constexpr std::string_view number = "number";
 constexpr std::string_view timestamp = "timestamp";
+constexpr std::string_view block_number = "blockNumber";
+constexpr std::string_view log_index = "logIndex";
+constexpr std::string_view transaction_index = "transactionIndex";
 } // namespace ethereum_rpc_field
 
 /// The shortest finality-lag limit a read confirmation accepts.
@@ -324,6 +329,7 @@ fc::uint256 ethereum_client::get_chain_id() const {
  */
 fc::uint256 ethereum_client::get_network_version() {
    fc::variants params; // Empty params array
+   // `net_version` answers in decimal, not as a QUANTITY.
    return to_uint256(execute_idempotent("net_version", params));
 }
 
@@ -443,12 +449,11 @@ std::string to_data_from_params(const abi::contract& contract, const data_or_par
  *
  * @return The latest block number as a uint256
  * @throws fc::network::json_rpc::json_rpc_exception if the RPC call fails
+ * @throws ethereum_transaction_policy_exception if the answer is not a canonical QUANTITY
  */
 fc::uint256 ethereum_client::get_block_number() {
    fc::variants params; // empty
-
-   // ilogf("Block number: {}", fc::json::to_pretty_string(resp));
-   return to_uint256(execute_idempotent("eth_blockNumber", params));
+   return parse_rpc_quantity(execute_idempotent("eth_blockNumber", params), transaction_policy_field::block_number);
 }
 
 /**
@@ -733,7 +738,8 @@ fc::variant ethereum_client::wait_for_receipt(const std::string& tx_hash,
    // Phase 2: wait for `opts.confirmations - 1` more blocks on top of the
    // receipt's block number. Using (confirmations - 1) because the receipt
    // block itself counts as the first confirmation.
-   const fc::uint256 receipt_block = to_uint256(receipt.get_object()["blockNumber"]);
+   const fc::uint256 receipt_block = parse_rpc_quantity(
+      receipt.get_object()[std::string{ethereum_rpc_field::block_number}], transaction_policy_field::block_number);
    const uint32_t    extra_blocks  = opts.confirmations - 1;
 
    // Materialise the threshold as a concrete `fc::uint256` to avoid the
@@ -806,6 +812,8 @@ fc::variant ethereum_client::get_transaction_receipt(const std::string& tx_hash)
  * @param from_block Starting block for the query range
  * @param to_block Ending block for the query range
  * @return Vector of ethereum_event_data structs sorted by block number and log index
+ * @throws ethereum_transaction_policy_exception if a log's `blockNumber`, `logIndex` or
+ *         `transactionIndex` is not a canonical QUANTITY, or an index exceeds uint32
  */
 std::vector<ethereum_event_data> ethereum_client::get_events(const address_compat_type& contract_addr,
                                                               const std::vector<std::string>& event_names,
@@ -848,6 +856,9 @@ std::vector<ethereum_event_data> ethereum_client::get_events(const address_compa
    std::vector<ethereum_event_data> results;
    results.reserve(logs.size());
 
+   const std::string block_number_field{ethereum_rpc_field::block_number};
+   const std::string log_index_field{ethereum_rpc_field::log_index};
+   const std::string transaction_index_field{ethereum_rpc_field::transaction_index};
    for (const auto& log_var : logs) {
       const auto& log = log_var.get_object();
 
@@ -855,8 +866,8 @@ std::vector<ethereum_event_data> ethereum_client::get_events(const address_compa
       evt.contract_address = addr;
 
       // Parse block number
-      if (log.contains("blockNumber")) {
-         evt.block_number = to_uint256(log["blockNumber"]);
+      if (log.contains(block_number_field)) {
+         evt.block_number = parse_rpc_quantity(log[block_number_field], transaction_policy_field::block_number);
       }
 
       // Parse transaction hash
@@ -865,13 +876,14 @@ std::vector<ethereum_event_data> ethereum_client::get_events(const address_compa
       }
 
       // Parse log index
-      if (log.contains("logIndex")) {
-         evt.log_index = static_cast<uint32_t>(to_uint256(log["logIndex"]));
+      if (log.contains(log_index_field)) {
+         evt.log_index = parse_rpc_quantity_as<uint32_t>(log[log_index_field], transaction_policy_field::log_index);
       }
 
       // Parse transaction index
-      if (log.contains("transactionIndex")) {
-         evt.transaction_index = static_cast<uint32_t>(to_uint256(log["transactionIndex"]));
+      if (log.contains(transaction_index_field)) {
+         evt.transaction_index =
+            parse_rpc_quantity_as<uint32_t>(log[transaction_index_field], transaction_policy_field::transaction_index);
       }
 
       // Parse topics
