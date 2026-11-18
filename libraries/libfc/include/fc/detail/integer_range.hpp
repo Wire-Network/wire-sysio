@@ -6,6 +6,7 @@
 #include <fc/int128.hpp>
 #include <fc/int256.hpp>
 #include <fc/reflect/typename.hpp>
+#include <fc/string.hpp>
 
 #include <concepts>
 #include <limits>
@@ -46,28 +47,73 @@ template <int256_or_uint256 T>
    throw_out_of_range(value, int256_type_name<T>, limits::min().str(), limits::max().str());
 }
 
-/// The number `number` as the 256-bit integer type `T`, read as boost reads it: decimal, hex after "0x" or octal
-/// after "0", after an optional '-'.
-/// @param text the text a range error names
-/// @throw parse_error_exception if the number is outside the range of `T`
+/// Throws the parse_error_exception for `text`, which is not a number the 256-bit integer type `T` reads.
 template <int256_or_uint256 T>
-T parse_256bit(const std::string& number, std::string_view text) {
+[[noreturn]] void throw_not_a_256bit_number(std::string_view text) {
+   FC_THROW_EXCEPTION(parse_error_exception, "Couldn't parse {} from \"{}\"", int256_type_name<T>, text);
+}
+
+/// The characters of 256-bit integer text.
+namespace int256_text {
+inline constexpr char minus_sign = '-';
+inline constexpr char zero_digit = '0';
+inline constexpr std::string_view hex_prefix = "0x";
+inline constexpr std::string_view upper_hex_prefix = "0X";
+} // namespace int256_text
+
+/// Whether 256-bit integer text needs "0x" before hex digits.
+enum class hex_prefix_rule {
+   required, ///< digits without the prefix are decimal
+   optional  ///< digits without the prefix are decimal when they all are, and hex otherwise
+};
+
+/**
+ * The number `text` as the 256-bit integer type `T`: an optional '-', then decimal digits, or hex digits after "0x"
+ * or "0X" (or, with `hex_prefix_rule::optional`, without it). Digits after a leading zero are decimal. Empty text and
+ * a bare "0x" or "0X" are zero; "-" and "-0x" are not numbers.
+ * @throw parse_error_exception if `text` is not such a number, or the number is outside the range of `T`
+ */
+template <int256_or_uint256 T>
+T parse_256bit(std::string_view text, hex_prefix_rule prefix_rule) {
+   using namespace int256_text;
+   std::string_view digits = text;
+   const bool negative = digits.starts_with(minus_sign);
+   if (negative)
+      digits.remove_prefix(1);
+   const bool prefixed = digits.starts_with(hex_prefix) || digits.starts_with(upper_hex_prefix);
+   if (prefixed)
+      digits.remove_prefix(hex_prefix.size());
+   const bool hex = prefixed || (prefix_rule == hex_prefix_rule::optional && !all_digits(digits));
+   if (!(hex ? all_hex_digits(digits) : all_digits(digits)) || (negative && digits.empty()))
+      throw_not_a_256bit_number<T>(text);
+   if (digits.empty())
+      return T{0};
+   if (!hex) {
+      // boost reads digits after a leading zero as octal.
+      while (digits.size() > 1 && digits.front() == zero_digit)
+         digits.remove_prefix(1);
+   }
+
+   std::string number; // the text in the grammar boost reads
+   if (negative)
+      number += minus_sign;
+   if (hex)
+      number += hex_prefix;
+   number += digits;
    // Holds every fc::int256 and fc::uint256, and throws where those wrap.
    boost::multiprecision::checked_int256_t value;
    try {
       value = boost::multiprecision::checked_int256_t{number};
    } catch (const std::overflow_error&) {
       throw_out_of_256bit_range<T>(text);
+   } catch (const std::runtime_error&) {
+      // boost refuses no text the checks above accept; this keeps a refusal from escaping as std::runtime_error.
+      // Caught after std::overflow_error, which derives from it.
+      throw_not_a_256bit_number<T>(text);
    }
    if (std::same_as<T, fc::uint256> && value < 0)
       throw_out_of_256bit_range<T>(text);
    return T{value};
-}
-
-/// The number `text` as the 256-bit integer type `T`, as `parse_256bit(text, text)`.
-template <int256_or_uint256 T>
-T parse_256bit(const std::string& text) {
-   return parse_256bit<T>(text, text);
 }
 
 } // namespace fc::detail
