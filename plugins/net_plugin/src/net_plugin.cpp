@@ -1,6 +1,7 @@
 #include <sysio/net_plugin/net_plugin.hpp>
 #include <sysio/net_plugin/buffer_factory.hpp>
 #include <sysio/net_plugin/gossip_bps_index.hpp>
+#include <sysio/net_plugin/handshake_repeat.hpp>
 #include <sysio/net_plugin/protocol.hpp>
 #include <sysio/net_plugin/queued_buffer.hpp>
 #include <sysio/net_plugin/net_logger.hpp>
@@ -762,7 +763,7 @@ namespace sysio {
       alignas(hardware_destructive_interference_sz)
       mutable fc::mutex                conn_mtx; //< mtx for last_handshake_recv .. remote_endpoint_ip
       handshake_message                last_handshake_recv    GUARDED_BY(conn_mtx);
-      handshake_message                last_handshake_sent    GUARDED_BY(conn_mtx);
+      handshake_send_record            last_handshake_send    GUARDED_BY(conn_mtx);
       block_id_type                    conn_fork_db_head      GUARDED_BY(conn_mtx);
       uint32_t                         conn_fork_db_head_num  GUARDED_BY(conn_mtx) {0};
       fc::time_point                   last_close             GUARDED_BY(conn_mtx);
@@ -848,7 +849,14 @@ namespace sysio {
       bool process_next_message(uint32_t message_length);
 
       void send_block_nack(const block_id_type& block_id);
-      void send_handshake();
+
+      /// Whether send_handshake may skip a handshake that repeats the last one sent on this connection.
+      enum class handshake_send {
+         skip_repeat, ///< skip it when handshake_repeats_last() holds
+         always       ///< send it; for the handshake that opens a session
+      };
+      /// Queue a handshake carrying the current chain state. Thread safe.
+      void send_handshake( handshake_send mode = handshake_send::skip_repeat );
 
       /** \name Peer Timestamps
        *  Time message handling
@@ -889,12 +897,17 @@ namespace sysio {
                            const send_buffer_type& send_buffer,
                            go_away_reason close_after_send);
       void cancel_sync();
+      /// Drop every queued outgoing message. A handshake among them is lost, so the next one is never a repeat.
       void flush_queues();
       bool enqueue_sync_block();
       void request_sync_blocks(uint32_t start, uint32_t end);
 
       void cancel_sync_wait();
       void sync_wait();
+      /// Answer a block at or below the fork database root received while not syncing from a peer: nack it, so the
+      /// peer stops broadcasting it to this node, and stop waiting on a sync response from the peer.
+      /// Called from connection strand.
+      void answer_block_at_or_below_root( const block_id_type& blk_id );
 
       /// Reset the pre-session and peer-auth ordinary-frame gates.
       void reset_peer_authentication_state();
@@ -1155,6 +1168,26 @@ namespace sysio {
       return { on_fork, unknown_block };
    }
 
+   namespace {
+      /// True when id is this node's block at its number and that number is at or below the fork database root, so
+      /// the block is irreversible here. False when the number is above the root, or the id there differs or is not
+      /// known. Thread safe.
+      bool is_irreversible_block( const block_id_type& id ) {
+         try {
+            const controller& cc = my_impl->chain_plug->chain();
+            if( !cc.fork_db_has_root() )
+               return false;
+            const block_num_type num = block_header::num_from_id( id );
+            if( num > cc.fork_db_root().block_num() )
+               return false;
+            const std::optional<block_id_type> my_id = cc.fork_block_id_for_num( num ); // thread-safe
+            return my_id == id;
+         } catch( ... ) {
+            return false;
+         }
+      }
+   } // namespace
+
    connection::connection( const string& endpoint, const string& this_address )
       : peer_addr( endpoint ),
         strand( boost::asio::make_strand(my_impl->thread_pool.get_executor()) ),
@@ -1163,7 +1196,7 @@ namespace sysio {
         connection_id( ++my_impl->current_connection_id ),
         sync_response_expected_timer( my_impl->thread_pool.get_executor() ),
         last_handshake_recv(),
-        last_handshake_sent(),
+        last_handshake_send(),
         p2p_address( endpoint )
    {
       auto [host, port, type] = net_utils::split_host_port_type(this_address);
@@ -1184,7 +1217,7 @@ namespace sysio {
         connection_id( ++my_impl->current_connection_id ),
         sync_response_expected_timer( my_impl->thread_pool.get_executor() ),
         last_handshake_recv(),
-        last_handshake_sent()
+        last_handshake_send()
    {
       /// The locally configured address type is authoritative; a peer's advertised address may only narrow it later.
       set_connection_type( listen_address );
@@ -1376,8 +1409,11 @@ namespace sysio {
       return false;
    }
 
+   // called from connection strand
    void connection::flush_queues() {
       buffer_queue.clear_write_queue();
+      fc::lock_guard g_conn( conn_mtx );
+      last_handshake_send = handshake_send_record();
    }
 
    void connection::close( bool reconnect, bool shutdown ) {
@@ -1405,7 +1441,7 @@ namespace sysio {
       {
          fc::lock_guard g_conn( conn_mtx );
          last_handshake_recv = handshake_message();
-         last_handshake_sent = handshake_message();
+         last_handshake_send = handshake_send_record();
          last_close = fc::time_point::now();
          conn_node_id = fc::sha256();
          last_block_nack_request_message_id = block_id_type{};
@@ -1530,24 +1566,38 @@ namespace sysio {
       }
    }
 
-   void connection::send_handshake() {
+   void connection::send_handshake( handshake_send mode ) {
       if (closed())
          return;
-      boost::asio::post(strand, [c = shared_from_this()]() {
+      boost::asio::post(strand, [c = shared_from_this(), mode]() {
          fc::unique_lock g_conn( c->conn_mtx );
-         if( c->populate_handshake( c->last_handshake_sent ) ) {
-            static_assert( std::is_same_v<decltype( c->sent_handshake_count ), int16_t>, "INT16_MAX based on int16_t" );
-            if( c->sent_handshake_count == INT16_MAX ) c->sent_handshake_count = 1; // do not wrap
-            c->last_handshake_sent.generation = ++c->sent_handshake_count;
-            auto last_handshake = c->last_handshake_sent;
+         handshake_message hello;
+         if( !c->populate_handshake( hello ) )
+            return;
+         const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+         if( mode == handshake_send::skip_repeat &&
+             handshake_repeats_last( hello, c->last_handshake_recv, c->last_handshake_send, now,
+                                     handshake_repeat_window ) ) {
+            const int16_t last_generation = c->last_handshake_send.sent.generation;
             g_conn.unlock();
-            peer_dlog( p2p_msg_log, c, "Sending handshake generation {}, froot {}, fhead {}, id {}",
-                       last_handshake.generation,
-                       block_header::num_from_id(last_handshake.fork_db_root_id),
-                       block_header::num_from_id(last_handshake.fork_db_head_id),
-                       last_handshake.fork_db_head_id.short_id() );
-            c->enqueue( last_handshake );
+            peer_dlog( p2p_msg_log, c, "Not sending handshake, unchanged since generation {}, froot {}, fhead {}",
+                       last_generation,
+                       block_header::num_from_id(hello.fork_db_root_id),
+                       block_header::num_from_id(hello.fork_db_head_id) );
+            return;
          }
+         static_assert( std::is_same_v<decltype( c->sent_handshake_count ), int16_t>, "INT16_MAX based on int16_t" );
+         if( c->sent_handshake_count == INT16_MAX ) c->sent_handshake_count = 1; // do not wrap
+         hello.generation = ++c->sent_handshake_count;
+         c->last_handshake_send =
+            handshake_send_record{ .sent = hello, .peer_last = c->last_handshake_recv, .time = now };
+         g_conn.unlock();
+         peer_dlog( p2p_msg_log, c, "Sending handshake generation {}, froot {}, fhead {}, id {}",
+                    hello.generation,
+                    block_header::num_from_id(hello.fork_db_root_id),
+                    block_header::num_from_id(hello.fork_db_head_id),
+                    hello.fork_db_head_id.short_id() );
+         c->enqueue( hello );
       });
    }
 
@@ -1897,6 +1947,12 @@ namespace sysio {
    void connection::cancel_sync_wait() {
       fc::lock_guard g( sync_response_expected_timer_mtx );
       sync_response_expected_timer.cancel();
+   }
+
+   // called from connection strand
+   void connection::answer_block_at_or_below_root( const block_id_type& blk_id ) {
+      send_block_nack( blk_id );
+      cancel_sync_wait();
    }
 
    // thread safe
@@ -2904,7 +2960,7 @@ namespace sysio {
             if( !err && socket->is_open() && socket == c->socket ) {
                c->update_endpoints(endpoint);
                if( c->start_session() ) {
-                  c->send_handshake();
+                  c->send_handshake( handshake_send::always );
                   c->send_time();
                }
             } else {
@@ -3264,8 +3320,7 @@ namespace sysio {
          if( blk_num <= fork_db_root_num ) {
             pending_message_buffer.advance_read_ptr( message_length ); // advance before any send
             peer_dlog( p2p_blk_log, this, "received block {} less than froot {}", blk_num, fork_db_root_num );
-            send_block_nack(blk_id);
-            cancel_sync_wait();
+            answer_block_at_or_below_root(blk_id);
 
             return true;
          }
@@ -3743,7 +3798,7 @@ namespace sysio {
          }
 
          if( sent_handshake_count == 0 ) {
-            send_handshake();
+            send_handshake( handshake_send::always );
          }
 
          // Send peer_auth_message AFTER our handshake so the peer has our node_id
@@ -4260,6 +4315,20 @@ namespace sysio {
          }
          if( exception || unlinkable) {
             if (unlinkable) {
+               // A block below the fork database root is unlinkable because its parent has left the fork database.
+               // When it is this node's block at that number, the peer sent irreversible history, not a bad or
+               // conflicting block, so it gets none of rejected_block's penalty, handshake or close: it is answered
+               // as the receive path answers a block at or below the root it has cached.
+               if( is_irreversible_block( id ) ) {
+                  fc_dlog( p2p_blk_log,
+                           "block {} {}... at or below fork database root is ours, ignoring, connection - {}",
+                           ptr->block_num(), id.short_id(), cid );
+                  boost::asio::post(c->strand, [c, id]() {
+                     if( !my_impl->sync_master->syncing_from_peer() )
+                        c->answer_block_at_or_below_root( id );
+                  });
+                  return;
+               }
                fc_dlog(p2p_blk_log, "unlinkable_block {} : {}, previous {} : {}",
                        ptr->block_num(), id, block_header::num_from_id(ptr->previous), ptr->previous);
             }
