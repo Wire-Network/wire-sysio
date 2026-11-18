@@ -10,7 +10,6 @@
 #include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/resource_limits.hpp>
 #include <sysio/chain/wasm_interface_private.hpp>
-#include <sysio/chain/wasm_sysio_validation.hpp>
 #include <sysio/chain/wasm_sysio_injection.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/protocol_state_object.hpp>
