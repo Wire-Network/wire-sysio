@@ -1176,16 +1176,15 @@ epoch_in_receipt outpost_ethereum_client::send_epoch_in(uint32_t epoch_index, co
       submission.landed_at = receipt.block_number;
       journal_submission(journal, std::move(submission));
       return receipt;
-   } catch (const eth::ethereum_transaction_policy_exception&) {
-      throw;   // refused locally, before anything was signed
    } catch (const fc::network::json_rpc::json_rpc_error& refusal) {
       // A refusal of the pre-flight leaves no attempt. One of the send keeps
       // it: the node, or another behind the endpoint, may hold the call.
       if (submission.attempts.empty()) throw;
       unconfirmed = refusal.to_string();
    } catch (const fc::exception& failure) {
-      // A timeout or transport failure: once the call was signed and sent, the
-      // node may hold it whether or not its response came back.
+      // A policy refusal before signing leaves no attempt. A timeout, a
+      // transport failure or a receipt the client refuses: once the call was
+      // signed and sent, the node may hold it.
       if (submission.attempts.empty()) throw;
       unconfirmed = failure.to_string();
    }

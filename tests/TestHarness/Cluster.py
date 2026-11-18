@@ -104,6 +104,9 @@ class Cluster(object):
         self.defproduceraAccount=self.defProducerAccounts["defproducera"]= Account("defproducera")
         self.defproducerbAccount=self.defProducerAccounts["defproducerb"]= Account("defproducerb")
         self.sysioAccount=self.defProducerAccounts["sysio"]= Account("sysio")
+        # bootstrap() deploys the noop test contract here. trx_generator sends its nonce action here, and tests send
+        # its transfer load here too, since the noop contract's transfer only checks the sender's authority.
+        self.noopAccount=Account("sysio.noop")
         self.carlAccount=None
 
         self.defproduceraAccount.ownerPrivateKey=defproduceraPrvtKey
@@ -1323,8 +1326,7 @@ class Cluster(object):
                 return None
             return trans
 
-        # sysio.noop used by trx_generator for noop action
-        systemAccounts = ['sysio.noop', 'sysio.bpay', 'sysio.msig', 'sysio.names', 'sysio.token', 'sysio.vpay', 'sysio.wrap', 'sysio.roa', 'sysio.acct', 'sysio.authex', 'sysio.dclaim', 'sysio.opreg', 'carl']
+        systemAccounts = [self.noopAccount.name, 'sysio.bpay', 'sysio.msig', 'sysio.names', 'sysio.token', 'sysio.vpay', 'sysio.wrap', 'sysio.roa', 'sysio.acct', 'sysio.authex', 'sysio.dclaim', 'sysio.opreg', 'carl']
         acctTrans = list(map(createSystemAccount, systemAccounts))
 
         for trans in acctTrans:
@@ -1339,8 +1341,10 @@ class Cluster(object):
         #         if activateIF:
         #             self.activateInstantFinality()
 
+        # The noop account was created with sysio's keys, which publishing needs.
         noopAccount = copy.deepcopy(self.sysioAccount)
-        noopAccount.name = 'sysio.noop'
+        noopAccount.name = self.noopAccount.name
+        self.noopAccount = noopAccount
         contract="noop"
         contractDir=str(self.unittestsTestContractsPath / contract)
         wasmFile="%s.wasm" % (contract)

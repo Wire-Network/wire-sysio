@@ -6,7 +6,9 @@
 
 #include <magic_enum/magic_enum.hpp>
 
+#include <concepts>
 #include <cstdint>
+#include <limits>
 #include <memory>
 #include <optional>
 #include <string>
@@ -118,6 +120,25 @@ fc::uint256 parse_canonical_uint256_decimal(std::string_view value,
  * The accepted form is `0x0` or `0x` followed by at most 64 hexadecimal digits with no leading zero.
  */
 fc::uint256 parse_rpc_quantity(const fc::variant& value, std::string_view field);
+
+/**
+ * Parse a canonical Ethereum JSON-RPC QUANTITY no greater than `maximum`.
+ *
+ * @throws ethereum_transaction_policy_exception `rpc_quantity_invalid` when the value is not canonical,
+ *         `rpc_quantity_out_of_range` when it exceeds `maximum`.
+ */
+fc::uint256 parse_rpc_quantity(const fc::variant& value, std::string_view field, const fc::uint256& maximum);
+
+/**
+ * Parse a canonical Ethereum JSON-RPC QUANTITY into `T`, refusing a value past `T`'s maximum.
+ *
+ * @throws ethereum_transaction_policy_exception `rpc_quantity_invalid` when the value is not canonical,
+ *         `rpc_quantity_out_of_range` when it does not fit in `T`.
+ */
+template <std::unsigned_integral T>
+T parse_rpc_quantity_as(const fc::variant& value, std::string_view field) {
+   return parse_rpc_quantity(value, field, fc::uint256{std::numeric_limits<T>::max()}).convert_to<T>();
+}
 
 /** Format a uint256 as a canonical Ethereum JSON-RPC QUANTITY. */
 std::string format_rpc_quantity(const fc::uint256& value);

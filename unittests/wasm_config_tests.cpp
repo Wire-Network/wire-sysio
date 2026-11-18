@@ -1169,8 +1169,15 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( reset_chain_tests, T, wasm_config_testers ) {
       chain.push_transaction(trx);
    }
    chain.produce_block();
-   // Make sure that a normal contract works
-   chain.set_wasm_params(genesis_state::default_initial_wasm_configuration);
+   // Make sure that a normal contract works: sysio.bios loads and runs one of its own actions.
+   {
+      signed_transaction trx;
+      trx.actions.push_back({ { { "sysio"_n, config::active_name} }, "sysio"_n, "reqauth"_n,
+                              fc::raw::pack("sysio"_n) });
+      chain.set_transaction_headers(trx);
+      trx.sign(chain.get_private_key("sysio"_n, "active"), chain.get_chain_id());
+      chain.push_transaction(trx);
+   }
    chain.produce_block();
 }
 
