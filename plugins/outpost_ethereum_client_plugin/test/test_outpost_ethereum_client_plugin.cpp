@@ -1,7 +1,6 @@
 #include <gsl-lite/gsl-lite.hpp>
 
 #include <boost/test/unit_test.hpp>
-#include <boost/dll.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 #include <boost/process/v1/io.hpp>
@@ -107,7 +106,6 @@ std::string test_tx_01_result =
 namespace {
 
 namespace bp = boost::process;
-namespace bfs = boost::filesystem;
 std::string program_name{"test_outpost_ethereum_client_plugin"};
 /**
  * Sig provider tester app resources
@@ -152,7 +150,7 @@ std::unique_ptr<sig_provider_tester> create_app(Args&&... extra_args) {
 
 constexpr std::string_view test_contract_abi_counter_json_file_01 = "ethereum-abi-counter-01.json";
 using namespace fc::network::ethereum;
-auto counter_abi_filename = fc::test::get_test_fixtures_path() / boost::filesystem::path(test_contract_abi_counter_json_file_01);
+auto counter_abi_filename = fc::test::get_test_fixtures_path() / std::filesystem::path(test_contract_abi_counter_json_file_01);
 auto counter_abis = [](){return fc::network::ethereum::abi::parse_contracts(std::filesystem::path(counter_abi_filename.generic_string()));};
 
 struct ethereum_contract_test_counter_client : fc::network::ethereum::ethereum_contract_client {
@@ -315,7 +313,7 @@ bool wait_for_client(sysio::outpost_ethereum_client_plugin& plugin, const std::s
 }
 
 auto load_abi_fixture(std::string_view filename) {
-   auto path = fc::test::get_test_fixtures_path() / bfs::path(filename);
+   auto path = fc::test::get_test_fixtures_path() / std::filesystem::path(filename);
    return fc::network::ethereum::abi::parse_contracts(std::filesystem::path(path.generic_string()));
 }
 

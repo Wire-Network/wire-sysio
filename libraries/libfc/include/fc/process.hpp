@@ -1,14 +1,14 @@
 #pragma once
 
-#include <boost/dll/runtime_symbol_info.hpp>
 #include <filesystem>
 #include <string>
 
 namespace fc {
 
-inline std::filesystem::path program_path() {
-   return boost::dll::program_location().string(); // e.g. "my_app.exe" or "my_app"
-}
+/// @return path of the running executable as the operating system reports it: /proc/self/exe on Linux,
+///         _NSGetExecutablePath on macOS
+/// @throws std::filesystem::filesystem_error or fc::exception when the operating system does not report it
+std::filesystem::path program_path();
 
 inline std::string program_name() {
    return program_path().stem().string();
