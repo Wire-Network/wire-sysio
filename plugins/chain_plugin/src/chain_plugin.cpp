@@ -4325,7 +4325,8 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
    } SYS_RETHROW_EXCEPTIONS(chain::account_query_exception, "unable to retrieve account info")
 }
 
-read_only::get_required_keys_result read_only::get_required_keys( const get_required_keys_params& params, const fc::time_point& )const {
+read_only::get_required_keys_result read_only::get_required_keys( const get_required_keys_params& params,
+                                                                  const fc::time_point& deadline )const {
    transaction pretty_input;
    auto resolver = caching_resolver(make_resolver(db, abi_serializer_max_time, throw_on_yield::yes));
    try {
@@ -4335,7 +4336,12 @@ read_only::get_required_keys_result read_only::get_required_keys( const get_requ
    } SYS_RETHROW_EXCEPTIONS(chain::transaction_type_exception, "Invalid transaction")
 
    SYS_ASSERT( pretty_input.delay_sec.value == 0, chain::transaction_type_exception, "delay_sec must be 0");
-   auto required_keys_set = db.get_authorization_manager().get_required_keys( pretty_input, params.available_keys );
+   const std::function<void()> checktime = [&deadline]() {
+      SYS_ASSERT( fc::time_point::now() < deadline, chain::deadline_exception,
+                  "get_required_keys exceeded its deadline {}", deadline );
+   };
+   auto required_keys_set =
+      db.get_authorization_manager().get_required_keys( pretty_input, params.available_keys, checktime );
    get_required_keys_result result;
    result.required_keys = required_keys_set;
    return result;
@@ -4370,6 +4376,34 @@ void read_only::send_read_only_transaction(send_read_only_transaction_params par
    } catch ( const std::bad_alloc& ) {
       handle_bad_alloc();
    } CATCH_AND_CALL(next);
+}
+
+read_only::get_transaction_id_params read_only::to_get_transaction_id_params( fc::variant request ) {
+   SYS_ASSERT( request.is_object(), chain::invalid_http_request, "Transaction object is missing or invalid" );
+   fc::mutable_variant_object trx( request.get_object() );
+   const fc::mutable_variant_object::iterator actions = trx.find( "actions" );
+   SYS_ASSERT( actions != trx.end() && actions->value().is_array(), chain::invalid_http_request,
+               "Transaction actions are missing or invalid" );
+   // Actions are rewritten in place, so the transaction is assembled once whatever the number of actions.
+   for( fc::variant& action : actions->value().get_array() ) {
+      SYS_ASSERT( action.is_object(), chain::invalid_http_request, "Transaction contains invalid or empty action" );
+      const fc::variant_object&        action_vo = action.get_object();
+      const fc::variant_object::iterator data     = action_vo.find( "data" );
+      if( data == action_vo.end() )
+         continue;
+      const fc::variant_object::iterator hex_data = action_vo.find( "hex_data" );
+      if( hex_data == action_vo.end() ) {
+         SYS_ASSERT( data->value().is_string(), chain::invalid_http_request,
+                     "Request supports only un-exploded 'data' (hex form)" );
+         continue;
+      }
+      fc::mutable_variant_object rewritten( action_vo );
+      rewritten["data"] = hex_data->value();
+      action = fc::variant( std::move( rewritten ) );
+   }
+   get_transaction_id_params result = fc::variant( std::move( trx ) ).as<get_transaction_id_params>();
+   SYS_ASSERT( result.id() != transaction().id(), chain::invalid_http_request, "Invalid transaction object" );
+   return result;
 }
 
 read_only::get_transaction_id_result read_only::get_transaction_id( const read_only::get_transaction_id_params& params, const fc::time_point& ) const {

@@ -506,10 +506,24 @@ public:
       flat_set<public_key_type> required_keys;
    };
 
+   /**
+    * The keys among `available_keys` that satisfy the authorizations the transaction declares.
+    * @throws chain::deadline_exception once `deadline` passes while the authorizations are evaluated
+    */
    get_required_keys_result get_required_keys( const get_required_keys_params& params, const fc::time_point& deadline)const;
 
    using get_transaction_id_params = transaction;
    using get_transaction_id_result = transaction_id_type;
+
+   /**
+    * Converts a `get_transaction_id` request to its transaction. An action that carries both `data` and `hex_data`
+    * is read from `hex_data`; an action that carries only `data` must give it in hex form.
+    *
+    * @throws chain::invalid_http_request when the request is not an object, its `actions` is missing or not an array,
+    *         an action is not an object, an action's only `data` is not a string, or the request decodes to an empty
+    *         transaction
+    */
+   static get_transaction_id_params to_get_transaction_id_params( fc::variant request );
 
    get_transaction_id_result get_transaction_id( const get_transaction_id_params& params, const fc::time_point& deadline)const;
 
