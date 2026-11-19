@@ -139,18 +139,19 @@ static size_t in_flight_sizeof(const std::optional<T>& o) {
 // key -> priority, url_handler
 typedef map<string, detail::internal_url_handler> url_handlers_type;
 
-/// A request body has this long, plus its size at request_body_min_bytes_per_second, to arrive once its header is read.
-/// Past that the connection is closed, which releases the body's bytes_in_flight reservation: a stalled upload cannot
-/// hold its share of the budget for longer, while a slow one that keeps coming is not cut off.
-inline constexpr std::chrono::seconds request_body_read_allowance{10};
-/// The average rate, in bytes per second, a request body must at least keep up; see request_body_read_allowance.
-inline constexpr uint64_t request_body_min_bytes_per_second = 64 * 1024;
+/// A request body has this long, plus its size at transfer_min_bytes_per_second, to arrive once its header is read,
+/// and a response as long to be written once its write starts. Past that the connection is closed, which releases the
+/// bytes the transfer holds against bytes_in_flight: a stalled peer cannot hold its share of the budget for longer,
+/// while a slow one that keeps up is not cut off.
+inline constexpr std::chrono::seconds transfer_allowance{10};
+/// The average rate, in bytes per second, a request body or a response must at least keep up; see transfer_allowance.
+inline constexpr uint64_t transfer_min_bytes_per_second = 64 * 1024;
 
-/// The time a request body of `body_size` bytes has to arrive once its header is read; see request_body_read_allowance.
-inline std::chrono::microseconds request_body_read_timeout(size_t body_size) {
+/// The time a request body or a response of `size` bytes has to be transferred; see transfer_allowance.
+inline std::chrono::microseconds transfer_timeout(size_t size) {
    constexpr uint64_t microseconds_per_second = 1'000'000;
-   return request_body_read_allowance +
-          std::chrono::microseconds(body_size * microseconds_per_second / request_body_min_bytes_per_second);
+   return transfer_allowance +
+          std::chrono::microseconds(size * microseconds_per_second / transfer_min_bytes_per_second);
 }
 
 struct http_plugin_state {
