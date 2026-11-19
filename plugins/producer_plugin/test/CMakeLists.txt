@@ -4,6 +4,7 @@ add_executable( test_producer_plugin
         test_options.cpp
         test_block_timing_util.cpp
         test_disallow_delayed_trx.cpp
+        test_incoming_trx_limits.cpp
         test_mockable_timers.cpp
         test_received_block.cpp
         test_round_block_status.cpp

@@ -97,6 +97,7 @@ namespace sysio::chain::config {
   static constexpr uint16_t   default_vote_thread_pool_size                = 4;
   static constexpr uint32_t   default_max_action_return_value_size         = 1024;
   static constexpr uint32_t   default_max_reversible_blocks                = 3600u;
+  static constexpr uint32_t   default_incoming_trx_max_signatures          = 256u; ///< default most signatures a transaction received over p2p or the API may carry
 
   static constexpr uint32_t   default_max_transaction_finality_status_success_duration_sec = 180;
   static constexpr uint32_t   default_max_transaction_finality_status_failure_duration_sec = 180;
