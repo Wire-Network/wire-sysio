@@ -91,7 +91,7 @@ namespace {
    /// How long past the head block's time a pushed transaction stays valid.
    constexpr fc::microseconds PUSH_EXPIRATION = fc::seconds(30);
 
-   /// Work units of the `sysio.synd::crank` the underwriter pushes every pass.
+   /// Work units per `sysio.synd::crank`; the contract clamps its own work and examination budgets.
    constexpr uint32_t UNDERWRITER_CRANK_LIMIT = 16;
    /// Requests one `sysio.bond::prune` examines (at most sysio.bond's MAX_PRUNE_LIMIT), and envelopes one
    /// `sysio.synd::pruneenv` acts on.
@@ -100,8 +100,7 @@ namespace {
    constexpr fc::microseconds UNDERWRITER_HOUSEKEEPING_INTERVAL = fc::minutes(10);
    /// Spacing of the underwriter's rebuild of its outpost clients from `sysio.chains`.
    constexpr fc::microseconds UNDERWRITER_CLIENTS_INTERVAL = fc::minutes(1);
-   /// Spacing of the underwriter's crank while no envelope request is in play: a bucket refill or a cleared cord
-   /// still lets queued releases move.
+   /// Fallback spacing when no epoch, trace, accept/approve or outcome-sync trigger requests a crank.
    constexpr fc::microseconds UNDERWRITER_IDLE_CRANK_INTERVAL = fc::minutes(5);
    /// What a signer signs at startup to show that its signatures recover to its own key.
    constexpr std::string_view SIGNER_PROBE = "batch_operator_plugin signer probe";
@@ -322,11 +321,7 @@ struct batch_operator_plugin::impl {
    std::map<fc::slug_name, built_outpost_client> underwriter_clients;   ///< by outpost chain code
    fc::time_point                           underwriter_clients_at;   ///< last rebuild of `underwriter_clients`
    fc::time_point                           underwriter_housekeeping_at;   ///< last housekeeping
-   fc::time_point                           underwriter_cranked_at;   ///< last crank
-   /// Round-robin release observation and per-pair retry state, independent of the request scan window.
-   std::optional<fc::slug_name> underwriter_release_from;
-   std::map<uw::synd_pair, uw::synd_crank_retry> underwriter_release_retries;
-   bool underwriter_release_progress = false; ///< unconsumed progress carried across bounded observation pages
+   uw::synd_crank_state                     underwriter_crank;
    /// The lowest `sysio.bond::requests` id the next pass reads (`underwriter::next_scan_start`); 0 reads them all.
    uw::request_id_t                         underwriter_scan_from = 0;
    /// Where the underwriter's prunes are in their walk of `sysio.bond::requests` (`underwriter::prune_sweep`).
@@ -1400,13 +1395,13 @@ struct batch_operator_plugin::impl {
    /**
     * One pass of the underwriter, run by its own cron job: bond each OPEN `sysio.synd` envelope request whose
     * envelope the outpost has confirmed, crank `sysio.synd`, then approve, claim and prune what it bonded.
-    * `underwriter::plan_actions` makes every decision; this reads its inputs and pushes its actions, all signed by
-    * `underwriter_signer`.
+    * `underwriter::plan_actions` plans underwriting actions and `synd_crank_state` schedules cranks. This reads
+    * their inputs and pushes their actions, all signed by `underwriter_signer`.
     *
     * Bonding is what releases an envelope's syndications, so a request is bonded only when its outpost's own record
     * of the envelope it emitted for the statement's epoch carries the statement's digest, within the token's exposure
     * cap and the account's balance, while the andon cord is clear, and while no bond of the underwriter's has been
-    * ruled INVALID since the node started. A pass whose table reads fail does nothing: planning from part of the state
+    * ruled INVALID since the node started. A pass whose required planning reads fail does nothing: partial state
     * could exceed a cap or miss a freeze. What it cannot act on waits for a later pass and is logged on every pass
     * it holds; deduplicating those lines is left to log tooling.
     */
@@ -1438,8 +1433,8 @@ struct batch_operator_plugin::impl {
       if (!tokens) return;
       std::optional<uw::plan_inputs> in = read_underwriter_state(*tokens, head_time);
       if (!in || shutting_down) return;
-      const auto release_work = read_underwriter_release_work(*tokens, in->requests);
-      if (!release_work || shutting_down) return;
+      const std::optional<uint32_t> current_epoch = read_underwriter_epoch();
+      if (shutting_down) return;
       uw::remember_bonded(underwriter_bonded, in->bonds, in->requests);
       if (underwriter_forfeits.note(uw::forfeited_requests(in->requests, underwriter_bonded))) {
          elog("batch_operator: underwriter stops bonding until the node is restarted: request {} was ruled INVALID "
@@ -1456,25 +1451,10 @@ struct batch_operator_plugin::impl {
       const uw::plan plan = uw::plan_actions(*in);
       underwriter_pending_accepts = plan.pending_accepts;
       report_plan(*in, plan);
-      const auto crank_now = fc::time_point::now();
-      bool crank_due = !plan.accepts.empty() || !plan.approves.empty();
-      const auto sync_work = uw::synd_sync_work(in->requests);
-      // Synchronization has its own persisted cursor through retained history; each pass can advance it even
-      // before any request is acknowledged. Keep its existing polling cadence until the terminal set clears.
-      crank_due = crank_due || sync_work.ready;
-      const bool release_due = uw::synd_crank_due(*release_work, underwriter_release_retries,
-                                                 underwriter_release_progress, crank_now);
-      crank_due = crank_due || release_due;
-      if (!in->frozen && (crank_due || crank_now - underwriter_cranked_at >= UNDERWRITER_IDLE_CRANK_INTERVAL)) {
-         crank_due = true;
-      } else {
-         crank_due = false;
-         if (in->frozen) {
-            underwriter_release_retries.clear();
-            underwriter_release_progress = false;
-         }
-      }
-      push_plan(plan, crank_due, *release_work);
+      const fc::time_point crank_now = fc::time_point::now();
+      const bool crank_due = underwriter_crank.due(plan, in->requests, current_epoch, crank_now,
+                                                   UNDERWRITER_IDLE_CRANK_INTERVAL);
+      push_plan(plan, crank_due, current_epoch, crank_now);
       underwriter_scan_from = uw::next_scan_start(underwriter_scan_from, in->requests, in->bonds, underwriter_bonded,
                                                 underwriter_pending_accepts);
 
@@ -1525,10 +1505,11 @@ struct batch_operator_plugin::impl {
    /// callback.
    /// `submitted_until` is set once queued, even if acceptance later times out or fails.
    bool underwriter_push(const char* contract, const char* action, const fc::variant_object& data,
-                          std::optional<fc::time_point_sec>* submitted_until = nullptr) {
+                          std::optional<fc::time_point_sec>* submitted_until = nullptr,
+                          std::shared_ptr<batch_operator_detail::async_action_completion>* completion = nullptr) {
       if (shutting_down) return false;
       try {
-         return push_action(contract, action, *underwriter_signer, data, submitted_until);
+         return push_action(contract, action, *underwriter_signer, data, submitted_until, completion);
       } catch (const fc::exception& e) {
          wlog("batch_operator: underwriter {}::{}: {}", contract, action, e.to_string());
       } catch (const std::exception& e) {
@@ -1540,10 +1521,10 @@ struct batch_operator_plugin::impl {
    /// Push what the plan decided: accepts first, so their releases start this pass, then the crank, approves and
    /// claims. Reserve each submitted accept until the irreversible view accounts for it or its transaction expires;
    /// a partial accept leaves the request OPEN, so the contract cannot refuse a repeated contribution for us.
-   /// `crank_due` includes eligible release work, outcome synchronization and idle recovery, with freeze/backoff
-   /// applied.
-   void push_plan(const uw::plan& plan, bool crank_due,
-                    const std::map<uw::synd_pair, uw::synd_work>& release_work) {
+   /// `crank_due` includes epoch changes, prior inline work, accepts/approvals, outcome synchronization and idle
+   /// recovery. Keep the decision's clock even when accepts wait for their delivery callbacks.
+   void push_plan(const uw::plan& plan, bool crank_due, std::optional<uint32_t> current_epoch,
+                    fc::time_point crank_now) {
       for (const uw::accept_action& accept : plan.accepts) {
          std::optional<fc::time_point_sec> submitted_until;
          const bool accepted = underwriter_push(uw::bond::account, uw::bond::action_accept,
@@ -1558,15 +1539,11 @@ struct batch_operator_plugin::impl {
                  accept.amount.to_string());
          }
       }
-      // The release observer checks refill capacity separately from underwriting request activity.
       if (crank_due) {
-         underwriter_cranked_at = fc::time_point::now();
-         underwriter_release_progress = false;
-         for (const auto& [pair, work] : release_work) {
-            underwriter_release_retries[pair].note(work, underwriter_cranked_at);
-         }
+         underwriter_crank.note(current_epoch, crank_now);
          underwriter_push(uw::synd::account, uw::synd::action_crank,
-                          fc::mutable_variant_object()(uw::synd::field::limit, UNDERWRITER_CRANK_LIMIT));
+                          fc::mutable_variant_object()(uw::synd::field::limit, UNDERWRITER_CRANK_LIMIT), nullptr,
+                          &underwriter_crank.completion);
       }
       for (const uw::request_id_t id : plan.approves) {
          underwriter_push(uw::bond::account, uw::bond::action_approve,
@@ -1711,64 +1688,22 @@ struct batch_operator_plugin::impl {
       return in;
    }
 
-   /**
-    * Observe at most eight registered pairs, with at most sixteen envelopes, three point reads and sixteen item
-    * rows per reached yield/invalidating envelope, plus one epoch singleton read. The persisted cursor skips finished
-    * history. Move the pair cursor only after every
-    * selected read succeeds; retry markers are retained only for registered pairs. A failed read withholds this pass.
-    */
-   std::optional<std::map<uw::synd_pair, uw::synd_work>>
-   read_underwriter_release_work(const std::map<fc::slug_name, liq_token>& tokens,
-                                  const std::vector<uw::request>& requests) {
+   /// One bounded singleton read. Before bootstrap the contract uses epoch zero; read failures omit this trigger.
+   std::optional<uint32_t> read_underwriter_epoch() {
       try {
-         const auto started = fc::time_point::now();
-         uint32_t reads = 1;
          sysio::chain_apis::read_only::get_table_rows_params state;
          state.code = chain::name(epoch::account);
          state.scope = epoch::account;
          state.table = epoch::table_epochstate;
          state.limit = SINGLETON_ROW_LIMIT;
          state.values_only = true;
-         const auto epoch_rows = read_table_checked(std::move(state));
-         if (!epoch_rows || epoch_rows->rows.empty()) return std::nullopt;
-         uint32_t rows_read = epoch_rows->rows.size();
-         const auto current = epoch_rows->rows.front().get_object()[epoch::field::current_epoch_index].as<uint32_t>();
-         std::map<uw::synd_pair, uw::synd_work> out;
-         auto it = underwriter_release_from ? tokens.lower_bound(*underwriter_release_from) : tokens.begin();
-         if (it == tokens.end()) it = tokens.begin();
-         for (uint32_t count = 0; it != tokens.end() && count < uw::synd::pairs_per_poll; ++count, ++it) {
-            const uw::synd_pair pair{it->second.chain_code, it->first};
-            auto work = uw::read_synd_work(pair, current, requests,
-               [this, &reads, &rows_read](const char* table, const fc::variant_object& key, bool exact, uint32_t limit)
-                  -> std::optional<fc::variants> {
-                  sysio::chain_apis::read_only::get_table_rows_params query;
-                  query.code = chain::name(uw::synd::account);
-                  query.scope = uw::synd::account;
-                  query.table = table;
-                  query.limit = limit;
-                  query.values_only = true;
-                  const auto bound = fc::json::to_string(key, fc::json::yield_function_t{});
-                  if (exact) query.find = bound;
-                  else query.lower_bound = bound;
-                  ++reads;
-                  auto rows = read_table_checked(std::move(query));
-                  if (!rows) return std::nullopt;
-                  rows_read += rows->rows.size();
-                  return std::move(rows->rows);
-               });
-            if (!work) return std::nullopt;
-            out.emplace(pair, std::move(*work));
-         }
-         underwriter_release_from = it == tokens.end() ? std::nullopt : std::optional{it->first};
-         std::erase_if(underwriter_release_retries, [&](const auto& entry) {
-            const auto found = tokens.find(entry.first.second);
-            return found == tokens.end() || found->second.chain_code != entry.first.first;
-         });
-         dlog("batch_operator: underwriter release observation: {} pairs, {} table reads, {} rows, {} us",
-              out.size(), reads, rows_read, (fc::time_point::now() - started).count());
-         return out;
+         const std::optional<sysio::chain_apis::read_only::get_table_rows_result> epoch_rows =
+            read_table_checked(std::move(state));
+         if (!epoch_rows) return std::nullopt;
+         if (epoch_rows->rows.empty()) return 0;
+         return epoch_rows->rows.front().get_object()[epoch::field::current_epoch_index].as<uint32_t>();
       } catch (const fc::exception& error) {
-         elog("batch_operator: underwriter cannot observe syndication release queues: {}", error.top_message());
+         elog("batch_operator: underwriter cannot read depot epoch: {}", error.top_message());
          return std::nullopt;
       }
    }
@@ -2043,8 +1978,10 @@ struct batch_operator_plugin::impl {
                     const std::string& action_name,
                     const signer& by,
                     const fc::variant_object& data,
-                    std::optional<fc::time_point_sec>* submitted_until = nullptr) {
+                    std::optional<fc::time_point_sec>* submitted_until = nullptr,
+                    std::shared_ptr<batch_operator_detail::async_action_completion>* result = nullptr) {
       if (submitted_until) submitted_until->reset();
+      if (result) result->reset();
       if (shutting_down) return false;
       const fc::time_point deadline = fc::time_point::now() + delivery_timeout;
       const bool           on_main  = std::this_thread::get_id() == app().executor().get_main_thread_id();
@@ -2082,6 +2019,7 @@ struct batch_operator_plugin::impl {
          packed_var);
       std::shared_ptr<batch_operator_detail::async_action_completion> completion =
          std::make_shared<batch_operator_detail::async_action_completion>();
+      if (result) *result = completion;
       std::future<void> future = completion->get_future();
       if (submitted_until) *submitted_until = expiration;
       if (on_main) {

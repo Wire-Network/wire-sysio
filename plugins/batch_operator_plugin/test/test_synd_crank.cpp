@@ -1,311 +1,187 @@
 #include "../src/synd_crank.hpp"
 
 #include <boost/test/unit_test.hpp>
+#include <chrono>
 
-using namespace sysio::batch_operator_detail::underwriter;
+namespace uw = sysio::batch_operator_detail::underwriter;
+namespace detail = sysio::batch_operator_detail;
+namespace trace_field = detail::transaction_trace_field;
 using mvo = fc::mutable_variant_object;
+using push_results = sysio::chain_apis::read_write::push_transaction_results;
+using push_result = sysio::chain::next_function_variant<push_results>;
 
 namespace {
-const synd_pair pair{fc::slug_name{"ETH"}, fc::slug_name{"LIQETH"}};
-constexpr uint32_t queue_epoch = 10;
-constexpr uint32_t refill_epoch = 20;
+constexpr uint32_t initial_epoch = 20;
+const fc::microseconds idle_interval = fc::minutes(5);
+const fc::time_point start = fc::time_point::from_iso_string("2026-11-19T00:00:00");
 
-/// Values-only rows and query accounting for a pair with an acknowledged request and pending principal.
-struct synd_fixture {
-   fc::variants ledger{mvo()("queue_epoch", queue_epoch)};
-   fc::variants envelopes{mvo()("chain_code", "ETH")("token_code", "LIQETH")("epoch_index", queue_epoch)
-      ("state", "RELEASABLE")("request_id", 1)("released", 50)("synd_total", 100)("yield_total", 0)};
-   fc::variants configs{mvo()("synd_burst", 50)("synd_refill", 50)};
-   fc::variants buckets{mvo()("level", 0)("last_epoch", refill_epoch)};
-   fc::variants items;
-   std::string fail_table;
-   uint32_t calls = 0;
-   uint32_t rows = 0;
+/// A normal API result whose root action either emits an inline action or does no further work.
+push_results trace_result(bool productive) {
+   fc::variants children;
+   if (productive) children.emplace_back(mvo());
+   return {{}, mvo()(trace_field::action_traces,
+      fc::variants{mvo()(trace_field::inline_traces, children)})};
+}
 
-   /// Envelopes carry independent outcome and invalidation progress even after requests have been pruned.
-   synd_fixture() {
-      set("outcome", "APPROVED");
-      set("burned", 0);
-   }
+/// Deliver a real immediate push result through the callback completion path.
+void finish(detail::async_action_completion& completion, push_results result) {
+   completion.complete_push_result(push_result{std::move(result)}, [] {}, [](const fc::exception_ptr&) {});
+}
 
-   /// Enforce the production query bounds, including the persisted cursor used to skip retained history.
-   std::optional<fc::variants> read(const char* table, const fc::variant_object& key, bool exact, uint32_t limit) {
-      ++calls;
-      BOOST_CHECK_EQUAL(key[synd::field::chain_code].as_uint64(), pair.first.value);
-      BOOST_CHECK_EQUAL(key[synd::field::token_code].as_uint64(), pair.second.value);
-      if (fail_table == table) return std::nullopt;
-      const fc::variants* values = nullptr;
-      if (table == synd::table_ledger) values = &ledger;
-      if (table == synd::table_envelopes || table == synd::table_items) {
-         values = &envelopes;
-         if (table == synd::table_items) values = &items;
-         BOOST_CHECK(!exact);
-         BOOST_CHECK_EQUAL(limit, synd::envelopes_per_pair);
-         BOOST_CHECK_EQUAL(key[synd::field::epoch_index].as_uint64(), queue_epoch);
-      } else {
-         BOOST_CHECK(exact);
-         BOOST_CHECK_EQUAL(limit, 1u);
-      }
-      if (table == synd::table_syndconfig) values = &configs;
-      if (table == synd::table_buckets) {
-         values = &buckets;
-         BOOST_CHECK_EQUAL(key[synd::field::direction].as_uint64(),
-                           magic_enum::enum_integer(bucket_direction::SYNDICATION));
-      }
-      BOOST_REQUIRE(values);
-      auto result = *values;
-      if (result.size() > limit) result.resize(limit);
-      rows += result.size();
-      return result;
-   }
-
-   /// Observe the same production reader without a chain or RPC service.
-   std::optional<synd_work> observe(uint32_t epoch, const std::vector<request>& requests = {}) {
-      return read_synd_work(pair, epoch, requests,
-         [this](const char* table, const fc::variant_object& key, bool exact, uint32_t limit) {
-            return read(table, key, exact, limit);
-         });
-   }
-
-   /// Change only the first envelope's lifecycle or progress.
-   void set(const char* field, const fc::variant& value) {
-      envelopes.front() = mvo(envelopes.front().get_object()).set(field, value);
-   }
-};
+/// An acknowledged envelope request that no longer requests outcome synchronization.
+uw::request settled_request() {
+   return {.id = 1, .issuer = sysio::chain::name{uw::synd::account},
+      .schema = sysio::chain::name{uw::envelope_schema}, .state = uw::request_state::APPROVED,
+      .outcome_acknowledged = true};
+}
 } // namespace
 
 BOOST_AUTO_TEST_SUITE(synd_crank_tests)
 
-/// Acknowledgment and pruning of bond requests must not remove pending release from scheduling.
-BOOST_AUTO_TEST_CASE(release_survives_acknowledged_or_pruned_requests_and_restart) {
-   synd_fixture fixture;
-   request settled{.id = 1, .issuer = sysio::chain::name{synd::account},
-      .schema = sysio::chain::name{envelope_schema}, .state = request_state::APPROVED,
-      .outcome_acknowledged = true};
-   const auto acknowledged = fixture.observe(refill_epoch + 1, {settled});
-   const auto pruned = fixture.observe(refill_epoch + 1);
-   BOOST_REQUIRE(acknowledged);
-   BOOST_REQUIRE(pruned);
-   BOOST_CHECK(acknowledged->ready);
-   BOOST_CHECK(*acknowledged == *pruned);
-   synd_crank_retry restarted;
-   BOOST_CHECK(restarted.due(*pruned, fc::time_point{}));
-   BOOST_CHECK(!synd_sync_work({settled}).ready);
-   settled.outcome_acknowledged = false;
-   BOOST_CHECK(synd_sync_work({settled}).ready);
+/// Approved, acknowledged, pruned and out-of-window requests cannot hide an epoch refill, including after restart.
+BOOST_AUTO_TEST_CASE(epoch_refill_survives_request_settlement_and_restart) {
+   uw::synd_crank_state state;
+   const uw::plan actions;
+   const std::vector<uw::request> settled{settled_request()};
+   BOOST_CHECK(state.due(actions, settled, initial_epoch, start, idle_interval));
+   state.note(initial_epoch, start);
+   BOOST_CHECK(!state.due(actions, settled, initial_epoch, start + fc::seconds(15), idle_interval));
+   BOOST_CHECK(state.due(actions, settled, initial_epoch + 1, start + fc::seconds(60), idle_interval));
+   BOOST_CHECK(state.due(actions, {}, initial_epoch + 1, start + fc::seconds(60), idle_interval));
+   uw::synd_crank_state restarted;
+   BOOST_CHECK(restarted.due(actions, {}, initial_epoch, start, idle_interval));
 }
 
-/// Capacity becomes eligible at a depot epoch change, including a zero-refill bucket with residual capacity.
-BOOST_AUTO_TEST_CASE(refill_waits_without_submitting_and_wakes_on_epoch_progress) {
-   synd_fixture fixture;
-   BOOST_CHECK(!fixture.observe(refill_epoch)->ready);
-   BOOST_CHECK(!fixture.observe(refill_epoch - 1)->ready);
-   BOOST_CHECK(fixture.observe(refill_epoch + 1)->ready);
-   fixture.configs = {mvo()("synd_burst", 0)("synd_refill", 50)};
-   BOOST_CHECK(!fixture.observe(refill_epoch + 1)->ready);
-   fixture.configs = {mvo()("synd_burst", 50)("synd_refill", 0)};
-   BOOST_CHECK(!fixture.observe(refill_epoch + 1)->ready);
-   fixture.buckets = {mvo()("level", 1)("last_epoch", refill_epoch)};
-   BOOST_CHECK(fixture.observe(refill_epoch)->ready);
-   fixture.buckets.clear(); // the contract initializes a missing bucket full
-   BOOST_CHECK(fixture.observe(refill_epoch)->ready);
-   fixture.configs.clear();
-   BOOST_CHECK(!fixture.observe(refill_epoch + 1)->ready);
+/// Empty/refill-waiting work gets one epoch attempt, rather than a transaction on every poll.
+BOOST_AUTO_TEST_CASE(empty_trace_waits_for_epoch_or_idle_fallback) {
+   uw::synd_crank_state state;
+   state.note(initial_epoch, start);
+   state.completion = std::make_shared<detail::async_action_completion>();
+   finish(*state.completion, trace_result(false));
+   for (uint32_t poll = 1; poll < 20; ++poll)
+      BOOST_CHECK(!state.due({}, {}, initial_epoch, start + fc::seconds(15 * poll), idle_interval));
+   BOOST_CHECK(state.due({}, {}, initial_epoch, start + idle_interval, idle_interval));
+   BOOST_CHECK(state.due({}, {}, initial_epoch + 1, start + fc::seconds(60), idle_interval));
+   state.note(initial_epoch + 1, start + fc::seconds(60));
+   BOOST_CHECK(!state.due({}, {}, initial_epoch + 1, start + fc::seconds(75), idle_interval));
 }
 
-/// Quiet, open and held queues do not become busy solely because a request still exists.
-BOOST_AUTO_TEST_CASE(idle_and_held_envelopes_do_not_request_release) {
-   for (const auto* state : {"OPEN", "HELD", "DONE", "INVALID"}) {
-      synd_fixture fixture;
-      fixture.set("state", state);
-      if (std::string(state) == "HELD") fixture.set("outcome", "PENDING");
-      BOOST_CHECK(!fixture.observe(refill_epoch + 1)->ready);
-   }
-   synd_fixture empty;
-   empty.ledger.clear();
-   BOOST_CHECK(!empty.observe(refill_epoch + 1)->ready);
-   BOOST_CHECK_EQUAL(empty.calls, 1u);
-   synd_fixture finished;
-   finished.set("released", 100);
-   BOOST_CHECK(!finished.observe(refill_epoch + 1)->ready);
-   BOOST_CHECK_EQUAL(finished.calls, 2u);
+/// Productive work can spend a shared contract budget; the next poll must continue even within the same epoch.
+BOOST_AUTO_TEST_CASE(productive_trace_continues_and_next_attempt_resets_progress) {
+   uw::synd_crank_state state;
+   state.note(initial_epoch, start);
+   state.completion = std::make_shared<detail::async_action_completion>();
+   finish(*state.completion, trace_result(true));
+   BOOST_CHECK(state.due({}, {}, initial_epoch, start + fc::seconds(15), idle_interval));
+   state.note(initial_epoch, start + fc::seconds(15));
+   BOOST_CHECK(!state.due({}, {}, initial_epoch, start + fc::seconds(30), idle_interval));
+   state.completion = std::make_shared<detail::async_action_completion>();
+   finish(*state.completion, trace_result(false));
+   BOOST_CHECK(!state.due({}, {}, initial_epoch, start + fc::seconds(45), idle_interval));
 }
 
-/// A waiting unbonded prefix still gates FIFO; bonded requests need refresh, and held rows can be bypassed.
-BOOST_AUTO_TEST_CASE(request_refresh_and_fifo_prefix_are_preserved) {
-   synd_fixture fixture;
-   fixture.set("state", "REQUESTED");
-   fixture.set("outcome", "PENDING");
-   request row{.id = 1, .state = request_state::OPEN};
-   BOOST_CHECK(!fixture.observe(refill_epoch + 1, {row})->ready);
-   row.state = request_state::HELD;
-   BOOST_CHECK(!fixture.observe(refill_epoch + 1, {row})->ready);
-   row.state = request_state::BONDED;
-   BOOST_CHECK(fixture.observe(refill_epoch + 1, {row})->ready);
-   fixture.set("state", "WAITING");
-   BOOST_CHECK(fixture.observe(refill_epoch)->ready);
-   const auto releasable = fixture.envelopes.front();
-   fixture.set("state", "HELD");
-   fixture.envelopes.push_back(mvo(releasable.get_object()).set("state", "RELEASABLE"));
-   BOOST_CHECK(fixture.observe(refill_epoch + 1)->ready);
+/// The real planner suppresses accepts/approvals/claims under the cord; scheduling still allows contract sync.
+BOOST_AUTO_TEST_CASE(frozen_planner_still_cranks_for_epoch_sync_and_productive_trace) {
+   uw::plan_inputs in;
+   in.frozen = true;
+   in.requests = {settled_request()};
+   in.requests.front().outcome_acknowledged = false;
+   const uw::plan actions = uw::plan_actions(in);
+   BOOST_CHECK(actions.accepts.empty());
+   BOOST_CHECK(actions.approves.empty());
+   BOOST_CHECK(actions.claims.empty());
+   uw::synd_crank_state state;
+   state.note(initial_epoch, start);
+   BOOST_CHECK(state.due(actions, in.requests, initial_epoch, start + fc::seconds(15), idle_interval));
+   in.requests.front().outcome_acknowledged = true;
+   BOOST_CHECK(!state.due(actions, in.requests, initial_epoch, start + fc::seconds(15), idle_interval));
+   BOOST_CHECK(state.due(actions, in.requests, initial_epoch + 1, start + fc::seconds(60), idle_interval));
+   BOOST_CHECK(state.due(actions, in.requests, initial_epoch, start + idle_interval, idle_interval));
+   state.completion = std::make_shared<detail::async_action_completion>();
+   finish(*state.completion, trace_result(true));
+   BOOST_CHECK(state.due(actions, in.requests, initial_epoch, start + fc::seconds(15), idle_interval));
 }
 
-/// Read failures withhold the entire observation, while malformed ABI rows propagate to the worker's logged catch.
-BOOST_AUTO_TEST_CASE(read_failures_are_distinct_from_empty_queues) {
-   for (const auto* table : {synd::table_ledger, synd::table_envelopes, synd::table_syndconfig, synd::table_buckets}) {
-      synd_fixture fixture;
-      fixture.fail_table = table;
-      BOOST_CHECK(!fixture.observe(refill_epoch + 1));
-   }
-   synd_fixture malformed;
-   malformed.set("state", "UNKNOWN");
-   BOOST_CHECK_THROW(malformed.observe(refill_epoch + 1), fc::exception);
+/// An epoch read failure cannot suppress accepts, approvals, synchronization or the idle fallback.
+BOOST_AUTO_TEST_CASE(epoch_read_failure_disables_only_epoch_trigger) {
+   uw::synd_crank_state state;
+   state.note(initial_epoch, start);
+   uw::plan actions;
+   BOOST_CHECK(!state.due(actions, {}, std::nullopt, start + fc::seconds(15), idle_interval));
+   actions.accepts.resize(1);
+   BOOST_CHECK(state.due(actions, {}, std::nullopt, start + fc::seconds(15), idle_interval));
+   actions.accepts.clear();
+   actions.approves.push_back(1);
+   BOOST_CHECK(state.due(actions, {}, std::nullopt, start + fc::seconds(15), idle_interval));
+   actions.approves.clear();
+   uw::request request = settled_request();
+   request.outcome_acknowledged = false;
+   BOOST_CHECK(state.due(actions, {request}, std::nullopt, start + fc::seconds(15), idle_interval));
+   BOOST_CHECK(state.due(actions, {}, std::nullopt, start + idle_interval, idle_interval));
+   state.note(std::nullopt, start + fc::seconds(15));
+   BOOST_REQUIRE(state.epoch);
+   BOOST_CHECK_EQUAL(*state.epoch, initial_epoch);
+   BOOST_CHECK(state.due(actions, {}, initial_epoch + 1, start + fc::seconds(60), idle_interval));
 }
 
-/// Retained envelope history is skipped by the exact ledger cursor, and reads remain bounded on a full page.
-BOOST_AUTO_TEST_CASE(queue_observation_has_fixed_row_and_call_bounds) {
-   synd_fixture fixture;
-   fixture.envelopes.resize(synd::envelopes_per_pair + 100, fixture.envelopes.front());
-   BOOST_CHECK(fixture.observe(refill_epoch + 1)->ready);
-   BOOST_CHECK_EQUAL(fixture.calls, 4u);
-   BOOST_CHECK_EQUAL(fixture.rows, synd::envelopes_per_pair + 3);
+/// Decision time survives delayed accepts. An absent singleton is epoch zero, not an observation failure.
+BOOST_AUTO_TEST_CASE(decision_clock_epoch_zero_and_skipped_epochs) {
+   uw::synd_crank_state state;
+   BOOST_CHECK(state.due({}, {}, 0, start, idle_interval));
+   state.note(0, start);
+   BOOST_CHECK(!state.due({}, {}, 0, start + fc::seconds(60), idle_interval));
+   BOOST_CHECK(state.due({}, {}, 0, start + idle_interval, idle_interval));
+   BOOST_CHECK(state.due({}, {}, initial_epoch, start + fc::seconds(60), idle_interval));
+   state.note(initial_epoch, start + fc::seconds(60));
+   BOOST_CHECK(!state.due({}, {}, initial_epoch, start + fc::seconds(75), idle_interval));
 }
 
-/// A ruling rewinds held envelopes independently of request acknowledgment, and invalidation may span cranks.
-BOOST_AUTO_TEST_CASE(ruled_holds_and_finished_history_continue_without_idle_delay) {
-   for (const auto* outcome : {"VALID", "INVALID"}) {
-      synd_fixture fixture;
-      fixture.set("state", "HELD");
-      fixture.set("outcome", outcome);
-      const auto work = *fixture.observe(refill_epoch);
-      BOOST_CHECK(work.ready);
-      synd_crank_retry retry;
-      retry.note(work, fc::time_point{});
-      fixture.set("burned", 10);
-      BOOST_CHECK(retry.due(*fixture.observe(refill_epoch), fc::time_point{}));
-   }
-   synd_fixture history;
-   history.set("state", "HELD");
-   history.set("outcome", "PENDING");
-   history.envelopes.resize(synd::envelopes_per_pair, history.envelopes.front());
-   BOOST_CHECK(history.observe(refill_epoch)->ready);
+/// Both actual API trace forms report inline work; root actions and malformed output alone do not.
+BOOST_AUTO_TEST_CASE(inline_progress_handles_nested_and_flat_trace_output) {
+   BOOST_CHECK(detail::trace_has_inline_actions(trace_result(true).processed));
+   BOOST_CHECK(!detail::trace_has_inline_actions(trace_result(false).processed));
+   BOOST_CHECK(!detail::trace_has_inline_actions(fc::variant{}));
+   BOOST_CHECK(!detail::trace_has_inline_actions(mvo()(trace_field::action_traces, false)));
+   const fc::variant flat = mvo()(trace_field::action_traces,
+      fc::variants{mvo()(trace_field::creator_action_ordinal, 0u),
+                   mvo()(trace_field::creator_action_ordinal, 1u)});
+   BOOST_CHECK(detail::trace_has_inline_actions(flat));
+   const fc::variant root_only = mvo()(trace_field::action_traces,
+      fc::variants{mvo()(trace_field::creator_action_ordinal, 0u)});
+   BOOST_CHECK(!detail::trace_has_inline_actions(root_only));
 }
 
-/// Lifetime yield totals are not pending yield; only remaining YIELD items can bypass an empty principal bucket.
-BOOST_AUTO_TEST_CASE(released_yield_does_not_make_refill_waiting_principal_ready) {
-   synd_fixture fixture;
-   fixture.set("yield_total", 25);
-   fixture.set("released", 75);
-   BOOST_CHECK(!fixture.observe(refill_epoch)->ready);
-   fixture.items = {mvo()("chain_code", "ETH")("token_code", "LIQETH")("epoch_index", queue_epoch)
-      ("id", 3)("kind", "YIELD")("remaining", 25)};
-   BOOST_CHECK(fixture.observe(refill_epoch)->ready);
-   fixture.items.front() = mvo(fixture.items.front().get_object()).set("remaining", 0);
-   BOOST_CHECK(!fixture.observe(refill_epoch)->ready);
+/// Deferred results expose progress, and duplicate callbacks cannot replace the first result.
+BOOST_AUTO_TEST_CASE(deferred_and_duplicate_callbacks_preserve_progress) {
+   detail::async_action_completion completion;
+   const push_result deferred{std::function<sysio::chain::t_or_exception<push_results>()>{[] {
+      return sysio::chain::t_or_exception<push_results>{trace_result(true)};
+   }}};
+   completion.complete_push_result(deferred, [] {}, [](const fc::exception_ptr&) {});
+   BOOST_CHECK(completion.succeeded());
+   BOOST_CHECK(completion.has_inline_actions());
+   finish(completion, trace_result(false));
+   BOOST_CHECK(completion.has_inline_actions());
+   detail::async_action_completion failed;
+   const push_result error{std::make_shared<fc::exception>()};
+   failed.complete_push_result(error, [] {}, [](const fc::exception_ptr&) {});
+   BOOST_CHECK(!failed.succeeded());
+   BOOST_CHECK(!failed.has_inline_actions());
 }
 
-/// Invalidations bypass principal capacity in every unfinished lifecycle state and survive request pruning.
-BOOST_AUTO_TEST_CASE(persisted_outcomes_precede_request_lookups_and_bucket_checks) {
-   for (const auto* state : {"REQUESTED", "RELEASABLE", "HELD"}) {
-      synd_fixture fixture;
-      fixture.set("state", state);
-      fixture.set("outcome", "INVALID");
-      fixture.items = {
-         mvo()("chain_code", "ETH")("token_code", "LIQETH")("epoch_index", queue_epoch)
-            ("id", 1)("kind", "YIELD")("remaining", 25),
-         mvo()("chain_code", "ETH")("token_code", "LIQETH")("epoch_index", queue_epoch)
-            ("id", 2)("kind", "YIELD")("remaining", 25)};
-      auto work = *fixture.observe(refill_epoch);
-      BOOST_CHECK(work.ready);
-      synd_crank_retry retry;
-      retry.note(work, fc::time_point{});
-      fixture.items.erase(fixture.items.begin()); // deletion advances no released or burned total
-      BOOST_CHECK(retry.due(*fixture.observe(refill_epoch), fc::time_point{}));
-   }
-   for (const auto* outcome : {"APPROVED", "VALID"}) {
-      synd_fixture fixture;
-      fixture.set("state", "REQUESTED");
-      fixture.set("outcome", outcome);
-      BOOST_CHECK(fixture.observe(refill_epoch)->ready);
-   }
-}
-
-/// An unchanged snapshot backs off even after a failed push; observed progress and new capacity wake immediately.
-BOOST_AUTO_TEST_CASE(retry_spacing_tracks_progress_and_refill) {
-   synd_fixture fixture;
-   auto work = *fixture.observe(refill_epoch + 1);
-   synd_crank_retry retry;
-   const auto now = fc::time_point::from_iso_string("2026-11-17T00:00:00");
-   BOOST_CHECK(retry.due(work, now));
-   retry.note(work, now);
-   BOOST_CHECK(!retry.due(work, now + fc::seconds(1)));
-   BOOST_CHECK(retry.due(work, now + synd_crank_retry::initial_wait));
-   retry.note(work, now + synd_crank_retry::initial_wait);
-   BOOST_CHECK(!retry.due(work, now + synd_crank_retry::initial_wait * 2));
-   fixture.set("released", 75);
-   work = *fixture.observe(refill_epoch + 1);
-   BOOST_CHECK(retry.due(work, now + fc::seconds(1)));
-   retry.note(work, now);
-   BOOST_CHECK(retry.due(*fixture.observe(refill_epoch + 2), now + fc::seconds(1)));
-   BOOST_CHECK(!retry.due(*fixture.observe(refill_epoch), now + fc::hours(1)));
-   for (int count = 0; count < 10; ++count) retry.note(work, now);
-   BOOST_CHECK(retry.wait <= synd_crank_retry::maximum_wait);
-}
-
-/// One pair may spend the entire contract budget; its progress and eventual drainage must wake an untouched pair.
-BOOST_AUTO_TEST_CASE(global_crank_progress_wakes_pairs_left_outside_the_budget) {
-   synd_fixture fixture;
-   const synd_pair other{fc::slug_name{"SOL"}, fc::slug_name{"LIQSOL"}};
-   std::map<synd_pair, synd_work> work{{pair, *fixture.observe(refill_epoch + 1)},
-                                      {other, *fixture.observe(refill_epoch + 1)}};
-   std::map<synd_pair, synd_crank_retry> retries;
-   bool progress = false;
-   auto now = fc::time_point::from_iso_string("2026-11-17T00:00:00");
-   BOOST_CHECK(synd_crank_due(work, retries, progress, now));
-   // Pair A keeps consuming the whole budget. B's unchanged view cannot tell whether the contract reached it.
-   for (int pass = 0; pass < 10; ++pass) {
-      for (const auto& [key, observed] : work) retries[key].note(observed, now);
-      progress = false;
-      now += fc::seconds(1);
-      BOOST_CHECK(!synd_crank_due(work, retries, progress, now));
-      work.at(pair).positions.front().released += 1;
-      BOOST_CHECK(synd_crank_due(work, retries, progress, now));
-   }
-   for (const auto& [key, observed] : work) retries[key].note(observed, now);
-   progress = false;
-   work.at(pair) = {}; // A just drained; B is ready but unchanged and must not inherit a five-minute pause
-   now += fc::seconds(1);
-   BOOST_CHECK(synd_crank_due(work, retries, progress, now));
-   for (const auto& [key, observed] : work) retries[key].note(observed, now);
-   progress = false;
-   BOOST_CHECK(!synd_crank_due(work, retries, progress, now + fc::seconds(1)));
-   work.at(other) = {};
-   BOOST_CHECK(!synd_crank_due(work, retries, progress, now + fc::hours(1)));
-}
-
-/// With more pairs than fit one poll, drainage on an empty page must wake ready work on the following page once.
-BOOST_AUTO_TEST_CASE(global_progress_survives_disjoint_observation_pages) {
-   synd_fixture fixture;
-   const synd_pair other{fc::slug_name{"SOL"}, fc::slug_name{"LIQSOL"}};
-   std::map<synd_pair, synd_work> first{{pair, *fixture.observe(refill_epoch + 1)}};
-   std::map<synd_pair, synd_work> second{{other, *fixture.observe(refill_epoch + 1)}};
-   std::map<synd_pair, synd_crank_retry> retries;
-   bool progress = false;
-   const auto now = fc::time_point::from_iso_string("2026-11-17T00:00:00");
-   BOOST_CHECK(synd_crank_due(first, retries, progress, now));
-   retries[pair].note(first.at(pair), now);
-   progress = false;
-   BOOST_CHECK(synd_crank_due(second, retries, progress, now));
-   for (int attempt = 0; attempt < 10; ++attempt) retries[other].note(second.at(other), now);
-   progress = false;
-   first.at(pair) = {};
-   BOOST_CHECK(!synd_crank_due(first, retries, progress, now + fc::seconds(1)));
-   BOOST_CHECK(progress);
-   BOOST_CHECK(synd_crank_due(second, retries, progress, now + fc::seconds(1)));
-   retries[other].note(second.at(other), now + fc::seconds(1));
-   progress = false;
-   BOOST_CHECK(!synd_crank_due(first, retries, progress, now + fc::seconds(2)));
-   BOOST_CHECK(!synd_crank_due(second, retries, progress, now + fc::seconds(2)));
+/// A timed-out caller retains only shared completion state; its late real push callback wakes the next poll.
+BOOST_AUTO_TEST_CASE(late_callback_wakes_scheduler_after_timeout) {
+   uw::synd_crank_state state;
+   state.note(initial_epoch, start);
+   state.completion = std::make_shared<detail::async_action_completion>();
+   std::future<void> done = state.completion->get_future();
+   const sysio::chain::plugin_interface::next_function<push_results> callback = detail::create_push_action_callback(
+      {}, state.completion, uw::synd::account, uw::synd::action_crank);
+   BOOST_CHECK(done.wait_for(std::chrono::milliseconds(0)) == std::future_status::timeout);
+   BOOST_CHECK(!state.due({}, {}, initial_epoch, start + fc::seconds(15), idle_interval));
+   callback(push_result{trace_result(true)});
+   BOOST_CHECK(done.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready);
+   BOOST_CHECK(state.due({}, {}, initial_epoch, start + fc::seconds(30), idle_interval));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
