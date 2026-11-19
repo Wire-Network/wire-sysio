@@ -149,13 +149,19 @@ void chain_api_plugin::plugin_startup() {
       CHAIN_RO_CALL(get_producer_schedule, 200, http_params_types::no_params),
       CHAIN_RO_CALL(get_required_keys, 200, http_params_types::params_required),
       CHAIN_RO_CALL(get_transaction_id, 200, http_params_types::params_required),
-      // transaction related APIs will be posted to read_write queue after keys are recovered, they are safe to run in parallel until they post to the read_write queue
+   }, appbase::exec_queue::read_only);
+
+   // Transaction calls run in parallel on the read_only queue until keys are recovered, then post to the
+   // trx_read_write queue. Their response reports the transaction's execution, so the bytes-in-flight budget refuses
+   // them only on intake.
+   _http_plugin.add_api({
       CHAIN_RO_CALL_ASYNC(compute_transaction, chain_apis::read_only::compute_transaction_results, 200, http_params_types::params_required),
       CHAIN_RW_CALL_ASYNC(push_transaction, chain_apis::read_write::push_transaction_results, 202, http_params_types::params_required),
       CHAIN_RW_CALL_ASYNC(push_transactions, chain_apis::read_write::push_transactions_results, 202, http_params_types::params_required),
       CHAIN_RW_CALL_ASYNC(send_transaction, chain_apis::read_write::send_transaction_results, 202, http_params_types::params_required),
       CHAIN_RW_CALL_ASYNC(send_transaction2, chain_apis::read_write::send_transaction_results, 202, http_params_types::params_required)
-   }, appbase::exec_queue::read_only);
+   }, appbase::exec_queue::read_only, appbase::priority::medium_low, http_content_type::json,
+      http_response_policy::always_sent);
 
    if (chain.account_queries_enabled()) {
       _http_plugin.add_async_api({

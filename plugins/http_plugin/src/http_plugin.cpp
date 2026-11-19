@@ -295,11 +295,16 @@ namespace sysio {
           * @param to_queue - execution queue to post to
           * @param priority - priority to post to the app thread at
           * @param content_type - json or plain txt
+          * @param response_policy - whether the bytes-in-flight budget can refuse the response
           * @return the constructed internal_url_handler
           */
-         static detail::internal_url_handler make_app_thread_url_handler(api_entry&& entry, appbase::exec_queue to_queue, int priority, http_content_type content_type ) {
+         static detail::internal_url_handler make_app_thread_url_handler(api_entry&& entry,
+                                                                         appbase::exec_queue to_queue, int priority,
+                                                                         http_content_type content_type,
+                                                                         http_response_policy response_policy) {
             detail::internal_url_handler handler;
             handler.content_type = content_type;
+            handler.response_policy = response_policy;
             handler.category = entry.category;
             auto next_ptr = std::make_shared<url_handler>(std::move(entry.handler));
             handler.fn = [priority, to_queue, next_ptr=std::move(next_ptr),
@@ -347,11 +352,15 @@ namespace sysio {
           * by the handler's response or its exception (single_response).
           * @param entry - the endpoint and its handler
           * @param content_type - json or plain txt
+          * @param response_policy - whether the bytes-in-flight budget can refuse the response
           * @return the constructed internal_url_handler
           */
-         static detail::internal_url_handler make_http_thread_url_handler(api_entry&& entry, http_content_type content_type) {
+         static detail::internal_url_handler make_http_thread_url_handler(api_entry&& entry,
+                                                                          http_content_type content_type,
+                                                                          http_response_policy response_policy) {
             detail::internal_url_handler handler;
             handler.content_type = content_type;
+            handler.response_policy = response_policy;
             handler.category = entry.category;
             handler.fn = [next=std::move(entry.handler), path=std::make_shared<const std::string>(entry.path)](
                             const detail::abstract_conn_ptr& conn, string&& r, string&& b,
@@ -699,17 +708,21 @@ namespace sysio {
               from_category(entry.category), entry.path, addrs);
    }
 
-   void http_plugin::add_handler(api_entry&& entry, appbase::exec_queue q, int priority, http_content_type content_type) {
+   void http_plugin::add_handler(api_entry&& entry, appbase::exec_queue q, int priority, http_content_type content_type,
+                                 http_response_policy response_policy) {
       log_add_handler(my.get(), entry);
       std::string path  = entry.path;
-      auto p = my->plugin_state->url_handlers.emplace(path, my->make_app_thread_url_handler(std::move(entry), q, priority, content_type));
+      auto p = my->plugin_state->url_handlers.emplace(
+         path, my->make_app_thread_url_handler(std::move(entry), q, priority, content_type, response_policy));
       SYS_ASSERT( p.second, chain::plugin_config_exception, "http url {} is not unique", path );
    }
 
-   void http_plugin::add_async_handler(api_entry&& entry, http_content_type content_type) {
+   void http_plugin::add_async_handler(api_entry&& entry, http_content_type content_type,
+                                       http_response_policy response_policy) {
       log_add_handler(my.get(), entry);
       std::string path  = entry.path;
-      auto p = my->plugin_state->url_handlers.emplace(path, my->make_http_thread_url_handler(std::move(entry), content_type));
+      auto p = my->plugin_state->url_handlers.emplace(
+         path, my->make_http_thread_url_handler(std::move(entry), content_type, response_policy));
       SYS_ASSERT( p.second, chain::plugin_config_exception, "http url {} is not unique", path );
    }
 
