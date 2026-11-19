@@ -22,6 +22,7 @@ add_executable( test_fc
         io/test_random_access_file.cpp
         io/test_raw.cpp
         io/test_unsigned_int.cpp
+        io/test_signed_int.cpp
         io/test_tracked_storage.cpp
         network/es/test_es_client.cpp
         network/ethereum/test_ethereum_client_and_rlp.cpp

@@ -142,7 +142,9 @@ struct trx_retry_db_impl {
                // to run on an API node, probably the best trade off to perform the abi serialization during block processing.
                auto resolver = get_serializers_cache(control, trace, abi_max_time);
                tt.trx_trace_v.clear();
-               abi_serializer::to_variant(*trace, tt.trx_trace_v, resolver, abi_max_time);
+               // abi_max_time bounds each action's decode and, from here, the decode of the whole trace.
+               abi_serializer::to_variant(*trace, tt.trx_trace_v, resolver, abi_max_time,
+                                          fc::time_point::now().safe_add(abi_max_time));
             } catch( chain::abi_exception& ) {
                tt.trx_trace_v = *trace;
             }
