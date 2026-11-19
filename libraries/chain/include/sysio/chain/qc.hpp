@@ -4,11 +4,11 @@
 #include <sysio/chain/finalizer_policy.hpp>
 #include <sysio/chain/vote_message.hpp>
 #include <sysio/chain/block_timestamp.hpp>
-#include <sysio/chain/thread_utils.hpp>
 #include <fc/crypto/bls_private_key.hpp>
 #include <fc/crypto/bls_public_key.hpp>
 #include <fc/crypto/bls_signature.hpp>
 #include <fc/bitset.hpp>
+#include <fc/thread_utils.hpp>
 #include <array>
 #include <map>
 #include <memory>
@@ -138,7 +138,7 @@ namespace sysio::chain {
          friend struct fc::has_reflector_init<votes_t>;
          friend class aggregating_qc_sig_t;
          struct bit_processed {
-            alignas(hardware_destructive_interference_sz)
+            alignas(fc::hardware_destructive_interference_sz)
             std::atomic<bool> value;
          };
 

@@ -61,7 +61,7 @@ class vote_processor_t {
    std::atomic<block_num_type>  largest_known_block_num{0};
    std::atomic<uint32_t>        queued_votes{0};
    std::atomic<bool>            stopped{true};
-   named_thread_pool<vote>      thread_pool;
+   fc::named_thread_pool<vote>  thread_pool;
 
 private:
    // called with unlocked mtx

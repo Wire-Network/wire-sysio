@@ -13,8 +13,8 @@
 #include <sysio/chain/code_object.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/exceptions.hpp>
-#include <sysio/chain/thread_utils.hpp>
 #include <fc/scoped_exit.hpp>
+#include <fc/thread_utils.hpp>
 
 #include "IR/Module.h"
 #include "Platform/Platform.h"
