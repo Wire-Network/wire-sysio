@@ -4349,19 +4349,22 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
 
 read_only::get_required_keys_result read_only::get_required_keys( const get_required_keys_params& params,
                                                                   const fc::time_point& deadline )const {
+   const std::function<void()> checktime = [&deadline]() {
+      SYS_ASSERT( fc::time_point::now() < deadline, chain::deadline_exception,
+                  "get_required_keys exceeded its deadline {}", deadline );
+   };
    transaction pretty_input;
    // The request deadline bounds packing, building serializers included.
    auto resolver = caching_resolver(make_resolver(db, abi_serializer_max_time, throw_on_yield::yes, deadline));
    try {
       abi_serializer::from_variant(params.transaction, pretty_input, resolver, yield_until(deadline),
                                    abi_serializer_max_time);
+   } catch (chain::abi_serialization_deadline_exception& e) {
+      checktime(); // the request deadline is reported as it is while checking keys
+      FC_RETHROW_EXCEPTION(e, warn, "Invalid transaction");
    } SYS_RETHROW_EXCEPTIONS(chain::transaction_type_exception, "Invalid transaction")
 
    SYS_ASSERT( pretty_input.delay_sec.value == 0, chain::transaction_type_exception, "delay_sec must be 0");
-   const std::function<void()> checktime = [&deadline]() {
-      SYS_ASSERT( fc::time_point::now() < deadline, chain::deadline_exception,
-                  "get_required_keys exceeded its deadline {}", deadline );
-   };
    auto required_keys_set =
       db.get_authorization_manager().get_required_keys( pretty_input, params.available_keys, checktime );
    get_required_keys_result result;

@@ -818,12 +818,13 @@ BOOST_FIXTURE_TEST_CASE( push_transaction_honors_request_deadline, validating_te
    BOOST_CHECK_EQUAL(provided, 1u);
 } FC_LOG_AND_RETHROW()
 
-/// get_required_keys packs its transaction under the request deadline it is given as well as the per-action limit: past
-/// the deadline it fails before returning keys.
+/// get_required_keys packs its transaction under the request deadline it is given as well as the per-action limit. Past
+/// the deadline it fails with deadline_exception, as it does while checking keys; out of the per-action limit alone, a
+/// serializer it cannot build fails it with abi_serialization_deadline_exception.
 BOOST_FIXTURE_TEST_CASE( get_required_keys_honors_request_deadline, validating_tester ) try {
    create_accounts({"asserter"_n});
    set_code("asserter"_n, test_contracts::asserter_wasm());
-   set_abi("asserter"_n, test_contracts::asserter_abi());
+   set_abi("asserter"_n, asserter_abi_with_field("keys_probe"));
    produce_block();
 
    signed_transaction trx;
@@ -838,14 +839,19 @@ BOOST_FIXTURE_TEST_CASE( get_required_keys_honors_request_deadline, validating_t
    const chain_apis::read_only::get_required_keys_params params{trx_var, {key}};
    std::optional<chain_apis::tracked_votes> tracked_votes;
 
+   // Neither builds the serializer, so both meet the ABI uncached.
+   chain_apis::read_only no_build_time(*control, {}, {}, tracked_votes, fc::microseconds(0),
+                                       fc::microseconds::maximum(), nullptr);
+   BOOST_CHECK_THROW(no_build_time.get_required_keys(params, no_build_time.start()),
+                     abi_serialization_deadline_exception);
+   chain_apis::read_only expired(*control, {}, {}, tracked_votes, fc::microseconds::maximum(), fc::microseconds(0),
+                                 nullptr);
+   BOOST_CHECK_THROW(expired.get_required_keys(params, expired.start()), deadline_exception);
+
    chain_apis::read_only unlimited(*control, {}, {}, tracked_votes, fc::microseconds::maximum(),
                                    fc::microseconds::maximum(), nullptr);
    BOOST_CHECK(unlimited.get_required_keys(params, unlimited.start()).required_keys ==
                flat_set<public_key_type>{key});
-
-   chain_apis::read_only expired(*control, {}, {}, tracked_votes, fc::microseconds::maximum(), fc::microseconds(0),
-                                 nullptr);
-   BOOST_CHECK_THROW(expired.get_required_keys(params, expired.start()), abi_serialization_deadline_exception);
 } FC_LOG_AND_RETHROW()
 
 /// push_transaction and push_transactions hand decoding their traces to the function they return, which runs on the

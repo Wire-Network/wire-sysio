@@ -24,7 +24,9 @@ std::shared_ptr<const abi_serializer> abi_serializer_cache::get(std::span<const 
    if (abi_serializer::is_empty_abi(abi))
       return {};
    const fc::sha256       digest = fc::sha256::hash(abi.data(), abi.size());
-   const fc::microseconds budget = build_budget(max_build_time, deadline, fc::time_point::now());
+   const fc::time_point   start  = fc::time_point::now();
+   const fc::microseconds budget = build_budget(max_build_time, deadline, start);
+   const fc::time_point   cutoff = fc::time_point(start).safe_add(budget);
    {
       std::unique_lock lock(_mtx);
       const auto itr = _index.find(digest);
@@ -34,11 +36,11 @@ std::shared_ptr<const abi_serializer> abi_serializer_cache::get(std::span<const 
          lock.unlock();
          return result_of(cached);
       }
-      SYS_ASSERT(budget > fc::microseconds(0), chain::abi_serialization_deadline_exception,
+      SYS_ASSERT(fc::time_point::now() < cutoff, chain::abi_serialization_deadline_exception,
                  "serialization time limit {}us exceeded", budget.count());
       ++_builds;
    }
-   return result_of(store(digest, build(abi, budget)));
+   return result_of(store(digest, build(abi, budget, cutoff)));
 }
 
 fc::microseconds abi_serializer_cache::build_budget(const fc::microseconds& max_build_time,
@@ -65,13 +67,14 @@ uint64_t abi_serializer_cache::builds() const {
    return _builds;
 }
 
-abi_serializer_cache::entry abi_serializer_cache::build(std::span<const char> abi,
-                                                       const fc::microseconds& max_build_time) {
+abi_serializer_cache::entry abi_serializer_cache::build(std::span<const char> abi, const fc::microseconds& budget,
+                                                       const fc::time_point& cutoff) {
    entry outcome;
-   outcome.build_budget = max_build_time;
+   outcome.build_budget = budget;
    outcome.charge       = abi.size() + entry_overhead_bytes;
    try {
-      const abi_serializer::yield_function_t yield = abi_serializer::create_yield_function(max_build_time);
+      const abi_serializer::yield_function_t yield = abi_serializer::create_yield_function(
+         build_budget(fc::microseconds::maximum(), cutoff, fc::time_point::now()));
       abi_def def;
       abi_serializer::to_abi(abi, def);
       yield(0); // unpacking counts against the budget

@@ -49,8 +49,9 @@ public:
    std::shared_ptr<const chain::abi_serializer> get(std::span<const char> abi, const fc::microseconds& max_build_time);
 
    /**
-    * As get(abi, max_build_time), with a build also cut short at `deadline`: its budget is
-    * build_budget(max_build_time, deadline, now) when it starts.
+    * As get(abi, max_build_time), with a build also cut short at `deadline`. The call's budget is
+    * build_budget(max_build_time, deadline, now) when it is made, and a build it starts ends by then plus that budget,
+    * however long it waited for the cache.
     */
    std::shared_ptr<const chain::abi_serializer> get(std::span<const char> abi, const fc::microseconds& max_build_time,
                                                     const fc::time_point& deadline);
@@ -85,8 +86,9 @@ private:
    };
    using lru_list = std::list<std::pair<fc::sha256, entry>>;
 
-   /// Builds the serializer for `abi` under `max_build_time`, capturing any failure in the entry.
-   static entry build(std::span<const char> abi, const fc::microseconds& max_build_time);
+   /// Builds the serializer for `abi`, a build with `budget` that must end by `cutoff`, capturing any failure in the
+   /// entry.
+   static entry build(std::span<const char> abi, const fc::microseconds& budget, const fc::time_point& cutoff);
    /// True when `cached` ran out of time and `timed_out_retry_interval` has passed by `now` since it failed.
    static bool retry_due(const entry& cached, const fc::time_point& now);
    /// True when a caller with `max_build_time` must build `cached` again rather than reuse it.
