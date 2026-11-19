@@ -478,7 +478,6 @@ struct implicit_production_pause_vote_tracker {
       case vote_result_t::unknown_public_key:
       case vote_result_t::invalid_signature:
       case vote_result_t::max_exceeded:
-      case vote_result_t::unknown_block:
          return;
       default:
          assert(false); // should never happen

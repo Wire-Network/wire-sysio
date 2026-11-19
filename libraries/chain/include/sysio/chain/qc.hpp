@@ -46,7 +46,6 @@ namespace sysio::chain {
       duplicate,             // duplicate vote, expected as votes arrive on multiple connections
       unknown_public_key,    // public key is invalid, indicates invalid vote
       invalid_signature,     // signature is invalid, indicates invalid vote
-      unknown_block,         // block not available, possibly less than LIB, or too far in the future
       max_exceeded           // received too many votes for a connection
    };
 
@@ -300,7 +299,7 @@ namespace sysio::chain {
 } //sysio::chain
 
 
-FC_REFLECT_ENUM(sysio::chain::vote_result_t, (success)(duplicate)(unknown_public_key)(invalid_signature)(unknown_block)(max_exceeded))
+FC_REFLECT_ENUM(sysio::chain::vote_result_t, (success)(duplicate)(unknown_public_key)(invalid_signature)(max_exceeded))
 FC_REFLECT(sysio::chain::qc_sig_t, (strong_votes)(weak_votes)(sig));
 FC_REFLECT(sysio::chain::aggregating_qc_sig_t, (received_qc_sig)(quorum)(max_weak_sum_before_weak_final)(aggregating_state)(strong_sum)(weak_sum)(weak_votes)(strong_votes));
 FC_REFLECT(sysio::chain::aggregating_qc_t, (active_finalizer_policy)(pending_finalizer_policy)(active_policy_sig)(pending_policy_sig));

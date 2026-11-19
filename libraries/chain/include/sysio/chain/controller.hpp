@@ -455,6 +455,8 @@ namespace sysio::chain {
 
          // called from net threads
          void process_vote_message( uint32_t connection_id, const vote_message_ptr& msg );
+         /// Called from net threads when a connection closes. Discards the votes from it parked for unknown blocks.
+         void notify_vote_connection_closed( uint32_t connection_id );
          // thread safe, for testing
          bool is_block_missing_finalizer_votes(const block_handle& bh) const;
 

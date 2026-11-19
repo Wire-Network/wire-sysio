@@ -1467,6 +1467,7 @@ namespace sysio {
       block_sync_frame_bytes_sent = 0;
       block_sync_throttling = false;
       last_vote_received = time_point{};
+      if( !shutdown ) my_impl->chain_plug->chain().notify_vote_connection_closed( connection_id );
       consecutive_blocks_nacks = 0;
       last_block_nack = block_id_type{};
       bp_connection = bp_connection_type::non_bp;
@@ -4517,20 +4518,6 @@ namespace sysio {
          connections.any_of_connections([connection_id](const connection_ptr& c) {
             if (c->connection_id == connection_id) {
                c->close( false );
-               return true;
-            }
-            return false;
-         });
-         break;
-      case vote_result_t::unknown_block: // track the failure
-         fc_dlog(vote_logger, "connection - {} vote unknown block #{}:{}..",
-                 connection_id, block_header::num_from_id(msg->block_id), msg->block_id.short_id());
-         connections.any_of_connections([connection_id](const connection_ptr& c) {
-            if (c->connection_id == connection_id) {
-               boost::asio::post(c->strand, [c]() {
-                  c->block_status_monitor_.rejected();
-                  c->adjust_peer_score(peer_scoring::block_rejected);
-               });
                return true;
             }
             return false;

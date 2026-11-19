@@ -1571,13 +1571,12 @@ struct controller_impl {
       // Furthermore, fork_db.root()->block_num() <= lib_num.
       // Also, even though blog.head() may still be nullptr, blog.first_block_num() is guaranteed to be lib_num + 1.
 
-      // At startup, we want to provide to our local finalizers the correct safety information
-      // to use if they don't already have one.
-      // If we start at a block after the IF transition, we need to provide this information
-      // at startup.
-      // -------------------------------------------------------------------------------------------
-      // we are past the IF transition.
       auto lib = fork_db_.root();
+      // Seed the vote processor with LIB and the fork database head: they bound the votes it parks and size its limits.
+      vote_processor.notify_lib(lib->block_num());
+      vote_processor.notify_new_block(fork_db_.head(include_root_t::yes), async_t::no);
+
+      // Local finalizers without safety information of their own start locked on LIB.
       my_finalizers.set_default_safety_information(
          finalizer_safety_information{.last_vote                = {},
                                       .lock                     = lib->make_block_ref(),
@@ -2411,7 +2410,7 @@ struct controller_impl {
                bsp->set_valid(true);
                fork_db_.add( bsp, ignore_duplicate_t::no );
                emit( accepted_block_header, std::tie(bsp->block, bsp->id()), __FILE__, __LINE__ );
-               vote_processor.notify_new_block(async_aggregation);
+               vote_processor.notify_new_block(bsp, async_aggregation);
             } else {
                assert(s != controller::block_status::irreversible);
                auto existing = fork_db_.get_block(bsp->id());
@@ -3005,7 +3004,10 @@ struct controller_impl {
       }
 
       fork_db_add_t add_result = fork_db_.add(bsp, ignore_duplicate_t::yes);
-      vote_processor.notify_new_block(async_aggregation);
+      // When the fork database already holds this block id, bsp is a second copy that it did not keep; the call that
+      // added the kept copy notifies the vote processor.
+      if (add_result != fork_db_add_t::duplicate)
+         vote_processor.notify_new_block(bsp, async_aggregation);
 
       return controller::accepted_block_result{add_result, block_handle{std::move(bsp)}};
    }
@@ -4361,6 +4363,10 @@ void controller::apply_trx_block_context(trx_block_context& trx_blk_context) {
 void controller::process_vote_message( uint32_t connection_id, const vote_message_ptr& vote ) {
    my->process_vote_message( connection_id, vote );
 };
+
+void controller::notify_vote_connection_closed( uint32_t connection_id ) {
+   my->vote_processor.notify_connection_closed( connection_id );
+}
 
 bool controller::is_block_missing_finalizer_votes(const block_handle& bh) const {
    return my->is_block_missing_finalizer_votes(bh);
