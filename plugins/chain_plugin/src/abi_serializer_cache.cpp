@@ -69,12 +69,12 @@ uint64_t abi_serializer_cache::builds() const {
 
 abi_serializer_cache::entry abi_serializer_cache::build(std::span<const char> abi, const fc::microseconds& budget,
                                                        const fc::time_point& cutoff) {
+   const abi_serializer::yield_function_t yield = abi_serializer::create_yield_function(cutoff);
+   yield(0); // a caller already past its cutoff throws before the try below, so nothing is cached for it
    entry outcome;
    outcome.build_budget = budget;
    outcome.charge       = abi.size() + entry_overhead_bytes;
    try {
-      const abi_serializer::yield_function_t yield = abi_serializer::create_yield_function(
-         build_budget(fc::microseconds::maximum(), cutoff, fc::time_point::now()));
       abi_def def;
       abi_serializer::to_abi(abi, def);
       yield(0); // unpacking counts against the budget

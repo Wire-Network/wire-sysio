@@ -11,6 +11,7 @@
 #include <fc/io/json.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/log/logger.hpp>
+#include <fc/mock_time.hpp>
 #include <fc/time.hpp>
 
 #include <sysio/chain/contract_types.hpp>
@@ -168,6 +169,26 @@ BOOST_AUTO_TEST_CASE(abi_yield_guards_are_independent)
    auto expired = abi_serializer::create_yield_function(fc::microseconds(0));
    BOOST_CHECK_THROW(expired(0), abi_serialization_deadline_exception);
 }
+
+/// A yield function made from an absolute deadline throws from that deadline on, however late it is made or first
+/// called, and still checks the recursion depth. fc::time_point::maximum() sets no deadline.
+BOOST_AUTO_TEST_CASE(abi_yield_until_absolute_deadline) try {
+   const fc::time_point  start    = fc::time_point::now();
+   fc::scoped_mock_clock clock(start);
+   const fc::time_point  deadline = start + fc::microseconds(100);
+   const abi_serializer::yield_function_t yield = abi_serializer::create_yield_function(deadline);
+
+   fc::mock_time_traits::set_now(deadline - fc::microseconds(1));
+   BOOST_CHECK_NO_THROW(yield(0));
+   BOOST_CHECK_THROW(yield(abi_serializer::max_recursion_depth), abi_recursion_depth_exception);
+   fc::mock_time_traits::set_now(deadline);
+   BOOST_CHECK_THROW(yield(0), abi_serialization_deadline_exception);
+   BOOST_CHECK_THROW(abi_serializer::create_yield_function(deadline)(0), abi_serialization_deadline_exception);
+
+   const abi_serializer::yield_function_t unbounded = abi_serializer::create_yield_function(fc::time_point::maximum());
+   fc::mock_time_traits::set_now(start + fc::hours(24 * 365));
+   BOOST_CHECK_NO_THROW(unbounded(0));
+} FC_LOG_AND_RETHROW()
 
 // verify that round trip conversion, via bytes, reproduces the exact same data
 fc::variant verify_byte_round_trip_conversion( const abi_serializer& abis, const type_name& type, const fc::variant& var )

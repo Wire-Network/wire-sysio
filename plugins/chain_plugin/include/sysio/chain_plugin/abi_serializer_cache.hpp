@@ -86,8 +86,10 @@ private:
    };
    using lru_list = std::list<std::pair<fc::sha256, entry>>;
 
-   /// Builds the serializer for `abi`, a build with `budget` that must end by `cutoff`, capturing any failure in the
-   /// entry.
+   /**
+    * Builds the serializer for `abi`, a build with `budget` that must end by `cutoff`, capturing any failure in the
+    * entry. Past `cutoff` before unpacking, it throws abi_serialization_deadline_exception instead, with no entry.
+    */
    static entry build(std::span<const char> abi, const fc::microseconds& budget, const fc::time_point& cutoff);
    /// True when `cached` ran out of time and `timed_out_retry_interval` has passed by `now` since it failed.
    static bool retry_due(const entry& cached, const fc::time_point& now);

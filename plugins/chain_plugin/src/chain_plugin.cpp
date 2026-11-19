@@ -3778,12 +3778,6 @@ fc::variant read_only::get_block_header_state(const get_block_header_state_param
 
 namespace {
 
-/// A yield function that throws abi_serialization_deadline_exception once `deadline` has passed.
-abi_serializer::yield_function_t yield_until(const fc::time_point& deadline) {
-   return abi_serializer::create_yield_function(
-      abi_serializer_cache::build_budget(fc::microseconds::maximum(), deadline, fc::time_point::now()));
-}
-
 /**
  * Packs the transaction `request` into `ptrx` with the ABIs `db` holds now. Building serializers and converting
  * action data end by `deadline`, and each action's conversion within `max_action_time`. Running out of either throws
@@ -3793,7 +3787,8 @@ void pack_transaction_request(const controller& db, const fc::variant& request, 
                               const fc::microseconds& max_action_time, const fc::time_point& deadline) {
    auto resolver = caching_resolver(make_resolver(db, max_action_time, throw_on_yield::yes, deadline));
    try {
-      abi_serializer::from_variant(request, ptrx, resolver, yield_until(deadline), max_action_time);
+      abi_serializer::from_variant(request, ptrx, resolver, abi_serializer::create_yield_function(deadline),
+                                   max_action_time);
    } catch (const chain::abi_serialization_deadline_exception& e) {
       chain::packed_transaction_type_exception not_packed(
          FC_LOG_MESSAGE(warn, "Transaction not submitted: its action data was not converted within the time limit"));
@@ -4357,8 +4352,8 @@ read_only::get_required_keys_result read_only::get_required_keys( const get_requ
    // The request deadline bounds packing, building serializers included.
    auto resolver = caching_resolver(make_resolver(db, abi_serializer_max_time, throw_on_yield::yes, deadline));
    try {
-      abi_serializer::from_variant(params.transaction, pretty_input, resolver, yield_until(deadline),
-                                   abi_serializer_max_time);
+      abi_serializer::from_variant(params.transaction, pretty_input, resolver,
+                                   abi_serializer::create_yield_function(deadline), abi_serializer_max_time);
    } catch (chain::abi_serialization_deadline_exception& e) {
       checktime(); // the request deadline is reported as it is while checking keys
       FC_RETHROW_EXCEPTION(e, warn, "Invalid transaction");
