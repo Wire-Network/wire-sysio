@@ -6,6 +6,7 @@ add_executable( test_net_plugin
         connection_type_unittest.cpp
         handshake_repeat_unittest.cpp
         local_txn_cache_unittest.cpp
+        message_rate_limiter_unittest.cpp
         rate_limit_parse_unittest.cpp
         net_msg_wire_unittest.cpp
         peer_auth_unittest.cpp

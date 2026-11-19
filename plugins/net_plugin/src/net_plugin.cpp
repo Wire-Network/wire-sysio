@@ -8,6 +8,7 @@
 #include <sysio/net_plugin/net_utils.hpp>
 #include <sysio/net_plugin/auto_bp_peering.hpp>
 #include <sysio/net_plugin/local_txn_cache.hpp>
+#include <sysio/net_plugin/message_rate_limiter.hpp>
 #include <sysio/net_plugin/peer_auth.hpp>
 #include <sysio/net_plugin/peer_scoring.hpp>
 #include <sysio/chain/types.hpp>
@@ -743,6 +744,9 @@ namespace sysio {
       /// processed, and it no longer counts against max_client_count
       std::atomic<bool>       go_away_queued{false};
       block_status_monitor    block_status_monitor_;
+      /// bounds the bp gossip messages this session handles; only accessed from the connection strand
+      message_rate_limiter    bp_gossip_rate_limiter{net_plugin_impl::bp_gossip_msg_burst,
+                                                     net_plugin_impl::bp_gossip_msg_refill_interval};
       std::atomic<time_point> last_vote_received;
       /// True once this peer may send ordinary frames to normal handlers.
       std::atomic<bool>       peer_authenticated{false};
@@ -1436,6 +1440,7 @@ namespace sysio {
       flush_queues();
       peer_syncing_from_us = false;
       block_status_monitor_.reset();
+      bp_gossip_rate_limiter.reset();
       ++consecutive_immediate_connection_close;
       {
          fc::lock_guard g_conn( conn_mtx );
@@ -4163,6 +4168,12 @@ namespace sysio {
    void connection::handle_message( gossip_bp_peers_message& msg ) {
       if (!my_impl->bp_gossip_enabled())
          return;
+
+      if (!bp_gossip_rate_limiter.try_consume(std::chrono::steady_clock::now())) {
+         peer_dlog(p2p_msg_log, this, "gossip_bp_peers_message over the rate limit, dropped");
+         adjust_peer_score(peer_scoring::bp_gossip_rate_exceeded);
+         return;
+      }
 
       if (!my_impl->bp_gossip_initialized()) {
          my_impl->set_bp_connection(this, bp_connection_type::bp_gossip_validating);

@@ -1,6 +1,14 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/test/unit_test.hpp>
 #include <sysio/net_plugin/auto_bp_peering.hpp>
+#include <sysio/net_plugin/message_rate_limiter.hpp>
+
+#include <fc/crypto/private_key.hpp>
+
+#include <secp256k1.h>
+#include <secp256k1_recovery.h>
+
+#include <map>
 
 #include "test_ports.hpp"
 
@@ -54,10 +62,33 @@ struct mock_connections_manager {
    }
 };
 
+/// The controller calls bp_connection_manager makes, answered from peer_infos
+struct mock_controller {
+   std::map<sysio::name, sysio::chain::peer_info_t> peer_infos; ///< on-chain peer keys, by producer
+
+   std::optional<sysio::chain::peer_info_t> get_peer_info(sysio::name producer) const {
+      const auto i = peer_infos.find(producer);
+      if (i == peer_infos.end())
+         return std::nullopt;
+      return i->second;
+   }
+};
+
+/// The chain_plugin calls bp_connection_manager makes
+struct mock_chain_plugin {
+   mock_controller controller;
+
+   mock_controller& chain() { return controller; }
+};
+
 struct mock_net_plugin : sysio::auto_bp_peering::bp_connection_manager<mock_net_plugin, mock_connection> {
 
    bool                         lib_catchup = true;
    mock_connections_manager     connections;
+   mock_chain_plugin            mock_chain;
+   mock_chain_plugin*           chain_plug = &mock_chain;
+   std::atomic<fc::time_point>  head_block_time{};
+   sysio::chain_id_type         chain_id = sysio::chain_id_type::empty_chain_id();
    std::vector<std::string>     p2p_addresses{"0.0.0.0:9876"};
    const std::string&           get_first_p2p_address() const { return *p2p_addresses.begin(); }
 
@@ -698,6 +729,363 @@ BOOST_AUTO_TEST_CASE(test_gossip_bp_not_counted_or_evicted) {
    BOOST_CHECK(!victim_for(plugin, newcomer));
    BOOST_CHECK(plugin.admit_client(newcomer));
    BOOST_CHECK(!client->closing);
+}
+
+using signed_bp_peer = sysio::gossip_bp_peers_message::signed_bp_peer;
+using key_type       = fc::crypto::private_key::key_type;
+
+/// Header byte of a K1 compact signature by a compressed key less that of one by an uncompressed key
+constexpr unsigned char k1_compressed_header_offset = 4;
+/// Offset of s in a K1 compact signature: the header byte, then r
+constexpr size_t k1_s_offset = 33;
+
+/// secp256k1 context for the signature forms the tests make beside the one fc signs
+const secp256k1_context* test_secp256k1_context() {
+   static secp256k1_context* const ctx = secp256k1_context_create(SECP256K1_CONTEXT_NONE);
+   return ctx;
+}
+
+/// @return compact as a signature
+fc::crypto::signature to_signature(const fc::ecc::compact_signature& compact) {
+   return fc::crypto::signature(fc::crypto::signature::storage_type(fc::ecc::signature_shim(compact)));
+}
+
+/// @return the high-S form of the canonical K1 signature sig, which recovers the same key: s negated modulo the curve
+///         order, which flips the parity of the recovery id
+fc::crypto::signature high_s_form(const fc::crypto::signature& sig) {
+   fc::ecc::compact_signature compact = sig.get<fc::ecc::signature_shim>()._data;
+   // s is a scalar below the curve order, which secret key negation takes to the curve order less s
+   BOOST_REQUIRE(secp256k1_ec_seckey_negate(test_secp256k1_context(), compact.data() + k1_s_offset));
+   compact[0] = fc::ecc::compact_signature_compressed_header +
+                 ((compact[0] - fc::ecc::compact_signature_compressed_header) ^ 1);
+   return to_signature(compact);
+}
+
+/// @return the canonical K1 signature sig with the header byte for an uncompressed key, which recovers the same key
+fc::crypto::signature uncompressed_header_form(const fc::crypto::signature& sig) {
+   fc::ecc::compact_signature compact = sig.get<fc::ecc::signature_shim>()._data;
+   compact[0] -= k1_compressed_header_offset;
+   return to_signature(compact);
+}
+
+/// @return a canonical K1 signature of digest by key other than key.sign(digest): libsecp256k1 signs with extra nonce
+///         data, as a signer that draws a random nonce does
+fc::crypto::signature signed_with_other_nonce(const fc::crypto::private_key& key, const fc::sha256& digest) {
+   const fc::ecc::private_key_secret& secret = key.get<fc::ecc::private_key_shim>()._data;
+   const std::array<unsigned char, 32> nonce_data{1};
+   secp256k1_ecdsa_recoverable_signature recoverable{};
+   BOOST_REQUIRE(secp256k1_ecdsa_sign_recoverable(test_secp256k1_context(), &recoverable,
+                                                  reinterpret_cast<const unsigned char*>(digest.data()),
+                                                  reinterpret_cast<const unsigned char*>(secret.data()),
+                                                  secp256k1_nonce_function_rfc6979, nonce_data.data()));
+   fc::ecc::compact_signature compact{};
+   int recovery_id = 0;
+   BOOST_REQUIRE(secp256k1_ecdsa_recoverable_signature_serialize_compact(test_secp256k1_context(), compact.data() + 1,
+                                                                         &recovery_id, &recoverable));
+   compact[0] = fc::ecc::compact_signature_compressed_header + recovery_id;
+   return to_signature(compact);
+}
+
+/// An entry of gossip_bps as the tests compare it: producer, server endpoint, outbound ip address, expiration slot and
+/// signature
+using held_entry = std::tuple<std::string, std::string, std::string, uint32_t, std::string>;
+
+/// @return the entries plugin holds, in key order
+std::vector<held_entry> held_entries(mock_net_plugin& plugin) {
+   std::vector<held_entry> entries;
+   fc::lock_guard g(plugin.gossip_bps.mtx);
+   for (const signed_bp_peer& peer : plugin.gossip_bps.index)
+      entries.emplace_back(peer.producer_name.to_string(), peer.server_endpoint(), peer.outbound_ip_address(),
+                           peer.expiration().slot, peer.sig.to_string({}));
+   return entries;
+}
+
+/// @return a gossip message of peers as it arrives: unpacked, its peer info not yet read
+sysio::gossip_bp_peers_message received(std::vector<signed_bp_peer> peers) {
+   const sysio::gossip_bp_peers_message msg{std::move(peers)};
+   return fc::raw::unpack<sysio::gossip_bp_peers_message>(fc::raw::pack(msg));
+}
+
+/// A node gossiping as prodt, beside the on-chain peer key of each producer the tests sign an entry for
+struct gossip_fixture {
+   /// Head block slot the fixture starts at
+   static constexpr uint32_t start_slot = 1'000'000;
+
+   /// Port of the gossiped server endpoints, from this test's lease
+   const std::string                              port = leased_port();
+   mock_net_plugin                                plugin;
+   std::map<sysio::name, fc::crypto::private_key> peer_keys;
+   sysio::block_timestamp_type                    head{start_slot};
+
+   gossip_fixture() {
+      plugin.set_bp_producer_peers({ "prodt,127.0.0.1:" + port + ",127.0.0.1" });
+      set_head(head);
+   }
+
+   void set_head(sysio::block_timestamp_type t) {
+      head = t;
+      plugin.head_block_time = t.to_time_point();
+   }
+
+   /// @return the head block time plus d
+   sysio::block_timestamp_type after(fc::microseconds d) const {
+      return sysio::block_timestamp_type(head.to_time_point() + d);
+   }
+
+   /// @return the private key of producer's on-chain peer key, registering a new key of type on first use
+   const fc::crypto::private_key& peer_key(sysio::name producer, key_type type = key_type::k1) {
+      if (!peer_keys.contains(producer)) {
+         const fc::crypto::private_key& key = peer_keys.emplace(producer, fc::crypto::private_key::generate(type))
+                                                 .first->second;
+         plugin.mock_chain.controller.peer_infos[producer] = { .rank = 1, .key = key.get_public_key() };
+      }
+      return peer_keys.at(producer);
+   }
+
+   /// @return producer's entry for its server endpoint on host and outbound ip address, expiring at expiration and
+   ///         signed with its peer key
+   signed_bp_peer entry(sysio::name producer, const std::string& host, const std::string& outbound_ip_address,
+                        sysio::block_timestamp_type expiration) {
+      signed_bp_peer peer{{ .producer_name = producer }};
+      peer.cached_bp_peer_info.emplace(host + ":" + port, outbound_ip_address, expiration);
+      peer.bp_peer_info = fc::raw::pack(*peer.cached_bp_peer_info);
+      peer.sig = peer_key(producer).sign(peer.digest(plugin.chain_id));
+      return peer;
+   }
+
+   /// @return the signed initial entry of producer, which has no peer info
+   signed_bp_peer initial_entry(sysio::name producer) {
+      signed_bp_peer peer{{ .producer_name = producer }};
+      peer.sig = peer_key(producer).sign(peer.digest(plugin.chain_id));
+      return peer;
+   }
+
+   /// @return true when plugin accepts a message of peers as valid
+   bool valid(std::vector<signed_bp_peer> peers) {
+      sysio::gossip_bp_peers_message msg = received(std::move(peers));
+      return plugin.validate_gossip_bp_peers_message(msg);
+   }
+
+   /// Validate a message of peers and merge what validation keeps, as handle_message does with a message that is not
+   /// an initial one
+   /// @return whether the merge changed the held entries, or nothing when the message is invalid
+   std::optional<bool> deliver(std::vector<signed_bp_peer> peers) {
+      sysio::gossip_bp_peers_message msg = received(std::move(peers));
+      if (!plugin.validate_gossip_bp_peers_message(msg))
+         return std::nullopt;
+      if (msg.peers.empty())
+         return false;
+      return plugin.update_gossip_bps(msg);
+   }
+};
+
+BOOST_AUTO_TEST_CASE(test_gossip_bp_resigned_entry_not_a_change) {
+   gossip_fixture f;
+   const signed_bp_peer held = f.entry("proda"_n, "p2p.proda.example.com", "198.51.100.1", f.after(fc::hours(1)));
+   BOOST_CHECK(f.deliver({ held }) == true);
+   const std::vector<held_entry> before = held_entries(f.plugin);
+
+   // the entry signed again, as a signer drawing a random nonce does: another canonical signature, valid, no change
+   signed_bp_peer resigned = held;
+   resigned.sig = signed_with_other_nonce(f.peer_key("proda"_n), held.digest(f.plugin.chain_id));
+   BOOST_REQUIRE(resigned.sig != held.sig);
+   sysio::gossip_bp_peers_message msg = received({ resigned });
+   BOOST_CHECK(f.plugin.validate_gossip_bp_peers_message(msg));
+   BOOST_CHECK_EQUAL(msg.peers.size(), 1u);
+   BOOST_CHECK(!f.plugin.update_gossip_bps(msg));
+   BOOST_CHECK(held_entries(f.plugin) == before);
+
+   // an entry of the same key expiring earlier changes nothing either
+   BOOST_CHECK(f.deliver({ f.entry("proda"_n, "p2p.proda.example.com", "198.51.100.1", f.after(fc::minutes(30))) }) ==
+               false);
+   BOOST_CHECK(held_entries(f.plugin) == before);
+
+   // one expiring later replaces the held entry
+   const signed_bp_peer later =
+      f.entry("proda"_n, "p2p.proda.example.com", "198.51.100.1", f.after(fc::hours(1)).next());
+   BOOST_CHECK(f.deliver({ later }) == true);
+   const std::vector<held_entry> after = held_entries(f.plugin);
+   BOOST_REQUIRE_EQUAL(after.size(), 1u);
+   BOOST_CHECK_EQUAL(std::get<3>(after[0]), later.cached_bp_peer_info->expiration.slot);
+   BOOST_CHECK_EQUAL(std::get<4>(after[0]), later.sig.to_string({}));
+}
+
+BOOST_AUTO_TEST_CASE(test_gossip_bp_non_canonical_signature_rejected) {
+   gossip_fixture f;
+   const signed_bp_peer peer = f.entry("proda"_n, "p2p.proda.example.com", "198.51.100.1", f.after(fc::hours(1)));
+   const fc::crypto::public_key key = f.peer_key("proda"_n).get_public_key();
+   BOOST_CHECK(f.valid({ peer }));
+
+   // each other form of the signature recovers the producer's key, and is refused
+   for (const fc::crypto::signature& form : { high_s_form(peer.sig), uncompressed_header_form(peer.sig) }) {
+      BOOST_REQUIRE(fc::crypto::public_key::recover(form, peer.digest(f.plugin.chain_id)) == key);
+      signed_bp_peer forged = peer;
+      forged.sig = form;
+      BOOST_CHECK(!f.valid({ forged }));
+   }
+
+   // the initial message too
+   const signed_bp_peer initial = f.initial_entry("proda"_n);
+   BOOST_CHECK(f.valid({ initial }));
+   signed_bp_peer forged_initial = initial;
+   forged_initial.sig = high_s_form(initial.sig);
+   BOOST_CHECK(!f.valid({ forged_initial }));
+
+   // a signature that is not K1 is refused, though it is by the producer's on-chain peer key
+   f.peer_key("prodb"_n, key_type::r1);
+   BOOST_CHECK(!f.valid({ f.entry("prodb"_n, "p2p.prodb.example.com", "198.51.100.2", f.after(fc::hours(1))) }));
+   BOOST_CHECK(held_entries(f.plugin).empty());
+}
+
+BOOST_AUTO_TEST_CASE(test_gossip_bp_held_signature_not_reused) {
+   gossip_fixture f;
+   const signed_bp_peer a = f.entry("proda"_n, "p2p.proda.example.com", "198.51.100.1", f.after(fc::hours(1)));
+   const signed_bp_peer b = f.entry("prodb"_n, "p2p.prodb.example.com", "198.51.100.2", f.after(fc::hours(1)));
+   BOOST_CHECK(f.deliver({ a, b }) == true);
+   const std::vector<held_entry> before = held_entries(f.plugin);
+
+   // later entries of proda and of prodb, each carrying the signature of proda's held entry
+   signed_bp_peer forged_a = f.entry("proda"_n, "p2p.proda.example.com", "198.51.100.1", f.after(fc::hours(1)).next());
+   signed_bp_peer forged_b = f.entry("prodb"_n, "p2p.prodb.example.com", "198.51.100.2", f.after(fc::hours(1)).next());
+   forged_a.sig = a.sig;
+   forged_b.sig = a.sig;
+   for (const signed_bp_peer& forged : { forged_a, forged_b }) {
+      sysio::gossip_bp_peers_message msg = received({ forged });
+      BOOST_CHECK(f.plugin.validate_gossip_bp_peers_message(msg));
+      BOOST_CHECK(msg.peers.empty()); // the signature recovers another key than the producer's
+      BOOST_CHECK(!f.plugin.update_gossip_bps(msg));
+      BOOST_CHECK(held_entries(f.plugin) == before);
+   }
+}
+
+BOOST_AUTO_TEST_CASE(test_gossip_bp_change_only_when_stored) {
+   const size_t max_per_producer = mock_net_plugin::max_bp_gossip_peers_per_producer;
+   gossip_fixture f;
+   const signed_bp_peer a = f.entry("proda"_n, "p2p.proda.example.com", "198.51.100.1", f.after(fc::hours(1)));
+   BOOST_CHECK(f.deliver({ a }) == true);
+
+   // a merge reports a change exactly when the held entries change, even for an entry under a new key that carries a
+   // held signature, which validation removes
+   signed_bp_peer copied_sig = f.entry("prodb"_n, "p2p.prodb.example.com", "198.51.100.2", f.after(fc::hours(1)));
+   copied_sig.sig = a.sig;
+   const std::vector<held_entry> before = held_entries(f.plugin);
+   const bool changed = f.plugin.update_gossip_bps(sysio::gossip_bp_peers_message{{ copied_sig }});
+   BOOST_CHECK_EQUAL(changed, held_entries(f.plugin) != before);
+
+   // a producer holding its most entries: a new key expiring no later than every held one is not stored
+   gossip_fixture full;
+   std::vector<signed_bp_peer> entries;
+   for (size_t n = 0; n < max_per_producer; ++n)
+      entries.push_back(full.entry("proda"_n, "p2p" + std::to_string(n) + ".proda.example.com", "198.51.100.1",
+                                   full.after(fc::hours(1))));
+   BOOST_CHECK(full.deliver(entries) == true);
+   const std::vector<held_entry> held = held_entries(full.plugin);
+   const std::string extra_host = "p2p" + std::to_string(max_per_producer) + ".proda.example.com";
+   BOOST_CHECK(full.deliver({ full.entry("proda"_n, extra_host, "198.51.100.1", full.after(fc::hours(1))) }) == false);
+   BOOST_CHECK(held_entries(full.plugin) == held);
+
+   // one expiring later takes the place of an earliest-expiring entry
+   BOOST_CHECK(full.deliver({ full.entry("proda"_n, extra_host, "198.51.100.1", full.after(fc::hours(1)).next()) }) ==
+               true);
+   const std::vector<held_entry> replaced = held_entries(full.plugin);
+   BOOST_CHECK_EQUAL(replaced.size(), max_per_producer);
+   BOOST_CHECK(std::ranges::any_of(replaced, [&extra_host](const held_entry& e) {
+      return std::get<1>(e).starts_with(extra_host);
+   }));
+}
+
+BOOST_AUTO_TEST_CASE(test_gossip_bp_expired_entries_rejected_and_evicted) {
+   const fc::microseconds latest_expiration = mock_net_plugin::bp_gossip_peer_expiration_variance;
+   gossip_fixture f;
+
+   // validation removes the entries outside their expiration window: expired, or expiring too late
+   sysio::gossip_bp_peers_message msg = received({
+      f.entry("proda"_n, "p2p0.proda.example.com", "198.51.100.1", sysio::block_timestamp_type(f.head.slot - 1)),
+      f.entry("proda"_n, "p2p1.proda.example.com", "198.51.100.1", f.head),
+      f.entry("proda"_n, "p2p2.proda.example.com", "198.51.100.1", f.after(fc::hours(1))),
+      f.entry("proda"_n, "p2p3.proda.example.com", "198.51.100.1", f.after(latest_expiration)),
+   });
+   BOOST_CHECK(f.plugin.validate_gossip_bp_peers_message(msg));
+   BOOST_REQUIRE_EQUAL(msg.peers.size(), 1u);
+   BOOST_CHECK_EQUAL(msg.peers[0].server_endpoint(), "p2p2.proda.example.com:" + f.port);
+
+   // a held entry is checked again when it arrives after it has expired
+   const signed_bp_peer expiring =
+      f.entry("prodb"_n, "p2p.prodb.example.com", "198.51.100.2", f.after(fc::minutes(10)));
+   BOOST_CHECK(f.deliver({ expiring }) == true);
+   f.set_head(f.after(fc::minutes(10)));
+   msg = received({ expiring });
+   BOOST_CHECK(f.plugin.validate_gossip_bp_peers_message(msg));
+   BOOST_CHECK(msg.peers.empty());
+
+   // a merge evicts the held entries that have expired
+   BOOST_CHECK(f.deliver({ f.entry("prodc"_n, "p2p.prodc.example.com", "198.51.100.3", f.after(fc::hours(1))) }) ==
+               true);
+   const std::vector<held_entry> held = held_entries(f.plugin);
+   BOOST_REQUIRE_EQUAL(held.size(), 1u);
+   BOOST_CHECK_EQUAL(std::get<0>(held[0]), "prodc");
+
+   // and so does the expire timer
+   f.set_head(f.after(fc::hours(1)));
+   f.plugin.expire_gossip_bp_peers();
+   BOOST_CHECK(held_entries(f.plugin).empty());
+}
+
+BOOST_AUTO_TEST_CASE(test_gossip_bp_message_order) {
+   const size_t max_per_producer = mock_net_plugin::max_bp_gossip_peers_per_producer;
+   gossip_fixture f;
+   const sysio::block_timestamp_type expiration = f.after(fc::hours(1));
+
+   // one server endpoint with two outbound ip addresses, as p2p-bp-gossip-endpoint allows, in key order
+   const signed_bp_peer first  = f.entry("proda"_n, "p2p.proda.example.com", "198.51.100.1", expiration);
+   const signed_bp_peer second = f.entry("proda"_n, "p2p.proda.example.com", "198.51.100.2", expiration);
+   BOOST_CHECK(f.valid({ first, second }));
+   BOOST_CHECK(!f.valid({ second, first }));
+   BOOST_CHECK(!f.valid({ first, first }));
+
+   // at most max_bp_gossip_peers_per_producer entries of a producer
+   std::vector<signed_bp_peer> entries;
+   for (size_t n = 0; n < max_per_producer; ++n)
+      entries.push_back(
+         f.entry("prodb"_n, "p2p" + std::to_string(n) + ".prodb.example.com", "198.51.100.2", expiration));
+   BOOST_CHECK(f.valid(entries));
+   entries.push_back(
+      f.entry("prodb"_n, "p2p" + std::to_string(max_per_producer) + ".prodb.example.com", "198.51.100.2", expiration));
+   BOOST_CHECK(!f.valid(entries));
+}
+
+BOOST_AUTO_TEST_CASE(test_gossip_bp_store_collision_keeps_entries) {
+   gossip_fixture f;
+   const signed_bp_peer a = f.entry("proda"_n, "p2p.proda.example.com", "198.51.100.1", f.after(fc::hours(1)));
+   const signed_bp_peer b = f.entry("prodb"_n, "p2p.prodb.example.com", "198.51.100.2", f.after(fc::hours(1)));
+   BOOST_CHECK(f.deliver({ a, b }) == true);
+   const std::vector<held_entry> before = held_entries(f.plugin);
+
+   const signed_bp_peer later_a =
+      f.entry("proda"_n, "p2p.proda.example.com", "198.51.100.1", f.after(fc::hours(1)).next());
+   {
+      fc::lock_guard g(f.plugin.gossip_bps.mtx);
+      auto& idx = f.plugin.gossip_bps.index.get<sysio::by_producer>();
+      // an insert under a key already held
+      BOOST_CHECK(!f.plugin.store_gossip_bp(idx.end(), later_a));
+      // a replacement of prodb's entry by one under proda's key
+      BOOST_CHECK(!f.plugin.store_gossip_bp(idx.find(sysio::gossip_bp_key(b)), later_a));
+   }
+   BOOST_CHECK(held_entries(f.plugin) == before);
+}
+
+BOOST_AUTO_TEST_CASE(test_gossip_bp_rate_limit) {
+   using clock_type = sysio::message_rate_limiter::clock;
+   const uint32_t              burst    = mock_net_plugin::bp_gossip_msg_burst;
+   const clock_type::duration  interval = mock_net_plugin::bp_gossip_msg_refill_interval;
+   const clock_type::time_point now     = clock_type::time_point{} + std::chrono::hours(1);
+   sysio::message_rate_limiter limiter(burst, interval);
+
+   for (uint32_t n = 0; n < burst; ++n)
+      BOOST_REQUIRE(limiter.try_consume(now));
+   BOOST_CHECK(!limiter.try_consume(now));
+   BOOST_CHECK(limiter.try_consume(now + interval));
+   BOOST_CHECK(!limiter.try_consume(now + interval));
 }
 
 struct bp_peer_info_v2 : sysio::gossip_bp_peers_message::bp_peer_info_v1 {

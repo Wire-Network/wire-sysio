@@ -134,4 +134,20 @@ namespace fc::ecc {
         return result;
     }
 
+    bool public_key::is_canonical( const compact_signature& c ) {
+        const unsigned char header = c[0];
+        if (header < compact_signature_compressed_header ||
+            header >= compact_signature_compressed_header + compact_signature_recovery_ids)
+            return false;
+        secp256k1_ecdsa_recoverable_signature recoverable{};
+        // fails when r or s is not below the curve order
+        if (!secp256k1_ecdsa_recoverable_signature_parse_compact(detail::_get_context(), &recoverable, c.data() + 1,
+                                                                 header - compact_signature_compressed_header))
+            return false;
+        secp256k1_ecdsa_signature signature{};
+        secp256k1_ecdsa_recoverable_signature_convert(detail::_get_context(), &signature, &recoverable);
+        // returns 1 when s was above half the curve order
+        return secp256k1_ecdsa_signature_normalize(detail::_get_context(), nullptr, &signature) == 0;
+    }
+
 } // namespace fc::ecc

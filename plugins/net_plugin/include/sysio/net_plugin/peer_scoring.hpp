@@ -21,6 +21,7 @@ namespace sysio::peer_scoring {
    constexpr int32_t heartbeat_timeout  = -10;
    constexpr int32_t benign_close       =  -5;
    constexpr int32_t block_nack         =  -2;
+   constexpr int32_t bp_gossip_rate_exceeded = -5; ///< a bp gossip message over the connection's rate limit
 
    /// Thread-safe peer score with CAS-based adjustment and clamping.
    /// Intended to be embedded as a member of a connection object.
