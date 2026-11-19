@@ -145,7 +145,8 @@ struct trx_retry_db_impl {
                // abi_max_time bounds each action's decode and, from here, the decode of the whole trace.
                abi_serializer::to_variant(*trace, tt.trx_trace_v, resolver, abi_max_time,
                                           fc::time_point::now().safe_add(abi_max_time));
-            } catch( chain::abi_exception& ) {
+            } catch (...) {
+               // The transaction was processed, so its trace is reported whatever decoding ran into.
                tt.trx_trace_v = *trace;
             }
          } );

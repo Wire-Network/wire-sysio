@@ -160,7 +160,8 @@ namespace sysio::chain::config {
   /// their bound for it passes 4 MiB, then on a stack they map; the rest is for host functions and the frames below.
   static constexpr std::size_t contract_thread_stack_size = 8*1024*1024;
 
-  static constexpr uint32_t   default_abi_serializer_max_time_us = 15*1000; ///< default deadline for abi serialization methods
+  /// default deadline for abi serialization methods
+  static constexpr uint32_t   default_abi_serializer_max_time_us = 100*1000;
 
   /**
  *  The number of sequential blocks produced by a single producer

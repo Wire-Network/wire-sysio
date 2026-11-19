@@ -2,6 +2,7 @@
 
 #include <boost/core/typeinfo.hpp>
 
+#include <algorithm>
 #include <utility>
 
 namespace sysio::chain_apis {
@@ -14,23 +15,39 @@ abi_serializer_cache::abi_serializer_cache(size_t max_bytes)
 
 std::shared_ptr<const abi_serializer> abi_serializer_cache::get(std::span<const char> abi,
                                                                 const fc::microseconds& max_build_time) {
+   return get(abi, max_build_time, fc::time_point::maximum());
+}
+
+std::shared_ptr<const abi_serializer> abi_serializer_cache::get(std::span<const char> abi,
+                                                                const fc::microseconds& max_build_time,
+                                                                const fc::time_point& deadline) {
    if (abi_serializer::is_empty_abi(abi))
       return {};
-   const fc::sha256 digest = fc::sha256::hash(abi.data(), abi.size());
+   const fc::sha256       digest = fc::sha256::hash(abi.data(), abi.size());
+   const fc::microseconds budget = build_budget(max_build_time, deadline, fc::time_point::now());
    {
       std::unique_lock lock(_mtx);
       const auto itr = _index.find(digest);
-      if (itr != _index.end() && !must_rebuild(itr->second->second, max_build_time)) {
+      if (itr != _index.end() && !must_rebuild(itr->second->second, budget)) {
          _lru.splice(_lru.begin(), _lru, itr->second);
          const entry cached = itr->second->second;
          lock.unlock();
          return result_of(cached);
       }
+      SYS_ASSERT(budget > fc::microseconds(0), chain::abi_serialization_deadline_exception,
+                 "serialization time limit {}us exceeded", budget.count());
       ++_builds;
    }
-   const entry outcome = build(abi, max_build_time);
-   store(digest, outcome);
-   return result_of(outcome);
+   return result_of(store(digest, build(abi, budget)));
+}
+
+fc::microseconds abi_serializer_cache::build_budget(const fc::microseconds& max_build_time,
+                                                    const fc::time_point& deadline, const fc::time_point& now) {
+   if (deadline == fc::time_point::maximum())
+      return max_build_time;
+   if (deadline <= now)
+      return fc::microseconds(0);
+   return std::min(max_build_time, deadline - now);
 }
 
 size_t abi_serializer_cache::size() const {
@@ -76,12 +93,23 @@ abi_serializer_cache::entry abi_serializer_cache::build(std::span<const char> ab
    return outcome;
 }
 
-bool abi_serializer_cache::must_rebuild(const entry& cached, const fc::microseconds& max_build_time) {
+bool abi_serializer_cache::retry_due(const entry& cached, const fc::time_point& now) {
    if (!cached.timed_out)
       return false;
    fc::time_point retry_at = cached.failed_at;
    retry_at.safe_add(timed_out_retry_interval);
-   return max_build_time > cached.build_budget || fc::time_point::now() >= retry_at;
+   return now >= retry_at;
+}
+
+bool abi_serializer_cache::must_rebuild(const entry& cached, const fc::microseconds& max_build_time) {
+   return cached.timed_out &&
+          (max_build_time > cached.build_budget || retry_due(cached, fc::time_point::now()));
+}
+
+bool abi_serializer_cache::replaces(const entry& outcome, const entry& existing, const fc::time_point& now) {
+   if (!existing.timed_out)
+      return false; // a serializer, or a failure no budget changes
+   return !outcome.timed_out || outcome.build_budget >= existing.build_budget || retry_due(existing, now);
 }
 
 std::shared_ptr<const abi_serializer> abi_serializer_cache::result_of(const entry& outcome) {
@@ -90,15 +118,20 @@ std::shared_ptr<const abi_serializer> abi_serializer_cache::result_of(const entr
    return outcome.serializer;
 }
 
-void abi_serializer_cache::store(const fc::sha256& digest, const entry& outcome) {
+abi_serializer_cache::entry abi_serializer_cache::store(const fc::sha256& digest, const entry& outcome) {
    std::lock_guard lock(_mtx);
    if (const auto itr = _index.find(digest); itr != _index.end()) {
-      _charged_bytes -= itr->second->second.charge;
+      const entry& existing = itr->second->second;
+      if (!replaces(outcome, existing, fc::time_point::now())) {
+         _lru.splice(_lru.begin(), _lru, itr->second);
+         return existing;
+      }
+      _charged_bytes -= existing.charge;
       _lru.erase(itr->second);
       _index.erase(itr);
    }
    if (outcome.charge > _max_bytes)
-      return;
+      return outcome;
    _charged_bytes += outcome.charge;
    _lru.emplace_front(digest, outcome);
    _index.emplace(digest, _lru.begin());
@@ -107,6 +140,7 @@ void abi_serializer_cache::store(const fc::sha256& digest, const entry& outcome)
       _index.erase(_lru.back().first);
       _lru.pop_back();
    }
+   return outcome;
 }
 
 abi_serializer_cache& shared_abi_serializer_cache() {

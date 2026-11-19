@@ -27,6 +27,7 @@
 #include <sysio/chain/types.hpp>
 #include <sysio/chain_plugin/abi_serializer_cache.hpp>
 #include <sysio/chain_plugin/account_query_db.hpp>
+#include <sysio/chain_plugin/captured_abis.hpp>
 #include <sysio/chain_plugin/get_info_db.hpp>
 #include <sysio/chain_plugin/tracked_votes.hpp>
 #include <sysio/chain_plugin/trx_finality_status_processing.hpp>
@@ -204,17 +205,19 @@ namespace sysio {
 
    /**
     * A resolver from an account to the serializer for its current ABI, null when it has none. Serializers come from
-    * shared_abi_serializer_cache(), which builds one on a miss within `abi_serializer_max_time`. A failed build
-    * throws when `yield_throw` is yes and resolves to null otherwise.
+    * shared_abi_serializer_cache(), which builds one on a miss within `abi_serializer_max_time`, cut short at
+    * `deadline`. A failed build throws when `yield_throw` is yes and resolves to null otherwise.
     */
-   inline auto make_resolver(const controller& control, fc::microseconds abi_serializer_max_time, throw_on_yield yield_throw ) {
-      return [&control, abi_serializer_max_time, yield_throw](const account_name& name) -> chain::abi_serializer_ptr {
+   inline auto make_resolver(const controller& control, fc::microseconds abi_serializer_max_time,
+                             throw_on_yield yield_throw, fc::time_point deadline = fc::time_point::maximum()) {
+      return [&control, abi_serializer_max_time, yield_throw, deadline](const account_name& name)
+                -> chain::abi_serializer_ptr {
          if (name.good()) {
             const auto* accnt = control.find_account_metadata( name );
             if( accnt != nullptr ) {
                try {
                   return chain_apis::shared_abi_serializer_cache().get( {accnt->abi.data(), accnt->abi.size()},
-                                                                        abi_serializer_max_time );
+                                                                        abi_serializer_max_time, deadline );
                } catch( ... ) {
                   if( yield_throw == throw_on_yield::yes )
                      throw;
@@ -522,12 +525,12 @@ public:
    using get_block_params = get_raw_block_params;
    std::function<chain::t_or_exception<fc::variant>()> get_block(const get_block_params& params, const fc::time_point& deadline) const;
 
-   // call from app() thread
-   abi_resolver get_block_serializers( const chain::signed_block_ptr& block, const fc::microseconds& max_time ) const;
-
-   // call from any thread
-   fc::variant convert_block( const chain::signed_block_ptr& block,
-                              abi_resolver& resolver ) const;
+   /**
+    * `block` as get_block returns it, its action data decoded with serializers for `abis`, taken by
+    * captured_abis::capture where chain state may be read. Call from any thread. abi_serializer_max_time bounds
+    * each action's decode and, from the call, building serializers and decoding all the action data together.
+    */
+   fc::variant convert_block( const chain::signed_block_ptr& block, const captured_abis& abis ) const;
 
    struct get_block_header_params {
       string block_num_or_id;
@@ -793,11 +796,11 @@ public:
    void send_transaction2(send_transaction2_params params, chain::plugin_interface::next_function<send_transaction_results> next);
 
 private:
-   /// A pushed transaction's trace with the ABIs of the accounts its actions name, read on the main thread when the
+   /// A pushed transaction's trace with the ABIs of the accounts its actions name, copied on the main thread when the
    /// transaction completed. Converting it to push_transaction_results can then run on any thread.
    struct pushed_trace {
       chain::transaction_trace_ptr trace;
-      abi_resolver                 resolver;
+      captured_abis                abis;
    };
    /// The error that ended a push, or its pushed_trace.
    using pushed_trace_or_error = std::variant<fc::exception_ptr, pushed_trace>;
