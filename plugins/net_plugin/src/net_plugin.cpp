@@ -298,9 +298,7 @@ namespace sysio {
    constexpr auto     def_max_nodes_per_host = 1;
    constexpr auto     def_conn_retry_wait = 30;
    constexpr auto     def_expire_timer_wait = std::chrono::seconds(3);
-   constexpr auto     def_resp_expected_wait = std::chrono::seconds(5);
-   static_assert(block_sync_rate_limiter::max_refill_delay < def_resp_expected_wait,
-                 "a rate limited peer must be sent its next sync block before its sync response timeout");
+   constexpr auto     def_resp_expected_wait = block_sync_rate_limiter::sync_response_timeout;
    constexpr auto     def_sync_fetch_span = 1000;
    constexpr auto     def_keepalive_interval = 10000;
    // transfer packed transaction is ~170 bytes, transaction notice is 41 bytes.
@@ -1909,7 +1907,7 @@ namespace sysio {
             const size_t sent = enqueue_block( blocks[i], block_num, queued_buffer::queue_t::block_sync );
             block_sync_total_bytes_sent += sent;
             if( rate_limited ) {
-               block_sync_limiter.charge( sent );
+               block_sync_limiter.charge( sent, std::chrono::steady_clock::now() );
             }
             ++peer_requested->last;
 

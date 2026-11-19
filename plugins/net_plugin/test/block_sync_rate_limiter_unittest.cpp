@@ -2,9 +2,11 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <algorithm>
 #include <chrono>
 #include <cstdint>
 #include <limits>
+#include <vector>
 
 using sysio::block_sync_rate_limiter;
 using namespace std::chrono_literals;
@@ -31,7 +33,7 @@ BOOST_AUTO_TEST_CASE(starts_full_and_refills_at_the_limit) {
    BOOST_TEST(bucket.may_send());
    BOOST_TEST(bucket.refill_delay().count() == 0);
 
-   bucket.charge(15'000);
+   bucket.charge(15'000, start);
    BOOST_TEST(bucket.allowance() == 5'000);
    BOOST_TEST(bucket.may_send());
 
@@ -47,7 +49,7 @@ BOOST_AUTO_TEST_CASE(zero_limit_is_unlimited) {
    BOOST_TEST(bucket.burst_bytes() == 0);
    BOOST_TEST(bucket.may_send());
 
-   bucket.charge(uint64_max);
+   bucket.charge(uint64_max, start);
    BOOST_TEST(bucket.allowance() == 0);
    BOOST_TEST(bucket.may_send());
    BOOST_TEST(bucket.refill_delay().count() == 0);
@@ -60,7 +62,7 @@ BOOST_AUTO_TEST_CASE(zero_limit_is_unlimited) {
 // An allowance of exactly zero holds the next block until refill credits one whole byte.
 BOOST_AUTO_TEST_CASE(zero_allowance_holds_until_one_byte_refills) {
    block_sync_rate_limiter bucket(limit, start);
-   bucket.charge(20'000);
+   bucket.charge(20'000, start);
    BOOST_TEST(bucket.allowance() == 0);
    BOOST_TEST(!bucket.may_send());
    BOOST_TEST(bucket.refill_delay().count() == 50);
@@ -80,7 +82,7 @@ BOOST_AUTO_TEST_CASE(zero_allowance_holds_until_one_byte_refills) {
 // A block larger than the allowance is sent and leaves it negative; refill_delay() covers the whole deficit.
 BOOST_AUTO_TEST_CASE(overdrawn_allowance_waits_for_the_deficit) {
    block_sync_rate_limiter bucket(limit, start);
-   bucket.charge(50'000);
+   bucket.charge(50'000, start);
    BOOST_TEST(bucket.allowance() == -30'000);
    BOOST_TEST(!bucket.may_send());
 
@@ -101,7 +103,7 @@ BOOST_AUTO_TEST_CASE(refill_delay_rounds_up) {
    constexpr uint64_t three_per_sec = 3;
    block_sync_rate_limiter bucket(three_per_sec, start);
    BOOST_TEST(bucket.burst_bytes() == 3);
-   bucket.charge(3);
+   bucket.charge(3, start);
    BOOST_TEST(bucket.refill_delay().count() == 333'334);
 
    bucket.refill(start + 333'333us);
@@ -113,7 +115,7 @@ BOOST_AUTO_TEST_CASE(refill_delay_rounds_up) {
 // Refills shorter than a byte, or than a microsecond, accumulate rather than round down to nothing.
 BOOST_AUTO_TEST_CASE(sub_byte_credit_carries_over) {
    block_sync_rate_limiter bucket(limit, start);
-   bucket.charge(20'000);
+   bucket.charge(20'000, start);
 
    // 7us is 0.14 bytes
    time_point now = start;
@@ -123,7 +125,7 @@ BOOST_AUTO_TEST_CASE(sub_byte_credit_carries_over) {
    }
    BOOST_TEST(bucket.allowance() == 1'400);
 
-   bucket.charge(1'400);
+   bucket.charge(1'400, now);
    const time_point resumed = now;
    // 999ns is under a microsecond
    for (int i = 0; i < 1'000; ++i) {
@@ -133,7 +135,7 @@ BOOST_AUTO_TEST_CASE(sub_byte_credit_carries_over) {
    // 999us of credit is 19.98 bytes
    BOOST_TEST(bucket.allowance() == 19);
    BOOST_TEST(bucket.refill_delay().count() == 0);
-   bucket.charge(19);
+   bucket.charge(19, now);
    bucket.refill(resumed + 1ms);
    BOOST_TEST(bucket.allowance() == 1);
 }
@@ -144,10 +146,10 @@ BOOST_AUTO_TEST_CASE(refill_caps_at_the_burst) {
    BOOST_TEST(bucket.allowance() == bucket.burst_bytes());
 
    // A full bucket discards credit short of a byte along with the rest.
-   bucket.charge(5'000);
+   bucket.charge(5'000, start + 10s);
    bucket.refill(start + 10s + 250ms + 25us);
    BOOST_TEST(bucket.allowance() == bucket.burst_bytes());
-   bucket.charge(20'000);
+   bucket.charge(20'000, start + 10s + 250ms + 25us);
    bucket.refill(start + 10s + 250ms + 25us + 49us);
    BOOST_TEST(bucket.allowance() == 0);
    bucket.refill(start + 10s + 250ms + 25us + 50us);
@@ -155,7 +157,7 @@ BOOST_AUTO_TEST_CASE(refill_caps_at_the_burst) {
 
    // An overdrawn bucket refills from its deficit, still up to the burst.
    block_sync_rate_limiter overdrawn(limit, start);
-   overdrawn.charge(30'000);
+   overdrawn.charge(30'000, start);
    BOOST_TEST(overdrawn.allowance() == -10'000);
    overdrawn.refill(start + 1s);
    BOOST_TEST(overdrawn.allowance() == 10'000);
@@ -163,9 +165,27 @@ BOOST_AUTO_TEST_CASE(refill_caps_at_the_burst) {
    BOOST_TEST(overdrawn.allowance() == 20'000);
 }
 
+// Time a full bucket waits before a charge, as while the block is fetched, is not credited to the charge: the charge
+// refills to its own time first, so the burst cap applies before the block is charged.
+BOOST_AUTO_TEST_CASE(time_full_before_a_charge_is_not_credited) {
+   constexpr uint64_t rate = 100'000;        ///< bytes per second
+   constexpr uint64_t block_bytes = 150'000; ///< 50'000 bytes past the burst
+   const time_point fetched = start + 600ms; ///< the block was fetched for 600 ms after the send was allowed
+   block_sync_rate_limiter bucket(rate, start);
+   bucket.refill(start);
+   BOOST_REQUIRE(bucket.may_send());
+
+   bucket.charge(block_bytes, fetched);
+   BOOST_TEST(bucket.allowance() == -50'000);
+   bucket.refill(fetched);
+   BOOST_TEST(!bucket.may_send());
+   // 50'001 bytes at 100'000 bytes per second
+   BOOST_TEST(bucket.refill_delay() == 500'010us);
+}
+
 BOOST_AUTO_TEST_CASE(earlier_time_credits_nothing) {
    block_sync_rate_limiter bucket(limit, start);
-   bucket.charge(20'000);
+   bucket.charge(20'000, start);
    bucket.refill(start - 1s);
    BOOST_TEST(bucket.allowance() == 0);
    bucket.refill(start);
@@ -177,11 +197,11 @@ BOOST_AUTO_TEST_CASE(earlier_time_credits_nothing) {
 
 BOOST_AUTO_TEST_CASE(reset_fills_the_bucket) {
    block_sync_rate_limiter bucket(limit, start);
-   bucket.charge(50'000);
+   bucket.charge(50'000, start);
    bucket.refill(start + 1us); // carries 20'000 byte-microseconds
    bucket.reset(start + 1s);
    BOOST_TEST(bucket.allowance() == 20'000);
-   bucket.charge(20'000);
+   bucket.charge(20'000, start + 1s);
    bucket.refill(start + 1s + 49us);
    BOOST_TEST(bucket.allowance() == 0); // the carried credit was dropped
    bucket.refill(start + 1s + 50us);
@@ -194,9 +214,9 @@ BOOST_AUTO_TEST_CASE(extreme_values_do_not_overflow) {
    BOOST_TEST(fastest.burst_bytes() == int64_max);
    BOOST_TEST(fastest.max_deficit_bytes() == int64_max);
    BOOST_TEST(fastest.allowance() == int64_max);
-   fastest.charge(uint64_max);
+   fastest.charge(uint64_max, time_point{});
    BOOST_TEST(fastest.allowance() == -int64_max);
-   fastest.charge(uint64_max);
+   fastest.charge(uint64_max, time_point{});
    BOOST_TEST(fastest.allowance() == -int64_max);
    // 2^63 bytes at 2^64 - 1 bytes per second is just over half a second
    BOOST_TEST(fastest.refill_delay().count() == 500'001);
@@ -206,7 +226,7 @@ BOOST_AUTO_TEST_CASE(extreme_values_do_not_overflow) {
    // The smallest limit, overdrawn by the largest charge, then refilled over the longest time a time point allows.
    block_sync_rate_limiter slowest(1, time_point{});
    BOOST_TEST(slowest.max_deficit_bytes() == 2);
-   slowest.charge(uint64_max);
+   slowest.charge(uint64_max, time_point{});
    BOOST_TEST(slowest.allowance() == -2);
    BOOST_TEST(slowest.refill_delay() == block_sync_rate_limiter::max_refill_delay);
    slowest.refill(time_point::max());
@@ -219,13 +239,13 @@ BOOST_AUTO_TEST_CASE(charge_overdraws_at_most_max_send_gap_of_the_limit) {
    block_sync_rate_limiter bucket(limit, start);
    BOOST_TEST(bucket.max_deficit_bytes() == 40'000);
 
-   bucket.charge(60'000);
+   bucket.charge(60'000, start);
    BOOST_TEST(bucket.allowance() == -40'000);
    bucket.reset(start);
-   bucket.charge(60'001);
+   bucket.charge(60'001, start);
    BOOST_TEST(bucket.allowance() == -40'000);
    bucket.reset(start);
-   bucket.charge(1'000'000);
+   bucket.charge(1'000'000, start);
    BOOST_TEST(bucket.allowance() == -40'000);
 
    // 40'001 bytes at 20'000 bytes per second: max_send_gap plus the 50us of one byte
@@ -239,7 +259,7 @@ BOOST_AUTO_TEST_CASE(refill_delay_is_bounded) {
    for (const uint64_t rate : {uint64_t{1}, uint64_t{3}, uint64_t{1'000}, limit, uint64_t{1'000'000'000}, uint64_max}) {
       BOOST_TEST_CONTEXT(rate) {
          block_sync_rate_limiter bucket(rate, start);
-         bucket.charge(uint64_max);
+         bucket.charge(uint64_max, start);
          // the time of one byte, rounded up to a microsecond
          const std::chrono::microseconds one_byte{usec_per_sec / rate + (usec_per_sec % rate != 0 ? 1 : 0)};
          BOOST_TEST(bucket.refill_delay() <= block_sync_rate_limiter::max_send_gap + one_byte);
@@ -269,7 +289,7 @@ BOOST_AUTO_TEST_CASE(oversized_blocks_go_one_per_max_send_gap) {
          BOOST_TEST(gap == block_sync_rate_limiter::max_send_gap + 50us);
       }
       last_send = now;
-      bucket.charge(block_bytes);
+      bucket.charge(block_bytes, now);
       BOOST_TEST(bucket.allowance() == -bucket.max_deficit_bytes());
    }
 }
@@ -299,13 +319,46 @@ BOOST_AUTO_TEST_CASE(sustained_sending_holds_to_the_limit) {
          // One microsecond sooner, the allowance had not yet reached one byte.
          BOOST_TEST(limit * (elapsed - 1) < (sent + 1 - burst) * usec_per_sec);
       }
-      bucket.charge(block_bytes);
+      bucket.charge(block_bytes, now);
       sent += block_bytes;
       BOOST_TEST(bucket.allowance() > -bucket.max_deficit_bytes()); // under the clamp, so every byte counts
    }
    // The last block waits for the 7'769'223 bytes before it, less the burst, plus one byte: 7'749'224 bytes at 20'000
    // bytes per second.
    BOOST_TEST(std::chrono::duration_cast<std::chrono::microseconds>(now - start).count() == 387'461'200);
+}
+
+// A capped listener on a slow link: the sender writes each block as soon as the bucket allows, and the link carries
+// the written blocks one after another. A wait for the bucket followed by a long transfer outlasts the transfer window,
+// but a block whose transfer takes at most sync_block_transfer_window arrives within sync_response_timeout of the block
+// before it.
+BOOST_AUTO_TEST_CASE(slow_link_blocks_arrive_within_the_response_timeout) {
+   constexpr uint64_t usec_per_sec = 1'000'000;
+   constexpr uint64_t link_bytes_per_sec = 60'000; ///< 3 times the limit
+   // 60'000 bytes overdraw the bucket by max_send_gap of the limit and cross the link in 1 s, so the 240'000 bytes
+   // after them wait about 2 s for the bucket and then take 4 s on the link.
+   const std::vector<uint64_t> block_sizes = {60'000, 240'000, 60'000, 240'000, 1'000, 300'000, 7'777, 120'000};
+   block_sync_rate_limiter bucket(limit, start);
+   time_point now = start;          ///< when the sender may write next
+   time_point link_free = start;    ///< when the link has carried every block written so far
+   time_point last_arrival = start; ///< the syncing peer's timeout runs from its request
+   std::chrono::microseconds longest_gap{0};
+   for (const uint64_t block_bytes : block_sizes) {
+      bucket.refill(now);
+      if (!bucket.may_send())
+         now += bucket.refill_delay();
+      bucket.charge(block_bytes, now);
+      const std::chrono::microseconds transfer{block_bytes * usec_per_sec / link_bytes_per_sec};
+      BOOST_REQUIRE(transfer <= block_sync_rate_limiter::sync_block_transfer_window);
+      const time_point arrival = std::max(now, link_free) + transfer;
+      link_free = arrival;
+      const std::chrono::microseconds gap =
+         std::chrono::duration_cast<std::chrono::microseconds>(arrival - last_arrival);
+      BOOST_TEST(gap <= block_sync_rate_limiter::sync_response_timeout);
+      longest_gap = std::max(longest_gap, gap);
+      last_arrival = arrival;
+   }
+   BOOST_TEST(longest_gap > block_sync_rate_limiter::sync_block_transfer_window);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -13,7 +13,8 @@ namespace sysio {
  * Token bucket that holds the sync blocks sent to one peer to a configured rate.
  *
  * The allowance is the number of bytes that may still be sent. Elapsed time refills it at the limit, up to
- * burst_bytes(), and every block sent is charged, so the last block sent may overdraw it. The next block may be sent
+ * burst_bytes(), and every block sent is charged at the time it is sent, after a refill to that time, so time the
+ * bucket spent full never counts toward a charge. The last block sent may overdraw it. The next block may be sent
  * once the allowance is positive again. A charge never takes the allowance below -max_deficit_bytes(): a block
  * larger than max_send_gap of the limit is sent at one block per max_send_gap rather than at the limit. Credit short
  * of a whole byte carries to the next refill, so no time is lost to rounding.
@@ -31,12 +32,18 @@ public:
    static constexpr std::chrono::microseconds burst_window = std::chrono::seconds{1};
 
    /// Longest a sender waits between sync blocks, not counting the time of one byte: a charge overdraws the bucket
-   /// by at most this much of the limit. Kept under the syncing peer's response timeout, which closes a connection
-   /// that sends no block for that long.
+   /// by at most this much of the limit. sync_response_timeout allows for it on top of a block's transfer.
    static constexpr std::chrono::microseconds max_send_gap = std::chrono::seconds{2};
 
    /// Longest refill_delay(): max_send_gap plus the time of one byte at the lowest limit, one byte per second.
    static constexpr std::chrono::microseconds max_refill_delay = max_send_gap + std::chrono::seconds{1};
+
+   /// Time a syncing peer allows a sync block to arrive once its sender sends it.
+   static constexpr std::chrono::microseconds sync_block_transfer_window = std::chrono::seconds{5};
+
+   /// How long a syncing peer waits for the next sync block before giving up on the sender: the longest a rate
+   /// limited sender waits before sending it, then its transfer window.
+   static constexpr std::chrono::microseconds sync_response_timeout = max_refill_delay + sync_block_transfer_window;
 
    /// @param limit_bytes_per_sec rate limit in bytes per second, or unlimited_rate
    /// @param now time the bucket starts full
@@ -89,10 +96,12 @@ public:
       }
    }
 
-   /// Charge a block sent. The allowance may go negative, down to -max_deficit_bytes().
-   void charge(uint64_t bytes) {
+   /// Refill to @p now, then charge a block sent at @p now. The allowance may go negative, down to
+   /// -max_deficit_bytes().
+   void charge(uint64_t bytes, clock::time_point now) {
       if (unlimited())
          return;
+      refill(now);
       const fc::int128 charged = fc::int128{allowance_} - bytes;
       allowance_ = static_cast<int64_t>(std::max<fc::int128>(charged, -fc::int128{max_deficit_bytes_}));
    }
