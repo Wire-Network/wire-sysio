@@ -30,6 +30,7 @@
 
 #include <cstdint>
 #include <iostream>
+#include <limits>
 #include <algorithm>
 #include <mutex>
 
@@ -99,7 +100,9 @@ namespace {
 /// Option setting the byte limit, in MiB, of the incoming transaction queue.
 constexpr auto option_name_incoming_transaction_queue_size = "incoming-transaction-queue-size-mb";
 /// Default of incoming-transaction-queue-size-mb.
-constexpr uint16_t default_incoming_transaction_queue_size_mb = 1024;
+constexpr int32_t default_incoming_transaction_queue_size_mb = 1024;
+/// Largest incoming-transaction-queue-size-mb accepted.
+constexpr uint64_t max_incoming_transaction_queue_size_mb = std::numeric_limits<uint16_t>::max();
 
 // track multiple failures on unapplied transactions
 class account_failures {
@@ -1517,7 +1520,7 @@ void producer_plugin::set_program_options(
           "Sets the maximum allowed NET bytes, above account NET, that can be used by an authorizing account within "
           "subjective-account-decay-time-minutes")
          (option_name_incoming_transaction_queue_size,
-          bpo::value<uint16_t>()->default_value(default_incoming_transaction_queue_size_mb),
+          bpo::value<int32_t>()->default_value(default_incoming_transaction_queue_size_mb),
           "Maximum size (in MiB) of the incoming transaction queue. Exceeding this value will subjectively drop transaction with resource exhaustion.")
          ("incoming-trx-max-signatures",
           bpo::value<uint32_t>()->default_value(chain::config::default_incoming_trx_max_signatures),
@@ -1659,8 +1662,8 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
    _max_reversible_blocks = options.at("max-reversible-blocks").as<uint32_t>();
 
    _unapplied_transactions.set_max_transaction_queue_size(
-      checked_mebibytes(options.at(option_name_incoming_transaction_queue_size).as<uint16_t>(),
-                        option_name_incoming_transaction_queue_size));
+      checked_mebibytes(options.at(option_name_incoming_transaction_queue_size).as<int32_t>(),
+                        option_name_incoming_transaction_queue_size, max_incoming_transaction_queue_size_mb));
 
    chain.get_mutable_subjective_billing().set_subjective_account_cpu_allowed(fc::microseconds(options.at("subjective-account-cpu-allowed-us").as<int64_t>()));
    chain.get_mutable_subjective_billing().set_subjective_account_net_allowed(

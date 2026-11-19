@@ -12,6 +12,7 @@
 
 #include <fc/io/json.hpp>
 
+#include <fstream>
 #include <future>
 #include <limits>
 #include <stdexcept>
@@ -115,9 +116,12 @@ packed_transaction_ptr sign(signed_transaction trx, const std::vector<private_ke
 class test_node {
 public:
    /// Starts the node.
-   /// @param args command line arguments after the data and config directories
-   explicit test_node(const std::vector<std::string>& args) {
+   /// @param args       command line arguments after the data and config directories
+   /// @param config_ini contents of the node's config.ini; empty for the default one
+   explicit test_node(const std::vector<std::string>& args, const std::string& config_ini = {}) {
       const std::string dir = temp.path().string();
+      if (!config_ini.empty())
+         std::ofstream(temp.path() / "config.ini") << config_ini;
       std::vector<std::string> all_args = {"test", "--data-dir", dir, "--config-dir", dir};
       all_args.insert(all_args.end(), args.begin(), args.end());
 
@@ -324,11 +328,20 @@ BOOST_AUTO_TEST_CASE(queue_size_option_sets_byte_limit) {
    }
 }
 
-// A zero incoming-transaction-queue-size-mb fails initialization with the configured value in the error.
-BOOST_AUTO_TEST_CASE(zero_queue_size_rejected) {
-   BOOST_CHECK_EXCEPTION(
-      test_node(producer_args({"--incoming-transaction-queue-size-mb", "0"})), plugin_config_exception,
-      testing::fc_exception_message_contains("incoming-transaction-queue-size-mb 0 must be between 1 and"));
+// An incoming-transaction-queue-size-mb outside 1 to 65535, from the command line or config.ini, fails initialization
+// with the configured value and the range in the error. A negative value is not read as its unsigned wraparound.
+BOOST_AUTO_TEST_CASE(out_of_range_queue_size_rejected) {
+   for (const std::string size_mb : {"0", "-1", "-65535", "65536"}) {
+      const std::string expected = "incoming-transaction-queue-size-mb " + size_mb + " must be between 1 and 65535 MiB";
+      BOOST_TEST_CONTEXT("command line " << size_mb) {
+         BOOST_CHECK_EXCEPTION(test_node(producer_args({"--incoming-transaction-queue-size-mb=" + size_mb})),
+                               plugin_config_exception, testing::fc_exception_message_contains(expected));
+      }
+      BOOST_TEST_CONTEXT("config.ini " << size_mb) {
+         BOOST_CHECK_EXCEPTION(test_node(producer_args(), "incoming-transaction-queue-size-mb = " + size_mb + "\n"),
+                               plugin_config_exception, testing::fc_exception_message_contains(expected));
+      }
+   }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
