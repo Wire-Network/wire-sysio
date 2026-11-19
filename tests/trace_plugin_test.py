@@ -96,6 +96,10 @@ class TraceApiPluginTest(unittest.TestCase):
         # use trace_api to get transId
         node.getTransaction(transId, silentErrors=False, exitOnError=True)
 
+        # the cluster's launch values of the limits the next relaunch sets to 0
+        timeLimitFlags = ("--http-max-response-time-ms", "--abi-serializer-max-time-ms")
+        launchTimeLimits = {flag: node.cmd[node.cmd.index(flag) + 1] for flag in timeLimitFlags}
+
         # relaunch with no time allocated for http response & abi-serializer
         node.kill(signal.SIGTERM)
         isRelaunchSuccess = node.relaunch(chainArg="--enable-stale-production", addSwapFlags={"--http-max-response-time-ms": "0", "--abi-serializer-max-time-ms": "0"})
@@ -121,7 +125,9 @@ class TraceApiPluginTest(unittest.TestCase):
         node.removeReversibleBlks()
         node.removeTracesDir()
 
-        isRelaunchSuccess = node.relaunch(chainArg="--snapshot {}".format(node.getLatestSnapshot()), addSwapFlags={"--trace-slice-stride": "2"})
+        # the transfers below run under the cluster's normal time limits
+        isRelaunchSuccess = node.relaunch(chainArg="--snapshot {}".format(node.getLatestSnapshot()),
+                                          addSwapFlags={"--trace-slice-stride": "2", **launchTimeLimits})
         assert isRelaunchSuccess, f"node0 relaunch from snapshot failed"
         assert node.waitForHeadToAdvance(), "Node0 did not advance HEAD after relaunch"
 

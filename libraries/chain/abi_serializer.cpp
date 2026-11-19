@@ -110,12 +110,45 @@ namespace sysio::chain {
       return fc::variant( temp, [yield](){ yield(0); } );
    }
 
+   /// Decodes a built-in `T[]`, calling `yield` every built_in_array_elements_per_yield elements.
+   template <typename T>
+   fc::variant array_from_stream(fc::datastream<const char*>& stream, const abi_serializer::yield_function_t& yield) {
+      fc::unsigned_int size;
+      fc::raw::unpack( stream, size );
+      FC_ASSERT( size.value <= MAX_NUM_ARRAY_ELEMENTS );
+      fc::variants vars;
+      vars.reserve( std::min<size_t>( size.value, stream.remaining() ) ); // every built-in element takes a byte or more
+      for( uint32_t i = 0; i < size.value; ++i ) {
+         if( i % abi_serializer::built_in_array_elements_per_yield == 0 )
+            yield(0);
+         T temp;
+         fc::raw::unpack( stream, temp );
+         vars.emplace_back( temp );
+      }
+      return fc::variant( std::move(vars) );
+   }
+
+   /// Packs a built-in `T[]`, calling `yield` every built_in_array_elements_per_yield elements.
+   template <typename T>
+   void pack_array(const fc::variant& var, abi_serializer::pack_stream& ds,
+                   const abi_serializer::yield_function_t& yield) {
+      const fc::variants& vars = var.get_array();
+      if( vars.size() > MAX_NUM_ARRAY_ELEMENTS )
+         throw std::range_error( "too large" ); // as from_variant of a std::vector throws
+      fc::raw::pack( ds, fc::unsigned_int( static_cast<uint32_t>( vars.size() ) ) );
+      for( size_t i = 0; i < vars.size(); ++i ) {
+         if( i % abi_serializer::built_in_array_elements_per_yield == 0 )
+            yield(0);
+         fc::raw::pack( ds, vars[i].as<T>() );
+      }
+   }
+
    template <typename T>
    auto pack_function() {
       return []( const fc::variant& var, abi_serializer::pack_stream& ds, bool is_array, bool is_optional,
                  const abi_serializer::yield_function_t& yield ){
          if( is_array )
-            fc::raw::pack( ds, var.as<vector<T>>() );
+            pack_array<T>( var, ds, yield );
          else if ( is_optional )
             fc::raw::pack( ds, var.as<std::optional<T>>() );
          else
@@ -128,7 +161,7 @@ namespace sysio::chain {
       return std::make_pair<abi_serializer::unpack_function, abi_serializer::pack_function>(
          []( fc::datastream<const char*>& stream, bool is_array, bool is_optional, const abi_serializer::yield_function_t& yield) {
             if( is_array )
-               return variant_from_stream<vector<T>>(stream);
+               return array_from_stream<T>(stream, yield);
             else if ( is_optional )
                return variant_from_stream<std::optional<T>>(stream);
             return variant_from_stream<T>(stream);
@@ -142,7 +175,7 @@ namespace sysio::chain {
       return std::make_pair<abi_serializer::unpack_function, abi_serializer::pack_function>(
          []( fc::datastream<const char*>& stream, bool is_array, bool is_optional, const abi_serializer::yield_function_t& yield) {
             if( is_array )
-               return variant_from_stream<vector<T>>(stream);
+               return array_from_stream<T>(stream, yield);
             else if ( is_optional )
                return variant_from_stream<std::optional<T>>(stream);
             return variant_from_stream<T>(stream, yield);
@@ -324,7 +357,8 @@ namespace sysio::chain {
    }
 
    std::vector<const fc::variant*> abi_serializer::struct_field_values( const struct_def& st,
-                                                                        const fc::variant_object& vo )const {
+                                                                        const fc::variant_object& vo,
+                                                                        const impl::abi_traverse_context& ctx )const {
       const auto order_itr = struct_fields_by_name.find( st.name );
       SYS_ASSERT( order_itr != struct_fields_by_name.end(), abi_exception,
                   "invariant failure: struct '{}' has no field index", impl::limit_size(st.name) );
@@ -332,13 +366,17 @@ namespace sysio::chain {
       const auto field_name_of = [&fields = st.fields]( uint32_t i ) -> std::string_view { return fields[i].name; };
 
       std::vector<const fc::variant*> values( st.fields.size(), nullptr );
+      size_t entries_read = 0;
       for( const auto& entry : vo ) {
+         if( ++entries_read % struct_keys_per_deadline_check == 0 )
+            ctx.check_deadline();
          const std::string_view key = entry.key();
-         for( auto itr = std::ranges::lower_bound( order, key, {}, field_name_of );
-              itr != order.end() && field_name_of( *itr ) == key; ++itr ) {
-            if( values[*itr] == nullptr )
-               values[*itr] = &entry.value();
-         }
+         auto itr = std::ranges::lower_bound( order, key, {}, field_name_of );
+         // The fields a key names all take its first occurrence, so a key seen before has nothing left to set.
+         if( itr == order.end() || field_name_of( *itr ) != key || values[*itr] != nullptr )
+            continue;
+         for( ; itr != order.end() && field_name_of( *itr ) == key; ++itr )
+            values[*itr] = &entry.value();
       }
       return values;
    }
@@ -750,7 +788,9 @@ namespace sysio::chain {
    {
       auto h = ctx.enter_scope();
       fc::datastream<const char*> ds( binary.data(), binary.size() );
-      return _binary_to_variant(type, ds, ctx);
+      fc::variant result = _binary_to_variant(type, ds, ctx);
+      ctx.check_deadline(); // a result finished past the deadline is not accepted
+      return result;
    }
 
    fc::variant abi_serializer::binary_to_variant( const std::string_view& type, const bytes& binary, const yield_function_t& yield, bool short_path )const {
@@ -768,13 +808,17 @@ namespace sysio::chain {
    fc::variant abi_serializer::binary_to_variant( const std::string_view& type, fc::datastream<const char*>& binary, const yield_function_t& yield, bool short_path )const {
       impl::binary_to_variant_context ctx(*this, yield, fc::microseconds{}, type);
       ctx.short_path = short_path;
-      return _binary_to_variant(type, binary, ctx);
+      fc::variant result = _binary_to_variant(type, binary, ctx);
+      ctx.check_deadline(); // a result finished past the deadline is not accepted
+      return result;
    }
 
    fc::variant abi_serializer::binary_to_variant( const std::string_view& type, fc::datastream<const char*>& binary, const fc::microseconds& max_action_data_serialization_time, bool short_path )const {
       impl::binary_to_variant_context ctx(*this, create_depth_yield_function(), max_action_data_serialization_time, type);
       ctx.short_path = short_path;
-      return _binary_to_variant(type, binary, ctx);
+      fc::variant result = _binary_to_variant(type, binary, ctx);
+      ctx.check_deadline(); // a result finished past the deadline is not accepted
+      return result;
    }
 
    void abi_serializer::_variant_to_binary( const std::string_view& type, const fc::variant& var, pack_stream& ds,
@@ -867,7 +911,7 @@ namespace sysio::chain {
                auto h2 = ctx.disallow_extensions_unless(false);
                _variant_to_binary(resolve_type(st.base), var, ds, ctx);
             }
-            const std::vector<const fc::variant*> values = struct_field_values( st, vo );
+            const std::vector<const fc::variant*> values = struct_field_values( st, vo, ctx );
             const fc::variant absent;
             bool disallow_additional_fields = false;
             for( uint32_t i = 0; i < st.fields.size(); ++i ) {
@@ -936,6 +980,7 @@ namespace sysio::chain {
       scratch.seekp(0);
       scratch.storage().clear();
       _variant_to_binary(type, var, scratch, ctx);
+      ctx.check_deadline(); // a result finished past the deadline is not accepted
       const bytes& packed = scratch.storage();
       return bytes(packed.begin(), packed.begin() + scratch.tellp());
    } FC_CAPTURE_AND_RETHROW("") }
@@ -957,6 +1002,7 @@ namespace sysio::chain {
       ctx.short_path = short_path;
       pack_stream packed;
       _variant_to_binary(type, var, packed, ctx);
+      ctx.check_deadline(); // a result finished past the deadline is not accepted
       ds.write(packed.storage().data(), packed.tellp());
    }
 
@@ -965,6 +1011,7 @@ namespace sysio::chain {
       ctx.short_path = short_path;
       pack_stream packed;
       _variant_to_binary(type, var, packed, ctx);
+      ctx.check_deadline(); // a result finished past the deadline is not accepted
       ds.write(packed.storage().data(), packed.tellp());
    }
 

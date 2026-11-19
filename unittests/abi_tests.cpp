@@ -4938,6 +4938,110 @@ BOOST_AUTO_TEST_CASE(action_data_expansion_stops_at_deadline)
                      abi_serialization_deadline_exception);
 } FC_LOG_AND_RETHROW() }
 
+/// ABI with two actions: `sigs`, whose data is an array of signatures, and `blob`, whose data is one `bytes` field.
+static const char* built_in_payload_abi = R"=====(
+{
+   "version": "sysio::abi/1.0",
+   "structs": [
+      {"name": "sigs", "base": "", "fields": [{"name": "sigs", "type": "signature[]"}]},
+      {"name": "blob", "base": "", "fields": [{"name": "b", "type": "bytes"}]}
+   ],
+   "actions": [
+      {"name": "sigs", "type": "sigs", "ricardian_contract": ""},
+      {"name": "blob", "type": "blob", "ricardian_contract": ""}
+   ]
+}
+)=====";
+
+/// A transaction variant with one action of account `hello` named `name` whose data is `data`.
+static fc::variant single_action_transaction(std::string_view name, const fc::variant& data) {
+   return fc::mutable_variant_object()("actions", fc::variants{fc::mutable_variant_object()
+      ("account", "hello")("name", name)("authorization", fc::variants{})("data", data)});
+}
+
+/// Packing a built-in array yields every few elements, so the per-action limit and the request deadline stop packing
+/// a long `signature[]` instead of finishing it past both.
+BOOST_AUTO_TEST_CASE(built_in_array_packing_honors_deadline)
+{ try {
+   constexpr size_t signature_count = 10000;
+   constexpr auto   tight_limit     = fc::milliseconds(1);
+
+   const abi_serializer abis(fc::json::from_string(built_in_payload_abi).as<abi_def>(), yield_fn());
+   const auto resolver = [&abis](const account_name&) -> std::optional<abi_serializer> { return abis; };
+   const fc::crypto::private_key key = fc::crypto::private_key::generate();
+   const std::vector<signature_type> sigs(signature_count, key.sign(fc::sha256::hash(std::string("data"))));
+   const fc::variant trx_var = single_action_transaction("sigs", fc::mutable_variant_object()("sigs", sigs));
+
+   signed_transaction unlimited;
+   abi_serializer::from_variant(trx_var, unlimited, resolver, fc::microseconds::maximum());
+   BOOST_REQUIRE_EQUAL(unlimited.actions.size(), 1u);
+   BOOST_CHECK(unlimited.actions[0].data == fc::raw::pack(sigs));
+
+   signed_transaction per_action;
+   BOOST_CHECK_THROW(abi_serializer::from_variant(trx_var, per_action, resolver, tight_limit),
+                     abi_serialization_deadline_exception);
+   signed_transaction request;
+   BOOST_CHECK_THROW(abi_serializer::from_variant(trx_var, request, resolver,
+                                                  abi_serializer::create_yield_function(tight_limit),
+                                                  fc::microseconds::maximum()),
+                     abi_serialization_deadline_exception);
+} FC_LOG_AND_RETHROW() }
+
+/// Decoding a built-in array yields every few elements, so the per-action limit stops decoding a long `signature[]`
+/// and the action's data stays hex.
+BOOST_AUTO_TEST_CASE(built_in_array_decoding_honors_deadline)
+{ try {
+   constexpr size_t signature_count = 10000;
+   constexpr auto   tight_limit     = fc::milliseconds(1);
+
+   const abi_serializer abis(fc::json::from_string(built_in_payload_abi).as<abi_def>(), yield_fn());
+   const auto resolver = [&abis](const account_name&) -> std::optional<abi_serializer> { return abis; };
+   const fc::crypto::private_key key = fc::crypto::private_key::generate();
+   const std::vector<signature_type> sigs(signature_count, key.sign(fc::sha256::hash(std::string("data"))));
+
+   signed_transaction trx;
+   trx.actions.emplace_back(std::vector<permission_level>{}, "hello"_n, "sigs"_n, fc::raw::pack(sigs));
+   fc::variant decoded;
+   abi_serializer::to_variant(trx, decoded, resolver, fc::microseconds::maximum());
+   BOOST_REQUIRE(decoded["actions"][size_t(0)]["data"].is_object());
+   BOOST_CHECK_EQUAL(decoded["actions"][size_t(0)]["data"]["sigs"].get_array().size(), signature_count);
+
+   fc::variant limited;
+   abi_serializer::to_variant(trx, limited, resolver, tight_limit);
+   BOOST_CHECK_EQUAL(limited["actions"][size_t(0)]["data"].as_string(), fc::to_hex(trx.actions[0].data));
+   BOOST_CHECK_EQUAL(limited["actions"][size_t(0)]["hex_data"].as_string(), fc::to_hex(trx.actions[0].data));
+} FC_LOG_AND_RETHROW() }
+
+/// A conversion checks its deadline before accepting its result: one `bytes` field large enough to outlast the
+/// per-action limit, converted without a yield inside it, is rejected when packed and left hex when decoded.
+BOOST_AUTO_TEST_CASE(action_data_finished_past_limit_not_accepted)
+{ try {
+   constexpr size_t blob_size   = 4 * 1024 * 1024;
+   constexpr char   blob_byte   = char(0xab);
+   constexpr auto   tight_limit = fc::milliseconds(1);
+
+   const abi_serializer abis(fc::json::from_string(built_in_payload_abi).as<abi_def>(), yield_fn());
+   const auto resolver = [&abis](const account_name&) -> std::optional<abi_serializer> { return abis; };
+   const bytes blob(blob_size, blob_byte);
+   const fc::variant trx_var = single_action_transaction("blob", fc::mutable_variant_object()("b", fc::to_hex(blob)));
+
+   signed_transaction unlimited;
+   abi_serializer::from_variant(trx_var, unlimited, resolver, fc::microseconds::maximum());
+   BOOST_REQUIRE_EQUAL(unlimited.actions.size(), 1u);
+   BOOST_CHECK(unlimited.actions[0].data == fc::raw::pack(blob));
+   signed_transaction limited_pack;
+   BOOST_CHECK_THROW(abi_serializer::from_variant(trx_var, limited_pack, resolver, tight_limit),
+                     abi_serialization_deadline_exception);
+
+   fc::variant decoded;
+   abi_serializer::to_variant(unlimited, decoded, resolver, fc::microseconds::maximum());
+   BOOST_CHECK(decoded["actions"][size_t(0)]["data"].is_object());
+   fc::variant limited_decode;
+   abi_serializer::to_variant(unlimited, limited_decode, resolver, tight_limit);
+   BOOST_CHECK_EQUAL(limited_decode["actions"][size_t(0)]["data"].as_string(),
+                     fc::to_hex(unlimited.actions[0].data));
+} FC_LOG_AND_RETHROW() }
+
 /// Decoding action data stops at the conversion's action-data deadline: actions reached after it keep their data as
 /// hex, as undecodable data does, and hex_data and return_value_hex_data stay present.
 BOOST_AUTO_TEST_CASE(to_variant_leaves_hex_past_action_data_deadline)
@@ -5031,6 +5135,36 @@ BOOST_AUTO_TEST_CASE(variant_to_binary_scales_with_object_keys)
    BOOST_REQUIRE_EQUAL(packed.size(), field_count);
    for (uint32_t i = 0; i < field_count; ++i)
       BOOST_REQUIRE_EQUAL(static_cast<uint8_t>(packed[i]), i % byte_values);
+} FC_LOG_AND_RETHROW() }
+
+/// A key repeated in the input object visits the fields it names once: 5,000 fields named `a` pack from an object
+/// repeating `"a"` 50,000 times well within a small budget, every field taking the first occurrence.
+BOOST_AUTO_TEST_CASE(variant_to_binary_repeated_key_visits_fields_once)
+{ try {
+   constexpr uint32_t field_count      = 5000;
+   constexpr uint32_t occurrence_count = 50000;
+   constexpr char     first_value      = 1;
+   constexpr auto     budget           = fc::milliseconds(200);
+
+   abi_def abi;
+   abi.version = "sysio::abi/1.0";
+   struct_def same("same", "", {});
+   for (uint32_t i = 0; i < field_count; ++i)
+      same.fields.emplace_back("a", "uint8");
+   abi.structs.push_back(std::move(same));
+   const abi_serializer abis(std::move(abi), yield_fn());
+
+   std::string json = R"({"a":1)";
+   for (uint32_t i = 1; i < occurrence_count; ++i)
+      json += R"(,"a":2)";
+   json += "}";
+   const fc::variant input = fc::json::from_string(json);
+   BOOST_REQUIRE_EQUAL(input.get_object().size(), occurrence_count);
+
+   bytes packed;
+   BOOST_REQUIRE_NO_THROW(packed = abis.variant_to_binary("same", input,
+                                                          abi_serializer::create_yield_function(budget)));
+   BOOST_CHECK(packed == bytes(field_count, first_value));
 } FC_LOG_AND_RETHROW() }
 
 /// ABI whose `nothing` type decodes from no bytes, with arrays and structs built from it.

@@ -148,6 +148,13 @@ struct abi_serializer {
    /// the bytes left plus what remains of this allowance.
    static constexpr uint32_t max_zero_size_array_elements = 1024;
 
+   /// Input object entries a struct's field lookup reads between two checks of the conversion's deadline.
+   static constexpr size_t struct_keys_per_deadline_check = 1024;
+
+   /// Elements of a built-in array (such as `signature[]`) packed or decoded between two calls of the conversion's
+   /// yield. A conversion overruns its deadline by at most this many elements before the yield throws.
+   static constexpr size_t built_in_array_elements_per_yield = 32;
+
    // create standard yield function that checks for max_serialization_time and max_recursion_depth.
    // restricts serialization time from creation of yield function until serialization is complete.
    // now() deadline captured at time of this call
@@ -223,9 +230,11 @@ private:
 
    /**
     * The value each field of `st` takes from `vo`: the first entry whose key is the field's name, else nullptr.
-    * Reads each entry of `vo` once.
+    * Reads each entry of `vo` once, visits the fields a key names only on its first occurrence, and checks `ctx`'s
+    * deadline every struct_keys_per_deadline_check entries.
     */
-   std::vector<const fc::variant*> struct_field_values( const struct_def& st, const fc::variant_object& vo )const;
+   std::vector<const fc::variant*> struct_field_values( const struct_def& st, const fc::variant_object& vo,
+                                                        const impl::abi_traverse_context& ctx )const;
 
    /// Each struct's field ordinals sorted by field name, ties in declaration order, to find the fields an input
    /// object's keys name by binary search.
