@@ -165,6 +165,13 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
    /// returns the uploader's rent. The buffer must exist: Anchor reads its
    /// bump before the handler runs. Cleanup confirms at `confirmed` commitment.
    solana_program_tx_fn<std::string, uint32_t>             cleanup_envelope_chunks;
+   /// `cleanup_epoch_deliveries(epoch_index) -> signature`.
+   /// Closes `epoch_index`'s `EpochDeliveries` tally and returns its rent to
+   /// the `payer` it records, which must be THIS signer: the relay only sends
+   /// it for tallies its own `epoch_in` created. Same eligibility as
+   /// `cleanup_envelope_chunks`, and the tally must exist (Anchor reads its bump
+   /// before the handler runs). Confirms at `confirmed` commitment.
+   solana_program_tx_fn<std::string, uint32_t>             cleanup_epoch_deliveries;
    /// `emit_outbound_envelope(wire_epoch_index: u32) -> signature`.
    /// Recovery/admin escape hatch only. The steady-state batch-operator relay
    /// never calls it because the draining `dispatch_attestations` round emits
@@ -197,6 +204,27 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
          {"uploader",                  signer},
       };
       auto& instr = get_idl(outpost_solana_client_detail::CLEANUP_ENVELOPE_CHUNKS_INSTRUCTION);
+      program_invoke_data_items params = {fc::variant(epoch_index)};
+      return resolve_accounts(instr, params, overrides);
+   }
+
+   /// The resolved account list `cleanup_epoch_deliveries(epoch_index)` sends:
+   /// the signer as `reaper`, the config and latest-outbound singletons,
+   /// `epoch_index`'s `EpochDeliveries` PDA, and the signer as `payer`, the
+   /// rent recipient.
+   std::vector<fc::network::solana::account_meta> cleanup_epoch_deliveries_accounts(uint32_t epoch_index) {
+      const auto signer = this->client->get_pubkey();
+      // `payer` is neither a signer nor seed-declared in the IDL (the program
+      // checks it against the tally's recorded payer), so the resolver cannot
+      // fill it: name it explicitly as the signer.
+      account_overrides_t overrides = {
+         {"config",                    config_pda},
+         {"latest_outbound_envelope",  latest_outbound_envelope_pda},
+         {"epoch_deliveries",          outpost_solana_client_detail::derive_epoch_deliveries_pda(program_id,
+                                                                                                  epoch_index)},
+         {"payer",                     signer},
+      };
+      auto& instr = get_idl(outpost_solana_client_detail::CLEANUP_EPOCH_DELIVERIES_INSTRUCTION);
       program_invoke_data_items params = {fc::variant(epoch_index)};
       return resolve_accounts(instr, params, overrides);
    }
@@ -299,6 +327,12 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
            auto& instr = get_idl(outpost_solana_client_detail::CLEANUP_ENVELOPE_CHUNKS_INSTRUCTION);
            program_invoke_data_items params = {fc::variant(epoch_index)};
            return execute_tx_and_confirm(instr, cleanup_envelope_chunks_accounts(epoch_index), params,
+                                         outpost_solana_client_detail::ENVELOPE_CHUNK_CLEANUP_CONFIRM_OPTIONS);
+        })
+      , cleanup_epoch_deliveries([this](uint32_t epoch_index) -> std::string {
+           auto& instr = get_idl(outpost_solana_client_detail::CLEANUP_EPOCH_DELIVERIES_INSTRUCTION);
+           program_invoke_data_items params = {fc::variant(epoch_index)};
+           return execute_tx_and_confirm(instr, cleanup_epoch_deliveries_accounts(epoch_index), params,
                                          outpost_solana_client_detail::ENVELOPE_CHUNK_CLEANUP_CONFIRM_OPTIONS);
         })
       // Retained as the program's explicit recovery/admin escape hatch. The
