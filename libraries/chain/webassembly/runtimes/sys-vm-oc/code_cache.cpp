@@ -1,4 +1,5 @@
 #include <sysio/chain/webassembly/sys-vm-oc/code_cache.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/code_cache_header.hpp>
 #include <sysio/chain/webassembly/sys-vm-oc/config.hpp>
 #include <sysio/chain/webassembly/common.hpp>
 #include <sysio/chain/webassembly/sys-vm-oc/memory.hpp>
@@ -18,17 +19,6 @@ namespace sysio { namespace chain { namespace sysvmoc {
 static constexpr size_t header_offset = 512u;
 static constexpr size_t header_size = 512u;
 static constexpr size_t total_header_size = header_offset + header_size;
-// Cache-file magic. Bumped (and moved off the inherited "EOSVMOC2" byte value) when the intrinsic table was
-// renumbered: OC bakes ordinal-derived dispatch offsets into the generated machine code, so a cache produced
-// under any other intrinsic table must be discarded even though its file format is otherwise readable.
-// Bump this (together with current_codegen_version) on ANY change to intrinsic ordinals or gs-region layout.
-static constexpr uint64_t header_id = 0x32434f4d56535953ULL; //"SYSVMOC2" little endian
-
-struct code_cache_header {
-   uint64_t id = header_id;
-   bool dirty = false;
-   uintptr_t serialized_descriptor_index = 0;
-} __attribute__ ((packed));
 static constexpr size_t header_dirty_bit_offset_from_file_start = header_offset + offsetof(code_cache_header, dirty);
 static constexpr size_t descriptor_ptr_from_file_start = header_offset + offsetof(code_cache_header, serialized_descriptor_index);
 
@@ -310,9 +300,10 @@ code_cache_base::code_cache_base(const std::filesystem::path& data_dir, const sy
       std::ifstream hs(_cache_file_path.generic_string(), std::ifstream::binary);
       hs.read(header_buff, sizeof(header_buff));
       SYS_ASSERT(!hs.fail(), bad_database_version_exception, "failed to read code cache header");
-      memcpy((char*)&cache_header, header_buff + header_offset, sizeof(cache_header));
+      cache_header = read_code_cache_header({header_buff + header_offset, sizeof(cache_header)});
 
-      SYS_ASSERT(cache_header.id == header_id, bad_database_version_exception, "existing SYS VM OC code cache not compatible with this version");
+      SYS_ASSERT(cache_header.id == code_cache_header::magic, bad_database_version_exception,
+                 "existing SYS VM OC code cache not compatible with this version");
       SYS_ASSERT(!cache_header.dirty, database_exception, "code cache is dirty");
    };
 

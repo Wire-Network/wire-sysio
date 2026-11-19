@@ -198,7 +198,6 @@ them change how the node starts or make it print something and exit.
 | `vote-threads` | unset | Number of worker threads in the vote processor pool. On a node with `producer-name` both an unset value and an explicit 0 are replaced by 4, so voting cannot be disabled there. Elsewhere, unset leaves the pool at 0 and the node neither accepts nor propagates votes on P2P. |
 | `abi-serializer-max-time-ms` | `100` | Maximum time, in milliseconds, to build the serializer for one ABI and to convert one action's data or table row. It is also the time a `get_block` or transaction response may spend building serializers and decoding action data, all together; actions left once that time is spent are returned as hex only. See [ABI conversions](#abi-conversions). |
 | `signature-cpu-billable-pct` | `50` | Percentage of actual signature-recovery CPU to bill, as a whole number. |
-| `maximum-variable-signature-length` | `16384` | Subjective limit, in bytes, on the variable components of a variable-length signature. |
 
 ### Execution runtime
 

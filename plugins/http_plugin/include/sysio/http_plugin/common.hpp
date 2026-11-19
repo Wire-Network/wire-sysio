@@ -2,11 +2,11 @@
 
 #include <magic_enum/magic_enum.hpp>
 
-#include <sysio/chain/thread_utils.hpp>// for thread pool
 #include <sysio/http_plugin/http_plugin.hpp>
 
 #include <fc/io/raw.hpp>
 #include <fc/log/logger_config.hpp>
+#include <fc/thread_utils.hpp>
 #include <fc/time.hpp>
 #include <fc/utility.hpp>
 #include <fc/network/listener.hpp>
@@ -174,7 +174,7 @@ struct http_plugin_state {
 
    uint16_t thread_pool_size = 2;
    struct http; // http is a namespace so use an embedded type for the named_thread_pool tag
-   sysio::chain::named_thread_pool<http> thread_pool;
+   fc::named_thread_pool<http> thread_pool;
 
    fc::logger& logger;
    std::function<void(http_plugin::metrics)> update_metrics;

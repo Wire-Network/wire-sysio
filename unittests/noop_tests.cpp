@@ -62,6 +62,26 @@ BOOST_FIXTURE_TEST_CASE(noop, sysio::testing::validating_tester) { try {
 
 } FC_LOG_AND_RETHROW() }
 
+// trx_generator's transfer load goes to the noop contract's transfer, which checks the sender's authority and changes
+// nothing, so the load needs no token contract or balances.
+BOOST_FIXTURE_TEST_CASE(transfer_checks_sender_authority, sysio::testing::validating_tester) { try {
+   constexpr auto contract = "noop"_n;
+   constexpr auto sender   = "alice"_n;
+   constexpr auto receiver = "bob"_n;
+   create_accounts({contract, sender, receiver});
+   set_contract(contract, test_contracts::noop_wasm(), test_contracts::noop_abi());
+   produce_block();
+
+   const auto transfer = mutable_variant_object()("from", sender)("to", receiver)("quantity", "1.0000 CUR")
+                                                 ("memo", "load");
+   auto trace = push_action(contract, "transfer"_n, sender, transfer);
+   BOOST_REQUIRE(trace->receipt);
+   produce_block();
+
+   // Signed by the receiver instead of the sender.
+   BOOST_CHECK_THROW(push_action(contract, "transfer"_n, receiver, transfer), missing_auth_exception);
+} FC_LOG_AND_RETHROW() }
+
 // Deployed chains leave sysio.noop without a contract so nobody can push free no-op transactions, while contracts may
 // notify it or send it inline actions as events. Those are billed to the originating action's payer, not sysio.noop.
 BOOST_FIXTURE_TEST_CASE(inline_and_notify_to_account_without_contract, sysio::testing::validating_tester) { try {

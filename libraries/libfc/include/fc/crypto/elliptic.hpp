@@ -27,6 +27,12 @@ namespace fc {
     typedef fc::sha256                   blinded_hash;
     typedef fc::sha256                   blind_signature;
 
+    /// Header byte of a compact signature by a compressed public key, before its recovery id is added: 27, plus 4 for
+    /// the compressed key. private_key::sign_compact() writes this header plus the recovery id.
+    constexpr unsigned char compact_signature_compressed_header = 31;
+    /// Number of recovery ids a compact signature header can carry
+    constexpr unsigned char compact_signature_recovery_ids = 4;
+
     /**
      *  @class public_key
      *  @brief contains only the public point of an elliptic curve key.
@@ -62,6 +68,11 @@ namespace fc {
 
            unsigned int fingerprint() const;
 
+          /// recover() also takes the high-S form of a signature and the headers for an uncompressed key, so each
+          /// signature has several encodings that recover the same key. Only the form sign_compact() writes is
+          /// canonical. This checks the form, not that c is a valid signature.
+          /// @return true when c is canonical: its header is compact_signature_compressed_header plus a recovery id,
+          ///         r and s are below the curve order, and s is at most half the curve order (low-S)
           static bool is_canonical( const compact_signature& c );
 
         private:

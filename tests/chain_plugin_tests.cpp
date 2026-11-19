@@ -3,6 +3,7 @@
 
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/abi_serializer.hpp>
+#include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/wasm_sysio_constraints.hpp>
 #include <sysio/chain/resource_limits.hpp>
 #include <sysio/chain/exceptions.hpp>
@@ -12,12 +13,15 @@
 
 #include <test_contracts.hpp>
 
+#include <fc/crypto/hex.hpp>
 #include <fc/io/fstream.hpp>
 
 #include <fc/variant_object.hpp>
 #include <fc/io/json.hpp>
 
+#include <algorithm>
 #include <array>
+#include <cstdint>
 #include <functional>
 #include <limits>
 #include <optional>
@@ -285,10 +289,12 @@ BOOST_FIXTURE_TEST_CASE( block_num_string_outside_uint32_is_unknown_block, valid
       {std::to_string(uint32_max + 2), std::nullopt},            // 4294967297: low 32 bits name block 1
       {std::to_string(uint32_max + 1 + head_num), std::nullopt}, // low 32 bits name the head block
       {std::to_string(uint64_max), std::nullopt},                // low 32 bits are 4294967295
-      {"-1", std::nullopt},
-      {"-" + std::to_string(uint32_max), std::nullopt},          // -4294967295: 1 modulo 2^32
-      {"-" + std::to_string(uint64_max), std::nullopt},          // -18446744073709551615: 1 modulo 2^64
    };
+
+   // Neither a number nor a block id. A minus sign makes no block number: "-4294967295" is 1 modulo 2^32 and
+   // "-18446744073709551615" is 1 modulo 2^64.
+   const std::vector<std::string> not_block_num_or_id{
+      "nope", "-1", "-" + std::to_string(uint32_max), "-" + std::to_string(uint64_max)};
 
    for (const auto& [endpoint, lookup_block_num] : endpoints) {
       for (const auto& [block_num_or_id, named] : cases) {
@@ -300,9 +306,10 @@ BOOST_FIXTURE_TEST_CASE( block_num_string_outside_uint32_is_unknown_block, valid
             }
          }
       }
-      // Neither a number nor a block id.
-      BOOST_TEST_CONTEXT(endpoint) {
-         BOOST_CHECK_THROW(lookup_block_num("nope"), block_id_type_exception);
+      for (const std::string& block_num_or_id : not_block_num_or_id) {
+         BOOST_TEST_CONTEXT(endpoint << " " << block_num_or_id) {
+            BOOST_CHECK_THROW(lookup_block_num(block_num_or_id), block_id_type_exception);
+         }
       }
    }
 } FC_LOG_AND_RETHROW() /// block_num_string_outside_uint32_is_unknown_block
@@ -511,6 +518,219 @@ BOOST_FIXTURE_TEST_CASE( permission_satisfies_link_follows_linkauth, validating_
 
    // A permission that does not exist satisfies nothing.
    BOOST_CHECK(!permission_satisfies_link(*control, {"alice"_n, "nosuch"_n}, "bob"_n, "accept"_n));
+} FC_LOG_AND_RETHROW()
+
+/// get_required_keys returns the keys of every declared permission however often and in whatever order actions
+/// declare them, applies the payer rules to each action on its own, and stops at the request deadline.
+BOOST_FIXTURE_TEST_CASE( get_required_keys_duplicate_declarations, validating_tester ) try {
+   produce_block();
+   create_accounts({"alice"_n, "bob"_n}, false, false);
+   produce_block();
+
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   chain_apis::read_only plugin(*control, {}, {}, _tracked_votes, fc::microseconds::maximum(),
+                                fc::microseconds::maximum(), nullptr);
+   const fc::time_point no_deadline = fc::time_point::maximum();
+
+   const public_key_type alice_key = get_public_key("alice"_n, "active");
+   const public_key_type bob_key   = get_public_key("bob"_n, "active");
+   const public_key_type bob_owner = get_public_key("bob"_n, "owner");
+   const public_key_type unrelated = get_public_key("nobody"_n, "active");
+   const flat_set<public_key_type> all_keys{alice_key, bob_key, bob_owner, unrelated};
+
+   const permission_level alice{"alice"_n, config::active_name};
+   const permission_level bob{"bob"_n, config::active_name};
+   const permission_level bob_as_owner{"bob"_n, config::owner_name};
+   const permission_level bob_payer{"bob"_n, config::sysio_payer_name};
+
+   using declarations = std::vector<std::vector<permission_level>>;
+   const auto request = [&](const declarations& actions, const flat_set<public_key_type>& available) {
+      signed_transaction trx;
+      set_transaction_headers(trx);
+      for (const std::vector<permission_level>& authorization : actions)
+         trx.actions.emplace_back(authorization, "alice"_n, "doit"_n, bytes{});
+      return chain_apis::read_only::get_required_keys_params{fc::variant(trx), available};
+   };
+   const auto required_keys = [&](const declarations& actions) {
+      return plugin.get_required_keys(request(actions, all_keys), no_deadline).required_keys;
+   };
+   /// `copies` actions, alternating between the two authorization lists.
+   const auto repeated = [](uint32_t copies, const std::vector<permission_level>& even,
+                            const std::vector<permission_level>& odd) {
+      declarations actions;
+      for (uint32_t i = 0; i < copies; ++i)
+         actions.push_back(i % 2 == 0 ? even : odd);
+      return actions;
+   };
+   constexpr uint32_t many = 2000;
+
+   BOOST_CHECK(required_keys({{alice}}) == (flat_set<public_key_type>{alice_key}));
+   BOOST_CHECK(required_keys({{bob}}) == (flat_set<public_key_type>{bob_key}));
+   BOOST_CHECK(required_keys({{bob_as_owner}}) == (flat_set<public_key_type>{bob_owner}));
+
+   // Duplicates within and across actions, in either order, require each key once.
+   const flat_set<public_key_type> alice_and_bob{alice_key, bob_key};
+   BOOST_CHECK(required_keys({{alice, bob, alice}}) == alice_and_bob);
+   BOOST_CHECK(required_keys(repeated(many, {alice, bob}, {bob, alice})) == alice_and_bob);
+   BOOST_CHECK(required_keys(repeated(many, {bob}, {alice, bob_as_owner})) ==
+              (flat_set<public_key_type>{alice_key, bob_key, bob_owner}));
+
+   // A payer marker needs no key of its own; its pairing is checked on every action.
+   BOOST_CHECK(required_keys({{bob_payer, bob}}) == (flat_set<public_key_type>{bob_key}));
+   BOOST_CHECK(required_keys(repeated(many, {bob_payer, bob}, {alice})) == alice_and_bob);
+   BOOST_CHECK_THROW(required_keys({{bob_payer, alice}, {bob}}), unsatisfied_authorization);
+   BOOST_CHECK_THROW(required_keys(repeated(many, {bob_payer, bob}, {bob_payer, alice})), unsatisfied_authorization);
+   BOOST_CHECK_THROW(required_keys({{alice, bob_payer, bob}}), irrelevant_auth_exception);
+   BOOST_CHECK_THROW(required_keys({{bob_payer, bob_payer, bob}}), irrelevant_auth_exception);
+
+   // A permission the available keys cannot satisfy fails however many times it is declared.
+   BOOST_CHECK_THROW(plugin.get_required_keys(request(repeated(many, {alice}, {bob}), {alice_key}), no_deadline),
+                     unsatisfied_authorization);
+
+   // A deadline already passed stops the request.
+   const fc::time_point passed = fc::time_point::now() - fc::microseconds(1);
+   BOOST_CHECK_THROW(plugin.get_required_keys(request({{alice}}, all_keys), passed), deadline_exception);
+   BOOST_CHECK_THROW(plugin.get_required_keys(request(repeated(many, {alice}, {bob}), all_keys), passed),
+                     deadline_exception);
+} FC_LOG_AND_RETHROW()
+
+/// get_required_keys stops at the request deadline while it evaluates one declared authority: its checktime reaches
+/// the authority evaluation, not only the points between evaluations.
+BOOST_FIXTURE_TEST_CASE( get_required_keys_deadline_inside_evaluation, validating_tester ) try {
+   produce_block();
+   create_accounts({"wide"_n}, false, false);
+   produce_block();
+
+   // A threshold-1 authority whose only available key sorts last, so evaluating it visits every key.
+   constexpr uint32_t key_count = 12000;
+   std::vector<public_key_type> keys;
+   keys.reserve(key_count);
+   for (uint32_t i = 0; i < key_count; ++i)
+      keys.push_back(get_public_key("wide"_n, std::to_string(i)));
+   std::sort(keys.begin(), keys.end());
+   std::vector<key_weight> weights;
+   weights.reserve(key_count);
+   for (const public_key_type& key : keys)
+      weights.push_back(key_weight{key, 1});
+   const permission_level wide{"wide"_n, "wide"_n};
+   set_authority(wide.actor, wide.permission, authority(1, std::move(weights)), config::active_name);
+   produce_block();
+
+   const flat_set<public_key_type> available{keys.back()};
+   signed_transaction              trx;
+   set_transaction_headers(trx);
+   trx.actions.emplace_back(std::vector<permission_level>{wide}, wide.actor, "doit"_n, bytes{});
+
+   // Beyond the two calls get_required_keys makes itself (one for the declared authorization, one before the
+   // permission is evaluated), the checktime is called during the evaluation.
+   uint32_t                    checktime_calls = 0;
+   const std::function<void()> count_calls     = [&checktime_calls]() { ++checktime_calls; };
+   BOOST_CHECK(control->get_authorization_manager().get_required_keys(trx, available, count_calls) == available);
+   BOOST_TEST(checktime_calls > 2u);
+
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   chain_apis::read_only plugin(*control, {}, {}, _tracked_votes, fc::microseconds::maximum(),
+                                fc::microseconds::maximum(), nullptr);
+   const chain_apis::read_only::get_required_keys_params params{fc::variant(trx), available};
+
+   // Without a deadline the request succeeds; the fastest of a few runs measures how long it takes.
+   constexpr int timing_runs = 3;
+   fc::microseconds unbounded = fc::microseconds::maximum();
+   for (int run = 0; run < timing_runs; ++run) {
+      const fc::time_point start = fc::time_point::now();
+      BOOST_CHECK(plugin.get_required_keys(params, fc::time_point::maximum()).required_keys == available);
+      unbounded = std::min(unbounded, fc::time_point::now() - start);
+   }
+   BOOST_TEST_MESSAGE("unbounded get_required_keys " << unbounded.count() << "us");
+
+   // A deadline this fraction of the way through falls inside the evaluation, which takes nearly all of the request.
+   constexpr int64_t deadline_fraction = 8;
+   const fc::time_point deadline = fc::time_point::now() + fc::microseconds(unbounded.count() / deadline_fraction);
+   BOOST_CHECK_THROW(plugin.get_required_keys(params, deadline), deadline_exception);
+} FC_LOG_AND_RETHROW()
+
+/// get_transaction_id reads each action from `hex_data` when it also has `data`, rejects malformed requests, and
+/// converts a request in time proportional to its size.
+BOOST_AUTO_TEST_CASE( get_transaction_id_many_actions ) try {
+   using chain_apis::read_only;
+   constexpr uint32_t action_count = 8000;
+   // Converting a request may take at most this many times as long as parsing its JSON, which is linear in its size.
+   constexpr int64_t max_convert_to_parse_ratio = 10;
+   constexpr int     timing_runs                = 3;
+
+   signed_transaction trx;
+   trx.expiration       = fc::time_point_sec(fc::time_point::from_iso_string("2030-01-01T00:00:00"));
+   trx.ref_block_num    = 1;
+   trx.ref_block_prefix = 2;
+   for (uint32_t i = 0; i < action_count; ++i)
+      trx.actions.emplace_back(std::vector<permission_level>{{"alice"_n, config::active_name}}, "alice"_n, "doit"_n,
+                               fc::raw::pack(i));
+
+   // Every action carries the exploded `data` the endpoint cannot use alongside the `hex_data` it reads.
+   fc::mutable_variant_object request(fc::variant(static_cast<const transaction&>(trx)).get_object());
+   fc::variants                actions;
+   for (uint32_t i = 0; i < action_count; ++i) {
+      const action& act = trx.actions[i];
+      actions.emplace_back(fc::mutable_variant_object()
+         ("account", act.account)
+         ("name", act.name)
+         ("authorization", act.authorization)
+         ("data", fc::mutable_variant_object()("value", i))
+         ("hex_data", fc::to_hex(act.data.data(), act.data.size())));
+   }
+   request["actions"] = std::move(actions);
+   const std::string body = fc::json::to_string(fc::variant(std::move(request)), fc::time_point::maximum());
+
+   BOOST_CHECK(read_only::to_get_transaction_id_params(fc::json::from_string(body)).id() == trx.id());
+
+   const auto elapsed_us = [](const auto& f) {
+      const fc::time_point start = fc::time_point::now();
+      f();
+      return (fc::time_point::now() - start).count();
+   };
+   int64_t parse_us   = std::numeric_limits<int64_t>::max();
+   int64_t convert_us = std::numeric_limits<int64_t>::max();
+   for (int run = 0; run < timing_runs; ++run) {
+      fc::variant                          parsed;
+      read_only::get_transaction_id_params converted;
+      parse_us   = std::min(parse_us, elapsed_us([&] { parsed = fc::json::from_string(body); }));
+      convert_us = std::min(convert_us, elapsed_us([&] {
+         converted = read_only::to_get_transaction_id_params(std::move(parsed));
+      }));
+      BOOST_TEST(converted.actions.size() == action_count);
+   }
+   BOOST_TEST_MESSAGE("parse " << parse_us << "us, convert " << convert_us << "us");
+   BOOST_TEST(convert_us < parse_us * max_convert_to_parse_ratio);
+
+   // `hex_data` wins over a `data` string; a `data` string alone is used as is.
+   const fc::variant first_action = fc::variant(trx.actions[0]);
+   const auto with_actions = [&](fc::variants acts) {
+      fc::mutable_variant_object single(fc::variant(static_cast<const transaction&>(trx)).get_object());
+      single["actions"] = std::move(acts);
+      return fc::variant(std::move(single));
+   };
+   transaction one_action = trx;
+   one_action.actions.resize(1);
+   const fc::variant          hex_data = first_action["data"];
+   fc::mutable_variant_object stale_data(first_action.get_object());
+   stale_data["hex_data"] = hex_data;
+   stale_data["data"]     = "00";
+   BOOST_CHECK(read_only::to_get_transaction_id_params(with_actions({fc::variant(std::move(stale_data))})).id() ==
+              one_action.id());
+   BOOST_CHECK(read_only::to_get_transaction_id_params(with_actions({first_action})).id() == one_action.id());
+
+   // Malformed requests.
+   fc::mutable_variant_object exploded_only(first_action.get_object());
+   exploded_only["data"] = fc::mutable_variant_object()("value", 0);
+   fc::mutable_variant_object no_actions(fc::variant(static_cast<const transaction&>(trx)).get_object());
+   no_actions.erase("actions");
+   BOOST_CHECK_THROW(read_only::to_get_transaction_id_params(fc::variant("not an object")), invalid_http_request);
+   BOOST_CHECK_THROW(read_only::to_get_transaction_id_params(fc::variant(std::move(no_actions))),
+                     invalid_http_request);
+   BOOST_CHECK_THROW(read_only::to_get_transaction_id_params(with_actions({fc::variant(1)})), invalid_http_request);
+   BOOST_CHECK_THROW(read_only::to_get_transaction_id_params(with_actions({fc::variant(std::move(exploded_only))})),
+                     invalid_http_request);
+   BOOST_CHECK_THROW(read_only::to_get_transaction_id_params(fc::variant(transaction())), invalid_http_request);
 } FC_LOG_AND_RETHROW()
 
 /// Packing a transaction request runs under the request deadline: past it, push_transaction, send_transaction,

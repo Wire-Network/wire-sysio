@@ -1,5 +1,6 @@
 #pragma once
 #include <sysio/chain/wasm_interface.hpp>
+#include <fc/time.hpp>
 #include <fc/utility.hpp>
 
 namespace sysio::chain::config {
@@ -47,6 +48,8 @@ namespace sysio::chain::config {
   static constexpr int      block_interval_ms = 500;
   static constexpr int      block_interval_us = block_interval_ms*1000;
   static constexpr uint64_t block_timestamp_epoch = 1735689600000ull; // epoch is year 2025.
+  /// Clock skew tolerated between nodes. A block timestamped more than this after the local clock is from the future.
+  static constexpr fc::microseconds allowed_clock_skew = fc::seconds(15);
 
   /** Percentages are fixed point with a denominator of 10,000 */
   static constexpr int percent_100 = 10000;
@@ -92,9 +95,9 @@ namespace sysio::chain::config {
   static constexpr uint32_t   default_production_pause_vote_timeout_ms     = 6u*1000u; // 6 seconds
   static constexpr uint16_t   default_controller_thread_pool_size          = 4;
   static constexpr uint16_t   default_vote_thread_pool_size                = 4;
-  static constexpr uint32_t   default_max_variable_signature_length        = 16384u;
   static constexpr uint32_t   default_max_action_return_value_size         = 1024;
   static constexpr uint32_t   default_max_reversible_blocks                = 3600u;
+  static constexpr uint32_t   default_incoming_trx_max_signatures          = 256u; ///< default most signatures a transaction received over p2p or the API may carry
 
   static constexpr uint32_t   default_max_transaction_finality_status_success_duration_sec = 180;
   static constexpr uint32_t   default_max_transaction_finality_status_failure_duration_sec = 180;
@@ -134,8 +137,15 @@ namespace sysio::chain::config {
 
   static constexpr uint32_t   hashing_checktime_block_size       = 10*1024;  /// call checktime from hashing intrinsic once per this number of bytes
 
+  /// Pairs per Miller loop in bls_pairing; keeps line coefficients within 612 KiB and the extra squarings under 2%.
+  static constexpr uint32_t   bls_pairing_batch_size             = 32;
+
   /// Consensus limit bounding one uninterrupted libsodium Ed25519 verification.
   static constexpr uint32_t   max_ed25519_message_size          = 65'536;
+
+  /// Consensus limit, in bytes, on a signature's variable-size component (`fc::crypto::signature::variable_size()`:
+  /// WebAuthn authenticator data plus client data JSON).
+  static constexpr uint32_t   max_signature_variable_size       = 16'384;
 
   /// Consensus limit, in bytes, on each of the base and the modulus that mod_exp accepts.
   static constexpr uint32_t   max_mod_exp_operand_size          = 8'192;

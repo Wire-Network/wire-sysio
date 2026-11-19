@@ -11,6 +11,8 @@
 #include <fc/utf8.hpp>
 #include <algorithm>
 #include <cassert>
+#include <cmath>
+#include <concepts>
 #include <cstring>
 #include <format>
 #include <functional>
@@ -605,6 +607,40 @@ bool variant::is_blob()const
    return get_type() == blob_type;
 }
 
+namespace {
+
+/// Throws the parse_error_exception for `value`, a number outside the range of the integer type `T`.
+template<std::integral T>
+[[noreturn]] void throw_out_of_integer_range(const auto value) {
+   detail::throw_out_of_range(std::format("{}", value), get_typename<T>::name(),
+                              std::to_string(std::numeric_limits<T>::min()),
+                              std::to_string(std::numeric_limits<T>::max()));
+}
+
+/// `value` as a `T`.
+/// @throw parse_error_exception if `value` is outside the range of `T`
+template<std::integral T>
+T checked_cast(const std::integral auto value) {
+   if (!std::in_range<T>(value))
+      throw_out_of_integer_range<T>(value);
+   return static_cast<T>(value);
+}
+
+/// `value` truncated toward zero, as a `T`.
+/// @throw parse_error_exception if the truncated value is outside the range of `T`, or `value` is NaN
+template<std::integral T>
+T truncating_cast(const double value) {
+   // Zero and powers of two are exact in a double, where the maximum of T itself may not be.
+   constexpr double min          = static_cast<double>(std::numeric_limits<T>::min());
+   constexpr double max_plus_one = 2.0 * static_cast<double>(T{1} << (std::numeric_limits<T>::digits - 1));
+   const double     truncated    = std::trunc(value);
+   if (!(truncated >= min && truncated < max_plus_one)) // NaN fails both comparisons
+      throw_out_of_integer_range<T>(value);
+   return static_cast<T>(truncated);
+}
+
+} // anonymous namespace
+
 int64_t variant::as_int64()const
 {
    switch( get_type() )
@@ -614,11 +650,11 @@ int64_t variant::as_int64()const
       case string_sso_type:
           return to_int64(read_sso(this));
       case double_type:
-          return int64_t(load_payload<double>());
+          return truncating_cast<int64_t>(load_payload<double>());
       case int64_type:
           return load_payload<int64_t>();
       case uint64_type:
-          return int64_t(load_payload<uint64_t>());
+          return checked_cast<int64_t>(load_payload<uint64_t>());
       case bool_type:
           return load_payload<bool>();
       case null_type:
@@ -637,9 +673,9 @@ uint64_t variant::as_uint64()const
       case string_sso_type:
           return to_uint64(read_sso(this));
       case double_type:
-          return static_cast<uint64_t>(load_payload<double>());
+          return truncating_cast<uint64_t>(load_payload<double>());
       case int64_type:
-          return static_cast<uint64_t>(load_payload<int64_t>());
+          return checked_cast<uint64_t>(load_payload<int64_t>());
       case uint64_type:
           return load_payload<uint64_t>();
       case bool_type:
@@ -996,14 +1032,6 @@ void from_variant( const variant& var,  variant& vo ) { vo = var; }
 
 namespace {
 
-/// Throws the parse_error_exception for `value`, a number outside the range of the narrow integer type `T`.
-template<std::integral T>
-[[noreturn]] void throw_out_of_narrow_range(const auto value) {
-   detail::throw_out_of_range(std::format("{}", value), get_typename<T>::name(),
-                              std::to_string(int64_t{std::numeric_limits<T>::min()}),
-                              std::to_string(int64_t{std::numeric_limits<T>::max()}));
-}
-
 /**
  * Converts `var` to `T`, an integer type narrower than the 64 bits a variant holds an integer in.
  *
@@ -1016,33 +1044,21 @@ template<std::integral T>
 template<std::integral T>
    requires(std::numeric_limits<T>::digits < std::numeric_limits<double>::digits)
 T as_narrow_integer(const variant& var) {
-   const auto narrow = [](const auto value) -> T {
-      if (!std::in_range<T>(value))
-         throw_out_of_narrow_range<T>(value);
-      return static_cast<T>(value);
-   };
-
    switch (var.get_type()) {
    case variant::int64_type:
-      return narrow(var.as_int64());
+      return checked_cast<T>(var.as_int64());
    case variant::uint64_type:
-      return narrow(var.as_uint64());
-   case variant::double_type: {
-      // One below the minimum and one above the maximum are exact in a double. NaN fails both comparisons.
-      const double value = var.as_double();
-      if (!(value > static_cast<double>(std::numeric_limits<T>::min()) - 1 &&
-            value < static_cast<double>(std::numeric_limits<T>::max()) + 1))
-         throw_out_of_narrow_range<T>(value);
-      return static_cast<T>(value);
-   }
+      return checked_cast<T>(var.as_uint64());
+   case variant::double_type:
+      return truncating_cast<T>(var.as_double());
    case variant::string_type:
    case variant::string_sso_type: {
-      // to_uint64() reads "-n" as 2^64 - n, so a negative number is parsed as signed.
+      // A negative number is parsed as signed, so it is a range error for an unsigned `T`, not a parse error.
       const std::string_view text = var.get_string();
-      return text.starts_with('-') ? narrow(to_int64(text)) : narrow(to_uint64(text));
+      return text.starts_with('-') ? checked_cast<T>(to_int64(text)) : checked_cast<T>(to_uint64(text));
    }
    default: // a bool, or null as zero; any other type throws bad_cast_exception
-      return std::is_signed_v<T> ? narrow(var.as_int64()) : narrow(var.as_uint64());
+      return std::is_signed_v<T> ? checked_cast<T>(var.as_int64()) : checked_cast<T>(var.as_uint64());
    }
 }
 
@@ -1290,11 +1306,21 @@ std::string format_string( const std::string& frmt, const variant_object& args, 
    void to_variant( unsigned long long int s, variant& v ) { v = variant( uint64_t(s)); }
    #endif
 
+   namespace {
+
+   /// The value of `v`, an int64, uint64, bool or null variant, in a type that holds every int64 and uint64.
+   fc::int128 as_wide_integer( const variant& v )
+   {
+      return v.is_uint64() ? static_cast<fc::int128>(v.as_uint64()) : static_cast<fc::int128>(v.as_int64());
+   }
+
+   } // anonymous namespace
+
    bool operator == ( const variant& a, const variant& b )
    {
       if( a.is_string()  || b.is_string() ) return a.as_string() == b.as_string();
       if( a.is_double()  || b.is_double() ) return a.as_double() == b.as_double();
-      if( a.is_int64()   || b.is_int64() )  return a.as_int64() == b.as_int64();
+      if( a.is_int64()   || b.is_int64() )  return as_wide_integer(a) == as_wide_integer(b);
       if( a.is_uint64()  || b.is_uint64() ) return a.as_uint64() == b.as_uint64();
       if( a.is_array()   || b.is_array() )  return a.get_array() == b.get_array();
       return false;
@@ -1314,7 +1340,7 @@ std::string format_string( const std::string& frmt, const variant_object& args, 
    {
       if( a.is_string()  || b.is_string() ) return a.as_string() < b.as_string();
       if( a.is_double()  || b.is_double() ) return a.as_double() < b.as_double();
-      if( a.is_int64()   || b.is_int64() )  return a.as_int64() < b.as_int64();
+      if( a.is_int64()   || b.is_int64() )  return as_wide_integer(a) < as_wide_integer(b);
       if( a.is_uint64()  || b.is_uint64() ) return a.as_uint64() < b.as_uint64();
       FC_ASSERT( false, "Invalid operation" );
    }
@@ -1323,7 +1349,7 @@ std::string format_string( const std::string& frmt, const variant_object& args, 
    {
       if( a.is_string()  || b.is_string() ) return a.as_string() > b.as_string();
       if( a.is_double()  || b.is_double() ) return a.as_double() > b.as_double();
-      if( a.is_int64()   || b.is_int64() )  return a.as_int64() > b.as_int64();
+      if( a.is_int64()   || b.is_int64() )  return as_wide_integer(a) > as_wide_integer(b);
       if( a.is_uint64()  || b.is_uint64() ) return a.as_uint64() > b.as_uint64();
       FC_ASSERT( false, "Invalid operation" );
    }
@@ -1332,7 +1358,7 @@ std::string format_string( const std::string& frmt, const variant_object& args, 
    {
       if( a.is_string()  || b.is_string() ) return a.as_string() <= b.as_string();
       if( a.is_double()  || b.is_double() ) return a.as_double() <= b.as_double();
-      if( a.is_int64()   || b.is_int64() )  return a.as_int64() <= b.as_int64();
+      if( a.is_int64()   || b.is_int64() )  return as_wide_integer(a) <= as_wide_integer(b);
       if( a.is_uint64()  || b.is_uint64() ) return a.as_uint64() <= b.as_uint64();
       FC_ASSERT( false, "Invalid operation" );
    }

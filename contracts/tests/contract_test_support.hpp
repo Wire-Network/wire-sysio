@@ -399,6 +399,24 @@ inline constexpr const char* frozen_message = "the andon cord is pulled: funds c
 
 } // namespace andon
 
+// ---------------------------------------------------------------------------
+//  sysio.system: what the depot runs on sysio, for the suites of contracts that send it actions
+// ---------------------------------------------------------------------------
+
+namespace system_contract {
+
+/// Deploy `wasm` and `abi` on sysio in place of the tester's sysio.bios, so the sysio.system actions another
+/// contract sends inline (as sysio.bond sends `addsubjex`) reach a contract that defines them. Create system
+/// accounts first: under sysio.system a new account gets only the base RAM of `newaccount`.
+template <typename Tester>
+void deploy(Tester& tester, const std::vector<uint8_t>& wasm, const std::vector<char>& abi) {
+   tester.set_code(config::system_account_name, wasm);
+   tester.set_abi(config::system_account_name, abi.data());
+   tester.produce_blocks();
+}
+
+} // namespace system_contract
+
 /// secp256k1 encodings for tests that feed the depot keys which are not curve points. libsecp256k1
 /// (through fc) is the oracle the contracts' own `mod_exp` arithmetic is checked against.
 namespace secp256k1 {

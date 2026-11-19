@@ -12,6 +12,8 @@
 #include <fc/io/datastream.hpp>
 #include <fc/io/raw.hpp>
 
+#include <secp256k1.h>
+
 #include <algorithm>
 #include <variant>
 
@@ -332,6 +334,66 @@ BOOST_AUTO_TEST_CASE(test_em_is_canonical) try {
 
    BOOST_TEST(em::public_key::is_canonical(sig.get<em::signature_shim>()._data));
    BOOST_TEST(!em::public_key::is_canonical(non_canonical.get<em::signature_shim>()._data));
+} FC_LOG_AND_RETHROW();
+
+namespace {
+/// Header byte of a K1 compact signature by a compressed key less that of one by an uncompressed key
+constexpr unsigned char k1_compressed_header_offset = 4;
+/// Offsets of r and s in a K1 compact signature: the header byte, then r, then s
+constexpr size_t k1_r_offset = 1;
+constexpr size_t k1_s_offset = 33;
+/// Size of r and of s
+constexpr size_t k1_scalar_size = 32;
+/// Number of digests test_k1_is_canonical signs
+constexpr int k1_canonical_digests = 16;
+
+/// @return the high-S form of the canonical K1 signature sig, which recovers the same key: s negated modulo the curve
+///         order, which flips the parity of the recovery id
+ecc::compact_signature k1_high_s_form(ecc::compact_signature sig) {
+   static secp256k1_context* const ctx = secp256k1_context_create(SECP256K1_CONTEXT_NONE);
+   // s is a scalar below the curve order, which secret key negation takes to the curve order less s
+   BOOST_REQUIRE(secp256k1_ec_seckey_negate(ctx, sig.data() + k1_s_offset));
+   sig[0] = ecc::compact_signature_compressed_header + ((sig[0] - ecc::compact_signature_compressed_header) ^ 1);
+   return sig;
+}
+} // namespace
+
+BOOST_AUTO_TEST_CASE(test_k1_is_canonical) try {
+   const private_key key = private_key::from_string("5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3");
+   // headers below every compact signature header, and the first above those of a compressed key
+   const std::array<unsigned char, 3> bad_headers{
+      0, ecc::compact_signature_compressed_header - k1_compressed_header_offset - 1,
+      ecc::compact_signature_compressed_header + ecc::compact_signature_recovery_ids };
+
+   for (int n = 0; n < k1_canonical_digests; ++n) {
+      const sha256 digest = sha256::hash("k1 canonical form " + std::to_string(n));
+      const ecc::compact_signature sig = key.sign(digest).get<ecc::signature_shim>()._data;
+      const ecc::public_key expected = ecc::public_key::recover(sig, digest);
+      BOOST_TEST(ecc::public_key::is_canonical(sig));
+
+      // the other forms of the signature recover the same key, and are not canonical
+      const ecc::compact_signature high_s = k1_high_s_form(sig);
+      BOOST_TEST((ecc::public_key::recover(high_s, digest) == expected));
+      BOOST_TEST(!ecc::public_key::is_canonical(high_s));
+
+      ecc::compact_signature uncompressed = sig;
+      uncompressed[0] -= k1_compressed_header_offset;
+      BOOST_TEST((ecc::public_key::recover(uncompressed, digest) == expected));
+      BOOST_TEST(!ecc::public_key::is_canonical(uncompressed));
+
+      for (const unsigned char header : bad_headers) {
+         ecc::compact_signature bad_header = sig;
+         bad_header[0] = header;
+         BOOST_TEST(!ecc::public_key::is_canonical(bad_header));
+      }
+
+      // r or s not below the curve order
+      for (const size_t offset : { k1_r_offset, k1_s_offset }) {
+         ecc::compact_signature overflow = sig;
+         std::fill_n(overflow.begin() + offset, k1_scalar_size, 0xff);
+         BOOST_TEST(!ecc::public_key::is_canonical(overflow));
+      }
+   }
 } FC_LOG_AND_RETHROW();
 
 // public_key::operator< must order key bytes UNSIGNED (it routes through

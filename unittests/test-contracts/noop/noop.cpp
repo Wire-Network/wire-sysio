@@ -8,3 +8,11 @@ void noop::anyaction( name                       from,
 {
    require_auth( from );
 }
+
+void noop::transfer( name                       from,
+                     const ignore<name>&        to,
+                     const ignore<asset>&       quantity,
+                     const ignore<std::string>& memo )
+{
+   require_auth( from );
+}
