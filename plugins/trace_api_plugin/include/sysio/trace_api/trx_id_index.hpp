@@ -121,11 +121,11 @@ private:
    /// Release the mapping and clear its bucket view.
    void unmap() noexcept;
 
-   /// Native bucket representations immediately after the mapped header; reads return live values.
+   /// Bucket array following the header.
    fc::read_only_array_view<trx_id_bucket> _buckets;
-   void*                _map_base     = nullptr;
-   std::size_t          _map_size     = 0;
-   bool                 _valid        = false;
+   void* _map_base = nullptr;
+   std::size_t _map_size = 0;
+   bool _valid = false;
 };
 
 } // namespace sysio::trace_api

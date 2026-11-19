@@ -5,13 +5,22 @@
 
 #include <sysio/trace_api/trx_id_index.hpp>
 #include <sysio/trace_api/test_common.hpp>
-#include <sysio/trace_api/trx_id_index_test_utils.hpp>
+
+#include <cstring>
 
 using namespace sysio;
 using namespace sysio::trace_api;
 using namespace sysio::trace_api::test_common;
 
 namespace {
+
+/// Build a transaction ID with a controlled native hash prefix and an optional distinct final byte.
+chain::transaction_id_type make_trx_id(uint64_t prefix64, uint8_t disambiguator = 0) {
+   chain::transaction_id_type id;
+   std::memcpy(id.data(), &prefix64, sizeof(prefix64));
+   id.data()[id.data_size() - 1] = disambiguator;
+   return id;
+}
 
 /// Distinct records used to verify that moving a reader transfers the intended mapping.
 constexpr uint64_t first_move_prefix = 1;

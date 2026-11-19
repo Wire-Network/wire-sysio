@@ -16,8 +16,3 @@ target_link_libraries( test_trace_api_plugin trace_api_plugin )
 target_include_directories( test_trace_api_plugin PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" )
 
 add_p_test(NAME test_trace_api_plugin COMMAND plugins/trace_api_plugin/test/test_trace_api_plugin)
-
-# Optional performance probe; timing is kept out of pass/fail test discovery.
-add_executable(benchmark_trx_id_index EXCLUDE_FROM_ALL benchmark_trx_id_index.cpp)
-target_link_libraries(benchmark_trx_id_index PRIVATE trace_api_plugin)
-target_include_directories(benchmark_trx_id_index PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")

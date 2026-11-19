@@ -182,23 +182,23 @@ trx_id_index_reader::trx_id_index_reader(trx_id_index_reader&& other) noexcept
    , _map_base(other._map_base)
    , _map_size(other._map_size)
    , _valid(other._valid) {
-   other._buckets      = {};
-   other._map_base     = nullptr;
-   other._map_size     = 0;
-   other._valid        = false;
+   other._buckets = {};
+   other._map_base = nullptr;
+   other._map_size = 0;
+   other._valid = false;
 }
 
 trx_id_index_reader& trx_id_index_reader::operator=(trx_id_index_reader&& other) noexcept {
    if (this != &other) {
       unmap();
-      _buckets      = other._buckets;
-      _map_base     = other._map_base;
-      _map_size     = other._map_size;
-      _valid        = other._valid;
-      other._buckets      = {};
-      other._map_base     = nullptr;
-      other._map_size     = 0;
-      other._valid        = false;
+      _buckets = other._buckets;
+      _map_base = other._map_base;
+      _map_size = other._map_size;
+      _valid = other._valid;
+      other._buckets = {};
+      other._map_base = nullptr;
+      other._map_size = 0;
+      other._valid = false;
    }
    return *this;
 }
