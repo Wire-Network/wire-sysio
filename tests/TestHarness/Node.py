@@ -297,6 +297,24 @@ class Node(Transactions):
         Utils.Print(f"Head block {head} is near a state-history-stride boundary, waiting for block {safeBlock}")
         return self.waitForBlock(safeBlock, timeout=timeout)
 
+    def pauseProduction(self, timeout=60):
+        """Pause block production and return the head block number once the head stops advancing.
+
+        A pause does not abort the block already in production, so the head can still advance after
+        the pause request returns. The head is read once a second, longer than the block interval,
+        until two consecutive reads agree. Exits the test if the head is still advancing after
+        `timeout` seconds."""
+        self.processUrllibRequest("producer", "pause", exitOnError=True)
+        head = self.getHeadBlockNum()
+        deadline = time.monotonic() + timeout
+        while time.monotonic() < deadline:
+            time.sleep(1)
+            newHead = self.getHeadBlockNum()
+            if newHead == head:
+                return head
+            head = newHead
+        Utils.errorExit(f"producer head did not settle after pause (still advancing at {head})")
+
     def waitForAnyProducer(self, producers, timeout=None, exitOnError=False):
         if timeout is None:
             # default to the typical configuration of 21 producers, each producing 12 blocks in a row (every 1/2 second)

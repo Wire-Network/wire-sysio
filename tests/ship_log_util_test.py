@@ -6,7 +6,6 @@ import shutil
 import signal
 import subprocess
 import tempfile
-import time
 
 from TestHarness import Cluster, TestHelper, Utils, WalletMgr
 
@@ -123,18 +122,8 @@ try:
         "producer did not advance clear of a state-history-stride boundary"
 
     Print("Pause producer and stop both nodes")
-    prodNode.processUrllibRequest("producer", "pause", exitOnError=True)
-    # pause can return while one more block is mid-production; wait for the head to settle so the
-    # ids captured below cover every block the ship logs can end on
-    headBlock = prodNode.getHeadBlockNum()
-    for _ in range(60):
-        time.sleep(1)
-        newHead = prodNode.getHeadBlockNum()
-        if newHead == headBlock:
-            break
-        headBlock = newHead
-    else:
-        Utils.errorExit(f"producer head did not settle after pause (still advancing at {headBlock})")
+    # the settled head makes the ids captured below cover every block the ship logs can end on
+    headBlock = prodNode.pauseProduction()
     shipNode.waitForBlock(headBlock)
 
     # capture chain block ids while the node is still up; the offline block-id checks below compare

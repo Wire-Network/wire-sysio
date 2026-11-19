@@ -122,9 +122,11 @@ try:
     assert prodNode.waitForBlockClearOfStride(shipStride, timeout=30), \
         "producer did not advance clear of a state-history-stride boundary"
 
-    prodNode.processUrllibRequest("producer", "pause", exitOnError=True)
-    blockNum = prodNode.getHeadBlockNum()
-    shipNode.waitForBlock(blockNum)
+    # The SHiP node must apply the producer's last block before it stops. A received block it has not
+    # applied stays in its fork database and is applied on the next relaunch, which appends to the
+    # log the tests below expect to be unchanged.
+    blockNum = prodNode.pauseProduction()
+    assert shipNode.waitForBlock(blockNum), f"shipNode did not reach the producer head {blockNum}"
     prodNode.kill(signal.SIGTERM)
     shipNode.kill(signal.SIGTERM)
 
