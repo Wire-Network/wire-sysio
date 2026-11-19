@@ -36,6 +36,10 @@ struct unapplied_transaction {
  * Track unapplied transactions for incoming, forked blocks, and aborted blocks.
  */
 class unapplied_transaction_queue {
+public:
+   /// Bytes in one MiB, the unit of the incoming-transaction-queue-size-mb option.
+   static constexpr uint64_t bytes_per_mb = 1024 * 1024;
+
 private:
    struct by_trx_id;
    struct by_type;
@@ -52,8 +56,8 @@ private:
    > unapplied_trx_queue_type;
 
    unapplied_trx_queue_type queue;
-   uint64_t max_transaction_queue_size = 1024*1024*1024; // enforced for incoming
-   uint64_t size_in_bytes = 0;
+   uint64_t max_transaction_queue_size = 1024 * bytes_per_mb; // enforced for incoming
+   uint64_t queued_bytes = 0;
    size_t incoming_count = 0;
 
 public:
@@ -70,10 +74,17 @@ public:
 
    void clear() {
       queue.clear();
+      queued_bytes = 0;
+      incoming_count = 0;
    }
 
    size_t incoming_size()const {
       return incoming_count;
+   }
+
+   /// Estimated memory held by all queued transactions (incoming, forked and aborted), in bytes.
+   uint64_t size_in_bytes()const {
+      return queued_bytes;
    }
 
    transaction_metadata_ptr get_trx( const transaction_id_type& id ) const {
@@ -123,24 +134,39 @@ public:
       }
    }
 
+   /// Forked transactions are not limited by the max transaction queue size; their bytes count toward it.
    void add_forked( const transaction_metadata_ptr& trx ) {
       auto insert_itr = queue.insert( { trx, trx_enum_type::forked } );
-      if( insert_itr.second ) added( insert_itr.first );
+      if( insert_itr.second ) added( insert_itr.first, calc_size( trx ) );
    }
 
+   /// Aborted transactions are not limited by the max transaction queue size; their bytes count toward it.
    void add_aborted( deque<transaction_metadata_ptr> aborted_trxs ) {
       for( auto& trx : aborted_trxs ) {
+         const uint64_t size = calc_size( trx );
          auto insert_itr = queue.insert( { std::move( trx ), trx_enum_type::aborted } );
-         if( insert_itr.second ) added( insert_itr.first );
+         if( insert_itr.second ) added( insert_itr.first, size );
       }
    }
 
+   /**
+    * Queue an incoming transaction. A different metadata for an already queued id is answered with tx_duplicate
+    * through `next`.
+    * @throws tx_resource_exhaustion if the transaction would take the queue past the max transaction queue size;
+    *         the queue is left unchanged and `next` is not kept.
+    */
    void add_incoming( const transaction_metadata_ptr& trx, bool api_trx, bool return_failure_trace, next_func_t next ) {
-      auto itr = queue.get<by_trx_id>().find( trx->id() );
-      if( itr == queue.get<by_trx_id>().end() ) {
+      auto& idx = queue.get<by_trx_id>();
+      auto itr = idx.find( trx->id() );
+      if( itr == idx.end() ) {
+         const uint64_t size = calc_size( trx );
+         SYS_ASSERT( fits( size ), tx_resource_exhaustion,
+                     "Transaction {}, size {} bytes would exceed configured "
+                     "incoming-transaction-queue-size-mb {}, current queue size {} bytes",
+                     trx->id(), size, max_transaction_queue_size / bytes_per_mb, queued_bytes );
          auto insert_itr = queue.insert(
                { trx, api_trx ? trx_enum_type::incoming_api : trx_enum_type::incoming_p2p, return_failure_trace, std::move( next ) } );
-         if( insert_itr.second ) added( insert_itr.first );
+         if( insert_itr.second ) added( insert_itr.first, size );
       } else {
          if( itr->trx_meta == trx ) return; // same trx meta pointer
          if( next ) {
@@ -175,25 +201,30 @@ public:
    }
 
 private:
+   static bool is_incoming( trx_enum_type t ) {
+      return t == trx_enum_type::incoming_p2p || t == trx_enum_type::incoming_api;
+   }
+
+   /// True if `size` more bytes stay within the max transaction queue size. Forked and aborted transactions are
+   /// queued without this check, so queued_bytes alone can already be past the limit.
+   bool fits( uint64_t size ) const {
+      return queued_bytes <= max_transaction_queue_size && size <= max_transaction_queue_size - queued_bytes;
+   }
+
    template<typename Itr>
-   void added( Itr itr ) {
-      auto size = calc_size( itr->trx_meta );
-      if( itr->trx_type == trx_enum_type::incoming_p2p || itr->trx_type == trx_enum_type::incoming_api ) {
+   void added( Itr itr, uint64_t size ) {
+      if( is_incoming( itr->trx_type ) ) {
          ++incoming_count;
-         SYS_ASSERT( size_in_bytes + size < max_transaction_queue_size, tx_resource_exhaustion,
-                     "Transaction {}, size {} bytes would exceed configured "
-                     "incoming-transaction-queue-size-mb {}, current queue size {} bytes",
-                     itr->trx_meta->id(), size, max_transaction_queue_size/(1024*1024), size_in_bytes );
       }
-      size_in_bytes += size;
+      queued_bytes += size;
    }
 
    template<typename Itr>
    void removed( Itr itr ) {
-      if( itr->trx_type == trx_enum_type::incoming_p2p || itr->trx_type == trx_enum_type::incoming_api ) {
+      if( is_incoming( itr->trx_type ) ) {
          --incoming_count;
       }
-      size_in_bytes -= calc_size( itr->trx_meta );
+      queued_bytes -= calc_size( itr->trx_meta );
    }
 
    static uint64_t calc_size( const transaction_metadata_ptr& trx ) {
