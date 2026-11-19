@@ -3,8 +3,34 @@
 #include <bls12-381/bls12-381.hpp>
 #include <fc/exception/exception.hpp>
 
+#include <random>
+
 using namespace std;
 using namespace bls12_381;
+
+namespace {
+
+/// Seed of the generator the pairing tests draw their points from.
+constexpr uint64_t pairing_seed = 0x5eed;
+
+/// Pair counts the pairing yield tests run with.
+constexpr array<size_t, 5> pairing_sizes = {1, 2, 7, 20, 33};
+
+/// Thrown by a yield to stop a pairing computation.
+struct yield_stop {};
+
+/// `count` pairs of random multiples of the G1 and G2 generators, as pairing::add_pair stores them.
+vector<tuple<g1, g2>> random_pairs(size_t count, mt19937_64& rng) {
+   vector<tuple<g1, g2>> pairs;
+   for (size_t i = 0; i < count; ++i) {
+      const array<uint64_t, 4> s1 = {rng(), rng(), rng(), rng()};
+      const array<uint64_t, 4> s2 = {rng(), rng(), rng(), rng()};
+      pairing::add_pair(pairs, g1::one().scale(s1), g2::one().scale(s2));
+   }
+   return pairs;
+}
+
+} // anonymous namespace
 
 BOOST_AUTO_TEST_SUITE(bls)
 
@@ -133,6 +159,51 @@ BOOST_AUTO_TEST_CASE(bls_pop_verify) try {
     BOOST_CHECK_EQUAL(ok, true);
 } FC_LOG_AND_RETHROW();
 
+/// The pairing calls its yield at least once per pair, and the yield leaves the result unchanged.
+BOOST_AUTO_TEST_CASE(pairing_yields_per_pair) try {
+   mt19937_64 rng(pairing_seed);
+   for (const size_t size : pairing_sizes) {
+      BOOST_TEST_CONTEXT("pairs " << size) {
+         const vector<tuple<g1, g2>> pairs = random_pairs(size, rng);
+         BOOST_REQUIRE_EQUAL(pairs.size(), size);
+         size_t yields = 0;
+         const fp12 yielding = pairing::calculate(pairs, [&]() { ++yields; });
+         BOOST_CHECK_GE(yields, size);
+         BOOST_CHECK(yielding.equal(pairing::calculate(pairs)));
+      }
+   }
+} FC_LOG_AND_RETHROW();
+
+/// What the yield throws leaves the pairing wherever the yield is called: at the first call, after the line
+/// coefficients of the last pair, at the first call after them, and at the last call.
+BOOST_AUTO_TEST_CASE(pairing_yield_exception_propagates) try {
+   mt19937_64 rng(pairing_seed);
+   for (const size_t size : pairing_sizes) {
+      const vector<tuple<g1, g2>> pairs = random_pairs(size, rng);
+      size_t yields = 0;
+      pairing::calculate(pairs, [&]() { ++yields; });
+      for (const size_t stop_at : {size_t{1}, size, size + 1, yields}) {
+         BOOST_TEST_CONTEXT("pairs " << size << ", stop at yield " << stop_at << " of " << yields) {
+            size_t calls = 0;
+            const auto stop = [&]() {
+               if (++calls == stop_at)
+                  throw yield_stop{};
+            };
+            BOOST_CHECK_THROW(pairing::calculate(pairs, stop), yield_stop);
+            BOOST_CHECK_EQUAL(calls, stop_at);
+         }
+      }
+   }
+} FC_LOG_AND_RETHROW();
+
+/// The Miller loop and the pairing of no pairs are one, and call no yield.
+BOOST_AUTO_TEST_CASE(pairing_of_no_pairs) try {
+   size_t yields = 0;
+   const auto count = [&]() { ++yields; };
+   BOOST_CHECK(pairing::miller_loop({}, count).equal(fp12::one()));
+   BOOST_CHECK(pairing::calculate({}, count).equal(fp12::one()));
+   BOOST_CHECK_EQUAL(yields, 0u);
+} FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_SUITE_END()
 

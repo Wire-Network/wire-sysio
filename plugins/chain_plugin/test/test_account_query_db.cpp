@@ -3,7 +3,7 @@
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/types.hpp>
 #include <sysio/chain_plugin/account_query_db.hpp>
-#include <sysio/chain/thread_utils.hpp>
+#include <fc/thread_utils.hpp>
 
 using namespace sysio;
 using namespace sysio::chain;

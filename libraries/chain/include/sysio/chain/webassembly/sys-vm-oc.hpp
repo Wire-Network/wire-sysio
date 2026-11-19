@@ -336,21 +336,40 @@ struct result_resolver {
    sys_vm_oc_type_converter& tc;
 };
 
+/// Remaining call depth at which a host function call traps: where a wasm function call's entry decrement reaches zero.
+inline constexpr unsigned host_call_trap_depth_remaining = 1;
+
+/**
+ * Reads the remaining call depth from the control block.
+ *
+ * The load is volatile: compiled wasm changes the value outside the compiler's view.
+ */
+inline unsigned call_depth_remaining() {
+   static_assert(std::is_same_v<decltype(control_block::current_call_depth_remaining), unsigned>,
+                 "movl reads a 32-bit call depth");
+   constexpr int cb_current_call_depth_remaining_segment_offset =
+      OFFSET_OF_CONTROL_BLOCK_MEMBER(current_call_depth_remaining);
+
+   unsigned remaining;
+   asm volatile("movl %%gs:%c[callDepthRemainOffset], %[remaining]\n"
+                : [remaining] "=r" (remaining)
+                : [callDepthRemainOffset] "i" (cb_current_call_depth_remaining_segment_offset));
+   return remaining;
+}
+
+/**
+ * Host function wrapper that compiled wasm calls.
+ *
+ * Unless `is_injected`, it first traps when the call depth is exhausted. It then calls `F` with the wasm arguments
+ * converted; any exception leaves wasm through siglongjmp with SYSVMOC_EXIT_EXCEPTION.
+ */
 template<auto F, typename Interface, typename Preconditions, bool is_injected, typename... A>
 auto fn(A... a) {
    try {
       if constexpr(!is_injected) {
-         constexpr int cb_current_call_depth_remaining_segment_offset = OFFSET_OF_CONTROL_BLOCK_MEMBER(current_call_depth_remaining);
-         constexpr int depth_assertion_intrinsic_offset = OFFSET_OF_FIRST_INTRINSIC - (int) require_intrinsic_index<find_intrinsic_index("sysvmoc_internal.depth_assert")>::value * 8;
-
-         asm volatile("cmpl   $1,%%gs:%c[callDepthRemainOffset]\n"
-                      "jne    1f\n"
-                      "callq  *%%gs:%c[depthAssertionIntrinsicOffset]\n"
-                      "1:\n"
-                      :
-                      : [callDepthRemainOffset] "i" (cb_current_call_depth_remaining_segment_offset),
-                        [depthAssertionIntrinsicOffset] "i" (depth_assertion_intrinsic_offset)
-                      : "cc");
+         // Called from C++, never from inline asm, so the compiler aligns the stack for the call.
+         if(call_depth_remaining() == host_call_trap_depth_remaining) [[unlikely]]
+            sysio::chain::sysvmoc::depth_assert();
       }
       using native_args = vm::flatten_parameters_t<AUTO_PARAM_WORKAROUND(F)>;
 

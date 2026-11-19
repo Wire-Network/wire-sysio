@@ -281,5 +281,39 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
       BOOST_REQUIRE(!std::get<1>(actual));
    }
 
+   /// Decoding has no deadline here, so an array of elements that decode from no bytes must still be bounded:
+   /// a count far past the bytes left fails the decode instead of looping over it.
+   BOOST_AUTO_TEST_CASE(zero_size_array_count_is_bounded)
+   {
+      auto abi = chain::abi_def( { {"nothing", "int8[0]"} },
+         {
+            { "foo", "", { {"items", "nothing[]"} } }
+         },
+         {
+            { "foo"_n, "foo", ""}
+         },
+         {}, {}, {}
+      );
+      abi.version = "sysio::abi/1.";
+      abi_data_handler handler(exception_handler{}, make_resolver("alice"_n), make_fetcher("alice"_n, pack_abi(abi)));
+
+      action_trace_v0 action;
+      action.global_sequence = 0;
+      action.receiver = "alice"_n;
+      action.account  = "alice"_n;
+      action.action   = "foo"_n;
+
+      action.data = fc::raw::pack(fc::unsigned_int(2));
+      const abi_data_handler::decode_result small = handler.decode(action);
+      BOOST_REQUIRE(small.status == abi_data_handler::decode_status::ok);
+      BOOST_TEST(small.params["items"].get_array().size() == 2u);
+
+      constexpr uint32_t oversized_count = 200000;
+      action.data = fc::raw::pack(fc::unsigned_int(oversized_count));
+      const abi_data_handler::decode_result oversized = handler.decode(action);
+      BOOST_CHECK(oversized.status == abi_data_handler::decode_status::failed);
+      BOOST_TEST(!oversized.error_message.empty());
+   }
+
 
 BOOST_AUTO_TEST_SUITE_END()

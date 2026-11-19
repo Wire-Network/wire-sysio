@@ -5,10 +5,10 @@
 #include <sysio/testing/tester.hpp>
 
 #include <sysio/chain/genesis_state.hpp>
-#include <sysio/chain/thread_utils.hpp>
 #include <sysio/chain/transaction_metadata.hpp>
 #include <sysio/chain/trace.hpp>
 #include <sysio/chain/name.hpp>
+#include <fc/thread_utils.hpp>
 
 #include <sysio/chain/application.hpp>
 

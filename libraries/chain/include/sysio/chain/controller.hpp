@@ -455,6 +455,8 @@ namespace sysio::chain {
 
          // called from net threads
          void process_vote_message( uint32_t connection_id, const vote_message_ptr& msg );
+         /// Called from net threads when a connection closes. Discards the votes from it parked for unknown blocks.
+         void notify_vote_connection_closed( uint32_t connection_id );
          // thread safe, for testing
          bool is_block_missing_finalizer_votes(const block_handle& bh) const;
 
@@ -531,6 +533,8 @@ namespace sysio::chain {
 
       void set_producer_node(bool is_producer_node);
       bool is_producer_node()const; // thread safe, set at program initialization
+      /// Whether this node has finalizer keys configured. Thread safe, set at program initialization.
+      bool is_finalizer_node() const;
 
       void set_pause_at_block_num(block_num_type block_num);
       block_num_type get_pause_at_block_num()const;

@@ -1,11 +1,11 @@
 #include <sysio/prometheus_plugin/prometheus_plugin.hpp>
 
 #include <sysio/chain/plugin_interface.hpp>
-#include <sysio/chain/thread_utils.hpp>
 #include <sysio/http_plugin/macros.hpp>
 #include <sysio/http_plugin/http_plugin.hpp>
 
 #include <fc/log/logger.hpp>
+#include <fc/thread_utils.hpp>
 
 #include "metrics.hpp"
 
@@ -15,7 +15,7 @@ namespace sysio {
 
    struct prometheus_plugin_impl {
 
-      sysio::chain::named_thread_pool<struct prom> _prometheus_thread_pool;
+      fc::named_thread_pool<struct prom>           _prometheus_thread_pool;
       boost::asio::io_context::strand              _prometheus_strand{_prometheus_thread_pool.get_executor()};
       metrics::catalog_type                        _catalog;
       fc::microseconds                             _max_response_time_us;

@@ -2,7 +2,7 @@
 
 #include<sysio/chain/transaction.hpp>
 #include<sysio/chain/block.hpp>
-#include<sysio/chain/thread_utils.hpp>
+#include <fc/thread_utils.hpp>
 
 #include<boost/asio/ip/tcp.hpp>
 #include<boost/asio/strand.hpp>
@@ -68,7 +68,7 @@ namespace sysio::testing {
 
    struct provider_connection {
       const provider_base_config&                                 _config;
-      sysio::chain::named_thread_pool<struct provider_connection> _connection_thread_pool;
+      fc::named_thread_pool<struct provider_connection>           _connection_thread_pool;
 
       std::mutex _trx_ack_map_lock;
       std::map<sysio::chain::transaction_id_type, fc::time_point> _trxs_ack_time_map;

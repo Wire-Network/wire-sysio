@@ -58,6 +58,8 @@ constexpr int64_t     cpu_weight = 10'000'000'000; ///< ample CPU for the accoun
 /// time, so a case that bills a no-op handler nothing sets ample_stipend(), which a descheduled frame stays inside.
 constexpr int64_t     stipend_us         = 1000;
 constexpr int64_t     long_frame_us      = 4 * stipend_us; ///< long_spins() keeps a frame busy at least this long
+constexpr auto        stopped_spin_time  = std::chrono::minutes( 5 ); ///< stopped_spin_memo() runs at least this long
+constexpr uint64_t    stopped_spin_factor = stopped_spin_time / std::chrono::microseconds( long_frame_us );
 constexpr uint32_t    first_long_spins   = 1000;
 constexpr uint32_t    max_spin_doublings = 21; ///< first_long_spins doubled this often still fits in uint32_t
 constexpr uint32_t    calibration_runs   = 3;  ///< runs of each loop count long_spins() measures
@@ -317,6 +319,12 @@ struct receiver_cpu_tester : validating_tester {
 
    /// A transfer memo that keeps cpu_receiver_test's handler busy well past the stipend.
    std::string long_spin_memo() { return spin_command + std::to_string( long_spins() ); }
+
+   /// A transfer memo for a push a deadline is expected to stop: the handler runs at least stopped_spin_time, far past
+   /// any deadline here and any delay in the timer that enforces it, and still ends if nothing stops it.
+   std::string stopped_spin_memo() {
+      return spin_command + std::to_string( uint64_t{ long_spins() } * stopped_spin_factor );
+   }
 
    const resource_limits::resource_object& usage( const controller& c, account_name account ) const {
       return c.db().get<resource_limits::resource_object, resource_limits::by_owner>( account );
@@ -681,8 +689,9 @@ BOOST_FIXTURE_TEST_CASE( zero_entry_leaves_the_contracts_cpu_window_alone, recei
 BOOST_FIXTURE_TEST_CASE( receiver_over_its_limit_fails_on_account_cpu_limit, receiver_cpu_tester ) try {
    // A real deadline: the handler runs through its stipend and then idle's remaining CPU, which together are tighter
    // than the transaction's limit.
+   const std::string memo = stopped_spin_memo();
    const auto deadline = fc::time_point::now() + fc::seconds( 10 );
-   BOOST_CHECK_EXCEPTION( push_measured( make_trx( { transfer_action( alice, idle, amount, "forever" ) } ), deadline ),
+   BOOST_CHECK_EXCEPTION( push_measured( make_trx( { transfer_action( alice, idle, amount, memo ) } ), deadline ),
                           tx_cpu_usage_exceeded, fc_exception_message_contains( "reached account cpu limit" ) );
    produce_block();
 } FC_LOG_AND_RETHROW()
@@ -783,7 +792,7 @@ BOOST_FIXTURE_TEST_CASE( explicit_payer_pays_for_everything_below_it, receiver_c
    produce_and_check_validator( { token_account, alice, game, winner } );
 
    // within the transaction's max_cpu_usage_ms
-   auto trx = make_trx( { transfer_action( alice, game, amount, "forever", true ) } );
+   auto trx = make_trx( { transfer_action( alice, game, amount, stopped_spin_memo(), true ) } );
    trx.max_cpu_usage_ms = small_max_cpu_usage_ms;
    sign( trx );
    BOOST_CHECK_EXCEPTION( push_measured( trx, fc::time_point::now() + fc::seconds( 10 ) ), tx_cpu_usage_exceeded,
@@ -1021,9 +1030,9 @@ BOOST_FIXTURE_TEST_CASE( receiver_subjective_bill_limits_its_frame_past_the_stip
    sub_bill.subjective_bill( pending_id, fc::time_point_sec( now + fc::seconds( pending_bill_lifetime_sec ) ), {},
                              { { game, {.cpu = fc::microseconds( game_cpu_us + beyond_any_leeway_us )} } } );
    const auto deadline = fc::time_point::now() + fc::seconds( 10 );
-   auto trx = make_trx( { transfer_action( alice, game, amount, memo ) } );
-   BOOST_CHECK_EXCEPTION( push_measured( trx, deadline ), tx_cpu_usage_exceeded,
-                          fc_exception_message_contains( account_cpu_limit_reached ) );
+   BOOST_CHECK_EXCEPTION(
+      push_measured( make_trx( { transfer_action( alice, game, amount, stopped_spin_memo() ) } ), deadline ),
+      tx_cpu_usage_exceeded, fc_exception_message_contains( account_cpu_limit_reached ) );
    transfer( alice, bob, amount, "spin:1" ); // reaches no contract
    // A handler within the stipend still runs, and bills the game nothing.
    set_notify_cpu_stipend( ample_stipend() );
@@ -1034,7 +1043,7 @@ BOOST_FIXTURE_TEST_CASE( receiver_subjective_bill_limits_its_frame_past_the_stip
    // With the pending CPU gone, the handler runs past the stipend again.
    set_notify_cpu_stipend( stipend_us );
    sub_bill.remove_subjective_billing( pending_id, 0 );
-   receipt = entries( push_measured( trx, deadline ) );
+   receipt = entries( push_measured( make_trx( { transfer_action( alice, game, amount, memo ) } ), deadline ) );
    BOOST_REQUIRE_EQUAL( receipt.size(), 2u );
    BOOST_TEST( receipt[1] > 0u );
    produce_block();
@@ -1265,7 +1274,7 @@ BOOST_FIXTURE_TEST_CASE( explicit_payer_covers_only_its_own_action, receiver_cpu
 
 BOOST_FIXTURE_TEST_CASE( receiver_frame_stops_at_the_transaction_limit, receiver_cpu_tester ) try {
    // The game has ample CPU, so its frame stops at the transaction's max_cpu_usage_ms, reported as such.
-   auto trx = make_trx( { transfer_action( alice, game, amount, "forever" ) } );
+   auto trx = make_trx( { transfer_action( alice, game, amount, stopped_spin_memo() ) } );
    trx.max_cpu_usage_ms = small_max_cpu_usage_ms;
    sign( trx );
    BOOST_CHECK_EXCEPTION( push_measured( trx, fc::time_point::now() + fc::seconds( 10 ) ), tx_cpu_usage_exceeded,
@@ -1281,7 +1290,8 @@ BOOST_FIXTURE_TEST_CASE( greylisted_receiver_fails_as_greylisted, receiver_cpu_t
    const auto memo = long_spin_memo();
    start_speculative_block();
    const auto deadline = fc::time_point::now() + fc::seconds( 10 );
-   BOOST_CHECK_EXCEPTION( push_measured( make_trx( { transfer_action( alice, idle, amount, "forever" ) } ), deadline ),
+   BOOST_CHECK_EXCEPTION( push_measured( make_trx( { transfer_action( alice, idle, amount, stopped_spin_memo() ) } ),
+                                         deadline ),
                           greylist_cpu_usage_exceeded, fc_exception_message_contains( greylisted_frame_stopped ) );
    BOOST_CHECK_EXCEPTION( push_measured( make_trx( { transfer_action( alice, idle, amount, memo ) } ) ),
                           greylist_cpu_usage_exceeded, fc_exception_message_contains( idle_over_greylisted_limit ) );

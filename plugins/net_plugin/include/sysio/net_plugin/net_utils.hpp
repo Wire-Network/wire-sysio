@@ -1,5 +1,6 @@
 #pragma once
 
+#include <sysio/chain/block_header.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -274,6 +275,18 @@ namespace detail {
    /// @return true when block notice and block nack should be disabled
    inline bool resolve_disable_block_nack(bool configured, bool explicitly_set, bool configured_producer) {
       return explicitly_set ? configured : configured_producer;
+   }
+
+   /// Whether this node rejects a received block as from the future (block_header::is_from_the_future). A node that
+   /// produces blocks or has finalizer keys rejects it; any other node accepts and relays it.
+   ///
+   /// @param producer_node whether this node has at least one producer configured
+   /// @param finalizer_node whether this node has at least one finalizer key configured
+   /// @param header header of the received block
+   /// @param now this node's current time
+   inline bool rejects_block_from_the_future(bool producer_node, bool finalizer_node,
+                                             const chain::block_header& header, fc::time_point now) {
+      return (producer_node || finalizer_node) && header.is_from_the_future(now);
    }
 
    /// De-duplicate listen endpoints while preserving first-seen order so positionally paired

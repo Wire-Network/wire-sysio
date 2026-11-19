@@ -1,6 +1,6 @@
 import re
 
-from regexes import FUNC_REGEX, IMPORT_REGEX, TYPE_REGEX
+from regexes import FUNC_REGEX, IMPORT_REGEX, TRAILING_PARENS_REGEX, TYPE_REGEX
 
 from lookahead import LookAhead
 
@@ -18,7 +18,7 @@ class WASM(object):
         self.start = ''
 
         self.max_type = -1
-        self.max_import = 0
+        self.max_import = -1
 
         self.function_symbol_map = {}
 
@@ -65,6 +65,25 @@ class WASM(object):
                 next(la_lines)
             else:
                 next(la_lines)
+
+    def type_signatures(self):
+        """Map each type index to its `(func ...)` text, without the index or the closing parentheses."""
+        signatures = {}
+        for t in self.types:
+            type_num = re.search(TYPE_REGEX, t).group(2)
+            signatures[type_num] = re.sub(TRAILING_PARENS_REGEX, '', t[t.index('(func'):])
+        return signatures
+
+    def func_type_indices(self):
+        """Map each function index, imported or defined, to its type index."""
+        type_indices = {}
+        for i in self.imports:
+            match = re.search(IMPORT_REGEX, i)
+            type_indices[match.group(6)] = match.group(8)
+        for f in self.funcs:
+            match = re.search(FUNC_REGEX, f)
+            type_indices[match.group(2)] = match.group(4)
+        return type_indices
 
     def get_type(self, line):
         type_num = int(re.search(TYPE_REGEX, line).group(2))
