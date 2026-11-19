@@ -13,6 +13,7 @@
 #include <fc/io/json.hpp>
 
 #include <future>
+#include <limits>
 #include <stdexcept>
 #include <string>
 #include <string_view>
@@ -163,6 +164,9 @@ public:
 
    chain_id_type chain_id() const { return chain_plug->chain().get_chain_id(); }
 
+   /// @return the byte limit of the node's incoming transaction queue
+   uint64_t max_incoming_transaction_queue_size() const { return prod_plug->get_max_incoming_transaction_queue_size(); }
+
    /// Delivers @p trx the way net_plugin delivers a p2p transaction.
    /// @return the result the node reported for it
    next_function_variant<transaction_trace_ptr> push(const packed_transaction_ptr& trx) {
@@ -302,6 +306,29 @@ BOOST_AUTO_TEST_CASE(blocks_apply_regardless_of_incoming_limit) {
    for (uint32_t block_num = 2; block_num <= chain.head().block_num(); ++block_num)
       node.receive_block(chain.fetch_block_by_number(block_num));
    BOOST_REQUIRE(node.wait_for_head(chain.head().id()));
+}
+
+// incoming-transaction-queue-size-mb sets the queue's byte limit across the option's range, including sizes whose byte
+// count overflows an int: 2048 MiB is 2^31 bytes, and 4097 MiB is 2^32 + 2^20 bytes, which wraps to 1 MiB in 32 bits.
+BOOST_AUTO_TEST_CASE(queue_size_option_sets_byte_limit) {
+   constexpr uint64_t default_queue_size_mb = 1024;
+   {
+      test_node node(producer_args());
+      BOOST_CHECK_EQUAL(node.max_incoming_transaction_queue_size(), default_queue_size_mb * 1024 * 1024);
+   }
+   for (const uint16_t size_mb : {uint16_t{2048}, uint16_t{4097}, std::numeric_limits<uint16_t>::max()}) {
+      BOOST_TEST_CONTEXT("incoming-transaction-queue-size-mb " << size_mb) {
+         test_node node(producer_args({"--incoming-transaction-queue-size-mb", std::to_string(size_mb)}));
+         BOOST_CHECK_EQUAL(node.max_incoming_transaction_queue_size(), uint64_t{size_mb} * 1024 * 1024);
+      }
+   }
+}
+
+// A zero incoming-transaction-queue-size-mb fails initialization with the configured value in the error.
+BOOST_AUTO_TEST_CASE(zero_queue_size_rejected) {
+   BOOST_CHECK_EXCEPTION(
+      test_node(producer_args({"--incoming-transaction-queue-size-mb", "0"})), plugin_config_exception,
+      testing::fc_exception_message_contains("incoming-transaction-queue-size-mb 0 must be between 1 and"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

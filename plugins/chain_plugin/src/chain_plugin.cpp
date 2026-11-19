@@ -1,5 +1,6 @@
 #include <sysio/chain_plugin/table_read.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
+#include <sysio/chain_plugin/mebibytes.hpp>
 #include <sysio/chain_plugin/trx_retry_db.hpp>
 #include <sysio/chain_plugin/tracked_votes.hpp>
 #include <sysio/chain/block_log.hpp>
@@ -166,18 +167,8 @@ constexpr auto snapshot_endpoint_unscheduled_block_message =
    "Snapshot endpoint returned unscheduled block #{}; auto-fetched snapshots must use exact "
    "{}-block cadence heights";
 
-constexpr uint64_t bytes_per_mebibyte = 1024 * 1024;
-
 /// Off-thread table reads poll this interval so plugin shutdown and request deadlines take effect promptly.
 constexpr std::chrono::milliseconds table_read_wait_poll_interval{200};
-
-/// Convert a positive MiB option value to bytes without overflowing uint64_t.
-uint64_t checked_mebibytes(uint64_t value, std::string_view option_name) {
-   constexpr auto max_mebibytes = std::numeric_limits<uint64_t>::max() / bytes_per_mebibyte;
-   SYS_ASSERT(value > 0 && value <= max_mebibytes, sysio::chain::plugin_config_exception,
-              "{} must be between 1 and {} MiB", option_name, max_mebibytes);
-   return value * bytes_per_mebibyte;
-}
 
 /** Log attended snapshot-bootstrap phase changes, transfer rate, percentage, and ETA. */
 class snapshot_download_progress_logger {
@@ -243,7 +234,7 @@ private:
 
    /** Convert a byte count to MiB for operator-facing logs. */
    static double to_mebibytes(uint64_t bytes) {
-      return static_cast<double>(bytes) / static_cast<double>(bytes_per_mebibyte);
+      return static_cast<double>(bytes) / static_cast<double>(sysio::bytes_per_mebibyte);
    }
 
    /** Calculate whole bytes per second without overflowing intermediate integer arithmetic. */
