@@ -4,11 +4,11 @@
 #include <sysio/chain/finalizer_policy.hpp>
 #include <sysio/chain/vote_message.hpp>
 #include <sysio/chain/block_timestamp.hpp>
-#include <sysio/chain/thread_utils.hpp>
 #include <fc/crypto/bls_private_key.hpp>
 #include <fc/crypto/bls_public_key.hpp>
 #include <fc/crypto/bls_signature.hpp>
 #include <fc/bitset.hpp>
+#include <fc/thread_utils.hpp>
 #include <array>
 #include <map>
 #include <memory>
@@ -46,7 +46,6 @@ namespace sysio::chain {
       duplicate,             // duplicate vote, expected as votes arrive on multiple connections
       unknown_public_key,    // public key is invalid, indicates invalid vote
       invalid_signature,     // signature is invalid, indicates invalid vote
-      unknown_block,         // block not available, possibly less than LIB, or too far in the future
       max_exceeded           // received too many votes for a connection
    };
 
@@ -125,6 +124,12 @@ namespace sysio::chain {
          strong         // Enough `strong` votes to have a valid `strong` QC
       };
 
+      /// Form of a qc_sig_t built from the aggregated votes. A part without weak votes is strong-only in either form.
+      enum class sig_form_t {
+         by_state,       ///< strong votes only in the `strong` state, strong and weak votes in other quorate states
+         strong_and_weak ///< strong and weak votes in every quorate state
+      };
+
       struct votes_t : fc::reflect_init {
       private:
          friend struct fc::reflector<votes_t>;
@@ -132,7 +137,7 @@ namespace sysio::chain {
          friend struct fc::has_reflector_init<votes_t>;
          friend class aggregating_qc_sig_t;
          struct bit_processed {
-            alignas(hardware_destructive_interference_sz)
+            alignas(fc::hardware_destructive_interference_sz)
             std::atomic<bool> value;
          };
 
@@ -193,8 +198,8 @@ namespace sysio::chain {
       // source into a qc_t; parts from different sources must never be mixed
       // (see aggregating_qc_t::get_best_qc).
       std::optional<qc_sig_t> received_qc_sig_copy() const;
-      // aggregated votes as a qc_sig_t, or nullopt when quorum has not been met
-      std::optional<qc_sig_t> aggregated_qc_sig() const;
+      /// Aggregated votes as a qc_sig_t in `form`, or nullopt when quorum has not been met.
+      std::optional<qc_sig_t> aggregated_qc_sig(sig_form_t form) const;
       bool has_received_qc_sig() const;
       // Unconditional store. Whether a received qc replaces the stored one is
       // decided by aggregating_qc_t::set_received_qc for the whole qc_t unit.
@@ -221,7 +226,8 @@ namespace sysio::chain {
       vote_result_t add_weak_vote(size_t index, const bls_signature& sig, uint64_t weight);
 
       bool is_quorum_met_no_lock() const;
-      qc_sig_t extract_qc_sig_from_aggregating() const;
+      /// Aggregated votes as a qc_sig_t in `form`. Called with the mutex held and quorum met.
+      qc_sig_t extract_qc_sig_from_aggregating(sig_form_t form) const;
    };
 
    // finalizer authority of strong, weak, or missing votes
@@ -263,6 +269,8 @@ namespace sysio::chain {
 
       aggregating_qc_t() = default;
 
+      /// Best qc for block `block_num` built from a single source, received or aggregated, or nullopt when there is
+      /// none. An aggregated qc keeps weak votes in both parts or drops them from both.
       std::optional<qc_t> get_best_qc(block_num_type block_num) const;
 
       qc_vote_metrics_t vote_metrics(const qc_t& qc) const;
@@ -291,7 +299,7 @@ namespace sysio::chain {
 } //sysio::chain
 
 
-FC_REFLECT_ENUM(sysio::chain::vote_result_t, (success)(duplicate)(unknown_public_key)(invalid_signature)(unknown_block)(max_exceeded))
+FC_REFLECT_ENUM(sysio::chain::vote_result_t, (success)(duplicate)(unknown_public_key)(invalid_signature)(max_exceeded))
 FC_REFLECT(sysio::chain::qc_sig_t, (strong_votes)(weak_votes)(sig));
 FC_REFLECT(sysio::chain::aggregating_qc_sig_t, (received_qc_sig)(quorum)(max_weak_sum_before_weak_final)(aggregating_state)(strong_sum)(weak_sum)(weak_votes)(strong_votes));
 FC_REFLECT(sysio::chain::aggregating_qc_t, (active_finalizer_policy)(pending_finalizer_policy)(active_policy_sig)(pending_policy_sig));

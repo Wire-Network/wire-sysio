@@ -129,37 +129,52 @@ namespace sysio::testing {
             return public_key_type(webauthn::public_key(priv_key.get_public_key().serialize(), presence, _origin));
          }
 
+         /// Authenticator data without extensions: the RP ID hash, the flags byte and the signature counter.
+         static constexpr size_t min_auth_data_size = 37;
+
          signature sign( const sha256& digest, bool = true) const {
-            auto json = std::string("{\"origin\":\"https://") +
-                        _origin +
-                        "\",\"type\":\"webauthn.get\",\"challenge\":\"" +
-                        fc::base64url_encode(digest.data(), digest.data_size()) +
-                        "\"}";
-            std::vector<uint8_t> auth_data(37);
-            memcpy(auth_data.data(), _origin_hash.data(), sizeof(_origin_hash));
+            return sign(digest, client_json(digest), min_auth_data_size);
+         }
 
-            auto client_data_hash = fc::sha256::hash(json);
-            fc::sha256::encoder e;
-            e.write((char*)auth_data.data(), auth_data.size());
-            e.write(client_data_hash.data(), client_data_hash.data_size());
-            auto sig = priv_key.sign_sha256(e.result());
-
-            char serialized_sig[4096];
-            datastream<char*> sig_ds(serialized_sig, sizeof(serialized_sig));
-            fc::raw::pack(sig_ds, (uint8_t)get_index<signature::storage_type, webauthn::signature>());
-            fc::raw::pack(sig_ds, sig);
-            fc::raw::pack(sig_ds, auth_data);
-            fc::raw::pack(sig_ds, json);
-            sig_ds.seekp(0);
-
-            signature ret;
-            fc::raw::unpack(sig_ds, ret);
-            return ret;
+         /**
+          * Signs like sign(), with the authenticator data zero-padded past min_auth_data_size so that the signature's
+          * `variable_size()` is @p variable_size.
+          */
+         signature sign_with_variable_size( const sha256& digest, size_t variable_size ) const {
+            const std::string json = client_json(digest);
+            const size_t smallest = json.size() + min_auth_data_size;
+            FC_ASSERT(variable_size >= smallest, "variable size {} is below the smallest signature, {}", variable_size,
+                      smallest);
+            return sign(digest, json, variable_size - json.size());
          }
 
          r1::private_key priv_key;
          static const std::string _origin;
          static const fc::sha256 _origin_hash;
+
+      private:
+         /// The client data JSON of an assertion over @p digest.
+         static std::string client_json( const sha256& digest ) {
+            return std::string("{\"origin\":\"https://") +
+                   _origin +
+                   "\",\"type\":\"webauthn.get\",\"challenge\":\"" +
+                   fc::base64url_encode(digest.data(), digest.data_size()) +
+                   "\"}";
+         }
+
+         /// Signs @p digest with client data @p json and @p auth_data_size bytes of authenticator data.
+         signature sign( const sha256& digest, const std::string& json, size_t auth_data_size ) const {
+            std::vector<uint8_t> auth_data(auth_data_size);
+            memcpy(auth_data.data(), _origin_hash.data(), sizeof(_origin_hash));
+
+            const fc::sha256 client_data_hash = fc::sha256::hash(json);
+            fc::sha256::encoder e;
+            e.write(reinterpret_cast<const char*>(auth_data.data()), auth_data.size());
+            e.write(client_data_hash.data(), client_data_hash.data_size());
+
+            return signature(signature::storage_type(
+               webauthn::signature(priv_key.sign_sha256(e.result()), auth_data, json)));
+         }
       };
    }
 

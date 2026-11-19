@@ -10,6 +10,8 @@
 
 #include <sysio/testing/tester.hpp>
 
+#include <optional>
+
 
 // ----------------------------------------------------------------------------
 struct finality_node_t : public sysio::testing::tester {
@@ -237,10 +239,12 @@ public:
       return num_advancing;
    }
 
-   vote_result_t process_vote(size_t node_idx, size_t vote_index = (size_t)-1,
-                            vote_mode mode = vote_mode::strong, bool duplicate = false) {
+   /// Sends a vote of node node_idx to node0; returns its result, or nullopt when there is no such vote or its block is
+   /// at or below node0's LIB.
+   std::optional<vote_result_t> process_vote(size_t node_idx, size_t vote_index = (size_t)-1,
+                                             vote_mode mode = vote_mode::strong, bool duplicate = false) {
       auto vote = nodes[node_idx].get_vote(vote_index, mode);
-      return vote ? process_vote(vote, duplicate) : vote_result_t::unknown_block;;
+      return vote ? process_vote(vote, duplicate) : std::nullopt;
    }
 
    // returns first node to not vote
@@ -308,13 +312,14 @@ private:
    // sets up "node_index" node
    void setup_node(finality_node_t& node, sysio::chain::account_name local_finalizer);
 
-   // send the vote message to node0 which is the producer (and Savanna leader), and wait till processed
-   vote_result_t process_vote(vote_message_ptr& vote, bool duplicate) {
+   /// Sends the vote message to node0, which is the producer (and Savanna leader), and waits till it is processed;
+   /// returns nullopt when its block is at or below node0's LIB, and throws when node0 does not report it.
+   std::optional<vote_result_t> process_vote(vote_message_ptr& vote, bool duplicate) {
       static uint32_t connection_id = 0;
       node0.control->process_vote_message( ++connection_id, vote );
       if (sysio::chain::block_header::num_from_id(vote->block_id) > node0.lib_num())
          return wait_on_aggregate_vote(connection_id, duplicate);
-      return vote_result_t::unknown_block;
+      return std::nullopt;
    }
 
    vote_result_t wait_on_aggregate_vote(uint32_t connection_id, bool duplicate)  {

@@ -1,5 +1,6 @@
 
 add_executable( test_fc
+        container/test_flat.cpp
         crypto/test_base58.cpp
         crypto/test_blake2.cpp
         crypto/test_bls.cpp
@@ -22,6 +23,7 @@ add_executable( test_fc
         io/test_random_access_file.cpp
         io/test_raw.cpp
         io/test_unsigned_int.cpp
+        io/test_signed_int.cpp
         io/test_tracked_storage.cpp
         network/es/test_es_client.cpp
         network/ethereum/test_ethereum_client_and_rlp.cpp
@@ -32,6 +34,7 @@ add_executable( test_fc
         network/solana/test_solana_client.cpp
         network/test_message_buffer.cpp
         network/test_to_int256.cpp
+        network/test_url.cpp
         scoped_exit/test_scoped_exit.cpp
         static_variant/test_static_variant.cpp
         variant/test_variant.cpp
@@ -52,6 +55,7 @@ add_executable( test_fc
         test_bls.cpp
         test_bitset.cpp
         test_ordered_diff.cpp
+        test_string.cpp
         test_system_timer.cpp
         test_thread_stack.cpp
         test_time.cpp

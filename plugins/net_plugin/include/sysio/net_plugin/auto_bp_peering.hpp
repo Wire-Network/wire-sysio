@@ -136,6 +136,12 @@ class bp_connection_manager {
    }
 
 public:
+   /// Most bp gossip messages a connection may send at once: a peer sends one for each change of its entries, as when
+   /// the gossiping producers all sign theirs anew
+   static constexpr uint32_t bp_gossip_msg_burst = 64;
+   /// Time for one more bp gossip message to be allowed from a connection
+   static constexpr std::chrono::steady_clock::duration bp_gossip_msg_refill_interval = std::chrono::seconds(5);
+
    // the following accessors are thread-safe
    // return true if bp gossip enabled (node has a configured producer peer account)
    bool bp_gossip_enabled() const { return !config.my_bp_gossip_accounts.empty(); }
@@ -239,15 +245,14 @@ public:
       for (const auto& my_bp_account : config.my_bp_gossip_accounts) { // my_bp_gossip_accounts not modified after plugin startup
          const auto& bp_account = my_bp_account.first;
          std::optional<peer_info_t> peer_info = cc.get_peer_info(bp_account);
-         if (peer_info && peer_info->key) {
+         // peers accept only K1 signatures
+         if (peer_info && peer_info->key && peer_info->key->contains<fc::ecc::public_key_shim>()) {
             for (const auto& le : my_bp_account.second) {
                fc_dlog(p2p_log, "Updating BP gossip_bp_peers_message for {} address {}", bp_account, le.server_endpoint);
                if (!initial_updated) {
                   // update initial so always an active one
                   gossip_bp_peers_message::signed_bp_peer signed_empty{{.producer_name = bp_account}}; // .server_endpoint not set for initial message
-                  signed_empty.sig = self()->sign_compact(*peer_info->key, signed_empty.digest(self()->chain_id));
-                  SYS_ASSERT(signed_empty.sig != signature_type{}, chain::plugin_config_exception,
-                             "Unable to sign empty gossip bp peer of {}, private key not found for {}", bp_account, peer_info->key->to_string({}));
+                  sign_gossip_bp(*peer_info->key, signed_empty);
                   initial_gossip_msg_factory.set_initial_send_buffer(signed_empty);
                   initial_updated = true;
                }
@@ -256,25 +261,51 @@ public:
                gossip_bp_peers_message::signed_bp_peer peer{{.producer_name = bp_account}};
                peer.cached_bp_peer_info.emplace(le.server_endpoint, le.outbound_ip_address, expire);
                peer.bp_peer_info = fc::raw::pack<gossip_bp_peers_message::bp_peer_info_v1>(*peer.cached_bp_peer_info);
-               peer.sig = self()->sign_compact(*peer_info->key, peer.digest(self()->chain_id));
-               SYS_ASSERT(peer.sig != signature_type{}, chain::plugin_config_exception,
-                          "Unable to sign bp peer {}, private key not found for {}",
-                          peer.producer_name, peer_info->key->to_string({}));
-               if (auto i = prod_idx.find(std::forward_as_tuple(bp_account, le.server_endpoint, le.outbound_ip_address)); i != prod_idx.end()) {
-                  gossip_bps.index.modify(i, [&peer](auto& v) {
-                     v.bp_peer_info        = peer.bp_peer_info;
-                     v.cached_bp_peer_info = peer.cached_bp_peer_info;
-                     v.sig                 = peer.sig;
-                  });
-               } else {
-                  gossip_bps.index.emplace(peer);
-               }
+               sign_gossip_bp(*peer_info->key, peer);
+               store_gossip_bp(prod_idx.find(gossip_bp_key(peer)), peer);
             }
          } else {
             connect_bp_gossip_peers = false;
-            fc_wlog(p2p_log, "On-chain peer-key not found for configured BP {}", bp_account);
+            fc_wlog(p2p_log, "On-chain K1 peer-key not found for configured BP {}", bp_account);
          }
       }
+   }
+
+   /// Sign peer with key, the on-chain peer key of its producer.
+   /// @throws plugin_config_exception when no signature provider holds key, or the signature is not the canonical K1
+   ///         signature peers require
+   void sign_gossip_bp(const public_key_type& key, gossip_bp_peers_message::signed_bp_peer& peer) const {
+      peer.sig = self()->sign_compact(key, peer.digest(self()->chain_id));
+      SYS_ASSERT(peer.sig != signature_type{}, chain::plugin_config_exception,
+                 "Unable to sign bp peer {}, private key not found for {}", peer.producer_name, key.to_string({}));
+      SYS_ASSERT(is_canonical_gossip_signature(peer.sig), chain::plugin_config_exception,
+                 "Signature of bp peer {} by {} is not a canonical K1 signature", peer.producer_name,
+                 key.to_string({}));
+   }
+
+   /// @return true when sig is a K1 signature in its canonical form, the one signature form bp gossip accepts
+   static bool is_canonical_gossip_signature(const signature_type& sig) {
+      return sig.contains<fc::ecc::signature_shim>() &&
+             fc::ecc::public_key::is_canonical(sig.get<fc::ecc::signature_shim>()._data);
+   }
+
+   /// Store peer in gossip_bps: replace the entry held refers to, or insert peer when held is the end of the
+   /// by_producer index. A store that would collide with another entry on a unique index leaves every entry as it was.
+   /// @return true when peer was stored
+   bool store_gossip_bp(gossip_bp_index_t::by_producer_iterator held,
+                        const gossip_bp_peers_message::signed_bp_peer& peer) REQUIRES(gossip_bps.mtx) {
+      auto& prod_idx = gossip_bps.index.get<by_producer>();
+      const bool stored = held == prod_idx.end() ? gossip_bps.index.insert(peer).second : prod_idx.replace(held, peer);
+      if (!stored)
+         fc_dlog(p2p_msg_log, "bp peer {} {} collides with a held entry, not stored", peer.producer_name,
+                 peer.server_endpoint());
+      return stored;
+   }
+
+   /// Evict the entries of gossip_bps that expire at or before now
+   void erase_expired_gossip_bps(block_timestamp_type now) REQUIRES(gossip_bps.mtx) {
+      auto& idx = gossip_bps.index.get<by_expiry>();
+      idx.erase(idx.begin(), idx.upper_bound(now));
    }
 
    // Only called from connection strand and the connection constructor
@@ -427,7 +458,13 @@ public:
    }
 
    // thread safe
-   // removes outdated signed bp_peers from msg
+   /// Validate msg, and remove from it the entries this node does not take. Every entry is checked, whether or not
+   /// gossip_bps holds it: an entry expiring at or before the head block time or no earlier than
+   /// bp_gossip_peer_expiration_variance after it (except in an initial message, which has no expiration), or whose
+   /// signature does not recover the on-chain peer key of its producer, is removed.
+   /// @return false when msg is invalid: an entry is malformed, the entries are not in strictly increasing
+   ///         gossip_bp_key() order, a producer has more than max_bp_gossip_peers_per_producer of them, or a signature
+   ///         is not a canonical K1 signature or recovers no key
    bool validate_gossip_bp_peers_message( gossip_bp_peers_message& msg ) {
       if (msg.peers.empty())
          return false;
@@ -449,19 +486,12 @@ public:
                peer.cached_bp_peer_info = fc::raw::unpack<gossip_bp_peers_message::bp_peer_info_v1>(peer.bp_peer_info);
                if (!valid_endpoint(peer.server_endpoint()))
                   return false; // invalid address
-               if (prev != nullptr) {
-                  if (prev->producer_name == peer.producer_name) {
-                     ++num_per_producer;
-                     if (num_per_producer > max_bp_gossip_peers_per_producer)
-                        return false; // more than allowed per producer
-                     if (prev->server_endpoint() == peer.server_endpoint())
-                        return false; // duplicate entries not allowed
-                  } else if (prev->producer_name > peer.producer_name) {
-                     return false; // required to be sorted
-                  } else {
-                     num_per_producer = 0;
-                  }
-               }
+               if (prev != nullptr && !(gossip_bp_key(*prev) < gossip_bp_key(peer)))
+                  return false; // required to be sorted by key, so no key appears twice
+               const bool same_producer = prev != nullptr && prev->producer_name == peer.producer_name;
+               num_per_producer = same_producer ? num_per_producer + 1 : 1;
+               if (num_per_producer > max_bp_gossip_peers_per_producer)
+                  return false; // more than allowed per producer
                prev = &peer;
             }
          } catch ( fc::exception& e ) {
@@ -470,16 +500,18 @@ public:
          }
       }
 
-      const controller& cc = self()->chain_plug->chain();
+      // checked before any key is recovered
+      if (!std::ranges::all_of(msg.peers, [](const gossip_bp_peers_message::signed_bp_peer& peer) {
+             return is_canonical_gossip_signature(peer.sig);
+          })) {
+         fc_dlog(p2p_msg_log, "gossip_bp_peers_message signature is not a canonical K1 signature");
+         return false;
+      }
+
       bool invalid_message = false;
       auto is_peer_key_valid = [&](const gossip_bp_peers_message::signed_bp_peer& peer) -> bool {
          try {
-            if (peer.sig.is_webauthn()) {
-               fc_dlog(p2p_msg_log, "Peer {} signature is webauthn, not allowed.", peer.producer_name);
-               invalid_message = true;
-               return false;
-            }
-            std::optional<peer_info_t> peer_info = cc.get_peer_info(peer.producer_name);
+            std::optional<peer_info_t> peer_info = self()->chain_plug->chain().get_peer_info(peer.producer_name);
             if (peer_info && peer_info->key) {
                public_key_type pk = public_key_type::recover(peer.sig, peer.digest(self()->chain_id));
                if (pk != *peer_info->key) {
@@ -508,12 +540,10 @@ public:
          return peer.expiration() > head_block_time && peer.expiration() < latest_acceptable_expiration_time;
       };
 
-      fc::lock_guard g(gossip_bps.mtx);
-      auto& sig_idx = gossip_bps.index.get<by_sig>();
+      // the expiration first, as it recovers no key
       for (auto i = msg.peers.begin(); i != msg.peers.end();) {
          const auto& peer = *i;
-         bool have_sig = sig_idx.contains(peer.sig); // we already have it, already verified
-         if (!have_sig && (!is_peer_key_valid(peer) || !is_expiration_valid(peer))) {
+         if (!is_expiration_valid(peer) || !is_peer_key_valid(peer)) {
             if (invalid_message)
                return false;
             // peer key may have changed or been removed on-chain, do not consider that a fatal error, just remove it
@@ -528,42 +558,44 @@ public:
    }
 
    // thread-safe
+   /// Merge the entries of msg, which validate_gossip_bp_peers_message() kept, into gossip_bps, once the held entries
+   /// that have expired are evicted. An entry replaces the held entry of its gossip_bp_key() only when it expires
+   /// later, so an entry that differs only in its signature changes nothing. A producer holds at most
+   /// max_bp_gossip_peers_per_producer entries: an entry of a new key displaces its earliest-expiring entry when it
+   /// expires later than that one, and is not stored otherwise.
+   /// @return true when an entry was stored
    bool update_gossip_bps(const gossip_bp_peers_message& msg) {
       // providing us with full set
+      const block_timestamp_type head_block_time = self()->head_block_time.load();
       fc::lock_guard g(gossip_bps.mtx);
+      erase_expired_gossip_bps(head_block_time);
       auto& idx = gossip_bps.index.get<by_producer>();
-      bool diff = false;
+      bool changed = false;
       for (const auto& peer : msg.peers) {
-         if (auto i = idx.find(std::forward_as_tuple(peer.producer_name, peer.server_endpoint(), peer.outbound_ip_address())); i != idx.end()) {
-            if (i->sig != peer.sig && peer.expiration() >= i->expiration()) { // signature has changed, producer_name and server_endpoint has not changed
-               assert(peer.cached_bp_peer_info); // unpacked in validate_gossip_bp_peers_message()
-               gossip_bps.index.modify(i, [&peer](auto& m) {
-                  m.bp_peer_info = peer.bp_peer_info;
-                  m.cached_bp_peer_info = peer.cached_bp_peer_info;
-                  m.sig = peer.sig;
-               });
-               diff = true;
-            }
-         } else {
-            auto r = idx.equal_range(peer.producer_name);
-            if (std::cmp_greater_equal(std::distance(r.first, r.second), max_bp_gossip_peers_per_producer)) {
-               // remove entry with min expiration
-               auto min_expiration_itr = r.first;
-               auto min_expiration = min_expiration_itr->expiration();
-               ++r.first;
-               for (; r.first != r.second; ++r.first) {
-                  if (r.first->expiration() < min_expiration) {
-                     min_expiration = r.first->expiration();
-                     min_expiration_itr = r.first;
-                  }
-               }
-               gossip_bps.index.erase(min_expiration_itr);
-            }
-            gossip_bps.index.insert(peer);
-            diff = true;
+         assert(peer.cached_bp_peer_info); // unpacked in validate_gossip_bp_peers_message()
+         if (peer.expiration() <= head_block_time)
+            continue; // expired since it was validated
+         if (auto i = idx.find(gossip_bp_key(peer)); i != idx.end()) {
+            if (peer.expiration() > i->expiration() && store_gossip_bp(i, peer))
+               changed = true;
+            continue;
+         }
+         auto r = idx.equal_range(peer.producer_name);
+         auto earliest = idx.end();
+         if (std::cmp_greater_equal(std::distance(r.first, r.second), max_bp_gossip_peers_per_producer)) {
+            earliest = std::min_element(r.first, r.second, [](const auto& a, const auto& b) {
+               return a.expiration() < b.expiration();
+            });
+            if (peer.expiration() <= earliest->expiration())
+               continue; // expires no later than every entry the producer holds
+         }
+         if (store_gossip_bp(idx.end(), peer)) {
+            if (earliest != idx.end())
+               idx.erase(earliest);
+            changed = true;
          }
       }
-      return diff;
+      return changed;
    }
 
    // thread-safe
@@ -572,23 +604,15 @@ public:
       if (!bp_gossip_enabled())
          return false;
 
-      auto head_block_time = self()->head_block_time.load();
+      const fc::time_point head_block_time = self()->head_block_time.load();
 
       fc::lock_guard g(gossip_bps.mtx);
-      auto& idx = gossip_bps.index.get<by_expiry>();
-      auto ex_lo = idx.lower_bound(block_timestamp_type{});
-      auto ex_up = idx.upper_bound(head_block_time);
-      idx.erase(ex_lo, ex_up);
-      if (ex_up != idx.end()) {
-         ex_lo = ex_up;
-         ex_up = idx.upper_bound(head_block_time + my_bp_gossip_peer_expiration);
-         auto my_bp_account_will_expire = std::ranges::any_of(ex_lo, ex_up, [&](const auto& i) {
-            return config.my_bp_gossip_accounts.contains(i.producer_name);
-         });
-         return my_bp_account_will_expire;
-      }
-
-      return false;
+      erase_expired_gossip_bps(head_block_time);
+      const auto& idx = gossip_bps.index.get<by_expiry>();
+      const block_timestamp_type soon = head_block_time + my_bp_gossip_peer_expiration;
+      return std::any_of(idx.begin(), idx.upper_bound(soon), [&](const gossip_bp_peers_message::signed_bp_peer& peer) {
+         return config.my_bp_gossip_accounts.contains(peer.producer_name);
+      });
    }
 
    // desc is a log label; pass nullptr to skip the per-address logging (periodic callers)

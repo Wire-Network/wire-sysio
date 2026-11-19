@@ -21,6 +21,12 @@ class code_cache_base;
 class memory;
 struct code_descriptor;
 
+/**
+ * The `sysvmoc_internal.depth_assert` trap intrinsic: leaves wasm with a wasm_execution_error for exceeding the
+ * maximum call depth. Host function wrappers call it directly.
+ */
+[[noreturn]] void depth_assert();
+
 class executor {
    public:
       executor(const code_cache_base& cc);

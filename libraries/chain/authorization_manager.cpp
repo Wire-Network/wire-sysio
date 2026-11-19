@@ -540,7 +540,7 @@ namespace sysio { namespace chain {
       // The permission_levels are traversed in ascending order, which is:
       // ascending order of the actor name with ties broken by ascending order of the permission name.
       for( const auto& p : permissions_to_satisfy ) {
-         checktime(); // TODO: this should eventually move into authority_checker instead
+         checktime();
          SYS_ASSERT( checker.satisfied( p ) || check_but_dont_fail, unsatisfied_authorization,
                      "transaction declares authority '{}', "
                      "but does not have signatures for it, "
@@ -598,9 +598,12 @@ namespace sysio { namespace chain {
    }
 
    flat_set<public_key_type> authorization_manager::get_required_keys( const transaction& trx,
-                                                                       const flat_set<public_key_type>& candidate_keys
+                                                                       const flat_set<public_key_type>& candidate_keys,
+                                                                       const std::function<void()>& _checktime
                                                                      )const
    {
+      const auto& checktime = ( static_cast<bool>(_checktime) ? _checktime : _noop_checktime );
+
       auto checker = make_auth_checker( [&](const permission_level& p) -> const shared_authority* {
                                           if(const permission_object* po = find_permission(p))
                                              return &po->auth;
@@ -610,15 +613,19 @@ namespace sysio { namespace chain {
                                         _control.get_global_properties().configuration.max_authority_depth,
                                         candidate_keys,
                                         {},
-                                        _noop_checktime
+                                        checktime
                                       );
+
+      // As in check_authorization, each distinct declared permission is evaluated once. The keys an evaluation marks
+      // used depend only on the permission, so neither the order nor the other evaluations change the result.
+      std::vector<permission_level> permissions_to_satisfy;
 
       // Only `trn.actions` is walked, matching consensus: transaction_context rejects a transaction that carries
       // context-free actions, and controller passes only `trn.actions` to check_authorization.
       for (const auto& act : trx.actions ) {
          // `sysio.payer` is a virtual marker, not a permission: no `permission_object` exists for
          // it and it carries no keys of its own. The key that authorizes a payer is the one on the
-         // REAL permission the same actor must also declare on that action, which is reached on its
+         // REAL permission the same actor must also declare on that action, which is collected on its
          // own iteration below.
          //
          // Checking `<payer>@active` instead, as this once did, diverges from consensus the moment
@@ -647,6 +654,8 @@ namespace sysio { namespace chain {
          for (size_t i = 0; i < act.authorization.size(); ++i) {
             const auto& declared_auth = act.authorization[i];
 
+            checktime();
+
             if (declared_auth.permission == config::sysio_payer_name) {
                SYS_ASSERT( !has_payer, irrelevant_auth_exception,
                            "Multiple payers specified for action" );
@@ -657,9 +666,7 @@ namespace sysio { namespace chain {
                continue;
             }
 
-            SYS_ASSERT( checker.satisfied(declared_auth), unsatisfied_authorization,
-                        "transaction declares authority '{}', but does not have signatures for it.",
-                        declared_auth );
+            permissions_to_satisfy.push_back(declared_auth);
          }
 
          if (has_payer) {
@@ -669,6 +676,14 @@ namespace sysio { namespace chain {
             SYS_ASSERT( paired, unsatisfied_authorization,
                         "Payer authorization for {} not paired with matching auth", payer );
          }
+      }
+
+      std::ranges::sort(permissions_to_satisfy);
+      permissions_to_satisfy.erase(std::ranges::unique(permissions_to_satisfy).begin(), permissions_to_satisfy.end());
+      for (const permission_level& p : permissions_to_satisfy) {
+         checktime();
+         SYS_ASSERT( checker.satisfied(p), unsatisfied_authorization,
+                     "transaction declares authority '{}', but does not have signatures for it.", p );
       }
 
       return checker.used_keys();

@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <array>
 #include <limits>
+#include <numeric>
 #include <optional>
 
 namespace sysio::chain {
@@ -44,7 +45,7 @@ namespace sysio::chain {
       };
 
       /// An unpacked enum value as a member value, or nullopt when it is not an integer within int64 and so is no
-      /// member's. as_int64() alone would reject the 128-bit variants and wrap uint64 ones.
+      /// member's. as_int64() alone would throw for the 128-bit variants and for a uint64 above int64_max.
       std::optional<int64_t> enum_member_value(const fc::variant& v) {
          if( v.is_int64() )
             return v.as_int64();
@@ -109,11 +110,45 @@ namespace sysio::chain {
       return fc::variant( temp, [yield](){ yield(0); } );
    }
 
+   /// Decodes a built-in `T[]`, calling `yield` every built_in_array_elements_per_yield elements.
+   template <typename T>
+   fc::variant array_from_stream(fc::datastream<const char*>& stream, const abi_serializer::yield_function_t& yield) {
+      fc::unsigned_int size;
+      fc::raw::unpack( stream, size );
+      FC_ASSERT( size.value <= MAX_NUM_ARRAY_ELEMENTS );
+      fc::variants vars;
+      vars.reserve( std::min<size_t>( size.value, stream.remaining() ) ); // every built-in element takes a byte or more
+      for( uint32_t i = 0; i < size.value; ++i ) {
+         if( i % abi_serializer::built_in_array_elements_per_yield == 0 )
+            yield(0);
+         T temp;
+         fc::raw::unpack( stream, temp );
+         vars.emplace_back( temp );
+      }
+      return fc::variant( std::move(vars) );
+   }
+
+   /// Packs a built-in `T[]`, calling `yield` every built_in_array_elements_per_yield elements.
+   template <typename T>
+   void pack_array(const fc::variant& var, abi_serializer::pack_stream& ds,
+                   const abi_serializer::yield_function_t& yield) {
+      const fc::variants& vars = var.get_array();
+      if( vars.size() > MAX_NUM_ARRAY_ELEMENTS )
+         throw std::range_error( "too large" ); // as from_variant of a std::vector throws
+      fc::raw::pack( ds, fc::unsigned_int( static_cast<uint32_t>( vars.size() ) ) );
+      for( size_t i = 0; i < vars.size(); ++i ) {
+         if( i % abi_serializer::built_in_array_elements_per_yield == 0 )
+            yield(0);
+         fc::raw::pack( ds, vars[i].as<T>() );
+      }
+   }
+
    template <typename T>
    auto pack_function() {
-      return []( const fc::variant& var, fc::datastream<char*>& ds, bool is_array, bool is_optional, const abi_serializer::yield_function_t& yield ){
+      return []( const fc::variant& var, abi_serializer::pack_stream& ds, bool is_array, bool is_optional,
+                 const abi_serializer::yield_function_t& yield ){
          if( is_array )
-            fc::raw::pack( ds, var.as<vector<T>>() );
+            pack_array<T>( var, ds, yield );
          else if ( is_optional )
             fc::raw::pack( ds, var.as<std::optional<T>>() );
          else
@@ -126,7 +161,7 @@ namespace sysio::chain {
       return std::make_pair<abi_serializer::unpack_function, abi_serializer::pack_function>(
          []( fc::datastream<const char*>& stream, bool is_array, bool is_optional, const abi_serializer::yield_function_t& yield) {
             if( is_array )
-               return variant_from_stream<vector<T>>(stream);
+               return array_from_stream<T>(stream, yield);
             else if ( is_optional )
                return variant_from_stream<std::optional<T>>(stream);
             return variant_from_stream<T>(stream);
@@ -140,7 +175,7 @@ namespace sysio::chain {
       return std::make_pair<abi_serializer::unpack_function, abi_serializer::pack_function>(
          []( fc::datastream<const char*>& stream, bool is_array, bool is_optional, const abi_serializer::yield_function_t& yield) {
             if( is_array )
-               return variant_from_stream<vector<T>>(stream);
+               return array_from_stream<T>(stream, yield);
             else if ( is_optional )
                return variant_from_stream<std::optional<T>>(stream);
             return variant_from_stream<T>(stream, yield);
@@ -233,6 +268,7 @@ namespace sysio::chain {
 
       typedefs.clear();
       structs.clear();
+      struct_fields_by_name.clear();
       actions.clear();
       tables.clear();
       error_messages.clear();
@@ -284,15 +320,19 @@ namespace sysio::chain {
       pb_pool.reset();
       pb_factory.reset();
       if( !abi.protobuf_types.value.empty() ) {
+         // Parsing and building the descriptors runs under the same deadline as validate(), checked between steps.
          namespace gpb = google::protobuf;
          gpb::FileDescriptorSet fds;
          gpb::util::JsonParseOptions opts;
          opts.ignore_unknown_fields = true;
+         ctx.check_deadline();
          auto status = gpb::util::JsonStringToMessage(abi.protobuf_types.value, &fds, opts);
+         ctx.check_deadline();
          SYS_ASSERT( status.ok(), invalid_type_inside_abi,
                      "Failed to parse protobuf_types: {}", std::string(status.message()) );
          pb_pool = std::make_shared<gpb::DescriptorPool>();
          for( int i = 0; i < fds.file_size(); ++i ) {
+            ctx.check_deadline();
             auto* fd = pb_pool->BuildFile(fds.file(i));
             SYS_ASSERT( fd != nullptr, invalid_type_inside_abi,
                         "Failed to build protobuf file descriptor: {}", fds.file(i).name() );
@@ -301,6 +341,44 @@ namespace sysio::chain {
       }
 
       validate(ctx);
+      index_struct_fields(ctx);
+   }
+
+   void abi_serializer::index_struct_fields( impl::abi_traverse_context& ctx ) {
+      for( const auto& [name, st] : structs ) {
+         ctx.check_deadline();
+         vector<uint32_t> order( st.fields.size() );
+         std::iota( order.begin(), order.end(), uint32_t{0} );
+         std::ranges::stable_sort( order, {}, [&fields = st.fields]( uint32_t i ) -> std::string_view {
+            return fields[i].name;
+         } );
+         struct_fields_by_name.emplace( name, std::move(order) );
+      }
+   }
+
+   std::vector<const fc::variant*> abi_serializer::struct_field_values( const struct_def& st,
+                                                                        const fc::variant_object& vo,
+                                                                        const impl::abi_traverse_context& ctx )const {
+      const auto order_itr = struct_fields_by_name.find( st.name );
+      SYS_ASSERT( order_itr != struct_fields_by_name.end(), abi_exception,
+                  "invariant failure: struct '{}' has no field index", impl::limit_size(st.name) );
+      const vector<uint32_t>& order = order_itr->second;
+      const auto field_name_of = [&fields = st.fields]( uint32_t i ) -> std::string_view { return fields[i].name; };
+
+      std::vector<const fc::variant*> values( st.fields.size(), nullptr );
+      size_t entries_read = 0;
+      for( const auto& entry : vo ) {
+         if( ++entries_read % struct_keys_per_deadline_check == 0 )
+            ctx.check_deadline();
+         const std::string_view key = entry.key();
+         auto itr = std::ranges::lower_bound( order, key, {}, field_name_of );
+         // The fields a key names all take its first occurrence, so a key seen before has nothing left to set.
+         if( itr == order.end() || field_name_of( *itr ) != key || values[*itr] != nullptr )
+            continue;
+         for( ; itr != order.end() && field_name_of( *itr ) == key; ++itr )
+            values[*itr] = &entry.value();
+      }
+      return values;
    }
 
    void abi_serializer::set_abi(const abi_def& abi, const fc::microseconds& max_serialization_time) {
@@ -371,7 +449,8 @@ namespace sysio::chain {
       return pb_message_to_variant(*msg);
    }
 
-   void abi_serializer::pb_variant_to_binary(const std::string_view& type, const fc::variant& var, fc::datastream<char*>& ds) const {
+   void abi_serializer::pb_variant_to_binary(const std::string_view& type, const fc::variant& var,
+                                             pack_stream& ds) const {
       auto desc = get_pb_descriptor(type);
       SYS_ASSERT( desc, pack_exception, "Unknown protobuf type '{}'", impl::limit_size(type) );
 
@@ -621,13 +700,23 @@ namespace sysio::chain {
       auto fixed_array_sz = is_szarray(rtype);
 
       auto read_array = [&](fc::unsigned_int::base_uint sz) {
+         SYS_ASSERT( sz <= stream.remaining() + ctx.zero_size_elements_left, unpack_exception,
+                     "Array '{}' declares {} elements but only {} bytes remain", ctx.get_path_string(), sz,
+                     stream.remaining() );
          ctx.hint_array_type_if_in_array();
          fc::variants vars;
          vars.reserve(std::min(sz, 1024u)); // limit the maximum size that can be reserved before data is read
          auto h1 = ctx.push_to_path( impl::array_index_path_item{} );
          for( fc::unsigned_int::base_uint i = 0; i < sz; ++i ) {
             ctx.set_array_index_of_path_back(i);
+            const size_t remaining = stream.remaining();
             auto v = _binary_to_variant(ftype, stream, ctx);
+            if( stream.remaining() == remaining ) {
+               SYS_ASSERT( ctx.zero_size_elements_left > 0, unpack_exception,
+                           "Array '{}' holds more than {} elements that decode from no bytes", ctx.get_path_string(),
+                           max_zero_size_array_elements );
+               --ctx.zero_size_elements_left;
+            }
             // The exception below is commented out to allow array of optional as input data
             //SYS_ASSERT( !v.is_null(), unpack_exception, "Invalid packed array '${p}'", ("p", ctx.get_path_string()) );
             vars.emplace_back(std::move(v));
@@ -699,7 +788,9 @@ namespace sysio::chain {
    {
       auto h = ctx.enter_scope();
       fc::datastream<const char*> ds( binary.data(), binary.size() );
-      return _binary_to_variant(type, ds, ctx);
+      fc::variant result = _binary_to_variant(type, ds, ctx);
+      ctx.check_deadline(); // a result finished past the deadline is not accepted
+      return result;
    }
 
    fc::variant abi_serializer::binary_to_variant( const std::string_view& type, const bytes& binary, const yield_function_t& yield, bool short_path )const {
@@ -717,16 +808,21 @@ namespace sysio::chain {
    fc::variant abi_serializer::binary_to_variant( const std::string_view& type, fc::datastream<const char*>& binary, const yield_function_t& yield, bool short_path )const {
       impl::binary_to_variant_context ctx(*this, yield, fc::microseconds{}, type);
       ctx.short_path = short_path;
-      return _binary_to_variant(type, binary, ctx);
+      fc::variant result = _binary_to_variant(type, binary, ctx);
+      ctx.check_deadline(); // a result finished past the deadline is not accepted
+      return result;
    }
 
    fc::variant abi_serializer::binary_to_variant( const std::string_view& type, fc::datastream<const char*>& binary, const fc::microseconds& max_action_data_serialization_time, bool short_path )const {
       impl::binary_to_variant_context ctx(*this, create_depth_yield_function(), max_action_data_serialization_time, type);
       ctx.short_path = short_path;
-      return _binary_to_variant(type, binary, ctx);
+      fc::variant result = _binary_to_variant(type, binary, ctx);
+      ctx.check_deadline(); // a result finished past the deadline is not accepted
+      return result;
    }
 
-   void abi_serializer::_variant_to_binary( const std::string_view& type, const fc::variant& var, fc::datastream<char *>& ds, impl::variant_to_binary_context& ctx )const
+   void abi_serializer::_variant_to_binary( const std::string_view& type, const fc::variant& var, pack_stream& ds,
+                                            impl::variant_to_binary_context& ctx )const
    { try {
       auto h = ctx.enter_scope();
       auto rtype = resolve_type(type);
@@ -815,10 +911,12 @@ namespace sysio::chain {
                auto h2 = ctx.disallow_extensions_unless(false);
                _variant_to_binary(resolve_type(st.base), var, ds, ctx);
             }
+            const std::vector<const fc::variant*> values = struct_field_values( st, vo, ctx );
+            const fc::variant absent;
             bool disallow_additional_fields = false;
             for( uint32_t i = 0; i < st.fields.size(); ++i ) {
                const auto& field = st.fields[i];
-               bool present = vo.contains(string(field.name).c_str());
+               bool present = values[i] != nullptr;
                if( present || is_optional(field.type) ) {
                   if( disallow_additional_fields )
                      SYS_THROW( pack_exception, "Unexpected field '{}' found in input object while processing struct '{}'",
@@ -826,7 +924,7 @@ namespace sysio::chain {
                   {
                      auto h1 = ctx.push_to_path( impl::field_path_item{ .parent_struct_itr = s_itr, .field_ordinal = i } );
                      auto h2 = ctx.disallow_extensions_unless( &field == &st.fields.back() );
-                     _variant_to_binary(_remove_bin_extension(field.type), present ? vo[field.name] : fc::variant(nullptr), ds, ctx);
+                     _variant_to_binary(_remove_bin_extension(field.type), present ? *values[i] : absent, ds, ctx);
                   }
                } else if( field.type.ends_with("$") && ctx.extensions_allowed() ) {
                   disallow_additional_fields = true;
@@ -865,17 +963,26 @@ namespace sysio::chain {
    } FC_CAPTURE_AND_RETHROW("") }
 
    bytes abi_serializer::_variant_to_binary( const std::string_view& type, const fc::variant& var, impl::variant_to_binary_context& ctx )const
+   {
+      pack_stream scratch;
+      return _variant_to_binary_with_scratch(type, var, scratch, ctx);
+   }
+
+   bytes abi_serializer::_variant_to_binary_with_scratch( const std::string_view& type, const fc::variant& var,
+                                                          pack_stream& scratch,
+                                                          impl::variant_to_binary_context& ctx )const
    { try {
       auto h = ctx.enter_scope();
       if( !_is_type(type, ctx) ) {
          return var.as<bytes>();
       }
 
-      bytes temp( 1024*1024 );
-      fc::datastream<char*> ds(temp.data(), temp.size() );
-      _variant_to_binary(type, var, ds, ctx);
-      temp.resize(ds.tellp());
-      return temp;
+      scratch.seekp(0);
+      scratch.storage().clear();
+      _variant_to_binary(type, var, scratch, ctx);
+      ctx.check_deadline(); // a result finished past the deadline is not accepted
+      const bytes& packed = scratch.storage();
+      return bytes(packed.begin(), packed.begin() + scratch.tellp());
    } FC_CAPTURE_AND_RETHROW("") }
 
    bytes abi_serializer::variant_to_binary( const std::string_view& type, const fc::variant& var, const yield_function_t& yield, bool short_path )const {
@@ -893,13 +1000,19 @@ namespace sysio::chain {
    void  abi_serializer::variant_to_binary( const std::string_view& type, const fc::variant& var, fc::datastream<char*>& ds, const yield_function_t& yield, bool short_path )const {
       impl::variant_to_binary_context ctx(*this, yield, fc::microseconds{}, type);
       ctx.short_path = short_path;
-      _variant_to_binary(type, var, ds, ctx);
+      pack_stream packed;
+      _variant_to_binary(type, var, packed, ctx);
+      ctx.check_deadline(); // a result finished past the deadline is not accepted
+      ds.write(packed.storage().data(), packed.tellp());
    }
 
    void  abi_serializer::variant_to_binary( const std::string_view& type, const fc::variant& var, fc::datastream<char*>& ds, const fc::microseconds& max_action_data_serialization_time, bool short_path ) const {
       impl::variant_to_binary_context ctx(*this, create_depth_yield_function(), max_action_data_serialization_time, type);
       ctx.short_path = short_path;
-      _variant_to_binary(type, var, ds, ctx);
+      pack_stream packed;
+      _variant_to_binary(type, var, packed, ctx);
+      ctx.check_deadline(); // a result finished past the deadline is not accepted
+      ds.write(packed.storage().data(), packed.tellp());
    }
 
    type_name abi_serializer::get_action_type(name action)const {
@@ -936,6 +1049,25 @@ namespace sysio::chain {
          yield( recursion_depth );
 
          return {std::move(callback)};
+      }
+
+      void abi_traverse_context::limit_to_one_action() {
+         fc::time_point deadline = action_data_deadline;
+         if( max_action_serialization_time.count() > 0 )
+            deadline = std::min( deadline, fc::time_point::now().safe_add( max_action_serialization_time ) );
+         if( deadline == fc::time_point::maximum() )
+            return;
+         yield = [deadline, y = yield, max = max_action_serialization_time]( size_t depth ) {
+            y( depth ); // the provided yield, which may bound the whole conversion
+            SYS_ASSERT( fc::time_point::now() < deadline, abi_serialization_deadline_exception,
+                        "serialization action data time limit {}us exceeded", max );
+         };
+      }
+
+      abi_serializer::pack_stream& abi_traverse_context::action_data_scratch() {
+         if( !action_data_scratch_stream )
+            action_data_scratch_stream = std::make_shared<abi_serializer::pack_stream>();
+         return *action_data_scratch_stream;
       }
 
       void abi_traverse_context_with_path::set_path_root( const std::string_view& type ) {

@@ -1,5 +1,5 @@
-#include <sysio/chain/thread_utils.hpp>
 #include <sysio/chain/platform_timer.hpp>
+#include <fc/thread_utils.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -11,7 +11,7 @@ BOOST_AUTO_TEST_SUITE(platform_timer_tests)
 
 BOOST_AUTO_TEST_CASE(correct_num_callbacks_test)
 {
-   named_thread_pool<struct test> pool;
+   fc::named_thread_pool<struct test> pool;
    const size_t num_threads = 16;
    pool.start(num_threads, [](const fc::exception& e) {
       BOOST_ERROR("exception: " + e.to_detail_string());
@@ -61,8 +61,8 @@ void called(size_t i) {
 /// Test would fail with a sleep in interrupt_timer() before fix
 BOOST_AUTO_TEST_CASE(correct_callback_test)
 {
-   named_thread_pool<struct test> pool;
-   named_thread_pool<struct interrupt> interrupt_pool;
+   fc::named_thread_pool<struct test> pool;
+   fc::named_thread_pool<struct interrupt> interrupt_pool;
    const size_t num_threads = 16;
    pool.start(num_threads, [](const fc::exception& e) {
       BOOST_ERROR("exception: " + e.to_detail_string());

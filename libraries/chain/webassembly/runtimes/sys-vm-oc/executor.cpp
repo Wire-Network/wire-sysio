@@ -118,8 +118,9 @@ static void store_internal_exception(const E& e) {
       __builtin_unreachable();                                                      \
    } while (0)
 
+/// Defines and registers the `module.name` trap intrinsic, which leaves wasm and never returns.
 #define DEFINE_SYSVMOC_TRAP_INTRINSIC(module,name) \
-	void name(); \
+	[[noreturn]] void name(); \
 	static intrinsic name##Function SYSVMOC_INTRINSIC_INIT_PRIORITY(#module "." #name,IR::FunctionType::get(),(void*)&name, \
      require_intrinsic_index<find_intrinsic_index(#module "." #name)>::value \
    ); \

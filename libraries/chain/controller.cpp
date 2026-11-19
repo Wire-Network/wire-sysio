@@ -25,7 +25,6 @@
 #include <sysio/chain/subjective_billing.hpp>
 #include <sysio/chain/chain_snapshot.hpp>
 #include <sysio/chain/snapshot_detail.hpp>
-#include <sysio/chain/thread_utils.hpp>
 #include <sysio/chain/platform_timer.hpp>
 #include <sysio/chain/deep_mind.hpp>
 #include <sysio/chain/contract_action_match.hpp>
@@ -42,6 +41,7 @@
 #include <fc/io/json.hpp>
 #include <fc/log/logger_config.hpp>
 #include <fc/scoped_exit.hpp>
+#include <fc/thread_utils.hpp>
 #include <fc/variant_object.hpp>
 
 #include <future>
@@ -465,6 +465,9 @@ struct building_block {
       return bb.parent.pending_producers();
    }
 
+   /// QC data for a block built on `parent`: the best QC of the nearest ancestor that has one, when it advances
+   /// the parent's claim and passes the structural checks receiving nodes apply; otherwise the parent's claim with
+   /// no QC.
    qc_data_t get_qc_data(fork_database_t& fork_db, const block_state& parent) {
       // find most recent ancestor block that has a QC by traversing fork db
       // branch from parent
@@ -478,6 +481,14 @@ struct building_block {
                         qc->block_num, block_header::num_from_id(parent.id()) );
             auto qc_claim = qc->to_qc_claim();
             if( parent.is_needed(qc_claim) ) {
+               // receiving nodes run the same check against the same parent
+               try {
+                  parent.verify_qc_basic(*qc);
+               } catch( const fc::exception& e ) {
+                  elog( "Omitting QC for block #{} from block #{}, QC fails basic verification: {}",
+                        qc->block_num, parent.block_num() + 1, e.to_detail_string() );
+                  return qc_data_t{ {},  parent.core.latest_qc_claim() };
+               }
                return qc_data_t{ *qc, qc_claim };
             } else {
                // no new qc info, repeat existing
@@ -504,7 +515,7 @@ struct building_block {
       auto [transaction_mroot, action_mroot] = std::visit(
          overloaded{[&](digests_t& trx_receipts) {
                        // calculate_merkle takes 3.2ms for 50,000 digests (legacy version took 11.1ms)
-                       auto trx_f = post_async_task(ioc, [&]() { return calculate_merkle(trx_receipts); });
+                       auto trx_f = fc::post_async_task(ioc, [&]() { return calculate_merkle(trx_receipts); });
                        auto act_mroot = calculate_merkle(action_receipts.digests_s);
                        return std::make_pair(trx_f.get(), act_mroot);
                     },
@@ -751,7 +762,7 @@ struct controller_impl {
    bool                            trusted_producer_light_validation = false;
    uint32_t                        snapshot_head_block = 0;
    struct chain; // chain is a namespace so use an embedded type for the named_thread_pool tag
-   named_thread_pool<chain>        thread_pool;
+   fc::named_thread_pool<chain>    thread_pool;
    deep_mind_handler*              deep_mind_logger = nullptr;
    bool                            okay_to_print_integrity_hash_on_stop = false;
    bool                            testing_allow_voting = false; // used in unit tests to create long forks or simulate not getting votes
@@ -1560,13 +1571,12 @@ struct controller_impl {
       // Furthermore, fork_db.root()->block_num() <= lib_num.
       // Also, even though blog.head() may still be nullptr, blog.first_block_num() is guaranteed to be lib_num + 1.
 
-      // At startup, we want to provide to our local finalizers the correct safety information
-      // to use if they don't already have one.
-      // If we start at a block after the IF transition, we need to provide this information
-      // at startup.
-      // -------------------------------------------------------------------------------------------
-      // we are past the IF transition.
       auto lib = fork_db_.root();
+      // Seed the vote processor with LIB and the fork database head: they bound the votes it parks and size its limits.
+      vote_processor.notify_lib(lib->block_num());
+      vote_processor.notify_new_block(fork_db_.head(include_root_t::yes), async_t::no);
+
+      // Local finalizers without safety information of their own start locked on LIB.
       my_finalizers.set_default_safety_information(
          finalizer_safety_information{.last_vote                = {},
                                       .lock                     = lib->make_block_ref(),
@@ -1739,7 +1749,7 @@ struct controller_impl {
                   snapshot_head_block, blog_start, blog_end
       );
 
-      sync_threaded_work<struct snapload> snapshot_load_workqueue;
+      fc::sync_threaded_work<struct snapload> snapshot_load_workqueue;
       boost::asio::io_context& snapshot_load_ctx = snapshot_load_workqueue.io_context();
 
       controller_index_set::walk_indices_via_post(snapshot_load_ctx, [this, &snapshot, &rows_loaded]( auto utils ){
@@ -1957,8 +1967,7 @@ struct controller_impl {
              || (code == contract_whitelist_exception::code_value)
              || (code == contract_blacklist_exception::code_value)
              || (code == action_blacklist_exception::code_value)
-             || (code == key_blacklist_exception::code_value)
-             || (code == sig_variable_size_limit_exception::code_value);
+             || (code == key_blacklist_exception::code_value);
    }
 
    bool scheduled_failure_is_subjective( const fc::exception& e ) const {
@@ -2401,7 +2410,7 @@ struct controller_impl {
                bsp->set_valid(true);
                fork_db_.add( bsp, ignore_duplicate_t::no );
                emit( accepted_block_header, std::tie(bsp->block, bsp->id()), __FILE__, __LINE__ );
-               vote_processor.notify_new_block(async_aggregation);
+               vote_processor.notify_new_block(bsp, async_aggregation);
             } else {
                assert(s != controller::block_status::irreversible);
                auto existing = fork_db_.get_block(bsp->id());
@@ -2947,9 +2956,9 @@ struct controller_impl {
    controller::accepted_block_result create_block_state_i( const block_id_type& id, const signed_block_ptr& b, const block_state& prev,
                                                            fc::time_point received_time ) {
       std::optional<qc_t> qc = verify_basic_block_invariants(id, b, prev);
-      log_and_drop_future<void> verify_qc_future;
+      fc::log_and_drop_future<void> verify_qc_future;
       if (qc) {
-         verify_qc_future = post_async_task(thread_pool.get_executor(), [&qc, &prev] {
+         verify_qc_future = fc::post_async_task(thread_pool.get_executor(), [&qc, &prev] {
             // do both signature verification and basic checks in the async task
             prev.verify_qc(*qc);
          });
@@ -2995,7 +3004,10 @@ struct controller_impl {
       }
 
       fork_db_add_t add_result = fork_db_.add(bsp, ignore_duplicate_t::yes);
-      vote_processor.notify_new_block(async_aggregation);
+      // When the fork database already holds this block id, bsp is a second copy that it did not keep; the call that
+      // added the kept copy notifies the vote processor.
+      if (add_result != fork_db_add_t::duplicate)
+         vote_processor.notify_new_block(bsp, async_aggregation);
 
       return controller::accepted_block_result{add_result, block_handle{std::move(bsp)}};
    }
@@ -4352,6 +4364,10 @@ void controller::process_vote_message( uint32_t connection_id, const vote_messag
    my->process_vote_message( connection_id, vote );
 };
 
+void controller::notify_vote_connection_closed( uint32_t connection_id ) {
+   my->vote_processor.notify_connection_closed( connection_id );
+}
+
 bool controller::is_block_missing_finalizer_votes(const block_handle& bh) const {
    return my->is_block_missing_finalizer_votes(bh);
 }
@@ -4523,10 +4539,6 @@ bool controller::is_speculative_block()const {
 
 bool controller::is_producing_block() const {
    return my->is_producing_block();
-}
-
-uint32_t controller::configured_subjective_signature_length_limit()const {
-   return my->conf.maximum_variable_signature_length;
 }
 
 void controller::validate_expiration( const transaction& trx )const { try {
@@ -4722,6 +4734,10 @@ void controller::set_producer_node(bool is_producer_node) {
 
 bool controller::is_producer_node()const {
    return my->is_producer_node;
+}
+
+bool controller::is_finalizer_node() const {
+   return !my->my_finalizers.empty();
 }
 
 void controller::set_pause_at_block_num(block_num_type block_num) {

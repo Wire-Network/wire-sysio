@@ -372,5 +372,18 @@ BOOST_AUTO_TEST_CASE( finalizer_safety_file_serialization_io ) try {
 
 } FC_LOG_AND_RETHROW()
 
+// A node with finalizer keys is a finalizer node whether or not it produces blocks.
+BOOST_AUTO_TEST_CASE( finalizer_node_without_producers ) try {
+   tester t(setup_policy::none);
+   BOOST_REQUIRE(!t.control->is_producer_node());
+   BOOST_CHECK(!t.control->is_finalizer_node());
+
+   const account_name finalizer = "finalizeraa"_n;
+   t.set_node_finalizers({&finalizer, 1});
+   BOOST_CHECK(t.control->is_finalizer_node());
+   BOOST_CHECK(!t.control->is_producer_node());
+
+} FC_LOG_AND_RETHROW()
+
 
 BOOST_AUTO_TEST_SUITE_END()

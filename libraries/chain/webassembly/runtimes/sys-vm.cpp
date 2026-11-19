@@ -59,37 +59,6 @@ namespace {
   };
 }
 
-// Used on setcode.  Must not reject anything that WAVM accepts
-// For the moment, this runs after WAVM validation, as I am not
-// sure that sys-vm will replicate WAVM's parsing exactly.
-struct setcode_options {
-   static constexpr bool forbid_export_mutable_globals = false;
-   static constexpr bool allow_code_after_function_end = true;
-   static constexpr bool allow_u32_limits_flags = true;
-   static constexpr bool allow_invalid_empty_local_set = true;
-   static constexpr bool allow_zero_blocktype = true;
-};
-
-void validate(const bytes& code, const whitelisted_intrinsics_type& intrinsics) {
-   wasm_code_ptr code_ptr((uint8_t*)code.data(), code.size());
-   try {
-      sys_vm_null_backend_t<setcode_options> bkend(code_ptr, code.size(), nullptr);
-      // check import signatures
-       sys_vm_host_functions_t::resolve(bkend.get_module());
-      // check that the imports are all currently enabled
-      const auto& imports = bkend.get_module().imports;
-      for(std::uint32_t i = 0; i < imports.size(); ++i) {
-         SYS_ASSERT(std::string_view((char*)imports[i].module_str.raw(), imports[i].module_str.size()) == "env" &&
-                    is_intrinsic_whitelisted(intrinsics, std::string_view((char*)imports[i].field_str.raw(), imports[i].field_str.size())),
-                    wasm_serialization_error, "{}.{} unresolveable",
-                    std::string((char*)imports[i].module_str.raw(), imports[i].module_str.size()),
-                    std::string((char*)imports[i].field_str.raw(), imports[i].field_str.size()));
-      }
-   } catch(vm::exception& e) {
-      SYS_THROW(wasm_serialization_error, "{}", e.detail());
-   }
-}
-
 void validate( const bytes& code, const wasm_config& cfg, const whitelisted_intrinsics_type& intrinsics ) {
    SYS_ASSERT(code.size() <= cfg.max_module_bytes, wasm_serialization_error, "Code too large");
    wasm_code_ptr code_ptr((uint8_t*)code.data(), code.size());
