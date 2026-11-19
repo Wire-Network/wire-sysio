@@ -268,22 +268,6 @@ namespace sysio { namespace chain { namespace wasm_injections {
             return "_sysio_f64_trunc_i64u";
          case wasm_ops::i64_trunc_s_f64_code:
             return "_sysio_f64_trunc_i64s";
-         case wasm_ops::f32_convert_s_i32_code:
-            return "_sysio_i32_to_f32";
-         case wasm_ops::f32_convert_u_i32_code:
-            return "_sysio_ui32_to_f32";
-         case wasm_ops::f32_convert_s_i64_code:
-            return "_sysio_i64_f32";
-         case wasm_ops::f32_convert_u_i64_code:
-            return "_sysio_ui64_to_f32";
-         case wasm_ops::f64_convert_s_i32_code:
-            return "_sysio_i32_to_f64";
-         case wasm_ops::f64_convert_u_i32_code:
-            return "_sysio_ui32_to_f64";
-         case wasm_ops::f64_convert_s_i64_code:
-            return "_sysio_i64_to_f64";
-         case wasm_ops::f64_convert_u_i64_code:
-            return "_sysio_ui64_to_f64";
 
          default:
             FC_THROW_EXCEPTION( sysio::chain::wasm_execution_error, "Error, unknown opcode in injection {}", opcode);
@@ -425,58 +409,6 @@ namespace sysio { namespace chain { namespace wasm_injections {
          f32op.pack(arg.new_code);
       }
    };
-   template <uint64_t Opcode>
-   struct i32_convert_f32_injector {
-      static constexpr bool kills = true;
-      static constexpr bool post = false;
-      static void init() {}
-      static void accept( wasm_ops::instr* inst, wasm_ops::visitor_arg& arg ) {
-         int32_t idx;
-         injector_utils::add_import<ResultType::f32, ValueType::i32>( *(arg.module), inject_which_op(Opcode), idx );
-         wasm_ops::op_types<>::call_t f32op;
-         f32op.field = idx;
-         f32op.pack(arg.new_code);
-      }
-   };
-   template <uint64_t Opcode>
-   struct i64_convert_f32_injector {
-      static constexpr bool kills = true;
-      static constexpr bool post = false;
-      static void init() {}
-      static void accept( wasm_ops::instr* inst, wasm_ops::visitor_arg& arg ) {
-         int32_t idx;
-         injector_utils::add_import<ResultType::f32, ValueType::i64>( *(arg.module), inject_which_op(Opcode), idx );
-         wasm_ops::op_types<>::call_t f32op;
-         f32op.field = idx;
-         f32op.pack(arg.new_code);
-      }
-   };
-   template <uint64_t Opcode>
-   struct i32_convert_f64_injector {
-      static constexpr bool kills = true;
-      static constexpr bool post = false;
-      static void init() {}
-      static void accept( wasm_ops::instr* inst, wasm_ops::visitor_arg& arg ) {
-         int32_t idx;
-         injector_utils::add_import<ResultType::f64, ValueType::i32>( *(arg.module), inject_which_op(Opcode), idx );
-         wasm_ops::op_types<>::call_t f64op;
-         f64op.field = idx;
-         f64op.pack(arg.new_code);
-      }
-   };
-   template <uint64_t Opcode>
-   struct i64_convert_f64_injector {
-      static constexpr bool kills = true;
-      static constexpr bool post = false;
-      static void init() {}
-      static void accept( wasm_ops::instr* inst, wasm_ops::visitor_arg& arg ) {
-         int32_t idx;
-         injector_utils::add_import<ResultType::f64, ValueType::i64>( *(arg.module), inject_which_op(Opcode), idx );
-         wasm_ops::op_types<>::call_t f64op;
-         f64op.field = idx;
-         f64op.pack(arg.new_code);
-      }
-   };
 
    struct f32_promote_injector {
       static constexpr bool kills = true;
@@ -567,14 +499,7 @@ namespace sysio { namespace chain { namespace wasm_injections {
       using i64_trunc_s_f64_t = wasm_ops::i64_trunc_s_f64         <f64_trunc_i64_injector<wasm_ops::i64_trunc_s_f64_code>>;
       using i64_trunc_u_f64_t = wasm_ops::i64_trunc_u_f64         <f64_trunc_i64_injector<wasm_ops::i64_trunc_u_f64_code>>;
 
-      using f32_convert_s_i32 = wasm_ops::f32_convert_s_i32       <i32_convert_f32_injector<wasm_ops::f32_convert_s_i32_code>>;
-      using f32_convert_s_i64 = wasm_ops::f32_convert_s_i64       <i64_convert_f32_injector<wasm_ops::f32_convert_s_i64_code>>;
-      using f32_convert_u_i32 = wasm_ops::f32_convert_u_i32       <i32_convert_f32_injector<wasm_ops::f32_convert_u_i32_code>>;
-      using f32_convert_u_i64 = wasm_ops::f32_convert_u_i64       <i64_convert_f32_injector<wasm_ops::f32_convert_u_i64_code>>;
-      using f64_convert_s_i32 = wasm_ops::f64_convert_s_i32       <i32_convert_f64_injector<wasm_ops::f64_convert_s_i32_code>>;
-      using f64_convert_s_i64 = wasm_ops::f64_convert_s_i64       <i64_convert_f64_injector<wasm_ops::f64_convert_s_i64_code>>;
-      using f64_convert_u_i32 = wasm_ops::f64_convert_u_i32       <i32_convert_f64_injector<wasm_ops::f64_convert_u_i32_code>>;
-      using f64_convert_u_i64 = wasm_ops::f64_convert_u_i64       <i64_convert_f64_injector<wasm_ops::f64_convert_u_i64_code>>;
+      // Integer-to-float conversions stay native: they are correctly rounded, matching softfloat.
    }; // pre_op_injectors
 
    struct post_op_injectors : wasm_ops::op_types<pass_injector> {

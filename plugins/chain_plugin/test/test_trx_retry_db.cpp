@@ -7,7 +7,6 @@
 
 #include <sysio/chain/controller.hpp>
 #include <sysio/chain/genesis_state.hpp>
-#include <sysio/chain/thread_utils.hpp>
 #include <sysio/chain/trace.hpp>
 #include <sysio/chain/name.hpp>
 
@@ -15,6 +14,7 @@
 #include <sysio/chain/plugin_interface.hpp>
 #include <fc/mock_time.hpp>
 #include <fc/bitutil.hpp>
+#include <fc/thread_utils.hpp>
 
 #include <boost/asio.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>

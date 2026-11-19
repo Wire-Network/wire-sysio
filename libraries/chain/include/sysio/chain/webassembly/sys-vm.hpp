@@ -29,8 +29,7 @@ namespace webassembly { namespace sys_vm_runtime {
 using namespace fc;
 using namespace sysio::vm;
 
-void validate(const bytes& code, const whitelisted_intrinsics_type& intrinsics );
-
+/// Validate WASM against the configured limits and the active intrinsic whitelist.
 void validate(const bytes& code, const wasm_config& cfg, const whitelisted_intrinsics_type& intrinsics );
 
 struct apply_options;

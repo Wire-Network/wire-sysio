@@ -6,9 +6,39 @@ import sys
 
 from generated_wasm import GeneratedWASM
 from regexes import DATA_REGEX, EXPORT_REGEX, FUNC_REGEX
-from test_wasm import TestWASM
+from test_wasm import TestWASM, export_stub_name
 
 from compile_tests import CompileError
+
+
+def check_stub_signatures(generated_wasm, test_wasm, num_to_name_map):
+    """Raise CompileError unless each generated stub has the signature of the test export it stands for.
+
+    Stubs are located by position after the imports, so a toolchain that places other functions there would otherwise
+    redirect calls to the wrong test functions without an error.
+    """
+    generated_signatures = generated_wasm.type_signatures()
+    generated_func_types = generated_wasm.func_type_indices()
+    test_signatures = test_wasm.type_signatures()
+    test_func_types = test_wasm.func_type_indices()
+    test_exports = {}
+    for e in test_wasm.exports:
+        match = re.search(EXPORT_REGEX, e)
+        if match:
+            test_exports[export_stub_name(match.group(2))] = match.group(4)
+
+    first_stub = generated_wasm.first_stub_index()
+    for stub_index, name in num_to_name_map.items():
+        stub_func = str(first_stub + int(stub_index))
+        if name not in test_exports or stub_func not in generated_func_types:
+            raise CompileError(f'No function pair for stub {name} (generated function {stub_func})')
+        stub_signature = generated_signatures[generated_func_types[stub_func]]
+        export_signature = test_signatures[test_func_types[test_exports[name]]]
+        if stub_signature != export_signature:
+            raise CompileError(
+                f'Stub {name} (generated function {stub_func}) has signature {stub_signature}, '
+                f'test export has {export_signature}')
+
 
 def main(generated_wasm_file, test_wasm_file, out_wasm_file, map_file):
     def read_wasm_file(wasm_file):
@@ -35,6 +65,7 @@ def main(generated_wasm_file, test_wasm_file, out_wasm_file, map_file):
 
     generated_wasm.read_wasm(read_wasm_file(generated_wasm_file))
     test_wasm.read_wasm(read_wasm_file(test_wasm_file))
+    check_stub_signatures(generated_wasm, test_wasm, num_to_name_map)
 
     type_map = test_wasm.shift_types(generated_wasm.max_type)
     max_func_num = test_wasm.shift_imports(type_map, generated_wasm.max_import)
@@ -42,7 +73,7 @@ def main(generated_wasm_file, test_wasm_file, out_wasm_file, map_file):
     max_func_num = generated_wasm.shift_base_funcs(max_func_num)
 
     num_to_name_map = {
-        int(k) + generated_wasm.num_imports_base_functions + 1:
+        int(k) + generated_wasm.first_stub_index():
         v for k, v in num_to_name_map.items()
     }
 

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <sysio/net_plugin/protocol.hpp>
-#include <sysio/chain/thread_utils.hpp>
 
 #include <fc/mutex.hpp>
+#include <fc/thread_utils.hpp>
 
 #include <boost/multi_index_container.hpp>
 

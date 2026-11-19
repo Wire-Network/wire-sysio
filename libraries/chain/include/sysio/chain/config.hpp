@@ -97,6 +97,7 @@ namespace sysio::chain::config {
   static constexpr uint16_t   default_vote_thread_pool_size                = 4;
   static constexpr uint32_t   default_max_action_return_value_size         = 1024;
   static constexpr uint32_t   default_max_reversible_blocks                = 3600u;
+  static constexpr uint32_t   default_incoming_trx_max_signatures          = 256u; ///< default most signatures a transaction received over p2p or the API may carry
 
   static constexpr uint32_t   default_max_transaction_finality_status_success_duration_sec = 180;
   static constexpr uint32_t   default_max_transaction_finality_status_failure_duration_sec = 180;
@@ -135,6 +136,9 @@ namespace sysio::chain::config {
   static constexpr uint32_t   setcode_ram_bytes_multiplier       = 10;     ///< multiplier on contract size to account for multiple copies and cached compilation
 
   static constexpr uint32_t   hashing_checktime_block_size       = 10*1024;  /// call checktime from hashing intrinsic once per this number of bytes
+
+  /// Pairs per Miller loop in bls_pairing; keeps line coefficients within 612 KiB and the extra squarings under 2%.
+  static constexpr uint32_t   bls_pairing_batch_size             = 32;
 
   /// Consensus limit bounding one uninterrupted libsodium Ed25519 verification.
   static constexpr uint32_t   max_ed25519_message_size          = 65'536;

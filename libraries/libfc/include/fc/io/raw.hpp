@@ -202,13 +202,19 @@ namespace fc {
       }while( val );
     }
 
+    /**
+     * Unpacks a signed_int, which is encoded in at most five bytes.
+     *
+     * @throws fc::assert_exception when the fifth byte still has its continuation bit set
+     */
     template<typename Stream> inline void unpack( Stream& s, signed_int& vi ) {
-      uint32_t v = 0; char b = 0; int by = 0;
+      uint32_t v = 0; char b = 0; uint8_t by = 0;
       do {
         s.get(b);
         v |= uint32_t(uint8_t(b) & 0x7f) << by;
         by += 7;
-      } while( uint8_t(b) & 0x80 );
+      } while( uint8_t(b) & 0x80 && by < 32 );
+      FC_ASSERT( !(uint8_t(b) & 0x80), "signed_int is longer than five bytes" );
       vi.value= (v>>1) ^ (~(v&1)+1ull);                         //reverse zigzag encoding
     }
 

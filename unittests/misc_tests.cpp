@@ -4,13 +4,13 @@
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/trace.hpp>
 #include <sysio/chain/types.hpp>
-#include <sysio/chain/thread_utils.hpp>
 #include <sysio/testing/tester.hpp>
 
 #include <fc/io/json.hpp>
 #include <fc/log/logger_config.hpp>
 #include <appbase/application.hpp>
 #include <fc/bitutil.hpp>
+#include <fc/thread_utils.hpp>
 
 #include <thread>
 

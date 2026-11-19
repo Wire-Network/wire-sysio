@@ -106,18 +106,17 @@ bool has_real_authorization(const chain::action& act, chain::name actor) {
    });
 }
 
-/// @p account's ABI, validated under @p yield; nullopt when the account has none or it is larger than @p max_abi_bytes.
+/// @p account's ABI, validated under @p yield; null when the account has none or it is larger than @p max_abi_bytes.
 /// Throws when the ABI does not unpack or validation runs past the yield's deadline.
-std::optional<chain::abi_serializer> load_abi(const chain::controller& chain, chain::name account,
-                                              uint32_t max_abi_bytes,
-                                              const chain::abi_serializer::yield_function_t& yield) {
+chain::abi_serializer_ptr load_abi(const chain::controller& chain, chain::name account, uint32_t max_abi_bytes,
+                                   const chain::abi_serializer::yield_function_t& yield) {
    const chain::account_metadata_object* metadata = chain.find_account_metadata(account);
    if (metadata == nullptr || metadata->abi.size() > max_abi_bytes)
-      return std::nullopt;
+      return nullptr;
    chain::abi_def abi;
    if (!chain::abi_serializer::to_abi(metadata->abi, abi))
-      return std::nullopt;
-   return chain::abi_serializer(std::move(abi), yield);
+      return nullptr;
+   return std::make_shared<const chain::abi_serializer>(std::move(abi), yield);
 }
 
 /// Each rule's to_string, for the start record.

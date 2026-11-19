@@ -62,11 +62,6 @@ RUN apt-get update && apt-get upgrade -y && \
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 100 && \
     update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 100
 
-COPY <<-EOF /ubsan.supp
-  vptr:wasm_sysio_validation.hpp
-  vptr:wasm_sysio_injection.hpp
-EOF
-
 ENV CC=/usr/bin/clang-18
 ENV CXX=/usr/bin/clang++-18
 ENV CMAKE_MAKE_PROGRAM=/usr/bin/ninja
@@ -80,7 +75,7 @@ COPY <<-EOF /extras.cmake
 EOF
 
 ENV SYSIO_PLATFORM_HAS_EXTRAS_CMAKE=1
-ENV UBSAN_OPTIONS=print_stacktrace=1,suppressions=/ubsan.supp
+ENV UBSAN_OPTIONS=print_stacktrace=1
 
 # GitHub CLI from the official apt repository. The release workflows use `gh`
 # inside these images (linux_amd64_build.yaml downloads the pinned wire-cdt

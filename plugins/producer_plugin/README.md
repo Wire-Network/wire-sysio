@@ -207,6 +207,7 @@ for `enable-stale-production`, and `-x` for `pause-on-startup`.
 | Option | Default | Meaning |
 |---|---|---|
 | `incoming-transaction-queue-size-mb` | `1024` | Maximum size in MiB of the incoming transaction queue. Beyond it, transactions are subjectively dropped with resource exhaustion. |
+| `incoming-trx-max-signatures` | `256` | Maximum signatures on a transaction received over p2p or the API. A transaction with more is rejected with `tx_too_many_sigs` before its keys are recovered. Transactions applied from blocks are not limited. |
 | `subjective-cpu-leeway-us` | `31000` | Microseconds allowed for a transaction that starts with insufficient CPU quota to complete and cover its CPU usage. |
 | `subjective-account-max-failures` | `3` | Maximum failures allowed for one account per window. |
 | `subjective-account-max-failures-window-size` | `1` | Window size, in blocks, for `subjective-account-max-failures`. |

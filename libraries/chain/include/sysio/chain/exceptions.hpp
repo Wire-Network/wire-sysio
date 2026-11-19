@@ -274,6 +274,10 @@ namespace sysio { namespace chain {
                                     3040019, "Packed transaction contains extra unexpected data" )
       FC_DECLARE_DERIVED_EXCEPTION( tx_compression_not_allowed, transaction_exception,
                                     3040020, "Packed transaction compression not allowed in consensus" )
+      /// An incoming transaction carrying more signatures than the node allows. Never thrown for a transaction
+      /// applied from a block.
+      FC_DECLARE_DERIVED_EXCEPTION( tx_too_many_sigs, transaction_exception,
+                                    3040021, "Transaction has too many signatures" )
 
 
    FC_DECLARE_DERIVED_EXCEPTION( action_validate_exception, chain_exception,

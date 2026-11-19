@@ -96,7 +96,8 @@ int main(int argc, char* argv[]) {
                stream.read(data.data(), sz);
                return fc::variant(fc::to_hex(data.data(),data.size()));
          },
-         [](const fc::variant&, fc::datastream<char*>&, bool, bool, const sysio::chain::abi_serializer::yield_function_t&) {
+         [](const fc::variant&, sysio::chain::abi_serializer::pack_stream&, bool, bool,
+            const sysio::chain::abi_serializer::yield_function_t&) {
             FC_ASSERT(false, "sorry, this kludge can't write out bytes");
          }));
       }

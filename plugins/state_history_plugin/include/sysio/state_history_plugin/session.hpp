@@ -60,7 +60,7 @@ public:
 
    // allow main thread to drain the strand before destruction -- some awake_if_idle() post()s may be inflight
    void drain_strand() {
-      chain::post_async_task(strand, [](){}).get();
+      fc::post_async_task(strand, [](){}).get();
    }
 
 private:

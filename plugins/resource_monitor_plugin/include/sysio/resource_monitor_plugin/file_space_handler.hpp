@@ -5,7 +5,7 @@
 
 #include <sysio/chain/application.hpp>
 #include <sysio/chain/exceptions.hpp>
-#include <sysio/chain/thread_utils.hpp>
+#include <fc/thread_utils.hpp>
 
 namespace sysio::resource_monitor {
    template<typename SpaceProvider>
@@ -183,7 +183,7 @@ namespace sysio::resource_monitor {
       SpaceProvider space_provider;
 
       static constexpr size_t thread_pool_size = 1;
-      sysio::chain::named_thread_pool<struct resmon> thread_pool;
+      fc::named_thread_pool<struct resmon> thread_pool;
 
       boost::asio::steady_timer timer {thread_pool.get_executor()};
 

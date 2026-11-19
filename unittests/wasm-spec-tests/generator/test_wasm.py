@@ -1,5 +1,6 @@
 import re
 
+from compile_tests import CompileError
 from regexes import (
     CALL_REGEX, CALL_INDIRECT_REGEX,
     ELEM_REGEX, EXPORT_REGEX,
@@ -7,6 +8,12 @@ from regexes import (
     IMPORT_REGEX, START_REGEX, TYPE_REGEX
 )
 from wasm import WASM
+
+
+def export_stub_name(export_name):
+    """Name of the generated stub function that stands for the test export `export_name`."""
+    return '_' + export_name.replace('-', '_').replace('.', '_')
+
 
 class TestWASM(WASM):
     def __init__(self):
@@ -137,13 +144,6 @@ class TestWASM(WASM):
         def inject_new_func_num(f, new_func_num):
             return re.sub(EXPORT_REGEX, lambda x: f'{x.group(1)}{x.group(2)}{x.group(3)}{new_func_num}{x.group(5)}', f)
 
-        def normalize(val):
-            ret_val = '_'
-            for i in range(0, len(val)):
-                ret_val += '_' if val[i] == '-' or val[i] == '.' else val[i]
-
-            return ret_val
-
         new_exports = []
         exports_map = {}
         for e in self.exports:
@@ -154,10 +154,10 @@ class TestWASM(WASM):
                 new_export = inject_new_func_num(e, new_func_num)
 
                 new_exports.append(new_export)
+                # Only function exports can stand behind a generated stub.
+                exports_map[export_stub_name(re.search(EXPORT_REGEX, e).group(2))] = new_func_num
             else:
                 new_exports.append(e)
-
-            exports_map[normalize(re.search(EXPORT_REGEX, e).group(2))] = new_func_num
         self.exports = new_exports
         return exports_map
 
@@ -165,12 +165,13 @@ class TestWASM(WASM):
         new_elems = []
         for e in self.elems:
             match = re.search(ELEM_REGEX, e)
+            if not match:
+                # Leaving the segment unshifted would point the table at the wrong functions.
+                raise CompileError(f'Unrecognized elem segment: {e}')
             new_numbers = []
-            if match:
-                numbers = match.group(2)
-                for n in numbers.split():
-                    shifted_num = self.function_symbol_map[n]
-                    new_numbers.append(str(shifted_num))
+            for n in match.group(2).split():
+                shifted_num = self.function_symbol_map[n]
+                new_numbers.append(str(shifted_num))
 
             new_numbers_str = ' '.join(new_numbers)
             sub_func = lambda x: f'{x.group(1)}{new_numbers_str}{x.group(3)}'
