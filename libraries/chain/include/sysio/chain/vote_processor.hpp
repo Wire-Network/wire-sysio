@@ -473,19 +473,20 @@ public:
             connection_votes& c = it->second;
             if (c.rejected_session == c.session)
                return; // the session sent a vote that failed verification
-            if (const uint32_t held = c.queued + c.parked; held >= limits.max_votes_per_connection) {
+            const uint32_t max_votes_per_connection = limits.max_votes_per_connection;
+            if (const uint32_t held = c.queued + c.parked; held >= max_votes_per_connection) {
                remove_parked(it);
                g.unlock();
                // drop, too many from this connection to process, consider connection invalid
                ilog("Exceeded max votes per connection {} >= {} for {}",
-                    held, limits.max_votes_per_connection, connection_id);
+                    held, max_votes_per_connection, connection_id);
                emit(connection_id, vote_result_t::max_exceeded, msg, {}, {});
                return;
             }
          }
-         if (queued_votes >= limits.max_queued_votes) {
+         if (const uint32_t max_queued_votes = limits.max_queued_votes; queued_votes >= max_queued_votes) {
             g.unlock();
-            ilog("Exceeded max queued votes {}, dropping vote from {}", limits.max_queued_votes, connection_id);
+            ilog("Exceeded max queued votes {}, dropping vote from {}", max_queued_votes, connection_id);
             return;
          }
       }
