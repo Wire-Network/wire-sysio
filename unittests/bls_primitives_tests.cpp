@@ -1,15 +1,24 @@
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/resource_limits.hpp>
+#include <sysio/chain/wasm_sysio_constraints.hpp>
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/webassembly/return_codes.hpp>
 
 #include <fc/variant_object.hpp>
+#include <fmt/format.h>
+
+#include <bls12-381/bls12-381.hpp>
 
 #include <boost/test/unit_test.hpp>
 
 #include <test_contracts.hpp>
 
 #include "fork_test_utilities.hpp"
+#include "test_utils.hpp"
+
+#include <bit>
+#include <chrono>
+#include <random>
 
 using namespace sysio::chain;
 using namespace sysio::testing;
@@ -21,6 +30,148 @@ std::vector<char> hex2bin(const std::string& source) {
    fc::from_hex(source, output.data(), output.size());
    return output;
 }
+
+namespace {
+
+/// Bytes of an affine G1 point, an affine G2 point and a GT element as bls_pairing reads and writes them.
+constexpr size_t g1_bytes = 96;
+constexpr size_t g2_bytes = 192;
+constexpr size_t gt_bytes = 576;
+
+/// Seed of the generator the pairing tests draw their points from.
+constexpr uint64_t pairing_seed = 0x5eed;
+
+/// (G1, G2) pairs encoded as testpairing takes them, and as the library pairs them.
+struct pairing_input {
+   std::vector<char>                                     g1_points;
+   std::vector<char>                                     g2_points;
+   std::vector<std::tuple<bls12_381::g1, bls12_381::g2>> pairs;
+
+   /// Append the pair (`p`, `q`); the library leaves out a pair holding a point at infinity.
+   void append(const bls12_381::g1& p, const bls12_381::g2& q) {
+      const size_t g1_at = g1_points.size();
+      const size_t g2_at = g2_points.size();
+      g1_points.resize(g1_at + g1_bytes);
+      g2_points.resize(g2_at + g2_bytes);
+      p.toAffineBytesLE(std::span<uint8_t, g1_bytes>(reinterpret_cast<uint8_t*>(g1_points.data() + g1_at), g1_bytes),
+                        bls12_381::from_mont::yes);
+      q.toAffineBytesLE(std::span<uint8_t, g2_bytes>(reinterpret_cast<uint8_t*>(g2_points.data() + g2_at), g2_bytes),
+                        bls12_381::from_mont::yes);
+      bls12_381::pairing::add_pair(pairs, p, q);
+   }
+};
+
+/// A uniformly random 256-bit scalar.
+std::array<uint64_t, 4> random_scalar(std::mt19937_64& rng) {
+   return {rng(), rng(), rng(), rng()};
+}
+
+/// The pairing product of `pairs` from a single Miller loop over all of them, encoded as bls_pairing writes it.
+std::vector<char> unbatched_pairing(const std::vector<std::tuple<bls12_381::g1, bls12_381::g2>>& pairs) {
+   std::vector<char> result(gt_bytes);
+   bls12_381::pairing::calculate(pairs).toBytesLE(
+      std::span<uint8_t, gt_bytes>(reinterpret_cast<uint8_t*>(result.data()), gt_bytes), bls12_381::from_mont::yes);
+   return result;
+}
+
+/// The account and action of the contract bls_pairing_deadline_test deploys.
+constexpr account_name pairing_account = "pairing"_n;
+constexpr action_name  pairing_action  = "pair"_n;
+
+/// CPU limits of the transaction bls_pairing_deadline_test expects to be stopped, and how long stopping it may take.
+constexpr uint32_t pairing_timeout_ms       = 100;
+constexpr uint32_t pairing_block_timeout_ms = 1'000;
+constexpr int64_t  pairing_stop_bound_ms    = 500;
+
+/// Pairs of the timed call: parsing them takes a fraction of pairing_timeout_ms, pairing them takes seconds.
+constexpr uint32_t deadline_pairs = 1u << 13;
+static_assert(std::has_single_bit(deadline_pairs), "the contract fills its point arrays by doubling");
+
+/// Where the pairing contract keeps its abort message, the pair count it reads, the G2 point it copies, its G1 and G2
+/// point arrays and its result. The first G1 point is the one it copies.
+constexpr uint32_t pairing_message_at = 8;
+constexpr uint32_t pairing_count_at   = 32;
+constexpr uint32_t g2_seed_at         = 64;
+constexpr uint32_t g1_points_at       = 1024;
+constexpr uint32_t g2_points_at       = g1_points_at + deadline_pairs * g1_bytes;
+constexpr uint32_t gt_at              = g2_points_at + deadline_pairs * g2_bytes;
+constexpr uint32_t pairing_pages      = (gt_at + gt_bytes + wasm_constraints::wasm_page_size - 1) /
+                                        wasm_constraints::wasm_page_size;
+
+/// Abort message of the pairing contract.
+constexpr auto pairing_failed = "bls_pairing failed";
+
+/// Selects the action of the contract on pairing_account for push_trx.
+struct pairing_call {
+   static account_name get_account() { return pairing_account; }
+   static action_name  get_name() { return pairing_action; }
+};
+
+/**
+ * A contract that pairs the G1 generator with the G2 generator as many times as its uint32 action data says, a power
+ * of two up to deadline_pairs, and aborts unless bls_pairing succeeds. It fills each point array by doubling it.
+ */
+std::string pairing_wast() {
+   std::vector<char> g1(g1_bytes);
+   std::vector<char> g2(g2_bytes);
+   bls12_381::g1::one().toAffineBytesLE(std::span<uint8_t, g1_bytes>(reinterpret_cast<uint8_t*>(g1.data()), g1_bytes),
+                                        bls12_381::from_mont::yes);
+   bls12_381::g2::one().toAffineBytesLE(std::span<uint8_t, g2_bytes>(reinterpret_cast<uint8_t*>(g2.data()), g2_bytes),
+                                        bls12_381::from_mont::yes);
+   return fmt::format(R"=====(
+(module
+ (import "env" "read_action_data" (func $read_action_data (param i32 i32) (result i32)))
+ (import "env" "memcpy" (func $memcpy (param i32 i32 i32) (result i32)))
+ (import "env" "sysio_assert" (func $assert (param i32 i32)))
+ (import "env" "bls_pairing" (func $bls_pairing (param i32 i32 i32 i32 i32 i32 i32) (result i32)))
+ (memory $0 {pages})
+ (data (i32.const {message}) "{failed}\00")
+ (data (i32.const {g2_seed}) "{g2}")
+ (data (i32.const {g1_at}) "{g1}")
+ (export "apply" (func $apply))
+ (func $fill (param $at i32) (param $filled i32) (param $size i32)
+  (block $done
+   (loop $double
+    (br_if $done (i32.ge_u (get_local $filled) (get_local $size)))
+    (drop (call $memcpy (i32.add (get_local $at) (get_local $filled)) (get_local $at) (get_local $filled)))
+    (set_local $filled (i32.shl (get_local $filled) (i32.const 1)))
+    (br $double)
+   )
+  )
+ )
+ (func $apply (param $0 i64) (param $1 i64) (param $2 i64)
+  (local $n i32)
+  (drop (call $read_action_data (i32.const {count_at}) (i32.const 4)))
+  (set_local $n (i32.load (i32.const {count_at})))
+  (drop (call $memcpy (i32.const {g2_at}) (i32.const {g2_seed}) (i32.const {g2_size})))
+  (call $fill (i32.const {g1_at}) (i32.const {g1_size}) (i32.mul (get_local $n) (i32.const {g1_size})))
+  (call $fill (i32.const {g2_at}) (i32.const {g2_size}) (i32.mul (get_local $n) (i32.const {g2_size})))
+  (call $assert (i32.eqz (call $bls_pairing (i32.const {g1_at}) (i32.mul (get_local $n) (i32.const {g1_size}))
+                                             (i32.const {g2_at}) (i32.mul (get_local $n) (i32.const {g2_size}))
+                                             (get_local $n) (i32.const {gt_at}) (i32.const {gt_size})))
+                (i32.const {message}))
+ )
+)
+)=====",
+                      fmt::arg("pages", pairing_pages), fmt::arg("message", pairing_message_at),
+                      fmt::arg("failed", pairing_failed), fmt::arg("g2_seed", g2_seed_at),
+                      fmt::arg("g2", sysio::test_utils::to_wast_string(g2)), fmt::arg("g1_at", g1_points_at),
+                      fmt::arg("g1", sysio::test_utils::to_wast_string(g1)), fmt::arg("count_at", pairing_count_at),
+                      fmt::arg("g2_at", g2_points_at), fmt::arg("g1_size", g1_bytes), fmt::arg("g2_size", g2_bytes),
+                      fmt::arg("gt_at", gt_at), fmt::arg("gt_size", gt_bytes));
+}
+
+/// Push the pairing contract's action for `pairs` pairs, billed explicitly so that no deadline applies.
+void push_pairs(tester& c, uint32_t pairs) {
+   signed_transaction trx;
+   trx.actions.emplace_back(vector<permission_level>{{pairing_account, config::active_name}}, pairing_account,
+                            pairing_action, fc::raw::pack(pairs));
+   c.set_transaction_headers(trx);
+   trx.sign(c.get_private_key(pairing_account, "active"), c.get_chain_id());
+   c.push_transaction(trx);
+}
+
+} // anonymous namespace
 
 BOOST_AUTO_TEST_SUITE(bls_primitives_tests)
 
@@ -430,6 +581,80 @@ BOOST_AUTO_TEST_CASE( bls_testpairing ) { try {
          ("expected_error", expected_error)
       );
    }
+
+} FC_LOG_AND_RETHROW() }
+
+/// bls_pairing pairs in batches of config::bls_pairing_batch_size; its result on either side of a batch boundary, and
+/// over several batches, is the one a single Miller loop over all the pairs gives.
+BOOST_AUTO_TEST_CASE( bls_pairing_batches ) { try {
+   tester c( setup_policy::full );
+
+   const auto& tester1_account = account_name("tester1");
+   c.create_accounts( {tester1_account} );
+   c.produce_block();
+
+   c.expand_roa_policy( c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
+   c.set_code( tester1_account, test_contracts::bls_primitives_test_wasm() );
+   c.set_abi( tester1_account, test_contracts::bls_primitives_test_abi().data() );
+   c.produce_block();
+
+   const auto push_pairing = [&](const pairing_input& input) {
+      c.push_action( tester1_account, "testpairing"_n, tester1_account, mutable_variant_object()
+         ("g1_points", input.g1_points)
+         ("g2_points", input.g2_points)
+         ("num", input.g1_points.size() / g1_bytes)
+         ("res", unbatched_pairing(input.pairs))
+         ("expected_error", (int32_t)return_code::success)
+      );
+   };
+
+   constexpr size_t batch = config::bls_pairing_batch_size;
+   std::mt19937_64 rng(pairing_seed);
+   for (const size_t size : {size_t{1}, batch - 1, batch, batch + 1, 3 * batch + 1}) {
+      BOOST_TEST_CONTEXT("pairs " << size) {
+         pairing_input input;
+         for (size_t i = 0; i < size; ++i) {
+            input.append(bls12_381::g1::one().scale(random_scalar(rng)),
+                         bls12_381::g2::one().scale(random_scalar(rng)));
+         }
+         BOOST_REQUIRE_EQUAL(input.pairs.size(), size);
+         push_pairing(input);
+      }
+   }
+
+   // Every pair holds a point at infinity, so nothing is paired and the result is one.
+   pairing_input at_infinity;
+   at_infinity.append(bls12_381::g1::zero(), bls12_381::g2::one().scale(random_scalar(rng)));
+   at_infinity.append(bls12_381::g1::one().scale(random_scalar(rng)), bls12_381::g2::zero());
+   BOOST_REQUIRE(at_infinity.pairs.empty());
+   push_pairing(at_infinity);
+
+} FC_LOG_AND_RETHROW() }
+
+/// A call with more pairs than the transaction deadline allows time for is stopped by the deadline.
+BOOST_AUTO_TEST_CASE( bls_pairing_deadline_test ) { try {
+   tester c( setup_policy::full );
+
+   c.create_accounts( {pairing_account} );
+   c.produce_block();
+   c.set_code( pairing_account, pairing_wast().c_str() );
+   c.produce_block();
+
+   // Load the contract before the timed transaction.
+   push_pairs(c, 1);
+
+   const std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+   BOOST_CHECK_EXCEPTION( sysio::test_utils::push_trx(c, pairing_call{}, 0, pairing_timeout_ms,
+                                                      pairing_block_timeout_ms, false, fc::raw::pack(deadline_pairs),
+                                                      pairing_account),
+                          tx_cpu_usage_exceeded, sysio::test_utils::is_tx_cpu_usage_exceeded );
+   const int64_t elapsed_ms =
+      std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start).count();
+   BOOST_TEST_MESSAGE( "bls_pairing of " << deadline_pairs << " pairs stopped after " << elapsed_ms << " ms" );
+   BOOST_CHECK_LT( elapsed_ms, pairing_stop_bound_ms );
+
+   push_pairs(c, 2);
+   c.produce_block();
 
 } FC_LOG_AND_RETHROW() }
 

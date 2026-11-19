@@ -137,6 +137,9 @@ namespace sysio::chain::config {
 
   static constexpr uint32_t   hashing_checktime_block_size       = 10*1024;  /// call checktime from hashing intrinsic once per this number of bytes
 
+  /// Pairs per Miller loop in bls_pairing; keeps line coefficients within 612 KiB and the extra squarings under 2%.
+  static constexpr uint32_t   bls_pairing_batch_size             = 32;
+
   /// Consensus limit bounding one uninterrupted libsodium Ed25519 verification.
   static constexpr uint32_t   max_ed25519_message_size          = 65'536;
 
