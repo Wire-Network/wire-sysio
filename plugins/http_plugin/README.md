@@ -52,10 +52,11 @@ when the posted work runs, throws, returns early on shutdown, or is discarded. H
 HTTP worker thread get no request-body check. The byte budget is checked once more when the response is sent,
 and a 503 replaces a response that does not fit, unless its handler was registered with
 `http_response_policy::always_sent` (the last argument of `add_api` and `add_async_api`). Such a response is
-always sent, even past the budget. Its request is checked against the budget before the handler runs, on either
-thread, and stays reserved until the handler answers. `chain_api_plugin` registers `compute_transaction`,
-`push_transaction`, `push_transactions`, `send_transaction`, and `send_transaction2` this way, as their response
-reports a transaction's execution; the budget refuses them only on intake.
+always sent, even past the budget. Its request is checked against the budget before the handler runs, on
+either thread, and stays reserved until it is answered, by the handler or by the report of an exception it
+throws. `chain_api_plugin` registers `compute_transaction`, `push_transaction`, `push_transactions`,
+`send_transaction`, and `send_transaction2` this way, as their response reports a transaction's execution; the
+budget refuses them only on intake.
 
 A response counts against the budget until it is written. A response not written 10 s plus its size at 64 KiB/s
 after its write starts closes its connection, which releases its bytes.

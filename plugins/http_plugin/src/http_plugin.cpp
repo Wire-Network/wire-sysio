@@ -71,17 +71,6 @@ namespace sysio {
          return std::make_shared<bytes_in_flight_reservation>(conn, body_size);
       }
 
-      /// `then`, releasing `reservation` once it has answered, when the response holds its own bytes in flight. Wrap it
-      /// in the request's single_response so that only one answer releases.
-      url_response_callback release_when_answered(url_response_callback then,
-                                                  std::shared_ptr<bytes_in_flight_reservation> reservation) {
-         return [then = std::move(then), reservation = std::move(reservation)](int code,
-                                                                               std::optional<fc::variant> response) {
-            then(code, std::move(response));
-            reservation->release();
-         };
-      }
-
       /// What the exception being handled says. Call only from a catch block.
       std::string current_exception_text() {
          try {
@@ -102,16 +91,21 @@ namespace sysio {
        */
       class single_response {
       public:
-         /// `path` names the request's endpoint in log lines.
-         explicit single_response(std::shared_ptr<const std::string> path) : path_(std::move(path)) {}
+         /// `path` names the request's endpoint in log lines. `request`, if any, counts the request against
+         /// bytes_in_flight until it is answered, and is released once the answer counts its own bytes.
+         explicit single_response(std::shared_ptr<const std::string> path,
+                                  std::shared_ptr<bytes_in_flight_reservation> request = {})
+            : path_(std::move(path)), request_(std::move(request)) {}
 
          /// Wrap a handler's response callback so that it answers only if nothing has yet.
          static url_response_callback guard(std::shared_ptr<single_response> self, url_response_callback then) {
             return [self = std::move(self), then = std::move(then)](int code, std::optional<fc::variant> response) {
-               if (self->claim())
+               if (self->claim()) {
                   then(code, std::move(response));
-               else
+                  self->release_request();
+               } else {
                   fc_elog(logger(), "{}: response {} after the request was answered; dropped", self->path(), code);
+               }
             };
          }
 
@@ -119,11 +113,13 @@ namespace sysio {
          /// from a catch block.
          template <typename Report>
          void report_exception(Report&& report) {
-            if (claim())
+            if (claim()) {
                report();
-            else
+               release_request();
+            } else {
                fc_elog(logger(), "{}: exception after the request was answered; dropped: {}", path(),
                        current_exception_text());
+            }
          }
 
          /// Take the answer: true for the first caller only.
@@ -136,8 +132,17 @@ namespace sysio {
          const std::string& path() const { return *path_; }
 
       private:
+         /// The request is answered, and its answer counts its own bytes: stop counting the request. Called only by
+         /// the answer's claimant.
+         void release_request() {
+            if (request_)
+               request_->release();
+         }
+
          std::shared_ptr<const std::string> path_; ///< shared by every request to the endpoint
-         std::atomic<bool> answered_{false};       ///< set by the first claim()
+         /// counts the request until it is answered; null when the request is not counted that long
+         std::shared_ptr<bytes_in_flight_reservation> request_;
+         std::atomic<bool> answered_{false}; ///< set by the first claim()
       };
 
       /**
@@ -354,11 +359,10 @@ namespace sysio {
                std::shared_ptr<bytes_in_flight_reservation> body_in_flight_guard = admit_request(conn, b.size());
                if (!body_in_flight_guard)
                   return; // admission rejected before any reservation was made, nothing to release
-               // An always-sent response is not refused once it is ready, so the request stays counted until then.
-               if (response_policy == http_response_policy::always_sent)
-                  then = release_when_answered(std::move(then), body_in_flight_guard);
-
-               std::shared_ptr<single_response> answer = std::make_shared<single_response>(path);
+               // An always-sent response is not refused once it is ready, so the request stays counted until it is
+               // answered, by the handler or by an exception.
+               std::shared_ptr<single_response> answer = std::make_shared<single_response>(
+                  path, response_policy == http_response_policy::always_sent ? body_in_flight_guard : nullptr);
                url_response_callback wrapped_then = single_response::guard(answer, std::move(then));
 
                // post to the app thread taking shared ownership of next (via std::shared_ptr),
@@ -403,14 +407,15 @@ namespace sysio {
                             const detail::abstract_conn_ptr& conn, string&& r, string&& b,
                             url_response_callback&& then ) mutable {
                // An always-sent response is not refused once it is ready, so the request is admitted here, before
-               // the handler runs, and stays counted until then.
+               // the handler runs, and stays counted until it is answered, by the handler or by an exception.
+               std::shared_ptr<bytes_in_flight_reservation> reservation;
                if (response_policy == http_response_policy::always_sent) {
-                  std::shared_ptr<bytes_in_flight_reservation> reservation = admit_request(conn, b.size());
+                  reservation = admit_request(conn, b.size());
                   if (!reservation)
                      return;
-                  then = release_when_answered(std::move(then), std::move(reservation));
                }
-               std::shared_ptr<single_response> answer = std::make_shared<single_response>(path);
+               std::shared_ptr<single_response> answer =
+                  std::make_shared<single_response>(path, std::move(reservation));
                try {
                   next(std::move(r), std::move(b), single_response::guard(answer, std::move(then)));
                } catch( ... ) {

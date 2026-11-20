@@ -1791,3 +1791,52 @@ BOOST_FIXTURE_TEST_CASE(stalled_response_closed_at_deadline, http_plugin_test_fi
       socket->close();
    BOOST_CHECK(wait_until([&] { return plugin->requests_in_flight() == 0; }));
 }
+
+/// An always-sent request whose handler keeps a copy of its callback and then throws is answered once, with the
+/// exception's 500, and is no longer counted against bytes_in_flight once that answer is out, though the copy is still
+/// held. Answering through the copy later is dropped, with no effect on the connection or the count.
+BOOST_FIXTURE_TEST_CASE(always_sent_request_released_when_an_exception_answers, quiet_http_plugin_test_fixture) {
+   constexpr auto app_thread_route = "/v1/node/app_thread_throws";
+   constexpr auto http_thread_route = "/v1/node/http_thread_throws";
+   const std::string request_body(1024, 'x');
+   auto* plugin = init_on_socket();
+   BOOST_REQUIRE(plugin);
+
+   std::mutex retained_mutex;
+   std::vector<url_response_callback> retained;
+   const auto retain_and_throw = [&](string&&, string&&, url_response_callback&& answer) {
+      {
+         const std::lock_guard lock(retained_mutex);
+         retained.push_back(answer);
+      }
+      throw std::runtime_error("after keeping a copy of the callback");
+   };
+   plugin->add_api({{app_thread_route, api_category::node, retain_and_throw}}, appbase::exec_queue::read_write,
+                   appbase::priority::medium_low, http_content_type::json, http_response_policy::always_sent);
+   plugin->add_async_api({{http_thread_route, api_category::node, retain_and_throw}}, http_content_type::json,
+                         http_response_policy::always_sent);
+
+   net::io_context ctx;
+   const unix_socket_client client{ctx, socket};
+   for (const char* route : {app_thread_route, http_thread_route}) {
+      unix_socket_client::socket_type connection = client.connect();
+      unix_socket_client::post(connection, route, request_body);
+      BOOST_CHECK(client.read_response(connection).result() == http::status::internal_server_error);
+      http::response<http::string_body> next;
+      const beast::error_code after = client.read(connection, next);
+      BOOST_CHECK_MESSAGE(after == http::error::end_of_stream, route << ": " << after.message());
+   }
+   const auto retained_count = [&] {
+      const std::lock_guard lock(retained_mutex);
+      return retained.size();
+   };
+   BOOST_REQUIRE_EQUAL(retained_count(), 2u);
+   BOOST_CHECK(wait_until([&] { return plugin->bytes_in_flight() == 0; }));
+
+   for (const url_response_callback& late : retained)
+      late(magic_enum::enum_integer(http::status::ok), fc::variant("late"));
+   BOOST_CHECK_EQUAL(plugin->bytes_in_flight(), 0u);
+
+   retained.clear();
+   BOOST_CHECK(all_released(*plugin));
+}
