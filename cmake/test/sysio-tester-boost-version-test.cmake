@@ -28,9 +28,11 @@ project(sysio_tester_boost_version_probe CXX)
 include(\"${WORK_DIR}/sdk/lib/cmake/sysio/SysioTester.cmake\")
 ")
 
+# Package lookups are rooted in the stub tree, so no Boost from the environment or the system is considered.
 execute_process(
    COMMAND "${CMAKE_COMMAND}" -S "${WORK_DIR}/consumer" -B "${WORK_DIR}/consumer/build" -G "${GENERATOR}"
            "-DCMAKE_CXX_COMPILER=${CXX}" "-DCMAKE_PREFIX_PATH=${WORK_DIR}/stub" -DCMAKE_FIND_USE_PACKAGE_REGISTRY=OFF
+           "-DCMAKE_FIND_ROOT_PATH=${WORK_DIR}/stub" -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=ONLY
    RESULT_VARIABLE result OUTPUT_VARIABLE output ERROR_VARIABLE output)
 if(result EQUAL 0)
    message(FATAL_ERROR
