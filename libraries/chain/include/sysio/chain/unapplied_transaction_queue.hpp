@@ -59,6 +59,8 @@ private:
 public:
 
    void set_max_transaction_queue_size( uint64_t v ) { max_transaction_queue_size = v; }
+   /// Byte limit on the incoming transactions the queue holds.
+   uint64_t get_max_transaction_queue_size() const { return max_transaction_queue_size; }
 
    bool empty() const {
       return queue.empty();
