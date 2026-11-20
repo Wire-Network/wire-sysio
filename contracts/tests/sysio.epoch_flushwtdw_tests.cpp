@@ -1,5 +1,5 @@
-/// Cross-contract tests for the `sysio.epoch::advance` ↔ `sysio.opreg::
-/// flushwtdw` integration (Task 9 of the operator-collateral plan).
+/// Cross-contract tests for the `sysio.epoch::tickeconomy` ↔ `sysio.opreg::flushwtdw` integration:
+/// a withdrawal matures on the economic clock AND waits for its consensus guard.
 ///
 /// Data model: identity is now slug_name-keyed across opreg / chains.
 /// The fixture deploys `sysio.chains` so the chain-of-record exists and
@@ -197,14 +197,15 @@ public:
             ("batch_operator_minimum_active",       1)
             ("batch_op_groups",                     1)
             ("epoch_retention_envelope_log_count",  200)));
+      BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "seteconomy"_n, mvo()
+         ("epoch_duration_sec", EPOCH_DURATION_SEC)("start_time", fc::time_point_sec(control->head().block_time()))));
 
       // Emissions readiness gate prerequisites — without these tables the
       // gate at sysio.epoch::advance returns CONFIG_MISSING and every
       // advance is a silent no-op.
       BOOST_REQUIRE_EQUAL(success(), setemitcfg_defaults());
       BOOST_REQUIRE_EQUAL(success(), push(SYSIO_ACCOUNT, sysio_abi, SYSIO_ACCOUNT,
-         "initt5"_n, mvo()
-            ("start_time", fc::time_point_sec(control->head().block_time()))));
+         "initt5"_n, mvo()));
 
       BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
          "setconfig"_n, mvo()
@@ -254,15 +255,38 @@ public:
       produce_blocks();
    }
 
-   /// Step the wall clock past `next_epoch_start` and call advance once.
-   uint32_t advance_one_epoch() {
+   /// Step the wall clock past both clocks' next boundary.
+   void cross_epoch_boundary() {
       for (uint32_t i = 0; i < EPOCH_DURATION_SEC * 2 + 1; ++i) {
          produce_block();
       }
-      BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, MSGCH_ACCOUNT,
-         "advance"_n, mvo()));
+   }
+
+   /// Close the current consensus epoch, as sysio.msgch's chkcons would.
+   void advance_consensus() {
+      BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, MSGCH_ACCOUNT, "advance"_n, mvo()));
       produce_blocks();
-      return current_epoch();
+   }
+
+   /// Open the next economic epoch; its tick flushes matured withdrawals.
+   void tick_economy() {
+      BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "tickeconomy"_n,
+         mvo()("epoch_index", economic_epoch() + 1)));
+      produce_blocks();
+   }
+
+   /// Cross a boundary and step both clocks once.
+   void advance_one_epoch() {
+      cross_epoch_boundary();
+      advance_consensus();
+      tick_economy();
+   }
+
+   uint32_t economic_epoch() {
+      auto data = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "economystate"_n, "economystate"_n);
+      if (data.empty()) return 0;
+      return epoch_abi.binary_to_variant("economic_state", data, fixture_abi_yield_function())
+         ["current_epoch_index"].as<uint32_t>();
    }
 
    uint32_t current_epoch() {
@@ -368,11 +392,11 @@ BOOST_FIXTURE_TEST_CASE(flushwtdw_requires_epoch_auth, sysio_epoch_flushwtdw_tes
    bootstrap_for_flushwtdw();
 
    auto r = push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "flushwtdw"_n, mvo()
-      ("current_epoch", 999));
+      ("economic_epoch", 999)("consensus_epoch", 999));
    BOOST_REQUIRE(r.find("missing authority of sysio.epoch") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(advance_releases_matured_native_withdraw, sysio_epoch_flushwtdw_tester) { try {
+BOOST_FIXTURE_TEST_CASE(tick_releases_matured_native_withdraw, sysio_epoch_flushwtdw_tester) { try {
    bootstrap_for_flushwtdw();
 
    constexpr uint64_t INITIAL_DEPOSIT = 5'000'000;
@@ -409,7 +433,7 @@ BOOST_FIXTURE_TEST_CASE(flushwtdw_credits_native_claim_without_outbound_attestat
 
    constexpr uint32_t FUTURE_EPOCH = 100;
    BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, EPOCH_ACCOUNT,
-      "flushwtdw"_n, mvo()("current_epoch", FUTURE_EPOCH)));
+      "flushwtdw"_n, mvo()("economic_epoch", FUTURE_EPOCH)("consensus_epoch", FUTURE_EPOCH)));
 
    BOOST_REQUIRE(get_wtdw(1).is_null());
    BOOST_REQUIRE_EQUAL(INITIAL_DEPOSIT - WITHDRAW_AMOUNT,
@@ -432,7 +456,7 @@ BOOST_FIXTURE_TEST_CASE(single_advance_leaves_immature_row_intact,
    BOOST_REQUIRE_EQUAL(success(),
       withdraw(UWRIT_OP, "WIRE", "WIRE", WITHDRAW_AMOUNT));
 
-   advance_one_epoch();   // only one boundary — eligible_at_epoch is +2
+   advance_one_epoch();   // only one boundary of each clock; both waits are 2
 
    BOOST_REQUIRE(!get_wtdw(1).is_null());
    BOOST_REQUIRE_EQUAL(INITIAL_DEPOSIT, balance_of(UWRIT_OP, "WIRE", "WIRE"));
@@ -459,6 +483,81 @@ BOOST_FIXTURE_TEST_CASE(slashed_operator_withdraw_drops_silently,
    BOOST_REQUIRE(get_wtdw(1).is_null());
    BOOST_REQUIRE_EQUAL(balance_after_slash,
                        balance_of(UWRIT_OP, "WIRE", "WIRE"));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(economic_wait_alone_does_not_release, sysio_epoch_flushwtdw_tester) { try {
+   // The economic clock runs ahead while consensus stands still: the consensus guard holds the
+   // collateral until the request's deliveries could have been judged.
+   bootstrap_for_flushwtdw();
+   constexpr uint64_t INITIAL_DEPOSIT = 1'000'000;
+   constexpr uint64_t WITHDRAW_AMOUNT =   400'000;
+   BOOST_REQUIRE_EQUAL(success(), fund_and_bond(UWRIT_OP, "WIRE", "WIRE", INITIAL_DEPOSIT));
+   BOOST_REQUIRE_EQUAL(success(), withdraw(UWRIT_OP, "WIRE", "WIRE", WITHDRAW_AMOUNT));
+
+   for (int i = 0; i < 4; ++i) {
+      cross_epoch_boundary();
+      tick_economy();
+   }
+   BOOST_REQUIRE(!get_wtdw(1).is_null());
+   BOOST_REQUIRE_EQUAL(INITIAL_DEPOSIT, balance_of(UWRIT_OP, "WIRE", "WIRE"));
+
+   // Two consensus closes satisfy the guard; the next economic tick releases it.
+   advance_consensus();
+   cross_epoch_boundary();
+   advance_consensus();
+   BOOST_REQUIRE(!get_wtdw(1).is_null());
+   tick_economy();
+   BOOST_REQUIRE(get_wtdw(1).is_null());
+   BOOST_REQUIRE_EQUAL(INITIAL_DEPOSIT - WITHDRAW_AMOUNT, balance_of(UWRIT_OP, "WIRE", "WIRE"));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(consensus_alone_does_not_release, sysio_epoch_flushwtdw_tester) { try {
+   // Consensus closes without economic ticks release nothing: flushing runs on the economic clock,
+   // and the economic wait must pass too.
+   bootstrap_for_flushwtdw();
+   constexpr uint64_t INITIAL_DEPOSIT = 1'000'000;
+   constexpr uint64_t WITHDRAW_AMOUNT =   400'000;
+   BOOST_REQUIRE_EQUAL(success(), fund_and_bond(UWRIT_OP, "WIRE", "WIRE", INITIAL_DEPOSIT));
+   BOOST_REQUIRE_EQUAL(success(), withdraw(UWRIT_OP, "WIRE", "WIRE", WITHDRAW_AMOUNT));
+   const auto row = get_wtdw(1);
+   BOOST_REQUIRE_EQUAL(economic_epoch() + 2, row["eligible_at_economic_epoch"].as<uint32_t>());
+   BOOST_REQUIRE_EQUAL(current_epoch() + 2, row["eligible_at_consensus_epoch"].as<uint32_t>());
+
+   for (int i = 0; i < 3; ++i) {
+      cross_epoch_boundary();
+      advance_consensus();
+   }
+   BOOST_REQUIRE(!get_wtdw(1).is_null());
+   tick_economy();   // one economic epoch is still short of the wait
+   BOOST_REQUIRE(!get_wtdw(1).is_null());
+   cross_epoch_boundary();
+   tick_economy();
+   BOOST_REQUIRE(get_wtdw(1).is_null());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(dispute_pause_holds_withdrawals_while_the_economy_ticks,
+                        sysio_epoch_flushwtdw_tester) { try {
+   // A dispute pause freezes the consensus index, so the guard holds every withdrawal requested
+   // since; the economic clock keeps ticking and releases them only after consensus resumes.
+   bootstrap_for_flushwtdw();
+   constexpr uint64_t INITIAL_DEPOSIT = 1'000'000;
+   constexpr uint64_t WITHDRAW_AMOUNT =   400'000;
+   BOOST_REQUIRE_EQUAL(success(), fund_and_bond(UWRIT_OP, "WIRE", "WIRE", INITIAL_DEPOSIT));
+   BOOST_REQUIRE_EQUAL(success(), withdraw(UWRIT_OP, "WIRE", "WIRE", WITHDRAW_AMOUNT));
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, CHALG_ACCOUNT, "pause"_n, mvo()));
+
+   for (int i = 0; i < 4; ++i) {
+      cross_epoch_boundary();
+      tick_economy();
+   }
+   BOOST_REQUIRE(!get_wtdw(1).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, CHALG_ACCOUNT, "unpause"_n, mvo()));
+   advance_consensus();
+   cross_epoch_boundary();
+   advance_consensus();
+   tick_economy();
+   BOOST_REQUIRE(get_wtdw(1).is_null());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -554,6 +554,23 @@ public:
    action_result set_epoch(uint32_t index) {
       return push(EPOCH_ACCOUNT, epoch_abi_ser, EPOCH_ACCOUNT, "setindex"_n, mvo()("index", index));
    }
+   /// The pending block's time, in whole seconds: what a bucket tick records.
+   uint32_t now_sec() { return control->pending_block_time().sec_since_epoch(); }
+   /// Produce blocks until the next action runs at the start of a whole second. A successful push produces a
+   /// half-second block, so the action after it runs in the same second. Returns that second.
+   uint32_t align_to_second() {
+      if (control->pending_block_time().time_since_epoch().count() % fc::seconds(1).count() != 0) produce_block();
+      return now_sec();
+   }
+   /// Produce blocks until the next action runs in second `sec`.
+   void elapse_to(uint32_t sec) {
+      while (now_sec() < sec) produce_block();
+      BOOST_REQUIRE_EQUAL(sec, now_sec());
+   }
+   /// When `bucket` was last ticked, in whole seconds.
+   static uint32_t last_refill(const fc::variant& bucket) {
+      return bucket["last_refill"].as<fc::time_point_sec>().sec_since_epoch();
+   }
 
    // --- sysio.andon ---
 
@@ -2303,17 +2320,18 @@ BOOST_FIXTURE_TEST_CASE(desyndicate_refuses_over_budget, sysio_synd_tester) try 
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(100 * UNIT), liq_balance("alice"_n));
 
    // A new bucket starts full: the whole burst passes, then nothing until it refills.
+   const uint32_t ticked_at = align_to_second();
    BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, 10 * UNIT));
    const auto bucket = desynd_bucket_row(SOLANA, LIQSOL);
    BOOST_REQUIRE_EQUAL(0u, bucket["level"].as_uint64());
-   BOOST_REQUIRE_EQUAL(5u, bucket["last_epoch"].as<uint32_t>());
+   BOOST_REQUIRE_EQUAL(ticked_at, last_refill(bucket));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("desyndication exceeds the current budget"), desyndicate("alice"_n, 1));
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(90 * UNIT), liq_balance("alice"_n));
    BOOST_REQUIRE_EQUAL(2u, counters_row()["next_request_id"].as_uint64());
    BOOST_REQUIRE(return_row(2).is_null());
 } FC_LOG_AND_RETHROW()
 
-// The bucket refills by `desynd_refill` per depot epoch up to the burst, and drops by the whole quantity
+// The bucket refills by `desynd_refill` per second up to the burst, and drops by the whole quantity
 // a desyndication moves, its fee included.
 BOOST_FIXTURE_TEST_CASE(passes_after_refill, sysio_synd_tester) try {
    BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
@@ -2321,21 +2339,24 @@ BOOST_FIXTURE_TEST_CASE(passes_after_refill, sysio_synd_tester) try {
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.desynd_fee_bps = 1000, .desynd_burst = 10 * UNIT,
                                                              .desynd_refill = 4 * UNIT}));
    BOOST_REQUIRE_EQUAL(success(), set_epoch(5));
+   const uint32_t t0 = align_to_second();
    BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, 10 * UNIT));
    // 9 queued, 1 kept as the fee, and the bucket emptied by all 10.
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(9 * UNIT), queued_desyndication(*this, 1).amount().amount());
    BOOST_REQUIRE_EQUAL(0u, desynd_bucket_row(SOLANA, LIQSOL)["level"].as_uint64());
 
-   // One epoch later 4 have refilled.
+   // One second later 4 have refilled.
    BOOST_REQUIRE_EQUAL(success(), set_epoch(6));
+   elapse_to(t0 + 1);
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("desyndication exceeds the current budget"),
                        desyndicate("alice"_n, 4 * UNIT + 1));
    BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, 4 * UNIT));
    BOOST_REQUIRE_EQUAL(0u, desynd_bucket_row(SOLANA, LIQSOL)["level"].as_uint64());
-   BOOST_REQUIRE_EQUAL(6u, desynd_bucket_row(SOLANA, LIQSOL)["last_epoch"].as<uint32_t>());
+   BOOST_REQUIRE_EQUAL(t0 + 1, last_refill(desynd_bucket_row(SOLANA, LIQSOL)));
 
-   // Three epochs refill 12, capped at the burst of 10.
+   // Three seconds refill 12, capped at the burst of 10.
    BOOST_REQUIRE_EQUAL(success(), set_epoch(9));
+   elapse_to(t0 + 4);
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("desyndication exceeds the current budget"),
                        desyndicate("alice"_n, 10 * UNIT + 1));
    BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, 10 * UNIT));
@@ -3018,10 +3039,10 @@ BOOST_FIXTURE_TEST_CASE(a_linked_contract_account_receives_without_notifications
    BOOST_REQUIRE_EQUAL(0, parked_balance(LIQSOL, ChainKind::CHAIN_KIND_SVM, pubkey));
 } FC_LOG_AND_RETHROW()
 
-// The syndication bucket starts full at its burst, refills by its refill per depot epoch up to the
-// burst, and a tranche is the smaller of an item's remainder and the level. Nothing refills within an
-// epoch.
-BOOST_FIXTURE_TEST_CASE(bucket_limits_a_tranche_and_refills_per_epoch, sysio_synd_tester) try {
+// The syndication bucket starts full at its burst, refills by its refill per second up to the
+// burst, and a tranche is the smaller of an item's remainder and the level. Nothing refills within a
+// second.
+BOOST_FIXTURE_TEST_CASE(bucket_limits_a_tranche_and_refills_per_second, sysio_synd_tester) try {
    const auto signer = ed_signer();
    const auto key    = signer.get_public_key();
    const auto pubkey = ed_bytes(key);
@@ -3035,39 +3056,42 @@ BOOST_FIXTURE_TEST_CASE(bucket_limits_a_tranche_and_refills_per_epoch, sysio_syn
    underwrite_envelope(SOLANA, LIQSOL, 1);
 
    // A full bucket of 10: the first item whole and 2 of the second.
+   const uint32_t t0 = align_to_second();
    BOOST_REQUIRE_EQUAL(success(), crank());
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(10 * UNIT), liq_balance("alice"_n));
    BOOST_REQUIRE(item_row(1).is_null());
    BOOST_REQUIRE_EQUAL(6 * UNIT, item_row(2)["remaining"].as_uint64());
    auto bucket = synd_bucket_row(SOLANA, LIQSOL);
    BOOST_REQUIRE_EQUAL(0u, bucket["level"].as_uint64());
-   BOOST_REQUIRE_EQUAL(5u, bucket["last_epoch"].as<uint32_t>());
+   BOOST_REQUIRE_EQUAL(t0, last_refill(bucket));
    BOOST_REQUIRE_EQUAL(STATE_RELEASABLE, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
    BOOST_REQUIRE_EQUAL(10 * UNIT, envelope_row(SOLANA, LIQSOL, 1)["released"].as_uint64());
 
-   // The same epoch: nothing refills and nothing moves.
+   // The same second: nothing refills and nothing moves.
    BOOST_REQUIRE_EQUAL(success(), crank());
    BOOST_REQUIRE(console_has(QUEUE_EMPTY_BUCKET));
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(10 * UNIT), liq_balance("alice"_n));
 
-   // One epoch refills 4.
+   // One second refills 4.
    BOOST_REQUIRE_EQUAL(success(), set_epoch(6));
+   elapse_to(t0 + 1);
    BOOST_REQUIRE_EQUAL(success(), crank());
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(14 * UNIT), liq_balance("alice"_n));
    BOOST_REQUIRE_EQUAL(2 * UNIT, item_row(2)["remaining"].as_uint64());
 
-   // Three epochs would refill 12, capped at the burst of 10: the last 2 pass and 8 remain.
+   // Three seconds would refill 12, capped at the burst of 10: the last 2 pass and 8 remain.
    BOOST_REQUIRE_EQUAL(success(), set_epoch(9));
+   elapse_to(t0 + 4);
    BOOST_REQUIRE_EQUAL(success(), crank());
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(16 * UNIT), liq_balance("alice"_n));
    BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
    bucket = synd_bucket_row(SOLANA, LIQSOL);
    BOOST_REQUIRE_EQUAL(8 * UNIT, bucket["level"].as_uint64());
-   BOOST_REQUIRE_EQUAL(9u, bucket["last_epoch"].as<uint32_t>());
+   BOOST_REQUIRE_EQUAL(t0 + 4, last_refill(bucket));
 } FC_LOG_AND_RETHROW()
 
 // An item larger than the burst never passes whole: it leaves in tranches of at most the burst, one
-// bucketful per epoch, until it is gone.
+// bucketful per second, until it is gone.
 BOOST_FIXTURE_TEST_CASE(oversize_item_releases_in_tranches, sysio_synd_tester) try {
    constexpr uint64_t BURST = 3 * UNIT;
    const auto         signer = ed_signer();
@@ -3082,9 +3106,10 @@ BOOST_FIXTURE_TEST_CASE(oversize_item_releases_in_tranches, sysio_synd_tester) t
    for (uint32_t epoch = 1; epoch <= expected.size(); ++epoch) {
       BOOST_TEST_CONTEXT("epoch " << epoch) {
          BOOST_REQUIRE_EQUAL(success(), set_epoch(epoch));
+         align_to_second();   // a later second than the last step, so the bucket is full again
          const int64_t before = liq_balance("alice"_n);
          BOOST_REQUIRE_EQUAL(success(), crank());
-         BOOST_REQUIRE_EQUAL(success(), crank());   // a second step in the same epoch moves nothing
+         BOOST_REQUIRE_EQUAL(success(), crank());   // a second step in the same second moves nothing
          const int64_t moved = liq_balance("alice"_n) - before;
          BOOST_REQUIRE_EQUAL(static_cast<int64_t>(expected[epoch - 1]), moved);
          BOOST_REQUIRE_LE(moved, static_cast<int64_t>(BURST));
@@ -3262,11 +3287,13 @@ BOOST_FIXTURE_TEST_CASE(a_pruned_request_keeps_its_pair_releasing, sysio_synd_te
    BOOST_REQUIRE_EQUAL(success(), crank());
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(4 * UNIT), liq_balance("alice"_n));
 
-   // Approved, then seen by a step, which records the outcome.
+   // Approved, then seen by a step, which records the outcome. The bucket has refilled over the
+   // window, so the step also releases a tranche.
    produce_block(fc::seconds(window_sec + 1));
    BOOST_REQUIRE_EQUAL(success(), push(BOND_ACCOUNT, bond_abi_ser, "carol"_n, "approve"_n, mvo()("request_id", id)));
    BOOST_REQUIRE_EQUAL(success(), crank());
    BOOST_REQUIRE_EQUAL("APPROVED", envelope_row(SOLANA, LIQSOL, 1)["outcome"].as_string());
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(8 * UNIT), liq_balance("alice"_n));
 
    // Dave takes his bond back; once the ruling is a week old nothing keeps the request row.
    BOOST_REQUIRE_EQUAL(success(), bond_claim(id, "dave"_n));
@@ -3275,10 +3302,6 @@ BOOST_FIXTURE_TEST_CASE(a_pruned_request_keeps_its_pair_releasing, sysio_synd_te
    BOOST_REQUIRE(bond_request(id).is_null());
 
    // The envelope goes on releasing from the recorded outcome.
-   BOOST_REQUIRE_EQUAL(success(), set_epoch(2));
-   BOOST_REQUIRE_EQUAL(success(), crank());
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(8 * UNIT), liq_balance("alice"_n));
-   BOOST_REQUIRE_EQUAL(success(), set_epoch(3));
    BOOST_REQUIRE_EQUAL(success(), crank());
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(10 * UNIT), liq_balance("alice"_n));
    BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
@@ -4786,7 +4809,7 @@ BOOST_FIXTURE_TEST_CASE(invalid_after_a_partial_park_burns_the_parked_part_out_o
 // The emergency stop (sysio.andon)
 // ---------------------------------------------------------------------------
 
-// Frozen queue steps move nothing. Clearing refills by elapsed epochs, capped at burst.
+// Frozen queue steps move nothing. Clearing refills by elapsed seconds, capped at burst.
 BOOST_FIXTURE_TEST_CASE(a_freeze_stops_release_and_refill_is_capped_at_burst, sysio_synd_tester) try {
    const auto signer = ed_signer();
    const auto key    = signer.get_public_key();
@@ -4796,15 +4819,18 @@ BOOST_FIXTURE_TEST_CASE(a_freeze_stops_release_and_refill_is_capped_at_burst, sy
    BOOST_REQUIRE_EQUAL(success(), set_epoch(1));
    syndicate_and_close(1, 1, pubkey, LIQSOL, 60 * UNIT);
    underwrite_envelope(SOLANA, LIQSOL, 1);
+   const uint32_t t0 = align_to_second();
    BOOST_REQUIRE_EQUAL(success(), crank());
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(20 * UNIT), liq_balance("alice"_n));
    BOOST_REQUIRE_EQUAL(0u, synd_bucket_row(SOLANA, LIQSOL)["level"].as_uint64());
 
    BOOST_REQUIRE_EQUAL(success(), set_epoch(3));
+   elapse_to(t0 + 2);
    BOOST_REQUIRE_EQUAL(success(), andon_pull());
 
    // Frozen: the crank runs, prints why it waits, and moves nothing -- not the item, not the bucket.
    BOOST_REQUIRE_EQUAL(success(), set_epoch(4));
+   elapse_to(t0 + 3);
    BOOST_REQUIRE_EQUAL(success(), crank());
    BOOST_REQUIRE(console_has(QUEUE_FROZEN));
    BOOST_REQUIRE(!executed(LIQ_ACCOUNT, "transfer"_n));
@@ -4815,22 +4841,26 @@ BOOST_FIXTURE_TEST_CASE(a_freeze_stops_release_and_refill_is_capped_at_burst, sy
    BOOST_REQUIRE_EQUAL(20 * UNIT, envelope["released"].as_uint64());
    auto bucket = synd_bucket_row(SOLANA, LIQSOL);
    BOOST_REQUIRE_EQUAL(0u, bucket["level"].as_uint64());
-   BOOST_REQUIRE_EQUAL(1u, bucket["last_epoch"].as<uint32_t>());
+   BOOST_REQUIRE_EQUAL(t0, last_refill(bucket));
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(40 * UNIT), liq_balance(SYND_ACCOUNT));
 
+   // Six seconds since the last tick would refill 24, capped at the burst of 20.
    BOOST_REQUIRE_EQUAL(success(), set_epoch(5));
+   elapse_to(t0 + 4);
    BOOST_REQUIRE_EQUAL(success(), andon_clear());
    BOOST_REQUIRE_EQUAL(success(), set_epoch(7));
+   elapse_to(t0 + 6);
    BOOST_REQUIRE_EQUAL(success(), crank());
    BOOST_REQUIRE(!console_has(QUEUE_FROZEN));
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(40 * UNIT), liq_balance("alice"_n));
    BOOST_REQUIRE_EQUAL(20 * UNIT, item_row(1)["remaining"].as_uint64());
    bucket = synd_bucket_row(SOLANA, LIQSOL);
    BOOST_REQUIRE_EQUAL(0u, bucket["level"].as_uint64());
-   BOOST_REQUIRE_EQUAL(7u, bucket["last_epoch"].as<uint32_t>());
+   BOOST_REQUIRE_EQUAL(t0 + 6, last_refill(bucket));
 
-   // From here the bucket refills as before: one epoch, 4 more.
+   // From here the bucket refills as before: one second, 4 more.
    BOOST_REQUIRE_EQUAL(success(), set_epoch(8));
+   elapse_to(t0 + 7);
    BOOST_REQUIRE_EQUAL(success(), crank());
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(44 * UNIT), liq_balance("alice"_n));
 } FC_LOG_AND_RETHROW()
@@ -4971,7 +5001,7 @@ BOOST_FIXTURE_TEST_CASE(a_freeze_still_issues_requests_and_takes_bonds, sysio_sy
 } FC_LOG_AND_RETHROW()
 
 // A bucket holding a positive level at the pull keeps it through a frozen crank -- nothing ticks and
-// nothing is spent. After clear, elapsed epochs refill the 40-unit burst before the queued 30
+// nothing is spent. After clear, elapsed seconds refill the 40-unit burst before the queued 30
 // units are released, leaving 10 units of capacity.
 BOOST_FIXTURE_TEST_CASE(a_freeze_keeps_a_positive_bucket_level, sysio_synd_tester) try {
    const auto signer = ed_signer();
@@ -4982,32 +5012,39 @@ BOOST_FIXTURE_TEST_CASE(a_freeze_keeps_a_positive_bucket_level, sysio_synd_teste
    BOOST_REQUIRE_EQUAL(success(), set_epoch(1));
    syndicate_and_close(1, 1, pubkey, LIQSOL, 10 * UNIT);
    underwrite_envelope(SOLANA, LIQSOL, 1);
+   const uint32_t t0 = align_to_second();
    BOOST_REQUIRE_EQUAL(success(), crank());
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(10 * UNIT), liq_balance("alice"_n));
    BOOST_REQUIRE_EQUAL(30 * UNIT, synd_bucket_row(SOLANA, LIQSOL)["level"].as_uint64());
 
    BOOST_REQUIRE_EQUAL(success(), set_epoch(3));
+   elapse_to(t0 + 2);
    BOOST_REQUIRE_EQUAL(success(), andon_pull());
    syndicate_and_close(3, 2, pubkey, LIQSOL, 30 * UNIT);
    underwrite_envelope(SOLANA, LIQSOL, 3);
    BOOST_REQUIRE_EQUAL(success(), set_epoch(4));
+   elapse_to(now_sec() + 1);
    BOOST_REQUIRE_EQUAL(success(), crank());
    BOOST_REQUIRE(console_has(QUEUE_FROZEN));
    BOOST_REQUIRE_EQUAL(STATE_RELEASABLE, envelope_row(SOLANA, LIQSOL, 3)["state"].as_string());
    auto bucket = synd_bucket_row(SOLANA, LIQSOL);
    BOOST_REQUIRE_EQUAL(30 * UNIT, bucket["level"].as_uint64());
-   BOOST_REQUIRE_EQUAL(1u, bucket["last_epoch"].as<uint32_t>());
+   BOOST_REQUIRE_EQUAL(t0, last_refill(bucket));
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(10 * UNIT), liq_balance("alice"_n));
 
    BOOST_REQUIRE_EQUAL(success(), set_epoch(5));
+   elapse_to(now_sec() + 1);
    BOOST_REQUIRE_EQUAL(success(), andon_clear());
    BOOST_REQUIRE_EQUAL(success(), set_epoch(7));
+   // Five seconds after the last tick refill the 10 spent, capped at the burst of 40.
+   const uint32_t refilled = std::max(now_sec() + 2, t0 + 5);
+   elapse_to(refilled);
    BOOST_REQUIRE_EQUAL(success(), crank());
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(40 * UNIT), liq_balance("alice"_n));
    BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQSOL, 3)["state"].as_string());
    bucket = synd_bucket_row(SOLANA, LIQSOL);
    BOOST_REQUIRE_EQUAL(10 * UNIT, bucket["level"].as_uint64());
-   BOOST_REQUIRE_EQUAL(7u, bucket["last_epoch"].as<uint32_t>());
+   BOOST_REQUIRE_EQUAL(refilled, last_refill(bucket));
 } FC_LOG_AND_RETHROW()
 
 // Repeated clears and pulls do not multiply capacity beyond the configured burst.
@@ -5024,17 +5061,23 @@ BOOST_FIXTURE_TEST_CASE(repeated_freezes_do_not_exceed_the_burst_cap, sysio_synd
    BOOST_REQUIRE_EQUAL(0u, synd_bucket_row(SOLANA, LIQSOL)["level"].as_uint64());
 
    BOOST_REQUIRE_EQUAL(success(), set_epoch(2));
+   elapse_to(now_sec() + 1);
    BOOST_REQUIRE_EQUAL(success(), andon_pull());
    BOOST_REQUIRE_EQUAL(success(), andon_clear());
    BOOST_REQUIRE_EQUAL(success(), andon_pull());
    BOOST_REQUIRE_EQUAL(success(), set_epoch(3));
+   elapse_to(now_sec() + 1);
    BOOST_REQUIRE_EQUAL(success(), andon_clear());
    BOOST_REQUIRE_EQUAL(success(), set_epoch(5));
+   elapse_to(now_sec() + 2);
    BOOST_REQUIRE_EQUAL(success(), andon_pull());
    BOOST_REQUIRE_EQUAL(success(), set_epoch(6));
+   elapse_to(now_sec() + 1);
    BOOST_REQUIRE_EQUAL(success(), andon_clear());
 
+   // Well past the five seconds a full refill takes; still one burst of 20.
    BOOST_REQUIRE_EQUAL(success(), set_epoch(8));
+   elapse_to(now_sec() + 2);
    BOOST_REQUIRE_EQUAL(success(), crank());
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(40 * UNIT), liq_balance("alice"_n));
    const auto bucket = synd_bucket_row(SOLANA, LIQSOL);
@@ -5976,6 +6019,7 @@ BOOST_FIXTURE_TEST_CASE(receipts_correlate_partial_release_fee_and_item_erasure,
    uint64_t fees = 0;
    for (uint32_t epoch = 1; epoch <= 3; ++epoch) {
       BOOST_REQUIRE_EQUAL(success(), set_epoch(epoch));
+      align_to_second();   // the refused logrelease adds no block, so the second crank shares this second
       BOOST_REQUIRE_EQUAL(success(), crank());
       const auto logs = receipts("logrelease"_n);
       BOOST_REQUIRE_EQUAL(logs.size(), 1u);

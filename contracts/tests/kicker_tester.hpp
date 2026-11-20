@@ -41,6 +41,8 @@ public:
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH, epoch_ser, EPOCH, "setconfig"_n, mvo()
          ("epoch_duration_sec", 60)("operators_per_epoch", 7)("batch_operator_minimum_active", 21)
          ("batch_op_groups", 3)("epoch_retention_envelope_log_count", 1000)));
+      BOOST_REQUIRE_EQUAL(success(), push(EPOCH, epoch_ser, EPOCH, "seteconomy"_n, mvo()
+         ("epoch_duration_sec", 60)("start_time", fc::time_point_sec(control->head().block_time()))));
       const auto emission = mvo()
          ("t1_allocation", 0)("t2_allocation", 0)("t3_allocation", 0)
          ("t1_duration", 1)("t2_duration", 1)("t3_duration", 1)("min_claimable", 0)
@@ -53,7 +55,7 @@ public:
       BOOST_REQUIRE_EQUAL(success(), push(SYSIO_ACCOUNT, system_ser, SYSIO_ACCOUNT, "setemitcfg"_n,
                                           mvo()("cfg", emission)));
       BOOST_REQUIRE_EQUAL(success(), push(SYSIO_ACCOUNT, system_ser, SYSIO_ACCOUNT, "initt5"_n,
-                                          mvo()("start_time", time_point_sec(control->pending_block_time()))));
+                                          mvo()));
       BOOST_REQUIRE_EQUAL(success(), configure(budget));
       BOOST_REQUIRE_EQUAL(success(), add());
    }
@@ -222,6 +224,12 @@ public:
       state("pending_emission_amount", pending);
       write_global("t5state"_n, "t5_state", state);
       write_global("payclaimtot"_n, "pay_claim_total", mvo()("outstanding", claims));
+   }
+   /// Open consensus genesis, then tick economic epoch 1. With `pay_cadence_epochs == 1` it is a pay
+   /// epoch, so the emissions gate either pays the period or records why it held it.
+   action_result open_first_pay_epoch() {
+      if (auto result = push(EPOCH, epoch_ser, EPOCH, "advance"_n, mvo()); result != success()) return result;
+      return push(EPOCH, epoch_ser, EPOCH, "tickeconomy"_n, mvo()("epoch_index", 1));
    }
 };
 } // namespace kicker_test_support

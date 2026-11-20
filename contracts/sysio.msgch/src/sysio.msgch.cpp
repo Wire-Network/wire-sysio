@@ -1001,14 +1001,15 @@ void msgch::bootstrap() {
    uint32_t epoch = epoch::current_epoch_index();
    check(epoch == 0, "bootstrap can only be called at epoch 0");
 
-   // Missing emissions config is a bootstrap defect, not an operational state:
-   // refuse to start a chain that cannot pay its first epoch. Without these
-   // checks the genesis advance below gate-blocks SILENTLY (sysio.epoch's
-   // emissions gate never throws, by design) and the misconfiguration only
-   // surfaces later as "epoch stuck at 0". The economic gate reasons
-   // (treasury exhaustion / balance shortfall) remain advance()'s soft
-   // block-and-retry at every epoch — only the two set-up-once singletons
-   // are asserted here.
+   // A missing economy is a bootstrap defect, not an operational state: refuse to
+   // start a chain that cannot pay its first economic epoch. Without these checks
+   // the economic clock would tick with its emissions gate blocked (the gate never
+   // throws, by design) and the misconfiguration would surface only as an empty
+   // treasury payout. The economic gate reasons (treasury exhaustion / balance
+   // shortfall) remain the economic clock's soft hold -- only the set-up-once
+   // singletons are asserted here.
+   check(epoch::economycfg_t(EPOCH_ACCOUNT).exists(),
+         "msgch::bootstrap: economic clock not configured -- sysio.epoch::seteconomy must run before bootstrap");
    check(sysiosystem::emissions::emitcfg_t(SYSTEM_ACCOUNT).exists(),
          "msgch::bootstrap: emissions config missing -- sysio.system::setemitcfg must run before bootstrap");
    check(sysiosystem::emissions::t5state_t(SYSTEM_ACCOUNT).exists(),
@@ -1331,7 +1332,7 @@ void msgch::chkcons() {
       auto opc = opcons.get(opc_pk);
       // Readiness is the durable `epoch_index == current epoch` signal that apply_consensus writes on
       // dispatch. We intentionally do NOT also gate on `consensus_reached`: advance() can return without
-      // bumping the epoch (the emissions gate in sysio.epoch::advance returns gracefully), and that
+      // bumping the epoch (its wall-clock check returns gracefully), and that
       // commit is not rolled back, so a pre-emptive reset of consensus_reached would strand the epoch
       // with nothing to re-arm it -- apply_consensus does not re-fire once the delivery set is complete.
       // A stale row from a prior epoch fails this check; a fresh dispatch for the new epoch overwrites it.
@@ -1379,7 +1380,7 @@ void msgch::chkcons() {
    if (!past_boundary) return;
 
    // All conditions met. Trigger advance. Per-outpost consensus is intentionally NOT reset here:
-   // advance() can legally return without advancing (the emissions gate), and that graceful return does
+   // advance() can legally return without advancing (its wall-clock check), and that graceful return does
    // not roll back a reset done beforehand, which would permanently strand the epoch. Stale consensus is
    // invalidated instead by the `epoch_index == epoch` check above once advance() actually bumps the
    // epoch, and the next epoch's dispatch overwrites the row.

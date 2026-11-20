@@ -27,7 +27,8 @@ Envelope (one per outpost per epoch, per direction)
 
 ### Key Concepts
 
-- **Epochs**: Time-bounded intervals managed by `sysio.epoch` — one global epoch clock for every chain. Each epoch has one group of batch operators on duty as relayers.
+- **Epochs**: Time-bounded intervals managed by `sysio.epoch` — one global consensus epoch clock for every chain. Each epoch has one group of batch operators on duty as relayers.
+- **Economic epochs**: A separate wall-clock grid on `sysio.epoch` that drives emissions, withdrawal maturity and producer pay. It never waits on outpost consensus.
 - **Envelopes**: Epoch-level containers. Each envelope carries the epoch index and timestamp, its route endpoints, and `previous_envelope_hash` — the digest of the previous envelope on the same (depot, outpost) stream — so each direction forms a hash chain. An envelope is capped at 32,768 bytes on every chain.
 - **Messages**: Individual cross-chain payloads containing a header (message ID, sequence, checksum, encoding flags) and a payload (an array of attestation entries).
 - **Attestations**: Typed data units that represent cross-chain actions — operator rosters, liquidity syndication and desyndication, yield reports and node-owner registrations.
@@ -84,7 +85,7 @@ Elected via Appointed Proof of Stake (APoS). They validate transactions and prod
 Operators scheduled in groups of `operators_per_epoch` (default 21 operators in 3 groups of 7); one group is on duty per epoch, and the schedule slides forward every epoch. They run the `batch_operator_plugin` and are responsible for:
 - Reading each outpost's outbound envelope and delivering it to `sysio.msgch`
 - Relaying the depot's outbound envelopes to each outpost
-- Cranking the depot: `sysio.msgch::chkcons` (epoch advance), `sysio.chalg::chkdispute`, `sysio.swap::tickyield`, `sysio.liq::queueyield`, `sysio.kicker::kick`
+- Cranking the depot: `sysio.msgch::chkcons` (epoch advance), `sysio.epoch::tickeconomy` (economic clock), `sysio.chalg::chkdispute`, `sysio.swap::tickyield`, `sysio.liq::queueyield`, `sysio.kicker::kick`
 
 Batch operators post depot-native collateral on `sysio.opreg`; a non-canonical delivery is slashed and missed deliveries lead to termination.
 
@@ -103,7 +104,7 @@ Holders of a node-owner NFT who commit it on the Ethereum outpost (`NODE_OWNER_R
 | Contract | Role |
 |----------|------|
 | **sysio.msgch** | OPP channel — receives inbound envelopes, evaluates consensus, routes attestations, queues and builds outbound envelopes, cranks the epoch |
-| **sysio.epoch** | Global epoch clock, sliding-window batch-operator schedule, emissions gate |
+| **sysio.epoch** | Consensus epoch clock and the economic clock (emissions, withdrawal maturity), sliding-window batch-operator schedule, emissions gate |
 | **sysio.opreg** | Operator registry and depot-native collateral ledger (deposit, withdraw queue, pull claims, slashing, termination) |
 | **sysio.chalg** | Envelope-dispute vote by Tier-1 node owners; slash execution |
 | **sysio.synd** | Liquidity syndication ledger: syndication envelopes, bonded release, desyndication, rate limits |

@@ -271,7 +271,11 @@
             "base": "",
             "fields": [
                 {
-                    "name": "current_epoch",
+                    "name": "economic_epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "consensus_epoch",
                     "type": "uint32"
                 }
             ]
@@ -680,11 +684,15 @@
                     "type": "uint64"
                 },
                 {
-                    "name": "eligible_at_epoch",
+                    "name": "eligible_at_economic_epoch",
                     "type": "uint32"
                 },
                 {
-                    "name": "requested_at_epoch",
+                    "name": "eligible_at_consensus_epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "requested_at_economic_epoch",
                     "type": "uint32"
                 }
             ]

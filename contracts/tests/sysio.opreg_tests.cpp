@@ -202,7 +202,8 @@ namespace withdrawal_field {
 constexpr char account[]       = "account";
 constexpr char amount[]        = "amount";
 constexpr char request_id[]    = "request_id";
-constexpr char current_epoch[] = "current_epoch";
+constexpr char economic_epoch[]  = "economic_epoch";
+constexpr char consensus_epoch[] = "consensus_epoch";
 constexpr char chain_code[]    = "chain_code";
 constexpr char token_code[]    = "token_code";
 } // namespace withdrawal_field
@@ -563,10 +564,10 @@ public:
          (withdrawal_field::request_id, request_id));
    }
 
-   /// Flush every matured withdrawal through the epoch-authorized action.
-   action_result flushwtdw(uint32_t current_epoch) {
+   /// Flush every withdrawal matured by `epoch` on both clocks through the epoch-authorized action.
+   action_result flushwtdw(uint32_t epoch) {
       return push_opreg_action(EPOCH_ACCOUNT, withdrawal_action::flush, mvo()
-         (withdrawal_field::current_epoch, current_epoch));
+         (withdrawal_field::economic_epoch, epoch)(withdrawal_field::consensus_epoch, epoch));
    }
 
    action_result terminate(name account, std::string reason) {
@@ -2639,7 +2640,7 @@ BOOST_FIXTURE_TEST_CASE(flushwtdw_terminated_operator_does_not_abort, sysio_opre
    // Flush at an epoch well past the withdraw's eligibility. Pre-fix this aborted with a
    // "balance underflow"; the TERMINATED branch erases the matured row instead.
    BOOST_REQUIRE_EQUAL(success(),
-      push_opreg_action(EPOCH_ACCOUNT, "flushwtdw"_n, mvo()("current_epoch", 1000000u)));
+      push_opreg_action(EPOCH_ACCOUNT, "flushwtdw"_n, mvo()("economic_epoch", 1000000u)("consensus_epoch", 1000000u)));
    BOOST_REQUIRE(get_wtdw(1).is_null());   // matured row erased, not stuck re-throwing every advance
 } FC_LOG_AND_RETHROW() }
 
@@ -2683,7 +2684,7 @@ BOOST_FIXTURE_TEST_CASE(flushwtdw_bounds_rows_per_epoch, sysio_opreg_tester) { t
 
    // First flush drains exactly MAX_WTDW_FLUSH_PER_EPOCH rows; the remainder stays queued.
    BOOST_REQUIRE_EQUAL(success(),
-      push_opreg_action(EPOCH_ACCOUNT, "flushwtdw"_n, mvo()("current_epoch", 1'000'000u)));
+      push_opreg_action(EPOCH_ACCOUNT, "flushwtdw"_n, mvo()("economic_epoch", 1'000'000u)("consensus_epoch", 1'000'000u)));
    BOOST_REQUIRE_EQUAL(N - MAX_WTDW_FLUSH_PER_EPOCH, count_pending());
 
    // Cross a block boundary so the second flush is a distinct transaction — an identical action in
@@ -2691,7 +2692,7 @@ BOOST_FIXTURE_TEST_CASE(flushwtdw_bounds_rows_per_epoch, sysio_opreg_tester) { t
    produce_blocks();
    // Second flush drains the rest -- progress resumes where the first stopped.
    BOOST_REQUIRE_EQUAL(success(),
-      push_opreg_action(EPOCH_ACCOUNT, "flushwtdw"_n, mvo()("current_epoch", 1'000'000u)));
+      push_opreg_action(EPOCH_ACCOUNT, "flushwtdw"_n, mvo()("economic_epoch", 1'000'000u)("consensus_epoch", 1'000'000u)));
    BOOST_REQUIRE_EQUAL(0u, count_pending());
 } FC_LOG_AND_RETHROW() }
 

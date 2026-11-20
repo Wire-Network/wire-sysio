@@ -114,7 +114,7 @@ the outside-the-pool earmark.
 ## Kicker deployment and earmark
 
 Deploy `sysio.kicker` privileged with `sysio.roa::setsyscode`, alongside LIQ and swap.
-After `setemitcfg`/`initt5` and each `regliqpool`, governance (`sysio`) calls
+After `setemitcfg`/`initt5` (which takes its start time from `sysio.epoch::seteconomy`, so the economic clock is set first) and each `regliqpool`, governance (`sysio`) calls
 `sysio.kicker::setconfig({budget_remaining, min_interval_sec, twap_window_sec, max_spot_deviation_bps})`, then
 `addpool(sym, rate_bps, min_gift, max_gift_per_day)` for each LIQ token. The
 C++ defaults are 200 bps and 1,000,000,000 WIRE subunits; all action fields must

@@ -93,15 +93,16 @@ bool earns_shadow_yield(sysio::slug_name chain_code, sysio::slug_name token_code
 /// Credit a WIRE-chain remit of `token_code` to the operator's claimable row instead of
 /// transferring it.
 ///
-/// Every caller (withdraw flush and termination payout) is reachable from
-/// `sysio.epoch::advance`, which must never abort. A custody contract's `transfer` notifies the
-/// operator, and the chain runs notified receivers with no exception isolation, so a pushed remit
-/// would let an operator's notify handler abort `advance` and halt epoch advancement chain-wide.
+/// Every caller is reachable from an action that must never abort: the withdraw flush from
+/// `sysio.epoch::tickeconomy`, the termination payout from `sysio.epoch::advance`. A custody
+/// contract's `transfer` notifies the operator, and the chain runs notified receivers with no
+/// exception isolation, so a pushed remit would let an operator's notify handler halt a clock
+/// chain-wide.
 /// In the termination case the operator would be blocking its own removal, so the retry never
 /// converges.
 ///
 /// Never throws: the credit saturates rather than overflowing, and `token_code` is taken as the
-/// caller holds it — it is NOT resolved here, so an unresolvable code cannot abort `advance`.
+/// caller holds it — it is NOT resolved here, so an unresolvable code cannot abort its caller.
 /// Resolution happens when the operator claims.
 void credit_remit_claim(name self, name account, sysio::slug_name token_code, uint64_t amount) {
    if (amount == 0) return;
@@ -705,14 +706,6 @@ void prune_dellog(uint64_t window_open_ms, uint32_t max_rows) {
    }
 }
 
-/// Get the current epoch index from sysio.epoch's epochstate singleton.
-/// Returns 0 if epochstate isn't initialized yet (cluster bootstrap).
-uint32_t get_current_epoch() {
-   sysio::epoch::epochstate_t es(opreg::EPOCH_ACCOUNT);
-   if (!es.exists()) return 0;
-   return es.get().current_epoch_index;
-}
-
 } // anonymous namespace
 
 // ---------------------------------------------------------------------------
@@ -867,7 +860,8 @@ enqueue_result try_enqueue_withdraw(name account,
       };
    }
 
-   uint32_t now_ep = get_current_epoch();
+   const uint32_t economic_epoch  = sysio::epoch::current_economic_epoch_index();
+   const uint32_t consensus_epoch = sysio::epoch::current_epoch_index();
    uint64_t request_id = next_withdraw_id();
 
    queue.emplace(ram_payer, opreg::withdraw_key{request_id}, opreg::withdraw_request{
@@ -876,8 +870,9 @@ enqueue_result try_enqueue_withdraw(name account,
       .chain_code          = chain_code,
       .token_code          = token_code,
       .amount              = amount,
-      .eligible_at_epoch   = now_ep + opreg::WITHDRAW_WAIT_EPOCHS,
-      .requested_at_epoch  = now_ep,
+      .eligible_at_economic_epoch  = economic_epoch + opreg::WITHDRAW_WAIT_ECONOMIC_EPOCHS,
+      .eligible_at_consensus_epoch = consensus_epoch + opreg::WITHDRAW_WAIT_EPOCHS,
+      .requested_at_economic_epoch = economic_epoch,
    });
    return { true, request_id, "" };
 }
@@ -949,7 +944,7 @@ OperatorAction build_deposit_action(const opp::types::ChainAddress& op_address,
 // ---------------------------------------------------------------------------
 //
 // Operator-authorized; queues a (chain=WIRE, token=token_code) row in the
-// withdraw queue subject to WITHDRAW_WAIT_EPOCHS maturation. A token this
+// withdraw queue subject to the economic and consensus waits. A token this
 // registry cannot custody reverts, so a request that could never be paid out
 // is never queued. A caller with no operator row reverts: it has nothing to
 // withdraw and no row to log into. Every other validation failure DOES NOT
@@ -1105,7 +1100,7 @@ void opreg::deposit(name account, sysio::slug_name token_code, uint64_t amount) 
 // ---------------------------------------------------------------------------
 //  flushwtdw — drain matured rows from the withdraw queue
 // ---------------------------------------------------------------------------
-void opreg::flushwtdw(uint32_t current_epoch) {
+void opreg::flushwtdw(uint32_t economic_epoch, uint32_t consensus_epoch) {
    require_auth(EPOCH_ACCOUNT);
 
    operators_t ops(get_self());
@@ -1113,14 +1108,19 @@ void opreg::flushwtdw(uint32_t current_epoch) {
    auto idx = queue.get_index<"byeligible"_n>();
 
    // Iterate matured rows. Erase as we go, hence the manual cursor. Bounded to
-   // MAX_WTDW_FLUSH_PER_EPOCH rows per advance (SEC-78): the remaining matured
-   // rows flush on the next advance, which keeps this epoch-inline action inside
-   // the transaction CPU deadline it shares with the rest of advance's fan-out.
+   // MAX_WTDW_FLUSH_PER_EPOCH rows per economic epoch (SEC-78): the remaining matured
+   // rows flush on the next one, which keeps this inline action inside the
+   // transaction CPU deadline it shares with the rest of the economic tick.
    // `flushed` is incremented at the top of every iteration, before any of the
    // per-row `continue` branches, so it counts every attempt.
+   //
+   // A row also waits for its consensus guard. Requests are queued in time order and both
+   // clocks only move forward, so along `byeligible` the guard never decreases: the first row
+   // the guard holds holds every row after it, and the walk stops there.
    uint32_t flushed = 0;
    auto it = idx.begin();
-   while (it != idx.end() && it->eligible_at_epoch <= current_epoch &&
+   while (it != idx.end() && it->eligible_at_economic_epoch <= economic_epoch &&
+          it->eligible_at_consensus_epoch <= consensus_epoch &&
           flushed < MAX_WTDW_FLUSH_PER_EPOCH) {
       auto row     = *it;          // copy out before erase
       auto wkey    = withdraw_key{row.request_id};
@@ -1180,8 +1180,8 @@ void opreg::flushwtdw(uint32_t current_epoch) {
       // For depot-native rows: CREDIT the operator's `remitclaims` row in the row's own token -- no
       // transfer happens here, and the operator receives nothing until it calls `claimremit`. The
       // row's `token_code` is carried as-is, never resolved here. This path runs inline from
-      // `sysio.epoch::advance`, where a pushed transfer would let the operator's notify handler
-      // abort epoch advancement chain-wide.
+      // `sysio.epoch::tickeconomy`, where a pushed transfer would let the operator's notify handler
+      // halt the economic clock chain-wide.
       credit_remit_claim(get_self(), row.account, row.token_code, row.amount);
       append_action_log(ops, op_pk, remit_action, true, "");
 
@@ -1380,8 +1380,8 @@ void opreg::terminate(name account, std::string reason) {
 // claimremit - pull depot-native collateral credited by a WIRE-chain remit, one token at a time.
 //
 // The remit paths (withdraw flush and termination payout) credit rather than
-// transfer because every one of them is reachable from `sysio.epoch::advance`, which must never
-// abort. This is the only place such a balance becomes a transfer, and it carries the operator's
+// transfer because every one of them is reachable from a `sysio.epoch` clock action
+// (`tickeconomy` or `advance`), which must never abort. This is the only place such a balance becomes a transfer, and it carries the operator's
 // own authority, so a hostile transfer-notify handler blocks nothing but this caller's own claim.
 //
 // The row is erased before the transfer is queued (inside pay_out), so a notify handler that

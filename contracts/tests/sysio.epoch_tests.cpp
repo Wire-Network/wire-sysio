@@ -94,6 +94,21 @@ public:
       return push_epoch_action(EPOCH_ACCOUNT, "advance"_n, mvo());
    }
 
+   action_result seteconomy(uint32_t duration, time_point_sec start, name signer = EPOCH_ACCOUNT) {
+      return push_epoch_action(signer, "seteconomy"_n, mvo()
+         ("epoch_duration_sec", duration)("start_time", start));
+   }
+
+   action_result tickeconomy(uint32_t epoch_index) {
+      return push_epoch_action(EPOCH_ACCOUNT, "tickeconomy"_n, mvo()("epoch_index", epoch_index));
+   }
+
+   fc::variant get_economic_config() {
+      auto data = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "economycfg"_n, "economycfg"_n);
+      return data.empty() ? fc::variant()
+                          : abi_ser.binary_to_variant("economic_config", data, fixture_abi_yield_function());
+   }
+
    action_result schbatchgps() {
       return push_epoch_action(EPOCH_ACCOUNT, "schbatchgps"_n, mvo());
    }
@@ -332,6 +347,59 @@ BOOST_FIXTURE_TEST_CASE(advance_before_config, sysio_epoch_tester) { try {
       error("assertion failure with message: epoch config not initialized"),
       advance()
    );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(seteconomy_validates_and_stores, sysio_epoch_tester) { try {
+   constexpr uint32_t duration = 360;
+   const time_point_sec start{control->head().block_time()};
+   constexpr uint32_t thirty_days = 30u * 24u * 60u * 60u;
+
+   BOOST_REQUIRE_EQUAL(error("missing authority of sysio.epoch"), seteconomy(duration, start, "operator1"_n));
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: economic epoch_duration_sec must be >= MIN_ECONOMIC_EPOCH_DURATION_SEC"),
+      seteconomy(59, start));
+   BOOST_REQUIRE_EQUAL(error("assertion failure with message: economic epoch_duration_sec exceeds 30-day ceiling"),
+                       seteconomy(thirty_days + 1, start));
+   BOOST_REQUIRE_EQUAL(error("assertion failure with message: economic start_time must be set"),
+                       seteconomy(duration, time_point_sec{}));
+
+   // The bounds are inclusive, and a start in the past is accepted.
+   BOOST_REQUIRE_EQUAL(success(), seteconomy(thirty_days, start));
+   const time_point_sec past{start.sec_since_epoch() - 7u * 24u * 60u * 60u};
+   BOOST_REQUIRE_EQUAL(success(), seteconomy(duration, past));
+   const auto cfg = get_economic_config();
+   BOOST_REQUIRE_EQUAL(duration, cfg["epoch_duration_sec"].as<uint32_t>());
+   BOOST_REQUIRE(past == cfg["start_time"].as<time_point_sec>());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(tickeconomy_waits_for_config_and_consensus_genesis, sysio_epoch_tester) { try {
+   BOOST_REQUIRE_EQUAL(error("assertion failure with message: economic clock not configured"), tickeconomy(1));
+
+   BOOST_REQUIRE_EQUAL(success(), seteconomy(360, time_point_sec{control->head().block_time()}));
+   BOOST_REQUIRE_EQUAL(error("assertion failure with message: the economic clock starts at the consensus genesis advance"),
+                       tickeconomy(1));
+} FC_LOG_AND_RETHROW() }
+
+// Without emissions state the economic clock still ticks: the gate holds the epoch's emissions and
+// records why, and the duty settlement step is skipped, so the tick needs nothing from sysio.system.
+BOOST_FIXTURE_TEST_CASE(tickeconomy_runs_without_emissions_state, sysio_epoch_tester) { try {
+   create_accounts({"sysio.opreg"_n});   // the withdrawal flush's inline target; codeless here
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(), seteconomy(360, time_point_sec{control->head().block_time()}));
+   BOOST_REQUIRE_EQUAL(success(), advance());
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), tickeconomy(1));
+
+   const auto state = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "economystate"_n, "economystate"_n);
+   BOOST_REQUIRE(!state.empty());
+   BOOST_REQUIRE_EQUAL(1u, abi_ser.binary_to_variant("economic_state", state, fixture_abi_yield_function())
+                              ["current_epoch_index"].as<uint32_t>());
+   const auto log = get_row_by_id(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "blocklog"_n, 1);
+   BOOST_REQUIRE(!log.empty());
+   BOOST_REQUIRE_EQUAL("EMISSIONS_BLOCK_REASON_CONFIG_MISSING",
+                       abi_ser.binary_to_variant("blocklog_entry", log, fixture_abi_yield_function())
+                          ["reason"].as_string());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(pause_unpause, sysio_epoch_tester) { try {

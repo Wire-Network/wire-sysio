@@ -33,7 +33,20 @@ namespace sysio {
 
       /// Internal continuation after epoch-close operator mutations execute.
       [[sysio::action]]
-      void finishadv(uint32_t epoch_index, int64_t emission_amount);
+      void finishadv(uint32_t epoch_index);
+
+      /// Set the economic clock (privileged): the duration of one economic epoch and the time its grid
+      /// starts. `start_time` may lie in the past -- the clock then catches up through the elapsed
+      /// epochs once it starts -- and is fixed once the clock has ticked.
+      [[sysio::action]]
+      void seteconomy(uint32_t epoch_duration_sec, sysio::time_point_sec start_time);
+
+      /// Open economic epoch `epoch_index` (permissionless crank). Refused unless `epoch_index` is the
+      /// next index, its grid boundary has passed, and the consensus genesis advance has run. Never
+      /// waits on outpost consensus. Runs the emissions gate, then matures withdrawals, accrues the
+      /// epoch's emission share, pays on a pay epoch, and steps the batch-duty settlement.
+      [[sysio::action]]
+      void tickeconomy(uint32_t epoch_index);
 
       /// Group assignment — reads AVAILABLE batch ops from sysio.opreg.
       [[sysio::action]]
@@ -93,11 +106,35 @@ namespace sysio {
 
       using epochstate_t = sysio::kv::global<"epochstate"_n, epoch_state>;
 
-      /// Emissions readiness gate block log. One row per epoch_index that
-      /// the gate has blocked from advancing. Inserted on the first gate
-      /// failure for a given epoch; same-reason retries update last_retry_at
-      /// and retry_count without re-broadcast. Pruned when the gate
-      /// eventually passes for that epoch (advance proceeds normally).
+      /// Economic clock configuration singleton, set by `seteconomy`. The economic clock drives
+      /// emissions accrual and pay, collateral-withdrawal maturity and the producer pay slot count;
+      /// it is independent of the consensus epoch above and never waits on outpost consensus.
+      struct [[sysio::table("economycfg")]] economic_config {
+         uint32_t              epoch_duration_sec = 360;   ///< length of one economic epoch
+         sysio::time_point_sec start_time{};               ///< where the grid starts; may be in the past
+
+         SYSLIB_SERIALIZE(economic_config, (epoch_duration_sec)(start_time))
+      };
+
+      using economycfg_t = sysio::kv::global<"economycfg"_n, economic_config>;
+
+      /// Economic clock state singleton. Economic epoch N spans [current_epoch_start,
+      /// next_epoch_start) on a fixed grid from `economic_config::start_time`: each boundary is the
+      /// previous one plus the duration in force, never the time a crank happened to run.
+      struct [[sysio::table("economystate")]] economic_state {
+         uint32_t   current_epoch_index = 0;   ///< 0 until the first tick
+         time_point current_epoch_start{};
+         time_point next_epoch_start{};
+
+         SYSLIB_SERIALIZE(economic_state, (current_epoch_index)(current_epoch_start)(next_epoch_start))
+      };
+
+      using economystate_t = sysio::kv::global<"economystate"_n, economic_state>;
+
+      /// Emissions readiness gate block log: at most one row, the open block episode, keyed by the
+      /// first economic epoch the gate blocked. Each further blocked economic epoch refreshes the row;
+      /// the first economic epoch whose emissions pass erases it. A blocked gate holds emissions only:
+      /// the economic clock and the consensus epoch keep running.
       struct blocklog_key {
          uint64_t epoch_index;
          uint64_t primary_key() const { return epoch_index; }
@@ -105,21 +142,22 @@ namespace sysio {
       };
 
       struct [[sysio::table("blocklog")]] blocklog_entry {
-         uint32_t                              epoch_index        = 0;
+         uint32_t                              epoch_index        = 0; ///< first blocked economic epoch
+         uint32_t                              last_epoch_index   = 0; ///< latest blocked economic epoch
          sysio::opp::types::EmissionsBlockReason reason           =
             sysio::opp::types::EMISSIONS_BLOCK_REASON_UNSPECIFIED;
          /// What the gate tried to authorize: the period total on a pay epoch, otherwise the epoch's share.
          int64_t                               attempted_emission = 0;
-         /// T5 budget not yet paid out or accrued to the open pay period (net headroom), not floored at 0.
+         /// T5 budget not yet paid out, accrued or settling (net headroom), not floored at 0.
          int64_t                               treasury_remaining = 0;
          int64_t                               sysio_balance      = 0;
          uint32_t                              first_blocked_at   = 0; // unix seconds
-         uint32_t                              last_retry_at      = 0; // unix seconds
-         uint32_t                              retry_count        = 0;
+         uint32_t                              last_blocked_at    = 0; // unix seconds
+         uint32_t                              blocked_epochs     = 0; ///< economic epochs blocked so far
 
          SYSLIB_SERIALIZE(blocklog_entry,
-            (epoch_index)(reason)(attempted_emission)(treasury_remaining)
-            (sysio_balance)(first_blocked_at)(last_retry_at)(retry_count))
+            (epoch_index)(last_epoch_index)(reason)(attempted_emission)(treasury_remaining)
+            (sysio_balance)(first_blocked_at)(last_blocked_at)(blocked_epochs))
       };
 
       using blocklog_t = sysio::kv::table<"blocklog"_n, blocklog_key, blocklog_entry>;
@@ -140,20 +178,31 @@ namespace sysio {
          return !es.exists() || es.get().current_epoch_index == 0;
       }
 
-      /// The depot's current epoch index, or 0 before the first epoch state is written. Never
-      /// throws. The one reader of the index alone: `sysio.msgch` and `sysio.synd`'s bucket ticks.
+      /// The depot's current consensus epoch index, or 0 before the first epoch state is written.
+      /// Never throws. Read by `sysio.msgch` and by `sysio.opreg`'s withdrawal consensus guard.
       static uint32_t current_epoch_index() {
          epochstate_t es(EPOCH_ACCOUNT);
          return es.exists() ? es.get().current_epoch_index : 0;
       }
 
-      /// Bounds on `epoch_duration_sec`. Floor is a typo-guard: below it a pay
-      /// period holds fewer block slots than one producer rotation, so the
-      /// per-block pay in sysio.system::payepoch degenerates to a handful of
-      /// slots per producer, masking misconfig. Ceiling bounds the slot
-      /// arithmetic and prevents a governance typo from setting a multi-year epoch.
+      /// The current economic epoch index, or 0 before the economic clock's first tick. Never throws.
+      static uint32_t current_economic_epoch_index() {
+         economystate_t es(EPOCH_ACCOUNT);
+         return es.exists() ? es.get().current_epoch_index : 0;
+      }
+
+      /// Bounds on the consensus `epoch_duration_sec`. The floor keeps an epoch longer than the
+      /// relay's round trip to the slowest outpost; the ceiling stops a governance typo from setting
+      /// a multi-year epoch.
       static constexpr uint32_t MIN_EPOCH_DURATION_SEC = 60;
       static constexpr uint32_t MAX_EPOCH_DURATION_SEC = 30u * 24u * 60u * 60u;
+
+      /// Bounds on the economic `epoch_duration_sec`. Floor is a typo-guard: below it a pay period
+      /// holds fewer block slots than one producer rotation, so the per-block pay in
+      /// sysio.system::payepoch degenerates to a handful of slots per producer, masking misconfig.
+      /// Ceiling bounds the slot arithmetic and stops a multi-year economic epoch.
+      static constexpr uint32_t MIN_ECONOMIC_EPOCH_DURATION_SEC = 60;
+      static constexpr uint32_t MAX_ECONOMIC_EPOCH_DURATION_SEC = 30u * 24u * 60u * 60u;
 
       /// Upper bound on the number of batch-operator groups: Solana's operator registry seats at most
       /// `MAX_OPERATOR_GROUPS` (8), and a window an outpost cannot seat stalls that outpost.
