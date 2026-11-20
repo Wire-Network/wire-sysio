@@ -96,7 +96,8 @@ public:
    const chain_id_type     chain_id;
    std::deque<trx_answers> answers;
 
-   /// Runs `f` on the main thread and returns its result.
+   /// Runs `f` on the main thread and returns its result. `f` can still run after a timeout has made this return, so
+   /// it captures by value or only state that outlives the app thread.
    template <typename F>
    auto on_main_thread(F f) {
       using result_t = std::invoke_result_t<F&>;
@@ -187,7 +188,7 @@ public:
          return n;
       });
       BOOST_REQUIRE(wait_until([&]() {
-         return on_main_thread([&]() {
+         return on_main_thread([this, pause_block]() {
             return chain->chain().head().block_num() == pause_block && !chain->chain().is_building_block();
          });
       }));
