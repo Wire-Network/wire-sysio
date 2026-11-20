@@ -1325,15 +1325,17 @@ public:
          const auto  block_deadline = _pending_block_deadline;
          push_result pr             = push_transaction(block_deadline, trx, api_trx, return_failure_trace, trx_tracker, next);
 
-         if (pr.trx_exhausted) {
-            _unapplied_transactions.add_incoming(trx, api_trx, return_failure_trace, next);
-         }
-
+         // set before the re-queue, which throws tx_resource_exhaustion when the queue is full
          exhausted = pr.block_exhausted;
 
-         if ( !in_producing_mode() && pr.trx_exhausted )
-            exhausted = true;  // report transaction exhausted if trx was exhausted in non-producing mode (so we will restart
-                               // a speculative block to retry it immediately, instead of waiting to receive a new block)
+         if (pr.trx_exhausted) {
+            _unapplied_transactions.add_incoming(trx, api_trx, return_failure_trace, next);
+
+            // report transaction exhausted if trx was exhausted in non-producing mode (so we will restart a speculative
+            // block to retry it immediately, instead of waiting to receive a new block)
+            if (!in_producing_mode())
+               exhausted = true;
+         }
 
       } catch (const guard_exception& e) {
          chain_plugin::handle_guard_exception(e);

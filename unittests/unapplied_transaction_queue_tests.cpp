@@ -422,4 +422,140 @@ BOOST_AUTO_TEST_CASE( unapplied_transaction_queue_incoming_count ) try {
 
 } FC_LOG_AND_RETHROW() /// unapplied_transaction_queue_incoming_count
 
+BOOST_AUTO_TEST_CASE( unapplied_transaction_queue_incoming_limit ) try {
+
+   unapplied_transaction_queue q;
+
+   auto trx1 = unique_trx_meta_data();
+   auto trx2 = unique_trx_meta_data();
+   auto trx3 = unique_trx_meta_data();
+   auto trx4 = unique_trx_meta_data( fc::time_point::now() - fc::seconds( 1 ) );
+
+   // limits below are in whole transactions
+   const uint64_t trx_size = trx1->get_estimated_size();
+   for( const auto& trx : { trx2, trx3, trx4 } )
+      BOOST_REQUIRE_EQUAL( trx->get_estimated_size(), trx_size );
+
+   q.set_max_transaction_queue_size( 2 * trx_size );
+
+   // fits
+   q.add_incoming( trx1, true, false, [](auto){} );
+   BOOST_TEST( q.size() == 1u );
+   BOOST_TEST( q.incoming_size() == 1u );
+   BOOST_TEST( q.size_in_bytes() == trx_size );
+
+   // exactly at the limit
+   q.add_incoming( trx2, false, false, [](auto){} );
+   BOOST_TEST( q.size() == 2u );
+   BOOST_TEST( q.incoming_size() == 2u );
+   BOOST_TEST( q.size_in_bytes() == 2 * trx_size );
+
+   // refused: nothing queued, counters unchanged, next not kept
+   bool refused_next_called = false;
+   BOOST_CHECK_THROW( q.add_incoming( trx3, true, false, [&](auto){ refused_next_called = true; } ),
+                      tx_resource_exhaustion );
+   BOOST_TEST( q.size() == 2u );
+   BOOST_TEST( q.incoming_size() == 2u );
+   BOOST_TEST( q.size_in_bytes() == 2 * trx_size );
+   BOOST_TEST( !q.get_trx( trx3->id() ) );
+
+   // a duplicate is answered with tx_duplicate even when the queue is full
+   auto trx1_dup = transaction_metadata::create_no_recover_keys( trx1->packed_trx(),
+                                                                 transaction_metadata::trx_type::input );
+   bool dup_answered = false;
+   q.add_incoming( trx1_dup, true, false, [&](auto&& result) {
+      const auto* ex = std::get_if<fc::exception_ptr>( &result );
+      dup_answered = ex && *ex && (*ex)->code() == tx_duplicate::code_value;
+   } );
+   BOOST_TEST( dup_answered );
+   BOOST_TEST( q.size() == 2u );
+   BOOST_TEST( q.size_in_bytes() == 2 * trx_size );
+
+   // drain to empty after the refusal: both counters return to zero
+   BOOST_REQUIRE( next( q ) == trx1 );
+   BOOST_TEST( q.incoming_size() == 1u );
+   BOOST_TEST( q.size_in_bytes() == trx_size );
+   BOOST_REQUIRE( next( q ) == trx2 );
+   BOOST_TEST( q.empty() );
+   BOOST_TEST( q.incoming_size() == 0u );
+   BOOST_TEST( q.size_in_bytes() == 0u );
+   BOOST_TEST( !refused_next_called );
+
+   // the refused transaction is accepted once there is room
+   bool applied_next_called = false;
+   q.add_incoming( trx3, true, false, [&](auto){ applied_next_called = true; } );
+   q.add_incoming( trx4, false, false, [](auto){} );
+   BOOST_TEST( q.size() == 2u );
+   BOOST_TEST( q.incoming_size() == 2u );
+   BOOST_TEST( q.size_in_bytes() == 2 * trx_size );
+
+   // clear_applied and clear_expired also return the counters to zero
+   q.clear_applied( create_test_block_state( { trx3 } )->block );
+   BOOST_TEST( applied_next_called );
+   BOOST_TEST( q.incoming_size() == 1u );
+   BOOST_TEST( q.size_in_bytes() == trx_size );
+   q.clear_expired( fc::time_point::now(), [](){ return false; }, [](auto, auto){} );
+   BOOST_TEST( q.empty() );
+   BOOST_TEST( q.incoming_size() == 0u );
+   BOOST_TEST( q.size_in_bytes() == 0u );
+
+} FC_LOG_AND_RETHROW() /// unapplied_transaction_queue_incoming_limit
+
+BOOST_AUTO_TEST_CASE( unapplied_transaction_queue_limit_counts_forked_aborted ) try {
+
+   unapplied_transaction_queue q;
+
+   auto trx1 = unique_trx_meta_data();
+   auto trx2 = unique_trx_meta_data();
+   auto trx3 = unique_trx_meta_data();
+   auto trx4 = unique_trx_meta_data();
+
+   // limits below are in whole transactions
+   const uint64_t trx_size = trx1->get_estimated_size();
+   for( const auto& trx : { trx2, trx3, trx4 } )
+      BOOST_REQUIRE_EQUAL( trx->get_estimated_size(), trx_size );
+
+   q.set_max_transaction_queue_size( 2 * trx_size );
+
+   // aborted and forked are never refused, even past the limit
+   q.add_aborted( { trx1, trx2 } );
+   BOOST_TEST( q.size_in_bytes() == 2 * trx_size );
+   add_forked( q, branch_t{ create_test_block_state( { trx3 } ) } );
+   BOOST_TEST( q.size() == 3u );
+   BOOST_TEST( q.incoming_size() == 0u );
+   BOOST_TEST( q.size_in_bytes() == 3 * trx_size );
+
+   // incoming is refused while the queue is past the limit
+   BOOST_CHECK_THROW( q.add_incoming( trx4, true, false, [](auto){} ), tx_resource_exhaustion );
+   BOOST_TEST( q.size() == 3u );
+   BOOST_TEST( q.incoming_size() == 0u );
+   BOOST_TEST( q.size_in_bytes() == 3 * trx_size );
+   BOOST_TEST( !q.get_trx( trx4->id() ) );
+
+   // and while it is exactly at the limit
+   BOOST_REQUIRE( next( q ) == trx3 );
+   BOOST_TEST( q.size_in_bytes() == 2 * trx_size );
+   BOOST_CHECK_THROW( q.add_incoming( trx4, true, false, [](auto){} ), tx_resource_exhaustion );
+   BOOST_TEST( q.size() == 2u );
+   BOOST_TEST( q.incoming_size() == 0u );
+   BOOST_TEST( q.size_in_bytes() == 2 * trx_size );
+
+   // incoming fits once forked and aborted bytes leave room
+   BOOST_REQUIRE( next( q ) == trx1 );
+   q.add_incoming( trx4, true, false, [](auto){} );
+   BOOST_TEST( q.size() == 2u );
+   BOOST_TEST( q.incoming_size() == 1u );
+   BOOST_TEST( q.size_in_bytes() == 2 * trx_size );
+
+   // clear() resets both counters
+   q.clear();
+   BOOST_TEST( q.empty() );
+   BOOST_TEST( q.incoming_size() == 0u );
+   BOOST_TEST( q.size_in_bytes() == 0u );
+   q.add_incoming( trx1, false, false, [](auto){} );
+   BOOST_TEST( q.incoming_size() == 1u );
+   BOOST_TEST( q.size_in_bytes() == trx_size );
+
+} FC_LOG_AND_RETHROW() /// unapplied_transaction_queue_limit_counts_forked_aborted
+
 BOOST_AUTO_TEST_SUITE_END()
