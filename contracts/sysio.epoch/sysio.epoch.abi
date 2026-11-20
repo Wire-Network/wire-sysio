@@ -22,6 +22,10 @@
                     "type": "uint32"
                 },
                 {
+                    "name": "last_epoch_index",
+                    "type": "uint32"
+                },
+                {
                     "name": "reason",
                     "type": "EmissionsBlockReason"
                 },
@@ -42,11 +46,11 @@
                     "type": "uint32"
                 },
                 {
-                    "name": "last_retry_at",
+                    "name": "last_blocked_at",
                     "type": "uint32"
                 },
                 {
-                    "name": "retry_count",
+                    "name": "blocked_epochs",
                     "type": "uint32"
                 }
             ]
@@ -58,6 +62,38 @@
                 {
                     "name": "epoch_index",
                     "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "economic_config",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch_duration_sec",
+                    "type": "uint32"
+                },
+                {
+                    "name": "start_time",
+                    "type": "time_point_sec"
+                }
+            ]
+        },
+        {
+            "name": "economic_state",
+            "base": "",
+            "fields": [
+                {
+                    "name": "current_epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "current_epoch_start",
+                    "type": "time_point"
+                },
+                {
+                    "name": "next_epoch_start",
+                    "type": "time_point"
                 }
             ]
         },
@@ -128,10 +164,6 @@
                 {
                     "name": "epoch_index",
                     "type": "uint32"
-                },
-                {
-                    "name": "emission_amount",
-                    "type": "int64"
                 }
             ]
         },
@@ -172,6 +204,30 @@
             ]
         },
         {
+            "name": "seteconomy",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch_duration_sec",
+                    "type": "uint32"
+                },
+                {
+                    "name": "start_time",
+                    "type": "time_point_sec"
+                }
+            ]
+        },
+        {
+            "name": "tickeconomy",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
             "name": "unpause",
             "base": "",
             "fields": []
@@ -204,6 +260,16 @@
             "ricardian_contract": ""
         },
         {
+            "name": "seteconomy",
+            "type": "seteconomy",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tickeconomy",
+            "type": "tickeconomy",
+            "ricardian_contract": ""
+        },
+        {
             "name": "unpause",
             "type": "unpause",
             "ricardian_contract": ""
@@ -217,6 +283,22 @@
             "key_names": ["epoch_index"],
             "key_types": ["uint64"],
             "table_id": 60163
+        },
+        {
+            "name": "economycfg",
+            "type": "economic_config",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 50728
+        },
+        {
+            "name": "economystate",
+            "type": "economic_state",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 30648
         },
         {
             "name": "epochcfg",

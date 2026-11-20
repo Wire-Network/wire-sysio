@@ -437,9 +437,11 @@ public:
    // "ETHEREUM" so the source it binds against (msgch's NODE_OWNER_SRC_CHAIN) is the scheduled outpost
    // and reaches consensus; the non-EVM drop case passes an SVM "SOLANA" so its delivery also reaches
    // consensus and the drop is exercised at the source binding, not merely the consensus gate. The
-   // outpost is registered before `schbatchgps`, so the batch op is scheduled for it.
+   // outpost is registered before `schbatchgps`, so the batch op is scheduled for it. The chain is
+   // left at epoch 0, inside the bootstrap window.
    void bootstrap_for_dispatch(const std::string& outpost_code = "ETH",
-                               ChainKind outpost_kind = ChainKind::CHAIN_KIND_EVM) {
+                               ChainKind outpost_kind = ChainKind::CHAIN_KIND_EVM,
+                               bool with_economy = true) {
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
          "setconfig"_n, mvo()
             ("epoch_duration_sec",                  60)
@@ -447,6 +449,10 @@ public:
             ("batch_operator_minimum_active",       1)
             ("batch_op_groups",                     1)
             ("epoch_retention_envelope_log_count",  200)));
+      if (with_economy) {
+         BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "seteconomy"_n, mvo()
+            ("epoch_duration_sec", 60)("start_time", fc::time_point_sec(control->head().block_time()))));
+      }
 
       BOOST_REQUIRE_EQUAL(success(), opreg_setconfig());
 
@@ -476,9 +482,6 @@ public:
 
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
          "schbatchgps"_n, mvo()));
-
-      BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
-         "advance"_n, mvo()));
 
       produce_blocks();
    }
@@ -510,15 +513,6 @@ public:
    /// Permissionless consensus-and-time crank that triggers sysio.epoch::advance.
    action_result chkcons() {
       return push(MSGCH_ACCOUNT, msgch_abi, BATCHOP, "chkcons"_n, mvo());
-   }
-
-   /// Read the sysio.epoch `blocklog` row for `epoch_index` (written by advance()'s emissions gate
-   /// when it blocks). `retry_count` counts how many times advance re-attempted and re-blocked.
-   fc::variant get_blocklog(uint32_t epoch_index) {
-      auto data = get_row_by_id(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "blocklog"_n, epoch_index);
-      return data.empty() ? fc::variant() : epoch_abi.binary_to_variant(
-         "blocklog_entry", data,
-         fixture_abi_yield_function());
    }
 
    fc::variant get_operator(name account) {
@@ -673,7 +667,7 @@ public:
    void enable_epoch_advancement() {
       deploy_system_with_emitcfg();
       BOOST_REQUIRE_EQUAL(success(), push_system(config::system_account_name, "initt5"_n,
-         mvo()("start_time", time_point_sec(control->head().block_time()))));
+         mvo()));
       produce_blocks();
    }
 
@@ -1394,29 +1388,19 @@ BOOST_FIXTURE_TEST_CASE(node_owner_claim_rejects_dotted_name, node_owner_claim_t
    assert_claim_rejected_as_name_invalid(AUTH_MSG_ACCOUNT);
 } FC_LOG_AND_RETHROW() }
 
-/// Regression: a non-advancing advance() must not permanently strand the epoch.
-///
-/// When every active outpost has reached consensus and the wall clock has passed, chkcons triggers
-/// sysio.epoch::advance. advance can legally return WITHOUT bumping the epoch when emissions are not
-/// ready -- its emissions gate records a block and returns gracefully, it does not throw. The earlier
-/// chkcons cleared per-outpost consensus_reached BEFORE calling advance, so that graceful return
-/// committed the cleared state and nothing re-armed it (apply_consensus does not re-fire for an
-/// already-complete delivery set) -- permanently stalling advancement even once emissions later became
-/// ready.
-///
-/// This fixture never deploys sysio.system, so the emissions gate always blocks (CONFIG_MISSING):
-/// exactly the non-advancing path. After consensus, each chkcons must re-attempt advance, which the
-/// gate records as blocklog.retry_count. Pre-fix, the second chkcons bailed at the consensus gate
-/// (retry_count would stay 1) and the epoch was stuck forever.
-BOOST_FIXTURE_TEST_CASE(chkcons_survives_non_advancing_advance, sysio_dispatch_tester) { try {
+/// Consensus never waits on the treasury: emissions run on the economic clock, so once every active
+/// outpost has reached consensus and the wall clock has passed, chkcons advances the consensus epoch
+/// even with no sysio.system deployed at all. Epoch 1 -> 2 retires a scheduled group, the advance
+/// that records batch duty.
+BOOST_FIXTURE_TEST_CASE(chkcons_advances_without_a_treasury, sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();
    const auto eth_code = fc::slug_name{"ETH"}.value;
 
-   // This fixture deploys no sysio.system, so even the genesis advance in bootstrap gate-blocked; the
-   // chain sits at `epoch0`. advance() always targets the next epoch, whose blocklog row counts gate
-   // re-attempts.
+   // The genesis advance is permissionless; it opens epoch 1 with BATCHOP's group scheduled.
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "advance"_n, mvo()));
+   produce_blocks();
    const uint32_t epoch0 = current_epoch();
-   const uint32_t target = epoch0 + 1;
+   BOOST_REQUIRE_EQUAL(epoch0, 1u);
 
    // operators_per_epoch == 1, so a single delivery is Option-A unanimous consensus; apply_consensus
    // records the outpcons row for ETH at epoch0.
@@ -1434,43 +1418,31 @@ BOOST_FIXTURE_TEST_CASE(chkcons_survives_non_advancing_advance, sysio_dispatch_t
    BOOST_REQUIRE_EQUAL(success(), deliver(/*chain_code=*/eth_code, envelope));
    produce_blocks();   // land the deliver in its own block (this fixture's push does not)
 
-   auto retry_count = [&]() -> uint32_t {
-      auto bl = get_blocklog(target);
-      return bl.is_null() ? 0u : bl["retry_count"].as<uint32_t>();
-   };
-   const uint32_t rc0 = retry_count();
-
    // Pass the wall clock (epoch_duration_sec == 60) so chkcons will fire advance, then refresh the head
    // so the subsequent push is stamped against the post-skip time and does not expire.
    produce_block(fc::seconds(120));
    produce_blocks();
 
-   // First chkcons fires advance, which gate-blocks on missing emissions and returns without advancing.
-   // The epoch is unchanged and the gate bumps retry_count -- confirming advance was actually attempted.
    BOOST_REQUIRE_EQUAL(success(), chkcons());
    produce_blocks();
-   BOOST_REQUIRE_EQUAL(current_epoch(), epoch0);
-   const uint32_t rc1 = retry_count();
-   BOOST_REQUIRE_EQUAL(rc1, rc0 + 1);
-
-   // REGRESSION: the per-outpost consensus signal must survive the non-advancing advance, so the second
-   // chkcons re-attempts advance (retry_count -> rc1 + 1). Pre-fix, chkcons cleared consensus_reached
-   // before calling advance, so this second call bailed at the consensus gate and never re-attempted --
-   // retry_count would stay at rc1 and the epoch would be permanently stranded.
-   BOOST_REQUIRE_EQUAL(success(), chkcons());
-   produce_blocks();
-   BOOST_REQUIRE_EQUAL(current_epoch(), epoch0);
-   BOOST_REQUIRE_EQUAL(retry_count(), rc1 + 1);
+   BOOST_REQUIRE_EQUAL(current_epoch(), epoch0 + 1);
 } FC_LOG_AND_RETHROW() }
 
 // ═════════════════════════════════════════════════════════════════════════
-// msgch::bootstrap emissions guards. Missing emissions config is a bootstrap DEFECT, not an
-// operational state: without these guards bootstrap's inline genesis advance would gate-block
-// SILENTLY (the emissions gate never throws, by design) and the misconfiguration would surface
-// only as "epoch stuck at 0". The three cases below cover both guards independently plus the
-// fully-configured pass-through. advance()'s own soft block-and-retry behavior for the ECONOMIC
-// gate reasons is covered above (chkcons_survives_non_advancing_advance) and in emissions_tests.
+// msgch::bootstrap economy guards. A missing economic clock or emissions config is a bootstrap
+// DEFECT, not an operational state: without these guards the economic clock would tick with its
+// emissions gate blocked (the gate never throws, by design) and the misconfiguration would surface
+// only as empty payouts. The cases below cover each guard independently plus the fully-configured
+// pass-through. The gate's own soft hold for the ECONOMIC reasons is covered in emissions_tests.
 // ═════════════════════════════════════════════════════════════════════════
+
+// Guard 0 — the economic clock is not configured (sysio.epoch::seteconomy never ran).
+BOOST_FIXTURE_TEST_CASE(bootstrap_requires_economic_config, sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch("ETH", ChainKind::CHAIN_KIND_EVM, /*with_economy=*/false);
+   BOOST_REQUIRE_EQUAL(
+      wasm_assert_msg("msgch::bootstrap: economic clock not configured -- sysio.epoch::seteconomy must run before bootstrap"),
+      push(MSGCH_ACCOUNT, msgch_abi, MSGCH_ACCOUNT, "bootstrap"_n, mvo()));
+} FC_LOG_AND_RETHROW() }
 
 // Guard 1 — emitcfg missing. This fixture deploys no sysio.system at all (setemitcfg / initt5
 // never ran), which is exactly the never-configured deployment shape.
@@ -1493,42 +1465,33 @@ BOOST_FIXTURE_TEST_CASE(bootstrap_requires_emissions_state, sysio_dispatch_teste
       push(MSGCH_ACCOUNT, msgch_abi, MSGCH_ACCOUNT, "bootstrap"_n, mvo()));
 } FC_LOG_AND_RETHROW() }
 
-// Both guards pass — the genesis 0 -> 1 advance actually happens. Guards that always threw (or a
-// gate that never passes) would look identical to guards 1 and 2 above, so this is the case that
-// pins them as guards rather than a permanent bootstrap block.
+// Every guard passes — the genesis 0 -> 1 advance actually happens. Guards that always threw would
+// look identical to the guards above, so this is the case that pins them as guards rather than a
+// permanent bootstrap block.
 BOOST_FIXTURE_TEST_CASE(bootstrap_advances_genesis_epoch_when_emissions_configured,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();
    setup_wire_token();   // payepoch pays WIRE out of sysio's token balance
    enable_epoch_advancement();        // setemitcfg + initt5
 
-   // bootstrap_for_dispatch's own advance ran while emissions were unconfigured, so it
-   // gate-blocked and left a blocklog row for the target epoch.
    BOOST_REQUIRE_EQUAL(current_epoch(), 0u);
-   BOOST_REQUIRE(!get_blocklog(1).is_null());
-
    BOOST_REQUIRE_EQUAL(success(),
       push(MSGCH_ACCOUNT, msgch_abi, MSGCH_ACCOUNT, "bootstrap"_n, mvo()));
    produce_blocks();
-
-   // The inline genesis advance passed the gate: epoch 0 -> 1, and the gate cleared the stale
-   // blocklog row on its way through.
    BOOST_REQUIRE_EQUAL(current_epoch(), 1u);
-   BOOST_REQUIRE(get_blocklog(1).is_null());
 } FC_LOG_AND_RETHROW() }
 
 // A forged/invalid delivery cannot strand the epoch. SEC-102's semantic-header check runs at
 // INGRESS (msgch::deliver's inbound_envelope_valid gate), so a forged envelope reverts on delivery
 // and records no envelope row -- it can never reach the consensus tally and leave a phantom
 // consensus_reached with no outpcons row. A subsequent VALID delivery reaches consensus normally and
-// chkcons proceeds to ATTEMPT advance (retry_count bumps) rather than waiting forever for a consensus
-// row that an accepted-then-soft-dropped invalid winner would have left missing. Drives the
-// production chkcons gate, not a direct epoch::advance.
+// chkcons advances rather than waiting forever for a consensus row that an accepted-then-soft-dropped
+// invalid winner would have left missing. Drives the production chkcons gate, not a direct
+// epoch::advance.
 BOOST_FIXTURE_TEST_CASE(forged_delivery_does_not_strand_chkcons, sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();
    const auto eth_code = fc::slug_name{"ETH"}.value;
    const uint32_t epoch0 = current_epoch();
-   const uint32_t target = epoch0 + 1;
 
    auto operator_payload = encode_operator_action(
       sysio::opp::attestations::OperatorAction::ACTION_TYPE_DEPOSIT_REQUEST,
@@ -1562,25 +1525,17 @@ BOOST_FIXTURE_TEST_CASE(forged_delivery_does_not_strand_chkcons, sysio_dispatch_
       deliver(eth_code, forged));
    produce_blocks();
 
-   auto retry_count = [&]() -> uint32_t {
-      auto bl = get_blocklog(target);
-      return bl.is_null() ? 0u : bl["retry_count"].as<uint32_t>();
-   };
-
    // The valid delivery (operators_per_epoch == 1 => Option-A unanimous) reaches consensus normally.
    BOOST_REQUIRE_EQUAL(success(), deliver(eth_code, valid));
    produce_blocks();
-   const uint32_t rc0 = retry_count();
 
-   // Pass the wall clock so chkcons fires advance; confirm it ATTEMPTED advance (retry_count bumps),
-   // i.e. it was NOT stranded waiting on a missing consensus row. Advance itself gate-blocks on
-   // emissions (this fixture deploys no sysio.system), exactly as in chkcons_survives_non_advancing_advance.
+   // Pass the wall clock so chkcons fires advance; the epoch moves, so chkcons was NOT stranded
+   // waiting on a missing consensus row.
    produce_block(fc::seconds(120));
    produce_blocks();
    BOOST_REQUIRE_EQUAL(success(), chkcons());
    produce_blocks();
-   BOOST_REQUIRE_EQUAL(current_epoch(), epoch0);
-   BOOST_REQUIRE_EQUAL(retry_count(), rc0 + 1);
+   BOOST_REQUIRE_EQUAL(current_epoch(), epoch0 + 1);
 } FC_LOG_AND_RETHROW() }
 
 ;
@@ -2034,7 +1989,6 @@ BOOST_FIXTURE_TEST_CASE(a_pulled_andon_cord_leaves_advance_running, sysio_dispat
    BOOST_REQUIRE_EQUAL(success(), push(MSGCH_ACCOUNT, msgch_abi, MSGCH_ACCOUNT, "bootstrap"_n, mvo()));
    produce_blocks();
    BOOST_REQUIRE_EQUAL(current_epoch(), 1u);
-   BOOST_REQUIRE(get_blocklog(1).is_null());
 } FC_LOG_AND_RETHROW() }
 
 // ── The solvency check (sysio.synd) through a delivered envelope ─────────────

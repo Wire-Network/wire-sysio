@@ -39,9 +39,13 @@ namespace sysio {
       static constexpr name LIQ_ACCOUNT    = "sysio.liq"_n;
       static constexpr name SYSTEM_ACCOUNT = "sysio"_n;
 
-      // 2-epoch wait between `queue_withdraw` and `flushwithdraws` releasing
-      // funds. Long enough that an operator who would drop below the role
-      // minimum is demoted before the funds physically leave.
+      /// Economic epochs between a withdrawal request and its release: the wall-clock wait.
+      static constexpr uint32_t WITHDRAW_WAIT_ECONOMIC_EPOCHS = 2;
+
+      /// Consensus epochs that must also close after the request before release. Non-canonical
+      /// deliverers are slashed when their consensus epoch closes, and a dispute pause stops the
+      /// consensus index, so this guard keeps a deliverer's collateral in place until its
+      /// deliveries have been judged, however far the economic clock runs ahead.
       static constexpr uint32_t WITHDRAW_WAIT_EPOCHS = 2;
 
       /// Per-(operator, chain, token) cap on pending collateral withdrawals
@@ -223,10 +227,11 @@ namespace sysio {
       [[sysio::action]]
       void cancelwtdw(name account, uint64_t request_id);
 
-      /// Internal: drain matured rows from `withdraw_queue`. Called inline
-      /// from `sysio.epoch::advance` each tick.
+      /// Internal: drain matured rows from `withdraw_queue`. Called inline from
+      /// `sysio.epoch::tickeconomy` each economic epoch with the current economic and consensus
+      /// indexes; a row is matured once both of its waits have passed.
       [[sysio::action]]
-      void flushwtdw(uint32_t current_epoch);
+      void flushwtdw(uint32_t economic_epoch, uint32_t consensus_epoch);
 
       /// Read-only rollup of the operator's spendable balance for a given
       /// (chain, token_kind). Returns 0 if the operator is SLASHED /
@@ -439,8 +444,9 @@ namespace sysio {
       using opconfig_t = sysio::kv::global<"opconfig"_n, op_config>;
 
       /// Pending-withdraw row keyed by sequential `request_id`. Drained by
-      /// `flushwtdw` once `eligible_at_epoch <= current_epoch`. Subtracted by
-      /// `available()` so the queued amount can't be double-used.
+      /// `flushwtdw` once `eligible_at_economic_epoch <= economic_epoch` and the consensus index has
+      /// reached `eligible_at_consensus_epoch`. Subtracted by `available()` so the queued amount
+      /// can't be double-used.
       struct withdraw_key {
          uint64_t request_id;
          uint64_t primary_key() const { return request_id; }
@@ -453,8 +459,9 @@ namespace sysio {
          sysio::slug_name   chain_code;
          sysio::slug_name   token_code;
          uint64_t          amount              = 0;
-         uint32_t          eligible_at_epoch   = 0;
-         uint32_t          requested_at_epoch  = 0;
+         uint32_t          eligible_at_economic_epoch  = 0;
+         uint32_t          eligible_at_consensus_epoch = 0;
+         uint32_t          requested_at_economic_epoch = 0;
 
          /// Composite (account, chain_code, token_code) for available() rollup.
          /// 3 × uint64 = 192 bits → checksum256.
@@ -466,14 +473,15 @@ namespace sysio {
             std::memcpy(buf.data() + 16, &token_code.value, 8);
             return sysio::sha256(reinterpret_cast<const char*>(buf.data()), buf.size());
          }
-         /// Eligibility cursor for flushwtdw.
-         uint64_t  by_eligible() const { return static_cast<uint64_t>(eligible_at_epoch); }
+         /// Eligibility cursor for flushwtdw: the economic wait. Both clocks only move forward, so
+         /// the consensus guard is also non-decreasing along this index.
+         uint64_t  by_eligible() const { return static_cast<uint64_t>(eligible_at_economic_epoch); }
          /// Per-account scan (cancelwtdw lookup convenience).
          uint64_t  by_account()  const { return account.value; }
 
          SYSLIB_SERIALIZE(withdraw_request,
             (request_id)(account)(chain_code)(token_code)(amount)
-            (eligible_at_epoch)(requested_at_epoch))
+            (eligible_at_economic_epoch)(eligible_at_consensus_epoch)(requested_at_economic_epoch))
       };
 
       using wtdwqueue_t = sysio::kv::table<"wtdwqueue"_n, withdraw_key, withdraw_request,

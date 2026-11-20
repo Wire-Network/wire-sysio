@@ -110,7 +110,7 @@
  * cord clears does that work. `linkswept` keeps the parked
  * balance and returns (the user's link stands; `sweep` delivers after the clear); `sweep`, `desyndicate`,
  * `dropenv` and `sweepyield` are refused. Intake, `challenge` and `setconfig` run. A bucket never refills
- * beyond its burst cap; elapsed frozen epochs refill normally after clear. Challenge windows run on.
+ * beyond its burst cap; time spent frozen refills normally after clear. Challenge windows run on.
  *
  * Launch. `importsynd` replays pre-launch positions inside the epoch-0 bootstrap window, minting
  * straight to a linked account or into `parked`; `importdone` closes the import for good.
@@ -324,7 +324,7 @@ namespace sysio {
       // -----------------------------------------------------------------------
 
       /// Set the rules of outpost `chain_code` and its liq token `token_code`: the syndication and
-      /// desyndication fees in basis points (at most `bond::BPS_DENOMINATOR`), the size and per-epoch
+      /// desyndication fees in basis points (at most `bond::BPS_DENOMINATOR`), the size and per-second
       /// refill of each direction's bucket in base units, the challenge window of each request in seconds
       /// (above 0), the bounty posted on each request from collected fees, and what a challenger pays on
       /// top of the hold bond. A pair with no row issues requests with DEFAULT_WINDOW_SEC and no bounty,
@@ -730,9 +730,9 @@ namespace sysio {
          uint32_t         synd_fee_bps     = 0;   ///< fee on a released syndication, in basis points
          uint32_t         desynd_fee_bps   = 0;   ///< fee on a desyndication, in basis points
          uint64_t         synd_burst       = 0;   ///< size of the syndication bucket, in base units
-         uint64_t         synd_refill      = 0;   ///< syndication bucket refill per depot epoch
+         uint64_t         synd_refill      = 0;   ///< syndication bucket refill per second, in base units
          uint64_t         desynd_burst     = 0;   ///< size of the desyndication bucket, in base units
-         uint64_t         desynd_refill    = 0;   ///< desyndication bucket refill per depot epoch
+         uint64_t         desynd_refill    = 0;   ///< desyndication bucket refill per second, in base units
          uint32_t         window_sec       = DEFAULT_WINDOW_SEC;   ///< challenge window of each request
          uint64_t         bounty           = 0;   ///< bounty posted on each request, paid from `feepot`
          uint64_t         challenge_extra  = 0;   ///< charged to a challenger on top of the hold bond
@@ -758,14 +758,14 @@ namespace sysio {
       };
 
       /// A leaky bucket: `level` base units may pass now, and it refills lazily by the configured
-      /// refill per depot epoch, including frozen epochs, up to the burst.
+      /// refill per second, including time spent frozen, up to the burst.
       struct [[sysio::table("buckets")]] bucket_row {
          sysio::slug_name chain_code;                                    ///< the outpost
          sysio::slug_name token_code;                                    ///< the liq token
          bucket_direction direction  = bucket_direction::SYNDICATION;    ///< the flow it limits
          uint64_t         level      = 0;   ///< base units that may pass now; never above the burst
-         uint32_t         last_epoch = 0;   ///< the depot epoch it was last ticked at
-         SYSLIB_SERIALIZE(bucket_row, (chain_code)(token_code)(direction)(level)(last_epoch))
+         sysio::time_point_sec last_refill{};   ///< when it was last ticked
+         SYSLIB_SERIALIZE(bucket_row, (chain_code)(token_code)(direction)(level)(last_refill))
       };
 
       /// Buckets by outpost, token and direction.

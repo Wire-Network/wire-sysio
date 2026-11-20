@@ -74,12 +74,11 @@ In this order: envelope consensus, then held, then its request's turn, then BOND
 then the bucket in item id order, then the fee, then release. Nothing releases from an envelope whose
 request is OPEN, HELD or INVALID.
 
-- **Bucket.** The pair's syndication bucket is ticked lazily against the depot's epoch:
-  `level = min(burst, level + refill * epochs elapsed)`, not counting an epoch during which the
-  `sysio.andon` cord was pulled (see The emergency stop); a new bucket starts full. The tranche is
-  `min(remaining, level)`, so no single release exceeds the burst. An empty bucket stops the pair's
-  syndications until it refills; an item larger than the level releases in tranches over several
-  epochs.
+- **Bucket.** The pair's syndication bucket is ticked lazily against block time:
+  `level = min(burst, level + refill * seconds elapsed)`, including time the `sysio.andon` cord was
+  pulled (see The emergency stop); a new bucket starts full. The tranche is `min(remaining, level)`,
+  so no single release exceeds the burst. An empty bucket stops the pair's syndications until it
+  refills; an item larger than the level releases in tranches over time.
 - **Fee.** `tranche * synd_fee_bps / 10000`, floored, into the fee pot.
 - **Release.** The rest goes to the account the pubkey has AuthX-linked at release time. The WIRE the
   item earned while held is credited to that account's own `sysio.liq` row with `sysio.liq::creditowed`
@@ -509,7 +508,7 @@ clear, is [`emergency-stop-playbook.md`](emergency-stop-playbook.md).
 | `setconfig`, `importsynd` | Run. |
 
 Frozen queue steps never spend capacity or release funds. The first tick after clear refills
-for all elapsed depot epochs, including the freeze, capped at the configured burst.
+for all elapsed time, including the freeze, capped at the configured burst.
 Repeated freezes cannot raise capacity beyond that cap.
 
 ## Tables
@@ -520,7 +519,7 @@ Repeated freezes cannot raise capacity beyond that cap.
 | `envelopes` | outpost, token, depot epoch | digest, syndicated and yield totals, item count, state, `sysio.bond` request id, released, burned, the request's recorded outcome, and the forfeit and returned bounty snapshotted on INVALID |
 | `items` | envelope, then id (arrival order) | kind, beneficiary key family and pubkey, amount, remaining, yield position |
 | `parked` | token, key family, pubkey | balance, yield position, active principal batch id and unattributed imported principal of an unlinked pubkey |
-| `buckets` | outpost, token, direction | level and the depot epoch last ticked, one per direction (SYNDICATION, DESYNDICATION) |
+| `buckets` | outpost, token, direction | level and the time last ticked, one per direction (SYNDICATION, DESYNDICATION) |
 | `ledger` | outpost, token | release and underwriting cursors; `retained_from_epoch` replay floor |
 | `returns` | request id | original holder, destination family/key, outpost, token, exact net burned amount and `sent_epoch`; erased by a later `desyndicate` once the outpost has consumed its envelope, or by `refundreturn` |
 | `feepot` | token | collected fees, with a yield position; bounties are paid from it, and its yield goes to `sysio` |
@@ -545,9 +544,9 @@ pair's whole row.
 | `desynd_fee_bps` | 0 | basis-point part of the fee on each desyndication, at most 10000 |
 | `desynd_fee_flat` | 0 | flat part of the fee on each desyndication, in shadow base units, added to the basis-point part. Syndication is kept free by design, so the desyndication fee (flat plus basis points) is sized to recover the external-chain gas the batch operators pay for both legs of the round trip: the syndication drain and the desyndication payout. Below `min_desyndicate`, so a minimum desyndication at 0 bps nets at least one base unit |
 | `custody_shortfall_bps` | 0 | maximum tolerated custody shortfall as a fraction of outstanding liabilities; hard cap 1000 (10%); configure LIQETH at 100 (1%) |
-| `synd_burst`, `synd_refill` | unset: nothing releases | syndication bucket size, and refill per depot epoch, in base units |
+| `synd_burst`, `synd_refill` | unset: nothing releases | syndication bucket size, and refill per second, in base units |
 | `min_desyndicate` | explicit bootstrap value: 1,000,000 | shared gross return floor (0.001 SOL at nine decimals), intentionally arbitrary; at most a nonzero desyndication burst; rejected before moving custody |
-| `desynd_burst`, `desynd_refill` | unset: nothing desyndicates | desyndication bucket size and refill |
+| `desynd_burst`, `desynd_refill` | unset: nothing desyndicates | desyndication bucket size, and refill per second, in base units |
 | `window_sec` | 10800 | challenge window of each request; above 0 |
 | `bounty` | 0 | bounty posted on each request, paid from the fee pot |
 | `challenge_extra` | 0 | charged to a challenger on top of the hold bond and kept in the fee pot whatever the ruling; at 0, an envelope whose hold bond rounds to zero cannot be challenged |
@@ -571,7 +570,7 @@ desyndication. The row must exist, with the buckets set, before the pair carries
 - `desyndicate(holder, quantity, max_fee)` refuses a fee above the cap before anything moves, then
   takes the whole quantity from the holder's balance and releases the quantity less the desyndication
   fee on the outpost. It is refused when the pair's desyndication budget is too low now;
-  it refills every depot epoch. It is also refused while the outpost's outbound queue is full, which
+  it refills every second. It is also refused while the outpost's outbound queue is full, which
   drains every depot epoch.
 
 ## What an operator sees

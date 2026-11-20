@@ -499,10 +499,11 @@ synd::bucket_key bucket_key_of(sysio::slug_name chain_code, sysio::slug_name tok
                            .direction  = magic_enum::enum_integer(direction)};
 }
 
-/// Refill by elapsed depot epochs, including freezes, capped at burst. Frozen
+/// Refill by elapsed seconds, including freezes, capped at burst. Frozen
 /// queue steps never spend capacity; the first step after clearing ticks lazily.
 synd::bucket_row tick_bucket(name self, sysio::slug_name chain_code, sysio::slug_name token_code,
-                             synd::bucket_direction direction, uint64_t burst, uint64_t refill, uint32_t epoch_index) {
+                             synd::bucket_direction direction, uint64_t burst, uint64_t refill,
+                             sysio::time_point_sec now) {
    synd::buckets_t  buckets(self);
    synd::bucket_row row = buckets.try_get(bucket_key_of(chain_code, token_code, direction))
                              .value_or(synd::bucket_row{
@@ -510,13 +511,13 @@ synd::bucket_row tick_bucket(name self, sysio::slug_name chain_code, sysio::slug
                                 .token_code  = token_code,
                                 .direction   = direction,
                                 .level       = burst,
-                                .last_epoch  = epoch_index,
+                                .last_refill = now,
                              });
-   if (epoch_index > row.last_epoch) {
-      const uint64_t elapsed       = epoch_index - row.last_epoch;
+   if (now > row.last_refill) {
+      const uint64_t elapsed  = now.sec_since_epoch() - row.last_refill.sec_since_epoch();
       const uint128_t refilled = static_cast<uint128_t>(row.level) + static_cast<uint128_t>(refill) * elapsed;
-      row.level      = refilled < burst ? static_cast<uint64_t>(refilled) : burst;
-      row.last_epoch = epoch_index;
+      row.level       = refilled < burst ? static_cast<uint64_t>(refilled) : burst;
+      row.last_refill = now;
    }
    row.level       = std::min(row.level, burst);
    return row;
@@ -604,7 +605,7 @@ public:
    queue_step(name self, uint32_t limit, bool underwriting = false)
       : underwriting_(underwriting), self_(self), left_(limit), looks_(static_cast<uint32_t>(std::min<uint64_t>(
                                             uint64_t{EXAMINE_FACTOR} * limit, std::numeric_limits<uint32_t>::max()))),
-        epoch_(epoch::current_epoch_index()), frozen_(andon::pulled(andon::ANDON_ACCOUNT)) {}
+        now_(current_time_point()), frozen_(andon::pulled(andon::ANDON_ACCOUNT)) {}
 
    /// Run every shadow's pair, in shadow-symbol order from the pair the last step ran out on, wrapping
    /// around, until the budget or the examination cap is spent. Every pair visited costs one examination
@@ -1005,7 +1006,7 @@ private:
       }
       synd::bucket_row bucket = tick_bucket(self_, item.chain_code, item.token_code,
                                             synd::bucket_direction::SYNDICATION, config->synd_burst,
-                                            config->synd_refill, epoch_);
+                                            config->synd_refill, now_);
       const uint64_t tranche = std::min(item.remaining, bucket.level);
       bucket.level -= tranche;
       synd::buckets_t(self_).set(ram_payer,
@@ -1111,7 +1112,7 @@ private:
    name                    self_;              ///< this contract
    uint32_t                left_;              ///< work units left
    uint32_t                looks_;             ///< examinations left
-   uint32_t                epoch_;             ///< the depot epoch the buckets tick to
+   sysio::time_point_sec   now_;               ///< the time the buckets tick to
    bool                    frozen_;            ///< the `sysio.andon` cord is pulled: nothing leaves or burns
    pair_state              pair_;              ///< the pair being walked
 
@@ -1561,14 +1562,14 @@ void synd::desyndicate(name holder, asset quantity, uint64_t max_fee) {
    const auto pubkey = linked_pubkey(holder, *kind);
    check(pubkey.has_value(), holder_unlinked_msg.data());
 
-   // The pair's desyndication bucket, ticked to the depot's current epoch, must hold the whole quantity;
+   // The pair's desyndication bucket, ticked to now, must hold the whole quantity;
    // it drops by the whole quantity, the fee included.
    const uint64_t quantity_units = static_cast<uint64_t>(quantity.amount);
    const auto config = assert_desynd_config(get_self(), st.chain_code, st.token_code, quantity_units);
    const auto quote = assert_desynd_fee(config, quantity_units);
    check(quote.fee <= max_fee, desynd_max_fee_message.data());
    bucket_row     bucket = tick_bucket(get_self(), st.chain_code, st.token_code, bucket_direction::DESYNDICATION,
-                                       config.desynd_burst, config.desynd_refill, epoch::current_epoch_index());
+                                       config.desynd_burst, config.desynd_refill, current_time_point());
    check(quantity_units <= bucket.level, desynd_budget_message.data());
    bucket.level -= quantity_units;
    buckets_t(get_self()).set(ram_payer, bucket_key_of(st.chain_code, st.token_code, bucket_direction::DESYNDICATION),

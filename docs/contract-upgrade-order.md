@@ -1,8 +1,9 @@
 # System-contract upgrade order
 
 The system contracts are not independent deployables. `sysio.epoch::advance`
-inlines actions into four other contracts, and the emissions gate reads two
-contracts' tables, so a release's contract builds are only correct **as a set**.
+and `sysio.epoch::tickeconomy` inline actions into four other contracts, and the
+emissions gate reads two contracts' tables, so a release's contract builds are
+only correct **as a set**.
 Upgrading them one at a time creates windows in which a new caller meets an old
 callee.
 
@@ -108,19 +109,21 @@ does:
 
 ## The cross-contract edges
 
-Everything `sysio.epoch::advance` inlines, directly:
+Everything the two `sysio.epoch` clocks inline, directly:
 
-| Callee | Actions |
-|---|---|
-| `sysio.opreg` | `recorddel`, `termcheck`, `flushwtdw` |
-| `sysio.chalg` | `slashop` |
-| `sysio.msgch` | `queueout`, `buildenv` |
-| `sysio` | `accrueepoch`, `rcrdbatch`, `payepoch` |
+| Caller | Callee | Actions |
+|---|---|---|
+| `advance` (consensus epoch) | `sysio.opreg` | `recorddel`, `termcheck` |
+| `advance` | `sysio.chalg` | `slashop` |
+| `advance` | `sysio.msgch` | `queueout`, `buildenv` |
+| `advance` | `sysio` | `rcrdduty` |
+| `tickeconomy` (economic clock) | `sysio.opreg` | `flushwtdw` |
+| `tickeconomy` | `sysio` | `accrueepoch`, `payepoch`, `settleduty` |
 
 Those callees inline further (`slashop` → `sysio.opreg::slash`, `termcheck` → the
 `sysio.opreg` termination path that credits `remitclaims`, `payepoch` →
 `sysio.token::transfer` for the pushed capex and governance buckets), so the
-transitive subtree — not just the table above — sits inside `advance`'s abort
+transitive subtree — not just the table above — sits inside each clock's abort
 surface. `advance` itself is inlined by `sysio.msgch::chkcons` (and by
 `sysio.msgch::bootstrap` at epoch 0), so `sysio.msgch` is both a caller and a
 callee of `sysio.epoch`.
@@ -149,7 +152,7 @@ WIRE-352 adds separate inline edges whose failure behavior depends on the caller
 | Andon custody readers: swap, liq, bond, synd, kicker | Three-field `cord` row | Deploy all six from the same revision on a fresh deployment; configure native pull/clear permissions. | Existing cord rows use an incompatible layout; no in-place migration is supplied. |
 | Syndication custody shortfall | Andon `pull(reason)` with `sysio.andon@active` | Deploy Andon before syndication carries traffic. Privileged syndication needs no custom pull permission. | Missing account/permission or incompatible code fails the transaction atomically. |
 | `sysio.synd` reading its own `mismatch` rows | its own table: `mismatch` is new | Deploy this `sysio.synd` fresh, as the row below requires. | One latest incident per chain/token; a new shortfall overwrites it. Snapshot evidence externally before governance reconciliation erases it. |
-| Syndication envelope and bucket rows | Current ABI layouts | Deploy fresh without rows from earlier layouts. | Buckets now store level and last epoch only; no frozen-epoch marker or migration is included. |
+| Syndication envelope and bucket rows | Current ABI layouts | Deploy fresh without rows from earlier layouts. | Buckets now store level and last refill time only; no frozen marker or migration is included. |
 
 Production deployment through `sysio.roa::setsyscode` privileges `sysio.dclaim`
 as part of the deploy, so there is no separate privilege step. The durable
@@ -193,36 +196,16 @@ This sequence keeps DClaim ready before either link path and prevents every
 old/new pairing of the two changed inline payloads from becoming externally
 observable.
 
-### WIRE-343 pre-launch activation
+### Economic clock activation
 
-Activate WIRE-343 in one quiesced maintenance window, with no
-`sysio.epoch::advance` between contract deployments. This remains the normal
-pre-launch procedure because a complete immutable roster history is required
-to credit the batch-operator payout:
-
-1. Set `pay_cadence_epochs` to a value in `[1, 10]` that also satisfies
-   `pay_cadence_epochs * operators_per_epoch <= 100` before the window. Groups are
-   at most 7 operators, so any cadence up to 10 qualifies. An older stored value
-   outside the accepted bounds is read with an effective clamp until rewritten.
-2. Prefer a completed payment period and verify that `t5state` has
-   `pending_emission_amount == 0`, all `batch_group_epochs` counters are zero,
-   and `batchepochs` is empty.
-3. Quiesce epoch advancement and deploy the new `sysio.system` and
-   `sysio.epoch` contracts together before allowing the next `advance`.
-
-The deployed contracts also have a bounded recovery path for an accidental
-mixed or mid-period deployment. `rcrdbatch` prunes the exact oldest retained
-roster, and `payepoch` removes at most 20 history rows per payment, so even a
-malformed gapped table cannot turn cleanup into an unbounded `advance`.
-If `payepoch` sees missing, stale, non-contiguous, or over-cap history, it
-retains that period's batch-emission slice in the treasury, records the retained
-emission and incomplete-history status in `epochlog`, and drains stale history
-monotonically before resuming batch payouts. Producer, capex, and governance
-processing still completes. The runtime also shortens a legacy cadence when
-necessary to keep batch credits at or below 100 per payout. This is a recovery
-path, not a replacement for the normal quiesced deployment. Do not downgrade
-while `batchepochs` is non-empty. T5 must also be initialized before its first
-successful epoch advance.
+The economic clock moves emissions, withdrawal maturity and batch-operator pay off the consensus
+epoch, and changes the inline signatures of `finishadv`, `accrueepoch`, `payepoch` and `flushwtdw`,
+the layouts of `t5state`, `epochlog`, `blocklog`, `wtdwqueue` and `buckets`, and `initt5`'s
+arguments. No migration is supplied: deploy `sysio.epoch`, `sysio`, `sysio.opreg`, `sysio.msgch` and
+`sysio.synd` together on a fresh chain, then `sysio.epoch::seteconomy` before `sysio.system::initt5`
+and before `sysio.msgch::bootstrap` (which refuses to start without it). `batch_operator_plugin` adds
+`sysio.epoch::tickeconomy` to the relay's actions, so an operator whose `@active` has been restricted
+by a `linkauth` must let it authorize that action too, or the plugin refuses to start.
 
 ## The two rules for future changes
 
@@ -254,8 +237,8 @@ changes. For the edges on `advance`'s path today, and the one `sysio.bond::accep
 
 | Edge | Why |
 |---|---|
-| `sysio.opreg`, `sysio.chalg`, `sysio.msgch` before `sysio.epoch`, when the release adds or changes an action `advance` inlines into them | Call edge: the new `advance` would otherwise reach a callee that cannot dispatch the action, and every advance aborts. |
-| `sysio` (`sysio.system`) before `sysio.epoch`, when the release adds or changes `accrueepoch` / `rcrdbatch` / `payepoch` | Call edge: the new `advance` would otherwise reach a `sysio.system` that cannot dispatch the action, and every advance aborts. |
+| `sysio.opreg`, `sysio.chalg`, `sysio.msgch` before `sysio.epoch`, when the release adds or changes an action `advance` or `tickeconomy` inlines into them | Call edge: the new clock would otherwise reach a callee that cannot dispatch the action, and every advance or tick aborts. |
+| `sysio` (`sysio.system`) before `sysio.epoch`, when the release adds or changes `rcrdduty` / `accrueepoch` / `payepoch` / `settleduty` | Call edge: the new clock would otherwise reach a `sysio.system` that cannot dispatch the action, and every advance or tick aborts. |
 | `sysio.epoch` and `sysio.kicker` before `sysio.system`, when `sysio.system` gains state the emissions gate must reserve (as `payclaimtot` reserves unclaimed `payclaims`) | Table edge: the old gate counts the new backing as spendable, so a later pay period can double-commit it and leave credited claims underfunded; an old kicker counts it as available treasury and `kick` can draw it. |
 | `sysio.epoch` before `sysio.msgch`, when the release adds or changes an action `chkcons` inlines into `sysio.epoch` | Call edge in the other direction. |
 | `sysio` (`sysio.system`) before `sysio.bond` | Call edge: `accept` on a request from a `sysio.*` issuer sends `sysio::addsubjex`, and the dispatcher rejects an action the deployed contract does not define, so every such `accept` aborts. |

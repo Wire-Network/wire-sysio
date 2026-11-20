@@ -426,11 +426,12 @@ public:
             ("batch_operator_minimum_active",       n_batch_ops)
             ("batch_op_groups",                     1)
             ("epoch_retention_envelope_log_count",  200)));
+      BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "seteconomy"_n, mvo()
+         ("epoch_duration_sec", EPOCH_DURATION_SEC)("start_time", fc::time_point_sec(control->head().block_time()))));
 
       BOOST_REQUIRE_EQUAL(success(), setemitcfg_defaults());
       BOOST_REQUIRE_EQUAL(success(), push(SYSIO_ACCOUNT, sysio_abi, SYSIO_ACCOUNT,
-         "initt5"_n, mvo()
-            ("start_time", fc::time_point_sec(control->head().block_time()))));
+         "initt5"_n, mvo()));
 
       BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
          "setconfig"_n, mvo()
@@ -1139,10 +1140,11 @@ public:
          ("batch_operator_minimum_active",      ROTATION_OPERATORS_PER_GROUP * ROTATION_GROUPS)
          ("batch_op_groups",                    ROTATION_GROUPS)
          ("epoch_retention_envelope_log_count", 200)));
+      BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "seteconomy"_n, mvo()
+         ("epoch_duration_sec", EPOCH_DURATION_SEC)("start_time", fc::time_point_sec(control->head().block_time()))));
 
       BOOST_REQUIRE_EQUAL(success(), setemitcfg_defaults());
-      BOOST_REQUIRE_EQUAL(success(), push(SYSIO_ACCOUNT, sysio_abi, SYSIO_ACCOUNT, "initt5"_n, mvo()
-         ("start_time", fc::time_point_sec(control->head().block_time()))));
+      BOOST_REQUIRE_EQUAL(success(), push(SYSIO_ACCOUNT, sysio_abi, SYSIO_ACCOUNT, "initt5"_n, mvo()));
 
       BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "setconfig"_n, mvo()
          ("terminate_prune_delay_ms",         600000)

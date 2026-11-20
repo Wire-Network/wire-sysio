@@ -731,9 +731,9 @@ namespace sysiosystem {
           * Drains the caller's `payclaims` row and transfers the whole balance out.
           *
           * payepoch credits rather than transfers because it runs inline from
-          * sysio.epoch::advance: `sysio.token::transfer` notifies the recipient, and a recipient
-          * whose notify handler aborts (or burns CPU) would abort advance and stall epoch
-          * advancement chain-wide. Moving the transfer here puts it under the claimant's own
+          * sysio.epoch::tickeconomy: `sysio.token::transfer` notifies the recipient, and a recipient
+          * whose notify handler aborts (or burns CPU) would abort the tick and stall the economic
+          * clock chain-wide. Moving the transfer here puts it under the claimant's own
           * authority, so a hostile recipient can only block its own payout.
           *
           * The T5 category buckets (`sysio.ops` capex, `sysio.gov` governance) are NOT credited
@@ -757,80 +757,62 @@ namespace sysiosystem {
          emissions::node_claim_result viewnodedist(const sysio::name& account_name);
 
          /**
-          * Initialize the T5 treasury emissions system.
+          * Initialize the T5 treasury emissions system. Its start time is the economic clock's
+          * (sysio.epoch::economycfg), which must be configured first.
           */
          [[sysio::action]]
-         void initt5(const sysio::time_point_sec& start_time);
+         void initt5();
 
          /**
-          * Pay emissions for the given sysio.epoch index. Called inline by
-          * sysio.epoch::advance on a pay-epoch (i.e., the period boundary
-          * defined by emit_cfg.pay_cadence_epochs). Auth: require_auth(
-          * "sysio.epoch").
+          * Pay the emissions accrued over the pay period ending at economic epoch `epoch_index`.
+          * Called inline by sysio.epoch::tickeconomy on a pay epoch (the period boundary defined by
+          * emit_cfg.pay_cadence_epochs) whose spendable balance covers the period, right after
+          * that epoch's accrueepoch. Auth: require_auth("sysio.epoch").
           *
-          * `period_emission` is the gate-computed sum of pending accrued
-          * emissions plus this epoch's per-epoch share. payepoch trusts that
-          * value (single-trx semantics make recomputation unnecessary) and
-          * distributes it across producer / batch / capex / gov
-          * pools as today, scaled to the period.
+          * `period_emission` is the gate-computed period total; payepoch asserts it equals the
+          * accrued `pending_emission_amount` and distributes it across producer / batch / capex /
+          * gov pools. The batch pool is not credited here in full: it opens a duty settlement that
+          * splits it pro rata to the period's duty units (see rcrdduty), paid in bounded steps.
           *
-          * `batch_op_groups` is retained as an ABI-compatible reserved field;
-          * payout uses only the immutable `batchepochs` roster history written
-          * for every accrued epoch. t5state.batch_group_epochs supplies the
-          * ACTUAL accrued-epoch count, rather than configured
-          * pay_cadence_epochs, because a mid-period config change or shortened
-          * genesis period can make those differ. Incomplete history retains the
-          * batch-emission slice in treasury and is reset for the next period;
-          * neither it nor a complete but all-empty history may halt
-          * sysio.epoch::advance.
-          *
-          * Runtime conditions (config missing, treasury exhausted, balance
-          * insufficient) are caught upstream by the gate, which records the
-          * block in sysio.epoch's blocklog and prevents advance from
-          * proceeding.
+          * While an earlier settlement is still open the payout waits: the step here advances that
+          * settlement and, if it is still not done, returns with the period still pending, so the
+          * next economic epoch's gate offers the payout again.
           */
          [[sysio::action]]
-         void payepoch(uint32_t epoch_index,
-                       std::vector<std::vector<sysio::name>> batch_op_groups,
-                       int64_t period_emission);
+         void payepoch(uint32_t epoch_index, int64_t period_emission);
 
          /**
-          * Accrue this epoch's per-epoch emission share onto t5state, without
-          * paying. Called inline by sysio.epoch::advance on EVERY successful
-          * epoch — including a pay epoch, where advance queues this action
-          * FIRST and payepoch after it, so FIFO inline ordering means payepoch
-          * observes the post-accrue state. Auth: require_auth("sysio.epoch").
+          * Accrue economic epoch `epoch_index`'s emission share onto t5state, without paying.
+          * Called inline by sysio.epoch::tickeconomy whenever the gate lets the epoch accrue --
+          * including a pay epoch, where it runs first so payepoch observes the post-accrue state.
+          * Auth: require_auth("sysio.epoch").
           *
-          * Increments t5state.pending_emission_amount by `per_epoch_emission`
-          * and bumps t5state.batch_group_epochs[batch_group_index] by 1, so
-          * the next payepoch sees the period total. `rcrdbatch` records the
-          * corresponding immutable roster separately.
+          * Adds `per_epoch_emission` to t5state.pending_emission_amount and the epoch's nominal
+          * block slots to pending_nominal_slots. A zero share is valid: the gate passes one to an
+          * open pay period with emission pending once the rest of the T5 budget is committed or the
+          * curve is zero, and `last_epoch_emission` (the decay base) keeps the last positive share.
           *
-          * A zero share is valid: the gate passes one to an open pay period with emission pending once the rest of
-          * the T5 budget is committed or the curve is zero. The epoch still counts toward the period, and
-          * `last_epoch_emission` (the decay base) keeps the last positive share.
-          *
-          * Because it also runs on the pay epoch, the counter sum that
-          * `payepoch` normalizes by includes the epoch being paid. Reading this
-          * as "non-pay epochs only" understates that sum by one and is how the
-          * configured-cadence divisor came to look correct.
-          *
-          * No transfers happen here. Treasury / balance gating is the
-          * gate's responsibility upstream.
+          * No transfers happen here. Treasury / balance gating is the gate's responsibility upstream.
           */
          [[sysio::action]]
-         void accrueepoch(uint32_t epoch_index,
-                          uint8_t  batch_group_index,
-                          int64_t  per_epoch_emission);
+         void accrueepoch(uint32_t epoch_index, int64_t per_epoch_emission);
 
          /**
-          * Record the immutable batch-operator roster for an accrued epoch.
-          * Empty rosters are retained so their emission share stays in the
-          * treasury. Called inline by sysio.epoch::advance immediately after
-          * accrueepoch. Auth: require_auth("sysio.epoch").
+          * Credit one duty unit to each of `members`, the batch-operator group that served
+          * consensus epoch `epoch_index`. A member still holding units of the settling period is
+          * settled first. Called inline by sysio.epoch::advance; never throws.
+          * Auth: require_auth("sysio.epoch").
           */
          [[sysio::action]]
-         void rcrdbatch(uint32_t epoch_index, std::vector<sysio::name> members);
+         void rcrdduty(uint32_t epoch_index, std::vector<sysio::name> members);
+
+         /**
+          * Advance the open batch-duty settlement by one bounded step (MAX_DUTY_SETTLEMENT_ROWS
+          * rows); a no-op when none is open. Called inline by sysio.epoch::tickeconomy every
+          * economic epoch. Auth: require_auth("sysio.epoch").
+          */
+         [[sysio::action]]
+         void settleduty();
 
          /**
           * Read-only: current T5 treasury emission state.

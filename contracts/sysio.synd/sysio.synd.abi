@@ -42,8 +42,8 @@
                     "type": "uint64"
                 },
                 {
-                    "name": "last_epoch",
-                    "type": "uint32"
+                    "name": "last_refill",
+                    "type": "time_point_sec"
                 }
             ]
         },
