@@ -34,8 +34,11 @@ using namespace std::chrono_literals;
 
 /// incoming-transaction-queue-size-mb for the node: the smallest the option takes.
 constexpr auto queue_size_mb = "1";
-/// Block net limit the genesis sets, small enough that the queued transactions take several full blocks.
-constexpr uint32_t max_block_net_usage = 64 * 1024;
+/// Block net limit the genesis sets: about 70 of the test transactions fit a block, so transactions re-queued as
+/// exhausted build up in the queue over the blocks after resume, however many of them one block reaches.
+constexpr uint32_t max_block_net_usage = 16 * 1024;
+static_assert(max_block_net_usage > config::min_max_transaction_net_usage,
+              "the chain requires a block net limit above the transaction net limit");
 /// Lifetime of every pushed transaction, long enough that none expires during the test.
 constexpr auto trx_lifetime = fc::minutes(5);
 /// Upper bound on every wait.
@@ -344,7 +347,7 @@ BOOST_AUTO_TEST_CASE(refused_while_not_building_block) {
 BOOST_AUTO_TEST_CASE(refused_requeue_of_exhausted_trx) {
    run_queue_full_node({"--max-block-net-usage-threshold-bytes", "0", "--max-block-cpu-usage-threshold-us", "0"},
                        [](queue_full_node& node) {
-      // paused, the transactions wait in the executor and all reach the next block
+      // paused, the transactions wait in the executor until production resumes
       node.pause();
       const size_t batch = node.twice_queue_capacity();
       node.push(batch);
