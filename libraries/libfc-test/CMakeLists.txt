@@ -13,5 +13,5 @@ target_include_directories(fc-test
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
 
-target_link_libraries(fc-test PUBLIC fc fc-lite magic_enum::magic_enum)
+target_link_libraries(fc-test PUBLIC fc fc-lite magic_enum::magic_enum PRIVATE Boost::process)
 

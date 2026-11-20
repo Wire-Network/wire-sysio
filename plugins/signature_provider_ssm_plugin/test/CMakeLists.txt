@@ -3,7 +3,7 @@
 # header-only Boost.Test (<boost/test/included/unit_test.hpp>): do not link
 # Boost::unit_test_framework here -- the prebuilt library would pull in a
 # second main() and a second `init_unit_test_suite` symbol. Unlike the kms
-# sibling, no Boost::process / Boost::dll: these tests only load keygen
+# sibling, no Boost::process: these tests only load keygen
 # fixtures from disk, never spawn the keygen scripts.
 
 set(TARGET_NAME test_signature_provider_ssm_plugin)

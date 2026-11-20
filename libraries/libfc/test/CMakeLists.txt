@@ -55,6 +55,7 @@ add_executable( test_fc
         test_bls.cpp
         test_bitset.cpp
         test_ordered_diff.cpp
+        test_process.cpp
         test_string.cpp
         test_system_timer.cpp
         test_thread_stack.cpp

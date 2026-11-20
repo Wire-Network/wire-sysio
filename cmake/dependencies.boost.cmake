@@ -15,8 +15,6 @@ set(BOOST_COMPONENTS
         context
         coroutine
         date_time
-        dll
-        filesystem
         format
         hana
         headers
