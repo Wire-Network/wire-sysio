@@ -17,35 +17,23 @@
 #include <limits>
 #include <stdexcept>
 #include <string>
-#include <string_view>
 #include <thread>
 #include <vector>
 
+#include "incoming_trx_utils.hpp"
+
 using namespace sysio;
 using namespace sysio::chain;
+using namespace sysio::test;
 
 namespace {
 
-/// Prefix of the accounts the test transactions create. Each transaction is a native newaccount by sysio, which runs
-/// on a chain with no contracts; a unique account name makes every transaction unique.
-constexpr std::string_view new_account_prefix = "inctrx";
-/// Letters after new_account_prefix, which fill an account name's 12 characters.
-constexpr size_t new_account_suffix_length = 6;
-/// Letters a name suffix is spelled with.
-constexpr std::string_view new_account_letters = "abcdefghijklmnopqrstuvwxyz";
 /// How long a node may take to start, to deliver a transaction result, or to apply the blocks it is given.
 constexpr std::chrono::seconds node_timeout{60};
 /// How often a test polls a node's head while waiting for it to apply blocks.
 constexpr std::chrono::milliseconds head_poll_interval{50};
-/// How long an incoming transaction stays valid.
-constexpr fc::microseconds trx_lifetime = fc::seconds(60);
 /// Signatures on the block transaction a node limited to one signature still applies.
 constexpr uint32_t block_trx_signatures = 40;
-
-/// Key of sysio@active: a producing test node signs with it, and its default genesis assigns it to sysio.
-private_key_type sysio_key() {
-   return testing::base_tester::get_private_key(config::system_account_name, "active");
-}
 
 /// @return @p count distinct K1 keys, the same on every call
 std::vector<private_key_type> make_keys(uint32_t count) {
@@ -66,30 +54,6 @@ authority all_keys_authority(const std::vector<private_key_type>& keys) {
       auth.keys.push_back(key_weight{key.get_public_key(), 1});
    auth.sort_fields();
    return auth;
-}
-
-/// @return a name for an account no earlier call returned
-account_name next_new_account() {
-   static uint64_t next_id = 0;
-   std::string name(new_account_prefix);
-   std::string suffix(new_account_suffix_length, new_account_letters.front());
-   uint64_t    id = next_id++;
-   for (size_t i = suffix.size(); i-- > 0; id /= new_account_letters.size())
-      suffix[i] = new_account_letters[id % new_account_letters.size()];
-   return account_name(name + suffix);
-}
-
-/// @return a transaction, authorized by sysio@active, of a native newaccount by sysio for a new account
-signed_transaction make_trx() {
-   const authority new_account_auth(sysio_key().get_public_key());
-   signed_transaction trx;
-   trx.expiration = fc::time_point_sec{fc::time_point::now() + trx_lifetime};
-   trx.actions.emplace_back(vector<permission_level>{{config::system_account_name, config::active_name}},
-                            newaccount{.creator = config::system_account_name,
-                                       .name    = next_new_account(),
-                                       .owner   = new_account_auth,
-                                       .active  = new_account_auth});
-   return trx;
 }
 
 /// @return a transaction updating sysio@active to @p auth
@@ -219,17 +183,6 @@ private:
    producer_plugin*    prod_plug  = nullptr;
 };
 
-/// Arguments of a node producing on the default genesis, signing with sysio_key().
-std::vector<std::string> producer_args(std::vector<std::string> extra = {}) {
-   const private_key_type key = sysio_key();
-   // <chain-kind>,<key-type>,<public-key>,<private-key-provider-spec>
-   const std::string provider = "wire,wire," + key.get_public_key().to_string({}) + ",KEY:" + key.to_string({});
-   std::vector<std::string> args = {"-p", "sysio", "-e", "--disable-subjective-p2p-billing=true",
-                                    "--signature-provider", provider};
-   args.insert(args.end(), extra.begin(), extra.end());
-   return args;
-}
-
 /// Requires that @p result is the rejection of a transaction carrying @p count signatures over a limit of @p limit.
 void require_too_many_sigs(const next_function_variant<transaction_trace_ptr>& result, uint32_t count,
                            uint32_t limit) {
@@ -263,10 +216,10 @@ BOOST_AUTO_TEST_CASE(default_limit_rejects_before_recovery) {
    constexpr uint32_t over_limit = chain::config::default_incoming_trx_max_signatures + 1;
 
    const std::vector<private_key_type> same_key(over_limit, sysio_key());
-   require_too_many_sigs(node.push(sign(make_trx(), same_key, node.chain_id())), over_limit,
+   require_too_many_sigs(node.push(sign(make_newaccount_trx(), same_key, node.chain_id())), over_limit,
                          chain::config::default_incoming_trx_max_signatures);
 
-   require_executed(node.push(sign(make_trx(), {sysio_key()}, node.chain_id())));
+   require_executed(node.push(sign(make_newaccount_trx(), {sysio_key()}, node.chain_id())));
 }
 
 // incoming-trx-max-signatures overrides the default: a transaction at the configured limit executes, and one with a
@@ -280,9 +233,9 @@ BOOST_AUTO_TEST_CASE(configured_limit_overrides_default) {
 
    require_executed(node.push(sign(make_updateauth_trx(all_keys_authority(signers)), {sysio_key()},
                                    node.chain_id())));
-   require_executed(node.push(sign(make_trx(), signers, node.chain_id())));
+   require_executed(node.push(sign(make_newaccount_trx(), signers, node.chain_id())));
 
-   require_too_many_sigs(node.push(sign(make_trx(), keys, node.chain_id())), limit + 1, limit);
+   require_too_many_sigs(node.push(sign(make_newaccount_trx(), keys, node.chain_id())), limit + 1, limit);
 }
 
 // The limit does not apply to a transaction in a received block: a node limited to one signature applies a block
@@ -293,7 +246,7 @@ BOOST_AUTO_TEST_CASE(blocks_apply_regardless_of_incoming_limit) {
    chain.set_authority(config::system_account_name, config::active_name, all_keys_authority(keys), config::owner_name,
                        {{config::system_account_name, config::active_name}}, {sysio_key()});
    chain.produce_block();
-   signed_transaction trx = make_trx();
+   signed_transaction trx = make_newaccount_trx();
    chain.set_transaction_headers(trx);
    for (const private_key_type& key : keys)
       trx.sign(key, chain.get_chain_id());
