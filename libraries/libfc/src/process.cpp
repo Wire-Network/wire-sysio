@@ -1,13 +1,12 @@
 #include <fc/process.hpp>
 
-#include <fc/exception/exception.hpp>
-
 #if defined(__APPLE__)
 #include <mach-o/dyld.h>
 #endif
 
 #include <cstdint>
 #include <cstring>
+#include <system_error>
 
 namespace fc {
 
@@ -18,7 +17,10 @@ std::filesystem::path program_path() {
    uint32_t size = 0;
    _NSGetExecutablePath(nullptr, &size); // with no room, reports the size needed, terminator included
    std::string path(size, '\0');
-   FC_ASSERT(_NSGetExecutablePath(path.data(), &size) == 0, "unable to read the executable path");
+   if (_NSGetExecutablePath(path.data(), &size) != 0) {
+      throw std::filesystem::filesystem_error("unable to read the executable path",
+                                              std::make_error_code(std::errc::no_buffer_space));
+   }
    path.resize(std::strlen(path.c_str()));
    return path;
 #else
