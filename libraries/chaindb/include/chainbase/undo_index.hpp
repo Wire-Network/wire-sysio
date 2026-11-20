@@ -2,6 +2,7 @@
 
 #include <chainbase/scope_exit.hpp>
 #include <boost/multi_index_container_fwd.hpp>
+#include <boost/multi_index/indexed_by.hpp>
 #include <boost/multi_index/member.hpp>
 #include <boost/intrusive/set.hpp>
 #include <boost/intrusive/avltree.hpp>
@@ -10,7 +11,6 @@
 #include <boost/throw_exception.hpp>
 
 #include <stdexcept>
-#include <boost/mpl/fold.hpp>
 #include <boost/mp11/list.hpp>
 #include <boost/mp11/algorithm.hpp>
 #include <boost/iterator/transform_iterator.hpp>
@@ -1094,22 +1094,9 @@ namespace chainbase {
    template<typename MultiIndexContainer>
    struct multi_index_to_undo_index_impl;
 
-   template<typename T, typename I, typename A>
-   struct mi_to_ui_ii;
    template<typename T, typename... I, typename A>
-   struct mi_to_ui_ii<T, boost::mp11::mp_list<I...>, A> {
+   struct multi_index_to_undo_index_impl<boost::multi_index_container<T, boost::multi_index::indexed_by<I...>, A>> {
       using type = undo_index<T, A, I...>;
-   };
-
-   struct to_mp11 {
-      template<typename State, typename T>
-      using apply = boost::mpl::identity<boost::mp11::mp_push_back<State, T>>;
-   };
-
-   template<typename T, typename I, typename A>
-   struct multi_index_to_undo_index_impl<boost::multi_index_container<T, I, A>> {
-      using as_mp11 = typename boost::mpl::fold<I, boost::mp11::mp_list<>, to_mp11>::type;
-      using type = typename mi_to_ui_ii<T, as_mp11, A>::type;
    };
 
    // Converts a multi_index_container to a corresponding undo_index.

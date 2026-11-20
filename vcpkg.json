@@ -93,7 +93,7 @@
     },
     {
       "name": "boost",
-      "version": "1.89.0#4"
+      "version": "1.92.0"
     },
     {
       "name": "llvm",

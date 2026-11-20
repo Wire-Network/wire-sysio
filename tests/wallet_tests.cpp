@@ -5,6 +5,7 @@
 
 #include <fc/filesystem.hpp>
 
+#include <algorithm>
 #include <chrono>
 #include <fstream>
 
@@ -264,8 +265,8 @@ BOOST_AUTO_TEST_CASE(wallet_manager_test)
    flat_set<public_key_type> pks;
    trx.get_signature_keys(chain_id, fc::time_point::maximum(), pks);
    BOOST_CHECK_EQUAL(2u, pks.size());
-   BOOST_CHECK(find(pks.cbegin(), pks.cend(), pkey1.get_public_key()) != pks.cend());
-   BOOST_CHECK(find(pks.cbegin(), pks.cend(), pkey2.get_public_key()) != pks.cend());
+   BOOST_CHECK(std::find(pks.cbegin(), pks.cend(), pkey1.get_public_key()) != pks.cend());
+   BOOST_CHECK(std::find(pks.cbegin(), pks.cend(), pkey2.get_public_key()) != pks.cend());
 
    BOOST_CHECK_EQUAL(3u, wm.get_public_keys().size());
    wm.set_timeout(chrono::seconds(0));
