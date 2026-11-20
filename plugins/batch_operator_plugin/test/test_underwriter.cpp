@@ -175,20 +175,6 @@ BOOST_AUTO_TEST_CASE(a_bond_of_ours_without_its_request_stops_the_pass) {
    BOOST_CHECK_THROW(decode_bond(bond_on(3, true), underwriter_account, requests), fc::exception);
 }
 
-BOOST_AUTO_TEST_CASE(synd_has_work_while_a_request_is_in_play_or_unacknowledged) {
-   auto settled = synd_request(1, eth, 1, liqeth, 10);
-   settled.state                = request_state::APPROVED;
-   settled.outcome_acknowledged = true;
-   BOOST_CHECK(!synd_has_work({settled}));
-   BOOST_CHECK(synd_has_work({settled, synd_request(2, eth, 2, liqeth, 10)}));   // OPEN
-   auto ruled = synd_request(3, eth, 3, liqeth, 10);
-   ruled.state = request_state::INVALID;   // not yet acknowledged
-   BOOST_CHECK(synd_has_work({settled, ruled}));
-   auto other_issuer = synd_request(4, eth, 4, liqeth, 10);
-   other_issuer.issuer = sysio::chain::name{"someone"};
-   BOOST_CHECK(!synd_has_work({settled, other_issuer}));
-}
-
 BOOST_AUTO_TEST_CASE(the_scan_window_keeps_every_request_still_needed) {
    const auto settled = [](uint64_t id) {
       auto r                 = synd_request(id, eth, static_cast<uint32_t>(id), liqeth, 10);

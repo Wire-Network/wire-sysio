@@ -217,14 +217,6 @@ inline std::optional<bond_position> decode_bond(const fc::variant_object& row, c
    };
 }
 
-/// Whether `sysio.synd` has queue work that only a crank moves: an envelope request still in play (OPEN, BONDED or
-/// HELD), or one ruled whose outcome it has not acknowledged yet.
-inline bool synd_has_work(const std::vector<request>& requests) {
-   return std::ranges::any_of(requests, [](const request& r) {
-      return is_envelope_request(r) && (!is_terminal(r.state) || !r.outcome_acknowledged);
-   });
-}
-
 /// The lowest request id a later pass still needs to read: every request in play, ruled but not acknowledged, or
 /// bonded by the underwriter or awaiting submission finality. Request ids only grow and a settled request never comes
 /// back into play, so earlier rows can be skipped. One past the newest read when nothing needs a later look;
