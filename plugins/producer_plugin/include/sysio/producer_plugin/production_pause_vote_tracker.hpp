@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sysio/chain/thread_utils.hpp>
+#include <fc/thread_utils.hpp>
 #include <fc/time.hpp>
 #include <atomic>
 
@@ -279,7 +279,7 @@ private:
 
    fc::microseconds negative_vote_timeout;
    fc::microseconds block_acceptance_delta;
-   alignas(chain::hardware_destructive_interference_sz)
+   alignas(fc::hardware_destructive_interference_sz)
    vote_timing      latest_other_vote;
    vote_timing      latest_producer_vote;
 };

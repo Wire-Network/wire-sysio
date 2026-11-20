@@ -191,8 +191,8 @@ fc::em::compact_signature der_to_eth_signature(
  * @brief End-to-end: DER -> low-S compact + recovered id -> 65-byte WIRE K1 sig.
  *
  * The WIRE K1 counterpart of `der_to_eth_signature`: same decode, low-S normalisation and recovery, packed as
- * `[ (31 + recovery_id) | r | s ]`, the `fc::ecc::compact_signature` layout `fc::ecc::private_key::sign_compact`
- * produces (header 27 + 4 for a compressed key).
+ * `[ (fc::ecc::compact_signature_compressed_header + recovery_id) | r | s ]`, the `fc::ecc::compact_signature`
+ * layout `fc::ecc::private_key::sign_compact` produces.
  *
  * @param der DER-encoded ECDSA signature returned from KMS::Sign
  * @param digest 32-byte digest that was passed to KMS as `MessageType=DIGEST`

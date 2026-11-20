@@ -269,6 +269,14 @@ extern "C" {
       return 0;
    }
 
+   void check_f32_bits(float actual, uint32_t expected, const char* msg) {
+      sysio::check(__builtin_bit_cast(uint32_t, actual) == expected, msg);
+   }
+
+   void check_f64_bits(double actual, uint64_t expected, const char* msg) {
+      sysio::check(__builtin_bit_cast(uint64_t, actual) == expected, msg);
+   }
+
    void sub_apply_0() {
       _type_i32();
 
@@ -284,11 +292,9 @@ extern "C" {
       int64_t x6 = _type_i64_value();
       sysio::check(x6 == (int64_t)2, "_type_i64_value fail 6");
 
-      float x7 = _type_f32_value();
-      sysio::check(*(uint32_t*)&x7 == (float)1077936128, "_type_f32_value fail 7");
+      check_f32_bits(_type_f32_value(), (uint32_t)1077936128, "_type_f32_value fail 7");
 
-      double x8 = _type_f64_value();
-      sysio::check(*(uint64_t*)&x8 == (double)4616189618054758400, "_type_f64_value fail 8");
+      check_f64_bits(_type_f64_value(), (uint64_t)4616189618054758400, "_type_f64_value fail 8");
 
       int32_t x9 = _empty((int32_t)0);
       sysio::check(x9 == (int32_t)22, "_empty fail 9");
@@ -546,8 +552,7 @@ extern "C" {
       int32_t x95 = _as_global_set_value();
       sysio::check(x95 == (int32_t)1, "_as_global_set_value fail 95");
 
-      float x96 = _as_load_address();
-      sysio::check(*(uint32_t*)&x96 == (float)1071225242, "_as_load_address fail 96");
+      check_f32_bits(_as_load_address(), (uint32_t)1071225242, "_as_load_address fail 96");
 
       int64_t x97 = _as_loadN_address();
       sysio::check(x97 == (int64_t)30, "_as_loadN_address fail 97");
@@ -566,8 +571,7 @@ extern "C" {
       int32_t x101 = _as_storeN_value();
       sysio::check(x101 == (int32_t)33, "_as_storeN_value fail 101");
 
-      float x102 = _as_unary_operand();
-      sysio::check(*(uint32_t*)&x102 == (float)1079613850, "_as_unary_operand fail 102");
+      check_f32_bits(_as_unary_operand(), (uint32_t)1079613850, "_as_unary_operand fail 102");
 
       int32_t x103 = _as_binary_left();
       sysio::check(x103 == (int32_t)3, "_as_binary_left fail 103");

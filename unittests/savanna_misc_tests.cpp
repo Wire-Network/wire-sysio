@@ -3,6 +3,7 @@
 #include <test-data.hpp>
 
 #include <fc/io/fstream.hpp> // for read_file_contents
+#include <fc/mock_time.hpp>
 
 using namespace sysio::chain;
 using namespace sysio::testing;
@@ -1142,6 +1143,201 @@ BOOST_FIXTURE_TEST_CASE(replay_fork_db_at_startup, savanna_cluster::cluster_t) t
 
    BOOST_REQUIRE_EQUAL(A.control->fork_db_size(), num_fork_db_blocks);
 
+} FC_LOG_AND_RETHROW()
+
+/// Engages the mock clock at the default genesis time. As the first base of `mock_clock_cluster_t` it is engaged
+/// before the cluster's nodes start their threads and released after they stop.
+struct mock_clock_t {
+   fc::scoped_mock_clock clock{tester::default_genesis().initial_timestamp};
+};
+
+/// Savanna cluster whose nodes read the mock clock.
+struct mock_clock_cluster_t : mock_clock_t, savanna_cluster::cluster_t {
+   /// Sets the mock clock to the time of `n`'s head block.
+   static void set_clock_to_head(const savanna_cluster::node_t& n) {
+      fc::mock_time_traits::set_now(n.head().block_time());
+   }
+
+   /// Produces a block on `n` in the slot following the later of the mock clock and `n`'s head block, as a producer
+   /// does, then sets the mock clock to the block's time.
+   static signed_block_ptr produce_on_clock(savanna_cluster::node_t& n) {
+      const fc::time_point   head_time  = n.head().block_time();
+      const fc::time_point   block_time = block_timestamp_type{std::max(fc::time_point::now(), head_time)}.next();
+      const signed_block_ptr b          = n.produce_block(block_time - head_time);
+      fc::mock_time_traits::set_now(b->timestamp.to_time_point());
+      return b;
+   }
+
+   /// Makes every node's finalizers vote only on blocks recent at the mock clock.
+   void vote_on_recent_blocks_only() {
+      for (savanna_cluster::node_t& n : _nodes)
+         n.allow_voting(false);
+   }
+};
+
+// ------------------------------------------------------------------------------------
+// A scheduled producer signs a block in one of its own future slots. A finalizer does
+// not vote on a block timestamped later than its clock plus the allowed clock skew, so
+// its safety information stays unchanged and it keeps voting on the real chain.
+// ------------------------------------------------------------------------------------
+BOOST_FIXTURE_TEST_CASE(no_vote_on_block_from_the_future, mock_clock_cluster_t) try {
+   using namespace savanna_cluster;
+   auto& A=_nodes[0]; auto& B=_nodes[1]; auto& D=_nodes[3];
+
+   constexpr fc::microseconds future_skip = fc::minutes(1);
+
+   B.allow_voting(false);                                    // B votes only on blocks near its clock
+
+   set_clock_to_head(A);
+   auto b0 = A.produce_block();
+   BOOST_CHECK_EQUAL(B.last_vote(), strong_vote(b0));
+
+   set_clock_to_head(A);
+   auto b1 = A.produce_block();
+   BOOST_CHECK_EQUAL(B.last_vote(), strong_vote(b1));
+
+   set_partition({&D});                                      // A, B and C do not see the blocks D produces
+   auto bf = D.produce_block(future_skip);                   // block from the future, signed by the scheduled producer
+   BOOST_REQUIRE_EQUAL(bf->previous, b1->calculate_id());
+   BOOST_REQUIRE_EQUAL(bf->timestamp.to_time_point(), b1->timestamp.to_time_point() + future_skip);
+
+   const fsi_t                fsi_before      = B.get_fsi();
+   const std::vector<uint8_t> fsi_file_before = B.save_fsi();
+
+   B.push_block(bf);
+   BOOST_CHECK_EQUAL(B.head().id(), bf->calculate_id());     // the block is valid, B applies it
+   BOOST_CHECK_EQUAL(B.last_vote(), strong_vote(b1));        // but does not vote on it
+   BOOST_CHECK(B.get_fsi() == fsi_before);
+   BOOST_CHECK(B.save_fsi() == fsi_file_before);
+
+   // The real chain continues from b1 with blocks earlier than bf. D is partitioned out, so the
+   // quorum of 3 needs B's votes alongside A's and C's.
+   set_clock_to_head(A);
+   auto b2 = A.produce_block();
+   BOOST_CHECK_EQUAL(B.last_vote(), strong_vote(b2));
+
+   set_clock_to_head(A);
+   auto b3 = A.produce_block();
+   BOOST_CHECK_EQUAL(B.last_vote(), strong_vote(b3));
+   BOOST_CHECK_EQUAL(B.head().id(), b3->calculate_id());     // b3 carries a QC on b2, B switches to the real chain
+
+   set_clock_to_head(A);
+   auto b4 = A.produce_block();
+   BOOST_CHECK_EQUAL(B.last_vote(), strong_vote(b4));
+   BOOST_CHECK_EQUAL(A.lib_num(), b2->block_num());
+   BOOST_CHECK_EQUAL(B.lib_num(), b2->block_num());
+
+   // A block ahead of the clock by less than the allowed clock skew is voted on.
+   set_clock_to_head(A);
+   auto b5 = A.produce_block(fc::seconds(10));
+   BOOST_CHECK_EQUAL(B.last_vote(), strong_vote(b5));
+
+} FC_LOG_AND_RETHROW()
+
+// ------------------------------------------------------------------------------------
+// The chain stalls for hours, with no blocks produced and no votes cast, then the
+// producers resume on the current clock. The finalizers vote on the new blocks, both
+// one whose last vote predates the stall and one restarted from its safety file during
+// the stall. Their safety information is updated and persisted, and finality resumes.
+// ------------------------------------------------------------------------------------
+BOOST_FIXTURE_TEST_CASE(finality_resumes_after_stall, mock_clock_cluster_t) try {
+   using namespace savanna_cluster;
+   auto& A=_nodes[0]; auto& B=_nodes[1]; auto& C=_nodes[2]; auto& D=_nodes[3];
+
+   constexpr fc::microseconds stall = fc::hours(2);
+
+   vote_on_recent_blocks_only();
+
+   signed_block_ptr b2, b3;
+   BOOST_REQUIRE_EQUAL(3u, A.lib_advances_by([&]() {
+      produce_on_clock(A);
+      b2 = produce_on_clock(A);
+      b3 = produce_on_clock(A);
+   }));
+   for (node_t* N : {&B, &C})
+      N->check_fsi(fsi_expect{.last_vote = b3, .lock = b2, .other_branch_latest_time = {}});
+
+   // C goes down, the chain stalls, and C restarts from its safety file.
+   C.close();
+   fc::mock_time_traits::set_now(fc::time_point::now() + stall);
+   C.open();
+   C.allow_voting(false);
+   C.check_fsi(fsi_expect{.last_vote = b3, .lock = b2, .other_branch_latest_time = {}});
+
+   // The producers resume on the clock.
+   const signed_block_ptr r1 = produce_on_clock(A);
+   BOOST_REQUIRE_GT(r1->timestamp.to_time_point(), b3->timestamp.to_time_point() + stall);
+   BOOST_CHECK_EQUAL(B.last_vote(), strong_vote(r1));
+   BOOST_CHECK_EQUAL(C.last_vote(), strong_vote(r1));
+
+   const signed_block_ptr r2 = produce_on_clock(A);
+   const signed_block_ptr r3 = produce_on_clock(A);
+   const signed_block_ptr r4 = produce_on_clock(A);
+   for (node_t* N : {&A, &B, &C, &D})
+      BOOST_CHECK_EQUAL(N->lib_num(), r2->block_num());
+   for (node_t* N : {&B, &C}) {
+      BOOST_CHECK_EQUAL(N->last_vote(), strong_vote(r4));
+      N->check_fsi(fsi_expect{.last_vote = r4, .lock = r3, .other_branch_latest_time = {}});
+   }
+
+   // The safety files hold the updated safety information.
+   for (node_t* N : {&B, &C}) {
+      N->close();
+      N->open();
+      N->check_fsi(fsi_expect{.last_vote = r4, .lock = r3, .other_branch_latest_time = {}});
+   }
+} FC_LOG_AND_RETHROW()
+
+// ------------------------------------------------------------------------------------
+// The whole network shuts down for hours. Two nodes restart from their state and two
+// from a snapshot, replaying their blocks logs. The producers resume on the current
+// clock, every finalizer votes on the new blocks, and finality resumes.
+// ------------------------------------------------------------------------------------
+BOOST_FIXTURE_TEST_CASE(finality_resumes_after_network_restart, mock_clock_cluster_t) try {
+   using namespace savanna_cluster;
+   auto& A=_nodes[0]; auto& B=_nodes[1]; auto& C=_nodes[2]; auto& D=_nodes[3];
+
+   constexpr fc::microseconds stall = fc::hours(2);
+
+   vote_on_recent_blocks_only();
+
+   const std::filesystem::path snapshot = C.snapshot();
+   signed_block_ptr b2, b3;
+   BOOST_REQUIRE_EQUAL(3u, A.lib_advances_by([&]() {
+      produce_on_clock(A);
+      b2 = produce_on_clock(A);
+      b3 = produce_on_clock(A);
+   }));
+
+   for (node_t& N : _nodes)
+      N.close();
+   fc::mock_time_traits::set_now(fc::time_point::now() + stall);
+   A.open();
+   B.open();
+   for (node_t* N : {&C, &D}) {
+      N->remove_state();
+      N->open_from_snapshot(snapshot);
+   }
+
+   for (node_t& N : _nodes) {
+      N.allow_voting(false);
+      BOOST_REQUIRE_EQUAL(N.head().id(), b3->calculate_id());
+      N.check_fsi(fsi_expect{.last_vote = b3, .lock = b2, .other_branch_latest_time = {}});
+   }
+
+   // The producers resume on the clock.
+   const signed_block_ptr r1 = produce_on_clock(A);
+   BOOST_REQUIRE_GT(r1->timestamp.to_time_point(), b3->timestamp.to_time_point() + stall);
+   for (node_t& N : _nodes)
+      BOOST_CHECK_EQUAL(N.last_vote(), strong_vote(r1));
+
+   const signed_block_ptr r2 = produce_on_clock(A);
+   const signed_block_ptr r3 = produce_on_clock(A);
+   const signed_block_ptr r4 = produce_on_clock(A);
+   for (node_t& N : _nodes) {
+      BOOST_CHECK_EQUAL(N.lib_num(), r2->block_num());
+      N.check_fsi(fsi_expect{.last_vote = r4, .lock = r3, .other_branch_latest_time = {}});
+   }
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()

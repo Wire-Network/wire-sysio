@@ -87,7 +87,7 @@ void initialize_outpost_plugin(const std::vector<std::string>& configuration_arg
 
 /// Load an Anchor IDL fixture from the libfc test fixture directory.
 idl::program load_idl_fixture(std::string_view filename) {
-   auto path = fc::test::get_test_fixtures_path() / boost::filesystem::path(filename);
+   auto path = fc::test::get_test_fixtures_path() / std::filesystem::path(filename);
    return idl::parse_idl_file(path.generic_string());
 }
 
@@ -580,6 +580,24 @@ BOOST_AUTO_TEST_CASE(opp_outpost_dispatch_attestations_present) try {
    BOOST_CHECK_EQUAL(dispatch->accounts[3].name, "epoch_deliveries");
    BOOST_CHECK_EQUAL(dispatch->accounts[4].name, "chunk_buffer");
 } FC_LOG_AND_RETHROW();
+BOOST_AUTO_TEST_CASE(opp_outpost_cleanup_epoch_deliveries_present) try {
+   auto prog = load_idl_fixture(opp_outpost_idl_fixture);
+   const std::string closer{sysio::outpost_solana_client_detail::CLEANUP_EPOCH_DELIVERIES_INSTRUCTION};
+   const auto        cleanup = std::ranges::find(prog.instructions, closer, &idl::instruction::name);
+   BOOST_REQUIRE(cleanup != prog.instructions.end());
+   BOOST_REQUIRE_EQUAL(cleanup->args.size(), 1u);
+   BOOST_CHECK_EQUAL(cleanup->args[0].name, "epoch_index");
+
+   // Accounts: reaper (signer), config, latest_outbound_envelope, epoch_deliveries, payer.
+   BOOST_REQUIRE_EQUAL(cleanup->accounts.size(), 5u);
+   BOOST_CHECK_EQUAL(cleanup->accounts[0].name, "reaper");
+   BOOST_CHECK(cleanup->accounts[0].is_signer);
+   BOOST_CHECK_EQUAL(cleanup->accounts[3].name, "epoch_deliveries");
+   BOOST_CHECK(cleanup->accounts[3].is_mut);
+   BOOST_CHECK_EQUAL(cleanup->accounts[4].name, "payer");
+   BOOST_CHECK(cleanup->accounts[4].is_mut);
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_CASE(opp_outpost_cleanup_envelope_chunks_present) try {
    auto prog = load_idl_fixture(opp_outpost_idl_fixture);
 
@@ -3064,8 +3082,55 @@ solana_public_key program_chunk_buffer_pda(const solana_public_key& program_id, 
       .first;
 }
 
-reap_detail::envelope_chunk_buffer scripted_buffer(uint32_t epoch, const solana_public_key& uploader) {
+reap_detail::reapable_account scripted_buffer(uint32_t epoch, const solana_public_key& uploader) {
    return {program_chunk_buffer_pda(resume_program_id, epoch, uploader), epoch, buffer_rent(epoch)};
+}
+
+constexpr std::string_view epoch_deliveries_name = "EpochDeliveries";
+
+/// Rent a scripted tally carries; distinct from buffer rent so the sums pin which kind closed.
+uint64_t tally_rent(uint32_t epoch) { return 2'000'000 + epoch; }
+
+/// The program's `EpochDeliveries` PDA, derived here from the program's seed declaration
+/// (`["epoch_deliveries", epoch_index.to_le_bytes()]`) rather than through the relay's own helper.
+solana_public_key program_tally_pda(const solana_public_key& program_id, uint32_t epoch) {
+   const std::string_view seed = "epoch_deliveries";
+   return system::find_program_address({std::vector<uint8_t>(seed.begin(), seed.end()),
+                                        {static_cast<uint8_t>(epoch), static_cast<uint8_t>(epoch >> 8),
+                                         static_cast<uint8_t>(epoch >> 16), static_cast<uint8_t>(epoch >> 24)}},
+                                       program_id)
+      .first;
+}
+
+reap_detail::reapable_account scripted_tally(uint32_t epoch) {
+   return {program_tally_pda(resume_program_id, epoch), epoch, tally_rent(epoch)};
+}
+
+/// An `EpochDeliveries` account as the program lays it out: discriminator, bump, epoch_index, payer, `deliveries`
+/// recorded deliveries (operator + digest), consensus_reached, consensus_hash, dispatched_count, zero-padded to the
+/// allocated size. Built by hand, not through the IDL, so a fixture that drifts from the program fails the decode.
+std::vector<uint8_t> epoch_deliveries_data(uint32_t epoch, const solana_public_key& payer, uint32_t deliveries) {
+   constexpr size_t  allocated_bytes = 8 + 1 + 4 + 32 + (4 + 16 * 64) + 1 + 32 + 4;
+   constexpr uint8_t bump            = 0xFE;
+   borsh::encoder enc;
+   const auto disc = idl::compute_account_discriminator(std::string{epoch_deliveries_name});
+   enc.write_fixed_bytes(disc.data(), disc.size());
+   enc.write_u8(bump);
+   enc.write_u32(epoch);
+   enc.write_pubkey(payer);
+   enc.write_u32(deliveries);
+   for (uint32_t i = 0; i < deliveries; ++i) {
+      enc.write_pubkey(measurement_pubkey(100 + i));
+      const std::array<uint8_t, 32> digest{};
+      enc.write_fixed_bytes(digest.data(), digest.size());
+   }
+   enc.write_u8(1);
+   const std::array<uint8_t, 32> consensus_hash{};
+   enc.write_fixed_bytes(consensus_hash.data(), consensus_hash.size());
+   enc.write_u32(deliveries);
+   auto bytes = enc.data();
+   bytes.resize(allocated_bytes);
+   return bytes;
 }
 
 /// One `getProgramAccounts` entry as the RPC returns it under the reaper's header-only `dataSlice`.
@@ -3102,17 +3167,17 @@ bool deadline_never_passes() { return false; }
 
 } // anonymous namespace
 
-BOOST_AUTO_TEST_CASE(envelope_chunks_reapable_mirrors_the_program_gates) try {
-   using reap_detail::envelope_chunks_reapable;
+BOOST_AUTO_TEST_CASE(epoch_reapable_mirrors_the_program_gates) try {
+   using reap_detail::epoch_reapable;
    // Settled: the draining round moved next_epoch_index past it and emitted outbound for it.
-   BOOST_CHECK(envelope_chunks_reapable({.next_epoch_index = 8, .latest_outbound_epoch = 7}, 7));
-   BOOST_CHECK(envelope_chunks_reapable({.next_epoch_index = 8, .latest_outbound_epoch = 7}, 3));
+   BOOST_CHECK(epoch_reapable({.next_epoch_index = 8, .latest_outbound_epoch = 7}, 7));
+   BOOST_CHECK(epoch_reapable({.next_epoch_index = 8, .latest_outbound_epoch = 7}, 3));
    // The live epoch: consensus has not drained yet.
-   BOOST_CHECK(!envelope_chunks_reapable({.next_epoch_index = 8, .latest_outbound_epoch = 7}, 8));
+   BOOST_CHECK(!epoch_reapable({.next_epoch_index = 8, .latest_outbound_epoch = 7}, 8));
    // A buffer staged ahead of the cursor (a relay racing the next epoch).
-   BOOST_CHECK(!envelope_chunks_reapable({.next_epoch_index = 8, .latest_outbound_epoch = 7}, 9));
+   BOOST_CHECK(!epoch_reapable({.next_epoch_index = 8, .latest_outbound_epoch = 7}, 9));
    // next_epoch_index alone is not enough: the program also requires the outbound emit to have reached the epoch.
-   BOOST_CHECK(!envelope_chunks_reapable({.next_epoch_index = 8, .latest_outbound_epoch = 6}, 7));
+   BOOST_CHECK(!epoch_reapable({.next_epoch_index = 8, .latest_outbound_epoch = 6}, 7));
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(chunk_reap_closes_every_settled_buffer_oldest_first) try {
@@ -3122,7 +3187,7 @@ BOOST_AUTO_TEST_CASE(chunk_reap_closes_every_settled_buffer_oldest_first) try {
    const std::vector buffers = {scripted_buffer(4, me), scripted_buffer(9, me), scripted_buffer(11, me),
                                 scripted_buffer(12, me)};
 
-   const auto result = reap_detail::drive_envelope_chunk_reap(
+   const auto result = reap_detail::drive_reap(
       {.next_epoch_index = 12, .latest_outbound_epoch = 11}, buffers, deadline_never_passes, harness.send(),
       "test-relay", {});
 
@@ -3141,7 +3206,7 @@ BOOST_AUTO_TEST_CASE(chunk_reap_continues_past_a_failed_close) try {
    reap_harness harness;
    harness.failing = {5};
 
-   const auto result = reap_detail::drive_envelope_chunk_reap(
+   const auto result = reap_detail::drive_reap(
       {.next_epoch_index = 9, .latest_outbound_epoch = 8},
       {scripted_buffer(5, me), scripted_buffer(6, me), scripted_buffer(8, me)}, deadline_never_passes, harness.send(),
       "test-relay", {});
@@ -3158,11 +3223,11 @@ BOOST_AUTO_TEST_CASE(chunk_reap_continues_past_a_failed_close) try {
 BOOST_AUTO_TEST_CASE(chunk_reap_bounds_one_sweep_and_defers_the_newest) try {
    const auto me      = measurement_pubkey(7);
    const auto backlog = sysio::outpost_solana_client_detail::MAX_ENVELOPE_CHUNK_REAPS_PER_SWEEP + 3;
-   std::vector<reap_detail::envelope_chunk_buffer> buffers;
+   std::vector<reap_detail::reapable_account> buffers;
    for (uint32_t epoch = 1; epoch <= backlog; ++epoch) buffers.push_back(scripted_buffer(epoch, me));
    reap_harness harness;
 
-   const auto result = reap_detail::drive_envelope_chunk_reap(
+   const auto result = reap_detail::drive_reap(
       {.next_epoch_index = backlog + 1, .latest_outbound_epoch = backlog}, buffers, deadline_never_passes, harness.send(),
       "test-relay", {});
 
@@ -3182,7 +3247,7 @@ BOOST_AUTO_TEST_CASE(chunk_reap_stops_at_the_deadline) try {
    // throws away the count of what it closed nor counts the remaining buffers as failed closes.
    const auto deadline_passed = [&] { return !harness.sent.empty(); };
 
-   const auto result = reap_detail::drive_envelope_chunk_reap(
+   const auto result = reap_detail::drive_reap(
       {.next_epoch_index = 9, .latest_outbound_epoch = 8},
       {scripted_buffer(2, me), scripted_buffer(3, me), scripted_buffer(4, me), scripted_buffer(9, me)},
       deadline_passed, harness.send(), "test-relay", {});
@@ -3220,10 +3285,10 @@ BOOST_AUTO_TEST_CASE(chunk_reap_defers_a_close_the_deadline_cut_short) try {
       return harness.send()(epoch);
    };
 
-   const auto result = reap_detail::drive_envelope_chunk_reap(
+   const auto result = reap_detail::drive_reap(
       {.next_epoch_index = 9, .latest_outbound_epoch = 8},
       {scripted_buffer(2, me), scripted_buffer(3, me), scripted_buffer(4, me)}, [&] { return deadline_passed; }, send,
-      "test-relay", [&](const reap_detail::envelope_chunk_buffer&) {
+      "test-relay", [&](const reap_detail::reapable_account&) {
          ++absence_reads;
          return true;
       });
@@ -3242,7 +3307,7 @@ BOOST_AUTO_TEST_CASE(chunk_reap_defers_a_close_the_deadline_cut_short) try {
       before_deadline.sent.push_back(epoch);
       FC_THROW_EXCEPTION(fc::timeout_exception, "Outbound HTTP read timeout for epoch {}", epoch);
    };
-   const auto failed = reap_detail::drive_envelope_chunk_reap(
+   const auto failed = reap_detail::drive_reap(
       {.next_epoch_index = 9, .latest_outbound_epoch = 8}, {scripted_buffer(2, me), scripted_buffer(3, me)},
       deadline_never_passes, own_timeout, "test-relay", {});
    BOOST_CHECK(before_deadline.sent == (std::vector<uint32_t>{2, 3}));
@@ -3260,10 +3325,10 @@ BOOST_AUTO_TEST_CASE(chunk_reap_recognizes_already_closed_without_claiming_rent)
    for (const auto mode : {read_result::absent, read_result::present, read_result::rpc_error, read_result::deadline}) {
       bool expired = false;
       unsigned reads = 0;
-      const auto result = reap_detail::drive_envelope_chunk_reap(
+      const auto result = reap_detail::drive_reap(
          {.next_epoch_index = 9, .latest_outbound_epoch = 8}, {buffer}, [&] { return expired; },
          [](uint32_t) -> std::string { FC_THROW("Transaction failed: custom program error"); }, "test-relay",
-         [&](const reap_detail::envelope_chunk_buffer& queried) {
+         [&](const reap_detail::reapable_account& queried) {
             ++reads;
             BOOST_CHECK(queried.address == buffer.address);
             if (mode == read_result::rpc_error) FC_THROW("account read failed");
@@ -3292,17 +3357,17 @@ BOOST_AUTO_TEST_CASE(chunk_reap_already_closed_consumes_the_sweep_bound) try {
    constexpr auto bound = reap_detail::MAX_ENVELOPE_CHUNK_REAPS_PER_SWEEP;
    constexpr uint32_t extra_buffers = 2;
    const auto me = measurement_pubkey(reap_scenario::uploader_seed);
-   std::vector<reap_detail::envelope_chunk_buffer> buffers;
+   std::vector<reap_detail::reapable_account> buffers;
    reap_harness harness;
    for (uint32_t epoch = 1; epoch <= bound + extra_buffers; ++epoch) {
       buffers.push_back(scripted_buffer(epoch, me));
       harness.failing.insert(epoch);
    }
    unsigned absence_reads = 0;
-   const auto result = reap_detail::drive_envelope_chunk_reap(
+   const auto result = reap_detail::drive_reap(
       {.next_epoch_index = bound + extra_buffers + 1, .latest_outbound_epoch = bound + extra_buffers},
       buffers, deadline_never_passes, harness.send(), "test-relay",
-      [&](const reap_detail::envelope_chunk_buffer& buffer) {
+      [&](const reap_detail::reapable_account& buffer) {
          BOOST_CHECK(buffer.address == buffers.at(absence_reads).address);
          ++absence_reads;
          return true;
@@ -3440,7 +3505,7 @@ constexpr fc::microseconds SWEEP_ENTRY_TOLERANCE = fc::seconds(1);
 struct sweep_harness {
    fc::time_point                                  clock = fc::time_point::now();
    reap_detail::envelope_chunk_reap_gates          gates{.next_epoch_index = 9, .latest_outbound_epoch = 8};
-   std::vector<reap_detail::envelope_chunk_buffer> buffers;
+   std::vector<reap_detail::reapable_account> buffers;
    reap_harness                                    closes;
    uint32_t                                        gate_reads   = 0;
    uint32_t                                        buffer_reads = 0;
@@ -3452,7 +3517,15 @@ struct sweep_harness {
    std::function<void(uint32_t)>                   after_close;
 
    /// Reconcile a failed close against its exact buffer when supplied by the test.
-   std::function<bool(const reap_detail::envelope_chunk_buffer&)> buffer_absent;
+   std::function<bool(const reap_detail::reapable_account&)> account_absent;
+
+   /// Bind the tally touchpoints, as the member does when the IDL declares `cleanup_epoch_deliveries`.
+   bool                                            reap_tallies = false;
+   std::vector<reap_detail::reapable_account>      tallies;
+   reap_harness                                    tally_closes;
+   uint32_t                                        tally_reads  = 0;
+   /// Runs after a tally close returned.
+   std::function<void(uint32_t)>                   after_tally_close;
 
    /// Bind all production sweep touchpoints to the scripted clock and hooks.
    reap_detail::envelope_chunk_sweep_touchpoints touchpoints() {
@@ -3476,7 +3549,19 @@ struct sweep_harness {
                if (after_close) after_close(epoch);
                return sig;
             },
-         .buffer_absent = buffer_absent,
+         .account_absent = account_absent,
+         .read_epoch_deliveries = reap_tallies ? std::function<std::vector<reap_detail::reapable_account>()>(
+                                                    [this] {
+                                                       ++tally_reads;
+                                                       return tallies;
+                                                    })
+                                              : nullptr,
+         .send_epoch_deliveries_cleanup = reap_tallies ? std::function<std::string(uint32_t)>([this](uint32_t epoch) {
+                                                            auto sig = tally_closes.send()(epoch);
+                                                            if (after_tally_close) after_tally_close(epoch);
+                                                            return sig;
+                                                         })
+                                                       : nullptr,
       };
    }
 
@@ -3514,6 +3599,75 @@ struct chunk_sweep_warning_capture {
 };
 
 } // anonymous namespace
+
+/// Tallies close with their own instruction, after the chunk buffers, under the same gates and schedule.
+BOOST_AUTO_TEST_CASE(sweep_reaps_settled_tallies_with_their_closer) try {
+   sweep_harness harness;
+   reap_detail::envelope_chunk_sweep_schedule schedule;
+   const auto me = measurement_pubkey(reap_scenario::uploader_seed);
+   harness.reap_tallies = true;
+   // Epoch 9 is the live epoch (next_epoch_index 9) for both kinds.
+   harness.buffers = {scripted_buffer(4, me), scripted_buffer(9, me)};
+   harness.tallies = {scripted_tally(3), scripted_tally(8), scripted_tally(9)};
+
+   BOOST_CHECK(harness.sweep(schedule, harness.clock + SWEEP_TEST_DEADLINE) == envelope_chunk_sweep_outcome::swept);
+   BOOST_CHECK(harness.closes.sent == (std::vector<uint32_t>{4}));
+   BOOST_CHECK(harness.tally_closes.sent == (std::vector<uint32_t>{3, 8}));
+   BOOST_CHECK_EQUAL(harness.tally_reads, 1u);
+   // Complete for both kinds: nothing to do until the cursor moves.
+   BOOST_CHECK(!schedule.due(harness.gates.next_epoch_index, harness.clock));
+} FC_LOG_AND_RETHROW();
+
+/// A program without `cleanup_epoch_deliveries` leaves the touchpoints unbound: no tally is read or closed.
+BOOST_AUTO_TEST_CASE(sweep_without_the_tally_closer_leaves_tallies_alone) try {
+   sweep_harness harness;
+   reap_detail::envelope_chunk_sweep_schedule schedule;
+   harness.buffers = {scripted_buffer(4, measurement_pubkey(reap_scenario::uploader_seed))};
+   harness.tallies = {scripted_tally(3)};
+
+   BOOST_CHECK(harness.sweep(schedule, harness.clock + SWEEP_TEST_DEADLINE) == envelope_chunk_sweep_outcome::swept);
+   BOOST_CHECK(harness.closes.sent == (std::vector<uint32_t>{4}));
+   BOOST_CHECK_EQUAL(harness.tally_reads, 0u);
+   BOOST_CHECK(harness.tally_closes.sent.empty());
+} FC_LOG_AND_RETHROW();
+
+/// A failed tally close backs every sweep off, exactly like a failed buffer close.
+BOOST_AUTO_TEST_CASE(sweep_backs_off_after_a_failed_tally_close) try {
+   sweep_harness harness;
+   reap_detail::envelope_chunk_sweep_schedule schedule;
+   harness.reap_tallies = true;
+   harness.tallies      = {scripted_tally(3), scripted_tally(5)};
+   harness.tally_closes.failing = {3};
+
+   BOOST_CHECK(harness.sweep(schedule, harness.clock + SWEEP_TEST_DEADLINE) == envelope_chunk_sweep_outcome::swept);
+   // One stuck tally does not strand the next one.
+   BOOST_CHECK(harness.tally_closes.sent == (std::vector<uint32_t>{3, 5}));
+   BOOST_CHECK(schedule.backing_off(harness.clock));
+} FC_LOG_AND_RETHROW();
+
+/// A tally close the deadline cut short is reconciled by its absence on the next discovery, never re-sent.
+BOOST_AUTO_TEST_CASE(sweep_reconciles_a_cut_off_tally_close) try {
+   sweep_harness harness;
+   reap_detail::envelope_chunk_sweep_schedule schedule;
+   harness.reap_tallies = true;
+   harness.tallies      = {scripted_tally(3)};
+   const auto deadline  = harness.clock + reap_detail::ENVELOPE_CHUNK_SWEEP_BUDGET;
+   harness.after_tally_close = [&, deadline](uint32_t epoch) {
+      // The close landed, but its confirmation ran into the deadline.
+      std::erase_if(harness.tallies, [&](const auto& tally) { return tally.epoch_index == epoch; });
+      harness.clock = deadline;
+      FC_THROW_EXCEPTION(fc::timeout_exception, "confirmation cut off");
+   };
+
+   BOOST_CHECK(harness.sweep(schedule, deadline) == envelope_chunk_sweep_outcome::swept);
+   BOOST_CHECK(schedule.due(harness.gates.next_epoch_index, harness.clock));
+   BOOST_CHECK(!schedule.backing_off(harness.clock));
+
+   harness.after_tally_close = nullptr;
+   BOOST_CHECK(harness.sweep(schedule, harness.clock + SWEEP_TEST_DEADLINE) == envelope_chunk_sweep_outcome::swept);
+   BOOST_CHECK_EQUAL(harness.tally_closes.sent.size(), 1u);
+   BOOST_CHECK(!schedule.due(harness.gates.next_epoch_index, harness.clock));
+} FC_LOG_AND_RETHROW();
 
 /// Landed closes cut off during confirmation drain across sweeps without a false no-progress back-off.
 BOOST_AUTO_TEST_CASE(chunk_sweep_cut_off_landed_closes_count_as_progress) try {
@@ -3627,7 +3781,7 @@ BOOST_AUTO_TEST_CASE(chunk_sweep_wires_already_closed_reconciliation) try {
    harness.buffers = {scripted_buffer(reap_scenario::buffer_epoch, me)};
    harness.closes.failing.insert(harness.buffers.front().epoch_index);
    unsigned absence_reads = 0;
-   harness.buffer_absent = [&](const reap_detail::envelope_chunk_buffer& buffer) {
+   harness.account_absent = [&](const reap_detail::reapable_account& buffer) {
       ++absence_reads;
       BOOST_CHECK(buffer.address == harness.buffers.front().address);
       return true;
@@ -4101,6 +4255,57 @@ BOOST_AUTO_TEST_CASE(chunk_buffer_discovery_decodes_own_buffers_and_skips_drift)
                      fc::exception);
 } FC_LOG_AND_RETHROW();
 
+BOOST_AUTO_TEST_CASE(tally_discovery_filters_on_discriminator_and_payer) try {
+   const auto me    = measurement_pubkey(7);
+   const auto disc  = idl::compute_account_discriminator(std::string{epoch_deliveries_name});
+   const auto filts = reap_detail::epoch_deliveries_filters(disc, me);
+   BOOST_REQUIRE_EQUAL(filts.size(), 2u);
+
+   const auto& by_disc = filts[0].get_object()["memcmp"].get_object();
+   BOOST_CHECK_EQUAL(by_disc["offset"].as_uint64(), 0u);
+   const auto disc_bytes = fc::from_base58(by_disc["bytes"].as_string());
+   BOOST_CHECK(std::ranges::equal(disc_bytes, disc, [](char a, uint8_t b) { return static_cast<uint8_t>(a) == b; }));
+
+   // The payer filter's offset is checked against real tally bytes, not against the relay's constant, and against a
+   // tally that already holds deliveries: the offset must not move with them.
+   const auto& by_payer = filts[1].get_object()["memcmp"].get_object();
+   const auto  offset   = by_payer["offset"].as_uint64();
+   BOOST_CHECK_EQUAL(by_payer["bytes"].as_string(), me.to_string(fc::yield_function_t{}));
+   const auto key = me.serialize();
+   for (const uint32_t deliveries : {0u, 3u}) {
+      const auto tally = epoch_deliveries_data(4, me, deliveries);
+      BOOST_REQUIRE_LE(offset + key.size(), tally.size());
+      BOOST_CHECK(std::equal(key.begin(), key.end(), tally.begin() + static_cast<std::ptrdiff_t>(offset)));
+   }
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(tally_discovery_decodes_own_tallies_and_skips_drift) try {
+   auto       program_client = resume_program_client();
+   const auto me             = measurement_pubkey(7);
+   const auto other          = measurement_pubkey(8);
+
+   const fc::variants rpc_result = {
+      program_accounts_entry(program_tally_pda(resume_program_id, 6), epoch_deliveries_data(6, me, 2), tally_rent(6)),
+      program_accounts_entry(program_tally_pda(resume_program_id, 2), epoch_deliveries_data(2, me, 0), tally_rent(2)),
+      // Decodes to another payer: a drifted decode the reaper must leave alone.
+      program_accounts_entry(program_tally_pda(resume_program_id, 3), epoch_deliveries_data(3, other, 1),
+                             tally_rent(3)),
+      // Decodes to epoch 5 at the address of epoch 4: a close built from it would be refused.
+      program_accounts_entry(program_tally_pda(resume_program_id, 4), epoch_deliveries_data(5, me, 0), tally_rent(4)),
+   };
+
+   const auto tallies = reap_detail::decode_epoch_deliveries(program_client, fc::variant(rpc_result), me);
+   BOOST_REQUIRE_EQUAL(tallies.size(), 2u);
+   BOOST_CHECK_EQUAL(tallies[0].epoch_index, 2u);
+   BOOST_CHECK(tallies[0].address == program_tally_pda(resume_program_id, 2));
+   BOOST_CHECK_EQUAL(tallies[0].lamports, tally_rent(2));
+   BOOST_CHECK_EQUAL(tallies[1].epoch_index, 6u);
+
+   // A result that is not the RPC's array shape is an error, not "no tallies".
+   BOOST_CHECK_THROW(reap_detail::decode_epoch_deliveries(program_client, fc::variant("unexpected"), me),
+                     fc::exception);
+} FC_LOG_AND_RETHROW();
+
 namespace {
 
 /// Own appbase and a real fixture signer for member tests; only account reads are stubbed.
@@ -4141,6 +4346,23 @@ BOOST_FIXTURE_TEST_CASE(cleanup_envelope_chunks_names_the_signer_as_uploader, ch
    BOOST_CHECK(accounts[3].key == program_chunk_buffer_pda(resume_program_id, 9, signer));
    BOOST_CHECK(accounts[3].is_writable);
    BOOST_CHECK(accounts[4].key == signer);   // uploader: the rent goes back to the relay that paid it
+   BOOST_CHECK(accounts[4].is_writable);
+} FC_LOG_AND_RETHROW();
+
+BOOST_FIXTURE_TEST_CASE(cleanup_epoch_deliveries_names_the_signer_as_payer, chunk_member_fixture) try {
+   sysio::opp_solana_outpost_client program_client(entry->client, resume_program_id,
+                                                   {load_idl_fixture(opp_outpost_idl_fixture)});
+   const auto signer   = entry->client->get_pubkey();
+   const auto accounts = program_client.cleanup_epoch_deliveries_accounts(9);
+
+   BOOST_REQUIRE_EQUAL(accounts.size(), 5u);
+   BOOST_CHECK(accounts[0].key == signer);   // reaper
+   BOOST_CHECK(accounts[0].is_signer);
+   BOOST_CHECK(accounts[1].key == program_client.config_pda);
+   BOOST_CHECK(accounts[2].key == program_client.latest_outbound_envelope_pda);
+   BOOST_CHECK(accounts[3].key == program_tally_pda(resume_program_id, 9));
+   BOOST_CHECK(accounts[3].is_writable);
+   BOOST_CHECK(accounts[4].key == signer);   // payer: the relay only closes tallies it paid for
    BOOST_CHECK(accounts[4].is_writable);
 } FC_LOG_AND_RETHROW();
 
@@ -4209,7 +4431,7 @@ struct chunk_member_client : sysio::outpost_solana_client {
    /// Scripted finalized envelope bytes.
    std::vector<char> inbound;
    /// Scripted discovery buffers.
-   std::vector<reap_detail::envelope_chunk_buffer> buffers;
+   std::vector<reap_detail::reapable_account> buffers;
    /// Commitments passed to exact-buffer reads.
    std::vector<commitment_t> absence_commitments;
    /// Addresses passed to exact-buffer reads.
@@ -4218,6 +4440,16 @@ struct chunk_member_client : sysio::outpost_solana_client {
    std::optional<fc::time_point> absence_deadline;
    /// Scripted exact-buffer response.
    std::optional<account_info> buffer_account;
+   /// Attempted tally discovery reads.
+   uint32_t tally_reads = 0;
+   /// Scripted tally discovery result.
+   std::vector<reap_detail::reapable_account> tallies;
+
+   /// Script tally discovery; the production reader is exercised on its own below.
+   std::vector<reap_detail::reapable_account> read_own_epoch_deliveries() override {
+      ++tally_reads;
+      return tallies;
+   }
 
    /// Observe the exact account, commitment and scoped deadline used to reconcile cleanup errors.
    std::optional<account_info> read_envelope_chunk_buffer(
@@ -4258,7 +4490,7 @@ struct chunk_member_client : sysio::outpost_solana_client {
       return reap_gate_accounts();
    }
    /// Exercise the real discovery reader and decoder, asserting every RPC option before returning headers.
-   fc::variant read_chunk_program_accounts(
+   fc::variant read_program_accounts(
       const solana_public_key& program, const std::vector<fc::variant>& filters,
       commitment_t commitment, const std::optional<data_slice>& slice) override {
       ++discovery_reads;
@@ -4345,8 +4577,9 @@ struct chunk_visibility_client : sysio::outpost_solana_client {
               .latest_outbound_epoch = reap_scenario::buffer_epoch - !settled};
    }
 
-   /// No older buffers need cleanup in these delivery scenarios.
-   std::vector<reap_detail::envelope_chunk_buffer> read_own_envelope_chunk_buffers() override { return {}; }
+   /// No older buffers or tallies need cleanup in these delivery scenarios.
+   std::vector<reap_detail::reapable_account> read_own_envelope_chunk_buffers() override { return {}; }
+   std::vector<reap_detail::reapable_account> read_own_epoch_deliveries() override { return {}; }
 
    /// Preserve the real HTTP boundary and observe that every visibility read shares the delivery scope.
    std::optional<account_info> read_envelope_chunk_buffer(const solana_public_key& address,
@@ -4760,6 +4993,20 @@ BOOST_FIXTURE_TEST_CASE(cleanup_binding_sends_confirmed_preflight, chunk_member_
    BOOST_CHECK(!config[chunk_rpc_fixture::skip_preflight_key].as_bool());
 } FC_LOG_AND_RETHROW();
 
+BOOST_FIXTURE_TEST_CASE(tally_cleanup_binding_sends_confirmed_preflight, chunk_member_fixture) try {
+   fc::test::capture_http_server server(chunk_transaction_replies(1));
+   entry->client = std::make_shared<solana_client>(entry->signature_provider, server.url());
+   sysio::opp_solana_outpost_client program(entry->client, resume_program_id,
+                                             {load_idl_fixture(opp_outpost_idl_fixture)});
+   BOOST_CHECK_EQUAL(program.cleanup_epoch_deliveries(reap_scenario::buffer_epoch), chunk_rpc_fixture::signature);
+   BOOST_REQUIRE_EQUAL(server.request_count(), chunk_rpc_fixture::requests_per_transaction);
+   const auto request = fc::json::from_string(server.request(1).body).get_object();
+   BOOST_CHECK_EQUAL(request[chunk_rpc_fixture::method_key].as_string(), chunk_rpc_fixture::send_method);
+   const auto& config = request[chunk_rpc_fixture::params_key].get_array()[1].get_object();
+   BOOST_CHECK_EQUAL(config[chunk_rpc_fixture::preflight_key].as_string(), chunk_rpc_fixture::confirmed);
+   BOOST_CHECK(!config[chunk_rpc_fixture::skip_preflight_key].as_bool());
+} FC_LOG_AND_RETHROW();
+
 /// Data chunks return at processed; the terminal binding must wait through processed for confirmed.
 BOOST_FIXTURE_TEST_CASE(epoch_in_binding_confirms_only_terminal_delivery, chunk_member_fixture) try {
    constexpr uint16_t total_chunks = 1;
@@ -4833,6 +5080,91 @@ BOOST_FIXTURE_TEST_CASE(chunk_member_delivery_sweeps_use_short_budget, chunk_mem
 } FC_LOG_AND_RETHROW();
 
 /// Unsorted discovery results must become oldest-first before the production walk sees them.
+/// Where the IDL declares the tally closer, boot fails unless `payer` sits at the offset the sweep filters on.
+BOOST_FIXTURE_TEST_CASE(tally_boot_checks_the_payer_offset, chunk_member_fixture) try {
+   BOOST_CHECK_NO_THROW(chunk_member_client{entry});
+   const auto tally_fields = [](idl::program& program) -> std::vector<idl::field>& {
+      auto type = std::ranges::find(program.types, std::string{epoch_deliveries_name}, &idl::type_def::name);
+      BOOST_REQUIRE(type != program.types.end());
+      BOOST_REQUIRE(type->struct_fields);
+      return *type->struct_fields;
+   };
+   // `payer` after the deliveries (where an appended field would sit), and `payer` not declared at all.
+   for (const bool drop : {false, true}) {
+      auto  program = load_idl_fixture(opp_outpost_idl_fixture);
+      auto& fields  = tally_fields(program);
+      auto  payer   = std::ranges::find(fields, std::string{"payer"}, &idl::field::name);
+      BOOST_REQUIRE(payer != fields.end());
+      if (drop) fields.erase(payer);
+      else std::rotate(payer, std::next(payer), fields.end());
+      BOOST_CHECK_EXCEPTION((chunk_member_client{entry, std::move(program)}), fc::exception,
+         [](const fc::exception& e) { return e.to_detail_string().find("tally discovery") != std::string::npos; });
+   }
+   // A program without the closer is accepted whatever it declares: the sweep never reads its tallies.
+   auto  program = load_idl_fixture(opp_outpost_idl_fixture);
+   auto& fields  = tally_fields(program);
+   fields.erase(std::ranges::find(fields, std::string{"payer"}, &idl::field::name));
+   std::erase_if(program.instructions, [](const auto& instruction) {
+      return instruction.name == reap_detail::CLEANUP_EPOCH_DELIVERIES_INSTRUCTION;
+   });
+   BOOST_CHECK_NO_THROW((chunk_member_client{entry, std::move(program)}));
+} FC_LOG_AND_RETHROW();
+
+/// The production tally reader filters on discriminator and `payer`, reads whole accounts, and orders the result.
+BOOST_FIXTURE_TEST_CASE(tally_member_discovery_filters_on_payer_and_orders_tallies, chunk_member_fixture) try {
+   /// Expose the production reader past `chunk_member_client`'s scripted override; answer its RPC with this signer's
+   /// tallies.
+   struct tally_discovery_client : chunk_member_client {
+      using chunk_member_client::chunk_member_client;
+      std::vector<reap_detail::reapable_account> read_production_tallies() {
+         return sysio::outpost_solana_client::read_own_epoch_deliveries();
+      }
+      std::vector<fc::variant> seen_filters;
+      fc::variant read_program_accounts(const solana_public_key& program, const std::vector<fc::variant>& filters,
+                                        commitment_t commitment, const std::optional<data_slice>& slice) override {
+         BOOST_CHECK(program == resume_program_id);
+         BOOST_CHECK(commitment == commitment_t::confirmed);
+         BOOST_CHECK(!slice);
+         seen_filters = filters;
+         const auto signer = entry()->client->get_pubkey();
+         return fc::variant(fc::variants{
+            program_accounts_entry(program_tally_pda(resume_program_id, 6), epoch_deliveries_data(6, signer, 1),
+                                   tally_rent(6)),
+            program_accounts_entry(program_tally_pda(resume_program_id, 2), epoch_deliveries_data(2, signer, 0),
+                                   tally_rent(2)),
+         });
+      }
+   } client(entry);
+   const auto tallies = client.read_production_tallies();
+   BOOST_REQUIRE_EQUAL(tallies.size(), 2u);
+   BOOST_CHECK_EQUAL(tallies[0].epoch_index, 2u);
+   BOOST_CHECK_EQUAL(tallies[1].epoch_index, 6u);
+   BOOST_CHECK_EQUAL(tallies[1].lamports, tally_rent(6));
+
+   BOOST_REQUIRE_EQUAL(client.seen_filters.size(), 2u);
+   const auto disc = idl::compute_account_discriminator(std::string{epoch_deliveries_name});
+   const auto expected = reap_detail::epoch_deliveries_filters(disc, entry->client->get_pubkey());
+   for (size_t i = 0; i < expected.size(); ++i)
+      BOOST_CHECK_EQUAL(fc::json::to_string(client.seen_filters[i], fc::json::yield_function_t{}),
+                        fc::json::to_string(expected[i], fc::json::yield_function_t{}));
+} FC_LOG_AND_RETHROW();
+
+/// The member sweep reads tallies only when the loaded IDL declares their closer.
+BOOST_FIXTURE_TEST_CASE(tally_member_sweep_reads_tallies_only_with_the_closer, chunk_member_fixture) try {
+   for (const bool declared : {true, false}) {
+      auto program = load_idl_fixture(opp_outpost_idl_fixture);
+      if (!declared) {
+         std::erase_if(program.instructions, [](const auto& instruction) {
+            return instruction.name == reap_detail::CLEANUP_EPOCH_DELIVERIES_INSTRUCTION;
+         });
+      }
+      chunk_member_client client(entry, std::move(program));
+      client.reap_settled_envelope_chunks(fc::time_point::now() + reap_detail::ENVELOPE_CHUNK_SWEEP_BUDGET);
+      BOOST_CHECK_EQUAL(client.discovery_reads, 1u);
+      BOOST_CHECK_EQUAL(client.tally_reads, declared ? 1u : 0u);
+   }
+} FC_LOG_AND_RETHROW();
+
 BOOST_FIXTURE_TEST_CASE(chunk_member_discovery_orders_buffers, chunk_member_fixture) try {
    /// Expose production readers while retaining the RPC-only overrides.
    struct discovery_client : chunk_member_client {

@@ -1,12 +1,15 @@
 #include <sysio/net_plugin/net_plugin.hpp>
+#include <sysio/net_plugin/block_sync_rate_limiter.hpp>
 #include <sysio/net_plugin/buffer_factory.hpp>
 #include <sysio/net_plugin/gossip_bps_index.hpp>
+#include <sysio/net_plugin/handshake_repeat.hpp>
 #include <sysio/net_plugin/protocol.hpp>
 #include <sysio/net_plugin/queued_buffer.hpp>
 #include <sysio/net_plugin/net_logger.hpp>
 #include <sysio/net_plugin/net_utils.hpp>
 #include <sysio/net_plugin/auto_bp_peering.hpp>
 #include <sysio/net_plugin/local_txn_cache.hpp>
+#include <sysio/net_plugin/message_rate_limiter.hpp>
 #include <sysio/net_plugin/peer_auth.hpp>
 #include <sysio/net_plugin/peer_scoring.hpp>
 #include <sysio/chain/types.hpp>
@@ -15,7 +18,6 @@
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/block.hpp>
 #include <sysio/chain/plugin_interface.hpp>
-#include <sysio/chain/thread_utils.hpp>
 #include <sysio/producer_plugin/producer_plugin.hpp>
 #include <sysio/chain/fork_database.hpp>
 
@@ -24,6 +26,7 @@
 #include <fc/io/json.hpp>
 #include <fc/io/raw.hpp>
 #include <fc/io/datastream.hpp>
+#include <fc/thread_utils.hpp>
 #include <fc/variant_object.hpp>
 #include <fc/crypto/rand.hpp>
 #include <fc/exception/exception.hpp>
@@ -296,14 +299,13 @@ namespace sysio {
    constexpr auto     def_max_nodes_per_host = 1;
    constexpr auto     def_conn_retry_wait = 30;
    constexpr auto     def_expire_timer_wait = std::chrono::seconds(3);
-   constexpr auto     def_resp_expected_wait = std::chrono::seconds(5);
+   constexpr auto     def_resp_expected_wait = block_sync_rate_limiter::sync_response_timeout;
    constexpr auto     def_sync_fetch_span = 1000;
    constexpr auto     def_keepalive_interval = 10000;
    // transfer packed transaction is ~170 bytes, transaction notice is 41 bytes.
    // Since both notice and trx are sent when peer does not have a trx, set a minimum requirement for sending the notice.
    // 4096 chosen as an arbitrary threshold where an additional small notice adds little additional overhead.
    constexpr auto     def_trx_notice_min_size = 4096;
-   constexpr auto     def_allowed_clock_skew = fc::seconds(15);
 
    class connections_manager {
    public:
@@ -413,7 +415,7 @@ namespace sysio {
                            public auto_bp_peering::bp_connection_manager<net_plugin_impl, connection> {
     public:
       uint16_t                                    thread_pool_size = 4;
-      sysio::chain::named_thread_pool<struct net> thread_pool;
+      fc::named_thread_pool<struct net>           thread_pool;
 
       std::atomic<connection_id_t>     current_connection_id{0};
 
@@ -609,6 +611,8 @@ namespace sysio {
       /// @brief ctor
       /// @param socket created by boost::asio in fc::listener
       /// @param address identifier of listen socket which accepted this new connection
+      /// @param block_sync_rate_limit bytes per second of sync blocks sent to the peer, or
+      ///        block_sync_rate_limiter::unlimited_rate
       explicit connection( tcp::socket&& socket, const string& listen_address, size_t block_sync_rate_limit );
       ~connection() = default;
 
@@ -669,7 +673,12 @@ namespace sysio {
 
       const string            peer_addr;
 
-      size_t                          block_sync_rate_limit{0};  // bytes/second, default unlimited
+      /// Paces the sync blocks sent to the peer to the listener's rate limit. Strand only.
+      block_sync_rate_limiter         block_sync_limiter;
+      /// Resumes block sync once block_sync_limiter allows the next block. Strand only.
+      boost::asio::steady_timer       block_sync_throttle_timer{my_impl->thread_pool.get_executor()};
+      /// True while block_sync_throttle_timer waits to resume block sync. Strand only.
+      bool                            block_sync_throttle_timer_armed{false};
 
       std::atomic<net_utils::connection_type> conn_type{net_utils::connection_type::both};
       std::atomic<uint32_t>           peer_start_block_num{0};
@@ -682,8 +691,6 @@ namespace sysio {
       std::atomic<size_t>             bytes_sent{0};
       std::atomic<size_t>             block_sync_bytes_received{0};
       std::atomic<size_t>             block_sync_total_bytes_sent{0};
-      std::chrono::nanoseconds        block_sync_send_start{0ns};     // start of enqueue blocks
-      size_t                          block_sync_frame_bytes_sent{0}; // bytes sent in this set of enqueue blocks
       std::atomic<bool>               block_sync_throttling{false};
       std::atomic<std::chrono::nanoseconds>   last_bytes_sent{0ns};
       std::atomic<boost::asio::ip::port_type> remote_endpoint_port{0};
@@ -743,6 +750,9 @@ namespace sysio {
       /// processed, and it no longer counts against max_client_count
       std::atomic<bool>       go_away_queued{false};
       block_status_monitor    block_status_monitor_;
+      /// bounds the bp gossip messages this session handles; only accessed from the connection strand
+      message_rate_limiter    bp_gossip_rate_limiter{net_plugin_impl::bp_gossip_msg_burst,
+                                                     net_plugin_impl::bp_gossip_msg_refill_interval};
       std::atomic<time_point> last_vote_received;
       /// True once this peer may send ordinary frames to normal handlers.
       std::atomic<bool>       peer_authenticated{false};
@@ -762,7 +772,7 @@ namespace sysio {
       alignas(hardware_destructive_interference_sz)
       mutable fc::mutex                conn_mtx; //< mtx for last_handshake_recv .. remote_endpoint_ip
       handshake_message                last_handshake_recv    GUARDED_BY(conn_mtx);
-      handshake_message                last_handshake_sent    GUARDED_BY(conn_mtx);
+      handshake_send_record            last_handshake_send    GUARDED_BY(conn_mtx);
       block_id_type                    conn_fork_db_head      GUARDED_BY(conn_mtx);
       uint32_t                         conn_fork_db_head_num  GUARDED_BY(conn_mtx) {0};
       fc::time_point                   last_close             GUARDED_BY(conn_mtx);
@@ -811,6 +821,12 @@ namespace sysio {
    private:
       void _close( bool reconnect, bool shutdown ); // for easy capture
 
+      /// Refill block_sync_limiter and, when it holds back the next sync block, arm block_sync_throttle_timer to
+      /// resume sync.
+      /// Called from the connection strand.
+      /// @return true when the next sync block must wait for the timer
+      bool throttle_block_sync();
+
       bool process_next_block_message(uint32_t message_length);
       bool process_next_trx_message(uint32_t message_length);
       bool process_next_trx_notice_message(uint32_t message_length);
@@ -848,7 +864,14 @@ namespace sysio {
       bool process_next_message(uint32_t message_length);
 
       void send_block_nack(const block_id_type& block_id);
-      void send_handshake();
+
+      /// Whether send_handshake may skip a handshake that repeats the last one sent on this connection.
+      enum class handshake_send {
+         skip_repeat, ///< skip it when handshake_repeats_last() holds
+         always       ///< send it; for the handshake that opens a session
+      };
+      /// Queue a handshake carrying the current chain state. Thread safe.
+      void send_handshake( handshake_send mode = handshake_send::skip_repeat );
 
       /** \name Peer Timestamps
        *  Time message handling
@@ -889,12 +912,17 @@ namespace sysio {
                            const send_buffer_type& send_buffer,
                            go_away_reason close_after_send);
       void cancel_sync();
+      /// Drop every queued outgoing message. A handshake among them is lost, so the next one is never a repeat.
       void flush_queues();
       bool enqueue_sync_block();
       void request_sync_blocks(uint32_t start, uint32_t end);
 
       void cancel_sync_wait();
       void sync_wait();
+      /// Answer a block at or below the fork database root received while not syncing from a peer: nack it, so the
+      /// peer stops broadcasting it to this node, and stop waiting on a sync response from the peer.
+      /// Called from connection strand.
+      void answer_block_at_or_below_root( const block_id_type& blk_id );
 
       /// Reset the pre-session and peer-auth ordinary-frame gates.
       void reset_peer_authentication_state();
@@ -1155,15 +1183,36 @@ namespace sysio {
       return { on_fork, unknown_block };
    }
 
+   namespace {
+      /// True when id is this node's block at its number and that number is at or below the fork database root, so
+      /// the block is irreversible here. False when the number is above the root, or the id there differs or is not
+      /// known. Thread safe.
+      bool is_irreversible_block( const block_id_type& id ) {
+         try {
+            const controller& cc = my_impl->chain_plug->chain();
+            if( !cc.fork_db_has_root() )
+               return false;
+            const block_num_type num = block_header::num_from_id( id );
+            if( num > cc.fork_db_root().block_num() )
+               return false;
+            const std::optional<block_id_type> my_id = cc.fork_block_id_for_num( num ); // thread-safe
+            return my_id == id;
+         } catch( ... ) {
+            return false;
+         }
+      }
+   } // namespace
+
    connection::connection( const string& endpoint, const string& this_address )
       : peer_addr( endpoint ),
+        block_sync_limiter( block_sync_rate_limiter::unlimited_rate, std::chrono::steady_clock::now() ),
         strand( boost::asio::make_strand(my_impl->thread_pool.get_executor()) ),
         socket( new tcp::socket( strand ) ),
         log_p2p_address( endpoint ),
         connection_id( ++my_impl->current_connection_id ),
         sync_response_expected_timer( my_impl->thread_pool.get_executor() ),
         last_handshake_recv(),
-        last_handshake_sent(),
+        last_handshake_send(),
         p2p_address( endpoint )
    {
       auto [host, port, type] = net_utils::split_host_port_type(this_address);
@@ -1177,14 +1226,14 @@ namespace sysio {
 
    connection::connection(tcp::socket&& s, const string& listen_address, size_t block_sync_rate_limit)
       : peer_addr(),
-        block_sync_rate_limit(block_sync_rate_limit),
+        block_sync_limiter( block_sync_rate_limit, std::chrono::steady_clock::now() ),
         strand( s.get_executor() ),
         socket( new tcp::socket( std::move(s) ) ),
         listen_address( listen_address ),
         connection_id( ++my_impl->current_connection_id ),
         sync_response_expected_timer( my_impl->thread_pool.get_executor() ),
         last_handshake_recv(),
-        last_handshake_sent()
+        last_handshake_send()
    {
       /// The locally configured address type is authoritative; a peer's advertised address may only narrow it later.
       set_connection_type( listen_address );
@@ -1376,8 +1425,11 @@ namespace sysio {
       return false;
    }
 
+   // called from connection strand
    void connection::flush_queues() {
       buffer_queue.clear_write_queue();
+      fc::lock_guard g_conn( conn_mtx );
+      last_handshake_send = handshake_send_record();
    }
 
    void connection::close( bool reconnect, bool shutdown ) {
@@ -1401,11 +1453,12 @@ namespace sysio {
       flush_queues();
       peer_syncing_from_us = false;
       block_status_monitor_.reset();
+      bp_gossip_rate_limiter.reset();
       ++consecutive_immediate_connection_close;
       {
          fc::lock_guard g_conn( conn_mtx );
          last_handshake_recv = handshake_message();
-         last_handshake_sent = handshake_message();
+         last_handshake_send = handshake_send_record();
          last_close = fc::time_point::now();
          conn_node_id = fc::sha256();
          last_block_nack_request_message_id = block_id_type{};
@@ -1423,10 +1476,12 @@ namespace sysio {
       latest_blk_time = std::chrono::steady_clock::time_point::min();
       session_start_time = std::chrono::steady_clock::time_point::min();
       set_state(connection_state::closed);
-      block_sync_send_start = 0ns;
-      block_sync_frame_bytes_sent = 0;
+      block_sync_limiter.reset( std::chrono::steady_clock::now() );
+      block_sync_throttle_timer.cancel();
+      block_sync_throttle_timer_armed = false;
       block_sync_throttling = false;
       last_vote_received = time_point{};
+      if( !shutdown ) my_impl->chain_plug->chain().notify_vote_connection_closed( connection_id );
       consecutive_blocks_nacks = 0;
       last_block_nack = block_id_type{};
       bp_connection = bp_connection_type::non_bp;
@@ -1530,24 +1585,38 @@ namespace sysio {
       }
    }
 
-   void connection::send_handshake() {
+   void connection::send_handshake( handshake_send mode ) {
       if (closed())
          return;
-      boost::asio::post(strand, [c = shared_from_this()]() {
+      boost::asio::post(strand, [c = shared_from_this(), mode]() {
          fc::unique_lock g_conn( c->conn_mtx );
-         if( c->populate_handshake( c->last_handshake_sent ) ) {
-            static_assert( std::is_same_v<decltype( c->sent_handshake_count ), int16_t>, "INT16_MAX based on int16_t" );
-            if( c->sent_handshake_count == INT16_MAX ) c->sent_handshake_count = 1; // do not wrap
-            c->last_handshake_sent.generation = ++c->sent_handshake_count;
-            auto last_handshake = c->last_handshake_sent;
+         handshake_message hello;
+         if( !c->populate_handshake( hello ) )
+            return;
+         const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+         if( mode == handshake_send::skip_repeat &&
+             handshake_repeats_last( hello, c->last_handshake_recv, c->last_handshake_send, now,
+                                     handshake_repeat_window ) ) {
+            const int16_t last_generation = c->last_handshake_send.sent.generation;
             g_conn.unlock();
-            peer_dlog( p2p_msg_log, c, "Sending handshake generation {}, froot {}, fhead {}, id {}",
-                       last_handshake.generation,
-                       block_header::num_from_id(last_handshake.fork_db_root_id),
-                       block_header::num_from_id(last_handshake.fork_db_head_id),
-                       last_handshake.fork_db_head_id.short_id() );
-            c->enqueue( last_handshake );
+            peer_dlog( p2p_msg_log, c, "Not sending handshake, unchanged since generation {}, froot {}, fhead {}",
+                       last_generation,
+                       block_header::num_from_id(hello.fork_db_root_id),
+                       block_header::num_from_id(hello.fork_db_head_id) );
+            return;
          }
+         static_assert( std::is_same_v<decltype( c->sent_handshake_count ), int16_t>, "INT16_MAX based on int16_t" );
+         if( c->sent_handshake_count == INT16_MAX ) c->sent_handshake_count = 1; // do not wrap
+         hello.generation = ++c->sent_handshake_count;
+         c->last_handshake_send =
+            handshake_send_record{ .sent = hello, .peer_last = c->last_handshake_recv, .time = now };
+         g_conn.unlock();
+         peer_dlog( p2p_msg_log, c, "Sending handshake generation {}, froot {}, fhead {}, id {}",
+                    hello.generation,
+                    block_header::num_from_id(hello.fork_db_root_id),
+                    block_header::num_from_id(hello.fork_db_head_id),
+                    hello.fork_db_head_id.short_id() );
+         c->enqueue( hello );
       });
    }
 
@@ -1766,6 +1835,31 @@ namespace sysio {
    }
 
    // called from connection strand
+   bool connection::throttle_block_sync() {
+      if( block_sync_throttle_timer_armed )
+         return true;
+      block_sync_limiter.refill( std::chrono::steady_clock::now() );
+      if( block_sync_limiter.may_send() ) {
+         block_sync_throttling = false;
+         return false;
+      }
+      const std::chrono::microseconds delay = block_sync_limiter.refill_delay();
+      peer_dlog( p2p_blk_log, this, "throttling block sync, allowance {} bytes at {} bytes/sec, resuming in {}us",
+                 block_sync_limiter.allowance(), block_sync_limiter.limit_bytes_per_sec(), delay.count() );
+      block_sync_throttling = true;
+      block_sync_throttle_timer_armed = true;
+      block_sync_throttle_timer.expires_after( delay );
+      block_sync_throttle_timer.async_wait( boost::asio::bind_executor( strand,
+         [c = shared_from_this()]( const boost::system::error_code& ec ) {
+            if( ec ) // cancelled by _close, which clears block_sync_throttle_timer_armed
+               return;
+            c->block_sync_throttle_timer_armed = false;
+            c->enqueue_sync_block();
+         } ) );
+      return true;
+   }
+
+   // called from connection strand
    bool connection::enqueue_sync_block() {
       if( !peer_requested ) {
          return false;
@@ -1781,57 +1875,50 @@ namespace sysio {
          return false;
       }
 
+      // The rate limit applies while the peer syncs from us, and charges every block sent under it.
+      const bool rate_limited = !block_sync_limiter.unlimited() && peer_syncing_from_us;
+      if( rate_limited ) {
+         if( throttle_block_sync() )
+            return false;
+      } else if( !block_sync_throttle_timer_armed ) {
+         block_sync_throttling = false;
+      }
+
       // Compute batch size: min of remaining blocks and batch limit, further bounded to def_sync_fetch_batch_max_bytes
       uint32_t remaining = peer_requested->end_block - num + 1;
       uint32_t batch_count = std::min(remaining, def_sync_fetch_batch_size);
+      // Under the rate limit, fetch no more than the allowance, which throttle_block_sync left positive; the first
+      // block is fetched regardless.
+      uint64_t batch_max_bytes = def_sync_fetch_batch_max_bytes;
+      if( rate_limited ) {
+         const int64_t allowance = std::max<int64_t>( block_sync_limiter.allowance(), 1 );
+         batch_max_bytes = std::min( batch_max_bytes, static_cast<uint64_t>( allowance ) );
+      }
 
       controller& cc = my_impl->chain_plug->chain();
       std::vector<std::vector<char>> blocks;
       try {
-         blocks = cc.fetch_serialized_blocks_by_number( num, batch_count, def_sync_fetch_batch_max_bytes ); // thread-safe
+         blocks = cc.fetch_serialized_blocks_by_number( num, batch_count, batch_max_bytes ); // thread-safe
       } FC_LOG_AND_DROP();
 
       if( !blocks.empty() ) {
-         // Initialize rate limit tracking at start of enqueue frame
-         if (block_sync_send_start == 0ns) {
-            block_sync_send_start = get_time();
-            block_sync_frame_bytes_sent = 0;
-         }
-
          for (uint32_t i = 0; i < blocks.size(); ++i) {
             uint32_t block_num = num + i;
 
-            // Check rate limit before each enqueue (preserves existing throttle behavior)
-            if( block_sync_rate_limit > 0 && block_sync_frame_bytes_sent > 0 && peer_syncing_from_us ) {
-               auto now = get_time();
-               auto elapsed_us = std::chrono::duration_cast<std::chrono::microseconds>(now - block_sync_send_start);
-               double current_rate_sec = (double(block_sync_frame_bytes_sent) / elapsed_us.count()) * 100000;
-               peer_dlog(p2p_blk_log, this, "start enqueue block time {}, now {}, elapsed {}, rate {}, limit {}",
-                         block_sync_send_start.count(), now.count(), elapsed_us.count(), current_rate_sec, block_sync_rate_limit);
-               if( current_rate_sec >= block_sync_rate_limit ) {
-                  block_sync_throttling = true;
-                  peer_dlog( p2p_blk_log, this, "throttling block sync to peer {}:{}", log_remote_endpoint_ip, log_remote_endpoint_port);
-                  // Discard remaining pre-fetched blocks; timer callback re-fetches from peer_requested->last + 1
-                  std::shared_ptr<boost::asio::steady_timer> throttle_timer = std::make_shared<boost::asio::steady_timer>(my_impl->thread_pool.get_executor());
-                  throttle_timer->expires_after(std::chrono::milliseconds(100));
-                  throttle_timer->async_wait(boost::asio::bind_executor(strand, [c=shared_from_this(), throttle_timer](const boost::system::error_code& ec) {
-                     if (!ec)
-                       c->enqueue_sync_block();
-                  }));
-                  return false;
-               }
+            // Discard the rest of the batch once the limit holds; the timer resumes at peer_requested->last + 1
+            if( rate_limited && i > 0 && throttle_block_sync() ) {
+               break;
             }
 
-            block_sync_throttling = false;
-            auto sent = enqueue_block( blocks[i], block_num, queued_buffer::queue_t::block_sync );
+            const size_t sent = enqueue_block( blocks[i], block_num, queued_buffer::queue_t::block_sync );
             block_sync_total_bytes_sent += sent;
-            block_sync_frame_bytes_sent += sent;
+            if( rate_limited ) {
+               block_sync_limiter.charge( sent, std::chrono::steady_clock::now() );
+            }
             ++peer_requested->last;
 
             if(block_num == peer_requested->end_block) {
                peer_requested.reset();
-               block_sync_send_start = 0ns;
-               block_sync_frame_bytes_sent = 0;
                peer_dlog( p2p_blk_log, this, "completing enqueue_sync_block {}", block_num );
                break;
             }
@@ -1841,14 +1928,10 @@ namespace sysio {
          // block_notice_message for the new blocks. Ignore, similar to the ignore in blk_send_branch().
          peer_ilog( p2p_blk_log, this, "enqueue block sync, unable to fetch block {}, resetting peer request", num );
          peer_requested.reset(); // unable to provide requested blocks
-         block_sync_send_start = 0ns;
-         block_sync_frame_bytes_sent = 0;
       } else {
          peer_ilog( p2p_blk_log, this, "enqueue peer sync, unable to fetch block {}, sending benign_other go away", num );
          adjust_peer_score(peer_scoring::benign_close);
          peer_requested.reset(); // unable to provide requested blocks
-         block_sync_send_start = 0ns;
-         block_sync_frame_bytes_sent = 0;
          no_retry = go_away_reason::benign_other;
          enqueue( go_away_message{ go_away_reason::benign_other } );
       }
@@ -1897,6 +1980,12 @@ namespace sysio {
    void connection::cancel_sync_wait() {
       fc::lock_guard g( sync_response_expected_timer_mtx );
       sync_response_expected_timer.cancel();
+   }
+
+   // called from connection strand
+   void connection::answer_block_at_or_below_root( const block_id_type& blk_id ) {
+      send_block_nack( blk_id );
+      cancel_sync_wait();
    }
 
    // thread safe
@@ -2765,7 +2854,7 @@ namespace sysio {
       {
          fc::lock_guard g( local_txns_mtx );
          start_size = local_txns.size();
-         const std::size_t removed = local_txns.expire(fc::time_point_sec{now - def_allowed_clock_skew}, // allow for some clock-skew
+         const std::size_t removed = local_txns.expire(fc::time_point_sec{now - config::allowed_clock_skew},
                                                        fc::time_point_sec{now});
          end_size = start_size - removed;
       }
@@ -2904,7 +2993,7 @@ namespace sysio {
             if( !err && socket->is_open() && socket == c->socket ) {
                c->update_endpoints(endpoint);
                if( c->start_session() ) {
-                  c->send_handshake();
+                  c->send_handshake( handshake_send::always );
                   c->send_time();
                }
             } else {
@@ -3264,8 +3353,7 @@ namespace sysio {
          if( blk_num <= fork_db_root_num ) {
             pending_message_buffer.advance_read_ptr( message_length ); // advance before any send
             peer_dlog( p2p_blk_log, this, "received block {} less than froot {}", blk_num, fork_db_root_num );
-            send_block_nack(blk_id);
-            cancel_sync_wait();
+            answer_block_at_or_below_root(blk_id);
 
             return true;
          }
@@ -3743,7 +3831,7 @@ namespace sysio {
          }
 
          if( sent_handshake_count == 0 ) {
-            send_handshake();
+            send_handshake( handshake_send::always );
          }
 
          // Send peer_auth_message AFTER our handshake so the peer has our node_id
@@ -4110,6 +4198,12 @@ namespace sysio {
       if (!my_impl->bp_gossip_enabled())
          return;
 
+      if (!bp_gossip_rate_limiter.try_consume(std::chrono::steady_clock::now())) {
+         peer_dlog(p2p_msg_log, this, "gossip_bp_peers_message over the rate limit, dropped");
+         adjust_peer_score(peer_scoring::bp_gossip_rate_exceeded);
+         return;
+      }
+
       if (!my_impl->bp_gossip_initialized()) {
          my_impl->set_bp_connection(this, bp_connection_type::bp_gossip_validating);
          peer_dlog(p2p_msg_log, this, "received gossip_bp_peers_message before bp gossip initialized");
@@ -4235,10 +4329,10 @@ namespace sysio {
          bool unlinkable = false;
          sync_manager::closing_mode close_mode = sync_manager::closing_mode::immediately;
          try {
-            if (cc.is_producer_node()) {
-               SYS_ASSERT(ptr->timestamp < (fc::time_point::now() + def_allowed_clock_skew), block_from_the_future,
-                          "received a block from the future, rejecting it: {}", id);
-            }
+            const bool from_the_future = net_utils::rejects_block_from_the_future(
+               cc.is_producer_node(), cc.is_finalizer_node(), *ptr, fc::time_point::now());
+            SYS_ASSERT(!from_the_future, block_from_the_future,
+                       "received a block from the future, rejecting it: {}", id);
             // this will return empty optional<block_handle> if block is not linkable
             controller::accepted_block_result abh = cc.accept_block( id, ptr, received_time );
             fork_db_add_result = abh.add_result;
@@ -4260,6 +4354,20 @@ namespace sysio {
          }
          if( exception || unlinkable) {
             if (unlinkable) {
+               // A block below the fork database root is unlinkable because its parent has left the fork database.
+               // When it is this node's block at that number, the peer sent irreversible history, not a bad or
+               // conflicting block, so it gets none of rejected_block's penalty, handshake or close: it is answered
+               // as the receive path answers a block at or below the root it has cached.
+               if( is_irreversible_block( id ) ) {
+                  fc_dlog( p2p_blk_log,
+                           "block {} {}... at or below fork database root is ours, ignoring, connection - {}",
+                           ptr->block_num(), id.short_id(), cid );
+                  boost::asio::post(c->strand, [c, id]() {
+                     if( !my_impl->sync_master->syncing_from_peer() )
+                        c->answer_block_at_or_below_root( id );
+                  });
+                  return;
+               }
                fc_dlog(p2p_blk_log, "unlinkable_block {} : {}, previous {} : {}",
                        ptr->block_num(), id, block_header::num_from_id(ptr->previous), ptr->previous);
             }
@@ -4443,20 +4551,6 @@ namespace sysio {
             return false;
          });
          break;
-      case vote_result_t::unknown_block: // track the failure
-         fc_dlog(vote_logger, "connection - {} vote unknown block #{}:{}..",
-                 connection_id, block_header::num_from_id(msg->block_id), msg->block_id.short_id());
-         connections.any_of_connections([connection_id](const connection_ptr& c) {
-            if (c->connection_id == connection_id) {
-               boost::asio::post(c->strand, [c]() {
-                  c->block_status_monitor_.rejected();
-                  c->adjust_peer_score(peer_scoring::block_rejected);
-               });
-               return true;
-            }
-            return false;
-         });
-         break;
       case vote_result_t::duplicate: // do nothing
          break;
       default:
@@ -4562,7 +4656,9 @@ namespace sysio {
       cfg.add_options()
          ( "p2p-listen-endpoint", bpo::value< vector<string> >()->default_value( vector<string>(1, string("0.0.0.0:9876:0")) ),
            "The actual host:port[:trx|:blk][:<rate-cap>] used to listen for incoming p2p connections. May be used multiple times."
-           " The optional rate cap will limit per connection block sync bandwidth to the specified rate. Total"
+           " The optional rate cap will limit per connection block sync bandwidth to the specified rate, sending at"
+           " most one second of the rate cap plus one block at once. A block larger than two seconds of the rate cap"
+           " is sent at one block per two seconds. Total"
            " allowed bandwidth is the rate-cap multiplied by the connection count limit. A number alone will be"
            " interpreted as bytes per second. The number may be suffixed with units. Supported units are:"
            " 'B/s', 'KB/s', 'MB/s, 'GB/s', 'TB/s', 'KiB/s', 'MiB/s', 'GiB/s', 'TiB/s'."
@@ -4903,7 +4999,12 @@ namespace sysio {
          const auto& p2p_addr = *p2p_iter;
          try {
             auto [listen_addr, block_sync_rate_limit] = net_utils::parse_listen_address(address);
-            fc_ilog( p2p_conn_log, "setting block_sync_rate_limit to {} megabytes per second", double(block_sync_rate_limit)/1000000);
+            if( block_sync_rate_limit == block_sync_rate_limiter::unlimited_rate ) {
+               fc_ilog( p2p_conn_log, "block_sync_rate_limit of {} is unlimited", listen_addr );
+            } else {
+               fc_ilog( p2p_conn_log, "setting block_sync_rate_limit of {} to {} bytes per second",
+                        listen_addr, block_sync_rate_limit );
+            }
 
             fc::create_listener<tcp>(
                   thread_pool.get_executor(), p2p_conn_log, accept_timeout, listen_addr, extra_listening_log_info,

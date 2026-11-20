@@ -1,5 +1,5 @@
 #include <sysio/chain/transaction_metadata.hpp>
-#include <sysio/chain/thread_utils.hpp>
+#include <fc/thread_utils.hpp>
 #include <boost/asio/thread_pool.hpp>
 
 namespace sysio { namespace chain {
@@ -10,7 +10,7 @@ recover_keys_future transaction_metadata::start_recover_keys( packed_transaction
                                                               fc::microseconds time_limit,
                                                               trx_type t )
 {
-   return post_async_task( thread_pool, [trx{std::move(trx)}, chain_id, time_limit, t]() mutable {
+   return fc::post_async_task( thread_pool, [trx{std::move(trx)}, chain_id, time_limit, t]() mutable {
       return recover_keys( std::move(trx), chain_id, time_limit, t );
    });
 }

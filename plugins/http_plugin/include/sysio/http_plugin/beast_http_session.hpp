@@ -107,15 +107,19 @@ class beast_http_session : public detail::abstract_conn,
    /// Bytes reserved against bytes_in_flight for the body of the request being read.
    size_t body_reservation_ = 0;
 
-   /// Runs every completion handler of the session, and the body deadline's.
+   /// What a deadline waits for.
+   enum class transfer_t { request_body, response };
+
+   /// Runs every completion handler of the session, and the deadline's.
    boost::asio::strand<typename Socket::executor_type> strand_;
-   /// Closes the connection when a request body does not arrive in time; see request_body_read_timeout().
-   boost::asio::steady_timer body_timer_;
-   /// Advances when a body deadline starts or stops, so a deadline's handler that was already queued when its deadline
+   /// Closes the connection when a request body does not arrive, or a response is not written, in time; see
+   /// transfer_timeout().
+   boost::asio::steady_timer deadline_timer_;
+   /// Advances when a deadline starts or stops, so a deadline's handler that was already queued when its deadline
    /// stopped can tell it is stale. Touched only on the strand.
-   uint64_t body_deadline_generation_ = 0;
-   /// The body deadline expired and closed the connection. Touched only on the strand.
-   bool body_timed_out_ = false;
+   uint64_t deadline_generation_ = 0;
+   /// A deadline expired and closed the connection. Touched only on the strand.
+   bool timed_out_ = false;
 
    template<
          class Body, class Allocator>
@@ -182,7 +186,8 @@ class beast_http_session : public detail::abstract_conn,
             handler_itr->second.fn(this->shared_from_this(),
                                 std::move(resource),
                                 std::move(body),
-                                make_http_response_handler(*plugin_state_, this->shared_from_this(), content_type));
+                                make_http_response_handler(*plugin_state_, this->shared_from_this(), content_type,
+                                                           handler_itr->second.response_policy));
          } else if (resource == "/v1/node/get_supported_apis") {
             http_plugin::get_supported_apis_result result;
             for (const auto& handler : plugin_state_->url_handlers) {
@@ -246,39 +251,58 @@ private:
       decrement_bytes_in_flight(std::exchange(body_reservation_, 0));
    }
 
-   /// Start the deadline for the body of `body_size` bytes about to be read; see request_body_read_timeout(). Runs on
-   /// the strand.
-   void start_body_deadline(size_t body_size) {
-      const uint64_t generation = ++body_deadline_generation_;
-      body_timer_.expires_after(request_body_read_timeout(body_size));
-      body_timer_.async_wait([weak_self = this->weak_from_this(), generation](const beast::error_code& ec) {
-         if (ec)
-            return; // cancelled: the body was read, or the session is gone
-         if (auto self = weak_self.lock())
-            self->on_body_deadline(generation);
-      });
+   /// Start the deadline for the `transfer` of `size` bytes about to begin; see transfer_timeout(). Runs on the strand.
+   void start_deadline(transfer_t transfer, size_t size) {
+      const uint64_t generation = ++deadline_generation_;
+      deadline_timer_.expires_after(transfer_timeout(size));
+      deadline_timer_.async_wait(
+         [weak_self = this->weak_from_this(), generation, transfer, size](const beast::error_code& ec) {
+            if (ec)
+               return; // cancelled: the transfer finished, or the session is gone
+            if (auto self = weak_self.lock())
+               self->on_deadline(generation, transfer, size);
+         });
    }
 
-   /// The body read is over, whatever its outcome. Runs on the strand.
-   void stop_body_deadline() {
-      ++body_deadline_generation_;
-      body_timer_.cancel();
+   /// The transfer is over, whatever its outcome. Runs on the strand.
+   void stop_deadline() {
+      ++deadline_generation_;
+      deadline_timer_.cancel();
    }
 
-   /// The body deadline `generation` expired: unless it stopped first, release the body's reservation and close the
-   /// connection. Runs on the strand, where the read's completion cannot run concurrently, so closing the socket only
-   /// aborts the read.
-   void on_body_deadline(uint64_t generation) {
-      if (generation != body_deadline_generation_)
+   /// The deadline `generation` for the `transfer` of `size` bytes expired: unless it stopped first, release the
+   /// request body's reservation, if any, and close the connection. Runs on the strand, where the transfer's completion
+   /// cannot run concurrently, so closing the socket only aborts the transfer, whose completion releases what it holds.
+   void on_deadline(uint64_t generation, transfer_t transfer, size_t size) {
+      if (generation != deadline_generation_)
          return;
-      ++body_deadline_generation_;
-      body_timed_out_ = true;
-      fc_dlog(plugin_state_->get_logger(), "closing connection to {}, request body of {} bytes not read within {} ms",
-              remote_endpoint_, body_reservation_,
-              std::chrono::duration_cast<std::chrono::milliseconds>(request_body_read_timeout(body_reservation_))
-                 .count());
+      ++deadline_generation_;
+      timed_out_ = true;
+      fc_dlog(plugin_state_->get_logger(), "closing connection to {}, {} of {} bytes not transferred within {} ms",
+              remote_endpoint_, magic_enum::enum_name(transfer), size,
+              std::chrono::duration_cast<std::chrono::milliseconds>(transfer_timeout(size)).count());
       release_request_body();
       do_eof();
+   }
+
+   /// Write `message`, counting `size` bytes against bytes_in_flight until the write completes, under the deadline for
+   /// a response of `size` bytes; then `on_written(ec, bytes_transferred)` runs on the strand. The write starts on the
+   /// strand, where its deadline runs. The caller must leave the socket and `message` alone afterwards.
+   template <typename Message, typename OnWritten>
+   void write_response(Message& message, size_t size, OnWritten&& on_written) {
+      increment_bytes_in_flight(size);
+      boost::asio::dispatch(strand_, [self = this->shared_from_this(), &message, size,
+                                      on_written = std::forward<OnWritten>(on_written)]() mutable {
+         self->start_deadline(transfer_t::response, size);
+         http::async_write(
+            self->socket_, message,
+            boost::asio::bind_executor(self->strand_, [self, size, on_written = std::move(on_written)](
+                                                         beast::error_code ec, std::size_t transferred) mutable {
+               self->stop_deadline();
+               self->decrement_bytes_in_flight(size);
+               on_written(ec, transferred);
+            }));
+      });
    }
 
 public:
@@ -336,7 +360,7 @@ public:
                       api_category_set categories, const std::string& local_address)
        : plugin_state_(std::move(plugin_state)), socket_(std::move(socket)), categories_(categories),
          remote_endpoint_(std::move(remote_endpoint)), local_address_(local_address),
-         strand_(boost::asio::make_strand(socket_.get_executor())), body_timer_(strand_) {
+         strand_(boost::asio::make_strand(socket_.get_executor())), deadline_timer_(strand_) {
       plugin_state_->requests_in_flight += 1;
       req_parser_.emplace();
       req_parser_->body_limit(plugin_state_->max_body_size);
@@ -394,7 +418,7 @@ public:
             return;
          }
          reserve_request_body(body_size);
-         start_body_deadline(body_size);
+         start_deadline(transfer_t::request_body, body_size);
       }
 
       // Check for the Expect field value
@@ -426,9 +450,9 @@ public:
    }
 
    void on_read(beast::error_code ec, std::size_t /* bytes_transferred */) {
-      stop_body_deadline();
-      if (body_timed_out_)
-         return; // on_body_deadline() released the body and closed the connection, even if the read finished meanwhile
+      stop_deadline();
+      if (timed_out_)
+         return; // on_deadline() released the body and closed the connection, even if the read finished meanwhile
 
       if(ec) {
          // By default, http_plugin runs in keep_alive mode (persistent connections)
@@ -463,8 +487,8 @@ public:
                  bool close) {
       boost::ignore_unused(bytes_transferred);
 
-      if (body_timed_out_)
-         return; // the body deadline closed the connection while a 100 Continue was being written
+      if (timed_out_)
+         return; // a deadline closed the connection: the body's while a 100 Continue was written, or the response's
       if(ec) {
          return fail(ec, "write", plugin_state_->get_logger());
       }
@@ -491,7 +515,7 @@ public:
       case continue_state_t::reject:
          // request body too large. After issuing 401 response, close connection
          continue_state_ = continue_state_t::none;
-         stop_body_deadline();
+         stop_deadline();
          do_eof();
          break;
          
@@ -649,21 +673,14 @@ public:
          file_res_->set(http::field::server, plugin_state_->server_header);
       file_res_->keep_alive(false); // close after file transfer
 
-      const auto tracked_size = payload_len;
-      increment_bytes_in_flight(tracked_size);
       write_begin_ = steady_clock::now();
       auto dt = write_begin_ - handle_begin_;
       handle_time_us_ += std::chrono::duration_cast<std::chrono::microseconds>(dt).count();
 
-      http::async_write(
-         socket_,
-         *file_res_,
-         boost::asio::bind_executor(strand_,
-            [self = this->shared_from_this(), tracked_size](beast::error_code ec, std::size_t bytes_transferred) {
-               self->decrement_bytes_in_flight(tracked_size);
-               self->file_res_.reset();
-               self->on_write(ec, bytes_transferred, true); // always close after file
-            }));
+      write_response(*file_res_, payload_len, [this](beast::error_code ec, std::size_t bytes_transferred) {
+         file_res_.reset();
+         on_write(ec, bytes_transferred, true); // always close after file
+      });
    }
 
    virtual void send_response(std::string&& json, unsigned int code) final {
@@ -683,16 +700,9 @@ public:
                remote_endpoint_, to_log_string(*res_) );
 
       // Counted only now: an invalid status or a body the status forbids throws above, and the write releases it.
-      increment_bytes_in_flight(payload_size);
-      // Write the response
-      http::async_write(
-         socket_,
-         *res_,
-         boost::asio::bind_executor(strand_,
-            [self = this->shared_from_this(), payload_size, close](beast::error_code ec, std::size_t transferred) {
-               self->decrement_bytes_in_flight(payload_size);
-               self->on_write(ec, transferred, close);
-            }));
+      write_response(*res_, payload_size, [this, close](beast::error_code ec, std::size_t transferred) {
+         on_write(ec, transferred, close);
+      });
    }
 
    void run_session() {

@@ -37,7 +37,7 @@
             "fields": [
                 {
                     "name": "n",
-                    "type": "uint32"
+                    "type": "uint64"
                 }
             ]
         }

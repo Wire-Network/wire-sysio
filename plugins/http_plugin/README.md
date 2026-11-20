@@ -50,7 +50,16 @@ reservation. For a handler posted to the app thread the request body is then che
 over -- and reserved against that budget for as long as it sits in the executor queue, released exactly once
 when the posted work runs, throws, returns early on shutdown, or is discarded. Handlers that run inline on an
 HTTP worker thread get no request-body check. The byte budget is checked once more when the response is sent,
-so a 503 can come back after the call has already executed.
+and a 503 replaces a response that does not fit, unless its handler was registered with
+`http_response_policy::always_sent` (the last argument of `add_api` and `add_async_api`). Such a response is
+always sent, even past the budget. Its request is checked against the budget before the handler runs, on
+either thread, and stays reserved until it is answered, by the handler or by the report of an exception it
+throws. `chain_api_plugin` registers `compute_transaction`, `push_transaction`, `push_transactions`,
+`send_transaction`, and `send_transaction2` this way, as their response reports a transaction's execution; the
+budget refuses them only on intake.
+
+A response counts against the budget until it is written. A response not written 10 s plus its size at 64 KiB/s
+after its write starts closes its connection, which releases its bytes.
 
 `/v1/node/get_supported_apis` is answered by the HTTP connection handler itself rather than by a registered
 handler: it returns the paths of every handler whose category is enabled on the listener that received the
@@ -174,7 +183,7 @@ All of `http_plugin`'s options are config-file options, so each is equally valid
 |---|---|---|
 | `http-threads` | `2` | Number of worker threads in the HTTP thread pool. Must be greater than 0. |
 | `max-body-size` | `2097152` | Maximum body size in bytes accepted for an incoming RPC request. |
-| `http-max-bytes-in-flight-mb` | `500` | Maximum megabytes `http_plugin` uses for in-flight request processing; `-1` for unlimited. A request body is admitted against it as soon as its header arrives (its `Content-Length`, or `max-body-size` when chunked), before any of the body is read, and held until the body is read or the connection closes. A body must arrive within 10 s plus its size at 64 KiB/s (42 s for 2 MiB), or the connection is closed. The budget is checked again when an app-thread handler is queued and when the response is sent. A 503 is returned when exceeded, and a refused body closes its connection. |
+| `http-max-bytes-in-flight-mb` | `500` | Maximum megabytes `http_plugin` uses for in-flight request processing; `-1` for unlimited. A request body is admitted against it as soon as its header arrives (its `Content-Length`, or `max-body-size` when chunked), before any of the body is read, and held until the body is read or the connection closes. A body must arrive within 10 s plus its size at 64 KiB/s (42 s for 2 MiB), or the connection is closed. A response counts against the budget until it is written, and must be written within 10 s plus its size at 64 KiB/s of its write starting, or the connection is closed. The budget is checked again when an app-thread handler is queued and when the response is sent, except for the response of a call that executes a transaction on the main thread (`/v1/chain/compute_transaction`, `push_transaction`, `push_transactions`, `send_transaction`, `send_transaction2`), which is always sent, its request counted from intake until it is answered. A 503 is returned when exceeded, and a refused body closes its connection. |
 | `http-max-in-flight-requests` | `-1` | Maximum number of concurrently open HTTP connections; `-1` for unlimited. The counter goes up when a session is created and down when it is destroyed, so idle keep-alive connections count against it, and it is checked only when a connection is accepted. A 503 is returned when exceeded. |
 | `http-max-response-time-ms` | `15` | Maximum time on the main thread for processing a request; `-1` for unlimited. API plugins read this value as their per-call deadline. |
 | `http-keep-alive` | `true` | When false, connections are not kept alive even if the client requests it. |
@@ -227,9 +236,10 @@ ninja -C build/debug http_plugin_unit_tests
 ```
 
 The suite covers body trimming and empty-content detection, `parse_params` for each `http_params_types` mode,
-rejection of invalid `http-category-address` specifications, category-to-address binding and per-listener
-endpoint visibility, loopback detection, the in-flight byte and request accounting including the
-request-body reservation, exception responses (whole before the connection closes, also under concurrent
+rejection of invalid `http-category-address` specifications, category-to-address binding and per-listener endpoint
+visibility, loopback detection, the in-flight byte and request accounting including the request-body reservation,
+the response write deadline, always-sent responses delivered over the byte budget while intake still refuses new
+requests with or without a body, exception responses (whole before the connection closes, also under concurrent
 failures), the single answer per request, and the API-error mapping of raw handler exceptions.
 
 ## Related plugins

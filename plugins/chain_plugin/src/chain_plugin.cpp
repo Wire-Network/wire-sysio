@@ -3665,11 +3665,12 @@ std::function<chain::t_or_exception<fc::variant>()> read_only::get_block(const g
    chain::signed_block_ptr block = get_raw_block(params, deadline);
 
    using return_type = t_or_exception<fc::variant>;
-   return [this,
-           resolver = get_serializers_cache(db, block, abi_serializer_max_time),
-           block    = std::move(block)]() mutable -> return_type {
+   // Only the ABIs are copied here, on the read_only queue; the returned function, which runs on the http thread pool,
+   // looks up and builds their serializers and decodes the block.
+   captured_abis abis = captured_abis::capture(db, *block);
+   return [this, abis = std::move(abis), block = std::move(block)]() -> return_type {
       try {
-         return convert_block(block, resolver);
+         return convert_block(block, abis);
       } CATCH_AND_RETURN(return_type);
    };
 }
@@ -3708,14 +3709,12 @@ read_only::get_block_header_result read_only::get_block_header(const read_only::
    }
 }
 
-abi_resolver
-read_only::get_block_serializers( const chain::signed_block_ptr& block, const fc::microseconds& max_time ) const {
-   return get_serializers_cache(db, block, max_time);
-}
-
-fc::variant read_only::convert_block( const chain::signed_block_ptr& block, abi_resolver& resolver ) const {
-   fc::variant pretty_output;
-   abi_serializer::to_variant( *block, pretty_output, resolver, abi_serializer_max_time );
+fc::variant read_only::convert_block( const chain::signed_block_ptr& block, const captured_abis& abis ) const {
+   const fc::time_point     deadline = fc::time_point::now().safe_add(abi_serializer_max_time);
+   captured_abi_serializers serializers(abi_serializer_max_time, deadline);
+   fc::variant              pretty_output;
+   abi_serializer::to_variant( *block, pretty_output, serializers.resolver_for(abis), abi_serializer_max_time,
+                               deadline );
 
    const auto block_id = block->calculate_id();
    uint32_t ref_block_prefix = block_id._hash[1];
@@ -3777,81 +3776,115 @@ fc::variant read_only::get_block_header_state(const get_block_header_state_param
    return result;
 }
 
-void read_write::push_transaction(const read_write::push_transaction_params& params, next_function<read_write::push_transaction_results> next) {
+namespace {
+
+/**
+ * Packs the transaction `request` into `ptrx` with the ABIs `db` holds now. Building serializers and converting
+ * action data end by `deadline`, and each action's conversion within `max_action_time`. Running out of either throws
+ * packed_transaction_type_exception rather than a deadline exception, since the transaction was not submitted.
+ */
+void pack_transaction_request(const controller& db, const fc::variant& request, packed_transaction& ptrx,
+                              const fc::microseconds& max_action_time, const fc::time_point& deadline) {
+   auto resolver = caching_resolver(make_resolver(db, max_action_time, throw_on_yield::yes, deadline));
+   try {
+      abi_serializer::from_variant(request, ptrx, resolver, abi_serializer::create_yield_function(deadline),
+                                   max_action_time);
+   } catch (const chain::abi_serialization_deadline_exception& e) {
+      chain::packed_transaction_type_exception not_packed(
+         FC_LOG_MESSAGE(warn, "Transaction not submitted: its action data was not converted within the time limit"));
+      for (const fc::log_message& log : e.get_log())
+         not_packed.append_log(log);
+      throw not_packed;
+   } SYS_RETHROW_EXCEPTIONS(chain::packed_transaction_type_exception, "Invalid packed transaction")
+}
+
+/**
+ * push_transaction's `processed` output for `trace`: its action traces nested under the action that caused them,
+ * action data decoded with `serializers` for the ABIs `abis` captured, each action within `max_action_time` and all
+ * of them by `action_data_deadline`. The plain trace when that fails for any reason.
+ */
+fc::variant push_transaction_output(const transaction_trace_ptr& trace, const captured_abis& abis,
+                                    captured_abi_serializers& serializers, const fc::microseconds& max_action_time,
+                                    const fc::time_point& action_data_deadline) {
+   fc::variant output;
+   try {
+      abi_serializer::to_variant(*trace, output, serializers.resolver_for(abis), max_action_time,
+                                 action_data_deadline);
+
+      // Create map of (closest_unnotified_ancestor_action_ordinal, global_sequence) with action trace
+      std::map< std::pair<uint32_t, uint64_t>, fc::mutable_variant_object > act_traces_map;
+      for( const auto& act_trace : output["action_traces"].get_array() ) {
+         if (act_trace["receipt"].is_null() && act_trace["except"].is_null()) continue;
+         auto closest_unnotified_ancestor_action_ordinal =
+               act_trace["closest_unnotified_ancestor_action_ordinal"].as<fc::unsigned_int>().value;
+         auto global_sequence = act_trace["receipt"].is_null() ?
+                                    std::numeric_limits<uint64_t>::max() :
+                                    act_trace["receipt"]["global_sequence"].as<uint64_t>();
+         act_traces_map.emplace( std::make_pair( closest_unnotified_ancestor_action_ordinal,
+                                                 global_sequence ),
+                                 act_trace.get_object() );
+      }
+
+      std::function<fc::variants(uint32_t)> convert_act_trace_to_tree_struct =
+      [&](uint32_t closest_unnotified_ancestor_action_ordinal) {
+         fc::variants restructured_act_traces;
+         auto it = act_traces_map.lower_bound(
+                     std::make_pair( closest_unnotified_ancestor_action_ordinal, 0)
+         );
+         for( ;
+            it != act_traces_map.end() && it->first.first == closest_unnotified_ancestor_action_ordinal; ++it )
+         {
+            auto& act_trace_mvo = it->second;
+
+            auto action_ordinal = act_trace_mvo["action_ordinal"].as<fc::unsigned_int>().value;
+            act_trace_mvo["inline_traces"] = convert_act_trace_to_tree_struct(action_ordinal);
+            if (act_trace_mvo["receipt"].is_null()) {
+               act_trace_mvo["receipt"] = fc::mutable_variant_object()
+                  ("abi_sequence", 0)
+                  ("act_digest", digest_type::hash(trace->action_traces[action_ordinal-1].act))
+                  ("auth_sequence", flat_map<account_name,uint64_t>())
+                  ("code_sequence", 0)
+                  ("global_sequence", 0)
+                  ("receiver", act_trace_mvo["receiver"])
+                  ("recv_sequence", 0);
+            }
+            restructured_act_traces.push_back( std::move(act_trace_mvo) );
+         }
+         return restructured_act_traces;
+      };
+
+      fc::mutable_variant_object output_mvo(std::move(output.get_object()));
+      output_mvo["action_traces"] = convert_act_trace_to_tree_struct(0);
+
+      output = std::move(output_mvo);
+   } catch (...) {
+      // The transaction was processed, so its trace is reported whatever decoding it ran into.
+      output = *trace;
+   }
+   return output;
+}
+
+} // anonymous namespace
+
+void read_write::push_transaction_trace(const push_transaction_params& params, next_function<pushed_trace> next) {
    try {
       auto ptrx = std::make_shared<packed_transaction>();
-      auto resolver = caching_resolver(make_resolver(db, abi_serializer_max_time, throw_on_yield::yes));
-      try {
-         abi_serializer::from_variant(params, *ptrx, resolver, abi_serializer_max_time);
-      } SYS_RETHROW_EXCEPTIONS(chain::packed_transaction_type_exception, "Invalid packed transaction")
+      pack_transaction_request(db, params, *ptrx, abi_serializer_max_time,
+                               fc::time_point::now().safe_add(http_max_response_time));
       ptrx->decompress();
 
-      static incoming::methods::transaction_async::method_type& on_incoming = app().get_method<incoming::methods::transaction_async>();
+      // Looked up on each call, so that the method is always the current application's.
+      incoming::methods::transaction_async::method_type& on_incoming =
+         app().get_method<incoming::methods::transaction_async>();
       on_incoming(ptrx, true, transaction_metadata::trx_type::input, false,
-            [this, next](const next_function_variant<transaction_trace_ptr>& result) -> void {
+            [&db = db, next](const next_function_variant<transaction_trace_ptr>& result) -> void {
          if (std::holds_alternative<fc::exception_ptr>(result)) {
             next(std::get<fc::exception_ptr>(result));
          } else {
-            auto trx_trace_ptr = std::get<transaction_trace_ptr>(result);
-
             try {
-               fc::variant output;
-               try {
-                  auto resolver = get_serializers_cache(db, trx_trace_ptr, abi_serializer_max_time);
-                  abi_serializer::to_variant(*trx_trace_ptr, output, resolver, abi_serializer_max_time);
-
-                  // Create map of (closest_unnotified_ancestor_action_ordinal, global_sequence) with action trace
-                  std::map< std::pair<uint32_t, uint64_t>, fc::mutable_variant_object > act_traces_map;
-                  for( const auto& act_trace : output["action_traces"].get_array() ) {
-                     if (act_trace["receipt"].is_null() && act_trace["except"].is_null()) continue;
-                     auto closest_unnotified_ancestor_action_ordinal =
-                           act_trace["closest_unnotified_ancestor_action_ordinal"].as<fc::unsigned_int>().value;
-                     auto global_sequence = act_trace["receipt"].is_null() ?
-                                                std::numeric_limits<uint64_t>::max() :
-                                                act_trace["receipt"]["global_sequence"].as<uint64_t>();
-                     act_traces_map.emplace( std::make_pair( closest_unnotified_ancestor_action_ordinal,
-                                                             global_sequence ),
-                                             act_trace.get_object() );
-                  }
-
-                  std::function<fc::variants(uint32_t)> convert_act_trace_to_tree_struct =
-                  [&](uint32_t closest_unnotified_ancestor_action_ordinal) {
-                     fc::variants restructured_act_traces;
-                     auto it = act_traces_map.lower_bound(
-                                 std::make_pair( closest_unnotified_ancestor_action_ordinal, 0)
-                     );
-                     for( ;
-                        it != act_traces_map.end() && it->first.first == closest_unnotified_ancestor_action_ordinal; ++it )
-                     {
-                        auto& act_trace_mvo = it->second;
-
-                        auto action_ordinal = act_trace_mvo["action_ordinal"].as<fc::unsigned_int>().value;
-                        act_trace_mvo["inline_traces"] = convert_act_trace_to_tree_struct(action_ordinal);
-                        if (act_trace_mvo["receipt"].is_null()) {
-                           act_trace_mvo["receipt"] = fc::mutable_variant_object()
-                              ("abi_sequence", 0)
-                              ("act_digest", digest_type::hash(trx_trace_ptr->action_traces[action_ordinal-1].act))
-                              ("auth_sequence", flat_map<account_name,uint64_t>())
-                              ("code_sequence", 0)
-                              ("global_sequence", 0)
-                              ("receiver", act_trace_mvo["receiver"])
-                              ("recv_sequence", 0);
-                        }
-                        restructured_act_traces.push_back( std::move(act_trace_mvo) );
-                     }
-                     return restructured_act_traces;
-                  };
-
-                  fc::mutable_variant_object output_mvo(std::move(output.get_object()));
-                  output_mvo["action_traces"] = convert_act_trace_to_tree_struct(0);
-
-                  output = std::move(output_mvo);
-               } catch( chain::abi_exception& ) {
-                  output = *trx_trace_ptr;
-               }
-
-               const chain::transaction_id_type& id = trx_trace_ptr->id;
-               next(read_write::push_transaction_results{id, output});
+               const transaction_trace_ptr& trace = std::get<transaction_trace_ptr>(result);
+               // The ABIs are copied now, on the main thread: the next transaction may change them.
+               next(pushed_trace{trace, captured_abis::capture(db, *trace)});
             } CATCH_AND_CALL(next);
          }
       });
@@ -3862,37 +3895,83 @@ void read_write::push_transaction(const read_write::push_transaction_params& par
    } CATCH_AND_CALL(next);
 }
 
-static void push_recurse(read_write* rw, int index, const std::shared_ptr<read_write::push_transactions_params>& params, const std::shared_ptr<read_write::push_transactions_results>& results, const next_function<read_write::push_transactions_results>& next) {
-   auto wrapped_next = [=](const next_function_variant<read_write::push_transaction_results>& result) {
-      if (std::holds_alternative<fc::exception_ptr>(result)) {
-         const auto& e = std::get<fc::exception_ptr>(result);
-         results->emplace_back( read_write::push_transaction_results{ transaction_id_type(), fc::mutable_variant_object( "error", e->to_detail_string() ) } );
-      } else if (std::holds_alternative<read_write::push_transaction_results>(result)) {
-         const auto& r = std::get<read_write::push_transaction_results>(result);
-         results->emplace_back( r );
-      } else {
-         assert(0);
+void read_write::push_transaction(const read_write::push_transaction_params& params,
+                                  next_function<read_write::push_transaction_results> next) {
+   push_transaction_trace(params, [next, max_time = abi_serializer_max_time](
+                                     next_function_variant<pushed_trace>&& result) {
+      if (auto* error = std::get_if<fc::exception_ptr>(&result)) {
+         next(std::move(*error));
+         return;
+      }
+      using return_type = t_or_exception<push_transaction_results>;
+      // The function passed to next() runs on the http thread pool. max_time bounds each action's decode and, from
+      // there, building serializers for the trace's ABIs and decoding its action data together.
+      next([pushed = std::get<pushed_trace>(std::move(result)), max_time]() -> return_type {
+         try {
+            const fc::time_point     deadline = fc::time_point::now().safe_add(max_time);
+            captured_abi_serializers serializers(max_time, deadline);
+            return return_type(push_transaction_results{
+               pushed.trace->id,
+               push_transaction_output(pushed.trace, pushed.abis, serializers, max_time, deadline)});
+         } CATCH_AND_RETURN(return_type);
+      });
+   });
+}
+
+void read_write::push_remaining(size_t index, std::shared_ptr<const push_transactions_params> params,
+                                std::shared_ptr<std::vector<pushed_trace_or_error>> pushed,
+                                next_function<push_transactions_results> next) {
+   push_transaction_trace(params->at(index),
+                          [this, index, params, pushed, next](next_function_variant<pushed_trace>&& result) {
+      if (auto* error = std::get_if<fc::exception_ptr>(&result))
+         pushed->emplace_back(std::move(*error));
+      else
+         pushed->emplace_back(std::get<pushed_trace>(std::move(result)));
+
+      if (index + 1 < params->size()) {
+         push_remaining(index + 1, params, pushed, next);
+         return;
       }
 
-      size_t next_index = index + 1;
-      if (next_index < params->size()) {
-         push_recurse(rw, next_index, params, results, next );
-      } else {
-         next(*results);
-      }
-   };
-
-   rw->push_transaction(params->at(index), wrapped_next);
+      using return_type = t_or_exception<push_transactions_results>;
+      // The function passed to next() runs on the http thread pool. max_time bounds each action's decode and, from
+      // there, building serializers for the ABIs of all the traces and decoding their action data together.
+      next([pushed, max_time = abi_serializer_max_time]() -> return_type {
+         try {
+            const fc::time_point     deadline = fc::time_point::now().safe_add(max_time);
+            captured_abi_serializers serializers(max_time, deadline);
+            push_transactions_results results;
+            results.reserve(pushed->size());
+            const auto add_error = [&results](const fc::exception_ptr& e) {
+               results.emplace_back(push_transaction_results{
+                  transaction_id_type(), fc::mutable_variant_object("error", e->to_detail_string())});
+            };
+            for (const pushed_trace_or_error& outcome : *pushed) {
+               if (const auto* error = std::get_if<fc::exception_ptr>(&outcome)) {
+                  add_error(*error);
+                  continue;
+               }
+               try {
+                  const pushed_trace& trace = std::get<pushed_trace>(outcome);
+                  results.emplace_back(push_transaction_results{
+                     trace.trace->id,
+                     push_transaction_output(trace.trace, trace.abis, serializers, max_time, deadline)});
+               } CATCH_AND_CALL(add_error);
+            }
+            return return_type(std::move(results));
+         } CATCH_AND_RETURN(return_type);
+      });
+   });
 }
 
 void read_write::push_transactions(const read_write::push_transactions_params& params, next_function<read_write::push_transactions_results> next) {
    try {
       SYS_ASSERT( params.size() <= 1000, too_many_tx_at_once, "Attempt to push too many transactions at once" );
-      auto params_copy = std::make_shared<read_write::push_transactions_params>(params.begin(), params.end());
-      auto result = std::make_shared<read_write::push_transactions_results>();
-      result->reserve(params.size());
+      auto params_copy = std::make_shared<const push_transactions_params>(params.begin(), params.end());
+      auto pushed = std::make_shared<std::vector<pushed_trace_or_error>>();
+      pushed->reserve(params.size());
 
-      push_recurse(this, 0, params_copy, result, next);
+      push_remaining(0, std::move(params_copy), std::move(pushed), next);
    } catch ( boost::interprocess::bad_alloc& ) {
       handle_db_exhaustion();
    } catch ( const std::bad_alloc& ) {
@@ -3905,10 +3984,8 @@ template<class API, class Result>
 void api_base::send_transaction_gen(API &api, send_transaction_params_t params, next_function<Result> next) {
    try {
       auto ptrx = std::make_shared<packed_transaction>();
-      auto resolver = caching_resolver(make_resolver(api.db, api.abi_serializer_max_time, throw_on_yield::yes));
-      try {
-         abi_serializer::from_variant(params.transaction, *ptrx, resolver, api.abi_serializer_max_time);
-      } SYS_RETHROW_EXCEPTIONS(packed_transaction_type_exception, "Invalid packed transaction")
+      pack_transaction_request(api.db, params.transaction, *ptrx, api.abi_serializer_max_time,
+                               fc::time_point::now().safe_add(api.http_max_response_time));
       ptrx->decompress();
 
       bool retry = false;
@@ -3924,7 +4001,9 @@ void api_base::send_transaction_gen(API &api, send_transaction_params_t params, 
                      ptrx->expiration(), api.trx_retry->get_max_expiration_time() );
       }
 
-      static incoming::methods::transaction_async::method_type& on_incoming = app().get_method<incoming::methods::transaction_async>();
+      // Looked up on each call, so that the method is always the current application's.
+      incoming::methods::transaction_async::method_type& on_incoming =
+         app().get_method<incoming::methods::transaction_async>();
       on_incoming(ptrx, true, params.trx_type, params.return_failure_trace,
             [&api, ptrx, next, retry, retry_num_blocks](const next_function_variant<transaction_trace_ptr>& result) -> void {
             if( std::holds_alternative<fc::exception_ptr>( result ) ) {
@@ -3953,16 +4032,24 @@ void api_base::send_transaction_gen(API &api, send_transaction_params_t params, 
                      (void)retry_num_blocks; // ref variable to avoid compilation warning
                   }
                   if (!retried) {
-                     // we are still on main thread here. The lambda passed to `next()` below will be executed on the http thread pool
+                     // We are still on the thread that ran the transaction, so only the ABIs are copied here. The
+                     // lambda passed to `next()` below runs on the http thread pool.
                      using return_type = t_or_exception<Result>;
                      next([&api,
                            trx_trace_ptr,
-                           resolver = get_serializers_cache(api.db, trx_trace_ptr, api.abi_serializer_max_time)]() mutable {
+                           abis = captured_abis::capture(api.db, *trx_trace_ptr)]() {
                         try {
                            fc::variant output;
                            try {
-                              abi_serializer::to_variant(*trx_trace_ptr, output, resolver, api.abi_serializer_max_time);
-                           } catch( abi_exception& ) {
+                              // abi_serializer_max_time bounds each action's decode and, from here, building
+                              // serializers for the trace's ABIs and decoding its action data together.
+                              const fc::time_point deadline =
+                                 fc::time_point::now().safe_add(api.abi_serializer_max_time);
+                              captured_abi_serializers serializers(api.abi_serializer_max_time, deadline);
+                              abi_serializer::to_variant(*trx_trace_ptr, output, serializers.resolver_for(abis),
+                                                         api.abi_serializer_max_time, deadline);
+                           } catch (...) {
+                              // The transaction was processed, so its trace is reported whatever decoding ran into.
                               output = *trx_trace_ptr;
                            }
                            const transaction_id_type& id = trx_trace_ptr->id;
@@ -4255,15 +4342,26 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
    } SYS_RETHROW_EXCEPTIONS(chain::account_query_exception, "unable to retrieve account info")
 }
 
-read_only::get_required_keys_result read_only::get_required_keys( const get_required_keys_params& params, const fc::time_point& )const {
+read_only::get_required_keys_result read_only::get_required_keys( const get_required_keys_params& params,
+                                                                  const fc::time_point& deadline )const {
+   const std::function<void()> checktime = [&deadline]() {
+      SYS_ASSERT( fc::time_point::now() < deadline, chain::deadline_exception,
+                  "get_required_keys exceeded its deadline {}", deadline );
+   };
    transaction pretty_input;
-   auto resolver = caching_resolver(make_resolver(db, abi_serializer_max_time, throw_on_yield::yes));
+   // The request deadline bounds packing, building serializers included.
+   auto resolver = caching_resolver(make_resolver(db, abi_serializer_max_time, throw_on_yield::yes, deadline));
    try {
-      abi_serializer::from_variant(params.transaction, pretty_input, resolver, abi_serializer_max_time);
+      abi_serializer::from_variant(params.transaction, pretty_input, resolver,
+                                   abi_serializer::create_yield_function(deadline), abi_serializer_max_time);
+   } catch (chain::abi_serialization_deadline_exception& e) {
+      checktime(); // the request deadline is reported as it is while checking keys
+      FC_RETHROW_EXCEPTION(e, warn, "Invalid transaction");
    } SYS_RETHROW_EXCEPTIONS(chain::transaction_type_exception, "Invalid transaction")
 
    SYS_ASSERT( pretty_input.delay_sec.value == 0, chain::transaction_type_exception, "delay_sec must be 0");
-   auto required_keys_set = db.get_authorization_manager().get_required_keys( pretty_input, params.available_keys );
+   auto required_keys_set =
+      db.get_authorization_manager().get_required_keys( pretty_input, params.available_keys, checktime );
    get_required_keys_result result;
    result.required_keys = required_keys_set;
    return result;
@@ -4298,6 +4396,34 @@ void read_only::send_read_only_transaction(send_read_only_transaction_params par
    } catch ( const std::bad_alloc& ) {
       handle_bad_alloc();
    } CATCH_AND_CALL(next);
+}
+
+read_only::get_transaction_id_params read_only::to_get_transaction_id_params( fc::variant request ) {
+   SYS_ASSERT( request.is_object(), chain::invalid_http_request, "Transaction object is missing or invalid" );
+   fc::mutable_variant_object trx( request.get_object() );
+   const fc::mutable_variant_object::iterator actions = trx.find( "actions" );
+   SYS_ASSERT( actions != trx.end() && actions->value().is_array(), chain::invalid_http_request,
+               "Transaction actions are missing or invalid" );
+   // Actions are rewritten in place, so the transaction is assembled once whatever the number of actions.
+   for( fc::variant& action : actions->value().get_array() ) {
+      SYS_ASSERT( action.is_object(), chain::invalid_http_request, "Transaction contains invalid or empty action" );
+      const fc::variant_object&        action_vo = action.get_object();
+      const fc::variant_object::iterator data     = action_vo.find( "data" );
+      if( data == action_vo.end() )
+         continue;
+      const fc::variant_object::iterator hex_data = action_vo.find( "hex_data" );
+      if( hex_data == action_vo.end() ) {
+         SYS_ASSERT( data->value().is_string(), chain::invalid_http_request,
+                     "Request supports only un-exploded 'data' (hex form)" );
+         continue;
+      }
+      fc::mutable_variant_object rewritten( action_vo );
+      rewritten["data"] = hex_data->value();
+      action = fc::variant( std::move( rewritten ) );
+   }
+   get_transaction_id_params result = fc::variant( std::move( trx ) ).as<get_transaction_id_params>();
+   SYS_ASSERT( result.id() != transaction().id(), chain::invalid_http_request, "Invalid transaction object" );
+   return result;
 }
 
 read_only::get_transaction_id_result read_only::get_transaction_id( const read_only::get_transaction_id_params& params, const fc::time_point& ) const {

@@ -13,6 +13,9 @@
 #include <bls12-381/bls12-381.hpp>
 #include <openssl/blake2.h>
 
+#include <algorithm>
+#include <span>
+
 // bls implementation
 namespace {
    using sysio::chain::span;
@@ -405,7 +408,16 @@ namespace sysio::chain::webassembly {
          if(i%4 == 0)
             context.trx_context.checktime();
       }
-      bls12_381::fp12 r = bls12_381::pairing::calculate(v, [this](){ context.trx_context.checktime();});
+      const auto yield = [this]() { context.trx_context.checktime(); };
+      const std::span<const std::tuple<bls12_381::g1, bls12_381::g2>> pairs(v);
+      // The Miller loops of consecutive batches multiply to the Miller loop of all the pairs.
+      bls12_381::fp12 r = bls12_381::fp12::one();
+      for(size_t first = 0; first < pairs.size(); first += config::bls_pairing_batch_size) {
+         const size_t count = std::min<size_t>(config::bls_pairing_batch_size, pairs.size() - first);
+         r.multiplyAssign(bls12_381::pairing::miller_loop(pairs.subspan(first, count), yield));
+      }
+      if(!pairs.empty())
+         bls12_381::pairing::final_exponentiation(r);
       r.toBytesLE(std::span<uint8_t, 576>((uint8_t*)result.data(), 576), from_mont::yes);
       return return_code::success;
    }

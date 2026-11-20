@@ -32,7 +32,6 @@ using namespace fc::network::ethereum;
 
 namespace eth = fc::network::ethereum;
 namespace fs = std::filesystem;
-namespace bfs = boost::filesystem;
 
 /* RLP encoding test data 01 */
 std::pair<std::string, std::string> test_str_01{"test123", "c88774657374313233"};
@@ -190,7 +189,7 @@ FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(can_load_abi_json_file) try {
    using namespace fc::network::ethereum;
-   auto abi_filename = fc::test::get_test_fixtures_path() / bfs::path(test_contract_abi_json_file_01);
+   auto abi_filename = fc::test::get_test_fixtures_path() / std::filesystem::path(test_contract_abi_json_file_01);
    auto contract_abis =
       fc::network::ethereum::abi::parse_contracts(std::filesystem::path(abi_filename.generic_string()));
    BOOST_CHECK(contract_abis.size() >= 2);
@@ -199,7 +198,7 @@ FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(validate_contract_function_signature_and_selector) try {
 
-   auto abi_filename = fc::test::get_test_fixtures_path() / bfs::path(test_contract_abi_json_file_01);
+   auto abi_filename = fc::test::get_test_fixtures_path() / std::filesystem::path(test_contract_abi_json_file_01);
    auto contract_abis =
       eth::abi::parse_contracts(fs::path(abi_filename.generic_string())) |
       std::views::filter([&](auto& contract) { return contract.type == eth::abi::invoke_target_type::function; }) |
@@ -237,7 +236,7 @@ FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(validate_contract_invoke_encode_decode) try {
 
-   auto abi_filename = fc::test::get_test_fixtures_path() / bfs::path(test_contract_abi_json_file_01);
+   auto abi_filename = fc::test::get_test_fixtures_path() / std::filesystem::path(test_contract_abi_json_file_01);
    auto contract_abis =
       eth::abi::parse_contracts(fs::path(abi_filename.generic_string())) |
       std::views::filter([&](auto& contract) { return contract.type == eth::abi::invoke_target_type::function; }) |
@@ -413,7 +412,7 @@ FC_LOG_AND_RETHROW();
 // previously wrapped size_t and bypassed the `offset + 32 <= data_size` check, or (c) declares more
 // array elements than the buffer can hold. See the pre-launch audit findings on ethereum_abi.cpp.
 BOOST_AUTO_TEST_CASE(decode_rejects_malicious_offsets_and_lengths) try {
-   auto abi_filename = fc::test::get_test_fixtures_path() / bfs::path(test_contract_abi_json_file_01);
+   auto abi_filename = fc::test::get_test_fixtures_path() / std::filesystem::path(test_contract_abi_json_file_01);
    auto contract_abis =
       eth::abi::parse_contracts(fs::path(abi_filename.generic_string())) |
       std::views::filter([&](auto& contract) { return contract.type == eth::abi::invoke_target_type::function; }) |

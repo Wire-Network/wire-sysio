@@ -6,7 +6,6 @@ import shutil
 import signal
 import subprocess
 import tempfile
-import time
 
 from TestHarness import Cluster, TestHelper, Utils, WalletMgr
 
@@ -117,24 +116,10 @@ try:
     assert Utils.waitForBool(lambda: prodNode.getHeadBlockNum() > shipStride + 10, timeout=300), \
         f"chain did not reach block {shipStride + 10}"
 
+    Print("Pause producer and stop both nodes")
     # Stop clear of a state-history-stride boundary: on an exact multiple the head log/index have
     # just rotated into retained/ and are empty, which the info/range checks below cannot parse.
-    assert prodNode.waitForBlockClearOfStride(shipStride, timeout=30), \
-        "producer did not advance clear of a state-history-stride boundary"
-
-    Print("Pause producer and stop both nodes")
-    prodNode.processUrllibRequest("producer", "pause", exitOnError=True)
-    # pause can return while one more block is mid-production; wait for the head to settle so the
-    # ids captured below cover every block the ship logs can end on
-    headBlock = prodNode.getHeadBlockNum()
-    for _ in range(60):
-        time.sleep(1)
-        newHead = prodNode.getHeadBlockNum()
-        if newHead == headBlock:
-            break
-        headBlock = newHead
-    else:
-        Utils.errorExit(f"producer head did not settle after pause (still advancing at {headBlock})")
+    headBlock = prodNode.pauseAtBlockClearOfStride(shipStride)
     shipNode.waitForBlock(headBlock)
 
     # capture chain block ids while the node is still up; the offline block-id checks below compare

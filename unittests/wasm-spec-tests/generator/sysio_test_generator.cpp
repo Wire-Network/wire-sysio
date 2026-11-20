@@ -1,15 +1,86 @@
+#include "sysio_test_generator.hpp"
+
 #include "picojson.hpp"
 
+#include <cstdint>
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <optional>
 #include <set>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <vector>
 
-#include "sysio_test_generator.hpp"
-
 using namespace std;
+
+namespace {
+/// wast2json command types for results that must be a NaN of the given class rather than an exact bit pattern.
+constexpr string_view command_assert_return_canonical_nan = "assert_return_canonical_nan";
+constexpr string_view command_assert_return_arithmetic_nan = "assert_return_arithmetic_nan";
+
+/// A function emitted into the generated contract that checks a float result by its bit pattern.
+struct check_helper {
+   string_view name;
+   string_view definition;
+};
+
+// Each float check is a call to one of these, so a sub_apply holds only the call and its arguments; inlining the
+// comparison at -O0 gives every check its own temporaries and exceeds the per-function local limit.
+// A canonical NaN masks off only the sign bit, so the payload must be exactly the quiet bit; an arithmetic NaN also
+// masks off the low payload bits, so only the exponent and the quiet bit must be set.
+constexpr check_helper f32_bits_check = {"check_f32_bits",
+                                         R"(   void check_f32_bits(float actual, uint32_t expected, const char* msg) {
+      sysio::check(__builtin_bit_cast(uint32_t, actual) == expected, msg);
+   }
+
+)"};
+constexpr check_helper f32_canonical_nan_check = {"check_f32_canonical_nan",
+                                                  R"(   void check_f32_canonical_nan(float actual, const char* msg) {
+      sysio::check((__builtin_bit_cast(uint32_t, actual) & 0x7fffffff) == 0x7fc00000, msg);
+   }
+
+)"};
+constexpr check_helper f32_arithmetic_nan_check = {"check_f32_arithmetic_nan",
+                                                   R"(   void check_f32_arithmetic_nan(float actual, const char* msg) {
+      sysio::check((__builtin_bit_cast(uint32_t, actual) & 0x7fc00000) == 0x7fc00000, msg);
+   }
+
+)"};
+constexpr check_helper f64_bits_check = {"check_f64_bits",
+                                         R"(   void check_f64_bits(double actual, uint64_t expected, const char* msg) {
+      sysio::check(__builtin_bit_cast(uint64_t, actual) == expected, msg);
+   }
+
+)"};
+constexpr check_helper f64_canonical_nan_check = {"check_f64_canonical_nan",
+                                                  R"(   void check_f64_canonical_nan(double actual, const char* msg) {
+      sysio::check((__builtin_bit_cast(uint64_t, actual) & 0x7fffffffffffffff) == 0x7ff8000000000000, msg);
+   }
+
+)"};
+constexpr check_helper f64_arithmetic_nan_check = {"check_f64_arithmetic_nan",
+                                                   R"(   void check_f64_arithmetic_nan(double actual, const char* msg) {
+      sysio::check((__builtin_bit_cast(uint64_t, actual) & 0x7ff8000000000000) == 0x7ff8000000000000, msg);
+   }
+
+)"};
+
+/// Every check helper, in the order a generated contract defines the ones it uses.
+constexpr check_helper check_helpers[] = {f32_bits_check, f32_canonical_nan_check, f32_arithmetic_nan_check,
+                                          f64_bits_check, f64_canonical_nan_check, f64_arithmetic_nan_check};
+
+/// f32 exponent and fraction masks, to recognise NaN arguments by their bit pattern.
+constexpr uint64_t f32_exponent_mask = 0x7f800000;
+constexpr uint64_t f32_fraction_mask = 0x007fffff;
+/// f64 exponent and fraction masks, to recognise NaN arguments by their bit pattern.
+constexpr uint64_t f64_exponent_mask = 0x7ff0000000000000;
+constexpr uint64_t f64_fraction_mask = 0x000fffffffffffff;
+
+/// Spec exports whose sys-vm implementation returns a NaN operand unchanged; see get_pinned_nan_result.
+const set<string> nan_passthrough_functions = {"min", "max", "floor", "ceil", "trunc", "nearest"};
+} // namespace
 
 const set<string> blacklist_memory_clearing = { "address.0",      "address.2",      "address.3",      "address.4",
                                                 "float_exprs.59", "float_exprs.60", "float_memory.0", "float_memory.1",
@@ -30,15 +101,34 @@ struct spec_test_function_state {
    set<string>      already_written_funcs;
    map<string, int> name_to_index;
    int              index = 0;
+   /// Names of the check helpers the sub_apply functions call.
+   set<string_view> used_check_helpers;
 };
 
-void write_file(ofstream& file, string test_name, string funcs, string sub_applies, string apply) {
+/**
+ * Write the C++ source of one spec test module's contract.
+ *
+ * @param file               output stream
+ * @param test_name          module name, e.g. `f32.0`
+ * @param funcs              stub definitions of the test module's exports, in map order
+ * @param used_check_helpers check helpers the sub_apply functions call; only these are defined
+ * @param sub_applies        sub_apply definitions
+ * @param apply              body of the switch that dispatches to the sub_apply functions
+ */
+void write_file(ofstream& file, string test_name, string funcs, const set<string_view>& used_check_helpers,
+                string sub_applies, string apply) {
    stringstream out;
    string       end_brace = "}";
 
    out << include_sysio;
    out << extern_c;
    out << funcs;
+   // After the stubs: the merge locates the stubs right after the imports.
+   for (const check_helper& helper : check_helpers) {
+      if (used_check_helpers.count(helper.name)) {
+         out << helper.definition;
+      }
+   }
    out << sub_applies;
    out << apply_func;
    if (!blacklist_memory_clearing.count(test_name)) {
@@ -87,6 +177,90 @@ string c_type(string wasm_type) {
    }
 
    return c_type;
+}
+
+/**
+ * Unsigned integer type holding the IEEE-754 bit pattern of a wasm float type.
+ *
+ * wast2json encodes f32/f64 argument and expected values as the decimal bit pattern.
+ *
+ * @return "uint32_t" for f32, "uint64_t" for f64, and an empty string for every other type.
+ */
+string float_bits_type(const string& wasm_type) {
+   if (wasm_type == "f32") {
+      return "uint32_t";
+   }
+   if (wasm_type == "f64") {
+      return "uint64_t";
+   }
+   return "";
+}
+
+/**
+ * Check helper for a float result.
+ *
+ * @param wasm_type      the type of the result
+ * @param canonical_nan  the result must be a canonical NaN
+ * @param arithmetic_nan the result must be an arithmetic NaN
+ * @return the NaN class check when a NaN is required, the exact bit pattern check otherwise, and nullptr for a
+ *         non-float result. Exits with an error if a NaN is required of a non-float result.
+ */
+const check_helper* get_float_check_helper(const string& wasm_type, bool canonical_nan, bool arithmetic_nan) {
+   if (wasm_type == "f32") {
+      return canonical_nan ? &f32_canonical_nan_check : arithmetic_nan ? &f32_arithmetic_nan_check : &f32_bits_check;
+   }
+   if (wasm_type == "f64") {
+      return canonical_nan ? &f64_canonical_nan_check : arithmetic_nan ? &f64_arithmetic_nan_check : &f64_bits_check;
+   }
+   if (canonical_nan || arithmetic_nan) {
+      cerr << "NaN assert expects a float result, got '" << wasm_type << "'\n";
+      exit(EXIT_FAILURE);
+   }
+   return nullptr;
+}
+
+/// Whether a wast2json f32/f64 value (a decimal bit pattern) is a NaN.
+bool is_nan_value(const string& wasm_type, const string& value) {
+   if (wasm_type != "f32" && wasm_type != "f64") {
+      return false;
+   }
+   const uint64_t bits = stoull(value);
+   const uint64_t exponent_mask = wasm_type == "f32" ? f32_exponent_mask : f64_exponent_mask;
+   const uint64_t fraction_mask = wasm_type == "f32" ? f32_fraction_mask : f64_fraction_mask;
+   return (bits & exponent_mask) == exponent_mask && (bits & fraction_mask) != 0;
+}
+
+/**
+ * Result pinned for an assert_return_arithmetic_nan command on a function that passes NaN operands through.
+ *
+ * sys-vm's min, max, floor, ceil, trunc and nearest (sys-vm softfloat.hpp for the interpreter and JIT, chain
+ * softfloat.cpp for OC) return the first NaN operand unchanged, so a signaling NaN stays signaling where the spec
+ * requires an arithmetic NaN. The check pins that result, so a change to either implementation fails it.
+ *
+ * @param command_type the command's `type`
+ * @param field        the invoked export
+ * @param params       the arguments, as (type, value) pairs
+ * @param return_type  the type of the result
+ * @return the first NaN argument's bit pattern, or nullopt for any other command. Exits with an error if a pinned
+ *         command has no NaN argument or its first NaN argument differs in type from the result.
+ */
+optional<string> get_pinned_nan_result(const string& command_type, const string& field,
+                                       const vector<pair<string, string>>& params, const string& return_type) {
+   if (command_type != command_assert_return_arithmetic_nan || !nan_passthrough_functions.count(field)) {
+      return nullopt;
+   }
+   for (const auto& [type, value] : params) {
+      if (is_nan_value(type, value)) {
+         if (type != return_type) {
+            cerr << command_type << " on " << field << " returns " << return_type << " but its NaN argument is " << type
+                 << "\n";
+            exit(EXIT_FAILURE);
+         }
+         return value;
+      }
+   }
+   cerr << command_type << " on " << field << " has no NaN argument\n";
+   exit(EXIT_FAILURE);
 }
 
 vector<pair<string, string>> get_params(picojson::object action) {
@@ -163,16 +337,30 @@ string write_test_function(string function_name, picojson::object test, spec_tes
    return out.str();
 }
 
-string write_test_function_call(string function_name, picojson::object test, int var_index) {
+/**
+ * Write the call of one spec test command and the check of its result.
+ *
+ * @param function_name      stub name of the invoked export
+ * @param test               the wast2json command
+ * @param var_index          index that makes the generated local names and the failure message unique
+ * @param used_check_helpers receives the check helper the call uses, if any
+ * @return the generated statements
+ */
+string write_test_function_call(string function_name, picojson::object test, int var_index,
+                                set<string_view>& used_check_helpers) {
    stringstream out;
    stringstream func_call;
-   string       return_cast = "";
 
    auto                         action          = test["action"].get<picojson::object>();
    vector<pair<string, string>> params          = get_params(action);
    pair<string, string>         expected_return = get_expected_return(test);
 
    auto [return_type, return_val] = expected_return;
+   const string command_type = test["type"].to_str();
+   const optional<string> pinned = get_pinned_nan_result(command_type, action["field"].to_str(), params, return_type);
+   if (pinned) {
+      return_val = *pinned;
+   }
 
    int param_index_offset = var_index;
    if (params.size() > 0) {
@@ -193,20 +381,18 @@ string write_test_function_call(string function_name, picojson::object test, int
       }
    }
 
-   bool needs_local_return = false;
-   if (return_val != "null") {
-      needs_local_return = c_type(return_type) != "void";
-   }
+   const bool has_expected_value = return_val != "" && return_val != "null";
+   const bool canonical_nan = !pinned && command_type == command_assert_return_canonical_nan;
+   const bool arithmetic_nan = !pinned && command_type == command_assert_return_arithmetic_nan;
+   const bool is_nan_command = canonical_nan || arithmetic_nan;
+   // Float results are checked by bit pattern. Comparing as float would convert both sides to float and round away
+   // low-order bits, so a wrong result could still pass.
+   const check_helper* float_check = has_expected_value || is_nan_command
+                                        ? get_float_check_helper(return_type, canonical_nan, arithmetic_nan)
+                                        : nullptr;
+   const bool needs_local_return = float_check == nullptr && has_expected_value && c_type(return_type) != "void";
 
-   // if return_type is float or double,
-   // generate local var and reinterpret cast.
    if (needs_local_return) {
-      if (return_type == "f32") {
-         return_cast = "*(uint32_t*)&";
-      } else if (return_type == "f64") {
-         return_cast = "*(uint64_t*)&";
-      }
-
       func_call << "   "
                 << "   " << c_type(return_type) << " "
                 << "x" << var_index << " = ";
@@ -237,25 +423,36 @@ string write_test_function_call(string function_name, picojson::object test, int
          }
       }
    }
-   func_call << ");";
+   func_call << ")";
 
+   const string fail_message = "\"" + function_name + " fail " + to_string(var_index) + "\"";
+   if (float_check) {
+      used_check_helpers.insert(float_check->name);
+      out << "      " << float_check->name << "(" << func_call.str();
+      if (!is_nan_command) {
+         out << ", (" << float_bits_type(return_type) << ")" << return_val;
+      }
+      out << ", " << fail_message << ");\n\n";
+      return out.str();
+   }
+
+   func_call << ";";
    if (needs_local_return) {
       out << func_call.str() << "\n";
    }
 
-   if (return_val != "" && return_val != "null") {
+   if (has_expected_value) {
       out << "   "
           << "   "
           << "sysio::check(";
       if (needs_local_return) {
-         out << return_cast << "x" << var_index;
+         out << "x" << var_index;
       } else {
          out << func_call.str();
       }
       out << " == ";
       out << "(" << c_type(return_type) << ")" << return_val;
-      out << ", "
-          << "\"" << function_name << " fail " << var_index << "\"";
+      out << ", " << fail_message;
       out << ");\n\n";
    } else {
       // If there's no expected return, just call the function to prove it doesn't blow up.
@@ -287,9 +484,9 @@ map<string, vector<picojson::object>> get_file_func_mappings(picojson::value v) 
                file_func_mappings[filename] = {};
             }
             if (obj["type"].to_str() == "assert_return" || obj["type"].to_str() == "action" ||
-                obj["type"].to_str() == "assert_exhaustion" || obj["type"].to_str() == "assert_return_canonical_nan" ||
-                obj["type"].to_str() == "assert_return_arithmetic_nan" || obj["type"].to_str() == "assert_exhaustion" ||
-                obj["type"].to_str() == "assert_trap") {
+                obj["type"].to_str() == "assert_exhaustion" ||
+                obj["type"].to_str() == command_assert_return_canonical_nan ||
+                obj["type"].to_str() == command_assert_return_arithmetic_nan || obj["type"].to_str() == "assert_trap") {
                file_func_mappings[filename].push_back(obj);
             }
          }
@@ -377,7 +574,8 @@ int main(int argc, char** argv) {
 
          string name = "sub_apply_" + to_string(sub_apply_index);
          sub_applies.push_back(name);
-         string func_call = write_test_function_call(function_name, test, sub_apply_index);
+         string func_call =
+            write_test_function_call(function_name, test, sub_apply_index, func_state.used_check_helpers);
          string sub_apply = create_sub_apply(func_call, name);
 
          sub_apply_funcs << sub_apply;
@@ -399,13 +597,13 @@ int main(int argc, char** argv) {
             string name = "sub_apply_" + to_string(sub_apply_index);
             sub_applies.push_back(name);
 
-            ss << write_test_function_call(function_name, test, i);
+            ss << write_test_function_call(function_name, test, i, func_state.used_check_helpers);
             sub_apply_funcs << create_sub_apply(ss.str(), name);
             ss.str("");
             test_mappings[test_name].insert(std::make_pair(sub_apply_index, ""));
             ++sub_apply_index;
          } else {
-            ss << write_test_function_call(function_name, test, i);
+            ss << write_test_function_call(function_name, test, i, func_state.used_check_helpers);
          }
          ++i;
       }
@@ -423,7 +621,8 @@ int main(int argc, char** argv) {
       }
       apply_func << "      }\n";
 
-      write_file(ofs_cpp, test_name, test_funcs.str(), sub_apply_funcs.str(), apply_func.str());
+      write_file(ofs_cpp, test_name, test_funcs.str(), func_state.used_check_helpers, sub_apply_funcs.str(),
+                 apply_func.str());
       write_map_file(ofs_map, func_state);
    }
 

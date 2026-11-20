@@ -4,7 +4,6 @@
 #include <vector>
 #include <type_traits>
 
-#include <boost/dll.hpp>
 #include <boost/process/v1/io.hpp>
 #include <boost/process/v1/search_path.hpp>
 #include <boost/process/v1/child.hpp>
@@ -16,7 +15,6 @@
 #include <fc-test/crypto_utils.hpp>
 
 namespace fc::test {
-namespace bfs = boost::filesystem;
 namespace bp = boost::process::v1;
 
 keygen_result generate_external_test_key_and_sig(const std::string& keygen_script) {
@@ -29,7 +27,7 @@ keygen_result generate_external_test_key_and_sig(const std::string& keygen_scrip
    std::string output;
    auto        python_exe = boost::process::v1::search_path("python");
    FC_ASSERT(!python_exe.empty());
-   FC_ASSERT(boost::filesystem::exists(script_path));
+   FC_ASSERT(std::filesystem::exists(script_path));
 
    bp::ipstream pipe_stream; // pipe for child's stdout
 
@@ -64,7 +62,7 @@ keygen_result load_keygen_fixture(const std::string& keygen_name, std::uint32_t 
    auto json_filename = std::format("{}-keygen-{:02}.json", keygen_name, id);
    auto json_path     = get_test_fixtures_path() / json_filename;
 
-   FC_ASSERT(boost::filesystem::exists(json_path));
+   FC_ASSERT(std::filesystem::exists(json_path));
 
    std::string json_data;
    fc::read_file_contents(json_path.string(), json_data);
@@ -95,7 +93,7 @@ std::vector<std::string> keygen_fixtures_to_specs(const std::string& keygen_name
    for (std::uint32_t id = 1;; ++id) {
       auto json_filename = std::format("{}-keygen-{:02}.json", keygen_name, id);
       auto json_path     = get_test_fixtures_path() / json_filename;
-      if (!boost::filesystem::exists(json_path))
+      if (!std::filesystem::exists(json_path))
          break;
       specs.push_back(keygen_fixture_to_spec(keygen_name, id));
    }

@@ -147,6 +147,35 @@ BOOST_AUTO_TEST_CASE(aggregate_vote_test) try {
    }
 } FC_LOG_AND_RETHROW();
 
+// A block is recent while younger than recent_block_max_age and not from the future.
+BOOST_AUTO_TEST_CASE(is_recent_test) try {
+   const fc::time_point   now            = fc::time_point::from_iso_string("2026-01-01T00:00:00.000");
+   const fc::microseconds block_interval = fc::milliseconds(config::block_interval_ms);
+
+   block_state bs;
+   auto timestamped = [&](fc::time_point t) -> const block_state& {
+      bs.header.timestamp = block_timestamp_type{t};
+      BOOST_REQUIRE_EQUAL(bs.timestamp().to_time_point(), t);
+      return bs;
+   };
+
+   BOOST_CHECK(!timestamped(now - block_state::recent_block_max_age).is_recent(now));
+   BOOST_CHECK(timestamped(now - block_state::recent_block_max_age + block_interval).is_recent(now));
+   BOOST_CHECK(timestamped(now).is_recent(now));
+
+   BOOST_CHECK(!timestamped(now + config::allowed_clock_skew).header.is_from_the_future(now));
+   BOOST_CHECK(timestamped(now + config::allowed_clock_skew).is_recent(now));
+
+   BOOST_CHECK(timestamped(now + config::allowed_clock_skew + block_interval).header.is_from_the_future(now));
+   BOOST_CHECK(!timestamped(now + config::allowed_clock_skew + block_interval).is_recent(now));
+   BOOST_CHECK(!timestamped(now + fc::hours(1)).is_recent(now));
+
+   // A clock reading less than recent_block_max_age after the block timestamp epoch.
+   const fc::time_point epoch = block_timestamp_type{}.to_time_point();
+   BOOST_CHECK(timestamped(epoch + block_interval).is_recent(epoch + block_interval));
+   BOOST_CHECK(timestamped(epoch).is_recent(epoch + block_interval));
+} FC_LOG_AND_RETHROW();
+
 void do_quorum_test(const std::vector<uint64_t>& weights,
                     uint64_t threshold,
                     bool strong,

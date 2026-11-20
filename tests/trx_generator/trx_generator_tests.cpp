@@ -209,7 +209,7 @@ struct echo_server_impl : rest::simple_server<echo_server_impl> {
       return res;
    }
 
-   sysio::chain::named_thread_pool<struct trxgen> _trx_gen_server_thread_pool;
+   fc::named_thread_pool<struct trxgen>           _trx_gen_server_thread_pool;
    boost::asio::io_context::strand                _trx_gen_server_strand;
 
    echo_server_impl()

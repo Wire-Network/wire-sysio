@@ -90,6 +90,12 @@ Two mechanisms add peers beyond the static `p2p-peer-address` list:
   the endpoints are never advertised. The inbound endpoint is normally this node's listen endpoint, and the
   outbound IP address is what peers use to allow this node through a firewall.
 
+  The peer key must be a K1 key: a node takes only canonical K1 signatures (low-S, compressed-key header byte) on
+  gossip entries and closes a connection that sends any other. It keeps one entry per producer, inbound endpoint
+  and outbound IP address, replaced only by one that expires later, so an entry signed again changes nothing and is
+  not passed on. Each connection may send 64 gossip messages at once and one more every 5 seconds; the node drops
+  the messages over that and lowers the sender's peer score.
+
 Which peers may connect is a separate question, answered by the connection allow-list: `allowed-connection`
 plus `peer-key` / `peer-private-key`. Repeated values are combined; `none` resets the policy to accept nobody,
 but only what precedes it, so a value listed after `none` is still combined in. `any` on its own accepts every
@@ -284,8 +290,8 @@ Lines an operator should recognize:
   `producer_plugin`'s signature-provider set, which is populated only when `producer-name` is configured;
   otherwise signing throws `producer_priv_key_not_found` — `Local producer has no private key in config.ini
   corresponding to public key "<key>"`. A configured BP with no `peerkeys` row is a separate, non-throwing
-  case: it logs `On-chain peer-key not found for configured BP <account>` and stops connecting to gossip
-  peers, so it never reaches this line.
+  case: it logs `On-chain K1 peer-key not found for configured BP <account>` and stops connecting to gossip
+  peers, so it never reaches this line. So does a configured BP whose `peerkeys` row holds a key that is not K1.
 - Shutdown: `shutdown..` and `exit shutdown` at debug level on `p2p_log`.
 
 ## Tests
@@ -295,9 +301,10 @@ ninja -C build/debug test_net_plugin
 ./build/debug/plugins/net_plugin/test/test_net_plugin
 ```
 
-The suite covers auto-BP peering, the block-nack producer default, block notice handling, connection type
-parsing (`trx` / `blk`), the local transaction cache, listen-endpoint rate-limit parsing, protocol message
-wire encoding, peer authentication, the queued send buffer, and /24 and /48 subnet masking.
+The suite covers auto-BP peering and bp gossip entry handling, the bp gossip message rate limiter, the block-nack
+producer default, block notice handling, connection type parsing (`trx` / `blk`), the local transaction cache,
+listen-endpoint rate-limit parsing, protocol message wire encoding, peer authentication, the queued send buffer, and
+/24 and /48 subnet masking.
 
 ## Related plugins
 

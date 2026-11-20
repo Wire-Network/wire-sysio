@@ -5,7 +5,7 @@
 #include <sysio/chain/transaction_metadata.hpp>
 #include <sysio/chain/action_receipt.hpp>
 #include <sysio/chain/incremental_merkle.hpp>
-#include <sysio/chain/thread_utils.hpp>
+#include <fc/thread_utils.hpp>
 
 namespace sysio::chain {
 
@@ -80,7 +80,7 @@ struct block_state : public block_header_state {     // block_header_state provi
 
    // ------ updated for votes, used for fork_db ordering ------------------------------
 private:
-   copyable_atomic<bool>      validated{false};     // We have executed the block's trxs and verified that action merkle root (block id) matches.
+   fc::copyable_atomic<bool>  validated{false};     // We have executed the block's trxs and verified that action merkle root (block id) matches.
 
    // ------ data members caching information available elsewhere ----------------------
    bool                       pub_keys_recovered = false;
@@ -125,10 +125,18 @@ public:
    // extract the qc_claim from block header finality_extension
    qc_claim_t extract_qc_claim() const;
 
-   // heuristic for determination if we are syncing or replaying for optimizations
-   bool is_recent() const {
-      return timestamp() > fc::time_point::now() - fc::seconds(30);
+   /// Age past which a block is not recent.
+   static constexpr fc::microseconds recent_block_max_age = fc::seconds(30);
+
+   /// Whether this block is recent at `now`: younger than recent_block_max_age, so finalizers skip voting while
+   /// syncing or replaying, and not from the future (block_header::is_from_the_future). Finalizers vote only on
+   /// recent blocks. Compares time points, since `now - recent_block_max_age` may precede the block timestamp epoch.
+   bool is_recent(fc::time_point now) const {
+      return timestamp().to_time_point() > now - recent_block_max_age && !header.is_from_the_future(now);
    }
+
+   /// Whether this block is recent at the current time.
+   bool is_recent() const { return is_recent(fc::time_point::now()); }
 
    // use the cached `finality_digest`
    block_ref make_block_ref() const {
