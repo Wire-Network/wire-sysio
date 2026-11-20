@@ -20,6 +20,7 @@
 #include <chrono>
 #include <deque>
 #include <future>
+#include <optional>
 #include <set>
 #include <string_view>
 #include <thread>
@@ -239,6 +240,15 @@ void run_queue_full_node(const std::vector<std::string>& extra_args, PushPhase&&
    for (const std::string& a : args)
       argv.push_back(a.c_str());
 
+   // State the app thread's callbacks write. Declared before the app thread and on_exit, so that on every exit path
+   // the app thread has joined before this goes out of scope; read here only after it has joined.
+   std::optional<queue_full_node>     node;
+   std::set<transaction_id_type>      trxs_in_blocks;
+   uint32_t                           blocks_with_trxs = 0;
+   std::atomic<uint32_t>              head_num{0};
+   std::atomic<uint32_t>              empty_run{0};
+   boost::signals2::scoped_connection accepted;
+
    std::promise<std::tuple<producer_plugin*, chain_plugin*>> plugin_promise;
    std::future<std::tuple<producer_plugin*, chain_plugin*>>  plugin_fut = plugin_promise.get_future();
    std::thread app_thread([&]() {
@@ -264,42 +274,34 @@ void run_queue_full_node(const std::vector<std::string>& extra_args, PushPhase&&
 
    BOOST_REQUIRE(plugin_fut.wait_for(wait_timeout) == std::future_status::ready);
    auto [prod_plug, chain_plug] = plugin_fut.get();
-   queue_full_node node(app, prod_plug, chain_plug, producer_key);
-
-   // written on the main thread, read here only after the app thread has joined
-   std::set<transaction_id_type> trxs_in_blocks;
-   uint32_t                      blocks_with_trxs = 0;
-   std::atomic<uint32_t>         head_num{0};
-   std::atomic<uint32_t>         empty_run{0};
-   // disconnects before the locals it writes go out of scope
-   boost::signals2::scoped_connection accepted =
-      chain_plug->chain().accepted_block().connect([&](const block_signal_params& t) {
-         const auto& [block, id] = t;
-         for (const transaction_receipt& receipt : block->transactions)
-            trxs_in_blocks.insert(receipt.trx.id());
-         blocks_with_trxs += block->transactions.empty() ? 0 : 1;
-         empty_run = block->transactions.empty() ? empty_run + 1 : 0;
-         head_num  = block->block_num();
-      });
+   node.emplace(app, prod_plug, chain_plug, producer_key);
+   accepted = chain_plug->chain().accepted_block().connect([&](const block_signal_params& t) {
+      const auto& [block, id] = t;
+      for (const transaction_receipt& receipt : block->transactions)
+         trxs_in_blocks.insert(receipt.trx.id());
+      blocks_with_trxs += block->transactions.empty() ? 0 : 1;
+      empty_run = block->transactions.empty() ? empty_run + 1 : 0;
+      head_num  = block->block_num();
+   });
    BOOST_REQUIRE(wait_until([&]() { return head_num >= warmup_blocks; }));
 
-   push_phase(node);
+   push_phase(*node);
 
-   BOOST_REQUIRE(wait_until([&]() { return node.count_answered() == node.answers.size(); }));
+   BOOST_REQUIRE(wait_until([&]() { return node->count_answered() == node->answers.size(); }));
    const uint32_t answered_at = head_num;
    BOOST_REQUIRE(wait_until(
       [&]() { return head_num > answered_at + trailing_empty_blocks && empty_run >= trailing_empty_blocks; }));
-   BOOST_TEST(node.queue_sizes().first == 0u);
+   BOOST_TEST(node->queue_sizes().first == 0u);
 
    app->quit();
    app_thread.join();
 
-   BOOST_TEST_MESSAGE("pushed " << node.answers.size() << ", refused " << node.count_refused()
+   BOOST_TEST_MESSAGE("pushed " << node->answers.size() << ", refused " << node->count_refused()
                                 << ", blocks with transactions " << blocks_with_trxs);
-   BOOST_TEST(node.count_refused() > 0u);
+   BOOST_TEST(node->count_refused() > 0u);
    BOOST_TEST(blocks_with_trxs > 1u); // the block net limit spread the accepted transactions over several blocks
-   for (size_t i = 0; i < node.answers.size(); ++i) {
-      const trx_answers& a = node.answers[i];
+   for (size_t i = 0; i < node->answers.size(); ++i) {
+      const trx_answers& a = node->answers[i];
       BOOST_TEST_CONTEXT("trx " << i << " " << a.error) {
          BOOST_TEST(a.count == 1u);
          BOOST_TEST(a.refused != a.executed);
