@@ -1,5 +1,6 @@
 #pragma once
 
+#include <sysio/chain/config.hpp>
 #include <sysio/chain/transaction_metadata.hpp>
 #include <sysio/chain/trace.hpp>
 #include <sysio/chain/exceptions.hpp>
@@ -36,10 +37,6 @@ struct unapplied_transaction {
  * Track unapplied transactions for incoming, forked blocks, and aborted blocks.
  */
 class unapplied_transaction_queue {
-public:
-   /// Bytes in one MiB, the unit of the incoming-transaction-queue-size-mb option.
-   static constexpr uint64_t bytes_per_mb = 1024 * 1024;
-
 private:
    struct by_trx_id;
    struct by_type;
@@ -56,7 +53,7 @@ private:
    > unapplied_trx_queue_type;
 
    unapplied_trx_queue_type queue;
-   uint64_t max_transaction_queue_size = 1024 * bytes_per_mb; // enforced for incoming
+   uint64_t max_transaction_queue_size = 1024 * config::bytes_per_mebibyte; // enforced for incoming
    uint64_t queued_bytes = 0;
    size_t incoming_count = 0;
 
@@ -163,7 +160,7 @@ public:
          SYS_ASSERT( fits( size ), tx_resource_exhaustion,
                      "Transaction {}, size {} bytes would exceed configured "
                      "incoming-transaction-queue-size-mb {}, current queue size {} bytes",
-                     trx->id(), size, max_transaction_queue_size / bytes_per_mb, queued_bytes );
+                     trx->id(), size, max_transaction_queue_size / config::bytes_per_mebibyte, queued_bytes );
          auto insert_itr = queue.insert(
                { trx, api_trx ? trx_enum_type::incoming_api : trx_enum_type::incoming_p2p, return_failure_trace, std::move( next ) } );
          if( insert_itr.second ) added( insert_itr.first, size );
