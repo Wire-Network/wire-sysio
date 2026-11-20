@@ -24,7 +24,6 @@ enable_testing()
 
 # Options to relax hard dependencies and allow callers to tweak behavior
 option(SYSIO_TESTER_REQUIRE_LLVM "Require LLVM to be present" OFF)
-set(SYSIO_TESTER_BOOST_MIN_VERSION "1.70" CACHE STRING "Minimum Boost version to accept")
 set(SYSIO_TESTER_EXTRA_INCLUDE_DIRS "" CACHE PATH "Extra include dirs for Sysio tests")
 
 # LLVM (optional)
@@ -128,25 +127,11 @@ endif()
 # Split compiled and header-only components: only request compiled ones from find_package to avoid warnings
 set(_sysio_boost_compiled_components date_time filesystem system chrono iostreams unit_test_framework)
 
-# First try CONFIG mode (vcpkg-style), then fallback to module mode
-set(_boost_found FALSE)
-# Suppress the noisy "New Boost version" warning
-set(Boost_NO_WARN_NEW_VERSIONS ON)
-find_package(Boost ${SYSIO_TESTER_BOOST_MIN_VERSION} QUIET CONFIG
+# Exactly the Boost version Sysio was built with: its installed headers and libraries are built against it.
+set(SYSIO_TESTER_BOOST_VERSION "@BOOST_VERSION@")
+find_package(Boost ${SYSIO_TESTER_BOOST_VERSION} EXACT REQUIRED CONFIG
         COMPONENTS ${_sysio_boost_compiled_components})
-if(Boost_FOUND)
-    set(_boost_found TRUE)
-else()
-    # Module mode fallback
-    find_package(Boost ${SYSIO_TESTER_BOOST_MIN_VERSION} QUIET
-            COMPONENTS ${_sysio_boost_compiled_components})
-    if(Boost_FOUND)
-        set(_boost_found TRUE)
-    endif()
-endif()
-
-# Ensure include dirs are available if Boost was found in any mode
-if(_boost_found AND Boost_INCLUDE_DIRS)
+if(Boost_INCLUDE_DIRS)
     include_directories(${Boost_INCLUDE_DIRS})
 endif()
 
