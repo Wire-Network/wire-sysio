@@ -119,7 +119,10 @@ Four effects depend on the draining call:
 4. The chunk buffer becomes eligible for cleanup once `next_epoch_index` has
    moved past its epoch and the outbound envelope has been emitted. It stays
    open after drain until the relay calls `cleanup_envelope_chunks`, returning
-   rent to its uploader. The crank needs the buffered bytes until drain.
+   rent to its uploader. The crank needs the buffered bytes until drain. The
+   epoch's `EpochDeliveries` tally becomes eligible under the same conditions and
+   is closed by `cleanup_epoch_deliveries`, returning rent to the operator whose
+   `epoch_in` created it.
 
 Because the depot learns of resolution *only* via the outbound envelope, and that
 emit is gated on drain, the invariant "the OPP flow does not resolve until every

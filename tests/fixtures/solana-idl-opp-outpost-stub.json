@@ -202,6 +202,45 @@
       ]
     },
     {
+      "name": "cleanup_epoch_deliveries",
+      "discriminator": [
+        198,
+        175,
+        134,
+        17,
+        5,
+        116,
+        158,
+        21
+      ],
+      "accounts": [
+        {
+          "name": "reaper",
+          "signer": true
+        },
+        {
+          "name": "config"
+        },
+        {
+          "name": "latest_outbound_envelope"
+        },
+        {
+          "name": "epoch_deliveries",
+          "writable": true
+        },
+        {
+          "name": "payer",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "epoch_index",
+          "type": "u32"
+        }
+      ]
+    },
+    {
       "name": "dispatch_attestations",
       "discriminator": [
         142,
@@ -560,6 +599,10 @@
           {
             "name": "epoch_index",
             "type": "u32"
+          },
+          {
+            "name": "payer",
+            "type": "pubkey"
           },
           {
             "name": "deliveries",
