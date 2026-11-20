@@ -119,12 +119,11 @@ try:
     # Stop clear of a state-history-stride boundary: on an exact multiple the head log/index have
     # just rotated into retained/ and are 0 bytes, so the file surgery below would operate on empty
     # files.
-    assert prodNode.waitForBlockClearOfStride(shipStride, timeout=30), \
-        "producer did not advance clear of a state-history-stride boundary"
-
-    prodNode.processUrllibRequest("producer", "pause", exitOnError=True)
-    blockNum = prodNode.getHeadBlockNum()
-    shipNode.waitForBlock(blockNum)
+    # The SHiP node must apply the producer's last block before it stops. A received block it has not
+    # applied stays in its fork database and is applied on the next relaunch, which appends to the
+    # log the tests below expect to be unchanged.
+    blockNum = prodNode.pauseAtBlockClearOfStride(shipStride)
+    assert shipNode.waitForBlock(blockNum), f"shipNode did not reach the pause block {blockNum}"
     prodNode.kill(signal.SIGTERM)
     shipNode.kill(signal.SIGTERM)
 
