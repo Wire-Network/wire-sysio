@@ -32,6 +32,8 @@ using namespace sysio;
 using namespace sysio::chain;
 using namespace sysio::chain::literals;
 using namespace std::chrono_literals;
+using sysio::test::wait_timeout;
+using sysio::test::wait_until;
 
 /// incoming-transaction-queue-size-mb for the node: the smallest the option takes.
 constexpr auto queue_size_mb = "1";
@@ -39,8 +41,6 @@ constexpr auto queue_size_mb = "1";
 constexpr uint32_t max_block_net_usage = 64 * 1024;
 /// Lifetime of every pushed transaction, long enough that none expires during the test.
 constexpr auto trx_lifetime = fc::minutes(5);
-/// Upper bound on every wait.
-constexpr auto wait_timeout = 60s;
 /// Blocks produced before the test starts pushing.
 constexpr uint32_t warmup_blocks = 3;
 /// Empty blocks after the last answer, so an extra answer from a transaction executed late would show.
@@ -54,18 +54,6 @@ struct trx_answers {
    std::atomic<bool>     executed{false}; ///< answered with a trace without an exception
    std::string           error;           ///< any other answer, written on the main thread, read after it has joined
 };
-
-/// Polls `pred` until it holds or `timeout` passes.
-template <typename Pred>
-bool wait_until(Pred&& pred, std::chrono::milliseconds timeout = wait_timeout) {
-   const std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now() + timeout;
-   while (!pred()) {
-      if (std::chrono::steady_clock::now() > end)
-         return false;
-      std::this_thread::sleep_for(10ms);
-   }
-   return true;
-}
 
 /// A running producing node: pushes it p2p transactions signed by sysio@active and records their answers.
 class queue_full_node {

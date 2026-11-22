@@ -14,7 +14,9 @@
 #include <sysio/chain/application.hpp>
 
 #include <map>
+#include <optional>
 #include <set>
+#include <vector>
 
 #include "incoming_trx_utils.hpp"
 
@@ -72,24 +74,71 @@ private:
    packed_transaction_ptr previous;
 };
 
-/// Outcomes of every run of a transaction, re-runs after a block abort included.
-struct trx_runs {
-   std::map<transaction_id_type, uint32_t> succeeded; ///< trx id -> runs that succeeded
-   std::set<transaction_id_type> cpu_dropped;         ///< trxs with a run failed past a cpu limit
+/// Runs of the test's transactions as the chain applies them, re-runs after a block abort included. Written on the main
+/// thread, read after it has joined.
+class trx_runs {
+public:
+   /// Runs of the submissions of one trx id that executed.
+   struct id_runs {
+      uint32_t submissions = 0;  ///< submissions that executed: a trx and its copy are two
+      bool rerun = false;        ///< a submission executed more than once
+      bool all_dropped = true;   ///< each submission failed after executing: past the cpu cap or beaten by its copy
+      bool cpu_cap_drop = false; ///< a submission failed past the cpu cap after executing
+   };
 
-   /// Records the outcome of one run.
-   void record(const transaction_trace_ptr& trace) {
-      if (!trace->except)
-         ++succeeded[trace->id];
-      else if (trace->except->code() == tx_cpu_usage_exceeded::code_value)
-         cpu_dropped.insert(trace->id);
+   /// Records one run of @p trx; ignores trxs that are not the test's newaccounts, such as onblock.
+   void record(const transaction_trace_ptr& trace, const packed_transaction_ptr& trx) {
+      const transaction& t = trx->get_transaction();
+      if (t.actions.empty() || t.actions.front().name != newaccount::get_name())
+         return;
+      if (!trace->except) {
+         submission& s = submissions[trx];
+         ++s.succeeded;
+         s.failed_after_success.reset();
+         pending.push_back(trx->id());
+      } else if (auto it = submissions.find(trx); it != submissions.end()) {
+         it->second.failed_after_success = trace->except->code();
+      }
    }
+
+   /// Forgets the trxs of the pending block: it was produced, or a new one started.
+   void clear_pending() { pending.clear(); }
+
+   /// @return ids of the trxs executed in the pending block
+   const std::vector<transaction_id_type>& pending_ids() const { return pending; }
+
+   /// @return the runs of each trx id that executed
+   std::map<transaction_id_type, id_runs> by_id() const {
+      std::map<transaction_id_type, id_runs> result;
+      for (const auto& [trx, s] : submissions) {
+         id_runs& r = result[trx->id()];
+         const bool cpu_cap = s.failed_after_success == tx_cpu_usage_exceeded::code_value;
+         ++r.submissions;
+         r.rerun = r.rerun || s.succeeded > 1;
+         r.cpu_cap_drop = r.cpu_cap_drop || cpu_cap;
+         r.all_dropped = r.all_dropped && (cpu_cap || s.failed_after_success == tx_duplicate::code_value);
+      }
+      return result;
+   }
+
+private:
+   /// Runs of one pushed trx; the re-run of an aborted block's trx runs the same submission.
+   struct submission {
+      uint32_t succeeded = 0;
+      std::optional<int64_t> failed_after_success; ///< exception code of a run that failed after the last success
+   };
+
+   std::map<packed_transaction_ptr, submission> submissions; ///< only those that executed
+   std::vector<transaction_id_type> pending;
 };
 
-/// Checks that the transactions reported executed are the valid ones, that each is in exactly one block, or in none
-/// if it is in `runs.cpu_dropped`, and that the blocks hold no other transaction.
+/// Checks that the transactions reported executed are the valid ones, that each is in exactly one block, or in none if
+/// each of its submissions that executed was then dropped, at least one past the cpu cap, and that the blocks hold no
+/// other transaction. Also checks that the trxs of @p synced_abort, a block aborted while it held them, ran again.
 void verify_executed(const std::deque<packed_transaction_ptr>& executed, const std::set<transaction_id_type>& valid,
-                     const trx_runs& runs, const std::deque<signed_block_ptr>& blocks) {
+                     const trx_runs& recorded, const std::vector<transaction_id_type>& synced_abort,
+                     const std::deque<signed_block_ptr>& blocks) {
+   const std::map<transaction_id_type, trx_runs::id_runs> runs = recorded.by_id();
    std::map<transaction_id_type, uint32_t> blocks_holding; // trx id -> blocks holding it
    for (const signed_block_ptr& block : blocks) {
       for (const transaction_receipt& receipt : block->transactions)
@@ -108,19 +157,20 @@ void verify_executed(const std::deque<packed_transaction_ptr>& executed, const s
       }
    }
    size_t dropped = 0;        // executed trxs in no block
-   size_t rerun_in_block = 0; // executed trxs in a block after more than one successful run
+   size_t rerun_in_block = 0; // executed trxs in a block after a submission executed more than once
    for (const transaction_id_type& id : executed_ids) {
       const auto it = blocks_holding.find(id);
       const uint32_t holding = it == blocks_holding.end() ? 0u : it->second;
-      const auto runs_it = runs.succeeded.find(id);
-      const uint32_t succeeded = runs_it == runs.succeeded.end() ? 0u : runs_it->second;
+      const auto runs_it = runs.find(id);
+      const trx_runs::id_runs r = runs_it == runs.end() ? trx_runs::id_runs{} : runs_it->second;
+      // re-run after a block abort, a trx past the producer's speculative-retry cpu cap is dropped; a client
+      // resubmits it
+      const bool cpu_dropped = r.all_dropped && r.cpu_cap_drop;
       dropped += holding == 0u ? 1 : 0;
-      rerun_in_block += holding == 1u && succeeded > 1u ? 1 : 0;
+      rerun_in_block += holding == 1u && r.rerun ? 1 : 0;
       BOOST_TEST_CONTEXT("executed trx " << id.str() << " in " << holding << " blocks") {
          BOOST_TEST(valid.count(id) == 1u);
-         // re-run after a block abort, a trx past the producer's speculative-retry cpu cap is dropped; a client
-         // resubmits it
-         BOOST_TEST((holding == 1u || (holding == 0u && runs.cpu_dropped.count(id) == 1u)));
+         BOOST_TEST((holding == 1u || (holding == 0u && cpu_dropped)));
       }
    }
    for (const auto& [id, holding] : blocks_holding) {
@@ -128,8 +178,20 @@ void verify_executed(const std::deque<packed_transaction_ptr>& executed, const s
          BOOST_TEST(executed_ids.count(id) == 1u);
       }
    }
+
+   BOOST_TEST_REQUIRE(!synced_abort.empty());
+   for (const transaction_id_type& id : synced_abort) {
+      BOOST_TEST_CONTEXT("trx of the synchronized abort " << id.str()) {
+         const auto runs_it = runs.find(id);
+         BOOST_TEST_REQUIRE((runs_it != runs.end()));
+         const trx_runs::id_runs& r = runs_it->second;
+         // or its copy took its place in the block
+         BOOST_TEST((r.rerun || r.cpu_cap_drop || r.submissions > 1));
+      }
+   }
    // drops are rare even under load; most aborted trxs land in a block
-   BOOST_TEST_MESSAGE("re-run trxs in a block " << rerun_in_block << ", dropped " << dropped);
+   BOOST_TEST_MESSAGE("synchronized abort trxs " << synced_abort.size() << ", re-run trxs in a block " << rerun_in_block
+                                                 << ", dropped " << dropped);
    BOOST_TEST(rerun_in_block > dropped);
 }
 
@@ -175,23 +237,37 @@ BOOST_AUTO_TEST_CASE(producer) {
       auto[prod_plug, chain_plug] = plugin_fut.get();
       trx_maker maker( chain_plug->get_chain_id() );
 
+      // written on the main thread, read after it has joined
+      trx_runs runs;
+      std::vector<transaction_id_type> synced_abort; // trxs of the block the synchronized abort aborted
+      bool synced_abort_posted = false;
       std::deque<signed_block_ptr> all_blocks;
-      std::promise<void> empty_blocks_promise;
-      std::future<void> empty_blocks_fut = empty_blocks_promise.get_future();
-      int num_empty = std::numeric_limits<int>::max();
+
+      std::atomic<uint32_t> head_num = 0;  // last accepted block
+      std::atomic<uint32_t> empty_run = 0; // consecutive empty blocks up to head_num
       auto ab = chain_plug->chain().accepted_block().connect( [&](const chain::block_signal_params& t) {
          const auto& [ block, id ] = t;
          all_blocks.push_back( block );
-         if( block->transactions.empty() ) {
-            if( --num_empty == 0 ) empty_blocks_promise.set_value();
-         } else if( num_empty > 0 ) { // we want a few empty blocks after we have some non-empty blocks
-            num_empty = 10;
-         }
+         runs.clear_pending();
+         empty_run = block->transactions.empty() ? empty_run + 1 : 0;
+         head_num = block->block_num();
       } );
-      trx_runs runs;
+      auto bs = chain_plug->chain().block_start().connect( [&]( uint32_t ) { runs.clear_pending(); } );
       auto at = chain_plug->chain().applied_transaction().connect(
          [&](std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> t) {
-            runs.record( std::get<0>( t ) );
+            runs.record( std::get<0>( t ), std::get<1>( t ) );
+            // once, abort a block while it holds executed trxs, whatever the timing of the periodic aborts below
+            if( synced_abort.empty() && !synced_abort_posted && !runs.pending_ids().empty() ) {
+               synced_abort_posted = true;
+               app->post( priority::high, [&]() {
+                  synced_abort_posted = false;
+                  if( synced_abort.empty() && !runs.pending_ids().empty() &&
+                      app->find_plugin<chain_plugin>()->chain().is_building_block() ) {
+                     synced_abort = runs.pending_ids();
+                     app->find_plugin<producer_plugin>()->get_integrity_hash();
+                  }
+               } );
+            }
          } );
 
       std::atomic<size_t> num_acked = 0;
@@ -248,7 +324,14 @@ BOOST_AUTO_TEST_CASE(producer) {
          }
       }
 
-      BOOST_CHECK( empty_blocks_fut.wait_for(std::chrono::seconds(60)) == std::future_status::ready );
+      // every push answered and acknowledged, then trailing empty blocks all after that, by which time any aborted trx
+      // has run again
+      constexpr uint32_t trailing_empty_blocks = 10;
+      BOOST_CHECK( test::wait_until( [&]() { return next_calls == num_pushes && num_acked == num_pushes; } ) );
+      const uint32_t answered_at = head_num;
+      BOOST_CHECK( test::wait_until( [&]() {
+         return head_num >= answered_at + trailing_empty_blocks && empty_run >= trailing_empty_blocks;
+      } ) );
 
       BOOST_CHECK_EQUAL( trace_with_except, 0u ); // should not have any traces with except in it
       BOOST_CHECK_EQUAL( num_pushes, num_posts );
@@ -262,7 +345,7 @@ BOOST_AUTO_TEST_CASE(producer) {
       BOOST_CHECK( all_blocks.size() > 3u ); // should have a few blocks otherwise test is running too fast
       BOOST_TEST_MESSAGE( "pushed " << num_pushes << ", valid " << maker.valid_ids().size() << ", reported executed "
                                     << trxs.size() << ", blocks " << all_blocks.size() );
-      verify_executed( trxs, maker.valid_ids(), runs, all_blocks );
+      verify_executed( trxs, maker.valid_ids(), runs, synced_abort, all_blocks );
    }
 }
 
