@@ -287,7 +287,7 @@ class Node(Transactions):
         When the last stored block is exactly a stride multiple, SHiP log rotation has just moved
         every entry into retained/ and the head log/index files are 0 bytes, so tooling that reads
         the head log has nothing to work with. A few more blocks can be produced between this check
-        and a pause taking effect, so a margin is kept on both sides of the boundary. Returns True
+        and the node stopping, so a margin is kept on both sides of the boundary. Returns True
         once the head is clear of the boundary, waiting for a safe block if needed."""
         head = self.getHeadBlockNum()
         posInStride = head % stride
@@ -296,6 +296,23 @@ class Node(Transactions):
         safeBlock = head - posInStride + (lowerMargin if posInStride < lowerMargin else stride + lowerMargin)
         Utils.Print(f"Head block {head} is near a state-history-stride boundary, waiting for block {safeBlock}")
         return self.waitForBlock(safeBlock, timeout=timeout)
+
+    def pauseAtBlockClearOfStride(self, stride, lowerMargin=5, lead=5, timeout=30):
+        """Pause block production at a block clear of a state-history-stride boundary and return it.
+
+        The pause block is the first block at least `lead` blocks past the head whose position in the
+        stride is at least `lowerMargin`, so the head log/index files hold entries when the node
+        stops. `pause_at_block` stops production at exactly that block. Returns once the head reaches
+        it, and exits the test if that takes longer than `timeout` seconds."""
+        pauseBlock = self.getHeadBlockNum() + lead
+        posInStride = pauseBlock % stride
+        if posInStride < lowerMargin:
+            pauseBlock += lowerMargin - posInStride
+        Utils.Print(f"Pausing production at block {pauseBlock}")
+        self.processUrllibRequest("producer", "pause_at_block", {"block_num": pauseBlock}, exitOnError=True)
+        if not self.waitForBlock(pauseBlock, timeout=timeout):
+            Utils.errorExit(f"head did not reach pause block {pauseBlock}")
+        return pauseBlock
 
     def waitForAnyProducer(self, producers, timeout=None, exitOnError=False):
         if timeout is None:

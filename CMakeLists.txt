@@ -55,6 +55,11 @@ add_p_test(NAME sys_vm_submodule_test
            COMMAND ${CMAKE_COMMAND} -DGENERATOR=${CMAKE_GENERATOR} -DCXX=${CMAKE_CXX_COMPILER} -DCONFIG=$<CONFIG>
                    -DSOURCE_DIR=${CMAKE_SOURCE_DIR} -DWORK_DIR=${CMAKE_BINARY_DIR}/cmake-test/sys-vm-submodule
                    -DSOFTFLOAT_DIR=${softfloat_DIR} -P ${CMAKE_SOURCE_DIR}/cmake/test/sys-vm-submodule-test.cmake)
+add_p_test(NAME sysio_tester_boost_version_test
+           COMMAND ${CMAKE_COMMAND} -DGENERATOR=${CMAKE_GENERATOR} -DCXX=${CMAKE_CXX_COMPILER}
+                   -DSYSIO_TESTER=${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioTester.cmake -DBOOST_VERSION=${BOOST_VERSION}
+                   -DWORK_DIR=${CMAKE_BINARY_DIR}/cmake-test/sysio-tester-boost-version
+                   -P ${CMAKE_SOURCE_DIR}/cmake/test/sysio-tester-boost-version-test.cmake)
 
 set(CLI_CLIENT_EXECUTABLE_NAME clio)
 set(NODE_EXECUTABLE_NAME nodeop)

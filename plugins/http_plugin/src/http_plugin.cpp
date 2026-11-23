@@ -18,6 +18,7 @@
 #include <regex>
 #include <string>
 #include <string_view>
+#include <utility>
 
 namespace sysio {
 
@@ -32,9 +33,9 @@ namespace sysio {
        * constructor and the decrement in the destructor, so the reservation is bound to a successfully
        * constructed guard: if allocating the guard throws (e.g. std::bad_alloc while admitting a request
        * under memory pressure) the increment never runs, and once constructed the matching decrement is
-       * guaranteed exactly once when the guard is destroyed.  Held via shared_ptr at the call site so the
-       * posted app-thread lambda stays copyable (boost::asio::post requires a copyable handler) and the
-       * release fires only when the final copy is destroyed.
+       * guaranteed exactly once, by release() or when the guard is destroyed.  Held via shared_ptr at the call
+       * site so the posted app-thread lambda stays copyable (boost::asio::post requires a copyable handler) and
+       * the destructor's release fires only when the final copy is destroyed.
        */
       struct bytes_in_flight_reservation {
          detail::abstract_conn_ptr conn;
@@ -42,11 +43,33 @@ namespace sysio {
 
          bytes_in_flight_reservation(detail::abstract_conn_ptr c, size_t sz)
             : conn(std::move(c)), size(sz) { conn->increment_bytes_in_flight(size); }
-         ~bytes_in_flight_reservation() { conn->decrement_bytes_in_flight(size); }
+         ~bytes_in_flight_reservation() { release(); }
+
+         /// End the reservation before the guard is destroyed, and stop holding the connection. Called by one holder
+         /// at most, which keeps the guard alive meanwhile.
+         void release() {
+            if (conn)
+               conn->decrement_bytes_in_flight(std::exchange(size, 0));
+            conn.reset();
+         }
 
          bytes_in_flight_reservation(const bytes_in_flight_reservation&) = delete;
          bytes_in_flight_reservation& operator=(const bytes_in_flight_reservation&) = delete;
       };
+
+      /**
+       * Admit a request whose body is `body_size` bytes against bytes_in_flight: answered with a 503 when it does not
+       * fit, otherwise reserved until the returned reservation is released or destroyed.
+       * @return the reservation, or null when the request was refused
+       */
+      std::shared_ptr<bytes_in_flight_reservation> admit_request(const detail::abstract_conn_ptr& conn,
+                                                                 size_t body_size) {
+         if (std::string error_str = conn->verify_max_bytes_in_flight(body_size); !error_str.empty()) {
+            conn->send_busy_response(std::move(error_str));
+            return {};
+         }
+         return std::make_shared<bytes_in_flight_reservation>(conn, body_size);
+      }
 
       /// What the exception being handled says. Call only from a catch block.
       std::string current_exception_text() {
@@ -68,16 +91,21 @@ namespace sysio {
        */
       class single_response {
       public:
-         /// `path` names the request's endpoint in log lines.
-         explicit single_response(std::shared_ptr<const std::string> path) : path_(std::move(path)) {}
+         /// `path` names the request's endpoint in log lines. `request`, if any, counts the request against
+         /// bytes_in_flight until it is answered, and is released once the answer counts its own bytes.
+         explicit single_response(std::shared_ptr<const std::string> path,
+                                  std::shared_ptr<bytes_in_flight_reservation> request = {})
+            : path_(std::move(path)), request_(std::move(request)) {}
 
          /// Wrap a handler's response callback so that it answers only if nothing has yet.
          static url_response_callback guard(std::shared_ptr<single_response> self, url_response_callback then) {
             return [self = std::move(self), then = std::move(then)](int code, std::optional<fc::variant> response) {
-               if (self->claim())
+               if (self->claim()) {
                   then(code, std::move(response));
-               else
+                  self->release_request();
+               } else {
                   fc_elog(logger(), "{}: response {} after the request was answered; dropped", self->path(), code);
+               }
             };
          }
 
@@ -85,11 +113,13 @@ namespace sysio {
          /// from a catch block.
          template <typename Report>
          void report_exception(Report&& report) {
-            if (claim())
+            if (claim()) {
                report();
-            else
+               release_request();
+            } else {
                fc_elog(logger(), "{}: exception after the request was answered; dropped: {}", path(),
                        current_exception_text());
+            }
          }
 
          /// Take the answer: true for the first caller only.
@@ -102,8 +132,17 @@ namespace sysio {
          const std::string& path() const { return *path_; }
 
       private:
+         /// The request is answered, and its answer counts its own bytes: stop counting the request. Called only by
+         /// the answer's claimant.
+         void release_request() {
+            if (request_)
+               request_->release();
+         }
+
          std::shared_ptr<const std::string> path_; ///< shared by every request to the endpoint
-         std::atomic<bool> answered_{false};       ///< set by the first claim()
+         /// counts the request until it is answered; null when the request is not counted that long
+         std::shared_ptr<bytes_in_flight_reservation> request_;
+         std::atomic<bool> answered_{false}; ///< set by the first claim()
       };
 
       /**
@@ -289,36 +328,41 @@ namespace sysio {
           * return to the http thread pool for response processing
           *
           * The returned handler reserves the request body against bytes_in_flight on admission and releases
-          * it (via a shared bytes_in_flight_reservation) when the posted app-thread work completes or is discarded.
+          * it (via a shared bytes_in_flight_reservation) when the posted app-thread work completes or is discarded,
+          * or, for an always-sent handler, once the request is answered if that is later.
           * The request is answered once, by the handler's response or its exception (single_response).
           * @param entry - the endpoint and its handler
           * @param to_queue - execution queue to post to
           * @param priority - priority to post to the app thread at
           * @param content_type - json or plain txt
+          * @param response_policy - whether the bytes-in-flight budget can refuse the response
           * @return the constructed internal_url_handler
           */
-         static detail::internal_url_handler make_app_thread_url_handler(api_entry&& entry, appbase::exec_queue to_queue, int priority, http_content_type content_type ) {
+         static detail::internal_url_handler make_app_thread_url_handler(api_entry&& entry,
+                                                                         appbase::exec_queue to_queue, int priority,
+                                                                         http_content_type content_type,
+                                                                         http_response_policy response_policy) {
             detail::internal_url_handler handler;
             handler.content_type = content_type;
+            handler.response_policy = response_policy;
             handler.category = entry.category;
             auto next_ptr = std::make_shared<url_handler>(std::move(entry.handler));
             handler.fn = [priority, to_queue, next_ptr=std::move(next_ptr),
-                          path=std::make_shared<const std::string>(entry.path)]
+                          path=std::make_shared<const std::string>(entry.path), response_policy]
                        ( detail::abstract_conn_ptr conn, string&& r, string&& b, url_response_callback&& then ) {
-               if (auto error_str = conn->verify_max_bytes_in_flight(b.size()); !error_str.empty()) {
-                  conn->send_busy_response(std::move(error_str));
-                  return; // admission rejected before any reservation was made, nothing to release
-               }
-
                // The request body is about to be moved into the (unbounded) app-thread queue, where it can
-               // sit until a possibly-slow handler runs.  Reserve its bytes against bytes_in_flight now that
-               // admission passed, so the queued memory is visible to concurrent verify_max_bytes_in_flight()
+               // sit until a possibly-slow handler runs.  Reserve its bytes against bytes_in_flight once
+               // admitted, so the queued memory is visible to concurrent verify_max_bytes_in_flight()
                // checks instead of accumulating uncounted.  The reservation is released exactly once when the
                // posted work below is destroyed -- whether it runs to completion, throws, returns early on
                // shutdown, or is discarded unrun when the queue is cleared.
-               auto body_in_flight_guard = std::make_shared<bytes_in_flight_reservation>(conn, b.size());
-
-               std::shared_ptr<single_response> answer = std::make_shared<single_response>(path);
+               std::shared_ptr<bytes_in_flight_reservation> body_in_flight_guard = admit_request(conn, b.size());
+               if (!body_in_flight_guard)
+                  return; // admission rejected before any reservation was made, nothing to release
+               // An always-sent response is not refused once it is ready, so the request stays counted until it is
+               // answered, by the handler or by an exception.
+               std::shared_ptr<single_response> answer = std::make_shared<single_response>(
+                  path, response_policy == http_response_policy::always_sent ? body_in_flight_guard : nullptr);
                url_response_callback wrapped_then = single_response::guard(answer, std::move(then));
 
                // post to the app thread taking shared ownership of next (via std::shared_ptr),
@@ -343,20 +387,35 @@ namespace sysio {
           * Make an internal_url_handler that will run the url_handler directly
           *
           * Runs inline on the http thread with no app-thread queueing, so the request body does not linger
-          * in a queue and is not separately reserved against bytes_in_flight here. The request is answered once,
-          * by the handler's response or its exception (single_response).
+          * in a queue and is not separately reserved against bytes_in_flight here, except for an always-sent
+          * handler: its request is admitted against bytes_in_flight here and reserved until it is answered. The
+          * request is answered once, by the handler's response or its exception (single_response).
           * @param entry - the endpoint and its handler
           * @param content_type - json or plain txt
+          * @param response_policy - whether the bytes-in-flight budget can refuse the response
           * @return the constructed internal_url_handler
           */
-         static detail::internal_url_handler make_http_thread_url_handler(api_entry&& entry, http_content_type content_type) {
+         static detail::internal_url_handler make_http_thread_url_handler(api_entry&& entry,
+                                                                          http_content_type content_type,
+                                                                          http_response_policy response_policy) {
             detail::internal_url_handler handler;
             handler.content_type = content_type;
+            handler.response_policy = response_policy;
             handler.category = entry.category;
-            handler.fn = [next=std::move(entry.handler), path=std::make_shared<const std::string>(entry.path)](
+            handler.fn = [next=std::move(entry.handler), path=std::make_shared<const std::string>(entry.path),
+                          response_policy](
                             const detail::abstract_conn_ptr& conn, string&& r, string&& b,
                             url_response_callback&& then ) mutable {
-               std::shared_ptr<single_response> answer = std::make_shared<single_response>(path);
+               // An always-sent response is not refused once it is ready, so the request is admitted here, before
+               // the handler runs, and stays counted until it is answered, by the handler or by an exception.
+               std::shared_ptr<bytes_in_flight_reservation> reservation;
+               if (response_policy == http_response_policy::always_sent) {
+                  reservation = admit_request(conn, b.size());
+                  if (!reservation)
+                     return;
+               }
+               std::shared_ptr<single_response> answer =
+                  std::make_shared<single_response>(path, std::move(reservation));
                try {
                   next(std::move(r), std::move(b), single_response::guard(answer, std::move(then)));
                } catch( ... ) {
@@ -699,17 +758,21 @@ namespace sysio {
               from_category(entry.category), entry.path, addrs);
    }
 
-   void http_plugin::add_handler(api_entry&& entry, appbase::exec_queue q, int priority, http_content_type content_type) {
+   void http_plugin::add_handler(api_entry&& entry, appbase::exec_queue q, int priority, http_content_type content_type,
+                                 http_response_policy response_policy) {
       log_add_handler(my.get(), entry);
       std::string path  = entry.path;
-      auto p = my->plugin_state->url_handlers.emplace(path, my->make_app_thread_url_handler(std::move(entry), q, priority, content_type));
+      auto p = my->plugin_state->url_handlers.emplace(
+         path, my->make_app_thread_url_handler(std::move(entry), q, priority, content_type, response_policy));
       SYS_ASSERT( p.second, chain::plugin_config_exception, "http url {} is not unique", path );
    }
 
-   void http_plugin::add_async_handler(api_entry&& entry, http_content_type content_type) {
+   void http_plugin::add_async_handler(api_entry&& entry, http_content_type content_type,
+                                       http_response_policy response_policy) {
       log_add_handler(my.get(), entry);
       std::string path  = entry.path;
-      auto p = my->plugin_state->url_handlers.emplace(path, my->make_http_thread_url_handler(std::move(entry), content_type));
+      auto p = my->plugin_state->url_handlers.emplace(
+         path, my->make_http_thread_url_handler(std::move(entry), content_type, response_policy));
       SYS_ASSERT( p.second, chain::plugin_config_exception, "http url {} is not unique", path );
    }
 

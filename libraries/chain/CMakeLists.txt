@@ -107,7 +107,6 @@ add_library( sysio_chain
 
               wast_to_wasm.cpp
               wasm_interface.cpp
-              wasm_sysio_validation.cpp
               wasm_sysio_injection.cpp
               wasm_config.cpp
               apply_context.cpp

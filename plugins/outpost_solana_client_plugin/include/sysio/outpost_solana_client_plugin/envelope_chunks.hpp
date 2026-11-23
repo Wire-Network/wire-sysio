@@ -16,7 +16,10 @@ inline constexpr std::string_view ENVELOPE_CHUNKS_SEED = "envelope_chunks";
 inline constexpr std::string_view EPOCH_DELIVERIES_SEED = "epoch_deliveries";
 /// Instruction name shared by boot validation and the cleanup binding.
 inline constexpr auto CLEANUP_ENVELOPE_CHUNKS_INSTRUCTION = "cleanup_envelope_chunks";
-/// Cleanup waits for confirmed status; the default retry envelope remains unchanged.
+/// Instruction that closes a settled epoch's `EpochDeliveries` tally and refunds the `epoch_in` caller that paid for
+/// it. Optional: a program without it leaves the tally sweep idle.
+inline constexpr auto CLEANUP_EPOCH_DELIVERIES_INSTRUCTION = "cleanup_epoch_deliveries";
+/// Both cleanups wait for confirmed status; the default retry envelope remains unchanged.
 inline constexpr fc::network::solana::solana_confirm_options ENVELOPE_CHUNK_CLEANUP_CONFIRM_OPTIONS{
    .commitment = fc::network::solana::commitment_t::confirmed};
 

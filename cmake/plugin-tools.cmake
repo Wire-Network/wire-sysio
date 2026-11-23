@@ -11,7 +11,6 @@ set(PLUGIN_DEFAULT_DEPENDENCIES
         Boost::bimap
         Boost::chrono
         Boost::date_time
-        Boost::dll
         Boost::interprocess
         Boost::iostreams
         Boost::multiprecision

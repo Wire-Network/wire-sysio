@@ -34,6 +34,7 @@ struct config;
 
 class code_cache_base {
    public:
+      /// Open or recreate the native cache after validating its header before boolean access.
       code_cache_base(const std::filesystem::path& data_dir, const sysvmoc::config& sysvmoc_config, const chainbase::database& db);
       ~code_cache_base();
 

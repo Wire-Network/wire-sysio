@@ -40,7 +40,7 @@ parse_params<chain_apis::read_only::get_transaction_status_params, http_params_t
    }
 }
 
-// if actions.data & actions.hex_data provided, use the hex_data since only currently support unexploded data
+/// Converts the body with read_only::to_get_transaction_id_params, reporting any failure as an invalid request.
 template<>
 chain_apis::read_only::get_transaction_id_params
 parse_params<chain_apis::read_only::get_transaction_id_params, http_params_types::params_required>(const std::string& body) {
@@ -49,43 +49,7 @@ parse_params<chain_apis::read_only::get_transaction_id_params, http_params_types
    }
 
    try {
-      fc::variant trx_var =  fc::json::from_string( body );
-      if( trx_var.is_object() ) {
-         fc::variant_object& vo = trx_var.get_object();
-         if( vo.contains("actions") && vo["actions"].is_array() ) {
-            fc::mutable_variant_object mvo{vo};
-            fc::variants& action_variants = mvo["actions"].get_array();
-            for( auto& action_v : action_variants ) {
-               if( action_v.is_object() ) {
-                 fc::variant_object& action_vo = action_v.get_object();
-                  if( action_vo.contains( "data" ) && action_vo.contains( "hex_data" ) ) {
-                     fc::mutable_variant_object maction_vo{action_vo};
-                     maction_vo["data"] = maction_vo["hex_data"];
-                     action_vo = maction_vo;
-                     vo = mvo;
-                  } else if( action_vo.contains( "data" ) ) {
-                     if( !action_vo["data"].is_string() ) {
-                        SYS_THROW(chain::invalid_http_request, "Request supports only un-exploded 'data' (hex form)");
-                     }
-                  }
-               }
-               else {
-                  SYS_THROW(chain::invalid_http_request, "Transaction contains invalid or empty action");
-               }
-            }
-         }
-         else {
-            SYS_THROW(chain::invalid_http_request, "Transaction actions are missing or invalid");
-         }
-      }
-      else {
-         SYS_THROW(chain::invalid_http_request, "Transaction object is missing or invalid");
-      }
-      auto trx = trx_var.as<chain_apis::read_only::get_transaction_id_params>();
-      if( trx.id() == transaction().id() ) {
-         SYS_THROW(chain::invalid_http_request, "Invalid transaction object");
-      }
-      return trx;
+      return chain_apis::read_only::to_get_transaction_id_params( fc::json::from_string( body ) );
    } SYS_RETHROW_EXCEPTIONS(chain::invalid_http_request, "Invalid transaction");
 }
 
@@ -148,14 +112,19 @@ void chain_api_plugin::plugin_startup() {
       CHAIN_RO_CALL(get_producers, 200, http_params_types::params_required),
       CHAIN_RO_CALL(get_producer_schedule, 200, http_params_types::no_params),
       CHAIN_RO_CALL(get_required_keys, 200, http_params_types::params_required),
-      CHAIN_RO_CALL(get_transaction_id, 200, http_params_types::params_required),
-      // transaction related APIs will be posted to read_write queue after keys are recovered, they are safe to run in parallel until they post to the read_write queue
+   }, appbase::exec_queue::read_only);
+
+   // Transaction calls run in parallel on the read_only queue until keys are recovered, then post to the
+   // trx_read_write queue. Their response reports the transaction's execution, so the bytes-in-flight budget refuses
+   // them only on intake.
+   _http_plugin.add_api({
       CHAIN_RO_CALL_ASYNC(compute_transaction, chain_apis::read_only::compute_transaction_results, 200, http_params_types::params_required),
       CHAIN_RW_CALL_ASYNC(push_transaction, chain_apis::read_write::push_transaction_results, 202, http_params_types::params_required),
       CHAIN_RW_CALL_ASYNC(push_transactions, chain_apis::read_write::push_transactions_results, 202, http_params_types::params_required),
       CHAIN_RW_CALL_ASYNC(send_transaction, chain_apis::read_write::send_transaction_results, 202, http_params_types::params_required),
       CHAIN_RW_CALL_ASYNC(send_transaction2, chain_apis::read_write::send_transaction_results, 202, http_params_types::params_required)
-   }, appbase::exec_queue::read_only);
+   }, appbase::exec_queue::read_only, appbase::priority::medium_low, http_content_type::json,
+      http_response_policy::always_sent);
 
    if (chain.account_queries_enabled()) {
       _http_plugin.add_async_api({
@@ -167,7 +136,9 @@ void chain_api_plugin::plugin_startup() {
       // chain_plugin send_read_only_transaction will post to read_exclusive queue
       CHAIN_RO_CALL_ASYNC(send_read_only_transaction, chain_apis::read_only::send_read_only_transaction_results, 200, http_params_types::params_required),
       CHAIN_RO_CALL_WITH_400(get_raw_block, 200, http_params_types::params_required),
-      CHAIN_RO_CALL_WITH_400(get_block_header, 200, http_params_types::params_required)
+      CHAIN_RO_CALL_WITH_400(get_block_header, 200, http_params_types::params_required),
+      // reads no chain state, so it runs on the http thread pool
+      CHAIN_RO_CALL_WITH_400(get_transaction_id, 200, http_params_types::params_required)
    });
 
    if (chain.transaction_finality_status_enabled()) {

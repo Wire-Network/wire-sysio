@@ -173,37 +173,32 @@ trx_id_index_reader::trx_id_index_reader(const std::filesystem::path& path) {
    // wrote the buckets little-endian with no padding (see the bulk-write note
    // in trx_id_index_writer::write), so the on-disk bytes are the in-memory
    // representation on x86_64 LE.
-   _buckets      = reinterpret_cast<const trx_id_bucket*>(static_cast<const char*>(_map_base) + sizeof(header));
-   _bucket_count = header.bucket_count;
-   _valid        = true;
+   _buckets = {static_cast<const char*>(_map_base) + sizeof(header), header.bucket_count};
+   _valid   = true;
 }
 
 trx_id_index_reader::trx_id_index_reader(trx_id_index_reader&& other) noexcept
    : _buckets(other._buckets)
-   , _bucket_count(other._bucket_count)
    , _map_base(other._map_base)
    , _map_size(other._map_size)
    , _valid(other._valid) {
-   other._buckets      = nullptr;
-   other._bucket_count = 0;
-   other._map_base     = nullptr;
-   other._map_size     = 0;
-   other._valid        = false;
+   other._buckets = {};
+   other._map_base = nullptr;
+   other._map_size = 0;
+   other._valid = false;
 }
 
 trx_id_index_reader& trx_id_index_reader::operator=(trx_id_index_reader&& other) noexcept {
    if (this != &other) {
       unmap();
-      _buckets      = other._buckets;
-      _bucket_count = other._bucket_count;
-      _map_base     = other._map_base;
-      _map_size     = other._map_size;
-      _valid        = other._valid;
-      other._buckets      = nullptr;
-      other._bucket_count = 0;
-      other._map_base     = nullptr;
-      other._map_size     = 0;
-      other._valid        = false;
+      _buckets = other._buckets;
+      _map_base = other._map_base;
+      _map_size = other._map_size;
+      _valid = other._valid;
+      other._buckets = {};
+      other._map_base = nullptr;
+      other._map_size = 0;
+      other._valid = false;
    }
    return *this;
 }
@@ -218,26 +213,28 @@ void trx_id_index_reader::unmap() noexcept {
       _map_base = nullptr;
       _map_size = 0;
    }
-   _buckets      = nullptr;
-   _bucket_count = 0;
+   _buckets = {};
 }
 
 std::optional<uint32_t> trx_id_index_reader::lookup(const chain::transaction_id_type& trx_id) const {
-   if (!_valid || _bucket_count == 0)
+   // Construction caps this count below uint32_t's limit; retain 32-bit arithmetic in the hot probe loop.
+   const auto bucket_count = static_cast<uint32_t>(_buckets.size());
+   if (!_valid || bucket_count == 0)
       return std::nullopt;
 
    const uint64_t prefix = trx_id_prefix(trx_id);
-   const uint32_t mask   = _bucket_count - 1;
+   const uint32_t mask   = bucket_count - 1;
    uint32_t idx          = static_cast<uint32_t>(prefix) & mask;
 
    // Bounded probe loop: a well-formed index has load factor <= 0.5 and an
    // empty bucket terminates the chain.  The bound guards against a corrupt
    // file with no empty buckets at all (would otherwise loop forever).
-   for (uint32_t probes = 0; probes < _bucket_count; ++probes) {
-      if (_buckets[idx].block_num == 0)
+   for (uint32_t probes = 0; probes < bucket_count; ++probes) {
+      const trx_id_bucket bucket = _buckets[idx];
+      if (bucket.block_num == 0)
          return std::nullopt;
-      if (_buckets[idx].prefix64 == prefix)
-         return _buckets[idx].block_num;
+      if (bucket.prefix64 == prefix)
+         return bucket.block_num;
       idx = (idx + 1) & mask;
    }
    return std::nullopt;

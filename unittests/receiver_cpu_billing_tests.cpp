@@ -18,6 +18,7 @@
 #include <chrono>
 #include <limits>
 #include <numeric>
+#include <optional>
 #include <string>
 #include <thread>
 
@@ -58,9 +59,12 @@ constexpr int64_t     cpu_weight = 10'000'000'000; ///< ample CPU for the accoun
 /// time, so a case that bills a no-op handler nothing sets ample_stipend(), which a descheduled frame stays inside.
 constexpr int64_t     stipend_us         = 1000;
 constexpr int64_t     long_frame_us      = 4 * stipend_us; ///< long_spins() keeps a frame busy at least this long
+constexpr auto        stopped_spin_time  = std::chrono::minutes( 5 ); ///< stopped_spin_memo() runs at least this long
+constexpr uint64_t    stopped_spin_factor = stopped_spin_time / std::chrono::microseconds( long_frame_us );
 constexpr uint32_t    first_long_spins   = 1000;
 constexpr uint32_t    max_spin_doublings = 21; ///< first_long_spins doubled this often still fits in uint32_t
 constexpr uint32_t    calibration_runs   = 3;  ///< runs of each loop count long_spins() measures
+constexpr uint32_t    max_calibration_attempts = 2 * calibration_runs; ///< bound transient rejected measurements
 constexpr uint32_t    short_spin_count   = 10;
 constexpr uint32_t    many_notifications = 50;
 constexpr auto        frame_pause        = std::chrono::milliseconds( 200 ); ///< a pause in a frame, past any stipend
@@ -106,6 +110,31 @@ uint64_t total( const std::vector<uint32_t>& entries ) {
 /// A frame's CPU is within its elapsed time, so a frame inside the stipend leaves an entry of 0.
 uint32_t most_past_stipend( int64_t elapsed_us, int64_t stipend = stipend_us ) {
    return static_cast<uint32_t>( std::max<int64_t>( elapsed_us - stipend, 0 ) );
+}
+
+/**
+ * The fastest of calibration_runs successful measurements. Host descheduling can push an otherwise short sample
+ * past the chain's CPU limit; discard only that typed failure, with a bounded number of attempts. Successful samples
+ * retain their original shared block; a rejected sample starts a fresh block before measuring again.
+ * An exhausted candidate fails calibration; it never authorizes a larger CPU budget or an unmeasured loop count.
+ */
+template<typename Measure, typename AdvanceBlock>
+std::optional<int64_t> fastest_calibration_sample( Measure&& measure, AdvanceBlock&& advance_block ) {
+   int64_t fastest_us = std::numeric_limits<int64_t>::max();
+   uint32_t completed = 0;
+   for( uint32_t attempt = 0; attempt < max_calibration_attempts && completed < calibration_runs; ++attempt ) {
+      bool rejected = false;
+      try {
+         fastest_us = std::min( fastest_us, measure( attempt ) );
+         ++completed;
+      } catch( const tx_cpu_usage_exceeded& ) {
+         // A failed transaction is rolled back and supplies no elapsed sample.
+         rejected = true;
+      }
+      if( rejected ) advance_block();
+   }
+   if( completed != calibration_runs ) return std::nullopt;
+   return fastest_us;
 }
 
 /// Contracts reached through system contracts pay CPU for their own code past the stipend of a notification; see
@@ -272,22 +301,24 @@ struct receiver_cpu_tester : validating_tester {
 
    /**
     * A loop count that keeps cpu_receiver_test busy for at least long_frame_us, well past the stipend. Runtimes differ
-    * by orders of magnitude, so it is measured: spins the game pays for directly, doubled until even the fastest of
-    * calibration_runs runs takes that long. Each loop count's runs get a block of their own: descheduled, the runs of
-    * all the counts can take more CPU than one block has. The test's own transactions start in a new block.
+    * by orders of magnitude, so measure the actual transfer notification handler, doubling its loop count until even
+    * the fastest of calibration_runs successful runs takes that long. A direct spin action can run at a different
+    * speed from the compiled notification path. These probes transfer tokens and bill CPU; callers calibrate before
+    * taking their balance/resource snapshots. Each loop count gets its own block. A rejected CPU-limit outlier starts
+    * a fresh block, up to max_calibration_attempts. The test's own transactions start in a new block.
     */
    uint32_t long_spins() {
       if( !long_spin_count ) {
          uint32_t n = first_long_spins;
          for( uint32_t i = 0; i <= max_spin_doublings && !long_spin_count; ++i, n *= 2 ) {
             // Being descheduled only adds to a run's elapsed time, so the fastest of a few runs is the loop's cost.
-            int64_t fastest_us = std::numeric_limits<int64_t>::max();
-            for( uint32_t run = 0; run < calibration_runs; ++run ) {
-               auto spin  = get_action( game, "spin"_n, auth( game ), mvo()( "n", n + run ) ); // distinct transactions
-               auto trace = push_measured( make_trx( { spin } ) );
-               fastest_us = std::min( fastest_us, trace->action_traces[0].elapsed.count() );
-            }
-            if( fastest_us >= long_frame_us )
+            const auto fastest_us = fastest_calibration_sample( [&]( uint32_t attempt ) {
+               auto trace = transfer( alice, game, amount, spin_command + std::to_string( n + attempt ) );
+               return frame( trace, game, "transfer"_n ).elapsed.count();
+            }, [&] { produce_block(); } );
+            BOOST_REQUIRE_MESSAGE( fastest_us, "CPU workload calibration could not collect " << calibration_runs
+                                   << " successful samples in " << max_calibration_attempts << " attempts at " << n );
+            if( *fastest_us >= long_frame_us )
                long_spin_count = n;
             produce_block();
          }
@@ -317,6 +348,12 @@ struct receiver_cpu_tester : validating_tester {
 
    /// A transfer memo that keeps cpu_receiver_test's handler busy well past the stipend.
    std::string long_spin_memo() { return spin_command + std::to_string( long_spins() ); }
+
+   /// A transfer memo for a push a deadline is expected to stop: the handler runs at least stopped_spin_time, far past
+   /// any deadline here and any delay in the timer that enforces it, and still ends if nothing stops it.
+   std::string stopped_spin_memo() {
+      return spin_command + std::to_string( uint64_t{ long_spins() } * stopped_spin_factor );
+   }
 
    const resource_limits::resource_object& usage( const controller& c, account_name account ) const {
       return c.db().get<resource_limits::resource_object, resource_limits::by_owner>( account );
@@ -381,6 +418,58 @@ struct receiver_cpu_tester : validating_tester {
 } // namespace
 
 BOOST_AUTO_TEST_SUITE(receiver_cpu_billing_tests)
+
+BOOST_AUTO_TEST_CASE( calibration_rejects_a_cpu_limit_outlier_but_requires_three_successful_samples ) {
+   uint32_t attempts = 0, blocks = 0;
+   const auto fastest = fastest_calibration_sample( [&]( uint32_t attempt ) -> int64_t {
+      ++attempts;
+      if( attempt == 0 ) FC_THROW_EXCEPTION( tx_cpu_usage_exceeded, "rejected calibration sample" );
+      return long_frame_us + calibration_runs - attempt;
+   }, [&] { ++blocks; } );
+   BOOST_REQUIRE( fastest );
+   BOOST_TEST( *fastest == long_frame_us );
+   BOOST_TEST( attempts == calibration_runs + 1 );
+   BOOST_TEST( blocks == 1u );
+}
+
+BOOST_AUTO_TEST_CASE( successful_calibration_samples_keep_their_original_shared_block ) {
+   uint32_t attempts = 0, blocks = 0;
+   const auto fastest = fastest_calibration_sample( [&]( uint32_t ) {
+      ++attempts;
+      return long_frame_us;
+   }, [&] { ++blocks; } );
+   BOOST_REQUIRE( fastest );
+   BOOST_TEST( *fastest == long_frame_us );
+   BOOST_TEST( attempts == calibration_runs );
+   BOOST_TEST( blocks == 0u );
+}
+
+BOOST_AUTO_TEST_CASE( calibration_exhaustion_never_accepts_an_incompletely_measured_count ) {
+   for( const bool one_success : { false, true } ) {
+      uint32_t attempts = 0, blocks = 0;
+      const auto fastest = fastest_calibration_sample( [&]( uint32_t attempt ) -> int64_t {
+         ++attempts;
+         if( one_success && attempt == 0 ) return long_frame_us;
+         FC_THROW_EXCEPTION( tx_cpu_usage_exceeded, "rejected calibration sample" );
+      }, [&] { ++blocks; } );
+      BOOST_TEST( !fastest );
+      BOOST_TEST( attempts == max_calibration_attempts );
+      BOOST_TEST( blocks == attempts - ( one_success ? 1u : 0u ) );
+   }
+}
+
+BOOST_AUTO_TEST_CASE( calibration_propagates_other_failures_and_block_advance_failures ) {
+   uint32_t blocks = 0;
+   BOOST_CHECK_THROW( fastest_calibration_sample( []( uint32_t ) -> int64_t {
+      FC_THROW_EXCEPTION( action_validate_exception, "unexpected calibration failure" );
+   }, [&] { ++blocks; } ), action_validate_exception );
+   BOOST_TEST( blocks == 0u );
+   BOOST_CHECK_THROW( fastest_calibration_sample( []( uint32_t ) -> int64_t {
+      FC_THROW_EXCEPTION( tx_cpu_usage_exceeded, "rejected calibration sample" );
+   }, [] {
+      FC_THROW_EXCEPTION( tx_cpu_usage_exceeded, "block advance is not a calibration sample" );
+   } ), tx_cpu_usage_exceeded );
+}
 
 BOOST_FIXTURE_TEST_CASE( transfer_between_plain_accounts_adds_no_entry, receiver_cpu_tester ) try {
    auto before = cpu_windows( { token_account, alice, bob } );
@@ -681,8 +770,9 @@ BOOST_FIXTURE_TEST_CASE( zero_entry_leaves_the_contracts_cpu_window_alone, recei
 BOOST_FIXTURE_TEST_CASE( receiver_over_its_limit_fails_on_account_cpu_limit, receiver_cpu_tester ) try {
    // A real deadline: the handler runs through its stipend and then idle's remaining CPU, which together are tighter
    // than the transaction's limit.
+   const std::string memo = stopped_spin_memo();
    const auto deadline = fc::time_point::now() + fc::seconds( 10 );
-   BOOST_CHECK_EXCEPTION( push_measured( make_trx( { transfer_action( alice, idle, amount, "forever" ) } ), deadline ),
+   BOOST_CHECK_EXCEPTION( push_measured( make_trx( { transfer_action( alice, idle, amount, memo ) } ), deadline ),
                           tx_cpu_usage_exceeded, fc_exception_message_contains( "reached account cpu limit" ) );
    produce_block();
 } FC_LOG_AND_RETHROW()
@@ -783,7 +873,7 @@ BOOST_FIXTURE_TEST_CASE( explicit_payer_pays_for_everything_below_it, receiver_c
    produce_and_check_validator( { token_account, alice, game, winner } );
 
    // within the transaction's max_cpu_usage_ms
-   auto trx = make_trx( { transfer_action( alice, game, amount, "forever", true ) } );
+   auto trx = make_trx( { transfer_action( alice, game, amount, stopped_spin_memo(), true ) } );
    trx.max_cpu_usage_ms = small_max_cpu_usage_ms;
    sign( trx );
    BOOST_CHECK_EXCEPTION( push_measured( trx, fc::time_point::now() + fc::seconds( 10 ) ), tx_cpu_usage_exceeded,
@@ -1021,9 +1111,9 @@ BOOST_FIXTURE_TEST_CASE( receiver_subjective_bill_limits_its_frame_past_the_stip
    sub_bill.subjective_bill( pending_id, fc::time_point_sec( now + fc::seconds( pending_bill_lifetime_sec ) ), {},
                              { { game, {.cpu = fc::microseconds( game_cpu_us + beyond_any_leeway_us )} } } );
    const auto deadline = fc::time_point::now() + fc::seconds( 10 );
-   auto trx = make_trx( { transfer_action( alice, game, amount, memo ) } );
-   BOOST_CHECK_EXCEPTION( push_measured( trx, deadline ), tx_cpu_usage_exceeded,
-                          fc_exception_message_contains( account_cpu_limit_reached ) );
+   BOOST_CHECK_EXCEPTION(
+      push_measured( make_trx( { transfer_action( alice, game, amount, stopped_spin_memo() ) } ), deadline ),
+      tx_cpu_usage_exceeded, fc_exception_message_contains( account_cpu_limit_reached ) );
    transfer( alice, bob, amount, "spin:1" ); // reaches no contract
    // A handler within the stipend still runs, and bills the game nothing.
    set_notify_cpu_stipend( ample_stipend() );
@@ -1034,7 +1124,7 @@ BOOST_FIXTURE_TEST_CASE( receiver_subjective_bill_limits_its_frame_past_the_stip
    // With the pending CPU gone, the handler runs past the stipend again.
    set_notify_cpu_stipend( stipend_us );
    sub_bill.remove_subjective_billing( pending_id, 0 );
-   receipt = entries( push_measured( trx, deadline ) );
+   receipt = entries( push_measured( make_trx( { transfer_action( alice, game, amount, memo ) } ), deadline ) );
    BOOST_REQUIRE_EQUAL( receipt.size(), 2u );
    BOOST_TEST( receipt[1] > 0u );
    produce_block();
@@ -1265,7 +1355,7 @@ BOOST_FIXTURE_TEST_CASE( explicit_payer_covers_only_its_own_action, receiver_cpu
 
 BOOST_FIXTURE_TEST_CASE( receiver_frame_stops_at_the_transaction_limit, receiver_cpu_tester ) try {
    // The game has ample CPU, so its frame stops at the transaction's max_cpu_usage_ms, reported as such.
-   auto trx = make_trx( { transfer_action( alice, game, amount, "forever" ) } );
+   auto trx = make_trx( { transfer_action( alice, game, amount, stopped_spin_memo() ) } );
    trx.max_cpu_usage_ms = small_max_cpu_usage_ms;
    sign( trx );
    BOOST_CHECK_EXCEPTION( push_measured( trx, fc::time_point::now() + fc::seconds( 10 ) ), tx_cpu_usage_exceeded,
@@ -1281,7 +1371,8 @@ BOOST_FIXTURE_TEST_CASE( greylisted_receiver_fails_as_greylisted, receiver_cpu_t
    const auto memo = long_spin_memo();
    start_speculative_block();
    const auto deadline = fc::time_point::now() + fc::seconds( 10 );
-   BOOST_CHECK_EXCEPTION( push_measured( make_trx( { transfer_action( alice, idle, amount, "forever" ) } ), deadline ),
+   BOOST_CHECK_EXCEPTION( push_measured( make_trx( { transfer_action( alice, idle, amount, stopped_spin_memo() ) } ),
+                                         deadline ),
                           greylist_cpu_usage_exceeded, fc_exception_message_contains( greylisted_frame_stopped ) );
    BOOST_CHECK_EXCEPTION( push_measured( make_trx( { transfer_action( alice, idle, amount, memo ) } ) ),
                           greylist_cpu_usage_exceeded, fc_exception_message_contains( idle_over_greylisted_limit ) );

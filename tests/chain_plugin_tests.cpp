@@ -3,6 +3,7 @@
 
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/abi_serializer.hpp>
+#include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/wasm_sysio_constraints.hpp>
 #include <sysio/chain/resource_limits.hpp>
 #include <sysio/chain/exceptions.hpp>
@@ -12,12 +13,15 @@
 
 #include <test_contracts.hpp>
 
+#include <fc/crypto/hex.hpp>
 #include <fc/io/fstream.hpp>
 
 #include <fc/variant_object.hpp>
 #include <fc/io/json.hpp>
 
+#include <algorithm>
 #include <array>
+#include <cstdint>
 #include <functional>
 #include <limits>
 #include <optional>
@@ -38,6 +42,100 @@ static auto get_account_full = [](chain_apis::read_only& plugin,
    BOOST_REQUIRE(!std::holds_alternative<fc::exception_ptr>(res));
    return std::get<chain_apis::read_only::get_account_results>(std::move(res));
 };
+
+namespace {
+
+/// The asserter ABI with its `condition` field renamed to `field`. Each test passes its own name, so the bytes are ones
+/// no serializer has been built for yet.
+std::string asserter_abi_with_field(std::string_view field) {
+   std::string abi = test_contracts::asserter_abi();
+   const size_t at = abi.find("condition");
+   BOOST_REQUIRE(at != std::string::npos);
+   abi.replace(at, std::string_view("condition").size(), field);
+   return abi;
+}
+
+/// Serializer builds the shared cache has started so far.
+uint64_t shared_builds() {
+   return chain_apis::shared_abi_serializer_cache().builds();
+}
+
+/// An ABI whose `store` action takes an array of structs, so its data can be made as slow to decode as a test needs.
+constexpr std::string_view bulk_abi = R"({
+   "version": "sysio::abi/1.2", "types": [],
+   "structs": [
+      {"name": "item", "base": "", "fields": [{"name": "owner", "type": "name"}, {"name": "amount", "type": "uint64"},
+                                              {"name": "balance", "type": "asset"}]},
+      {"name": "store", "base": "", "fields": [{"name": "items", "type": "item[]"}]}
+   ],
+   "actions": [{"name": "store", "type": "store", "ricardian_contract": ""}],
+   "tables": [], "ricardian_clauses": [], "variants": [], "action_results": []
+})";
+
+/// Data of bulk's `store` action holding `count` items.
+bytes bulk_store_data(size_t count) {
+   std::vector<char>                 packed;
+   fc::datastream<std::vector<char>> ds(packed);
+   fc::raw::pack(ds, fc::unsigned_int(count));
+   for (size_t i = 0; i < count; ++i) {
+      fc::raw::pack(ds, name("alice"));
+      fc::raw::pack(ds, uint64_t(i));
+      fc::raw::pack(ds, asset(int64_t(i), symbol(4, "SYS")));
+   }
+   return ds.storage();
+}
+
+/// The trace of a processed transaction whose top-level actions are `acts`, in order.
+transaction_trace_ptr trace_of(const std::vector<action>& acts) {
+   auto trace = std::make_shared<transaction_trace>();
+   trace->id  = transaction_id_type::hash("trace_of");
+   for (size_t i = 0; i < acts.size(); ++i) {
+      action_trace act_trace;
+      act_trace.action_ordinal = i + 1;
+      act_trace.receiver       = acts[i].account;
+      act_trace.act            = acts[i];
+      action_receipt receipt;
+      receipt.receiver        = acts[i].account;
+      receipt.global_sequence = i + 1;
+      receipt.recv_sequence   = i + 1;
+      act_trace.receipt       = receipt;
+      trace->action_traces.push_back(std::move(act_trace));
+   }
+   return trace;
+}
+
+/**
+ * Starts a request with `start` while asserter's ABI names its first field `field`, then restores the ABI and runs the
+ * function the request completed with, as the http thread pool would. Checks that the request built no serializer
+ * before that function ran, that the function built the one serializer, and that it decoded the data with the ABI as
+ * it was when the transaction completed.
+ */
+template <typename Result>
+void expect_abis_copied_at_completion(validating_tester& chain, std::string_view field,
+                                      const std::function<void(next_function<Result>)>& start) {
+   chain.set_abi("asserter"_n, asserter_abi_with_field(field));
+   chain.produce_block();
+
+   const uint64_t builds = shared_builds();
+   std::optional<next_function_variant<Result>> completed;
+   start([&completed](next_function_variant<Result>&& result) { completed = std::move(result); });
+   BOOST_CHECK_EQUAL(shared_builds(), builds);
+   BOOST_REQUIRE(completed);
+   using deferred_t = std::function<t_or_exception<Result>()>;
+   BOOST_REQUIRE(std::holds_alternative<deferred_t>(*completed));
+
+   chain.set_abi("asserter"_n, test_contracts::asserter_abi());
+   chain.produce_block();
+   const t_or_exception<Result> decoded = std::get<deferred_t>(*completed)();
+   BOOST_REQUIRE(std::holds_alternative<Result>(decoded));
+   BOOST_CHECK_EQUAL(shared_builds(), builds + 1);
+   const fc::variant& data = std::get<Result>(decoded).processed["action_traces"][size_t(0)]["act"]["data"];
+   BOOST_REQUIRE(data.is_object());
+   BOOST_CHECK(data.get_object().contains(std::string(field)));
+   BOOST_CHECK(!data.get_object().contains("condition"));
+}
+
+} // namespace
 
 BOOST_AUTO_TEST_SUITE(chain_plugin_tests)
 
@@ -101,8 +199,8 @@ BOOST_FIXTURE_TEST_CASE( get_block_with_invalid_abi, validating_tester ) try {
 
    // block should be decoded successfully
    auto block = plugin.get_raw_block(param, fc::time_point::maximum());
-   auto abi_cache = plugin.get_block_serializers(block, fc::microseconds::maximum());
-   std::string block_str = json::to_pretty_string(plugin.convert_block(block, abi_cache));
+   std::string block_str =
+      json::to_pretty_string(plugin.convert_block(block, chain_apis::captured_abis::capture(*control, *block)));
    BOOST_TEST(block_str.find("procassert") != std::string::npos);
    BOOST_TEST(block_str.find("condition") != std::string::npos);
    BOOST_TEST(block_str.find("Should Not Assert!") != std::string::npos);
@@ -121,8 +219,8 @@ BOOST_FIXTURE_TEST_CASE( get_block_with_invalid_abi, validating_tester ) try {
 
    // get the same block as string, results in decode failed(invalid abi) but not exception
    auto block2 = plugin.get_raw_block(param, fc::time_point::maximum());
-   auto abi_cache2 = plugin.get_block_serializers(block2, fc::microseconds::maximum());
-   std::string block_str2 = json::to_pretty_string(plugin.convert_block(block2, abi_cache2));
+   std::string block_str2 =
+      json::to_pretty_string(plugin.convert_block(block2, chain_apis::captured_abis::capture(*control, *block2)));
    BOOST_TEST(block_str2.find("procassert") != std::string::npos);
    BOOST_TEST(block_str2.find("condition") == std::string::npos); // decode failed
    BOOST_TEST(block_str2.find("Should Not Assert!") == std::string::npos); // decode failed
@@ -420,6 +518,743 @@ BOOST_FIXTURE_TEST_CASE( permission_satisfies_link_follows_linkauth, validating_
 
    // A permission that does not exist satisfies nothing.
    BOOST_CHECK(!permission_satisfies_link(*control, {"alice"_n, "nosuch"_n}, "bob"_n, "accept"_n));
+} FC_LOG_AND_RETHROW()
+
+/// get_required_keys returns the keys of every declared permission however often and in whatever order actions
+/// declare them, applies the payer rules to each action on its own, and stops at the request deadline.
+BOOST_FIXTURE_TEST_CASE( get_required_keys_duplicate_declarations, validating_tester ) try {
+   produce_block();
+   create_accounts({"alice"_n, "bob"_n}, false, false);
+   produce_block();
+
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   chain_apis::read_only plugin(*control, {}, {}, _tracked_votes, fc::microseconds::maximum(),
+                                fc::microseconds::maximum(), nullptr);
+   const fc::time_point no_deadline = fc::time_point::maximum();
+
+   const public_key_type alice_key = get_public_key("alice"_n, "active");
+   const public_key_type bob_key   = get_public_key("bob"_n, "active");
+   const public_key_type bob_owner = get_public_key("bob"_n, "owner");
+   const public_key_type unrelated = get_public_key("nobody"_n, "active");
+   const flat_set<public_key_type> all_keys{alice_key, bob_key, bob_owner, unrelated};
+
+   const permission_level alice{"alice"_n, config::active_name};
+   const permission_level bob{"bob"_n, config::active_name};
+   const permission_level bob_as_owner{"bob"_n, config::owner_name};
+   const permission_level bob_payer{"bob"_n, config::sysio_payer_name};
+
+   using declarations = std::vector<std::vector<permission_level>>;
+   const auto request = [&](const declarations& actions, const flat_set<public_key_type>& available) {
+      signed_transaction trx;
+      set_transaction_headers(trx);
+      for (const std::vector<permission_level>& authorization : actions)
+         trx.actions.emplace_back(authorization, "alice"_n, "doit"_n, bytes{});
+      return chain_apis::read_only::get_required_keys_params{fc::variant(trx), available};
+   };
+   const auto required_keys = [&](const declarations& actions) {
+      return plugin.get_required_keys(request(actions, all_keys), no_deadline).required_keys;
+   };
+   /// `copies` actions, alternating between the two authorization lists.
+   const auto repeated = [](uint32_t copies, const std::vector<permission_level>& even,
+                            const std::vector<permission_level>& odd) {
+      declarations actions;
+      for (uint32_t i = 0; i < copies; ++i)
+         actions.push_back(i % 2 == 0 ? even : odd);
+      return actions;
+   };
+   constexpr uint32_t many = 2000;
+
+   BOOST_CHECK(required_keys({{alice}}) == (flat_set<public_key_type>{alice_key}));
+   BOOST_CHECK(required_keys({{bob}}) == (flat_set<public_key_type>{bob_key}));
+   BOOST_CHECK(required_keys({{bob_as_owner}}) == (flat_set<public_key_type>{bob_owner}));
+
+   // Duplicates within and across actions, in either order, require each key once.
+   const flat_set<public_key_type> alice_and_bob{alice_key, bob_key};
+   BOOST_CHECK(required_keys({{alice, bob, alice}}) == alice_and_bob);
+   BOOST_CHECK(required_keys(repeated(many, {alice, bob}, {bob, alice})) == alice_and_bob);
+   BOOST_CHECK(required_keys(repeated(many, {bob}, {alice, bob_as_owner})) ==
+              (flat_set<public_key_type>{alice_key, bob_key, bob_owner}));
+
+   // A payer marker needs no key of its own; its pairing is checked on every action.
+   BOOST_CHECK(required_keys({{bob_payer, bob}}) == (flat_set<public_key_type>{bob_key}));
+   BOOST_CHECK(required_keys(repeated(many, {bob_payer, bob}, {alice})) == alice_and_bob);
+   BOOST_CHECK_THROW(required_keys({{bob_payer, alice}, {bob}}), unsatisfied_authorization);
+   BOOST_CHECK_THROW(required_keys(repeated(many, {bob_payer, bob}, {bob_payer, alice})), unsatisfied_authorization);
+   BOOST_CHECK_THROW(required_keys({{alice, bob_payer, bob}}), irrelevant_auth_exception);
+   BOOST_CHECK_THROW(required_keys({{bob_payer, bob_payer, bob}}), irrelevant_auth_exception);
+
+   // A permission the available keys cannot satisfy fails however many times it is declared.
+   BOOST_CHECK_THROW(plugin.get_required_keys(request(repeated(many, {alice}, {bob}), {alice_key}), no_deadline),
+                     unsatisfied_authorization);
+
+   // A deadline already passed stops the request.
+   const fc::time_point passed = fc::time_point::now() - fc::microseconds(1);
+   BOOST_CHECK_THROW(plugin.get_required_keys(request({{alice}}, all_keys), passed), deadline_exception);
+   BOOST_CHECK_THROW(plugin.get_required_keys(request(repeated(many, {alice}, {bob}), all_keys), passed),
+                     deadline_exception);
+} FC_LOG_AND_RETHROW()
+
+/// get_required_keys stops at the request deadline while it evaluates one declared authority: its checktime reaches
+/// the authority evaluation, not only the points between evaluations.
+BOOST_FIXTURE_TEST_CASE( get_required_keys_deadline_inside_evaluation, validating_tester ) try {
+   produce_block();
+   create_accounts({"wide"_n}, false, false);
+   produce_block();
+
+   // A threshold-1 authority whose only available key sorts last, so evaluating it visits every key.
+   constexpr uint32_t key_count = 12000;
+   std::vector<public_key_type> keys;
+   keys.reserve(key_count);
+   for (uint32_t i = 0; i < key_count; ++i)
+      keys.push_back(get_public_key("wide"_n, std::to_string(i)));
+   std::sort(keys.begin(), keys.end());
+   std::vector<key_weight> weights;
+   weights.reserve(key_count);
+   for (const public_key_type& key : keys)
+      weights.push_back(key_weight{key, 1});
+   const permission_level wide{"wide"_n, "wide"_n};
+   set_authority(wide.actor, wide.permission, authority(1, std::move(weights)), config::active_name);
+   produce_block();
+
+   const flat_set<public_key_type> available{keys.back()};
+   signed_transaction              trx;
+   set_transaction_headers(trx);
+   trx.actions.emplace_back(std::vector<permission_level>{wide}, wide.actor, "doit"_n, bytes{});
+
+   // Beyond the two calls get_required_keys makes itself (one for the declared authorization, one before the
+   // permission is evaluated), the checktime is called during the evaluation.
+   uint32_t                    checktime_calls = 0;
+   const std::function<void()> count_calls     = [&checktime_calls]() { ++checktime_calls; };
+   BOOST_CHECK(control->get_authorization_manager().get_required_keys(trx, available, count_calls) == available);
+   BOOST_TEST(checktime_calls > 2u);
+
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   chain_apis::read_only plugin(*control, {}, {}, _tracked_votes, fc::microseconds::maximum(),
+                                fc::microseconds::maximum(), nullptr);
+   const chain_apis::read_only::get_required_keys_params params{fc::variant(trx), available};
+
+   // Without a deadline the request succeeds; the fastest of a few runs measures how long it takes.
+   constexpr int timing_runs = 3;
+   fc::microseconds unbounded = fc::microseconds::maximum();
+   for (int run = 0; run < timing_runs; ++run) {
+      const fc::time_point start = fc::time_point::now();
+      BOOST_CHECK(plugin.get_required_keys(params, fc::time_point::maximum()).required_keys == available);
+      unbounded = std::min(unbounded, fc::time_point::now() - start);
+   }
+   BOOST_TEST_MESSAGE("unbounded get_required_keys " << unbounded.count() << "us");
+
+   // A deadline this fraction of the way through falls inside the evaluation, which takes nearly all of the request.
+   constexpr int64_t deadline_fraction = 8;
+   const fc::time_point deadline = fc::time_point::now() + fc::microseconds(unbounded.count() / deadline_fraction);
+   BOOST_CHECK_THROW(plugin.get_required_keys(params, deadline), deadline_exception);
+} FC_LOG_AND_RETHROW()
+
+/// get_transaction_id reads each action from `hex_data` when it also has `data`, rejects malformed requests, and
+/// converts a request in time proportional to its size.
+BOOST_AUTO_TEST_CASE( get_transaction_id_many_actions ) try {
+   using chain_apis::read_only;
+   constexpr uint32_t action_count = 8000;
+   // Converting a request may take at most this many times as long as parsing its JSON, which is linear in its size.
+   constexpr int64_t max_convert_to_parse_ratio = 10;
+   constexpr int     timing_runs                = 3;
+
+   signed_transaction trx;
+   trx.expiration       = fc::time_point_sec(fc::time_point::from_iso_string("2030-01-01T00:00:00"));
+   trx.ref_block_num    = 1;
+   trx.ref_block_prefix = 2;
+   for (uint32_t i = 0; i < action_count; ++i)
+      trx.actions.emplace_back(std::vector<permission_level>{{"alice"_n, config::active_name}}, "alice"_n, "doit"_n,
+                               fc::raw::pack(i));
+
+   // Every action carries the exploded `data` the endpoint cannot use alongside the `hex_data` it reads.
+   fc::mutable_variant_object request(fc::variant(static_cast<const transaction&>(trx)).get_object());
+   fc::variants                actions;
+   for (uint32_t i = 0; i < action_count; ++i) {
+      const action& act = trx.actions[i];
+      actions.emplace_back(fc::mutable_variant_object()
+         ("account", act.account)
+         ("name", act.name)
+         ("authorization", act.authorization)
+         ("data", fc::mutable_variant_object()("value", i))
+         ("hex_data", fc::to_hex(act.data.data(), act.data.size())));
+   }
+   request["actions"] = std::move(actions);
+   const std::string body = fc::json::to_string(fc::variant(std::move(request)), fc::time_point::maximum());
+
+   BOOST_CHECK(read_only::to_get_transaction_id_params(fc::json::from_string(body)).id() == trx.id());
+
+   const auto elapsed_us = [](const auto& f) {
+      const fc::time_point start = fc::time_point::now();
+      f();
+      return (fc::time_point::now() - start).count();
+   };
+   int64_t parse_us   = std::numeric_limits<int64_t>::max();
+   int64_t convert_us = std::numeric_limits<int64_t>::max();
+   for (int run = 0; run < timing_runs; ++run) {
+      fc::variant                          parsed;
+      read_only::get_transaction_id_params converted;
+      parse_us   = std::min(parse_us, elapsed_us([&] { parsed = fc::json::from_string(body); }));
+      convert_us = std::min(convert_us, elapsed_us([&] {
+         converted = read_only::to_get_transaction_id_params(std::move(parsed));
+      }));
+      BOOST_TEST(converted.actions.size() == action_count);
+   }
+   BOOST_TEST_MESSAGE("parse " << parse_us << "us, convert " << convert_us << "us");
+   BOOST_TEST(convert_us < parse_us * max_convert_to_parse_ratio);
+
+   // `hex_data` wins over a `data` string; a `data` string alone is used as is.
+   const fc::variant first_action = fc::variant(trx.actions[0]);
+   const auto with_actions = [&](fc::variants acts) {
+      fc::mutable_variant_object single(fc::variant(static_cast<const transaction&>(trx)).get_object());
+      single["actions"] = std::move(acts);
+      return fc::variant(std::move(single));
+   };
+   transaction one_action = trx;
+   one_action.actions.resize(1);
+   const fc::variant          hex_data = first_action["data"];
+   fc::mutable_variant_object stale_data(first_action.get_object());
+   stale_data["hex_data"] = hex_data;
+   stale_data["data"]     = "00";
+   BOOST_CHECK(read_only::to_get_transaction_id_params(with_actions({fc::variant(std::move(stale_data))})).id() ==
+              one_action.id());
+   BOOST_CHECK(read_only::to_get_transaction_id_params(with_actions({first_action})).id() == one_action.id());
+
+   // Malformed requests.
+   fc::mutable_variant_object exploded_only(first_action.get_object());
+   exploded_only["data"] = fc::mutable_variant_object()("value", 0);
+   fc::mutable_variant_object no_actions(fc::variant(static_cast<const transaction&>(trx)).get_object());
+   no_actions.erase("actions");
+   BOOST_CHECK_THROW(read_only::to_get_transaction_id_params(fc::variant("not an object")), invalid_http_request);
+   BOOST_CHECK_THROW(read_only::to_get_transaction_id_params(fc::variant(std::move(no_actions))),
+                     invalid_http_request);
+   BOOST_CHECK_THROW(read_only::to_get_transaction_id_params(with_actions({fc::variant(1)})), invalid_http_request);
+   BOOST_CHECK_THROW(read_only::to_get_transaction_id_params(with_actions({fc::variant(std::move(exploded_only))})),
+                     invalid_http_request);
+   BOOST_CHECK_THROW(read_only::to_get_transaction_id_params(fc::variant(transaction())), invalid_http_request);
+} FC_LOG_AND_RETHROW()
+
+/// Packing a transaction request runs under the request deadline: past it, push_transaction, send_transaction,
+/// send_transaction2 and compute_transaction fail before the transaction reaches the node, with
+/// packed_transaction_type_exception rather than a deadline exception.
+BOOST_FIXTURE_TEST_CASE( push_transaction_honors_request_deadline, validating_tester ) try {
+   signed_transaction trx;
+   trx.actions.emplace_back(std::vector<permission_level>{{config::system_account_name, config::active_name}},
+                            config::system_account_name, "noop"_n, bytes{});
+   set_transaction_headers(trx);
+   const fc::variant params{packed_transaction(trx)};
+
+   using incoming_method = plugin_interface::incoming::methods::transaction_async;
+   appbase::scoped_app app;
+   size_t              provided = 0;
+   // The provider stays registered while its handle lives.
+   incoming_method::method_type::handle provider = app->get_method<incoming_method>().register_provider(
+      [&provided](const packed_transaction_ptr&, bool, transaction_metadata::trx_type, bool,
+                  next_function<transaction_trace_ptr>) { ++provided; });
+
+   std::optional<chain_apis::trx_retry_db>  no_retry;
+   std::optional<chain_apis::tracked_votes> tracked_votes;
+   chain_apis::read_write rw_expired(*control, no_retry, fc::microseconds::maximum(), fc::microseconds(0), true);
+   chain_apis::read_only  ro_expired(*control, {}, {}, tracked_votes, fc::microseconds::maximum(), fc::microseconds(0),
+                                     nullptr);
+
+   const auto expect_not_submitted = [](const auto& refused) {
+      BOOST_REQUIRE(refused);
+      BOOST_REQUIRE(std::holds_alternative<fc::exception_ptr>(*refused));
+      const fc::exception_ptr& error = std::get<fc::exception_ptr>(*refused);
+      BOOST_CHECK_EQUAL(error->code(), packed_transaction_type_exception::code_value);
+      BOOST_CHECK(error->to_detail_string().find("not submitted") != std::string::npos);
+   };
+   using push_results_t = chain_apis::read_write::push_transaction_results;
+   std::optional<next_function_variant<push_results_t>> pushed;
+   rw_expired.push_transaction(params.get_object(),
+                               [&pushed](next_function_variant<push_results_t>&& result) { pushed = std::move(result); });
+   expect_not_submitted(pushed);
+
+   std::optional<next_function_variant<push_results_t>> sent;
+   rw_expired.send_transaction(params.get_object(),
+                               [&sent](next_function_variant<push_results_t>&& result) { sent = std::move(result); });
+   expect_not_submitted(sent);
+
+   std::optional<next_function_variant<push_results_t>> sent2;
+   rw_expired.send_transaction2({.return_failure_trace = true, .transaction = params},
+                                [&sent2](next_function_variant<push_results_t>&& result) { sent2 = std::move(result); });
+   expect_not_submitted(sent2);
+
+   using compute_results_t = chain_apis::read_only::compute_transaction_results;
+   std::optional<next_function_variant<compute_results_t>> computed;
+   ro_expired.compute_transaction({params}, [&computed](next_function_variant<compute_results_t>&& result) {
+      computed = std::move(result);
+   });
+   expect_not_submitted(computed);
+   BOOST_CHECK_EQUAL(provided, 0u);
+
+   // JSON action data whose serializer has no time to build, under abi_serializer_max_time rather than the deadline.
+   create_accounts({"asserter"_n});
+   set_code("asserter"_n, test_contracts::asserter_wasm());
+   set_abi("asserter"_n, asserter_abi_with_field("pack_probe"));
+   produce_block();
+   signed_transaction json_trx;
+   json_trx.actions.emplace_back(std::vector<permission_level>{{"asserter"_n, config::active_name}}, "asserter"_n,
+                                 "procassert"_n, fc::raw::pack(int8_t{1}, std::string("fine")));
+   set_transaction_headers(json_trx);
+   json_trx.sign(get_private_key("asserter"_n, "active"), control->get_chain_id());
+   fc::variant json_trx_var;
+   abi_serializer::to_variant(static_cast<const transaction&>(json_trx), json_trx_var, get_resolver(),
+                              abi_serializer_max_time);
+   BOOST_REQUIRE(json_trx_var["actions"][size_t(0)]["data"].is_object());
+   const fc::variant json_params = fc::mutable_variant_object()("signatures", json_trx.signatures)(
+      "compression", "none")("transaction", json_trx_var);
+
+   chain_apis::read_write no_build_time(*control, no_retry, fc::microseconds(0), fc::microseconds::maximum(), true);
+   std::optional<next_function_variant<push_results_t>> unpacked;
+   no_build_time.push_transaction(json_params.get_object(), [&unpacked](next_function_variant<push_results_t>&& result) {
+      unpacked = std::move(result);
+   });
+   expect_not_submitted(unpacked);
+   BOOST_CHECK_EQUAL(provided, 0u);
+
+   chain_apis::read_write in_time(*control, no_retry, fc::microseconds::maximum(), fc::microseconds::maximum(), true);
+   in_time.push_transaction(json_params.get_object(), [](next_function_variant<push_results_t>&&) {});
+   BOOST_CHECK_EQUAL(provided, 1u);
+} FC_LOG_AND_RETHROW()
+
+/// get_required_keys packs its transaction under the request deadline it is given as well as the per-action limit. Past
+/// the deadline it fails with deadline_exception, as it does while checking keys; out of the per-action limit alone, a
+/// serializer it cannot build fails it with abi_serialization_deadline_exception.
+BOOST_FIXTURE_TEST_CASE( get_required_keys_honors_request_deadline, validating_tester ) try {
+   create_accounts({"asserter"_n});
+   set_code("asserter"_n, test_contracts::asserter_wasm());
+   set_abi("asserter"_n, asserter_abi_with_field("keys_probe"));
+   produce_block();
+
+   signed_transaction trx;
+   trx.actions.emplace_back(std::vector<permission_level>{{"asserter"_n, config::active_name}}, "asserter"_n,
+                            "procassert"_n, fc::raw::pack(int8_t{1}, std::string("fine")));
+   set_transaction_headers(trx);
+   fc::variant trx_var;
+   abi_serializer::to_variant(trx, trx_var, get_resolver(), abi_serializer_max_time);
+   BOOST_REQUIRE(trx_var["actions"][size_t(0)]["data"].is_object());
+
+   const public_key_type key = get_public_key("asserter"_n, "active");
+   const chain_apis::read_only::get_required_keys_params params{trx_var, {key}};
+   std::optional<chain_apis::tracked_votes> tracked_votes;
+
+   // Neither builds the serializer, so both meet the ABI uncached.
+   chain_apis::read_only no_build_time(*control, {}, {}, tracked_votes, fc::microseconds(0),
+                                       fc::microseconds::maximum(), nullptr);
+   BOOST_CHECK_THROW(no_build_time.get_required_keys(params, no_build_time.start()),
+                     abi_serialization_deadline_exception);
+   chain_apis::read_only expired(*control, {}, {}, tracked_votes, fc::microseconds::maximum(), fc::microseconds(0),
+                                 nullptr);
+   BOOST_CHECK_THROW(expired.get_required_keys(params, expired.start()), deadline_exception);
+
+   chain_apis::read_only unlimited(*control, {}, {}, tracked_votes, fc::microseconds::maximum(),
+                                   fc::microseconds::maximum(), nullptr);
+   BOOST_CHECK(unlimited.get_required_keys(params, unlimited.start()).required_keys ==
+               flat_set<public_key_type>{key});
+} FC_LOG_AND_RETHROW()
+
+/// push_transaction and push_transactions hand decoding their traces to the function they return, which runs on the
+/// http thread pool rather than on the thread that executed the transactions. abi_serializer_max_time bounds that
+/// decoding as a whole; with none, the data stays hex.
+BOOST_FIXTURE_TEST_CASE( push_transaction_defers_trace_decode, validating_tester ) try {
+   create_accounts({"asserter"_n});
+   set_code("asserter"_n, test_contracts::asserter_wasm());
+   set_abi("asserter"_n, test_contracts::asserter_abi());
+   produce_block();
+
+   signed_transaction trx;
+   trx.actions.emplace_back(std::vector<permission_level>{{"asserter"_n, config::active_name}}, "asserter"_n,
+                            "procassert"_n, fc::raw::pack(int8_t{1}, std::string("fine")));
+   set_transaction_headers(trx);
+   trx.sign(get_private_key("asserter"_n, "active"), control->get_chain_id());
+   const fc::variant params{packed_transaction(trx)};
+   const transaction_trace_ptr trace = push_transaction(trx);
+   const std::string hex_data = fc::to_hex(trx.actions[0].data);
+
+   using incoming_method = plugin_interface::incoming::methods::transaction_async;
+   appbase::scoped_app app;
+   size_t              provided = 0;
+   // The provider stays registered while its handle lives.
+   incoming_method::method_type::handle provider = app->get_method<incoming_method>().register_provider(
+      [&trace, &provided](const packed_transaction_ptr&, bool, transaction_metadata::trx_type, bool,
+                          next_function<transaction_trace_ptr> next) {
+         ++provided;
+         next(transaction_trace_ptr(trace));
+      });
+
+   std::optional<chain_apis::trx_retry_db> no_retry;
+   using results_t  = chain_apis::read_write::push_transaction_results;
+   using deferred_t = std::function<t_or_exception<results_t>()>;
+   const auto push = [&](const fc::microseconds& max_time) {
+      chain_apis::read_write rw(*control, no_retry, max_time, fc::microseconds::maximum(), true);
+      std::optional<next_function_variant<results_t>> pushed;
+      rw.push_transaction(params.get_object(), [&pushed](next_function_variant<results_t>&& result) {
+         pushed = std::move(result);
+      });
+      BOOST_REQUIRE(pushed);
+      BOOST_REQUIRE(std::holds_alternative<deferred_t>(*pushed));
+      t_or_exception<results_t> decoded = std::get<deferred_t>(*pushed)();
+      BOOST_REQUIRE(std::holds_alternative<results_t>(decoded));
+      return std::get<results_t>(std::move(decoded));
+   };
+
+   const results_t results = push(fc::microseconds::maximum());
+   BOOST_CHECK(results.transaction_id == trx.id());
+   const fc::variant& act = results.processed["action_traces"][size_t(0)]["act"];
+   BOOST_REQUIRE(act["data"].is_object());
+   BOOST_CHECK_EQUAL(act["data"]["message"].as_string(), "fine");
+
+   // With no time to decode, the data stays hex.
+   const results_t spent = push(fc::microseconds(0));
+   BOOST_CHECK_EQUAL(spent.processed["action_traces"][size_t(0)]["act"]["data"].as_string(), hex_data);
+   BOOST_CHECK_EQUAL(spent.processed["action_traces"][size_t(0)]["act"]["hex_data"].as_string(), hex_data);
+
+   using batch_results_t  = chain_apis::read_write::push_transactions_results;
+   using batch_deferred_t = std::function<t_or_exception<batch_results_t>()>;
+   const auto push_batch = [&](const fc::microseconds& max_time) {
+      chain_apis::read_write rw(*control, no_retry, max_time, fc::microseconds::maximum(), true);
+      std::optional<next_function_variant<batch_results_t>> pushed;
+      rw.push_transactions({params.get_object(), params.get_object()},
+                           [&pushed](next_function_variant<batch_results_t>&& result) { pushed = std::move(result); });
+      BOOST_REQUIRE(pushed);
+      BOOST_REQUIRE(std::holds_alternative<batch_deferred_t>(*pushed));
+      t_or_exception<batch_results_t> decoded = std::get<batch_deferred_t>(*pushed)();
+      BOOST_REQUIRE(std::holds_alternative<batch_results_t>(decoded));
+      return std::get<batch_results_t>(std::move(decoded));
+   };
+
+   const batch_results_t batch = push_batch(fc::microseconds::maximum());
+   BOOST_REQUIRE_EQUAL(batch.size(), 2u);
+   for (const results_t& result : batch)
+      BOOST_CHECK(result.processed["action_traces"][size_t(0)]["act"]["data"].is_object());
+
+   const batch_results_t batch_spent = push_batch(fc::microseconds(0));
+   BOOST_REQUIRE_EQUAL(batch_spent.size(), 2u);
+   for (const results_t& result : batch_spent)
+      BOOST_CHECK_EQUAL(result.processed["action_traces"][size_t(0)]["act"]["data"].as_string(), hex_data);
+
+   BOOST_CHECK_EQUAL(provided, 6u);
+} FC_LOG_AND_RETHROW()
+
+/// get_block builds serializers and decodes a block's action data within abi_serializer_max_time as a whole; with
+/// none, the data stays hex and no serializer is built.
+BOOST_FIXTURE_TEST_CASE( get_block_honors_response_budget, validating_tester ) try {
+   create_accounts({"asserter"_n});
+   set_code("asserter"_n, test_contracts::asserter_wasm());
+   set_abi("asserter"_n, asserter_abi_with_field("budget_probe"));
+   produce_block();
+
+   signed_transaction trx;
+   trx.actions.emplace_back(std::vector<permission_level>{{"asserter"_n, config::active_name}}, "asserter"_n,
+                            "procassert"_n, fc::raw::pack(int8_t{1}, std::string("fine")));
+   set_transaction_headers(trx);
+   trx.sign(get_private_key("asserter"_n, "active"), control->get_chain_id());
+   push_transaction(trx);
+   produce_block();
+
+   const chain_apis::read_only::get_raw_block_params param{std::to_string(control->head().block_num())};
+   std::optional<chain_apis::tracked_votes> tracked_votes;
+   const auto block_json = [&](const fc::microseconds& max_time) {
+      chain_apis::read_only plugin(*control, {}, {}, tracked_votes, max_time, fc::microseconds::maximum(), nullptr);
+      const t_or_exception<fc::variant> converted = plugin.get_block(param, fc::time_point::maximum())();
+      BOOST_REQUIRE(std::holds_alternative<fc::variant>(converted));
+      return json::to_string(std::get<fc::variant>(converted), fc::time_point::maximum());
+   };
+
+   const uint64_t    builds   = shared_builds();
+   const std::string hex_data = fc::to_hex(trx.actions[0].data);
+   const std::string spent    = block_json(fc::microseconds(0));
+   BOOST_CHECK(spent.find("\"message\":\"fine\"") == std::string::npos);
+   BOOST_CHECK(spent.find("\"data\":\"" + hex_data + "\"") != std::string::npos);
+   BOOST_CHECK(spent.find("\"hex_data\":\"" + hex_data + "\"") != std::string::npos);
+   BOOST_CHECK_EQUAL(shared_builds(), builds);
+
+   const std::string decoded = block_json(fc::microseconds::maximum());
+   BOOST_CHECK(decoded.find("\"budget_probe\":1,\"message\":\"fine\"") != std::string::npos);
+   BOOST_CHECK_EQUAL(shared_builds(), builds + 1);
+} FC_LOG_AND_RETHROW()
+
+/// get_block only copies the ABIs of the accounts its block names. The function it returns, which runs on the http
+/// thread pool, builds their serializers and decodes the block with the ABIs as they were when get_block ran.
+BOOST_FIXTURE_TEST_CASE( get_block_copies_abis_for_the_http_thread_pool, validating_tester ) try {
+   create_accounts({"asserter"_n});
+   set_code("asserter"_n, test_contracts::asserter_wasm());
+   set_abi("asserter"_n, asserter_abi_with_field("block_probe"));
+   produce_block();
+
+   signed_transaction trx;
+   trx.actions.emplace_back(std::vector<permission_level>{{"asserter"_n, config::active_name}}, "asserter"_n,
+                            "procassert"_n, fc::raw::pack(int8_t{1}, std::string("fine")));
+   set_transaction_headers(trx);
+   trx.sign(get_private_key("asserter"_n, "active"), control->get_chain_id());
+   push_transaction(trx);
+   produce_block();
+
+   const chain_apis::read_only::get_raw_block_params param{std::to_string(control->head().block_num())};
+   std::optional<chain_apis::tracked_votes> tracked_votes;
+   chain_apis::read_only plugin(*control, {}, {}, tracked_votes, fc::microseconds::maximum(),
+                                fc::microseconds::maximum(), nullptr);
+
+   const uint64_t builds  = shared_builds();
+   const auto     convert = plugin.get_block(param, fc::time_point::maximum());
+   BOOST_CHECK_EQUAL(shared_builds(), builds);
+
+   set_abi("asserter"_n, test_contracts::asserter_abi());
+   produce_block();
+   const t_or_exception<fc::variant> converted = convert();
+   BOOST_REQUIRE(std::holds_alternative<fc::variant>(converted));
+   const std::string block_json = json::to_string(std::get<fc::variant>(converted), fc::time_point::maximum());
+   BOOST_CHECK(block_json.find("\"block_probe\":1,\"message\":\"fine\"") != std::string::npos);
+   BOOST_CHECK(block_json.find("\"condition\"") == std::string::npos);
+   BOOST_CHECK_EQUAL(shared_builds(), builds + 1);
+} FC_LOG_AND_RETHROW()
+
+/// Each transaction API only copies the ABIs its trace names when the transaction completes. The function it returns,
+/// which runs on the http thread pool, builds their serializers and decodes the trace with the ABIs as they were then.
+BOOST_FIXTURE_TEST_CASE( transaction_completions_copy_abis_for_the_http_thread_pool, validating_tester ) try {
+   create_accounts({"asserter"_n});
+   set_code("asserter"_n, test_contracts::asserter_wasm());
+   set_abi("asserter"_n, test_contracts::asserter_abi());
+   produce_block();
+
+   signed_transaction trx;
+   trx.actions.emplace_back(std::vector<permission_level>{{"asserter"_n, config::active_name}}, "asserter"_n,
+                            "procassert"_n, fc::raw::pack(int8_t{1}, std::string("fine")));
+   set_transaction_headers(trx);
+   trx.sign(get_private_key("asserter"_n, "active"), control->get_chain_id());
+   const fc::variant             params{packed_transaction(trx)};
+   const transaction_trace_ptr   trace = push_transaction(trx);
+
+   using incoming_method = plugin_interface::incoming::methods::transaction_async;
+   appbase::scoped_app app;
+   // The provider stays registered while its handle lives.
+   incoming_method::method_type::handle provider = app->get_method<incoming_method>().register_provider(
+      [&trace](const packed_transaction_ptr&, bool, transaction_metadata::trx_type, bool,
+               next_function<transaction_trace_ptr> next) { next(transaction_trace_ptr(trace)); });
+
+   std::optional<chain_apis::trx_retry_db>  no_retry;
+   std::optional<chain_apis::tracked_votes> tracked_votes;
+   chain_apis::read_write rw(*control, no_retry, fc::microseconds::maximum(), fc::microseconds::maximum(), true);
+   chain_apis::read_only  ro(*control, {}, {}, tracked_votes, fc::microseconds::maximum(),
+                             fc::microseconds::maximum(), nullptr);
+
+   using push_results_t = chain_apis::read_write::push_transaction_results;
+   expect_abis_copied_at_completion<push_results_t>(*this, "push_probe", [&](next_function<push_results_t> next) {
+      rw.push_transaction(params.get_object(), std::move(next));
+   });
+   expect_abis_copied_at_completion<push_results_t>(*this, "send_probe", [&](next_function<push_results_t> next) {
+      rw.send_transaction(params.get_object(), std::move(next));
+   });
+   expect_abis_copied_at_completion<push_results_t>(*this, "send2_probe", [&](next_function<push_results_t> next) {
+      rw.send_transaction2({.return_failure_trace = true, .transaction = params}, std::move(next));
+   });
+   using compute_results_t = chain_apis::read_only::compute_transaction_results;
+   expect_abis_copied_at_completion<compute_results_t>(*this, "compute_probe",
+                                                       [&](next_function<compute_results_t> next) {
+      ro.compute_transaction({params}, std::move(next));
+   });
+
+   // push_transactions copies the ABIs of each trace when its transaction completes, and builds one serializer for an
+   // ABI its traces share.
+   set_abi("asserter"_n, asserter_abi_with_field("batch_probe"));
+   produce_block();
+   using batch_results_t  = chain_apis::read_write::push_transactions_results;
+   using batch_deferred_t = std::function<t_or_exception<batch_results_t>()>;
+   const uint64_t builds = shared_builds();
+   std::optional<next_function_variant<batch_results_t>> pushed;
+   rw.push_transactions({params.get_object(), params.get_object()},
+                        [&pushed](next_function_variant<batch_results_t>&& result) { pushed = std::move(result); });
+   BOOST_CHECK_EQUAL(shared_builds(), builds);
+   BOOST_REQUIRE(pushed);
+   BOOST_REQUIRE(std::holds_alternative<batch_deferred_t>(*pushed));
+   set_abi("asserter"_n, test_contracts::asserter_abi());
+   produce_block();
+   const t_or_exception<batch_results_t> decoded = std::get<batch_deferred_t>(*pushed)();
+   BOOST_REQUIRE(std::holds_alternative<batch_results_t>(decoded));
+   BOOST_CHECK_EQUAL(shared_builds(), builds + 1);
+   const batch_results_t& batch = std::get<batch_results_t>(decoded);
+   BOOST_REQUIRE_EQUAL(batch.size(), 2u);
+   for (const push_results_t& result : batch)
+      BOOST_CHECK(result.processed["action_traces"][size_t(0)]["act"]["data"].get_object().contains("batch_probe"));
+} FC_LOG_AND_RETHROW()
+
+/// A resolver made for one request returns the serializer an earlier request built for the same ABI.
+BOOST_FIXTURE_TEST_CASE( make_resolver_reuses_serializer_across_requests, validating_tester ) try {
+   create_accounts({"asserter"_n});
+   set_code("asserter"_n, test_contracts::asserter_wasm());
+   set_abi("asserter"_n, test_contracts::asserter_abi());
+   produce_block();
+
+   const auto first  = make_resolver(*control, abi_serializer_max_time, throw_on_yield::yes)("asserter"_n);
+   const auto second = make_resolver(*control, abi_serializer_max_time, throw_on_yield::yes)("asserter"_n);
+   BOOST_REQUIRE(first);
+   BOOST_REQUIRE(second);
+   BOOST_CHECK(&*first == &*second);
+   BOOST_CHECK(!make_resolver(*control, abi_serializer_max_time, throw_on_yield::yes)("nosuchacct"_n));
+} FC_LOG_AND_RETHROW()
+
+/// Decoding a processed transaction's trace that runs out of abi_serializer_max_time part way still returns the trace,
+/// never an error: actions decoded by then keep their decoded data, the action that ran out of time and every action
+/// after it keep their data as hex, and the receipts and ids are all there. Covers push_transaction, send_transaction
+/// and push_transactions, whose traces share one budget.
+BOOST_FIXTURE_TEST_CASE( trace_decode_out_of_time_returns_trace, validating_tester ) try {
+   create_accounts({"asserter"_n, "bulk"_n});
+   set_code("asserter"_n, test_contracts::asserter_wasm());
+   set_abi("asserter"_n, test_contracts::asserter_abi());
+   set_abi("bulk"_n, std::string(bulk_abi));
+   produce_block();
+
+   // Far more data than decodes within the limit on any machine; the limit stops its decode, so the size costs no time.
+   constexpr size_t           slow_item_count = 128 * 1024;
+   constexpr fc::microseconds limit           = fc::milliseconds(20);
+   const action fast(std::vector<permission_level>{{"asserter"_n, config::active_name}}, "asserter"_n, "procassert"_n,
+                     fc::raw::pack(int8_t{1}, std::string("fine")));
+   const action slow(std::vector<permission_level>{{"bulk"_n, config::active_name}}, "bulk"_n, "store"_n,
+                     bulk_store_data(slow_item_count));
+   const transaction_trace_ptr trace     = trace_of({fast, slow, fast});
+   const std::string           fast_hex  = fc::to_hex(fast.data);
+   const std::string           slow_hex  = fc::to_hex(slow.data);
+   // Both serializers are cached first, so the limit is spent on decoding alone.
+   BOOST_REQUIRE(make_resolver(*control, fc::microseconds::maximum(), throw_on_yield::yes)("asserter"_n));
+   BOOST_REQUIRE(make_resolver(*control, fc::microseconds::maximum(), throw_on_yield::yes)("bulk"_n));
+
+   using incoming_method = plugin_interface::incoming::methods::transaction_async;
+   appbase::scoped_app app;
+   // The provider stays registered while its handle lives.
+   incoming_method::method_type::handle provider = app->get_method<incoming_method>().register_provider(
+      [&trace](const packed_transaction_ptr&, bool, transaction_metadata::trx_type, bool,
+               next_function<transaction_trace_ptr> next) { next(transaction_trace_ptr(trace)); });
+
+   signed_transaction trx;
+   trx.actions.push_back(fast);
+   set_transaction_headers(trx);
+   const fc::variant params{packed_transaction(trx)};
+   std::optional<chain_apis::trx_retry_db> no_retry;
+   chain_apis::read_write rw(*control, no_retry, limit, fc::microseconds::maximum(), true);
+
+   // The first action decoded, the slow one and the one after it hex, each with its receipt.
+   const auto expect_cut_short = [&](const fc::variant& action_traces) {
+      BOOST_REQUIRE_EQUAL(action_traces.size(), 3u);
+      const fc::variant& first = action_traces[size_t(0)]["act"];
+      BOOST_REQUIRE(first["data"].is_object());
+      BOOST_CHECK_EQUAL(first["data"]["message"].as_string(), "fine");
+      BOOST_CHECK_EQUAL(action_traces[size_t(1)]["act"]["data"].as_string(), slow_hex);
+      BOOST_CHECK_EQUAL(action_traces[size_t(1)]["act"]["hex_data"].as_string(), slow_hex);
+      BOOST_CHECK_EQUAL(action_traces[size_t(2)]["act"]["data"].as_string(), fast_hex);
+      for (size_t i = 0; i < 3; ++i)
+         BOOST_CHECK_EQUAL(action_traces[i]["receipt"]["global_sequence"].as_uint64(), i + 1);
+   };
+
+   using results_t  = chain_apis::read_write::push_transaction_results;
+   using deferred_t = std::function<t_or_exception<results_t>()>;
+   const auto decoded = [](const std::optional<next_function_variant<results_t>>& completed) {
+      BOOST_REQUIRE(completed);
+      BOOST_REQUIRE(std::holds_alternative<deferred_t>(*completed));
+      t_or_exception<results_t> result = std::get<deferred_t>(*completed)();
+      BOOST_REQUIRE(std::holds_alternative<results_t>(result));
+      return std::get<results_t>(std::move(result));
+   };
+
+   std::optional<next_function_variant<results_t>> pushed;
+   rw.push_transaction(params.get_object(),
+                       [&pushed](next_function_variant<results_t>&& result) { pushed = std::move(result); });
+   const results_t push_result = decoded(pushed);
+   BOOST_CHECK(push_result.transaction_id == trace->id);
+   expect_cut_short(push_result.processed["action_traces"]);
+
+   std::optional<next_function_variant<results_t>> sent;
+   rw.send_transaction(params.get_object(),
+                       [&sent](next_function_variant<results_t>&& result) { sent = std::move(result); });
+   const results_t send_result = decoded(sent);
+   BOOST_CHECK(send_result.transaction_id == trace->id);
+   expect_cut_short(send_result.processed["action_traces"]);
+
+   // One budget covers every trace of push_transactions: the second trace starts after it is spent, so all its data
+   // stays hex, and it is still returned whole.
+   using batch_results_t  = chain_apis::read_write::push_transactions_results;
+   using batch_deferred_t = std::function<t_or_exception<batch_results_t>()>;
+   std::optional<next_function_variant<batch_results_t>> batch_pushed;
+   rw.push_transactions({params.get_object(), params.get_object()},
+                        [&batch_pushed](next_function_variant<batch_results_t>&& result) {
+                           batch_pushed = std::move(result);
+                        });
+   BOOST_REQUIRE(batch_pushed);
+   BOOST_REQUIRE(std::holds_alternative<batch_deferred_t>(*batch_pushed));
+   const t_or_exception<batch_results_t> batch_result = std::get<batch_deferred_t>(*batch_pushed)();
+   BOOST_REQUIRE(std::holds_alternative<batch_results_t>(batch_result));
+   const batch_results_t& batch = std::get<batch_results_t>(batch_result);
+   BOOST_REQUIRE_EQUAL(batch.size(), 2u);
+   BOOST_CHECK(batch[0].transaction_id == trace->id);
+   expect_cut_short(batch[0].processed["action_traces"]);
+   BOOST_CHECK(batch[1].transaction_id == trace->id);
+   const fc::variant& second = batch[1].processed["action_traces"];
+   BOOST_REQUIRE_EQUAL(second.size(), 3u);
+   BOOST_CHECK_EQUAL(second[size_t(0)]["act"]["data"].as_string(), fast_hex);
+   BOOST_CHECK_EQUAL(second[size_t(1)]["act"]["data"].as_string(), slow_hex);
+   BOOST_CHECK_EQUAL(second[size_t(2)]["act"]["data"].as_string(), fast_hex);
+} FC_LOG_AND_RETHROW()
+
+/// A serializer build make_resolver starts gets the time abi_serializer_max_time allows, cut short at the request
+/// deadline: with no time left by either, nothing is built.
+BOOST_FIXTURE_TEST_CASE( make_resolver_builds_within_request_deadline, validating_tester ) try {
+   create_accounts({"asserter"_n});
+   set_code("asserter"_n, test_contracts::asserter_wasm());
+   set_abi("asserter"_n, asserter_abi_with_field("resolver_probe"));
+   produce_block();
+
+   const uint64_t builds = shared_builds();
+   const fc::time_point later = fc::time_point::now() + fc::seconds(30);
+   BOOST_CHECK_THROW(make_resolver(*control, fc::microseconds::maximum(), throw_on_yield::yes,
+                                   fc::time_point::now())("asserter"_n),
+                     abi_serialization_deadline_exception);
+   BOOST_CHECK_THROW(make_resolver(*control, fc::microseconds(0), throw_on_yield::yes, later)("asserter"_n),
+                     abi_serialization_deadline_exception);
+   BOOST_CHECK(!make_resolver(*control, fc::microseconds(0), throw_on_yield::no, later)("asserter"_n));
+   BOOST_CHECK_EQUAL(shared_builds(), builds);
+
+   const auto built = make_resolver(*control, fc::microseconds::maximum(), throw_on_yield::yes, later)("asserter"_n);
+   BOOST_REQUIRE(built);
+   BOOST_CHECK(built->is_struct("procassert"));
+   BOOST_CHECK_EQUAL(shared_builds(), builds + 1);
+   // Once built, the serializer is had whatever time is left.
+   BOOST_CHECK(make_resolver(*control, fc::microseconds(0), throw_on_yield::yes, fc::time_point::now())("asserter"_n) ==
+               built);
+} FC_LOG_AND_RETHROW()
+
+/// Two forks that give one account different ABIs at the same ABI sequence each decode with their own ABI.
+BOOST_AUTO_TEST_CASE( make_resolver_keys_serializers_by_abi_bytes ) try {
+   std::string renamed_abi = test_contracts::asserter_abi();
+   const auto  field       = renamed_abi.find("condition");
+   BOOST_REQUIRE(field != std::string::npos);
+   renamed_abi.replace(field, std::string_view("condition").size(), "verdict");
+
+   tester fork_a;
+   tester fork_b;
+   const std::string original_abi = test_contracts::asserter_abi();
+   for (const auto& [chain, abi] : {std::pair<tester*, const std::string*>{&fork_a, &original_abi},
+                                    std::pair<tester*, const std::string*>{&fork_b, &renamed_abi}}) {
+      chain->create_accounts({"asserter"_n});
+      chain->set_code("asserter"_n, test_contracts::asserter_wasm());
+      chain->set_abi("asserter"_n, *abi);
+      chain->produce_block();
+   }
+   BOOST_REQUIRE_EQUAL(fork_a.control->find_account_metadata("asserter"_n)->abi_sequence,
+                       fork_b.control->find_account_metadata("asserter"_n)->abi_sequence);
+
+   const bytes data = fc::raw::pack(int8_t{1}, std::string("text"));
+   const auto  decode = [&](tester& chain) {
+      const fc::microseconds max_time = base_tester::abi_serializer_max_time;
+      const auto abis = make_resolver(*chain.control, max_time, throw_on_yield::yes)("asserter"_n);
+      BOOST_REQUIRE(abis);
+      return abis->binary_to_variant(abis->get_action_type("procassert"_n), data, max_time);
+   };
+   const fc::variant on_a = decode(fork_a);
+   const fc::variant on_b = decode(fork_b);
+   BOOST_CHECK(on_a.get_object().contains("condition"));
+   BOOST_CHECK(!on_a.get_object().contains("verdict"));
+   BOOST_CHECK(on_b.get_object().contains("verdict"));
+   BOOST_CHECK(!on_b.get_object().contains("condition"));
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()

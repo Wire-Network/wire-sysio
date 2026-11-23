@@ -4,13 +4,13 @@
 #include <sysio/producer_plugin/round_block_status.hpp>
 #include <sysio/producer_plugin/subjective_exempt_db.hpp>
 #include <sysio/producer_plugin/trx_priority_db.hpp>
+#include <sysio/chain_plugin/mebibytes.hpp>
 #include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/plugin_interface.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/snapshot.hpp>
 #include <sysio/chain/snapshot_scheduler.hpp>
 #include <sysio/chain/subjective_billing.hpp>
-#include <sysio/chain/thread_utils.hpp>
 #include <sysio/chain/unapplied_transaction_queue.hpp>
 #include <sysio/chain/fork_database.hpp>
 #include <sysio/chain/platform_timer.hpp>
@@ -21,6 +21,7 @@
 #include <fc/system_timer.hpp>
 #include <fc/log/logger_config.hpp>
 #include <fc/scoped_exit.hpp>
+#include <fc/thread_utils.hpp>
 #include <fc/time.hpp>
 
 #include <boost/asio.hpp>
@@ -29,6 +30,7 @@
 
 #include <cstdint>
 #include <iostream>
+#include <limits>
 #include <algorithm>
 #include <mutex>
 
@@ -94,6 +96,13 @@ using namespace sysio::chain;
 using namespace sysio::chain::plugin_interface;
 
 namespace {
+
+/// Option setting the byte limit, in MiB, of the incoming transaction queue.
+constexpr auto option_name_incoming_transaction_queue_size = "incoming-transaction-queue-size-mb";
+/// Default of incoming-transaction-queue-size-mb.
+constexpr int32_t default_incoming_transaction_queue_size_mb = 1024;
+/// Largest incoming-transaction-queue-size-mb accepted.
+constexpr uint64_t max_incoming_transaction_queue_size_mb = std::numeric_limits<uint16_t>::max();
 
 // track multiple failures on unapplied transactions
 class account_failures {
@@ -478,7 +487,6 @@ struct implicit_production_pause_vote_tracker {
       case vote_result_t::unknown_public_key:
       case vote_result_t::invalid_signature:
       case vote_result_t::max_exceeded:
-      case vote_result_t::unknown_block:
          return;
       default:
          assert(false); // should never happen
@@ -801,7 +809,7 @@ public:
    bool                                  _production_enabled = false;
    bool                                  _pause_production   = false;
 
-   sysio::chain::named_thread_pool<struct prod>      _timer_thread;
+   fc::named_thread_pool<struct prod>                _timer_thread;
    // Runs on the real clock in production; a test engages fc's mock clock via
    // fc::mock_time_traits::set_now() and drives production timing deterministically.
    fc::system_timer                                  _timer{_timer_thread.get_executor()};
@@ -823,6 +831,8 @@ public:
    unapplied_transaction_queue                       _unapplied_transactions;
    alignas(hardware_destructive_interference_sz)
    std::atomic<int32_t>                              _max_transaction_time_ms; // modified by app thread, read by net_plugin thread pool
+   /// incoming-trx-max-signatures, fixed after initialize
+   uint32_t _incoming_trx_max_signatures = chain::config::default_incoming_trx_max_signatures;
    // Floor for the speculative-retry CPU cap applied in push_transaction(). That cap is normally
    // 2x the transaction's previously measured wall-clock cost, which guards against "producer bombs"
    // (transactions that speculate cheaply but consume large CPU when produced into a block). For very
@@ -1185,6 +1195,29 @@ public:
       bool return_failure_traces;
    };
 
+   /// Report an incoming transaction rejected before execution: log it and call next with the exception, on the main
+   /// thread like every other result. Thread safe.
+   void post_incoming_trx_failure(packed_transaction_ptr trx, std::exception_ptr ex_ptr, bool is_transient,
+                                  next_function<transaction_trace_ptr> next) {
+      // use read_write when read is likely fine; maintains previous behavior of next() always being called from the
+      // main thread
+      app().executor().post(
+              priority::low, exec_queue::read_write,
+              [this, ex_ptr{std::move(ex_ptr)}, trx{std::move(trx)}, is_transient, next{std::move(next)}]() {
+                 auto start       = fc::time_point::now();
+                 auto idle_time   = _time_tracker.add_idle_time(start);
+                 auto trx_tracker = _time_tracker.start_trx(is_transient, start);
+                 fc_tlog(_log, "Time since last trx: {}us", idle_time);
+                 auto ex_handler = [this, is_transient, &next, &trx](fc::exception_ptr ex) {
+                    log_trx_results(trx, nullptr, ex, 0, is_transient);
+                    next(std::move(ex));
+                 };
+                 try {
+                    std::rethrow_exception(ex_ptr);
+                 } CATCH_AND_CALL(ex_handler)
+              });
+   }
+
    void on_incoming_transaction_async(const packed_transaction_ptr&        trx,
                                       bool                                 api_trx,
                                       transaction_metadata::trx_type       trx_type,
@@ -1222,6 +1255,16 @@ public:
          };
       }
 
+      try {
+         const size_t num_signatures = trx->get_signatures().size();
+         SYS_ASSERT(num_signatures <= _incoming_trx_max_signatures, tx_too_many_sigs,
+                    "transaction has {} signatures, exceeding the limit of {}", num_signatures,
+                    _incoming_trx_max_signatures);
+      } catch (...) {
+         post_incoming_trx_failure(trx, std::current_exception(), is_transient, std::move(next));
+         return;
+      }
+
       boost::asio::post(
               chain_plug->chain().get_thread_pool(), // use chain thread pool for key recovery
               [this, trx{trx}, time_limit{max_trx_cpu_usage}, trx_type, is_transient, next{std::move(next)}, api_trx, return_failure_traces]() mutable {
@@ -1233,22 +1276,7 @@ public:
                     trx_meta = transaction_metadata::recover_keys(trx, chain.get_chain_id(), time_limit, trx_type);
                     priority = _trx_priority_db.get_trx_priority(trx->get_transaction());
                  } catch (...) {
-                    // use read_write when read is likely fine; maintains previous behavior of next() always being called from the main thread
-                    app().executor().post(
-                            priority::low, exec_queue::read_write,
-                            [this, ex_ptr{std::current_exception()}, trx{std::move(trx)}, is_transient, next{std::move(next)}]() {
-                               auto start       = fc::time_point::now();
-                               auto idle_time   = _time_tracker.add_idle_time(start);
-                               auto trx_tracker = _time_tracker.start_trx(is_transient, start);
-                               fc_tlog(_log, "Time since last trx: {}us", idle_time);
-                               auto ex_handler = [this, is_transient, &next, &trx](fc::exception_ptr ex) {
-                                  log_trx_results(trx, nullptr, ex, 0, is_transient);
-                                  next(std::move(ex));
-                               };
-                               try {
-                                  std::rethrow_exception(ex_ptr);
-                               } CATCH_AND_CALL(ex_handler)
-                            });
+                    post_incoming_trx_failure(std::move(trx), std::current_exception(), is_transient, std::move(next));
                     return;
                  }
 
@@ -1297,15 +1325,17 @@ public:
          const auto  block_deadline = _pending_block_deadline;
          push_result pr             = push_transaction(block_deadline, trx, api_trx, return_failure_trace, trx_tracker, next);
 
-         if (pr.trx_exhausted) {
-            _unapplied_transactions.add_incoming(trx, api_trx, return_failure_trace, next);
-         }
-
+         // set before the re-queue, which throws tx_resource_exhaustion when the queue is full
          exhausted = pr.block_exhausted;
 
-         if ( !in_producing_mode() && pr.trx_exhausted )
-            exhausted = true;  // report transaction exhausted if trx was exhausted in non-producing mode (so we will restart
-                               // a speculative block to retry it immediately, instead of waiting to receive a new block)
+         if (pr.trx_exhausted) {
+            _unapplied_transactions.add_incoming(trx, api_trx, return_failure_trace, next);
+
+            // report transaction exhausted if trx was exhausted in non-producing mode (so we will restart a speculative
+            // block to retry it immediately, instead of waiting to receive a new block)
+            if (!in_producing_mode())
+               exhausted = true;
+         }
 
       } catch (const guard_exception& e) {
          chain_plugin::handle_guard_exception(e);
@@ -1491,8 +1521,13 @@ void producer_plugin::set_program_options(
           bpo::value<uint64_t>()->default_value( config::default_subjective_net_bytes ),
           "Sets the maximum allowed NET bytes, above account NET, that can be used by an authorizing account within "
           "subjective-account-decay-time-minutes")
-         ("incoming-transaction-queue-size-mb", bpo::value<uint16_t>()->default_value( 1024 ),
+         (option_name_incoming_transaction_queue_size,
+          bpo::value<int32_t>()->default_value(default_incoming_transaction_queue_size_mb),
           "Maximum size (in MiB) of the incoming transaction queue. Exceeding this value will subjectively drop transaction with resource exhaustion.")
+         ("incoming-trx-max-signatures",
+          bpo::value<uint32_t>()->default_value(chain::config::default_incoming_trx_max_signatures),
+          "Maximum number of signatures on a transaction received over p2p or the API. A transaction with more is "
+          "rejected before its keys are recovered. Transactions applied from blocks are not limited.")
          ("disable-subjective-account-billing", boost::program_options::value<vector<string>>()->composing()->multitoken(),
           "Account which is excluded from subjective CPU and NET billing")
          ("disable-subjective-payer-billing", bpo::value<bool>()->default_value(true),
@@ -1619,17 +1654,18 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
 
    _max_transaction_time_ms = options.at("max-transaction-time").as<int32_t>();
 
+   _incoming_trx_max_signatures = options.at("incoming-trx-max-signatures").as<uint32_t>();
+   SYS_ASSERT(_incoming_trx_max_signatures > 0, plugin_config_exception,
+              "incoming-trx-max-signatures must be greater than 0");
+
    _max_irreversible_block_age_us = fc::seconds(options.at("max-irreversible-block-age").as<int32_t>());
    _max_reversible_blocks = options.at("max-reversible-blocks").as<uint32_t>();
 
    _max_reversible_blocks = options.at("max-reversible-blocks").as<uint32_t>();
 
-   auto max_incoming_transaction_queue_size = options.at("incoming-transaction-queue-size-mb").as<uint16_t>() * 1024 * 1024;
-
-   SYS_ASSERT(max_incoming_transaction_queue_size > 0, plugin_config_exception,
-              "incoming-transaction-queue-size-mb {} must be greater than 0", max_incoming_transaction_queue_size);
-
-   _unapplied_transactions.set_max_transaction_queue_size(max_incoming_transaction_queue_size);
+   _unapplied_transactions.set_max_transaction_queue_size(
+      checked_mebibytes(options.at(option_name_incoming_transaction_queue_size).as<int32_t>(),
+                        option_name_incoming_transaction_queue_size, max_incoming_transaction_queue_size_mb));
 
    chain.get_mutable_subjective_billing().set_subjective_account_cpu_allowed(fc::microseconds(options.at("subjective-account-cpu-allowed-us").as<int64_t>()));
    chain.get_mutable_subjective_billing().set_subjective_account_net_allowed(
@@ -2023,6 +2059,10 @@ producer_plugin::runtime_options producer_plugin::get_runtime_options() const {
 
 fc::microseconds producer_plugin::get_read_only_max_transaction_time() const {
    return my->_ro_max_trx_time_us;
+}
+
+uint64_t producer_plugin::get_max_incoming_transaction_queue_size() const {
+   return my->_unapplied_transactions.get_max_transaction_queue_size();
 }
 
 fc::time_point producer_plugin::get_read_only_window_deadline() const {

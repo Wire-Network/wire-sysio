@@ -116,6 +116,7 @@ namespace {
       constexpr auto account             = "sysio.msgch";
       constexpr auto table_envelopes     = "envelopes";
       constexpr auto table_outenvelopes  = "outenvelopes";
+      constexpr auto table_outpcons      = "outpcons";
       constexpr auto action_deliver      = "deliver";
       constexpr auto action_chkcons      = "chkcons";
       /// Field names on `envelope_entry` / `outbound_envelope` rows.
@@ -1398,12 +1399,12 @@ struct batch_operator_plugin::impl {
     * `underwriter::plan_actions` makes every decision; this reads its inputs and pushes its actions, all signed by
     * `underwriter_signer`.
     *
-    * Bonding is what releases an envelope's syndications, so a request is bonded only when its outpost's own record
-    * of the envelope it emitted for the statement's epoch carries the statement's digest, within the token's exposure
-    * cap and the account's balance, while the andon cord is clear, and while no bond of the underwriter's has been
-    * ruled INVALID since the node started. A pass whose table reads fail does nothing: planning from part of the state
-    * could exceed a cap or miss a freeze. What it cannot act on waits for a later pass and is logged on every pass
-    * it holds; deduplicating those lines is left to log tooling.
+    * Bonding is what releases an envelope's syndications, so a request is bonded only when its outpost authenticates
+    * its digest directly or authenticates a later WIRE-accepted checkpoint covering its accepted envelope, within
+    * the token's exposure cap and the account's balance, while the andon cord is clear, and while no bond of the
+    * underwriter's has been ruled INVALID since the node started. A pass whose funding or freeze reads fail does
+    * nothing: planning from part of that state could exceed a cap or miss a freeze. What it cannot act on waits for
+    * a later pass and is logged on every pass it holds; deduplicating those lines is left to log tooling.
     */
    void underwriter_tick() {
       if (shutting_down || !underwriter_enabled) return;
@@ -1445,7 +1446,10 @@ struct batch_operator_plugin::impl {
       }
       in->accepts_after = underwriter_accepts_after;
       in->pending_accepts = underwriter_pending_accepts;
-      if (!in->frozen && !in->halted) in->emitted = read_emitted_digests(in->requests);
+      if (!in->frozen && !in->halted) {
+         read_accepted_prefixes(*in);
+         in->emitted = read_emitted_digests(*in);
+      }
       const uw::plan plan = uw::plan_actions(*in);
       underwriter_pending_accepts = plan.pending_accepts;
       report_plan(*in, plan);
@@ -1848,19 +1852,75 @@ struct batch_operator_plugin::impl {
       }
    }
 
-   /// The digest each outpost recorded for the envelope it emitted, for every (chain, epoch) an OPEN envelope request
-   /// names, read at each outpost client's settled commitment. A chain whose read fails is reported and leaves only
-   /// its own requests waiting.
-   std::map<uw::envelope_key, fc::sha256> read_emitted_digests(const std::vector<uw::request>& requests) {
-      return uw::collect_emitted(
-         uw::wanted_envelopes(requests),
+   /// Read WIRE's irreversible stream tips and bind each older OPEN request to its original accepted syndication
+   /// row. `sysio.msgch` enforces every predecessor link; `sysio.synd` creates these immutable identities only from
+   /// its accepted dispatch. `sysio.bond` assigns the request id and `sysio.synd` records it by statement lookup.
+   /// No historical body or audit log is needed.
+   /// Missing/malformed rows provide no prefix proof; direct outpost verification remains available.
+   void read_accepted_prefixes(uw::plan_inputs& in) {
+      const auto wanted = uw::wanted_envelopes(in.requests);
+      if (wanted.empty()) return;
+      const auto tips = read_all_rows(msgch::account, msgch::account, msgch::table_outpcons);
+      if (!tips) return;
+      for (const auto& value : *tips) {
+         try {
+            const auto checkpoint = uw::decode_checkpoint(value.get_object());
+            if (checkpoint) in.checkpoints.emplace(*checkpoint);
+         } catch (const fc::exception& e) {
+            wlog("batch_operator: underwriter cannot decode an accepted stream tip: {}", e.top_message());
+         }
+      }
+      for (const auto& request : in.requests) {
+         if (request.state != uw::request_state::OPEN || !uw::is_envelope_request(request) ||
+             request.bonded >= request.covered) continue;
+         const auto s = uw::decode_statement(request.statement);
+         if (!s || s->token_code != request.token_code) continue;
+         const auto tip = in.checkpoints.find(s->chain_code);
+         if (tip == in.checkpoints.end() || s->epoch_index > tip->second.epoch_index) continue;
+         sysio::chain_apis::read_only::get_table_rows_params p;
+         p.code = chain::name(uw::synd::account);
+         p.scope = uw::synd::account;
+         p.table = uw::synd::table_envelopes;
+         p.find = fc::json::to_string(fc::mutable_variant_object()
+            (uw::synd::field::chain_code, s->chain_code.value)
+            (uw::synd::field::token_code, s->token_code.value)
+            (uw::synd::field::epoch_index, s->epoch_index), fc::json::yield_function_t{});
+         p.limit = EXACT_LOOKUP_LIMIT;
+         p.values_only = true;
+         const auto rows = read_table_checked(std::move(p));
+         if (!rows || rows->rows.empty()) continue;
+         const auto accepted = uw::decode_accepted_envelope(rows->rows.front().get_object());
+         if (accepted && accepted->first == request.id) in.accepted.emplace(*accepted);
+      }
+   }
+
+   /// Independently read a recent checkpoint per chain at the outpost client's settled commitment. If it matches
+   /// WIRE, older accepted requests need no historical outpost record; otherwise try each exact requested epoch.
+   /// A chain whose read fails is reported and leaves only its own requests waiting.
+   std::map<uw::envelope_key, fc::sha256> read_emitted_digests(const uw::plan_inputs& in) {
+      auto emitted = uw::collect_emitted(
+         uw::wanted_envelopes(in.requests),
          [&](fc::slug_name chain_code, uint32_t epoch) -> std::optional<fc::sha256> {
             if (shutting_down) return std::nullopt;
             const auto client = underwriter_clients.find(chain_code);
             FC_ASSERT(client != underwriter_clients.end(), "this node has no client for it");
             return client->second.client->read_emitted_envelope_digest(epoch, delivery_timeout);
          },
-         [](fc::slug_name chain_code, const std::string& why) { report_unreadable(chain_code, why); });
+         [](fc::slug_name chain_code, const std::string& why) { report_unreadable(chain_code, why); },
+         in.checkpoints, in.accepted);
+      for (const auto& [chain_code, checkpoint] : in.checkpoints) {
+         const auto record = emitted.find({chain_code, checkpoint.epoch_index});
+         if (record == emitted.end()) continue;
+         if (uw::checkpoint_verified(chain_code, checkpoint, emitted)) {
+            ilog("batch_operator: underwriter verified accepted checkpoint for outpost {} epoch {} digest {}",
+                 chain_code.to_string(), checkpoint.epoch_index, checkpoint.digest.str());
+         } else {
+            elog("batch_operator: underwriter: outpost {} epoch {} accepted checkpoint digest {}, but source "
+                 "recorded {}; direct request verification required",
+                 chain_code.to_string(), checkpoint.epoch_index, checkpoint.digest.str(), record->second.str());
+         }
+      }
+      return emitted;
    }
 
    /// Report that `chain_code`'s outpost could not be read this pass, and why.
@@ -1885,13 +1945,13 @@ struct batch_operator_plugin::impl {
       const chain::controller& chain = chain_plug->chain();
       try {
          auto resolver = make_resolver(chain, delivery_timeout, throw_on_yield::no);
-         std::optional<chain::abi_serializer> abis_opt = resolver(chain::name(contract));
-         if (!abis_opt) {
+         const chain::abi_serializer_ptr abis = resolver(chain::name(contract));
+         if (!abis) {
             elog("batch_operator: no ABI found for {}", contract);
             return std::nullopt;
          }
-         const chain::type_name action_type = abis_opt->get_action_type(chain::name(action_name));
-         chain::bytes action_data = abis_opt->variant_to_binary(
+         const chain::type_name action_type = abis->get_action_type(chain::name(action_name));
+         chain::bytes action_data = abis->variant_to_binary(
             action_type, fc::variant(data), chain::abi_serializer::create_yield_function(delivery_timeout));
          unsigned_trx out;
          out.trx.actions.emplace_back(std::vector<chain::permission_level>{auth}, chain::name(contract),

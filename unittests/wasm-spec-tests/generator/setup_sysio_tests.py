@@ -61,6 +61,8 @@ def setup_tests(j):
     os.chdir(new_dir)
 
     out = subprocess.run([generator, json_file], capture_output=True)
+    if out.returncode != 0:
+        sys.stderr.write(out.stderr.decode('utf-8'))
     out.check_returncode()
 
     mkdirs()

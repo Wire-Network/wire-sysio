@@ -303,7 +303,7 @@ BOOST_AUTO_TEST_CASE(an_unreadable_chain_holds_back_only_its_own_reads) {
    full.bonded = full.covered;
    const auto wanted = wanted_envelopes({synd_request(1, eth, 7, liqeth, 10), synd_request(2, eth, 8, liqeth, 10),
                                          synd_request(3, sol, 3, liqsol, 10), bonded_already, full});
-   BOOST_CHECK((wanted == std::set<envelope_key>{{eth, 7}, {eth, 8}, {sol, 3}}));
+   BOOST_CHECK((wanted == wanted_envelope_requests{{{eth, 7}, {1}}, {{eth, 8}, {2}}, {{sol, 3}, {3}}}));
 
    std::vector<envelope_key>  reads;
    std::vector<fc::slug_name> failures;
@@ -319,6 +319,219 @@ BOOST_AUTO_TEST_CASE(an_unreadable_chain_holds_back_only_its_own_reads) {
    BOOST_CHECK((failures == std::vector<fc::slug_name>{eth}));
    BOOST_REQUIRE_EQUAL(1u, emitted.size());
    BOOST_CHECK(emitted.at({sol, 3}) == digest_of("sol3"));
+}
+
+BOOST_AUTO_TEST_CASE(accepted_envelope_membership_decodes_the_contract_row) {
+   const auto s = decode_statement(synd_request(1, sol, 7, liqsol, 10).statement).value();
+   const auto row = mvo()("chain_code", s.chain_code)("token_code", s.token_code)
+                         ("epoch_index", s.epoch_index)("digest", s.digest)("request_id", 1);
+   const auto decoded = decode_accepted_envelope(row);
+   BOOST_REQUIRE(decoded.has_value());
+   BOOST_CHECK_EQUAL(1u, decoded->first);
+   BOOST_CHECK(decoded->second == s);
+   BOOST_CHECK(!decode_accepted_envelope(mvo()("request_id", 1)));
+   BOOST_CHECK(!decode_accepted_envelope(mvo(row)("request_id", 0)));
+   BOOST_CHECK(!decode_accepted_envelope(mvo(row)("digest", fc::sha256{})));
+   BOOST_CHECK(!decode_accepted_envelope(mvo(row)("digest", "not a digest")));
+   BOOST_CHECK(!decode_accepted_envelope(mvo(row)("epoch_index", uint64_t{1} << 32)));
+}
+
+/// Exercise the actual outpcons ABI representation, including uint64 values rendered as decimal strings.
+BOOST_AUTO_TEST_CASE(accepted_checkpoint_decodes_the_contract_row) {
+   const auto tip = digest_of("accepted source tip");
+   const auto row = mvo()("chain_code", sol.value)("epoch_index", 100)
+                         ("consensus_reached", true)("envelope_digest", tip);
+   for (const auto& value : {row, mvo(row)("chain_code", std::to_string(sol.value))}) {
+      const auto decoded = decode_checkpoint(value);
+      BOOST_REQUIRE(decoded.has_value());
+      BOOST_CHECK_EQUAL(sol, decoded->first);
+      BOOST_CHECK_EQUAL(100u, decoded->second.epoch_index);
+      BOOST_CHECK(tip == decoded->second.digest);
+   }
+   BOOST_CHECK(!decode_checkpoint(mvo()));
+   BOOST_CHECK(!decode_checkpoint(mvo(row)("chain_code", "SOL")));
+   BOOST_CHECK(!decode_checkpoint(mvo(row)("chain_code", 0)));
+   BOOST_CHECK(!decode_checkpoint(mvo(row)("consensus_reached", false)));
+   BOOST_CHECK(!decode_checkpoint(mvo(row)("epoch_index", uint64_t{1} << 32)));
+   BOOST_CHECK(!decode_checkpoint(mvo(row)("envelope_digest", fc::sha256{})));
+   BOOST_CHECK(!decode_checkpoint(mvo(row)("envelope_digest", "not a digest")));
+}
+
+/// One token's membership must not suppress a still-available direct record needed by another token's request.
+BOOST_AUTO_TEST_CASE(shared_epoch_requests_keep_direct_fallback_for_missing_membership) {
+   for (const bool history_retained : {true, false}) {
+      auto in = eth_inputs();
+      in.exposure_policies.emplace(liqsol, units_of(liqsol, 100));
+      in.balances.emplace(liqsol, units_of(liqsol, 100));
+      in.requests = {synd_request(1, eth, 7, liqeth, 10), synd_request(2, eth, 7, liqsol, 10)};
+      const auto first = decode_statement(in.requests.front().statement).value();
+      in.requests.back().statement = statement_bytes(eth, 7, first.digest, liqsol);
+      in.accepted.emplace(1, first);
+      // A different request's membership at this same epoch does not cover request 2 either.
+      in.accepted.emplace(99, decode_statement(in.requests.back().statement).value());
+      in.checkpoints.emplace(eth, envelope_checkpoint{100, digest_of("accepted tip")});
+      std::vector<envelope_key> reads;
+      const auto read = [&](fc::slug_name chain, uint32_t epoch) -> std::optional<fc::sha256> {
+         reads.emplace_back(chain, epoch);
+         if (epoch == 100) return in.checkpoints.at(eth).digest;
+         if (history_retained) return first.digest;
+         return std::nullopt;
+      };
+      const auto on_failure = [](auto, auto) { BOOST_FAIL("source reads must not fail"); };
+      in.emitted = collect_emitted(wanted_envelopes(in.requests), read, on_failure, in.checkpoints, in.accepted);
+      BOOST_CHECK((reads == std::vector<envelope_key>{{eth, 100}, {eth, 7}}));
+      const auto out = plan_actions(in);
+      BOOST_REQUIRE_EQUAL(history_retained ? 2u : 1u, out.accepts.size());
+      if (!history_retained) {
+         BOOST_REQUIRE_EQUAL(1u, out.waiting.size());
+         BOOST_CHECK_EQUAL(2u, out.waiting.front().request_id);
+         BOOST_CHECK(out.waiting.front().reason == wait_reason::UNVERIFIED);
+      }
+      // Once both exact request ids have membership, one checkpoint read is sufficient.
+      in.accepted.emplace(2, decode_statement(in.requests.back().statement).value());
+      reads.clear();
+      in.emitted = collect_emitted(wanted_envelopes(in.requests), read, on_failure, in.checkpoints, in.accepted);
+      BOOST_CHECK((reads == std::vector<envelope_key>{{eth, 100}}));
+      BOOST_REQUIRE_EQUAL(2u, plan_actions(in).accepts.size());
+   }
+}
+
+/// Only the recent external checkpoint exists: an underwriter can start after a week without old Solana log entries.
+BOOST_AUTO_TEST_CASE(a_recent_checkpoint_authenticates_week_old_accepted_requests_without_history_reads) {
+   auto in = eth_inputs();
+   in.exposure_policies = {{liqsol, units_of(liqsol, 100)}};
+   in.balances = {{liqsol, units_of(liqsol, 100)}};
+   in.requests = {synd_request(1, sol, 1, liqsol, 10), synd_request(2, sol, 2, liqsol, 10)};
+   for (const auto& r : in.requests) in.accepted.emplace(r.id, decode_statement(r.statement).value());
+   constexpr uint32_t after_one_week = 10081;
+   const auto tip = digest_of("finalized recent tip");
+   in.checkpoints.emplace(sol, envelope_checkpoint{after_one_week, tip});
+   std::vector<envelope_key> reads;
+   in.emitted = collect_emitted(wanted_envelopes(in.requests),
+      [&](fc::slug_name chain, uint32_t epoch) -> std::optional<fc::sha256> {
+         reads.emplace_back(chain, epoch);
+         BOOST_CHECK_EQUAL(after_one_week, epoch);
+         return tip;
+      }, [](auto, auto) { BOOST_FAIL("the checkpoint read must succeed"); }, in.checkpoints, in.accepted);
+   BOOST_CHECK((reads == std::vector<envelope_key>{{sol, after_one_week}}));
+   BOOST_CHECK(!in.emitted.contains({sol, 1}));
+   const auto out = plan_actions(in);
+   BOOST_REQUIRE_EQUAL(2u, out.accepts.size());
+   BOOST_CHECK_EQUAL(1u, out.accepts[0].request_id);
+   BOOST_CHECK_EQUAL(2u, out.accepts[1].request_id);
+   BOOST_CHECK(out.waiting.empty());
+   // Prefix authentication changes only verification: exposure, freezes and forfeit halts still apply.
+   in.exposure_policies.clear();
+   BOOST_CHECK(plan_actions(in).accepts.empty());
+   in.exposure_policies = {{liqsol, units_of(liqsol, 100)}};
+   in.frozen = true;
+   BOOST_CHECK(plan_actions(in).accepts.empty());
+   in.frozen = false;
+   in.halted = true;
+   BOOST_CHECK(plan_actions(in).accepts.empty());
+}
+
+BOOST_AUTO_TEST_CASE(a_checkpoint_cannot_authenticate_an_unrelated_statement) {
+   auto in = eth_inputs();
+   in.requests = {synd_request(1, eth, 7, liqeth, 10)};
+   const auto s = decode_statement(in.requests.front().statement).value();
+   const auto tip = digest_of("accepted tip");
+   in.checkpoints.emplace(eth, envelope_checkpoint{100, tip});
+   in.emitted.emplace(envelope_key{eth, 100}, tip);
+   // A bare older epoch, or membership recorded for a different request id, is insufficient.
+   auto out = plan_actions(in);
+   BOOST_CHECK(out.accepts.empty());
+   BOOST_REQUIRE_EQUAL(1u, out.waiting.size());
+   BOOST_CHECK(out.waiting[0].reason == wait_reason::UNVERIFIED);
+   in.accepted.emplace(2, s);
+   out = plan_actions(in);
+   BOOST_CHECK(out.accepts.empty());
+   BOOST_CHECK(out.waiting[0].reason == wait_reason::UNVERIFIED);
+   // Defense in depth against a synd bug: healthy synd builds the statement from this immutable row, but an
+   // inconsistent request must still fail closed. This is not reachable through an ordinary user request.
+   for (unsigned field = 0; field < 4; ++field) {
+      auto other = s;
+      if (field == 0) other.digest = digest_of("another envelope");
+      if (field == 1) other.chain_code = sol;
+      if (field == 2) other.epoch_index = 8;
+      if (field == 3) other.token_code = liqsol;
+      in.accepted.insert_or_assign(1, other);
+      out = plan_actions(in);
+      BOOST_CHECK(out.accepts.empty());
+      BOOST_REQUIRE_EQUAL(1u, out.waiting.size());
+      BOOST_CHECK(out.waiting[0].reason == wait_reason::NOT_ACCEPTED);
+   }
+}
+
+BOOST_AUTO_TEST_CASE(a_prefix_requires_matching_nonempty_finalized_tips_for_the_same_chain_and_epoch) {
+   auto in = eth_inputs();
+   in.requests = {synd_request(1, eth, 7, liqeth, 10)};
+   in.accepted.emplace(1, decode_statement(in.requests.front().statement).value());
+   const auto tip = digest_of("WIRE tip");
+   in.checkpoints.emplace(eth, envelope_checkpoint{100, tip});
+   const auto waits = [&] {
+      const auto out = plan_actions(in);
+      BOOST_CHECK(out.accepts.empty());
+      BOOST_REQUIRE_EQUAL(1u, out.waiting.size());
+      BOOST_CHECK(out.waiting[0].reason == wait_reason::UNVERIFIED);
+   };
+   waits(); // no external anchor
+   in.emitted = {{{eth, 100}, digest_of("different external tip")}};
+   waits();
+   in.emitted = {{{sol, 100}, tip}};
+   waits();
+   in.emitted = {{{eth, 99}, tip}};
+   waits();
+   in.checkpoints[eth] = {100, {}};
+   in.emitted = {{{eth, 100}, {}}};
+   waits();
+   in.checkpoints[eth] = {6, tip};
+   in.emitted = {{{eth, 6}, tip}};
+   waits(); // a request newer than the authenticated prefix is not covered
+   in.checkpoints.clear();
+   waits(); // an external record without WIRE's accepted tip establishes no prefix
+}
+
+BOOST_AUTO_TEST_CASE(direct_verification_survives_a_missing_or_different_checkpoint) {
+   for (const bool missing : {true, false}) {
+      auto in = eth_inputs();
+      in.requests = {synd_request(1, eth, 7, liqeth, 10)};
+      const auto s = decode_statement(in.requests.front().statement).value();
+      in.accepted.emplace(1, s);
+      in.checkpoints.emplace(eth, envelope_checkpoint{100, digest_of("WIRE tip")});
+      std::vector<envelope_key> reads;
+      in.emitted = collect_emitted(wanted_envelopes(in.requests),
+         [&](fc::slug_name chain, uint32_t epoch) -> std::optional<fc::sha256> {
+            reads.emplace_back(chain, epoch);
+            if (epoch == 7) return s.digest;
+            if (missing) return std::nullopt;
+            return digest_of("different external tip");
+         }, [](auto, auto) { BOOST_FAIL("neither read should throw"); }, in.checkpoints, in.accepted);
+      BOOST_CHECK((reads == std::vector<envelope_key>{{eth, 100}, {eth, 7}}));
+      BOOST_REQUIRE_EQUAL(1u, plan_actions(in).accepts.size());
+      in.emitted[{eth, 7}] = digest_of("contradicted statement");
+      // Even a matching newer checkpoint cannot override explicit contradictory evidence for the request's epoch.
+      in.emitted[{eth, 100}] = in.checkpoints.at(eth).digest;
+      const auto out = plan_actions(in);
+      BOOST_CHECK(out.accepts.empty());
+      BOOST_REQUIRE_EQUAL(1u, out.waiting.size());
+      BOOST_CHECK(out.waiting[0].reason == wait_reason::CONTRADICTED);
+   }
+}
+
+BOOST_AUTO_TEST_CASE(a_failed_checkpoint_read_does_not_stop_other_chains_or_repeat_the_failed_rpc) {
+   const envelope_checkpoints checkpoints{{eth, {100, digest_of("eth tip")}}, {sol, {100, digest_of("sol tip")}}};
+   std::vector<envelope_key> reads;
+   std::vector<fc::slug_name> failures;
+   const auto emitted = collect_emitted({{{eth, 1}, {1}}, {{eth, 2}, {2}}, {{sol, 1}, {3}}},
+      [&](fc::slug_name chain, uint32_t epoch) -> std::optional<fc::sha256> {
+         reads.emplace_back(chain, epoch);
+         if (chain == eth) FC_THROW_EXCEPTION(fc::exception, "rpc down");
+         return std::nullopt;
+      }, [&](fc::slug_name chain, const std::string&) { failures.push_back(chain); }, checkpoints);
+   BOOST_CHECK(emitted.empty());
+   BOOST_CHECK((reads == std::vector<envelope_key>{{eth, 100}, {sol, 100}, {sol, 1}}));
+   BOOST_CHECK((failures == std::vector<fc::slug_name>{eth}));
 }
 
 BOOST_AUTO_TEST_CASE(a_statement_the_outpost_recorded_is_bonded_for_its_remainder) {

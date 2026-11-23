@@ -2585,9 +2585,9 @@ BOOST_AUTO_TEST_CASE(oversized_chunk_extension_is_bounded_and_removed) {
    options.timeouts.idle = fc::milliseconds(200);
 
    BOOST_CHECK_EXCEPTION(download(server, output, options), fc::exception, [](const fc::exception& error) {
-      // Beast refuses to buffer the unterminated extension; a watchdog timeout would instead
+      // Beast stops reading an unterminated chunk header at 8 KiB; a watchdog timeout would instead
       // report timeout_idle, so this cannot be satisfied by the test simply running long.
-      return error.to_detail_string().find("buffer overflow") != std::string::npos;
+      return error.to_detail_string().find("bad chunk extension") != std::string::npos;
    });
    check_download_files_removed(output);
 }

@@ -93,7 +93,7 @@
     },
     {
       "name": "boost",
-      "version": "1.89.0#4"
+      "version": "1.92.0"
     },
     {
       "name": "llvm",
@@ -105,7 +105,7 @@
     },
     {
       "name": "bls12-381",
-      "version": "1.0.0-wire#1"
+      "version": "1.0.0-wire#2"
     },
     {
       "name": "bn256",

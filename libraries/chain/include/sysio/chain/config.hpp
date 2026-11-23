@@ -19,6 +19,9 @@ namespace sysio::chain::config {
   static constexpr auto default_state_size            = 1*1024*1024*1024ll;
   static constexpr auto default_state_guard_size      =    128*1024*1024ll;
 
+  /// Bytes in one MiB, the unit of the `*-mb` options.
+  static constexpr uint64_t bytes_per_mebibyte = 1024 * 1024;
+
 
   static constexpr auto system_account_name    { "sysio"_n };
   static constexpr auto null_account_name      { "sysio.null"_n };
@@ -97,6 +100,7 @@ namespace sysio::chain::config {
   static constexpr uint16_t   default_vote_thread_pool_size                = 4;
   static constexpr uint32_t   default_max_action_return_value_size         = 1024;
   static constexpr uint32_t   default_max_reversible_blocks                = 3600u;
+  static constexpr uint32_t   default_incoming_trx_max_signatures          = 256u; ///< default most signatures a transaction received over p2p or the API may carry
 
   static constexpr uint32_t   default_max_transaction_finality_status_success_duration_sec = 180;
   static constexpr uint32_t   default_max_transaction_finality_status_failure_duration_sec = 180;
@@ -136,6 +140,9 @@ namespace sysio::chain::config {
 
   static constexpr uint32_t   hashing_checktime_block_size       = 10*1024;  /// call checktime from hashing intrinsic once per this number of bytes
 
+  /// Pairs per Miller loop in bls_pairing; keeps line coefficients within 612 KiB and the extra squarings under 2%.
+  static constexpr uint32_t   bls_pairing_batch_size             = 32;
+
   /// Consensus limit bounding one uninterrupted libsodium Ed25519 verification.
   static constexpr uint32_t   max_ed25519_message_size          = 65'536;
 
@@ -166,7 +173,8 @@ namespace sysio::chain::config {
   /// their bound for it passes 4 MiB, then on a stack they map; the rest is for host functions and the frames below.
   static constexpr std::size_t contract_thread_stack_size = 8*1024*1024;
 
-  static constexpr uint32_t   default_abi_serializer_max_time_us = 15*1000; ///< default deadline for abi serialization methods
+  /// default deadline for abi serialization methods
+  static constexpr uint32_t   default_abi_serializer_max_time_us = 100*1000;
 
   /**
  *  The number of sequential blocks produced by a single producer

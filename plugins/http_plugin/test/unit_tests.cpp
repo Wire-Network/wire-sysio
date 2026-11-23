@@ -18,6 +18,7 @@
 #include <boost/test/included/unit_test.hpp>
 
 #include <array>
+#include <deque>
 #include <iostream>
 #include <mutex>
 #include <sstream>
@@ -1450,11 +1451,11 @@ BOOST_FIXTURE_TEST_CASE(request_body_reserved_while_read, http_plugin_test_fixtu
 }
 
 /// A body has a fixed allowance plus its size at the minimum rate to arrive.
-BOOST_AUTO_TEST_CASE(request_body_read_timeout_scales_with_size) {
+BOOST_AUTO_TEST_CASE(transfer_timeout_scales_with_size) {
    using namespace std::chrono_literals;
-   BOOST_CHECK(request_body_read_timeout(0) == request_body_read_allowance);
-   BOOST_CHECK(request_body_read_timeout(request_body_min_bytes_per_second) == request_body_read_allowance + 1s);
-   BOOST_CHECK(request_body_read_timeout(2 * 1024 * 1024) == 42s); // the default max-body-size
+   BOOST_CHECK(transfer_timeout(0) == transfer_allowance);
+   BOOST_CHECK(transfer_timeout(transfer_min_bytes_per_second) == transfer_allowance + 1s);
+   BOOST_CHECK(transfer_timeout(2 * 1024 * 1024) == 42s); // the default max-body-size
 }
 
 /// A body that does not arrive in time closes its connection and releases its reservation, whether the client sent
@@ -1467,13 +1468,13 @@ BOOST_FIXTURE_TEST_CASE(stalled_request_body_closed_at_deadline, http_plugin_tes
    constexpr size_t budget_bytes = 1024 * 1024;
    constexpr auto   budget = "--http-max-bytes-in-flight-mb=1";
    constexpr size_t small_body = 1;
-   constexpr size_t large_body = 2 * request_body_min_bytes_per_second; // two seconds past the allowance
+   constexpr size_t large_body = 2 * transfer_min_bytes_per_second; // two seconds past the allowance
    constexpr size_t paused_body = 2;
    constexpr size_t stalled_bytes = small_body + large_body + small_body;
    constexpr size_t too_large_while_stalled = budget_bytes - large_body / 2;
    static_assert(stalled_bytes + too_large_while_stalled > budget_bytes && too_large_while_stalled < budget_bytes);
    constexpr auto pause = 5s;
-   static_assert(pause < request_body_read_allowance);
+   static_assert(pause < transfer_allowance);
    const std::string endpoint = test_http_endpoint("127.0.0.1", request_body_deadline_index);
    const std::string server_address = "--http-server-address=" + endpoint;
 
@@ -1517,7 +1518,7 @@ BOOST_FIXTURE_TEST_CASE(stalled_request_body_closed_at_deadline, http_plugin_tes
 
    // Each stalled body's connection closes at its deadline, not before.
    const auto closed_after = [&](tcp::socket& socket, size_t body_size) {
-      const auto deadline = request_body_read_timeout(body_size);
+      const auto deadline = transfer_timeout(body_size);
       BOOST_CHECK(closed_by_server(read_until_closed(ctx, socket, deadline + server_reaction_limit)));
       BOOST_CHECK_MESSAGE(steady_clock::now() - start >= deadline,
                           "a " << body_size << " byte body was cut off before its deadline");
@@ -1538,4 +1539,304 @@ BOOST_FIXTURE_TEST_CASE(stalled_request_body_closed_at_deadline, http_plugin_tes
    for (auto* socket : {&small, &large, &expecting, &paused, &refused, &served})
       socket->close();
    BOOST_CHECK(wait_until([&] { return plugin->requests_in_flight() == 0; }));
+}
+
+namespace {
+/// A client of a unix-socket listener.
+struct unix_socket_client {
+   using socket_type = net::local::stream_protocol::socket;
+
+   net::io_context& ctx;
+   std::filesystem::path path;
+
+   socket_type connect() const {
+      socket_type socket(ctx);
+      socket.connect(net::local::stream_protocol::endpoint(path.string()));
+      return socket;
+   }
+
+   /// POST `body` to `route`.
+   static void post(socket_type& socket, const char* route, const std::string& body) {
+      http::request<http::string_body> request{http::verb::post, route, 11};
+      request.body() = body;
+      request.prepare_payload();
+      http::write(socket, request);
+   }
+
+   /// Send the header of a POST to `route` that declares a body of `body_size` bytes, and none of the body.
+   static void post_header_only(socket_type& socket, const char* route, size_t body_size) {
+      const std::string header =
+         std::string("POST ") + route + " HTTP/1.1\r\nContent-Length: " + std::to_string(body_size) + "\r\n\r\n";
+      net::write(socket, net::buffer(header));
+   }
+
+   /// Read the next response on `socket` into `response`, giving up after server_reaction_limit.
+   /// @return the read's error, or net::error::timed_out if no response arrived in time
+   beast::error_code read(socket_type& socket, http::response<http::string_body>& response) const {
+      beast::flat_buffer buffer;
+      std::optional<beast::error_code> result;
+      http::async_read(socket, buffer, response, [&](beast::error_code ec, size_t) { result = ec; });
+      ctx.restart();
+      ctx.run_for(server_reaction_limit);
+      if (result)
+         return *result;
+      socket.cancel();
+      ctx.restart();
+      ctx.run(); // the cancelled read completes before its buffer goes out of scope
+      return net::error::timed_out;
+   }
+
+   /// The next response on `socket`, which must arrive whole within server_reaction_limit.
+   http::response<http::string_body> read_response(socket_type& socket) const {
+      http::response<http::string_body> response;
+      const beast::error_code ec = read(socket, response);
+      BOOST_REQUIRE_MESSAGE(!ec, "no whole response: " << ec.message());
+      return response;
+   }
+};
+
+/// Answers that handlers park until the test gives them, as a transaction endpoint answers once its transaction has
+/// executed.
+class parked_answers {
+public:
+   /// A handler that parks its answer.
+   url_handler handler() {
+      return [this](string&&, string&&, url_response_callback&& answer) {
+         const std::lock_guard lock(mutex_);
+         answers_.push_back(std::move(answer));
+      };
+   }
+
+   /// How many answers are parked.
+   size_t size() const {
+      const std::lock_guard lock(mutex_);
+      return answers_.size();
+   }
+
+   /// The oldest parked answer, once there is one.
+   url_response_callback take() {
+      BOOST_REQUIRE(wait_until([this] { return size() > 0; }));
+      const std::lock_guard lock(mutex_);
+      url_response_callback answer = std::move(answers_.front());
+      answers_.pop_front();
+      return answer;
+   }
+
+private:
+   mutable std::mutex mutex_;
+   std::deque<url_response_callback> answers_;
+};
+
+/// Whether `response` is the 503 of the bytes-in-flight budget.
+bool refused_by_budget(const http::response<http::string_body>& response) {
+   return response.result() == http::status::service_unavailable &&
+          response.body().find("Too many bytes in flight") != std::string::npos;
+}
+} // namespace
+
+/// An always-sent response, as a transaction endpoint's is, reports work that has already taken effect: it is sent
+/// whatever bytes are in flight when it is ready, from an app-thread or an http-thread handler, and its bytes are
+/// counted until it is written. Its request is counted from intake until it is answered. The budget still refuses new
+/// requests on intake, those without a body included, and a budgeted response that does not fit still gets a 503.
+BOOST_FIXTURE_TEST_CASE(always_sent_response_delivered_over_budget, http_plugin_test_fixture) {
+   constexpr size_t budget_bytes = 1024 * 1024;
+   constexpr auto budget = "--http-max-bytes-in-flight-mb=1";
+   constexpr auto app_thread_route = "/v1/node/app_thread_transaction";
+   constexpr auto http_thread_route = "/v1/node/http_thread_transaction";
+   constexpr auto budgeted_route = "/v1/node/budgeted_result";
+   const std::string request_body = R"({"transaction":{}})";
+   const fc::variant executed(fc::mutable_variant_object()("transaction_id", std::string(64, 'a'))(
+      "processed", fc::mutable_variant_object()("receipt", "executed")));
+   const std::string executed_json = fc::json::to_string(executed, fc::time_point::maximum());
+
+   fc::temp_directory directory;
+   const std::filesystem::path socket_path = directory.path() / "always-sent.sock";
+   http_plugin* plugin =
+      init({bu::framework::current_test_case().p_name->c_str(), "--data-dir", directory.path().c_str(),
+            "--http-server-address", "", "--unix-socket-path", socket_path.c_str(), budget});
+   BOOST_REQUIRE(plugin);
+
+   parked_answers parked;
+   plugin->add_api({{app_thread_route, api_category::node, parked.handler()}}, appbase::exec_queue::read_write,
+                   appbase::priority::medium_low, http_content_type::json, http_response_policy::always_sent);
+   plugin->add_async_api({{http_thread_route, api_category::node, parked.handler()}}, http_content_type::json,
+                         http_response_policy::always_sent);
+   plugin->add_api({{budgeted_route, api_category::node, parked.handler()}}, appbase::exec_queue::read_write);
+
+   net::io_context ctx;
+   const unix_socket_client client{ctx, socket_path};
+   const auto in_flight_becomes = [&](size_t bytes) {
+      return wait_until([&] { return plugin->bytes_in_flight() == bytes; });
+   };
+   // A request admitted while the budget has room, and its parked answer.
+   const auto submit = [&](const char* route) {
+      unix_socket_client::socket_type socket = client.connect();
+      unix_socket_client::post(socket, route, request_body);
+      return std::pair{std::move(socket), parked.take()};
+   };
+   const auto refused_on_intake = [&](const char* route, const std::string& body) {
+      unix_socket_client::socket_type socket = client.connect();
+      unix_socket_client::post(socket, route, body);
+      return refused_by_budget(client.read_response(socket));
+   };
+   const auto answer_delivered = [&](unix_socket_client::socket_type& socket, const url_response_callback& answer) {
+      answer(magic_enum::enum_integer(http::status::accepted), executed);
+      const http::response<http::string_body> response = client.read_response(socket);
+      BOOST_CHECK(response.result() == http::status::accepted);
+      BOOST_CHECK_EQUAL(response.body(), executed_json);
+   };
+
+   auto [app_thread_socket, app_thread_answer] = submit(app_thread_route);
+   auto [http_thread_socket, http_thread_answer] = submit(http_thread_route);
+   auto [budgeted_socket, budgeted_answer] = submit(budgeted_route);
+   // The always-sent requests stay counted while they await their answer; the budgeted one did until its handler ran.
+   const size_t awaiting_bytes = 2 * request_body.size();
+   BOOST_REQUIRE(in_flight_becomes(awaiting_bytes));
+
+   // Other traffic fills the rest of the budget before the answers are ready: a body that declares it and stalls.
+   unix_socket_client::socket_type holder = client.connect();
+   unix_socket_client::post_header_only(holder, budgeted_route, budget_bytes - awaiting_bytes);
+   BOOST_REQUIRE(in_flight_becomes(budget_bytes));
+
+   BOOST_CHECK(refused_on_intake(app_thread_route, request_body));
+   BOOST_CHECK(refused_on_intake(http_thread_route, request_body));
+   BOOST_CHECK_EQUAL(parked.size(), 0u); // no handler ran for them
+
+   budgeted_answer(magic_enum::enum_integer(http::status::ok), executed);
+   BOOST_CHECK(refused_by_budget(client.read_response(budgeted_socket)));
+   answer_delivered(app_thread_socket, app_thread_answer);
+   answer_delivered(http_thread_socket, http_thread_answer);
+   BOOST_CHECK(in_flight_becomes(budget_bytes - awaiting_bytes)); // answered, the requests are no longer counted
+
+   holder.close();
+   BOOST_REQUIRE(in_flight_becomes(0));
+
+   // An answer larger than the whole budget is sent too, and holds its bytes until the client reads it. It is far
+   // larger than a unix socket's send buffer, so its write cannot finish before then; meanwhile requests are refused
+   // on intake, with or without a body.
+   const fc::variant large_result(std::string(4 * budget_bytes, 'x'));
+   const std::string large_json = fc::json::to_string(large_result, fc::time_point::maximum());
+   auto [large_socket, large_answer] = submit(app_thread_route);
+   BOOST_REQUIRE(in_flight_becomes(request_body.size()));
+   large_answer(magic_enum::enum_integer(http::status::accepted), large_result);
+   BOOST_REQUIRE(in_flight_becomes(large_json.size()));
+   for (const char* route : {app_thread_route, http_thread_route})
+      for (const std::string& body : {request_body, std::string()})
+         BOOST_CHECK_MESSAGE(refused_on_intake(route, body), route << " with a " << body.size() << " byte body");
+   BOOST_CHECK_EQUAL(parked.size(), 0u);
+   const http::response<http::string_body> large_response = client.read_response(large_socket);
+   BOOST_CHECK(large_response.result() == http::status::accepted);
+   BOOST_CHECK(large_response.body() == large_json);
+   BOOST_CHECK(in_flight_becomes(0));
+
+   for (unix_socket_client::socket_type* socket :
+        {&app_thread_socket, &http_thread_socket, &budgeted_socket, &large_socket})
+      socket->close();
+   BOOST_CHECK(wait_until([&] { return plugin->requests_in_flight() == 0; }));
+}
+
+/// A response the client does not read in time closes its connection, which releases its bytes, as a request body that
+/// does not arrive in time does. Until then they count against the budget: a request that does not fit beside them is
+/// refused, and once they are released it is served.
+BOOST_FIXTURE_TEST_CASE(stalled_response_closed_at_deadline, http_plugin_test_fixture) {
+   using steady_clock = std::chrono::steady_clock;
+   constexpr size_t budget_bytes = 1024 * 1024;
+   constexpr auto budget = "--http-max-bytes-in-flight-mb=1";
+   constexpr auto route = "/v1/node/large_result";
+   // Far larger than a unix socket's send buffer, so its write cannot finish while the client does not read.
+   constexpr size_t result_size = budget_bytes / 2;
+   // A request body that fits the budget only once the stalled response is released.
+   constexpr size_t request_size = budget_bytes - result_size / 2;
+   static_assert(result_size + request_size > budget_bytes && request_size < budget_bytes);
+   const fc::variant result(std::string(result_size, 'x'));
+   const std::string result_json = fc::json::to_string(result, fc::time_point::maximum());
+
+   fc::temp_directory directory;
+   const std::filesystem::path socket_path = directory.path() / "stalled-response.sock";
+   http_plugin* plugin =
+      init({bu::framework::current_test_case().p_name->c_str(), "--data-dir", directory.path().c_str(),
+            "--http-server-address", "", "--unix-socket-path", socket_path.c_str(), budget});
+   BOOST_REQUIRE(plugin);
+   plugin->add_async_api({{route, api_category::node,
+                           [result](string&&, string&&, url_response_callback&& cb) { cb(200, result); }}},
+                         http_content_type::json, http_response_policy::always_sent);
+
+   net::io_context ctx;
+   const unix_socket_client client{ctx, socket_path};
+
+   unix_socket_client::socket_type stalled = client.connect();
+   // Taken before the request is sent, so the response's deadline cannot have started earlier.
+   const steady_clock::time_point start = steady_clock::now();
+   unix_socket_client::post(stalled, route, std::string());
+   BOOST_REQUIRE(wait_until([&] { return plugin->bytes_in_flight() == result_json.size(); }));
+
+   unix_socket_client::socket_type refused = client.connect();
+   unix_socket_client::post_header_only(refused, route, request_size);
+   BOOST_CHECK(refused_by_budget(client.read_response(refused)));
+
+   // The connection closes at the deadline, not before, and the response's bytes are released.
+   const std::chrono::microseconds deadline = transfer_timeout(result_json.size());
+   BOOST_REQUIRE(wait_until([&] { return plugin->bytes_in_flight() == 0; }, deadline + server_reaction_limit));
+   BOOST_CHECK_MESSAGE(steady_clock::now() - start >= deadline, "the response was cut off before its deadline");
+   http::response<http::string_body> cut_off;
+   BOOST_CHECK(client.read(stalled, cut_off)); // what was sent before the close, then the end of the connection
+
+   unix_socket_client::socket_type served = client.connect();
+   unix_socket_client::post(served, route, std::string(request_size, 'x'));
+   const http::response<http::string_body> response = client.read_response(served);
+   BOOST_CHECK(response.result() == http::status::ok);
+   BOOST_CHECK(response.body() == result_json);
+
+   for (unix_socket_client::socket_type* socket : {&stalled, &refused, &served})
+      socket->close();
+   BOOST_CHECK(wait_until([&] { return plugin->requests_in_flight() == 0; }));
+}
+
+/// An always-sent request whose handler keeps a copy of its callback and then throws is answered once, with the
+/// exception's 500, and is no longer counted against bytes_in_flight once that answer is out, though the copy is still
+/// held. Answering through the copy later is dropped, with no effect on the connection or the count.
+BOOST_FIXTURE_TEST_CASE(always_sent_request_released_when_an_exception_answers, quiet_http_plugin_test_fixture) {
+   constexpr auto app_thread_route = "/v1/node/app_thread_throws";
+   constexpr auto http_thread_route = "/v1/node/http_thread_throws";
+   const std::string request_body(1024, 'x');
+   auto* plugin = init_on_socket();
+   BOOST_REQUIRE(plugin);
+
+   std::mutex retained_mutex;
+   std::vector<url_response_callback> retained;
+   const auto retain_and_throw = [&](string&&, string&&, url_response_callback&& answer) {
+      {
+         const std::lock_guard lock(retained_mutex);
+         retained.push_back(answer);
+      }
+      throw std::runtime_error("after keeping a copy of the callback");
+   };
+   plugin->add_api({{app_thread_route, api_category::node, retain_and_throw}}, appbase::exec_queue::read_write,
+                   appbase::priority::medium_low, http_content_type::json, http_response_policy::always_sent);
+   plugin->add_async_api({{http_thread_route, api_category::node, retain_and_throw}}, http_content_type::json,
+                         http_response_policy::always_sent);
+
+   net::io_context ctx;
+   const unix_socket_client client{ctx, socket};
+   for (const char* route : {app_thread_route, http_thread_route}) {
+      unix_socket_client::socket_type connection = client.connect();
+      unix_socket_client::post(connection, route, request_body);
+      BOOST_CHECK(client.read_response(connection).result() == http::status::internal_server_error);
+      http::response<http::string_body> next;
+      const beast::error_code after = client.read(connection, next);
+      BOOST_CHECK_MESSAGE(after == http::error::end_of_stream, route << ": " << after.message());
+   }
+   const auto retained_count = [&] {
+      const std::lock_guard lock(retained_mutex);
+      return retained.size();
+   };
+   BOOST_REQUIRE_EQUAL(retained_count(), 2u);
+   BOOST_CHECK(wait_until([&] { return plugin->bytes_in_flight() == 0; }));
+
+   for (const url_response_callback& late : retained)
+      late(magic_enum::enum_integer(http::status::ok), fc::variant("late"));
+   BOOST_CHECK_EQUAL(plugin->bytes_in_flight(), 0u);
+
+   retained.clear();
+   BOOST_CHECK(all_released(*plugin));
 }

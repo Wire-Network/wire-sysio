@@ -96,6 +96,12 @@ void assert_envelope_chunks_shape(opp_solana_outpost_client& program_client);
 /// @throws fc::exception when a cursor is missing or its byte offset disagrees with the IDL.
 void assert_envelope_chunk_gate_shapes(opp_solana_outpost_client& program_client);
 
+/// Round-trip an `EpochDeliveries` probe through the loaded IDL; fail boot if the `epoch_index` / `payer` offsets the
+/// tally sweep filters on drift. Run only when the IDL declares `cleanup_epoch_deliveries`.
+/// @param program_client Client holding the loaded outpost IDL.
+/// @throws fc::exception when the account or either field is missing, or a field's offset disagrees with the IDL.
+void assert_epoch_deliveries_payer_shape(opp_solana_outpost_client& program_client);
+
 /// Reduce the name-filtered IDL candidates to the ones whose declared
 /// `address` (Anchor IDL v2 top-level / `metadata.address`) matches the
 /// configured program id. Without this, WHICH same-named IDL version drives
@@ -387,16 +393,18 @@ std::string drive_dispatch_rounds(
                                                                       send_dispatch,
    const std::string&                                                 log_label);
 
-/// Backstop on cleanup calls per sweep, in addition to the wall-clock budget; oldest buffers go first.
+/// Backstop on cleanup calls per kind of account per sweep, in addition to the wall-clock budget; oldest go first.
 inline constexpr uint32_t MAX_ENVELOPE_CHUNK_REAPS_PER_SWEEP = 16;
 
-/// One of this relay's own `EnvelopeChunks` staging buffers, as the
-/// `getProgramAccounts` discovery read reports it.
-struct envelope_chunk_buffer {
+/// One per-epoch account this relay paid rent for, as a `getProgramAccounts`
+/// discovery read reports it: an `EnvelopeChunks` staging buffer, or an
+/// `EpochDeliveries` tally this relay's `epoch_in` created. Both close once
+/// their epoch is reapable.
+struct reapable_account {
    fc::network::solana::solana_public_key address;
-   /// The WIRE epoch the buffer staged, read from its header.
+   /// The WIRE epoch the account belongs to, read from its header.
    uint32_t                               epoch_index = 0;
-   /// Rent the close returns to the uploader.
+   /// Rent the close returns to this relay.
    uint64_t                               lamports    = 0;
 };
 
@@ -421,9 +429,10 @@ envelope_chunk_reap_gates decode_envelope_chunk_reap_gates(
    const std::vector<std::optional<fc::network::solana::account_info>>& infos);
 
 /// The program's own eligibility predicate for reaping `epoch_index`'s buffer
-/// (wire-solana `cleanup_envelope_chunks_handler`). The relay mirrors it so it
-/// never pays for a close the program is guaranteed to refuse.
-bool envelope_chunks_reapable(const envelope_chunk_reap_gates& gates, uint32_t epoch_index);
+/// or tally (wire-solana `epoch_reapable`, shared by `cleanup_envelope_chunks`
+/// and `cleanup_epoch_deliveries`). The relay mirrors it so it never pays for a
+/// close the program is guaranteed to refuse.
+bool epoch_reapable(const envelope_chunk_reap_gates& gates, uint32_t epoch_index);
 
 /// Whether the outpost has already settled `epoch_index`: its draining
 /// `dispatch_attestations` round moved `next_epoch_index` past it. A delivery
@@ -457,6 +466,10 @@ struct envelope_chunk_reap_result {
 
    /// Whether every eligible buffer was handled without a failed close.
    bool complete() const { return failed == 0 && deferred == 0; }
+
+   /// Fold a later walk of the same sweep into this one: counts add, and the
+   /// deadline flag and cut-off close carry over from whichever walk set them.
+   void append(const envelope_chunk_reap_result& later);
 };
 
 /// How long the chunk-buffer sweep stands down after a failure, or repeated deadline stops.
@@ -491,7 +504,7 @@ public:
 
    /// Count the last cut-off close as already closed if successful discovery no longer lists its address.
    /// Consume the record once; no rent is attributed, and a still-present buffer is retried normally.
-   uint32_t reconcile_cut_off_close(const std::vector<envelope_chunk_buffer>& buffers);
+   uint32_t reconcile_cut_off_close(const std::vector<reapable_account>& buffers);
 
    /// Record a sweep that threw before reaching its end and before its
    /// deadline; resets the deadline-stop streak and backs every sweep off.
@@ -539,14 +552,38 @@ fc::network::solana::data_slice envelope_chunk_buffer_header_slice();
 ///
 /// @throws fc::exception if the result is not the RPC's array shape or the
 ///         loaded IDL does not declare `EnvelopeChunks`.
-std::vector<envelope_chunk_buffer> decode_envelope_chunk_buffers(opp_solana_outpost_client&                    program_client,
-                                                                 const fc::variant&                            program_accounts,
-                                                                 const fc::network::solana::solana_public_key& uploader);
+std::vector<reapable_account> decode_envelope_chunk_buffers(
+   opp_solana_outpost_client& program_client, const fc::variant& program_accounts,
+   const fc::network::solana::solana_public_key& uploader);
 
-/// The chunk-buffer reaper, factored over its RPC touchpoints so the unit tests
-/// drive it without a Solana endpoint.
+/// The `getProgramAccounts` filters selecting the `EpochDeliveries` tallies
+/// `payer` created: the account discriminator at offset 0 and the tally's
+/// `payer` field, which the program keeps ahead of the variable-length
+/// deliveries so its offset is fixed. Both are base58 `memcmp` filters.
 ///
-/// Walks `buffers` in supplied order; discovery supplies oldest epoch first. A buffer `envelope_chunks_reapable`
+/// @param discriminator the `EpochDeliveries` discriminator the loaded IDL declares.
+/// @param payer         the relay's signer, recorded as `payer` by the `epoch_in` that created the tally.
+std::vector<fc::variant> epoch_deliveries_filters(const std::array<uint8_t, 8>&                 discriminator,
+                                                  const fc::network::solana::solana_public_key& payer);
+
+/// Decode a `getProgramAccounts` result (whole accounts) into the tallies
+/// `payer` created, oldest epoch first.
+///
+/// An entry is kept only when its decoded `payer` is `payer` AND its address is
+/// the PDA the program derives from its epoch: a mismatch can only be IDL
+/// drift, and a close sent for it would fail. Such an entry is logged and
+/// skipped rather than failing the whole read.
+///
+/// @throws fc::exception if the result is not the RPC's array shape or the
+///         loaded IDL does not declare `EpochDeliveries`.
+std::vector<reapable_account> decode_epoch_deliveries(
+   opp_solana_outpost_client& program_client, const fc::variant& program_accounts,
+   const fc::network::solana::solana_public_key& payer);
+
+/// The reaper's walk over one kind of account, factored over its RPC
+/// touchpoints so the unit tests drive it without a Solana endpoint.
+///
+/// Walks `buffers` in supplied order; discovery supplies oldest epoch first. A buffer `epoch_reapable`
 /// rejects is counted and skipped -- it becomes reapable once its epoch drains.
 /// Each eligible buffer is closed by `send_cleanup(epoch_index)`; a send that
 /// throws is logged with its error, counted, and the walk continues, because one
@@ -561,22 +598,23 @@ std::vector<envelope_chunk_buffer> decode_envelope_chunk_buffers(opp_solana_outp
 /// Failed closes are reconciled by the exact account's absence, never by a generic Anchor error:
 /// other required accounts can raise the same error. Already-closed buffers consume the per-sweep bound.
 ///
-/// @param gates            the program's two cursors, read before the walk.
-/// @param buffers          this relay's buffers.
-/// @param deadline_passed  true once the caller's deadline has passed.
-/// @param send_cleanup     sends `cleanup_envelope_chunks(epoch_index)` and
-///                         returns the tx signature.
-/// @param log_label        client identity for log lines.
-/// @param buffer_absent    exact-buffer read at processed commitment after an error. A null account
-///                         counts as already closed, without recovered rent. A read error preserves the close failure.
-///                         The caller must keep this read under the same scoped deadline.
-envelope_chunk_reap_result drive_envelope_chunk_reap(
-   const envelope_chunk_reap_gates&                     gates,
-   std::vector<envelope_chunk_buffer>                   buffers,
-   const std::function<bool()>&                         deadline_passed,
-   const std::function<std::string(uint32_t)>&          send_cleanup,
-   const std::string&                                   log_label,
-   const std::function<bool(const envelope_chunk_buffer&)>& buffer_absent);
+/// @param gates               the program's two cursors, read before the walk.
+/// @param buffers             this relay's accounts of one kind.
+/// @param deadline_passed     true once the caller's deadline has passed.
+/// @param send_cleanup        sends `cleanup_instruction(epoch_index)` and returns the tx signature.
+/// @param log_label           client identity for log lines.
+/// @param account_absent      exact-account read at processed commitment after an error. A null account
+///                            counts as already closed, without recovered rent. A read error preserves the close
+///                            failure. The caller must keep this read under the same scoped deadline.
+/// @param cleanup_instruction the closing instruction, named in log lines.
+envelope_chunk_reap_result drive_reap(
+   const envelope_chunk_reap_gates&                    gates,
+   std::vector<reapable_account>                       buffers,
+   const std::function<bool()>&                        deadline_passed,
+   const std::function<std::string(uint32_t)>&         send_cleanup,
+   const std::string&                                  log_label,
+   const std::function<bool(const reapable_account&)>& account_absent,
+   std::string_view                                    cleanup_instruction = CLEANUP_ENVELOPE_CHUNKS_INSTRUCTION);
 
 /// How one call to `sweep_envelope_chunks` ended.
 enum class envelope_chunk_sweep_outcome {
@@ -604,11 +642,17 @@ struct envelope_chunk_sweep_touchpoints {
    /// Reads both cursors at `confirmed` or stronger (`read_envelope_chunk_reap_gates`).
    std::function<envelope_chunk_reap_gates()>          read_gates;
    /// The relay's own buffers (`read_own_envelope_chunk_buffers`).
-   std::function<std::vector<envelope_chunk_buffer>()> read_buffers;
+   std::function<std::vector<reapable_account>()>      read_buffers;
    /// Sends `cleanup_envelope_chunks(epoch_index)` and returns the tx signature.
    std::function<std::string(uint32_t)>                send_cleanup;
-   /// Reads whether the exact failed-close buffer is absent at processed commitment, within the sweep deadline.
-   std::function<bool(const envelope_chunk_buffer&)>   buffer_absent;
+   /// Reads whether the exact failed-close account is absent at processed commitment, within the sweep deadline.
+   std::function<bool(const reapable_account&)>        account_absent;
+   /// The `EpochDeliveries` tallies this relay created (`read_own_epoch_deliveries`). Left empty, together with
+   /// `send_epoch_deliveries_cleanup`, when the loaded IDL has no `cleanup_epoch_deliveries`: the sweep then
+   /// reaps chunk buffers only.
+   std::function<std::vector<reapable_account>()>      read_epoch_deliveries;
+   /// Sends `cleanup_epoch_deliveries(epoch_index)` and returns the tx signature.
+   std::function<std::string(uint32_t)>                send_epoch_deliveries_cleanup;
 };
 
 /// One chunk-buffer sweep, gated by `schedule`: the body of
@@ -617,7 +661,7 @@ struct envelope_chunk_sweep_touchpoints {
 ///
 /// In order: a backing-off schedule or a spent deadline returns before any
 /// read; the cursors are read (unless `gates` carries them); a sweep that is not
-/// due returns; otherwise the discovery read runs and `drive_envelope_chunk_reap`
+/// due returns; otherwise the discovery read runs and `drive_reap`
 /// walks the buffers, and the schedule records the result. A read that throws
 /// before the deadline backs the schedule off; one that throws at or after the
 /// deadline records a deadline stop, backing off after consecutive no-progress attempts.
@@ -907,8 +951,8 @@ protected:
       fc::network::solana::commitment_t commitment,
       const std::optional<fc::network::solana::data_slice>& slice);
 
-   /// RPC boundary for discovery; forwards the exact program, filters, commitment and slice.
-   virtual fc::variant read_chunk_program_accounts(
+   /// RPC boundary for both discovery reads; forwards the exact program, filters, commitment and slice.
+   virtual fc::variant read_program_accounts(
       const fc::network::solana::solana_public_key& program_id, const std::vector<fc::variant>& filters,
       fc::network::solana::commitment_t commitment, const std::optional<fc::network::solana::data_slice>& slice);
 
@@ -918,7 +962,12 @@ protected:
 
    /// Every `EnvelopeChunks` buffer this relay's signer still owns, oldest epoch
    /// first (`getProgramAccounts`, header-only slice).
-   virtual std::vector<outpost_solana_client_detail::envelope_chunk_buffer> read_own_envelope_chunk_buffers();
+   virtual std::vector<outpost_solana_client_detail::reapable_account> read_own_envelope_chunk_buffers();
+
+   /// Every `EpochDeliveries` tally this relay's signer created and still owns the rent of, oldest epoch first
+   /// (`getProgramAccounts` filtered on `payer`, whole accounts). Called only when the IDL declares
+   /// `cleanup_epoch_deliveries`.
+   virtual std::vector<outpost_solana_client_detail::reapable_account> read_own_epoch_deliveries();
 
    /// Read an exact buffer at the caller's commitment, under the active delivery or sweep deadline.
    /// Used for confirmed terminal dependencies and processed failed-close reconciliation.
@@ -927,8 +976,11 @@ protected:
    virtual std::optional<fc::network::solana::account_info> read_envelope_chunk_buffer(
       const fc::network::solana::solana_public_key& address, fc::network::solana::commitment_t commitment);
 
-   /// Return the rent of every chunk buffer this relay staged for an epoch that
-   /// has since settled.
+   /// Return the rent of every chunk buffer this relay staged, and every
+   /// `EpochDeliveries` tally its `epoch_in` created, for an epoch that has
+   /// since settled. Tallies are reaped only where the program declares
+   /// `cleanup_epoch_deliveries`; their first `epoch_in` caller pays for them
+   /// and nothing else returns that rent.
    ///
    /// `epoch_in` stages each delivery in a per-(epoch, signer) buffer the
    /// uploader pays rent for, and `dispatch_attestations` deliberately leaves it

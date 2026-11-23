@@ -140,7 +140,7 @@ wasm-runtime = sys-vm-jit
 read-mode = head
 validation-mode = full
 api-accept-transactions = true
-abi-serializer-max-time-ms = 15
+abi-serializer-max-time-ms = 100
 
 # Optional features.
 enable-account-queries = true
@@ -196,7 +196,7 @@ them change how the node starts or make it print something and exit.
 | `chain-state-db-guard-size-mb` | `128` | Shut the node down safely when free space in the chain state database drops below this size in MiB. |
 | `chain-threads` | `4` | Number of worker threads in the controller thread pool. Must be greater than 0. |
 | `vote-threads` | unset | Number of worker threads in the vote processor pool. On a node with `producer-name` both an unset value and an explicit 0 are replaced by 4, so voting cannot be disabled there. Elsewhere, unset leaves the pool at 0 and the node neither accepts nor propagates votes on P2P. |
-| `abi-serializer-max-time-ms` | `15` | Maximum ABI serialization time allowed, in milliseconds. |
+| `abi-serializer-max-time-ms` | `100` | Maximum time, in milliseconds, to build the serializer for one ABI and to convert one action's data or table row. It is also the time a `get_block` or transaction response may spend building serializers and decoding action data, all together; actions left once that time is spent are returned as hex only. See [ABI conversions](#abi-conversions). |
 | `signature-cpu-billable-pct` | `50` | Percentage of actual signature-recovery CPU to bill, as a whole number. |
 
 ### Execution runtime
@@ -286,6 +286,34 @@ process-wide `outbound-http-*` fallback that `http_client_plugin` registers.
 
 `chain_plugin` registers no HTTP handlers. It exposes `chain_apis::read_only` and `chain_apis::read_write`,
 which [`chain_api_plugin`](../chain_api_plugin/README.md) publishes as `/v1/chain/*`.
+
+### ABI conversions
+
+- `get_block`, and `push_transaction`, `push_transactions`, `send_transaction`, `send_transaction2` without
+  `retry_trx`, `compute_transaction` and `send_read_only_transaction` once their transactions complete, copy the
+  packed ABIs of the accounts the block or traces name where chain state is read, and do nothing else with them there.
+  Looking up their serializers, building those not cached, and decoding the response run on the http thread pool,
+  within `abi-serializer-max-time-ms` together. Serializers are cached across requests, keyed by the SHA-256 of the
+  packed ABI.
+- Packing the JSON action data of these requests and of `get_required_keys` runs where chain state is read, within
+  `http-max-response-time-ms`. A serializer it builds comes from the same cache and gets `abi-serializer-max-time-ms`,
+  cut short at that deadline. A transaction whose packing runs out of either time is not submitted, and the request
+  fails with `packed_transaction_type_exception`.
+- Once a transaction has run, its response always carries its trace: action data that cannot be decoded in time stays
+  hex, and a trace that fails to decode altogether is returned undecoded.
+- `get_table_rows` builds its serializer for each request on the http thread pool, without the cache. The build and
+  the decode of each row may each take `abi-serializer-max-time-ms`.
+
+These paths still convert with `abi-serializer-max-time-ms` per action or table read on the thread that reads chain
+state, so their cost there scales with it. On a node without read-only threads, such as a producer, the read_only
+queue is the main thread.
+
+- Transaction retry (`send_transaction2` with `retry_trx`), which decodes each tracked trace when its transaction is
+  applied.
+- [`account_watch_plugin`](../account_watch_plugin/README.md).
+- Transaction trace logging at debug level in `producer_plugin`.
+- `read_table_rows_checked` for internal callers: `batch_operator_plugin` with the setting, `snapshot_api_plugin`
+  with its default, and snapshot attestation with the larger of the two.
 
 ## Diagnostics
 
