@@ -155,25 +155,36 @@ struct abi_serializer {
    /// yield. A conversion overruns its deadline by at most this many elements before the yield throws.
    static constexpr size_t built_in_array_elements_per_yield = 32;
 
+   /// Throws abi_recursion_depth_exception once `recursion_depth` reaches max_recursion_depth.
+   static void check_recursion_depth( size_t recursion_depth ) {
+      SYS_ASSERT( recursion_depth < max_recursion_depth, abi_recursion_depth_exception,
+                  "recursive definition, max_recursion_depth {} ", max_recursion_depth );
+   }
+
    // create standard yield function that checks for max_serialization_time and max_recursion_depth.
    // restricts serialization time from creation of yield function until serialization is complete.
    // now() deadline captured at time of this call
    static yield_function_t create_yield_function(const fc::microseconds& max_serialization_time) {
       fc::time_point deadline = fc::time_point::now().safe_add(max_serialization_time);
       return [max_serialization_time, deadline](size_t recursion_depth) {
-         SYS_ASSERT( recursion_depth < max_recursion_depth, abi_recursion_depth_exception,
-                     "recursive definition, max_recursion_depth {} ", max_recursion_depth );
-
+         check_recursion_depth( recursion_depth );
          SYS_ASSERT( fc::time_point::now() < deadline, abi_serialization_deadline_exception,
                      "serialization time limit {}us exceeded", max_serialization_time );
       };
    }
 
-   static yield_function_t create_depth_yield_function() {
-      return [](size_t recursion_depth) {
-         SYS_ASSERT( recursion_depth < max_recursion_depth, abi_recursion_depth_exception,
-                     "recursive definition, max_recursion_depth {} ", max_recursion_depth );
+   /// A yield function that checks max_recursion_depth and throws abi_serialization_deadline_exception once `deadline`
+   /// has passed, whenever it is first called. fc::time_point::maximum() sets no deadline.
+   static yield_function_t create_yield_function(const fc::time_point& deadline) {
+      return [deadline](size_t recursion_depth) {
+         check_recursion_depth( recursion_depth );
+         SYS_ASSERT( fc::time_point::now() < deadline, abi_serialization_deadline_exception,
+                     "serialization deadline {} exceeded", deadline );
       };
+   }
+
+   static yield_function_t create_depth_yield_function() {
+      return [](size_t recursion_depth) { check_recursion_depth( recursion_depth ); };
    }
 
    /// The member of an ABI enum carrying the given underlying value, or nullptr for an unlisted value.

@@ -82,14 +82,18 @@ endif()
 # Link and include libsodium from vcpkg
 
 ### MARK TEST SUITES FOR EXECUTION ###
+# Boost.Test arguments of every unit_test entry: a detailed report, and each test unit's start and end, messages,
+# warnings and failures logged; passed checks are not.
+set(UNIT_TEST_ARGS --report_level=detailed --log_level=test_suite --color_output)
 # Runtime-independent suites are registered once rather than once per WASM runtime.
-add_p_test(NAME protocol_feature_digest_unit_test COMMAND unit_test --run_test=protocol_feature_digest_tests --report_level=detailed --log_level=all --color_output)
+add_p_test(NAME protocol_feature_digest_unit_test
+           COMMAND unit_test --run_test=protocol_feature_digest_tests ${UNIT_TEST_ARGS})
 add_p_test(NAME sysvmoc_signal_handler_unit_test
-           COMMAND unit_test --run_test=sysvmoc_signal_handler_tests --report_level=detailed --log_level=all --color_output)
+           COMMAND unit_test --run_test=sysvmoc_signal_handler_tests ${UNIT_TEST_ARGS})
 add_p_test(NAME sysvmoc_code_cache_unit_test
-           COMMAND unit_test --run_test=sysvmoc_code_cache_tests --report_level=detailed --log_level=all --color_output)
+           COMMAND unit_test --run_test=sysvmoc_code_cache_tests ${UNIT_TEST_ARGS})
 add_p_test(NAME thread_stack_size_unit_test
-           COMMAND unit_test --run_test=thread_stack_size_tests --report_level=detailed --log_level=all --color_output)
+           COMMAND unit_test --run_test=thread_stack_size_tests ${UNIT_TEST_ARGS})
 # One entry per suite per runtime, <suite without _tests>_unit_test_<runtime>, discovered from the built executable.
 # To run unit_test with all log from blockchain displayed, put "--verbose" after "--", i.e. "unit_test -- --verbose".
 # COST starts the longest suites first, even on a fresh run before ctest has measured them.
@@ -99,7 +103,7 @@ boost_test_discover_tests(unit_test
         RUNTIMES ${UNIT_TEST_RUNTIMES}
         # Registered above without a runtime.
         EXCLUDE "^(protocol_feature_digest|sysvmoc_signal_handler|sysvmoc_code_cache|thread_stack_size)_tests$"
-        ARGS --report_level=detailed --log_level=all --color_output
+        ARGS ${UNIT_TEST_ARGS}
         COST_BY_NAME "^(api_part[1-3]|checktime|wasm_part[1-3]|wasm_config_part[1-5])$" 5000
              "^(snapshot_part[12]|finality)$" 4000
              "^delay$" 3000)
@@ -110,7 +114,7 @@ if("sys-vm-oc" IN_LIST UNIT_TEST_RUNTIMES)
           NAME_STRIP "s$" "_test$"
           RUNTIMES sys-vm-oc
           INCLUDE "^wasm_part"
-          ARGS --report_level=detailed --log_level=all --color_output
+          ARGS ${UNIT_TEST_ARGS}
           PROPERTIES ENVIRONMENT SYSIO_DISABLE_FSGSBASE=1 COST 5000)
 endif()
 # The KV suites also run with the std::map KV engine under the chain. A validating_tester's validator stays on chainbase
@@ -121,12 +125,12 @@ boost_test_discover_tests(unit_test
         NAME_STRIP "s$" "_test$"
         RUNTIMES sys-vm
         INCLUDE "^(deep_mind_tests|kv_tests|kv_(api|comprehensive|intrinsic_probe|limits|token)_tests|payer_choice_test|ram_tests|snapshot_part[12]_tests|test_state_history)$"
-        ARGS --report_level=detailed --log_level=all --color_output
+        ARGS ${UNIT_TEST_ARGS}
         PROPERTIES ENVIRONMENT SYSIO_TEST_KV_ENGINE=map)
 # This one test, not its cluster suite: it is what undoes several blocks through the controller on the map engine.
 add_p_test(NAME fork_switch_undoes_kv_writes_unit_test_sys-vm-kv-map
            COMMAND unit_test --run_test=forked_tests_savanna/fork_switch_undoes_kv_writes
-                   --report_level=detailed --log_level=all --color_output -- --sys-vm
+                   ${UNIT_TEST_ARGS} -- --sys-vm
            ENVIRONMENT SYSIO_TEST_KV_ENGINE=map)
 # The tests the KV docs cite have to exist. The name carries _unit_test_ so that every run of the unit tests includes it.
 add_test(NAME kv_doc_links_unit_test_check

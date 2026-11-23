@@ -53,6 +53,18 @@ namespace sysio {
       plaintext = 2
    };
 
+   /**
+    * Whether the http-max-bytes-in-flight-mb budget can refuse a request once its handler has answered. The budget
+    * refuses requests on intake, before their handler runs, whatever the policy.
+    */
+   enum class http_response_policy {
+      /// The response is checked against the budget when it is sent, and a 503 replaces one that does not fit.
+      budgeted = 1,
+      /// The response is always sent, its bytes counted against the budget. For a handler whose response reports
+      /// work that has already taken effect, such as an executed transaction, which a 503 would hide.
+      always_sent = 2
+   };
+
    struct http_plugin_defaults {
       //If empty, unix socket support will be completely disabled. If not empty,
       // unix socket support is enabled with the given default path (treated relative
@@ -99,16 +111,28 @@ namespace sysio {
         void plugin_shutdown();
         void handle_sighup() override;
 
-        void add_handler(api_entry&& entry, appbase::exec_queue q, int priority = appbase::priority::medium_low, http_content_type content_type = http_content_type::json);
-        void add_api(api_description&& api, appbase::exec_queue q, int priority = appbase::priority::medium_low, http_content_type content_type = http_content_type::json) {
+        /// Register a handler that runs on the app thread, posted to `q` at `priority`. `response_policy` says whether
+        /// the bytes-in-flight budget can refuse its response.
+        void add_handler(api_entry&& entry, appbase::exec_queue q, int priority = appbase::priority::medium_low,
+                         http_content_type content_type = http_content_type::json,
+                         http_response_policy response_policy = http_response_policy::budgeted);
+        /// add_handler() for each call of `api`.
+        void add_api(api_description&& api, appbase::exec_queue q, int priority = appbase::priority::medium_low,
+                     http_content_type content_type = http_content_type::json,
+                     http_response_policy response_policy = http_response_policy::budgeted) {
            for (auto& call : api)
-              add_handler(std::move(call), q, priority, content_type);
+              add_handler(std::move(call), q, priority, content_type, response_policy);
         }
 
-        void add_async_handler(api_entry&& entry, http_content_type content_type = http_content_type::json);
-        void add_async_api(api_description&& api, http_content_type content_type = http_content_type::json) {
+        /// Register a handler that runs inline on an http thread. `response_policy` says whether the bytes-in-flight
+        /// budget can refuse its response.
+        void add_async_handler(api_entry&& entry, http_content_type content_type = http_content_type::json,
+                               http_response_policy response_policy = http_response_policy::budgeted);
+        /// add_async_handler() for each call of `api`.
+        void add_async_api(api_description&& api, http_content_type content_type = http_content_type::json,
+                           http_response_policy response_policy = http_response_policy::budgeted) {
            for (auto& call : api)
-              add_async_handler(std::move(call), content_type);
+              add_async_handler(std::move(call), content_type, response_policy);
         }
 
         /// Register a raw handler, which answers through the connection it is given, for endpoints that send binary

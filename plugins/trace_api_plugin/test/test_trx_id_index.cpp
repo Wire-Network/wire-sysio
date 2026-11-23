@@ -6,21 +6,28 @@
 #include <sysio/trace_api/trx_id_index.hpp>
 #include <sysio/trace_api/test_common.hpp>
 
+#include <cstring>
+
 using namespace sysio;
 using namespace sysio::trace_api;
 using namespace sysio::trace_api::test_common;
 
 namespace {
 
-// Build a sha256 whose first 8 bytes (the prefix64) equal the given value.
-// On little-endian x86 this is the little-endian encoding written into bytes 0-7.
+/// Build a transaction ID with a controlled native hash prefix and an optional distinct final byte.
 chain::transaction_id_type make_trx_id(uint64_t prefix64, uint8_t disambiguator = 0) {
    chain::transaction_id_type id;
    std::memcpy(id.data(), &prefix64, sizeof(prefix64));
-   // vary the last byte so ids with the same prefix64 are still distinct objects
    id.data()[id.data_size() - 1] = disambiguator;
    return id;
 }
+
+/// Distinct records used to verify that moving a reader transfers the intended mapping.
+constexpr uint64_t first_move_prefix = 1;
+constexpr uint64_t second_move_prefix = 2;
+constexpr uint32_t first_move_block = 10;
+constexpr uint32_t second_move_block = 20;
+constexpr uint32_t missing_move_block = 0;
 
 struct trx_id_index_fixture {
    fc::temp_directory tempdir;
@@ -33,6 +40,43 @@ struct trx_id_index_fixture {
 } // namespace
 
 BOOST_AUTO_TEST_SUITE(trx_id_index_tests)
+
+/// Moving a reader transfers its bucket view and prevents further lookups through the source.
+BOOST_FIXTURE_TEST_CASE(move_constructor_transfers_mapping, trx_id_index_fixture) {
+   trx_id_index_writer writer;
+   writer.add(make_trx_id(first_move_prefix), first_move_block);
+   writer.write(index_path());
+   trx_id_index_reader source(index_path());
+   trx_id_index_reader destination(std::move(source));
+   BOOST_REQUIRE(destination.valid());
+   BOOST_CHECK_EQUAL(destination.lookup(make_trx_id(first_move_prefix)).value_or(missing_move_block),
+                     first_move_block);
+   BOOST_CHECK(!source.valid());
+   BOOST_CHECK(!source.lookup(make_trx_id(first_move_prefix)));
+}
+
+/// Move assignment releases an existing mapping, retains the new records, and tolerates self assignment.
+BOOST_FIXTURE_TEST_CASE(move_assignment_replaces_mapping, trx_id_index_fixture) {
+   trx_id_index_writer writer;
+   writer.add(make_trx_id(first_move_prefix), first_move_block);
+   writer.write(index_path());
+   trx_id_index_reader destination(index_path());
+   writer.add(make_trx_id(second_move_prefix), second_move_block);
+   writer.write(index_path());
+   trx_id_index_reader source(index_path());
+   destination = std::move(source);
+   BOOST_REQUIRE(destination.valid());
+   BOOST_CHECK_EQUAL(destination.lookup(make_trx_id(first_move_prefix)).value_or(missing_move_block),
+                     first_move_block);
+   BOOST_CHECK_EQUAL(destination.lookup(make_trx_id(second_move_prefix)).value_or(missing_move_block),
+                     second_move_block);
+   BOOST_CHECK(!source.valid());
+   BOOST_CHECK(!source.lookup(make_trx_id(second_move_prefix)));
+   auto* same = &destination;
+   destination = std::move(*same);
+   BOOST_CHECK_EQUAL(destination.lookup(make_trx_id(second_move_prefix)).value_or(missing_move_block),
+                     second_move_block);
+}
 
 /// Rebuilding replaces existing bytes and ignores crash leftovers instead of appending stale index data.
 BOOST_FIXTURE_TEST_CASE(rewrite_with_stale_temporary, trx_id_index_fixture) {

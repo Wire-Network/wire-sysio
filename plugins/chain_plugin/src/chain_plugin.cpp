@@ -1,5 +1,6 @@
 #include <sysio/chain_plugin/table_read.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
+#include <sysio/chain_plugin/mebibytes.hpp>
 #include <sysio/chain_plugin/trx_retry_db.hpp>
 #include <sysio/chain_plugin/tracked_votes.hpp>
 #include <sysio/chain/block_log.hpp>
@@ -166,18 +167,8 @@ constexpr auto snapshot_endpoint_unscheduled_block_message =
    "Snapshot endpoint returned unscheduled block #{}; auto-fetched snapshots must use exact "
    "{}-block cadence heights";
 
-constexpr uint64_t bytes_per_mebibyte = 1024 * 1024;
-
 /// Off-thread table reads poll this interval so plugin shutdown and request deadlines take effect promptly.
 constexpr std::chrono::milliseconds table_read_wait_poll_interval{200};
-
-/// Convert a positive MiB option value to bytes without overflowing uint64_t.
-uint64_t checked_mebibytes(uint64_t value, std::string_view option_name) {
-   constexpr auto max_mebibytes = std::numeric_limits<uint64_t>::max() / bytes_per_mebibyte;
-   SYS_ASSERT(value > 0 && value <= max_mebibytes, sysio::chain::plugin_config_exception,
-              "{} must be between 1 and {} MiB", option_name, max_mebibytes);
-   return value * bytes_per_mebibyte;
-}
 
 /** Log attended snapshot-bootstrap phase changes, transfer rate, percentage, and ETA. */
 class snapshot_download_progress_logger {
@@ -243,7 +234,7 @@ private:
 
    /** Convert a byte count to MiB for operator-facing logs. */
    static double to_mebibytes(uint64_t bytes) {
-      return static_cast<double>(bytes) / static_cast<double>(bytes_per_mebibyte);
+      return static_cast<double>(bytes) / static_cast<double>(sysio::bytes_per_mebibyte);
    }
 
    /** Calculate whole bytes per second without overflowing intermediate integer arithmetic. */
@@ -3665,11 +3656,12 @@ std::function<chain::t_or_exception<fc::variant>()> read_only::get_block(const g
    chain::signed_block_ptr block = get_raw_block(params, deadline);
 
    using return_type = t_or_exception<fc::variant>;
-   return [this,
-           resolver = get_serializers_cache(db, block, abi_serializer_max_time),
-           block    = std::move(block)]() mutable -> return_type {
+   // Only the ABIs are copied here, on the read_only queue; the returned function, which runs on the http thread pool,
+   // looks up and builds their serializers and decodes the block.
+   captured_abis abis = captured_abis::capture(db, *block);
+   return [this, abis = std::move(abis), block = std::move(block)]() -> return_type {
       try {
-         return convert_block(block, resolver);
+         return convert_block(block, abis);
       } CATCH_AND_RETURN(return_type);
    };
 }
@@ -3708,16 +3700,12 @@ read_only::get_block_header_result read_only::get_block_header(const read_only::
    }
 }
 
-abi_resolver
-read_only::get_block_serializers( const chain::signed_block_ptr& block, const fc::microseconds& max_time ) const {
-   return get_serializers_cache(db, block, max_time);
-}
-
-fc::variant read_only::convert_block( const chain::signed_block_ptr& block, abi_resolver& resolver ) const {
-   fc::variant pretty_output;
-   // abi_serializer_max_time bounds each action's decode and, from here, the decode of the whole block.
-   abi_serializer::to_variant( *block, pretty_output, resolver, abi_serializer_max_time,
-                               fc::time_point::now().safe_add(abi_serializer_max_time) );
+fc::variant read_only::convert_block( const chain::signed_block_ptr& block, const captured_abis& abis ) const {
+   const fc::time_point     deadline = fc::time_point::now().safe_add(abi_serializer_max_time);
+   captured_abi_serializers serializers(abi_serializer_max_time, deadline);
+   fc::variant              pretty_output;
+   abi_serializer::to_variant( *block, pretty_output, serializers.resolver_for(abis), abi_serializer_max_time,
+                               deadline );
 
    const auto block_id = block->calculate_id();
    uint32_t ref_block_prefix = block_id._hash[1];
@@ -3782,16 +3770,37 @@ fc::variant read_only::get_block_header_state(const get_block_header_state_param
 namespace {
 
 /**
- * push_transaction's `processed` output for `trace`: its action traces nested under the action that caused them,
- * action data decoded with `resolver`, each action within `max_action_time` and all of them by
- * `action_data_deadline`. Without the ABIs it needs, the plain trace.
+ * Packs the transaction `request` into `ptrx` with the ABIs `db` holds now. Building serializers and converting
+ * action data end by `deadline`, and each action's conversion within `max_action_time`. Running out of either throws
+ * packed_transaction_type_exception rather than a deadline exception, since the transaction was not submitted.
  */
-fc::variant push_transaction_output(const transaction_trace_ptr& trace, const abi_resolver& resolver,
-                                    const fc::microseconds& max_action_time,
+void pack_transaction_request(const controller& db, const fc::variant& request, packed_transaction& ptrx,
+                              const fc::microseconds& max_action_time, const fc::time_point& deadline) {
+   auto resolver = caching_resolver(make_resolver(db, max_action_time, throw_on_yield::yes, deadline));
+   try {
+      abi_serializer::from_variant(request, ptrx, resolver, abi_serializer::create_yield_function(deadline),
+                                   max_action_time);
+   } catch (const chain::abi_serialization_deadline_exception& e) {
+      chain::packed_transaction_type_exception not_packed(
+         FC_LOG_MESSAGE(warn, "Transaction not submitted: its action data was not converted within the time limit"));
+      for (const fc::log_message& log : e.get_log())
+         not_packed.append_log(log);
+      throw not_packed;
+   } SYS_RETHROW_EXCEPTIONS(chain::packed_transaction_type_exception, "Invalid packed transaction")
+}
+
+/**
+ * push_transaction's `processed` output for `trace`: its action traces nested under the action that caused them,
+ * action data decoded with `serializers` for the ABIs `abis` captured, each action within `max_action_time` and all
+ * of them by `action_data_deadline`. The plain trace when that fails for any reason.
+ */
+fc::variant push_transaction_output(const transaction_trace_ptr& trace, const captured_abis& abis,
+                                    captured_abi_serializers& serializers, const fc::microseconds& max_action_time,
                                     const fc::time_point& action_data_deadline) {
    fc::variant output;
    try {
-      abi_serializer::to_variant(*trace, output, resolver, max_action_time, action_data_deadline);
+      abi_serializer::to_variant(*trace, output, serializers.resolver_for(abis), max_action_time,
+                                 action_data_deadline);
 
       // Create map of (closest_unnotified_ancestor_action_ordinal, global_sequence) with action trace
       std::map< std::pair<uint32_t, uint64_t>, fc::mutable_variant_object > act_traces_map;
@@ -3839,7 +3848,8 @@ fc::variant push_transaction_output(const transaction_trace_ptr& trace, const ab
       output_mvo["action_traces"] = convert_act_trace_to_tree_struct(0);
 
       output = std::move(output_mvo);
-   } catch( chain::abi_exception& ) {
+   } catch (...) {
+      // The transaction was processed, so its trace is reported whatever decoding it ran into.
       output = *trace;
    }
    return output;
@@ -3850,27 +3860,22 @@ fc::variant push_transaction_output(const transaction_trace_ptr& trace, const ab
 void read_write::push_transaction_trace(const push_transaction_params& params, next_function<pushed_trace> next) {
    try {
       auto ptrx = std::make_shared<packed_transaction>();
-      auto resolver = caching_resolver(make_resolver(db, abi_serializer_max_time, throw_on_yield::yes));
-      try {
-         abi_serializer::from_variant(params, *ptrx, resolver,
-                                      abi_serializer::create_yield_function(http_max_response_time),
-                                      abi_serializer_max_time);
-      } SYS_RETHROW_EXCEPTIONS(chain::packed_transaction_type_exception, "Invalid packed transaction")
+      pack_transaction_request(db, params, *ptrx, abi_serializer_max_time,
+                               fc::time_point::now().safe_add(http_max_response_time));
       ptrx->decompress();
 
       // Looked up on each call, so that the method is always the current application's.
       incoming::methods::transaction_async::method_type& on_incoming =
          app().get_method<incoming::methods::transaction_async>();
       on_incoming(ptrx, true, transaction_metadata::trx_type::input, false,
-            [&db = db, max_action_time = abi_serializer_max_time,
-             next](const next_function_variant<transaction_trace_ptr>& result) -> void {
+            [&db = db, next](const next_function_variant<transaction_trace_ptr>& result) -> void {
          if (std::holds_alternative<fc::exception_ptr>(result)) {
             next(std::get<fc::exception_ptr>(result));
          } else {
             try {
                const transaction_trace_ptr& trace = std::get<transaction_trace_ptr>(result);
-               // The ABIs are read now, on the main thread: the next transaction may change them.
-               next(pushed_trace{trace, get_serializers_cache(db, trace, max_action_time)});
+               // The ABIs are copied now, on the main thread: the next transaction may change them.
+               next(pushed_trace{trace, captured_abis::capture(db, *trace)});
             } CATCH_AND_CALL(next);
          }
       });
@@ -3891,13 +3896,14 @@ void read_write::push_transaction(const read_write::push_transaction_params& par
       }
       using return_type = t_or_exception<push_transaction_results>;
       // The function passed to next() runs on the http thread pool. max_time bounds each action's decode and, from
-      // here, the decode of the whole trace.
+      // there, building serializers for the trace's ABIs and decoding its action data together.
       next([pushed = std::get<pushed_trace>(std::move(result)), max_time]() -> return_type {
          try {
-            const fc::time_point action_data_deadline = fc::time_point::now().safe_add(max_time);
+            const fc::time_point     deadline = fc::time_point::now().safe_add(max_time);
+            captured_abi_serializers serializers(max_time, deadline);
             return return_type(push_transaction_results{
                pushed.trace->id,
-               push_transaction_output(pushed.trace, pushed.resolver, max_time, action_data_deadline)});
+               push_transaction_output(pushed.trace, pushed.abis, serializers, max_time, deadline)});
          } CATCH_AND_RETURN(return_type);
       });
    });
@@ -3920,10 +3926,11 @@ void read_write::push_remaining(size_t index, std::shared_ptr<const push_transac
 
       using return_type = t_or_exception<push_transactions_results>;
       // The function passed to next() runs on the http thread pool. max_time bounds each action's decode and, from
-      // here, the decode of all the traces together.
+      // there, building serializers for the ABIs of all the traces and decoding their action data together.
       next([pushed, max_time = abi_serializer_max_time]() -> return_type {
          try {
-            const fc::time_point action_data_deadline = fc::time_point::now().safe_add(max_time);
+            const fc::time_point     deadline = fc::time_point::now().safe_add(max_time);
+            captured_abi_serializers serializers(max_time, deadline);
             push_transactions_results results;
             results.reserve(pushed->size());
             const auto add_error = [&results](const fc::exception_ptr& e) {
@@ -3939,7 +3946,7 @@ void read_write::push_remaining(size_t index, std::shared_ptr<const push_transac
                   const pushed_trace& trace = std::get<pushed_trace>(outcome);
                   results.emplace_back(push_transaction_results{
                      trace.trace->id,
-                     push_transaction_output(trace.trace, trace.resolver, max_time, action_data_deadline)});
+                     push_transaction_output(trace.trace, trace.abis, serializers, max_time, deadline)});
                } CATCH_AND_CALL(add_error);
             }
             return return_type(std::move(results));
@@ -3968,12 +3975,8 @@ template<class API, class Result>
 void api_base::send_transaction_gen(API &api, send_transaction_params_t params, next_function<Result> next) {
    try {
       auto ptrx = std::make_shared<packed_transaction>();
-      auto resolver = caching_resolver(make_resolver(api.db, api.abi_serializer_max_time, throw_on_yield::yes));
-      try {
-         abi_serializer::from_variant(params.transaction, *ptrx, resolver,
-                                      abi_serializer::create_yield_function(api.http_max_response_time),
-                                      api.abi_serializer_max_time);
-      } SYS_RETHROW_EXCEPTIONS(packed_transaction_type_exception, "Invalid packed transaction")
+      pack_transaction_request(api.db, params.transaction, *ptrx, api.abi_serializer_max_time,
+                               fc::time_point::now().safe_add(api.http_max_response_time));
       ptrx->decompress();
 
       bool retry = false;
@@ -3989,7 +3992,9 @@ void api_base::send_transaction_gen(API &api, send_transaction_params_t params, 
                      ptrx->expiration(), api.trx_retry->get_max_expiration_time() );
       }
 
-      static incoming::methods::transaction_async::method_type& on_incoming = app().get_method<incoming::methods::transaction_async>();
+      // Looked up on each call, so that the method is always the current application's.
+      incoming::methods::transaction_async::method_type& on_incoming =
+         app().get_method<incoming::methods::transaction_async>();
       on_incoming(ptrx, true, params.trx_type, params.return_failure_trace,
             [&api, ptrx, next, retry, retry_num_blocks](const next_function_variant<transaction_trace_ptr>& result) -> void {
             if( std::holds_alternative<fc::exception_ptr>( result ) ) {
@@ -4018,21 +4023,24 @@ void api_base::send_transaction_gen(API &api, send_transaction_params_t params, 
                      (void)retry_num_blocks; // ref variable to avoid compilation warning
                   }
                   if (!retried) {
-                     // we are still on main thread here. The lambda passed to `next()` below will be executed on the http thread pool
+                     // We are still on the thread that ran the transaction, so only the ABIs are copied here. The
+                     // lambda passed to `next()` below runs on the http thread pool.
                      using return_type = t_or_exception<Result>;
                      next([&api,
                            trx_trace_ptr,
-                           resolver = get_serializers_cache(api.db, trx_trace_ptr, api.abi_serializer_max_time)]() mutable {
+                           abis = captured_abis::capture(api.db, *trx_trace_ptr)]() {
                         try {
                            fc::variant output;
                            try {
-                              // abi_serializer_max_time bounds each action's decode and, from here, the decode of
-                              // the whole trace.
-                              const fc::time_point action_data_deadline =
+                              // abi_serializer_max_time bounds each action's decode and, from here, building
+                              // serializers for the trace's ABIs and decoding its action data together.
+                              const fc::time_point deadline =
                                  fc::time_point::now().safe_add(api.abi_serializer_max_time);
-                              abi_serializer::to_variant(*trx_trace_ptr, output, resolver, api.abi_serializer_max_time,
-                                                         action_data_deadline);
-                           } catch( abi_exception& ) {
+                              captured_abi_serializers serializers(api.abi_serializer_max_time, deadline);
+                              abi_serializer::to_variant(*trx_trace_ptr, output, serializers.resolver_for(abis),
+                                                         api.abi_serializer_max_time, deadline);
+                           } catch (...) {
+                              // The transaction was processed, so its trace is reported whatever decoding ran into.
                               output = *trx_trace_ptr;
                            }
                            const transaction_id_type& id = trx_trace_ptr->id;
@@ -4327,19 +4335,22 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
 
 read_only::get_required_keys_result read_only::get_required_keys( const get_required_keys_params& params,
                                                                   const fc::time_point& deadline )const {
-   transaction pretty_input;
-   auto resolver = caching_resolver(make_resolver(db, abi_serializer_max_time, throw_on_yield::yes));
-   try {
-      abi_serializer::from_variant(params.transaction, pretty_input, resolver,
-                                   abi_serializer::create_yield_function(http_max_response_time),
-                                   abi_serializer_max_time);
-   } SYS_RETHROW_EXCEPTIONS(chain::transaction_type_exception, "Invalid transaction")
-
-   SYS_ASSERT( pretty_input.delay_sec.value == 0, chain::transaction_type_exception, "delay_sec must be 0");
    const std::function<void()> checktime = [&deadline]() {
       SYS_ASSERT( fc::time_point::now() < deadline, chain::deadline_exception,
                   "get_required_keys exceeded its deadline {}", deadline );
    };
+   transaction pretty_input;
+   // The request deadline bounds packing, building serializers included.
+   auto resolver = caching_resolver(make_resolver(db, abi_serializer_max_time, throw_on_yield::yes, deadline));
+   try {
+      abi_serializer::from_variant(params.transaction, pretty_input, resolver,
+                                   abi_serializer::create_yield_function(deadline), abi_serializer_max_time);
+   } catch (chain::abi_serialization_deadline_exception& e) {
+      checktime(); // the request deadline is reported as it is while checking keys
+      FC_RETHROW_EXCEPTION(e, warn, "Invalid transaction");
+   } SYS_RETHROW_EXCEPTIONS(chain::transaction_type_exception, "Invalid transaction")
+
+   SYS_ASSERT( pretty_input.delay_sec.value == 0, chain::transaction_type_exception, "delay_sec must be 0");
    auto required_keys_set =
       db.get_authorization_manager().get_required_keys( pretty_input, params.available_keys, checktime );
    get_required_keys_result result;

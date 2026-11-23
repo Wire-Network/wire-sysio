@@ -22,8 +22,7 @@
 #include <string>
 #include <unordered_map>
 
-#define BOOST_DLL_USE_STD_FS
-#include <boost/dll/runtime_symbol_info.hpp>
+#include <fc/process.hpp>
 
 namespace fc {
 
@@ -292,7 +291,7 @@ namespace fc {
    const std::string& get_thread_name() {
       if(thread_name.empty()) {
          try {
-            thread_name = boost::dll::program_location().filename().generic_string();
+            thread_name = program_path().filename().generic_string();
          } catch (...) {
             thread_name = "unknown";
          }

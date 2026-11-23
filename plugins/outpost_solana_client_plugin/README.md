@@ -8,7 +8,7 @@ The `outpost_solana_client_plugin` provides Solana JSON-RPC client integration f
 - [Class Diagrams](#class-diagrams)
 - [Inbound Dispatch Manifests](#inbound-dispatch-manifests)
 - [Outpost Cranks](#outpost-cranks)
-- [Envelope Chunk Cleanup](#envelope-chunk-cleanup)
+- [Envelope Chunk and Delivery Tally Cleanup](#envelope-chunk-and-delivery-tally-cleanup)
 - [Client Architecture](#client-architecture)
 - [solana_client (RPC Client)](#solana_client-rpc-client)
 - [solana_program_data_client (Raw/Vanilla Programs)](#solana_program_data_client-rawvanilla-programs)
@@ -517,7 +517,7 @@ delivery.
 
 ---
 
-## Envelope Chunk Cleanup
+## Envelope Chunk and Delivery Tally Cleanup
 
 The batch operator reaps its own settled `EnvelopeChunks` buffers after delivery,
 on delivery-path settled skips, and on idle inbound ticks. It calls
@@ -537,6 +537,15 @@ The batch operator's loaded IDL must declare `cleanup_envelope_chunks`,
 `EnvelopeChunks`, `OutpostConfig` and `LatestOutboundEnvelope`. Boot validates the
 `EnvelopeChunks` epoch/operator offsets and both settlement cursor offsets against
 that IDL so header drift fails visibly at startup.
+
+The same sweep also reaps the `EpochDeliveries` tallies this operator's `epoch_in`
+created (the first `epoch_in` of an epoch pays for its tally), by
+`cleanup_epoch_deliveries`, under the same settlement gates, budget and back-off.
+Discovery is a second `getProgramAccounts` read with discriminator and `payer`
+`memcmp` filters and no `dataSlice`; `payer` sits at a fixed offset ahead of the
+recorded deliveries. This is optional: when the loaded IDL does not declare
+`cleanup_epoch_deliveries`, the relay logs it at startup and leaves tallies alone.
+When it does, boot validates the `EpochDeliveries` epoch/payer offsets against the IDL.
 
 ---
 

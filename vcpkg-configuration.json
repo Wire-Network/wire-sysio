@@ -10,8 +10,8 @@
     {
       "kind": "git",
       "repository": "https://github.com/wire-network/wire-vcpkg-registry",
-      "baseline": "394d206b3506a1652408f213da4020b32b337f16",
-      "reference": "394d206b3506a1652408f213da4020b32b337f16",
+      "baseline": "ed473275d1152f2af775b98f29058bed8bad76ff",
+      "reference": "ed473275d1152f2af775b98f29058bed8bad76ff",
       "packages": [
         "boost",
         "softfloat",

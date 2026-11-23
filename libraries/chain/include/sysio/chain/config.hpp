@@ -19,6 +19,9 @@ namespace sysio::chain::config {
   static constexpr auto default_state_size            = 1*1024*1024*1024ll;
   static constexpr auto default_state_guard_size      =    128*1024*1024ll;
 
+  /// Bytes in one MiB, the unit of the `*-mb` options.
+  static constexpr uint64_t bytes_per_mebibyte = 1024 * 1024;
+
 
   static constexpr auto system_account_name    { "sysio"_n };
   static constexpr auto null_account_name      { "sysio.null"_n };
@@ -170,7 +173,8 @@ namespace sysio::chain::config {
   /// their bound for it passes 4 MiB, then on a stack they map; the rest is for host functions and the frames below.
   static constexpr std::size_t contract_thread_stack_size = 8*1024*1024;
 
-  static constexpr uint32_t   default_abi_serializer_max_time_us = 15*1000; ///< default deadline for abi serialization methods
+  /// default deadline for abi serialization methods
+  static constexpr uint32_t   default_abi_serializer_max_time_us = 100*1000;
 
   /**
  *  The number of sequential blocks produced by a single producer

@@ -91,6 +91,9 @@ public:
    /// read-exclusive work stops at the window's end as well.
    fc::time_point get_read_only_window_deadline() const;
 
+   /// Byte limit on the incoming transaction queue, set by incoming-transaction-queue-size-mb.
+   uint64_t get_max_incoming_transaction_queue_size() const;
+
    void add_greylist_accounts(const greylist_params& params);
    void remove_greylist_accounts(const greylist_params& params);
    greylist_params get_greylist() const;

@@ -24,7 +24,7 @@ chain_api_plugin::plugin_startup
   '-- http_plugin::add_api / add_async_api  (one entry per /v1/chain/<call>)
 ```
 
-Three things are decided at registration time and visible to operators:
+Four things are decided at registration time and visible to operators:
 
 - **Which thread runs a call.** Most endpoints are registered with `add_api(..., exec_queue::read_only)`, so
   the call goes on the read-only queue, whose tasks run in parallel on the read-only thread pool as well as on
@@ -40,6 +40,11 @@ Three things are decided at registration time and visible to operators:
   reachable on every listener, exactly like `/v1/node/get_supported_apis`. Read calls are `chain_ro`; the four
   transaction-submission calls are `chain_rw`. With `--http-category-address` this is what lets a node publish
   reads publicly while keeping writes on loopback.
+- **Whether a response can be refused.** `compute_transaction` and the four transaction-submission calls are
+  registered with `http_response_policy::always_sent`: their response reports the transaction's execution, so it
+  is sent even when `http-max-bytes-in-flight-mb` is exceeded by then. The budget refuses these calls only on
+  intake, before the transaction is submitted. Every other call's response, `send_read_only_transaction`'s
+  included, gets a 503 when it does not fit.
 - **Which calls exist at all.** `get_accounts_by_authorizers` is registered only when `chain_plugin` reports
   account queries enabled (`enable-account-queries = true`), and `get_transaction_status` only when the
   transaction finality status feature is enabled

@@ -139,12 +139,20 @@ requests `sysio.synd` issues for syndication envelopes. Each poll it:
 
 1. **Verifies each statement against its outpost.** An OPEN request states the
    outpost, the depot epoch and the digest of the envelope the depot accepted. The
-   outpost keeps its own write-once record of each envelope it emitted, the keccak256
-   of its canonical bytes (Ethereum `OPP.outboundEnvelopes`, Solana's outbound
-   `EnvelopeLog`); read at the outpost client's settled commitment (Solana `finalized`,
-   the Ethereum client's read confirmation), that record must carry the statement's digest.
-   Whether the statement is true is checked against the outpost alone; amounts,
-   states and windows still come from the depot's tables.
+   underwriter first reads WIRE's latest irreversible `sysio.msgch::outpcons` tip,
+   then independently reads the outpost's recorded digest for that same epoch
+   (Ethereum `OPP.outboundEnvelopes`, Solana's outbound `EnvelopeLog`) at settled
+   commitment (Solana `finalized`, the Ethereum client's read confirmation).
+   Matching digests authenticate the accepted prefix: both chains commit each
+   envelope's canonical bytes and its predecessor's digest. An older request must
+   also match its original `sysio.synd::envelopes` row's request id, chain, token,
+   epoch and immutable digest. This relies on finalized WIRE execution of the
+   predecessor checks and syndication intake; it is not a standalone historical
+   inclusion proof. No old envelope bodies or outpost records are needed. If a
+   checkpoint cannot be matched, or any request sharing an epoch lacks its own
+   accepted membership, a direct outpost record for that epoch still verifies it.
+   The plugin logs matching checkpoints and reports a mismatched tip with both
+   digests. Amounts, states and windows come from WIRE's tables.
 2. **Bonds** each verified OPEN request `sysio.synd` issued under the `oppenvelope`
    schema, oldest first (`sysio.bond::accept`). Each contribution is the minimum of
    the uncovered remainder, the token's remaining exposure allowance (bonds not
@@ -195,7 +203,8 @@ those lines is left to log tooling:
 | Condition | Effect |
 |-----------|--------|
 | An outpost cannot be read | That chain's requests wait |
-| The outpost holds no final record for the statement's epoch | The request waits |
+| Neither an authenticated accepted prefix nor a direct final outpost record proves the statement | The request waits |
+| A synd bug produces a statement inconsistent with its immutable accepted row | `NOT_ACCEPTED`: defense in depth; never bonded through a checkpoint |
 | The outpost recorded another digest for that epoch | Never bonded; an error log names both digests |
 | The node cannot serve a chain (no RPC client, wrong chain id) | That chain's requests wait; the others go on |
 | Neither exposure option for the token, or remaining finite exposure allowance or balance below one 0.01-token increment | The request waits |
@@ -205,7 +214,7 @@ those lines is left to log tooling:
 | The `sysio.andon` cord is pulled | Nothing is bonded, approved or claimed until it clears; cranks continue so the contract can synchronize outcomes and issue requests while holding releases and burns |
 | A request is challenged (HELD) | Reported, whether or not we bonded it: a judge rules it |
 | A bond of ours is ruled INVALID while the node runs, even one since claimed or pruned | Bonding stops until a restart; approvals and claims go on. A forfeited bond's principal is not returned |
-| A required planning table read fails, or a row behind one of our bonds does not decode | The pass does nothing |
+| A required funding/freeze table read fails, or a row behind one of our bonds does not decode | The pass does nothing |
 | The epoch singleton cannot be read | Only epoch-triggered cranking is omitted; other triggers and planned work continue |
 
 ### Underwriter setup
@@ -228,10 +237,12 @@ The node needs an outpost RPC client for every active chain (each client spec na
 a signing key, though the underwriter only reads), the Ethereum OPP ABI files (which
 must declare `outboundEnvelopes`) and the Solana IDL (which must declare
 `EnvelopeLog`). Use RPC endpoints independent of the batch operators': the
-verification is only as good as the outpost reads. A request whose record has left
-the outpost can no longer be verified and waits until a judge rules it. Ethereum keeps
-200 epochs by default, but Solana keeps only its last 10 records, so a Solana request
-must be verified within about 10 epochs. Before `sysio.chains::setoutpost` replaces an
+verification is only as good as the outpost reads. Ethereum keeps 200 epochs by
+default and Solana keeps its last 10 records; an older request remains verifiable
+through a matching recent checkpoint and its accepted syndication row. Proofs are
+rebuilt every pass, including after restart; there is no persistent verification
+cache or expanded on-chain history. If neither a matching checkpoint nor a direct
+record is available, the request waits. Before `sysio.chains::setoutpost` replaces an
 active outpost's deployment, let that chain's `sysio.synd` envelopes drain, those
 still waiting for a request included: the underwriter reads only the new deployment's
 records. Run one underwriter node per account, and bond from that account by no

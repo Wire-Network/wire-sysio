@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <cstring>
+#include <limits>
 #include <map>
 #include <optional>
 #include <set>
@@ -70,13 +71,25 @@ namespace bond {
 /// `sysio.synd` identifiers the underwriter touches.
 namespace synd {
    constexpr auto account         = "sysio.synd";
+   constexpr auto table_envelopes = "envelopes";
    constexpr auto action_crank    = "crank";
    constexpr auto action_pruneenv = "pruneenv";
    namespace field {
-      constexpr auto limit      = "limit";
-      constexpr auto chain_code = "chain_code";
-      constexpr auto token_code = "token_code";
+      constexpr auto limit       = "limit";
+      constexpr auto chain_code  = "chain_code";
+      constexpr auto token_code  = "token_code";
+      constexpr auto epoch_index = "epoch_index";
+      constexpr auto digest      = "digest";
+      constexpr auto request_id  = "request_id";
    }
+}
+
+/// Fields on the irreversible `sysio.msgch::outpcons` stream tips.
+namespace msgch::field {
+   constexpr auto chain_code        = "chain_code";
+   constexpr auto epoch_index       = "epoch_index";
+   constexpr auto consensus_reached = "consensus_reached";
+   constexpr auto envelope_digest   = "envelope_digest";
 }
 
 /// `sysio.andon` identifiers the underwriter reads: while the cord is pulled it bonds, approves and claims nothing.
@@ -314,6 +327,9 @@ struct envelope_statement {
    uint32_t      epoch_index = 0;    ///< the depot epoch the envelope was accepted for
    fc::sha256    digest{};           ///< the envelope's epoch digest, as `sysio.msgch` accepted it
    fc::slug_name token_code{};       ///< the liq token the statement covers
+
+   /// Equality binds every part of a request's accepted envelope identity, including its token.
+   bool operator==(const envelope_statement&) const = default;
 };
 
 /// Bytes of one encoded statement: the chain code, the epoch, the digest and the token code, little-endian and
@@ -336,29 +352,97 @@ inline std::optional<envelope_statement> decode_statement(const std::vector<char
 /// The (outpost chain, depot epoch) an envelope statement names.
 using envelope_key = std::pair<fc::slug_name, uint32_t>;
 
-/// The (chain, epoch) of every OPEN envelope request with a remainder to bond: the outpost records a pass reads.
-inline std::set<envelope_key> wanted_envelopes(const std::vector<request>& requests) {
-   std::set<envelope_key> wanted;
+/// An irreversible `sysio.msgch::outpcons` tip. Acceptance enforces the predecessor digest at every step, so an
+/// independently matching outpost digest authenticates the accepted prefix, not just this epoch's envelope.
+struct envelope_checkpoint {
+   uint32_t   epoch_index = 0;
+   fc::sha256 digest{};
+};
+
+/// The latest accepted tip per outpost, read afresh each pass; never carried across a deployment change or restart.
+using envelope_checkpoints = std::map<fc::slug_name, envelope_checkpoint>;
+
+/// Decode an accepted stream tip. The ABI stores `chain_code` as uint64, not as a slug-name string.
+/// Missing, malformed, unaccepted or empty tips cannot authenticate a prefix.
+inline std::optional<std::pair<fc::slug_name, envelope_checkpoint>>
+decode_checkpoint(const fc::variant_object& row) {
+   try {
+      const fc::slug_name chain_code{row[msgch::field::chain_code].as_uint64()};
+      const auto epoch = row[msgch::field::epoch_index].as_uint64();
+      const auto digest = row[msgch::field::envelope_digest].as<fc::sha256>();
+      if (chain_code == fc::slug_name{} || !row[msgch::field::consensus_reached].as_bool() ||
+          epoch > std::numeric_limits<uint32_t>::max() || digest == fc::sha256{}) return std::nullopt;
+      return std::pair{chain_code, envelope_checkpoint{static_cast<uint32_t>(epoch), digest}};
+   } catch (const fc::exception&) {
+      return std::nullopt;
+   }
+}
+
+/// Each request's original accepted `sysio.synd::envelopes` identity, including its immutable digest. Unlike a bare
+/// epoch comparison this binds the statement being bonded to an envelope actually dispatched by `sysio.msgch`.
+using accepted_envelopes = std::map<request_id_t, envelope_statement>;
+
+/// Decode an accepted syndication envelope row, keeping its request id so a neighboring primary-key row cannot
+/// authenticate another request. Missing/malformed rows are not evidence.
+inline std::optional<std::pair<request_id_t, envelope_statement>>
+decode_accepted_envelope(const fc::variant_object& row) {
+   try {
+      const request_id_t id = row[synd::field::request_id].as_uint64();
+      const auto epoch = row[synd::field::epoch_index].as_uint64();
+      if (id == 0 || epoch > std::numeric_limits<uint32_t>::max()) return std::nullopt;
+      envelope_statement s{
+         .chain_code = row[synd::field::chain_code].as<fc::slug_name>(),
+         .epoch_index = static_cast<uint32_t>(epoch),
+         .digest = row[synd::field::digest].as<fc::sha256>(),
+         .token_code = row[synd::field::token_code].as<fc::slug_name>(),
+      };
+      if (s.digest == fc::sha256{}) return std::nullopt;
+      return std::pair{id, s};
+   } catch (const fc::exception&) {
+      return std::nullopt;
+   }
+}
+
+/// Whether `emitted` independently authenticates the checkpoint's exact chain and epoch. Empty digests cannot
+/// authenticate an uninitialized stream; the caller reads WIRE at LIB and the outpost at settled commitment.
+inline bool checkpoint_verified(fc::slug_name chain_code, const envelope_checkpoint& checkpoint,
+                                const std::map<envelope_key, fc::sha256>& emitted) {
+   const auto record = emitted.find({chain_code, checkpoint.epoch_index});
+   return checkpoint.digest != fc::sha256{} && record != emitted.end() && record->second == checkpoint.digest;
+}
+
+/// The requests sharing each (chain, epoch) that still needs coverage. Keep request ids because one token's
+/// accepted membership cannot suppress another token's direct lookup when their envelope epoch is shared.
+using wanted_envelope_requests = std::map<envelope_key, std::set<request_id_t>>;
+
+/// Every OPEN envelope request with a remainder to bond, grouped by its independently readable source record.
+inline wanted_envelope_requests wanted_envelopes(const std::vector<request>& requests) {
+   wanted_envelope_requests wanted;
    for (const request& r : requests) {
       if (r.state != request_state::OPEN || !is_envelope_request(r) || r.bonded >= r.covered) continue;
       if (const std::optional<envelope_statement> s = decode_statement(r.statement)) {
-         wanted.emplace(s->chain_code, s->epoch_index);
+         wanted[{s->chain_code, s->epoch_index}].insert(r.id);
       }
    }
    return wanted;
 }
 
-/// The digest each outpost recorded for the `wanted` epochs, read with `read(chain, epoch)`. A chain whose read
-/// throws is reported through `on_failure(chain, why)` once and not read again, so it holds back only its own
-/// requests.
+/// Final outpost records proving the `wanted` requests, directly or through accepted checkpoints, read with
+/// `read(chain, epoch)`. A chain whose read throws is reported through `on_failure(chain, why)` once and not read
+/// again, so it holds back only its own requests. Prefer one recent checkpoint per chain. Skip an older direct
+/// lookup only when every request sharing that epoch has accepted membership. Otherwise retain the direct epoch
+/// lookup, including its contradictory-digest behavior.
 template <typename Read, typename OnFailure>
-std::map<envelope_key, fc::sha256> collect_emitted(const std::set<envelope_key>& wanted, Read&& read,
-                                                   OnFailure&& on_failure) {
+std::map<envelope_key, fc::sha256> collect_emitted(const wanted_envelope_requests& wanted, Read&& read,
+                                                OnFailure&& on_failure,
+                                                const envelope_checkpoints& checkpoints = {},
+                                                const accepted_envelopes& accepted = {}) {
    std::map<envelope_key, fc::sha256> emitted;
    std::set<fc::slug_name>            failed;
-   for (const envelope_key& key : wanted) {
+   std::set<envelope_key>            attempted;
+   const auto read_once = [&](const envelope_key& key) {
       const auto& [chain_code, epoch] = key;
-      if (failed.contains(chain_code)) continue;
+      if (failed.contains(chain_code) || !attempted.insert(key).second) return;
       try {
          if (const std::optional<fc::sha256> digest = read(chain_code, epoch)) emitted.emplace(key, *digest);
       } catch (const fc::exception& e) {
@@ -368,6 +452,17 @@ std::map<envelope_key, fc::sha256> collect_emitted(const std::set<envelope_key>&
          on_failure(chain_code, std::string(e.what()));
          failed.insert(chain_code);
       }
+   };
+   for (const auto& [key, requests] : wanted) {
+      const auto& [chain_code, epoch] = key;
+      const auto checkpoint = checkpoints.find(chain_code);
+      if (checkpoint != checkpoints.end() && checkpoint->second.digest != fc::sha256{}) {
+         read_once({chain_code, checkpoint->second.epoch_index});
+         if (epoch <= checkpoint->second.epoch_index &&
+             std::ranges::all_of(requests, [&](request_id_t id) { return accepted.contains(id); }) &&
+             checkpoint_verified(chain_code, checkpoint->second, emitted)) continue;
+      }
+      read_once(key);
    }
    return emitted;
 }
@@ -376,8 +471,9 @@ std::map<envelope_key, fc::sha256> collect_emitted(const std::set<envelope_key>&
 enum class wait_reason : uint8_t {
    BAD_STATEMENT,    ///< the statement does not decode
    TOKEN_MISMATCH,   ///< the statement's token is not the request's bond token
-   UNVERIFIED,       ///< the outpost holds no final record of an envelope for that epoch
+   UNVERIFIED,       ///< neither a direct outpost record nor an authenticated accepted prefix proves the statement
    CONTRADICTED,     ///< the outpost recorded another digest for that epoch: the statement is false
+   NOT_ACCEPTED,     ///< defense in depth: a synd bug produced a request inconsistent with its immutable row
    NO_CAP,           ///< neither capped nor unlimited exposure is configured for the token
    INVALID_PRECISION, ///< the token cannot represent the contract's bond increment
    PENDING_ACCEPT,   ///< a submitted contribution is not yet visible in the irreversible view
@@ -433,6 +529,8 @@ struct plan_inputs {
    std::set<request_id_t>                bonded;
    /// The digest each outpost recorded for the envelope it emitted, for the (chain, epoch) pairs read this pass.
    std::map<envelope_key, fc::sha256> emitted;
+   envelope_checkpoints             checkpoints; ///< WIRE's irreversible accepted stream tips
+   accepted_envelopes               accepted;    ///< request membership in those accepted streams
    /// Token code -> exposure policy. Absent and default-created policies permit no new underwriting.
    std::map<fc::slug_name, exposure_policy> exposure_policies;
    std::map<fc::slug_name, chain::asset> balances;   ///< token code -> the underwriter's balance
@@ -447,7 +545,9 @@ struct plan_inputs {
 };
 
 /// Decide one pass. Only envelope requests are underwritten, and only when the outpost's own record of the envelope
-/// it emitted for the statement's epoch carries the statement's digest. OPEN requests are taken oldest first, so a
+/// it emitted for the statement's epoch carries the statement's digest, or a later authenticated checkpoint covers
+/// the request's exact accepted syndication envelope. This relies on WIRE's finalized execution of the enforced
+/// envelope hash chain; it is not a standalone historical inclusion proof. OPEN requests are taken oldest first, so a
 /// pair's envelopes are bonded in the order `sysio.synd` releases them. Each contribution is limited by the uncovered
 /// remainder, available exposure and wallet balance, rounded down to a 0.01-token increment so other underwriters can
 /// complete the coverage. A bond counts against its token's cap until `claim` returns it, unless it was forfeited.
@@ -506,8 +606,19 @@ inline plan plan_actions(const plan_inputs& in) {
          if (!s) { wait(wait_reason::BAD_STATEMENT); break; }
          if (s->token_code != r->token_code) { wait(wait_reason::TOKEN_MISMATCH); break; }
          const auto emitted = in.emitted.find({s->chain_code, s->epoch_index});
-         if (emitted == in.emitted.end()) { wait(wait_reason::UNVERIFIED); break; }
-         if (emitted->second != s->digest) { wait(wait_reason::CONTRADICTED); break; }
+         if (emitted != in.emitted.end()) {
+            if (emitted->second != s->digest) { wait(wait_reason::CONTRADICTED); break; }
+         } else {
+            const auto checkpoint = in.checkpoints.find(s->chain_code);
+            const auto member = in.accepted.find(r->id);
+            if (checkpoint == in.checkpoints.end() || s->epoch_index > checkpoint->second.epoch_index ||
+                !checkpoint_verified(s->chain_code, checkpoint->second, in.emitted) || member == in.accepted.end()) {
+               wait(wait_reason::UNVERIFIED); break;
+            }
+            // Healthy synd creates the request statement from this immutable row. This extra equality guard
+            // fails closed if a future synd bug violates that contract; it is not an ordinary rejection path.
+            if (member->second != *s) { wait(wait_reason::NOT_ACCEPTED); break; }
+         }
          const auto policy = in.exposure_policies.find(r->token_code);
          if (policy == in.exposure_policies.end() || std::holds_alternative<disabled_exposure>(policy->second)) {
             wait(wait_reason::NO_CAP); break;

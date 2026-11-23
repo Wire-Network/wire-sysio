@@ -12,7 +12,9 @@
 
 #include <fc/io/json.hpp>
 
+#include <fstream>
 #include <future>
+#include <limits>
 #include <stdexcept>
 #include <string>
 #include <string_view>
@@ -114,9 +116,12 @@ packed_transaction_ptr sign(signed_transaction trx, const std::vector<private_ke
 class test_node {
 public:
    /// Starts the node.
-   /// @param args command line arguments after the data and config directories
-   explicit test_node(const std::vector<std::string>& args) {
+   /// @param args       command line arguments after the data and config directories
+   /// @param config_ini contents of the node's config.ini; empty for the default one
+   explicit test_node(const std::vector<std::string>& args, const std::string& config_ini = {}) {
       const std::string dir = temp.path().string();
+      if (!config_ini.empty())
+         std::ofstream(temp.path() / "config.ini") << config_ini;
       std::vector<std::string> all_args = {"test", "--data-dir", dir, "--config-dir", dir};
       all_args.insert(all_args.end(), args.begin(), args.end());
 
@@ -162,6 +167,9 @@ public:
    test_node& operator=(const test_node&) = delete;
 
    chain_id_type chain_id() const { return chain_plug->chain().get_chain_id(); }
+
+   /// @return the byte limit of the node's incoming transaction queue
+   uint64_t max_incoming_transaction_queue_size() const { return prod_plug->get_max_incoming_transaction_queue_size(); }
 
    /// Delivers @p trx the way net_plugin delivers a p2p transaction.
    /// @return the result the node reported for it
@@ -302,6 +310,38 @@ BOOST_AUTO_TEST_CASE(blocks_apply_regardless_of_incoming_limit) {
    for (uint32_t block_num = 2; block_num <= chain.head().block_num(); ++block_num)
       node.receive_block(chain.fetch_block_by_number(block_num));
    BOOST_REQUIRE(node.wait_for_head(chain.head().id()));
+}
+
+// incoming-transaction-queue-size-mb sets the queue's byte limit across the option's range, including sizes whose byte
+// count overflows an int: 2048 MiB is 2^31 bytes, and 4097 MiB is 2^32 + 2^20 bytes, which wraps to 1 MiB in 32 bits.
+BOOST_AUTO_TEST_CASE(queue_size_option_sets_byte_limit) {
+   constexpr uint64_t default_queue_size_mb = 1024;
+   {
+      test_node node(producer_args());
+      BOOST_CHECK_EQUAL(node.max_incoming_transaction_queue_size(), default_queue_size_mb * 1024 * 1024);
+   }
+   for (const uint16_t size_mb : {uint16_t{2048}, uint16_t{4097}, std::numeric_limits<uint16_t>::max()}) {
+      BOOST_TEST_CONTEXT("incoming-transaction-queue-size-mb " << size_mb) {
+         test_node node(producer_args({"--incoming-transaction-queue-size-mb", std::to_string(size_mb)}));
+         BOOST_CHECK_EQUAL(node.max_incoming_transaction_queue_size(), uint64_t{size_mb} * 1024 * 1024);
+      }
+   }
+}
+
+// An incoming-transaction-queue-size-mb outside 1 to 65535, from the command line or config.ini, fails initialization
+// with the configured value and the range in the error. A negative value is not read as its unsigned wraparound.
+BOOST_AUTO_TEST_CASE(out_of_range_queue_size_rejected) {
+   for (const std::string size_mb : {"0", "-1", "-65535", "65536"}) {
+      const std::string expected = "incoming-transaction-queue-size-mb " + size_mb + " must be between 1 and 65535 MiB";
+      BOOST_TEST_CONTEXT("command line " << size_mb) {
+         BOOST_CHECK_EXCEPTION(test_node(producer_args({"--incoming-transaction-queue-size-mb=" + size_mb})),
+                               plugin_config_exception, testing::fc_exception_message_contains(expected));
+      }
+      BOOST_TEST_CONTEXT("config.ini " << size_mb) {
+         BOOST_CHECK_EXCEPTION(test_node(producer_args(), "incoming-transaction-queue-size-mb = " + size_mb + "\n"),
+                               plugin_config_exception, testing::fc_exception_message_contains(expected));
+      }
+   }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

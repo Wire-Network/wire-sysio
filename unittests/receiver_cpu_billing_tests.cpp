@@ -18,6 +18,7 @@
 #include <chrono>
 #include <limits>
 #include <numeric>
+#include <optional>
 #include <string>
 #include <thread>
 
@@ -63,6 +64,7 @@ constexpr uint64_t    stopped_spin_factor = stopped_spin_time / std::chrono::mic
 constexpr uint32_t    first_long_spins   = 1000;
 constexpr uint32_t    max_spin_doublings = 21; ///< first_long_spins doubled this often still fits in uint32_t
 constexpr uint32_t    calibration_runs   = 3;  ///< runs of each loop count long_spins() measures
+constexpr uint32_t    max_calibration_attempts = 2 * calibration_runs; ///< bound transient rejected measurements
 constexpr uint32_t    short_spin_count   = 10;
 constexpr uint32_t    many_notifications = 50;
 constexpr auto        frame_pause        = std::chrono::milliseconds( 200 ); ///< a pause in a frame, past any stipend
@@ -108,6 +110,31 @@ uint64_t total( const std::vector<uint32_t>& entries ) {
 /// A frame's CPU is within its elapsed time, so a frame inside the stipend leaves an entry of 0.
 uint32_t most_past_stipend( int64_t elapsed_us, int64_t stipend = stipend_us ) {
    return static_cast<uint32_t>( std::max<int64_t>( elapsed_us - stipend, 0 ) );
+}
+
+/**
+ * The fastest of calibration_runs successful measurements. Host descheduling can push an otherwise short sample
+ * past the chain's CPU limit; discard only that typed failure, with a bounded number of attempts. Successful samples
+ * retain their original shared block; a rejected sample starts a fresh block before measuring again.
+ * An exhausted candidate fails calibration; it never authorizes a larger CPU budget or an unmeasured loop count.
+ */
+template<typename Measure, typename AdvanceBlock>
+std::optional<int64_t> fastest_calibration_sample( Measure&& measure, AdvanceBlock&& advance_block ) {
+   int64_t fastest_us = std::numeric_limits<int64_t>::max();
+   uint32_t completed = 0;
+   for( uint32_t attempt = 0; attempt < max_calibration_attempts && completed < calibration_runs; ++attempt ) {
+      bool rejected = false;
+      try {
+         fastest_us = std::min( fastest_us, measure( attempt ) );
+         ++completed;
+      } catch( const tx_cpu_usage_exceeded& ) {
+         // A failed transaction is rolled back and supplies no elapsed sample.
+         rejected = true;
+      }
+      if( rejected ) advance_block();
+   }
+   if( completed != calibration_runs ) return std::nullopt;
+   return fastest_us;
 }
 
 /// Contracts reached through system contracts pay CPU for their own code past the stipend of a notification; see
@@ -274,22 +301,24 @@ struct receiver_cpu_tester : validating_tester {
 
    /**
     * A loop count that keeps cpu_receiver_test busy for at least long_frame_us, well past the stipend. Runtimes differ
-    * by orders of magnitude, so it is measured: spins the game pays for directly, doubled until even the fastest of
-    * calibration_runs runs takes that long. Each loop count's runs get a block of their own: descheduled, the runs of
-    * all the counts can take more CPU than one block has. The test's own transactions start in a new block.
+    * by orders of magnitude, so measure the actual transfer notification handler, doubling its loop count until even
+    * the fastest of calibration_runs successful runs takes that long. A direct spin action can run at a different
+    * speed from the compiled notification path. These probes transfer tokens and bill CPU; callers calibrate before
+    * taking their balance/resource snapshots. Each loop count gets its own block. A rejected CPU-limit outlier starts
+    * a fresh block, up to max_calibration_attempts. The test's own transactions start in a new block.
     */
    uint32_t long_spins() {
       if( !long_spin_count ) {
          uint32_t n = first_long_spins;
          for( uint32_t i = 0; i <= max_spin_doublings && !long_spin_count; ++i, n *= 2 ) {
             // Being descheduled only adds to a run's elapsed time, so the fastest of a few runs is the loop's cost.
-            int64_t fastest_us = std::numeric_limits<int64_t>::max();
-            for( uint32_t run = 0; run < calibration_runs; ++run ) {
-               auto spin  = get_action( game, "spin"_n, auth( game ), mvo()( "n", n + run ) ); // distinct transactions
-               auto trace = push_measured( make_trx( { spin } ) );
-               fastest_us = std::min( fastest_us, trace->action_traces[0].elapsed.count() );
-            }
-            if( fastest_us >= long_frame_us )
+            const auto fastest_us = fastest_calibration_sample( [&]( uint32_t attempt ) {
+               auto trace = transfer( alice, game, amount, spin_command + std::to_string( n + attempt ) );
+               return frame( trace, game, "transfer"_n ).elapsed.count();
+            }, [&] { produce_block(); } );
+            BOOST_REQUIRE_MESSAGE( fastest_us, "CPU workload calibration could not collect " << calibration_runs
+                                   << " successful samples in " << max_calibration_attempts << " attempts at " << n );
+            if( *fastest_us >= long_frame_us )
                long_spin_count = n;
             produce_block();
          }
@@ -389,6 +418,58 @@ struct receiver_cpu_tester : validating_tester {
 } // namespace
 
 BOOST_AUTO_TEST_SUITE(receiver_cpu_billing_tests)
+
+BOOST_AUTO_TEST_CASE( calibration_rejects_a_cpu_limit_outlier_but_requires_three_successful_samples ) {
+   uint32_t attempts = 0, blocks = 0;
+   const auto fastest = fastest_calibration_sample( [&]( uint32_t attempt ) -> int64_t {
+      ++attempts;
+      if( attempt == 0 ) FC_THROW_EXCEPTION( tx_cpu_usage_exceeded, "rejected calibration sample" );
+      return long_frame_us + calibration_runs - attempt;
+   }, [&] { ++blocks; } );
+   BOOST_REQUIRE( fastest );
+   BOOST_TEST( *fastest == long_frame_us );
+   BOOST_TEST( attempts == calibration_runs + 1 );
+   BOOST_TEST( blocks == 1u );
+}
+
+BOOST_AUTO_TEST_CASE( successful_calibration_samples_keep_their_original_shared_block ) {
+   uint32_t attempts = 0, blocks = 0;
+   const auto fastest = fastest_calibration_sample( [&]( uint32_t ) {
+      ++attempts;
+      return long_frame_us;
+   }, [&] { ++blocks; } );
+   BOOST_REQUIRE( fastest );
+   BOOST_TEST( *fastest == long_frame_us );
+   BOOST_TEST( attempts == calibration_runs );
+   BOOST_TEST( blocks == 0u );
+}
+
+BOOST_AUTO_TEST_CASE( calibration_exhaustion_never_accepts_an_incompletely_measured_count ) {
+   for( const bool one_success : { false, true } ) {
+      uint32_t attempts = 0, blocks = 0;
+      const auto fastest = fastest_calibration_sample( [&]( uint32_t attempt ) -> int64_t {
+         ++attempts;
+         if( one_success && attempt == 0 ) return long_frame_us;
+         FC_THROW_EXCEPTION( tx_cpu_usage_exceeded, "rejected calibration sample" );
+      }, [&] { ++blocks; } );
+      BOOST_TEST( !fastest );
+      BOOST_TEST( attempts == max_calibration_attempts );
+      BOOST_TEST( blocks == attempts - ( one_success ? 1u : 0u ) );
+   }
+}
+
+BOOST_AUTO_TEST_CASE( calibration_propagates_other_failures_and_block_advance_failures ) {
+   uint32_t blocks = 0;
+   BOOST_CHECK_THROW( fastest_calibration_sample( []( uint32_t ) -> int64_t {
+      FC_THROW_EXCEPTION( action_validate_exception, "unexpected calibration failure" );
+   }, [&] { ++blocks; } ), action_validate_exception );
+   BOOST_TEST( blocks == 0u );
+   BOOST_CHECK_THROW( fastest_calibration_sample( []( uint32_t ) -> int64_t {
+      FC_THROW_EXCEPTION( tx_cpu_usage_exceeded, "rejected calibration sample" );
+   }, [] {
+      FC_THROW_EXCEPTION( tx_cpu_usage_exceeded, "block advance is not a calibration sample" );
+   } ), tx_cpu_usage_exceeded );
+}
 
 BOOST_FIXTURE_TEST_CASE( transfer_between_plain_accounts_adds_no_entry, receiver_cpu_tester ) try {
    auto before = cpu_windows( { token_account, alice, bob } );

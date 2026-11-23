@@ -48,6 +48,7 @@ constexpr std::string_view OP_READ_EMITTED_DIGEST = "read_emitted_envelope_diges
 using outpost_solana_client_detail::derive_epoch_deliveries_pda;
 using outpost_solana_client_detail::derive_envelope_chunks_pda;
 using outpost_solana_client_detail::CLEANUP_ENVELOPE_CHUNKS_INSTRUCTION;
+using outpost_solana_client_detail::CLEANUP_EPOCH_DELIVERIES_INSTRUCTION;
 
 /// The liqSOL pool's seeds (wire-solana `liqsol-core`: `inbound.rs` and the
 /// `report_liq_yield` / `synd` account declarations), same lock-step caveat.
@@ -170,6 +171,18 @@ namespace epoch_deliveries {
    constexpr auto account_name            = "EpochDeliveries";
    constexpr auto field_consensus_reached = "consensus_reached";
    constexpr auto field_dispatched_count  = "dispatched_count";
+   constexpr auto field_epoch_index       = "epoch_index";
+   constexpr auto field_payer             = "payer";
+   /// Byte offset of `epoch_index`: discriminator, then bump u8.
+   constexpr size_t epoch_offset = ANCHOR_DISCRIMINATOR_BYTES + sizeof(uint8_t);
+   /// Byte offset of `payer`: discriminator, bump u8, epoch_index u32. The program keeps `payer` ahead of the
+   /// variable-length deliveries so the tally sweep can filter on it; `assert_epoch_deliveries_payer_shape` checks it
+   /// against the loaded IDL at boot.
+   constexpr size_t payer_offset = epoch_offset + sizeof(uint32_t);
+   static_assert(payer_offset == 13, "must equal the program's EpochDeliveries payer offset");
+   /// `EpochDeliveries::SIZE`: header, payer, a 4-byte deliveries length plus 16 64-byte slots, consensus_reached,
+   /// consensus_hash, dispatched_count. Sizes the boot probe so the whole IDL decode reaches every field.
+   constexpr size_t account_bytes = payer_offset + 32 + (4 + 16 * 64) + 1 + 32 + 4;
 } // namespace epoch_deliveries
 
 /// `DistributionState` -- the liqSOL pool singleton `handle_desyndicate_liq`
@@ -340,6 +353,39 @@ void assert_envelope_chunk_gate_shapes(opp_solana_outpost_client& program_client
    FC_ASSERT(program_client.get_program() != nullptr, "no IDL program loaded");
    probe(outpost_config::account_name, outpost_config::field_next_epoch_index, outpost_config::epoch_offset);
    probe(latest_envelope::account_name, latest_envelope::field_epoch, latest_envelope::epoch_offset);
+}
+
+void assert_epoch_deliveries_payer_shape(opp_solana_outpost_client& program_client) {
+   constexpr uint32_t probe_epoch    = 0x12345678;
+   constexpr uint8_t  probe_key_byte = 0xAB;
+   const auto* program = program_client.get_program();
+   FC_ASSERT(program != nullptr, "no IDL program loaded");
+   const auto* account = program->find_account(epoch_deliveries::account_name);
+   FC_ASSERT(account != nullptr, "outpost program IDL declares no {}; the tally sweep reads it",
+             epoch_deliveries::account_name);
+   // Zero everywhere else, so the deliveries vector decodes empty and the whole IDL decode reaches every field.
+   std::vector<uint8_t> bytes(epoch_deliveries::account_bytes);
+   std::copy(account->discriminator.begin(), account->discriminator.end(), bytes.begin());
+   const auto epoch = epoch_index_le_seed(probe_epoch);
+   std::copy(epoch.begin(), epoch.end(), bytes.begin() + epoch_deliveries::epoch_offset);
+   std::fill_n(bytes.begin() + epoch_deliveries::payer_offset, 32, probe_key_byte);
+   fc::variant decoded;
+   try {
+      decoded = program_client.decode_account_info_data(epoch_deliveries::account_name, bytes);
+   } catch (fc::exception& e) {
+      FC_RETHROW_EXCEPTION(e, warn, "{} IDL probe cannot be decoded for tally discovery",
+                           epoch_deliveries::account_name);
+   }
+   const auto& fields = decoded.get_object();
+   FC_ASSERT(fields.contains(epoch_deliveries::field_epoch_index) && fields.contains(epoch_deliveries::field_payer),
+             "EpochDeliveries IDL missing '{}' / '{}' fields for tally discovery", epoch_deliveries::field_epoch_index,
+             epoch_deliveries::field_payer);
+   const auto key = fc::network::solana::solana_public_key::from_base58_string(
+      fields[epoch_deliveries::field_payer].as_string()).serialize();
+   const bool payer_matches = std::ranges::all_of(key, [](uint8_t byte) { return byte == probe_key_byte; });
+   FC_ASSERT(fields[epoch_deliveries::field_epoch_index].as_uint64() == probe_epoch && payer_matches,
+             "EpochDeliveries IDL epoch_index/payer offsets disagree with tally discovery (payer expected at byte {})",
+             epoch_deliveries::payer_offset);
 }
 
 /// Assert the loaded IDL declares `EpochDeliveries` with the two cursor fields
@@ -1391,7 +1437,7 @@ envelope_chunk_reap_gates decode_envelope_chunk_reap_gates(
    };
 }
 
-bool envelope_chunks_reapable(const envelope_chunk_reap_gates& gates, uint32_t epoch_index) {
+bool epoch_reapable(const envelope_chunk_reap_gates& gates, uint32_t epoch_index) {
    return gates.next_epoch_index > epoch_index && gates.latest_outbound_epoch >= epoch_index;
 }
 
@@ -1426,7 +1472,7 @@ bool envelope_chunk_sweep_schedule::record(uint32_t                          nex
 }
 
 uint32_t envelope_chunk_sweep_schedule::reconcile_cut_off_close(
-   const std::vector<envelope_chunk_buffer>& buffers) {
+   const std::vector<reapable_account>& buffers) {
    if (!_cut_off_close) return 0;
    const bool missing = std::none_of(buffers.begin(), buffers.end(), [&](const auto& buffer) {
       return buffer.address == *_cut_off_close;
@@ -1453,17 +1499,48 @@ void envelope_chunk_sweep_schedule::record_failure(fc::time_point now) {
    _retry_after = now + ENVELOPE_CHUNK_SWEEP_RETRY_BACKOFF;
 }
 
+namespace {
+
+/// One `getProgramAccounts` `memcmp` filter: `base58_bytes` at byte `offset` of the account data.
+fc::variant memcmp_filter_at(size_t offset, std::string base58_bytes) {
+   return fc::variant(fc::mutable_variant_object()(
+      memcmp_filter::key,
+      fc::mutable_variant_object()(memcmp_filter::offset, offset)(memcmp_filter::bytes, std::move(base58_bytes))));
+}
+
+/// The discriminator filter both discovery reads open with.
+fc::variant discriminator_filter(const std::array<uint8_t, 8>& discriminator) {
+   return memcmp_filter_at(0, fc::to_base58(reinterpret_cast<const char*>(discriminator.data()), discriminator.size(),
+                                            fc::yield_function_t{}));
+}
+
+/// One entry of a raw `getProgramAccounts` result: the account address, its lamports, and its data decoded from the
+/// `[<base64>, "base64"]` encoding the discovery reads request.
+struct program_account_view {
+   fc::network::solana::solana_public_key address;
+   uint64_t                               lamports = 0;
+   std::vector<uint8_t>                   data;
+};
+
+/// Parse one `{pubkey, account}` entry of a `getProgramAccounts` result.
+program_account_view parse_program_account(const fc::variant& entry_v) {
+   const auto& entry   = entry_v.get_object();
+   const auto& account = entry[program_account_entry::field_account].get_object();
+   const auto  decoded_b64 =
+      fc::base64_decode(account[program_account_entry::field_data].get_array().at(0).as_string());
+   return {fc::network::solana::solana_public_key::from_base58_string(
+              entry[program_account_entry::field_pubkey].as_string()),
+           account[program_account_entry::field_lamports].as_uint64(),
+           std::vector<uint8_t>(decoded_b64.begin(), decoded_b64.end())};
+}
+
+} // anonymous namespace
+
 std::vector<fc::variant> envelope_chunk_buffer_filters(const std::array<uint8_t, 8>&                 discriminator,
                                                        const fc::network::solana::solana_public_key& uploader) {
-   const auto memcmp = [](size_t offset, std::string base58_bytes) {
-      return fc::variant(fc::mutable_variant_object()(
-         memcmp_filter::key,
-         fc::mutable_variant_object()(memcmp_filter::offset, offset)(memcmp_filter::bytes, std::move(base58_bytes))));
-   };
    return {
-      memcmp(0, fc::to_base58(reinterpret_cast<const char*>(discriminator.data()), discriminator.size(),
-                              fc::yield_function_t{})),
-      memcmp(envelope_chunks::operator_offset, uploader.to_string(fc::yield_function_t{})),
+      discriminator_filter(discriminator),
+      memcmp_filter_at(envelope_chunks::operator_offset, uploader.to_string(fc::yield_function_t{})),
    };
 }
 
@@ -1471,7 +1548,7 @@ fc::network::solana::data_slice envelope_chunk_buffer_header_slice() {
    return {.offset = 0, .length = envelope_chunks::data_offset};
 }
 
-std::vector<envelope_chunk_buffer> decode_envelope_chunk_buffers(
+std::vector<reapable_account> decode_envelope_chunk_buffers(
    opp_solana_outpost_client& program_client, const fc::variant& program_accounts,
    const fc::network::solana::solana_public_key& uploader) {
    const auto* program = program_client.get_program();
@@ -1481,19 +1558,11 @@ std::vector<envelope_chunk_buffer> decode_envelope_chunk_buffers(
    FC_ASSERT(program_accounts.is_array(), "getProgramAccounts did not return an array: {}",
              fc::json::to_string(program_accounts, fc::json::yield_function_t{}));
 
-   std::vector<envelope_chunk_buffer> buffers;
+   std::vector<reapable_account> buffers;
    for (const fc::variant& entry_v : program_accounts.get_array()) {
-      const auto& entry   = entry_v.get_object();
-      const auto  address = fc::network::solana::solana_public_key::from_base58_string(
-         entry[program_account_entry::field_pubkey].as_string());
-      const auto& account = entry[program_account_entry::field_account].get_object();
-      // `data` is `[<base64>, "base64"]`, the encoding the discovery read requests.
-      const auto decoded_b64 =
-         fc::base64_decode(account[program_account_entry::field_data].get_array().at(0).as_string());
-      const std::vector<uint8_t> header(decoded_b64.begin(), decoded_b64.end());
-
+      const auto entry = parse_program_account(entry_v);
       const fc::variant decoded =
-         program_client.decode_account_info_data(envelope_chunks::account_name, header);
+         program_client.decode_account_info_data(envelope_chunks::account_name, entry.data);
       const fc::variant_object& fields  = decoded.get_object();
       FC_ASSERT(fields.contains(envelope_chunks::field_epoch_index) && fields.contains(envelope_chunks::field_operator),
                 "EnvelopeChunks decoded without '{}' / '{}'; the loaded IDL disagrees with the deployed program",
@@ -1507,31 +1576,90 @@ std::vector<envelope_chunk_buffer> decode_envelope_chunk_buffers(
       // disagrees with the program. A close built from it would fail its seeds check -- skip it, loudly.
       if (decoded_operator != uploader || epoch_index > std::numeric_limits<uint32_t>::max() ||
           derive_envelope_chunks_pda(program_client.program_id, static_cast<uint32_t>(epoch_index), uploader) !=
-             address) {
+             entry.address) {
          wlog("outpost_solana_client: EnvelopeChunks {} decoded as epoch={} operator={}, which does not derive that "
               "address for uploader {}; the loaded IDL disagrees with the program, leaving the buffer in place",
-              address.to_string(fc::yield_function_t{}), epoch_index,
+              entry.address.to_string(fc::yield_function_t{}), epoch_index,
               decoded_operator.to_string(fc::yield_function_t{}), uploader.to_string(fc::yield_function_t{}));
          continue;
       }
-      buffers.push_back(envelope_chunk_buffer{address, static_cast<uint32_t>(epoch_index),
-                                              account[program_account_entry::field_lamports].as_uint64()});
+      buffers.push_back(reapable_account{entry.address, static_cast<uint32_t>(epoch_index), entry.lamports});
    }
-   std::ranges::sort(buffers, {}, &envelope_chunk_buffer::epoch_index);
+   std::ranges::sort(buffers, {}, &reapable_account::epoch_index);
    return buffers;
 }
 
-envelope_chunk_reap_result drive_envelope_chunk_reap(
-   const envelope_chunk_reap_gates&                     gates,
-   std::vector<envelope_chunk_buffer>                   buffers,
-   const std::function<bool()>&                         deadline_passed,
-   const std::function<std::string(uint32_t)>&          send_cleanup,
-   const std::string&                                   log_label,
-   const std::function<bool(const envelope_chunk_buffer&)>& buffer_absent) {
+std::vector<fc::variant> epoch_deliveries_filters(const std::array<uint8_t, 8>&                 discriminator,
+                                                  const fc::network::solana::solana_public_key& payer) {
+   return {
+      discriminator_filter(discriminator),
+      memcmp_filter_at(epoch_deliveries::payer_offset, payer.to_string(fc::yield_function_t{})),
+   };
+}
+
+std::vector<reapable_account> decode_epoch_deliveries(
+   opp_solana_outpost_client& program_client, const fc::variant& program_accounts,
+   const fc::network::solana::solana_public_key& payer) {
+   const auto* program = program_client.get_program();
+   FC_ASSERT(program != nullptr && program->find_account(epoch_deliveries::account_name) != nullptr,
+             "outpost program IDL declares no {}; this relay cannot find its tallies", epoch_deliveries::account_name);
+   FC_ASSERT(program_accounts.is_array(), "getProgramAccounts did not return an array: {}",
+             fc::json::to_string(program_accounts, fc::json::yield_function_t{}));
+
+   std::vector<reapable_account> tallies;
+   for (const fc::variant& entry_v : program_accounts.get_array()) {
+      const auto entry = parse_program_account(entry_v);
+      const fc::variant decoded =
+         program_client.decode_account_info_data(epoch_deliveries::account_name, entry.data);
+      const fc::variant_object& fields = decoded.get_object();
+      FC_ASSERT(fields.contains(epoch_deliveries::field_epoch_index) && fields.contains(epoch_deliveries::field_payer),
+                "EpochDeliveries decoded without '{}' / '{}'; the loaded IDL disagrees with the deployed program",
+                epoch_deliveries::field_epoch_index, epoch_deliveries::field_payer);
+      const uint64_t epoch_index   = fields[epoch_deliveries::field_epoch_index].as_uint64();
+      const auto     decoded_payer = fc::network::solana::solana_public_key::from_base58_string(
+         fields[epoch_deliveries::field_payer].as_string());
+
+      // The memcmp filter already selected tallies recording `payer`, so one that decodes to another payer, an
+      // out-of-range epoch, or an address its epoch's seeds do not derive can only be a decode that disagrees with
+      // the program. A close built from it would be refused -- skip it, loudly.
+      if (decoded_payer != payer || epoch_index > std::numeric_limits<uint32_t>::max() ||
+          derive_epoch_deliveries_pda(program_client.program_id, static_cast<uint32_t>(epoch_index)) !=
+             entry.address) {
+         wlog("outpost_solana_client: EpochDeliveries {} decoded as epoch={} payer={}, which does not derive that "
+              "address for payer {}; the loaded IDL disagrees with the program, leaving the tally in place",
+              entry.address.to_string(fc::yield_function_t{}), epoch_index,
+              decoded_payer.to_string(fc::yield_function_t{}), payer.to_string(fc::yield_function_t{}));
+         continue;
+      }
+      tallies.push_back(reapable_account{entry.address, static_cast<uint32_t>(epoch_index), entry.lamports});
+   }
+   std::ranges::sort(tallies, {}, &reapable_account::epoch_index);
+   return tallies;
+}
+
+void envelope_chunk_reap_result::append(const envelope_chunk_reap_result& later) {
+   reaped           += later.reaped;
+   already_closed   += later.already_closed;
+   not_yet_eligible += later.not_yet_eligible;
+   deferred         += later.deferred;
+   failed           += later.failed;
+   lamports_reaped  += later.lamports_reaped;
+   deadline_reached = deadline_reached || later.deadline_reached;
+   if (later.cut_off_close) cut_off_close = later.cut_off_close;
+}
+
+envelope_chunk_reap_result drive_reap(
+   const envelope_chunk_reap_gates&                    gates,
+   std::vector<reapable_account>                       buffers,
+   const std::function<bool()>&                        deadline_passed,
+   const std::function<std::string(uint32_t)>&         send_cleanup,
+   const std::string&                                  log_label,
+   const std::function<bool(const reapable_account&)>& account_absent,
+   std::string_view                                    cleanup_instruction) {
    envelope_chunk_reap_result result;
    for (const auto& buffer : buffers) {
       // One confirmed snapshot observes drain and emit atomically; rejected epochs have not drained yet.
-      if (!envelope_chunks_reapable(gates, buffer.epoch_index)) {
+      if (!epoch_reapable(gates, buffer.epoch_index)) {
          ++result.not_yet_eligible;
          continue;
       }
@@ -1553,43 +1681,48 @@ envelope_chunk_reap_result drive_envelope_chunk_reap(
          // Verify this exact buffer instead of parsing error strings. nullopt represents absence, but libfc also
          // returns it for a malformed reply. That can delay recovery until a later discovery; no rent is claimed.
          // Empty data is still present, and thrown read errors preserve failure. The callback shares the deadline.
-         if (!deadline_passed() && buffer_absent) {
+         if (!deadline_passed() && account_absent) {
             try {
-               if (buffer_absent(buffer)) {
+               if (account_absent(buffer)) {
                   ++result.already_closed;
-                  ilog("outpost_solana_client[{}]: cleanup buffer={} epoch={} already closed; rent not attributed",
-                       log_label, buffer.address.to_string(fc::yield_function_t{}), buffer.epoch_index);
+                  ilog("outpost_solana_client[{}]: {} account={} epoch={} already closed; rent not attributed",
+                       log_label, cleanup_instruction, buffer.address.to_string(fc::yield_function_t{}),
+                       buffer.epoch_index);
                   return;
                }
             } catch (const fc::exception& e) {
-               dlog("outpost_solana_client[{}]: cleanup absence check failed buffer={}: {}",
-                    log_label, buffer.address.to_string(fc::yield_function_t{}), e.to_detail_string());
+               dlog("outpost_solana_client[{}]: {} absence check failed account={}: {}",
+                    log_label, cleanup_instruction, buffer.address.to_string(fc::yield_function_t{}),
+                    e.to_detail_string());
             } catch (const std::exception& e) {
-               dlog("outpost_solana_client[{}]: cleanup absence check failed buffer={}: {}",
-                    log_label, buffer.address.to_string(fc::yield_function_t{}), e.what());
+               dlog("outpost_solana_client[{}]: {} absence check failed account={}: {}",
+                    log_label, cleanup_instruction, buffer.address.to_string(fc::yield_function_t{}), e.what());
             }
          }
          if (deadline_passed()) {
             result.deadline_reached = true;
             result.cut_off_close = buffer.address;
             ++result.deferred;
-            ilog("outpost_solana_client[{}]: cleanup_envelope_chunks for epoch={} buffer={} ran into the sweep "
+            ilog("outpost_solana_client[{}]: {} for epoch={} account={} ran into the sweep "
                  "deadline: {}; the next sweep retries it if it did not land",
-                 log_label, buffer.epoch_index, buffer.address.to_string(fc::yield_function_t{}), error);
+                 log_label, cleanup_instruction, buffer.epoch_index, buffer.address.to_string(fc::yield_function_t{}),
+                 error);
             return;
          }
          ++result.failed;
-         wlog("outpost_solana_client[{}]: cleanup_envelope_chunks failed for epoch={} buffer={}: {}; the next sweep "
+         wlog("outpost_solana_client[{}]: {} failed for epoch={} account={}: {}; the next sweep "
               "retries it",
-              log_label, buffer.epoch_index, buffer.address.to_string(fc::yield_function_t{}), error);
+              log_label, cleanup_instruction, buffer.epoch_index, buffer.address.to_string(fc::yield_function_t{}),
+              error);
       };
       try {
          const auto sig = send_cleanup(buffer.epoch_index);
          ++result.reaped;
          result.lamports_reaped += buffer.lamports;
-         ilog("outpost_solana_client[{}]: cleanup_envelope_chunks closed epoch={} buffer={} returning {} lamports "
+         ilog("outpost_solana_client[{}]: {} closed epoch={} account={} returning {} lamports "
               "sig={}",
-              log_label, buffer.epoch_index, buffer.address.to_string(fc::yield_function_t{}), buffer.lamports, sig);
+              log_label, cleanup_instruction, buffer.epoch_index, buffer.address.to_string(fc::yield_function_t{}),
+              buffer.lamports, sig);
       } catch (const fc::exception& e) {
          close_threw(e.to_detail_string());
       } catch (const std::exception& e) {
@@ -1668,19 +1801,37 @@ envelope_chunk_sweep_outcome sweep_envelope_chunks(envelope_chunk_sweep_schedule
       }
 
       const auto buffers = touchpoints.read_buffers();
+      // Tallies are reaped only where the program declares their closer; both discoveries run before any close so
+      // one deadline and one cut-off reconciliation cover the two kinds.
+      const bool reap_tallies = touchpoints.read_epoch_deliveries && touchpoints.send_epoch_deliveries_cleanup;
+      const auto tallies = reap_tallies ? touchpoints.read_epoch_deliveries() : std::vector<reapable_account>{};
       discovery_complete = true;
       if (deadline_passed()) warn_discovery_exhausted();
-      const auto already_closed = schedule.reconcile_cut_off_close(buffers);
-      auto result = drive_envelope_chunk_reap(cursors, buffers, deadline_passed,
-                                              touchpoints.send_cleanup, log_label, touchpoints.buffer_absent);
-      result.already_closed += already_closed;
-      if (result.reaped + result.already_closed + result.failed + result.deferred > 0) {
-         ilog("outpost_solana_client[{}]: chunk-buffer sweep at next_epoch={} closed {} ({} lamports), failed {}, "
+      std::vector<reapable_account> discovered = buffers;
+      discovered.insert(discovered.end(), tallies.begin(), tallies.end());
+      const auto already_closed = schedule.reconcile_cut_off_close(discovered);
+      auto result = drive_reap(cursors, buffers, deadline_passed, touchpoints.send_cleanup, log_label,
+                               touchpoints.account_absent, CLEANUP_ENVELOPE_CHUNKS_INSTRUCTION);
+      const auto tally_result =
+         drive_reap(cursors, tallies, deadline_passed, touchpoints.send_epoch_deliveries_cleanup, log_label,
+                    touchpoints.account_absent, CLEANUP_EPOCH_DELIVERIES_INSTRUCTION);
+      const auto log_walk = [&](std::string_view walk, const envelope_chunk_reap_result& walked) {
+         if (walked.reaped + walked.already_closed + walked.failed + walked.deferred == 0) return;
+         ilog("outpost_solana_client[{}]: {} sweep at next_epoch={} closed {} ({} lamports), failed {}, "
               "already closed {} (rent not attributed), deferred {}{}, {} not yet settled",
-              log_label, cursors.next_epoch_index, result.reaped, result.lamports_reaped, result.failed,
-              result.already_closed,
-              result.deferred, result.deadline_reached ? " (stopped at the deadline)" : "", result.not_yet_eligible);
+              log_label, walk, cursors.next_epoch_index, walked.reaped, walked.lamports_reaped, walked.failed,
+              walked.already_closed, walked.deferred, walked.deadline_reached ? " (stopped at the deadline)" : "",
+              walked.not_yet_eligible);
+      };
+      log_walk("chunk-buffer", result);
+      log_walk("delivery-tally", tally_result);
+      result.append(tally_result);
+      // The last sweep's cut-off close (of either kind) that discovery no longer lists landed after all.
+      if (already_closed > 0) {
+         ilog("outpost_solana_client[{}]: the close the last sweep's deadline cut off had landed; rent not attributed",
+              log_label);
       }
+      result.already_closed += already_closed;
       if (schedule.record(cursors.next_epoch_index, result, touchpoints.now())) warn_deadline_backoff();
       return envelope_chunk_sweep_outcome::swept;
    } catch (const fc::exception& e) {
@@ -1892,6 +2043,14 @@ outpost_solana_client::outpost_solana_client(
       }
       outpost_solana_client_detail::assert_envelope_chunks_shape(*_program_client);
       outpost_solana_client_detail::assert_envelope_chunk_gate_shapes(*_program_client);
+      // The tally closer is newer than the chunk closer, so a program without it is accepted and its tallies are
+      // left alone. Where it is declared, the sweep filters tallies on `payer` at a fixed offset; check it here.
+      if (_program_client->has_idl(CLEANUP_EPOCH_DELIVERIES_INSTRUCTION)) {
+         outpost_solana_client_detail::assert_epoch_deliveries_payer_shape(*_program_client);
+      } else {
+         ilog("outpost_solana_client[{}]: IDL declares no `{}`; this relay leaves its EpochDeliveries rent on chain",
+              to_string(), CLEANUP_EPOCH_DELIVERIES_INSTRUCTION);
+      }
       // `DistributionState` is read only for DESYNDICATE_LIQ manifests, and only
       // the integrated liqsol-core program declares it -- a standalone outpost
       // IDL has no syndicated pool to release from, and its DistributionState
@@ -2075,7 +2234,7 @@ std::vector<std::optional<fc::network::solana::account_info>> outpost_solana_cli
    return _entry->client->get_multiple_accounts(accounts, commitment, slice);
 }
 
-fc::variant outpost_solana_client::read_chunk_program_accounts(
+fc::variant outpost_solana_client::read_program_accounts(
    const fc::network::solana::solana_public_key& program_id, const std::vector<fc::variant>& filters,
    fc::network::solana::commitment_t commitment, const std::optional<fc::network::solana::data_slice>& slice) {
    return _entry->client->get_program_accounts(program_id, filters, commitment, slice);
@@ -2090,7 +2249,7 @@ outpost_solana_client_detail::envelope_chunk_reap_gates outpost_solana_client::r
    return outpost_solana_client_detail::decode_envelope_chunk_reap_gates(*_program_client, infos);
 }
 
-std::vector<outpost_solana_client_detail::envelope_chunk_buffer>
+std::vector<outpost_solana_client_detail::reapable_account>
 outpost_solana_client::read_own_envelope_chunk_buffers() {
    const auto* program = _program_client->get_program();
    FC_ASSERT(program != nullptr, "no IDL program loaded");
@@ -2098,10 +2257,25 @@ outpost_solana_client::read_own_envelope_chunk_buffers() {
    FC_ASSERT(chunks_account != nullptr, "outpost program IDL declares no {}", envelope_chunks::account_name);
 
    const auto uploader = _entry->client->get_pubkey();
-   const auto result   = read_chunk_program_accounts(
+   const auto result   = read_program_accounts(
       _program_id, outpost_solana_client_detail::envelope_chunk_buffer_filters(chunks_account->discriminator, uploader),
       fc::network::solana::commitment_t::confirmed, outpost_solana_client_detail::envelope_chunk_buffer_header_slice());
    return outpost_solana_client_detail::decode_envelope_chunk_buffers(*_program_client, result, uploader);
+}
+
+std::vector<outpost_solana_client_detail::reapable_account> outpost_solana_client::read_own_epoch_deliveries() {
+   const auto* program = _program_client->get_program();
+   FC_ASSERT(program != nullptr, "no IDL program loaded");
+   const auto* tally_account = program->find_account(epoch_deliveries::account_name);
+   FC_ASSERT(tally_account != nullptr, "outpost program IDL declares no {}", epoch_deliveries::account_name);
+
+   const auto payer = _entry->client->get_pubkey();
+   // Whole accounts, not a header slice: `payer` is the only field the filter needs at a fixed offset, and the IDL
+   // decode of the full tally is what checks the rest. The filter returns only this relay's own tallies.
+   const auto result = read_program_accounts(
+      _program_id, outpost_solana_client_detail::epoch_deliveries_filters(tally_account->discriminator, payer),
+      fc::network::solana::commitment_t::confirmed, std::nullopt);
+   return outpost_solana_client_detail::decode_epoch_deliveries(*_program_client, result, payer);
 }
 
 std::optional<fc::network::solana::account_info> outpost_solana_client::read_envelope_chunk_buffer(
@@ -2118,6 +2292,7 @@ void outpost_solana_client::reap_settled_envelope_chunks(
    // Every RPC the sweep makes -- the gate read, the discovery read, each close and its confirmation polling -- runs
    // under this scope, so none outlives `deadline_abs` (a nested scope only ever shortens the caller's).
    fc::task::deadline_scope rpc_deadline(deadline_abs);
+   const bool reap_epoch_deliveries = _program_client->has_idl(CLEANUP_EPOCH_DELIVERIES_INSTRUCTION);
    outpost_solana_client_detail::sweep_envelope_chunks(
       _chunk_sweep_schedule, sweep_start, deadline_abs, gates,
       {
@@ -2125,9 +2300,20 @@ void outpost_solana_client::reap_settled_envelope_chunks(
          .read_gates   = [this] { return read_envelope_chunk_reap_gates(); },
          .read_buffers = [this] { return read_own_envelope_chunk_buffers(); },
          .send_cleanup = [this](uint32_t epoch_index) { return _program_client->cleanup_envelope_chunks(epoch_index); },
-         .buffer_absent = [this](const outpost_solana_client_detail::envelope_chunk_buffer& buffer) {
+         .account_absent = [this](const outpost_solana_client_detail::reapable_account& buffer) {
             return !read_envelope_chunk_buffer(buffer.address, ENVELOPE_CHUNK_ABSENCE_COMMITMENT).has_value();
          },
+         // Bound only where the program declares the tally closer (checked at boot); otherwise the sweep reaps
+         // chunk buffers alone.
+         .read_epoch_deliveries = reap_epoch_deliveries
+                                     ? std::function<std::vector<outpost_solana_client_detail::reapable_account>()>(
+                                          [this] { return read_own_epoch_deliveries(); })
+                                     : nullptr,
+         .send_epoch_deliveries_cleanup =
+            reap_epoch_deliveries ? std::function<std::string(uint32_t)>([this](uint32_t epoch_index) {
+                                       return _program_client->cleanup_epoch_deliveries(epoch_index);
+                                    })
+                                  : nullptr,
       },
       to_string());
 }
