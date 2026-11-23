@@ -3098,6 +3098,51 @@ BOOST_FIXTURE_TEST_CASE( economic_clock_runs_while_consensus_is_paused, sysio_em
    BOOST_REQUIRE_EQUAL( get_t5_state()["epoch_count"].as<uint64_t>(), 2u );
 } FC_LOG_AND_RETHROW()
 
+BOOST_FIXTURE_TEST_CASE( emissions_pay_and_claim_while_the_andon_cord_is_pulled, sysio_emissions_tester ) try {
+   // The andon cord freezes depot custody exits; emissions keep accruing and paying, and both claims pay out.
+   const account_name owner    = "nodeandon"_n;
+   const account_name producer = "producera"_n;
+   create_t5_holding_accounts();
+   create_user_accounts({ owner });
+   setup_producers(3);
+   wait_for_producer_schedule();
+   produce_complete_cycles(3, 2);
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name ) );
+   const uint32_t vested_start = head_secs() - (T1_DURATION + 10);
+   BOOST_REQUIRE_EQUAL( success(), setinittime( config::system_account_name, tpsec(vested_start) ) );
+   BOOST_REQUIRE_EQUAL( success(), addnodeowner( ROA, owner, 1 ) );
+
+   namespace andon = sysio_system::test_support::andon;
+   // Under sysio.system a new account has only base RAM; grant what the contract image needs.
+   create_accounts({ andon::account });
+   control->get_mutable_resource_limits_manager().set_account_limits(andon::account, 1024 * 1024, -1, -1, false);
+   produce_blocks();
+   abi_serializer andon_ser;
+   andon::deploy(*this, andon_ser, contracts::andon_wasm(), contracts::andon_abi());
+   BOOST_REQUIRE_EQUAL( success(), andon::pull(*this, andon_ser) );
+   const fc::variant cord = andon_ser.binary_to_variant(
+      "cord_state", get_row_by_account(andon::account, andon::account, "cord"_n, "cord"_n),
+      fixture_abi_yield_function());
+   BOOST_REQUIRE( cord["pulled"].as_bool() );
+
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   produce_blocks(130);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   BOOST_REQUIRE_EQUAL( get_t5_state()["epoch_count"].as<uint64_t>(), 2u );
+
+   const int64_t owed = pay_claimable(producer);
+   BOOST_REQUIRE_GT( owed, 0 );
+   const int64_t producer_before = get_wire_balance(producer).get_amount();
+   BOOST_REQUIRE_EQUAL( success(), push_system_action(producer, "claimpay"_n, mvo()("account_name", producer)) );
+   BOOST_REQUIRE_EQUAL( producer_before + owed, get_wire_balance(producer).get_amount() );
+
+   const asset vested = viewnodedist( owner ).claimable;
+   BOOST_REQUIRE_EQUAL( vested, T1_ALLOCATION );
+   const asset owner_before = get_wire_balance( owner );
+   BOOST_REQUIRE_EQUAL( success(), claimnodedis( owner, owner ) );
+   BOOST_REQUIRE_EQUAL( get_wire_balance( owner ), owner_before + vested );
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( advance_pays_after_epoch_duration, sysio_emissions_tester ) try {
    create_t5_holding_accounts();
    // Set start_time in the past so epoch has already elapsed
