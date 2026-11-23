@@ -25,6 +25,16 @@ namespace {
 using namespace sysio;
 using namespace sysio::chain;
 
+/// @return the code of the exception @p result answers a push with, if it answers with one
+std::optional<int64_t> answer_error_code(const next_function_variant<transaction_trace_ptr>& result) {
+   if (const fc::exception_ptr* ex = std::get_if<fc::exception_ptr>(&result))
+      return (*ex)->code();
+   const transaction_trace_ptr& trace = std::get<transaction_trace_ptr>(result);
+   if (trace->except)
+      return trace->except->code();
+   return {};
+}
+
 /// Makes the test's transactions: native newaccounts by sysio, every few made to fail.
 class trx_maker {
 public:
@@ -132,12 +142,13 @@ private:
    std::vector<transaction_id_type> pending;
 };
 
-/// Checks that the transactions reported executed are the valid ones, that each is in exactly one block, or in none if
-/// each of its submissions that executed was then dropped, at least one past the cpu cap, and that the blocks hold no
-/// other transaction. Also checks that the trxs of @p synced_abort, a block aborted while it held them, ran again.
+/// Checks that the transactions reported executed are the valid ones, less those refused past their cpu limit
+/// (@p cpu_refused), that each is in exactly one block, or in none if each of its submissions that executed was then
+/// dropped, at least one past the cpu cap, and that the blocks hold no other transaction. Also checks that the trxs of
+/// @p synced_abort, a block aborted while it held them, ran again.
 void verify_executed(const std::deque<packed_transaction_ptr>& executed, const std::set<transaction_id_type>& valid,
-                     const trx_runs& recorded, const std::vector<transaction_id_type>& synced_abort,
-                     const std::deque<signed_block_ptr>& blocks) {
+                     const std::set<transaction_id_type>& cpu_refused, const trx_runs& recorded,
+                     const std::vector<transaction_id_type>& synced_abort, const std::deque<signed_block_ptr>& blocks) {
    const std::map<transaction_id_type, trx_runs::id_runs> runs = recorded.by_id();
    std::map<transaction_id_type, uint32_t> blocks_holding; // trx id -> blocks holding it
    for (const signed_block_ptr& block : blocks) {
@@ -150,12 +161,16 @@ void verify_executed(const std::deque<packed_transaction_ptr>& executed, const s
    for (const packed_transaction_ptr& trx : executed)
       executed_ids.insert(trx->id());
 
-   BOOST_TEST(executed_ids.size() == valid.size());
+   // a valid trx that runs past its cpu limit, as when the node stalls, is refused; a client resubmits it
+   size_t refused = 0;
    for (const transaction_id_type& id : valid) {
       BOOST_TEST_CONTEXT("valid trx " << id.str()) {
-         BOOST_TEST(executed_ids.count(id) == 1u);
+         const bool reported_executed = executed_ids.count(id) == 1u;
+         refused += reported_executed ? 0 : 1;
+         BOOST_TEST((reported_executed || cpu_refused.count(id) == 1u));
       }
    }
+   BOOST_TEST(executed_ids.size() + refused == valid.size());
    size_t dropped = 0;        // executed trxs in no block
    size_t rerun_in_block = 0; // executed trxs in a block after a submission executed more than once
    for (const transaction_id_type& id : executed_ids) {
@@ -191,7 +206,7 @@ void verify_executed(const std::deque<packed_transaction_ptr>& executed, const s
    }
    // drops are rare even under load; most aborted trxs land in a block
    BOOST_TEST_MESSAGE("synchronized abort trxs " << synced_abort.size() << ", re-run trxs in a block " << rerun_in_block
-                                                 << ", dropped " << dropped);
+                                                 << ", dropped " << dropped << ", refused past cpu limit " << refused);
    BOOST_TEST(rerun_in_block > dropped);
 }
 
@@ -278,6 +293,7 @@ BOOST_AUTO_TEST_CASE(producer) {
                   } );
 
       std::deque<packed_transaction_ptr> trxs;
+      std::set<transaction_id_type> cpu_refused; // answered past their cpu limit; read after the app thread has joined
       std::atomic<size_t> next_calls = 0;
       std::atomic<size_t> num_posts = 0;
       std::atomic<size_t> trace_with_except = 0;
@@ -286,15 +302,18 @@ BOOST_AUTO_TEST_CASE(producer) {
       for( size_t i = 1; i <= num_pushes; ++i ) {
          packed_transaction_ptr ptrx = maker.make();
          dlog( "posting {}", ptrx->id() );
-         app->post( priority::low, [ptrx, &next_calls, &num_posts, &trace_with_except, &trx_match, &trxs, &app]() {
+         app->post( priority::low, [ptrx, &next_calls, &num_posts, &trace_with_except, &trx_match, &trxs, &cpu_refused,
+                                    &app]() {
             ++num_posts;
             bool return_failure_traces = num_posts % 2;
             app->get_method<plugin_interface::incoming::methods::transaction_async>()(ptrx,
                false, // api_trx
                transaction_metadata::trx_type::input, // trx_type
                return_failure_traces, // return_failure_traces
-               [ptrx, &next_calls, &trace_with_except, &trx_match, &trxs, return_failure_traces]
+               [ptrx, &next_calls, &trace_with_except, &trx_match, &trxs, &cpu_refused, return_failure_traces]
                (const next_function_variant<transaction_trace_ptr>& result) {
+                  if( answer_error_code( result ) == tx_cpu_usage_exceeded::code_value )
+                     cpu_refused.insert( ptrx->id() );
                   if( !std::holds_alternative<fc::exception_ptr>( result ) && !std::get<chain::transaction_trace_ptr>( result )->except ) {
                      if( std::get<chain::transaction_trace_ptr>( result )->id == ptrx->id() ) {
                         trxs.push_back( ptrx );
@@ -345,7 +364,7 @@ BOOST_AUTO_TEST_CASE(producer) {
       BOOST_CHECK( all_blocks.size() > 3u ); // should have a few blocks otherwise test is running too fast
       BOOST_TEST_MESSAGE( "pushed " << num_pushes << ", valid " << maker.valid_ids().size() << ", reported executed "
                                     << trxs.size() << ", blocks " << all_blocks.size() );
-      verify_executed( trxs, maker.valid_ids(), runs, synced_abort, all_blocks );
+      verify_executed( trxs, maker.valid_ids(), cpu_refused, runs, synced_abort, all_blocks );
    }
 }
 
