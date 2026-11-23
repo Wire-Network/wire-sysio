@@ -44,10 +44,14 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
 3. Bump the epoch index, drop the expired group from the front of the window and append a new tail
    group drawn from `ACTIVE` batch operators that are not already resident (non-bootstrapped first).
    The resident groups stay disjoint, so an operator serves at most once every `batch_op_groups`
-   epochs.
+   epochs. The tail is always a full `operators_per_epoch` group: when too few such operators are
+   `ACTIVE`, the advance reverts and the epoch waits until enough are. The revert also defers that
+   advance's slashes and terminations until it succeeds. Keep `ACTIVE` batch operators beyond
+   `batch_operator_minimum_active`: with none spare, one operator leaving `ACTIVE` holds the epoch
+   at its group's next expiry.
 4. `sysio.opreg::flushwtdw` matures queued collateral withdrawals.
 5. Queue `OPERATORS` (the operators the window seats, with their status and authex links; none for
-   an empty window) and `BATCH_OPERATOR_GROUPS` (withheld when the next group is empty) to every
+   an empty window) and `BATCH_OPERATOR_GROUPS` (withheld when no schedule is seated) to every
    active outpost through `sysio.msgch::queueout`, then `sysio.msgch::buildenv` per outpost.
 6. `sysio.system::accrueepoch` and `rcrdbatch`, plus `payepoch` on pay epochs.
 

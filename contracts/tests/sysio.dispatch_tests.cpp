@@ -323,12 +323,16 @@ public:
    static constexpr auto CHAINS_ACCOUNT = "sysio.chains"_n;
    static constexpr auto ROA_ACCOUNT    = "sysio.roa"_n;
    static constexpr auto BATCHOP        = "batchop.a"_n;
+   /// Further members of a multi-operator dispatch group, seated alongside BATCHOP.
+   static constexpr std::array<name, 2> EXTRA_BATCHOPS{"batchop.b"_n, "batchop.c"_n};
    static constexpr auto UWRIT_OP       = "uwrit.alice"_n;
    /// Node-owner claim target, deliberately absent until depot dispatch.
    static constexpr auto CLAIM_ACCOUNT  = "claimacct"_n;
    static constexpr uint64_t ROA_NETWORK_GEN = 0;
    /// Termination prune delay for the suite's opreg config: ten minutes, far beyond any test's wall clock.
    static constexpr uint64_t TERMINATE_PRUNE_DELAY_MS = 10ULL * 60 * 1000;
+   /// Epoch length the dispatch bootstrap configures.
+   static constexpr uint32_t DISPATCH_EPOCH_DURATION_SEC = 60;
 
    sysio_dispatch_tester() {
       produce_blocks(2);
@@ -438,13 +442,18 @@ public:
    // and reaches consensus; the non-EVM drop case passes an SVM "SOLANA" so its delivery also reaches
    // consensus and the drop is exercised at the source binding, not merely the consensus gate. The
    // outpost is registered before `schbatchgps`, so the batch op is scheduled for it.
+   //
+   // `group_size` seats that many bootstrapped batch operators: BATCHOP plus the first
+   // `group_size - 1` of EXTRA_BATCHOPS.
    void bootstrap_for_dispatch(const std::string& outpost_code = "ETH",
-                               ChainKind outpost_kind = ChainKind::CHAIN_KIND_EVM) {
+                               ChainKind outpost_kind = ChainKind::CHAIN_KIND_EVM,
+                               uint32_t group_size = 1) {
+      BOOST_REQUIRE(group_size >= 1 && group_size <= EXTRA_BATCHOPS.size() + 1);
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
          "setconfig"_n, mvo()
-            ("epoch_duration_sec",                  60)
-            ("operators_per_epoch",                 1)
-            ("batch_operator_minimum_active",       1)
+            ("epoch_duration_sec",                  DISPATCH_EPOCH_DURATION_SEC)
+            ("operators_per_epoch",                 group_size)
+            ("batch_operator_minimum_active",       group_size)
             ("batch_op_groups",                     1)
             ("epoch_retention_envelope_log_count",  200)));
 
@@ -455,6 +464,15 @@ public:
             ("account",          BATCHOP.to_string())
             ("type",             OperatorType::OPERATOR_TYPE_BATCH)
             ("is_bootstrapped",  true)));
+
+      for (uint32_t i = 0; i + 1 < group_size; ++i) {
+         create_accounts({EXTRA_BATCHOPS[i]});
+         BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
+            "regoperator"_n, mvo()
+               ("account",          EXTRA_BATCHOPS[i].to_string())
+               ("type",             OperatorType::OPERATOR_TYPE_BATCH)
+               ("is_bootstrapped",  true)));
+      }
 
       BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
          "regoperator"_n, mvo()
@@ -484,10 +502,20 @@ public:
    }
 
    action_result deliver(uint64_t chain_code, const std::vector<char>& data) {
-      return push(MSGCH_ACCOUNT, msgch_abi, BATCHOP, "deliver"_n, mvo()
-         ("batch_op_name", BATCHOP.to_string())
+      return deliver_as(BATCHOP, chain_code, data);
+   }
+
+   action_result deliver_as(name op, uint64_t chain_code, const std::vector<char>& data) {
+      return push(MSGCH_ACCOUNT, msgch_abi, op, "deliver"_n, mvo()
+         ("batch_op_name", op.to_string())
          ("chain_code",    chain_code)
          ("data",          data));
+   }
+
+   /// Let the epoch boundary pass without advancing, opening evalcons' majority path.
+   void elapse_epoch_boundary() {
+      produce_block(fc::seconds(DISPATCH_EPOCH_DURATION_SEC + 1));
+      produce_blocks();
    }
 
    transaction_trace_ptr deliver_trace(uint64_t chain_code,
@@ -974,6 +1002,49 @@ BOOST_FIXTURE_TEST_CASE(dispatch_routes_node_owner_reg_to_roa, sysio_dispatch_te
    auto pending = get_dclaim_row("pclaims"_n, "pending_claim", CLAIM_ACCOUNT.to_uint64_t());
    BOOST_REQUIRE(!pending.is_null());
    BOOST_REQUIRE_EQUAL(pending["balance"].as<asset>().get_amount(), 4321);
+} FC_LOG_AND_RETHROW() }
+
+/// WNS-86: a node-owner registration has no gate after consensus, so the consensus threshold is
+/// what stands between one batch operator and a new node owner. With two of three seated members
+/// out of ACTIVE, the remaining member's envelope is never accepted, before or after the boundary.
+/// When a second member returns and delivers the same envelope, the claim goes through, which shows
+/// the payload was valid and only the threshold held it back.
+BOOST_FIXTURE_TEST_CASE(degraded_group_cannot_dispatch_node_owner_reg, sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch("ETHEREUM", ChainKind::CHAIN_KIND_EVM, /*group_size=*/3);
+   const name terminated = EXTRA_BATCHOPS[0];
+   const name returning  = EXTRA_BATCHOPS[1];
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "terminate"_n,
+      mvo()("account", terminated.to_string())("reason", std::string("seated member terminated"))));
+   // The transition a queued withdrawal or a collateral shortfall dispatches.
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "processbatch"_n,
+      mvo()("account", returning.to_string())("was_eligible", true)("is_eligible", false)));
+   produce_blocks();
+
+   const auto eth_code = fc::slug_name{"ETHEREUM"}.value;
+   const auto eth_pub  = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
+   const auto payload  = encode_node_owner_registration(
+      CLAIM_ACCOUNT.to_string(), /*tier=*/2, sysio::opp::types::WIRE_KEY_TYPE_K1,
+      k1_pubkey_bytes(get_public_key(CLAIM_ACCOUNT, "active")), em_uncompressed_pubkey_bytes(eth_pub),
+      fc::crypto::ethereum::address_to_bytes(eth_pub));
+   const auto envelope = encode_envelope_with_one_attestation(
+      current_epoch(), sysio::opp::types::ATTESTATION_TYPE_NODE_OWNER_REG, payload);
+
+   BOOST_REQUIRE_EQUAL(success(), deliver(eth_code, envelope));
+   produce_blocks();
+   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(success(), chkcons());
+   produce_blocks();
+   BOOST_REQUIRE(get_nodeowner(CLAIM_ACCOUNT).is_null());
+   BOOST_CHECK((control->db().find<account_object, by_name>(CLAIM_ACCOUNT) == nullptr));
+
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "processbatch"_n,
+      mvo()("account", returning.to_string())("was_eligible", false)("is_eligible", true)));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(returning, eth_code, envelope));
+   produce_blocks();
+   const auto reg = get_nodeowner(CLAIM_ACCOUNT);
+   BOOST_REQUIRE(!reg.is_null());
+   BOOST_REQUIRE_EQUAL(reg["tier"].as<uint32_t>(), 2u);
 } FC_LOG_AND_RETHROW() }
 
 /// A copied public key cannot authorize an existing name, and rejection must not block a fresh claim.

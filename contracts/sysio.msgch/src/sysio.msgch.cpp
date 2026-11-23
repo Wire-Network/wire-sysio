@@ -104,7 +104,7 @@ constexpr const char* DISPUTE_TOO_FEW_CANDIDATES_LOG =
    "msgch::maybe_open_dispute: no dispute for (chain=%llu, epoch=%u): "
    "%u distinct version(s), a vote needs >=%u\n";
 
-/// Diagnostic for a two-version split that can still acquire a strict majority from silent operators.
+/// Diagnostic for a two-version split that silent eligible operators can still carry to the threshold.
 constexpr const char* DISPUTE_INCOMPLETE_TWO_WAY_LOG =
    "msgch::maybe_open_dispute: no dispute for (chain=%llu, epoch=%u): "
    "two versions but only %u of %u eligible operators delivered\n";
@@ -144,54 +144,44 @@ msgch::outbound_queue_entry outbound_queue_of(const msgch::outqueue_t& queues, u
       .value_or(msgch::outbound_queue_entry{.chain_code = chain_code, .queued = 0});
 }
 
-/// Size of the ACTIVE batch-operator group -- the set that can actually deliver for the current
-/// epoch. Every consensus threshold derives from THIS, never from the configured
-/// `operators_per_epoch`.
-///
-/// The two differ routinely. `sysio.epoch::advance` fills a new tail only *up to* the configured
-/// size (`for (... && new_tail.size() < cfg.operators_per_epoch; ...)`) and documents a short group
-/// as "a degraded but non-fatal state: batch operators were terminated faster than replacements
-/// could activate". With the configured 7 and a live group of S, a config-derived threshold makes
-/// the unanimous path unreachable for any S < 7 and the majority path unreachable for S <= 3 --
-/// consensus becomes arithmetically impossible and the epoch stalls chain-wide.
-///
-/// The count is of members who can ACTUALLY deliver, which is the resident group INTERSECTED with
-/// current opreg ACTIVE status -- exactly the admission rule `deliver` enforces. The resident group
-/// is a snapshot taken at schbatchgps/advance time; an operator slashed, terminated, or dropped
-/// below its collateral minimum mid-window stays in `batch_op_groups[current]` but is refused by
-/// `deliver` ("delivering operator is not ACTIVE in sysio.opreg"). Counting raw snapshot members
-/// would therefore still overstate the reachable set and leave the unanimous path unsatisfiable
-/// after a mid-window slash -- the very case WNS-15 names. A missing operator row counts as
-/// not-active, failing closed the same way `deliver` does.
-///
-/// Returned as the SET, not just a count, because the consensus tally must filter deliveries
-/// through the same membership test that produces the threshold. Counting every delivery row while
-/// sizing the group to the live set mixes two different populations: an operator that delivers and
-/// is then slashed leaves a row behind that would still count toward a threshold it is no longer
-/// part of, letting a strictly smaller set finalize an envelope (A delivers, A is slashed, B
-/// delivers -> 2 of a 2-member group, with C never heard from). Numerator and denominator come from
-/// this one snapshot so they cannot diverge.
-///
-/// Empty when epoch state is unreadable or the group cursor is out of range. That is fail-closed:
-/// `deliver` requires `is_batch_operator_active`, which requires the same epoch state, so there is
-/// nothing to tally in that window anyway. There is deliberately no configured-size fallback --
-/// `epochcfg.operators_per_epoch` sizes the schedule, it does not describe who can deliver now.
-std::vector<name> eligible_batch_operators() {
+/// The batch-operator group on duty for the current epoch, as consensus counts it.
+struct duty_group {
+   /// Members seated when the group was scheduled (`batch_op_groups[current]`). The consensus
+   /// threshold derives from this size, which cannot change while the group is on duty.
+   uint32_t seated_size = 0;
+   /// Seated members whose sysio.opreg status is ACTIVE now: the only operators whose deliveries
+   /// count. A missing operator row counts as not ACTIVE, as it does in `deliver`.
+   std::vector<name> eligible;
+};
+
+/// Read the group on duty. Both fields come from one snapshot so the tally and the threshold cannot
+/// disagree about who is in the group. Empty when epoch state is unreadable or the group cursor is
+/// out of range; `deliver` refuses every operator in that state, so there is nothing to tally.
+duty_group current_duty_group() {
    epoch::epochstate_t tbl(EPOCH_ACCOUNT);
    if (!tbl.exists()) return {};
-   auto state = tbl.get();
+   const epoch::epoch_state state = tbl.get();
    if (state.current_batch_op_group >= state.batch_op_groups.size()) return {};
+   const std::vector<name>& seated = state.batch_op_groups[state.current_batch_op_group];
 
    opreg::operators_t ops(OPREG_ACCOUNT);
-   std::vector<name> eligible;
-   for (const auto& member : state.batch_op_groups[state.current_batch_op_group]) {
-      const auto key = opreg::operator_key{member.value};
+   duty_group group{.seated_size = static_cast<uint32_t>(seated.size())};
+   for (const name& member : seated) {
+      const opreg::operator_key key{member.value};
       if (!ops.contains(key)) continue;
       if (ops.get(key).status == opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE) {
-         eligible.push_back(member);
+         group.eligible.push_back(member);
       }
    }
-   return eligible;
+   return group;
+}
+
+/// Matching deliveries an envelope needs: a strict majority of the SEATED group, the rule the
+/// Ethereum and Solana outposts apply to the depot's envelopes. A member that leaves ACTIVE loses
+/// its vote but does not lower the threshold; when fewer than this many members remain ACTIVE,
+/// nothing is accepted until enough of them return.
+uint32_t consensus_threshold(uint32_t seated_size) {
+   return seated_size / 2 + 1;
 }
 
 /// Insert a metadata row into `envelope_log` and, if the table has grown
@@ -917,11 +907,11 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
 }
 
 /// Evaluate the dispute trigger and, if met, open a Tier-1 dispute vote via sysio.chalg. A two-way
-/// split is actionable only after every eligible operator has delivered, preserving the chance for
-/// silent operators to create a strict majority. An existing three-or-more-version split remains
-/// actionable at the boundary. A strict majority, one-version split, or pre-boundary split waits.
+/// split is actionable once the eligible operators that have not delivered can no longer carry its
+/// leading version to the threshold. An existing three-or-more-version split remains actionable at
+/// the boundary. A version at the threshold, a one-version split, or a pre-boundary split waits.
 void maybe_open_dispute(name self, uint64_t chain_code, uint32_t epoch_index,
-                        uint32_t group_size, uint32_t total_deliveries,
+                        uint32_t threshold, uint32_t eligible_count, uint32_t total_deliveries,
                         const std::vector<checksum256>& seen_checksums,
                         const std::vector<uint32_t>& checksum_counts,
                         const std::vector<std::vector<name>>& checksum_operators) {
@@ -946,21 +936,25 @@ void maybe_open_dispute(name self, uint64_t chain_code, uint32_t epoch_index,
    for (auto c : checksum_counts) {
       if (c > max_count) max_count = c;
    }
-   // Same strict-majority form as evalcons Option B -- these two MUST agree, or a split that
-   // evalcons treats as un-resolved could be declined a dispute here (or vice versa).
-   if (max_count * 2 > group_size) {  // a majority exists -> no vote needed
-      sysio::print_f("msgch::maybe_open_dispute: no dispute for (chain=%llu, epoch=%u): a version holds a majority (%u of group %u), resolved without a vote\n",
-                     chain_code, epoch_index, max_count, group_size);
+   // Same threshold as evalcons Option B -- these two MUST agree, or a split that evalcons treats
+   // as un-resolved could be declined a dispute here (or vice versa).
+   if (max_count >= threshold) {  // a version is accepted without a vote
+      sysio::print_f("msgch::maybe_open_dispute: no dispute for (chain=%llu, epoch=%u): "
+                     "a version holds %u deliveries, threshold %u, resolved without a vote\n",
+                     chain_code, epoch_index, max_count, threshold);
       return;
    }
 
-   // A two-way split is not terminal while an eligible operator remains silent: that operator can
-   // still establish a strict majority. Three-or-more candidate splits intentionally retain the
-   // existing post-boundary dispute behavior.
+   // A two-way split is not terminal while the eligible operators that have not delivered could
+   // still carry its leading version to the threshold (with every seated member ACTIVE, that is
+   // until all have delivered). Three-or-more candidate splits intentionally retain the existing
+   // post-boundary dispute behavior. The tally counts each eligible operator at most once, so
+   // `total_deliveries <= eligible_count`.
+   const uint32_t silent_eligible = eligible_count - total_deliveries;
    if (seen_checksums.size() == chalg_limits::minimum_dispute_candidate_versions &&
-       total_deliveries != group_size) {
+       max_count + silent_eligible >= threshold) {
       sysio::print_f(DISPUTE_INCOMPLETE_TWO_WAY_LOG,
-                     chain_code, epoch_index, total_deliveries, group_size);
+                     chain_code, epoch_index, total_deliveries, eligible_count);
       return;
    }
 
@@ -1196,16 +1190,23 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
       if (d_idx.find(composite) != d_idx.end()) return;
    }
 
-   // The eligible set is resolved BEFORE the tally so both the counts and the threshold come from
-   // one snapshot -- see eligible_batch_operators(). A delivery from an operator that is no longer
-   // eligible is skipped outright rather than counted against a group it is not part of.
-   const std::vector<name> eligible = eligible_batch_operators();
+   // The group is resolved BEFORE the tally so the counts and the threshold come from one snapshot
+   // -- see current_duty_group(). A delivery from an operator that is no longer ACTIVE is skipped
+   // outright: it neither counts toward a version nor lowers the threshold.
+   const duty_group group = current_duty_group();
+   const std::vector<name>& eligible = group.eligible;
    if (eligible.empty()) {
       sysio::print_f("msgch::evalcons: no consensus for (chain=%llu, epoch=%u): no eligible batch operators\n",
                      chain_code, epoch_index);
       return;
    }
-   const uint32_t group_size = static_cast<uint32_t>(eligible.size());
+   const uint32_t threshold      = consensus_threshold(group.seated_size);
+   const uint32_t eligible_count = static_cast<uint32_t>(eligible.size());
+   if (eligible_count < threshold) {
+      sysio::print_f("msgch::evalcons: no consensus for (chain=%llu, epoch=%u): "
+                     "%u of %u seated batch operators are ACTIVE, threshold %u\n",
+                     chain_code, epoch_index, eligible_count, group.seated_size, threshold);
+   }
    const auto is_eligible = [&eligible](const name& op) {
       return std::find(eligible.begin(), eligible.end(), op) != eligible.end();
    };
@@ -1245,17 +1246,16 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
    size_t consensus_group = 0;
 
    for (size_t g = 0; g < seen_checksums.size(); ++g) {
-      // Option A: ALL operators delivered identical data
-      if (checksum_counts[g] == group_size &&
-          total_deliveries == group_size) {
+      // Option A: every eligible operator delivered identical data, and they reach the threshold.
+      if (checksum_counts[g] == eligible_count &&
+          total_deliveries == eligible_count &&
+          checksum_counts[g] >= threshold) {
          consensus_reached = true;
          consensus_group = g;
          break;
       }
-      // Option B: Majority at epoch boundary (current time >= next_epoch_start).
-      // Strict majority written as `count * 2 > group_size` rather than `count > group_size / 2`:
-      // a short tail can be EVEN, where integer division would accept an exact half as a majority.
-      if (checksum_counts[g] * 2 > group_size) {
+      // Option B: the threshold at the epoch boundary (current time >= next_epoch_start).
+      if (checksum_counts[g] >= threshold) {
          epoch::epochstate_t state_tbl(EPOCH_ACCOUNT);
          if (state_tbl.exists()) {
             auto state = state_tbl.get();
@@ -1272,7 +1272,7 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
       // No automatic consensus. A terminal two-way tie or a three-or-more-version no-majority
       // split past the epoch boundary opens a Tier-1 dispute vote; all other cases wait for more
       // deliveries.
-      maybe_open_dispute(get_self(), chain_code, epoch_index, group_size, total_deliveries,
+      maybe_open_dispute(get_self(), chain_code, epoch_index, threshold, eligible_count, total_deliveries,
                          seen_checksums, checksum_counts, checksum_operators);
       return;
    }

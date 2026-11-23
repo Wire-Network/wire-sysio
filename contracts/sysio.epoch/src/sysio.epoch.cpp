@@ -55,6 +55,10 @@ constexpr name TERMINATION_CHECK = "termcheck"_n;
 constexpr const char* NON_CANONICAL_DELIVERY_REASON_PREFIX =
    "non-canonical OPP envelope delivery, epoch ";
 
+/// `finishadv` refusal when the ACTIVE, non-resident batch operators cannot fill a new tail group.
+constexpr const char* SHORT_TAIL_GROUP_MSG =
+   "not enough ACTIVE batch operators to seat a full tail group; the epoch waits for more";
+
 // System-owned rows are billed to the sysio RAM pool rather than to this contract account (the
 // privileged-contract model sysio.token uses): the contract account stays finite at its code+abi
 // size while table growth draws from sysio's pool. Permitted because the contract is privileged.
@@ -689,29 +693,13 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
          new_tail.push_back(pool[i].first);
       }
 
-      // A tail SHORTER than `operators_per_epoch` means the ACTIVE batch-operator
-      // roster has fallen below `batch_operator_minimum_active` (the config
-      // equality at ::setconfig pins that minimum to
-      // `operators_per_epoch * batch_op_groups`, i.e. exactly this window). The
-      // depot cannot repair that here: with a pool smaller than the window, N
-      // groups that are both FULL and DISJOINT do not exist, and both escapes
-      // are unsound -- re-seating a resident breaks the Ethereum disjointness
-      // above, while a short group lowers the quorum denominator it defines and
-      // makes EVEN group sizes reachable, where Ethereum's `(groupSize + 1) / 2`
-      // is an exact half and two competing digests can both tip.
-      //
-      // So the schedule is left as-is and the DECISION is pushed to the emit
-      // site: an empty active group is never published (see the withhold
-      // below). Short-but-non-empty is pre-existing behaviour and is not made
-      // safe here -- it is reported so the roster can be repaired off-chain.
-      if (new_tail.size() < cfg.operators_per_epoch) {
-         sysio::print("sysio.epoch::finishadv: only ", new_tail.size(), " of ",
-                      cfg.operators_per_epoch,
-                      " eligible batch operators for the new tail group at epoch ",
-                      state.current_epoch_index + cfg.batch_op_groups - 1,
-                      "; the ACTIVE roster is below batch_operator_minimum_active "
-                      "-- operator roster needs attention\n");
-      }
+      // Seat a FULL group or none. sysio.msgch and both outposts take a group's
+      // consensus threshold from its seated size, so a short group would let fewer
+      // operators finalize its epoch; re-seating a resident would break the
+      // disjointness above. The revert undoes this whole advance, its slashes and
+      // terminations included, and the next chkcons retries it, so the epoch waits
+      // until enough batch operators are ACTIVE.
+      check(new_tail.size() == cfg.operators_per_epoch, SHORT_TAIL_GROUP_MSG);
 
       state.batch_op_groups.push_back(std::move(new_tail));
    }
@@ -878,15 +866,10 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
       // seating it wedges the outpost permanently (the handler that could
       // replace the window runs only past the gate the empty group breaks).
       //
-      // This is the ONE sound guarantee available here. The slide cannot buy
-      // non-emptiness by backfilling: with an ACTIVE pool smaller than the
-      // window, N groups that are both FULL and DISJOINT do not exist, and
-      // both escapes are unsound (see the slide's comment -- re-seating a
-      // resident breaks Ethereum's chunk-position disjointness; a short group
-      // lowers the quorum denominator it defines). So the schedule is left
-      // alone and the decision lands here. Withholding the attestation leaves
-      // the outpost on its previous window -- the same end state its own
-      // guards reach, without shipping an invalid payload.
+      // The slide seats only full groups, so an empty next group means no
+      // schedule has been seated (`schbatchgps` has not run). Withholding the
+      // attestation leaves the outpost on its previous window -- the same end
+      // state its own guards reach, without shipping an invalid payload.
       //
       // Cost, accepted deliberately: the withheld attestation also carries
       // `epoch_duration_sec` and the whole-window resync that

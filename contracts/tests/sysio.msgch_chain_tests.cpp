@@ -127,6 +127,11 @@ constexpr const char* STILL_SEATED_REGISTRATION_ERROR =
    "assertion failure with message: operator still holds a batch schedule seat: it may register again "
    "once its seats have closed";
 
+/// `finishadv`'s refusal when the ACTIVE operators outside the surviving groups cannot fill a tail.
+constexpr const char* SHORT_TAIL_GROUP_ERROR =
+   "assertion failure with message: not enough ACTIVE batch operators to seat a full tail group; the epoch "
+   "waits for more";
+
 /// sysio.opreg configuration ABI field identifiers used by the WNS-16 fixture.
 namespace opreg_config_fields {
 constexpr const char* TERMINATE_PRUNE_DELAY_MS         = "terminate_prune_delay_ms";
@@ -418,10 +423,9 @@ public:
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
          "setconfig"_n, mvo()
             ("epoch_duration_sec",                  EPOCH_DURATION_SEC)
-            // Sizes the SCHEDULE, not the consensus threshold: evalcons derives its thresholds
-            // from the live eligible group (msgch's `eligible_batch_operators`), so tests that
-            // shrink the eligible set below this value still reach consensus. The epoch contract
-            // enforces minimum_active == operators_per_epoch * batch_op_groups.
+            // Sizes the seated group, and with it evalcons' threshold: a strict majority of the
+            // seated members, of which only the ACTIVE ones count. The epoch contract enforces
+            // minimum_active == operators_per_epoch * batch_op_groups.
             ("operators_per_epoch",                 n_batch_ops)
             ("batch_operator_minimum_active",       n_batch_ops)
             ("batch_op_groups",                     1)
@@ -592,6 +596,30 @@ public:
       return data.empty() ? fc::variant() : msgch_abi.binary_to_variant(
          "outpost_consensus_entry", data,
          fixture_abi_yield_function());
+   }
+
+   /// True when msgch has accepted an envelope from `chain_code` for `epoch_index`.
+   bool consensus_recorded(uint64_t chain_code, uint32_t epoch_index) {
+      const fc::variant opc = get_outpcons(chain_code);
+      return !opc.is_null() && opc[msgch_fields::CONSENSUS_REACHED].as<bool>() &&
+             opc[msgch_fields::EPOCH_INDEX].as<uint32_t>() == epoch_index;
+   }
+
+   /// Register `account` as a bootstrapped batch operator, ACTIVE at once and unseated. `finishadv`
+   /// seats only full groups, so a fixture that removes a seated member needs one of these for the
+   /// slide to seat in its place. Lands the registration in a block, so a following epoch-length
+   /// jump cannot expire it.
+   void register_spare_batch_operator(name account) {
+      BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n,
+         mvo()("account", account.to_string())("type", opp::types::OPERATOR_TYPE_BATCH)("is_bootstrapped", true)));
+      produce_blocks();
+   }
+
+   /// Move a batch operator in or out of ACTIVE the way a collateral change does: `withdraw`,
+   /// `deposit` and `cancelwtdw` re-evaluate eligibility and dispatch this same `processbatch`.
+   action_result set_batch_operator_active(name account, bool active) {
+      return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "processbatch"_n, mvo()
+         ("account", account.to_string())("was_eligible", !active)("is_eligible", active));
    }
 
    /// Return whether the epoch contract currently holds advancement for an open dispute.
@@ -1203,6 +1231,9 @@ public:
       const std::function<std::vector<uint64_t>(uint32_t duty)>& later_deliveries) {
       // The anchor, then one more consecutive miss than the threshold allows.
       constexpr uint32_t kTerminatingDuty = ROTATION_MAX_CONSECUTIVE_MISSES + 2;
+      // Seated in BATCHOP's place once it terminates. It sorts after every seated operator, so it
+      // leaves the rotation unchanged until then.
+      register_spare_batch_operator(BATCHOP_D);
       std::map<uint64_t, inbound_stream_tip> tips;
       uint32_t batchop_duties = 0;
       bool     terminated     = false;
@@ -2066,6 +2097,7 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_
    constexpr uint32_t kExpectedDeliveredLogCount           = 2;
 
    bootstrap(/*n_batch_ops=*/kBatchOperatorCount, /*batchop_is_bootstrapped=*/false);
+   register_spare_batch_operator(BATCHOP_D);  // refills the group once BATCHOP is slashed
    BOOST_REQUIRE_EQUAL(kExpectedInitialEpoch, current_epoch());
    BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE,
                        get_operator(BATCHOP)[opreg_fields::STATUS]
@@ -2186,6 +2218,7 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_then_termination_still_advances, s
    constexpr const char* kTerminationReason   = "terminated after a non-canonical delivery";
 
    bootstrap(/*n_batch_ops=*/kBatchOperatorCount, /*batchop_is_bootstrapped=*/false);
+   register_spare_batch_operator(BATCHOP_D);  // refills the group once BATCHOP is slashed
    const uint32_t epoch = current_epoch();
    inbound_stream_tip tip;
    const auto canonical = encode_chained_delivery(kCanonicalPayload, tip);
@@ -2248,6 +2281,8 @@ BOOST_FIXTURE_TEST_CASE(advance_records_one_row_per_member_per_epoch, sysio_msgc
 BOOST_FIXTURE_TEST_CASE(advance_without_active_outpost_records_nothing, sysio_msgch_chain_tester) { try {
    BOOST_REQUIRE(bootstrap_rotation(ROTATION_WINDOW_MS, /*batchop_is_bootstrapped=*/false,
                                     rotation_outposts::none).empty());
+   // The final advance records BATCHOP's first duty as a miss, which terminates it on the percent rail.
+   register_spare_batch_operator(BATCHOP_D);
 
    // One full rotation, so every group expires once.
    for (uint32_t step = 0; step < ROTATION_GROUPS; ++step) {
@@ -2315,16 +2350,9 @@ BOOST_FIXTURE_TEST_CASE(partial_delivery_is_a_duty_epoch_miss, sysio_msgch_chain
    });
 } FC_LOG_AND_RETHROW() }
 
-// WNS-15(a) / WNS-08 (WIRE-346 / WIRE-322): consensus thresholds must derive from the group that
-// can ACTUALLY deliver, not from the configured `operators_per_epoch`.
-//
-// The resident group is a snapshot; `deliver` additionally requires current opreg ACTIVE status, so
-// slashing a member shrinks the deliverable set without shrinking the snapshot. With the configured
-// size still 3, the pre-fix thresholds were both unreachable for the surviving two: unanimity
-// required 3 deliveries, and the boundary-majority path required `count > 3/2`, i.e. 3 as well.
-// Consensus was arithmetically impossible and the epoch stalled chain-wide with every remaining
-// operator behaving correctly. CertiK shipped this as
-// sysio_msgch_chain_tests/short_one_member_group_still_uses_configured_three_member_quorum.
+// WNS-15(a) / WNS-08 / WNS-85: a seated member that leaves ACTIVE loses its vote, and the threshold
+// stays a strict majority of the seated group. Three seated, one slashed: the two survivors are that
+// majority, so their unanimous delivery is accepted before the boundary.
 BOOST_FIXTURE_TEST_CASE(short_group_after_slash_still_reaches_consensus, sysio_msgch_chain_tester) { try {
    bootstrap(/*n_batch_ops=*/3);   // configured operators_per_epoch == 3, resident group == 3
 
@@ -2344,7 +2372,8 @@ BOOST_FIXTURE_TEST_CASE(short_group_after_slash_still_reaches_consensus, sysio_m
       deliver_as(BATCHOP_C, ETH_OUTPOST_ID, envelope));
    produce_blocks();
 
-   // Both surviving members deliver identical bytes: unanimity over the ELIGIBLE group.
+   // Both surviving members deliver identical bytes: unanimity among the ACTIVE members, who are a
+   // majority of the seated three.
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, envelope));
    produce_blocks();
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, envelope));
@@ -2527,15 +2556,13 @@ BOOST_FIXTURE_TEST_CASE(chkcons_retries_terminal_tie_after_tier_one_registration
                            {ONE_OPERATOR_PER_TIED_VERSION, ONE_OPERATOR_PER_TIED_VERSION});
 } FC_LOG_AND_RETHROW() }
 
-// Review follow-up on WNS-15(a): the consensus tally and the threshold must be drawn from the SAME
-// population. Sizing the group to the live set while still counting every delivery row lets a
-// slashed operator's pre-slash vote carry a threshold it is no longer part of:
+// The tally counts only members that are ACTIVE when it runs, so a delivery made before its
+// operator was slashed does not count:
 //
 //   A delivers X -> A is slashed -> B delivers X
-//   group_size == 2 (B, C), counts[X] == total == 2  ->  Option A accepts,
 //
-// finalizing on A+B even though C -- one of the two currently-ACTIVE members -- never delivered.
-// That is a strictly smaller quorum than the live group, so it must not resolve until C speaks.
+// leaves one counted delivery against a threshold of two (of three seated), so the envelope is not
+// accepted until C delivers it too.
 BOOST_FIXTURE_TEST_CASE(slash_after_delivery_does_not_count_toward_consensus, sysio_msgch_chain_tester) { try {
    bootstrap(/*n_batch_ops=*/3);
 
@@ -2550,8 +2577,8 @@ BOOST_FIXTURE_TEST_CASE(slash_after_delivery_does_not_count_toward_consensus, sy
       mvo()("account", BATCHOP.to_string())("reason", "WNS-15 slash-after-delivery regression")));
    produce_blocks();
 
-   // B delivers. Eligible set is {B, C}; only B has delivered among them, so one of two is not a
-   // majority and A's stale row must not make up the difference.
+   // B delivers. Only B's delivery counts; A's row from before its slash must not make up the
+   // difference.
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, envelope));
    produce_blocks();
    {
@@ -2577,6 +2604,134 @@ BOOST_FIXTURE_TEST_CASE(slash_after_delivery_does_not_count_toward_consensus, sy
    BOOST_REQUIRE_EQUAL(opc["consensus_reached"].as<bool>(), true);
    BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), epoch);
    BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), digest.str());
+} FC_LOG_AND_RETHROW() }
+
+// WNS-85 / WNS-86: the threshold is a strict majority of the group as SEATED. Members that leave
+// ACTIVE lose their vote without lowering it, so the last ACTIVE member of a three-member group
+// cannot accept an envelope alone -- not through the unanimous path before the boundary, and not
+// through the majority path or the chkcons re-drive after it.
+BOOST_FIXTURE_TEST_CASE(lone_active_member_cannot_finalize_for_seated_group, sysio_msgch_chain_tester) { try {
+   bootstrap(/*n_batch_ops=*/3);
+
+   // Both stay seated; neither is ACTIVE.
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, CHALG_ACCOUNT, "slash"_n,
+      mvo()("account", BATCHOP_B.to_string())("reason", std::string("seated member slashed"))));
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "terminate"_n,
+      mvo()("account", BATCHOP_C.to_string())("reason", std::string("seated member terminated"))));
+   produce_blocks();
+
+   const uint32_t epoch    = current_epoch();
+   const auto     envelope = encode_delivery(epoch, "lone-active-member");
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, envelope));
+   produce_blocks();
+   BOOST_REQUIRE(!consensus_recorded(ETH_OUTPOST_ID, epoch));
+
+   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(success(), push(MSGCH_ACCOUNT, msgch_abi, BATCHOP, msgch_actions::CHECK_CONSENSUS, mvo()));
+   produce_blocks();
+   BOOST_REQUIRE(!consensus_recorded(ETH_OUTPOST_ID, epoch));
+   // Nothing the envelope carried was stored for dispatch.
+   BOOST_REQUIRE_EQUAL(0u, attestation_count(ETH_OUTPOST_ID, epoch));
+} FC_LOG_AND_RETHROW() }
+
+// A group below its threshold waits rather than halts: a member that left ACTIVE through a
+// collateral change (a queued withdrawal, a shortfall) counts again once it returns, and the
+// envelope is accepted with the seated majority behind it.
+BOOST_FIXTURE_TEST_CASE(returning_member_restores_the_threshold, sysio_msgch_chain_tester) { try {
+   bootstrap(/*n_batch_ops=*/3);
+
+   BOOST_REQUIRE_EQUAL(success(), set_batch_operator_active(BATCHOP_B, false));
+   BOOST_REQUIRE_EQUAL(success(), set_batch_operator_active(BATCHOP_C, false));
+   produce_blocks();
+
+   const uint32_t epoch    = current_epoch();
+   const auto     envelope = encode_delivery(epoch, "returning-member");
+   const auto     digest   = oracle::epoch_digest(decode_envelope(envelope));
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, envelope));
+   produce_blocks();
+   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(success(), push(MSGCH_ACCOUNT, msgch_abi, BATCHOP, msgch_actions::CHECK_CONSENSUS, mvo()));
+   produce_blocks();
+   BOOST_REQUIRE(!consensus_recorded(ETH_OUTPOST_ID, epoch));
+
+   // Not yet ACTIVE, B is refused outright.
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: delivering operator is not ACTIVE in sysio.opreg"),
+      deliver_as(BATCHOP_B, ETH_OUTPOST_ID, envelope));
+
+   BOOST_REQUIRE_EQUAL(success(), set_batch_operator_active(BATCHOP_B, true));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, envelope));
+   produce_blocks();
+
+   BOOST_REQUIRE(consensus_recorded(ETH_OUTPOST_ID, epoch));
+   BOOST_REQUIRE_EQUAL(get_outpcons(ETH_OUTPOST_ID)["envelope_digest"].as_string(), digest.str());
+   BOOST_REQUIRE_EQUAL(1u, attestation_count(ETH_OUTPOST_ID, epoch));
+} FC_LOG_AND_RETHROW() }
+
+// The boundary path counts against the seated size, not the ACTIVE count. Five seated, two
+// slashed: a 2-1 split among the three ACTIVE members is a majority of those three but not of the
+// five, so it is not accepted. Every ACTIVE member has delivered, so the split goes to a Tier-1
+// dispute, whose vote decides it.
+BOOST_FIXTURE_TEST_CASE(boundary_majority_counts_against_seated_size, sysio_msgch_chain_tester) { try {
+   bootstrap(/*n_batch_ops=*/5);
+
+   for (const name op : {BATCHOP_D, BATCHOP_E}) {
+      BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, CHALG_ACCOUNT, "slash"_n,
+         mvo()("account", op.to_string())("reason", std::string("seated member slashed"))));
+   }
+   produce_blocks();
+
+   const uint32_t epoch = current_epoch();
+   const auto     left  = encode_delivery(epoch, "seated-majority-left");
+   const auto     right = encode_delivery(epoch, "seated-majority-right");
+   for (const name op : {BATCHOP, BATCHOP_B}) {
+      BOOST_REQUIRE_EQUAL(success(), deliver_as(op, ETH_OUTPOST_ID, left));
+      produce_blocks();
+   }
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, right));
+   produce_blocks();
+
+   elapse_epoch_boundary();
+   advance_via_consensus();
+   BOOST_REQUIRE(!consensus_recorded(ETH_OUTPOST_ID, epoch));
+
+   const fc::sha256 left_checksum  = fc::sha256::hash(left.data(), left.size());
+   const fc::sha256 right_checksum = fc::sha256::hash(right.data(), right.size());
+   assert_open_tie_dispute(epoch, {left_checksum, right_checksum}, {2u, 1u});
+   resolve_tie_dispute(epoch, left_checksum);
+} FC_LOG_AND_RETHROW() }
+
+// Three of five seated agree among four ACTIVE members: the threshold of three is met, so the
+// envelope is accepted at the boundary although one ACTIVE member dissents.
+BOOST_FIXTURE_TEST_CASE(seated_majority_accepted_at_boundary_despite_dissent, sysio_msgch_chain_tester) { try {
+   bootstrap(/*n_batch_ops=*/5);
+
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, CHALG_ACCOUNT, "slash"_n,
+      mvo()("account", BATCHOP_E.to_string())("reason", std::string("seated member slashed"))));
+   produce_blocks();
+
+   const uint32_t epoch    = current_epoch();
+   const auto     majority = encode_delivery(epoch, "seated-majority");
+   const auto     dissent  = encode_delivery(epoch, "seated-dissent");
+   for (const name op : {BATCHOP, BATCHOP_B, BATCHOP_C}) {
+      BOOST_REQUIRE_EQUAL(success(), deliver_as(op, ETH_OUTPOST_ID, majority));
+      produce_blocks();
+   }
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_D, ETH_OUTPOST_ID, dissent));
+   produce_blocks();
+   // Before the boundary only unanimity among the ACTIVE members is accepted.
+   BOOST_REQUIRE(!consensus_recorded(ETH_OUTPOST_ID, epoch));
+
+   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(success(), push(MSGCH_ACCOUNT, msgch_abi, BATCHOP, msgch_actions::CHECK_CONSENSUS, mvo()));
+   produce_blocks();
+   BOOST_REQUIRE(consensus_recorded(ETH_OUTPOST_ID, epoch));
+   BOOST_REQUIRE_EQUAL(get_outpcons(ETH_OUTPOST_ID)[msgch_fields::WINNING_CHECKSUM].as_string(),
+                       fc::sha256::hash(majority.data(), majority.size()).str());
+   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
 } FC_LOG_AND_RETHROW() }
 
 // ---------------------------------------------------------------------------
@@ -2645,57 +2800,75 @@ BOOST_FIXTURE_TEST_CASE(advance_ships_group_index_zero_for_single_group, sysio_m
    }
 } FC_LOG_AND_RETHROW() }
 
-/// The depot must NEVER publish an active index that names an EMPTY group: that index selects
-/// the group an outpost admits against and sizes its quorum from, so an empty one admits nobody,
-/// can never reach consensus, and wedges the outpost permanently — the handler that could replace
-/// the window runs only PAST the gate the empty group breaks.
+/// WNS-85: `finishadv` seats a FULL tail group or none. A short group would set a lower consensus
+/// threshold for its epoch, since msgch and both outposts take it from the seated size, and
+/// re-seating a resident would break the window's disjointness. So when the ACTIVE operators
+/// outside the surviving groups cannot fill the tail, the advance reverts as a whole and the epoch
+/// waits; it proceeds once another batch operator is ACTIVE.
 ///
-/// The state is reached by starving an EXISTING window, which is the only way it is reachable:
-/// `schbatchgps` refuses to build a starved schedule up front ("not enough available batch
-/// operators for group assignment"), so a pool smaller than the window can only arise AFTER the
-/// schedule exists — operators leaving the ACTIVE set. Here two of the three are administratively
-/// terminated. The slide then finds no ACTIVE operator outside the surviving groups (residency is
-/// what keeps window groups DISJOINT, which Ethereum's `_resolveChunkPosition` depends on, so it
-/// is not relaxed to fill the gap), pushes an empty tail, and the lookahead index — `cursor + 1`
-/// — names it.
-///
-/// Asserted here: the BATCH_OPERATOR_GROUPS attestation is absent, AND the envelope still exists
-/// carrying other attestations. The second half is the regression guard that matters — withholding
-/// is implemented by skipping ONE queueout, and an early `return` from `finishadv` would also produce
-/// a missing roster while silently dropping the rest of the epoch's emissions.
-BOOST_FIXTURE_TEST_CASE(advance_withholds_batch_operator_groups_when_next_group_is_empty,
-                        sysio_msgch_chain_tester) { try {
+/// Three single-member groups [A], [C], [B]. With B and C terminated, the 1->2 advance re-seats A
+/// (its group expired, so it is not resident), but the 2->3 advance has nobody to seat.
+BOOST_FIXTURE_TEST_CASE(advance_refuses_to_seat_a_short_tail_group, sysio_msgch_chain_tester) { try {
    constexpr uint32_t kGroups = 3;
    constexpr uint64_t kRotationWindowMs = 12ULL * kGroups * EPOCH_DURATION_SEC * 1000ULL;
-   bootstrap_rotation(kRotationWindowMs);
+   // Bootstrapped, so BATCHOP is exempt from the miss rails and stays ACTIVE without delivering.
+   bootstrap_rotation(kRotationWindowMs, /*batchop_is_bootstrapped=*/true);
 
-   // A full window ships its roster every epoch — the baseline the withhold is measured against.
-   BOOST_REQUIRE_EQUAL(1, shipped_batch_operator_groups_count(ETH_OUTPOST_ID));
-
-   // Starve it: terminate two of the three, leaving one ACTIVE operator for a three-seat window.
    for (const auto& op : {BATCHOP_B, BATCHOP_C}) {
       BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "terminate"_n,
          mvo()("account", op.to_string())("reason", std::string("starve the schedule window"))));
    }
    produce_blocks();
 
-   // The terminated pair still occupy their seats until they slide out, so the sole survivor is
-   // resident and the residency-excluded pool is empty: every tail from here is empty. Walk the
-   // window so an empty group reaches the lookahead seat, then hold there.
-   bool observed_withhold = false;
-   for (uint32_t round = 0; round < kGroups + 1; ++round) {
-      advance_to_next_epoch();
-      // `advance` skipped at most ONE queueout, never the rest of its work.
-      BOOST_REQUIRE_GT(shipped_attestation_count(ETH_OUTPOST_ID), 0);
-      if (shipped_batch_operator_groups_count(ETH_OUTPOST_ID) == 0) observed_withhold = true;
-      if (observed_withhold) {
-         // Once the lookahead seat is empty it stays empty — the roster is never republished
-         // while starved, and an empty active index is never shipped.
-         BOOST_REQUIRE_EQUAL(0, shipped_batch_operator_groups_count(ETH_OUTPOST_ID));
-      }
-   }
-   BOOST_REQUIRE_MESSAGE(observed_withhold,
-      "starved window never withheld BATCH_OPERATOR_GROUPS -- an empty active group was published");
+   const uint32_t held_epoch = advance_to_next_epoch();
+   const auto     held_window = read_epoch_state()[epoch_fields::BATCH_OP_GROUPS];
+
+   const auto advance_at_boundary = [&]() {
+      const fc::time_point next = read_epoch_state()["next_epoch_start"].as<fc::time_point>();
+      const fc::microseconds delta = next - control->head().block_time();
+      if (delta.count() > 0) produce_block(delta);
+      return push(EPOCH_ACCOUNT, epoch_abi, MSGCH_ACCOUNT, "advance"_n, mvo());
+   };
+
+   BOOST_REQUIRE_EQUAL(error(SHORT_TAIL_GROUP_ERROR), advance_at_boundary());
+   produce_blocks();
+   // Nothing moved: same epoch, same window, and the retry fails the same way.
+   BOOST_REQUIRE_EQUAL(held_epoch, current_epoch());
+   BOOST_REQUIRE_EQUAL(fc::json::to_string(held_window, fc::time_point::maximum()),
+                       fc::json::to_string(read_epoch_state()[epoch_fields::BATCH_OP_GROUPS],
+                                           fc::time_point::maximum()));
+   BOOST_REQUIRE_EQUAL(error(SHORT_TAIL_GROUP_ERROR), advance_at_boundary());
+   produce_blocks();
+
+   // A new ACTIVE operator fills the tail and the held advance goes through.
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n,
+      mvo()("account", BATCHOP_D.to_string())("type", opp::types::OPERATOR_TYPE_BATCH)("is_bootstrapped", true)));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), advance_at_boundary());
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(held_epoch + 1, current_epoch());
+   const auto groups = read_epoch_state()[epoch_fields::BATCH_OP_GROUPS].get_array();
+   BOOST_REQUIRE_EQUAL(kGroups, groups.size());
+   const auto tail = groups.back().get_array();
+   BOOST_REQUIRE_EQUAL(1u, tail.size());
+   BOOST_REQUIRE_EQUAL(BATCHOP_D.to_string(), tail.front().as_string());
+} FC_LOG_AND_RETHROW() }
+
+/// With no schedule seated there is no next group to publish, so `finishadv` withholds
+/// BATCH_OPERATOR_GROUPS. It skips only that queueout: the envelope is still built and carries the
+/// epoch's other attestations.
+BOOST_FIXTURE_TEST_CASE(advance_withholds_batch_operator_groups_without_a_schedule,
+                        sysio_msgch_chain_tester) { try {
+   bootstrap(/*n_batch_ops=*/1, /*batchop_is_bootstrapped=*/true, /*build_schedule=*/false);
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::BATCH_OP_GROUPS].get_array().empty());
+
+   BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID, sysio::opp::types::ATTESTATION_TYPE_OPERATORS,
+                                           std::vector<char>{0x01, 0x02, 0x03}));
+   produce_blocks();
+   advance_to_next_epoch();
+
+   BOOST_REQUIRE_EQUAL(0, shipped_batch_operator_groups_count(ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(1, shipped_attestation_count(ETH_OUTPOST_ID));
 } FC_LOG_AND_RETHROW() }
 
 /// An operator terminated in the same epoch drops out of both outposts' rosters
@@ -2733,6 +2906,7 @@ BOOST_FIXTURE_TEST_CASE(advance_roster_excludes_same_epoch_termination,
 /// terminate it again, so `regoperator` refuses the account until its last seat has closed.
 BOOST_FIXTURE_TEST_CASE(regoperator_refuses_account_still_seated, sysio_msgch_chain_tester) { try {
    const auto outposts = bootstrap_rotation(ROTATION_WINDOW_MS);
+   register_spare_batch_operator(BATCHOP_D);  // takes BATCHOP's seat once its leftover one closes
 
    // BATCHOP delivers on its epoch-1 duty, so it stays ACTIVE and the slide seats it again in the tail.
    BOOST_REQUIRE_EQUAL(BATCHOP, duty_member());
@@ -2822,9 +2996,10 @@ BOOST_FIXTURE_TEST_CASE(advance_roster_keeps_a_seated_slashed_member_until_it_le
    constexpr uint32_t kGroups = 3;
    constexpr uint64_t kRotationWindowMs = 12ULL * kGroups * EPOCH_DURATION_SEC * 1000ULL;
    bootstrap_rotation(kRotationWindowMs);
-   // A spare so the slide can refill the slashed member's seat.
-   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n,
-      mvo()("account", BATCHOP_D.to_string())("type", opp::types::OPERATOR_TYPE_BATCH)("is_bootstrapped", true)));
+   // Spares so the slide can refill the seats of the slashed member and of BATCHOP, which never
+   // delivers and is terminated on the percent rail at its first duty.
+   register_spare_batch_operator(BATCHOP_D);
+   register_spare_batch_operator(BATCHOP_E);
    BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, CHALG_ACCOUNT, "slash"_n,
       mvo()("account", BATCHOP_C.to_string())("reason", std::string("seated slash"))));
    produce_blocks();
@@ -2964,6 +3139,7 @@ BOOST_FIXTURE_TEST_CASE(envelope_prune_bounded_per_delivery, sysio_msgch_chain_t
 BOOST_FIXTURE_TEST_CASE(dispute_resolves_while_envelopes_are_pruned, sysio_msgch_chain_tester) { try {
    const std::vector<name> ops{BATCHOP, BATCHOP_B};
    bootstrap(ONE_TO_ONE_TIE_GROUP_SIZE);
+   register_spare_batch_operator(BATCHOP_C);  // refills the group once the losing deliverer is slashed
    const uint32_t first_epoch = current_epoch();
    inbound_stream_tip tip;
    for (uint32_t i = 0; i < INBOUND_ENVELOPE_RETENTION_EPOCHS; ++i) {
