@@ -23,8 +23,9 @@
 #include <future>
 #include <optional>
 #include <set>
-#include <string_view>
 #include <thread>
+
+#include "incoming_trx_utils.hpp"
 
 namespace {
 
@@ -32,6 +33,8 @@ using namespace sysio;
 using namespace sysio::chain;
 using namespace sysio::chain::literals;
 using namespace std::chrono_literals;
+using sysio::test::wait_timeout;
+using sysio::test::wait_until;
 
 /// incoming-transaction-queue-size-mb for the node: the smallest the option takes.
 constexpr auto queue_size_mb = "1";
@@ -42,8 +45,6 @@ static_assert(max_block_net_usage > config::min_max_transaction_net_usage,
               "the chain requires a block net limit above the transaction net limit");
 /// Lifetime of every pushed transaction, long enough that none expires during the test.
 constexpr auto trx_lifetime = fc::minutes(5);
-/// Upper bound on every wait.
-constexpr auto wait_timeout = 60s;
 /// Genesis time, where the mock clock starts: past the first production round after the block timestamp epoch,
 /// whose block deadlines the producer does not compute.
 constexpr const char* genesis_timestamp = "2025-01-01T12:00:00";
@@ -55,23 +56,6 @@ constexpr uint32_t max_clock_moves = 200;
 constexpr uint32_t warmup_blocks = 3;
 /// Empty blocks after the last answer, so an extra answer from a transaction executed late would show.
 constexpr uint32_t trailing_empty_blocks = 3;
-/// Prefix of the accounts the test transactions create. Each transaction is a native newaccount by sysio, which runs
-/// on a chain with no contracts; a unique account name makes every transaction unique.
-constexpr std::string_view new_account_prefix = "qfull";
-/// Letters after new_account_prefix, which fill an account name's 12 characters.
-constexpr size_t new_account_suffix_length = 7;
-/// Letters a name suffix is spelled with.
-constexpr std::string_view new_account_letters = "abcdefghijklmnopqrstuvwxyz";
-
-/// @return a name for an account no earlier call returned
-account_name next_new_account() {
-   static uint64_t next_id = 0;
-   std::string     name(new_account_prefix);
-   uint64_t        id = next_id++;
-   for (size_t i = 0; i < new_account_suffix_length; ++i, id /= new_account_letters.size())
-      name += new_account_letters[id % new_account_letters.size()];
-   return account_name(name);
-}
 
 /// The answers one pushed transaction received.
 struct trx_answers {
@@ -81,18 +65,6 @@ struct trx_answers {
    std::atomic<bool>     executed{false}; ///< answered with a trace without an exception
    std::string           error;           ///< any other answer, written on the main thread, read after it has joined
 };
-
-/// Polls `pred` until it holds or `timeout` passes.
-template <typename Pred>
-bool wait_until(Pred&& pred, std::chrono::milliseconds timeout = wait_timeout) {
-   const std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now() + timeout;
-   while (!pred()) {
-      if (std::chrono::steady_clock::now() > end)
-         return false;
-      std::this_thread::sleep_for(10ms);
-   }
-   return true;
-}
 
 /// A running producing node on the mock clock: pushes it p2p transactions signed by sysio@active, records their answers
 /// and the blocks it produces, and moves the clock for it. While the clock stands still, the block being built stays
@@ -158,14 +130,7 @@ public:
 
    /// @return a transaction, authorized by sysio@active, of a native newaccount by sysio for a new account
    packed_transaction_ptr make_trx() const {
-      const authority    new_account_auth(key.get_public_key());
-      signed_transaction trx;
-      trx.expiration = fc::time_point_sec{fc::time_point::now() + trx_lifetime};
-      trx.actions.emplace_back(vector<permission_level>{{config::system_account_name, config::active_name}},
-                               newaccount{.creator = config::system_account_name,
-                                          .name    = next_new_account(),
-                                          .owner   = new_account_auth,
-                                          .active  = new_account_auth});
+      signed_transaction trx = test::make_newaccount_trx(trx_lifetime);
       trx.sign(key, chain_id);
       return std::make_shared<packed_transaction>(std::move(trx));
    }
@@ -266,8 +231,7 @@ void run_queue_full_node(const std::vector<std::string>& extra_args, PushPhase&&
    fc::temp_directory temp;
    const std::string  temp_dir_str = temp.path().string();
 
-   const private_key_type producer_key =
-      sysio::testing::base_tester::get_private_key(config::system_account_name, "active");
+   const private_key_type producer_key = test::sysio_key();
    const auto [bls_priv, bls_pub, bls_pop, bls_prov] = sysio::testing::get_bls_key("finalizeraa"_n);
 
    genesis_state genesis = sysio::testing::base_tester::default_genesis();
