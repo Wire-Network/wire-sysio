@@ -87,7 +87,7 @@ void initialize_outpost_plugin(const std::vector<std::string>& configuration_arg
 
 /// Load an Anchor IDL fixture from the libfc test fixture directory.
 idl::program load_idl_fixture(std::string_view filename) {
-   auto path = fc::test::get_test_fixtures_path() / boost::filesystem::path(filename);
+   auto path = fc::test::get_test_fixtures_path() / std::filesystem::path(filename);
    return idl::parse_idl_file(path.generic_string());
 }
 

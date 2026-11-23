@@ -17,6 +17,7 @@ set(fc_sources
         src/io/secure_file.cpp
         src/io/console.cpp
         src/filesystem.cpp
+        src/process.cpp
         src/interprocess/file_mapping.cpp
         src/log/log_message.cpp
         src/log/logger.cpp
@@ -110,7 +111,6 @@ target_link_libraries(
         Boost::iostreams
         Boost::interprocess
         Boost::multi_index
-        Boost::dll
         Boost::multiprecision
         Boost::beast
         Boost::asio

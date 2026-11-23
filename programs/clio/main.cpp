@@ -84,6 +84,7 @@ Options:
 #include <fc/variant_object.hpp>
 #include <fc/io/fstream.hpp>
 #include <fc/io/secure_file.hpp>
+#include <fc/process.hpp>
 
 #include <sysio/chain/name.hpp>
 #include <sysio/chain/config.hpp>
@@ -100,8 +101,6 @@ Options:
 #include <boost/range/adaptor/transformed.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/range/algorithm/copy.hpp>
-#define BOOST_DLL_USE_STD_FS
-#include <boost/dll/runtime_symbol_info.hpp>
 
 #define CLI11_HAS_FILESYSTEM 0
 #include <CLI/CLI.hpp>
@@ -1220,7 +1219,7 @@ void ensure_kiod_running(CLI::App* app) {
         return;
     }
 
-    auto parent_path = boost::dll::program_location().parent_path();
+    const std::filesystem::path parent_path = fc::program_path().parent_path();
     auto binPath = parent_path / key_store_executable_name;
     if (!std::filesystem::exists(binPath)) {
         binPath = parent_path.parent_path() / "kiod"/ key_store_executable_name;

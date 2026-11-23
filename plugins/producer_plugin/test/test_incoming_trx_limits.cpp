@@ -12,38 +12,28 @@
 
 #include <fc/io/json.hpp>
 
+#include <fstream>
 #include <future>
+#include <limits>
 #include <stdexcept>
 #include <string>
-#include <string_view>
 #include <thread>
 #include <vector>
 
+#include "incoming_trx_utils.hpp"
+
 using namespace sysio;
 using namespace sysio::chain;
+using namespace sysio::test;
 
 namespace {
 
-/// Prefix of the accounts the test transactions create. Each transaction is a native newaccount by sysio, which runs
-/// on a chain with no contracts; a unique account name makes every transaction unique.
-constexpr std::string_view new_account_prefix = "inctrx";
-/// Letters after new_account_prefix, which fill an account name's 12 characters.
-constexpr size_t new_account_suffix_length = 6;
-/// Letters a name suffix is spelled with.
-constexpr std::string_view new_account_letters = "abcdefghijklmnopqrstuvwxyz";
 /// How long a node may take to start, to deliver a transaction result, or to apply the blocks it is given.
 constexpr std::chrono::seconds node_timeout{60};
 /// How often a test polls a node's head while waiting for it to apply blocks.
 constexpr std::chrono::milliseconds head_poll_interval{50};
-/// How long an incoming transaction stays valid.
-constexpr fc::microseconds trx_lifetime = fc::seconds(60);
 /// Signatures on the block transaction a node limited to one signature still applies.
 constexpr uint32_t block_trx_signatures = 40;
-
-/// Key of sysio@active: a producing test node signs with it, and its default genesis assigns it to sysio.
-private_key_type sysio_key() {
-   return testing::base_tester::get_private_key(config::system_account_name, "active");
-}
 
 /// @return @p count distinct K1 keys, the same on every call
 std::vector<private_key_type> make_keys(uint32_t count) {
@@ -64,30 +54,6 @@ authority all_keys_authority(const std::vector<private_key_type>& keys) {
       auth.keys.push_back(key_weight{key.get_public_key(), 1});
    auth.sort_fields();
    return auth;
-}
-
-/// @return a name for an account no earlier call returned
-account_name next_new_account() {
-   static uint64_t next_id = 0;
-   std::string name(new_account_prefix);
-   std::string suffix(new_account_suffix_length, new_account_letters.front());
-   uint64_t    id = next_id++;
-   for (size_t i = suffix.size(); i-- > 0; id /= new_account_letters.size())
-      suffix[i] = new_account_letters[id % new_account_letters.size()];
-   return account_name(name + suffix);
-}
-
-/// @return a transaction, authorized by sysio@active, of a native newaccount by sysio for a new account
-signed_transaction make_trx() {
-   const authority new_account_auth(sysio_key().get_public_key());
-   signed_transaction trx;
-   trx.expiration = fc::time_point_sec{fc::time_point::now() + trx_lifetime};
-   trx.actions.emplace_back(vector<permission_level>{{config::system_account_name, config::active_name}},
-                            newaccount{.creator = config::system_account_name,
-                                       .name    = next_new_account(),
-                                       .owner   = new_account_auth,
-                                       .active  = new_account_auth});
-   return trx;
 }
 
 /// @return a transaction updating sysio@active to @p auth
@@ -114,9 +80,12 @@ packed_transaction_ptr sign(signed_transaction trx, const std::vector<private_ke
 class test_node {
 public:
    /// Starts the node.
-   /// @param args command line arguments after the data and config directories
-   explicit test_node(const std::vector<std::string>& args) {
+   /// @param args       command line arguments after the data and config directories
+   /// @param config_ini contents of the node's config.ini; empty for the default one
+   explicit test_node(const std::vector<std::string>& args, const std::string& config_ini = {}) {
       const std::string dir = temp.path().string();
+      if (!config_ini.empty())
+         std::ofstream(temp.path() / "config.ini") << config_ini;
       std::vector<std::string> all_args = {"test", "--data-dir", dir, "--config-dir", dir};
       all_args.insert(all_args.end(), args.begin(), args.end());
 
@@ -162,6 +131,9 @@ public:
    test_node& operator=(const test_node&) = delete;
 
    chain_id_type chain_id() const { return chain_plug->chain().get_chain_id(); }
+
+   /// @return the byte limit of the node's incoming transaction queue
+   uint64_t max_incoming_transaction_queue_size() const { return prod_plug->get_max_incoming_transaction_queue_size(); }
 
    /// Delivers @p trx the way net_plugin delivers a p2p transaction.
    /// @return the result the node reported for it
@@ -211,17 +183,6 @@ private:
    producer_plugin*    prod_plug  = nullptr;
 };
 
-/// Arguments of a node producing on the default genesis, signing with sysio_key().
-std::vector<std::string> producer_args(std::vector<std::string> extra = {}) {
-   const private_key_type key = sysio_key();
-   // <chain-kind>,<key-type>,<public-key>,<private-key-provider-spec>
-   const std::string provider = "wire,wire," + key.get_public_key().to_string({}) + ",KEY:" + key.to_string({});
-   std::vector<std::string> args = {"-p", "sysio", "-e", "--disable-subjective-p2p-billing=true",
-                                    "--signature-provider", provider};
-   args.insert(args.end(), extra.begin(), extra.end());
-   return args;
-}
-
 /// Requires that @p result is the rejection of a transaction carrying @p count signatures over a limit of @p limit.
 void require_too_many_sigs(const next_function_variant<transaction_trace_ptr>& result, uint32_t count,
                            uint32_t limit) {
@@ -255,10 +216,10 @@ BOOST_AUTO_TEST_CASE(default_limit_rejects_before_recovery) {
    constexpr uint32_t over_limit = chain::config::default_incoming_trx_max_signatures + 1;
 
    const std::vector<private_key_type> same_key(over_limit, sysio_key());
-   require_too_many_sigs(node.push(sign(make_trx(), same_key, node.chain_id())), over_limit,
+   require_too_many_sigs(node.push(sign(make_newaccount_trx(), same_key, node.chain_id())), over_limit,
                          chain::config::default_incoming_trx_max_signatures);
 
-   require_executed(node.push(sign(make_trx(), {sysio_key()}, node.chain_id())));
+   require_executed(node.push(sign(make_newaccount_trx(), {sysio_key()}, node.chain_id())));
 }
 
 // incoming-trx-max-signatures overrides the default: a transaction at the configured limit executes, and one with a
@@ -272,9 +233,9 @@ BOOST_AUTO_TEST_CASE(configured_limit_overrides_default) {
 
    require_executed(node.push(sign(make_updateauth_trx(all_keys_authority(signers)), {sysio_key()},
                                    node.chain_id())));
-   require_executed(node.push(sign(make_trx(), signers, node.chain_id())));
+   require_executed(node.push(sign(make_newaccount_trx(), signers, node.chain_id())));
 
-   require_too_many_sigs(node.push(sign(make_trx(), keys, node.chain_id())), limit + 1, limit);
+   require_too_many_sigs(node.push(sign(make_newaccount_trx(), keys, node.chain_id())), limit + 1, limit);
 }
 
 // The limit does not apply to a transaction in a received block: a node limited to one signature applies a block
@@ -285,7 +246,7 @@ BOOST_AUTO_TEST_CASE(blocks_apply_regardless_of_incoming_limit) {
    chain.set_authority(config::system_account_name, config::active_name, all_keys_authority(keys), config::owner_name,
                        {{config::system_account_name, config::active_name}}, {sysio_key()});
    chain.produce_block();
-   signed_transaction trx = make_trx();
+   signed_transaction trx = make_newaccount_trx();
    chain.set_transaction_headers(trx);
    for (const private_key_type& key : keys)
       trx.sign(key, chain.get_chain_id());
@@ -302,6 +263,38 @@ BOOST_AUTO_TEST_CASE(blocks_apply_regardless_of_incoming_limit) {
    for (uint32_t block_num = 2; block_num <= chain.head().block_num(); ++block_num)
       node.receive_block(chain.fetch_block_by_number(block_num));
    BOOST_REQUIRE(node.wait_for_head(chain.head().id()));
+}
+
+// incoming-transaction-queue-size-mb sets the queue's byte limit across the option's range, including sizes whose byte
+// count overflows an int: 2048 MiB is 2^31 bytes, and 4097 MiB is 2^32 + 2^20 bytes, which wraps to 1 MiB in 32 bits.
+BOOST_AUTO_TEST_CASE(queue_size_option_sets_byte_limit) {
+   constexpr uint64_t default_queue_size_mb = 1024;
+   {
+      test_node node(producer_args());
+      BOOST_CHECK_EQUAL(node.max_incoming_transaction_queue_size(), default_queue_size_mb * 1024 * 1024);
+   }
+   for (const uint16_t size_mb : {uint16_t{2048}, uint16_t{4097}, std::numeric_limits<uint16_t>::max()}) {
+      BOOST_TEST_CONTEXT("incoming-transaction-queue-size-mb " << size_mb) {
+         test_node node(producer_args({"--incoming-transaction-queue-size-mb", std::to_string(size_mb)}));
+         BOOST_CHECK_EQUAL(node.max_incoming_transaction_queue_size(), uint64_t{size_mb} * 1024 * 1024);
+      }
+   }
+}
+
+// An incoming-transaction-queue-size-mb outside 1 to 65535, from the command line or config.ini, fails initialization
+// with the configured value and the range in the error. A negative value is not read as its unsigned wraparound.
+BOOST_AUTO_TEST_CASE(out_of_range_queue_size_rejected) {
+   for (const std::string size_mb : {"0", "-1", "-65535", "65536"}) {
+      const std::string expected = "incoming-transaction-queue-size-mb " + size_mb + " must be between 1 and 65535 MiB";
+      BOOST_TEST_CONTEXT("command line " << size_mb) {
+         BOOST_CHECK_EXCEPTION(test_node(producer_args({"--incoming-transaction-queue-size-mb=" + size_mb})),
+                               plugin_config_exception, testing::fc_exception_message_contains(expected));
+      }
+      BOOST_TEST_CONTEXT("config.ini " << size_mb) {
+         BOOST_CHECK_EXCEPTION(test_node(producer_args(), "incoming-transaction-queue-size-mb = " + size_mb + "\n"),
+                               plugin_config_exception, testing::fc_exception_message_contains(expected));
+      }
+   }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

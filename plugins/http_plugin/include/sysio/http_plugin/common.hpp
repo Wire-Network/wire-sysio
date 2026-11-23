@@ -102,6 +102,8 @@ struct internal_url_handler {
    internal_url_handler_fn fn;
    api_category category;
    http_content_type content_type = http_content_type::json;
+   /// Whether the bytes-in-flight budget can refuse the handler's response.
+   http_response_policy response_policy = http_response_policy::budgeted;
 };
 /**
 * Helper method to calculate the "in flight" size of a fc::variant
@@ -137,18 +139,19 @@ static size_t in_flight_sizeof(const std::optional<T>& o) {
 // key -> priority, url_handler
 typedef map<string, detail::internal_url_handler> url_handlers_type;
 
-/// A request body has this long, plus its size at request_body_min_bytes_per_second, to arrive once its header is read.
-/// Past that the connection is closed, which releases the body's bytes_in_flight reservation: a stalled upload cannot
-/// hold its share of the budget for longer, while a slow one that keeps coming is not cut off.
-inline constexpr std::chrono::seconds request_body_read_allowance{10};
-/// The average rate, in bytes per second, a request body must at least keep up; see request_body_read_allowance.
-inline constexpr uint64_t request_body_min_bytes_per_second = 64 * 1024;
+/// A request body has this long, plus its size at transfer_min_bytes_per_second, to arrive once its header is read,
+/// and a response as long to be written once its write starts. Past that the connection is closed, which releases the
+/// bytes the transfer holds against bytes_in_flight: a stalled peer cannot hold its share of the budget for longer,
+/// while a slow one that keeps up is not cut off.
+inline constexpr std::chrono::seconds transfer_allowance{10};
+/// The average rate, in bytes per second, a request body or a response must at least keep up; see transfer_allowance.
+inline constexpr uint64_t transfer_min_bytes_per_second = 64 * 1024;
 
-/// The time a request body of `body_size` bytes has to arrive once its header is read; see request_body_read_allowance.
-inline std::chrono::microseconds request_body_read_timeout(size_t body_size) {
+/// The time a request body or a response of `size` bytes has to be transferred; see transfer_allowance.
+inline std::chrono::microseconds transfer_timeout(size_t size) {
    constexpr uint64_t microseconds_per_second = 1'000'000;
-   return request_body_read_allowance +
-          std::chrono::microseconds(body_size * microseconds_per_second / request_body_min_bytes_per_second);
+   return transfer_allowance +
+          std::chrono::microseconds(size * microseconds_per_second / transfer_min_bytes_per_second);
 }
 
 struct http_plugin_state {
@@ -192,20 +195,31 @@ struct http_plugin_state {
 *
 * @param plugin_state - plugin state object, shared state of http_plugin
 * @param session_ptr - beast_http_session object on which to invoke send_response
+* @param content_type - the content type of the handler that answers
+* @param response_policy - whether a 503 replaces a response that does not fit the bytes-in-flight budget
 * @return lambda suitable for url_response_callback
 */
-inline auto make_http_response_handler(http_plugin_state& plugin_state, detail::abstract_conn_ptr session_ptr, http_content_type content_type) {
-   return [&plugin_state,
-           session_ptr{std::move(session_ptr)}, content_type](int code, std::optional<fc::variant> response) mutable {
+inline auto make_http_response_handler(http_plugin_state& plugin_state, detail::abstract_conn_ptr session_ptr,
+                                       http_content_type content_type, http_response_policy response_policy) {
+   return [&plugin_state, session_ptr{std::move(session_ptr)}, content_type,
+           response_policy](int code, std::optional<fc::variant> response) mutable {
       auto payload_size = detail::in_flight_sizeof(response);
       plugin_state.bytes_in_flight += payload_size;
 
       // post back to an HTTP thread to allow the response handler to be called from any thread
       boost::asio::dispatch(plugin_state.thread_pool.get_executor(),
-                        [&plugin_state, session_ptr{std::move(session_ptr)}, code, payload_size, response = std::move(response), content_type]() {
+                        [&plugin_state, session_ptr{std::move(session_ptr)}, code, payload_size,
+                         response = std::move(response), content_type, response_policy]() {
                            auto on_exit = fc::make_scoped_exit([&](){plugin_state.bytes_in_flight -= payload_size;});
 
-                           if(auto error_str = session_ptr->verify_max_bytes_in_flight(0); !error_str.empty()) {
+                           // Why the budget refuses the response with `extra_bytes` more in flight; empty to send it.
+                           const auto refusal = [&](size_t extra_bytes) -> std::string {
+                              if (response_policy == http_response_policy::always_sent)
+                                 return {};
+                              return session_ptr->verify_max_bytes_in_flight(extra_bytes);
+                           };
+
+                           if(auto error_str = refusal(0); !error_str.empty()) {
                               session_ptr->send_busy_response(std::move(error_str));
                               return;
                            }
@@ -224,7 +238,7 @@ inline auto make_http_response_handler(http_plugin_state& plugin_state, detail::
                                  std::string json = plaintext_body
                                                        ? response->as_string()
                                                        : fc::json::to_string(*response, fc::time_point::maximum());
-                                 if (auto error_str = session_ptr->verify_max_bytes_in_flight(json.size()); error_str.empty())
+                                 if (auto error_str = refusal(json.size()); error_str.empty())
                                     session_ptr->send_response(std::move(json), code);
                                  else
                                     session_ptr->send_busy_response(std::move(error_str));

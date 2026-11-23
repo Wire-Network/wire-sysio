@@ -4,6 +4,7 @@
 #include <sysio/producer_plugin/round_block_status.hpp>
 #include <sysio/producer_plugin/subjective_exempt_db.hpp>
 #include <sysio/producer_plugin/trx_priority_db.hpp>
+#include <sysio/chain_plugin/mebibytes.hpp>
 #include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/plugin_interface.hpp>
 #include <sysio/chain/global_property_object.hpp>
@@ -29,6 +30,7 @@
 
 #include <cstdint>
 #include <iostream>
+#include <limits>
 #include <algorithm>
 #include <mutex>
 
@@ -94,6 +96,13 @@ using namespace sysio::chain;
 using namespace sysio::chain::plugin_interface;
 
 namespace {
+
+/// Option setting the byte limit, in MiB, of the incoming transaction queue.
+constexpr auto option_name_incoming_transaction_queue_size = "incoming-transaction-queue-size-mb";
+/// Default of incoming-transaction-queue-size-mb.
+constexpr int32_t default_incoming_transaction_queue_size_mb = 1024;
+/// Largest incoming-transaction-queue-size-mb accepted.
+constexpr uint64_t max_incoming_transaction_queue_size_mb = std::numeric_limits<uint16_t>::max();
 
 // track multiple failures on unapplied transactions
 class account_failures {
@@ -1316,15 +1325,17 @@ public:
          const auto  block_deadline = _pending_block_deadline;
          push_result pr             = push_transaction(block_deadline, trx, api_trx, return_failure_trace, trx_tracker, next);
 
-         if (pr.trx_exhausted) {
-            _unapplied_transactions.add_incoming(trx, api_trx, return_failure_trace, next);
-         }
-
+         // set before the re-queue, which throws tx_resource_exhaustion when the queue is full
          exhausted = pr.block_exhausted;
 
-         if ( !in_producing_mode() && pr.trx_exhausted )
-            exhausted = true;  // report transaction exhausted if trx was exhausted in non-producing mode (so we will restart
-                               // a speculative block to retry it immediately, instead of waiting to receive a new block)
+         if (pr.trx_exhausted) {
+            _unapplied_transactions.add_incoming(trx, api_trx, return_failure_trace, next);
+
+            // report transaction exhausted if trx was exhausted in non-producing mode (so we will restart a speculative
+            // block to retry it immediately, instead of waiting to receive a new block)
+            if (!in_producing_mode())
+               exhausted = true;
+         }
 
       } catch (const guard_exception& e) {
          chain_plugin::handle_guard_exception(e);
@@ -1510,7 +1521,8 @@ void producer_plugin::set_program_options(
           bpo::value<uint64_t>()->default_value( config::default_subjective_net_bytes ),
           "Sets the maximum allowed NET bytes, above account NET, that can be used by an authorizing account within "
           "subjective-account-decay-time-minutes")
-         ("incoming-transaction-queue-size-mb", bpo::value<uint16_t>()->default_value( 1024 ),
+         (option_name_incoming_transaction_queue_size,
+          bpo::value<int32_t>()->default_value(default_incoming_transaction_queue_size_mb),
           "Maximum size (in MiB) of the incoming transaction queue. Exceeding this value will subjectively drop transaction with resource exhaustion.")
          ("incoming-trx-max-signatures",
           bpo::value<uint32_t>()->default_value(chain::config::default_incoming_trx_max_signatures),
@@ -1651,12 +1663,9 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
 
    _max_reversible_blocks = options.at("max-reversible-blocks").as<uint32_t>();
 
-   auto max_incoming_transaction_queue_size = options.at("incoming-transaction-queue-size-mb").as<uint16_t>() * 1024 * 1024;
-
-   SYS_ASSERT(max_incoming_transaction_queue_size > 0, plugin_config_exception,
-              "incoming-transaction-queue-size-mb {} must be greater than 0", max_incoming_transaction_queue_size);
-
-   _unapplied_transactions.set_max_transaction_queue_size(max_incoming_transaction_queue_size);
+   _unapplied_transactions.set_max_transaction_queue_size(
+      checked_mebibytes(options.at(option_name_incoming_transaction_queue_size).as<int32_t>(),
+                        option_name_incoming_transaction_queue_size, max_incoming_transaction_queue_size_mb));
 
    chain.get_mutable_subjective_billing().set_subjective_account_cpu_allowed(fc::microseconds(options.at("subjective-account-cpu-allowed-us").as<int64_t>()));
    chain.get_mutable_subjective_billing().set_subjective_account_net_allowed(
@@ -2050,6 +2059,10 @@ producer_plugin::runtime_options producer_plugin::get_runtime_options() const {
 
 fc::microseconds producer_plugin::get_read_only_max_transaction_time() const {
    return my->_ro_max_trx_time_us;
+}
+
+uint64_t producer_plugin::get_max_incoming_transaction_queue_size() const {
+   return my->_unapplied_transactions.get_max_transaction_queue_size();
 }
 
 fc::time_point producer_plugin::get_read_only_window_deadline() const {
