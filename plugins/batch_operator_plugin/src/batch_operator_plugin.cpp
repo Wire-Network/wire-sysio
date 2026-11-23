@@ -22,6 +22,7 @@
 #include "async_action_completion.hpp"
 #include "group_election.hpp"
 #include "role_config.hpp"
+#include "synd_crank.hpp"
 #include "underwriter.hpp"
 #include "yield_cranks.hpp"
 
@@ -90,7 +91,7 @@ namespace {
    /// How long past the head block's time a pushed transaction stays valid.
    constexpr fc::microseconds PUSH_EXPIRATION = fc::seconds(30);
 
-   /// Work units of the `sysio.synd::crank` the underwriter pushes every pass.
+   /// Work units per `sysio.synd::crank`; the contract clamps its own work and examination budgets.
    constexpr uint32_t UNDERWRITER_CRANK_LIMIT = 16;
    /// Requests one `sysio.bond::prune` examines (at most sysio.bond's MAX_PRUNE_LIMIT), and envelopes one
    /// `sysio.synd::pruneenv` acts on.
@@ -99,8 +100,7 @@ namespace {
    constexpr fc::microseconds UNDERWRITER_HOUSEKEEPING_INTERVAL = fc::minutes(10);
    /// Spacing of the underwriter's rebuild of its outpost clients from `sysio.chains`.
    constexpr fc::microseconds UNDERWRITER_CLIENTS_INTERVAL = fc::minutes(1);
-   /// Spacing of the underwriter's crank while no envelope request is in play: a bucket refill or a cleared cord
-   /// still lets queued releases move.
+   /// Fallback spacing when no epoch, trace, accept/approve or outcome-sync trigger requests a crank.
    constexpr fc::microseconds UNDERWRITER_IDLE_CRANK_INTERVAL = fc::minutes(5);
    /// What a signer signs at startup to show that its signatures recover to its own key.
    constexpr std::string_view SIGNER_PROBE = "batch_operator_plugin signer probe";
@@ -322,7 +322,7 @@ struct batch_operator_plugin::impl {
    std::map<fc::slug_name, built_outpost_client> underwriter_clients;   ///< by outpost chain code
    fc::time_point                           underwriter_clients_at;   ///< last rebuild of `underwriter_clients`
    fc::time_point                           underwriter_housekeeping_at;   ///< last housekeeping
-   fc::time_point                           underwriter_cranked_at;   ///< last crank
+   uw::synd_crank_state                     underwriter_crank;
    /// The lowest `sysio.bond::requests` id the next pass reads (`underwriter::next_scan_start`); 0 reads them all.
    uw::request_id_t                         underwriter_scan_from = 0;
    /// Where the underwriter's prunes are in their walk of `sysio.bond::requests` (`underwriter::prune_sweep`).
@@ -1396,8 +1396,8 @@ struct batch_operator_plugin::impl {
    /**
     * One pass of the underwriter, run by its own cron job: bond each OPEN `sysio.synd` envelope request whose
     * envelope the outpost has confirmed, crank `sysio.synd`, then approve, claim and prune what it bonded.
-    * `underwriter::plan_actions` makes every decision; this reads its inputs and pushes its actions, all signed by
-    * `underwriter_signer`.
+    * `underwriter::plan_actions` plans underwriting actions and `synd_crank_state` schedules cranks. This reads
+    * their inputs and pushes their actions, all signed by `underwriter_signer`.
     *
     * Bonding is what releases an envelope's syndications, so a request is bonded only when its outpost authenticates
     * its digest directly or authenticates a later WIRE-accepted checkpoint covering its accepted envelope, within
@@ -1434,6 +1434,8 @@ struct batch_operator_plugin::impl {
       if (!tokens) return;
       std::optional<uw::plan_inputs> in = read_underwriter_state(*tokens, head_time);
       if (!in || shutting_down) return;
+      const std::optional<uint32_t> current_epoch = read_underwriter_epoch();
+      if (shutting_down) return;
       uw::remember_bonded(underwriter_bonded, in->bonds, in->requests);
       if (underwriter_forfeits.note(uw::forfeited_requests(in->requests, underwriter_bonded))) {
          elog("batch_operator: underwriter stops bonding until the node is restarted: request {} was ruled INVALID "
@@ -1453,7 +1455,10 @@ struct batch_operator_plugin::impl {
       const uw::plan plan = uw::plan_actions(*in);
       underwriter_pending_accepts = plan.pending_accepts;
       report_plan(*in, plan);
-      push_plan(plan, uw::synd_has_work(in->requests), now);
+      const fc::time_point crank_now = fc::time_point::now();
+      const bool crank_due = underwriter_crank.due(plan, in->requests, current_epoch, crank_now,
+                                                   UNDERWRITER_IDLE_CRANK_INTERVAL);
+      push_plan(plan, crank_due, current_epoch, crank_now);
       underwriter_scan_from = uw::next_scan_start(underwriter_scan_from, in->requests, in->bonds, underwriter_bonded,
                                                 underwriter_pending_accepts);
 
@@ -1504,10 +1509,11 @@ struct batch_operator_plugin::impl {
    /// callback.
    /// `submitted_until` is set once queued, even if acceptance later times out or fails.
    bool underwriter_push(const char* contract, const char* action, const fc::variant_object& data,
-                          std::optional<fc::time_point_sec>* submitted_until = nullptr) {
+                          std::optional<fc::time_point_sec>* submitted_until = nullptr,
+                          std::shared_ptr<batch_operator_detail::async_action_completion>* completion = nullptr) {
       if (shutting_down) return false;
       try {
-         return push_action(contract, action, *underwriter_signer, data, submitted_until);
+         return push_action(contract, action, *underwriter_signer, data, submitted_until, completion);
       } catch (const fc::exception& e) {
          wlog("batch_operator: underwriter {}::{}: {}", contract, action, e.to_string());
       } catch (const std::exception& e) {
@@ -1519,8 +1525,10 @@ struct batch_operator_plugin::impl {
    /// Push what the plan decided: accepts first, so their releases start this pass, then the crank, approves and
    /// claims. Reserve each submitted accept until the irreversible view accounts for it or its transaction expires;
    /// a partial accept leaves the request OPEN, so the contract cannot refuse a repeated contribution for us.
-   /// `synd_busy` says `sysio.synd` has an envelope request in play or an outcome to acknowledge.
-   void push_plan(const uw::plan& plan, bool synd_busy, fc::time_point now) {
+   /// `crank_due` includes epoch changes, prior inline work, accepts/approvals, outcome synchronization and idle
+   /// recovery. Keep the decision's clock even when accepts wait for their delivery callbacks.
+   void push_plan(const uw::plan& plan, bool crank_due, std::optional<uint32_t> current_epoch,
+                    fc::time_point crank_now) {
       for (const uw::accept_action& accept : plan.accepts) {
          std::optional<fc::time_point_sec> submitted_until;
          const bool accepted = underwriter_push(uw::bond::account, uw::bond::action_accept,
@@ -1535,12 +1543,11 @@ struct batch_operator_plugin::impl {
                  accept.amount.to_string());
          }
       }
-      // One crank moves a bounded amount of work. Every pass while synd is busy; otherwise now and then, for what a
-      // bucket refill or a cleared cord lets through.
-      if (synd_busy || now - underwriter_cranked_at >= UNDERWRITER_IDLE_CRANK_INTERVAL) {
-         underwriter_cranked_at = now;
+      if (crank_due) {
+         underwriter_crank.note(current_epoch, crank_now);
          underwriter_push(uw::synd::account, uw::synd::action_crank,
-                          fc::mutable_variant_object()(uw::synd::field::limit, UNDERWRITER_CRANK_LIMIT));
+                          fc::mutable_variant_object()(uw::synd::field::limit, UNDERWRITER_CRANK_LIMIT), nullptr,
+                          &underwriter_crank.completion);
       }
       for (const uw::request_id_t id : plan.approves) {
          underwriter_push(uw::bond::account, uw::bond::action_approve,
@@ -1683,6 +1690,26 @@ struct batch_operator_plugin::impl {
       if (!frozen) return std::nullopt;
       in.frozen = *frozen;
       return in;
+   }
+
+   /// One bounded singleton read. Before bootstrap the contract uses epoch zero; read failures omit this trigger.
+   std::optional<uint32_t> read_underwriter_epoch() {
+      try {
+         sysio::chain_apis::read_only::get_table_rows_params state;
+         state.code = chain::name(epoch::account);
+         state.scope = epoch::account;
+         state.table = epoch::table_epochstate;
+         state.limit = SINGLETON_ROW_LIMIT;
+         state.values_only = true;
+         const std::optional<sysio::chain_apis::read_only::get_table_rows_result> epoch_rows =
+            read_table_checked(std::move(state));
+         if (!epoch_rows) return std::nullopt;
+         if (epoch_rows->rows.empty()) return 0;
+         return epoch_rows->rows.front().get_object()[epoch::field::current_epoch_index].as<uint32_t>();
+      } catch (const fc::exception& error) {
+         elog("batch_operator: underwriter cannot read depot epoch: {}", error.top_message());
+         return std::nullopt;
+      }
    }
 
    /// The symbol of every token a request can be bonded in: each `sysio.liq` shadow, and WIRE.
@@ -2011,8 +2038,10 @@ struct batch_operator_plugin::impl {
                     const std::string& action_name,
                     const signer& by,
                     const fc::variant_object& data,
-                    std::optional<fc::time_point_sec>* submitted_until = nullptr) {
+                    std::optional<fc::time_point_sec>* submitted_until = nullptr,
+                    std::shared_ptr<batch_operator_detail::async_action_completion>* result = nullptr) {
       if (submitted_until) submitted_until->reset();
+      if (result) result->reset();
       if (shutting_down) return false;
       const fc::time_point deadline = fc::time_point::now() + delivery_timeout;
       const bool           on_main  = std::this_thread::get_id() == app().executor().get_main_thread_id();
@@ -2050,6 +2079,7 @@ struct batch_operator_plugin::impl {
          packed_var);
       std::shared_ptr<batch_operator_detail::async_action_completion> completion =
          std::make_shared<batch_operator_detail::async_action_completion>();
+      if (result) *result = completion;
       std::future<void> future = completion->get_future();
       if (submitted_until) *submitted_until = expiration;
       if (on_main) {
