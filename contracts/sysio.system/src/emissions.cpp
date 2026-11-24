@@ -51,6 +51,9 @@ constexpr int64_t  MS_PER_SECOND          = 1000;
 // Basis-point denominator for all category / sub-split ratios.
 constexpr int64_t  BPS_DENOMINATOR        = 10000;
 
+// Duty units each member of the on-duty group earns for one consensus epoch served.
+constexpr uint32_t DUTY_UNITS_PER_EPOCH   = 1;
+
 constexpr sysio::name GOVERNANCE_ACCOUNT         = "sysio.gov"_n;
 // Capex ("capital expenditure") bucket lives on sysio.ops -- operational spend.
 constexpr sysio::name CAPEX_OPERATIONS_ACCOUNT   = "sysio.ops"_n;
@@ -307,6 +310,30 @@ uint32_t step_settlement(name self, duty_state& duty, t5_state& state) {
 
    if (walked_to_end) finish_settlement(self, duty, state);
    return static_cast<uint32_t>(due.size());
+}
+
+// Credit `units` duty units to `member` in the open period. A member still holding units of the settling
+// period is paid them first, at that period's rate; a row of a period that closed without a settlement is
+// dropped. `state` is t5state when it exists (a settlement exists only then). Never throws.
+void credit_duty(name self, duty_state& duty, std::optional<t5_state>& state, batchduty_t& rows, name member,
+                 uint32_t units) {
+   std::optional<batch_duty> row = rows.try_get(batch_duty_key{member.value});
+   if (row && row->period != duty.open_period) {
+      // Units from a closed period wait only for the settling one; pay them out first.
+      if (duty.settling() && row->period == duty.settling_period && state) {
+         const int64_t paid = settle_duty_row(self, duty, rows, *row);
+         state->unsettled_batch_emission -= paid;
+         state->total_distributed        += paid;
+      } else {
+         rows.erase(batch_duty_key{member.value});
+      }
+      row.reset();
+   }
+
+   batch_duty updated = row.value_or(batch_duty{.account_name = member, .period = duty.open_period});
+   updated.units = saturating_add(updated.units, units);
+   rows.set(self, batch_duty_key{member.value}, updated);
+   duty.open_units += units;
 }
 
 // Erase up to `budget` `batchduty` rows of periods that closed without a settlement (duty but no batch
@@ -707,9 +734,16 @@ void system_contract::accrueepoch(uint32_t epoch_index, int64_t per_epoch_emissi
 // rcrdduty - credit one duty unit to each member of the group that served
 // consensus epoch `epoch_index`. Runs inline from sysio.epoch::advance, so it
 // never throws: a member holding units of the settling period is settled at
-// that period's rate before its new unit opens a row in the open period.
+// that period's rate before its new unit opens a row in the open period. While
+// the grid is in an economic epoch not yet opened, the units are parked under it.
 void system_contract::rcrdduty(uint32_t /*epoch_index*/, std::vector<sysio::name> members) {
    require_auth(epoch_refs::account);
+
+   const uint32_t unopened = sysio::epoch::unopened_economic_epoch_at(current_time_point());
+   if (unopened != 0) {
+      for (const auto& member : members) park_work(get_self(), unopened, member, 0, DUTY_UNITS_PER_EPOCH);
+      return;
+   }
 
    dutystate_t duty_tbl(get_self());
    auto duty = duty_tbl.get_or_default(duty_state{});
@@ -718,28 +752,53 @@ void system_contract::rcrdduty(uint32_t /*epoch_index*/, std::vector<sysio::name
    std::optional<t5_state> state = t5s.exists() ? std::optional<t5_state>{t5s.get()} : std::nullopt;
 
    batchduty_t rows(get_self());
-   for (const auto& member : members) {
-      auto row = rows.try_get(batch_duty_key{member.value});
-      if (row && row->period != duty.open_period) {
-         // Units from a closed period wait only for the settling one; pay them out first.
-         if (duty.settling() && row->period == duty.settling_period && state) {
-            const int64_t paid = settle_duty_row(get_self(), duty, rows, *row);
-            state->unsettled_batch_emission -= paid;
-            state->total_distributed        += paid;
-         } else {
-            rows.erase(batch_duty_key{member.value});
-         }
-         row.reset();
-      }
-
-      batch_duty updated = row.value_or(batch_duty{.account_name = member, .period = duty.open_period});
-      updated.units += 1;
-      rows.set(get_self(), batch_duty_key{member.value}, updated);
-      duty.open_units += 1;
-   }
+   for (const auto& member : members) credit_duty(get_self(), duty, state, rows, member, DUTY_UNITS_PER_EPOCH);
 
    duty_tbl.set(duty, get_self());
    if (state) t5s.set(*state, get_self());
+}
+
+// creditwork - credit the work parked under economic epochs up to `epoch_index` to the open pay period,
+// oldest epoch first, at most MAX_PARKED_WORK_ROWS rows. Inline from sysio.epoch::tickeconomy after the
+// epoch's payout, so the work joins the period after it.
+void system_contract::creditwork(uint32_t epoch_index) {
+   require_auth(epoch_refs::account);
+
+   // Snapshot the rows first: crediting erases them, and the walk must not hold an iterator across that.
+   parkedwork_t parked(get_self());
+   std::vector<parked_work> due;
+   due.reserve(MAX_PARKED_WORK_ROWS);
+   for (auto it = parked.begin();
+        it != parked.end() && it->economic_epoch <= epoch_index && due.size() < MAX_PARKED_WORK_ROWS; ++it) {
+      due.push_back(*it);
+   }
+   if (due.empty()) return;
+
+   dutystate_t duty_tbl(get_self());
+   auto duty = duty_tbl.get_or_default(duty_state{});
+   t5state_t t5s(get_self());
+   std::optional<t5_state> state = t5s.exists() ? std::optional<t5_state>{t5s.get()} : std::nullopt;
+   batchduty_t rows(get_self());
+   bool duty_credited = false;
+
+   for (const auto& work : due) {
+      const producer_key_t producer_key{work.account_name.value};
+      if (work.blocks > 0 && _producers.contains(producer_key)) {
+         _producers.modify(same_payer, producer_key, [&](auto& p) {
+            p.unpaid_blocks = saturating_add(p.unpaid_blocks, work.blocks);
+         });
+      }
+      if (work.units > 0) {
+         credit_duty(get_self(), duty, state, rows, work.account_name, work.units);
+         duty_credited = true;
+      }
+      parked.erase(parked_work_key{work.economic_epoch, work.account_name.value});
+   }
+
+   if (duty_credited) {
+      duty_tbl.set(duty, get_self());
+      if (state) t5s.set(*state, get_self());
+   }
 }
 
 // settleduty - one bounded step of the open batch-duty settlement, then pruning of obsolete duty rows
@@ -848,8 +907,9 @@ void system_contract::payepoch(uint32_t epoch_index, int64_t period_emission) {
    // block `onblock` counted for it: every block it made, at most one round per rotation. A missed
    // block is never counted, so its pay stays in the treasury: it does not flow to the producers
    // that did show up, because the rate does not depend on who did. The divisor is the period's
-   // nominal slot count, raised to the blocks counted when a period runs long (late economic cranks
-   // count a later epoch's blocks into an earlier payout), so the slice is never exceeded.
+   // nominal slot count, raised to the blocks counted when carried blocks push the count past it,
+   // so the slice is never exceeded. Blocks made after the period's boundary are parked under their
+   // own economic epoch until this payout has run, so a late crank pays the same blocks.
    //
    // Standbys (positions 22..cfg.standby_end_rank) draw a retainer from the standby slice
    // (cfg.standby_bps of the pool). Each POSITION holds a fixed share, decaying linearly from
@@ -950,8 +1010,8 @@ void system_contract::payepoch(uint32_t epoch_index, int64_t period_emission) {
          }
       }
 
-      // `nominal_slots` is the period's entitlement; `produced_blocks` raises it when a period ran
-      // long, so no producer's rate exceeds its slice.
+      // `nominal_slots` is the period's entitlement; `produced_blocks` raises it when carried blocks
+      // exceed it, so no producer's rate exceeds its slice.
       //
       // Carried blocks are NOT subtracted back out. A row whose pay rounds to zero keeps its blocks
       // (that promise is what makes the model forfeiture-free) and they are counted again in the

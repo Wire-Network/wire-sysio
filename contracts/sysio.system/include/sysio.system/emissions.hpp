@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <limits>
 
 // Core emissions tables owned by sysio.system. This header is intentionally
 // free of OPP / protobuf dependencies so that downstream contracts (notably
@@ -41,6 +42,10 @@ inline constexpr uint16_t MAX_PAY_CADENCE_EPOCHS = 10;
 /// `settleduty` and inside `rcrdduty` -- however many operators served in the settling period; a
 /// larger roster settles across several economic epochs.
 inline constexpr uint32_t MAX_DUTY_SETTLEMENT_ROWS = 50;
+
+/// `parkedwork` rows one `creditwork` credits. Covers a full producer schedule (21) and the largest batch
+/// operator window (56) working in one economic epoch; rows past it are credited at the next tick.
+inline constexpr uint32_t MAX_PARKED_WORK_ROWS = 100;
 
 // ---------------------------------------------------------------------------
 // Emission configuration (set via setemitcfg action)
@@ -294,9 +299,10 @@ inline int64_t spendable_wire(int64_t balance, const pay_claim_total& claims, co
 
 // ---------------------------------------------------------------------------
 // Batch-operator duty. Each consensus epoch close credits one duty unit to every member of the
-// group that was on duty (rcrdduty); each payepoch closes the open pay period and splits its batch
-// pool pro rata to those units. Settlement walks `batchduty` in bounded steps, so the number of
-// operators that served in a period bounds no single transaction.
+// group that was on duty (rcrdduty, or creditwork for units parked under an unopened economic
+// epoch); each payepoch closes the open pay period and splits its batch pool pro rata to those
+// units. Settlement walks `batchduty` in bounded steps, so the number of operators that served in
+// a period bounds no single transaction.
 // ---------------------------------------------------------------------------
 
 struct batch_duty_key {
@@ -344,6 +350,53 @@ struct [[sysio::table("dutystate"), sysio::contract("sysio.system")]] duty_state
 };
 
 using dutystate_t = sysio::kv::global<"dutystate"_n, duty_state>;
+
+// ---------------------------------------------------------------------------
+// Work parked for its economic epoch. Producer blocks (`onblock`) and batch duty (`rcrdduty`) recorded
+// while the grid is in an economic epoch `sysio.epoch::tickeconomy` has not opened yet belong to that
+// epoch, not to the pay period still open: they wait here, and the tick opening the epoch credits them
+// (`creditwork`) after its own payout. A late crank therefore pays every period exactly the work done
+// in it, as an on-time crank does. Empty while the crank keeps up, apart from the work recorded between
+// a boundary and its tick.
+// ---------------------------------------------------------------------------
+
+/// `parkedwork` key: rows ordered by economic epoch, then account.
+struct parked_work_key {
+   uint64_t economic_epoch;
+   uint64_t account_name;
+   SYSLIB_SERIALIZE(parked_work_key, (economic_epoch)(account_name))
+};
+
+/// One account's work in one economic epoch not yet opened when the work was recorded.
+struct [[sysio::table("parkedwork"), sysio::contract("sysio.system")]] parked_work {
+   uint32_t    economic_epoch = 0;   ///< the grid epoch the work was done in
+   sysio::name account_name;
+   uint32_t    blocks = 0;           ///< producer blocks `onblock` counted
+   uint32_t    units  = 0;           ///< batch-duty units `rcrdduty` recorded
+
+   SYSLIB_SERIALIZE(parked_work, (economic_epoch)(account_name)(blocks)(units))
+};
+
+using parkedwork_t = sysio::kv::table<"parkedwork"_n, parked_work_key, parked_work>;
+
+/// `a + b`, saturating at the uint32 maximum: work counters are credited on paths that must not throw.
+inline uint32_t saturating_add(uint32_t a, uint32_t b) {
+   constexpr uint32_t max = std::numeric_limits<uint32_t>::max();
+   return b > max - a ? max : a + b;
+}
+
+/// Park `blocks` producer blocks and `units` duty units of `account`'s work in economic epoch `economic_epoch`,
+/// which sysio.epoch::tickeconomy has not opened yet; `creditwork` credits them once it has. Billed to `self`.
+/// Never throws.
+inline void park_work(sysio::name self, uint32_t economic_epoch, sysio::name account, uint32_t blocks, uint32_t units) {
+   parkedwork_t parked(self);
+   const parked_work_key key{economic_epoch, account.value};
+   parked_work row =
+      parked.try_get(key).value_or(parked_work{.economic_epoch = economic_epoch, .account_name = account});
+   row.blocks = saturating_add(row.blocks, blocks);
+   row.units  = saturating_add(row.units, units);
+   parked.set(self, key, row);
+}
 
 // ---------------------------------------------------------------------------
 // Per-economic-epoch derivations from annual config + the canonical economic epoch_duration_sec.
@@ -397,8 +450,8 @@ inline int64_t net_headroom(const emission_config& cfg, const t5_state& state) {
 }
 
 /// Whether the next accrual is one of the first pay period's scheduled epochs, which accrue the initial emission: no
-/// payout has run, and the last epoch accrued, if any, was not yet that period's pay epoch. A first payout held or
-/// deferred past its pay epoch therefore decays from then on, as it would have after paying.
+/// payout has run, and the last epoch accrued, if any, was not yet that period's pay epoch. A first payout held past
+/// its pay epoch therefore decays from then on, as it would have after paying.
 inline bool in_initial_emission_window(const emission_config& cfg, const t5_state& state) {
    if (state.epoch_count != 0) return false;
    if (state.last_epoch_index == 0) return true;

@@ -49,6 +49,7 @@ constexpr name ACCRUE_EPOCH  = "accrueepoch"_n;
 constexpr name PAY_EPOCH     = "payepoch"_n;
 constexpr name SETTLE_DUTY   = "settleduty"_n;
 constexpr name RECORD_DUTY   = "rcrdduty"_n;
+constexpr name CREDIT_WORK   = "creditwork"_n;
 } // namespace system_actions
 
 /// Action identifiers owned by sysio.chalg and invoked by epoch close.
@@ -85,9 +86,6 @@ struct emissions_gate_result {
    bool                  accrue             = false; ///< accrueepoch runs for this economic epoch
    bool                  pay                = false; ///< payepoch runs for this economic epoch
    bool                  is_pay_epoch       = false; ///< the open pay period has reached its cadence
-   /// A pay epoch ticked while a later boundary has already passed: the payout waits for the tick that catches up.
-   /// Not a block: the blocklog is left as it is.
-   bool                  deferred           = false;
    /// This epoch's share, sized on the net headroom. May be 0 when accruing: the open pay period has emission
    /// pending, and either it has committed the rest of the budget or the curve is zero.
    int64_t               emission_amount    = 0;
@@ -105,12 +103,11 @@ struct emissions_gate_result {
    int64_t attempted_emission() const { return is_pay_epoch ? period_emission : emission_amount; }
 };
 
-/// Decide what economic epoch `target_epoch`'s emissions may do. `crank_behind` is true when a later economic boundary
-/// has already passed. Never throws.
+/// Decide what economic epoch `target_epoch`'s emissions may do. Never throws.
 ///
 /// `epoch_duration_sec` is the canonical economic duration from sysio.epoch::economycfg, passed by
 /// tickeconomy so this gate and sysio.system see identical inputs.
-emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec, uint32_t target_epoch, bool crank_behind) {
+emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec, uint32_t target_epoch) {
    emissions_gate_result r;
 
    sysiosystem::emissions::emitcfg_t emit_cfg_tbl(SYSTEM_ACCOUNT);
@@ -146,16 +143,11 @@ emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec, uint32_
    // t5s.period_start_epoch = 0, so the first period covers economic epochs 1..(pay_cadence - 1) (one short,
    // since 0 is the clock's pre-start index). A payout the balance could not cover stays open past its cadence
    // and fires at the first economic epoch that can pay it.
+   //
+   // A catch-up tick pays like an on-time one: work recorded after this epoch's boundary waits in sysio.system's
+   // parkedwork until the tick opening its own epoch, so the payout sees only the period's own blocks and duty.
    r.is_pay_epoch = (target_epoch >= t5s.period_start_epoch + cfg.pay_cadence_epochs - 1);
    if (!r.is_pay_epoch) return r;
-
-   // While the crank catches up, the payout waits for the tick that reaches the grid: one payout then pairs the pools
-   // of every period it covers with the blocks and duty earned across them. Paying each period as its tick ran would
-   // credit all the work since the last payout to the first period's pools and leave the later periods none.
-   if (crank_behind) {
-      r.deferred = true;
-      return r;
-   }
 
    // Same saturating accumulation as sysio.system::accrueepoch (shared helper in emissions.hpp) so the gate's
    // period total exactly matches what accrueepoch will store and payepoch will assert against.
@@ -978,13 +970,22 @@ void epoch::seteconomy(uint32_t epoch_duration_sec, sysio::time_point_sec start_
 
    // The grid is anchored at start_time: once an economic epoch has opened, moving the anchor would
    // re-date every epoch already accrued.
+   //
+   // While a boundary has passed without its tick, withdrawals and parked work are already dated by the
+   // boundaries still to be ticked, so the grid may not change until the crank is current. Once it is,
+   // the next boundary is fixed and a new duration spaces only the boundaries after it, so a grid index
+   // never moves earlier in time. A grid not yet started may still be started in the past.
    economycfg_t cfg_tbl(get_self());
    if (cfg_tbl.exists()) {
+      const economic_config current = cfg_tbl.get();
       economystate_t state_tbl(get_self());
       if (state_tbl.exists() && state_tbl.get().current_epoch_index > 0) {
-         check(start_time == cfg_tbl.get().start_time,
+         check(start_time == current.start_time,
                "economic start_time is fixed once the economic clock has started");
       }
+      const bool changes = epoch_duration_sec != current.epoch_duration_sec || start_time != current.start_time;
+      check(!changes || unopened_economic_epoch_at(current_time_point()) == 0,
+            "economic clock is behind: tick every passed boundary before changing it");
    }
 
    // The emissions pay-period accumulation bound (see emissions.hpp) depends on the economic
@@ -1033,12 +1034,11 @@ void epoch::tickeconomy(uint32_t epoch_index) {
       : state.next_epoch_start;
    check(current_time_point() >= boundary, "economic epoch boundary has not passed");
 
-   const bool crank_behind = economic_epoch_index_at(current_time_point()) > epoch_index;
-   const auto gate         = check_emissions_ready(cfg.epoch_duration_sec, epoch_index, crank_behind);
+   const auto gate = check_emissions_ready(cfg.epoch_duration_sec, epoch_index);
    if (gate.blocked()) {
       sysio::print_f("epoch::tickeconomy: economic epoch %u emissions held -- see blocklog\n", epoch_index);
       record_gate_block(get_self(), epoch_index, gate);
-   } else if (!gate.deferred) {
+   } else {
       clear_gate_block(get_self());
    }
 
@@ -1074,14 +1074,21 @@ void epoch::tickeconomy(uint32_t epoch_index) {
       ).send();
    }
 
-   // One bounded step of any batch-duty settlement still open, every economic epoch. Settlements
-   // only exist once initt5 has run.
+   // One bounded step of any batch-duty settlement still open, every economic epoch, then the work
+   // recorded in this epoch before this tick opened it joins the open pay period, after this epoch's
+   // payout. Settlements and parked work only exist once initt5 has run.
    if (sysiosystem::emissions::t5state_t(SYSTEM_ACCOUNT).exists()) {
       action(
          permission_level{get_self(), "owner"_n},
          SYSTEM_ACCOUNT,
          system_actions::SETTLE_DUTY,
          std::make_tuple()
+      ).send();
+      action(
+         permission_level{get_self(), "owner"_n},
+         SYSTEM_ACCOUNT,
+         system_actions::CREDIT_WORK,
+         std::make_tuple(epoch_index)
       ).send();
    }
 }

@@ -1,7 +1,9 @@
 #include <sysio.system/sysio.system.hpp>
 #include <sysio.system/block_utils.hpp>
+#include <sysio.system/emissions.hpp>
 #include <sysio.system/producer_score.hpp>
 #include <sysio.token/sysio.token.hpp>
+#include <sysio.epoch/sysio.epoch.hpp>
 
 #include <algorithm>
 #include <limits>
@@ -22,6 +24,9 @@ namespace sysiosystem {
       static_assert( uint64_t{blocks_per_round} * sysio::block_timestamp::block_interval_ms
                         % milliseconds_per_second == 0,
                      "a round must last a whole number of seconds" );
+
+      /// Blocks one counted block adds to its producer's pay count.
+      constexpr uint32_t blocks_per_counted_block = 1;
    }
 
    void system_contract::onblock( ignore<block_header> ) {
@@ -51,10 +56,18 @@ namespace sysiosystem {
       // Seniority is credited for the same counted rounds: the scheduled time since the previously
       // counted one, at most a rotation. The round index comes from this producer's own block, so a
       // late successor takes nothing away, and a second round in one rotation is never counted.
+      //
+      // A block made in an economic epoch the economic clock has not opened yet belongs to that epoch,
+      // not to the pay period still open: it is parked and joins the count when the tick opening the
+      // epoch has paid the periods before it. Nothing is parked before T5 exists, as nothing is paid.
       auto key = producer_key_t{producer.value};
       if ( _producers.contains(key) ) {
+         const uint32_t unopened = emissions::t5state_t( get_self() ).exists()
+            ? sysio::epoch::unopened_economic_epoch_at( current_time_point() )
+            : 0;
          const uint32_t round = timestamp.slot / blocks_per_round;
          bool seniority_moved = false;
+         bool counted         = false;
          _producers.modify( same_payer, key, [&]( auto& p ) {
             if( p.last_paid_round != round ) {
                const uint32_t rotation =
@@ -76,8 +89,12 @@ namespace sysiosystem {
                }
                p.last_paid_round = round;
             }
-            p.unpaid_blocks++;
+            counted = true;
+            if( unopened == 0 ) p.unpaid_blocks += blocks_per_counted_block;
          });
+         if( counted && unopened != 0 ) {
+            emissions::park_work( get_self(), unopened, producer, blocks_per_counted_block, 0 );
+         }
          // The score reads seniority in whole hours, so only an hour crossed costs a rescore.
          if( seniority_moved ) rescore_producer( producer );
       }

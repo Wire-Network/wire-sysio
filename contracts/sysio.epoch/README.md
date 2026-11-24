@@ -38,7 +38,7 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
 | Action | Auth | Description |
 |--------|------|-------------|
 | `setconfig` | `sysio.epoch` | Set the consensus epoch configuration. Requires `operators_per_epoch * batch_op_groups == batch_operator_minimum_active` and enforces the outposts' limits (`MAX_OPERATORS_PER_EPOCH` 7, Ethereum's group size; `MAX_BATCH_OP_GROUPS` 8, Solana's group count), so the window holds at most `MAX_SCHEDULED_BATCH_OPERATORS` (56) |
-| `seteconomy` | `sysio.epoch` | Set the economic clock's duration and grid start. The start is fixed once the clock has ticked; it is re-validated against `sysio.system`'s pay-period accrual bound |
+| `seteconomy` | `sysio.epoch` | Set the economic clock's duration and grid start. The grid may start in the past, but no change is accepted while a boundary has passed without its tick; the start is fixed once the clock has ticked, and a new duration spaces only the boundaries after the next one, so a grid index never moves earlier in time. Re-validated against `sysio.system`'s pay-period accrual bound |
 | `schbatchgps` | `sysio.epoch` | Build the initial window from the `ACTIVE` batch operators on `sysio.opreg` (non-bootstrapped first, then bootstrapped, trimmed to `batch_operator_minimum_active`) |
 | `advance` | permissionless at genesis (epoch 0 → 1); afterwards `sysio.msgch` or `sysio.epoch` | Advance the consensus epoch once its wall-clock boundary has passed and the contract is not paused |
 | `tickeconomy` | permissionless | Open economic epoch `epoch_index`: refused unless it is the next index, its grid boundary has passed, and the consensus genesis advance has run |
@@ -70,7 +70,10 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
 3. `sysio.opreg::flushwtdw` matures queued collateral withdrawals whose economic wait and consensus
    guard have both passed.
 4. `sysio.system::accrueepoch`, plus `payepoch` on pay epochs, then `settleduty` (one bounded step of
-   any open batch-duty settlement, skipped until `initt5` has run).
+   any open batch-duty settlement) and `creditwork` (the blocks and duty recorded in this epoch before
+   the tick opened it join the open pay period), both skipped until `initt5` has run. A catch-up tick
+   pays its period exactly as an on-time one: work done after the period's boundary is parked until
+   its own epoch's tick.
 
 ## Dependencies
 
@@ -78,5 +81,5 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
   opened by the batch operators' `tickeconomy` crank
 - Reads operators from `sysio.opreg`, authex links from `sysio.authex`, outposts from `sysio.chains`
 - Calls `sysio.chalg::slashop`, `sysio.opreg::{recorddel,termcheck,flushwtdw}`,
-  `sysio.msgch::{queueout,buildenv}` and `sysio.system::{rcrdduty,accrueepoch,payepoch,settleduty}`
+  `sysio.msgch::{queueout,buildenv}` and `sysio.system::{rcrdduty,accrueepoch,payepoch,settleduty,creditwork}`
 - Pause/unpause controlled by `sysio.chalg`

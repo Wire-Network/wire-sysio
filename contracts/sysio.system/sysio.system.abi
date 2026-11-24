@@ -357,6 +357,16 @@
             ]
         },
         {
+            "name": "creditwork",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
             "name": "deleteauth",
             "base": "",
             "fields": [
@@ -948,6 +958,42 @@
                 {
                     "name": "header",
                     "type": "block_header"
+                }
+            ]
+        },
+        {
+            "name": "parked_work",
+            "base": "",
+            "fields": [
+                {
+                    "name": "economic_epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "account_name",
+                    "type": "name"
+                },
+                {
+                    "name": "blocks",
+                    "type": "uint32"
+                },
+                {
+                    "name": "units",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "parked_work_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "economic_epoch",
+                    "type": "uint64"
+                },
+                {
+                    "name": "account_name",
+                    "type": "uint64"
                 }
             ]
         },
@@ -2068,6 +2114,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "creditwork",
+            "type": "creditwork",
+            "ricardian_contract": ""
+        },
+        {
             "name": "deleteauth",
             "type": "deleteauth",
             "ricardian_contract": ""
@@ -2447,6 +2498,14 @@
             "key_names": ["account_name"],
             "key_types": ["uint64"],
             "table_id": 49260
+        },
+        {
+            "name": "parkedwork",
+            "type": "parked_work",
+            "index_type": "i64",
+            "key_names": ["economic_epoch","account_name"],
+            "key_types": ["uint64","uint64"],
+            "table_id": 10521
         },
         {
             "name": "payclaims",

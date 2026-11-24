@@ -182,7 +182,9 @@ namespace sysiosystem {
       /// Blocks counted and not yet paid -- the ONE pay input. `payepoch` credits every block at
       /// the period's per-block rate and zeroes the count of every producer it pays; a block the
       /// producer's slot did not deliver is simply never counted, so its pay stays in the treasury.
-      /// At most one round per rotation is counted; see `last_paid_round`.
+      /// At most one round per rotation is counted; see `last_paid_round`. A block made in an
+      /// economic epoch the economic clock has not opened yet is parked (`parkedwork`) and joins
+      /// this count when the tick opening that epoch has paid the periods before it.
       /// The count SURVIVES a park, a demotion, a lost key, or a termination: a producer that is not
       /// schedulable at a payepoch is neither paid nor reset, and whatever was counted is paid at the
       /// first payepoch where it is schedulable again (never, for a slashed one).
@@ -800,8 +802,9 @@ namespace sysiosystem {
          /**
           * Credit one duty unit to each of `members`, the batch-operator group that served
           * consensus epoch `epoch_index`. A member still holding units of the settling period is
-          * settled first. Called inline by sysio.epoch::advance; never throws.
-          * Auth: require_auth("sysio.epoch").
+          * settled first. While the economic epoch the grid is in has not been opened by
+          * sysio.epoch::tickeconomy, the units are parked under it instead (see `parkedwork`).
+          * Called inline by sysio.epoch::advance; never throws. Auth: require_auth("sysio.epoch").
           */
          [[sysio::action]]
          void rcrdduty(uint32_t epoch_index, std::vector<sysio::name> members);
@@ -813,6 +816,16 @@ namespace sysiosystem {
           */
          [[sysio::action]]
          void settleduty();
+
+         /**
+          * Credit the work parked under economic epochs up to `epoch_index` to the open pay period:
+          * blocks to their producers' `unpaid_blocks`, duty units as `rcrdduty` credits them.
+          * At most MAX_PARKED_WORK_ROWS rows, oldest epoch first; the rest wait for the next tick.
+          * Called inline by sysio.epoch::tickeconomy after the epoch's payout; never throws.
+          * Auth: require_auth("sysio.epoch").
+          */
+         [[sysio::action]]
+         void creditwork(uint32_t epoch_index);
 
          /**
           * Read-only: current T5 treasury emission state.

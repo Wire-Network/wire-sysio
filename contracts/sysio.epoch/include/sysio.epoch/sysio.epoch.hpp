@@ -36,15 +36,18 @@ namespace sysio {
       void finishadv(uint32_t epoch_index);
 
       /// Set the economic clock (privileged): the duration of one economic epoch and the time its grid
-      /// starts. `start_time` may lie in the past -- the clock then catches up through the elapsed
-      /// epochs once it starts -- and is fixed once the clock has ticked.
+      /// starts. The grid may start in the past -- the clock then catches up through the elapsed epochs
+      /// once it starts -- but no change is accepted while a boundary has passed without its tick. The
+      /// start is fixed once the clock has ticked, and a new duration spaces only the boundaries after
+      /// the next one.
       [[sysio::action]]
       void seteconomy(uint32_t epoch_duration_sec, sysio::time_point_sec start_time);
 
       /// Open economic epoch `epoch_index` (permissionless crank). Refused unless `epoch_index` is the
       /// next index, its grid boundary has passed, and the consensus genesis advance has run. Never
       /// waits on outpost consensus. Runs the emissions gate, then matures withdrawals, accrues the
-      /// epoch's emission share, pays on a pay epoch, and steps the batch-duty settlement.
+      /// epoch's emission share, pays on a pay epoch, steps the batch-duty settlement, and credits the
+      /// work recorded in the epoch before this tick opened it.
       [[sysio::action]]
       void tickeconomy(uint32_t epoch_index);
 
@@ -194,15 +197,26 @@ namespace sysio {
       /// The economic epoch the grid is in at `now`: the last one whose boundary has passed, counting
       /// boundaries `tickeconomy` has not yet processed. Equals `current_economic_epoch_index()` while
       /// the crank keeps up. 0 before the first boundary or when the clock is not configured. Never throws.
+      ///
+      /// `seteconomy` refuses a change while a boundary has passed without its tick, so a boundary never
+      /// moves once passed or scheduled, and the index only grows with time.
       static uint32_t economic_epoch_index_at(time_point now) {
          economycfg_t cfg_tbl(EPOCH_ACCOUNT);
          if (!cfg_tbl.exists()) return 0;
-         const economic_config cfg   = cfg_tbl.get();
-         const economic_state  state = economystate_t(EPOCH_ACCOUNT).get_or_default(economic_state{});
-         const time_point next = state.current_epoch_index == 0 ? time_point{cfg.start_time} : state.next_epoch_start;
-         if (now < next) return state.current_epoch_index;
-         const int64_t duration_us = static_cast<int64_t>(cfg.epoch_duration_sec) * 1'000'000;
-         return state.current_epoch_index + 1 + static_cast<uint32_t>((now - next).count() / duration_us);
+         return grid_index_at(cfg_tbl.get(), economystate_t(EPOCH_ACCOUNT).get_or_default(economic_state{}), now);
+      }
+
+      /// The economic epoch the grid is in at `now` when `tickeconomy` has not opened it yet, else 0. Work
+      /// recorded at `now` belongs to that epoch, so sysio.system holds it until the tick opening the epoch
+      /// has paid every period before it. 0 while the crank is current, before the first boundary, or when
+      /// the clock is not configured. Never throws.
+      static uint32_t unopened_economic_epoch_at(time_point now) {
+         const economic_state state = economystate_t(EPOCH_ACCOUNT).get_or_default(economic_state{});
+         if (state.current_epoch_index > 0 && now < state.next_epoch_start) return 0;
+         economycfg_t cfg_tbl(EPOCH_ACCOUNT);
+         if (!cfg_tbl.exists()) return 0;
+         const uint32_t index = grid_index_at(cfg_tbl.get(), state, now);
+         return index > state.current_epoch_index ? index : 0;
       }
 
       /// Bounds on the consensus `epoch_duration_sec`. The floor keeps an epoch longer than the
@@ -237,6 +251,15 @@ namespace sysio {
       static constexpr uint32_t MAX_SCHEDULED_BATCH_OPERATORS = MAX_BATCH_OP_GROUPS * MAX_OPERATORS_PER_EPOCH;
 
    private:
+
+      /// The grid index at `now` for a configured clock: the opened epoch until its next boundary, then one
+      /// more per elapsed duration. Before the first tick the next boundary is `start_time`.
+      static uint32_t grid_index_at(const economic_config& cfg, const economic_state& state, time_point now) {
+         const time_point next = state.current_epoch_index == 0 ? time_point{cfg.start_time} : state.next_epoch_start;
+         if (now < next) return state.current_epoch_index;
+         const int64_t duration_us = static_cast<int64_t>(cfg.epoch_duration_sec) * 1'000'000;
+         return state.current_epoch_index + 1 + static_cast<uint32_t>((now - next).count() / duration_us);
+      }
 
       // Namespace alias for OPP protobuf enum types
       using OperatorType   = sysio::opp::types::OperatorType;

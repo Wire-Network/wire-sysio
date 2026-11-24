@@ -43,7 +43,7 @@ public:
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH, epoch_ser, EPOCH, "setconfig"_n, mvo()
          ("epoch_duration_sec", EPOCH_DURATION_SEC)("operators_per_epoch", 7)("batch_operator_minimum_active", 21)
          ("batch_op_groups", 3)("epoch_retention_envelope_log_count", 1000)));
-      BOOST_REQUIRE_EQUAL(success(), anchor_economy());
+      BOOST_REQUIRE_EQUAL(success(), configure_economy(unanchored_start()));
       const auto emission = mvo()
          ("t1_allocation", 0)("t2_allocation", 0)("t3_allocation", 0)
          ("t1_duration", 1)("t2_duration", 1)("t3_duration", 1)("min_claimable", 0)
@@ -226,10 +226,20 @@ public:
       write_global("t5state"_n, "t5_state", state);
       write_global("payclaimtot"_n, "pay_claim_total", mvo()("outstanding", claims));
    }
-   /// Start the economic grid at the head block time. Allowed until the first economic tick.
-   action_result anchor_economy() {
+   /// How far ahead the fixture starts the economic grid, so no boundary passes before the first tick anchors it.
+   static constexpr uint32_t UNANCHORED_ECONOMIC_START_SEC = 10u * 365u * 24u * 60u * 60u;
+   /// A grid start no fixture wait reaches.
+   fc::time_point_sec unanchored_start() {
+      return fc::time_point_sec(control->head().block_time() + fc::seconds(UNANCHORED_ECONOMIC_START_SEC));
+   }
+   /// Configure the economic clock to start its grid at `start`.
+   action_result configure_economy(fc::time_point_sec start) {
       return push(EPOCH, epoch_ser, EPOCH, "seteconomy"_n, mvo()
-         ("epoch_duration_sec", EPOCH_DURATION_SEC)("start_time", fc::time_point_sec(control->head().block_time())));
+         ("epoch_duration_sec", EPOCH_DURATION_SEC)("start_time", start));
+   }
+   /// Start the economic grid at the head block time. Allowed while no boundary has passed without its tick.
+   action_result anchor_economy() {
+      return configure_economy(fc::time_point_sec(control->head().block_time()));
    }
    /// Open consensus genesis, then tick economic epoch 1 on a grid anchored at this tick, so the fixture's waits do
    /// not leave the crank behind. With `pay_cadence_epochs == 1` it is a pay epoch, so the emissions gate either pays
