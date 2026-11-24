@@ -2323,7 +2323,14 @@
             "index_type": "i64",
             "key_names": ["account_name"],
             "key_types": ["uint64"],
-            "table_id": 63846
+            "table_id": 63846,
+            "secondary_indexes": [
+                {
+                    "name": "byperiod",
+                    "key_type": "uint128",
+                    "table_id": 52253
+                }
+            ]
         },
         {
             "name": "blockinfo",

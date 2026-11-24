@@ -2697,6 +2697,89 @@ BOOST_FIXTURE_TEST_CASE( duty_settlement_spans_economic_epochs_and_reserves_its_
    BOOST_REQUIRE_EQUAL(success(), settleduty());
 } FC_LOG_AND_RETHROW()
 
+BOOST_FIXTURE_TEST_CASE( duty_rows_of_a_period_without_a_pool_are_pruned, sysio_emissions_tester ) try {
+   // A period that closes with duty but no batch pool opens no settlement, so its rows are obsolete. A
+   // later settlement walks only its own period's rows, and settleduty erases the obsolete ones in
+   // bounded steps.
+   constexpr uint32_t stale_count     = MAX_DUTY_SETTLEMENT_ROWS + 10;
+   constexpr int64_t  tiny_emission   = 1;
+   constexpr int64_t  period_emission = 1'000'000'000;
+   vector<name> stale;
+   for (uint64_t value = 1; value <= stale_count; ++value) stale.emplace_back(value);
+   const vector<name> serving{ name{uint64_t{stale_count} + 1} };
+   create_t5_holding_accounts();
+   BOOST_REQUIRE_EQUAL(success(), setemitcfg_defaults(config::system_account_name));
+   BOOST_REQUIRE_EQUAL(success(), initt5(config::system_account_name));
+
+   const int64_t tiny_compute = test_split_bps(tiny_emission, COMPUTE_BPS);
+   BOOST_REQUIRE_EQUAL(int64_t(0), tiny_compute - test_split_bps(tiny_compute, PRODUCER_BPS));
+   BOOST_REQUIRE_EQUAL(success(), rcrdduty(1, stale));
+   BOOST_REQUIRE_EQUAL(success(), accrue(1, tiny_emission));
+   BOOST_REQUIRE_EQUAL(success(), pay(1, tiny_emission));
+   BOOST_REQUIRE_EQUAL(0u, get_duty_state()["settling_period"].as<uint32_t>());
+   BOOST_REQUIRE(!get_batch_duty(stale.front()).is_null());
+
+   // Period 2's settlement walks its one row and finishes in payepoch's first step.
+   BOOST_REQUIRE_EQUAL(success(), rcrdduty(2, serving));
+   BOOST_REQUIRE_EQUAL(success(), accrue(2, period_emission));
+   BOOST_REQUIRE_EQUAL(success(), pay(2, period_emission));
+   BOOST_REQUIRE_EQUAL(0u, get_duty_state()["settling_period"].as<uint32_t>());
+   BOOST_REQUIRE(get_batch_duty(serving.front()).is_null());
+   BOOST_REQUIRE(get_epoch_log(2)["batch_settled"].as_bool());
+
+   BOOST_REQUIRE_EQUAL(success(), settleduty());
+   BOOST_REQUIRE(get_batch_duty(stale.front()).is_null());
+   BOOST_REQUIRE(!get_batch_duty(stale.back()).is_null());
+   produce_blocks(1);
+   BOOST_REQUIRE_EQUAL(success(), settleduty());
+   BOOST_REQUIRE(get_batch_duty(stale.back()).is_null());
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( claimnodedis_reserves_batch_emission_still_settling, sysio_emissions_tester ) try {
+   // A settlement left open across economic epochs still owes its pool to the period's operators, so a
+   // node-owner claim between settlement steps may spend only what is left beyond it.
+   constexpr uint32_t operators = MAX_DUTY_SETTLEMENT_ROWS + 10;
+   constexpr int64_t period_emission = 1'000'000'000;
+   const account_name owner = "nodesettle"_n;
+   vector<name> members;
+   for (uint64_t value = 1; value <= operators; ++value) members.emplace_back(value);
+   create_t5_holding_accounts();
+   create_user_accounts({ owner, "settledrain"_n });
+   BOOST_REQUIRE_EQUAL(success(), setemitcfg_defaults(config::system_account_name));
+   BOOST_REQUIRE_EQUAL(success(), setinittime(config::system_account_name, tpsec(head_secs() - (T1_DURATION + 10))));
+   BOOST_REQUIRE_EQUAL(success(), addnodeowner(ROA, owner, 1));
+   BOOST_REQUIRE_EQUAL(success(), initt5(config::system_account_name));
+   BOOST_REQUIRE_EQUAL(success(), rcrdduty(1, members));
+   BOOST_REQUIRE_EQUAL(success(), accrue(1, period_emission));
+   BOOST_REQUIRE_EQUAL(success(), pay(1, period_emission));
+
+   const int64_t unsettled = get_t5_state()["unsettled_batch_emission"].as<int64_t>();
+   BOOST_REQUIRE_GT(unsettled, 0);
+   const int64_t claimable = viewnodedist(owner).claimable.get_amount();
+   BOOST_REQUIRE_GT(claimable, 0);
+
+   // Leave the treasury one unit short of the settling pool, the outstanding pay and this claim.
+   const int64_t balance = get_wire_balance(config::system_account_name).get_amount();
+   const int64_t target  = unsettled + pay_outstanding_total() + claimable - 1;
+   BOOST_REQUIRE_GT(balance, target);
+   base_tester::push_action(TOKEN, "transfer"_n,
+      vector<permission_level>{{ config::system_account_name, "active"_n }},
+      mvo()("from", config::system_account_name)("to", "settledrain"_n)
+           ("quantity", asset(balance - target, WIRE_SYMBOL))("memo", "leave one short"));
+   produce_blocks(1);
+
+   require_substr(claimnodedis(owner, owner), "treasury balance is reserved against owed epoch pay");
+   BOOST_REQUIRE_EQUAL(get_wire_balance(config::system_account_name).get_amount(), target);
+
+   base_tester::push_action(TOKEN, "transfer"_n,
+      vector<permission_level>{{ "settledrain"_n, "active"_n }},
+      mvo()("from", "settledrain"_n)("to", config::system_account_name)
+           ("quantity", asset(1, WIRE_SYMBOL))("memo", "one unit of headroom"));
+   produce_blocks(1);
+   BOOST_REQUIRE_EQUAL(success(), claimnodedis(owner, owner));
+   BOOST_REQUIRE_EQUAL(get_wire_balance(owner).get_amount(), claimable);
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( payepoch_waits_while_a_settlement_is_open, sysio_emissions_tester ) try {
    // Each period settles at its own rate, so a payout cannot open a second settlement: it steps the
    // open one and, if that is still not done, leaves its period pending for a later economic epoch.
@@ -4745,7 +4828,7 @@ BOOST_FIXTURE_TEST_CASE( claimnodedis_reserves_outstanding_epoch_pay, sysio_emis
    // nothing is spent: the outstanding pay is still fully backed.
    auto blocked = claimnodedis( "noderesv"_n, "noderesv"_n );
    BOOST_REQUIRE( blocked != success() );
-   require_substr( blocked, "treasury balance is reserved against unclaimed epoch pay" );
+   require_substr( blocked, "treasury balance is reserved against owed epoch pay" );
    BOOST_REQUIRE_EQUAL( get_wire_balance(config::system_account_name).get_amount(), target );
    BOOST_REQUIRE_EQUAL( pay_outstanding_total(), outstanding );
 

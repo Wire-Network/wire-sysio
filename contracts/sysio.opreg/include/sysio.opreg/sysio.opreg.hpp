@@ -459,8 +459,11 @@ namespace sysio {
          sysio::slug_name   chain_code;
          sysio::slug_name   token_code;
          uint64_t          amount              = 0;
+         /// requested_at_economic_epoch + WITHDRAW_WAIT_ECONOMIC_EPOCHS
          uint32_t          eligible_at_economic_epoch  = 0;
-         uint32_t          eligible_at_consensus_epoch = 0;
+         uint32_t          eligible_at_consensus_epoch = 0; ///< consensus index at the request + WITHDRAW_WAIT_EPOCHS
+         /// The economic epoch the grid was in at the request (`sysio.epoch::economic_epoch_index_at`), which
+         /// can be ahead of the last epoch ticked.
          uint32_t          requested_at_economic_epoch = 0;
 
          /// Composite (account, chain_code, token_code) for available() rollup.

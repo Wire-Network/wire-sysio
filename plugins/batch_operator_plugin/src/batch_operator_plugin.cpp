@@ -685,10 +685,22 @@ struct batch_operator_plugin::impl {
     * suspends the election while the clock must keep running. Every ACTIVE operator pushes the due
     * epochs; the contract opens each one once and refuses the rest, so a redundant push costs only
     * its refusal. Nothing is pushed before the consensus genesis advance, which the contract requires.
+    * The consensus index is read here rather than taken from `current_epoch`, which the election poll
+    * does not record while consensus is paused. The catch-up stops at the first push that is refused
+    * or times out, so one poll waits on at most one failed tick.
     */
    void crank_economic_clock() {
       using namespace batch_operator_detail;
-      if (current_epoch == 0) return;
+      sysio::chain_apis::read_only::get_table_rows_params consensus;
+      consensus.code        = chain::name(epoch::account);
+      consensus.scope       = epoch::account;
+      consensus.table       = epoch::table_epochstate;
+      consensus.limit       = SINGLETON_ROW_LIMIT;
+      consensus.values_only = true;
+      const auto consensus_rows = read_table_checked(std::move(consensus));
+      if (!consensus_rows || consensus_rows->rows.empty() || !consensus_rows->rows.front().is_object()) return;
+      const uint32_t consensus_epoch_index = static_cast<uint32_t>(
+         consensus_rows->rows.front().get_object()[epoch::field::current_epoch_index].as_uint64());
 
       sysio::chain_apis::read_only::get_table_rows_params config;
       config.code        = chain::name(economy::account);
@@ -713,10 +725,15 @@ struct batch_operator_plugin::impl {
          config_rows->rows.front().get_object(), has_state ? &state_rows->rows.front().get_object() : nullptr);
       if (!clock) return;
 
-      for (const uint32_t epoch_index : economic_epochs_due(*clock, fc::time_point::now(), economy::ticks_per_poll)) {
+      for (const uint32_t epoch_index :
+           economic_epochs_due(*clock, consensus_epoch_index, fc::time_point::now(), economy::ticks_per_poll)) {
          try {
-            push_action(economy::account, economy::action_tickeconomy, *relay_signer,
-                        fc::mutable_variant_object()(economy::field::epoch_index, epoch_index));
+            // A later index cannot open before this one, so a refused or timed-out push ends the
+            // catch-up; the next poll re-reads the clock.
+            if (!push_action(economy::account, economy::action_tickeconomy, *relay_signer,
+                             fc::mutable_variant_object()(economy::field::epoch_index, epoch_index))) {
+               break;
+            }
          } catch (const fc::exception& e) {
             // Expected-transient: another operator opened the epoch first.
             dlog("batch_operator: tickeconomy({}): {}", epoch_index, e.to_string());

@@ -160,11 +160,8 @@ emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec, uint32_
    // the gate authorize a period the treasury cannot cover, and a later claimpay would fail on overdraw.
    // `sysio_balance` is reported to the blocklog as this SPENDABLE amount, the one a shortfall is measured against.
    sysiosystem::emissions::payclaimtot_t claim_tot_tbl(SYSTEM_ACCOUNT);
-   const __int128 reserved =
-      static_cast<__int128>(claim_tot_tbl.get_or_default(sysiosystem::emissions::pay_claim_total{}).outstanding)
-      + t5s.unsettled_batch_emission;
-   const __int128 spendable = static_cast<__int128>(r.sysio_balance) - reserved;
-   r.sysio_balance = spendable > 0 ? static_cast<int64_t>(spendable) : 0;
+   r.sysio_balance = sysiosystem::emissions::spendable_wire(
+      r.sysio_balance, claim_tot_tbl.get_or_default(sysiosystem::emissions::pay_claim_total{}), t5s);
 
    if (r.sysio_balance < r.period_emission) {
       r.reason = opp::types::EMISSIONS_BLOCK_REASON_BALANCE_INSUFFICIENT;
