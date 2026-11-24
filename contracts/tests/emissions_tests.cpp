@@ -1287,8 +1287,8 @@ public:
    // called, so no duty accrues and the batch-op share stays in the treasury
    // (what we want in producer-focused tests).
    //
-   // Sets BOTH clocks to `epoch_duration_sec` (the contract minimum, 60 s, by
-   // default): the consensus epoch via setconfig and the economic clock via
+   // Sets BOTH clocks to `epoch_duration_sec` (by default 60 s, the economic
+   // clock's minimum): the consensus epoch via setconfig and the economic clock via
    // seteconomy, its grid starting at the head block time. Tests cross a boundary
    // by produce_blocks(120).
    action_result init_epoch_state(uint32_t epoch_duration_sec = 60,

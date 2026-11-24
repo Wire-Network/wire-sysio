@@ -31,8 +31,7 @@ namespace sysio {
     *    truth); the outpost owns the
     *    chain-native ↔ depot-frame conversion at its boundary.
     *
-    * ## Lifecycle (unified bootstrap + post-bootstrap, per
-    * /data/shared/code/wire/.claude/rules/epoch-duration-global.md):
+    * ## Lifecycle (unified bootstrap + post-bootstrap):
     *
     *  * `regtoken` / `regchaintoken`: priv-gated. Before the network
     *    genesis (bootstrap window) sets `active=true` inline; else

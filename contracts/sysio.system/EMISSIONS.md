@@ -7,7 +7,7 @@ through a claim action. All amounts are `WIRE` (9-decimal subunits).
 
 Every "epoch" on this page is an **economic epoch** of `sysio.epoch`'s economic
 clock (`economycfg`): a fixed wall-clock grid that never waits on outpost
-consensus. The OPP consensus epoch only feeds batch-operator duty.
+consensus. Each outpost chain's OPP consensus epoch only feeds batch-operator duty.
 
 ## Per-epoch flow
 
@@ -22,11 +22,11 @@ consensus. The OPP consensus epoch only feeds batch-operator duty.
 - Every economic epoch then calls `settleduty`, one bounded step of any open
   settlement.
 
-Separately, every consensus epoch close (`sysio.epoch::advance`, one outpost chain)
+Separately, every consensus epoch close of an outpost chain (`sysio.epoch::advance`)
 calls `rcrdduty`, crediting each member of the group that served it with the
-epoch's scheduled length in seat-seconds. Both clocks
-skip the duty actions until `initt5` has run: nothing can be paid before then,
-and consensus must not depend on `sysio.system`.
+epoch's scheduled length in seat-seconds. Both clocks skip the duty actions
+until `initt5` has run: nothing can be paid before then, and consensus must not
+depend on `sysio.system`.
 
 A start time in the past makes the clock catch up, one epoch per tick, through
 the elapsed grid. Epochs before launch accrue their curve share, but nobody

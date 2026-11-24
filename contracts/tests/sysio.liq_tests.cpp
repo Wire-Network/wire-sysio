@@ -435,7 +435,7 @@ BOOST_FIXTURE_TEST_CASE(a_freeze_admits_transfers_into_custody_and_refuses_the_r
 // A yield pool registered after the bootstrap window
 // ---------------------------------------------------------------------------
 
-// A shadow opened after epoch 0 gets its pool from shadow sysio already holds and WIRE the treasury has
+// A shadow opened after the network genesis gets its pool from shadow sysio already holds and WIRE the treasury has
 // not reserved: regliqpool mints nothing, fails without either, and the yield that waited in liqpending
 // queues once the pool exists.
 BOOST_FIXTURE_TEST_CASE(a_pool_registered_after_the_bootstrap_window_is_seeded_from_held_shadow,

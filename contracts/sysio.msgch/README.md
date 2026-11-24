@@ -7,7 +7,7 @@ Inbound/outbound OPP message chain management and consensus tracking contract.
 - Accepts inbound OPP envelopes delivered by the batch operators of the active group, one delivery per
   operator per outpost per epoch (`MAX_ENVELOPE_BYTES` = 32,768; larger deliveries are rejected)
 - Evaluates consensus per (outpost, epoch): every eligible operator delivers an identical envelope
-  (fast path), or a strict majority of the group agrees once the epoch boundary has passed. A
+  (fast path), or a strict majority of the group agrees once the chain's epoch boundary has passed. A
   post-boundary split with no strict majority opens a `sysio.chalg` dispute
 - Validates the per-outpost envelope chain and message sequence, stores the accepted messages and
   attestations, and routes each attestation to its depot handler
@@ -20,7 +20,7 @@ Inbound/outbound OPP message chain management and consensus tracking contract.
 
 | Table | Type | Description |
 |-------|------|-------------|
-| `envelopes` | `kv::table` | Inbound deliveries, one row per batch operator per outpost per epoch (working state, pruned to the current and previous epoch) |
+| `envelopes` | `kv::table` | Inbound deliveries, one row per batch operator per outpost per epoch (working state, pruned per outpost to its current and previous epoch) |
 | `messages` | `kv::table` | Individual OPP messages extracted from consensus-verified envelopes |
 | `attestations` | `kv::table` | Attestations extracted inbound, and outbound attestations queued (`READY`) for envelope packing. The `byqueue` index orders them by outpost, status and lane |
 | `outqueue` | `kv::table` | Per-outpost count of queued general-lane attestations, capped at `MAX_QUEUED_ATTESTATIONS` |
@@ -57,14 +57,15 @@ Inbound (outpost → depot):
 
 Outbound (depot → outpost), queued through `queueout`:
 
-- `OPERATORS` and `BATCH_OPERATOR_GROUPS` from `sysio.epoch::advance`, to every active outpost. They
-  form the schedule lane, which ships first and which the queue cap never refuses.
+- `OPERATORS` and `BATCH_OPERATOR_GROUPS` from `sysio.epoch::advance(chain)`, to that chain's outpost.
+  They form the schedule lane, which ships first and which the queue cap never refuses.
 - `DESYNDICATE_LIQ` from `sysio.synd::desyndicate`. A full queue refuses it, and the whole
   `desyndicate` reverts.
 
 ## Dependencies
 
-- Reads epoch state from `sysio.epoch` and operator status from `sysio.opreg`
+- Reads each chain's epoch state from `sysio.epoch`, and operator status and served chains from
+  `sysio.opreg`
 - Opens disputes on `sysio.chalg` (`opendispute`); `sysio.chalg::chkdispute` calls back into `resolvedisp`
 - Triggers `sysio.epoch::advance` from `chkcons` (and from `bootstrap` / `bootchain` at a chain's genesis)
 - Routes inbound attestations to `sysio.synd` and `sysio.roa`; node-owner linking can indirectly sweep funded DClaim imports

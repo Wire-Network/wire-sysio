@@ -809,7 +809,7 @@ public:
 
       for (const auto& a : assets) {
          const auto sym = symbol::from_string(std::string("9,") + a.token);
-         // Registered inside the epoch-0 bootstrap window, so the rows land ACTIVE.
+         // Registered before the network genesis (the bootstrap window), so the rows land ACTIVE.
          BOOST_REQUIRE_EQUAL(success(), push_contract(CHAINS_ACCOUNT, chains_abi_ser, CHAINS_ACCOUNT,
             shadow_action::regchain, mvo()
             ("kind", a.kind)("code", codename_mvo(a.chain))

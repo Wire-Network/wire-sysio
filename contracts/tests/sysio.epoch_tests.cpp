@@ -456,6 +456,46 @@ BOOST_FIXTURE_TEST_CASE(setconfig_is_per_chain, sysio_epoch_tester) { try {
    BOOST_REQUIRE_EQUAL(50u, sol["epoch_retention_envelope_log_count"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
+/// Each chain's `setconfig` bounds its own duration to 10 s .. 30 days, both inclusive. A refused duration
+/// stores nothing on a new chain and leaves a configured chain's row, and the other chain's, as they were. A chain
+/// at the floor runs 10 s epochs.
+BOOST_FIXTURE_TEST_CASE(setconfig_bounds_the_epoch_duration_per_chain, sysio_epoch_tester) { try {
+   constexpr uint32_t kFloorSec        = 10;
+   constexpr uint32_t kCeilingSec      = 30u * 24u * 60u * 60u;
+   constexpr uint32_t kBlocksPerSecond = 2;
+   const action_result below_floor =
+      error("assertion failure with message: epoch_duration_sec must be >= MIN_EPOCH_DURATION_SEC");
+   const action_result above_ceiling =
+      error("assertion failure with message: epoch_duration_sec exceeds 30-day ceiling");
+   const auto duration_of = [&](std::string_view chain) {
+      return get_epoch_config(chain)["epoch_duration_sec"].as<uint32_t>();
+   };
+
+   BOOST_REQUIRE_EQUAL(below_floor, setconfig(kFloorSec - 1, 7, 21, 3, 200, ETH));
+   BOOST_REQUIRE(get_epoch_config(ETH).is_null());
+   BOOST_REQUIRE_EQUAL(above_ceiling, setconfig(kCeilingSec + 1, 7, 21, 3, 200, SOL));
+   BOOST_REQUIRE(get_epoch_config(SOL).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), setconfig(kFloorSec, 7, 21, 3, 200, ETH));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(kCeilingSec, 7, 21, 3, 200, SOL));
+   BOOST_REQUIRE_EQUAL(kFloorSec, duration_of(ETH));
+   BOOST_REQUIRE_EQUAL(kCeilingSec, duration_of(SOL));
+
+   BOOST_REQUIRE_EQUAL(below_floor, setconfig(kFloorSec - 1, 7, 21, 3, 200, SOL));
+   BOOST_REQUIRE_EQUAL(above_ceiling, setconfig(kCeilingSec + 1, 7, 21, 3, 200, ETH));
+   BOOST_REQUIRE_EQUAL(kFloorSec, duration_of(ETH));
+   BOOST_REQUIRE_EQUAL(kCeilingSec, duration_of(SOL));
+
+   BOOST_REQUIRE_EQUAL(success(), advance(ETH));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(int64_t{kFloorSec}, epoch_length_sec(ETH));
+   produce_blocks(kFloorSec * kBlocksPerSecond + 1);
+   BOOST_REQUIRE_EQUAL(success(), advance(ETH));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(2u, get_epoch_state(ETH)["current_epoch_index"].as<uint32_t>());
+   BOOST_REQUIRE_EQUAL(int64_t{kFloorSec}, epoch_length_sec(ETH));
+} FC_LOG_AND_RETHROW() }
+
 /// Two chains run their own counters on their own durations: a chain advances on its own boundary,
 /// and a paused chain holds only itself.
 BOOST_FIXTURE_TEST_CASE(chains_advance_on_their_own_cadence, sysio_epoch_tester) { try {

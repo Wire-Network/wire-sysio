@@ -8,7 +8,8 @@ OPP envelope dispute resolution and slash-execution contract.
   consensus rules in `sysio.msgch` see a post-boundary no-strict-majority split for one
   (outpost, epoch): a two-version split only after every eligible operator has delivered, or a
   three-or-more-version split even when eligible operators are silent.
-- Pauses epoch advancement while a dispute is open and releases it on resolution
+- Pauses the disputed chain's epoch advancement while its dispute is open and releases it on
+  resolution; other chains keep advancing
 - Dispatches the winning envelope (via `sysio.msgch::resolvedisp`) once a checksum wins
 - Executes slashing of operators through `sysio.opreg` -- the single slashing chokepoint that holds
   `opreg::slash` authority

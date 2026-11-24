@@ -81,7 +81,7 @@ namespace {
    /// discovered at startup — keeps `epoch_tick` viable so a cold-sync node
    /// that finds outposts later still responds.
    constexpr std::size_t MIN_CRON_THREADS = 5;
-   /// Inbound plus outbound cron entries for each active outpost.
+   /// Inbound plus outbound cron entries for each relayed outpost.
    constexpr std::size_t OPP_CRON_JOBS_PER_OUTPOST = 2;
    /// The plugin-wide epoch polling cron entry.
    constexpr std::size_t EPOCH_TICK_CRON_JOBS = 1;

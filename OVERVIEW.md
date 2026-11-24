@@ -27,7 +27,7 @@ Envelope (one per outpost per epoch, per direction)
 
 ### Key Concepts
 
-- **Epochs**: Time-bounded intervals managed by `sysio.epoch` — one global consensus epoch clock for every chain. Each epoch has one group of batch operators on duty as relayers.
+- **Epochs**: Time-bounded intervals managed by `sysio.epoch` — each outpost chain runs its own consensus epoch, with its own counter, duration (10 s .. 30 days, default 360 s) and batch-operator schedule. Each epoch of a chain has one group of the batch operators serving that chain on duty as relayers.
 - **Economic epochs**: A separate wall-clock grid on `sysio.epoch` that drives emissions, withdrawal maturity and producer pay. It never waits on outpost consensus.
 - **Envelopes**: Epoch-level containers. Each envelope carries the epoch index and timestamp, its route endpoints, and `previous_envelope_hash` — the digest of the previous envelope on the same (depot, outpost) stream — so each direction forms a hash chain. An envelope is capped at 32,768 bytes on every chain.
 - **Messages**: Individual cross-chain payloads containing a header (message ID, sequence, checksum, encoding flags) and a payload (an array of attestation entries).
@@ -49,15 +49,15 @@ This allows a single unified message format across all supported chains.
 ### Inbound (External Chain → Wire)
 
 1. A user action on an external chain (e.g. syndicating liqETH into the Ethereum `SyndicationPool`) queues a protobuf-encoded attestation in the outpost's outbound buffer, which the outpost seals into its envelope for the epoch.
-2. Every batch operator in the active group independently reads that envelope through its chain-specific client plugin (`outpost_ethereum_client_plugin`, `outpost_solana_client_plugin`).
+2. Every batch operator in the outpost's active group independently reads that envelope through its chain-specific client plugin (`outpost_ethereum_client_plugin`, `outpost_solana_client_plugin`).
 3. Each operator delivers the envelope to Wire's `sysio.msgch` contract via the `deliver()` action.
-4. `sysio.msgch` evaluates consensus: every eligible operator delivering an identical envelope is accepted immediately; otherwise a strict majority is accepted once the epoch boundary has passed. A split with no strict majority opens a `sysio.chalg` dispute.
+4. `sysio.msgch` evaluates consensus: every eligible operator delivering an identical envelope is accepted immediately; otherwise a strict majority is accepted once the chain's epoch boundary has passed. A split with no strict majority opens a `sysio.chalg` dispute.
 5. Attestations are extracted, validated, and routed to the appropriate system contract handlers.
 
 ### Outbound (Wire → External Chain)
 
 1. System contracts queue attestations for a target outpost via `sysio.msgch::queueout()`. Once an outpost has 512 non-roster attestations waiting, `queueout` refuses another.
-2. When the epoch advances, `buildenv()` packs the outpost's `READY` attestations, rosters first, into a protobuf-encoded outbound envelope of at most 32,768 bytes and 64 attestations; the rest stays queued for the next epoch.
+2. When the outpost's epoch advances, `buildenv()` packs the outpost's `READY` attestations, rosters first, into a protobuf-encoded outbound envelope of at most 32,768 bytes and 64 attestations; the rest stays queued for the next epoch.
 3. Batch operators read the outbound envelope and submit it to the target chain's Outpost — chunked on both chains (`OPPInbound.epochIn` on Ethereum, `epoch_in` on Solana).
 4. The Outpost verifies the envelope chain and group consensus, then routes attestations to their registered handlers. An unhandled type is skipped, never reverted.
 
@@ -82,12 +82,12 @@ Cross-chain swaps routed through outposts, outpost reserves and outpost-side ope
 Elected via Appointed Proof of Stake (APoS). They validate transactions and produce blocks on the Wire blockchain — the standard Antelope producer role. Producers register with `sysio.opreg` and post depot-native collateral there.
 
 ### Batch Operators
-Operators scheduled in groups of `operators_per_epoch` (default 21 operators in 3 groups of 7); one group is on duty per epoch, and the schedule slides forward every epoch. They run the `batch_operator_plugin` and are responsible for:
-- Reading each outpost's outbound envelope and delivering it to `sysio.msgch`
-- Relaying the depot's outbound envelopes to each outpost
-- Cranking the depot: `sysio.msgch::chkcons` (epoch advance), `sysio.epoch::tickeconomy` (economic clock), `sysio.chalg::chkdispute`, `sysio.swap::tickyield`, `sysio.liq::queueyield`, `sysio.kicker::kick`
+Operators that choose the outpost chains they serve (`sysio.opreg::joinchain` / `leavechain`). Each chain seats groups of `operators_per_epoch` from the operators serving it (default 21 operators in 3 groups of 7): one group is on duty per epoch of the chain, and the chain's schedule slides forward every epoch. They run the `batch_operator_plugin` and are responsible for:
+- Reading the outbound envelope of each outpost they serve and delivering it to `sysio.msgch`
+- Relaying the depot's outbound envelopes to each outpost they serve
+- Cranking the depot: `sysio.msgch::chkcons(chain)` (a chain's epoch advance), `sysio.epoch::tickeconomy` (economic clock), `sysio.chalg::chkdispute`, `sysio.swap::tickyield`, `sysio.liq::queueyield`, `sysio.kicker::kick`
 
-Batch operators post depot-native collateral on `sysio.opreg`; a non-canonical delivery is slashed and missed deliveries lead to termination.
+Batch operators post depot-native collateral on `sysio.opreg`, one bond for every chain they serve; a non-canonical delivery is slashed, and missed deliveries on a chain evict the operator from that chain alone.
 
 Signing keys for outbound submissions can be held locally (`KEY:`) or in a `kiod` daemon (`KIOD:`) — both built into `signature_provider_manager_plugin`. AWS KMS support (`KMS:` — Ethereum, WIRE K1 and Solana keys, remote signing so the key never leaves KMS) is provided by `signature_provider_kms_plugin`, enabled per config with `plugin = sysio::signature_provider_kms_plugin`. See `plugins/signature_provider_kms_plugin/test/README.md` for KMS key setup, IAM requirements, the `KMS:` spec format, and operational notes. AWS SSM Parameter Store support (`SSM:` — all key types) is `signature_provider_ssm_plugin`, enabled with `plugin = sysio::signature_provider_ssm_plugin`: the private key is fetched from a KMS-encrypted `SecureString` parameter once at startup and signing is local thereafter, fast enough for every signing path including block production. See `plugins/signature_provider_ssm_plugin/test/README.md` for parameter setup, IAM requirements, the `SSM:` spec format, and rotation notes. A `KMS:`/`SSM:` spec whose plugin is not enabled fails the boot with an error naming the `plugin =` line to add; host applications that embed the manager without the plugins can still register handlers from `main()` via `register_spec_handler()`.
 
@@ -103,9 +103,9 @@ Holders of a node-owner NFT who commit it on the Ethereum outpost (`NODE_OWNER_R
 
 | Contract | Role |
 |----------|------|
-| **sysio.msgch** | OPP channel — receives inbound envelopes, evaluates consensus, routes attestations, queues and builds outbound envelopes, cranks the epoch |
-| **sysio.epoch** | Consensus epoch clock and the economic clock (emissions, withdrawal maturity), sliding-window batch-operator schedule, emissions gate |
-| **sysio.opreg** | Operator registry and depot-native collateral ledger (deposit, withdraw queue, pull claims, slashing, termination) |
+| **sysio.msgch** | OPP channel — receives inbound envelopes, evaluates consensus, routes attestations, queues and builds outbound envelopes, cranks each chain's epoch |
+| **sysio.epoch** | One consensus epoch per outpost chain, each with its sliding-window batch-operator schedule, and the single economic clock (emissions, withdrawal maturity), emissions gate |
+| **sysio.opreg** | Operator registry and depot-native collateral ledger (deposit, withdraw queue, pull claims, slashing, termination), and the chains each batch operator serves (per-chain eviction) |
 | **sysio.chalg** | Envelope-dispute vote by Tier-1 node owners; slash execution |
 | **sysio.synd** | Liquidity syndication ledger: syndication envelopes, bonded release, desyndication, rate limits |
 | **sysio.bond** | Generic bonded underwriting of provable statements |
@@ -137,9 +137,9 @@ On Solana the outpost lives in the `liqsol-core` program (`instructions/opp/`), 
 
 ## Consensus & Security
 
-- **Group consensus**: An envelope is accepted when every eligible operator in the active group delivers it identically, or by strict majority once the epoch boundary has passed.
+- **Group consensus**: An envelope is accepted when every eligible operator in the chain's active group delivers it identically, or by strict majority once the chain's epoch boundary has passed.
 - **Envelope hash chains**: Each envelope carries the digest of its predecessor on the same stream, and messages carry sequence numbers, so envelopes and messages cannot be reordered or replayed.
-- **Disputes**: A post-boundary split with no strict majority opens a `sysio.chalg` dispute that pauses the epoch until Tier-1 node owners vote a canonical envelope. Operators that delivered a non-canonical envelope are slashed.
+- **Disputes**: A post-boundary split with no strict majority opens a `sysio.chalg` dispute that pauses that chain's epoch until Tier-1 node owners vote a canonical envelope; other chains keep advancing. Operators that delivered a non-canonical envelope are slashed.
 - **Bonded syndication**: Syndicated value is released on the depot only after `sysio.bond` underwriters bond the syndication statement; anyone may challenge it during the challenge window.
 - **Emergency stop**: `sysio.andon` freezes depot fund egress; outposts pause independently (`SyndicationPool` pause on Ethereum, `frozen` on Solana).
 

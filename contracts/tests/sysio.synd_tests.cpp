@@ -336,7 +336,7 @@ public:
 
    // --- registries ---
 
-   // Registrations inside the epoch-0 bootstrap window land ACTIVE, as the launch bootstrap's do.
+   // Registrations before the network genesis (the bootstrap window) land ACTIVE, as the launch bootstrap's do.
    action_result regchain(ChainKind kind, std::string_view code, uint32_t external_chain_id) {
       return push(CHAINS_ACCOUNT, chains_abi_ser, CHAINS_ACCOUNT, "regchain"_n, mvo()
          ("kind", kind)("code", codename_mvo(code))("external_chain_id", external_chain_id)

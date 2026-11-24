@@ -98,5 +98,6 @@ operator's status, its bond and its other chains are untouched. The window's gro
 the close that evicts a member also slides out the only seat it held on the chain. An `EVICTED` member
 is not evaluated again, and it rejoins as a `LEFT` operator does, which restarts the rails.
 Bootstrapped operators are never evicted. Governance's `terminate` is the global removal.
-- A membership ends with its registration: `prune` erases a pruned operator's rows and `regoperator`
-  erases them when the account registers again.
+
+A membership ends with its registration: `prune` erases a pruned operator's rows and `regoperator`
+erases them when the account registers again.

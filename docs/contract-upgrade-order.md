@@ -123,9 +123,9 @@ Everything the two `sysio.epoch` clocks inline, directly:
 Those callees inline further (`slashop` → `sysio.opreg::slash`, `payepoch` →
 `sysio.token::transfer` for the pushed capex and governance buckets), so the
 transitive subtree — not just the table above — sits inside each clock's abort
-surface. `advance` itself is inlined by `sysio.msgch::chkcons` (and by
-`sysio.msgch::bootstrap` at epoch 0), so `sysio.msgch` is both a caller and a
-callee of `sysio.epoch`.
+surface. `advance(chain)` itself is inlined by `sysio.msgch::chkcons(chain)` (and
+by `sysio.msgch::bootstrap` / `bootchain` at a chain's epoch 0), so `sysio.msgch`
+is both a caller and a callee of `sysio.epoch`.
 
 Independently of inlines, the emissions readiness gate in `sysio.epoch` **reads**
 `sysio.system`'s `emitcfg`, `t5state` and `payclaimtot`, and `sysio.token`'s
@@ -161,7 +161,7 @@ On a fresh deployment, finish the DClaim import before the first `createlink` or
 `recordlink`: fund `sysio.dclaim` with the total of the credits, push every
 `importseed` batch, reconcile the `unmapped` rows against the export, and only
 then seal the import with `importdone`. The LCO import in the cluster bootstrap
-(`LcoImportSteps` in wire-tools-ts) runs these steps in the epoch-0 window and
+(`LcoImportSteps` in wire-tools-ts) runs these steps in the bootstrap window and
 stops before the seal when a row differs. A link sweeps only the credits already
 in `unmapped`, and its holder cannot trigger the sweep again: `createlink`
 accepts one link per account and chain, and only `sysio.authex` may send
@@ -205,6 +205,19 @@ arguments. No migration is supplied: deploy `sysio.epoch`, `sysio`, `sysio.opreg
 and before `sysio.msgch::bootstrap` (which refuses to start without it). `batch_operator_plugin` adds
 `sysio.epoch::tickeconomy` to the relay's actions, so an operator whose `@active` has been restricted
 by a `linkauth` must let it authorize that action too, or the plugin refuses to start.
+
+### Per-chain consensus epochs
+
+Each outpost chain runs its own consensus epoch. `sysio.epoch`'s `epochcfg` and `epochstate` become
+tables keyed by chain, and `setconfig`, `schbatchgps`, `advance`, `finishadv`, `pause`, `unpause`,
+`sysio.msgch::chkcons`, `sysio.opreg::recorddel` / `termcheck` and `sysio::rcrdduty` take the chain.
+`sysio.opreg` adds `servchains` and keys `dellog` and the `wtdwqueue` consensus waits by chain,
+`sysio.chalg` drops its dispute counter and `byepoch` index, and `batchduty` / `dutystate` count
+seat-seconds. No migration is supplied: deploy `sysio.epoch`, `sysio`, `sysio.opreg`, `sysio.msgch`,
+`sysio.chalg`, `sysio.chains`, `sysio.tokens`, `sysio.liq` and `sysio.synd` together on a fresh chain
+with the matching `batch_operator_plugin`. Before `sysio.msgch::bootstrap`, configure each active
+outpost with `sysio.epoch::setconfig(chain, ...)`, have each batch operator `joinchain` the chains it
+serves, and build each chain's window with `schbatchgps(chain)`.
 
 ## The two rules for future changes
 

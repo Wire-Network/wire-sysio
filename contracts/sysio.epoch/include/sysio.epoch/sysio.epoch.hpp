@@ -57,7 +57,8 @@ namespace sysio {
       [[sysio::action]]
       void tickeconomy(uint32_t epoch_index);
 
-      /// Fill outpost `chain_code`'s schedule window from the ACTIVE batch operators in sysio.opreg.
+      /// Fill outpost `chain_code`'s schedule window from the ACTIVE batch operators serving it
+      /// (`SERVING` in `sysio.opreg::servchains`).
       [[sysio::action]]
       void schbatchgps(sysio::slug_name chain_code);
 
@@ -274,10 +275,10 @@ namespace sysio {
          return state.current_epoch_index + 1 + static_cast<uint32_t>((now - next).count() / duration_us);
       }
 
-      /// Bounds on the consensus `epoch_duration_sec`. The floor keeps an epoch longer than the
-      /// relay's round trip to the slowest outpost; the ceiling stops a governance typo from setting
-      /// a multi-year epoch.
-      static constexpr uint32_t MIN_EPOCH_DURATION_SEC = 60;
+      /// Bounds on each chain's consensus `epoch_duration_sec`, checked by `setconfig(chain, ...)`. The
+      /// floor is the hard minimum for any chain; a chain whose relay round trip needs longer is
+      /// configured longer. The ceiling stops a governance typo from setting a multi-year epoch.
+      static constexpr uint32_t MIN_EPOCH_DURATION_SEC = 10;
       static constexpr uint32_t MAX_EPOCH_DURATION_SEC = 30u * 24u * 60u * 60u;
 
       /// Bounds on the economic `epoch_duration_sec`. Floor is a typo-guard: below it a pay period

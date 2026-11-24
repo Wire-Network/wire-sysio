@@ -365,7 +365,7 @@ clio -u "$DEPOT_URL" get account sysio.bond
 ### Recording the state of each chain
 
 ```bash
-# Depot: head and LIB, the epoch, the last envelopes accepted per outpost, the cord
+# Depot: head and LIB, each chain's epoch, the last envelopes accepted per outpost, the cord
 clio -u "$DEPOT_URL" get info
 clio -u "$DEPOT_URL" get table sysio.epoch epochstate -S sysio.epoch
 clio -u "$DEPOT_URL" get table sysio.msgch envlog -S sysio.msgch -r -l 20

@@ -571,7 +571,7 @@ desyndication. The row must exist, with the buckets set, before the pair carries
   takes the whole quantity from the holder's balance and releases the quantity less the desyndication
   fee on the outpost. It is refused when the pair's desyndication budget is too low now;
   it refills every second. It is also refused while the outpost's outbound queue is full, which
-  drains every depot epoch.
+  drains every epoch of that outpost.
 
 ## What an operator sees
 

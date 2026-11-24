@@ -316,8 +316,8 @@ under it. It is not applied only to rounds missed from that point on.
   seniority and registration order earn after rechecking current admission; a minimum raised while you were
   parked requires a top-up first. Parked time adds no seniority.
 - **Withdraw** with `sysio.opreg::withdraw(account, token_code, amount)`. The request is queued
-  rather than immediate (`cancelwtdw` cancels it before it flushes); once it flushes at an epoch
-  advance, the funds are credited to a per-token claim that you pull with
+  rather than immediate (`cancelwtdw` cancels it before it flushes); once it flushes at an economic
+  epoch tick, the funds are credited to a per-token claim that you pull with
   `sysio.opreg::claimremit(account, token_code)`. Once your balance falls below the minimum for
   any required token you leave `ACTIVE` and the schedule drops you at the next rebuild.
 - **Collect shadow yield.** Bonded shadow LIQ keeps earning WIRE yield: each bonded unit earns

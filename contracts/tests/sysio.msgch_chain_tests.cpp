@@ -2232,7 +2232,7 @@ BOOST_FIXTURE_TEST_CASE(late_confirmation_after_consensus_recorded, sysio_msgch_
 } FC_LOG_AND_RETHROW() }
 
 /// WNS-16: a non-canonical delivery must be slashed before its historical
-/// miss window can terminate it. The fixture builds its historical anchor and
+/// miss window can evict it. The fixture builds its historical anchor and
 /// misses through real `chkcons -> advance` transitions, then lowers the
 /// consecutive-miss threshold before the divergent epoch. Pre-fix, `termcheck`
 /// marked BATCHOP TERMINATED before `slashop` rejected that state and rolled
@@ -2274,7 +2274,7 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_
    }
 
    // Create reachable history under permissive rails. The first epoch's canonical anchor prevents
-   // the 99% percent rail from terminating BATCHOP while each following epoch records one real miss
+   // the 99% percent rail from evicting BATCHOP while each following epoch records one real miss
    // through advance()'s inline recorddel/termcheck calls. Both outposts receive identical envelopes,
    // so their inbound streams share one tip.
    set_termination_thresholds(kPermissiveMaxConsecutiveMisses, kPermissiveMaxPercentMisses);
@@ -2307,7 +2307,7 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_
       tip = next_stream_tip(historical_miss);
    }
 
-   // The accumulated real misses are now terminating. A non-canonical delivery is still recorded
+   // The accumulated real misses now breach a rail. A non-canonical delivery is still recorded
    // as delivered, so only slash-first ordering prevents termcheck from blocking this advance.
    set_termination_thresholds(kTerminatingMaxConsecutiveMisses, kPermissiveMaxPercentMisses);
 

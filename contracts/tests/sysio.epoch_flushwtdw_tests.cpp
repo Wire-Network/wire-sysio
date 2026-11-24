@@ -63,7 +63,8 @@ public:
    /// The `tickeconomy` refusal before the next economic boundary has passed.
    static constexpr std::string_view ECONOMIC_BOUNDARY_NOT_PASSED = "economic epoch boundary has not passed";
 
-   /// Must be >= the contract's MIN_EPOCH_DURATION_SEC (60) typo-guard floor.
+   /// Both clocks run at this duration, so it must be >= the economic clock's
+   /// MIN_ECONOMIC_EPOCH_DURATION_SEC (60), the higher of the two floors.
    /// Each advance_one_epoch() crosses the boundary by producing
    /// `EPOCH_DURATION_SEC * 2 + 1` half-second blocks; empty-block production
    /// in the tester is cheap, so the floor doesn't materially slow the suite.

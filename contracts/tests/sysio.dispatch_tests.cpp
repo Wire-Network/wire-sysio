@@ -705,8 +705,8 @@ public:
    /// Deploy sysio.tokens, sysio.liq and sysio.synd and register the bootstrapped outpost's liq
    /// token ("LIQETH" on ETH) with its shadow, plus two tokens the syndication intake must refuse: a
    /// plain ERC20 ("USDCETH") and a liq token nobody opened a shadow for ("LIQTWO").
-   /// `bootstrap_for_dispatch` must have run first — registrations inside the epoch-0
-   /// bootstrap window land ACTIVE.
+   /// `bootstrap_for_dispatch` must have run first — registrations before the network genesis
+   /// (the bootstrap window) land ACTIVE.
    void setup_liq_for_dispatch(std::string_view chain = "ETH", std::string_view token = "LIQETH",
                                ChainKind family = ChainKind::CHAIN_KIND_EVM) {
       create_accounts({TOKENS_ACCOUNT, LIQ_ACCOUNT, SYND_ACCOUNT});
