@@ -111,7 +111,8 @@ public:
    }
 
    /// Moves the mock clock a block interval at a time until `pred` holds, letting the node finish its work at the
-   /// current time before each move and produce the block that falls due after it.
+   /// current time before each move and produce the block that falls due after it. The clock moves between the main
+   /// thread's tasks, never while one of them runs a transaction.
    /// @return whether `pred` held within max_clock_moves
    template <typename Pred>
    bool advance_clock_until(Pred&& pred) {
@@ -122,7 +123,11 @@ public:
             return true;
          const uint32_t head_before = head_num;
          clock_now += fc::milliseconds(config::block_interval_ms);
-         fc::mock_time_traits::set_now(clock_now);
+         // moved by a main thread task, so between transactions: a move during one would bill it the whole step
+         on_main_thread([now = clock_now]() {
+            fc::mock_time_traits::set_now(now);
+            return true;
+         });
          wait_until([&]() { return head_num > head_before; }, block_patience);
       }
       return pred();
