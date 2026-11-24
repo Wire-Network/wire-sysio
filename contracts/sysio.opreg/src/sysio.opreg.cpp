@@ -777,16 +777,16 @@ uint64_t termination_window_open_ms(uint64_t now_ms, const opreg::op_config& cfg
    return now_ms > cfg.terminate_window_ms ? now_ms - cfg.terminate_window_ms : 0;
 }
 
-/// Bounded oldest-first sweep of dellog rows that have aged out of the
-/// rolling termination window. `log_id` allocation order matches `ts_ms`
-/// order (both are monotonic), so the primary index walks oldest-first and
-/// the sweep stops at the first still-in-window row.
+/// Bounded oldest-first sweep of dellog rows, of every chain, that have aged out of the rolling
+/// window. `log_id` allocation order matches `ts_ms` order (both are monotonic), so the `bylogid`
+/// index walks oldest-first and the sweep stops at the first still-in-window row.
 void prune_dellog(uint64_t window_open_ms, uint32_t max_rows) {
-   opreg::dellog_t log(name{"sysio.opreg"_n});
-   uint32_t removed = 0;
-   for (auto it = log.begin();
-        it != log.end() && removed < max_rows && it->ts_ms < window_open_ms; ) {
-      it = log.erase(std::move(it));
+   opreg::dellog_t log(opreg::OPREG_ACCOUNT);
+   auto            by_log_id = log.get_index<"bylogid"_n>();
+   uint32_t        removed   = 0;
+   for (auto it = by_log_id.begin();
+        it != by_log_id.end() && removed < max_rows && it->ts_ms < window_open_ms; ) {
+      it = by_log_id.erase(std::move(it));
       ++removed;
    }
 }
@@ -1396,15 +1396,13 @@ void opreg::slash(name account, std::string reason) {
 }
 
 // ---------------------------------------------------------------------------
-//  terminate / termcheck / recorddel — administrative removal
+//  terminate — administrative removal; recorddel / termcheck — per-chain eviction
 // ---------------------------------------------------------------------------
 
 namespace {
 
-/// Internal terminate body — used by both the operator-removal path
-/// (`termcheck` -> `terminate` inline) and the slashing-equivalent path for
-/// completeness. Marks status TERMINATED and remits each
-/// depot-native token balance to a pull claim for the operator.
+/// Body of the governance `terminate`. Marks status TERMINATED and remits each depot-native token
+/// balance to a pull claim for the operator.
 void terminate_inline(name self, name account, const std::string& reason) {
    opreg::operators_t ops(self);
    auto op_pk = opreg::operator_key{account.value};
@@ -1564,7 +1562,7 @@ void opreg::claimyield(name account, sysio::slug_name token_code) {
    credit_remit_claim(get_self(), account, opp::wire::token_code, credited);
 }
 
-void opreg::recorddel(name account, uint32_t epoch, bool delivered) {
+void opreg::recorddel(name account, sysio::slug_name chain_code, uint32_t epoch, bool delivered) {
    require_auth(EPOCH_ACCOUNT);
 
    // Recorded whatever the operator's status at close: the seat is the duty. A withdrawal below
@@ -1578,18 +1576,19 @@ void opreg::recorddel(name account, uint32_t epoch, bool delivered) {
    const auto cfg = cfg_tbl.get_or_default(op_config{});
    prune_dellog(termination_window_open_ms(now_ms, cfg), MAX_DELLOG_PRUNE_PER_WRITE);
 
-   dellog_t log(get_self());
-   uint64_t id = next_dellog_id();
-   log.emplace(ram_payer, delivery_key{id}, delivery_log_entry{
-      .log_id    = id,
-      .account   = account,
-      .epoch     = epoch,
-      .delivered = delivered,
-      .ts_ms     = now_ms,
+   dellog_t       log(get_self());
+   const uint64_t id = next_dellog_id();
+   log.emplace(ram_payer, delivery_key{chain_code, account, now_ms, id}, delivery_log_entry{
+      .log_id     = id,
+      .account    = account,
+      .chain_code = chain_code,
+      .epoch      = epoch,
+      .delivered  = delivered,
+      .ts_ms      = now_ms,
    });
 }
 
-void opreg::termcheck(name account) {
+void opreg::termcheck(name account, sysio::slug_name chain_code) {
    require_auth(EPOCH_ACCOUNT);
 
    operators_t ops(get_self());
@@ -1600,7 +1599,7 @@ void opreg::termcheck(name account) {
    // operator that withdraws before each close and cancels after it is UNKNOWN every time.
    if (op.has_terminal_status()) return;
    // Bootstrapped operators are the genesis / chain-of-trust seed set and
-   // are NEVER subject to rolling-window termination — see
+   // are NEVER subject to rolling-window eviction — see
    // .claude/rules/bootstrapped-operator-invariants.md at the wire root. A
    // transient bug in the deliver / consensus / advance pipeline (or a
    // benign operator-side outage) must not be able to tear the
@@ -1608,45 +1607,37 @@ void opreg::termcheck(name account) {
    // `batch_operator_minimum_active` with no remaining ACTIVE operators
    // to advance consensus and no recovery path.
    if (op.is_bootstrapped) return;
-   // Termination on rolling-buffer underperformance is scoped to batch operators, and for
-   // producers that is now a DECISION rather than an open question.
-   //
-   // A producer that misses `max_consecutive_missed_rounds` consecutive scheduled rounds is
-   // DEMOTED by sysio.system -- moved to a categorical tier no score can climb out of, so it
-   // leaves the schedule and draws no pay. Demotion is deliberately recoverable: the producer
-   // re-registers via `regproducer` when it is ready again. Termination is not recoverable, and
-   // it also returns the bond, so applying it to an offline-but-bonded producer would convert a
-   // reversible outage into a permanent exit and hand back the collateral that makes the operator
-   // accountable. An indefinitely-demoted producer therefore stays demoted -- holding its row and
-   // its bond -- until it either re-registers or withdraws of its own accord.
-   //
-   // Underwriter offline-too-long remains open; they have no committee and no schedule to miss.
+   // Only batch operators serve chains. A producer that keeps missing its rounds is demoted by
+   // sysio.system instead.
    if (op.type != OperatorType::OPERATOR_TYPE_BATCH) return;
+
+   // Nothing to evaluate for an operator that never joined the chain, nor for one already EVICTED from it.
+   servchains_t                 members(get_self());
+   const served_chain_key       member_key{chain_code, account};
+   std::optional<served_chain> membership = members.try_get(member_key);
+   if (!membership || membership->status == chain_service_status::EVICTED) return;
 
    // Thresholds come from opconfig — tests can dial them down so the
    // miss-window evaluation fits the test timeout budget.
    opconfig_t cfg_tbl(get_self());
    const auto cfg = cfg_tbl.get_or_default(op_config{});
 
-   // Both rails read only the current registration: a re-registered account's earlier rows stay
-   // in the log until they age out. They start after the registration's own second, because
-   // `current_time_ms` has second resolution and the block that terminated the previous
-   // registration can share it. A return to ACTIVE within a registration resets neither rail,
-   // so a cancelled withdrawal cannot clear the misses recorded while the operator was UNKNOWN.
-   uint64_t now_ms      = current_time_ms();
-   uint64_t window_open = std::max(termination_window_open_ms(now_ms, cfg), op.registered_at + 1);
+   // Both rails read only the current registration and the latest join of this chain: earlier rows
+   // stay in the log until they age out. Each start is the second after the event, because
+   // `current_time_ms` has second resolution and a close in that same second can still record
+   // against the previous registration or membership. A return to ACTIVE resets neither rail, so a
+   // cancelled withdrawal cannot clear the misses recorded while the operator was UNKNOWN.
+   const uint64_t now_ms      = current_time_ms();
+   const uint64_t window_open = std::max({termination_window_open_ms(now_ms, cfg), op.registered_at + 1,
+                                          membership->joined_at_ms + 1});
 
    dellog_t log(get_self());
-   auto idx = log.get_index<"byaccountts"_n>();
-   uint128_t lower_key = (static_cast<uint128_t>(account.value) << 64) | window_open;
-   uint128_t upper_key = (static_cast<uint128_t>(account.value) << 64) | std::numeric_limits<uint64_t>::max();
-
    uint32_t consecutive_misses = 0;
    uint32_t worst_consecutive  = 0;
    uint32_t total_misses       = 0;
    uint32_t total_in_window    = 0;
-   for (auto it = idx.lower_bound(lower_key); it != idx.end() && it->by_account_ts() <= upper_key; ++it) {
-      if (it->account != account) break;
+   for (auto it = log.lower_bound(delivery_key{chain_code, account, window_open, 0});
+        it != log.end() && it->chain_code == chain_code && it->account == account; ++it) {
       total_in_window++;
       if (!it->delivered) total_misses++;
 
@@ -1662,14 +1653,17 @@ void opreg::termcheck(name account) {
    bool exceeds_percent     = total_in_window > 0 &&
                               (total_misses * 100u / total_in_window) > cfg.terminate_max_pct_misses_24h;
    if (exceeds_consecutive || exceeds_percent) {
-      terminate_inline(get_self(), account,
+      membership->status        = chain_service_status::EVICTED;
+      membership->updated_at_ms = now_ms;
+      membership->status_reason =
          exceeds_consecutive
             ? std::string{"rolling-window: >"}
                  + std::to_string(cfg.terminate_max_consecutive_misses)
                  + " consecutive misses"
             : std::string{"rolling-window: >"}
                  + std::to_string(cfg.terminate_max_pct_misses_24h)
-                 + "% miss rate");
+                 + "% miss rate";
+      members.set(ram_payer, member_key, *membership);
    }
 }
 

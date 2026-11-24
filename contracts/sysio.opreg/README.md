@@ -14,18 +14,18 @@ the collateral each has bonded, and the outpost chains each batch operator serve
   every payout is credited to `remitclaims` and pulled by the operator with `claimremit`
 - Records the outpost chains each batch operator serves (`servchains`). A chain's schedule
   (`sysio.epoch`) seats only operators `SERVING` it
-- Keeps the rolling delivery log (`dellog`) `termcheck` reads to remove a batch operator that keeps
-  missing its duty epochs
+- Keeps a rolling delivery log per chain (`dellog`); `termcheck` evicts a batch operator that keeps
+  missing its duty epochs on a chain from that chain alone
 
 ## Tables
 
 | Table | Type | Description |
 |-------|------|-------------|
 | `operators` | `kv::table` | One row per operator, keyed by account: type, status, bootstrap flag, collateral balances, timestamps, status reason and the newest `MAX_RECENT_ACTIONS` audit entries. Indexed by type and status |
-| `opconfig` | `kv::global` | Termination rails (`terminate_max_consecutive_misses`, `terminate_max_pct_misses_24h`, `terminate_window_ms`), the prune delay, and each role's per-(chain, token) minimum bonds |
+| `opconfig` | `kv::global` | Eviction rails (`terminate_max_consecutive_misses`, `terminate_max_pct_misses_24h`, `terminate_window_ms`), the prune delay, and each role's per-(chain, token) minimum bonds |
 | `servchains` | `kv::table` | One row per (chain, batch operator), keyed chain first: `SERVING`, `LEFT` or `EVICTED`, the join time, the last change and the eviction reason. Indexed by account |
 | `wtdwqueue` | `kv::table` | Pending withdrawals, released by `flushwtdw` |
-| `dellog` | `kv::table` | One row per duty epoch a batch operator's group closed: delivered or missed. Rows older than `terminate_window_ms` are pruned |
+| `dellog` | `kv::table` | One row per (chain, batch operator, duty epoch) the chain closed: delivered to that chain or missed. Keyed by chain, account and time; rows older than `terminate_window_ms` are pruned oldest-first across chains through the `bylogid` index |
 | `remitclaims` | `kv::table` | Collateral and yield owed to an account, per token, until `claimremit` |
 | `yielddebts` | `kv::table` | Shadow yield earned but not yet covered by the yield pool, kept across pruning and re-registration |
 | `yieldpool` | `kv::table` | Per shadow token: WIRE received from `sysio.liq` and WIRE already credited |
@@ -35,7 +35,7 @@ the collateral each has bonded, and the outpost chains each batch operator serve
 
 | Action | Auth | Description |
 |--------|------|-------------|
-| `setconfig` | `sysio.opreg` | Set the termination rails, the prune delay and the per-role minimum bonds. `terminate_window_ms` must span `terminate_max_consecutive_misses + 1` duty rotations of every chain's epoch schedule |
+| `setconfig` | `sysio.opreg` | Set the eviction rails, the prune delay and the per-role minimum bonds. `terminate_window_ms` must span `terminate_max_consecutive_misses + 1` duty rotations of every chain's epoch schedule |
 | `regoperator` | the account, or `sysio.opreg` | Register an operator. Only `sysio.opreg` registers a bootstrapped one. An account registering itself needs a `sysio.authex` link for every active outpost, except a batch operator, whose links `joinchain` checks. A terminated account registers again once its balances are drained and no schedule seats it; the new registration serves no chain |
 | `joinchain` | the operator, or `sysio.opreg` | Serve one active outpost: see below |
 | `leavechain` | the operator | Stop serving one outpost: see below |
@@ -46,9 +46,9 @@ the collateral each has bonded, and the outpost chains each batch operator serve
 | `available` | read-only | An operator's spendable balance for one (chain, token) |
 | `processprod`, `processbatch`, `processuw` | `sysio.opreg` | Eligibility transitions after a balance change |
 | `slash` | `sysio.chalg` | Seize the operator's collateral and mark it `SLASHED` |
-| `recorddel` | `sysio.epoch` | Record one member's delivery result for a duty epoch that closed |
-| `termcheck` | `sysio.epoch` | Terminate a batch operator whose rolling log breaches a termination rail |
-| `terminate` | `sysio.opreg` | Terminate an operator: its collateral is credited to `remitclaims` |
+| `recorddel` | `sysio.epoch` | Record one member's delivery result for a duty epoch one chain closed |
+| `termcheck` | `sysio.epoch` | Evict a batch operator from one chain when its rolling log there breaches a rail: see below |
+| `terminate` | `sysio.opreg` | Terminate an operator globally: its collateral is credited to `remitclaims` |
 | `claimremit` | the operator | Pull one token's credited collateral or yield |
 | `sweepyield` | permissionless | Pull the shadow yield `sysio.liq` owes the registry into its yield pool |
 | `claimyield` | permissionless | Credit an operator's earned shadow yield to its WIRE claim |
@@ -70,5 +70,17 @@ is `SERVING`.
 - **`EVICTED`** removes the operator from one chain. `sysio.msgch::deliver` refuses its deliveries on
   that chain, and the chain's consensus threshold leaves it out. A `LEFT` member still delivers its
   remaining seats.
+
+## Eviction
+
+`sysio.epoch::advance(chain)` sends `recorddel` and `termcheck` for each member of the chain's group
+whose epoch closed. `termcheck` reads that operator's rows on that chain recorded after both its
+registration and its latest join of the chain, and evicts it from the chain when they hold more than
+`terminate_max_consecutive_misses` consecutive misses, or a whole-percent miss rate above
+`terminate_max_pct_misses_24h`. The membership becomes `EVICTED` with the rail as its reason; the
+operator's status, its bond and its other chains are untouched. The window's groups are disjoint, so
+the close that evicts a member also slides out the only seat it held on the chain. An `EVICTED` member
+is not evaluated again, and it rejoins as a `LEFT` operator does, which restarts the rails.
+Bootstrapped operators are never evicted. Governance's `terminate` is the global removal.
 - A membership ends with its registration: `prune` erases a pruned operator's rows and `regoperator`
   erases them when the account registers again.

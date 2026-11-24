@@ -217,6 +217,18 @@
             "base": "",
             "fields": [
                 {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "ts_ms",
+                    "type": "uint64"
+                },
+                {
                     "name": "log_id",
                     "type": "uint64"
                 }
@@ -233,6 +245,10 @@
                 {
                     "name": "account",
                     "type": "name"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
                 },
                 {
                     "name": "epoch",
@@ -498,6 +514,10 @@
                     "type": "name"
                 },
                 {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
                     "name": "epoch",
                     "type": "uint32"
                 },
@@ -666,6 +686,10 @@
                 {
                     "name": "account",
                     "type": "name"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
                 }
             ]
         },
@@ -927,14 +951,14 @@
             "name": "dellog",
             "type": "delivery_log_entry",
             "index_type": "i64",
-            "key_names": ["log_id"],
-            "key_types": ["uint64"],
+            "key_names": ["chain_code","account","ts_ms","log_id"],
+            "key_types": ["slug_name","name","uint64","uint64"],
             "table_id": 14972,
             "secondary_indexes": [
                 {
-                    "name": "byaccountts",
-                    "key_type": "uint128",
-                    "table_id": 30319
+                    "name": "bylogid",
+                    "key_type": "uint64",
+                    "table_id": 9629
                 }
             ]
         },

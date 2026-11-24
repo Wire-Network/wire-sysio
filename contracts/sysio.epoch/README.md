@@ -54,8 +54,9 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
 
 1. Delivery audit of the chain's expiring group, when the chain is an active outpost: every operator
    that delivered a non-canonical envelope to it is slashed through `sysio.chalg::slashop`; then each
-   member gets one `sysio.opreg::recorddel` (delivered if it delivered to this chain), followed by
-   `sysio.opreg::termcheck`, and each member of the group earns the epoch's scheduled length in
+   member gets one `sysio.opreg::recorddel` for this chain (delivered if it delivered to it), followed
+   by `sysio.opreg::termcheck` for this chain, which evicts a member breaching the chain's miss rails
+   from this chain alone, and each member of the group earns the epoch's scheduled length in
    seat-seconds through `sysio.system::rcrdduty` (skipped until `sysio.system::initt5` has run).
 2. Bump the chain's consensus epoch index, drop the expired group from the front of its window and
    append a new tail group drawn from the `ACTIVE` batch operators serving the chain that are not

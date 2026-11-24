@@ -390,7 +390,7 @@ void epoch::advance(sysio::slug_name chain_code) {
    //     (chain_code, current_epoch_index, batch_op_name == member)
    //   - note whether it delivered and collect every non-canonical deliverer
    // Then slash the non-canonical deliverers before delivery accounting can
-   // terminate them, and record one result per member: delivered to this
+   // evict them, and record one result per member: delivered to this
    // outpost or not.
    //
    // Only an active outpost (`sysio.chains::chains`, active && !is_depot) owes
@@ -427,8 +427,8 @@ void epoch::advance(sysio::slug_name chain_code) {
       const bool have_winner = consensus && consensus->epoch_index == state.current_epoch_index;
 
       /// One member's delivery result for the expiring epoch, retained until non-canonical
-      /// offenders have been slashed. `recorddel` records every member, a newly slashed one
-      /// included, while `termcheck` skips SLASHED and TERMINATED rows.
+      /// offenders have been slashed. `recorddel` records every member, a newly slashed or evicted
+      /// one included, while `termcheck` skips SLASHED and TERMINATED operators and EVICTED members.
       struct delivery_observation {
          name member;
          bool delivered = false;
@@ -471,7 +471,7 @@ void epoch::advance(sysio::slug_name chain_code) {
          ).send();
       }
 
-      // Preserve delivery history and ordinary termination accounting. Inline
+      // Preserve this chain's delivery history and its eviction accounting. Inline
       // slashing completes before these actions, and all mutations complete
       // before finishadv reads the registry for outbound attestations.
       for (const auto& observation : observations) {
@@ -479,13 +479,13 @@ void epoch::advance(sysio::slug_name chain_code) {
             permission_level{get_self(), "owner"_n},
             OPREG_ACCOUNT,
             opreg_actions::RECORD_DELIVERY,
-            std::make_tuple(observation.member, state.current_epoch_index, observation.delivered)
+            std::make_tuple(observation.member, chain_code, state.current_epoch_index, observation.delivered)
          ).send();
          action(
             permission_level{get_self(), "owner"_n},
             OPREG_ACCOUNT,
             opreg_actions::TERMINATION_CHECK,
-            std::make_tuple(observation.member)
+            std::make_tuple(observation.member, chain_code)
          ).send();
       }
 

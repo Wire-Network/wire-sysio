@@ -53,6 +53,22 @@ void write_kv_row(Tester& tester, name code, name table, uint64_t id, const std:
    else store.insert_row(code, table_id, config::system_account_name, key_view, value);
 }
 
+/// Every row of `code`'s `table`, decoded as `abi_type`, in primary-key order across every scope.
+template <typename Tester>
+std::vector<fc::variant> table_rows(Tester& tester, name code, name table, const abi_serializer& abi,
+                                    const char* abi_type) {
+   const auto               table_id = compute_table_id(table.to_uint64_t());
+   std::vector<fc::variant> rows;
+   auto                     cursor = tester.control->kv().open_row_cursor();
+   kv_row                   row;
+   for (bool more = cursor->seek_lower({code, table_id}, row);
+        more && row.code == code && row.table_id == table_id; more = cursor->next(row)) {
+      const std::vector<char> raw(row.value.begin(), row.value.end());
+      rows.push_back(abi.binary_to_variant(abi_type, raw, Tester::fixture_abi_yield_function()));
+   }
+   return rows;
+}
+
 /// The authorization an action needs when an unprivileged contract bills RAM to `signer`
 /// (a deposit row emplaced for a user, say): the signer's `sysio.payer` beside `active`.
 /// The active key satisfies both.

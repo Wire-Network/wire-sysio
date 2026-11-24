@@ -66,9 +66,8 @@ namespace sysio {
       /// advance's fan-out.
       static constexpr uint32_t MAX_WTDW_FLUSH_PER_EPOCH = 32;
 
-      /// Rolling delivery-buffer thresholds for batch-op termination. Per the
-      /// plan §1: missing a delivery is NOT a slash; consistent missing IS
-      /// grounds for administrative termination.
+      /// Rolling delivery-buffer thresholds for evicting a batch operator from one chain. Missing a
+      /// delivery is NOT a slash; consistent missing on a chain evicts the operator from that chain.
       ///
       /// All three thresholds live in `op_config` so tests can override them
       /// without recompiling. These `DEFAULT_*` constants are the values
@@ -77,7 +76,7 @@ namespace sysio {
       static constexpr uint32_t DEFAULT_TERMINATE_MAX_PCT_MISSES_24H     = 5;   // percent
       static constexpr uint64_t DEFAULT_TERMINATE_WINDOW_MS              = 24ULL * 60 * 60 * 1000;
 
-      /// Lowest accepted threshold for consecutive miss termination.
+      /// Lowest accepted threshold for the consecutive-miss eviction rail.
       static constexpr uint32_t MIN_TERMINATE_MAX_CONSECUTIVE_MISSES = 1;
 
       /// Highest launch-approved consecutive-miss threshold; larger values can
@@ -86,7 +85,7 @@ namespace sysio {
       /// not silently widen this security ceiling.
       static constexpr uint32_t MAX_TERMINATE_MAX_CONSECUTIVE_MISSES = 5;
 
-      /// Lowest accepted threshold for rolling-window percent-miss termination.
+      /// Lowest accepted threshold for the rolling-window percent-miss eviction rail.
       static constexpr uint32_t MIN_TERMINATE_MAX_PCT_MISSES_24H = 1;
 
       /// Highest accepted percent-miss threshold. A 100% threshold can never be
@@ -166,7 +165,7 @@ namespace sysio {
       /// Set operator registry configuration. The three `terminate_*`
       /// thresholds drive `termcheck`'s rolling-buffer evaluation; tests
       /// can dial them down (e.g. `terminate_max_consecutive_misses=2`,
-      /// `terminate_window_ms=60_000`) to make the miss → terminate path
+      /// `terminate_window_ms=60_000`) to make the miss → eviction path
       /// observable inside a flow-test's timeout budget.
       ///
       /// The three `req_*_collat` vectors are the per-role eligibility
@@ -275,25 +274,26 @@ namespace sysio {
       [[sysio::action]]
       void slash(name account, std::string reason);
 
-      /// Record a batch operator's result for one duty epoch in the rolling
-      /// buffer. Called inline from `sysio.epoch::advance` once per
-      /// expiring-group member, whatever its status at the close; `delivered`
-      /// only if it reached every active outpost. Each write also prunes up to
-      /// `MAX_DELLOG_PRUNE_PER_WRITE` rows that have aged out of the window, so
-      /// no dedicated crank is needed.
+      /// Record a batch operator's result for one duty epoch of outpost `chain_code` in the rolling
+      /// buffer. Called inline from `sysio.epoch::advance(chain_code)` once per expiring-group member,
+      /// whatever its status at the close; `delivered` only if it delivered to that chain. Each write
+      /// also prunes up to `MAX_DELLOG_PRUNE_PER_WRITE` rows, of any chain, that have aged out of the
+      /// window, so no dedicated crank is needed.
       [[sysio::action]]
-      void recorddel(name account, uint32_t epoch, bool delivered);
+      void recorddel(name account, sysio::slug_name chain_code, uint32_t epoch, bool delivered);
 
-      /// Terminate the operator inline when its rolling buffer holds more than
-      /// `terminate_max_consecutive_misses` consecutive misses, or a
-      /// whole-percent miss rate (rounded down) above
-      /// `terminate_max_pct_misses_24h`. Both rails count duty epochs recorded
-      /// after the second of the operator's current registration, and a return
-      /// to ACTIVE does not reset either one. ACTIVE and UNKNOWN operators are both
-      /// evaluated. Called by `sysio.epoch::advance` after every `recorddel`.
+      /// Evict the operator from outpost `chain_code` when its rolling buffer on that chain holds more
+      /// than `terminate_max_consecutive_misses` consecutive misses, or a whole-percent miss rate
+      /// (rounded down) above `terminate_max_pct_misses_24h`. Both rails count the chain's duty epochs
+      /// recorded after the second of the operator's current registration and after the second of its
+      /// latest join of the chain; a return to ACTIVE resets neither. The membership becomes EVICTED
+      /// with the rail's reason; the operator's status, bond and other chains are untouched. ACTIVE
+      /// and UNKNOWN operators are both evaluated; bootstrapped operators and an EVICTED membership
+      /// are not. Called by `sysio.epoch::advance(chain_code)` after every `recorddel`.
       [[sysio::action]]
-      void termcheck(name account);
+      void termcheck(name account, sysio::slug_name chain_code);
 
+      /// Terminate the operator globally (governance): its collateral is credited to `remitclaims`.
       [[sysio::action]]
       void terminate(name account, std::string reason);
 
@@ -562,34 +562,37 @@ namespace sysio {
             sysio::const_mem_fun<withdraw_request, uint64_t, &withdraw_request::by_account>>
       >;
 
-      /// Per-batch-op rolling delivery buffer. One row per (operator, duty
-      /// epoch), `delivered` only if the operator delivered to every active
-      /// outpost. Rows older than `terminate_window_ms` are discarded by
-      /// `prune` / on-write.
+      /// Key of the per-chain rolling delivery buffer: chain, then operator, then time, so one
+      /// operator's rows on one chain are a single time-ordered range `termcheck` seeks into at its
+      /// window's opening edge. `log_id` keeps two rows of the same second distinct.
       struct delivery_key {
-         uint64_t log_id;
-         uint64_t primary_key() const { return log_id; }
-         SYSLIB_SERIALIZE(delivery_key, (log_id))
+         sysio::slug_name chain_code;
+         name             account;
+         uint64_t         ts_ms  = 0;
+         uint64_t         log_id = 0;
+         SYSLIB_SERIALIZE(delivery_key, (chain_code)(account)(ts_ms)(log_id))
       };
 
+      /// One row per (outpost chain, operator, duty epoch), `delivered` only if the operator delivered
+      /// to that chain. Rows older than `terminate_window_ms` are discarded oldest-first, across
+      /// chains, by `prune` and on write.
       struct [[sysio::table("dellog")]] delivery_log_entry {
-         uint64_t  log_id   = 0;
-         name      account;
-         uint32_t  epoch    = 0;
-         bool      delivered = false;
-         uint64_t  ts_ms    = 0;
+         uint64_t         log_id    = 0;
+         name             account;
+         sysio::slug_name chain_code;
+         uint32_t         epoch     = 0;   ///< the chain's consensus epoch the row is for
+         bool             delivered = false;
+         uint64_t         ts_ms     = 0;
 
-         /// Composite (account, ts_ms) for the rolling 24h scan.
-         uint128_t by_account_ts() const {
-            return (static_cast<uint128_t>(account.value) << 64) | ts_ms;
-         }
+         /// Allocation order, which is also time order across every chain: the retention sweep's cursor.
+         uint64_t by_log_id() const { return log_id; }
 
-         SYSLIB_SERIALIZE(delivery_log_entry, (log_id)(account)(epoch)(delivered)(ts_ms))
+         SYSLIB_SERIALIZE(delivery_log_entry, (log_id)(account)(chain_code)(epoch)(delivered)(ts_ms))
       };
 
       using dellog_t = sysio::kv::table<"dellog"_n, delivery_key, delivery_log_entry,
-         sysio::kv::index<"byaccountts"_n,
-            sysio::const_mem_fun<delivery_log_entry, uint128_t, &delivery_log_entry::by_account_ts>>
+         sysio::kv::index<"bylogid"_n,
+            sysio::const_mem_fun<delivery_log_entry, uint64_t, &delivery_log_entry::by_log_id>>
       >;
 
       struct remitclaim_key {

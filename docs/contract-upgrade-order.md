@@ -120,8 +120,7 @@ Everything the two `sysio.epoch` clocks inline, directly:
 | `tickeconomy` (economic clock) | `sysio.opreg` | `flushwtdw` |
 | `tickeconomy` | `sysio` | `accrueepoch`, `payepoch`, `settleduty` |
 
-Those callees inline further (`slashop` → `sysio.opreg::slash`, `termcheck` → the
-`sysio.opreg` termination path that credits `remitclaims`, `payepoch` →
+Those callees inline further (`slashop` → `sysio.opreg::slash`, `payepoch` →
 `sysio.token::transfer` for the pushed capex and governance buckets), so the
 transitive subtree — not just the table above — sits inside each clock's abort
 surface. `advance` itself is inlined by `sysio.msgch::chkcons` (and by
