@@ -697,6 +697,16 @@ public:
       return table_rows(MSGCH_ACCOUNT, msgch_tables::ENVELOPES, msgch_abi, msgch_abi_types::ENVELOPE_ENTRY);
    }
 
+   /// `envelopes` rows recorded for (`chain_code`, `epoch_index`), across operators.
+   uint32_t envelope_rows_for(uint64_t chain_code, uint32_t epoch_index) {
+      uint32_t n = 0;
+      for (const auto& row : envelope_rows()) {
+         if (row[msgch_fields::CHAIN_CODE].as_uint64() == chain_code &&
+             row[msgch_fields::EPOCH_INDEX].as<uint32_t>() == epoch_index) ++n;
+      }
+      return n;
+   }
+
    /// `envelopes` rows recorded for `epoch_index`, across outposts and operators.
    uint32_t envelope_rows_for_epoch(uint32_t epoch_index) {
       uint32_t n = 0;
@@ -3053,16 +3063,16 @@ BOOST_FIXTURE_TEST_CASE(envelopes_pruned_beyond_retention_window, sysio_msgch_ch
    }
 } FC_LOG_AND_RETHROW() }
 
-/// One delivery erases at most `ENVELOPE_PRUNE_BUDGET` expired rows, oldest first, and never a
-/// retained one. With more expired rows than one budget, the first delivery of an epoch leaves the
-/// newest expired rows for the next delivery, which clears them without touching the previous epoch.
+/// One delivery erases at most `ENVELOPE_PRUNE_BUDGET` of its own outpost's expired rows, oldest first,
+/// and never a retained one. With more expired rows per outpost than one budget, the first ETH delivery
+/// of an epoch leaves ETH's newest expired rows for the next, which clears them; SOL's expired rows wait
+/// for SOL's own deliveries.
 BOOST_FIXTURE_TEST_CASE(envelope_prune_bounded_per_delivery, sysio_msgch_chain_tester) { try {
-   constexpr uint32_t kBatchOperatorCount = 3;
-   constexpr uint32_t kOutpostCount       = 2;
-   constexpr uint32_t kRowsPerEpoch       = kBatchOperatorCount * kOutpostCount;
-   static_assert(kRowsPerEpoch > ENVELOPE_PRUNE_BUDGET && kRowsPerEpoch <= 2 * ENVELOPE_PRUNE_BUDGET,
-                 "the expired epoch must take exactly two deliveries to clear");
-   const std::vector<name> ops{BATCHOP, BATCHOP_B, BATCHOP_C};
+   constexpr uint32_t kBatchOperatorCount = 6;
+   constexpr uint32_t kRowsPerOutpost     = kBatchOperatorCount;
+   static_assert(kRowsPerOutpost > ENVELOPE_PRUNE_BUDGET && kRowsPerOutpost <= 2 * ENVELOPE_PRUNE_BUDGET,
+                 "an outpost's expired epoch must take exactly two of its deliveries to clear");
+   const std::vector<name> ops{BATCHOP, BATCHOP_B, BATCHOP_C, BATCHOP_D, BATCHOP_E, BATCHOP_F};
 
    bootstrap(kBatchOperatorCount);
    const uint32_t expiring_epoch = current_epoch();
@@ -3074,27 +3084,73 @@ BOOST_FIXTURE_TEST_CASE(envelope_prune_bounded_per_delivery, sysio_msgch_chain_t
    const uint32_t epoch = current_epoch();
    BOOST_REQUIRE_EQUAL(expiring_epoch + INBOUND_ENVELOPE_RETENTION_EPOCHS, epoch);
 
-   std::vector<uint64_t> expiring_ids;
+   std::vector<uint64_t> expiring_eth_ids;
    for (const auto& row : envelope_rows()) {
-      if (row[msgch_fields::EPOCH_INDEX].as<uint32_t>() == expiring_epoch) {
-         expiring_ids.push_back(row[msgch_fields::ID].as_uint64());
+      if (row[msgch_fields::EPOCH_INDEX].as<uint32_t>() == expiring_epoch &&
+          row[msgch_fields::CHAIN_CODE].as_uint64() == ETH_OUTPOST_ID) {
+         expiring_eth_ids.push_back(row[msgch_fields::ID].as_uint64());
       }
    }
-   BOOST_REQUIRE_EQUAL(expiring_ids.size(), kRowsPerEpoch);
+   BOOST_REQUIRE_EQUAL(expiring_eth_ids.size(), kRowsPerOutpost);
 
    const auto envelope = encode_chained_delivery("budget-" + std::to_string(epoch), tip);
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, envelope));
    produce_blocks();
-   BOOST_REQUIRE_EQUAL(envelope_rows_for_epoch(expiring_epoch), kRowsPerEpoch - ENVELOPE_PRUNE_BUDGET);
-   BOOST_REQUIRE_EQUAL(envelope_rows().front()[msgch_fields::ID].as_uint64(),
-                       expiring_ids[ENVELOPE_PRUNE_BUDGET]);
-   BOOST_REQUIRE_EQUAL(envelope_rows_for_epoch(expiring_epoch + 1), kRowsPerEpoch);
+   BOOST_REQUIRE_EQUAL(envelope_rows_for(ETH_OUTPOST_ID, expiring_epoch), kRowsPerOutpost - ENVELOPE_PRUNE_BUDGET);
+   BOOST_REQUIRE_EQUAL(envelope_rows_for(SOL_OUTPOST_ID, expiring_epoch), kRowsPerOutpost);
+   BOOST_REQUIRE(find_inbound_delivery(ETH_OUTPOST_ID, expiring_epoch, ops[ENVELOPE_PRUNE_BUDGET - 1]).is_null());
+   BOOST_REQUIRE(!find_inbound_delivery(ETH_OUTPOST_ID, expiring_epoch, ops[ENVELOPE_PRUNE_BUDGET]).is_null());
+   BOOST_REQUIRE_EQUAL(envelope_rows_for_epoch(expiring_epoch + 1), 2 * kRowsPerOutpost);
 
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, envelope));
    produce_blocks();
-   BOOST_REQUIRE_EQUAL(envelope_rows_for_epoch(expiring_epoch), 0u);
-   BOOST_REQUIRE_EQUAL(envelope_rows_for_epoch(expiring_epoch + 1), kRowsPerEpoch);
-   BOOST_REQUIRE_EQUAL(envelope_rows_for_epoch(epoch), 2u);
+   BOOST_REQUIRE_EQUAL(envelope_rows_for(ETH_OUTPOST_ID, expiring_epoch), 0u);
+   BOOST_REQUIRE_EQUAL(envelope_rows_for(SOL_OUTPOST_ID, expiring_epoch), kRowsPerOutpost);
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, SOL_OUTPOST_ID, envelope));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(envelope_rows_for(SOL_OUTPOST_ID, expiring_epoch), kRowsPerOutpost - ENVELOPE_PRUNE_BUDGET);
+   BOOST_REQUIRE_EQUAL(envelope_rows_for_epoch(expiring_epoch + 1), 2 * kRowsPerOutpost);
+   BOOST_REQUIRE_EQUAL(envelope_rows_for_epoch(epoch), 3u);
+   BOOST_REQUIRE_EQUAL(envelope_index_entries(), envelope_rows().size());
+} FC_LOG_AND_RETHROW() }
+
+/// The prune is per outpost. SOL's only deliveries are in the first epoch, so they hold the lowest
+/// ids; ETH keeps delivering. ETH's deliveries past the window prune ETH's expired rows only, and
+/// SOL's rows from the first epoch stay until SOL delivers again, which prunes them.
+BOOST_FIXTURE_TEST_CASE(envelope_prune_is_per_outpost, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kBatchOperatorCount = 3;
+   const std::vector<name> ops{BATCHOP, BATCHOP_B, BATCHOP_C};
+
+   bootstrap(kBatchOperatorCount);
+   const uint32_t first_epoch = current_epoch();
+   std::map<uint64_t, inbound_stream_tip> tips;
+   const auto deliver_all = [&](uint64_t outpost, std::string_view payload) {
+      auto&      tip      = tips[outpost];
+      const auto envelope = encode_chained_delivery(payload, tip);
+      for (const auto& op : ops) BOOST_REQUIRE_EQUAL(success(), deliver_as(op, outpost, envelope));
+      produce_blocks();
+      tip = next_stream_tip(envelope);
+   };
+
+   deliver_all(SOL_OUTPOST_ID, "sol-first");
+   for (uint32_t i = 0; i <= INBOUND_ENVELOPE_RETENTION_EPOCHS; ++i) {
+      deliver_all(ETH_OUTPOST_ID, "eth-" + std::to_string(current_epoch()));
+      advance_one_epoch();
+   }
+   const uint32_t epoch = current_epoch();
+   BOOST_REQUIRE_EQUAL(first_epoch + INBOUND_ENVELOPE_RETENTION_EPOCHS + 1, epoch);
+
+   // ETH's own expired epochs are gone; SOL's first-epoch rows survive ETH's prunes.
+   BOOST_REQUIRE_EQUAL(envelope_rows_for(ETH_OUTPOST_ID, first_epoch), 0u);
+   BOOST_REQUIRE_EQUAL(envelope_rows_for(SOL_OUTPOST_ID, first_epoch), kBatchOperatorCount);
+   for (uint32_t retained = first_epoch + 1; retained < epoch; ++retained) {
+      BOOST_REQUIRE_EQUAL(envelope_rows_for(ETH_OUTPOST_ID, retained), kBatchOperatorCount);
+   }
+
+   deliver_all(SOL_OUTPOST_ID, "sol-later");
+   BOOST_REQUIRE_EQUAL(envelope_rows_for(SOL_OUTPOST_ID, first_epoch), 0u);
+   BOOST_REQUIRE_EQUAL(envelope_rows_for(SOL_OUTPOST_ID, epoch), kBatchOperatorCount);
    BOOST_REQUIRE_EQUAL(envelope_index_entries(), envelope_rows().size());
 } FC_LOG_AND_RETHROW() }
 

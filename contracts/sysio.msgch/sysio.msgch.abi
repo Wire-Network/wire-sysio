@@ -187,6 +187,14 @@
                     "type": "uint64"
                 },
                 {
+                    "name": "chain_code",
+                    "type": "uint64"
+                },
+                {
+                    "name": "chain_seq",
+                    "type": "uint64"
+                },
+                {
                     "name": "endpoints",
                     "type": "Endpoints"
                 },
@@ -501,7 +509,14 @@
             "index_type": "i64",
             "key_names": ["id"],
             "key_types": ["uint64"],
-            "table_id": 31386
+            "table_id": 31386,
+            "secondary_indexes": [
+                {
+                    "name": "bychain",
+                    "key_type": "uint128",
+                    "table_id": 45782
+                }
+            ]
         },
         {
             "name": "messages",

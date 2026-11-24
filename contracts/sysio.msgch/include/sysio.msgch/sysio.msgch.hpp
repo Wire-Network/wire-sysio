@@ -409,25 +409,32 @@ namespace sysio {
       /// consumed inline by the consensus + dispatch path and never stored.
       /// Off-chain audit reconstruction is out of scope.
       ///
-      /// Total row count is capped at
-      /// `active_outposts * 2 * epoch_retention_envelope_log_count`
-      /// (one inbound + one outbound row per active outpost per epoch).
-      /// Eviction is head-first on overflow — see
-      /// `write_envelope_log` in `src/sysio.msgch.cpp`.
+      /// Retention is per outpost: each outpost keeps at most
+      /// `2 * epoch_retention_envelope_log_count` rows (one inbound + one
+      /// outbound per epoch), and a write evicts only its own outpost's oldest
+      /// rows — see `write_envelope_log` in `src/sysio.msgch.cpp`.
       struct [[sysio::table("envlog")]] envelope_log_entry {
          uint64_t        id;                ///< monotonic auto-increment PK
+         uint64_t        chain_code;        ///< the outpost the envelope came from or went to
+         /// This outpost's own row sequence: contiguous over its retained rows, so the newest minus the
+         /// oldest plus one is its row count.
+         uint64_t        chain_seq;
          opp::Endpoints  endpoints;         ///< start + end ChainId
          uint32_t        epoch_index;
          checksum256     checksum;          ///< sha256/keccak of envelope bytes
          time_point      emitted_at;
 
          uint64_t primary_key() const { return id; }
+         uint128_t by_chain() const { return opp::outpost_sequence_key(chain_code, chain_seq); }
 
          SYSLIB_SERIALIZE(envelope_log_entry,
-            (id)(endpoints)(epoch_index)(checksum)(emitted_at))
+            (id)(chain_code)(chain_seq)(endpoints)(epoch_index)(checksum)(emitted_at))
       };
 
-      using envelope_log_t = sysio::kv::table<"envlog"_n, id_key, envelope_log_entry>;
+      using envelope_log_t = sysio::kv::table<"envlog"_n, id_key, envelope_log_entry,
+         sysio::kv::index<"bychain"_n,
+            sysio::const_mem_fun<envelope_log_entry, uint128_t, &envelope_log_entry::by_chain>>
+      >;
 
    private:
 

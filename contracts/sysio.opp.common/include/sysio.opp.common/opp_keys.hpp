@@ -32,4 +32,10 @@ inline uint128_t outpost_epoch_key(uint64_t chain_code, uint32_t epoch_index) {
    return (static_cast<uint128_t>(chain_code) << 32) | static_cast<uint128_t>(epoch_index);
 }
 
+/// Order-preserving composite key for an `(outpost chain_code, sequence)` pair: `chain_code` in bits
+/// 64-127, `sequence` in bits 0-63. Sorts by chain_code then sequence.
+inline uint128_t outpost_sequence_key(uint64_t chain_code, uint64_t sequence) {
+   return (static_cast<uint128_t>(chain_code) << 64) | static_cast<uint128_t>(sequence);
+}
+
 } // namespace sysio::opp

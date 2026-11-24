@@ -901,9 +901,8 @@ void epoch::finishadv(uint32_t epoch_index) {
 
    // No scheduled cleanup of `sysio.msgch::envelopes` is needed here:
    // `deliver` prunes rows older than the previous epoch. The durable audit
-   // trail lives in the `envelope_log` table on the same contract, capped at
-   // `active_outposts * 2 * cfg.epoch_retention_envelope_log_count`
-   // and pruned head-first on overflow.
+   // trail lives in the `envelope_log` table on the same contract, where each
+   // outpost keeps `2 * cfg.epoch_retention_envelope_log_count` rows.
 }
 
 // ---------------------------------------------------------------------------

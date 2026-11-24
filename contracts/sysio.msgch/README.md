@@ -27,7 +27,7 @@ Inbound/outbound OPP message chain management and consensus tracking contract.
 | `outenvelopes` | `kv::table` | Built outbound envelopes awaiting relay, with their canonical epoch digest |
 | `outpcons` | `kv::table` | Per-outpost consensus record: accepted envelope digest and inbound message-chain tip |
 | `attseq` | `kv::table` | Attestation sequence counter |
-| `envlog` | `kv::table` | Metadata-only envelope audit log, capped at `active_outposts * 2 * epoch_retention_envelope_log_count` rows |
+| `envlog` | `kv::table` | Metadata-only envelope audit log; each outpost keeps its newest `2 * epoch_retention_envelope_log_count` rows |
 
 ## Actions
 

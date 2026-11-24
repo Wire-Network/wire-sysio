@@ -77,14 +77,11 @@ namespace sysio {
          uint32_t    batch_operator_minimum_active = 21;
          uint32_t    batch_op_groups = 3;          // rotation groups (21 / 7)
 
-         /// Cap multiplier for the metadata-only `envelope_log` table on
-         /// `sysio.msgch`. Effective row cap is
-         /// `active_outposts * 2 * epoch_retention_envelope_log_count`
-         /// (one inbound + one outbound record per active outpost per
-         /// epoch). Default 200 — matches the SOL/ETH per-direction
-         /// metadata-log cap. Each `evalcons` consensus-reach + `buildenv`
-         /// emit reads this directly; runtime changes via `setconfig`
-         /// take effect on the next write.
+         /// Epochs of history each outpost keeps in the metadata-only `envelope_log` table on
+         /// `sysio.msgch`: an outpost holds at most `2 * epoch_retention_envelope_log_count` rows
+         /// (one inbound + one outbound record per epoch). Default 200 — matches the SOL/ETH
+         /// per-direction metadata-log cap. Each log write reads this directly; runtime changes via
+         /// `setconfig` take effect on the next write.
          uint32_t    epoch_retention_envelope_log_count = 200;
 
          SYSLIB_SERIALIZE(epoch_config,

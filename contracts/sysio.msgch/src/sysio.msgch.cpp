@@ -95,6 +95,16 @@ static_assert(INBOUND_ENVELOPE_RETENTION_EPOCHS >= 1,
               "the prune must never reach the current epoch, which every reader depends on");
 static_assert(ENVELOPE_PRUNE_BUDGET > 1, "the prune must outpace the one row each delivery adds");
 
+/// `envlog` rows an outpost logs per epoch: one accepted inbound envelope and one outbound emit. An
+/// outpost keeps this many rows per epoch of `epoch_retention_envelope_log_count`.
+constexpr uint32_t ENVELOPE_LOG_ROWS_PER_EPOCH = 2;
+
+/// Maximum `envlog` rows of its own outpost a single write evicts.
+constexpr uint32_t ENVELOPE_LOG_EVICTION_BUDGET = 2;
+
+static_assert(ENVELOPE_LOG_EVICTION_BUDGET > 1,
+              "the eviction must outpace the one row each write adds, so a lowered retention converges");
+
 /// Stable audit marker for a UIC rejected before it can reach `rcrdcommit`.
 constexpr const char* UIC_DISPATCH_REJECTED_LOG_PREFIX =
    "UIC_DISPATCH_REJECTED";
@@ -194,80 +204,71 @@ std::vector<name> eligible_batch_operators() {
    return eligible;
 }
 
-/// Insert a metadata row into `envelope_log` and, if the table has grown
-/// past its derived cap, evict the oldest full epoch (one
-/// `per_epoch_record_count`'s worth of rows) from the head.
+/// Insert a metadata row into `envelope_log` for outpost `chain_code`, then evict up to
+/// `ENVELOPE_LOG_EVICTION_BUDGET` of that outpost's oldest rows while it holds more than
+/// `ENVELOPE_LOG_ROWS_PER_EPOCH * epoch_retention_envelope_log_count`. Retention is per outpost, so a
+/// busy outpost never evicts another's history. No config means no cap.
 ///
-/// Cap derivation:
-///   active_outposts        = sysio.epoch.outposts.size()
-///   per_epoch_record_count = active_outposts * 2     // 1 inbound + 1 outbound per outpost
-///   cap                    = per_epoch * cfg.epoch_retention_envelope_log_count
-///
-/// `live_count` is computed in O(1) from id arithmetic
-/// (`available_primary_key()` and `tbl.begin()->id`) — no full-table scan
-/// and no per-endpoint walk. Eviction at most touches one full epoch's
-/// rows per write, since the slice can only grow by one per insert.
+/// The outpost's rows are contiguous in `chain_seq` (inserted at the tail, evicted from the head, the
+/// newest never evicted), so its row count is the newest sequence minus the oldest plus one.
 void write_envelope_log(name self,
+                        uint64_t                     chain_code,
                         const sysio::opp::Endpoints& endpoints,
                         uint32_t                     epoch_index,
                         const checksum256&           checksum) {
-   sysio::msgch::envelope_log_t tbl(self);
+   msgch::envelope_log_t tbl(self);
+   auto by_chain = tbl.get_index<"bychain"_n>();
+
+   // The outpost's newest row: one step back from the first entry past its range.
+   uint64_t chain_seq = 1;
+   {
+      auto newest = by_chain.upper_bound(opp::outpost_sequence_key(chain_code, std::numeric_limits<uint64_t>::max()));
+      --newest;
+      if (newest != by_chain.end() && newest->chain_code == chain_code) chain_seq = newest->chain_seq + 1;
+   }
+
    const uint64_t new_id = std::max<uint64_t>(1, tbl.available_primary_key());
-   tbl.emplace(ram_payer, sysio::msgch::id_key{new_id}, sysio::msgch::envelope_log_entry{
+   tbl.emplace(ram_payer, msgch::id_key{new_id}, msgch::envelope_log_entry{
       .id          = new_id,
+      .chain_code  = chain_code,
+      .chain_seq   = chain_seq,
       .endpoints   = endpoints,
       .epoch_index = epoch_index,
       .checksum    = checksum,
       .emitted_at  = current_time_point(),
    });
 
-   // Active-outpost count is sourced from sysio.chains::chains, filtering
-   // out the depot self-row. Mirrors the predicate used by sysio.epoch's
-   // `is_active_outpost`: a chain row is an active outpost iff
-   // `row.active == true && row.is_depot == false`.
-   sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
-   uint32_t active_outposts = 0;
-   for (auto it = chains_tbl.begin(); it != chains_tbl.end(); ++it) {
-      if (it->active && !it->is_depot) ++active_outposts;
-   }
-   if (active_outposts == 0) return;                  // nothing to bound against
-
    epoch::epochcfg_t cfg_tbl(EPOCH_ACCOUNT);
-   if (!cfg_tbl.exists()) return;                     // no config yet, no cap
-   const auto cfg = cfg_tbl.get();
-   const uint32_t per_epoch = active_outposts * 2;    // 1 inbound + 1 outbound
+   if (!cfg_tbl.exists()) return;
    const uint64_t cap =
-      static_cast<uint64_t>(per_epoch) * cfg.epoch_retention_envelope_log_count;
+      uint64_t{ENVELOPE_LOG_ROWS_PER_EPOCH} * cfg_tbl.get().epoch_retention_envelope_log_count;
 
-   auto first_it = tbl.begin();
-   if (first_it == tbl.end()) return;                 // defensive: just inserted
-   const uint64_t oldest_id  = first_it.key().id;
-   const uint64_t live_count = (new_id + 1) - oldest_id;
-   if (live_count <= cap) return;
-
-   uint32_t dropped = 0;
-   for (auto it = tbl.begin();
-        it != tbl.end() && dropped < per_epoch; ) {
-      it = tbl.erase(std::move(it));
-      ++dropped;
+   auto oldest = by_chain.lower_bound(opp::outpost_sequence_key(chain_code, 0));
+   for (uint32_t evicted = 0; evicted < ENVELOPE_LOG_EVICTION_BUDGET && oldest != by_chain.end() &&
+                              oldest->chain_code == chain_code && chain_seq - oldest->chain_seq + 1 > cap;
+        ++evicted) {
+      oldest = by_chain.erase(std::move(oldest));
    }
 }
 
-/// Erase up to `ENVELOPE_PRUNE_BUDGET` inbound `envelopes` rows that fell out of the retention
-/// window, oldest first.
+/// Erase up to `ENVELOPE_PRUNE_BUDGET` of outpost `chain_code`'s inbound `envelopes` rows that fell out
+/// of the retention window, oldest epoch first. Walks the outpost's own `byoutepoch` range, so one
+/// outpost's deliveries never prune another's rows, and stops at its first retained epoch, so a call
+/// is O(budget).
 ///
-/// Primary-key order is epoch order: ids come from `available_primary_key()`, `deliver` only
-/// accepts current-epoch envelopes, and rows leave only from the head, so the newest id is never
-/// erased and ids never restart. The walk stops at the first retained row, so a call is O(budget).
-void prune_expired_envelopes(name self, uint32_t current_epoch) {
+/// Ids never restart: `deliver` calls this after inserting its row, the newest id, which is in the
+/// current epoch and so outside the pruned range.
+void prune_expired_envelopes(name self, uint64_t chain_code, uint32_t current_epoch) {
    if (current_epoch < INBOUND_ENVELOPE_RETENTION_EPOCHS) return;
-   const uint32_t newest_expired_epoch = current_epoch - INBOUND_ENVELOPE_RETENTION_EPOCHS;
+   const uint128_t newest_expired =
+      opp::outpost_epoch_key(chain_code, current_epoch - INBOUND_ENVELOPE_RETENTION_EPOCHS);
 
    msgch::envelopes_t envs(self);
-   auto it = envs.begin();
-   for (uint32_t erased = 0; erased < ENVELOPE_PRUNE_BUDGET && it != envs.end() &&
-                             it->epoch_index <= newest_expired_epoch; ++erased) {
-      it = envs.erase(std::move(it));
+   auto by_outpost_epoch = envs.get_index<"byoutepoch"_n>();
+   auto it = by_outpost_epoch.lower_bound(opp::outpost_epoch_key(chain_code, 0));
+   for (uint32_t erased = 0; erased < ENVELOPE_PRUNE_BUDGET && it != by_outpost_epoch.end() &&
+                             it->by_outpost_epoch() <= newest_expired; ++erased) {
+      it = by_outpost_epoch.erase(std::move(it));
    }
 }
 
@@ -870,7 +871,7 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
       endpoints.start.id   = op_row.external_chain_id;
       endpoints.end.kind   = ChainKind::CHAIN_KIND_WIRE;
       endpoints.end.id     = WIRE_CHAIN_ID;
-      write_envelope_log(self, endpoints, epoch_index, envelope_digest);
+      write_envelope_log(self, chain_code, endpoints, epoch_index, envelope_digest);
 
       // Drop heavy raw_data from each per-batch-op envelope row but KEEP the metadata tuple so
       // sysio.epoch::advance can still read per-op checksums + delivery for slash classification.
@@ -1167,7 +1168,7 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
    });
 
    // After the emplace, so the newest id always survives (see prune_expired_envelopes).
-   prune_expired_envelopes(get_self(), epoch);
+   prune_expired_envelopes(get_self(), chain_code, epoch);
 
    // Evaluate consensus inline
    action(
@@ -1766,7 +1767,7 @@ void msgch::buildenv(uint64_t chain_code) {
    {
       // Same endpoints the wire envelope carries (derived above from the
       // destination's `sysio.chains` row).
-      write_envelope_log(get_self(), route_endpoints, epoch, envelope_digest);
+      write_envelope_log(get_self(), chain_code, route_endpoints, epoch, envelope_digest);
 
       // Drop the prefix of prior emits the outpost has consumed: an outpost emits epoch N only after
       // accepting ours, so `outpcons.epoch_index` covering a row's epoch proves consumption. The walk
