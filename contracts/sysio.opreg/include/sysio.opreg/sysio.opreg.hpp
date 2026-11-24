@@ -98,12 +98,31 @@ namespace sysio {
       /// exceeded by an all-miss window while `termcheck` uses strict breach semantics.
       static constexpr uint32_t MAX_TERMINATE_MAX_PCT_MISSES_24H = 99;
 
+      /// Denominator of the whole-percent miss rate the percent rail compares with its threshold.
+      static constexpr uint32_t PERCENT_SCALE = 100;
+
+      /// Duty epochs recorded since the operator joined the chain before the percent rail applies; the
+      /// consecutive rail applies from the first. At the default, one early miss alone stays at the default
+      /// percent threshold rather than above it.
+      static constexpr uint32_t DEFAULT_TERMINATE_MIN_PCT_SAMPLES =
+         PERCENT_SCALE / DEFAULT_TERMINATE_MAX_PCT_MISSES_24H;
+
+      /// Lowest accepted percent-rail sample: the rail applies from the first duty epoch.
+      static constexpr uint32_t MIN_TERMINATE_MIN_PCT_SAMPLES = 1;
+
+      /// Highest accepted percent-rail sample: one miss in this many duty epochs stays at the lowest accepted
+      /// percent threshold, so no threshold needs a longer grace.
+      static constexpr uint32_t MAX_TERMINATE_MIN_PCT_SAMPLES = PERCENT_SCALE / MIN_TERMINATE_MAX_PCT_MISSES_24H;
+
       static_assert(MIN_TERMINATE_MAX_CONSECUTIVE_MISSES <= DEFAULT_TERMINATE_MAX_CONSECUTIVE_MISSES &&
                     DEFAULT_TERMINATE_MAX_CONSECUTIVE_MISSES <= MAX_TERMINATE_MAX_CONSECUTIVE_MISSES,
                     "production default consecutive-miss threshold must lie inside the accepted bounds");
       static_assert(MIN_TERMINATE_MAX_PCT_MISSES_24H <= DEFAULT_TERMINATE_MAX_PCT_MISSES_24H &&
                     DEFAULT_TERMINATE_MAX_PCT_MISSES_24H <= MAX_TERMINATE_MAX_PCT_MISSES_24H,
                     "production default percent-miss threshold must lie inside the accepted bounds");
+      static_assert(MIN_TERMINATE_MIN_PCT_SAMPLES <= DEFAULT_TERMINATE_MIN_PCT_SAMPLES &&
+                    DEFAULT_TERMINATE_MIN_PCT_SAMPLES <= MAX_TERMINATE_MIN_PCT_SAMPLES,
+                    "production default percent-rail sample must lie inside the accepted bounds");
 
       /// Minimum accepted `terminate_window_ms` for a given consecutive-miss
       /// threshold and one outpost chain's epoch schedule. Delivery records
@@ -168,9 +187,10 @@ namespace sysio {
       //  Actions
       // -----------------------------------------------------------------------
 
-      /// Set operator registry configuration. The three `terminate_*`
-      /// thresholds drive `termcheck`'s rolling-buffer evaluation; tests
-      /// can dial them down (e.g. `terminate_max_consecutive_misses=2`,
+      /// Set operator registry configuration. The four eviction settings
+      /// (`terminate_max_consecutive_misses`, `terminate_max_pct_misses_24h`,
+      /// `terminate_min_pct_samples`, `terminate_window_ms`) drive `termcheck`;
+      /// tests can dial them down (e.g. `terminate_max_consecutive_misses=2`,
       /// `terminate_window_ms=60_000`) to make the miss → eviction path
       /// observable inside a flow-test's timeout budget.
       ///
@@ -193,6 +213,7 @@ namespace sysio {
       void setconfig(uint64_t terminate_prune_delay_ms,
                      uint32_t terminate_max_consecutive_misses,
                      uint32_t terminate_max_pct_misses_24h,
+                     uint32_t terminate_min_pct_samples,
                      uint64_t terminate_window_ms,
                      std::vector<chain_min_bond> req_prod_collat,
                      std::vector<chain_min_bond> req_batchop_collat,
@@ -291,8 +312,9 @@ namespace sysio {
       void recorddel(name account, sysio::slug_name chain_code, uint32_t epoch, bool delivered);
 
       /// Evict the operator from outpost `chain_code` when its rolling buffer on that chain holds more
-      /// than `terminate_max_consecutive_misses` consecutive misses, or a whole-percent miss rate
-      /// (rounded down) above `terminate_max_pct_misses_24h`. Both rails count the chain's duty epochs
+      /// than `terminate_max_consecutive_misses` consecutive misses, or, once it holds at least
+      /// `terminate_min_pct_samples` duty epochs, a whole-percent miss rate (rounded down) above
+      /// `terminate_max_pct_misses_24h`. Both rails count the chain's duty epochs
       /// recorded after the second of the operator's current registration and after the second of its
       /// latest join of the chain; a return to ACTIVE resets neither. The membership becomes EVICTED
       /// with the rail's reason, and the operator forfeits its unsettled batch duty on the chain
@@ -516,12 +538,14 @@ namespace sysio {
          uint64_t terminate_prune_delay_ms         = 86400000; // 24hrs
          uint32_t terminate_max_consecutive_misses = DEFAULT_TERMINATE_MAX_CONSECUTIVE_MISSES;
          uint32_t terminate_max_pct_misses_24h     = DEFAULT_TERMINATE_MAX_PCT_MISSES_24H;
+         uint32_t terminate_min_pct_samples        = DEFAULT_TERMINATE_MIN_PCT_SAMPLES;
          uint64_t terminate_window_ms              = DEFAULT_TERMINATE_WINDOW_MS;
 
          SYSLIB_SERIALIZE(op_config,
             (req_prod_collat)(req_batchop_collat)(req_uw_collat)
             (terminate_prune_delay_ms)
-            (terminate_max_consecutive_misses)(terminate_max_pct_misses_24h)(terminate_window_ms))
+            (terminate_max_consecutive_misses)(terminate_max_pct_misses_24h)(terminate_min_pct_samples)
+            (terminate_window_ms))
       };
 
       using opconfig_t = sysio::kv::global<"opconfig"_n, op_config>;

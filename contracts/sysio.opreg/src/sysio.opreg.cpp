@@ -275,6 +275,7 @@ void erase_memberships(name self, name account) {
 void opreg::setconfig(uint64_t terminate_prune_delay_ms,
                       uint32_t terminate_max_consecutive_misses,
                       uint32_t terminate_max_pct_misses_24h,
+                      uint32_t terminate_min_pct_samples,
                       uint64_t terminate_window_ms,
                       std::vector<chain_min_bond> req_prod_collat,
                       std::vector<chain_min_bond> req_batchop_collat,
@@ -288,6 +289,9 @@ void opreg::setconfig(uint64_t terminate_prune_delay_ms,
    check(terminate_max_pct_misses_24h >= MIN_TERMINATE_MAX_PCT_MISSES_24H &&
          terminate_max_pct_misses_24h <= MAX_TERMINATE_MAX_PCT_MISSES_24H,
          "terminate_max_pct_misses_24h must be in [1, 99]");
+   check(terminate_min_pct_samples >= MIN_TERMINATE_MIN_PCT_SAMPLES &&
+         terminate_min_pct_samples <= MAX_TERMINATE_MIN_PCT_SAMPLES,
+         "terminate_min_pct_samples must be in [1, 100]");
    check(terminate_window_ms > 0, "terminate_window_ms must be positive");
 
    // SEC-28 residual: delivery records accrue only on duty epochs -- one per
@@ -340,6 +344,7 @@ void opreg::setconfig(uint64_t terminate_prune_delay_ms,
    cfg.terminate_prune_delay_ms         = terminate_prune_delay_ms;
    cfg.terminate_max_consecutive_misses = terminate_max_consecutive_misses;
    cfg.terminate_max_pct_misses_24h     = terminate_max_pct_misses_24h;
+   cfg.terminate_min_pct_samples        = terminate_min_pct_samples;
    cfg.terminate_window_ms              = terminate_window_ms;
    cfg.req_prod_collat                  = std::move(req_prod_collat);
    cfg.req_batchop_collat               = std::move(req_batchop_collat);
@@ -1727,9 +1732,11 @@ void opreg::termcheck(name account, sysio::slug_name chain_code) {
       }
    }
 
-   bool exceeds_consecutive = worst_consecutive > cfg.terminate_max_consecutive_misses;
-   bool exceeds_percent     = total_in_window > 0 &&
-                              (total_misses * 100u / total_in_window) > cfg.terminate_max_pct_misses_24h;
+   // The percent rail waits for a minimum sample, so a miss among the first duties cannot evict alone.
+   const bool exceeds_consecutive = worst_consecutive > cfg.terminate_max_consecutive_misses;
+   const bool exceeds_percent     = total_in_window > 0 && total_in_window >= cfg.terminate_min_pct_samples &&
+                                    uint64_t{total_misses} * PERCENT_SCALE / total_in_window >
+                                       cfg.terminate_max_pct_misses_24h;
    if (exceeds_consecutive || exceeds_percent) {
       membership->status        = chain_service_status::EVICTED;
       membership->updated_at_ms = now_ms;

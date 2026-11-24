@@ -81,6 +81,18 @@ constexpr uint32_t kMaxAcceptedPctMisses24h = 99;
 /// Disabling percent threshold rejected because an all-miss window cannot exceed it.
 constexpr uint32_t kDisablingPctMisses24h = 100;
 
+/// Mirrors opreg's PERCENT_SCALE: the denominator of the whole-percent miss rate.
+constexpr uint32_t kPercentScale = 100;
+
+/// Mirrors opreg's DEFAULT_TERMINATE_MIN_PCT_SAMPLES: duty epochs before the percent rail applies.
+constexpr uint32_t kDefaultMinPctSamples = kPercentScale / kDefaultMaxPctMisses24h;
+
+/// Percent-rail sample that applies the rail from the first duty epoch, the lowest accepted.
+constexpr uint32_t kPercentRailFromFirstDuty = 1;
+
+/// Highest accepted percent-rail sample (opreg's MAX_TERMINATE_MIN_PCT_SAMPLES).
+constexpr uint32_t kMaxAcceptedMinPctSamples = kPercentScale;
+
 /// Compact collateral amount used to activate non-bootstrapped batch operators.
 constexpr uint64_t kTestMinBond = 1;
 
@@ -473,6 +485,7 @@ public:
    action_result setconfig(uint64_t prune_delay = 600000,
                            uint32_t max_consec_misses = 5,
                            uint32_t max_pct_misses_24h = 5,
+                           uint32_t min_pct_samples = kDefaultMinPctSamples,
                            uint64_t terminate_window_ms = 24ULL * 60 * 60 * 1000,
                            std::vector<fc::variant> req_prod_collat    = {},
                            std::vector<fc::variant> req_batchop_collat = {},
@@ -481,6 +494,7 @@ public:
          ("terminate_prune_delay_ms",         prune_delay)
          ("terminate_max_consecutive_misses", max_consec_misses)
          ("terminate_max_pct_misses_24h",     max_pct_misses_24h)
+         ("terminate_min_pct_samples",        min_pct_samples)
          ("terminate_window_ms",              terminate_window_ms)
          ("req_prod_collat",                  req_prod_collat)
          ("req_batchop_collat",               req_batchop_collat)
@@ -563,11 +577,13 @@ public:
    void activate_batch_operator(name account,
                                 uint32_t max_consec_misses = kDefaultMaxConsecutiveMisses,
                                 uint32_t max_pct_misses_24h = kMaxAcceptedPctMisses24h,
+                                uint32_t min_pct_samples = kDefaultMinPctSamples,
                                 uint64_t terminate_window_ms = kTerminateWindowMs) {
       BOOST_REQUIRE_EQUAL(success(), setconfig(
          /*prune_delay=*/kDefaultPruneDelayMs,
          /*max_consec_misses=*/max_consec_misses,
          /*max_pct_misses_24h=*/max_pct_misses_24h,
+         /*min_pct_samples=*/min_pct_samples,
          /*terminate_window_ms=*/terminate_window_ms,
          /*req_prod_collat=*/{},
          /*req_batchop_collat=*/{
@@ -1039,6 +1055,24 @@ BOOST_FIXTURE_TEST_CASE(setconfig_basic, sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(kDefaultMaxConsecutiveMisses,
                        cfg["terminate_max_consecutive_misses"].as_uint64());
    BOOST_REQUIRE_EQUAL(kDefaultMaxPctMisses24h, cfg["terminate_max_pct_misses_24h"].as_uint64());
+   BOOST_REQUIRE_EQUAL(kDefaultMinPctSamples, cfg["terminate_min_pct_samples"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(setconfig_bounds_min_pct_samples, sysio_opreg_tester) { try {
+   constexpr std::string_view kOutOfBounds =
+      "assertion failure with message: terminate_min_pct_samples must be in [1, 100]";
+   for (const uint32_t rejected : {kPercentRailFromFirstDuty - 1, kMaxAcceptedMinPctSamples + 1}) {
+      BOOST_REQUIRE_EQUAL(error(std::string(kOutOfBounds)),
+                          setconfig(kDefaultPruneDelayMs, kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h,
+                                    rejected, kTerminateWindowMs));
+   }
+   for (const uint32_t accepted : {kPercentRailFromFirstDuty, kMaxAcceptedMinPctSamples}) {
+      BOOST_REQUIRE_EQUAL(success(),
+                          setconfig(kDefaultPruneDelayMs, kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h,
+                                    accepted, kTerminateWindowMs));
+      BOOST_REQUIRE_EQUAL(accepted, get_opconfig()["terminate_min_pct_samples"].as_uint64());
+      produce_blocks();
+   }
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(setconfig_rejects_zero_prune_delay, sysio_opreg_tester) { try {
@@ -1052,7 +1086,8 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_disabling_percent_miss_threshold, sysi
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: terminate_max_pct_misses_24h must be in [1, 99]"),
       setconfig(kDefaultPruneDelayMs,
-                kDefaultMaxConsecutiveMisses, kDisablingPctMisses24h, kTerminateWindowMs)
+                kDefaultMaxConsecutiveMisses, kDisablingPctMisses24h, kDefaultMinPctSamples,
+                kTerminateWindowMs)
    );
 } FC_LOG_AND_RETHROW() }
 
@@ -1060,13 +1095,15 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_disabling_consecutive_miss_threshold, 
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: terminate_max_consecutive_misses must be in [1, 5]"),
       setconfig(kDefaultPruneDelayMs,
-                kDefaultMaxConsecutiveMisses + 1, kMaxAcceptedPctMisses24h, kTerminateWindowMs)
+                kDefaultMaxConsecutiveMisses + 1, kMaxAcceptedPctMisses24h, kDefaultMinPctSamples,
+                kTerminateWindowMs)
    );
 
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: terminate_max_consecutive_misses must be in [1, 5]"),
       setconfig(kDefaultPruneDelayMs,
-                std::numeric_limits<uint32_t>::max(), kMaxAcceptedPctMisses24h, kTerminateWindowMs)
+                std::numeric_limits<uint32_t>::max(), kMaxAcceptedPctMisses24h, kDefaultMinPctSamples,
+                kTerminateWindowMs)
    );
 } FC_LOG_AND_RETHROW() }
 
@@ -1078,14 +1115,14 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_zero_min_bond, sysio_opreg_tester) { t
       error("assertion failure with message: req_uw_collat: min_bond must be positive "
             "(an empty requirement set imposes no bond)"),
       setconfig(kDefaultPruneDelayMs,
-                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kTerminateWindowMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kDefaultMinPctSamples, kTerminateWindowMs,
                 {}, {}, { make_chain_min_bond("WIRE", "NTA", kRejectedZeroMinBond) })
    );
    // The identical shape with a positive min_bond is accepted.
    BOOST_REQUIRE_EQUAL(
       success(),
       setconfig(kDefaultPruneDelayMs,
-                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kTerminateWindowMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kDefaultMinPctSamples, kTerminateWindowMs,
                 {}, {}, { make_chain_min_bond("WIRE", "NTA", kTestMinBond) })
    );
 } FC_LOG_AND_RETHROW() }
@@ -1109,7 +1146,7 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_uncanonical_collateral_code, sysio_opr
       error("assertion failure with message: req_uw_collat: code 7 has no canonical "
             "slug_name spelling"),
       setconfig(kDefaultPruneDelayMs,
-                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kTerminateWindowMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kDefaultMinPctSamples, kTerminateWindowMs,
                 {}, {}, { bad_chain })
    );
 
@@ -1117,7 +1154,7 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_uncanonical_collateral_code, sysio_opr
    BOOST_REQUIRE_EQUAL(
       success(),
       setconfig(kDefaultPruneDelayMs,
-                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kTerminateWindowMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kDefaultMinPctSamples, kTerminateWindowMs,
                 {}, {}, { make_chain_min_bond("WIRE", "NTA", kTestMinBond) })
    );
 } FC_LOG_AND_RETHROW() }
@@ -1130,14 +1167,14 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_window_narrower_than_consecutive_run, 
       error("assertion failure with message: terminate_window_ms must span at least "
             "terminate_max_consecutive_misses + 1 duty rotations"),
       setconfig(kDefaultPruneDelayMs,
-                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kDefaultMinPctSamples,
                 kMinWindowMsAtDefaults - 1)
    );
 
    // The exact span boundary is the smallest accepted window.
    BOOST_REQUIRE_EQUAL(success(),
       setconfig(kDefaultPruneDelayMs,
-                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kDefaultMinPctSamples,
                 kMinWindowMsAtDefaults));
 } FC_LOG_AND_RETHROW() }
 
@@ -1154,11 +1191,11 @@ BOOST_FIXTURE_TEST_CASE(setconfig_window_spans_every_chains_schedule, sysio_opre
       error("assertion failure with message: terminate_window_ms must span at least "
             "terminate_max_consecutive_misses + 1 duty rotations"),
       setconfig(kDefaultPruneDelayMs,
-                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kDefaultMinPctSamples,
                 kMinWindowMsAtDefaults));
    BOOST_REQUIRE_EQUAL(success(),
       setconfig(kDefaultPruneDelayMs,
-                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kDefaultMinPctSamples,
                 2 * kMinWindowMsAtDefaults));
 } FC_LOG_AND_RETHROW() }
 
@@ -1168,7 +1205,7 @@ BOOST_FIXTURE_TEST_CASE(setconfig_window_unchecked_before_epoch_config, sysio_op
    // closes the gap when the epoch duration arrives.
    BOOST_REQUIRE_EQUAL(success(),
       setconfig(kDefaultPruneDelayMs,
-                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kDefaultMinPctSamples,
                 /*terminate_window_ms=*/1));
 } FC_LOG_AND_RETHROW() }
 
@@ -1177,7 +1214,7 @@ BOOST_FIXTURE_TEST_CASE(epoch_setconfig_rejects_duration_that_vacates_stored_win
    produce_blocks();
    BOOST_REQUIRE_EQUAL(success(),
       setconfig(kDefaultPruneDelayMs,
-                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kDefaultMinPctSamples,
                 kMinWindowMsAtDefaults));
    produce_blocks();
 
@@ -1214,6 +1251,7 @@ BOOST_FIXTURE_TEST_CASE(termcheck_evicts_at_duty_rotation_cadence, sysio_opreg_t
    activate_batch_operator("batchop.a"_n,
                            kDefaultMaxConsecutiveMisses,
                            kMaxAcceptedPctMisses24h,
+                           kDefaultMinPctSamples,
                            kMinWindowMsAtDefaults + kDutyRotationMs);
 
    // Duty epoch 1: a delivered record anchors the window and keeps the
@@ -1704,6 +1742,7 @@ BOOST_FIXTURE_TEST_CASE(deposit_custodies_and_credits_wire_units, sysio_opreg_te
       /*prune_delay=*/kDefaultPruneDelayMs,
       /*max_consec_misses=*/kDefaultMaxConsecutiveMisses,
       /*max_pct_misses_24h=*/kDefaultMaxPctMisses24h,
+      /*min_pct_samples=*/kDefaultMinPctSamples,
       /*terminate_window_ms=*/kTerminateWindowMs,
       /*req_prod_collat=*/{},
       /*req_batchop_collat=*/{},
@@ -1921,6 +1960,7 @@ BOOST_FIXTURE_TEST_CASE(withdraw_rechecks_eligibility_after_enqueue, sysio_opreg
       /*prune_delay=*/kDefaultPruneDelayMs,
       /*max_consec_misses=*/kDefaultMaxConsecutiveMisses,
       /*max_pct_misses_24h=*/kMaxAcceptedPctMisses24h,
+      /*min_pct_samples=*/kDefaultMinPctSamples,
       /*terminate_window_ms=*/kTerminateWindowMs,
       /*req_prod_collat=*/{
          make_chain_min_bond(kWireCodename, kWireCodename, kTestMinBond),
@@ -2333,6 +2373,7 @@ BOOST_FIXTURE_TEST_CASE(shadow_row_satisfies_role_minimum, sysio_opreg_tester) {
       /*prune_delay=*/kDefaultPruneDelayMs,
       /*max_consec_misses=*/kDefaultMaxConsecutiveMisses,
       /*max_pct_misses_24h=*/kMaxAcceptedPctMisses24h,
+      /*min_pct_samples=*/kDefaultMinPctSamples,
       /*terminate_window_ms=*/kTerminateWindowMs,
       /*req_prod_collat=*/{},
       /*req_batchop_collat=*/{
@@ -2480,7 +2521,8 @@ BOOST_FIXTURE_TEST_CASE(terminate_rejects_already_slashed_operator, sysio_opreg_
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(termcheck_evicts_all_miss_window_at_max_accepted_percent, sysio_opreg_tester) { try {
-   activate_batch_operator("batchop.a"_n);
+   activate_batch_operator("batchop.a"_n, kDefaultMaxConsecutiveMisses, kMaxAcceptedPctMisses24h,
+                           kPercentRailFromFirstDuty);
 
    BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, 1, /*delivered=*/false));
    produce_blocks();
@@ -2509,11 +2551,52 @@ BOOST_FIXTURE_TEST_CASE(termcheck_evicts_after_default_consecutive_boundary, sys
    require_evicted("batchop.a"_n, "rolling-window: >5 consecutive misses");
 } FC_LOG_AND_RETHROW() }
 
+/// The percent rail waits for `terminate_min_pct_samples` duty epochs: a miss rate above the threshold
+/// evicts only once the sample is reached.
+BOOST_FIXTURE_TEST_CASE(termcheck_percent_rail_waits_for_min_samples, sysio_opreg_tester) { try {
+   activate_batch_operator("batchop.a"_n, kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h);
+   constexpr uint32_t kEarlyMisses = 2;
+
+   // An early miss alone, then a second: each is above the threshold but short of the sample.
+   uint32_t epoch = 1;
+   for (; epoch <= kEarlyMisses; ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/false));
+      BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+      produce_block();
+      BOOST_REQUIRE_EQUAL(std::string(served::status::serving), membership_status("batchop.a"_n));
+   }
+   // Deliveries up to one short of the sample keep the rate above the threshold.
+   for (; epoch < kDefaultMinPctSamples; ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/true));
+      BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+      produce_block();
+   }
+   BOOST_REQUIRE_EQUAL(std::string(served::status::serving), membership_status("batchop.a"_n));
+   BOOST_REQUIRE_GT(uint64_t{kEarlyMisses} * kPercentScale / (kDefaultMinPctSamples - 1), kDefaultMaxPctMisses24h);
+
+   // The duty that reaches the sample applies the rail.
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/true));
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+   require_evicted("batchop.a"_n, kDefaultMaxPctMissesReason);
+} FC_LOG_AND_RETHROW() }
+
+/// The sample grace holds back only the percent rail: a consecutive run evicts before it is reached.
+BOOST_FIXTURE_TEST_CASE(termcheck_consecutive_rail_applies_during_the_percent_grace, sysio_opreg_tester) { try {
+   activate_batch_operator("batchop.a"_n, kSingleAllowedConsecutiveMiss, kDefaultMaxPctMisses24h);
+   for (uint32_t epoch = 1; epoch <= kSingleAllowedConsecutiveMiss + 1; ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/false));
+   }
+   BOOST_REQUIRE_LT(kSingleAllowedConsecutiveMiss + 1, kDefaultMinPctSamples);
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+   require_evicted("batchop.a"_n, kSingleAllowedConsecutiveMissReason);
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(termcheck_keeps_bootstrapped_operator_exempt, sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig(
       /*prune_delay=*/kDefaultPruneDelayMs,
       /*max_consec_misses=*/1,
       /*max_pct_misses_24h=*/kMaxAcceptedPctMisses24h,
+      /*min_pct_samples=*/kDefaultMinPctSamples,
       /*terminate_window_ms=*/kTerminateWindowMs));
    BOOST_REQUIRE_EQUAL(success(),
       regoperator("batchop.a"_n, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/true));
@@ -2669,7 +2752,8 @@ BOOST_FIXTURE_TEST_CASE(termcheck_starts_a_new_sample_for_a_new_registration, sy
    activate_batch_operator(
       kEligibilityBatchOperator,
       /*max_consec_misses=*/kDefaultMaxConsecutiveMisses,
-      /*max_pct_misses_24h=*/kDefaultMaxPctMisses24h);
+      /*max_pct_misses_24h=*/kDefaultMaxPctMisses24h,
+      /*min_pct_samples=*/kPercentRailFromFirstDuty);
 
    BOOST_REQUIRE_EQUAL(success(),
       recorddel(kEligibilityBatchOperator, kPriorRegistrationFirstMissEpoch, /*delivered=*/false));
@@ -2708,7 +2792,8 @@ BOOST_FIXTURE_TEST_CASE(termcheck_preserves_percent_sample_across_withdrawal_ine
    activate_batch_operator(
       kEligibilityBatchOperator,
       /*max_consec_misses=*/kDefaultMaxConsecutiveMisses,
-      /*max_pct_misses_24h=*/kDefaultMaxPctMisses24h);
+      /*max_pct_misses_24h=*/kDefaultMaxPctMisses24h,
+      /*min_pct_samples=*/kPercentRailFromFirstDuty);
 
    for (uint32_t epoch = kFirstPercentRailHistoryEpoch;
         epoch < kPercentRailPostReactivationMissEpoch;
@@ -2986,6 +3071,7 @@ BOOST_FIXTURE_TEST_CASE(setconfig_two_native_asset_bond_activation, sysio_opreg_
    BOOST_REQUIRE_EQUAL(success(), setconfig(
       /*prune_delay=*/600000,
       /*max_consec_misses=*/5, /*max_pct_misses_24h=*/5,
+      /*min_pct_samples=*/kDefaultMinPctSamples,
       /*terminate_window_ms=*/24ULL * 60 * 60 * 1000,
       /*req_prod_collat=*/{},
       /*req_batchop_collat=*/{
@@ -3024,7 +3110,7 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_duplicate_chain_token_in_collat, sysio
    // The duplicate-detection assertion text refers to "(chain, token_kind)"
    // historically; the contract message may be updated to "(chain_code,
    // token_code)" — match on the stable prefix to tolerate either spelling.
-   auto r = setconfig(600000, 5, 5, 24ULL * 60 * 60 * 1000,
+   auto r = setconfig(600000, 5, 5, kDefaultMinPctSamples, 24ULL * 60 * 60 * 1000,
                 /*req_prod_collat=*/{},
                 /*req_batchop_collat=*/duplicate_vec,
                 /*req_uw_collat=*/{});
@@ -3033,7 +3119,7 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_duplicate_chain_token_in_collat, sysio
 
 BOOST_FIXTURE_TEST_CASE(setconfig_stamps_collat_config_timestamp, sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig(
-      600000, 5, 5, 24ULL * 60 * 60 * 1000,
+      600000, 5, 5, kDefaultMinPctSamples, 24ULL * 60 * 60 * 1000,
       /*req_prod_collat=*/{},
       /*req_batchop_collat=*/{
          make_chain_min_bond("WIRE", "NTA", 1000),
@@ -3632,7 +3718,7 @@ BOOST_FIXTURE_TEST_CASE(two_generic_depot_assets_are_both_required_and_withdrawa
    constexpr uint64_t Funding = 4 * Unit;
    const auto account = kEligibilityProducer;
    BOOST_REQUIRE_EQUAL(success(), setconfig(kDefaultPruneDelayMs, kDefaultMaxConsecutiveMisses,
-      kMaxAcceptedPctMisses24h, kTerminateWindowMs,
+      kMaxAcceptedPctMisses24h, kDefaultMinPctSamples, kTerminateWindowMs,
       {make_chain_min_bond(kWireCodename, First.token, Minimum),
        make_chain_min_bond(kWireCodename, Second.token, Minimum)}, {}, {}));
    BOOST_REQUIRE_EQUAL(success(), regoperator(account, OPERATOR_TYPE_PRODUCER, false));
@@ -3683,7 +3769,7 @@ BOOST_FIXTURE_TEST_CASE(native_wire_partial_withdrawal_stays_active_and_claims_e
    constexpr uint64_t Bond = 2 * Minimum;
    const auto account = kEligibilityBatchOperator;
    BOOST_REQUIRE_EQUAL(success(), setconfig(kDefaultPruneDelayMs, kDefaultMaxConsecutiveMisses,
-      kMaxAcceptedPctMisses24h, kTerminateWindowMs,
+      kMaxAcceptedPctMisses24h, kDefaultMinPctSamples, kTerminateWindowMs,
       {}, {make_chain_min_bond(kWireCodename, kWireCodename, Minimum)}, {}));
    BOOST_REQUIRE_EQUAL(success(), regoperator(account, OPERATOR_TYPE_BATCH, false));
    setup_wire_token_and_fund(account, kWireFundingQuantity);

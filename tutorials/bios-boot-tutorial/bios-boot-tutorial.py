@@ -174,6 +174,7 @@ def regProducers(b, e):
         'terminate_prune_delay_ms': 600000,
         'terminate_max_consecutive_misses': 5,
         'terminate_max_pct_misses_24h': 5,
+        'terminate_min_pct_samples': 20,
         'terminate_window_ms': 86400000,
         'req_prod_collat': [],
         'req_batchop_collat': [],

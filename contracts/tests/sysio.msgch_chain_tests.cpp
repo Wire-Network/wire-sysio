@@ -154,6 +154,7 @@ namespace opreg_config_fields {
 constexpr const char* TERMINATE_PRUNE_DELAY_MS         = "terminate_prune_delay_ms";
 constexpr const char* TERMINATE_MAX_CONSECUTIVE_MISSES = "terminate_max_consecutive_misses";
 constexpr const char* TERMINATE_MAX_PERCENT_MISSES_24H = "terminate_max_pct_misses_24h";
+constexpr const char* TERMINATE_MIN_PERCENT_SAMPLES    = "terminate_min_pct_samples";
 constexpr const char* TERMINATE_WINDOW_MS              = "terminate_window_ms";
 constexpr const char* REQUIRED_PRODUCER_COLLATERAL     = "req_prod_collat";
 constexpr const char* REQUIRED_BATCH_OPERATOR_COLLATERAL = "req_batchop_collat";
@@ -362,6 +363,15 @@ public:
    /// terminates on the consecutive rail.
    static constexpr uint32_t ROTATION_MAX_PERCENT_MISSES = 99;
 
+   /// Percent-miss threshold of the default fixture: sysio.opreg's production default.
+   static constexpr uint32_t DEFAULT_MAX_PERCENT_MISSES = 5;
+
+   /// Duty epochs before the percent rail applies: sysio.opreg's production default.
+   static constexpr uint32_t DEFAULT_MIN_PERCENT_SAMPLES = 20;
+
+   /// Percent-rail sample that applies the rail from the first duty epoch.
+   static constexpr uint32_t PERCENT_RAIL_FROM_FIRST_DUTY = 1;
+
    /// Exact minimum window the span bound accepts for the rotation schedule: (misses + 1) duty
    /// rotations.
    static constexpr uint64_t ROTATION_WINDOW_MS =
@@ -513,6 +523,7 @@ public:
             ("terminate_prune_delay_ms",         600000)
             ("terminate_max_consecutive_misses", 5)
             ("terminate_max_pct_misses_24h",     5)
+            ("terminate_min_pct_samples",        DEFAULT_MIN_PERCENT_SAMPLES)
             ("terminate_window_ms",              uint64_t{24ULL * 60 * 60 * 1000})
             ("req_prod_collat",                  fc::variants{})
             // Empty collateral requirements intentionally keep non-bootstrapped
@@ -1334,7 +1345,8 @@ public:
    /// Reconfigure only the rolling-termination rails while preserving the WNS-16 fixture's
    /// collateral requirements. This lets the test build real history under a permissive policy,
    /// then demonstrate that deferred slashing wins when the same history becomes terminating.
-   void set_termination_thresholds(uint32_t max_consecutive_misses, uint32_t max_percent_misses) {
+   void set_termination_thresholds(uint32_t max_consecutive_misses, uint32_t max_percent_misses,
+                                   uint32_t min_percent_samples = DEFAULT_MIN_PERCENT_SAMPLES) {
       constexpr uint64_t TERMINATE_PRUNE_DELAY_MS   = 600'000;
       constexpr uint64_t TERMINATE_WINDOW_MS        = 24ULL * 60 * 60 * 1000;
 
@@ -1343,6 +1355,7 @@ public:
             (opreg_config_fields::TERMINATE_PRUNE_DELAY_MS,         TERMINATE_PRUNE_DELAY_MS)
             (opreg_config_fields::TERMINATE_MAX_CONSECUTIVE_MISSES, max_consecutive_misses)
             (opreg_config_fields::TERMINATE_MAX_PERCENT_MISSES_24H, max_percent_misses)
+            (opreg_config_fields::TERMINATE_MIN_PERCENT_SAMPLES,    min_percent_samples)
             (opreg_config_fields::TERMINATE_WINDOW_MS,              TERMINATE_WINDOW_MS)
             (opreg_config_fields::REQUIRED_PRODUCER_COLLATERAL,     fc::variants{})
             (opreg_config_fields::REQUIRED_BATCH_OPERATOR_COLLATERAL, fc::variants{
@@ -1403,6 +1416,7 @@ public:
          ("terminate_prune_delay_ms",         600000)
          ("terminate_max_consecutive_misses", ROTATION_MAX_CONSECUTIVE_MISSES)
          ("terminate_max_pct_misses_24h",     ROTATION_MAX_PERCENT_MISSES)
+         ("terminate_min_pct_samples",        DEFAULT_MIN_PERCENT_SAMPLES)
          ("terminate_window_ms",              terminate_window_ms)
          ("req_prod_collat",                  fc::variants{})
          ("req_batchop_collat",               fc::variants{
@@ -3086,6 +3100,9 @@ BOOST_FIXTURE_TEST_CASE(advance_roster_excludes_same_epoch_eviction,
       "regoperator"_n, mvo()("account", BATCHOP_D.to_string())
          ("type", opp::types::OPERATOR_TYPE_BATCH)("is_bootstrapped", true)));
    serve_chains({BATCHOP_D}, epoch_chains);
+   // With the percent rail applying from the first duty, the one missed epoch evicts BATCHOP on each chain.
+   set_termination_thresholds(ROTATION_MAX_CONSECUTIVE_MISSES, DEFAULT_MAX_PERCENT_MISSES,
+                              PERCENT_RAIL_FROM_FIRST_DUTY);
    produce_blocks();
    advance_to_next_epoch();
    BOOST_REQUIRE(get_operator(BATCHOP)["status"].as<opp::types::OperatorStatus>() ==
@@ -3378,7 +3395,8 @@ BOOST_FIXTURE_TEST_CASE(evicted_member_delivers_nothing_until_it_rejoins_with_fr
    constexpr uint32_t kHalfSampleMaxPercentMisses     = 49;
    constexpr const char* kHalfSampleReason            = "rolling-window: >49% miss rate";
    bootstrap(/*n_batch_ops=*/3, /*batchop_is_bootstrapped=*/false);   // one group of three on each chain
-   set_termination_thresholds(kPermissiveMaxConsecutiveMisses, kPermissiveMaxPercentMisses);
+   set_termination_thresholds(kPermissiveMaxConsecutiveMisses, kPermissiveMaxPercentMisses,
+                              PERCENT_RAIL_FROM_FIRST_DUTY);
 
    inbound_stream_tip tip;
    // Every listed member delivers one chained envelope to its chain; the tip moves past it.
@@ -3403,7 +3421,8 @@ BOOST_FIXTURE_TEST_CASE(evicted_member_delivers_nothing_until_it_rejoins_with_fr
 
    // Epoch 3, BATCHOP seated: evict it from ETH alone.
    const uint32_t evicted_epoch = current_epoch();
-   set_termination_thresholds(kPermissiveMaxConsecutiveMisses, kHalfSampleMaxPercentMisses);
+   set_termination_thresholds(kPermissiveMaxConsecutiveMisses, kHalfSampleMaxPercentMisses,
+                              PERCENT_RAIL_FROM_FIRST_DUTY);
    BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, EPOCH_ACCOUNT, opreg_actions::TERMINATION_CHECK,
       mvo()(opreg_fields::ACCOUNT, BATCHOP)(opreg_fields::CHAIN_CODE, ETH_CHAIN_CODE)));
    produce_blocks();

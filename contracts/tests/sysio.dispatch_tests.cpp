@@ -426,6 +426,7 @@ public:
          ("terminate_prune_delay_ms",         TERMINATE_PRUNE_DELAY_MS)
          ("terminate_max_consecutive_misses", 5)
          ("terminate_max_pct_misses_24h",     5)
+         ("terminate_min_pct_samples",        20)
          ("terminate_window_ms",              uint64_t{24ULL * 60 * 60 * 1000})
          ("req_prod_collat",                  fc::variants{})
          ("req_batchop_collat",               fc::variants{})

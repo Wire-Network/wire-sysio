@@ -6371,6 +6371,7 @@ struct producer_score_tester : public producer_eligibility_tester {
          ("terminate_prune_delay_ms",         prune_delay_ms)
          ("terminate_max_consecutive_misses", uint32_t{5})
          ("terminate_max_pct_misses_24h",     uint32_t{5})
+         ("terminate_min_pct_samples",        uint32_t{20})
          ("terminate_window_ms",              uint64_t{24ULL * 60 * 60 * 1000})
          ("req_prod_collat",                  req_prod_collat)
          ("req_batchop_collat",               fc::variants{})

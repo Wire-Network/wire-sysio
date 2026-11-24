@@ -209,7 +209,8 @@ public:
 
       BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "setconfig"_n, mvo()
          ("terminate_prune_delay_ms", 600000)("terminate_max_consecutive_misses", 5)
-         ("terminate_max_pct_misses_24h", 5)("terminate_window_ms", uint64_t{24ULL*60*60*1000})
+         ("terminate_max_pct_misses_24h", 5)("terminate_min_pct_samples", 20)
+         ("terminate_window_ms", uint64_t{24ULL*60*60*1000})
          ("req_prod_collat", fc::variants{})("req_batchop_collat", fc::variants{})
          ("req_uw_collat", fc::variants{})));
 
@@ -1202,7 +1203,8 @@ BOOST_FIXTURE_TEST_CASE(deliver_rejects_decollateralized_unknown_group_member, s
    // Require an ETH bond so a non-bootstrapped op's status tracks its collateral.
    BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "setconfig"_n, mvo()
       ("terminate_prune_delay_ms", 600000)("terminate_max_consecutive_misses", 5)
-      ("terminate_max_pct_misses_24h", 5)("terminate_window_ms", uint64_t{24ULL * 60 * 60 * 1000})
+      ("terminate_max_pct_misses_24h", 5)("terminate_min_pct_samples", 20)
+      ("terminate_window_ms", uint64_t{24ULL * 60 * 60 * 1000})
       ("req_prod_collat", fc::variants{})
       ("req_batchop_collat", fc::variants{make_chain_min_bond("WIRE", "WIRE", MIN_BOND)})
       ("req_uw_collat", fc::variants{})));

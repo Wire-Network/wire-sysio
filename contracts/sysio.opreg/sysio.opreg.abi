@@ -363,6 +363,10 @@
                     "type": "uint32"
                 },
                 {
+                    "name": "terminate_min_pct_samples",
+                    "type": "uint32"
+                },
+                {
                     "name": "terminate_window_ms",
                     "type": "uint64"
                 }
@@ -649,6 +653,10 @@
                 },
                 {
                     "name": "terminate_max_pct_misses_24h",
+                    "type": "uint32"
+                },
+                {
+                    "name": "terminate_min_pct_samples",
                     "type": "uint32"
                 },
                 {

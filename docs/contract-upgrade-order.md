@@ -215,12 +215,13 @@ tables keyed by chain, and `setconfig`, `schbatchgps`, `advance`, `finishadv`, `
 `sysio.opreg` adds `servchains` and keys `dellog` and the `wtdwqueue` consensus waits by chain,
 `sysio.chalg` drops its dispute counter and `byepoch` index, `batchduty` / `dutystate` count
 seat-seconds with one `batchduty` row per (operator, chain), and `termcheck` sends the new
-`sysio::forfeitduty` when it evicts. No migration is supplied: deploy `sysio.epoch`, `sysio`,
-`sysio.opreg`, `sysio.msgch`, `sysio.chalg`, `sysio.chains`, `sysio.tokens`, `sysio.liq` and
-`sysio.synd` together on a fresh chain with the matching `batch_operator_plugin`. Before
-`sysio.msgch::bootstrap`, configure each active outpost with `sysio.epoch::setconfig(chain, ...)`,
-have each batch operator `joinchain` the chains it serves, and build each chain's window with
-`schbatchgps(chain)`.
+`sysio::forfeitduty` when it evicts. `sysio.opreg::setconfig` takes the new
+`terminate_min_pct_samples`, kept on `opconfig`. No migration is supplied: deploy
+`sysio.epoch`, `sysio`, `sysio.opreg`, `sysio.msgch`, `sysio.chalg`, `sysio.chains`, `sysio.tokens`,
+`sysio.liq` and `sysio.synd` together on a fresh chain with the matching `batch_operator_plugin`.
+Before `sysio.msgch::bootstrap`, configure each active outpost with
+`sysio.epoch::setconfig(chain, ...)`, have each batch operator `joinchain` the chains it serves, and
+build each chain's window with `schbatchgps(chain)`.
 
 ## The two rules for future changes
 

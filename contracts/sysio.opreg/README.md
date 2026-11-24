@@ -22,7 +22,7 @@ the collateral each has bonded, and the outpost chains each batch operator serve
 | Table | Type | Description |
 |-------|------|-------------|
 | `operators` | `kv::table` | One row per operator, keyed by account: type, status, bootstrap flag, collateral balances, timestamps, status reason and the newest `MAX_RECENT_ACTIONS` audit entries. Indexed by type and status |
-| `opconfig` | `kv::global` | Eviction rails (`terminate_max_consecutive_misses`, `terminate_max_pct_misses_24h`, `terminate_window_ms`), the prune delay, and each role's per-(chain, token) minimum bonds |
+| `opconfig` | `kv::global` | Eviction rails (`terminate_max_consecutive_misses`, `terminate_max_pct_misses_24h`, `terminate_min_pct_samples`, `terminate_window_ms`), the prune delay, and each role's per-(chain, token) minimum bonds |
 | `servchains` | `kv::table` | One row per (chain, batch operator), keyed chain first: `SERVING`, `LEFT` or `EVICTED`, the join time, the last change and the eviction reason. Indexed by account |
 | `wtdwqueue` | `kv::table` | Pending withdrawals keyed by request id: the economic epoch each is eligible at and its per-chain consensus waits. Released by `flushwtdw`. Indexed by account |
 | `dellog` | `kv::table` | One row per (chain, batch operator, duty epoch) the chain closed: delivered to that chain or missed. Keyed by chain, account and time; rows older than `terminate_window_ms` are pruned oldest-first across chains through the `bylogid` index |
@@ -93,7 +93,9 @@ is `SERVING`.
 whose epoch closed. `termcheck` reads that operator's rows on that chain recorded after both its
 registration and its latest join of the chain, and evicts it from the chain when they hold more than
 `terminate_max_consecutive_misses` consecutive misses, or a whole-percent miss rate above
-`terminate_max_pct_misses_24h`. The membership becomes `EVICTED` with the rail as its reason; the
+`terminate_max_pct_misses_24h`. The percent rail applies only once those rows number at least
+`terminate_min_pct_samples` (default 20), so one early miss cannot evict alone; the consecutive rail
+applies from the first row. The membership becomes `EVICTED` with the rail as its reason; the
 operator's status, its bond and its other chains are untouched. The window's groups are disjoint, so
 the close that evicts a member also slides out the only seat it held on the chain. An `EVICTED` member
 is not evaluated again, and it rejoins as a `LEFT` operator does, which restarts the rails.
