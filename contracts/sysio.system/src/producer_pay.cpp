@@ -4,15 +4,16 @@
 #include <sysio.system/producer_score.hpp>
 #include <sysio.token/sysio.token.hpp>
 #include <sysio.epoch/sysio.epoch.hpp>
+#include <sysio.opp.common/safe_ops.hpp>
 
 #include <algorithm>
-#include <limits>
 #include <vector>
 
 namespace sysiosystem {
 
    using sysio::microseconds;
    using sysio::token;
+   using sysio::opp::safe::add_sat;
 
    namespace {
       /// Milliseconds in a second, for the block interval.
@@ -59,7 +60,8 @@ namespace sysiosystem {
       //
       // A block made in an economic epoch the economic clock has not opened yet belongs to that epoch,
       // not to the pay period still open: it is parked and joins the count when the tick opening the
-      // epoch has paid the periods before it. Nothing is parked before T5 exists, as nothing is paid.
+      // epoch has paid the periods before it. Parking starts at initt5, when tickeconomy starts sending
+      // creditwork; a block made before then is counted at once and paid by the first payout.
       auto key = producer_key_t{producer.value};
       if ( _producers.contains(key) ) {
          const uint32_t unopened = emissions::t5state_t( get_self() ).exists()
@@ -82,15 +84,13 @@ namespace sysiosystem {
                      ? rotation_sec
                      : std::min( rotation_sec, rounds_since * round_duration_sec );
                   const uint64_t before = producer_rank::seniority_credit( p.service_sec );
-                  p.service_sec = p.service_sec > std::numeric_limits<uint64_t>::max() - credit_sec
-                                     ? std::numeric_limits<uint64_t>::max()
-                                     : p.service_sec + credit_sec;
+                  p.service_sec = add_sat( p.service_sec, credit_sec );
                   seniority_moved = producer_rank::seniority_credit( p.service_sec ) != before;
                }
                p.last_paid_round = round;
             }
             counted = true;
-            if( unopened == 0 ) p.unpaid_blocks += blocks_per_counted_block;
+            if( unopened == 0 ) p.unpaid_blocks = add_sat( p.unpaid_blocks, blocks_per_counted_block );
          });
          if( counted && unopened != 0 ) {
             emissions::park_work( get_self(), unopened, producer, blocks_per_counted_block, 0 );

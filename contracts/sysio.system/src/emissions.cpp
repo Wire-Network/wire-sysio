@@ -76,6 +76,7 @@ using sysio::asset;
 using sysio::current_time_point;
 using sysio::name;
 using sysio::time_point_sec;
+using sysio::opp::safe::add_sat;
 using sysio::opp::types::OperatorType;
 
 // ---------------------------------------------------------------------------
@@ -331,7 +332,7 @@ void credit_duty(name self, duty_state& duty, std::optional<t5_state>& state, ba
    }
 
    batch_duty updated = row.value_or(batch_duty{.account_name = member, .period = duty.open_period});
-   updated.units = saturating_add(updated.units, units);
+   updated.units = add_sat(updated.units, units);
    rows.set(self, batch_duty_key{member.value}, updated);
    duty.open_units += units;
 }
@@ -759,8 +760,9 @@ void system_contract::rcrdduty(uint32_t /*epoch_index*/, std::vector<sysio::name
 }
 
 // creditwork - credit the work parked under economic epochs up to `epoch_index` to the open pay period,
-// oldest epoch first, at most MAX_PARKED_WORK_ROWS rows. Inline from sysio.epoch::tickeconomy after the
-// epoch's payout, so the work joins the period after it.
+// oldest epoch first, at most MAX_PARKED_WORK_ROWS rows. Inline from sysio.epoch::tickeconomy twice: before
+// the payout up to the epoch before the one it opens (rows an earlier call's bound left, which belong to the
+// period being paid), and after it up to that epoch, whose work joins the period after.
 void system_contract::creditwork(uint32_t epoch_index) {
    require_auth(epoch_refs::account);
 
@@ -785,7 +787,7 @@ void system_contract::creditwork(uint32_t epoch_index) {
       const producer_key_t producer_key{work.account_name.value};
       if (work.blocks > 0 && _producers.contains(producer_key)) {
          _producers.modify(same_payer, producer_key, [&](auto& p) {
-            p.unpaid_blocks = saturating_add(p.unpaid_blocks, work.blocks);
+            p.unpaid_blocks = add_sat(p.unpaid_blocks, work.blocks);
          });
       }
       if (work.units > 0) {
@@ -934,8 +936,11 @@ void system_contract::payepoch(uint32_t epoch_index, int64_t period_emission) {
       const int64_t active_pool  = producer_pool - standby_pool;
 
       // Nominal block slots in the period, accumulated by `accrueepoch` at each economic epoch's OWN
-      // duration -- every epoch of the period including this one, exactly as
-      // `pending_emission_amount` is (the equality check above pins that). The fallback is the
+      // duration over the ticks that built the pool -- epochs `period_start_epoch` through this one,
+      // exactly as `pending_emission_amount` is (the equality check above pins that). The blocks paid
+      // run one epoch behind those ticks: made from the previous pay epoch's boundary to this one's
+      // (from launch, for the first period). Both windows span the same number of epochs, so their slot
+      // counts differ only across a duration change. The fallback is the
       // zero-accrual case (no economic config when the period accrued), not a compatibility path.
       const uint64_t nominal_slots = state.pending_nominal_slots > 0
          ? state.pending_nominal_slots

@@ -820,9 +820,9 @@ namespace sysiosystem {
          /**
           * Credit the work parked under economic epochs up to `epoch_index` to the open pay period:
           * blocks to their producers' `unpaid_blocks`, duty units as `rcrdduty` credits them.
-          * At most MAX_PARKED_WORK_ROWS rows, oldest epoch first; the rest wait for the next tick.
-          * Called inline by sysio.epoch::tickeconomy after the epoch's payout; never throws.
-          * Auth: require_auth("sysio.epoch").
+          * At most MAX_PARKED_WORK_ROWS rows, oldest epoch first; the rest wait for the next call.
+          * Called inline by sysio.epoch::tickeconomy before its payout, up to the epoch before the one
+          * it opens, and after it, up to that epoch; never throws. Auth: require_auth("sysio.epoch").
           */
          [[sysio::action]]
          void creditwork(uint32_t epoch_index);

@@ -3510,33 +3510,239 @@ BOOST_FIXTURE_TEST_CASE( catch_up_retains_an_idle_periods_batch_pool, sysio_emis
    BOOST_REQUIRE_EQUAL( balance_before, get_wire_balance(config::system_account_name).get_amount() );
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( parked_work_past_one_ticks_bound_is_credited_at_the_next_tick, sysio_emissions_tester ) try {
-   // creditwork credits at most MAX_PARKED_WORK_ROWS parked rows per tick, oldest first; the rest wait a tick.
-   constexpr uint32_t operators = MAX_PARKED_WORK_ROWS + 10;
+BOOST_FIXTURE_TEST_CASE( parked_work_past_one_ticks_bound_is_paid_in_its_own_period, sysio_emissions_tester ) try {
+   // More accounts work in one unopened economic epoch than one creditwork credits. The tick opening the epoch credits
+   // MAX_PARKED_WORK_ROWS rows after its payout and the next tick credits the rest before its own, so that payout
+   // splits the pool over every unit, as on time. The ACTIVE operators sort after the placeholder members, into the
+   // rows past the bound.
+   constexpr int64_t pool = 100'000'000'000;   // 100 WIRE
+   const vector<account_name> active{ "batchalice"_n, "batchbob"_n, "batchcarol"_n };
    vector<name> members;
-   for (uint64_t value = 1; value <= operators; ++value) members.emplace_back(value);
+   for (uint64_t value = 1; members.size() + active.size() < MAX_PARKED_WORK_ROWS + 10; ++value) {
+      members.emplace_back(value);
+   }
+   members.insert(members.end(), active.begin(), active.end());
+   const uint64_t units = members.size();
    create_t5_holding_accounts();
+   create_accounts(active, false, false, false, true);
+   for (const account_name& op : active) {
+      BOOST_REQUIRE_EQUAL( success(), register_operator(op, OperatorType::OPERATOR_TYPE_BATCH, true) );
+   }
    create_user_accounts({ "outsider"_n });
+   BOOST_REQUIRE_EQUAL( success(), setemitcfg(config::system_account_name, flat_batch_pool_cfg(pool)) );
    BOOST_REQUIRE_EQUAL( success(), initt5(config::system_account_name) );
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
    require_substr( push_system_action("outsider"_n, "creditwork"_n, mvo()("epoch_index", 1)),
                    "missing authority of sysio.epoch" );
 
+   // On time: every unit counts as it is recorded and the next tick pays the period; its settlement takes two ticks.
+   BOOST_REQUIRE_EQUAL( success(), rcrdduty(1, members) );
+   cross_economic_boundaries(1);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   BOOST_REQUIRE_EQUAL( units, get_duty_state()["settling_units"].as<uint64_t>() );
+   cross_economic_boundaries(1);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   BOOST_REQUIRE_EQUAL( 0u, get_duty_state()["settling_period"].as<uint32_t>() );
+   std::map<account_name, int64_t> on_time;
+   for (const account_name& op : active) {
+      on_time[op] = pay_claimable(op);
+      BOOST_REQUIRE_EQUAL( pool / static_cast<int64_t>(units), on_time.at(op) );
+   }
+
+   // Caught up: the same units are recorded after a boundary no tick has opened, so they park under its epoch.
    cross_economic_boundaries(1);
    const uint32_t parked_epoch = economic_epoch_index() + 1;
-   BOOST_REQUIRE_EQUAL( success(), rcrdduty(1, members) );
-   BOOST_REQUIRE_EQUAL( 1u, get_parked_work(parked_epoch, members.back())["units"].as<uint32_t>() );
+   BOOST_REQUIRE_EQUAL( success(), rcrdduty(2, members) );
    BOOST_REQUIRE_EQUAL( 0u, get_duty_state()["open_units"].as<uint64_t>() );
+   cross_economic_boundaries(1);
 
+   // The tick opening the epoch pays the period before it, then credits the first MAX_PARKED_WORK_ROWS rows.
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
    BOOST_REQUIRE( get_parked_work(parked_epoch, members.front()).is_null() );
-   BOOST_REQUIRE( !get_parked_work(parked_epoch, members.back()).is_null() );
+   for (const account_name& op : active) BOOST_REQUIRE( !get_parked_work(parked_epoch, op).is_null() );
    BOOST_REQUIRE_EQUAL( uint64_t{MAX_PARKED_WORK_ROWS}, get_duty_state()["open_units"].as<uint64_t>() );
 
+   // The next tick, a pay tick, credits the rest before paying, so its payout settles every unit at this period's rate.
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   for (const account_name& op : active) BOOST_REQUIRE( get_parked_work(parked_epoch, op).is_null() );
+   BOOST_REQUIRE_EQUAL( units, get_duty_state()["settling_units"].as<uint64_t>() );
+   BOOST_REQUIRE_EQUAL( 0u, get_duty_state()["open_units"].as<uint64_t>() );
    cross_economic_boundaries(1);
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
-   BOOST_REQUIRE( get_parked_work(parked_epoch, members.back()).is_null() );
-   BOOST_REQUIRE_EQUAL( uint64_t{operators - MAX_PARKED_WORK_ROWS}, get_duty_state()["open_units"].as<uint64_t>() );
+   BOOST_REQUIRE_EQUAL( 0u, get_duty_state()["settling_period"].as<uint32_t>() );
+   for (const account_name& op : active) BOOST_REQUIRE_EQUAL( 2 * on_time.at(op), pay_claimable(op) );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( catch_up_holds_a_payout_on_balance_while_work_is_parked, sysio_emissions_tester ) try {
+   // One operator serves in each of three economic epochs, and a short treasury balance holds the second epoch's period
+   // at its pay tick, so the third epoch's tick pays the second and third operators together. Run on time, then caught
+   // up -- every unit parked under its epoch before any of those ticks runs -- each operator draws the same.
+   const account_name alice = "batchalice"_n;   // on time
+   const account_name bob   = "batchbob"_n;
+   const account_name carol = "batchcarol"_n;
+   const account_name dave  = "batchdave"_n;    // caught up
+   const account_name erin  = "batcherin"_n;
+   const account_name frank = "batchfrank"_n;
+   const account_name drain = "helddrain"_n;
+   constexpr int64_t pool = 100'000'000'000;   // 100 WIRE
+   const asset kept = asset::from_string("1.000000000 WIRE");
+   create_t5_holding_accounts();
+   create_accounts({ alice, bob, carol, dave, erin, frank }, false, false, false, true);
+   for (const account_name& op : { alice, bob, carol, dave, erin, frank }) {
+      BOOST_REQUIRE_EQUAL( success(), register_operator(op, OperatorType::OPERATOR_TYPE_BATCH, true) );
+   }
+   create_user_accounts({ drain });
+   BOOST_REQUIRE_EQUAL( success(), setemitcfg(config::system_account_name, flat_batch_pool_cfg(pool)) );
+   BOOST_REQUIRE_EQUAL( success(), initt5(config::system_account_name) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+
+   // Move all but `kept` of sysio's WIRE out, below any period's total, and back.
+   auto transfer_wire = [&](account_name from, account_name to, const asset& quantity) {
+      base_tester::push_action(TOKEN, "transfer"_n, vector<permission_level>{{ from, "active"_n }},
+         mvo()("from", from)("to", to)("quantity", quantity)("memo", "hold a payout"));
+   };
+   auto drain_treasury = [&]() {
+      transfer_wire(config::system_account_name, drain, get_wire_balance(config::system_account_name) - kept);
+   };
+   auto restore_treasury = [&]() { transfer_wire(drain, config::system_account_name, get_wire_balance(drain)); };
+   // Run the next tick and require the balance to have held its payout.
+   auto tick_held = [&]() {
+      const uint64_t payouts = get_t5_state()["epoch_count"].as<uint64_t>();
+      BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+      BOOST_REQUIRE_EQUAL( payouts, get_t5_state()["epoch_count"].as<uint64_t>() );
+      BOOST_REQUIRE_EQUAL( "EMISSIONS_BLOCK_REASON_BALANCE_INSUFFICIENT",
+                           get_blocklog_row(economic_epoch_index())["reason"].as_string() );
+   };
+
+   // On time: each epoch's duty is recorded after its tick.
+   BOOST_REQUIRE_EQUAL( success(), rcrdduty(1, { alice }) );
+   cross_economic_boundaries(1);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   BOOST_REQUIRE_EQUAL( success(), rcrdduty(2, { bob }) );
+   drain_treasury();
+   cross_economic_boundaries(1);
+   tick_held();
+   const uint32_t on_time_held = economic_epoch_index();
+   BOOST_REQUIRE_EQUAL( success(), rcrdduty(3, { carol }) );
+   restore_treasury();
+   cross_economic_boundaries(1);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   BOOST_REQUIRE( get_blocklog_row(on_time_held).is_null() );
+   const uint32_t on_time_release = economic_epoch_index();
+   BOOST_REQUIRE_EQUAL( pool, pay_claimable(alice) );
+   BOOST_REQUIRE_EQUAL( pool, pay_claimable(bob) );
+   BOOST_REQUIRE_EQUAL( pool, pay_claimable(carol) );
+
+   // Caught up: the three epochs' duty is parked under them, then their ticks run back to back.
+   const uint32_t first = economic_epoch_index() + 1;
+   cross_economic_boundaries(1);
+   BOOST_REQUIRE_EQUAL( success(), rcrdduty(4, { dave }) );
+   cross_economic_boundaries(1);
+   BOOST_REQUIRE_EQUAL( success(), rcrdduty(5, { erin }) );
+   cross_economic_boundaries(1);
+   BOOST_REQUIRE_EQUAL( success(), rcrdduty(6, { frank }) );
+   cross_economic_boundaries(1);
+   BOOST_REQUIRE_EQUAL( 1u, get_parked_work(first, dave)["units"].as<uint32_t>() );
+   BOOST_REQUIRE_EQUAL( 1u, get_parked_work(first + 1, erin)["units"].as<uint32_t>() );
+   BOOST_REQUIRE_EQUAL( 1u, get_parked_work(first + 2, frank)["units"].as<uint32_t>() );
+
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );   // opens dave's epoch
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );   // pays dave, opens erin's
+   BOOST_REQUIRE_EQUAL( pool, pay_claimable(dave) );
+   drain_treasury();
+   tick_held();                                                // holds erin's period, opens frank's into it
+   BOOST_REQUIRE( get_parked_work(first + 2, frank).is_null() );
+   BOOST_REQUIRE_EQUAL( 1u, get_batch_duty(frank)["units"].as<uint32_t>() );
+   BOOST_REQUIRE_EQUAL( 2u, get_duty_state()["open_units"].as<uint64_t>() );
+   BOOST_REQUIRE_EQUAL( 0, pay_claimable(erin) );
+   restore_treasury();
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );   // pays erin and frank together
+   BOOST_REQUIRE( !economic_epoch_due() );
+   BOOST_REQUIRE( get_blocklog_row(first + 2).is_null() );
+
+   BOOST_REQUIRE_EQUAL( pay_claimable(alice), pay_claimable(dave) );
+   BOOST_REQUIRE_EQUAL( pay_claimable(bob),   pay_claimable(erin) );
+   BOOST_REQUIRE_EQUAL( pay_claimable(carol), pay_claimable(frank) );
+   BOOST_REQUIRE_EQUAL( 2 * pool, get_epoch_log(on_time_release)["total_emission"].as<int64_t>() );
+   BOOST_REQUIRE_EQUAL( 2 * pool, get_epoch_log(economic_epoch_index())["total_emission"].as<int64_t>() );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( catch_up_pays_each_period_its_own_duty_at_a_pay_cadence_of_two, sysio_emissions_tester ) try {
+   // Two economic epochs to a pay period, each accruing a 100-WIRE pool, and one unit of duty in every epoch: each
+   // period pays its two units the two pools, so every operator draws 100 WIRE. Caught up, the work of the epochs after
+   // a pay epoch waits for their ticks and joins the next period, exactly as on time.
+   const account_name alice = "batchalice"_n;   // on time
+   const account_name bob   = "batchbob"_n;
+   const account_name carol = "batchcarol"_n;   // caught up
+   const account_name dave  = "batchdave"_n;
+   const account_name erin  = "batcherin"_n;
+   const account_name frank = "batchfrank"_n;
+   constexpr int64_t  pool    = 100'000'000'000;   // 100 WIRE an epoch
+   constexpr uint16_t cadence = 2;
+   create_t5_holding_accounts();
+   create_accounts({ alice, bob, carol, dave, erin, frank }, false, false, false, true);
+   for (const account_name& op : { alice, bob, carol, dave, erin, frank }) {
+      BOOST_REQUIRE_EQUAL( success(), register_operator(op, OperatorType::OPERATOR_TYPE_BATCH, true) );
+   }
+   mvo cfg(flat_batch_pool_cfg(pool));
+   cfg("pay_cadence_epochs", cadence);
+   BOOST_REQUIRE_EQUAL( success(), setemitcfg(config::system_account_name, cfg) );
+   BOOST_REQUIRE_EQUAL( success(), initt5(config::system_account_name) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );   // the first period's pay epoch
+   BOOST_REQUIRE_EQUAL( 1u, get_t5_state()["epoch_count"].as<uint64_t>() );
+
+   // Run the next tick and require it to pay, or not.
+   auto tick = [&](bool pays) {
+      const uint64_t payouts = get_t5_state()["epoch_count"].as<uint64_t>();
+      BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+      BOOST_REQUIRE_EQUAL( payouts + (pays ? 1u : 0u), get_t5_state()["epoch_count"].as<uint64_t>() );
+   };
+   // The period paid at `pay_epoch` drew both of its epochs' pools, all of them credited.
+   auto paid_full_period = [&](uint32_t pay_epoch) {
+      const auto log = get_epoch_log(pay_epoch);
+      BOOST_REQUIRE_EQUAL( cadence * pool, log["batch_emission"].as<int64_t>() );
+      BOOST_REQUIRE_EQUAL( int64_t(0), log["batch_emission_retained"].as<int64_t>() );
+      BOOST_REQUIRE( log["batch_settled"].as_bool() );
+   };
+
+   // On time: one unit in each epoch of the period, each recorded after its epoch's tick.
+   BOOST_REQUIRE_EQUAL( success(), rcrdduty(1, { alice }) );
+   cross_economic_boundaries(1);
+   tick(false);
+   BOOST_REQUIRE_EQUAL( success(), rcrdduty(2, { bob }) );
+   cross_economic_boundaries(1);
+   tick(true);
+   paid_full_period(economic_epoch_index());
+   BOOST_REQUIRE_EQUAL( pool, pay_claimable(alice) );
+   BOOST_REQUIRE_EQUAL( pool, pay_claimable(bob) );
+
+   // Caught up: the next period's first epoch is recorded on time; its second and both epochs of the period after it
+   // are parked under their epochs, then all four ticks run back to back.
+   BOOST_REQUIRE_EQUAL( success(), rcrdduty(3, { carol }) );
+   const uint32_t first = economic_epoch_index() + 1;
+   cross_economic_boundaries(1);
+   BOOST_REQUIRE_EQUAL( success(), rcrdduty(4, { dave }) );
+   cross_economic_boundaries(1);
+   BOOST_REQUIRE_EQUAL( success(), rcrdduty(5, { erin }) );
+   cross_economic_boundaries(1);
+   BOOST_REQUIRE_EQUAL( success(), rcrdduty(6, { frank }) );
+   cross_economic_boundaries(1);
+
+   tick(false);
+   tick(true);   // pays carol and dave; erin's epoch opens into the next period, frank's is still ahead
+   BOOST_REQUIRE( economic_epoch_due() );
+   paid_full_period(economic_epoch_index());
+   BOOST_REQUIRE_EQUAL( pool, pay_claimable(carol) );
+   BOOST_REQUIRE_EQUAL( pool, pay_claimable(dave) );
+   BOOST_REQUIRE_EQUAL( 0, pay_claimable(erin) );
+   BOOST_REQUIRE_EQUAL( 1u, get_batch_duty(erin)["units"].as<uint32_t>() );
+   BOOST_REQUIRE_EQUAL( 1u, get_parked_work(first + 2, frank)["units"].as<uint32_t>() );
+   tick(false);
+   tick(true);
+   BOOST_REQUIRE( !economic_epoch_due() );
+   paid_full_period(economic_epoch_index());
+   BOOST_REQUIRE_EQUAL( pool, pay_claimable(erin) );
+   BOOST_REQUIRE_EQUAL( pool, pay_claimable(frank) );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( advance_pays_after_epoch_duration, sysio_emissions_tester ) try {

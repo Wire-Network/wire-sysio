@@ -62,9 +62,7 @@ namespace sysio::opp::claimable {
 /// limit keeps the row payable end to end. The cap is unreachable for any real payout.
 inline uint64_t add_capped(uint64_t balance, uint64_t amount) {
    constexpr uint64_t cap = static_cast<uint64_t>(safe::depot_amount_max);
-   if (balance >= cap) return cap;
-   const uint64_t room = cap - balance;
-   return amount >= room ? cap : balance + amount;
+   return safe::add_sat(balance, amount, cap);
 }
 
 /// Credit `amount` to a claimable row, creating it when absent and accumulating when present.

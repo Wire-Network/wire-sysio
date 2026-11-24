@@ -46,8 +46,8 @@ namespace sysio {
       /// Open economic epoch `epoch_index` (permissionless crank). Refused unless `epoch_index` is the
       /// next index, its grid boundary has passed, and the consensus genesis advance has run. Never
       /// waits on outpost consensus. Runs the emissions gate, then matures withdrawals, accrues the
-      /// epoch's emission share, pays on a pay epoch, steps the batch-duty settlement, and credits the
-      /// work recorded in the epoch before this tick opened it.
+      /// epoch's emission share, pays on a pay epoch, and steps the batch-duty settlement. Parked work is
+      /// credited before the payout for the epochs before this one, and after it for this one.
       [[sysio::action]]
       void tickeconomy(uint32_t epoch_index);
 
@@ -198,8 +198,9 @@ namespace sysio {
       /// boundaries `tickeconomy` has not yet processed. Equals `current_economic_epoch_index()` while
       /// the crank keeps up. 0 before the first boundary or when the clock is not configured. Never throws.
       ///
-      /// `seteconomy` refuses a change while a boundary has passed without its tick, so a boundary never
-      /// moves once passed or scheduled, and the index only grows with time.
+      /// `seteconomy` never moves a boundary that has passed, so the index never decreases as time
+      /// passes; once the clock has ticked it also keeps the next boundary, so the index of every time
+      /// before that boundary is fixed.
       static uint32_t economic_epoch_index_at(time_point now) {
          economycfg_t cfg_tbl(EPOCH_ACCOUNT);
          if (!cfg_tbl.exists()) return 0;

@@ -972,9 +972,10 @@ void epoch::seteconomy(uint32_t epoch_duration_sec, sysio::time_point_sec start_
    // re-date every epoch already accrued.
    //
    // While a boundary has passed without its tick, withdrawals and parked work are already dated by the
-   // boundaries still to be ticked, so the grid may not change until the crank is current. Once it is,
-   // the next boundary is fixed and a new duration spaces only the boundaries after it, so a grid index
-   // never moves earlier in time. A grid not yet started may still be started in the past.
+   // boundaries still to be ticked, so the grid may not change until the crank is current. Once it is, a
+   // new duration spaces only the boundaries after the next one: no boundary that has passed moves, nor,
+   // once the clock has ticked, the next one. A grid whose start is still ahead may be re-anchored, even
+   // into the past.
    economycfg_t cfg_tbl(get_self());
    if (cfg_tbl.exists()) {
       const economic_config current = cfg_tbl.get();
@@ -1056,6 +1057,21 @@ void epoch::tickeconomy(uint32_t epoch_index) {
       std::make_tuple(epoch_index, current_epoch_index())
    ).send();
 
+   // Parked work exists only once initt5 has run: onblock parks from then on, and advance sends rcrdduty.
+   const bool t5_exists = sysiosystem::emissions::t5state_t(SYSTEM_ACCOUNT).exists();
+   auto credit_work_through = [&](uint32_t last_epoch) {
+      action(
+         permission_level{get_self(), "owner"_n},
+         SYSTEM_ACCOUNT,
+         system_actions::CREDIT_WORK,
+         std::make_tuple(last_epoch)
+      ).send();
+   };
+
+   // Work of the epochs before this one is still parked only where an earlier tick's creditwork bound left
+   // it. It belongs to the period this tick pays, so it is credited before the payout.
+   if (t5_exists && epoch_index > 1) credit_work_through(epoch_index - 1);
+
    // Accrual precedes the payout sibling, so payepoch reads the period total including this epoch.
    if (gate.accrue) {
       action(
@@ -1075,21 +1091,16 @@ void epoch::tickeconomy(uint32_t epoch_index) {
    }
 
    // One bounded step of any batch-duty settlement still open, every economic epoch, then the work
-   // recorded in this epoch before this tick opened it joins the open pay period, after this epoch's
-   // payout. Settlements and parked work only exist once initt5 has run.
-   if (sysiosystem::emissions::t5state_t(SYSTEM_ACCOUNT).exists()) {
+   // recorded in this epoch before this tick opened it joins the period after this payout (with any
+   // earlier rows the call before the payout could not reach). Settlements only exist once initt5 has run.
+   if (t5_exists) {
       action(
          permission_level{get_self(), "owner"_n},
          SYSTEM_ACCOUNT,
          system_actions::SETTLE_DUTY,
          std::make_tuple()
       ).send();
-      action(
-         permission_level{get_self(), "owner"_n},
-         SYSTEM_ACCOUNT,
-         system_actions::CREDIT_WORK,
-         std::make_tuple(epoch_index)
-      ).send();
+      credit_work_through(epoch_index);
    }
 }
 

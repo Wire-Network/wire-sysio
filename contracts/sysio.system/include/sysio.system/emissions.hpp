@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sysio.system/fp_math.hpp>
+#include <sysio.opp.common/safe_ops.hpp>
 
 #include <sysio/asset.hpp>
 #include <sysio/kv_global.hpp>
@@ -12,14 +13,13 @@
 
 #include <algorithm>
 #include <cstdint>
-#include <limits>
 
 // Core emissions tables owned by sysio.system. This header is intentionally
-// free of OPP / protobuf dependencies so that downstream contracts (notably
-// sysio.roa) can include it to check emitcfg_t::exists() before invoking
-// addnodeowner. The opreg / token / epoch cross-contract reads used by
-// payepoch and viewepoch live in emissions.cpp (implementation detail,
-// not public API).
+// free of protobuf dependencies (its one sysio.opp.common include, safe_ops.hpp,
+// is dependency-free) so that downstream contracts (notably sysio.roa) can
+// include it to check emitcfg_t::exists() before invoking addnodeowner. The
+// opreg / token / epoch cross-contract reads used by payepoch and viewepoch
+// live in emissions.cpp (implementation detail, not public API).
 
 namespace sysiosystem::emissions {
 
@@ -44,7 +44,9 @@ inline constexpr uint16_t MAX_PAY_CADENCE_EPOCHS = 10;
 inline constexpr uint32_t MAX_DUTY_SETTLEMENT_ROWS = 50;
 
 /// `parkedwork` rows one `creditwork` credits. Covers a full producer schedule (21) and the largest batch
-/// operator window (56) working in one economic epoch; rows past it are credited at the next tick.
+/// operator window (56) working in one economic epoch. Rows past it are credited by the next tick before its
+/// payout, so they still join their own period; only work of more than twice this many accounts in one
+/// economic epoch has rows that land a period late.
 inline constexpr uint32_t MAX_PARKED_WORK_ROWS = 100;
 
 // ---------------------------------------------------------------------------
@@ -355,9 +357,10 @@ using dutystate_t = sysio::kv::global<"dutystate"_n, duty_state>;
 // Work parked for its economic epoch. Producer blocks (`onblock`) and batch duty (`rcrdduty`) recorded
 // while the grid is in an economic epoch `sysio.epoch::tickeconomy` has not opened yet belong to that
 // epoch, not to the pay period still open: they wait here, and the tick opening the epoch credits them
-// (`creditwork`) after its own payout. A late crank therefore pays every period exactly the work done
-// in it, as an on-time crank does. Empty while the crank keeps up, apart from the work recorded between
-// a boundary and its tick.
+// (`creditwork`) after its own payout. Rows an earlier tick's bound left are credited before the next
+// payout, which pays their period. A late crank therefore pays every period exactly the work done in
+// it, as an on-time crank does. Empty while the crank keeps up, apart from the work recorded between a
+// boundary and its tick.
 // ---------------------------------------------------------------------------
 
 /// `parkedwork` key: rows ordered by economic epoch, then account.
@@ -379,12 +382,6 @@ struct [[sysio::table("parkedwork"), sysio::contract("sysio.system")]] parked_wo
 
 using parkedwork_t = sysio::kv::table<"parkedwork"_n, parked_work_key, parked_work>;
 
-/// `a + b`, saturating at the uint32 maximum: work counters are credited on paths that must not throw.
-inline uint32_t saturating_add(uint32_t a, uint32_t b) {
-   constexpr uint32_t max = std::numeric_limits<uint32_t>::max();
-   return b > max - a ? max : a + b;
-}
-
 /// Park `blocks` producer blocks and `units` duty units of `account`'s work in economic epoch `economic_epoch`,
 /// which sysio.epoch::tickeconomy has not opened yet; `creditwork` credits them once it has. Billed to `self`.
 /// Never throws.
@@ -393,8 +390,8 @@ inline void park_work(sysio::name self, uint32_t economic_epoch, sysio::name acc
    const parked_work_key key{economic_epoch, account.value};
    parked_work row =
       parked.try_get(key).value_or(parked_work{.economic_epoch = economic_epoch, .account_name = account});
-   row.blocks = saturating_add(row.blocks, blocks);
-   row.units  = saturating_add(row.units, units);
+   row.blocks = sysio::opp::safe::add_sat(row.blocks, blocks);
+   row.units  = sysio::opp::safe::add_sat(row.units, units);
    parked.set(self, key, row);
 }
 
