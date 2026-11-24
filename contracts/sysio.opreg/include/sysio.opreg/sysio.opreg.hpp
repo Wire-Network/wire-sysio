@@ -226,8 +226,10 @@ namespace sysio {
 
       /// Register a new operator. A terminated account registers again only once its balances are
       /// drained and it holds no seat in the batch-operator schedule; the new registration serves no
-      /// chain. An operator registering itself needs a `sysio.authex` link for every active outpost,
-      /// except a batch operator, whose links `joinchain` checks chain by chain.
+      /// chain, and the account forfeits the unsettled batch duty it still holds from an earlier
+      /// registration (`sysio.system::forfeitduty` for each such chain). An operator registering itself
+      /// needs a `sysio.authex` link for every active outpost, except a batch operator, whose links
+      /// `joinchain` checks chain by chain.
       [[sysio::action]]
       void regoperator(name account,
                        opp::types::OperatorType type,

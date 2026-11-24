@@ -215,7 +215,8 @@ tables keyed by chain, and `setconfig`, `schbatchgps`, `advance`, `finishadv`, `
 `sysio.opreg` adds `servchains` and keys `dellog` and the `wtdwqueue` consensus waits by chain,
 `sysio.chalg` drops its dispute counter and `byepoch` index, `batchduty` / `dutystate` count
 seat-seconds with one `batchduty` row per (operator, chain), and `termcheck` sends the new
-`sysio::forfeitduty` when it evicts. `sysio.opreg::setconfig` takes the new
+`sysio::forfeitduty` when it evicts, as `regoperator` does for each chain an account registering
+again still holds duty on. `sysio.opreg::setconfig` takes the new
 `terminate_min_pct_samples`, kept on `opconfig`, and each `servchains` row carries
 the duty tally `termcheck` reads. No migration is supplied: deploy
 `sysio.epoch`, `sysio`, `sysio.opreg`, `sysio.msgch`, `sysio.chalg`, `sysio.chains`, `sysio.tokens`,
@@ -256,7 +257,7 @@ changes. For the edges on `advance`'s path today, and the one `sysio.bond::accep
 |---|---|
 | `sysio.opreg`, `sysio.chalg`, `sysio.msgch` before `sysio.epoch`, when the release adds or changes an action `advance` or `tickeconomy` inlines into them | Call edge: the new clock would otherwise reach a callee that cannot dispatch the action, and every advance or tick aborts. |
 | `sysio` (`sysio.system`) before `sysio.epoch`, when the release adds or changes `rcrdduty` / `accrueepoch` / `payepoch` / `settleduty` | Call edge: the new clock would otherwise reach a `sysio.system` that cannot dispatch the action, and every advance or tick aborts. |
-| `sysio` (`sysio.system`) before `sysio.opreg`, when the release adds or changes `forfeitduty` | Call edge: `termcheck` inlines it inside `advance`, so an old `sysio.system` aborts every advance that evicts. |
+| `sysio` (`sysio.system`) before `sysio.opreg`, when the release adds or changes `forfeitduty` | Call edge: `termcheck` inlines it inside `advance`, so an old `sysio.system` aborts every advance that evicts, and every `regoperator` that forfeits an earlier registration's duty. |
 | `sysio.epoch` and `sysio.kicker` before `sysio.system`, when `sysio.system` gains state the emissions gate must reserve (as `payclaimtot` reserves unclaimed `payclaims`) | Table edge: the old gate counts the new backing as spendable, so a later pay period can double-commit it and leave credited claims underfunded; an old kicker counts it as available treasury and `kick` can draw it. |
 | `sysio.epoch` before `sysio.msgch`, when the release adds or changes an action `chkcons` inlines into `sysio.epoch` | Call edge in the other direction. |
 | `sysio` (`sysio.system`) before `sysio.bond` | Call edge: `accept` on a request from a `sysio.*` issuer sends `sysio::addsubjex`, and the dispatcher rejects an action the deployed contract does not define, so every such `accept` aborts. |

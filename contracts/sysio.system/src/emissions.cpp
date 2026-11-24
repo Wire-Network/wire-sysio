@@ -760,9 +760,9 @@ void system_contract::rcrdduty(sysio::slug_name chain_code, uint32_t /*epoch_ind
 }
 
 // forfeitduty - erase `account`'s unsettled duty on `chain_code`, open or settling, when sysio.opreg
-// evicts it from that chain. The period totals keep the forfeited seat-seconds, so no operator is
-// credited the share and the settlement leaves it in the treasury. Inline from sysio.opreg::termcheck,
-// so it never throws.
+// evicts it from that chain or the account registers again. The period totals keep the forfeited
+// seat-seconds, so no operator is credited the share and the settlement leaves it in the treasury.
+// Inline from sysio.opreg::termcheck and regoperator, so it never throws.
 void system_contract::forfeitduty(sysio::name account, sysio::slug_name chain_code) {
    require_auth(opreg_refs::account);
 
@@ -811,8 +811,8 @@ void system_contract::settleduty() {
 // The batch-operator slice opens a duty settlement: it is split pro rata to the
 // period's seat-seconds (rcrdduty) and credited in bounded steps. Only ACTIVE
 // batch operators are paid; any skipped amount, like duty forfeited by an
-// eviction (forfeitduty), stays in the treasury and is recorded on the epochlog
-// row when the settlement completes.
+// eviction or a new registration (forfeitduty), stays in the treasury and is
+// recorded on the epochlog row when the settlement completes.
 //
 // Single-trx semantics guarantee gate conditions hold through this call;
 // payepoch trusts the gate-computed period_emission and does not recompute.

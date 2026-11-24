@@ -3486,6 +3486,89 @@ BOOST_FIXTURE_TEST_CASE(evicted_member_delivers_nothing_until_it_rejoins_with_fr
    BOOST_REQUIRE_EQUAL(uint64_t{EPOCH_DURATION_SEC}, batch_duty_seat_seconds(BATCHOP, ETH_OUTPOST_ID));
 } FC_LOG_AND_RETHROW() }
 
+/// A terminated operator that registers again forfeits its earlier registration's duty on every chain. BATCHOP
+/// serves ETH and SOL and is terminated while still seated; its last seat's close credits that registration
+/// more duty. Once no window seats it, it registers again, bonds and is ACTIVE before the pay period settles.
+/// `regoperator` erases its duty on both chains while the period keeps the seat-seconds, so the payout pays it
+/// only for the seats it serves after rejoining, and the earlier registration's share stays in the treasury.
+BOOST_FIXTURE_TEST_CASE(registering_again_forfeits_the_earlier_registrations_duty, sysio_msgch_chain_tester) { try {
+   bootstrap_rotation(ROTATION_WINDOW_MS, /*batchop_is_bootstrapped=*/false, rotation_outposts::eth_and_sol);
+   const std::vector<uint64_t> chains{ETH_OUTPOST_ID, SOL_OUTPOST_ID};
+
+   // BATCHOP's epoch-1 seat closes on both chains and the slide seats it again in the tail.
+   for (const uint64_t chain : chains) BOOST_REQUIRE_EQUAL(BATCHOP, duty_member(chain));
+   advance_to_next_epoch();
+   BOOST_REQUIRE(holds_schedule_seat(BATCHOP));
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "terminate"_n,
+      mvo()("account", BATCHOP.to_string())("reason", std::string(SEATED_TERMINATION_REASON))));
+   produce_blocks(); // land it before the advance's epoch-length jump expires it
+
+   // Its remaining seats close, still crediting the terminated registration.
+   for (uint32_t step = 0; step < ROTATION_GROUPS && holds_schedule_seat(BATCHOP); ++step) advance_to_next_epoch();
+   BOOST_REQUIRE(!holds_schedule_seat(BATCHOP));
+   std::map<uint64_t, uint64_t> earlier_duty;
+   for (const uint64_t chain : chains) {
+      earlier_duty[chain] = batch_duty_seat_seconds(BATCHOP, chain);
+      BOOST_REQUIRE_GT(earlier_duty[chain], uint64_t{EPOCH_DURATION_SEC});
+   }
+   const uint64_t open_before = duty_state()[system_fields::OPEN_SEAT_SECONDS].as<uint64_t>();
+
+   // Registering again forfeits both chains' duty; the period keeps its seat-seconds.
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n, mvo()
+      ("account", BATCHOP.to_string())("type", opp::types::OperatorType::OPERATOR_TYPE_BATCH)
+      ("is_bootstrapped", false)));
+   for (const uint64_t chain : chains) BOOST_REQUIRE_EQUAL(0u, batch_duty_seat_seconds(BATCHOP, chain));
+   BOOST_REQUIRE_EQUAL(open_before, duty_state()[system_fields::OPEN_SEAT_SECONDS].as<uint64_t>());
+
+   // It bonds, ACTIVE again before the period settles, and rejoins both chains.
+   BOOST_REQUIRE_EQUAL(success(), fund_and_bond(BATCHOP, BATCH_OPERATOR_MINIMUM_COLLATERAL));
+   BOOST_REQUIRE(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE ==
+                 get_operator(BATCHOP)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
+   for (const std::string_view chain : epoch_chains) {
+      BOOST_REQUIRE_EQUAL(success(), served::join(*this, BATCHOP, chain));
+   }
+   produce_blocks(); // land them before the advance's epoch-length jump expires them
+
+   // Walk until a seat of the new registration has closed on ETH.
+   for (uint32_t step = 0; step < 2 * ROTATION_GROUPS && batch_duty_seat_seconds(BATCHOP, ETH_OUTPOST_ID) == 0;
+        ++step) {
+      advance_to_next_epoch();
+   }
+   // Its duty is the new registration's one seat on each chain, nothing of the earlier registration's.
+   BOOST_REQUIRE_EQUAL(uint64_t{EPOCH_DURATION_SEC}, batch_duty_seat_seconds(BATCHOP, ETH_OUTPOST_ID));
+   BOOST_REQUIRE_LE(batch_duty_seat_seconds(BATCHOP, SOL_OUTPOST_ID), uint64_t{EPOCH_DURATION_SEC});
+   const uint64_t period_seat_seconds = duty_state()[system_fields::OPEN_SEAT_SECONDS].as<uint64_t>();
+
+   // Each operator's rows settle at the period's rate: pool * seat-seconds / period seat-seconds, per row.
+   const std::vector<name> operators{BATCHOP, BATCHOP_B, BATCHOP_C};
+   std::map<name, std::vector<uint64_t>> rows;
+   for (const name op : operators) {
+      BOOST_REQUIRE_EQUAL(0, pay_claimable(op));
+      for (const uint64_t chain : chains) rows[op].push_back(batch_duty_seat_seconds(op, chain));
+   }
+
+   const uint32_t paid_epoch = tick_economy_to_grid();
+   const auto     log        = epoch_log(paid_epoch);
+   BOOST_REQUIRE(log[system_fields::BATCH_SETTLED].as<bool>());
+   const int64_t pool = log[system_fields::BATCH_EMISSION].as<int64_t>();
+   BOOST_REQUIRE_GT(pool, 0);
+   const auto share = [&](uint64_t seat_seconds) {
+      return static_cast<int64_t>(static_cast<__int128>(pool) * seat_seconds / period_seat_seconds);
+   };
+   int64_t paid = 0;
+   for (const name op : operators) {
+      int64_t expected = 0;
+      for (const uint64_t seat_seconds : rows[op]) expected += share(seat_seconds);
+      BOOST_REQUIRE_EQUAL(expected, pay_claimable(op));
+      paid += expected;
+   }
+   const int64_t retained = log[system_fields::BATCH_EMISSION_RETAINED].as<int64_t>();
+   BOOST_REQUIRE_EQUAL(pool - paid, retained);
+   int64_t forfeited = 0;
+   for (const uint64_t chain : chains) forfeited += share(earlier_duty[chain]);
+   BOOST_REQUIRE_GE(retained, forfeited);
+} FC_LOG_AND_RETHROW() }
+
 /// WNS-56: the OPERATORS roster lists exactly the operators the window seats, so registrations cannot
 /// grow it. Unbonded registrations, an ACTIVE batch operator the window does not seat, and an ACTIVE
 /// challenger are all left out.

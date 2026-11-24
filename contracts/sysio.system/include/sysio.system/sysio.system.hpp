@@ -816,8 +816,9 @@ namespace sysiosystem {
           * for the chain, whether it belongs to the open or the settling period. The period totals keep
           * the seat-seconds, so no operator is credited the share and its settlement leaves it in the
           * treasury. The operator's duty on its other chains is untouched. Called inline by
-          * sysio.opreg::termcheck when it evicts the operator from the chain; never throws.
-          * Auth: require_auth("sysio.opreg").
+          * sysio.opreg::termcheck when it evicts the operator from the chain, and by
+          * sysio.opreg::regoperator for each chain the account still holds duty on from an earlier
+          * registration; never throws. Auth: require_auth("sysio.opreg").
           */
          [[sysio::action]]
          void forfeitduty(sysio::name account, sysio::slug_name chain_code);

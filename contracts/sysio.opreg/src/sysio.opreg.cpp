@@ -90,7 +90,7 @@ constexpr std::string_view still_seated_on_chain_msg =
    "operator still holds a seat in this chain's schedule: it may rejoin once its seats have closed";
 constexpr std::string_view not_serving_msg              = "operator does not serve this chain";
 
-/// Action identifiers owned by sysio.system and invoked by an eviction.
+/// Action identifiers owned by sysio.system and invoked by an eviction or a new registration.
 namespace system_actions {
 constexpr name FORFEIT_DUTY = "forfeitduty"_n;
 } // namespace system_actions
@@ -272,6 +272,17 @@ void erase_memberships(name self, name account) {
    }
 }
 
+/// Send `sysio.system::forfeitduty(account, chain_code)` inline: the account's unsettled batch duty on the
+/// chain, open or settling, is erased while the period totals keep its seat-seconds, so no operator is paid
+/// the share.
+void forfeit_duty(name self, name account, sysio::slug_name chain_code) {
+   action(
+      permission_level{self, active_permission},
+      opreg::SYSTEM_ACCOUNT, system_actions::FORFEIT_DUTY,
+      std::make_tuple(account, chain_code)
+   ).send();
+}
+
 } // anonymous namespace
 
 // ---------------------------------------------------------------------------
@@ -419,6 +430,13 @@ void opreg::regoperator(name account,
          if (chain_it->is_depot || !chain_it->active) continue;
          check(authex_link_of(account, chain_it->kind).has_value(), missing_outpost_link_msg);
       }
+   }
+
+   // A registration is never paid for an earlier one's duty: forfeit what the account still holds on any
+   // chain, whether its old row was replaced above or pruned before. Its last seat has closed, so no
+   // earlier seat credits more.
+   for (const sysio::slug_name chain_code : sysiosystem::emissions::duty_chains_of(SYSTEM_ACCOUNT, account)) {
+      forfeit_duty(get_self(), account, chain_code);
    }
 
    auto now = current_time_ms();
@@ -1782,11 +1800,7 @@ void opreg::termcheck(name account, sysio::slug_name chain_code) {
       // The eviction forfeits the operator's unsettled batch duty on this chain; its other chains keep
       // theirs. No duty is recorded before initt5, so there is nothing to forfeit until then.
       if (sysiosystem::emissions::records_batch_duty(SYSTEM_ACCOUNT)) {
-         action(
-            permission_level{get_self(), active_permission},
-            SYSTEM_ACCOUNT, system_actions::FORFEIT_DUTY,
-            std::make_tuple(account, chain_code)
-         ).send();
+         forfeit_duty(get_self(), account, chain_code);
       }
    } else if (tally.duties != duties_before) {
       members.set(ram_payer, member_key, *membership);

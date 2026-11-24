@@ -36,7 +36,7 @@ the collateral each has bonded, and the outpost chains each batch operator serve
 | Action | Auth | Description |
 |--------|------|-------------|
 | `setconfig` | `sysio.opreg` | Set the eviction rails, the prune delay and the per-role minimum bonds. `terminate_window_ms` must span `terminate_max_consecutive_misses + 1` duty rotations of every chain's epoch schedule |
-| `regoperator` | the account, or `sysio.opreg` | Register an operator. Only `sysio.opreg` registers a bootstrapped one. An account registering itself needs a `sysio.authex` link for every active outpost, except a batch operator, whose links `joinchain` checks. A terminated account registers again once its balances are drained and no schedule seats it; the new registration serves no chain |
+| `regoperator` | the account, or `sysio.opreg` | Register an operator. Only `sysio.opreg` registers a bootstrapped one. An account registering itself needs a `sysio.authex` link for every active outpost, except a batch operator, whose links `joinchain` checks. A terminated account registers again once its balances are drained and no schedule seats it; the new registration serves no chain and forfeits the account's unsettled batch duty from the earlier one |
 | `joinchain` | the operator, or `sysio.opreg` | Serve one active outpost: see below |
 | `leavechain` | the operator | Stop serving one outpost: see below |
 | `deposit` | the operator | Bond WIRE or a shadow LIQ token |
@@ -110,4 +110,6 @@ it is paid nothing for the chain's open or settling pay period, nor for any seat
 while its other chains keep paying. Duty on the chain starts again from its rejoin.
 
 A membership ends with its registration: `prune` erases a pruned operator's rows and `regoperator`
-erases them when the account registers again.
+erases them when the account registers again. `regoperator` also forfeits the account's unsettled
+batch duty on every chain (`sysio.system::forfeitduty` for each), open or settling, whether its old row
+is replaced or was pruned, so a new registration is paid only for its own seats.

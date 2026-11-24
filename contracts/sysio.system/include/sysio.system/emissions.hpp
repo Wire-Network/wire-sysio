@@ -13,6 +13,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <vector>
 
 // Core emissions tables owned by sysio.system. This header is intentionally
 // free of OPP / protobuf dependencies so that downstream contracts (notably
@@ -298,8 +299,9 @@ inline int64_t spendable_wire(int64_t balance, const pay_claim_total& claims, co
 // member of the group that served it with that epoch's scheduled length in seconds (rcrdduty), on the
 // member's row for that chain; each payepoch closes the open pay period and splits its one batch pool
 // pro rata to those seat-seconds over every chain. An eviction from a chain forfeits the operator's
-// unsettled duty there (forfeitduty). Settlement walks `batchduty` in bounded steps, so the number of
-// operators that served in a period bounds no single transaction.
+// unsettled duty there (forfeitduty), and a new registration of the account forfeits its duty on every
+// chain. Settlement walks `batchduty` in bounded steps, so the number of operators that served in a
+// period bounds no single transaction.
 // ---------------------------------------------------------------------------
 
 struct batch_duty_key {
@@ -315,8 +317,9 @@ inline uint128_t duty_period_key(uint32_t period, uint64_t account) {
 }
 
 /// One batch operator's unpaid duty on one outpost chain. The row exists only while it holds unpaid
-/// seat-seconds; settlement erases it, an eviction from the chain erases it (`forfeitduty`), and a row
-/// of a period that closed without a settlement is pruned by `settleduty`.
+/// seat-seconds; settlement erases it, an eviction from the chain or a new registration of the account
+/// erases it (`forfeitduty`), and a row of a period that closed without a settlement is pruned by
+/// `settleduty`.
 struct [[sysio::table("batchduty"), sysio::contract("sysio.system")]] batch_duty {
    sysio::name      account_name;
    sysio::slug_name chain_code;         ///< outpost chain the duty was served on
@@ -331,6 +334,18 @@ struct [[sysio::table("batchduty"), sysio::contract("sysio.system")]] batch_duty
 
 using batchduty_t = sysio::kv::table<"batchduty"_n, batch_duty_key, batch_duty,
    sysio::kv::index<"byperiod"_n, sysio::const_mem_fun<batch_duty, uint128_t, &batch_duty::by_period>>>;
+
+/// The chains `account` holds unsettled duty on in `batchduty` (sysio.system deployed on `system_account`),
+/// open or settling: its rows are one range of the primary key, ordered by chain.
+inline std::vector<sysio::slug_name> duty_chains_of(sysio::name system_account, sysio::name account) {
+   batchduty_t                   rows(system_account);
+   std::vector<sysio::slug_name> chains;
+   for (auto it = rows.lower_bound(batch_duty_key{account, sysio::slug_name{}});
+        it != rows.end() && it->account_name == account; ++it) {
+      chains.push_back(it->chain_code);
+   }
+   return chains;
+}
 
 /// Duty accounting: the open pay period and, while one is being paid out, the settling period.
 /// A period number is only an accounting label, independent of both clocks.

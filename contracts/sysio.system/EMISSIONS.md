@@ -141,7 +141,10 @@ operator is credited the share, so it stays in the treasury when the settlement
 completes. `rcrdduty` credits an `EVICTED` member nothing on the chain, including
 the seat whose close evicted it, until it rejoins. Its other chains keep paying.
 Slashing and governance `terminate` still forfeit every chain's unsettled duty,
-since settlement pays only ACTIVE operators.
+since settlement pays only ACTIVE operators. A terminated account that registers
+again could be ACTIVE before that duty settles, so `sysio.opreg::regoperator`
+sends `forfeitduty` for every chain the account still holds duty on: the new
+registration is paid only for the seats it serves.
 
 `setemitcfg` accepts a payment cadence only in `[1, 10]` economic epochs.
 
@@ -361,7 +364,7 @@ period_emission
 | `accrueepoch` | `sysio.epoch` | Accrue this economic epoch's curve share |
 | `payepoch` | `sysio.epoch` | Distribute the period's compute / capex / governance (credits `payclaims`; pushes only the category buckets) and open its batch-duty settlement |
 | `rcrdduty` | `sysio.epoch` | Credit the epoch's scheduled length in seat-seconds to each member of the group that served a consensus epoch of one chain, except a member evicted from it |
-| `forfeitduty` | `sysio.opreg` | Erase an evicted operator's unsettled seat-seconds on one chain, leaving the period totals as they were |
+| `forfeitduty` | `sysio.opreg` | Erase an operator's unsettled seat-seconds on one chain, leaving the period totals as they were: on its eviction from the chain, and on each chain when the account registers again |
 | `settleduty` | `sysio.epoch` | One bounded step of the open batch-duty settlement |
 | `viewnodedist` | read-only | Preview a node owner's claimable amount |
 | `viewepoch` | read-only | Remaining budget / next-emission estimate |
@@ -378,13 +381,13 @@ period_emission
 | `payclaims` | Table | Per-account epoch pay credited by `payepoch` and not yet claimed |
 | `payclaimtot` | Singleton | Running total of outstanding `payclaims`, reserved by every gate that spends the treasury balance |
 | `t5state` | Singleton | Treasury state: pending emission, unsettled batch emission, total distributed, decay continuity |
-| `batchduty` | Table | Per-(operator, chain) unpaid seat-seconds and the pay period they belong to; erased as they settle or when the operator is evicted from the chain |
+| `batchduty` | Table | Per-(operator, chain) unpaid seat-seconds and the pay period they belong to; erased as they settle, when the operator is evicted from the chain, or when the account registers again |
 | `dutystate` | Singleton | The open pay period's seat-second total and the settling period's pool, seat-seconds and walk cursor |
 | `epochlog` | Table | Per-pay-epoch audit log (head-pruned to `epoch_log_retention_count`) |
 
 ## Dependencies
 
 - Driven inline by `sysio.epoch::tickeconomy` (`accrueepoch` + `payepoch` + `settleduty`),
-  `sysio.epoch::advance` (`rcrdduty`) and `sysio.opreg::termcheck` (`forfeitduty`).
+  `sysio.epoch::advance` (`rcrdduty`) and `sysio.opreg::termcheck` / `regoperator` (`forfeitduty`).
 - Reads producer eligibility, operator status and batch operators' chain memberships from `sysio.opreg`.
 - Reads the canonical economic epoch duration and start time from `sysio.epoch::economycfg`.

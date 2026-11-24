@@ -1284,6 +1284,11 @@ public:
       );
    }
 
+   /// Terminate an operator through governance (sysio.opreg's own authority).
+   action_result terminate_operator(account_name account, const std::string& reason = "test terminate") {
+      return push_opreg_action(OPREG, "terminate"_n, mvo()("account", account)("reason", reason));
+   }
+
    // =============================================================================
    // sysio.epoch action helpers
    // =============================================================================
@@ -3106,6 +3111,91 @@ BOOST_FIXTURE_TEST_CASE( forfeitduty_requires_sysio_opreg, sysio_emissions_teste
       require_substr( r, "missing authority of sysio.opreg" );
    }
    BOOST_REQUIRE_EQUAL(uint64_t{T_EPOCH_SECS}, get_batch_duty(MEMBER)["seat_seconds"].as<uint64_t>());
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( registering_again_forfeits_every_chain_of_the_earlier_duty, sysio_emissions_tester ) try {
+   // A terminated account that registers again, ACTIVE at once, forfeits its earlier registration's duty on
+   // every chain: its settling rows, which the settlement cursor rests on, and its open row are erased while
+   // both periods keep their seat-seconds, so the settlement pays it nothing for them. The duty it serves
+   // after registering again is paid.
+   const account_name LATE = "zzzzbatchop"_n;   // sorts after every numeric name below
+   constexpr std::string_view OTHER_CHAIN     = "SOL";
+   constexpr std::string_view LATER_CHAIN     = "BASE";
+   constexpr int64_t          period_emission = 1'000'000'000;
+   // Exactly one settlement step of rows sorts before LATE, so payepoch's step stops at LATE's first row.
+   vector<name> members;
+   for (uint64_t value = 1; value <= MAX_DUTY_SETTLEMENT_ROWS; ++value) members.emplace_back(value);
+   members.push_back(LATE);
+   create_t5_holding_accounts();
+   create_accounts({ LATE }, false, false, false, true);
+   BOOST_REQUIRE_EQUAL(success(), register_operator(LATE, OperatorType::OPERATOR_TYPE_BATCH, true));
+   BOOST_REQUIRE_EQUAL(success(), setemitcfg_defaults(config::system_account_name));
+   BOOST_REQUIRE_EQUAL(success(), initt5(config::system_account_name));
+   BOOST_REQUIRE_EQUAL(success(), rcrdduty(1, members));
+   BOOST_REQUIRE_EQUAL(success(), rcrdduty(1, { LATE }, T_EPOCH_SECS, OTHER_CHAIN));
+   BOOST_REQUIRE_EQUAL(success(), accrue(1, period_emission));
+   BOOST_REQUIRE_EQUAL(success(), pay(1, period_emission));
+   BOOST_REQUIRE_EQUAL(success(), rcrdduty(2, { LATE }, T_EPOCH_SECS, LATER_CHAIN));
+
+   auto duty = get_duty_state();
+   BOOST_REQUIRE_EQUAL(1u, duty["settling_period"].as<uint32_t>());
+   BOOST_REQUIRE_EQUAL(LATE.to_uint64_t(), duty["settle_cursor"].as<uint64_t>());
+   const uint64_t settling_seat_seconds = duty["settling_seat_seconds"].as<uint64_t>();
+   BOOST_REQUIRE_EQUAL(uint64_t{T_EPOCH_SECS}, duty["open_seat_seconds"].as<uint64_t>());
+   for (const std::string_view chain : { EPOCH_CHAIN, OTHER_CHAIN }) {
+      BOOST_REQUIRE_EQUAL(1u, get_batch_duty(LATE, chain)["period"].as<uint32_t>());
+   }
+   BOOST_REQUIRE_EQUAL(2u, get_batch_duty(LATE, LATER_CHAIN)["period"].as<uint32_t>());
+
+   BOOST_REQUIRE_EQUAL(success(), terminate_operator(LATE));
+   BOOST_REQUIRE_EQUAL(success(), register_operator(LATE, OperatorType::OPERATOR_TYPE_BATCH, true));
+   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_ACTIVE", get_opreg_operator(LATE)["status"].as_string());
+   for (const std::string_view chain : { EPOCH_CHAIN, OTHER_CHAIN, LATER_CHAIN }) {
+      BOOST_REQUIRE(get_batch_duty(LATE, chain).is_null());
+   }
+   duty = get_duty_state();
+   BOOST_REQUIRE_EQUAL(settling_seat_seconds, duty["settling_seat_seconds"].as<uint64_t>());
+   BOOST_REQUIRE_EQUAL(uint64_t{T_EPOCH_SECS}, duty["open_seat_seconds"].as<uint64_t>());
+   BOOST_REQUIRE_EQUAL(LATE.to_uint64_t(), duty["settle_cursor"].as<uint64_t>());
+
+   // The settlement walks on past the cursor and completes, paying LATE nothing: none of the numeric names is a
+   // registered operator, so the whole pool stays in the treasury.
+   BOOST_REQUIRE_EQUAL(success(), settleduty());
+   BOOST_REQUIRE_EQUAL(0u, get_duty_state()["settling_period"].as<uint32_t>());
+   BOOST_REQUIRE_EQUAL(int64_t(0), get_wire_balance_paid(LATE).get_amount());
+   const int64_t compute    = test_split_bps(period_emission, COMPUTE_BPS);
+   const int64_t batch_pool = compute - test_split_bps(compute, PRODUCER_BPS);
+   const auto    log        = get_epoch_log(1);
+   BOOST_REQUIRE(log["batch_settled"].as_bool());
+   BOOST_REQUIRE_EQUAL(batch_pool, log["batch_emission_retained"].as<int64_t>());
+
+   // Its first seat after registering again is paid at period 2's rate, which still counts the forfeited seat.
+   BOOST_REQUIRE_EQUAL(success(), rcrdduty(3, { LATE }));
+   BOOST_REQUIRE_EQUAL(2u * T_EPOCH_SECS, get_duty_state()["open_seat_seconds"].as<uint64_t>());
+   BOOST_REQUIRE_EQUAL(success(), accrue(2, period_emission));
+   BOOST_REQUIRE_EQUAL(success(), pay(2, period_emission));
+   BOOST_REQUIRE_EQUAL(batch_pool / 2, get_wire_balance_paid(LATE).get_amount());
+   BOOST_REQUIRE_EQUAL(batch_pool - batch_pool / 2, get_epoch_log(2)["batch_emission_retained"].as<int64_t>());
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( registering_afresh_forfeits_nothing, sysio_emissions_tester ) try {
+   // An account registering for the first time holds no duty: its registration sends no forfeit, and other
+   // operators' duty is untouched.
+   const account_name PEER  = "batchopa"_n;
+   const account_name FRESH = "batchopb"_n;
+   create_t5_holding_accounts();
+   create_accounts({ PEER, FRESH }, false, false, false, true);
+   BOOST_REQUIRE_EQUAL(success(), register_operator(PEER, OperatorType::OPERATOR_TYPE_BATCH, true));
+   BOOST_REQUIRE_EQUAL(success(), setemitcfg_defaults(config::system_account_name));
+   BOOST_REQUIRE_EQUAL(success(), initt5(config::system_account_name));
+   BOOST_REQUIRE_EQUAL(success(), rcrdduty(1, { PEER }));
+
+   const transaction_trace_ptr trace = base_tester::push_action(OPREG, "regoperator"_n, OPREG, mvo()
+      ("account", FRESH)("type", OperatorType::OPERATOR_TYPE_BATCH)("is_bootstrapped", true));
+   for (const action_trace& act : trace->action_traces) {
+      BOOST_REQUIRE(act.act.name != "forfeitduty"_n);
+   }
+   BOOST_REQUIRE_EQUAL(uint64_t{T_EPOCH_SECS}, get_batch_duty(PEER)["seat_seconds"].as<uint64_t>());
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( setemitcfg_bounds_period_accrual_to_asset_range, sysio_emissions_tester ) try {
@@ -5993,10 +6083,6 @@ struct producer_eligibility_tester : public sysio_emissions_tester {
    void create_producer_accounts(const std::vector<account_name>& names) {
       create_accounts(names, false, false, false, true);
       produce_blocks(1);
-   }
-
-   action_result terminate_operator(account_name account, const std::string& reason = "test terminate") {
-      return push_opreg_action(OPREG, "terminate"_n, mvo()("account", account)("reason", reason));
    }
 
    /// Registers `count` producers, each an ACTIVE bootstrapped PRODUCER operator
