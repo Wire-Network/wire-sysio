@@ -361,8 +361,11 @@ struct batch_operator_plugin::impl {
    /// Written by the epoch tick, read by the crank and kick cron jobs.
    std::atomic<bool>        is_active{true};
    /// Whether the relay jobs run: `sysio.msgch::deliver` accepts the operator's status, which only ACTIVE passes.
-   /// Written and read by the epoch tick, and by the deferred startup before the cron service runs.
-   bool                     status_delivers = true;
+   /// False until a read of the status shows ACTIVE. Written and read by the epoch tick, and by the deferred startup
+   /// before the cron service runs.
+   bool                     status_delivers = false;
+   /// Whether `poll_own_status` has read the status once. Same threads as `status_delivers`.
+   bool                     status_read = false;
 
    // Plugin references
    chain_plugin*                     chain_plug = nullptr;
@@ -1018,10 +1021,11 @@ struct batch_operator_plugin::impl {
     *   * `is_active` (`opreg_status::compute_is_active`): `chkcons` and the cranks push; false once SLASHED or
     *     TERMINATED, kept on any other status.
     *   * `status_delivers` (`opreg_status::compute_delivers`): the relay jobs run; true only while
-    *     `sysio.msgch::deliver` accepts the status, which needs ACTIVE. `refresh_relay` stops the jobs on every chain
-    *     otherwise and rebuilds them once the status reads ACTIVE again.
+    *     `sysio.msgch::deliver` accepts the status, which needs ACTIVE. The jobs start at the first read of ACTIVE;
+    *     `refresh_relay` stops them on every chain once the status is refused and rebuilds them once it reads ACTIVE
+    *     again.
     * An operator with no row reads as UNKNOWN (`batch_operator_detail::own_status_of`). A failed read changes neither
-    * gate. Logs each flip.
+    * gate. Logs the first read's relay decision and each flip after it.
     */
    void poll_own_status() {
       sysio::chain_apis::read_only::get_table_rows_params p;
@@ -1045,7 +1049,15 @@ struct batch_operator_plugin::impl {
 
       const bool was_delivering = status_delivers;
       status_delivers = sysio::opp::depot::opreg_status::compute_delivers(status, was_delivering);
-      if (was_delivering && !status_delivers) {
+      if (!status_read) {
+         status_read = true;
+         if (status_delivers) {
+            ilog("batch_operator: own status reads ACTIVE — starting the relay jobs");
+         } else {
+            wlog("batch_operator: own status {} is refused by sysio.msgch::deliver — the relay jobs start once it "
+                 "reads ACTIVE", status);
+         }
+      } else if (was_delivering && !status_delivers) {
          elog("batch_operator: own status {} is refused by sysio.msgch::deliver — stopping the relay jobs", status);
       } else if (!was_delivering && status_delivers) {
          ilog("batch_operator: own status flipped to ACTIVE — restarting the relay jobs");

@@ -558,9 +558,10 @@ BOOST_AUTO_TEST_CASE(own_status_is_the_row_or_unknown_without_one) try {
                      OperatorStatus_Name(sysio::opp::types::OPERATOR_STATUS_UNKNOWN));
 } FC_LOG_AND_RETHROW();
 
-/// Across polls the relay jobs follow `sysio.msgch::deliver`'s status gate: they run on every relayed chain while the
-/// operator reads ACTIVE, stop on all of them under UNKNOWN, without a row, or once SLASHED or TERMINATED, and restart
-/// when it reads ACTIVE again (a terminated operator that registers again). A failed read leaves them as they were.
+/// Across polls the relay jobs follow `sysio.msgch::deliver`'s status gate: none run before a read of ACTIVE (a node
+/// that starts before its operator row is readable), they run on every relayed chain while the operator reads ACTIVE,
+/// stop on all of them under UNKNOWN, without a row, or once SLASHED or TERMINATED, and restart when it reads ACTIVE
+/// again (a terminated operator that registers again). A failed read leaves them as they were.
 BOOST_AUTO_TEST_CASE(relay_jobs_run_only_while_deliver_accepts_the_status) try {
    using namespace sysio::opp::types;
    const std::vector<outpost_descriptor> relayed{outpost(serving_chain), outpost(left_seated_chain)};
@@ -569,6 +570,8 @@ BOOST_AUTO_TEST_CASE(relay_jobs_run_only_while_deliver_accepts_the_status) try {
       bool                        relays;
    };
    const std::vector<poll> polls{
+      {std::nullopt, false},
+      {fc::variants{}, false},
       {fc::variants{operator_row(self, OPERATOR_STATUS_ACTIVE)}, true},
       {fc::variants{operator_row(self, OPERATOR_STATUS_UNKNOWN)}, false},
       {std::nullopt, false},
@@ -582,7 +585,7 @@ BOOST_AUTO_TEST_CASE(relay_jobs_run_only_while_deliver_accepts_the_status) try {
       {fc::variants{operator_row(self, OPERATOR_STATUS_UNKNOWN)}, false},
       {fc::variants{operator_row(self, OPERATOR_STATUS_ACTIVE)}, true},
    };
-   bool status_delivers = true;
+   bool status_delivers = false;
    for (const poll& each : polls) {
       if (each.lookup) {
          status_delivers = sysio::opp::depot::opreg_status::compute_delivers(

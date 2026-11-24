@@ -18,8 +18,8 @@ members execute the epoch cycle on that chain. Each poll the plugin also reads i
 | `UNKNOWN` (collateral under the minimum), or no row | stopped on every chain: `sysio.msgch::deliver` refuses any status but `ACTIVE` | keep their last state |
 | `SLASHED`, `TERMINATED` | stopped on every chain | stop |
 
-Stopped relay jobs are rebuilt on the first poll that reads `ACTIVE` again. A failed
-read changes nothing.
+The relay jobs start on the first poll that reads `ACTIVE`, and stopped ones are rebuilt
+on the first poll that reads `ACTIVE` again. A failed read changes nothing.
 
 ### Served chains
 
