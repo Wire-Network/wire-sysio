@@ -69,43 +69,47 @@ struct depot_ops {
    virtual void emit_debug_envelope(sysio::opp::debugging::DebugEnvelopeEvent event) = 0;
 
    /**
-    * True when the current wall-clock time is in the safe operating window for
-    * the current epoch (far enough from both edges). The inbound and outbound
-    * jobs gate themselves on this.
+    * True when the current wall-clock time is in the safe operating window of
+    * outpost `chain_code`'s current epoch (far enough from both edges, by that
+    * chain's own edge buffer). The inbound and outbound jobs gate themselves on
+    * this. False while the chain's epoch state has not been read.
     */
-   virtual bool within_epoch_window() const = 0;
+   virtual bool within_epoch_window(uint64_t chain_code) const = 0;
 
    /**
-    * True when this batch operator is the one elected to drive OPP deliveries
-    * for the current epoch. Only elected operators should call into the
-    * outpost clients or the WIRE-side depot actions; non-elected jobs bail
-    * early to avoid racing / wasted RPCs / rejected chain transactions.
+    * True when this batch operator is elected to drive OPP deliveries for
+    * outpost `chain_code`'s current epoch: it sits in the group on duty in that
+    * chain's own schedule window and the chain is not paused. Only elected
+    * operators should call into the outpost client or the WIRE-side depot
+    * actions; non-elected jobs bail early to avoid racing / wasted RPCs /
+    * rejected chain transactions.
     */
-   virtual bool is_elected() const = 0;
+   virtual bool is_elected(uint64_t chain_code) const = 0;
 
    /**
-    * The most recent `current_epoch_index` read from `sysio.epoch::epochstate`.
-    * Cached by the depot implementation; refreshed on the `epoch_tick` job.
+    * The most recent `current_epoch_index` read from outpost `chain_code`'s
+    * `sysio.epoch::epochstate` row, or 0 while it has not been read. Cached by
+    * the depot implementation; refreshed by the epoch tick.
     */
-   virtual uint32_t current_epoch() const = 0;
+   virtual uint32_t current_epoch(uint64_t chain_code) const = 0;
 
    /**
     * True when wall-clock has advanced past the depot's `next_epoch_start` for
-    * the currently-cached epoch. Used by the outpost cranker to decide when
-    * a consensus-retry re-delivery is warranted on a stuck path-2 fallback
-    * case: once the WIRE depot's boundary has elapsed, the outpost-side
-    * boundary (same `epoch_duration_sec`) is also definitively past, so a
-    * re-delivery from an already-delivered operator can re-trigger the
-    * outpost's consensus evaluation and tip path-2 fallback. Without this
-    * gate the cranker would have to either re-deliver every tick (gas
-    * waste) or never re-deliver (chain stalls when initial deliveries fall
-    * short of unanimous). Mirrors the WIRE-side `sysio.msgch::chkcons`
-    * "time gate passed" check.
+    * outpost `chain_code`'s currently-cached epoch. Used by the outpost cranker
+    * to decide when a consensus-retry re-delivery is warranted on a stuck
+    * path-2 fallback case: once the WIRE depot's boundary has elapsed, the
+    * outpost-side boundary (same `epoch_duration_sec`) is also definitively
+    * past, so a re-delivery from an already-delivered operator can re-trigger
+    * the outpost's consensus evaluation and tip path-2 fallback. Without this
+    * gate the cranker would have to either re-deliver every tick (gas waste)
+    * or never re-deliver (chain stalls when initial deliveries fall short of
+    * unanimous). Mirrors the WIRE-side `sysio.msgch::chkcons` "time gate
+    * passed" check.
     *
-    * Returns false when the cache is empty (pre-bootstrap) or when the
-    * boundary has not yet elapsed for the current epoch.
+    * Returns false when the chain's cache is empty (pre-bootstrap) or when the
+    * boundary has not yet elapsed for its current epoch.
     */
-   virtual bool is_epoch_boundary_past() const = 0;
+   virtual bool is_epoch_boundary_past(uint64_t chain_code) const = 0;
 };
 
 } // namespace sysio

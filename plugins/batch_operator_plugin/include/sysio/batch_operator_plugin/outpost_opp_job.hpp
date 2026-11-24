@@ -16,8 +16,8 @@ namespace sysio {
  * Holds an `outpost_client_ptr` (the chain-specific SPI, owned by
  * `outpost_client_plugin`) and a reference to a `depot_ops` (the WIRE-side
  * contract, owned by `batch_operator_plugin`). The batch operator plugin
- * constructs one per registered outpost at startup and schedules two cron
- * jobs against it:
+ * constructs one per outpost chain the operator relays and schedules two cron
+ * jobs against it, each at that chain's poll interval:
  *
  *   - `outpost_opp_outbound_<id>` calls `run_outbound()` every cycle.
  *   - `outpost_opp_inbound_<id>`  calls `run_inbound()`  every cycle.
@@ -25,6 +25,10 @@ namespace sysio {
  * Both jobs can fire on different cron worker threads; the internal
  * `_state_mx` serializes mutable state access between them. `one_at_a_time`
  * on each cron job prevents a single job from re-entering itself.
+ *
+ * Each outpost chain runs its own consensus epoch, so every epoch and election
+ * query the job makes of `depot_ops` names the job's own chain
+ * (`client->chain_code()`).
  *
  * The `outpost_deadline` passed to every `outpost_client` RPC call is the
  * per-call deadline, not the cycle deadline. Concrete clients are required

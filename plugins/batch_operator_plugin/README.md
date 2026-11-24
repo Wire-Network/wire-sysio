@@ -4,15 +4,31 @@ Cranks Depot and Outpost contracts, ferrying OPP message chains between the WIRE
 
 ## Overview
 
-Every batch operator runs this plugin. `sysio.epoch` keeps a sliding window of
-`batch_op_groups` groups of `operators_per_epoch` operators (default 3 groups of 7, epochs
-of 6 minutes); the group at the front of the window is elected for the current epoch and
-its members execute the epoch cycle. Each poll the plugin also reads its own
-`sysio.opreg` status and stops relaying once the operator is `SLASHED` or `TERMINATED`.
+Every batch operator runs this plugin. Each outpost chain runs its own consensus epoch:
+`sysio.epoch` keeps, per chain, an epoch counter, a duration (`epochcfg`, default 6
+minutes) and a sliding window of `batch_op_groups` groups of `operators_per_epoch`
+operators (default 3 groups of 7) drawn from the operators serving that chain. The group
+at the front of a chain's window is elected for that chain's current epoch and its
+members execute the epoch cycle on that chain. Each poll the plugin also reads its own
+`sysio.opreg` status and stops pushing once the operator is `SLASHED` or `TERMINATED`.
+
+### Served chains
+
+The plugin relays a chain when its operator's `sysio.opreg::servchains` row on it
+(read by the `byaccount` index) is:
+
+| Status | Relayed |
+|--------|---------|
+| `SERVING` (`joinchain`) | yes |
+| `LEFT` (`leavechain`) | while the operator still holds a seat in that chain's window, whose duties it still owes |
+| `EVICTED` (the chain's miss rails) | no: `sysio.msgch::deliver` refuses its deliveries |
+
+A chain with no row is not relayed. The relayed set is re-read every poll, so a
+`joinchain` or `leavechain` takes effect without a restart.
 
 ## Epoch Cycle
 
-Run by every member of the elected group, for every active outpost chain:
+Run by every member of a chain's elected group, on that chain, for the chain's own epoch:
 
 **Outbound (WIRE → Outposts):**
 1. Read the outpost's outbound envelope that `sysio.epoch::advance` built
@@ -30,11 +46,12 @@ Run by every member of the elected group, for every active outpost chain:
 
 ## Depot cranks
 
-Every epoch poll (`--batch-epoch-poll-ms`) also pushes the depot actions nothing on
-chain schedules. `sysio.msgch::chkcons` — which advances the epoch once every active
-outpost has consensus and the boundary has passed — comes only from elected operators;
-the rest come from every ACTIVE operator, because the elected one may be the operator
-that is offline, and each is a cheap no-op once its work is done:
+The plugin also pushes the depot actions nothing on chain schedules.
+`sysio.msgch::chkcons(chain_code)` — which advances one chain's epoch once that chain
+has consensus and its boundary has passed — comes from the epoch tick, only for each
+relayed chain the operator is elected on. The rest come every `--batch-epoch-poll-ms`
+from their own cron job, from every ACTIVE operator, because the elected one may be the
+operator that is offline, and each is a cheap no-op once its work is done:
 
 | Action | When | Why nothing else drives it |
 |--------|------|----------------------------|
@@ -69,7 +86,7 @@ permission then need not be linked for `sysio.kicker::kick`.
 | Option | Default | Description |
 |--------|---------|-------------|
 | `--batch-operator-account` | — | WIRE account name for this operator. Configuring it enables the relay |
-| `--batch-epoch-poll-ms` | 15000 | How often to check epoch state (ms) |
+| `--batch-epoch-poll-ms` | 15000 | Longest interval between the relay's polls of a chain (see [Cadence](#cadence)), and the interval of the depot cranks and the underwriter's poll (ms) |
 | `--batch-delivery-timeout-ms` | 60000 | Max time for one outbound delivery, every transaction and confirmation wait included (ms). On Ethereum a single receipt wait may use whatever of it is left, so size it past the outpost chain's block time. |
 | `--batch-yield-tick-interval-ms` | 60000 | Minimum spacing between this operator's `sysio.swap::tickyield` pushes per yield pool (ms) |
 | `--batch-underwriter-account` | none | `account` or `account@permission` (default `active`) the underwriter bonds from. Configuring it enables the underwriter |
@@ -107,11 +124,28 @@ still satisfies its authorization; after `updateauth` rotates it, the role stops
 pushing (the underwriter) or logs (the relay) until the node is restarted with the
 new key.
 
+### Cadence
+
+Each chain is paced by its own epoch duration:
+
+| | Rule | 360 s epoch | 10 s epoch |
+|---|---|---|---|
+| Poll interval | 1/24 of the epoch, no shorter than 1 s and no longer than `--batch-epoch-poll-ms` | 15 s | 1 s |
+| Edge buffer | 1/144 of the epoch, no shorter than one block (500 ms) | 2.5 s | 500 ms |
+
+A chain's inbound and outbound jobs run at its own poll interval, and hold deliveries
+back within its edge buffer of either edge of its epoch (until the epoch is overdue).
+The epoch tick, which reads every chain's `epochstate` and `epochcfg`, the operator's
+memberships and `sysio.chains`, fires every second and reads at the shortest poll
+interval of the chains it relays (`--batch-epoch-poll-ms` when it relays none). A change
+of a chain's duration reschedules its jobs on the next read.
+
 ### Outpost wiring
 
 Nothing about an outpost is declared per node.
 
-* **Which chains** — every active non-depot `sysio.chains` row.
+* **Which chains** — every active non-depot `sysio.chains` row the operator relays (see
+  [Served chains](#served-chains)).
 * **Where each one lives** — the row's own `outpost` struct (`opp_addr` /
   `opp_inbound_addr`), so every operator relays a chain through the same
   deployment.
@@ -122,14 +156,15 @@ Nothing about an outpost is declared per node.
   is additionally asserted against the row's `external_chain_id`, so a client
   registered under the wrong code is rejected rather than relayed through.
 
-An elected group must deliver on **every** active chain, so a missing RPC client
-is fatal: the node logs the chains it cannot serve and shuts down. The check runs
-after the sync gate, where `sysio.chains` is readable. Missing contract
-*addresses* are not fatal — they are governance state, fixable with
-`sysio.chains::setoutpost` without touching a node — so such a chain is skipped
-fail-closed and picked up on a later tick. A `setoutpost` redeploy is likewise
-picked up on the next epoch tick: the relay job is rebuilt against the new
-address rather than left pointing at the old one.
+A group member must deliver on **every** chain it serves, so a missing RPC client
+for a relayed chain is fatal: the node logs the chains it cannot serve and shuts
+down. A chain the operator does not relay needs no client and is ignored. The check
+runs after the sync gate, where `sysio.chains` is readable, and again on every read
+that adds a relayed chain. Missing contract *addresses* are not fatal — they are
+governance state, fixable with `sysio.chains::setoutpost` without touching a node —
+so such a chain is skipped fail-closed and picked up on a later tick. A `setoutpost`
+redeploy is likewise picked up on the next epoch tick: the relay job is rebuilt
+against the new address rather than left pointing at the old one.
 
 ## Underwriter
 

@@ -453,12 +453,8 @@ namespace sysio {
                     name{opreg_names::index_bystatus} == "bystatus"_n,
                     "the host reads the roster under the shared names");
 
-      /// A batch operator's standing on one outpost chain. Only SERVING draws new seats there.
-      enum class chain_service_status : uint8_t {
-         SERVING,   ///< draws new seats on the chain
-         LEFT,      ///< left by the operator; the seats it holds still owe their duty
-         EVICTED,   ///< removed by the chain's miss rails; its deliveries on the chain are refused
-      };
+      /// A batch operator's standing on one outpost chain, shared with the host (`opreg_constants.hpp`).
+      using chain_service_status = opreg_names::chain_service_status;
 
       /// Key of `servchains`: the chain first, so one chain's members are one contiguous range.
       struct served_chain_key {
@@ -470,12 +466,12 @@ namespace sysio {
       /// One batch operator's membership of one outpost chain, written by `joinchain` and kept until
       /// the operator row is pruned or the account registers again.
       struct [[sysio::table("servchains")]] served_chain {
-         name                 account;
-         sysio::slug_name     chain_code;
-         chain_service_status status        = chain_service_status::SERVING;
-         uint64_t             joined_at_ms  = 0;   ///< the latest `joinchain` that made the row SERVING
-         uint64_t             updated_at_ms = 0;   ///< the latest status change
-         std::string          status_reason;       ///< why the row was EVICTED; empty otherwise
+         name                              account;
+         sysio::slug_name                  chain_code;
+         opreg_names::chain_service_status status        = opreg_names::chain_service_status::SERVING;
+         uint64_t                          joined_at_ms  = 0;   ///< the latest `joinchain` that made the row SERVING
+         uint64_t                          updated_at_ms = 0;   ///< the latest status change
+         std::string                       status_reason;       ///< why the row was EVICTED; empty otherwise
 
          uint64_t by_account() const { return account.value; }
 
@@ -487,6 +483,10 @@ namespace sysio {
          sysio::kv::index<"byaccount"_n,
             sysio::const_mem_fun<served_chain, uint64_t, &served_chain::by_account>>
       >;
+
+      static_assert(name{opreg_names::table_servchains} == "servchains"_n &&
+                    name{opreg_names::index_byaccount} == "byaccount"_n,
+                    "the host reads the memberships under the shared names");
 
       /// `account`'s membership row on outpost `chain_code`, or nullopt when it has none. Never throws.
       static std::optional<served_chain> membership_of(name account, sysio::slug_name chain_code) {

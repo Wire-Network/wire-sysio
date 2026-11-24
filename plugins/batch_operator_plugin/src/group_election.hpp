@@ -1,8 +1,8 @@
 #pragma once
 /**
  * @file group_election.hpp
- * @brief One operator's batch-op group standing for one epoch, plus the
- *        diagnostic that reports a non-election.
+ * @brief One operator's batch-op group standing for one epoch of one outpost
+ *        chain, plus the diagnostic that reports a non-election.
  */
 
 #include <cstdint>
@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 
+#include <fc/slug_name.hpp>
 #include <fc/variant.hpp>
 #include <sysio/chain/name.hpp>
 
@@ -19,7 +20,7 @@ namespace sysio::batch_operator_detail {
 /// batch-op group"; for `current_group`, "no epoch state parsed yet".
 inline constexpr uint8_t GROUP_NONE = 255;
 
-/// This operator's standing against one `sysio.epoch::epochstate` reading.
+/// This operator's standing against one chain's `sysio.epoch::epochstate` row.
 ///
 /// `current_group` is the group ON DUTY, taken verbatim from
 /// `epochstate.current_batch_op_group`. The sliding window keeps the group on
@@ -61,12 +62,12 @@ inline group_election evaluate_group_election(uint8_t             current_batch_
    return election;
 }
 
-/// The non-election diagnostic. `active_group` is `election.current_group` —
-/// the value the election itself compared against — so the line can never name
+/// The non-election diagnostic for outpost `chain_code`'s epoch `epoch_index`. `active_group` is
+/// `election.current_group` — the value the election itself compared against — so the line can never name
 /// a group the decision did not consult.
-inline std::string not_elected_message(uint32_t epoch_index, const group_election& election) {
-   return std::format("batch_operator: not elected for epoch {} (my_group={}, active_group={})",
-                      epoch_index, election.my_group, election.current_group);
+inline std::string not_elected_message(uint64_t chain_code, uint32_t epoch_index, const group_election& election) {
+   return std::format("batch_operator: chain {} not elected for epoch {} (my_group={}, active_group={})",
+                      fc::slug_name{chain_code}.to_string(), epoch_index, election.my_group, election.current_group);
 }
 
 } // namespace sysio::batch_operator_detail

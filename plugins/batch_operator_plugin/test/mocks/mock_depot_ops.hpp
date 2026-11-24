@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <map>
 #include <mutex>
 #include <optional>
 #include <vector>
@@ -57,20 +58,34 @@ public:
       emitted_events.push_back(std::move(event));
    }
 
-   bool     within_epoch_window() const override { return window_open; }
-   bool     is_elected()         const override { return elected; }
-   uint32_t current_epoch()      const override { return epoch; }
-   bool     is_epoch_boundary_past() const override { return epoch_boundary_past; }
+   bool within_epoch_window(uint64_t chain_code) const override { return knobs_of(chain_code).window_open; }
+   bool is_elected(uint64_t chain_code) const override { return knobs_of(chain_code).elected; }
+   uint32_t current_epoch(uint64_t chain_code) const override { return knobs_of(chain_code).epoch; }
+   bool is_epoch_boundary_past(uint64_t chain_code) const override {
+      return knobs_of(chain_code).epoch_boundary_past;
+   }
 
-   // Knobs callers can set before driving the job under test.
-   bool     window_open = true;
-   bool     elected     = true;
-   uint32_t epoch       = 1;
-   /// Drives the consensus-retry gate in `outpost_opp_job::run_outbound`.
-   /// Default `false` keeps the existing tests' "no retry" expectation
-   /// intact; tests targeting the retry path flip this to `true` to
-   /// simulate wall-clock past `next_epoch_start`.
+   /// One chain's epoch and election, as the epoch queries answer them.
+   struct chain_knobs {
+      bool     window_open = true;
+      bool     elected     = true;
+      uint32_t epoch       = 1;
+      /// Drives the consensus-retry gate in `outpost_opp_job::run_outbound`.
+      /// Default `false` keeps the existing tests' "no retry" expectation
+      /// intact; tests targeting the retry path flip this to `true` to
+      /// simulate wall-clock past `next_epoch_start`.
+      bool     epoch_boundary_past = false;
+   };
+
+   // Knobs callers can set before driving the job under test. They answer for
+   // every chain without its own entry in `chains`.
+   bool     window_open         = true;
+   bool     elected             = true;
+   uint32_t epoch               = 1;
    bool     epoch_boundary_past = false;
+
+   /// Per-chain knobs, overriding the ones above for their chain.
+   std::map<uint64_t, chain_knobs> chains;
 
    std::function<std::optional<sysio::outbound_envelope_record>(uint64_t, uint32_t)> pending_response;
    std::function<bool(uint64_t, uint32_t)>                                           has_delivered_response;
@@ -92,8 +107,22 @@ public:
    std::vector<key>          has_delivered_calls;
    std::vector<deliver_call> deliver_calls;
    std::vector<sysio::opp::debugging::DebugEnvelopeEvent> emitted_events;
+   /// The chain each epoch or election query asked about, in call order.
+   mutable std::vector<uint64_t> epoch_queries;
 
 private:
+   /// `chain_code`'s knobs, recording the query.
+   chain_knobs knobs_of(uint64_t chain_code) const {
+      std::lock_guard<std::mutex> lock(_mx);
+      epoch_queries.push_back(chain_code);
+      const auto it = chains.find(chain_code);
+      if (it != chains.end()) return it->second;
+      return chain_knobs{.window_open         = window_open,
+                         .elected             = elected,
+                         .epoch               = epoch,
+                         .epoch_boundary_past = epoch_boundary_past};
+   }
+
    mutable std::mutex _mx;
 };
 

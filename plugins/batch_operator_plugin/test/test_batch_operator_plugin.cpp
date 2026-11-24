@@ -1,24 +1,31 @@
 #include "../src/async_action_completion.hpp"
 #include "../src/role_config.hpp"
+#include "../src/served_chains.hpp"
+#include "mocks/mock_outpost_client.hpp"
 
 #include <boost/test/unit_test.hpp>
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <cstdint>
 #include <functional>
+#include <map>
 #include <memory>
 #include <optional>
 #include <set>
 #include <sstream>
 #include <stdexcept>
+#include <string_view>
 #include <thread>
+#include <vector>
 
 #include <sysio/batch_operator_plugin/batch_operator_plugin.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/services/cron_service.hpp>
 
 #include <fc/slug_name.hpp>
+#include <fc/variant_object.hpp>
 
 using namespace std::literals;
 
@@ -357,6 +364,154 @@ BOOST_AUTO_TEST_CASE(cron_service_accepts_dynamic_outpost_jobs_after_start) try 
 
    svc->cancel(id);
    BOOST_CHECK(svc->list({meta.label}).empty());
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_SUITE_END()
+
+// ─── Served chains ──────────────────────────────────────────────────────────
+
+namespace {
+
+using namespace sysio::batch_operator_detail;
+using fc::operator""_s;
+
+constexpr auto self     = "batchop.a";
+constexpr auto stranger = "batchop.b";
+
+/// One chain for each membership the relay rule tells apart.
+constexpr fc::slug_name serving_chain     = "ETHEREUM"_s;
+constexpr fc::slug_name left_seated_chain = "SOLANA"_s;
+constexpr fc::slug_name left_free_chain   = "BASE"_s;
+constexpr fc::slug_name evicted_chain     = "ARBITRUM"_s;
+/// An active outpost this operator has no membership on.
+constexpr fc::slug_name unserved_chain    = "POLYGON"_s;
+
+constexpr uint8_t seated_group = 0;
+/// A `servchains` status value this build does not know.
+constexpr uint64_t unknown_status_value = 7;
+constexpr auto     unknown_status_name  = "RETIRED";
+constexpr auto     no_rpc_client        = "no RPC client is registered under this chain code";
+
+/// A `servchains` value as the ABI renders it.
+fc::variant membership_row(std::string_view account, fc::slug_name chain, const fc::variant& status) {
+   return fc::variant(fc::mutable_variant_object()(sysio::opreg_names::field::account, std::string(account))
+                                                  (sysio::opreg_names::field::chain_code, chain)
+                                                  (sysio::opreg_names::field::status, status));
+}
+
+/// The status's ABI spelling.
+fc::variant status_name(chain_service_status status) { return fc::variant(std::string(magic_enum::enum_name(status))); }
+
+/// A chain view whose window seats `self` in `group`, or nobody.
+chain_epoch_view view_seating(fc::slug_name chain, uint8_t group) {
+   chain_epoch_view view;
+   view.chain_code        = chain.value;
+   view.election.my_group = group;
+   return view;
+}
+
+outpost_descriptor outpost(fc::slug_name chain) { return outpost_descriptor{.id = chain.value}; }
+
+} // namespace
+
+BOOST_AUTO_TEST_SUITE(batch_operator_served_chains_tests)
+
+/// Memberships decode from the status's name or its value; another account's row and a status this build does not
+/// know are left out.
+BOOST_AUTO_TEST_CASE(memberships_decode_by_name_and_value) try {
+   const fc::variants rows{
+      membership_row(self, serving_chain, status_name(chain_service_status::SERVING)),
+      membership_row(self, left_seated_chain,
+                     fc::variant(magic_enum::enum_integer(chain_service_status::LEFT))),
+      membership_row(self, evicted_chain, status_name(chain_service_status::EVICTED)),
+      membership_row(stranger, unserved_chain, status_name(chain_service_status::SERVING)),
+      membership_row(self, left_free_chain, fc::variant(std::string(unknown_status_name))),
+      membership_row(self, unserved_chain, fc::variant(unknown_status_value)),
+   };
+   const chain_memberships memberships = decode_memberships(rows, sysio::chain::name(self));
+   const chain_memberships expected{{serving_chain.value, chain_service_status::SERVING},
+                                    {left_seated_chain.value, chain_service_status::LEFT},
+                                    {evicted_chain.value, chain_service_status::EVICTED}};
+   BOOST_CHECK(memberships == expected);
+} FC_LOG_AND_RETHROW();
+
+/// The relay rule: SERVING relays, LEFT relays while it still holds a seat, EVICTED never.
+BOOST_AUTO_TEST_CASE(serving_and_seated_left_members_relay) try {
+   for (const bool seated : {false, true}) {
+      BOOST_CHECK(relays_chain(chain_service_status::SERVING, seated));
+      BOOST_CHECK_EQUAL(relays_chain(chain_service_status::LEFT, seated), seated);
+      BOOST_CHECK(!relays_chain(chain_service_status::EVICTED, seated));
+   }
+} FC_LOG_AND_RETHROW();
+
+/// The relayed chains: SERVING (seated or not), LEFT while seated in that chain's own window; not LEFT without a
+/// seat, EVICTED though seated, or a chain with no membership.
+BOOST_AUTO_TEST_CASE(relayed_chains_follow_membership_and_seats) try {
+   const chain_memberships memberships{{serving_chain.value, chain_service_status::SERVING},
+                                       {left_seated_chain.value, chain_service_status::LEFT},
+                                       {left_free_chain.value, chain_service_status::LEFT},
+                                       {evicted_chain.value, chain_service_status::EVICTED}};
+   chain_epochs views;
+   views.emplace(left_seated_chain.value, view_seating(left_seated_chain, seated_group));
+   views.emplace(left_free_chain.value, view_seating(left_free_chain, GROUP_NONE));
+   views.emplace(evicted_chain.value, view_seating(evicted_chain, seated_group));
+   views.emplace(unserved_chain.value, view_seating(unserved_chain, seated_group));
+
+   const std::set<uint64_t> expected{serving_chain.value, left_seated_chain.value};
+   BOOST_CHECK(relayed_chains(memberships, views) == expected);
+   // Its seat on another chain does not keep a LEFT member on this one.
+   const chain_memberships left_only{{left_free_chain.value, chain_service_status::LEFT}};
+   BOOST_CHECK(relayed_chains(left_only, views).empty());
+} FC_LOG_AND_RETHROW();
+
+/// Only relayed outposts are built: a chain this operator does not serve is never built, so no client for it is
+/// required, while a relayed chain without one is still reported unserviceable (the plugin then shuts the node down).
+BOOST_AUTO_TEST_CASE(an_unserved_chain_is_ignored_and_an_unserviceable_served_chain_refuses) try {
+   const std::vector<outpost_descriptor> active{outpost(serving_chain), outpost(unserved_chain),
+                                                outpost(left_seated_chain)};
+   const std::set<uint64_t>              relayed{serving_chain.value, left_seated_chain.value};
+   const std::vector<outpost_descriptor> relay = relayed_outposts(active, relayed);
+   BOOST_REQUIRE_EQUAL(relay.size(), 2u);
+   BOOST_CHECK_EQUAL(relay[0].id, serving_chain.value);
+   BOOST_CHECK_EQUAL(relay[1].id, left_seated_chain.value);
+
+   // No RPC client for any chain: only the relayed ones are reported.
+   std::map<uint64_t, std::shared_ptr<sysio::outpost_client>> built;
+   std::vector<uint64_t>                                      made;
+   const auto wrap = [](const outpost_descriptor&, const std::shared_ptr<sysio::outpost_client>& client) {
+      return client;
+   };
+   const std::vector<unserviceable_chain> unserviceable = build_missing(
+      built, relay,
+      [&](const outpost_descriptor& op) {
+         made.push_back(op.id);
+         return client_build{.unserviceable = no_rpc_client};
+      },
+      wrap);
+   BOOST_REQUIRE_EQUAL(unserviceable.size(), 2u);
+   BOOST_CHECK_EQUAL(unserviceable[0].code, serving_chain.to_string());
+   BOOST_CHECK_EQUAL(unserviceable[0].why, no_rpc_client);
+   BOOST_CHECK_EQUAL(unserviceable[1].code, left_seated_chain.to_string());
+   BOOST_CHECK(std::ranges::find(made, unserved_chain.value) == made.end());
+   BOOST_CHECK(built.empty());
+
+   // With a client for the served chain only, the relay builds it and reports nothing: the unserved chain, which
+   // has no client, is not asked for one.
+   made.clear();
+   const std::set<uint64_t> serving_only{serving_chain.value};
+   const std::vector<unserviceable_chain> served = build_missing(
+      built, relayed_outposts(active, serving_only),
+      [&](const outpost_descriptor& op) {
+         made.push_back(op.id);
+         if (op.id != serving_chain.value) return client_build{.unserviceable = no_rpc_client};
+         return client_build{.client = std::make_shared<sysio::test::mock_outpost_client>(
+                                sysio::opp::types::CHAIN_KIND_EVM, op.id, 0)};
+      },
+      wrap);
+   BOOST_CHECK(served.empty());
+   BOOST_CHECK(made == std::vector<uint64_t>{serving_chain.value});
+   BOOST_REQUIRE_EQUAL(built.size(), 1u);
+   BOOST_CHECK(built.contains(serving_chain.value));
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_SUITE_END()
