@@ -7,6 +7,7 @@
 #include <sysio/binary_extension.hpp>
 #include <sysio/crypto.hpp>
 #include <sysio/privileged.hpp>
+#include <sysio/slug_name.hpp>
 #include <sysio/producer_schedule.hpp>
 #include <sysio/system.hpp>
 #include <sysio/time.hpp>
@@ -772,7 +773,7 @@ namespace sysiosystem {
           * `period_emission` is the gate-computed period total; payepoch asserts it equals the
           * accrued `pending_emission_amount` and distributes it across producer / batch / capex /
           * gov pools. The batch pool is not credited here in full: it opens a duty settlement that
-          * splits it pro rata to the period's duty units (see rcrdduty), paid in bounded steps.
+          * splits it pro rata to the period's seat-seconds (see rcrdduty), paid in bounded steps.
           *
           * While an earlier settlement is still open the payout waits: the step here advances that
           * settlement and, if it is still not done, returns with the period still pending, so the
@@ -798,13 +799,16 @@ namespace sysiosystem {
          void accrueepoch(uint32_t epoch_index, int64_t per_epoch_emission);
 
          /**
-          * Credit one duty unit to each of `members`, the batch-operator group that served
-          * consensus epoch `epoch_index`. A member still holding units of the settling period is
-          * settled first. Called inline by sysio.epoch::advance; never throws.
+          * Credit `duty_seconds` seat-seconds to each of `members`, the batch-operator group that
+          * served consensus epoch `epoch_index` of outpost chain `chain_code`; `duty_seconds` is that
+          * epoch's scheduled length. Every chain's duty accrues to the one open pay period. A member
+          * still holding seat-seconds of the settling period is settled first. A zero `duty_seconds`
+          * credits nothing. Called inline by sysio.epoch::advance; never throws.
           * Auth: require_auth("sysio.epoch").
           */
          [[sysio::action]]
-         void rcrdduty(uint32_t epoch_index, std::vector<sysio::name> members);
+         void rcrdduty(sysio::slug_name chain_code, uint32_t epoch_index, std::vector<sysio::name> members,
+                       uint32_t duty_seconds);
 
          /**
           * Advance the open batch-duty settlement by one bounded step (MAX_DUTY_SETTLEMENT_ROWS

@@ -12,6 +12,7 @@
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <magic_enum/magic_enum.hpp>
 #include <algorithm>
+#include <limits>
 
 namespace sysio {
 
@@ -227,6 +228,14 @@ void clear_gate_block(name self) {
    if (open != log_tbl.end()) {
       log_tbl.erase(open);
    }
+}
+
+/// The closing epoch's scheduled length in whole seconds (`next_epoch_start - current_epoch_start`, read
+/// before the increment), or the chain's configured duration when that span is not positive.
+uint32_t scheduled_epoch_seconds(const epoch::epoch_state& state, const epoch::epoch_config& cfg) {
+   const int64_t span_sec = (state.next_epoch_start - state.current_epoch_start).to_seconds();
+   if (span_sec <= 0) return cfg.epoch_duration_sec;
+   return static_cast<uint32_t>(std::min<int64_t>(span_sec, std::numeric_limits<uint32_t>::max()));
 }
 
 } // anonymous namespace
@@ -452,16 +461,18 @@ void epoch::advance(sysio::slug_name chain_code) {
          ).send();
       }
 
-      // One duty unit per member for the epoch it served. sysio.system splits each economic pay
-      // period's batch pool by these units; whether a member is still ACTIVE is decided when its
-      // units are paid, so a member slashed above draws nothing. Skipped until initt5 has run:
-      // nothing can be paid before then, and consensus must not depend on sysio.system.
+      // Each member earns the closing epoch's scheduled length in seat-seconds. sysio.system splits
+      // each economic pay period's one batch pool by seat-seconds over every chain; whether a member
+      // is still ACTIVE is decided when it is paid, so a member slashed above draws nothing. Skipped
+      // until initt5 has run: nothing can be paid before then, and consensus must not depend on
+      // sysio.system.
       if (sysiosystem::emissions::t5state_t(SYSTEM_ACCOUNT).exists()) {
          action(
             permission_level{get_self(), "owner"_n},
             SYSTEM_ACCOUNT,
             system_actions::RECORD_DUTY,
-            std::make_tuple(state.current_epoch_index, expiring_group)
+            std::make_tuple(chain_code, state.current_epoch_index, expiring_group,
+                            scheduled_epoch_seconds(state, *cfg))
          ).send();
       }
 

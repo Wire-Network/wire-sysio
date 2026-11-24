@@ -131,8 +131,8 @@
                     "type": "uint32"
                 },
                 {
-                    "name": "units",
-                    "type": "uint32"
+                    "name": "seat_seconds",
+                    "type": "uint64"
                 }
             ]
         },
@@ -407,7 +407,7 @@
                     "type": "uint32"
                 },
                 {
-                    "name": "open_units",
+                    "name": "open_seat_seconds",
                     "type": "uint64"
                 },
                 {
@@ -419,7 +419,7 @@
                     "type": "int64"
                 },
                 {
-                    "name": "settling_units",
+                    "name": "settling_seat_seconds",
                     "type": "uint64"
                 },
                 {
@@ -1230,12 +1230,20 @@
             "base": "",
             "fields": [
                 {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
                     "name": "epoch_index",
                     "type": "uint32"
                 },
                 {
                     "name": "members",
                     "type": "name[]"
+                },
+                {
+                    "name": "duty_seconds",
+                    "type": "uint32"
                 }
             ]
         },

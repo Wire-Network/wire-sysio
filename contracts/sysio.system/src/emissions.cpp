@@ -241,14 +241,17 @@ uint64_t nominal_slots_of(uint32_t epoch_duration_sec) {
 // Batch-duty settlement
 // ---------------------------------------------------------------------------
 
-// Pay `row`'s units of the settling period at that period's rate -- its pool over its units -- when
-// its operator is still an ACTIVE batch operator, and erase the row. An inactive operator's share
-// stays in the treasury. Returns the amount credited. Never throws.
+// Pay `row`'s seat-seconds of the settling period at that period's rate -- its pool over its
+// seat-seconds -- when its operator is still an ACTIVE batch operator, and erase the row. An inactive
+// operator's share stays in the treasury. Returns the amount credited. Never throws.
 int64_t settle_duty_row(name self, duty_state& duty, batchduty_t& rows, const batch_duty& row) {
    int64_t pay = 0;
-   if (duty.settling_units > 0 && is_op_active(row.account_name, OperatorType::OPERATOR_TYPE_BATCH)) {
-      pay = static_cast<int64_t>(
-         static_cast<__int128>(duty.settling_pool) * row.units / duty.settling_units);
+   if (duty.settling_seat_seconds > 0 && is_op_active(row.account_name, OperatorType::OPERATOR_TYPE_BATCH)) {
+      // A non-negative int64 pool times a uint64 seat-second count fits __int128, and a row's
+      // seat-seconds are part of the period total, so the quotient is at most the pool.
+      pay = static_cast<int64_t>(static_cast<__int128>(duty.settling_pool) *
+                                 static_cast<__int128>(row.seat_seconds) /
+                                 static_cast<__int128>(duty.settling_seat_seconds));
    }
    credit_pay(self, row.account_name, pay, memo::batch_op_reward);
    duty.settling_paid += pay;
@@ -270,12 +273,12 @@ void finish_settlement(name self, duty_state& duty, t5_state& state) {
       });
    }
 
-   duty.settling_period      = 0;
-   duty.settling_pool        = 0;
-   duty.settling_units       = 0;
-   duty.settling_paid        = 0;
-   duty.settling_epoch_index = 0;
-   duty.settle_cursor        = 0;
+   duty.settling_period       = 0;
+   duty.settling_pool         = 0;
+   duty.settling_seat_seconds = 0;
+   duty.settling_paid         = 0;
+   duty.settling_epoch_index  = 0;
+   duty.settle_cursor         = 0;
 }
 
 // One bounded settlement step: walk the settling period's `batchduty` rows (the `byperiod` index) from
@@ -704,12 +707,15 @@ void system_contract::accrueepoch(uint32_t epoch_index, int64_t per_epoch_emissi
    t5s.set(state, get_self());
 }
 
-// rcrdduty - credit one duty unit to each member of the group that served
-// consensus epoch `epoch_index`. Runs inline from sysio.epoch::advance, so it
-// never throws: a member holding units of the settling period is settled at
-// that period's rate before its new unit opens a row in the open period.
-void system_contract::rcrdduty(uint32_t /*epoch_index*/, std::vector<sysio::name> members) {
+// rcrdduty - credit `duty_seconds` seat-seconds to each member of the group that
+// served consensus epoch `epoch_index` of `chain_code`. Runs inline from
+// sysio.epoch::advance, so it never throws: a member holding seat-seconds of the
+// settling period is settled at that period's rate before its new duty opens a
+// row in the open period.
+void system_contract::rcrdduty(sysio::slug_name /*chain_code*/, uint32_t /*epoch_index*/,
+                               std::vector<sysio::name> members, uint32_t duty_seconds) {
    require_auth(epoch_refs::account);
+   if (duty_seconds == 0) return;
 
    dutystate_t duty_tbl(get_self());
    auto duty = duty_tbl.get_or_default(duty_state{});
@@ -733,9 +739,9 @@ void system_contract::rcrdduty(uint32_t /*epoch_index*/, std::vector<sysio::name
       }
 
       batch_duty updated = row.value_or(batch_duty{.account_name = member, .period = duty.open_period});
-      updated.units += 1;
+      updated.seat_seconds += duty_seconds;
       rows.set(get_self(), batch_duty_key{member.value}, updated);
-      duty.open_units += 1;
+      duty.open_seat_seconds += duty_seconds;
    }
 
    duty_tbl.set(duty, get_self());
@@ -780,7 +786,7 @@ void system_contract::settleduty() {
 // stays in sysio's balance. LIQ yield draws no treasury bonus.
 //
 // The batch-operator slice opens a duty settlement: it is split pro rata to the
-// period's duty units (rcrdduty) and credited in bounded steps. Only ACTIVE
+// period's seat-seconds (rcrdduty) and credited in bounded steps. Only ACTIVE
 // batch operators are paid; any skipped amount stays in the treasury and is
 // recorded on the epochlog row when the settlement completes.
 //
@@ -1008,22 +1014,22 @@ void system_contract::payepoch(uint32_t epoch_index, int64_t period_emission) {
    }
 
    // =======================================================================
-   // Batch-op pay. The period's duty units split the batch pool: open a
+   // Batch-op pay. The period's seat-seconds split the batch pool: open a
    // settlement for the period now closing and take its first step. A period
    // with no duty leaves the whole pool in the treasury.
    // =======================================================================
-   const bool batch_has_duty = duty.open_units > 0 && batch_pool > 0;
+   const bool batch_has_duty = duty.open_seat_seconds > 0 && batch_pool > 0;
    if (batch_has_duty) {
-      duty.settling_period      = duty.open_period;
-      duty.settling_pool        = batch_pool;
-      duty.settling_units       = duty.open_units;
-      duty.settling_paid        = 0;
-      duty.settling_epoch_index = epoch_index;
-      duty.settle_cursor        = 0;
+      duty.settling_period       = duty.open_period;
+      duty.settling_pool         = batch_pool;
+      duty.settling_seat_seconds = duty.open_seat_seconds;
+      duty.settling_paid         = 0;
+      duty.settling_epoch_index  = epoch_index;
+      duty.settle_cursor         = 0;
       state.unsettled_batch_emission = batch_pool;
    }
-   duty.open_period += 1;
-   duty.open_units   = 0;
+   duty.open_period      += 1;
+   duty.open_seat_seconds = 0;
 
    // =======================================================================
    // Category buckets: fixed accounts, no opreg filter. The unallocated

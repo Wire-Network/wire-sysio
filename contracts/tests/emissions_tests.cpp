@@ -777,10 +777,13 @@ public:
       return sysio_abi_ser.binary_to_variant("duty_state", data, fixture_abi_yield_function());
    }
 
-   /// Credit one duty unit to each of `members`, as sysio.epoch::advance does at consensus close.
-   action_result rcrdduty( uint32_t consensus_epoch_index, const vector<name>& members ) {
+   /// Credit `duty_seconds` seat-seconds to each of `members` for consensus epoch `consensus_epoch_index`
+   /// of `chain_code`, as sysio.epoch::advance does when that chain's epoch closes.
+   action_result rcrdduty( uint32_t consensus_epoch_index, const vector<name>& members,
+                           uint32_t duty_seconds = T_EPOCH_SECS, std::string_view chain_code = EPOCH_CHAIN ) {
       return push_system_action(EPOCH, "rcrdduty"_n, mvo()
-         ("epoch_index", consensus_epoch_index)("members", members));
+         ("chain_code", chain_code)("epoch_index", consensus_epoch_index)("members", members)
+         ("duty_seconds", duty_seconds));
    }
 
    /// One bounded settlement step, as sysio.epoch::tickeconomy runs every economic epoch.
@@ -2634,8 +2637,8 @@ BOOST_FIXTURE_TEST_CASE( payepoch_with_no_duty_retains_the_batch_pool, sysio_emi
    BOOST_REQUIRE(!get_duty_state()["settling_period"].as<uint32_t>());
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( payepoch_splits_the_batch_pool_by_duty_units, sysio_emissions_tester ) try {
-   // Two operators served the period, one twice as often: the pool splits 2:1 by duty units, the
+BOOST_FIXTURE_TEST_CASE( payepoch_splits_the_batch_pool_by_seat_seconds, sysio_emissions_tester ) try {
+   // Two operators served the period, one twice as often: the pool splits 2:1 by seat-seconds, the
    // rows are consumed, and the integer remainder stays in the treasury.
    const account_name OFTEN = "batchopa"_n;
    const account_name ONCE  = "batchopb"_n;
@@ -2649,8 +2652,8 @@ BOOST_FIXTURE_TEST_CASE( payepoch_splits_the_batch_pool_by_duty_units, sysio_emi
 
    BOOST_REQUIRE_EQUAL(success(), rcrdduty(1, { OFTEN, ONCE }));
    BOOST_REQUIRE_EQUAL(success(), rcrdduty(2, { OFTEN }));
-   BOOST_REQUIRE_EQUAL(2u, get_batch_duty(OFTEN)["units"].as<uint32_t>());
-   BOOST_REQUIRE_EQUAL(3u, get_duty_state()["open_units"].as<uint64_t>());
+   BOOST_REQUIRE_EQUAL(2u * T_EPOCH_SECS, get_batch_duty(OFTEN)["seat_seconds"].as<uint64_t>());
+   BOOST_REQUIRE_EQUAL(3u * T_EPOCH_SECS, get_duty_state()["open_seat_seconds"].as<uint64_t>());
 
    BOOST_REQUIRE_EQUAL(success(), accrue(1, period_emission));
    BOOST_REQUIRE_EQUAL(success(), pay(1, period_emission));
@@ -2669,8 +2672,65 @@ BOOST_FIXTURE_TEST_CASE( payepoch_splits_the_batch_pool_by_duty_units, sysio_emi
    BOOST_REQUIRE_EQUAL(batch_pool - often_pay - once_pay, log["batch_emission_retained"].as<int64_t>());
    BOOST_REQUIRE_EQUAL(int64_t(0), get_t5_state()["unsettled_batch_emission"].as<int64_t>());
    // New duty after the close belongs to the next period.
-   BOOST_REQUIRE_EQUAL(0u, get_duty_state()["open_units"].as<uint64_t>());
+   BOOST_REQUIRE_EQUAL(0u, get_duty_state()["open_seat_seconds"].as<uint64_t>());
    BOOST_REQUIRE_EQUAL(2u, get_duty_state()["open_period"].as<uint32_t>());
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( payepoch_pays_a_seat_second_the_same_on_every_chain, sysio_emissions_tester ) try {
+   // Two chains at different epoch durations share the one batch pool by seat-seconds: one seat on the
+   // 120 s chain earns what two seats on the 60 s chain earn, and one 60 s seat earns half of that.
+   const account_name LONG_SEAT   = "batchopa"_n;
+   const account_name SHORT_SEATS = "batchopb"_n;
+   const account_name SHORT_SEAT  = "batchopc"_n;
+   constexpr std::string_view SHORT_CHAIN     = "ETH";
+   constexpr std::string_view LONG_CHAIN      = "SOL";
+   constexpr uint32_t         short_seconds   = T_EPOCH_SECS;
+   constexpr uint32_t         long_seconds    = 2 * T_EPOCH_SECS;
+   constexpr int64_t          period_emission = 1'000'000'000;
+   create_t5_holding_accounts();
+   create_accounts({ LONG_SEAT, SHORT_SEATS, SHORT_SEAT }, false, false, false, true);
+   for (const account_name& op : { LONG_SEAT, SHORT_SEATS, SHORT_SEAT }) {
+      BOOST_REQUIRE_EQUAL(success(), register_operator(op, OperatorType::OPERATOR_TYPE_BATCH, true));
+   }
+   BOOST_REQUIRE_EQUAL(success(), setemitcfg_defaults(config::system_account_name));
+   BOOST_REQUIRE_EQUAL(success(), initt5(config::system_account_name));
+
+   BOOST_REQUIRE_EQUAL(success(), rcrdduty(1, { LONG_SEAT }, long_seconds, LONG_CHAIN));
+   BOOST_REQUIRE_EQUAL(success(), rcrdduty(1, { SHORT_SEATS, SHORT_SEAT }, short_seconds, SHORT_CHAIN));
+   BOOST_REQUIRE_EQUAL(success(), rcrdduty(2, { SHORT_SEATS }, short_seconds, SHORT_CHAIN));
+   const uint64_t period_seat_seconds = uint64_t{long_seconds} + 3 * uint64_t{short_seconds};
+   BOOST_REQUIRE_EQUAL(uint64_t{long_seconds}, get_batch_duty(LONG_SEAT)["seat_seconds"].as<uint64_t>());
+   BOOST_REQUIRE_EQUAL(2 * uint64_t{short_seconds}, get_batch_duty(SHORT_SEATS)["seat_seconds"].as<uint64_t>());
+   BOOST_REQUIRE_EQUAL(uint64_t{short_seconds}, get_batch_duty(SHORT_SEAT)["seat_seconds"].as<uint64_t>());
+   BOOST_REQUIRE_EQUAL(period_seat_seconds, get_duty_state()["open_seat_seconds"].as<uint64_t>());
+
+   BOOST_REQUIRE_EQUAL(success(), accrue(1, period_emission));
+   BOOST_REQUIRE_EQUAL(success(), pay(1, period_emission));
+
+   const int64_t compute    = test_split_bps(period_emission, COMPUTE_BPS);
+   const int64_t batch_pool = compute - test_split_bps(compute, PRODUCER_BPS);
+   const int64_t total      = static_cast<int64_t>(period_seat_seconds);
+   const int64_t long_pay   = get_wire_balance_paid(LONG_SEAT).get_amount();
+   const int64_t short_pay  = get_wire_balance_paid(SHORT_SEATS).get_amount();
+   const int64_t single_pay = get_wire_balance_paid(SHORT_SEAT).get_amount();
+   BOOST_REQUIRE_GT(single_pay, 0);
+   BOOST_REQUIRE_EQUAL(long_pay, short_pay);
+   BOOST_REQUIRE_EQUAL(batch_pool * int64_t{long_seconds} / total, long_pay);
+   BOOST_REQUIRE_EQUAL(batch_pool * int64_t{short_seconds} / total, single_pay);
+   BOOST_REQUIRE_EQUAL(batch_pool - long_pay - short_pay - single_pay,
+                       get_epoch_log(1)["batch_emission_retained"].as<int64_t>());
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( rcrdduty_credits_nothing_for_zero_duty_seconds, sysio_emissions_tester ) try {
+   // An epoch of no length earns no seat-seconds, so it opens no duty row.
+   const account_name MEMBER = "batchopa"_n;
+   create_t5_holding_accounts();
+   BOOST_REQUIRE_EQUAL(success(), setemitcfg_defaults(config::system_account_name));
+   BOOST_REQUIRE_EQUAL(success(), initt5(config::system_account_name));
+   BOOST_REQUIRE_EQUAL(success(), rcrdduty(1, { MEMBER }, 0));
+   BOOST_REQUIRE(get_batch_duty(MEMBER).is_null());
+   const auto duty = get_duty_state();
+   BOOST_REQUIRE(duty.is_null() || duty["open_seat_seconds"].as<uint64_t>() == 0);
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( payepoch_retains_the_duty_share_of_an_inactive_operator, sysio_emissions_tester ) try {
@@ -2847,9 +2907,9 @@ BOOST_FIXTURE_TEST_CASE( payepoch_waits_while_a_settlement_is_open, sysio_emissi
    BOOST_REQUIRE_EQUAL(2 * period_emission, get_epoch_log(3)["total_emission"].as<int64_t>());
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( rcrdduty_settles_a_member_still_holding_settling_units, sysio_emissions_tester ) try {
-   // A member whose settling-period units the walk has not reached yet is paid at that period's
-   // rate before its new unit opens a row in the open period.
+BOOST_FIXTURE_TEST_CASE( rcrdduty_settles_a_member_still_holding_settling_seat_seconds, sysio_emissions_tester ) try {
+   // A member whose settling-period seat-seconds the walk has not reached yet is paid at that
+   // period's rate before its new duty opens a row in the open period.
    const account_name LATE = "zzzzbatchop"_n;   // sorts after every numeric name below
    constexpr uint32_t operators = MAX_DUTY_SETTLEMENT_ROWS + 5;
    constexpr int64_t period_emission = 1'000'000'000;
@@ -2872,7 +2932,7 @@ BOOST_FIXTURE_TEST_CASE( rcrdduty_settles_a_member_still_holding_settling_units,
    BOOST_REQUIRE_EQUAL(batch_pool / operators, get_wire_balance_paid(LATE).get_amount());
    const auto row = get_batch_duty(LATE);
    BOOST_REQUIRE_EQUAL(2u, row["period"].as<uint32_t>());
-   BOOST_REQUIRE_EQUAL(1u, row["units"].as<uint32_t>());
+   BOOST_REQUIRE_EQUAL(T_EPOCH_SECS, row["seat_seconds"].as<uint64_t>());
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( setemitcfg_bounds_period_accrual_to_asset_range, sysio_emissions_tester ) try {
@@ -4452,7 +4512,7 @@ BOOST_FIXTURE_TEST_CASE( single_active_producer_paid_per_block, sysio_emissions_
 
 // Lowering pay_cadence_epochs MID-PERIOD must not multiply the payout: the period that
 // closes after the drop holds two accrued epochs and pays its batch pool once, split by
-// duty units, and its producer pay once over both epochs' slots.
+// seat-seconds, and its producer pay once over both epochs' slots.
 BOOST_FIXTURE_TEST_CASE( cadence_drop_midperiod_does_not_multiply_batch_payout,
                          sysio_emissions_tester ) try {
    const account_name BATCH_OP = "batchopb"_n;
@@ -4478,7 +4538,7 @@ BOOST_FIXTURE_TEST_CASE( cadence_drop_midperiod_does_not_multiply_batch_payout,
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
    BOOST_REQUIRE_EQUAL( get_t5_state()["epoch_count"].as<uint64_t>(), 0u ); // non-pay
    BOOST_REQUIRE_GT( get_t5_state()["pending_emission_amount"].as<int64_t>(), 0 );
-   // The group served consensus epoch 1, so the period holds its one duty unit.
+   // The group served consensus epoch 1, so the period holds its one seat's seat-seconds.
    BOOST_REQUIRE_EQUAL( success(), rcrdduty(1, { BATCH_OP }) );
 
    // Drop to cadence 1 mid-period: the next economic epoch closes a two-epoch period.
@@ -4495,7 +4555,7 @@ BOOST_FIXTURE_TEST_CASE( cadence_drop_midperiod_does_not_multiply_batch_payout,
    const int64_t producer_pool = test_split_bps(compute, PRODUCER_BPS);
    const int64_t batch_pool    = compute - producer_pool;
 
-   // The only duty unit in the period draws the whole pool exactly once -- not twice.
+   // The period's only duty draws the whole pool exactly once -- not twice.
    const int64_t got = get_wire_balance_paid(BATCH_OP).get_amount() - bal_before;
    BOOST_REQUIRE_EQUAL( got, batch_pool );
 
@@ -4922,7 +4982,7 @@ BOOST_FIXTURE_TEST_CASE( claimnodedis_reserves_outstanding_epoch_pay, sysio_emis
    BOOST_REQUIRE_GT( claimable, 0 );
 
    // Credit epoch pay so something is outstanding, using the real payepoch path: one ACTIVE
-   // bootstrapped batch operator holding the period's only duty unit takes the whole batch pool.
+   // bootstrapped batch operator holding the period's only duty takes the whole batch pool.
    const account_name BATCH_OP = "batchresv"_n;
    create_accounts( { BATCH_OP }, false, false, false, true );
    BOOST_REQUIRE_EQUAL( success(),
@@ -5208,9 +5268,9 @@ BOOST_FIXTURE_TEST_CASE( pay_cadence_2_pays_every_other_epoch, sysio_emissions_t
 } FC_LOG_AND_RETHROW()
 
 // WNS-13 / WIRE-343: a pay period pays every roster that served in it, not the
-// roster in place when it closes. Duty units name their members when each
+// roster in place when it closes. Seat-seconds name their members when each
 // consensus epoch closes, so two rotating one-member rosters split a cadence-two
-// period evenly, and the consumed units leave the next period to pay
+// period evenly, and the consumed seat-seconds leave the next period to pay
 // independently as well.
 BOOST_FIXTURE_TEST_CASE( pay_cadence_rotating_batch_rosters_receive_their_own_epochs,
                          sysio_emissions_tester ) try {
@@ -5248,7 +5308,7 @@ BOOST_FIXTURE_TEST_CASE( pay_cadence_rotating_batch_rosters_receive_their_own_ep
    BOOST_REQUIRE_GT(b_first, 0);
    BOOST_REQUIRE_EQUAL(a_first, b_first);
 
-   // A second period proves payepoch consumed the first period's units: rows
+   // A second period proves payepoch consumed the first period's seat-seconds: rows
    // surviving it would skew this period's split.
    const int64_t a_after_first = get_wire_balance(BATCH_OP_A).get_amount();
    const int64_t b_after_first = get_wire_balance(BATCH_OP_B).get_amount();

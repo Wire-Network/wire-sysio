@@ -293,10 +293,11 @@ inline int64_t spendable_wire(int64_t balance, const pay_claim_total& claims, co
 }
 
 // ---------------------------------------------------------------------------
-// Batch-operator duty. Each consensus epoch close credits one duty unit to every member of the
-// group that was on duty (rcrdduty); each payepoch closes the open pay period and splits its batch
-// pool pro rata to those units. Settlement walks `batchduty` in bounded steps, so the number of
-// operators that served in a period bounds no single transaction.
+// Batch-operator duty, in seat-seconds. Each consensus epoch close credits every member of the
+// group that was on duty with that epoch's scheduled length in seconds (rcrdduty), whichever chain
+// it served; each payepoch closes the open pay period and splits its one batch pool pro rata to
+// those seat-seconds. Settlement walks `batchduty` in bounded steps, so the number of operators
+// that served in a period bounds no single transaction.
 // ---------------------------------------------------------------------------
 
 struct batch_duty_key {
@@ -309,16 +310,17 @@ inline uint128_t duty_period_key(uint32_t period, uint64_t account) {
    return (static_cast<uint128_t>(period) << 64) | static_cast<uint128_t>(account);
 }
 
-/// One batch operator's unpaid duty. The row exists only while it holds unpaid units; settlement
-/// erases it, and a row of a period that closed without a settlement is pruned by `settleduty`.
+/// One batch operator's unpaid duty. The row exists only while it holds unpaid seat-seconds;
+/// settlement erases it, and a row of a period that closed without a settlement is pruned by
+/// `settleduty`.
 struct [[sysio::table("batchduty"), sysio::contract("sysio.system")]] batch_duty {
    sysio::name account_name;
-   uint32_t    period = 0;   ///< pay period the units belong to (duty_state::open_period when credited)
-   uint32_t    units  = 0;   ///< consensus epochs served on duty in that period
+   uint32_t    period       = 0;   ///< pay period the duty belongs to (duty_state::open_period when credited)
+   uint64_t    seat_seconds = 0;   ///< scheduled seconds of the consensus epochs served in that period, every chain
 
    uint128_t by_period() const { return duty_period_key(period, account_name.value); }
 
-   SYSLIB_SERIALIZE(batch_duty, (account_name)(period)(units))
+   SYSLIB_SERIALIZE(batch_duty, (account_name)(period)(seat_seconds))
 };
 
 using batchduty_t = sysio::kv::table<"batchduty"_n, batch_duty_key, batch_duty,
@@ -327,19 +329,19 @@ using batchduty_t = sysio::kv::table<"batchduty"_n, batch_duty_key, batch_duty,
 /// Duty accounting: the open pay period and, while one is being paid out, the settling period.
 /// A period number is only an accounting label, independent of both clocks.
 struct [[sysio::table("dutystate"), sysio::contract("sysio.system")]] duty_state {
-   uint32_t open_period          = 1;   ///< pay period new duty accrues to
-   uint64_t open_units           = 0;   ///< duty units accrued to the open period
-   uint32_t settling_period      = 0;   ///< closed period being paid out; 0 when none is
-   int64_t  settling_pool        = 0;   ///< batch emission of the settling period
-   uint64_t settling_units       = 0;   ///< duty units of the settling period
-   int64_t  settling_paid        = 0;   ///< credited to the settling period's operators so far
-   uint32_t settling_epoch_index = 0;   ///< economic epoch that paid it (its epochlog row)
-   uint64_t settle_cursor        = 0;   ///< account the next settlement step starts at, within the settling period
+   uint32_t open_period           = 1;   ///< pay period new duty accrues to
+   uint64_t open_seat_seconds     = 0;   ///< seat-seconds accrued to the open period
+   uint32_t settling_period       = 0;   ///< closed period being paid out; 0 when none is
+   int64_t  settling_pool         = 0;   ///< batch emission of the settling period
+   uint64_t settling_seat_seconds = 0;   ///< seat-seconds of the settling period
+   int64_t  settling_paid         = 0;   ///< credited to the settling period's operators so far
+   uint32_t settling_epoch_index  = 0;   ///< economic epoch that paid it (its epochlog row)
+   uint64_t settle_cursor         = 0;   ///< account the next settlement step starts at, within the settling period
 
    bool settling() const { return settling_period != 0; }
 
    SYSLIB_SERIALIZE(duty_state,
-      (open_period)(open_units)(settling_period)(settling_pool)(settling_units)(settling_paid)
+      (open_period)(open_seat_seconds)(settling_period)(settling_pool)(settling_seat_seconds)(settling_paid)
       (settling_epoch_index)(settle_cursor))
 };
 
@@ -503,7 +505,7 @@ struct [[sysio::table("epochlog"), sysio::contract("sysio.system")]] epoch_log {
    int64_t                compute_amount    = 0;
    int64_t                capex_amount      = 0;
    int64_t                governance_amount = 0;
-   /// The period's batch-operator pool, split by duty units over the settlement that follows.
+   /// The period's batch-operator pool, split by seat-seconds over the settlement that follows.
    int64_t                batch_emission          = 0;
    /// Batch emission the settlement left in the treasury: a period with no duty, members no
    /// longer ACTIVE, and integer-division remainders. Final once `batch_settled` is true.

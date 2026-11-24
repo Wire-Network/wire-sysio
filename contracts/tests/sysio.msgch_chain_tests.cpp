@@ -634,6 +634,14 @@ public:
          fixture_abi_yield_function());
    }
 
+   /// `account`'s unpaid batch-duty seat-seconds on sysio.system; 0 when it holds none.
+   uint64_t batch_duty_seat_seconds(name account) {
+      const auto data = get_row_by_account(SYSIO_ACCOUNT, SYSIO_ACCOUNT, "batchduty"_n, account);
+      if (data.empty()) return 0;
+      return sysio_abi.binary_to_variant("batch_duty", data, fixture_abi_yield_function())["seat_seconds"]
+         .as<uint64_t>();
+   }
+
    /// Return whether the epoch contract currently holds `chain_code`'s advancement for an open dispute.
    bool epoch_is_paused(uint64_t chain_code = ETH_OUTPOST_ID) {
       auto state = read_epoch_state(chain_code);
@@ -3389,6 +3397,33 @@ BOOST_FIXTURE_TEST_CASE(chains_advance_independently_at_their_own_pace, sysio_ms
       deliver_as(BATCHOP, SOL_OUTPOST_ID,
                  encode_delivery(current_epoch(ETH_OUTPOST_ID), "wrong-epoch", sol_tip.envelope_digest,
                                  sol_tip.message_id)));
+} FC_LOG_AND_RETHROW() }
+
+/// Each chain's epoch close credits its group with that epoch's own scheduled length in seat-seconds: a seat
+/// on the slower chain counts for its longer epoch.
+BOOST_FIXTURE_TEST_CASE(epoch_close_credits_the_chain_epoch_length_as_seat_seconds, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kSolDurationSec = 2 * EPOCH_DURATION_SEC;
+   const std::vector<name> ops{BATCHOP};
+   bootstrap(1, /*batchop_is_bootstrapped=*/true, /*build_schedule=*/true, kSolDurationSec);
+   BOOST_REQUIRE_EQUAL(0u, batch_duty_seat_seconds(BATCHOP));   // a genesis advance records no duty
+
+   // Only ETH's boundary has passed: its 60 s epoch is credited.
+   std::map<uint64_t, inbound_stream_tip> tips;
+   deliver_chain_unanimous(ops, ETH_OUTPOST_ID, "eth-1", tips);
+   deliver_chain_unanimous(ops, SOL_OUTPOST_ID, "sol-1", tips);
+   elapse_epoch_boundary();
+   advance_via_consensus();
+   BOOST_REQUIRE_EQUAL(2u, current_epoch(ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(1u, current_epoch(SOL_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(uint64_t{EPOCH_DURATION_SEC}, batch_duty_seat_seconds(BATCHOP));
+
+   // ETH's second epoch and SOL's 120 s epoch close together.
+   deliver_chain_unanimous(ops, ETH_OUTPOST_ID, "eth-2", tips);
+   elapse_epoch_boundary();
+   advance_via_consensus();
+   BOOST_REQUIRE_EQUAL(3u, current_epoch(ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(2u, current_epoch(SOL_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(uint64_t{2 * EPOCH_DURATION_SEC + kSolDurationSec}, batch_duty_seat_seconds(BATCHOP));
 } FC_LOG_AND_RETHROW() }
 
 /// A dispute pauses only its own chain: the disputed chain's chkcons holds while the other chain keeps
