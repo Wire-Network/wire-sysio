@@ -173,6 +173,40 @@
             "fields": []
         },
         {
+            "name": "resendroster",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "slug_name"
+                }
+            ]
+        },
+        {
+            "name": "roster_sent",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                },
+                {
+                    "name": "roster_hash",
+                    "type": "checksum256"
+                }
+            ]
+        },
+        {
+            "name": "rostersent_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "schbatchgps",
             "base": "",
             "fields": []
@@ -250,6 +284,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "resendroster",
+            "type": "resendroster",
+            "ricardian_contract": ""
+        },
+        {
             "name": "schbatchgps",
             "type": "schbatchgps",
             "ricardian_contract": ""
@@ -315,6 +354,14 @@
             "key_names": ["name"],
             "key_types": ["name"],
             "table_id": 59387
+        },
+        {
+            "name": "rostersent",
+            "type": "roster_sent",
+            "index_type": "i64",
+            "key_names": ["chain_code"],
+            "key_types": ["uint64"],
+            "table_id": 63183
         }
     ],
     "ricardian_clauses": [],

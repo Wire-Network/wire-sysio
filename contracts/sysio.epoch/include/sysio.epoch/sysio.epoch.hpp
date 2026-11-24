@@ -3,6 +3,7 @@
 #include <sysio/sysio.hpp>
 #include <sysio/kv_global.hpp>
 #include <sysio/kv_table.hpp>
+#include <sysio/slug_name.hpp>
 #include <sysio/asset.hpp>
 #include <sysio/crypto.hpp>
 #include <sysio/system.hpp>
@@ -59,6 +60,11 @@ namespace sysio {
       /// Clear global pause (only callable by sysio.chalg).
       [[sysio::action]]
       void unpause();
+
+      /// Forget the roster last queued to outpost `code`, so the next advance queues the roster to it
+      /// again: the recovery for an outpost that lost the roster it held. Auth: sysio.epoch.
+      [[sysio::action]]
+      void resendroster(sysio::slug_name code);
 
       // -----------------------------------------------------------------------
       //  Tables
@@ -161,6 +167,24 @@ namespace sysio {
       };
 
       using blocklog_t = sysio::kv::table<"blocklog"_n, blocklog_key, blocklog_entry>;
+
+      /// The last OPERATORS roster queued to each outpost, keyed by the outpost's `sysio.chains` code.
+      /// `advance` queues the roster to an outpost only when its hash differs from the row's. An
+      /// outpost activated after genesis has no row, so its first advance queues the roster to it.
+      struct rostersent_key {
+         uint64_t chain_code;
+         uint64_t primary_key() const { return chain_code; }
+         SYSLIB_SERIALIZE(rostersent_key, (chain_code))
+      };
+
+      struct [[sysio::table("rostersent")]] roster_sent {
+         uint64_t    chain_code = 0;
+         checksum256 roster_hash; ///< SHA-256 of the encoded OPERATORS attestation last queued
+
+         SYSLIB_SERIALIZE(roster_sent, (chain_code)(roster_hash))
+      };
+
+      using rostersent_t = sysio::kv::table<"rostersent"_n, rostersent_key, roster_sent>;
 
       // Well-known accounts
       static constexpr name CHALG_ACCOUNT  = "sysio.chalg"_n;

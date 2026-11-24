@@ -32,6 +32,7 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
 | `economycfg` | `kv::global` | Economic clock: `epoch_duration_sec` (60 s .. 30 days) and the grid's `start_time` |
 | `economystate` | `kv::global` | Economic epoch index and its current / next boundary |
 | `blocklog` | `kv::table` | At most one row: the open emissions block episode, keyed by its first blocked economic epoch, with the reason, attempted emission, treasury and balance figures, and how many economic epochs it has held. Erased when an economic epoch's emissions pass |
+| `rostersent` | `kv::table` | One row per outpost a roster has been queued to, keyed by its `sysio.chains` code: the SHA-256 of the last `OPERATORS` roster queued to it |
 
 ## Actions
 
@@ -44,6 +45,7 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
 | `tickeconomy` | permissionless | Open economic epoch `epoch_index`: refused unless it is the next index, its grid boundary has passed, and the consensus genesis advance has run |
 | `pause` | `sysio.chalg` | Set the global pause |
 | `unpause` | `sysio.chalg` | Clear the global pause |
+| `resendroster` | `sysio.epoch` | Erase an outpost's `rostersent` row, so the next `advance` queues the roster to it again. Refused when no roster has been queued to that outpost |
 
 ## What `advance` does
 
@@ -56,9 +58,11 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
    new tail group drawn from `ACTIVE` batch operators that are not already resident (non-bootstrapped
    first). The resident groups stay disjoint, so an operator serves at most once every
    `batch_op_groups` epochs.
-3. Queue `OPERATORS` (the operators the window seats, with their status and authex links; none for
-   an empty window) and `BATCH_OPERATOR_GROUPS` (withheld when the next group is empty) to every
-   active outpost through `sysio.msgch::queueout`, then `sysio.msgch::buildenv` per outpost.
+3. Queue `OPERATORS` (the operators the window seats, in account order, with their status and authex
+   links; none for an empty window) to each active outpost whose `rostersent` hash differs from it, and
+   `BATCH_OPERATOR_GROUPS` (withheld when the next group is empty) to every active outpost, through
+   `sysio.msgch::queueout`, then `sysio.msgch::buildenv` per outpost. An outpost keeps the last roster
+   it received.
 
 ## What `tickeconomy` does
 

@@ -647,56 +647,63 @@ void epoch::finishadv(uint32_t epoch_index) {
    // the keys they deliver with (Solana also refuses a window that seats an ineligible member), so the
    // window is all they need, and the roster stays within MAX_SCHEDULED_BATCH_OPERATORS however many
    // operators register. A member whose opreg row was pruned is left out.
-   // IMPORTANT: Must come before BATCH_OPERATOR_GROUPS so that the ETH outpost's
-   // _handleOperators populates operatorEthAddress before _handleBatchOperatorGroups
-   // looks up those addresses.
+   // An outpost keeps the last roster it received, so the roster is queued to an outpost only when it
+   // differs from the one last queued to it (`rostersent`). Members are listed by account, so a window
+   // that only rotates its groups encodes the same roster.
+   // IMPORTANT: Must come before BATCH_OPERATOR_GROUPS: Solana applies attestations in order and
+   // resolves the groups against the roster it holds. (Ethereum seats the groups after the envelope's
+   // last attestation.)
    {
       opp::attestations::Operators ops_attest;
       opreg::operators_t opreg_ops(OPREG_ACCOUNT);
       authex::links_t authex_links(AUTHEX_ACCOUNT);
       auto links_by_name = authex_links.get_index<"byname"_n>();
 
+      std::vector<name> members;
       for (const auto& group : state.batch_op_groups) {
-         for (const auto& member : group) {
-            const auto op = opreg_ops.try_get(opreg::operator_key{member.value});
-            if (!op) continue;
+         members.insert(members.end(), group.begin(), group.end());
+      }
+      std::sort(members.begin(), members.end());
 
-            opp::attestations::OperatorEntry entry;
-            entry.account.name = member.to_string();
-            entry.type = op->type;
-            entry.status = op->status;
+      for (const name member : members) {
+         const auto op = opreg_ops.try_get(opreg::operator_key{member.value});
+         if (!op) continue;
 
-            // Collect all authex-linked chain addresses for this operator.
-            // Store raw public key bytes from the variant (33 bytes for EM/secp256k1,
-            // 32 bytes for ED/Ed25519).
-            auto link_it = links_by_name.lower_bound(member.value);
-            while (link_it != links_by_name.end() && link_it->username == member) {
-               opp::types::ChainAddress chain_addr;
-               chain_addr.kind = link_it->chain_kind;
+         opp::attestations::OperatorEntry entry;
+         entry.account.name = member.to_string();
+         entry.type = op->type;
+         entry.status = op->status;
 
-               std::visit([&](const auto& key_data) {
-                  using T = std::decay_t<decltype(key_data)>;
-                  if constexpr (std::is_same_v<T, webauthn_public_key>) {
-                     // EM (secp256k1 compressed) — 33 bytes in key.key
-                     chain_addr.address.assign(key_data.key.begin(), key_data.key.end());
-                  } else if constexpr (std::is_same_v<T, ed_public_key>) {
-                     // ED (Ed25519) — 32 bytes
-                     chain_addr.address.assign(
-                        reinterpret_cast<const char*>(key_data.data()),
-                        reinterpret_cast<const char*>(key_data.data() + key_data.size()));
-                  } else if constexpr (std::is_same_v<T, ecc_public_key>) {
-                     // K1/R1 (secp256k1/P-256 compressed) — 33 bytes
-                     chain_addr.address.assign(key_data.begin(), key_data.end());
-                  }
-                  // Skip BLS keys — not used for chain address linking
-               }, link_it->pub_key);
+         // Collect all authex-linked chain addresses for this operator.
+         // Store raw public key bytes from the variant (33 bytes for EM/secp256k1,
+         // 32 bytes for ED/Ed25519).
+         auto link_it = links_by_name.lower_bound(member.value);
+         while (link_it != links_by_name.end() && link_it->username == member) {
+            opp::types::ChainAddress chain_addr;
+            chain_addr.kind = link_it->chain_kind;
 
-               entry.addresses.push_back(std::move(chain_addr));
-               ++link_it;
-            }
+            std::visit([&](const auto& key_data) {
+               using T = std::decay_t<decltype(key_data)>;
+               if constexpr (std::is_same_v<T, webauthn_public_key>) {
+                  // EM (secp256k1 compressed) — 33 bytes in key.key
+                  chain_addr.address.assign(key_data.key.begin(), key_data.key.end());
+               } else if constexpr (std::is_same_v<T, ed_public_key>) {
+                  // ED (Ed25519) — 32 bytes
+                  chain_addr.address.assign(
+                     reinterpret_cast<const char*>(key_data.data()),
+                     reinterpret_cast<const char*>(key_data.data() + key_data.size()));
+               } else if constexpr (std::is_same_v<T, ecc_public_key>) {
+                  // K1/R1 (secp256k1/P-256 compressed) — 33 bytes
+                  chain_addr.address.assign(key_data.begin(), key_data.end());
+               }
+               // Skip BLS keys — not used for chain address linking
+            }, link_it->pub_key);
 
-            ops_attest.operators.push_back(std::move(entry));
+            entry.addresses.push_back(std::move(chain_addr));
+            ++link_it;
          }
+
+         ops_attest.operators.push_back(std::move(entry));
       }
 
       // An empty roster tells an outpost nothing (Solana skips it as an anomaly), so an empty window
@@ -705,10 +712,17 @@ void epoch::finishadv(uint32_t epoch_index) {
          std::vector<char> encoded;
          auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
          (void)out(ops_attest);
+         const checksum256 roster_hash = sha256(encoded.data(), encoded.size());
 
+         rostersent_t sent_tbl(get_self());
          sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
          for (auto it = chains_tbl.begin(); it != chains_tbl.end(); ++it) {
             if (!is_active_outpost(*it)) continue;
+            const rostersent_key key{it->code.value};
+            const std::optional<roster_sent> sent = sent_tbl.try_get(key);
+            if (sent && sent->roster_hash == roster_hash) continue;
+
+            sent_tbl.set(ram_payer, key, roster_sent{.chain_code = key.chain_code, .roster_hash = roster_hash});
             action(
                permission_level{get_self(), "owner"_n},
                MSGCH_ACCOUNT,
@@ -1096,6 +1110,16 @@ void epoch::unpause() {
    auto state = state_tbl.get();
    state.is_paused = false;
    state_tbl.set(state, ram_payer);
+}
+
+// ---------------------------------------------------------------------------
+//  resendroster
+// ---------------------------------------------------------------------------
+void epoch::resendroster(sysio::slug_name code) {
+   require_auth(get_self());
+
+   rostersent_t sent_tbl(get_self());
+   sent_tbl.erase(rostersent_key{code.value}, "no roster has been queued to this outpost");
 }
 
 } // namespace sysio

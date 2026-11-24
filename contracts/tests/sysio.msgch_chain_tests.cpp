@@ -36,8 +36,10 @@
 
 #include <magic_enum/magic_enum.hpp>
 
+#include <algorithm>
 #include <functional>
 #include <map>
+#include <optional>
 #include <set>
 
 #include "contracts.hpp"
@@ -886,28 +888,66 @@ public:
       return groups_attestation;
    }
 
-   /// The OPERATORS roster the most recent envelope for `chain_code` carries, checked against the
-   /// schedule after inline mutations: it lists exactly the window's members that have an opreg row,
-   /// each with its current status, ahead of BATCH_OPERATOR_GROUPS. Returns account name -> status.
-   std::map<std::string, opp::types::OperatorStatus> require_roster_is_window(uint64_t chain_code) {
-      const auto row = find_outbound_envelope(chain_code);
-      BOOST_REQUIRE(!row.is_null());
-      const auto env = decode_envelope(row["raw_envelope"].as<std::vector<char>>());
+   /// The OPERATORS roster `envelope_row` carries, if any: the last one, which the outpost applies last.
+   /// When the envelope also carries BATCH_OPERATOR_GROUPS, the roster comes first so the groups resolve
+   /// against it.
+   std::optional<std::string> carried_roster(const fc::variant& envelope_row) {
+      const auto env = decode_envelope(envelope_row["raw_envelope"].as<std::vector<char>>());
       BOOST_REQUIRE_EQUAL(env.messages_size(), 1);
-      std::map<std::string, opp::types::OperatorStatus> roster;
-      bool have_operators = false;
+      std::optional<std::string> roster;
+      int roster_at = -1;
+      int groups_at = -1;
+      int position  = 0;
       for (const auto& att : env.messages(0).payload().attestations()) {
          if (att.type() == opp::types::ATTESTATION_TYPE_OPERATORS) {
-            opp::attestations::Operators operators;
-            BOOST_REQUIRE(operators.ParseFromString(att.data()));
-            have_operators = true;
-            roster.clear();
-            for (const auto& entry : operators.operators()) roster[entry.account().name()] = entry.status();
+            roster    = att.data();
+            roster_at = position;
          } else if (att.type() == opp::types::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS) {
-            BOOST_REQUIRE(have_operators);
+            groups_at = position;
          }
+         ++position;
       }
-      BOOST_REQUIRE(have_operators);
+      if (roster && groups_at >= 0) BOOST_REQUIRE_LT(roster_at, groups_at);
+      return roster;
+   }
+
+   /// Whether the newest outbound envelope for `chain_code` carries an OPERATORS roster.
+   bool tip_carries_roster(uint64_t chain_code) {
+      const auto row = find_outbound_envelope(chain_code);
+      BOOST_REQUIRE(!row.is_null());
+      return carried_roster(row).has_value();
+   }
+
+   /// The `rostersent` row for `chain_code` (primary key = chain_code); null variant when absent.
+   fc::variant get_roster_sent(uint64_t chain_code) {
+      auto data = get_row_by_id(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "rostersent"_n, chain_code);
+      return data.empty() ? fc::variant() : epoch_abi.binary_to_variant(
+         "roster_sent", data, fixture_abi_yield_function());
+   }
+
+   /// The OPERATORS roster `chain_code` holds -- the one the newest envelope carrying a roster shipped --
+   /// checked against the schedule after inline mutations: it lists exactly the window's members that
+   /// have an opreg row, in account order, each with its current status, and `rostersent` holds its hash.
+   /// Returns account name -> status.
+   std::map<std::string, opp::types::OperatorStatus> require_roster_is_window(uint64_t chain_code) {
+      std::optional<std::string> shipped;
+      const auto rows = outbound_envelope_rows(chain_code);
+      for (auto it = rows.rbegin(); it != rows.rend() && !shipped; ++it) shipped = carried_roster(*it);
+      BOOST_REQUIRE_MESSAGE(shipped, "no outbound envelope carries an OPERATORS roster");
+
+      const auto sent = get_roster_sent(chain_code);
+      BOOST_REQUIRE(!sent.is_null());
+      BOOST_REQUIRE_EQUAL(sent["roster_hash"].as_string(), fc::sha256::hash(shipped->data(), shipped->size()).str());
+
+      opp::attestations::Operators operators;
+      BOOST_REQUIRE(operators.ParseFromString(*shipped));
+      std::map<std::string, opp::types::OperatorStatus> roster;
+      std::vector<name> order;
+      for (const auto& entry : operators.operators()) {
+         roster[entry.account().name()] = entry.status();
+         order.emplace_back(entry.account().name());
+      }
+      BOOST_REQUIRE(std::is_sorted(order.begin(), order.end()));
 
       // Held in a local: a range-for over a member of the temporary would read freed memory.
       const auto state = read_epoch_state();
@@ -2855,7 +2895,106 @@ BOOST_FIXTURE_TEST_CASE(advance_queues_no_roster_for_an_empty_window, sysio_msgc
    // Nothing else was queued either, so neither outpost gets an envelope this epoch.
    for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
       BOOST_REQUIRE(find_outbound_envelope(chain).is_null());
+      BOOST_REQUIRE(get_roster_sent(chain).is_null());
    }
+} FC_LOG_AND_RETHROW() }
+
+/// An outpost keeps the last roster it received, so `advance` queues the roster to it only when the
+/// roster differs from the one last queued: an advance that reseats the same members ships
+/// BATCH_OPERATOR_GROUPS alone, and a slash that reseats the window ships the new roster.
+BOOST_FIXTURE_TEST_CASE(advance_queues_the_roster_only_when_it_changes, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kUnchangedAdvances = 2;
+   bootstrap(/*n_batch_ops=*/3);
+   // A spare the slide seats once a member is slashed; it sorts after the seated three.
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n,
+      mvo()("account", BATCHOP_D.to_string())("type", opp::types::OPERATOR_TYPE_BATCH)("is_bootstrapped", true)));
+   produce_blocks();
+   for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) BOOST_REQUIRE(tip_carries_roster(chain));
+   const std::string genesis_hash = get_roster_sent(ETH_OUTPOST_ID)["roster_hash"].as_string();
+
+   for (uint32_t round = 0; round < kUnchangedAdvances; ++round) {
+      advance_to_next_epoch();
+      for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
+         BOOST_REQUIRE(!tip_carries_roster(chain));
+         BOOST_REQUIRE_EQUAL(shipped_batch_operator_groups(chain).groups_size(), 1);
+         BOOST_REQUIRE(!require_roster_is_window(chain).count(BATCHOP_D.to_string()));
+      }
+   }
+   BOOST_REQUIRE_EQUAL(get_roster_sent(ETH_OUTPOST_ID)["roster_hash"].as_string(), genesis_hash);
+
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, CHALG_ACCOUNT, "slash"_n,
+      mvo()("account", BATCHOP_C.to_string())("reason", std::string("seated slash"))));
+   produce_blocks();
+   advance_to_next_epoch();
+   for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
+      BOOST_REQUIRE(tip_carries_roster(chain));
+      const auto roster = require_roster_is_window(chain);
+      BOOST_REQUIRE(!roster.count(BATCHOP_C.to_string()));
+      BOOST_REQUIRE_EQUAL(roster.at(BATCHOP_D.to_string()), opp::types::OPERATOR_STATUS_ACTIVE);
+   }
+   BOOST_REQUIRE_NE(get_roster_sent(ETH_OUTPOST_ID)["roster_hash"].as_string(), genesis_hash);
+
+   advance_to_next_epoch();
+   for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) BOOST_REQUIRE(!tip_carries_roster(chain));
+} FC_LOG_AND_RETHROW() }
+
+/// The roster lists the window's members by account, so a window that only rotates its groups encodes
+/// the same roster and `advance` does not queue it again; BATCH_OPERATOR_GROUPS still ships every epoch.
+BOOST_FIXTURE_TEST_CASE(advance_does_not_resend_the_roster_for_a_rotation, sysio_msgch_chain_tester) { try {
+   bootstrap_rotation(ROTATION_WINDOW_MS, /*batchop_is_bootstrapped=*/true);
+   BOOST_REQUIRE(tip_carries_roster(ETH_OUTPOST_ID));
+   for (uint32_t step = 0; step < ROTATION_GROUPS; ++step) {
+      const name on_duty = duty_member();
+      advance_to_next_epoch();
+      BOOST_REQUIRE(duty_member() != on_duty);
+      BOOST_REQUIRE(!tip_carries_roster(ETH_OUTPOST_ID));
+      BOOST_REQUIRE_EQUAL(static_cast<uint32_t>(shipped_batch_operator_groups(ETH_OUTPOST_ID).groups_size()),
+                          ROTATION_GROUPS);
+      BOOST_REQUIRE_EQUAL(require_roster_is_window(ETH_OUTPOST_ID).size(), ROTATION_GROUPS);
+   }
+} FC_LOG_AND_RETHROW() }
+
+/// An outpost activated after genesis has no `rostersent` row, so the first advance after its activation
+/// queues it the roster, while the outpost already holding that roster gets none.
+BOOST_FIXTURE_TEST_CASE(advance_sends_the_roster_to_an_outpost_activated_later, sysio_msgch_chain_tester) { try {
+   bootstrap_rotation(ROTATION_WINDOW_MS, /*batchop_is_bootstrapped=*/true);
+   register_chain(opp::types::ChainKind::CHAIN_KIND_SVM, SOL_CHAIN_CODE, SOL_EXTERNAL_CHAIN_ID);
+   produce_blocks();
+   advance_to_next_epoch();
+   BOOST_REQUIRE(find_outbound_envelope(SOL_OUTPOST_ID).is_null());
+   BOOST_REQUIRE(get_roster_sent(SOL_OUTPOST_ID).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, chains_actions::ACTIVATE_CHAIN,
+                                       mvo()("code", SOL_CHAIN_CODE)));
+   produce_blocks(); // land it before the advance's epoch-length jump expires it
+   advance_to_next_epoch();
+   BOOST_REQUIRE(tip_carries_roster(SOL_OUTPOST_ID));
+   BOOST_REQUIRE(!tip_carries_roster(ETH_OUTPOST_ID));
+   BOOST_REQUIRE(require_roster_is_window(SOL_OUTPOST_ID) == require_roster_is_window(ETH_OUTPOST_ID));
+} FC_LOG_AND_RETHROW() }
+
+/// `resendroster` forgets the roster last queued to one outpost, so the next advance queues the roster to
+/// it again while the outpost still holding it gets none. Only sysio.epoch may call it, and only for an
+/// outpost a roster has been queued to.
+BOOST_FIXTURE_TEST_CASE(resendroster_requeues_the_roster_to_one_outpost, sysio_msgch_chain_tester) { try {
+   const auto resend = [&](name signer) {
+      return push(EPOCH_ACCOUNT, epoch_abi, signer, "resendroster"_n, mvo()("code", SOL_CHAIN_CODE));
+   };
+   bootstrap(/*n_batch_ops=*/3);
+   advance_to_next_epoch();
+   BOOST_REQUIRE(!tip_carries_roster(SOL_OUTPOST_ID));
+
+   BOOST_REQUIRE_EQUAL(error("missing authority of sysio.epoch"), resend(BATCHOP));
+   BOOST_REQUIRE_EQUAL(success(), resend(EPOCH_ACCOUNT));
+   BOOST_REQUIRE(get_roster_sent(SOL_OUTPOST_ID).is_null());
+   produce_blocks(); // the refused retry below is a new transaction, not a duplicate
+   BOOST_REQUIRE_EQUAL(error("assertion failure with message: no roster has been queued to this outpost"),
+                       resend(EPOCH_ACCOUNT));
+
+   advance_to_next_epoch();
+   BOOST_REQUIRE(tip_carries_roster(SOL_OUTPOST_ID));
+   BOOST_REQUIRE(!tip_carries_roster(ETH_OUTPOST_ID));
+   BOOST_REQUIRE(require_roster_is_window(SOL_OUTPOST_ID) == require_roster_is_window(ETH_OUTPOST_ID));
 } FC_LOG_AND_RETHROW() }
 
 /// Even sysio.epoch authority cannot invoke the continuation as a top-level action.
