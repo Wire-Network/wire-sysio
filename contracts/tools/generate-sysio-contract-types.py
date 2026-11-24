@@ -231,6 +231,55 @@ STRUCT_KIND = 'struct'
 
 TS_IDENTIFIER = re.compile(r'^[A-Za-z_$][A-Za-z0-9_$]*$')
 
+# An ABI array, `T[]` or fixed-size `T[N]`; abi_serializer decodes both to a JSON array.
+ARRAY_TYPE = re.compile(r'^(?P<element>.+)\[[0-9]*\]$')
+
+
+def array_element_type(abi_type: str) -> str | None:
+    """Return the element type of an ABI array type, or None when `abi_type` is not an array."""
+    array = ARRAY_TYPE.match(abi_type)
+    return array.group('element') if array else None
+
+
+def struct_fields(struct_name: str, structs_map: dict, type_aliases: dict) -> list[dict]:
+    """Return a struct's fields in JSON row order: base struct fields first, as abi_serializer emits them."""
+    chain = [struct_name]
+    base = resolve_type(structs_map[struct_name].get('base', ''), type_aliases)
+    while base:
+        if base in chain:
+            raise ValueError(f'ABI struct {struct_name} has a circular base: {" -> ".join(chain + [base])}')
+        if base not in structs_map:
+            raise ValueError(f'ABI struct {chain[-1]} has base {base}, which is not a struct')
+        chain.append(base)
+        base = resolve_type(structs_map[base].get('base', ''), type_aliases)
+    return [field for name in reversed(chain) for field in structs_map[name].get('fields', [])]
+
+
+def holds_bool(abi_type: str, structs_map: dict, type_aliases: dict, variants_map: dict,
+               covered: tuple[str, ...] = ()) -> bool:
+    """Return whether a value of `abi_type` can hold an ABI `bool` in any field, element or variant alternative.
+
+    References to the `covered` types are skipped; the caller inspects those itself.
+    """
+    pending = [abi_type]
+    seen: set[str] = set(covered)
+    while pending:
+        current = resolve_type(pending.pop(), type_aliases)
+        if current in seen:
+            continue
+        seen.add(current)
+        if current.endswith(('$', '?')):
+            pending.append(current[:-1])
+        elif (element := array_element_type(current)) is not None:
+            pending.append(element)
+        elif current == 'bool':
+            return True
+        elif current in variants_map:
+            pending.extend(variants_map[current].get('types', []))
+        elif current in structs_map:
+            pending.extend(field['type'] for field in struct_fields(current, structs_map, type_aliases))
+    return False
+
 
 def boolean_descriptor(abi_type: str, structs_map: dict, type_aliases: dict, variants_map: dict,
                        visiting: tuple[str, ...] = ()) -> dict | None:
@@ -240,42 +289,52 @@ def boolean_descriptor(abi_type: str, structs_map: dict, type_aliases: dict, var
     extension (`$`) types are described by their inner type, because the typed
     client passes null and absent values through unchanged. Struct fields are
     keyed by ABI field name, which the node's JSON uses whatever the --style
-    flag, and include the base struct's fields, which every row carries.
+    flag, and include the base struct's fields, which every row carries. When
+    two fields share a name, the last one in row order describes it, as the
+    node emits both and a JSON parser keeps the last.
 
-    Raises ValueError for a recursive struct, and for a variant alternative
-    that holds a `bool`: descriptors do not cover variants, so generation fails
-    rather than leaving such a value unconverted.
+    Raises ValueError where a descriptor would leave a `bool` unconverted: a
+    variant alternative that holds one, since descriptors do not cover
+    variants; a recursive struct that holds one, which has no finite
+    descriptor; and a binary extension field whose absence would expose a
+    same-named earlier field with different `bool` content.
     """
     abi_type = resolve_type(abi_type, type_aliases)
     if abi_type.endswith(('$', '?')):
         return boolean_descriptor(abi_type[:-1], structs_map, type_aliases, variants_map, visiting)
-    if abi_type.endswith('[]'):
-        items = boolean_descriptor(abi_type[:-2], structs_map, type_aliases, variants_map, visiting)
+    if (element := array_element_type(abi_type)) is not None:
+        items = boolean_descriptor(element, structs_map, type_aliases, variants_map, visiting)
         return None if items is None else {'kind': ARRAY_KIND, 'items': items}
     if abi_type == 'bool':
         return {'kind': BOOLEAN_KIND}
     if abi_type in variants_map:
         for alternative in variants_map[abi_type].get('types', []):
-            if boolean_descriptor(alternative, structs_map, type_aliases, variants_map, visiting) is not None:
+            if holds_bool(alternative, structs_map, type_aliases, variants_map, (abi_type,)):
                 raise ValueError(f'ABI variant {abi_type} alternative {alternative} holds a bool; '
                                  'table row descriptors do not describe variants')
         return None
     if abi_type not in structs_map:
         return None
     if abi_type in visiting:
-        raise ValueError(f'ABI struct {abi_type} is recursive: {" -> ".join(visiting + (abi_type,))}')
+        if holds_bool(abi_type, structs_map, type_aliases, variants_map):
+            raise ValueError(f'ABI struct {abi_type} is recursive and holds a bool: '
+                             f'{" -> ".join(visiting + (abi_type,))}')
+        return None
 
-    struct = structs_map[abi_type]
     fields: dict = {}
-    if struct.get('base'):
-        base = boolean_descriptor(struct['base'], structs_map, type_aliases, variants_map, visiting + (abi_type,))
-        if base is not None:
-            fields.update(base['fields'])
-    for field in struct.get('fields', []):
+    declared: set[str] = set()
+    for field in struct_fields(abi_type, structs_map, type_aliases):
+        name = field['name']
         descriptor = boolean_descriptor(field['type'], structs_map, type_aliases, variants_map,
                                         visiting + (abi_type,))
-        if descriptor is not None:
-            fields[field['name']] = descriptor
+        if name in declared and field['type'].endswith('$') and descriptor != fields.get(name):
+            raise ValueError(f'ABI struct {abi_type} binary extension field {name} redeclares a field '
+                             'with different bool content, which an absent extension leaves in the row')
+        declared.add(name)
+        if descriptor is None:
+            fields.pop(name, None)
+        else:
+            fields[name] = descriptor
     return {'kind': STRUCT_KIND, 'fields': fields} if fields else None
 
 
