@@ -278,24 +278,25 @@ void finish_settlement(name self, duty_state& duty, t5_state& state) {
    duty.settle_cursor        = 0;
 }
 
-// One bounded settlement step: walk `batchduty` from the cursor, paying the settling period's rows,
-// for at most MAX_DUTY_SETTLEMENT_ROWS rows; reaching the end of the table finishes the settlement.
-// Credited amounts move from unsettled to distributed. A no-op when no settlement is open. Never
-// throws.
-void step_settlement(name self, duty_state& duty, t5_state& state) {
-   if (!duty.settling()) return;
+// One bounded settlement step: walk the settling period's `batchduty` rows (the `byperiod` index) from
+// the cursor, paying at most MAX_DUTY_SETTLEMENT_ROWS of them; passing the period's last row finishes
+// the settlement. Credited amounts move from unsettled to distributed. Returns the rows paid. A no-op
+// when no settlement is open. Never throws.
+uint32_t step_settlement(name self, duty_state& duty, t5_state& state) {
+   if (!duty.settling()) return 0;
 
    // Snapshot the step's rows and the cursor first, then settle: settling erases rows, and the walk
    // must not hold an iterator across those erasures.
    batchduty_t rows(self);
+   auto by_period = rows.get_index<"byperiod"_n>();
    std::vector<batch_duty> due;
    due.reserve(MAX_DUTY_SETTLEMENT_ROWS);
-   uint32_t examined = 0;
-   auto it = rows.lower_bound(batch_duty_key{duty.settle_cursor});
-   for (; it != rows.end() && examined < MAX_DUTY_SETTLEMENT_ROWS; ++it, ++examined) {
-      if (it->period == duty.settling_period) due.push_back(*it);
+   auto it = by_period.lower_bound(duty_period_key(duty.settling_period, duty.settle_cursor));
+   for (; it != by_period.end() && it->period == duty.settling_period && due.size() < MAX_DUTY_SETTLEMENT_ROWS;
+        ++it) {
+      due.push_back(*it);
    }
-   const bool walked_to_end = it == rows.end();
+   const bool walked_to_end = it == by_period.end() || it->period != duty.settling_period;
    if (!walked_to_end) duty.settle_cursor = it->account_name.value;
 
    for (const auto& row : due) {
@@ -305,6 +306,22 @@ void step_settlement(name self, duty_state& duty, t5_state& state) {
    }
 
    if (walked_to_end) finish_settlement(self, duty, state);
+   return static_cast<uint32_t>(due.size());
+}
+
+// Erase up to `budget` `batchduty` rows of periods that closed without a settlement (duty but no batch
+// pool), so no later settlement walks past them. Periods settle one at a time and in order, so every row
+// older than the settling period, or than the open period when none is settling, is one. Never throws.
+void prune_obsolete_duty(name self, const duty_state& duty, uint32_t budget) {
+   const uint32_t live_from = duty.settling() ? duty.settling_period : duty.open_period;
+   batchduty_t rows(self);
+   auto by_period = rows.get_index<"byperiod"_n>();
+   std::vector<uint64_t> obsolete;
+   for (auto it = by_period.lower_bound(duty_period_key(0, 0));
+        it != by_period.end() && it->period < live_from && obsolete.size() < budget; ++it) {
+      obsolete.push_back(it->account_name.value);
+   }
+   for (const uint64_t account : obsolete) rows.erase(batch_duty_key{account});
 }
 
 } // anonymous namespace
@@ -530,26 +547,23 @@ void system_contract::claimnodedis(const sysio::name& account_name) {
    const auto info = compute_node_claim(emission, row, cfg.min_claimable);
    sysio::check(info.can_claim, "claim amount below minimum threshold");
 
-   // Node-owner vesting draws on the SAME `sysio` WIRE balance that backs unclaimed epoch pay, so
-   // it must respect the same reserve the epoch readiness gate holds. `payclaims`
-   // rows are already owed: paying them out is a promise this contract has made and cannot revoke,
-   // whereas this withdrawal is a claim on the free remainder.
-   //
-   // Without the reserve the two overdraw each other. Credit 60 of epoch pay against a 100
-   // balance, let a vested owner withdraw 50, and only 50 backs the 60 owed -- the later
-   // `claimpay` cannot pay out, and `payepoch` stays balance-blocked from then on. That exposure
-   // is new: before payouts became claimable, epoch pay had already left the treasury by the time
-   // this ran, so there was nothing outstanding for it to spend into.
+   // Node-owner vesting draws on the SAME `sysio` WIRE balance that backs owed epoch pay -- `payclaims`
+   // credited and not yet pulled, and batch emission still settling -- so it spends only what the
+   // epoch readiness gate also treats as spendable. Those amounts are promises this contract has
+   // made; this withdrawal is a claim on the free remainder. Without the reserve the two overdraw
+   // each other: a later `claimpay` or settlement step could not pay out, and `payepoch` would stay
+   // balance-blocked.
    //
    // Rejecting rather than capping keeps `claimed` exactly in step with what was transferred; the
    // claim stays fully available and succeeds once claims are pulled or emissions refill the
    // treasury. `claimnodedis` is user-initiated, so the throw reaches the caller who asked.
    payclaimtot_t nd_tot_tbl(get_self());
-   const int64_t nd_outstanding =
-      static_cast<int64_t>(nd_tot_tbl.get_or_default(pay_claim_total{}).outstanding);
-   const int64_t nd_spendable = get_wire_balance(get_self()) - nd_outstanding;
+   t5state_t     nd_t5_tbl(get_self());
+   const int64_t nd_spendable = emissions::spendable_wire(get_wire_balance(get_self()),
+                                                          nd_tot_tbl.get_or_default(pay_claim_total{}),
+                                                          nd_t5_tbl.get_or_default(t5_state{}));
    sysio::check(info.claimable.amount <= nd_spendable,
-                "treasury balance is reserved against unclaimed epoch pay; try again later");
+                "treasury balance is reserved against owed epoch pay; try again later");
 
    nodedist.modify(same_payer, pk, [&](auto& mrow) {
       mrow.claimed += info.claimable;
@@ -728,21 +742,25 @@ void system_contract::rcrdduty(uint32_t /*epoch_index*/, std::vector<sysio::name
    if (state) t5s.set(*state, get_self());
 }
 
-// settleduty - one bounded step of the open batch-duty settlement. Inline from
-// sysio.epoch::tickeconomy every economic epoch; a no-op when none is open.
+// settleduty - one bounded step of the open batch-duty settlement, then pruning of obsolete duty rows
+// with the rest of the step's budget. Inline from sysio.epoch::tickeconomy every economic epoch.
 void system_contract::settleduty() {
    require_auth(epoch_refs::account);
 
    dutystate_t duty_tbl(get_self());
    if (!duty_tbl.exists()) return;
    auto duty = duty_tbl.get();
-   if (!duty.settling()) return;
+   if (!duty.settling()) {
+      prune_obsolete_duty(get_self(), duty, MAX_DUTY_SETTLEMENT_ROWS);
+      return;
+   }
 
    t5state_t t5s(get_self());
    if (!t5s.exists()) return;
    auto state = t5s.get();
 
-   step_settlement(get_self(), duty, state);
+   const uint32_t paid_rows = step_settlement(get_self(), duty, state);
+   prune_obsolete_duty(get_self(), duty, MAX_DUTY_SETTLEMENT_ROWS - paid_rows);
 
    duty_tbl.set(duty, get_self());
    t5s.set(state, get_self());

@@ -860,7 +860,9 @@ enqueue_result try_enqueue_withdraw(name account,
       };
    }
 
-   const uint32_t economic_epoch  = sysio::epoch::current_economic_epoch_index();
+   // The economic wait counts boundaries after the request, so it starts from the grid's epoch at the
+   // request, not the last one ticked: catch-up ticks for boundaries already past must not count.
+   const uint32_t economic_epoch  = sysio::epoch::economic_epoch_index_at(current_time_point());
    const uint32_t consensus_epoch = sysio::epoch::current_epoch_index();
    uint64_t request_id = next_withdraw_id();
 

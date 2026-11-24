@@ -73,10 +73,13 @@ inline std::optional<economic_clock_view> decode_economic_clock(const fc::varian
 }
 
 /// The economic epoch indexes due at `now`, oldest first, at most `limit`. Each later boundary is the
-/// previous one plus the configured duration, the same grid `tickeconomy` walks.
-inline std::vector<uint32_t> economic_epochs_due(const economic_clock_view& clock, fc::time_point now,
-                                                 uint32_t limit) {
+/// previous one plus the configured duration, the same grid `tickeconomy` walks. None before the
+/// consensus genesis advance (`consensus_epoch_index` 0), which `tickeconomy` waits for; a dispute
+/// pause does not hold the economic clock.
+inline std::vector<uint32_t> economic_epochs_due(const economic_clock_view& clock, uint32_t consensus_epoch_index,
+                                                 fc::time_point now, uint32_t limit) {
    std::vector<uint32_t> due;
+   if (consensus_epoch_index == 0) return due;
    fc::time_point boundary = clock.next_boundary;
    for (uint32_t index = clock.current_epoch_index + 1; due.size() < limit && now >= boundary; ++index) {
       due.push_back(index);

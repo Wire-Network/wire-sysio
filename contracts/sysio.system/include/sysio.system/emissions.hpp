@@ -283,6 +283,15 @@ struct [[sysio::table("t5state"), sysio::contract("sysio.system")]] t5_state {
 
 using t5state_t = sysio::kv::global<"t5state"_n, t5_state>;
 
+/// sysio's WIRE `balance` less what is already owed out of it -- pay credited by payepoch and not yet
+/// pulled, and the batch emission still settling -- floored at 0. The emissions readiness gate and
+/// `claimnodedis` both spend only this amount, so neither can draw on WIRE the other has committed.
+inline int64_t spendable_wire(int64_t balance, const pay_claim_total& claims, const t5_state& state) {
+   const __int128 spendable = static_cast<__int128>(balance) - static_cast<__int128>(claims.outstanding)
+                            - static_cast<__int128>(state.unsettled_batch_emission);
+   return spendable > 0 ? static_cast<int64_t>(spendable) : 0;
+}
+
 // ---------------------------------------------------------------------------
 // Batch-operator duty. Each consensus epoch close credits one duty unit to every member of the
 // group that was on duty (rcrdduty); each payepoch closes the open pay period and splits its batch
@@ -295,17 +304,25 @@ struct batch_duty_key {
    SYSLIB_SERIALIZE(batch_duty_key, (account_name))
 };
 
+/// `batchduty`'s `byperiod` key: rows ordered by period, then account.
+inline uint128_t duty_period_key(uint32_t period, uint64_t account) {
+   return (static_cast<uint128_t>(period) << 64) | static_cast<uint128_t>(account);
+}
+
 /// One batch operator's unpaid duty. The row exists only while it holds unpaid units; settlement
-/// erases it.
+/// erases it, and a row of a period that closed without a settlement is pruned by `settleduty`.
 struct [[sysio::table("batchduty"), sysio::contract("sysio.system")]] batch_duty {
    sysio::name account_name;
    uint32_t    period = 0;   ///< pay period the units belong to (duty_state::open_period when credited)
    uint32_t    units  = 0;   ///< consensus epochs served on duty in that period
 
+   uint128_t by_period() const { return duty_period_key(period, account_name.value); }
+
    SYSLIB_SERIALIZE(batch_duty, (account_name)(period)(units))
 };
 
-using batchduty_t = sysio::kv::table<"batchduty"_n, batch_duty_key, batch_duty>;
+using batchduty_t = sysio::kv::table<"batchduty"_n, batch_duty_key, batch_duty,
+   sysio::kv::index<"byperiod"_n, sysio::const_mem_fun<batch_duty, uint128_t, &batch_duty::by_period>>>;
 
 /// Duty accounting: the open pay period and, while one is being paid out, the settling period.
 /// A period number is only an accounting label, independent of both clocks.
@@ -317,7 +334,7 @@ struct [[sysio::table("dutystate"), sysio::contract("sysio.system")]] duty_state
    uint64_t settling_units       = 0;   ///< duty units of the settling period
    int64_t  settling_paid        = 0;   ///< credited to the settling period's operators so far
    uint32_t settling_epoch_index = 0;   ///< economic epoch that paid it (its epochlog row)
-   uint64_t settle_cursor        = 0;   ///< batchduty key the next settlement step starts at
+   uint64_t settle_cursor        = 0;   ///< account the next settlement step starts at, within the settling period
 
    bool settling() const { return settling_period != 0; }
 
@@ -379,12 +396,21 @@ inline int64_t net_headroom(const emission_config& cfg, const t5_state& state) {
    return gross_headroom(cfg, state) - state.pending_emission_amount - state.unsettled_batch_emission;
 }
 
+/// Whether the next accrual is one of the first pay period's scheduled epochs, which accrue the initial emission: no
+/// payout has run, and the last epoch accrued, if any, was not yet that period's pay epoch. A first payout held or
+/// deferred past its pay epoch therefore decays from then on, as it would have after paying.
+inline bool in_initial_emission_window(const emission_config& cfg, const t5_state& state) {
+   if (state.epoch_count != 0) return false;
+   if (state.last_epoch_index == 0) return true;
+   return uint64_t{state.last_epoch_index} + 1 < uint64_t{state.period_start_epoch} + cfg.pay_cadence_epochs;
+}
+
 /// The per-epoch share the next accrual commits, capped at the net headroom.
 ///
-/// The first pay period (epoch_count == 0) accrues the scaled initial emission; later periods decay the last positive
-/// share, clamped to the per-epoch min and max. The share is 0 once the open period has committed the rest of the
-/// budget, or when the curve itself is 0. Shared by sysio.epoch's readiness gate, which accrues it, and viewepoch,
-/// which reports it, so the estimate cannot drift from the accrual.
+/// The first pay period's scheduled epochs (in_initial_emission_window) accrue the scaled initial emission; every
+/// later accrual decays the last positive share, clamped to the per-epoch min and max. The share is 0 once the open
+/// period has committed the rest of the budget, or when the curve itself is 0. Shared by sysio.epoch's readiness gate,
+/// which accrues it, and viewepoch, which reports it, so the estimate cannot drift from the accrual.
 ///
 /// epoch_duration_sec must be the canonical value from sysio.epoch::economycfg.
 inline int64_t compute_epoch_emission(const emission_config& cfg,
@@ -394,7 +420,7 @@ inline int64_t compute_epoch_emission(const emission_config& cfg,
    if (headroom <= 0) return 0;
 
    int64_t emission = 0;
-   if (state.epoch_count == 0) {
+   if (in_initial_emission_window(cfg, state)) {
       emission = scale_annual_to_epoch(cfg.annual_initial_emission, epoch_duration_sec);
    } else {
       const fp_math::fp_t factor =

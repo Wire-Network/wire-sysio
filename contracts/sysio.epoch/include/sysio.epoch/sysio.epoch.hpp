@@ -215,6 +215,20 @@ namespace sysio {
          return es.exists() ? es.get().current_epoch_index : 0;
       }
 
+      /// The economic epoch the grid is in at `now`: the last one whose boundary has passed, counting
+      /// boundaries `tickeconomy` has not yet processed. Equals `current_economic_epoch_index()` while
+      /// the crank keeps up. 0 before the first boundary or when the clock is not configured. Never throws.
+      static uint32_t economic_epoch_index_at(time_point now) {
+         economycfg_t cfg_tbl(EPOCH_ACCOUNT);
+         if (!cfg_tbl.exists()) return 0;
+         const economic_config cfg   = cfg_tbl.get();
+         const economic_state  state = economystate_t(EPOCH_ACCOUNT).get_or_default(economic_state{});
+         const time_point next = state.current_epoch_index == 0 ? time_point{cfg.start_time} : state.next_epoch_start;
+         if (now < next) return state.current_epoch_index;
+         const int64_t duration_us = static_cast<int64_t>(cfg.epoch_duration_sec) * 1'000'000;
+         return state.current_epoch_index + 1 + static_cast<uint32_t>((now - next).count() / duration_us);
+      }
+
       /// Bounds on the consensus `epoch_duration_sec`. The floor keeps an epoch longer than the
       /// relay's round trip to the slowest outpost; the ceiling stops a governance typo from setting
       /// a multi-year epoch.

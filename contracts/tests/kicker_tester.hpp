@@ -25,6 +25,8 @@ class kicker_tester : public sysio_liq_tester {
 public:
    static constexpr auto KICKER = "sysio.kicker"_n;
    static constexpr auto EPOCH = "sysio.epoch"_n;
+   /// Both clocks' epoch length: the consensus epoch and the economic grid.
+   static constexpr uint32_t EPOCH_DURATION_SEC = 60;
    static constexpr uint64_t seed = 75'000 * UNIT;
    static constexpr uint64_t holder = 25'000 * UNIT;
    static constexpr uint64_t budget = 1'000'000 * UNIT;
@@ -39,10 +41,9 @@ public:
       deploy(SYSIO_ACCOUNT, contracts::system_wasm(), contracts::system_abi(), system_ser, true);
       deploy(EPOCH, contracts::epoch_wasm(), contracts::epoch_abi(), epoch_ser, true);
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH, epoch_ser, EPOCH, "setconfig"_n, mvo()
-         ("epoch_duration_sec", 60)("operators_per_epoch", 7)("batch_operator_minimum_active", 21)
+         ("epoch_duration_sec", EPOCH_DURATION_SEC)("operators_per_epoch", 7)("batch_operator_minimum_active", 21)
          ("batch_op_groups", 3)("epoch_retention_envelope_log_count", 1000)));
-      BOOST_REQUIRE_EQUAL(success(), push(EPOCH, epoch_ser, EPOCH, "seteconomy"_n, mvo()
-         ("epoch_duration_sec", 60)("start_time", fc::time_point_sec(control->head().block_time()))));
+      BOOST_REQUIRE_EQUAL(success(), anchor_economy());
       const auto emission = mvo()
          ("t1_allocation", 0)("t2_allocation", 0)("t3_allocation", 0)
          ("t1_duration", 1)("t2_duration", 1)("t3_duration", 1)("min_claimable", 0)
@@ -225,10 +226,17 @@ public:
       write_global("t5state"_n, "t5_state", state);
       write_global("payclaimtot"_n, "pay_claim_total", mvo()("outstanding", claims));
    }
-   /// Open consensus genesis, then tick economic epoch 1. With `pay_cadence_epochs == 1` it is a pay
-   /// epoch, so the emissions gate either pays the period or records why it held it.
+   /// Start the economic grid at the head block time. Allowed until the first economic tick.
+   action_result anchor_economy() {
+      return push(EPOCH, epoch_ser, EPOCH, "seteconomy"_n, mvo()
+         ("epoch_duration_sec", EPOCH_DURATION_SEC)("start_time", fc::time_point_sec(control->head().block_time())));
+   }
+   /// Open consensus genesis, then tick economic epoch 1 on a grid anchored at this tick, so the fixture's waits do
+   /// not leave the crank behind. With `pay_cadence_epochs == 1` it is a pay epoch, so the emissions gate either pays
+   /// the period or records why it held it.
    action_result open_first_pay_epoch() {
       if (auto result = push(EPOCH, epoch_ser, EPOCH, "advance"_n, mvo()); result != success()) return result;
+      if (auto result = anchor_economy(); result != success()) return result;
       return push(EPOCH, epoch_ser, EPOCH, "tickeconomy"_n, mvo()("epoch_index", 1));
    }
 };
