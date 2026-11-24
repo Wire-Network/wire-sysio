@@ -85,15 +85,21 @@ endif()
 # Boost.Test arguments of every unit_test entry: a detailed report, and each test unit's start and end, messages,
 # warnings and failures logged; passed checks are not.
 set(UNIT_TEST_ARGS --report_level=detailed --log_level=test_suite --color_output)
-# Runtime-independent suites are registered once rather than once per WASM runtime.
-add_p_test(NAME protocol_feature_digest_unit_test
-           COMMAND unit_test --run_test=protocol_feature_digest_tests ${UNIT_TEST_ARGS})
-add_p_test(NAME sysvmoc_signal_handler_unit_test
-           COMMAND unit_test --run_test=sysvmoc_signal_handler_tests ${UNIT_TEST_ARGS})
-add_p_test(NAME sysvmoc_code_cache_unit_test
-           COMMAND unit_test --run_test=sysvmoc_code_cache_tests ${UNIT_TEST_ARGS})
-add_p_test(NAME thread_stack_size_unit_test
-           COMMAND unit_test --run_test=thread_stack_size_tests ${UNIT_TEST_ARGS})
+# Suites that run no WASM, so that the runtime does not matter to them: one entry each, <suite>_unit_test.
+string(CONCAT UNIT_TEST_NO_RUNTIME_SUITES
+    "^(authority_checker|be_key_codec|blake3_encoder|block_header|block_header_state|block_log_extraction|"
+    "block_timestamp|chainbase_fast_path|crypto_golden|ed25519|finality_core|finality_misc|int128|merkle_tree|name|"
+    "protocol_feature_digest|resource_limits|softfloat_golden|softfloat_thread_local|sysvmoc_code_cache|"
+    "sysvmoc_signal_handler|thread_stack_size|transaction_dedup|wasm_jit_serialization)_tests?$")
+# Suites whose checks depend on wall-clock time: transaction deadlines and interrupts through the platform timer, and
+# CPU measured as elapsed time. They run alone, so other tests' load does not move those times.
+set(UNIT_TEST_TIMED_SUITES
+    "^(abi|bls_primitives|checktime|crypto_primitives|platform_timer|receiver_cpu_billing)_tests$")
+boost_test_discover_tests(unit_test
+        NAME @NAME@_unit_test
+        NAME_STRIP "s$" "_test$"
+        INCLUDE "${UNIT_TEST_NO_RUNTIME_SUITES}"
+        ARGS ${UNIT_TEST_ARGS})
 # One entry per suite per runtime, <suite without _tests>_unit_test_<runtime>, discovered from the built executable.
 # To run unit_test with all log from blockchain displayed, put "--verbose" after "--", i.e. "unit_test -- --verbose".
 # COST starts the longest suites first, even on a fresh run before ctest has measured them.
@@ -101,12 +107,19 @@ boost_test_discover_tests(unit_test
         NAME @NAME@_unit_test_@RUNTIME@
         NAME_STRIP "s$" "_test$"
         RUNTIMES ${UNIT_TEST_RUNTIMES}
-        # Registered above without a runtime.
-        EXCLUDE "^(protocol_feature_digest|sysvmoc_signal_handler|sysvmoc_code_cache|thread_stack_size)_tests$"
+        EXCLUDE "${UNIT_TEST_NO_RUNTIME_SUITES}|${UNIT_TEST_TIMED_SUITES}"
         ARGS ${UNIT_TEST_ARGS}
-        COST_BY_NAME "^(api_part[1-3]|checktime|wasm_part[1-3]|wasm_config_part[1-5])$" 5000
+        COST_BY_NAME "^(api_part[1-3]|wasm_part[1-3]|wasm_config_part[1-5])$" 5000
              "^(snapshot_part[12]|finality)$" 4000
              "^delay$" 3000)
+# RUN_SERIAL: ctest holds these until no other test is running, then runs them one at a time.
+boost_test_discover_tests(unit_test
+        NAME @NAME@_unit_test_@RUNTIME@
+        NAME_STRIP "s$" "_test$"
+        RUNTIMES ${UNIT_TEST_RUNTIMES}
+        INCLUDE "${UNIT_TEST_TIMED_SUITES}"
+        ARGS ${UNIT_TEST_ARGS}
+        PROPERTIES RUN_SERIAL TRUE)
 if("sys-vm-oc" IN_LIST UNIT_TEST_RUNTIMES)
   # The wasm_part suites also run on sys-vm-oc without fsgsbase instructions.
   boost_test_discover_tests(unit_test
@@ -137,9 +150,7 @@ add_test(NAME kv_doc_links_unit_test_check
          COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/check_kv_doc_test_links.py --unit-test $<TARGET_FILE:unit_test>
                  ${CMAKE_SOURCE_DIR}/docs/kv-behavior-spec.md ${CMAKE_SOURCE_DIR}/docs/kv-security-audit.md)
 # Include every unit_test entry, including the runtime-independent suites.
-string(CONCAT ctest_tests
-    "'_unit_test_|^(protocol_feature_digest|sysvmoc_signal_handler|"
-    "sysvmoc_code_cache|thread_stack_size)_unit_test' -LE wasm_spec_tests -j8")
+set(ctest_tests "'_unit_test(_|$)' -LE wasm_spec_tests -j8")
 
 ### COVERAGE TESTING ###
 if(ENABLE_COVERAGE_TESTING)
