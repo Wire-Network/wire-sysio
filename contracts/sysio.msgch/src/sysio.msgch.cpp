@@ -1518,8 +1518,8 @@ void msgch::queueout(uint64_t chain_code,
 //  first, FIFO within a lane) into a single outbound envelope, up to
 //  MAX_ENVELOPE_BYTES and MAX_ENVELOPE_ATTESTATIONS; the rest stay READY and
 //  ride the next epoch's `buildenv` call. Mirrors the Solana
-//  (`emit_outbound_inner`) and Ethereum (`emitOutboundEnvelope`) packing-loop
-//  pattern — never drop, never refuse, always emit what fits.
+//  (`emit_outbound_inner`) packing loop — never drop, never refuse, always
+//  emit what fits.
 //
 //  Each envelope chains from its predecessor on the same outpost stream:
 //  `previous_envelope_hash` carries the prior emit's canonical epoch digest

@@ -24,7 +24,7 @@ namespace sysio {
 
       /// Hard cap on an encoded envelope in both directions, mirroring the Solana
       /// (`opp_outpost::MAX_ENVELOPE_BYTES`) and Ethereum (`OPP.MAX_ENVELOPE_BYTES`) caps. Ethereum is
-      /// the binding constraint: a cold `emitOutboundEnvelope` of a near-64-KiB envelope exceeds the
+      /// the binding constraint: delivering a near-64-KiB envelope to `OPPInbound.epochIn` exceeds the
       /// EIP-7825 per-transaction gas cap. Inbound, `deliver` rejects anything larger.
       static constexpr size_t MAX_ENVELOPE_BYTES = 32'768;
 

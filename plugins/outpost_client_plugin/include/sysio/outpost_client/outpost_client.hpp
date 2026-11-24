@@ -21,12 +21,11 @@ namespace sysio {
 /// `OPPCommon.MAX_ENVELOPE_BYTES`, and the depot's `sysio.msgch` packing cap —
 /// the e2e-supported WIRE / Ethereum / Solana envelope boundary.
 ///
-/// MIRROR DUTY — never let one side differ. Reduced 65'536 -> 32'768: a cold
-/// near-64-KiB `emitOutboundEnvelope` on Ethereum costs ~45 M gas, roughly 2.7x
-/// EIP-7825's 16'777'216 per-transaction cap, so an envelope that large is
-/// undeliverable by construction. Every derived guard in the clients (hex
-/// bounds, JSON-RPC response ceilings, Solana chunk counts) follows from this
-/// single declaration.
+/// MIRROR DUTY — never let one side differ. Bound on Solana by the BPF heap the
+/// receiving chain's finalize path uses, and on Ethereum by EIP-7825's
+/// 16'777'216-gas per-transaction cap on the inbound delivery that carries an
+/// envelope. Every derived guard in the clients (hex bounds, JSON-RPC response
+/// ceilings, Solana chunk counts) follows from this single declaration.
 inline constexpr size_t OPP_MAX_ENVELOPE_BYTES = 32'768;
 
 /**
@@ -122,18 +121,19 @@ public:
     * @brief OPP INBOUND — pull the envelope the remote chain has produced for
     *        this epoch and return its raw protobuf bytes.
     *
-    * Filters by `epoch_index` internally. Ethereum and Solana each expose a
-    * single latest-outbound storage slot, so a poll may still observe the
-    * preceding epoch until the delivery that emits this one overwrites it.
-    * Delivering that stale envelope to `sysio.msgch::deliver` trips an
-    * `envelope epoch_index mismatch` assertion.
+    * Filters by `epoch_index` internally: only that epoch's envelope is ever
+    * returned, since delivering another to `sysio.msgch::deliver` trips an
+    * `envelope epoch_index mismatch` assertion. A client may have work to do
+    * before the envelope can be read — the Ethereum outpost publishes an
+    * envelope only when a relay hands it the epoch's messages, which its client
+    * does from here — and returns empty until it can.
     *
     * @param epoch_index  Only envelopes whose `epoch_index` field matches this
     *                     value are returned; all others are silently dropped.
     * @param deadline     Upper bound on the total time spent talking to the
     *                     remote chain for this call.
     * @return Raw `opp::Envelope` bytes ready for `sysio.msgch::deliver`, or an
-    *         empty vector if the latest slot did not match.
+    *         empty vector while this epoch's envelope is not yet readable.
     * @throws fc::exception on RPC failure or deadline expiry.
     */
    virtual std::vector<char> read_inbound_envelope(uint32_t         epoch_index,

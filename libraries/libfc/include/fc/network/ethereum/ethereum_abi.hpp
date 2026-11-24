@@ -146,6 +146,8 @@ struct component_type {
    std::string internal_type{""};
    list_config_type list_config{};
    std::vector<component_type> components{};
+   /// An event parameter carried in a log topic rather than in the log's data. Only event inputs set it.
+   bool indexed{false};
    bool is_dynamic() const {
       // IF CONTAINER WITH DYNAMIC CHILD (AT ANY DEPTH)
       if (is_container() && std::ranges::any_of(components, [](const auto& c) { return c.is_dynamic(); }))
@@ -309,7 +311,7 @@ struct get_typename<fc::network::ethereum::abi::data_type> {
 FC_REFLECT_ENUM(fc::network::ethereum::abi::invoke_target_type, (function)(constructor)(event)(error)(receive)(fallback));
 
 FC_REFLECT(fc::network::ethereum::abi::component_type::list_config_type, (is_list)(size));
-FC_REFLECT(fc::network::ethereum::abi::component_type, (name)(type)(list_config)(components)(internal_type));
+FC_REFLECT(fc::network::ethereum::abi::component_type, (name)(type)(list_config)(components)(internal_type)(indexed));
 FC_REFLECT(fc::network::ethereum::abi::contract, (name)(type)(inputs)(outputs));
 
 namespace fc {

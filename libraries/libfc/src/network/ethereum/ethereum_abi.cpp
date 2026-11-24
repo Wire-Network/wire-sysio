@@ -1062,6 +1062,10 @@ void fc::from_variant(const fc::variant& var, fc::network::ethereum::abi::compon
       vo.internal_type = obj["internalType"].as_string();
    }
 
+   if (obj.contains("indexed")) {
+      vo.indexed = obj["indexed"].as_bool();
+   }
+
    if (obj.contains("components")) {
       vo.components.clear();
 

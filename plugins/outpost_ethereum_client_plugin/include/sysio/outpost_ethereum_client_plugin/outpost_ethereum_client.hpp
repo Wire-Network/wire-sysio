@@ -29,7 +29,8 @@ struct dispatch_spill {
    uint16_t dispatched = 0;
    /// Every attestation has been routed.
    bool     complete   = false;
-   /// The outbound envelope has been emitted and `nextEpochIndex` advanced.
+   /// The outbound envelope answering the epoch has been finalized and
+   /// `nextEpochIndex` advanced.
    bool     finalized  = false;
 };
 
@@ -60,48 +61,24 @@ enum class delivery_settlement {
 delivery_settlement classify_settlement(std::string_view own_digest, std::string_view settled_digest,
                                         bool tipped);
 
-/// Decoded `OPPInbound.pendingConsensusForDigest(bytes32)` view result.
-struct pending_consensus {
-   /// The epoch the outpost is accepting.
-   uint32_t next_epoch         = 0;
-   /// Deliveries recorded for the digest in that epoch.
-   uint32_t agreeing           = 0;
-   /// Members of the group scheduled for that epoch.
-   uint32_t group_size         = 0;
-   /// `block.timestamp` at which the outpost's current epoch began.
-   uint64_t epoch_started_at   = 0;
-   /// The outpost's mirror of the depot's `epoch_duration_sec`.
-   uint32_t epoch_duration_sec = 0;
-};
-
-/// The contract's path-2 predicate (`.claude/rules/opp-consensus.md`): the
-/// boundary has elapsed and a strict majority of the group agrees. A
-/// re-delivery sent while this is false is a paid no-op; one sent while it is
-/// true re-runs the tip and settles the epoch.
-///
-/// @param consensus  the view, read for the digest this relay delivered.
-/// @param now_sec    wall clock, seconds since the epoch.
-bool majority_tip_reachable(const pending_consensus& consensus, uint64_t now_sec);
-
 /// What the relay should do about the epoch it is holding, given the outpost's
 /// view of that epoch.
 enum class delivery_action {
    /// Nothing recorded and the epoch has not tipped: deliver the envelope.
    deliver,
-   /// This relay's delivery is recorded, the epoch has not tipped, and the
-   /// contract's path-2 predicate holds: re-send the same envelope so the
-   /// outpost re-runs the tip (idempotent on a same-digest re-delivery).
-   retry_consensus,
-   /// This relay's delivery is recorded and the epoch has not tipped; a
-   /// re-delivery would change nothing until more of the group delivers (or,
-   /// before the outpost's own boundary, until that boundary passes).
+   /// This relay's delivery is recorded and the epoch has not tipped. The
+   /// outpost tips on the delivery that brings a strict majority of the group
+   /// to one digest, so the tip waits on the rest of the group; a re-delivery
+   /// is a no-op the contract does not even record.
    await_peers,
-   /// The epoch tipped on THIS relay's digest and is not finished: re-supply
-   /// the envelope so the outpost dispatches the next stretch.
+   /// The epoch tipped and is not finished, and this relay may carry it on:
+   /// its delivery is the settled digest, or it never delivered (a late
+   /// member of the group, which the outpost admits with the agreed bytes).
+   /// Re-supply the envelope so the outpost dispatches the next stretch.
    continue_dispatch,
-   /// The epoch tipped on a digest this relay did not deliver. Only a relay
-   /// whose recorded delivery matches the settled digest may continue it, so
-   /// there is nothing for this one to send.
+   /// The epoch tipped on a digest other than the one this relay delivered: a
+   /// minority envelope, which the outpost refuses to resume from, so there is
+   /// nothing for this one to send.
    wait_for_deliverer,
    /// The outpost has already finalized this epoch: nothing to send.
    already_finalized,
@@ -120,17 +97,17 @@ bool same_evm_address(std::string_view lhs, std::string_view rhs);
 /// Pure and side-effect free so the table is unit-testable without an EVM
 /// node; the caller performs whichever RPC the verdict names.
 ///
+/// The outpost keeps no time: nothing here depends on when the epoch began
+/// or how long the depot's epochs last.
+///
 /// @param next_epoch_index   the outpost's `nextEpochIndex()`.
 /// @param epoch_index        WIRE epoch being delivered.
 /// @param spill              the outpost's `dispatchSpill(epoch_index)`.
 /// @param settlement         this relay's delivery record, see `classify_settlement`.
-/// @param majority_reachable `majority_tip_reachable` for the digest this relay
-///                           delivered; consulted only for a recorded, untipped epoch.
 delivery_action decide_delivery(uint32_t              next_epoch_index,
                                 uint32_t              epoch_index,
                                 const dispatch_spill& spill,
-                                delivery_settlement   settlement,
-                                bool                  majority_reachable);
+                                delivery_settlement   settlement);
 
 /// Everything the relay reads about one epoch at ONE block, so the pieces
 /// cannot disagree with each other.
@@ -207,7 +184,8 @@ struct delivery_receipt_summary {
    /// `EpochDispatchProgressed(epoch, dispatched)`: where the call's dispatch
    /// stopped, when it dispatched at all.
    std::optional<uint16_t> dispatched;
-   /// `EpochComplete(epoch)`: the call emitted and finalized the epoch.
+   /// `EpochComplete(epoch)`: the call finalized the epoch's outbound envelope
+   /// and closed it.
    bool                    finalized  = false;
 };
 
@@ -339,6 +317,36 @@ ethereum_transaction_fees outbid_fees(const ethereum_client::gas_config_t& marke
 std::optional<fc::uint256> first_unaccounted_nonce(const fc::uint256& latest, const fc::uint256& pending,
                                                    const std::vector<ethereum_submission>& submissions);
 
+/// A point on OPP's outbound hash chain: the chain hash after the `message_end`-th message (exclusive end of the
+/// range it closes). The chain is `h_n = keccak256(h_{n-1} || keccak256(message_n))` from `h_0 = 0`.
+struct outbound_chain_point {
+   /// The chain hash, a normalised word.
+   std::string chain_hash;
+   /// Messages the chain had folded in at this point.
+   uint64_t    message_end = 0;
+};
+
+/// Decoded `OPP.getFinalizedOutbound(uint32)`: the envelope the outpost's consensus tip closed for an epoch, and
+/// where to find its messages and its publication.
+struct finalized_outbound {
+   /// Where the envelope ends on the outbound chain.
+   outbound_chain_point end;
+   /// The envelope's `epochTimestamp`, in milliseconds. Non-zero for every finalized epoch.
+   uint64_t             timestamp_ms        = 0;
+   /// The block the envelope's first message was emitted in; zero for an envelope with no messages.
+   uint64_t             first_message_block = 0;
+   /// The block it was published in; zero until it is.
+   uint64_t             published_block     = 0;
+};
+
+/// Fold `messages`, in order, into OPP's outbound chain from `start`: the chain point the outpost will compare a
+/// publication against.
+///
+/// @param start    where the chain stands before the first message, a normalised word.
+/// @param messages the encoded messages, as their `OutboundMessage` events carried them.
+/// @return the chain hash after the last message, a normalised word; `start` itself for no messages.
+std::string outbound_chain_hash(std::string_view start, const std::vector<std::vector<char>>& messages);
+
 } // namespace outpost_ethereum_client_detail
 
 /**
@@ -392,14 +400,24 @@ public:
                                          const std::vector<char>& envelope_bytes,
                                          fc::microseconds         deadline) override;
 
-   /// `OPP.getLatestOutboundEnvelope()` at the client's read confirmation (`read_settled_block`): the envelope the
-   /// outpost emitted for `epoch_index`, or empty while the slot holds another epoch.
+   /// The envelope the outpost published for `epoch_index`, read at the client's read confirmation
+   /// (`read_settled_block`): the `OPPEnvelope` log in the block `getFinalizedOutbound(epoch_index)` names.
+   ///
+   /// Publishing is part of reading. While the epoch is finalized but unpublished, and it is the next to publish,
+   /// this relay publishes it: the `OutboundMessage` logs from the envelope's first-message block on, re-chained
+   /// here against the finalized end before anything is paid for, are handed to
+   /// `OPP.publishOutboundEnvelope`. The call then returns empty and the next poll reads the publication once it
+   /// is as deep as the read confirmation. Anyone may publish, and the outpost refuses every list but the
+   /// finalized one, so relays racing to publish cost at most a no-op.
+   ///
+   /// @return The envelope bytes, or empty while the epoch is not finalized, not yet published at the read
+   ///         confirmation, or its record has left the outpost's retention window.
+   /// @throws fc::exception on transport failure, deadline expiry, or a publication the outpost refuses.
    std::vector<char> read_inbound_envelope(uint32_t         epoch_index,
                                            fc::microseconds deadline) override;
 
    /// `OPP.outboundEnvelopes(epoch)` at the client's read confirmation (`read_settled_block`): the checksum the
-   /// outpost recorded when it emitted that epoch's envelope. Throws when the loaded OPP ABI does not declare the
-   /// view.
+   /// outpost recorded when it published that epoch's envelope.
    std::optional<fc::sha256> read_emitted_envelope_digest(uint32_t         epoch_index,
                                                           fc::microseconds deadline) override;
 
@@ -507,11 +525,30 @@ private:
    epoch_in_receipt send_epoch_in(uint32_t epoch_index, const std::string& envelope_hex, uint64_t gas_budget,
                                   fc::time_point deadline_abs);
 
-   /// Read `OPPInbound.pendingConsensusForDigest(digest)` at `block` and decode it.
-   /// @throws fc::exception on transport failure, deadline expiry, or an
-   ///         unparsable response.
-   outpost_ethereum_client_detail::pending_consensus read_pending_consensus(const std::string& digest_word,
-                                                                            const fc::uint256& block);
+   /// `OPP.getFinalizedOutbound(epoch_index)` at `block`, or `std::nullopt` when the outpost holds no finalized
+   /// record for it: not finalized yet, or pruned past its retention window.
+   /// @throws fc::exception on transport failure or an unparsable response.
+   std::optional<outpost_ethereum_client_detail::finalized_outbound>
+   read_finalized_outbound(uint32_t epoch_index, const fc::network::ethereum::block_number_or_tag_t& block);
+
+   /// The envelope for `epoch_index` among the `OPPEnvelope` logs of `published_block`, or empty when none of
+   /// them decodes as that epoch's envelope under the platform cap.
+   /// @throws fc::exception on transport failure.
+   std::vector<char> read_published_envelope(uint32_t epoch_index, uint64_t published_block);
+
+   /// The outbound messages `[first, end)` from the `OutboundMessage` logs of blocks `from_block` through
+   /// `to_block`, in stream order, or `std::nullopt` when any of them is missing from that range.
+   /// @throws fc::exception on transport failure or an unparsable log.
+   std::optional<std::vector<std::vector<char>>> read_outbound_messages(
+      uint64_t first, uint64_t end, uint64_t from_block, const fc::network::ethereum::block_number_or_tag_t& to_block);
+
+   /// Publish the outbound epoch after the latest one the outpost published at `settled`, provided it is
+   /// finalized there and no later than `epoch_index`. Publication is ordered, so a relay behind on an earlier
+   /// epoch publishes that one first. Skips the send when the head already shows the epoch published, and when
+   /// the messages read do not chain to the finalized end (reported; a node serving incomplete logs must not
+   /// cost a revert).
+   /// @throws fc::exception on transport failure or a publication the outpost refuses.
+   void publish_next_outbound(uint32_t epoch_index, const fc::network::ethereum::block_number_or_tag_t& settled);
 
    /// The block the reads of what the outpost emitted are made at, from the
    /// client's `read_confirmation`. Across a reorg deeper than the shallower of
