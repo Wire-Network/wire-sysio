@@ -3,6 +3,7 @@
 #include <sysio.chains/sysio.chains.hpp>
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio.liq/sysio.liq.hpp>
+#include <sysio.system/emissions.hpp>
 #include <sysio/slug_name.hpp>
 #include <sysio.opp.common/safe_ops.hpp>
 #include <sysio.opp.common/claimable.hpp>
@@ -37,6 +38,9 @@ void reevaluate_eligibility(opreg::operators_t& ops,
 // System-owned rows bill to the sysio RAM pool, not this contract account (privileged-contract
 // model, as sysio.token uses): the account stays finite at code+abi size; growth draws from the pool.
 constexpr name ram_payer = "sysio"_n;
+
+/// Permission this contract authorizes its inline actions with.
+constexpr name active_permission = "active"_n;
 
 /// Memo on the transfer that moves a `deposit` into the registry's custody.
 constexpr std::string_view deposit_transfer_memo = "opreg::deposit";
@@ -85,6 +89,11 @@ constexpr std::string_view already_serving_msg          = "operator already serv
 constexpr std::string_view still_seated_on_chain_msg =
    "operator still holds a seat in this chain's schedule: it may rejoin once its seats have closed";
 constexpr std::string_view not_serving_msg              = "operator does not serve this chain";
+
+/// Action identifiers owned by sysio.system and invoked by an eviction.
+namespace system_actions {
+constexpr name FORFEIT_DUTY = "forfeitduty"_n;
+} // namespace system_actions
 
 /// Resolve a depot-native collateral `token_code` through the shared resolver, against this
 /// registry's custody contracts (`sysio.token` for WIRE, `sysio.liq` for a shadow LIQ symbol).
@@ -1157,7 +1166,7 @@ void reevaluate_eligibility(opreg::operators_t& ops,
       return;
    }
    action(
-      permission_level{self, "active"_n},
+      permission_level{self, active_permission},
       self, handler,
       std::make_tuple(account, was_eligible, is_eligible)
    ).send();
@@ -1173,7 +1182,7 @@ void reevaluate_eligibility(opreg::operators_t& ops,
 void notify_producer_standing(name self, const opreg::operator_entry& op) {
    if (op.type != OperatorType::OPERATOR_TYPE_PRODUCER) return;
    action(
-      permission_level{self, "active"_n},
+      permission_level{self, active_permission},
       self, "processprod"_n,
       std::make_tuple(op.account, false, false)
    ).send();
@@ -1733,6 +1742,16 @@ void opreg::termcheck(name account, sysio::slug_name chain_code) {
                  + std::to_string(cfg.terminate_max_pct_misses_24h)
                  + "% miss rate";
       members.set(ram_payer, member_key, *membership);
+
+      // The eviction forfeits the operator's unsettled batch duty on this chain; its other chains keep
+      // theirs. No duty is recorded before initt5, so there is nothing to forfeit until then.
+      if (sysiosystem::emissions::records_batch_duty(SYSTEM_ACCOUNT)) {
+         action(
+            permission_level{get_self(), active_permission},
+            SYSTEM_ACCOUNT, system_actions::FORFEIT_DUTY,
+            std::make_tuple(account, chain_code)
+         ).send();
+      }
    }
 }
 

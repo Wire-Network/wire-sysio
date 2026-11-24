@@ -800,15 +800,27 @@ namespace sysiosystem {
 
          /**
           * Credit `duty_seconds` seat-seconds to each of `members`, the batch-operator group that
-          * served consensus epoch `epoch_index` of outpost chain `chain_code`; `duty_seconds` is that
-          * epoch's scheduled length. Every chain's duty accrues to the one open pay period. A member
-          * still holding seat-seconds of the settling period is settled first. A zero `duty_seconds`
-          * credits nothing. Called inline by sysio.epoch::advance; never throws.
-          * Auth: require_auth("sysio.epoch").
+          * served consensus epoch `epoch_index` of outpost chain `chain_code`, on the member's row for
+          * that chain; `duty_seconds` is that epoch's scheduled length. Every chain's duty accrues to
+          * the one open pay period. A member whose sysio.opreg membership of the chain is EVICTED is
+          * credited nothing. A member still holding seat-seconds of the settling period on the chain is
+          * settled first. A zero `duty_seconds` credits nothing. Called inline by sysio.epoch::advance;
+          * never throws. Auth: require_auth("sysio.epoch").
           */
          [[sysio::action]]
          void rcrdduty(sysio::slug_name chain_code, uint32_t epoch_index, std::vector<sysio::name> members,
                        uint32_t duty_seconds);
+
+         /**
+          * Forfeit `account`'s unsettled duty on outpost chain `chain_code`: erase its `batchduty` row
+          * for the chain, whether it belongs to the open or the settling period. The period totals keep
+          * the seat-seconds, so no operator is credited the share and its settlement leaves it in the
+          * treasury. The operator's duty on its other chains is untouched. Called inline by
+          * sysio.opreg::termcheck when it evicts the operator from the chain; never throws.
+          * Auth: require_auth("sysio.opreg").
+          */
+         [[sysio::action]]
+         void forfeitduty(sysio::name account, sysio::slug_name chain_code);
 
          /**
           * Advance the open batch-duty settlement by one bounded step (MAX_DUTY_SETTLEMENT_ROWS

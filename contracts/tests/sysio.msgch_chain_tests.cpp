@@ -172,6 +172,7 @@ constexpr name SET_CONFIG    = "setconfig"_n;
 constexpr name SCHEDULE      = "schbatchgps"_n;
 constexpr name ADVANCE       = "advance"_n;
 constexpr name FINISH_ADVANCE = "finishadv"_n;
+constexpr name TICK_ECONOMY  = "tickeconomy"_n;
 } // namespace epoch_actions
 
 /// sysio.msgch table identifiers used by the WNS-16 fixture.
@@ -272,10 +273,36 @@ namespace system_actions {
 constexpr name SET_PRIVILEGED = "setpriv"_n;
 } // namespace system_actions
 
+/// sysio.system tables the batch-duty assertions read.
+namespace system_tables {
+constexpr name BATCH_DUTY = "batchduty"_n;
+constexpr name DUTY_STATE = "dutystate"_n;
+constexpr name PAY_CLAIMS = "payclaims"_n;
+constexpr name EPOCH_LOG  = "epochlog"_n;
+} // namespace system_tables
+
+/// sysio.system ABI type names used to decode those rows.
+namespace system_abi_types {
+constexpr const char* BATCH_DUTY = "batch_duty";
+constexpr const char* DUTY_STATE = "duty_state";
+constexpr const char* PAY_CLAIM  = "pay_claim";
+constexpr const char* EPOCH_LOG  = "epoch_log";
+} // namespace system_abi_types
+
 namespace system_fields {
 constexpr const char* ACCOUNT = "account";
 constexpr const char* IS_PRIVILEGED = "is_priv";
+constexpr const char* SEAT_SECONDS            = "seat_seconds";
+constexpr const char* BALANCE                 = "balance";
+constexpr const char* OPEN_SEAT_SECONDS       = "open_seat_seconds";
+constexpr const char* SETTLING_PERIOD         = "settling_period";
+constexpr const char* BATCH_EMISSION          = "batch_emission";
+constexpr const char* BATCH_EMISSION_RETAINED = "batch_emission_retained";
+constexpr const char* BATCH_SETTLED           = "batch_settled";
 } // namespace system_fields
+
+/// `tickeconomy`'s refusal of an economic epoch whose boundary is still ahead.
+constexpr std::string_view ECONOMIC_BOUNDARY_NOT_PASSED_ERROR = "economic epoch boundary has not passed";
 
 /// sysio.roa ABI field identifiers used by the empty-electorate retry regression.
 namespace roa_fields {
@@ -670,12 +697,53 @@ public:
          fixture_abi_yield_function());
    }
 
-   /// `account`'s unpaid batch-duty seat-seconds on sysio.system; 0 when it holds none.
-   uint64_t batch_duty_seat_seconds(name account) {
-      const auto data = get_row_by_account(SYSIO_ACCOUNT, SYSIO_ACCOUNT, "batchduty"_n, account);
+   /// `account`'s unpaid batch-duty seat-seconds on `chain_code` in sysio.system; 0 when it holds none there.
+   /// The row key is (account, chain), the `[scope][id]` layout `get_row_by_id` reads.
+   uint64_t batch_duty_seat_seconds(name account, uint64_t chain_code) {
+      const auto data = get_row_by_id(SYSIO_ACCOUNT, account, system_tables::BATCH_DUTY, chain_code);
       if (data.empty()) return 0;
-      return sysio_abi.binary_to_variant("batch_duty", data, fixture_abi_yield_function())["seat_seconds"]
-         .as<uint64_t>();
+      return sysio_abi.binary_to_variant(system_abi_types::BATCH_DUTY, data, fixture_abi_yield_function())
+         [system_fields::SEAT_SECONDS].as<uint64_t>();
+   }
+
+   /// sysio.system's duty accounting singleton (open period, settling period).
+   fc::variant duty_state() {
+      const auto data = get_row_by_id(SYSIO_ACCOUNT, SYSIO_ACCOUNT, system_tables::DUTY_STATE,
+                                      system_tables::DUTY_STATE.to_uint64_t());
+      BOOST_REQUIRE(!data.empty());
+      return sysio_abi.binary_to_variant(system_abi_types::DUTY_STATE, data, fixture_abi_yield_function());
+   }
+
+   /// WIRE credited to `account` in sysio.system's `payclaims` and not yet claimed; 0 when none.
+   int64_t pay_claimable(name account) {
+      const auto data = get_row_by_id(SYSIO_ACCOUNT, SYSIO_ACCOUNT, system_tables::PAY_CLAIMS, account.to_uint64_t());
+      if (data.empty()) return 0;
+      return static_cast<int64_t>(sysio_abi.binary_to_variant(system_abi_types::PAY_CLAIM, data,
+                                                              fixture_abi_yield_function())
+                                     [system_fields::BALANCE].as_uint64());
+   }
+
+   /// Tick the economic clock through every boundary that has passed. A tick behind the grid only accrues;
+   /// the one that reaches it pays the open pay period, opening its batch-duty settlement. Returns the
+   /// economic epoch that paid.
+   uint32_t tick_economy_to_grid() {
+      uint32_t       ticked = 0;
+      action_result  result;
+      while ((result = push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::TICK_ECONOMY,
+                            mvo()(epoch_fields::EPOCH_INDEX, ticked + 1))) == success()) {
+         ++ticked;
+      }
+      BOOST_REQUIRE_NE(std::string::npos, result.find(ECONOMIC_BOUNDARY_NOT_PASSED_ERROR));
+      BOOST_REQUIRE_GT(ticked, 0u);
+      produce_blocks();
+      return ticked;
+   }
+
+   /// sysio.system's audit row of the economic epoch that paid a period.
+   fc::variant epoch_log(uint32_t economic_epoch_index) {
+      const auto data = get_row_by_id(SYSIO_ACCOUNT, SYSIO_ACCOUNT, system_tables::EPOCH_LOG, economic_epoch_index);
+      BOOST_REQUIRE(!data.empty());
+      return sysio_abi.binary_to_variant(system_abi_types::EPOCH_LOG, data, fixture_abi_yield_function());
    }
 
    /// Return whether the epoch contract currently holds `chain_code`'s advancement for an open dispute.
@@ -3210,10 +3278,98 @@ BOOST_FIXTURE_TEST_CASE(eviction_on_one_chain_keeps_the_operator_on_the_other, s
    BOOST_REQUIRE(!seated_on(BATCHOP_D, SOL_OUTPOST_ID));
 } FC_LOG_AND_RETHROW() }
 
+/// An eviction forfeits the operator's unsettled duty on that chain alone. The close that evicts BATCHOP from ETH
+/// erases its ETH duty and credits it nothing for the breaching seat, while the period keeps the forfeited
+/// seat-seconds and its SOL duty keeps accruing. The payout then pays BATCHOP its SOL share alone, and the
+/// forfeited ETH share stays in the treasury.
+BOOST_FIXTURE_TEST_CASE(eviction_forfeits_the_chain_duty_while_the_other_chain_pays, sysio_msgch_chain_tester) { try {
+   // The anchor on both chains, then misses on ETH alone until the consecutive rail fires.
+   constexpr uint32_t kEvictingDuty = 1 + ROTATION_MAX_CONSECUTIVE_MISSES + 1;
+   bootstrap_rotation(ROTATION_WINDOW_MS, /*batchop_is_bootstrapped=*/false, rotation_outposts::eth_and_sol);
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n,
+      mvo()("account", BATCHOP_D.to_string())("type", opp::types::OPERATOR_TYPE_BATCH)("is_bootstrapped", true)));
+   serve_chains({BATCHOP_D}, epoch_chains);
+   produce_blocks();
+
+   // Walk to BATCHOP's evicting duty, delivering it to SOL every time and to ETH only the first time.
+   std::map<uint64_t, inbound_stream_tip> tips;
+   uint32_t duties = 0;
+   for (uint32_t step = 0; step < ROTATION_GROUPS * kEvictingDuty && duties < kEvictingDuty; ++step) {
+      if (duty_member(SOL_OUTPOST_ID) == BATCHOP) {
+         BOOST_REQUIRE_EQUAL(BATCHOP, duty_member(ETH_OUTPOST_ID));
+         std::vector<uint64_t> reached{SOL_OUTPOST_ID};
+         if (duties == 0) reached.push_back(ETH_OUTPOST_ID);
+         ++duties;
+         for (const uint64_t outpost : reached) {
+            auto&      tip      = tips[outpost];
+            const auto envelope = encode_chained_delivery(ROTATION_DELIVERY_PAYLOAD, tip);
+            BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, outpost, envelope));
+            tip = next_stream_tip(envelope);
+         }
+         produce_blocks();
+      }
+      if (duties < kEvictingDuty) advance_to_next_epoch();
+   }
+   BOOST_REQUIRE_EQUAL(kEvictingDuty, duties);
+
+   // Before the evicting close BATCHOP holds one seat of duty per earlier duty on each chain.
+   const uint64_t forfeited_seat_seconds = uint64_t{kEvictingDuty - 1} * EPOCH_DURATION_SEC;
+   BOOST_REQUIRE_EQUAL(std::string(served_status::serving), membership_status(BATCHOP, ETH_OUTPOST_ID));
+   for (const uint64_t chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
+      BOOST_REQUIRE_EQUAL(forfeited_seat_seconds, batch_duty_seat_seconds(BATCHOP, chain));
+   }
+   const uint64_t open_before = duty_state()[system_fields::OPEN_SEAT_SECONDS].as<uint64_t>();
+
+   // The evicting close forfeits the ETH duty and credits only the SOL seat; the period total keeps the forfeit.
+   advance_to_next_epoch();
+   BOOST_REQUIRE_EQUAL(std::string(served_status::evicted), membership_status(BATCHOP, ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(std::string(served_status::serving), membership_status(BATCHOP, SOL_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(0u, batch_duty_seat_seconds(BATCHOP, ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(uint64_t{kEvictingDuty} * EPOCH_DURATION_SEC, batch_duty_seat_seconds(BATCHOP, SOL_OUTPOST_ID));
+   const uint64_t period_seat_seconds = duty_state()[system_fields::OPEN_SEAT_SECONDS].as<uint64_t>();
+   BOOST_REQUIRE_EQUAL(open_before + EPOCH_DURATION_SEC, period_seat_seconds);
+
+   // Each operator's rows settle at the period's rate: pool * seat-seconds / period seat-seconds, per row.
+   const std::vector<name> operators{BATCHOP, BATCHOP_B, BATCHOP_C, BATCHOP_D};
+   std::map<name, std::vector<uint64_t>> rows;
+   for (const name op : operators) {
+      BOOST_REQUIRE_EQUAL(0, pay_claimable(op));
+      for (const uint64_t chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
+         rows[op].push_back(batch_duty_seat_seconds(op, chain));
+      }
+   }
+
+   const uint32_t paid_epoch = tick_economy_to_grid();
+   const auto     log        = epoch_log(paid_epoch);
+   BOOST_REQUIRE(log[system_fields::BATCH_SETTLED].as<bool>());
+   BOOST_REQUIRE_EQUAL(0u, duty_state()[system_fields::SETTLING_PERIOD].as<uint32_t>());
+   const int64_t pool = log[system_fields::BATCH_EMISSION].as<int64_t>();
+   BOOST_REQUIRE_GT(pool, 0);
+   const auto share = [&](uint64_t seat_seconds) {
+      return static_cast<int64_t>(static_cast<__int128>(pool) * seat_seconds / period_seat_seconds);
+   };
+   int64_t paid = 0;
+   for (const name op : operators) {
+      int64_t expected = 0;
+      for (const uint64_t seat_seconds : rows[op]) expected += share(seat_seconds);
+      BOOST_REQUIRE_EQUAL(expected, pay_claimable(op));
+      paid += expected;
+      for (const uint64_t chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
+         BOOST_REQUIRE_EQUAL(0u, batch_duty_seat_seconds(op, chain));
+      }
+   }
+   BOOST_REQUIRE_EQUAL(share(uint64_t{kEvictingDuty} * EPOCH_DURATION_SEC), pay_claimable(BATCHOP));
+   const int64_t retained = log[system_fields::BATCH_EMISSION_RETAINED].as<int64_t>();
+   BOOST_REQUIRE_EQUAL(pool - paid, retained);
+   BOOST_REQUIRE_GE(retained, share(forfeited_seat_seconds));
+} FC_LOG_AND_RETHROW() }
+
 /// An eviction that lands while the member still holds its seat (here an out-of-band `termcheck` as
 /// sysio.epoch, mid-epoch): `deliver` refuses it on that chain, the chain's consensus leaves it out, and
-/// its close records the miss without evaluating it again. It rejoins once that seat has closed, and the
-/// rejoin restarts the rails: the misses that evicted it no longer count.
+/// its close records the miss without evaluating it again. The eviction forfeits its unsettled duty on that
+/// chain and the seat's close credits it none. It rejoins once that seat has closed, and the rejoin restarts
+/// the rails, the misses that evicted it no longer counting, and its duty on the chain, credited afresh from
+/// its first seat after the rejoin.
 BOOST_FIXTURE_TEST_CASE(evicted_member_delivers_nothing_until_it_rejoins_with_fresh_rails,
                         sysio_msgch_chain_tester) { try {
    constexpr uint32_t kPermissiveMaxConsecutiveMisses = 5;
@@ -3235,11 +3391,15 @@ BOOST_FIXTURE_TEST_CASE(evicted_member_delivers_nothing_until_it_rejoins_with_fr
       tip = next_stream_tip(envelope);
    };
 
-   // Epoch 1 delivered everywhere; epoch 2 missed everywhere.
+   // Epoch 1 delivered everywhere; epoch 2 missed everywhere. Both closes credit every seat on each chain.
    deliver_epoch({BATCHOP, BATCHOP_B, BATCHOP_C}, {BATCHOP, BATCHOP_B, BATCHOP_C}, "anchor");
    advance_one_epoch();
    advance_one_epoch();
    BOOST_REQUIRE_EQUAL(std::string(served_status::serving), membership_status(BATCHOP, ETH_OUTPOST_ID));
+   for (const uint64_t outpost : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
+      BOOST_REQUIRE_EQUAL(uint64_t{2 * EPOCH_DURATION_SEC}, batch_duty_seat_seconds(BATCHOP, outpost));
+   }
+   const uint64_t open_before_eviction = duty_state()[system_fields::OPEN_SEAT_SECONDS].as<uint64_t>();
 
    // Epoch 3, BATCHOP seated: evict it from ETH alone.
    const uint32_t evicted_epoch = current_epoch();
@@ -3251,6 +3411,10 @@ BOOST_FIXTURE_TEST_CASE(evicted_member_delivers_nothing_until_it_rejoins_with_fr
    BOOST_REQUIRE_EQUAL(std::string(served_status::evicted), evicted[opreg_fields::STATUS].as_string());
    BOOST_REQUIRE_EQUAL(kHalfSampleReason, evicted[opreg_fields::STATUS_REASON].as_string());
    BOOST_REQUIRE(seated_on(BATCHOP, ETH_OUTPOST_ID));
+   // The eviction forfeited the ETH duty, leaving the period total as it was; the SOL duty stands.
+   BOOST_REQUIRE_EQUAL(0u, batch_duty_seat_seconds(BATCHOP, ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(uint64_t{2 * EPOCH_DURATION_SEC}, batch_duty_seat_seconds(BATCHOP, SOL_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(open_before_eviction, duty_state()[system_fields::OPEN_SEAT_SECONDS].as<uint64_t>());
 
    const auto envelope = encode_chained_delivery("after-eviction", tip);
    BOOST_REQUIRE_EQUAL(error(EVICTED_DELIVERY_ERROR), deliver_as(BATCHOP, ETH_OUTPOST_ID, envelope));
@@ -3275,6 +3439,12 @@ BOOST_FIXTURE_TEST_CASE(evicted_member_delivers_nothing_until_it_rejoins_with_fr
    BOOST_REQUIRE_EQUAL(evicted["updated_at_ms"].as_uint64(), still_evicted["updated_at_ms"].as_uint64());
    BOOST_REQUIRE_EQUAL(std::string(served_status::serving), membership_status(BATCHOP, SOL_OUTPOST_ID));
    BOOST_REQUIRE(!seated_on(BATCHOP, ETH_OUTPOST_ID));
+   // The seat it still held earned nothing on ETH; SOL credited its seat as before. The two other members
+   // earned their ETH seats and all three their SOL seats.
+   BOOST_REQUIRE_EQUAL(0u, batch_duty_seat_seconds(BATCHOP, ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(uint64_t{3 * EPOCH_DURATION_SEC}, batch_duty_seat_seconds(BATCHOP, SOL_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(open_before_eviction + uint64_t{(2 + 3) * EPOCH_DURATION_SEC},
+                       duty_state()[system_fields::OPEN_SEAT_SECONDS].as<uint64_t>());
 
    // Rejoined, BATCHOP is seated again from the next slide.
    BOOST_REQUIRE_EQUAL(success(),
@@ -3282,6 +3452,7 @@ BOOST_FIXTURE_TEST_CASE(evicted_member_delivers_nothing_until_it_rejoins_with_fr
    deliver_epoch({BATCHOP_B, BATCHOP_C}, {BATCHOP, BATCHOP_B, BATCHOP_C}, "rejoined");
    advance_one_epoch();
    BOOST_REQUIRE(seated_on(BATCHOP, ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(0u, batch_duty_seat_seconds(BATCHOP, ETH_OUTPOST_ID));   // that epoch did not seat it
 
    // Its first duty since the rejoin is delivered. Counted with the misses that evicted it the sample
    // would be 50% again; counted from the rejoin it is clean.
@@ -3292,6 +3463,8 @@ BOOST_FIXTURE_TEST_CASE(evicted_member_delivers_nothing_until_it_rejoins_with_fr
    BOOST_REQUIRE_EQUAL(1u, delivered.size());
    BOOST_REQUIRE(delivered.front()[opreg_fields::DELIVERED].as<bool>());
    BOOST_REQUIRE_EQUAL(std::string(served_status::serving), membership_status(BATCHOP, ETH_OUTPOST_ID));
+   // Its first seat since the rejoin is its whole ETH duty: nothing from before the eviction came back.
+   BOOST_REQUIRE_EQUAL(uint64_t{EPOCH_DURATION_SEC}, batch_duty_seat_seconds(BATCHOP, ETH_OUTPOST_ID));
 } FC_LOG_AND_RETHROW() }
 
 /// WNS-56: the OPERATORS roster lists exactly the operators the window seats, so registrations cannot
@@ -3821,13 +3994,15 @@ BOOST_FIXTURE_TEST_CASE(chains_advance_independently_at_their_own_pace, sysio_ms
                                  sol_tip.message_id)));
 } FC_LOG_AND_RETHROW() }
 
-/// Each chain's epoch close credits its group with that epoch's own scheduled length in seat-seconds: a seat
-/// on the slower chain counts for its longer epoch.
+/// Each chain's epoch close credits its group with that epoch's own scheduled length in seat-seconds, on each
+/// member's row for that chain: a seat on the slower chain counts for its longer epoch.
 BOOST_FIXTURE_TEST_CASE(epoch_close_credits_the_chain_epoch_length_as_seat_seconds, sysio_msgch_chain_tester) { try {
    constexpr uint32_t kSolDurationSec = 2 * EPOCH_DURATION_SEC;
    const std::vector<name> ops{BATCHOP};
    bootstrap(1, /*batchop_is_bootstrapped=*/true, kSolDurationSec);
-   BOOST_REQUIRE_EQUAL(0u, batch_duty_seat_seconds(BATCHOP));   // a genesis advance records no duty
+   for (const uint64_t chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
+      BOOST_REQUIRE_EQUAL(0u, batch_duty_seat_seconds(BATCHOP, chain));   // a genesis advance records no duty
+   }
 
    // Only ETH's boundary has passed: its 60 s epoch is credited.
    std::map<uint64_t, inbound_stream_tip> tips;
@@ -3837,7 +4012,8 @@ BOOST_FIXTURE_TEST_CASE(epoch_close_credits_the_chain_epoch_length_as_seat_secon
    advance_via_consensus();
    BOOST_REQUIRE_EQUAL(2u, current_epoch(ETH_OUTPOST_ID));
    BOOST_REQUIRE_EQUAL(1u, current_epoch(SOL_OUTPOST_ID));
-   BOOST_REQUIRE_EQUAL(uint64_t{EPOCH_DURATION_SEC}, batch_duty_seat_seconds(BATCHOP));
+   BOOST_REQUIRE_EQUAL(uint64_t{EPOCH_DURATION_SEC}, batch_duty_seat_seconds(BATCHOP, ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(0u, batch_duty_seat_seconds(BATCHOP, SOL_OUTPOST_ID));
 
    // ETH's second epoch and SOL's 120 s epoch close together.
    deliver_chain_unanimous(ops, ETH_OUTPOST_ID, "eth-2", tips);
@@ -3845,7 +4021,10 @@ BOOST_FIXTURE_TEST_CASE(epoch_close_credits_the_chain_epoch_length_as_seat_secon
    advance_via_consensus();
    BOOST_REQUIRE_EQUAL(3u, current_epoch(ETH_OUTPOST_ID));
    BOOST_REQUIRE_EQUAL(2u, current_epoch(SOL_OUTPOST_ID));
-   BOOST_REQUIRE_EQUAL(uint64_t{2 * EPOCH_DURATION_SEC + kSolDurationSec}, batch_duty_seat_seconds(BATCHOP));
+   BOOST_REQUIRE_EQUAL(uint64_t{2 * EPOCH_DURATION_SEC}, batch_duty_seat_seconds(BATCHOP, ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(uint64_t{kSolDurationSec}, batch_duty_seat_seconds(BATCHOP, SOL_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(uint64_t{2 * EPOCH_DURATION_SEC + kSolDurationSec},
+                       duty_state()[system_fields::OPEN_SEAT_SECONDS].as<uint64_t>());
 } FC_LOG_AND_RETHROW() }
 
 /// A dispute pauses only its own chain: the disputed chain's chkcons holds while the other chain keeps

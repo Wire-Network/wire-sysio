@@ -127,6 +127,10 @@
                     "type": "name"
                 },
                 {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
                     "name": "period",
                     "type": "uint32"
                 },
@@ -142,7 +146,11 @@
             "fields": [
                 {
                     "name": "account_name",
-                    "type": "uint64"
+                    "type": "name"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
                 }
             ]
         },
@@ -737,6 +745,20 @@
                 {
                     "name": "id",
                     "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "forfeitduty",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
                 }
             ]
         },
@@ -2091,6 +2113,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "forfeitduty",
+            "type": "forfeitduty",
+            "ricardian_contract": ""
+        },
+        {
             "name": "getsnaphash",
             "type": "getsnaphash",
             "ricardian_contract": ""
@@ -2329,8 +2356,8 @@
             "name": "batchduty",
             "type": "batch_duty",
             "index_type": "i64",
-            "key_names": ["account_name"],
-            "key_types": ["uint64"],
+            "key_names": ["account_name","chain_code"],
+            "key_types": ["name","slug_name"],
             "table_id": 63846,
             "secondary_indexes": [
                 {

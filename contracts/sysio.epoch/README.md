@@ -57,8 +57,9 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
    that delivered a non-canonical envelope to it is slashed through `sysio.chalg::slashop`; then each
    member gets one `sysio.opreg::recorddel` for this chain (delivered if it delivered to it), followed
    by `sysio.opreg::termcheck` for this chain, which evicts a member breaching the chain's miss rails
-   from this chain alone, and each member of the group earns the epoch's scheduled length in
-   seat-seconds through `sysio.system::rcrdduty` (skipped until `sysio.system::initt5` has run).
+   from this chain alone and forfeits its unsettled duty there, and each member of the group not
+   evicted from the chain earns the epoch's scheduled length in seat-seconds through
+   `sysio.system::rcrdduty` (skipped until `sysio.system::initt5` has run).
 2. Bump the chain's consensus epoch index, drop the expired group from the front of its window and
    append a new tail group drawn from the `ACTIVE` batch operators serving the chain that are not
    already resident (non-bootstrapped first). The resident groups stay disjoint, so an operator serves

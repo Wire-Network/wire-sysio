@@ -500,12 +500,12 @@ void epoch::advance(sysio::slug_name chain_code) {
          ).send();
       }
 
-      // Each member earns the closing epoch's scheduled length in seat-seconds. sysio.system splits
-      // each economic pay period's one batch pool by seat-seconds over every chain; whether a member
-      // is still ACTIVE is decided when it is paid, so a member slashed above draws nothing. Skipped
-      // until initt5 has run: nothing can be paid before then, and consensus must not depend on
-      // sysio.system.
-      if (sysiosystem::emissions::t5state_t(SYSTEM_ACCOUNT).exists()) {
+      // Each member earns the closing epoch's scheduled length in seat-seconds on this chain. sysio.system
+      // splits each economic pay period's one batch pool by seat-seconds over every chain; whether a
+      // member is still ACTIVE is decided when it is paid, so a member slashed above draws nothing, and a
+      // member the termchecks above evicted from this chain is credited nothing here. Skipped until
+      // initt5 has run: nothing can be paid before then, and consensus must not depend on sysio.system.
+      if (sysiosystem::emissions::records_batch_duty(SYSTEM_ACCOUNT)) {
          action(
             permission_level{get_self(), "owner"_n},
             SYSTEM_ACCOUNT,
@@ -1043,7 +1043,7 @@ void epoch::tickeconomy(uint32_t epoch_index) {
 
    // One bounded step of any batch-duty settlement still open, every economic epoch. Settlements
    // only exist once initt5 has run.
-   if (sysiosystem::emissions::t5state_t(SYSTEM_ACCOUNT).exists()) {
+   if (sysiosystem::emissions::records_batch_duty(SYSTEM_ACCOUNT)) {
       action(
          permission_level{get_self(), "owner"_n},
          SYSTEM_ACCOUNT,

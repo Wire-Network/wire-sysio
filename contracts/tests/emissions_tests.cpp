@@ -761,10 +761,11 @@ public:
           fixture_abi_yield_function());
    }
 
-   /// One operator's unpaid batch duty, or null when it holds none.
-   fc::variant get_batch_duty( account_name account ) {
-      auto data = get_row_by_account(config::system_account_name, config::system_account_name,
-                                     "batchduty"_n, account);
+   /// One operator's unpaid batch duty on `chain_code`, or null when it holds none there. The row key is
+   /// (account, chain), the `[scope][id]` layout `get_row_by_id` reads.
+   fc::variant get_batch_duty( account_name account, std::string_view chain_code = EPOCH_CHAIN ) {
+      auto data = get_row_by_id(config::system_account_name, account, "batchduty"_n,
+                                fc::slug_name{chain_code}.value);
       if (data.empty()) return fc::variant();
       return sysio_abi_ser.binary_to_variant("batch_duty", data, fixture_abi_yield_function());
    }
@@ -784,6 +785,12 @@ public:
       return push_system_action(EPOCH, "rcrdduty"_n, mvo()
          ("chain_code", chain_code)("epoch_index", consensus_epoch_index)("members", members)
          ("duty_seconds", duty_seconds));
+   }
+
+   /// Forfeit `account`'s unsettled duty on `chain_code`, as sysio.opreg::termcheck does when it evicts it
+   /// from the chain; `signer` defaults to sysio.opreg.
+   action_result forfeitduty( name account, std::string_view chain_code, name signer = OPREG ) {
+      return push_system_action(signer, "forfeitduty"_n, mvo()("account", account)("chain_code", chain_code));
    }
 
    /// One bounded settlement step, as sysio.epoch::tickeconomy runs every economic epoch.
@@ -2708,9 +2715,11 @@ BOOST_FIXTURE_TEST_CASE( payepoch_pays_a_seat_second_the_same_on_every_chain, sy
    BOOST_REQUIRE_EQUAL(success(), rcrdduty(1, { SHORT_SEATS, SHORT_SEAT }, short_seconds, SHORT_CHAIN));
    BOOST_REQUIRE_EQUAL(success(), rcrdduty(2, { SHORT_SEATS }, short_seconds, SHORT_CHAIN));
    const uint64_t period_seat_seconds = uint64_t{long_seconds} + 3 * uint64_t{short_seconds};
-   BOOST_REQUIRE_EQUAL(uint64_t{long_seconds}, get_batch_duty(LONG_SEAT)["seat_seconds"].as<uint64_t>());
-   BOOST_REQUIRE_EQUAL(2 * uint64_t{short_seconds}, get_batch_duty(SHORT_SEATS)["seat_seconds"].as<uint64_t>());
-   BOOST_REQUIRE_EQUAL(uint64_t{short_seconds}, get_batch_duty(SHORT_SEAT)["seat_seconds"].as<uint64_t>());
+   BOOST_REQUIRE_EQUAL(uint64_t{long_seconds},
+                       get_batch_duty(LONG_SEAT, LONG_CHAIN)["seat_seconds"].as<uint64_t>());
+   BOOST_REQUIRE_EQUAL(2 * uint64_t{short_seconds},
+                       get_batch_duty(SHORT_SEATS, SHORT_CHAIN)["seat_seconds"].as<uint64_t>());
+   BOOST_REQUIRE_EQUAL(uint64_t{short_seconds}, get_batch_duty(SHORT_SEAT, SHORT_CHAIN)["seat_seconds"].as<uint64_t>());
    BOOST_REQUIRE_EQUAL(period_seat_seconds, get_duty_state()["open_seat_seconds"].as<uint64_t>());
 
    BOOST_REQUIRE_EQUAL(success(), accrue(1, period_emission));
@@ -2942,6 +2951,161 @@ BOOST_FIXTURE_TEST_CASE( rcrdduty_settles_a_member_still_holding_settling_seat_s
    const auto row = get_batch_duty(LATE);
    BOOST_REQUIRE_EQUAL(2u, row["period"].as<uint32_t>());
    BOOST_REQUIRE_EQUAL(T_EPOCH_SECS, row["seat_seconds"].as<uint64_t>());
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( duty_rows_are_kept_per_chain_and_settle_as_one_pool, sysio_emissions_tester ) try {
+   // An operator serving two chains holds one duty row on each. With no share rounding, the settlement pays
+   // the two rows exactly what one row of their summed seat-seconds would earn.
+   const account_name BOTH = "batchopa"_n;
+   const account_name ONE  = "batchopb"_n;
+   constexpr std::string_view OTHER_CHAIN     = "SOL";
+   constexpr uint32_t         other_seconds   = 2 * T_EPOCH_SECS;
+   constexpr int64_t          period_emission = 1'000'000'000;
+   create_t5_holding_accounts();
+   create_accounts({ BOTH, ONE }, false, false, false, true);
+   for (const account_name& op : { BOTH, ONE }) {
+      BOOST_REQUIRE_EQUAL(success(), register_operator(op, OperatorType::OPERATOR_TYPE_BATCH, true));
+   }
+   BOOST_REQUIRE_EQUAL(success(), setemitcfg_defaults(config::system_account_name));
+   BOOST_REQUIRE_EQUAL(success(), initt5(config::system_account_name));
+
+   BOOST_REQUIRE_EQUAL(success(), rcrdduty(1, { BOTH, ONE }));
+   BOOST_REQUIRE_EQUAL(success(), rcrdduty(1, { BOTH }, other_seconds, OTHER_CHAIN));
+   BOOST_REQUIRE_EQUAL(uint64_t{T_EPOCH_SECS}, get_batch_duty(BOTH)["seat_seconds"].as<uint64_t>());
+   BOOST_REQUIRE_EQUAL(uint64_t{other_seconds}, get_batch_duty(BOTH, OTHER_CHAIN)["seat_seconds"].as<uint64_t>());
+   BOOST_REQUIRE_EQUAL(uint64_t{T_EPOCH_SECS}, get_batch_duty(ONE)["seat_seconds"].as<uint64_t>());
+   BOOST_REQUIRE(get_batch_duty(ONE, OTHER_CHAIN).is_null());
+   const uint64_t period_seat_seconds = 2 * uint64_t{T_EPOCH_SECS} + other_seconds;
+   BOOST_REQUIRE_EQUAL(period_seat_seconds, get_duty_state()["open_seat_seconds"].as<uint64_t>());
+
+   BOOST_REQUIRE_EQUAL(success(), accrue(1, period_emission));
+   BOOST_REQUIRE_EQUAL(success(), pay(1, period_emission));
+
+   const int64_t compute    = test_split_bps(period_emission, COMPUTE_BPS);
+   const int64_t batch_pool = compute - test_split_bps(compute, PRODUCER_BPS);
+   const int64_t total      = static_cast<int64_t>(period_seat_seconds);
+   const int64_t both_seat_seconds = int64_t{T_EPOCH_SECS} + int64_t{other_seconds};
+   BOOST_REQUIRE_EQUAL(int64_t(0), batch_pool * int64_t{T_EPOCH_SECS} % total);   // no share rounds
+   BOOST_REQUIRE_EQUAL(batch_pool * both_seat_seconds / total, get_wire_balance_paid(BOTH).get_amount());
+   BOOST_REQUIRE_EQUAL(batch_pool * int64_t{T_EPOCH_SECS} / total, get_wire_balance_paid(ONE).get_amount());
+   for (const std::string_view chain : { EPOCH_CHAIN, OTHER_CHAIN }) {
+      BOOST_REQUIRE(get_batch_duty(BOTH, chain).is_null());
+   }
+   BOOST_REQUIRE_EQUAL(int64_t(0), get_epoch_log(1)["batch_emission_retained"].as<int64_t>());
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( forfeitduty_drops_one_chain_of_open_duty_and_keeps_the_period_total,
+                         sysio_emissions_tester ) try {
+   // An eviction from one chain forfeits the operator's open duty there: its row on that chain is erased while
+   // the period keeps the seat-seconds, so the settlement credits that share to nobody. Its other chain pays.
+   const account_name EVICTED = "batchopa"_n;
+   const account_name PEER    = "batchopb"_n;
+   constexpr std::string_view OTHER_CHAIN     = "SOL";
+   constexpr int64_t          period_emission = 1'000'000'000;
+   create_t5_holding_accounts();
+   create_accounts({ EVICTED, PEER }, false, false, false, true);
+   for (const account_name& op : { EVICTED, PEER }) {
+      BOOST_REQUIRE_EQUAL(success(), register_operator(op, OperatorType::OPERATOR_TYPE_BATCH, true));
+   }
+   BOOST_REQUIRE_EQUAL(success(), setemitcfg_defaults(config::system_account_name));
+   BOOST_REQUIRE_EQUAL(success(), initt5(config::system_account_name));
+
+   BOOST_REQUIRE_EQUAL(success(), rcrdduty(1, { EVICTED, PEER }));
+   BOOST_REQUIRE_EQUAL(success(), rcrdduty(1, { EVICTED }, T_EPOCH_SECS, OTHER_CHAIN));
+   const uint64_t period_seat_seconds = 3 * uint64_t{T_EPOCH_SECS};
+
+   BOOST_REQUIRE_EQUAL(success(), forfeitduty(EVICTED, EPOCH_CHAIN));
+   BOOST_REQUIRE(get_batch_duty(EVICTED).is_null());
+   BOOST_REQUIRE_EQUAL(uint64_t{T_EPOCH_SECS}, get_batch_duty(EVICTED, OTHER_CHAIN)["seat_seconds"].as<uint64_t>());
+   BOOST_REQUIRE_EQUAL(uint64_t{T_EPOCH_SECS}, get_batch_duty(PEER)["seat_seconds"].as<uint64_t>());
+   BOOST_REQUIRE_EQUAL(period_seat_seconds, get_duty_state()["open_seat_seconds"].as<uint64_t>());
+
+   // With no row on the chain there is nothing to forfeit, and the operator's other rows are untouched.
+   BOOST_REQUIRE_EQUAL(success(), forfeitduty(EVICTED, EPOCH_CHAIN));
+   BOOST_REQUIRE_EQUAL(success(), forfeitduty(PEER, OTHER_CHAIN));
+   BOOST_REQUIRE_EQUAL(uint64_t{T_EPOCH_SECS}, get_batch_duty(PEER)["seat_seconds"].as<uint64_t>());
+   BOOST_REQUIRE_EQUAL(period_seat_seconds, get_duty_state()["open_seat_seconds"].as<uint64_t>());
+
+   BOOST_REQUIRE_EQUAL(success(), accrue(1, period_emission));
+   BOOST_REQUIRE_EQUAL(success(), pay(1, period_emission));
+
+   const int64_t compute    = test_split_bps(period_emission, COMPUTE_BPS);
+   const int64_t batch_pool = compute - test_split_bps(compute, PRODUCER_BPS);
+   const int64_t seat_pay   = batch_pool * int64_t{T_EPOCH_SECS} / static_cast<int64_t>(period_seat_seconds);
+   BOOST_REQUIRE_EQUAL(seat_pay, get_wire_balance_paid(EVICTED).get_amount());
+   BOOST_REQUIRE_EQUAL(seat_pay, get_wire_balance_paid(PEER).get_amount());
+   const auto log = get_epoch_log(1);
+   BOOST_REQUIRE(log["batch_settled"].as_bool());
+   BOOST_REQUIRE_EQUAL(batch_pool - 2 * seat_pay, log["batch_emission_retained"].as<int64_t>());
+   BOOST_REQUIRE_EQUAL(int64_t(0), get_t5_state()["unsettled_batch_emission"].as<int64_t>());
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( forfeitduty_drops_settling_duty_at_the_settlement_cursor, sysio_emissions_tester ) try {
+   // A forfeit while the settlement is open erases the operator's settling row on that chain, here the row the
+   // settlement's cursor rests on. The walk resumes at the operator's next row, on its other chain, at the
+   // period's unchanged rate, and the forfeited share stays in the treasury.
+   const account_name LATE = "zzzzbatchop"_n;   // sorts after every numeric name below
+   constexpr std::string_view OTHER_CHAIN     = "SOL";
+   constexpr int64_t          period_emission = 1'000'000'000;
+   // Exactly one settlement step of rows sorts before LATE, so payepoch's step stops at LATE's first row.
+   vector<name> members;
+   for (uint64_t value = 1; value <= MAX_DUTY_SETTLEMENT_ROWS; ++value) members.emplace_back(value);
+   members.push_back(LATE);
+   create_t5_holding_accounts();
+   create_accounts({ LATE }, false, false, false, true);
+   BOOST_REQUIRE_EQUAL(success(), register_operator(LATE, OperatorType::OPERATOR_TYPE_BATCH, true));
+   BOOST_REQUIRE_EQUAL(success(), setemitcfg_defaults(config::system_account_name));
+   BOOST_REQUIRE_EQUAL(success(), initt5(config::system_account_name));
+   BOOST_REQUIRE_EQUAL(success(), rcrdduty(1, members));
+   BOOST_REQUIRE_EQUAL(success(), rcrdduty(1, { LATE }, T_EPOCH_SECS, OTHER_CHAIN));
+   BOOST_REQUIRE_EQUAL(success(), accrue(1, period_emission));
+   BOOST_REQUIRE_EQUAL(success(), pay(1, period_emission));
+
+   auto duty = get_duty_state();
+   BOOST_REQUIRE_EQUAL(1u, duty["settling_period"].as<uint32_t>());
+   BOOST_REQUIRE_EQUAL(LATE.to_uint64_t(), duty["settle_cursor"].as<uint64_t>());
+   const uint64_t period_seat_seconds = duty["settling_seat_seconds"].as<uint64_t>();
+   BOOST_REQUIRE_EQUAL((uint64_t{MAX_DUTY_SETTLEMENT_ROWS} + 2) * T_EPOCH_SECS, period_seat_seconds);
+   BOOST_REQUIRE_EQUAL(1u, get_batch_duty(LATE)["period"].as<uint32_t>());
+
+   BOOST_REQUIRE_EQUAL(success(), forfeitduty(LATE, EPOCH_CHAIN));
+   BOOST_REQUIRE(get_batch_duty(LATE).is_null());
+   BOOST_REQUIRE(!get_batch_duty(LATE, OTHER_CHAIN).is_null());
+   duty = get_duty_state();
+   BOOST_REQUIRE_EQUAL(period_seat_seconds, duty["settling_seat_seconds"].as<uint64_t>());
+   BOOST_REQUIRE_EQUAL(LATE.to_uint64_t(), duty["settle_cursor"].as<uint64_t>());
+
+   BOOST_REQUIRE_EQUAL(success(), settleduty());
+   BOOST_REQUIRE_EQUAL(0u, get_duty_state()["settling_period"].as<uint32_t>());
+   BOOST_REQUIRE(get_batch_duty(LATE, OTHER_CHAIN).is_null());
+
+   const int64_t compute    = test_split_bps(period_emission, COMPUTE_BPS);
+   const int64_t batch_pool = compute - test_split_bps(compute, PRODUCER_BPS);
+   const int64_t late_pay   = batch_pool * int64_t{T_EPOCH_SECS} / static_cast<int64_t>(period_seat_seconds);
+   BOOST_REQUIRE_EQUAL(late_pay, get_wire_balance_paid(LATE).get_amount());
+   // None of the numeric names is a registered operator, so LATE's one row is all the settlement paid.
+   const auto log = get_epoch_log(1);
+   BOOST_REQUIRE(log["batch_settled"].as_bool());
+   BOOST_REQUIRE_EQUAL(batch_pool - late_pay, log["batch_emission_retained"].as<int64_t>());
+   BOOST_REQUIRE_EQUAL(int64_t(0), get_t5_state()["unsettled_batch_emission"].as<int64_t>());
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( forfeitduty_requires_sysio_opreg, sysio_emissions_tester ) try {
+   // Only sysio.opreg's eviction forfeits duty: sysio.epoch and the operator itself are refused, and the row
+   // stays.
+   const account_name MEMBER = "batchopa"_n;
+   create_t5_holding_accounts();
+   create_accounts({ MEMBER }, false, false, false, true);
+   BOOST_REQUIRE_EQUAL(success(), setemitcfg_defaults(config::system_account_name));
+   BOOST_REQUIRE_EQUAL(success(), initt5(config::system_account_name));
+   BOOST_REQUIRE_EQUAL(success(), rcrdduty(1, { MEMBER }));
+
+   for (const name signer : { EPOCH, MEMBER }) {
+      const action_result r = forfeitduty(MEMBER, EPOCH_CHAIN, signer);
+      BOOST_REQUIRE( r != success() );
+      require_substr( r, "missing authority of sysio.opreg" );
+   }
+   BOOST_REQUIRE_EQUAL(uint64_t{T_EPOCH_SECS}, get_batch_duty(MEMBER)["seat_seconds"].as<uint64_t>());
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( setemitcfg_bounds_period_accrual_to_asset_range, sysio_emissions_tester ) try {

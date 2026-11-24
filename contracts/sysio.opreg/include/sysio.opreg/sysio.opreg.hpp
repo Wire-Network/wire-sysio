@@ -295,9 +295,11 @@ namespace sysio {
       /// (rounded down) above `terminate_max_pct_misses_24h`. Both rails count the chain's duty epochs
       /// recorded after the second of the operator's current registration and after the second of its
       /// latest join of the chain; a return to ACTIVE resets neither. The membership becomes EVICTED
-      /// with the rail's reason; the operator's status, bond and other chains are untouched. ACTIVE
-      /// and UNKNOWN operators are both evaluated; bootstrapped operators and an EVICTED membership
-      /// are not. Called by `sysio.epoch::advance(chain_code)` after every `recorddel`.
+      /// with the rail's reason, and the operator forfeits its unsettled batch duty on the chain
+      /// (`sysio.system::forfeitduty`, once `initt5` has run); its status, bond, other chains and
+      /// their duty are untouched. ACTIVE and UNKNOWN operators are both evaluated; bootstrapped
+      /// operators and an EVICTED membership are not. Called by `sysio.epoch::advance(chain_code)`
+      /// after every `recorddel`.
       [[sysio::action]]
       void termcheck(name account, sysio::slug_name chain_code);
 
@@ -498,6 +500,12 @@ namespace sysio {
       static bool delivers_on_chain(name account, sysio::slug_name chain_code) {
          const std::optional<served_chain> membership = membership_of(account, chain_code);
          return membership && membership->status != chain_service_status::EVICTED;
+      }
+
+      /// True when `account`'s membership of outpost `chain_code` is EVICTED. Never throws.
+      static bool is_evicted_from(name account, sysio::slug_name chain_code) {
+         const std::optional<served_chain> membership = membership_of(account, chain_code);
+         return membership && membership->status == chain_service_status::EVICTED;
       }
 
       /// Operator registry configuration singleton.

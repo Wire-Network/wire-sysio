@@ -99,5 +99,9 @@ the close that evicts a member also slides out the only seat it held on the chai
 is not evaluated again, and it rejoins as a `LEFT` operator does, which restarts the rails.
 Bootstrapped operators are never evicted. Governance's `terminate` is the global removal.
 
+The eviction forfeits the operator's unsettled batch duty on the chain (`sysio.system::forfeitduty`):
+it is paid nothing for the chain's open or settling pay period, nor for any seat it still holds there,
+while its other chains keep paying. Duty on the chain starts again from its rejoin.
+
 A membership ends with its registration: `prune` erases a pruned operator's rows and `regoperator`
 erases them when the account registers again.

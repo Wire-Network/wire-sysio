@@ -255,7 +255,7 @@ int64_t settle_duty_row(name self, duty_state& duty, batchduty_t& rows, const ba
    }
    credit_pay(self, row.account_name, pay, memo::batch_op_reward);
    duty.settling_paid += pay;
-   rows.erase(batch_duty_key{row.account_name.value});
+   rows.erase(row.key());
    return pay;
 }
 
@@ -285,6 +285,10 @@ void finish_settlement(name self, duty_state& duty, t5_state& state) {
 // the cursor, paying at most MAX_DUTY_SETTLEMENT_ROWS of them; passing the period's last row finishes
 // the settlement. Credited amounts move from unsettled to distributed. Returns the rows paid. A no-op
 // when no settlement is open. Never throws.
+//
+// The cursor is the account of the first row the step did not reach. Every row of the settling period
+// before it has been erased, so resuming at that account's first remaining row is exact even when the
+// step stopped between two of its chains, or a row was erased since (`forfeitduty`, `rcrdduty`).
 uint32_t step_settlement(name self, duty_state& duty, t5_state& state) {
    if (!duty.settling()) return 0;
 
@@ -319,12 +323,12 @@ void prune_obsolete_duty(name self, const duty_state& duty, uint32_t budget) {
    const uint32_t live_from = duty.settling() ? duty.settling_period : duty.open_period;
    batchduty_t rows(self);
    auto by_period = rows.get_index<"byperiod"_n>();
-   std::vector<uint64_t> obsolete;
+   std::vector<batch_duty_key> obsolete;
    for (auto it = by_period.lower_bound(duty_period_key(0, 0));
         it != by_period.end() && it->period < live_from && obsolete.size() < budget; ++it) {
-      obsolete.push_back(it->account_name.value);
+      obsolete.push_back(it->key());
    }
-   for (const uint64_t account : obsolete) rows.erase(batch_duty_key{account});
+   for (const batch_duty_key& key : obsolete) rows.erase(key);
 }
 
 } // anonymous namespace
@@ -708,11 +712,11 @@ void system_contract::accrueepoch(uint32_t epoch_index, int64_t per_epoch_emissi
 }
 
 // rcrdduty - credit `duty_seconds` seat-seconds to each member of the group that
-// served consensus epoch `epoch_index` of `chain_code`. Runs inline from
-// sysio.epoch::advance, so it never throws: a member holding seat-seconds of the
-// settling period is settled at that period's rate before its new duty opens a
-// row in the open period.
-void system_contract::rcrdduty(sysio::slug_name /*chain_code*/, uint32_t /*epoch_index*/,
+// served consensus epoch `epoch_index` of `chain_code`, on its row for that chain.
+// Runs inline from sysio.epoch::advance, so it never throws: a member holding
+// seat-seconds of the settling period on the chain is settled at that period's
+// rate before its new duty opens a row in the open period.
+void system_contract::rcrdduty(sysio::slug_name chain_code, uint32_t /*epoch_index*/,
                                std::vector<sysio::name> members, uint32_t duty_seconds) {
    require_auth(epoch_refs::account);
    if (duty_seconds == 0) return;
@@ -725,7 +729,13 @@ void system_contract::rcrdduty(sysio::slug_name /*chain_code*/, uint32_t /*epoch
 
    batchduty_t rows(get_self());
    for (const auto& member : members) {
-      auto row = rows.try_get(batch_duty_key{member.value});
+      // An EVICTED member earns nothing on the chain: its eviction forfeited its unsettled duty there
+      // (forfeitduty), and the seats it still holds go unpaid. sysio.opreg::termcheck runs before this
+      // in the same advance, so the seat whose close evicted it is not credited either.
+      if (sysio::opreg::is_evicted_from(member, chain_code)) continue;
+
+      const batch_duty_key key{member, chain_code};
+      std::optional<batch_duty> row = rows.try_get(key);
       if (row && row->period != duty.open_period) {
          // Units from a closed period wait only for the settling one; pay them out first.
          if (duty.settling() && row->period == duty.settling_period && state) {
@@ -733,19 +743,32 @@ void system_contract::rcrdduty(sysio::slug_name /*chain_code*/, uint32_t /*epoch
             state->unsettled_batch_emission -= paid;
             state->total_distributed        += paid;
          } else {
-            rows.erase(batch_duty_key{member.value});
+            rows.erase(key);
          }
          row.reset();
       }
 
-      batch_duty updated = row.value_or(batch_duty{.account_name = member, .period = duty.open_period});
+      batch_duty updated =
+         row.value_or(batch_duty{.account_name = member, .chain_code = chain_code, .period = duty.open_period});
       updated.seat_seconds += duty_seconds;
-      rows.set(get_self(), batch_duty_key{member.value}, updated);
+      rows.set(get_self(), key, updated);
       duty.open_seat_seconds += duty_seconds;
    }
 
    duty_tbl.set(duty, get_self());
    if (state) t5s.set(*state, get_self());
+}
+
+// forfeitduty - erase `account`'s unsettled duty on `chain_code`, open or settling, when sysio.opreg
+// evicts it from that chain. The period totals keep the forfeited seat-seconds, so no operator is
+// credited the share and the settlement leaves it in the treasury. Inline from sysio.opreg::termcheck,
+// so it never throws.
+void system_contract::forfeitduty(sysio::name account, sysio::slug_name chain_code) {
+   require_auth(opreg_refs::account);
+
+   batchduty_t rows(get_self());
+   const batch_duty_key key{account, chain_code};
+   if (rows.contains(key)) rows.erase(key);
 }
 
 // settleduty - one bounded step of the open batch-duty settlement, then pruning of obsolete duty rows
@@ -787,8 +810,9 @@ void system_contract::settleduty() {
 //
 // The batch-operator slice opens a duty settlement: it is split pro rata to the
 // period's seat-seconds (rcrdduty) and credited in bounded steps. Only ACTIVE
-// batch operators are paid; any skipped amount stays in the treasury and is
-// recorded on the epochlog row when the settlement completes.
+// batch operators are paid; any skipped amount, like duty forfeited by an
+// eviction (forfeitduty), stays in the treasury and is recorded on the epochlog
+// row when the settlement completes.
 //
 // Single-trx semantics guarantee gate conditions hold through this call;
 // payepoch trusts the gate-computed period_emission and does not recompute.
