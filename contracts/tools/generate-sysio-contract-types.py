@@ -218,6 +218,158 @@ def abi_type_to_ts(abi_type: str, structs_map: dict, type_aliases: dict,
 
 
 # ---------------------------------------------------------------------------
+# ABI bool fields → runtime row descriptors
+# ---------------------------------------------------------------------------
+
+# abi_serializer packs an ABI `bool` as a uint8, so a JSON table row carries
+# 0/1 where the generated interfaces declare `boolean`. Each table's row
+# descriptor locates those values for the typed client to convert.
+BOOLEAN_DESCRIPTOR_KIND = 'SysioBooleanDescriptorKind'
+BOOLEAN_KIND = 'boolean'
+ARRAY_KIND = 'array'
+STRUCT_KIND = 'struct'
+
+TS_IDENTIFIER = re.compile(r'^[A-Za-z_$][A-Za-z0-9_$]*$')
+
+
+def boolean_descriptor(abi_type: str, structs_map: dict, type_aliases: dict, variants_map: dict,
+                       visiting: tuple[str, ...] = ()) -> dict | None:
+    """Describe where ABI `bool` values sit inside a value of `abi_type`.
+
+    Returns None when the type holds no `bool`. Optional (`?`) and binary
+    extension (`$`) types are described by their inner type, because the typed
+    client passes null and absent values through unchanged. Struct fields are
+    keyed by ABI field name, which the node's JSON uses whatever the --style
+    flag, and include the base struct's fields, which every row carries.
+
+    Raises ValueError for a recursive struct, and for a variant alternative
+    that holds a `bool`: descriptors do not cover variants, so generation fails
+    rather than leaving such a value unconverted.
+    """
+    abi_type = resolve_type(abi_type, type_aliases)
+    if abi_type.endswith(('$', '?')):
+        return boolean_descriptor(abi_type[:-1], structs_map, type_aliases, variants_map, visiting)
+    if abi_type.endswith('[]'):
+        items = boolean_descriptor(abi_type[:-2], structs_map, type_aliases, variants_map, visiting)
+        return None if items is None else {'kind': ARRAY_KIND, 'items': items}
+    if abi_type == 'bool':
+        return {'kind': BOOLEAN_KIND}
+    if abi_type in variants_map:
+        for alternative in variants_map[abi_type].get('types', []):
+            if boolean_descriptor(alternative, structs_map, type_aliases, variants_map, visiting) is not None:
+                raise ValueError(f'ABI variant {abi_type} alternative {alternative} holds a bool; '
+                                 'table row descriptors do not describe variants')
+        return None
+    if abi_type not in structs_map:
+        return None
+    if abi_type in visiting:
+        raise ValueError(f'ABI struct {abi_type} is recursive: {" -> ".join(visiting + (abi_type,))}')
+
+    struct = structs_map[abi_type]
+    fields: dict = {}
+    if struct.get('base'):
+        base = boolean_descriptor(struct['base'], structs_map, type_aliases, variants_map, visiting + (abi_type,))
+        if base is not None:
+            fields.update(base['fields'])
+    for field in struct.get('fields', []):
+        descriptor = boolean_descriptor(field['type'], structs_map, type_aliases, variants_map,
+                                        visiting + (abi_type,))
+        if descriptor is not None:
+            fields[field['name']] = descriptor
+    return {'kind': STRUCT_KIND, 'fields': fields} if fields else None
+
+
+def table_boolean_descriptors(abi: dict, structs_map: dict, type_aliases: dict, variants_map: dict) -> dict:
+    """Map each table whose row type holds an ABI `bool` to that row's struct descriptor."""
+    descriptors = {}
+    for table in abi.get('tables', []):
+        descriptor = boolean_descriptor(table['type'], structs_map, type_aliases, variants_map)
+        if descriptor is None:
+            continue
+        if descriptor['kind'] != STRUCT_KIND:
+            raise ValueError(f'table {table["name"]} row type {table["type"]} is not a struct')
+        descriptors[table['name']] = descriptor
+    return descriptors
+
+
+def ts_property_key(name: str) -> str:
+    """Emit `name` as an object-literal key, quoting it when it is not an identifier."""
+    return name if TS_IDENTIFIER.match(name) else json.dumps(name)
+
+
+def emit_boolean_descriptor(descriptor: dict) -> str:
+    """Emit one descriptor as a TypeScript object literal."""
+    kind = descriptor['kind']
+    if kind == BOOLEAN_KIND:
+        return f'{{ kind: {BOOLEAN_DESCRIPTOR_KIND}.{BOOLEAN_KIND} }}'
+    if kind == ARRAY_KIND:
+        return f'{{ kind: {BOOLEAN_DESCRIPTOR_KIND}.{ARRAY_KIND}, items: {emit_boolean_descriptor(descriptor["items"])} }}'
+    fields = ', '.join(f'{ts_property_key(name)}: {emit_boolean_descriptor(field)}'
+                       for name, field in descriptor['fields'].items())
+    return f'{{ kind: {BOOLEAN_DESCRIPTOR_KIND}.{STRUCT_KIND}, fields: {{ {fields} }} }}'
+
+
+def emit_table_boolean_descriptors(descriptors: dict) -> str:
+    """Emit a contract's table -> row descriptor map as a TypeScript object literal."""
+    entries = ', '.join(f'{ts_property_key(table)}: {emit_boolean_descriptor(descriptor)}'
+                        for table, descriptor in descriptors.items())
+    return f'{{ {entries} }}' if entries else '{}'
+
+
+BOOLEAN_DESCRIPTOR_TYPES = [
+    '/** Kind of value a {@link SysioBooleanDescriptor} describes. */',
+    f'export enum {BOOLEAN_DESCRIPTOR_KIND} {{',
+    '  /** An ABI `bool`. */',
+    f'  {BOOLEAN_KIND} = "{BOOLEAN_KIND}",',
+    '  /** An ABI array whose elements hold `bool` values. */',
+    f'  {ARRAY_KIND} = "{ARRAY_KIND}",',
+    '  /** An ABI struct whose fields hold `bool` values. */',
+    f'  {STRUCT_KIND} = "{STRUCT_KIND}",',
+    '}',
+    '',
+    '/** An ABI `bool`, which a JSON table row encodes as `0` or `1`. */',
+    'export interface SysioBooleanValueDescriptor {',
+    '  /** Descriptor discriminator. */',
+    f'  readonly kind: {BOOLEAN_DESCRIPTOR_KIND}.{BOOLEAN_KIND}',
+    '}',
+    '',
+    '/** An ABI array whose elements hold ABI `bool` values. */',
+    'export interface SysioBooleanArrayDescriptor {',
+    '  /** Descriptor discriminator. */',
+    f'  readonly kind: {BOOLEAN_DESCRIPTOR_KIND}.{ARRAY_KIND}',
+    '  /** Where the `bool` values sit inside each element. */',
+    '  readonly items: SysioBooleanDescriptor',
+    '}',
+    '',
+    '/** An ABI struct with fields that hold ABI `bool` values; fields holding none are omitted. */',
+    'export interface SysioBooleanStructDescriptor {',
+    '  /** Descriptor discriminator. */',
+    f'  readonly kind: {BOOLEAN_DESCRIPTOR_KIND}.{STRUCT_KIND}',
+    '  /** Field descriptors, keyed by the ABI field name a JSON table row uses. */',
+    '  readonly fields: SysioBooleanFieldDescriptors',
+    '}',
+    '',
+    '/** ABI field name -> where the `bool` values sit inside that field. */',
+    'export interface SysioBooleanFieldDescriptors {',
+    '  /** Descriptor of one field. */',
+    '  readonly [field: string]: SysioBooleanDescriptor',
+    '}',
+    '',
+    '/** Where the ABI `bool` values sit inside a value of one ABI type; optionals and binary extensions are described by their inner type. */',
+    'export type SysioBooleanDescriptor =',
+    '  | SysioBooleanValueDescriptor',
+    '  | SysioBooleanArrayDescriptor',
+    '  | SysioBooleanStructDescriptor',
+    '',
+    '/** Table name -> its row descriptor, for the tables of one contract whose rows hold ABI `bool` values. */',
+    'export type SysioTableBooleanDescriptors<Name extends SysioContractName> = {',
+    '  readonly [TableName in keyof SysioContractMapping[Name]["tables"]]?: SysioBooleanStructDescriptor',
+    '}',
+    '',
+]
+
+
+# ---------------------------------------------------------------------------
 # Main generation
 # ---------------------------------------------------------------------------
 
@@ -227,7 +379,8 @@ def generate(abi_files: list[str], output_dir: str, style: str) -> None:
     os.makedirs(os.path.join(output_dir, 'typescript'), exist_ok=True)
 
     all_definitions: dict = {}
-    contract_registry: list[tuple[str, str, list[str], list[str]]] = []   # (name, prefix, action_names, table_names)
+    # (name, prefix, action_names, table_names, table_boolean_descriptors)
+    contract_registry: list[tuple[str, str, list[str], list[str], dict]] = []
     ts_lines: list[str] = [
         '// noinspection SpellCheckingInspection',
         '/**',
@@ -255,6 +408,7 @@ def generate(abi_files: list[str], output_dir: str, style: str) -> None:
         structs_map = {s['name']: s for s in abi.get('structs', [])}
         action_names = {a['name'] for a in abi.get('actions', [])}
         type_aliases = {t['new_type_name']: t['type'] for t in abi.get('types', [])}
+        variants_map = {v['name']: v for v in abi.get('variants', [])}
 
         enums_map = {e['name']: e for e in abi.get('enums', [])}
 
@@ -346,7 +500,8 @@ def generate(abi_files: list[str], output_dir: str, style: str) -> None:
         # ── typed-client surface: Sysio<Pascal>Contract (actions + tables) ──
         ts_lines.extend(emit_contract_interface(abi, contract_name, contract_prefix))
         contract_registry.append((contract_name, contract_prefix,
-            [a['name'] for a in abi.get('actions', [])], [t['name'] for t in abi.get('tables', [])]))
+            [a['name'] for a in abi.get('actions', [])], [t['name'] for t in abi.get('tables', [])],
+            table_boolean_descriptors(abi, structs_map, type_aliases, variants_map)))
 
     # ── contract registry: SysioContractName + Account + Mapping + Definitions ──
     ts_lines.append('// ── contract registry ──')
@@ -373,23 +528,31 @@ def generate(abi_files: list[str], output_dir: str, style: str) -> None:
         ts_lines.append(f'  [SysioContractName.{short}]: {contract_prefix}Contract')
     ts_lines.append('}')
     ts_lines.append('')
+    ts_lines.extend(BOOLEAN_DESCRIPTOR_TYPES)
     ts_lines.append('/** Runtime action/table names + account per contract (the typed client validates against this). */')
     ts_lines.append('export interface SysioContractDefinition<Name extends SysioContractName> {')
+    ts_lines.append('  /** Short contract name. */')
     ts_lines.append('  readonly name: Name')
+    ts_lines.append('  /** Default on-chain account hosting the contract. */')
     ts_lines.append('  readonly account: string')
+    ts_lines.append('  /** ABI action names. */')
     ts_lines.append('  readonly actions: ReadonlyArray<string>')
+    ts_lines.append('  /** ABI table names. */')
     ts_lines.append('  readonly tables: ReadonlyArray<string>')
+    ts_lines.append('  /** Row descriptors of the tables whose rows hold ABI `bool` values. */')
+    ts_lines.append('  readonly tableBooleans: SysioTableBooleanDescriptors<Name>')
     ts_lines.append('}')
     ts_lines.append('export const SysioContractDefinitions: {')
     ts_lines.append('  readonly [Name in SysioContractName]: SysioContractDefinition<Name>')
     ts_lines.append('} = {')
-    for contract_name, _prefix, action_names, table_names in contract_registry:
+    for contract_name, _prefix, action_names, table_names, table_booleans in contract_registry:
         short = short_contract_name(contract_name)
         account = DEPLOY_ACCOUNT_OVERRIDES.get(short, contract_name)
         actions_arr = ', '.join(f'"{a}"' for a in action_names)
         tables_arr = ', '.join(f'"{t}"' for t in table_names)
         ts_lines.append(f'  [SysioContractName.{short}]: {{ name: SysioContractName.{short}, account: "{account}", '
-                        f'actions: [{actions_arr}], tables: [{tables_arr}] }},')
+                        f'actions: [{actions_arr}], tables: [{tables_arr}], '
+                        f'tableBooleans: {emit_table_boolean_descriptors(table_booleans)} }},')
     ts_lines.append('}')
     ts_lines.append('')
 

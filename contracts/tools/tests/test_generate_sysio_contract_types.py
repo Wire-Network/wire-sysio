@@ -85,5 +85,86 @@ class GenerateSysioContractTypesTests(unittest.TestCase):
             )
 
 
+
+class TableBooleanDescriptorTests(unittest.TestCase):
+    """Verify where generated table descriptors locate ABI `bool` values."""
+
+    BOOLEAN = {"kind": GENERATOR.BOOLEAN_KIND}
+
+    @staticmethod
+    def structs(*definitions: dict) -> dict:
+        """Index ABI struct definitions by name, as the generator does."""
+        return {definition["name"]: definition for definition in definitions}
+
+    def test_descriptors_cover_bases_optionals_and_struct_arrays(self) -> None:
+        """Locate bools in a base struct, an optional field and an array of structs; skip tables without bools."""
+        structs = self.structs(
+            {"name": "row_base", "base": "", "fields": [{"name": "flag", "type": "bool"}]},
+            {"name": "inner", "base": "", "fields": [{"name": "ok", "type": "bool"}, {"name": "n", "type": "uint64"}]},
+            {
+                "name": "row",
+                "base": "row_base",
+                "fields": [
+                    {"name": "active", "type": "bool?"},
+                    {"name": "items", "type": "inner[]"},
+                    {"name": "count", "type": "uint64"},
+                ],
+            },
+            {"name": "plain", "base": "", "fields": [{"name": "count", "type": "uint64"}]},
+        )
+        abi = {"tables": [{"name": "rows", "type": "row"}, {"name": "plain", "type": "plain"}]}
+
+        descriptors = GENERATOR.table_boolean_descriptors(abi, structs, {}, {})
+
+        self.assertEqual(
+            {
+                "rows": {
+                    "kind": GENERATOR.STRUCT_KIND,
+                    "fields": {
+                        "flag": self.BOOLEAN,
+                        "active": self.BOOLEAN,
+                        "items": {
+                            "kind": GENERATOR.ARRAY_KIND,
+                            "items": {"kind": GENERATOR.STRUCT_KIND, "fields": {"ok": self.BOOLEAN}},
+                        },
+                    },
+                }
+            },
+            descriptors,
+        )
+
+    def test_recursive_structs_and_variant_bools_are_refused(self) -> None:
+        """Fail generation rather than emit a descriptor that would leave a bool unconverted."""
+        recursive = self.structs({"name": "node", "base": "", "fields": [{"name": "next", "type": "node?"}]})
+        with self.assertRaises(ValueError):
+            GENERATOR.boolean_descriptor("node", recursive, {}, {})
+
+        variants = {"choice": {"name": "choice", "types": ["uint64", "bool"]}}
+        with self.assertRaises(ValueError):
+            GENERATOR.boolean_descriptor("choice", {}, {}, variants)
+
+    def test_generated_contract_definition_carries_table_booleans(self) -> None:
+        """Emit the table descriptor on the contract definition."""
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        root = Path(directory.name)
+        abi_path = root / "sysio.flags.abi"
+        abi_path.write_text(
+            json.dumps(
+                {
+                    "version": "sysio::abi/1.2",
+                    "structs": [{"name": "flag_row", "base": "", "fields": [{"name": "set", "type": "bool"}]}],
+                    "actions": [],
+                    "tables": [{"name": "flags", "type": "flag_row", "index_type": "i64"}],
+                }
+            ),
+            encoding="utf-8",
+        )
+        GENERATOR.generate([str(abi_path)], str(root / "output"), "snake")
+        generated = (root / "output" / "typescript" / "SysioContractTypes.ts").read_text(encoding="utf-8")
+        self.assertIn("tableBooleans:", generated)
+        self.assertIn(f"{GENERATOR.BOOLEAN_DESCRIPTOR_KIND}.{GENERATOR.BOOLEAN_KIND}", generated)
+
+
 if __name__ == "__main__":
     unittest.main()
