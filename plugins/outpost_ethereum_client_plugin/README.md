@@ -258,16 +258,33 @@ end hash, message end, timestamp, the block of the envelope's first message, and
 in); anyone publishes it with `publishOutboundEnvelope(epoch, messages)`, which re-chains the list, refuses any
 other, and emits the assembled envelope as `OPPEnvelope(data)`.
 
-`read_inbound_envelope` reads `getFinalizedOutbound(epoch)` at the client's **read confirmation**, never at the
-head. Once the epoch is published there, it reads the `OPPEnvelope` logs of the recorded block and returns the
-one carrying this epoch. While the epoch is finalized but unpublished, the relay publishes it: publication is
-ordered, so it publishes the epoch after `latestOutboundEpoch()` (this one, or an earlier one first), handing
-over the `OutboundMessage` logs from the envelope's first-message block to the read confirmation after
-re-chaining them from `publishedOutboundCursor()` against the finalized end, and skipping the send when the head
-already shows the epoch published. The read returns empty until the publication is as deep as the read
-confirmation. `read_emitted_envelope_digest` (the underwriter's check) reads `outboundEnvelopes(epoch)` at the
-same confirmation. WIRE consensus on inbound is committed forward against these reads, so an operator that read
-a publication a reorg then removes could reach WIRE-side consensus on it.
+**Following.** `follow_outpost` runs on its own cron job every `batch-outpost-follow-ms` (4 s by default, a third
+of a slot), whether or not the operator is elected. It reads the `OutboundMessage` logs from a block cursor to the
+head, in ranges of at most 1,000 blocks, into a cache that checks every message against the chain hash its own
+event carries: no block is skipped whatever the spacing, which bounds only how stale the cache may be. The cache
+starts from the outpost's state at the head: the published cursor, and the block of the first message after it
+(the first unpublished finalized envelope, early-closed envelope or open envelope that holds one), so a restart
+rescans exactly the pending messages. A message that does not follow from what the cache holds (a reorg, or a
+node that skipped a log) clears it, and the next follow starts again.
+
+**Publishing.** The `epochIn` whose receipt shows the outpost finalizing the epoch is followed at once by
+`publishOutboundEnvelope` for the envelope it closed, from the cache and the messages in that receipt, at the next
+nonce: it cannot land before the call, and a reorg that drops the call brings it back after it. Publications go
+through the signer's journal (`submission_purpose::publish`) like `epochIn`, so they are repriced, replaced and
+settled the same way. A publication that cannot be made then is left to the read path.
+
+**Reading.** `read_inbound_envelope` reads `getFinalizedOutbound(epoch)` at the client's **read confirmation**,
+never at the head. That record fixes the envelope: its end on the chain, its message count and its timestamp,
+and the header's previous-envelope hash is fixed by the earlier epochs. Every publication of the epoch carries the
+same bytes, so once the finalization is settled the publication need not be: a settled one is read from the
+`OPPEnvelope` logs of the recorded block, and one at the head is read from its block and delivered once it matches
+the settled record (epoch, timestamp, and exactly the messages that chain from the previous epoch's settled end to
+this one's). While the epoch is finalized but unpublished at the head, the read publishes it, and any unpublished
+epoch before it first, from the cache (or, missing it, the `OutboundMessage` logs from the envelope's first-message
+block), re-chained against the finalized end before anything is paid for; it publishes nothing while a delivery
+holds the signer. `read_emitted_envelope_digest` (the underwriter's check) reads `outboundEnvelopes(epoch)` at the
+read confirmation. WIRE consensus on inbound is committed forward against these reads, so an operator that read a
+finalization a reorg then removes could reach WIRE-side consensus on it.
 
 The read confirmation is one of:
 
@@ -426,8 +443,12 @@ Per-client runtime lines are prefixed with the SPI label `outpost_ethereum_clien
 - `skipping epoch=... delivery — the outpost has already finalized it`, `tipped on digest ... but this relay
   delivered ...`, `delivery recorded; consensus not yet tipped` and `not delivered — the outpost is still on
   epoch ...` for each decision that sends nothing.
-- `publishing outbound epoch ... (... messages)` for each publication sent, and at warning level a finalized
-  epoch whose messages the node served only part of, or whose messages do not chain to the finalized end.
+- `publishing outbound epoch ... (... messages)` and `published outbound epoch ... in block ...` for each
+  publication sent, and at warning level a finalized epoch whose messages are not in hand or do not chain to the
+  finalized end, a publication after a finalizing call that failed, and a head publication that does not match
+  the settled record.
+- `following outbound messages from message ... reading from block ...` when the cache starts, and at warning
+  level `outbound message ... does not follow the messages held` when it starts again.
 - `refused at ... gas (...); retrying at the ceiling` at warning level for a gas refusal below the ceiling,
   and `cannot advance past attestation N at the ceiling` at error level — once per cursor position — when
   no funding carries the attestation there; `still open after N calls in one tick` at warning level when

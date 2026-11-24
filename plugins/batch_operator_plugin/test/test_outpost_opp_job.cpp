@@ -106,6 +106,41 @@ BOOST_AUTO_TEST_CASE(run_inbound_skips_when_not_elected) {
    BOOST_CHECK(depot.deliver_calls.empty());
 }
 
+// ─── run_follow ─────────────────────────────────────────────────────────────
+
+// Following is not gated on election or the epoch window: the operator elected
+// next must already hold what the outpost emitted.
+BOOST_AUTO_TEST_CASE(run_follow_follows_whether_or_not_elected) {
+   auto client = make_client(CHAIN_KIND_EVM, 0, 31337);
+   mock_depot_ops depot;
+   depot.elected     = false;
+   depot.window_open = false;
+
+   outpost_opp_job job(client, depot, kDeadline);
+   job.run_follow();
+   depot.elected     = true;
+   depot.window_open = true;
+   job.run_follow();
+
+   BOOST_REQUIRE_EQUAL(client->follow_deadlines.size(), 2u);
+   BOOST_CHECK(client->follow_deadlines.front() == kDeadline);
+   BOOST_CHECK(depot.read_pending_calls.empty());
+   BOOST_CHECK(depot.has_delivered_calls.empty());
+}
+
+// A failed follow is logged, and the next poll follows again.
+BOOST_AUTO_TEST_CASE(run_follow_swallows_a_failure_and_follows_next_poll) {
+   auto client = make_client(CHAIN_KIND_EVM, 0, 31337);
+   mock_depot_ops depot;
+   client->follow_response = [](fc::microseconds) { FC_THROW("node unreachable"); };
+
+   outpost_opp_job job(client, depot, kDeadline);
+   BOOST_CHECK_NO_THROW(job.run_follow());
+   client->follow_response = [](fc::microseconds) {};
+   BOOST_CHECK_NO_THROW(job.run_follow());
+   BOOST_CHECK_EQUAL(client->follow_deadlines.size(), 2u);
+}
+
 BOOST_AUTO_TEST_CASE(run_outbound_noop_when_no_pending_envelope) {
    auto client = make_client(CHAIN_KIND_EVM, 0, 31337);
    mock_depot_ops depot;

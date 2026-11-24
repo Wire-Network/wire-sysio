@@ -54,6 +54,10 @@ namespace {
    /// Shared RPC/depot budget; see the SHARED KNOB comment in set_program_options.
    constexpr fc::microseconds DELIVERY_TIMEOUT  = fc::seconds(60);
    constexpr fc::microseconds EPOCH_POLL        = fc::seconds(15);
+   /// How often each outpost relay follows what its outpost emits (`--batch-outpost-follow-ms`): a third of a
+   /// 12-second Ethereum slot. Following reads from a block cursor, so the spacing bounds only how stale what it
+   /// holds may be; no block is skipped at any spacing.
+   constexpr fc::microseconds OUTPOST_FOLLOW_POLL = fc::seconds(4);
    constexpr fc::microseconds EPOCH_EDGE_BUFFER = fc::milliseconds(2500);
    /// Minimum spacing between this operator's `sysio.swap::tickyield` pushes per
    /// yield pool (`--batch-yield-tick-interval-ms`).
@@ -78,8 +82,8 @@ namespace {
    /// discovered at startup — keeps `epoch_tick` viable so a cold-sync node
    /// that finds outposts later still responds.
    constexpr std::size_t MIN_CRON_THREADS = 5;
-   /// Inbound plus outbound cron entries for each active outpost.
-   constexpr std::size_t OPP_CRON_JOBS_PER_OUTPOST = 2;
+   /// Outbound, inbound and follow cron entries for each active outpost.
+   constexpr std::size_t OPP_CRON_JOBS_PER_OUTPOST = 3;
    /// The plugin-wide epoch polling cron entry.
    constexpr std::size_t EPOCH_TICK_CRON_JOBS = 1;
    /// The underwriter's polling cron entry.
@@ -293,6 +297,7 @@ struct batch_operator_plugin::impl {
    /// an account was configured. There is no separate enable flag.
    bool         enabled             = false;
    fc::microseconds epoch_poll          = EPOCH_POLL;
+   fc::microseconds outpost_follow_poll = OUTPOST_FOLLOW_POLL;
    fc::microseconds delivery_timeout    = DELIVERY_TIMEOUT;
    fc::microseconds yield_tick_interval = YIELD_TICK_INTERVAL;
 
@@ -388,10 +393,11 @@ struct batch_operator_plugin::impl {
    /// removes as governance changes the active set, and the underwriter's poll. Stopped at plugin_shutdown.
    sysio::services::cron_service_ptr cron_svc;
    std::vector<cron_service::job_id_t> cron_job_ids;
-   /// Cron job IDs for a scheduled outpost relay pair.
+   /// Cron job IDs for a scheduled outpost relay's jobs.
    struct scheduled_opp_job_ids {
       cron_service::job_id_t outbound = 0;
       cron_service::job_id_t inbound  = 0;
+      cron_service::job_id_t follow   = 0;
    };
    std::map<uint64_t, scheduled_opp_job_ids> scheduled_opp_jobs;
    std::atomic<bool>                 shutting_down{false};
@@ -1258,9 +1264,11 @@ struct batch_operator_plugin::impl {
       if (cron_svc) {
          cron_svc->cancel(sched_it->second.outbound);
          cron_svc->cancel(sched_it->second.inbound);
+         cron_svc->cancel(sched_it->second.follow);
       }
       forget_cron_job_id(sched_it->second.outbound);
       forget_cron_job_id(sched_it->second.inbound);
+      forget_cron_job_id(sched_it->second.follow);
       scheduled_opp_jobs.erase(sched_it);
    }
 
@@ -1277,13 +1285,14 @@ struct batch_operator_plugin::impl {
       });
    }
 
-   /// Schedule one cron direction for an outpost relay job.
+   /// Schedule one cron entry for an outpost relay job, every `interval`.
    cron_service::job_id_t schedule_opp_job_direction(uint64_t chain_code,
                                                      const std::shared_ptr<sysio::outpost_opp_job>& job,
                                                      std::string_view direction,
-                                                     void (sysio::outpost_opp_job::*runner)()) {
+                                                     void (sysio::outpost_opp_job::*runner)(),
+                                                     fc::microseconds interval) {
       sysio::services::cron_service::job_schedule sched;
-      sched.milliseconds = {sysio::services::cron_service::job_schedule::step_value{whole_milliseconds(epoch_poll)}};
+      sched.milliseconds = {sysio::services::cron_service::job_schedule::step_value{whole_milliseconds(interval)}};
       sysio::services::cron_service::job_metadata_t meta;
       meta.label         = std::format("outpost_opp_{}_{}", direction, chain_code);
       meta.one_at_a_time = true;
@@ -1294,20 +1303,23 @@ struct batch_operator_plugin::impl {
                               meta);
       cron_job_ids.push_back(id);
       ilog("batch_operator_plugin: scheduled {} for {} (id={}, every {}ms)",
-           meta.label, job->client().to_string(), id, whole_milliseconds(epoch_poll));
+           meta.label, job->client().to_string(), id, whole_milliseconds(interval));
       return id;
    }
 
-   /// Schedule inbound and outbound cron jobs for a single active outpost.
+   /// Schedule the outbound, inbound and follow cron jobs for a single active outpost.
    void schedule_opp_job(uint64_t chain_code, const std::shared_ptr<sysio::outpost_opp_job>& job) {
       if (!cron_svc || shutting_down || scheduled_opp_jobs.contains(chain_code)) return;
       auto outbound_id = schedule_opp_job_direction(chain_code, job, "outbound",
-                                                    &sysio::outpost_opp_job::run_outbound);
+                                                    &sysio::outpost_opp_job::run_outbound, epoch_poll);
       auto inbound_id = schedule_opp_job_direction(chain_code, job, "inbound",
-                                                   &sysio::outpost_opp_job::run_inbound);
+                                                   &sysio::outpost_opp_job::run_inbound, epoch_poll);
+      auto follow_id = schedule_opp_job_direction(chain_code, job, "follow",
+                                                  &sysio::outpost_opp_job::run_follow, outpost_follow_poll);
       scheduled_opp_jobs.emplace(chain_code, scheduled_opp_job_ids{
          .outbound = outbound_id,
          .inbound  = inbound_id,
+         .follow   = follow_id,
       });
    }
 
@@ -2223,6 +2235,10 @@ void batch_operator_plugin::set_program_options(options_description& cli,
         "WIRE account name for this batch operator. Configuring an account enables the relay.");
    opts("batch-epoch-poll-ms", bpo::value<uint32_t>()->default_value(whole_milliseconds(EPOCH_POLL)),
         "How often to check epoch state (ms)");
+   opts("batch-outpost-follow-ms", bpo::value<uint32_t>()->default_value(whole_milliseconds(OUTPOST_FOLLOW_POLL)),
+        "How often each outpost relay follows what its outpost emits, elected or not (ms). Following reads from a "
+        "block cursor, so this bounds only how stale the relay's view may be; no block is skipped at any spacing. "
+        "Must be at least 1");
    // SIZING RULE for batch-delivery-timeout-ms: it bounds the WHOLE outbound
    // delivery, a sequence of confirmed transactions. Ethereum sends the envelope
    // in ONE `epochIn` plus one continuation per dispatch spill (a handful at
@@ -2267,6 +2283,9 @@ void batch_operator_plugin::plugin_initialize(const variables_map& options) {
    if (options.count("batch-operator-account"))
       _impl->operator_account = chain::name(options["batch-operator-account"].as<std::string>());
    _impl->epoch_poll          = fc::milliseconds(options["batch-epoch-poll-ms"].as<uint32_t>());
+   const auto outpost_follow_ms = options["batch-outpost-follow-ms"].as<uint32_t>();
+   FC_ASSERT(outpost_follow_ms > 0, "batch-outpost-follow-ms must be at least 1, got {}", outpost_follow_ms);
+   _impl->outpost_follow_poll = fc::milliseconds(outpost_follow_ms);
    _impl->delivery_timeout    = fc::milliseconds(options["batch-delivery-timeout-ms"].as<uint32_t>());
    _impl->yield_tick_interval = fc::milliseconds(options["batch-yield-tick-interval-ms"].as<uint32_t>());
    _impl->enabled             = _impl->operator_account.good();

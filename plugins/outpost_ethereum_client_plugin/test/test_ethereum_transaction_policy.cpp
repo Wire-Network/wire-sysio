@@ -794,9 +794,12 @@ BOOST_AUTO_TEST_CASE(all_typed_write_wrappers_share_the_policy_enforced_path) {
       std::string(contract_address),
       fc::network::ethereum::abi::parse_contracts(fc::test::get_test_fixtures_path() / opp_abi_fixture_file),
    };
-   uint32_t     epoch    = 1;
-   fc::variants messages{fc::variant(std::string("01"))};
-   expect_policy_rejection([&] { opp.publish_outbound_envelope(epoch, messages); });
+   // OPP's journaled write: refused before signing, so nothing is left to journal.
+   uint32_t                   epoch    = 1;
+   fc::variants               messages{fc::variant(std::string("01"))};
+   sysio::ethereum_submission publication;
+   expect_policy_rejection([&] { opp.publish_outbound_envelope(epoch, messages, deadline, publication); });
+   BOOST_CHECK(publication.attempts.empty());
 
    sysio::syndication_pool_contract_client pool{
       client,

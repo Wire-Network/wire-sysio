@@ -35,7 +35,9 @@ enum class submission_purpose {
    /// A zero-value transfer to the signer itself at a nonce this process holds no record of: it replaces a
    /// pending transaction the relay cannot reprice, or fills a nonce nothing holds below one the relay
    /// journaled, so the relay never queues behind something it cannot move.
-   cancel
+   cancel,
+   /// `OPP.publishOutboundEnvelope` for the submission's epoch.
+   publish
 };
 
 /// Where a journaled transaction stood at the last check against the head.
@@ -64,7 +66,7 @@ struct submission_attempt {
 /// able to sign it again at its nonce rather than queue a new call behind it.
 struct ethereum_submission {
    submission_purpose purpose     = submission_purpose::epoch_in;
-   /// The epoch an `epochIn` delivers; zero for a cancel.
+   /// The epoch an `epochIn` delivers or a publication publishes; zero for a cancel.
    uint32_t           epoch_index = 0;
    /// The transaction as signed, without its signature: nonce, recipient, gas limit and calldata. The fees
    /// are each attempt's own.
@@ -135,50 +137,20 @@ inline constexpr auto finalized_outbound        = "getFinalizedOutbound";
 inline constexpr auto latest_outbound_epoch     = "latestOutboundEpoch";
 inline constexpr auto published_outbound_cursor = "publishedOutboundCursor";
 inline constexpr auto outbound_envelopes        = "outboundEnvelopes";
+inline constexpr auto latest_finalized_outbound_epoch = "latestFinalizedOutboundEpoch";
+inline constexpr auto outbound_cut_count        = "outboundCutCount";
+inline constexpr auto outbound_cuts_assigned    = "outboundCutsAssigned";
+inline constexpr auto outbound_cut              = "getOutboundCut";
+inline constexpr auto open_envelope_first_block = "openEnvelopeFirstBlock";
 /// `OutboundMessage(uint64 indexed messageIndex, bytes32 chainHash, bytes message)`: one outbound message, emitted
 /// whole when it is added and folded into the outbound hash chain.
 inline constexpr auto event_outbound_message    = "OutboundMessage";
 /// `OPPEnvelope(bytes data)`: a published outbound envelope.
 inline constexpr auto event_envelope            = "OPPEnvelope";
+/// `OutboundEpochFinalized(uint32 indexed epochIndex, uint64 firstMessage, uint64 messageEnd, bytes32 endHash,
+/// uint64 timestampMs)`: the consensus tip closed an epoch's envelope at a point on the outbound chain.
+inline constexpr auto event_epoch_finalized     = "OutboundEpochFinalized";
 } // namespace opp_abi_name
-
-/// Typed contract client for OPP.sol. State-changing calls go through
-/// `create_tx_and_confirm` — OPP writes are consensus-critical and must
-/// not silently drop (see epoch-859 stall RCA); the confirmed factory
-/// awaits `eth_getTransactionReceipt` + N blocks before returning.
-///
-/// OPP stores no outbound payload: each message is emitted whole as an `OutboundMessage` event and folded into a
-/// hash chain; the outpost's consensus tip closes an epoch's envelope at a point on that chain, and anyone
-/// publishes it by handing the messages back (`publishOutboundEnvelope`), which emits it as `OPPEnvelope`.
-struct opp_contract_client : ethereum_contract_client {
-   /// `publishOutboundEnvelope(uint32 wireEpochIndex, bytes[] messages)` — permissionless. Publishes the envelope
-   /// the outpost finalized for `wireEpochIndex`; the messages ride as `0x`-hex strings, the libfc encoder's
-   /// form for `bytes`. The contract re-chains them and refuses any list but the finalized one, so a relay that
-   /// read the wrong messages pays for a revert and publishes nothing. An epoch already published is a no-op.
-   ethereum_contract_tx_fn<fc::variant, uint32_t, fc::variants> publish_outbound_envelope;
-   /// View `getFinalizedOutbound(uint32)`: `(bytes32 endHash, uint64 messageEnd, uint64 timestampMs,
-   /// uint64 firstMessageBlock, uint64 publishedBlock)`, all zero for an epoch never finalized or pruned.
-   ethereum_contract_call_fn<fc::variant, uint32_t> finalized_outbound;
-   /// View `latestOutboundEpoch()`: the latest PUBLISHED outbound epoch.
-   ethereum_contract_call_fn<fc::variant> latest_outbound_epoch;
-   /// View `publishedOutboundCursor()`: `(bytes32 chainHash, uint64 messageEnd)`, where the latest published
-   /// envelope ended on the outbound chain — what the next publication re-chains from.
-   ethereum_contract_call_fn<fc::variant> published_outbound_cursor;
-   /// View `outboundEnvelopes(uint32)`: the outpost's write-once record of the envelope it published for an
-   /// epoch, `(uint32 epochIndex, uint64 emittedAt, bytes32 checksum)`, kept for its retention window.
-   ethereum_contract_call_fn<fc::variant, uint32_t> outbound_envelopes;
-
-   opp_contract_client(const ethereum_client_ptr& client,
-                       const address_compat_type& contract_address,
-                       const std::vector<fc::network::ethereum::abi::contract>& contracts)
-      : ethereum_contract_client(client, contract_address, contracts)
-      , publish_outbound_envelope(create_tx_and_confirm<fc::variant, uint32_t, fc::variants>(
-           get_abi(opp_abi_name::publish_outbound_envelope)))
-      , finalized_outbound(create_call<fc::variant, uint32_t>(get_abi(opp_abi_name::finalized_outbound)))
-      , latest_outbound_epoch(create_call<fc::variant>(get_abi(opp_abi_name::latest_outbound_epoch)))
-      , published_outbound_cursor(create_call<fc::variant>(get_abi(opp_abi_name::published_outbound_cursor)))
-      , outbound_envelopes(create_call<fc::variant, uint32_t>(get_abi(opp_abi_name::outbound_envelopes))) {}
-};
 
 /// EIP-7825's per-transaction gas cap (2^24) — the most any single `epochIn`
 /// can be funded with, whatever the client's policy allows.
@@ -331,7 +303,8 @@ inline constexpr auto logs         = "logs";
 std::string send_submission_attempt(ethereum_client& client, const signed_transaction& signed_tx,
                                     ethereum_submission& submission);
 
-/// What one `epochIn` left on chain, read from its receipt once it confirmed.
+/// What one journaled call — an `epochIn` or a `publishOutboundEnvelope` — left on chain, read from its receipt
+/// once it confirmed.
 struct epoch_in_receipt {
    /// The transaction's hash, for logs.
    std::string  tx_hash;
@@ -366,6 +339,103 @@ inline epoch_in_receipt parse_epoch_in_receipt(std::string tx_hash, const fc::va
    }
    return parsed;
 }
+
+/**
+ * @brief Confirmation options for one `publishOutboundEnvelope`: gas from the node's estimate, as the client
+ *        buffers it, and the receipt awaited for `receipt_wait`.
+ *
+ * The receipt wait replaces the library's default retry budget, as in `delivery_confirm_options`.
+ *
+ * @param receipt_wait How long to wait for the receipt.
+ * @return The options the call is sent with.
+ */
+inline ethereum_confirm_options publication_confirm_options(fc::microseconds receipt_wait) {
+   ethereum_confirm_options options = ethereum_confirm_option_defaults;
+   options.retry.total_timeout      = receipt_wait;
+   return options;
+}
+
+/// Typed contract client for OPP.sol.
+///
+/// OPP stores no outbound payload: each message is emitted whole as an `OutboundMessage` event and folded into a
+/// hash chain; the outpost's consensus tip closes an epoch's envelope at a point on that chain, and anyone
+/// publishes it by handing the messages back (`publishOutboundEnvelope`), which emits it as `OPPEnvelope`.
+struct opp_contract_client : ethereum_contract_client {
+   /// `publishOutboundEnvelope(uint32 wireEpochIndex, bytes[] messages)` — permissionless. Publishes the envelope
+   /// the outpost finalized for `wireEpochIndex`; the messages ride as `0x`-hex strings, the libfc encoder's
+   /// form for `bytes`. The contract re-chains them and refuses any list but the finalized one, so a relay that
+   /// read the wrong messages pays for a revert and publishes nothing. An epoch already published is a no-op.
+   ///
+   /// Journaled like `epochIn`: `submission` is filled after signing and before the send, so a caller whose send
+   /// or receipt wait threw still knows the nonce, fees and hash it may have left in flight. Returns the
+   /// confirmed receipt. The ABI arguments are bound as non-const lvalue references, so callers materialize
+   /// named locals.
+   std::function<epoch_in_receipt(uint32_t& epoch_index, fc::variants& messages, fc::time_point deadline,
+                                  ethereum_submission& submission)>
+      publish_outbound_envelope;
+   /// View `getFinalizedOutbound(uint32)`: `(bytes32 endHash, uint64 messageEnd, uint64 timestampMs,
+   /// uint64 firstMessageBlock, uint64 publishedBlock)`, all zero for an epoch never finalized or pruned.
+   ethereum_contract_call_fn<fc::variant, uint32_t> finalized_outbound;
+   /// View `latestOutboundEpoch()`: the latest PUBLISHED outbound epoch.
+   ethereum_contract_call_fn<fc::variant> latest_outbound_epoch;
+   /// View `publishedOutboundCursor()`: `(bytes32 chainHash, uint64 messageEnd)`, where the latest published
+   /// envelope ended on the outbound chain — what the next publication re-chains from.
+   ethereum_contract_call_fn<fc::variant> published_outbound_cursor;
+   /// View `outboundEnvelopes(uint32)`: the outpost's write-once record of the envelope it published for an
+   /// epoch, `(uint32 epochIndex, uint64 emittedAt, bytes32 checksum)`, kept for its retention window.
+   ethereum_contract_call_fn<fc::variant, uint32_t> outbound_envelopes;
+   /// View `latestFinalizedOutboundEpoch()`: the latest epoch whose envelope the consensus tip closed.
+   ethereum_contract_call_fn<fc::variant> latest_finalized_outbound_epoch;
+   /// View `outboundCutCount()`: envelopes an in-flight overflow has closed early, ever.
+   ethereum_contract_call_fn<fc::variant> outbound_cut_count;
+   /// View `outboundCutsAssigned()`: how many of those an epoch has taken; the rest wait, in order.
+   ethereum_contract_call_fn<fc::variant> outbound_cuts_assigned;
+   /// View `getOutboundCut(uint64)`: `(bytes32 endHash, uint64 messageEnd, uint64 firstMessageBlock)` of an
+   /// envelope closed early, all zero once an epoch takes it.
+   ethereum_contract_call_fn<fc::variant, uint64_t> outbound_cut;
+   /// View `openEnvelopeFirstBlock()`: the block the open envelope's first message was emitted in; zero while it
+   /// is empty.
+   ethereum_contract_call_fn<fc::variant> open_envelope_first_block;
+
+   opp_contract_client(const ethereum_client_ptr& client,
+                       const address_compat_type& contract_address,
+                       const std::vector<fc::network::ethereum::abi::contract>& contracts)
+      : ethereum_contract_client(client, contract_address, contracts)
+      , publish_outbound_envelope([this](uint32_t& epoch_index, fc::variants& messages, fc::time_point deadline,
+                                         ethereum_submission& submission) -> epoch_in_receipt {
+           const auto&                abi    = get_abi(opp_abi_name::publish_outbound_envelope);
+           contract_invoke_data_items params = {epoch_index, messages};
+           auto tx = this->client->create_default_tx(this->contract_address, abi, params, 0, 0);
+           tx.data              = fc::from_hex(contract_encode_data(abi, params));
+           const auto signed_tx = this->client->sign_transaction(tx, abi.name);
+           submission           = ethereum_submission{
+                        .purpose     = submission_purpose::publish,
+                        .epoch_index = epoch_index,
+                        .transaction = tx,
+                        .attempts    = {{.tx_hash = signed_tx.tx_hash,
+                                         .fees    = {.max_priority_fee_per_gas = tx.max_priority_fee_per_gas,
+                                                     .max_fee_per_gas          = tx.max_fee_per_gas},
+                                         .raw_hex = signed_tx.raw_hex}},
+                        .state       = submission_state::pending,
+                        .landed_at   = std::nullopt,
+           };
+           const auto tx_hash = send_submission_attempt(*this->client, signed_tx, submission);
+           // Measured after the send, so the wait gets exactly what is left.
+           const auto receipt_wait = std::max(fc::microseconds(), deadline - fc::time_point::now());
+           return parse_epoch_in_receipt(tx_hash,
+                                         this->client->wait_for_receipt(tx_hash, publication_confirm_options(receipt_wait)));
+        })
+      , finalized_outbound(create_call<fc::variant, uint32_t>(get_abi(opp_abi_name::finalized_outbound)))
+      , latest_outbound_epoch(create_call<fc::variant>(get_abi(opp_abi_name::latest_outbound_epoch)))
+      , published_outbound_cursor(create_call<fc::variant>(get_abi(opp_abi_name::published_outbound_cursor)))
+      , outbound_envelopes(create_call<fc::variant, uint32_t>(get_abi(opp_abi_name::outbound_envelopes)))
+      , latest_finalized_outbound_epoch(
+           create_call<fc::variant>(get_abi(opp_abi_name::latest_finalized_outbound_epoch)))
+      , outbound_cut_count(create_call<fc::variant>(get_abi(opp_abi_name::outbound_cut_count)))
+      , outbound_cuts_assigned(create_call<fc::variant>(get_abi(opp_abi_name::outbound_cuts_assigned)))
+      , outbound_cut(create_call<fc::variant, uint64_t>(get_abi(opp_abi_name::outbound_cut)))
+      , open_envelope_first_block(create_call<fc::variant>(get_abi(opp_abi_name::open_envelope_first_block))) {}
+};
 
 /// ABI entry names of `OPPInbound.sol` the typed wrapper binds.
 namespace opp_inbound_abi_name {

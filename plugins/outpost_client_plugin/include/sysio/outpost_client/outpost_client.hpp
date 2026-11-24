@@ -126,7 +126,11 @@ public:
     * `envelope epoch_index mismatch` assertion. A client may have work to do
     * before the envelope can be read — the Ethereum outpost publishes an
     * envelope only when a relay hands it the epoch's messages, which its client
-    * does from here — and returns empty until it can.
+    * does from here — and returns empty until it can. The bytes need not come
+    * from a settled block: on Ethereum the envelope is fixed once the outpost's
+    * record closing it is settled, and any publication of it carries the same
+    * bytes, so the client delivers a publication from the head once it matches
+    * that settled record.
     *
     * @param epoch_index  Only envelopes whose `epoch_index` field matches this
     *                     value are returned; all others are silently dropped.
@@ -179,6 +183,22 @@ public:
       (void)epoch_index;
       (void)deadline;
    }
+
+   /**
+    * @brief OUTPOST FOLLOWING — keep up with what the outpost emits, as it emits it.
+    *
+    * Called on its own cadence (`batch-outpost-follow-ms`), whether or not this operator is elected, so the
+    * operator elected for an epoch already holds what the outpost emitted toward it. Following is a cache: it
+    * never decides what is delivered, and a client that follows nothing loses only latency.
+    *
+    * The default follows nothing. The Ethereum relay overrides it to collect the outpost's `OutboundMessage`
+    * events from a block cursor, so no block is skipped however late a call comes, and the messages of the
+    * pending outbound epochs are in hand when the epoch is published.
+    *
+    * @param deadline  Upper bound on the total time spent talking to the remote chain for this call.
+    * @throws fc::exception on RPC failure or deadline expiry.
+    */
+   virtual void follow_outpost(fc::microseconds deadline) { (void)deadline; }
 
 protected:
    /// Throw `fc::timeout_exception` if the wall-clock has crossed `deadline_abs`.

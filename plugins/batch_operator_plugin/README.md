@@ -22,11 +22,17 @@ Run by every member of the elected group, for every active outpost chain:
 3. The outpost reaches consensus once enough group members have delivered identical bytes
 
 **Inbound (Outposts → WIRE):**
-1. The outpost emits its outbound envelope once it has dispatched the inbound one (ETH: in the `epochIn`
-   that finishes dispatch, a continuation if it spilled; SOL: in the consensus-reaching `epoch_in`)
-2. Read the latest outbound envelope from Outpost storage
+1. The outpost closes its outbound envelope once it has dispatched the inbound one (ETH: the `epochIn` that
+   finishes dispatch finalizes it on the outbound hash chain, and the relay publishes it right after, at the
+   next nonce; SOL: the consensus-reaching `epoch_in` emits it)
+2. Read the envelope: ETH, once the finalization is as deep as the read confirmation, from a publication that
+   matches it; SOL, from outpost storage at finalized commitment
 3. Deliver its raw protobuf bytes to Depot (`sysio.msgch::deliver`)
 4. Depot evaluates consensus across the group's deliveries
+
+Between epochs every operator, elected or not, follows what each outpost emits
+(`--batch-outpost-follow-ms`): on Ethereum, the outbound messages from a block cursor, so the operator elected
+for an epoch already holds the messages it publishes.
 
 ## Depot cranks
 
@@ -71,6 +77,7 @@ permission then need not be linked for `sysio.kicker::kick`.
 |--------|---------|-------------|
 | `--batch-operator-account` | — | WIRE account name for this operator. Configuring it enables the relay |
 | `--batch-epoch-poll-ms` | 15000 | How often to check epoch state (ms) |
+| `--batch-outpost-follow-ms` | 4000 | How often each outpost relay follows what its outpost emits, elected or not (ms). Following reads from a block cursor, so this bounds only how stale the relay's view may be; no block is skipped at any spacing. Must be at least 1 |
 | `--batch-delivery-timeout-ms` | 60000 | Max time for one outbound delivery, every transaction and confirmation wait included (ms). On Ethereum a single receipt wait may use whatever of it is left, so size it past the outpost chain's block time. |
 | `--batch-yield-tick-interval-ms` | 60000 | Minimum spacing between this operator's `sysio.swap::tickyield` pushes per yield pool (ms) |
 | `--batch-underwriter-account` | none | `account` or `account@permission` (default `active`) the underwriter bonds from. Configuring it enables the underwriter |

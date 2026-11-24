@@ -3,8 +3,11 @@
 #include <algorithm>
 #include <cctype>
 #include <limits>
+#include <mutex>
 #include <optional>
 
+#include <google/protobuf/io/coded_stream.h>
+#include <google/protobuf/wire_format_lite.h>
 #include <magic_enum/magic_enum.hpp>
 
 #include <fc/crypto/keccak256.hpp>
@@ -33,6 +36,8 @@ namespace detail = outpost_ethereum_client_detail;
 // ── Op labels used for deadline-exceeded error messages ──────────────────
 constexpr std::string_view OP_DELIVER_OUTBOUND = "deliver_outbound_envelope";
 constexpr std::string_view OP_READ_INBOUND     = "read_inbound_envelope";
+constexpr std::string_view OP_FOLLOW_OUTPOST   = "follow_outpost";
+constexpr std::string_view OP_PUBLISH_OUTBOUND = "publish_outbound";
 constexpr std::string_view OP_READ_EMITTED_DIGEST = "read_emitted_envelope_digest";
 
 constexpr std::string_view OP_REALIZE_YIELD    = "crank_outpost:realizeYield";
@@ -78,6 +83,12 @@ constexpr auto epoch_consensus_event_signature           = "EpochConsensus(uint3
 constexpr auto epoch_dispatch_progressed_event_signature = "EpochDispatchProgressed(uint32,uint16)";
 constexpr auto epoch_complete_event_signature            = "EpochComplete(uint32)";
 
+/// Solidity signatures of the `OPP` outbound events the relay reads out of a receipt, hashed the same way;
+/// `delivery_publishes_the_envelope_its_call_finalized` holds each to the bytes, its receipt carrying the topics
+/// written out.
+constexpr auto outbound_message_event_signature         = "OutboundMessage(uint64,bytes32,bytes)";
+constexpr auto outbound_epoch_finalized_event_signature = "OutboundEpochFinalized(uint32,uint64,uint64,bytes32,uint64)";
+
 /// The three refusals `SyndicationPool.realizeYield()` raises for its own reasons
 /// (Wire-Network/wire-ethereum#207), hashed the same way;
 /// `realize_yield_refusal_selectors_are_pinned` holds each to the bytes the contract emits.
@@ -111,6 +122,8 @@ constexpr auto first_message_block = "firstMessageBlock";
 constexpr auto published_block     = "publishedBlock";
 /// `publishedOutboundCursor()` fields.
 constexpr auto chain_hash          = "chainHash";
+/// `OutboundEpochFinalized` fields past its indexed epoch.
+constexpr auto first_message       = "firstMessage";
 /// The encoded message an `OutboundMessage` event carries.
 constexpr auto message             = "message";
 /// The envelope an `OPPEnvelope` event carries.
@@ -248,6 +261,13 @@ constexpr int    HEX_RADIX                     = 16;
 constexpr size_t FINALIZED_OUTBOUND_WORDS = 5;
 /// Words `publishedOutboundCursor()` returns: `(bytes32 chainHash, uint64 messageEnd)`.
 constexpr size_t OUTBOUND_CURSOR_WORDS    = 2;
+/// Words `getOutboundCut(uint64)` returns: `(bytes32 endHash, uint64 messageEnd, uint64 firstMessageBlock)`.
+constexpr size_t OUTBOUND_CUT_WORDS       = 3;
+
+/// The most blocks one `eth_getLogs` of the outbound messages spans. Hosted RPCs cap the range of one log query
+/// (commonly at a few thousand blocks); reading in ranges this size keeps a catch-up over a long idle stretch, or
+/// after a restart, inside every such cap.
+constexpr uint64_t MAX_LOG_SCAN_BLOCKS = 1'000;
 
 /// Topic index of the first indexed argument in a receipt log (`topics[0]` is
 /// the event signature).
@@ -445,8 +465,14 @@ std::string revert_hex(const fc::network::json_rpc::json_rpc_error& refusal) {
 
 /// A journaled transaction as the logs name it.
 std::string describe_submission(const ethereum_submission& submission) {
-   if (submission.purpose == submission_purpose::cancel) {
+   switch (submission.purpose) {
+   case submission_purpose::cancel:
       return "the cancel at nonce " + submission.transaction.nonce.str();
+   case submission_purpose::publish:
+      return "the publication of outbound epoch=" + std::to_string(submission.epoch_index) + " at nonce " +
+             submission.transaction.nonce.str();
+   case submission_purpose::epoch_in:
+      break;
    }
    return "the epochIn for epoch=" + std::to_string(submission.epoch_index) + " at nonce " +
           submission.transaction.nonce.str();
@@ -620,6 +646,91 @@ std::string outbound_chain_hash(std::string_view start, const std::vector<std::v
    return head;
 }
 
+void outbound_message_cache::reset(outbound_chain_point start) {
+   _start = std::move(start);
+   _messages.clear();
+   _started = true;
+}
+
+void outbound_message_cache::clear() {
+   _start = {};
+   _messages.clear();
+   _started = false;
+}
+
+follow_result outbound_message_cache::follow(outbound_message message) {
+   if (!_started) return follow_result::discontinuous;
+   if (message.index < _start.message_end) return follow_result::behind;
+   if (message.index < end()) {
+      const auto& held = _messages[message.index - _start.message_end];
+      return held.message == message.message && held.chain_hash == message.chain_hash
+                ? follow_result::duplicate
+                : follow_result::discontinuous;
+   }
+   if (message.index > end()) return follow_result::discontinuous;
+   const auto& previous = _messages.empty() ? _start.chain_hash : _messages.back().chain_hash;
+   if (outbound_chain_hash(previous, std::vector<std::vector<char>>{message.message}) != message.chain_hash) {
+      return follow_result::discontinuous;
+   }
+   _messages.push_back(std::move(message));
+   return follow_result::appended;
+}
+
+std::optional<std::vector<std::vector<char>>> outbound_message_cache::between(const outbound_chain_point& start,
+                                                                              const outbound_chain_point& end) const {
+   if (!_started || start.message_end < _start.message_end || end.message_end < start.message_end ||
+       end.message_end > this->end()) {
+      return std::nullopt;
+   }
+   const uint64_t first = start.message_end - _start.message_end;
+   const uint64_t last  = end.message_end - _start.message_end;
+   const auto&    before = first == 0 ? _start.chain_hash : _messages[first - 1].chain_hash;
+   if (before != start.chain_hash) return std::nullopt;
+   const auto& after = last == 0 ? _start.chain_hash : _messages[last - 1].chain_hash;
+   if (after != end.chain_hash) return std::nullopt;
+   std::vector<std::vector<char>> messages;
+   messages.reserve(last - first);
+   for (uint64_t i = first; i < last; ++i) messages.push_back(_messages[i].message);
+   return messages;
+}
+
+void outbound_message_cache::forget_before(uint64_t index) {
+   if (!_started || index <= _start.message_end || index > end()) return;
+   const uint64_t drop = index - _start.message_end;
+   _start              = {.chain_hash = _messages[drop - 1].chain_hash, .message_end = index};
+   _messages.erase(_messages.begin(), _messages.begin() + static_cast<std::ptrdiff_t>(drop));
+}
+
+bool envelope_matches_finalized(const std::vector<char>& envelope, uint32_t epoch_index,
+                                const finalized_outbound& finalized, const outbound_chain_point& start) {
+   using wire = google::protobuf::internal::WireFormatLite;
+   if (envelope.size() > static_cast<size_t>(std::numeric_limits<int>::max())) return false;
+   const auto size = static_cast<int>(envelope.size());
+
+   sysio::opp::Envelope header;
+   if (!header.ParseFromArray(envelope.data(), size)) return false;
+   if (header.epoch_index() != epoch_index || header.epoch_timestamp() != finalized.timestamp_ms) return false;
+   if (finalized.end.message_end < start.message_end) return false;
+
+   // The messages exactly as the envelope frames them: encoding a parsed
+   // message again need not give back the bytes the outpost chained.
+   std::vector<std::vector<char>>          messages;
+   google::protobuf::io::CodedInputStream input(reinterpret_cast<const uint8_t*>(envelope.data()), size);
+   while (const uint32_t tag = input.ReadTag()) {
+      if (wire::GetTagFieldNumber(tag) != sysio::opp::Envelope::kMessagesFieldNumber ||
+          wire::GetTagWireType(tag) != wire::WIRETYPE_LENGTH_DELIMITED) {
+         if (!wire::SkipField(&input, tag)) return false;
+         continue;
+      }
+      uint32_t    length = 0;
+      std::string bytes;
+      if (!input.ReadVarint32(&length) || !input.ReadString(&bytes, static_cast<int>(length))) return false;
+      messages.emplace_back(bytes.begin(), bytes.end());
+   }
+   if (messages.size() != finalized.end.message_end - start.message_end) return false;
+   return outbound_chain_hash(start.chain_hash, messages) == finalized.end.chain_hash;
+}
+
 std::optional<realize_yield_refusal> classify_realize_yield_revert(std::string_view revert_data) {
    const auto data = strip_hex_prefix(revert_data);
    if (data.size() < EVM_SELECTOR_HEX_CHARS) return std::nullopt;
@@ -750,6 +861,100 @@ std::optional<fc::uint256> first_unaccounted_nonce(const fc::uint256& latest, co
 }
 
 } // namespace outpost_ethereum_client_detail
+
+namespace {
+
+/// The `0x`-hex payload one decoded event field carries, or an assertion naming `event_name` and `field_name`.
+std::vector<char> decoded_bytes_field(const fc::variant_object& decoded, const char* field_name,
+                                      std::string_view client_label, const char* event_name) {
+   FC_ASSERT(decoded.contains(field_name) && decoded[field_name].is_string(),
+             "outpost_ethereum_client[{}]: an {} log carried no '{}'", client_label, event_name, field_name);
+   const auto raw = fc::crypto::ethereum::hex_to_bytes(decoded[field_name].as_string());
+   return {reinterpret_cast<const char*>(raw.data()), reinterpret_cast<const char*>(raw.data() + raw.size())};
+}
+
+/// The decoded non-indexed fields of `event`, or an assertion naming the decoder's reason.
+fc::variant_object decoded_event(const eth::ethereum_event_data& event, std::string_view client_label) {
+   const auto decoded = event.decode<fc::variant_object>();
+   FC_ASSERT(decoded, "outpost_ethereum_client[{}]: an {} log did not decode: {}", client_label, event.event_name,
+             decoded ? std::string{} : decoded.error().to_detail_string());
+   return *decoded;
+}
+
+/// The indexed `uint` in `event`'s first indexed topic, or an assertion.
+uint64_t indexed_uint(const eth::ethereum_event_data& event, std::string_view client_label) {
+   FC_ASSERT(event.topics.size() > FIRST_INDEXED_TOPIC, "outpost_ethereum_client[{}]: an {} log carries no topic {}",
+             client_label, event.event_name, FIRST_INDEXED_TOPIC);
+   const auto value = word_to_uint(normalized_hex(event.topics[FIRST_INDEXED_TOPIC]));
+   FC_ASSERT(value, "outpost_ethereum_client[{}]: an {} log carries a malformed indexed value '{}'", client_label,
+             event.event_name, event.topics[FIRST_INDEXED_TOPIC]);
+   return *value;
+}
+
+/// A normalised word field of a decoded event, or an assertion.
+std::string decoded_word_field(const fc::variant_object& decoded, const char* field_name,
+                               std::string_view client_label, std::string_view event_name) {
+   auto word = decoded.contains(field_name) ? normalized_word(decoded[field_name]) : std::string{};
+   FC_ASSERT(is_hex_word(word), "outpost_ethereum_client[{}]: an {} log carried a malformed '{}'", client_label,
+             event_name, field_name);
+   return word;
+}
+
+/// A `uint` field of a decoded event, or an assertion.
+uint64_t decoded_uint_field(const fc::variant_object& decoded, const char* field_name,
+                            std::string_view client_label, std::string_view event_name) {
+   const auto value = decoded.contains(field_name) ? abi_uint_output(decoded[field_name]) : std::nullopt;
+   FC_ASSERT(value, "outpost_ethereum_client[{}]: an {} log carried a malformed '{}'", client_label, event_name,
+             field_name);
+   return *value;
+}
+
+/// One `OutboundMessage` log as the message it carries.
+detail::outbound_message outbound_message_from(const eth::ethereum_event_data& event, std::string_view client_label) {
+   const auto decoded = decoded_event(event, client_label);
+   return {
+      .index      = indexed_uint(event, client_label),
+      .chain_hash = decoded_word_field(decoded, opp_abi::field::chain_hash, client_label, event.event_name),
+      .message    = decoded_bytes_field(decoded, opp_abi::field::message, client_label,
+                                        opp_abi_name::event_outbound_message),
+      .block      = event.block_number.convert_to<uint64_t>(),
+   };
+}
+
+/// One `OutboundEpochFinalized` log as the epoch it finalized.
+detail::finalized_epoch_event finalized_epoch_from(const eth::ethereum_event_data& event,
+                                                   std::string_view                 client_label) {
+   const auto decoded = decoded_event(event, client_label);
+   const auto epoch   = indexed_uint(event, client_label);
+   FC_ASSERT(epoch <= std::numeric_limits<uint32_t>::max(),
+             "outpost_ethereum_client[{}]: an {} log names epoch {}, past uint32", client_label, event.event_name,
+             epoch);
+   return {
+      .epoch_index   = static_cast<uint32_t>(epoch),
+      .first_message = decoded_uint_field(decoded, opp_abi::field::first_message, client_label, event.event_name),
+      .end           = {.chain_hash  = decoded_word_field(decoded, opp_abi::field::end_hash, client_label,
+                                                          event.event_name),
+                        .message_end = decoded_uint_field(decoded, opp_abi::field::message_end, client_label,
+                                                          event.event_name)},
+      .timestamp_ms  = decoded_uint_field(decoded, opp_abi::field::timestamp_ms, client_label, event.event_name),
+   };
+}
+
+/// A receipt's log entry as the event data `get_events` would have returned for it.
+eth::ethereum_event_data event_from_receipt_log(const fc::variant_object& log, const fc::uint256& block,
+                                                const eth::abi::contract& abi) {
+   eth::ethereum_event_data event;
+   event.event_name   = abi.name;
+   event.event_abi    = abi;
+   event.block_number = block;
+   for (const auto& topic : log[receipt_log_field::topics].get_array()) event.topics.push_back(topic.as_string());
+   if (log.contains(receipt_log_field::data) && log[receipt_log_field::data].is_string()) {
+      event.data = fc::crypto::ethereum::hex_to_bytes(log[receipt_log_field::data].as_string());
+   }
+   return event;
+}
+
+} // namespace
 
 std::string send_submission_attempt(ethereum_client& client, const signed_transaction& signed_tx,
                                     ethereum_submission& submission) {
@@ -1443,6 +1648,11 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
            to_string(), action == detail::delivery_action::continue_dispatch ? "continued" : "delivered",
            epoch_index, total, gas_budget, receipt.block_number.str(), receipt.tx_hash, summary.recorded,
            summary.tipped, summary.dispatched ? std::to_string(*summary.dispatched) : "-", summary.finalized);
+
+      // The call that finalized the epoch closed its outbound envelope too.
+      // Published now, at the next nonce, it cannot land before this call, and
+      // a reorg that drops this call brings it back after it.
+      if (summary.finalized && _opp_client) publish_after_finalizing(epoch_index, receipt, deadline_abs);
    }
 }
 
@@ -1539,118 +1749,303 @@ std::vector<char> outpost_ethereum_client::read_published_envelope(uint32_t epoc
    return {};
 }
 
-std::optional<std::vector<std::vector<char>>> outpost_ethereum_client::read_outbound_messages(
-   uint64_t first, uint64_t end, uint64_t from_block, const eth::block_number_or_tag_t& to_block) {
-   std::vector<std::vector<char>> messages;
-   if (end <= first) return messages;
-   messages.resize(end - first);
-   std::vector<bool> found(end - first, false);
-   const auto events = _entry->client->get_events(_opp_addr, {opp_abi_name::event_outbound_message},
-                                                  {_opp_client->get_abi(opp_abi_name::event_outbound_message)},
-                                                  pinned(fc::uint256{from_block}), to_block);
-   for (const auto& event : events) {
-      // `messageIndex` is the event's one indexed argument.
-      FC_ASSERT(event.topics.size() > FIRST_INDEXED_TOPIC,
-                "outpost_ethereum_client[{}]: an {} log carries no message index", to_string(),
-                opp_abi_name::event_outbound_message);
-      const auto index = word_to_uint(normalized_hex(event.topics[FIRST_INDEXED_TOPIC]));
-      FC_ASSERT(index.has_value(), "outpost_ethereum_client[{}]: an {} log carries a malformed message index '{}'",
-                to_string(), opp_abi_name::event_outbound_message, event.topics[FIRST_INDEXED_TOPIC]);
-      if (*index < first || *index >= end) continue;
-      const auto decoded = event.decode<fc::variant_object>();
-      FC_ASSERT(decoded, "outpost_ethereum_client[{}]: {} log {} did not decode: {}", to_string(),
-                opp_abi_name::event_outbound_message, *index,
-                decoded ? std::string{} : decoded.error().to_detail_string());
-      FC_ASSERT(decoded->contains(opp_abi::field::message) && (*decoded)[opp_abi::field::message].is_string(),
-                "outpost_ethereum_client[{}]: {} log {} carried no '{}'", to_string(),
-                opp_abi_name::event_outbound_message, *index, opp_abi::field::message);
-      const auto raw = fc::crypto::ethereum::hex_to_bytes((*decoded)[opp_abi::field::message].as_string());
-      const auto slot = *index - first;
-      messages[slot]  = std::vector<char>(reinterpret_cast<const char*>(raw.data()),
-                                          reinterpret_cast<const char*>(raw.data() + raw.size()));
-      found[slot]     = true;
+detail::outbound_chain_point outpost_ethereum_client::read_published_cursor(const eth::block_number_or_tag_t& block) {
+   const auto raw = view_hex(_opp_client->published_outbound_cursor(block), to_string(),
+                             opp_abi_name::published_outbound_cursor);
+   FC_ASSERT(raw.size() == HEX_PREFIX_CHARS + OUTBOUND_CURSOR_WORDS * EVM_ABI_WORD_HEX_CHARS,
+             "outpost_ethereum_client[{}]: {} did not return one chain point", to_string(),
+             opp_abi_name::published_outbound_cursor);
+   const auto decoded = eth::contract_decode_data(_opp_client->get_abi(opp_abi_name::published_outbound_cursor), raw);
+   FC_ASSERT(decoded.is_object(), "outpost_ethereum_client[{}]: {} did not decode", to_string(),
+             opp_abi_name::published_outbound_cursor);
+   const auto& object = decoded.get_object();
+   const auto  end    = abi_uint_output(object[opp_abi::field::message_end]);
+   auto        hash   = normalized_word(object[opp_abi::field::chain_hash]);
+   FC_ASSERT(end.has_value() && is_hex_word(hash), "outpost_ethereum_client[{}]: {} carried a malformed chain point",
+             to_string(), opp_abi_name::published_outbound_cursor);
+   return {.chain_hash = std::move(hash), .message_end = *end};
+}
+
+uint64_t outpost_ethereum_client::read_opp_uint(const ethereum_contract_call_fn<fc::variant>& view,
+                                                const char* view_name, const eth::block_number_or_tag_t& block) {
+   const auto raw   = view_hex(view(block), to_string(), view_name);
+   const auto value = abi_uint_output(eth::contract_decode_data(_opp_client->get_abi(view_name), raw));
+   FC_ASSERT(value.has_value(), "outpost_ethereum_client[{}]: {} was not a parsable numeric output", to_string(),
+             view_name);
+   return *value;
+}
+
+std::vector<detail::outbound_message> outpost_ethereum_client::read_outbound_message_logs(uint64_t from_block,
+                                                                                       uint64_t to_block) {
+   std::vector<detail::outbound_message> messages;
+   const auto&                           abi = _opp_client->get_abi(opp_abi_name::event_outbound_message);
+   for (uint64_t first = from_block; first <= to_block;) {
+      const uint64_t last   = to_block - first < MAX_LOG_SCAN_BLOCKS ? to_block : first + MAX_LOG_SCAN_BLOCKS - 1;
+      const auto     events = _entry->client->get_events(_opp_addr, {opp_abi_name::event_outbound_message}, {abi},
+                                                         pinned(fc::uint256{first}), pinned(fc::uint256{last}));
+      for (const auto& event : events) messages.push_back(outbound_message_from(event, to_string()));
+      if (last == to_block) break;
+      first = last + 1;
    }
-   if (!std::ranges::all_of(found, [](bool present) { return present; })) return std::nullopt;
    return messages;
 }
 
-void outpost_ethereum_client::publish_next_outbound(uint32_t epoch_index, const eth::block_number_or_tag_t& settled) {
-   const auto latest_raw =
-      view_hex(_opp_client->latest_outbound_epoch(settled), to_string(), opp_abi_name::latest_outbound_epoch);
-   const auto latest_published = abi_uint_output(
-      eth::contract_decode_data(_opp_client->get_abi(opp_abi_name::latest_outbound_epoch), latest_raw));
-   FC_ASSERT(latest_published.has_value(), "outpost_ethereum_client[{}]: {} was not a parsable numeric output",
-             to_string(), opp_abi_name::latest_outbound_epoch);
-   // Publication is ordered: the next epoch to publish is the one after the latest published, and a relay asked
-   // for a later epoch publishes the earlier one first.
-   const uint64_t next = *latest_published + 1;
-   if (next > epoch_index) return;
-   const auto target = static_cast<uint32_t>(next);
-   const auto finalized = read_finalized_outbound(target, settled);
-   if (!finalized) {
-      dlog("outpost_ethereum_client[{}]: outbound epoch {} is not finalized at the read confirmation", to_string(),
-           target);
-      return;
+void outpost_ethereum_client::start_following(uint64_t head) {
+   const auto at        = pinned(fc::uint256{head});
+   const auto cursor    = read_published_cursor(at);
+   const auto published = read_opp_uint(_opp_client->latest_outbound_epoch, opp_abi_name::latest_outbound_epoch, at);
+   const auto finalized =
+      read_opp_uint(_opp_client->latest_finalized_outbound_epoch, opp_abi_name::latest_finalized_outbound_epoch, at);
+
+   // The first message after the published cursor opens the first envelope that
+   // holds one: an unpublished finalized envelope, an early-closed envelope
+   // waiting for an epoch, or the open envelope, in that order. Messages are
+   // emitted in stream order, so none of the pending ones is in an earlier block.
+   uint64_t first_block = 0;
+   for (uint64_t epoch = published + 1; epoch <= finalized && first_block == 0; ++epoch) {
+      const auto record = read_finalized_outbound(static_cast<uint32_t>(epoch), at);
+      if (record) first_block = record->first_message_block;
+   }
+   if (first_block == 0) {
+      const auto assigned = read_opp_uint(_opp_client->outbound_cuts_assigned, opp_abi_name::outbound_cuts_assigned, at);
+      const auto count    = read_opp_uint(_opp_client->outbound_cut_count, opp_abi_name::outbound_cut_count, at);
+      for (uint64_t cut = assigned + 1; cut <= count && first_block == 0; ++cut) {
+         uint64_t   number = cut;
+         const auto raw    = view_hex(_opp_client->outbound_cut(at, number), to_string(), opp_abi_name::outbound_cut);
+         FC_ASSERT(raw.size() == HEX_PREFIX_CHARS + OUTBOUND_CUT_WORDS * EVM_ABI_WORD_HEX_CHARS,
+                   "outpost_ethereum_client[{}]: {}({}) did not return one record", to_string(),
+                   opp_abi_name::outbound_cut, cut);
+         const auto decoded = eth::contract_decode_data(_opp_client->get_abi(opp_abi_name::outbound_cut), raw);
+         FC_ASSERT(decoded.is_object(), "outpost_ethereum_client[{}]: {}({}) did not decode", to_string(),
+                   opp_abi_name::outbound_cut, cut);
+         first_block = abi_uint_output(decoded.get_object()[opp_abi::field::first_message_block]).value_or(0);
+      }
+   }
+   if (first_block == 0) {
+      first_block =
+         read_opp_uint(_opp_client->open_envelope_first_block, opp_abi_name::open_envelope_first_block, at);
    }
 
-   const auto cursor_raw =
-      view_hex(_opp_client->published_outbound_cursor(settled), to_string(), opp_abi_name::published_outbound_cursor);
-   FC_ASSERT(cursor_raw.size() == HEX_PREFIX_CHARS + OUTBOUND_CURSOR_WORDS * EVM_ABI_WORD_HEX_CHARS,
-             "outpost_ethereum_client[{}]: {} did not return one chain point", to_string(),
-             opp_abi_name::published_outbound_cursor);
-   const auto cursor_var =
-      eth::contract_decode_data(_opp_client->get_abi(opp_abi_name::published_outbound_cursor), cursor_raw);
-   FC_ASSERT(cursor_var.is_object(), "outpost_ethereum_client[{}]: {} did not decode", to_string(),
-             opp_abi_name::published_outbound_cursor);
-   const auto& cursor_object = cursor_var.get_object();
-   const auto  cursor_end    = abi_uint_output(cursor_object[opp_abi::field::message_end]);
-   const auto  cursor_hash   = normalized_word(cursor_object[opp_abi::field::chain_hash]);
-   FC_ASSERT(cursor_end.has_value() && is_hex_word(cursor_hash),
-             "outpost_ethereum_client[{}]: {} carried a malformed chain point", to_string(),
-             opp_abi_name::published_outbound_cursor);
-   FC_ASSERT(*cursor_end <= finalized->end.message_end,
-             "outpost_ethereum_client[{}]: outbound epoch {} ends at message {}, before the published cursor at {}",
-             to_string(), target, finalized->end.message_end, *cursor_end);
+   _followed.reset(cursor);
+   _follow_next_block = first_block != 0 ? first_block : head + 1;
+   ilog("outpost_ethereum_client[{}]: following outbound messages from message {} (published through epoch {}), "
+        "reading from block {}",
+        to_string(), cursor.message_end, published, _follow_next_block);
+}
 
-   const auto messages =
-      read_outbound_messages(*cursor_end, finalized->end.message_end, finalized->first_message_block, settled);
-   if (!messages) {
-      wlog("outpost_ethereum_client[{}]: outbound epoch {} holds messages [{}, {}) from block {}, but the node "
-           "served only part of them; publishing next poll",
-           to_string(), target, *cursor_end, finalized->end.message_end, finalized->first_message_block);
-      return;
+bool outpost_ethereum_client::follow_messages(const std::vector<detail::outbound_message>& messages) {
+   for (const auto& message : messages) {
+      const auto index  = message.index;
+      const auto block  = message.block;
+      const auto result = _followed.follow(message);
+      if (result != detail::follow_result::discontinuous) continue;
+      wlog("outpost_ethereum_client[{}]: outbound message {} in block {} does not follow the messages held "
+           "(through message {}); starting again from the outpost's state",
+           to_string(), index, block, _followed.end());
+      _followed.clear();
+      return false;
    }
-   // The outpost refuses any list but the finalized one. Checking it here first means a node serving the wrong
-   // logs costs a log line, not a reverted transaction.
-   const auto chained = detail::outbound_chain_hash(cursor_hash, *messages);
-   if (chained != finalized->end.chain_hash) {
-      wlog("outpost_ethereum_client[{}]: outbound epoch {}'s {} messages chain to {}, not the finalized end {}; "
-           "not publishing",
-           to_string(), target, messages->size(), chained, finalized->end.chain_hash);
-      return;
-   }
+   return true;
+}
 
-   // Another relay may have published at the head since the read confirmation; its publication makes this one a
-   // paid no-op, so it is not sent.
-   const auto head_raw =
-      view_hex(_opp_client->latest_outbound_epoch(eth::block_tag_t::latest), to_string(),
-               opp_abi_name::latest_outbound_epoch);
-   const auto head_published = abi_uint_output(
-      eth::contract_decode_data(_opp_client->get_abi(opp_abi_name::latest_outbound_epoch), head_raw));
-   if (head_published && *head_published >= target) {
-      dlog("outpost_ethereum_client[{}]: outbound epoch {} is already published at the head", to_string(), target);
-      return;
-   }
+void outpost_ethereum_client::follow_outpost(fc::microseconds deadline) {
+   const auto               deadline_abs = fc::time_point::now() + deadline;
+   fc::task::deadline_scope rpc_deadline(deadline_abs);
+   throw_if_past_deadline(deadline_abs, OP_FOLLOW_OUTPOST);
+   if (!_opp_client) return;
 
+   const std::lock_guard lock(_follow_mutex);
+   const auto            head = _entry->client->get_block_number().convert_to<uint64_t>();
+   if (!_followed.started()) start_following(head);
+   if (_follow_next_block > head) return;
+   // The cursor moves only past blocks whose logs were all taken in.
+   if (!follow_messages(read_outbound_message_logs(_follow_next_block, head))) return;
+   _follow_next_block = head + 1;
+   // Messages published, by this relay or any other, are not needed again.
+   if (!_followed.empty()) _followed.forget_before(read_published_cursor(pinned(fc::uint256{head})).message_end);
+}
+
+std::optional<std::vector<std::vector<char>>>
+outpost_ethereum_client::epoch_messages(const detail::outbound_chain_point& start,
+                                        const detail::outbound_chain_point& end, uint64_t first_message_block,
+                                        uint64_t to_block) {
+   {
+      const std::lock_guard lock(_follow_mutex);
+      if (auto held = _followed.between(start, end)) return held;
+      // What was followed covers this epoch but does not chain to its end: a
+      // reorg the cache did not see changed what it holds.
+      if (_followed.started() && _followed.begin() <= start.message_end && _followed.end() >= end.message_end) {
+         wlog("outpost_ethereum_client[{}]: the followed outbound messages do not chain to message {} at {}; "
+              "starting again from the outpost's state",
+              to_string(), end.message_end, end.chain_hash);
+         _followed.clear();
+      }
+   }
+   if (end.message_end == start.message_end) {
+      return end.chain_hash == start.chain_hash ? std::optional{std::vector<std::vector<char>>{}} : std::nullopt;
+   }
+   if (first_message_block == 0) return std::nullopt;
+   detail::outbound_message_cache read;
+   read.reset(start);
+   for (auto& message : read_outbound_message_logs(first_message_block, to_block)) {
+      if (message.index >= end.message_end) break;
+      if (read.follow(std::move(message)) == detail::follow_result::discontinuous) return std::nullopt;
+   }
+   return read.between(start, end);
+}
+
+std::pair<std::vector<detail::outbound_message>, std::optional<detail::finalized_epoch_event>>
+outpost_ethereum_client::receipt_outbound_events(const epoch_in_receipt& receipt) {
+   const auto  message_topic   = signature_hash_hex(outbound_message_event_signature);
+   const auto  finalized_topic = signature_hash_hex(outbound_epoch_finalized_event_signature);
+   const auto& message_abi     = _opp_client->get_abi(opp_abi_name::event_outbound_message);
+   const auto& finalized_abi   = _opp_client->get_abi(opp_abi_name::event_epoch_finalized);
+
+   std::vector<detail::outbound_message>        messages;
+   std::optional<detail::finalized_epoch_event> finalized;
+   for (const auto& entry : receipt.logs) {
+      if (!entry.is_object()) continue;
+      const auto& log = entry.get_object();
+      if (!log.contains(receipt_log_field::address) || !log[receipt_log_field::address].is_string()) continue;
+      if (!detail::same_evm_address(log[receipt_log_field::address].as_string(), _opp_addr)) continue;
+      if (!log.contains(receipt_log_field::topics) || !log[receipt_log_field::topics].is_array()) continue;
+      const auto& topics = log[receipt_log_field::topics].get_array();
+      if (topics.empty() || !topics.front().is_string()) continue;
+      const auto topic = normalized_word(topics.front());
+      if (same_hex(topic, message_topic)) {
+         messages.push_back(
+            outbound_message_from(event_from_receipt_log(log, receipt.block_number, message_abi), to_string()));
+      } else if (same_hex(topic, finalized_topic)) {
+         finalized = finalized_epoch_from(event_from_receipt_log(log, receipt.block_number, finalized_abi), to_string());
+      }
+   }
+   return {std::move(messages), std::move(finalized)};
+}
+
+epoch_in_receipt outpost_ethereum_client::send_publication(uint32_t                              epoch_index,
+                                                           const std::vector<std::vector<char>>& messages,
+                                                           fc::time_point                        deadline_abs) {
+   // Nothing is sent behind a nonce the relay cannot account for or reprice.
+   settle_submissions(deadline_abs);
+
+   uint32_t     epoch_arg = epoch_index;
    fc::variants message_args;
-   message_args.reserve(messages->size());
-   for (const auto& message : *messages) {
+   message_args.reserve(messages.size());
+   for (const auto& message : messages) {
       message_args.emplace_back(fc::to_hex(message.data(), static_cast<uint32_t>(message.size())));
    }
-   uint32_t epoch_arg = target;
-   ilog("outpost_ethereum_client[{}]: publishing outbound epoch {} ({} messages)", to_string(), target,
-        messages->size());
-   _opp_client->publish_outbound_envelope(epoch_arg, message_args);
+   ethereum_submission submission;
+   std::string         unconfirmed;
+   auto&               journal = _entry->submissions->submissions;
+   try {
+      auto receipt = _opp_client->publish_outbound_envelope(epoch_arg, message_args, deadline_abs, submission);
+      submission.state     = submission_state::landed;
+      submission.landed_at = receipt.block_number;
+      journal_submission(journal, std::move(submission));
+      return receipt;
+   } catch (const fc::network::json_rpc::json_rpc_error& refusal) {
+      if (submission.attempts.empty()) throw;
+      unconfirmed = refusal.to_string();
+   } catch (const fc::exception& failure) {
+      if (submission.attempts.empty()) throw;
+      unconfirmed = failure.to_string();
+   }
+   const auto nonce = submission.transaction.nonce;
+   journal_submission(journal, std::move(submission));
+   SYS_THROW(chain::outpost_delivery_incomplete_exception,
+             "outpost_ethereum_client[{}]: the publication of outbound epoch={} at nonce {} was sent without a "
+             "receipt ({}); the next send settles it first",
+             to_string(), epoch_index, nonce.str(), unconfirmed);
+}
+
+uint32_t outpost_ethereum_client::publish_through(uint32_t epoch_index, const fc::uint256& at_block,
+                                                  const std::optional<detail::finalized_epoch_event>& known,
+                                                  fc::time_point deadline_abs) {
+   const auto at        = pinned(at_block);
+   const auto published = read_opp_uint(_opp_client->latest_outbound_epoch, opp_abi_name::latest_outbound_epoch, at);
+   auto       cursor    = read_published_cursor(at);
+   uint32_t   sent      = 0;
+   // Publication is ordered: an epoch the outpost has not reached reverts, so
+   // an earlier one left unpublished goes first.
+   for (uint64_t next = published + 1; next <= epoch_index; ++next) {
+      const auto epoch = static_cast<uint32_t>(next);
+      throw_if_past_deadline(deadline_abs, OP_PUBLISH_OUTBOUND);
+
+      detail::outbound_chain_point end;
+      uint64_t                     first_message_block = 0;
+      if (known && known->epoch_index == epoch) {
+         end = known->end;
+      } else {
+         const auto record = read_finalized_outbound(epoch, at);
+         if (!record) {
+            dlog("outpost_ethereum_client[{}]: outbound epoch {} is not finalized at block {}", to_string(), epoch,
+                 at_block.str());
+            break;
+         }
+         end                 = record->end;
+         first_message_block = record->first_message_block;
+      }
+      FC_ASSERT(cursor.message_end <= end.message_end,
+                "outpost_ethereum_client[{}]: outbound epoch {} ends at message {}, before the published cursor at {}",
+                to_string(), epoch, end.message_end, cursor.message_end);
+
+      auto messages = epoch_messages(cursor, end, first_message_block, at_block.convert_to<uint64_t>());
+      if (!messages && first_message_block == 0 && end.message_end > cursor.message_end) {
+         // Only the receipt's event was in hand; the record names where the logs start.
+         if (const auto record = read_finalized_outbound(epoch, at)) {
+            messages = epoch_messages(cursor, end, record->first_message_block, at_block.convert_to<uint64_t>());
+         }
+      }
+      if (!messages) {
+         // The outpost refuses any list but the finalized one: one that does not
+         // chain here would cost a revert and publish nothing.
+         wlog("outpost_ethereum_client[{}]: the messages of outbound epoch {} (through message {}) are not in hand "
+              "or do not chain to its finalized end {}; not publishing",
+              to_string(), epoch, end.message_end, end.chain_hash);
+         break;
+      }
+      ilog("outpost_ethereum_client[{}]: publishing outbound epoch {} ({} messages)", to_string(), epoch,
+           messages->size());
+      const auto receipt = send_publication(epoch, *messages, deadline_abs);
+      ilog("outpost_ethereum_client[{}]: published outbound epoch {} in block {} (tx={})", to_string(), epoch,
+           receipt.block_number.str(), receipt.tx_hash);
+      ++sent;
+      cursor = end;
+      const std::lock_guard lock(_follow_mutex);
+      _followed.forget_before(end.message_end);
+   }
+   return sent;
+}
+
+void outpost_ethereum_client::publish_after_finalizing(uint32_t epoch_index, const epoch_in_receipt& receipt,
+                                                       fc::time_point deadline_abs) {
+   try {
+      auto [messages, finalized] = receipt_outbound_events(receipt);
+      if (!finalized || finalized->epoch_index != epoch_index) {
+         wlog("outpost_ethereum_client[{}]: the call that finalized epoch {} carries no {} for it; the read path "
+              "publishes it",
+              to_string(), epoch_index, opp_abi_name::event_epoch_finalized);
+         return;
+      }
+      {
+         // The messages the tip itself emitted are in this receipt, possibly
+         // before the follow job reaches its block. Ones past where the follow
+         // job has read are left to it.
+         const std::lock_guard lock(_follow_mutex);
+         if (_followed.started() && !messages.empty() && messages.front().index <= _followed.end()) {
+            follow_messages(messages);
+         }
+      }
+      publish_through(epoch_index, receipt.block_number, finalized, deadline_abs);
+   } catch (const fc::exception& e) {
+      wlog("outpost_ethereum_client[{}]: publishing outbound epoch {} after finalizing it failed; the read path "
+           "publishes it: {}",
+           to_string(), epoch_index, e.to_detail_string());
+   } catch (const std::exception& e) {
+      wlog("outpost_ethereum_client[{}]: publishing outbound epoch {} after finalizing it failed; the read path "
+           "publishes it: {}",
+           to_string(), epoch_index, e.what());
+   }
 }
 
 std::vector<char> outpost_ethereum_client::read_inbound_envelope(
@@ -1665,10 +2060,11 @@ std::vector<char> outpost_ethereum_client::read_inbound_envelope(
              "address — pass opp_addr to create_outpost_client",
              to_string());
 
-   // Read at the client's read confirmation, never at the head. WIRE consensus on inbound is committed forward
-   // against this read: an operator that reads a publication a reorg then removes can reach WIRE-side consensus on
-   // it and queue attestations off it, leaving WIRE committed to history that no longer exists. See
-   // `read_settled_block` for what reading unlike the group costs.
+   // The record finalizing the epoch is read at the client's read
+   // confirmation, never at the head: WIRE consensus on inbound is committed
+   // forward against it, and an envelope a reorg could still change must never
+   // reach the depot. See `read_settled_block` for what reading unlike the
+   // group costs. Once it is settled the envelope is fixed.
    const auto settled   = read_settled_block();
    const auto finalized = read_finalized_outbound(epoch_index, settled);
    if (!finalized) {
@@ -1678,7 +2074,44 @@ std::vector<char> outpost_ethereum_client::read_inbound_envelope(
    }
    if (finalized->published_block != 0) return read_published_envelope(epoch_index, finalized->published_block);
 
-   publish_next_outbound(epoch_index, settled);
+   const auto head          = _entry->client->get_block_number();
+   const auto head_finalized = read_finalized_outbound(epoch_index, pinned(head));
+   if (head_finalized && head_finalized->published_block != 0) {
+      // Published since the read confirmation. Its bytes are the envelope the
+      // settled record fixes, and they are checked against it.
+      auto envelope = read_published_envelope(epoch_index, head_finalized->published_block);
+      if (envelope.empty()) return envelope;
+      // Where the epoch's messages start: the previous epoch's end, settled with
+      // it; none before the first epoch the outpost finalized. A previous
+      // record past the retention window belongs to a published epoch, and this
+      // one is then published at the read confirmation, read above.
+      const auto previous = epoch_index > 1 ? read_finalized_outbound(epoch_index - 1, settled) : std::nullopt;
+      const auto start    = previous ? previous->end
+                                     : detail::outbound_chain_point{.chain_hash  = std::string(EVM_ABI_WORD_HEX_CHARS, '0'),
+                                                                    .message_end = 0};
+      if (!detail::envelope_matches_finalized(envelope, epoch_index, *finalized, start)) {
+         wlog("outpost_ethereum_client[{}]: the publication of outbound epoch {} in block {} does not match the "
+              "settled record (end {} at message {}, timestamp {}); not delivering it",
+              to_string(), epoch_index, head_finalized->published_block, finalized->end.chain_hash,
+              finalized->end.message_end, finalized->timestamp_ms);
+         return {};
+      }
+      ilog("outpost_ethereum_client[{}]: outbound epoch {} published in block {} matches its settled finalization; "
+           "delivering it",
+           to_string(), epoch_index, head_finalized->published_block);
+      return envelope;
+   }
+
+   // Unpublished at the head: publish it, and any unpublished epoch before it.
+   // A delivery holds the signer for its whole run, and may itself publish the
+   // epoch it finalizes; publishing waits for the next poll rather than for it.
+   std::unique_lock journal_lock(_entry->submissions->mutex, std::try_to_lock);
+   if (!journal_lock.owns_lock()) {
+      dlog("outpost_ethereum_client[{}]: a delivery holds the signer; publishing outbound epoch {} next poll",
+           to_string(), epoch_index);
+      return {};
+   }
+   publish_through(epoch_index, head, std::nullopt, deadline_abs);
    return {};
 }
 
