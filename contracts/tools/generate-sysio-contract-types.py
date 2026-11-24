@@ -232,13 +232,19 @@ STRUCT_KIND = 'struct'
 TS_IDENTIFIER = re.compile(r'^[A-Za-z_$][A-Za-z0-9_$]*$')
 
 # An ABI array, `T[]` or fixed-size `T[N]`; abi_serializer decodes both to a JSON array.
-ARRAY_TYPE = re.compile(r'^(?P<element>.+)\[[0-9]*\]$')
+ARRAY_TYPE = re.compile(r'^(?P<element>.+)\[(?P<length>[0-9]*)\]$')
 
 
 def array_element_type(abi_type: str) -> str | None:
     """Return the element type of an ABI array type, or None when `abi_type` is not an array."""
     array = ARRAY_TYPE.match(abi_type)
     return array.group('element') if array else None
+
+
+def is_zero_length_array(abi_type: str) -> bool:
+    """Return whether `abi_type` is a fixed-size array `T[0]`, which abi_serializer always decodes to `[]`."""
+    array = ARRAY_TYPE.match(abi_type)
+    return array is not None and array.group('length') != '' and int(array.group('length')) == 0
 
 
 def struct_fields(struct_name: str, structs_map: dict, type_aliases: dict) -> list[dict]:
@@ -255,17 +261,38 @@ def struct_fields(struct_name: str, structs_map: dict, type_aliases: dict) -> li
     return [field for name in reversed(chain) for field in structs_map[name].get('fields', [])]
 
 
+def visible_field_types(struct_name: str, structs_map: dict, type_aliases: dict) -> dict[str, list[str]]:
+    """Map each field name of a struct's JSON row to the types of the declarations whose value it can carry.
+
+    abi_serializer emits every decoded field, base struct fields first, and a JSON parser keeps a repeated
+    name's last value. A decoded row holds every field up to its last required field; only the binary
+    extension (`$`) fields after it can be absent. So a declaration up to that field shadows the earlier
+    declarations of its name, and a declaration after it leaves them possible.
+    """
+    fields = struct_fields(struct_name, structs_map, type_aliases)
+    last_required = max((index for index, field in enumerate(fields)
+                         if not resolve_type(field['type'], type_aliases).endswith('$')), default=-1)
+    visible: dict[str, list[str]] = {}
+    for index, field in enumerate(fields):
+        if index <= last_required:
+            visible[field['name']] = [field['type']]
+        else:
+            visible.setdefault(field['name'], []).append(field['type'])
+    return visible
+
+
 def holds_bool(abi_type: str, structs_map: dict, type_aliases: dict, variants_map: dict,
                covered: tuple[str, ...] = ()) -> bool:
     """Return whether a value of `abi_type` can hold an ABI `bool` in any field, element or variant alternative.
 
-    References to the `covered` types are skipped; the caller inspects those itself.
+    Struct fields are inspected through visible_field_types. References to the `covered` types are
+    skipped; the caller inspects those itself.
     """
     pending = [abi_type]
     seen: set[str] = set(covered)
     while pending:
         current = resolve_type(pending.pop(), type_aliases)
-        if current in seen:
+        if current in seen or is_zero_length_array(current):
             continue
         seen.add(current)
         if current.endswith(('$', '?')):
@@ -277,7 +304,8 @@ def holds_bool(abi_type: str, structs_map: dict, type_aliases: dict, variants_ma
         elif current in variants_map:
             pending.extend(variants_map[current].get('types', []))
         elif current in structs_map:
-            pending.extend(field['type'] for field in struct_fields(current, structs_map, type_aliases))
+            pending.extend(field_type for types in visible_field_types(current, structs_map, type_aliases).values()
+                           for field_type in types)
     return False
 
 
@@ -289,9 +317,8 @@ def boolean_descriptor(abi_type: str, structs_map: dict, type_aliases: dict, var
     extension (`$`) types are described by their inner type, because the typed
     client passes null and absent values through unchanged. Struct fields are
     keyed by ABI field name, which the node's JSON uses whatever the --style
-    flag, and include the base struct's fields, which every row carries. When
-    two fields share a name, the last one in row order describes it, as the
-    node emits both and a JSON parser keeps the last.
+    flag, and include the base struct's fields, which every row carries. Only
+    the declarations visible_field_types finds a row can carry are inspected.
 
     Raises ValueError where a descriptor would leave a `bool` unconverted: a
     variant alternative that holds one, since descriptors do not cover
@@ -302,6 +329,8 @@ def boolean_descriptor(abi_type: str, structs_map: dict, type_aliases: dict, var
     abi_type = resolve_type(abi_type, type_aliases)
     if abi_type.endswith(('$', '?')):
         return boolean_descriptor(abi_type[:-1], structs_map, type_aliases, variants_map, visiting)
+    if is_zero_length_array(abi_type):
+        return None
     if (element := array_element_type(abi_type)) is not None:
         items = boolean_descriptor(element, structs_map, type_aliases, variants_map, visiting)
         return None if items is None else {'kind': ARRAY_KIND, 'items': items}
@@ -322,19 +351,14 @@ def boolean_descriptor(abi_type: str, structs_map: dict, type_aliases: dict, var
         return None
 
     fields: dict = {}
-    declared: set[str] = set()
-    for field in struct_fields(abi_type, structs_map, type_aliases):
-        name = field['name']
-        descriptor = boolean_descriptor(field['type'], structs_map, type_aliases, variants_map,
-                                        visiting + (abi_type,))
-        if name in declared and field['type'].endswith('$') and descriptor != fields.get(name):
+    for name, types in visible_field_types(abi_type, structs_map, type_aliases).items():
+        descriptors = [boolean_descriptor(field_type, structs_map, type_aliases, variants_map, visiting + (abi_type,))
+                       for field_type in types]
+        if any(descriptor != descriptors[-1] for descriptor in descriptors[:-1]):
             raise ValueError(f'ABI struct {abi_type} binary extension field {name} redeclares a field '
                              'with different bool content, which an absent extension leaves in the row')
-        declared.add(name)
-        if descriptor is None:
-            fields.pop(name, None)
-        else:
-            fields[name] = descriptor
+        if descriptors[-1] is not None:
+            fields[name] = descriptors[-1]
     return {'kind': STRUCT_KIND, 'fields': fields} if fields else None
 
 

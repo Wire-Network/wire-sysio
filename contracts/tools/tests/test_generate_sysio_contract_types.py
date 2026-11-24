@@ -282,6 +282,138 @@ class TableBooleanDescriptorTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "alternative row"):
             GENERATOR.table_boolean_descriptors(abi, structs, {}, back_to_row)
 
+    def test_zero_length_fixed_arrays_hold_no_bools(self) -> None:
+        """Treat `T[0]`, which the node always decodes to `[]`, as holding no bool in descriptors and variants."""
+        abi = {"tables": [{"name": "rows", "type": "row"}]}
+        flag_only = {"rows": {"kind": GENERATOR.STRUCT_KIND, "fields": {"flag": self.BOOLEAN}}}
+
+        variant_row = self.structs(
+            {
+                "name": "row",
+                "base": "",
+                "fields": [{"name": "value", "type": "choice"}, {"name": "flag", "type": "bool"}],
+            }
+        )
+        variants = {"choice": {"name": "choice", "types": ["uint64", "bool[0]"]}}
+        self.assertEqual(flag_only, GENERATOR.table_boolean_descriptors(abi, variant_row, {}, variants))
+
+        recursive_row = self.structs(
+            {
+                "name": "row",
+                "base": "",
+                "fields": [{"name": "next", "type": "row[0]"}, {"name": "flag", "type": "bool"}],
+            }
+        )
+        self.assertEqual(flag_only, GENERATOR.table_boolean_descriptors(abi, recursive_row, {}, {}))
+
+        fields_row = self.structs(
+            {"name": "inner", "base": "", "fields": [{"name": "ok", "type": "bool"}]},
+            {
+                "name": "row",
+                "base": "",
+                "fields": [
+                    {"name": "flags", "type": "bool[0]"},
+                    {"name": "padded", "type": "bool[00]"},
+                    {"name": "inners", "type": "inner[0]?"},
+                    {"name": "aliased", "type": "no_flags"},
+                    {"name": "flag", "type": "bool"},
+                ],
+            },
+        )
+        aliases = {"no_flags": "bool[0]"}
+        self.assertEqual(flag_only, GENERATOR.table_boolean_descriptors(abi, fields_row, aliases, {}))
+
+    def test_shadowed_declarations_are_not_inspected(self) -> None:
+        """Skip a field declaration that a later required declaration of its name always replaces in the row."""
+        abi = {"tables": [{"name": "rows", "type": "row"}]}
+        variants = {"choice": {"name": "choice", "types": ["uint64", "bool"]}}
+
+        shadowed_variant = self.structs(
+            {"name": "row_base", "base": "", "fields": [{"name": "value", "type": "choice"}]},
+            {"name": "row", "base": "row_base", "fields": [{"name": "value", "type": "uint8"}]},
+        )
+        self.assertEqual({}, GENERATOR.table_boolean_descriptors(abi, shadowed_variant, {}, variants))
+
+        # A struct used as a variant alternative is inspected the same way.
+        shadowed_alternative = self.structs(
+            {"name": "alt_base", "base": "", "fields": [{"name": "value", "type": "bool"}]},
+            {"name": "alt", "base": "alt_base", "fields": [{"name": "value", "type": "uint8"}]},
+            {"name": "row", "base": "", "fields": [{"name": "value", "type": "alt_choice"}]},
+        )
+        alt_variants = {"alt_choice": {"name": "alt_choice", "types": ["uint64", "alt"]}}
+        self.assertEqual({}, GENERATOR.table_boolean_descriptors(abi, shadowed_alternative, {}, alt_variants))
+
+        shadowed_recursion = self.structs(
+            {"name": "row_base", "base": "", "fields": [{"name": "next", "type": "row?"}]},
+            {
+                "name": "row",
+                "base": "row_base",
+                "fields": [{"name": "next", "type": "uint64"}, {"name": "flag", "type": "bool"}],
+            },
+        )
+        self.assertEqual(
+            {"rows": {"kind": GENERATOR.STRUCT_KIND, "fields": {"flag": self.BOOLEAN}}},
+            GENERATOR.table_boolean_descriptors(abi, shadowed_recursion, {}, {}),
+        )
+
+    def test_binary_extension_fallbacks_are_inspected(self) -> None:
+        """Inspect an earlier declaration that an absent trailing binary extension field leaves in the row."""
+        abi = {"tables": [{"name": "rows", "type": "row"}]}
+        variants = {"choice": {"name": "choice", "types": ["uint64", "bool"]}}
+
+        fallback_variant = self.structs(
+            {"name": "row_base", "base": "", "fields": [{"name": "value", "type": "choice"}]},
+            {"name": "row", "base": "row_base", "fields": [{"name": "value", "type": "uint8$"}]},
+        )
+        with self.assertRaisesRegex(ValueError, "alternative bool"):
+            GENERATOR.table_boolean_descriptors(abi, fallback_variant, {}, variants)
+
+        fallback_alternative = self.structs(
+            {"name": "alt_base", "base": "", "fields": [{"name": "value", "type": "bool"}]},
+            {"name": "alt", "base": "alt_base", "fields": [{"name": "value", "type": "uint8$"}]},
+            {"name": "row", "base": "", "fields": [{"name": "value", "type": "alt_choice"}]},
+        )
+        alt_variants = {"alt_choice": {"name": "alt_choice", "types": ["uint64", "alt"]}}
+        with self.assertRaisesRegex(ValueError, "alternative alt"):
+            GENERATOR.table_boolean_descriptors(abi, fallback_alternative, {}, alt_variants)
+
+        # Every declaration an absent extension can expose must agree.
+        agreeing_chain = self.structs(
+            {"name": "row_base", "base": "", "fields": [{"name": "value", "type": "bool"}]},
+            {"name": "row_mid", "base": "row_base", "fields": [{"name": "value", "type": "bool?$"}]},
+            {"name": "row", "base": "row_mid", "fields": [{"name": "value", "type": "bool$"}]},
+        )
+        self.assertEqual(
+            {"rows": {"kind": GENERATOR.STRUCT_KIND, "fields": {"value": self.BOOLEAN}}},
+            GENERATOR.table_boolean_descriptors(abi, agreeing_chain, {}, {}),
+        )
+        disagreeing_chain = self.structs(
+            {"name": "row_base", "base": "", "fields": [{"name": "value", "type": "uint8"}]},
+            {"name": "row_mid", "base": "row_base", "fields": [{"name": "value", "type": "bool$"}]},
+            {"name": "row", "base": "row_mid", "fields": [{"name": "value", "type": "bool$"}]},
+        )
+        with self.assertRaisesRegex(ValueError, "binary extension field value"):
+            GENERATOR.table_boolean_descriptors(abi, disagreeing_chain, {}, {})
+
+        # A later required declaration replaces every earlier one, binary extensions included.
+        required_last = self.structs(
+            {"name": "row_base", "base": "", "fields": [{"name": "value", "type": "choice"}]},
+            {"name": "row_mid", "base": "row_base", "fields": [{"name": "value", "type": "bool$"}]},
+            {"name": "row", "base": "row_mid", "fields": [{"name": "value", "type": "uint8"}]},
+        )
+        self.assertEqual({}, GENERATOR.table_boolean_descriptors(abi, required_last, {}, variants))
+
+        # An extension followed by a required field is never absent from a decoded row, so it shadows.
+        extension_then_required = self.structs(
+            {"name": "row_base", "base": "", "fields": [{"name": "value", "type": "choice"}]},
+            {
+                "name": "row",
+                "base": "row_base",
+                "fields": [{"name": "value", "type": "uint8$"}, {"name": "count", "type": "uint64"}],
+            },
+        )
+        self.assertEqual({}, GENERATOR.table_boolean_descriptors(abi, extension_then_required, {}, variants))
+
     def test_generated_contract_definition_carries_table_booleans(self) -> None:
         """Emit the table descriptor on the contract definition."""
         directory = tempfile.TemporaryDirectory()
