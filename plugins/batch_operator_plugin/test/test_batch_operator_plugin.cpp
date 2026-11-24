@@ -10,12 +10,14 @@
 #include <chrono>
 #include <cstdint>
 #include <functional>
+#include <limits>
 #include <map>
 #include <memory>
 #include <optional>
 #include <set>
 #include <sstream>
 #include <stdexcept>
+#include <string>
 #include <string_view>
 #include <thread>
 #include <vector>
@@ -433,6 +435,69 @@ BOOST_AUTO_TEST_CASE(memberships_decode_by_name_and_value) try {
                                     {left_seated_chain.value, chain_service_status::LEFT},
                                     {evicted_chain.value, chain_service_status::EVICTED}};
    BOOST_CHECK(memberships == expected);
+} FC_LOG_AND_RETHROW();
+
+/// The `byaccount` range reads every row of the account, from its key to the next account's (exclusive); the largest
+/// name reads to the end of the index.
+BOOST_AUTO_TEST_CASE(the_membership_range_spans_the_account) try {
+   const uint64_t    value = sysio::chain::name(self).to_uint64_t();
+   const index_range range = membership_range(sysio::chain::name(self));
+   BOOST_CHECK_EQUAL(range.lower_bound, byaccount_bound(value));
+   BOOST_CHECK_EQUAL(range.upper_bound, byaccount_bound(value + 1));
+   // A uint64 key is written as a decimal string, as fc::json writes every 64-bit integer.
+   BOOST_CHECK_EQUAL(range.lower_bound, "{\"byaccount\":\"" + std::to_string(value) + "\"}");
+
+   const index_range last = membership_range(sysio::chain::name(std::numeric_limits<uint64_t>::max()));
+   BOOST_CHECK_EQUAL(last.lower_bound, byaccount_bound(std::numeric_limits<uint64_t>::max()));
+   BOOST_CHECK(last.upper_bound.empty());
+} FC_LOG_AND_RETHROW();
+
+/// An operator serving two chains holds two `servchains` rows under one `byaccount` key. The range read follows
+/// each page's cursor to the end, so both memberships decode, whatever page boundary falls between them.
+BOOST_AUTO_TEST_CASE(two_memberships_of_one_account_are_both_read) try {
+   const index_range range = membership_range(sysio::chain::name(self));
+   constexpr auto    second_page = "second-page-cursor";
+   std::vector<std::pair<std::string, std::string>> reads;
+   const std::optional<fc::variants> rows = read_range(range, [&](const std::string& lower, const std::string& upper) {
+      reads.emplace_back(lower, upper);
+      if (reads.size() == 1) {
+         return std::optional<table_page>{table_page{
+            .rows = {membership_row(self, serving_chain, status_name(chain_service_status::SERVING))},
+            .more = true,
+            .next_key = second_page}};
+      }
+      return std::optional<table_page>{table_page{
+         .rows = {membership_row(self, left_seated_chain, status_name(chain_service_status::LEFT))}}};
+   });
+   BOOST_REQUIRE(rows.has_value());
+   const std::vector<std::pair<std::string, std::string>> expected_reads{{range.lower_bound, range.upper_bound},
+                                                                         {second_page, range.upper_bound}};
+   BOOST_CHECK(reads == expected_reads);
+   const chain_memberships expected{{serving_chain.value, chain_service_status::SERVING},
+                                    {left_seated_chain.value, chain_service_status::LEFT}};
+   BOOST_CHECK(decode_memberships(*rows, sysio::chain::name(self)) == expected);
+} FC_LOG_AND_RETHROW();
+
+/// A range read fails as a whole when any page's read fails, or when a page reports more rows without moving its
+/// cursor, so the caller keeps its last good reading instead of acting on part of the range.
+BOOST_AUTO_TEST_CASE(a_range_read_fails_on_a_failed_or_stuck_page) try {
+   const index_range range = membership_range(sysio::chain::name(self));
+   const fc::variants first{membership_row(self, serving_chain, status_name(chain_service_status::SERVING))};
+   uint32_t           calls = 0;
+   BOOST_CHECK(!read_range(range, [&](const std::string&, const std::string&) -> std::optional<table_page> {
+      if (++calls == 1) return table_page{.rows = first, .more = true, .next_key = "cursor"};
+      return std::nullopt;
+   }));
+   BOOST_CHECK_EQUAL(calls, 2u);
+
+   for (const std::string& stuck : {std::string{}, range.lower_bound}) {
+      calls = 0;
+      BOOST_CHECK(!read_range(range, [&](const std::string&, const std::string&) -> std::optional<table_page> {
+         ++calls;
+         return table_page{.rows = first, .more = true, .next_key = stuck};
+      }));
+      BOOST_CHECK_EQUAL(calls, 1u);
+   }
 } FC_LOG_AND_RETHROW();
 
 /// The relay rule: SERVING relays, LEFT relays while it still holds a seat, EVICTED never.

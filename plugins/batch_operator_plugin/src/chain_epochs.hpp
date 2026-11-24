@@ -189,15 +189,18 @@ inline fc::time_point next_epoch_read_at(fc::time_point read_at, fc::microsecond
    return read_at + interval - fc::microseconds(tick_step.count() / 2);
 }
 
-/// The `relayed` chains this operator is elected on, in chain-code order: the chains it pushes
-/// `sysio.msgch::chkcons` for.
-inline std::vector<uint64_t> elected_chains(const chain_epochs& views, const std::set<uint64_t>& relayed) {
-   std::vector<uint64_t> elected;
+/// The `relayed` chains this operator is elected on whose epoch boundary has passed at `now`, in chain-code order: the
+/// chains it pushes `sysio.msgch::chkcons` for, which advances a chain only past its boundary.
+inline std::vector<uint64_t> chkcons_chains(const chain_epochs& views, const std::set<uint64_t>& relayed,
+                                            fc::time_point now) {
+   std::vector<uint64_t> due;
    for (const uint64_t chain_code : relayed) {
       const auto view = views.find(chain_code);
-      if (view != views.end() && view->second.election.is_elected) elected.push_back(chain_code);
+      if (view != views.end() && view->second.election.is_elected && is_epoch_boundary_past(view->second, now)) {
+         due.push_back(chain_code);
+      }
    }
-   return elected;
+   return due;
 }
 
 } // namespace sysio::batch_operator_detail

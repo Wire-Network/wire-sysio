@@ -10,12 +10,15 @@ minutes) and a sliding window of `batch_op_groups` groups of `operators_per_epoc
 operators (default 3 groups of 7) drawn from the operators serving that chain. The group
 at the front of a chain's window is elected for that chain's current epoch and its
 members execute the epoch cycle on that chain. Each poll the plugin also reads its own
-`sysio.opreg` status and stops pushing once the operator is `SLASHED` or `TERMINATED`.
+`sysio.opreg` status: once the operator is `SLASHED` or `TERMINATED` it stops pushing
+`chkcons` and the depot cranks. Its per-chain relay jobs keep running while the window
+seats it, and `sysio.msgch::deliver` refuses their deliveries from an operator that is
+not `ACTIVE`.
 
 ### Served chains
 
 The plugin relays a chain when its operator's `sysio.opreg::servchains` row on it
-(read by the `byaccount` index) is:
+(its rows read as one range of the `byaccount` index) is:
 
 | Status | Relayed |
 |--------|---------|
@@ -49,9 +52,10 @@ Run by every member of a chain's elected group, on that chain, for the chain's o
 The plugin also pushes the depot actions nothing on chain schedules.
 `sysio.msgch::chkcons(chain_code)` — which advances one chain's epoch once that chain
 has consensus and its boundary has passed — comes from the epoch tick, only for each
-relayed chain the operator is elected on. The rest come every `--batch-epoch-poll-ms`
-from their own cron job, from every ACTIVE operator, because the elected one may be the
-operator that is offline, and each is a cheap no-op once its work is done:
+relayed chain the operator is elected on, once that chain's boundary has passed. The
+rest come every `--batch-epoch-poll-ms` from their own cron job, from every ACTIVE
+operator, because the elected one may be the operator that is offline, and each is a
+cheap no-op once its work is done:
 
 | Action | When | Why nothing else drives it |
 |--------|------|----------------------------|

@@ -291,8 +291,8 @@ BOOST_AUTO_TEST_CASE(the_epoch_window_uses_the_chains_own_buffer) try {
    BOOST_CHECK(within_epoch_window(genesis, past_fast_buffer));
 } FC_LOG_AND_RETHROW();
 
-/// `chkcons` goes to each relayed chain the operator is elected on, and only those.
-BOOST_AUTO_TEST_CASE(chkcons_goes_only_to_relayed_chains_elected_on) try {
+/// `chkcons` goes to each relayed chain the operator is elected on, and only once that chain's boundary has passed.
+BOOST_AUTO_TEST_CASE(chkcons_goes_only_to_relayed_elected_chains_past_their_boundary) try {
    chain_epochs views = decode_both().views;
    // Elected on a chain it does not relay.
    chain_epoch_view unrelayed = views.at(fast_chain.value);
@@ -300,9 +300,15 @@ BOOST_AUTO_TEST_CASE(chkcons_goes_only_to_relayed_chains_elected_on) try {
    views.emplace(unconfigured_chain.value, unrelayed);
 
    const std::set<uint64_t> relayed{fast_chain.value, slow_chain.value};
-   BOOST_CHECK(elected_chains(views, relayed) == std::vector<uint64_t>{fast_chain.value});
-   BOOST_CHECK(elected_chains(views, {slow_chain.value}).empty());
-   BOOST_CHECK(elected_chains({}, relayed).empty());
+   const fc::time_point     boundary = views.at(fast_chain.value).next_epoch_start;
+   BOOST_CHECK(chkcons_chains(views, relayed, boundary) == std::vector<uint64_t>{fast_chain.value});
+   BOOST_CHECK(chkcons_chains(views, relayed, boundary - fc::milliseconds(1)).empty());
+   BOOST_CHECK(chkcons_chains(views, {slow_chain.value}, boundary).empty());
+   BOOST_CHECK(chkcons_chains({}, relayed, boundary).empty());
+
+   // A chain without a next epoch start has no boundary to pass.
+   views.at(fast_chain.value).next_epoch_start = fc::time_point();
+   BOOST_CHECK(chkcons_chains(views, relayed, boundary).empty());
 } FC_LOG_AND_RETHROW();
 
 /// The epoch tick reads at the shortest relayed chain's cadence, and at the poll option without one; a job polls its

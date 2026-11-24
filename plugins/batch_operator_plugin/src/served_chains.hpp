@@ -18,11 +18,13 @@
 #include <vector>
 
 #include <fc/exception/exception.hpp>
+#include <fc/io/json.hpp>
 #include <fc/slug_name.hpp>
 #include <fc/variant.hpp>
 #include <fc/variant_object.hpp>
 #include <magic_enum/magic_enum.hpp>
 #include <sysio.opreg/opreg_constants.hpp>
+#include <sysio/batch_operator_plugin/table_range.hpp>
 #include <sysio/chain/name.hpp>
 #include <sysio/opp/types/types.pb.h>
 #include <sysio/outpost_client/outpost_client.hpp>
@@ -58,6 +60,21 @@ inline std::optional<chain_service_status> decode_service_status(const fc::varia
    const uint64_t value = status.as_uint64();
    if (value > std::numeric_limits<underlying>::max()) return std::nullopt;
    return magic_enum::enum_cast<chain_service_status>(static_cast<underlying>(value));
+}
+
+/// The JSON bound of `byaccount` key `account_value` that chain_plugin's secondary-key codec expects.
+inline std::string byaccount_bound(uint64_t account_value) {
+   return fc::json::to_string(fc::mutable_variant_object()(opreg_names::index_byaccount, account_value),
+                              fc::json::yield_function_t{});
+}
+
+/// The `byaccount` range of every `servchains` row of `account`, one per chain it has a membership on: to the next
+/// account's key, exclusive, or to the end of the index for the largest name.
+inline index_range membership_range(chain::name account) {
+   const uint64_t value = account.to_uint64_t();
+   index_range    range{.lower_bound = byaccount_bound(value)};
+   if (value != std::numeric_limits<uint64_t>::max()) range.upper_bound = byaccount_bound(value + 1);
+   return range;
 }
 
 /// `operator_account`'s memberships from `servchains` values read by `byaccount`. A row of another account, or one
