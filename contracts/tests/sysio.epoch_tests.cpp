@@ -78,10 +78,16 @@ public:
       }
    }
 
+   /// The outpost chain the single-chain cases configure.
+   static constexpr std::string_view ETH = "ETH";
+   /// A second outpost chain, for the per-chain cases.
+   static constexpr std::string_view SOL = "SOL";
+
    action_result setconfig(uint32_t duration = 360, uint32_t ops_per = 7,
                            uint32_t total = 21, uint32_t grps = 3,
-                           uint32_t retention = 200) {
+                           uint32_t retention = 200, std::string_view chain = ETH) {
       return push_epoch_action(EPOCH_ACCOUNT, "setconfig"_n, mvo()
+         ("chain_code", chain)
          ("epoch_duration_sec", duration)
          ("operators_per_epoch", ops_per)
          ("batch_operator_minimum_active", total)
@@ -90,8 +96,8 @@ public:
       );
    }
 
-   action_result advance() {
-      return push_epoch_action(EPOCH_ACCOUNT, "advance"_n, mvo());
+   action_result advance(std::string_view chain = ETH) {
+      return push_epoch_action(EPOCH_ACCOUNT, "advance"_n, mvo()("chain_code", chain));
    }
 
    action_result seteconomy(uint32_t duration, time_point_sec start, name signer = EPOCH_ACCOUNT) {
@@ -109,8 +115,8 @@ public:
                           : abi_ser.binary_to_variant("economic_config", data, fixture_abi_yield_function());
    }
 
-   action_result schbatchgps() {
-      return push_epoch_action(EPOCH_ACCOUNT, "schbatchgps"_n, mvo());
+   action_result schbatchgps(std::string_view chain = ETH) {
+      return push_epoch_action(EPOCH_ACCOUNT, "schbatchgps"_n, mvo()("chain_code", chain));
    }
 
    /// Replacement for `regoutpost`: register a chain row in `sysio.chains`.
@@ -129,28 +135,46 @@ public:
       );
    }
 
-   action_result pause() {
-      return push_epoch_action(CHALG_ACCOUNT, "pause"_n, mvo());
+   action_result pause(std::string_view chain = ETH) {
+      return push_epoch_action(CHALG_ACCOUNT, "pause"_n, mvo()("chain_code", chain));
    }
 
-   action_result unpause() {
-      return push_epoch_action(CHALG_ACCOUNT, "unpause"_n, mvo());
+   action_result unpause(std::string_view chain = ETH) {
+      return push_epoch_action(CHALG_ACCOUNT, "unpause"_n, mvo()("chain_code", chain));
    }
 
-   fc::variant get_epoch_config() {
-      auto data = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochcfg"_n, "epochcfg"_n);
+   /// `chain`'s `epochcfg` row; null variant when absent.
+   fc::variant get_epoch_config(std::string_view chain = ETH) {
+      auto data = get_row_by_id(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochcfg"_n, fc::slug_name{chain}.value);
       return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
          "epoch_config",
          data,
          fixture_abi_yield_function() );
    }
 
-   fc::variant get_epoch_state() {
-      auto data = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, "epochstate"_n);
+   /// `chain`'s `epochstate` row; null variant when absent.
+   fc::variant get_epoch_state(std::string_view chain = ETH) {
+      auto data = get_row_by_id(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, fc::slug_name{chain}.value);
       return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
          "epoch_state",
          data,
          fixture_abi_yield_function() );
+   }
+
+   /// The `netgenesis` marker; null variant before the network genesis.
+   fc::variant get_network_genesis() {
+      auto data = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "netgenesis"_n, "netgenesis"_n);
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
+         "network_genesis",
+         data,
+         fixture_abi_yield_function() );
+   }
+
+   /// Length of `chain`'s current epoch, in seconds.
+   int64_t epoch_length_sec(std::string_view chain) {
+      const auto state = get_epoch_state(chain);
+      return (state["next_epoch_start"].as<time_point>() - state["current_epoch_start"].as<time_point>())
+         .to_seconds();
    }
 
    /// Read a chain row from sysio.chains by code (slug_name PK).
@@ -376,7 +400,7 @@ BOOST_FIXTURE_TEST_CASE(tickeconomy_waits_for_config_and_consensus_genesis, sysi
    BOOST_REQUIRE_EQUAL(error("assertion failure with message: economic clock not configured"), tickeconomy(1));
 
    BOOST_REQUIRE_EQUAL(success(), seteconomy(360, time_point_sec{control->head().block_time()}));
-   BOOST_REQUIRE_EQUAL(error("assertion failure with message: the economic clock starts at the consensus genesis advance"),
+   BOOST_REQUIRE_EQUAL(error("assertion failure with message: the economic clock starts at the network genesis"),
                        tickeconomy(1));
 } FC_LOG_AND_RETHROW() }
 
@@ -412,6 +436,93 @@ BOOST_FIXTURE_TEST_CASE(pause_unpause, sysio_epoch_tester) { try {
    );
 
    BOOST_REQUIRE_EQUAL(success(), unpause());
+   BOOST_REQUIRE_EQUAL(error("assertion failure with message: epoch state not initialized"), unpause(SOL));
+} FC_LOG_AND_RETHROW() }
+
+/// Each outpost chain holds its own config row; configuring one leaves the other untouched.
+BOOST_FIXTURE_TEST_CASE(setconfig_is_per_chain, sysio_epoch_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setconfig(360, 7, 21, 3, 200, ETH));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(120, 1, 2, 2, 50, SOL));
+
+   const auto eth = get_epoch_config(ETH);
+   BOOST_REQUIRE_EQUAL(fc::slug_name{ETH}.value, eth["chain_code"].as_uint64());
+   BOOST_REQUIRE_EQUAL(360u, eth["epoch_duration_sec"].as_uint64());
+   BOOST_REQUIRE_EQUAL(3u, eth["batch_op_groups"].as_uint64());
+   BOOST_REQUIRE_EQUAL(200u, eth["epoch_retention_envelope_log_count"].as_uint64());
+   const auto sol = get_epoch_config(SOL);
+   BOOST_REQUIRE_EQUAL(fc::slug_name{SOL}.value, sol["chain_code"].as_uint64());
+   BOOST_REQUIRE_EQUAL(120u, sol["epoch_duration_sec"].as_uint64());
+   BOOST_REQUIRE_EQUAL(2u, sol["batch_op_groups"].as_uint64());
+   BOOST_REQUIRE_EQUAL(50u, sol["epoch_retention_envelope_log_count"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
+/// Two chains run their own counters on their own durations: a chain advances on its own boundary,
+/// and a paused chain holds only itself.
+BOOST_FIXTURE_TEST_CASE(chains_advance_on_their_own_cadence, sysio_epoch_tester) { try {
+   constexpr uint32_t kEthDurationSec = 60;
+   constexpr uint32_t kSolDurationSec = 120;
+   constexpr uint32_t kBlocksPerSecond = 2;
+   const auto index = [&](std::string_view chain) {
+      return get_epoch_state(chain)["current_epoch_index"].as<uint32_t>();
+   };
+   BOOST_REQUIRE_EQUAL(success(), setconfig(kEthDurationSec, 7, 21, 3, 200, ETH));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(kSolDurationSec, 7, 21, 3, 200, SOL));
+   BOOST_REQUIRE_EQUAL(success(), advance(ETH));
+   BOOST_REQUIRE_EQUAL(success(), advance(SOL));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(1u, index(ETH));
+   BOOST_REQUIRE_EQUAL(1u, index(SOL));
+   BOOST_REQUIRE_EQUAL(kEthDurationSec, epoch_length_sec(ETH));
+   BOOST_REQUIRE_EQUAL(kSolDurationSec, epoch_length_sec(SOL));
+
+   // Only ETH's boundary has passed: SOL's advance is a no-op.
+   produce_blocks(kEthDurationSec * kBlocksPerSecond + 1);
+   BOOST_REQUIRE_EQUAL(success(), advance(ETH));
+   BOOST_REQUIRE_EQUAL(success(), advance(SOL));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(2u, index(ETH));
+   BOOST_REQUIRE_EQUAL(1u, index(SOL));
+
+   // A paused SOL holds only itself.
+   BOOST_REQUIRE_EQUAL(success(), pause(SOL));
+   produce_blocks(kEthDurationSec * kBlocksPerSecond + 1);
+   BOOST_REQUIRE_EQUAL(success(), advance(ETH));
+   BOOST_REQUIRE_EQUAL(error("assertion failure with message: epoch advancement is paused"), advance(SOL));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(3u, index(ETH));
+   BOOST_REQUIRE_EQUAL(1u, index(SOL));
+   BOOST_REQUIRE(!get_epoch_state(ETH)["is_paused"].as<bool>());
+
+   BOOST_REQUIRE_EQUAL(success(), unpause(SOL));
+   BOOST_REQUIRE_EQUAL(success(), advance(SOL));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(3u, index(ETH));
+   BOOST_REQUIRE_EQUAL(2u, index(SOL));
+} FC_LOG_AND_RETHROW() }
+
+/// The first chain's genesis advance is the network genesis: it writes the `netgenesis` marker, which
+/// closes the bootstrap window (a chain registered after it starts inactive), and a later chain's
+/// genesis leaves the marker as it was.
+BOOST_FIXTURE_TEST_CASE(first_genesis_advance_is_the_network_genesis, sysio_epoch_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regchain(ChainKind::CHAIN_KIND_EVM, std::string(ETH), 1));
+   BOOST_REQUIRE(get_chain(std::string(ETH))["active"].as<bool>());
+   BOOST_REQUIRE(get_network_genesis().is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), setconfig(360, 7, 21, 3, 200, ETH));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(360, 7, 21, 3, 200, SOL));
+   BOOST_REQUIRE_EQUAL(success(), advance(ETH));
+   produce_blocks();
+   const auto genesis = get_network_genesis();
+   BOOST_REQUIRE(!genesis.is_null());
+   const auto genesis_at = genesis["genesis_at"].as<time_point>();
+
+   BOOST_REQUIRE_EQUAL(success(), regchain(ChainKind::CHAIN_KIND_SVM, std::string(SOL), 1));
+   BOOST_REQUIRE(!get_chain(std::string(SOL))["active"].as<bool>());
+
+   BOOST_REQUIRE_EQUAL(success(), advance(SOL));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(1u, get_epoch_state(SOL)["current_epoch_index"].as<uint32_t>());
+   BOOST_REQUIRE(genesis_at == get_network_genesis()["genesis_at"].as<time_point>());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(initgroups_no_opreg, sysio_epoch_tester) { try {

@@ -193,6 +193,7 @@ public:
 
    void bootstrap_opp_stack() {
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "setconfig"_n, mvo()
+         ("chain_code", ETH_CHAIN_CODE)
          ("epoch_duration_sec", 60)
          ("operators_per_epoch", 1)
          ("batch_operator_minimum_active", 1)
@@ -216,11 +217,26 @@ public:
          ("external_chain_id", 31337)("name", std::string("ethereum-test"))("description", std::string{})
          ("outpost", sysio_system::test_support::no_outpost_mvo())));
 
-      BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "schbatchgps"_n, mvo()));
+      BOOST_REQUIRE_EQUAL(success(), schbatchgps());
       produce_blocks();
    }
 
-   uint64_t eth_code() const { return fc::slug_name{"ETH"}.value; }
+   /// The outpost chain the stack registers and schedules.
+   static constexpr std::string_view ETH_CHAIN_CODE = "ETH";
+
+   uint64_t eth_code() const { return fc::slug_name{ETH_CHAIN_CODE}.value; }
+
+   /// Fill `chain`'s schedule window from the ACTIVE batch operators.
+   action_result schbatchgps(std::string_view chain = ETH_CHAIN_CODE) {
+      return push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "schbatchgps"_n, mvo()("chain_code", chain));
+   }
+
+   /// `chain_code`'s `epochstate` row; null variant before it has one.
+   fc::variant epoch_state(uint64_t chain_code) {
+      auto data = get_row_by_id(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, chain_code);
+      return data.empty() ? fc::variant() : epoch_abi.binary_to_variant("epoch_state", data,
+         fixture_abi_yield_function());
+   }
 
    // ── node-owner / nodecount setup ─────────────────────────────────────────
 
@@ -285,13 +301,12 @@ public:
          fixture_abi_yield_function());
    }
 
-   bool epoch_paused() {
-      auto data = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, "epochstate"_n);
-      if (data.empty()) return false;
-      auto v = epoch_abi.binary_to_variant("epoch_state", data,
-         fixture_abi_yield_function());
-      return v["is_paused"].as_bool();
+   /// Whether `chain_code`'s epoch advancement is paused.
+   bool epoch_paused(uint64_t chain_code) {
+      const auto v = epoch_state(chain_code);
+      return !v.is_null() && v["is_paused"].as_bool();
    }
+   bool epoch_paused() { return epoch_paused(eth_code()); }
 
    /// `chalgstate.open_disputes` (0 when the singleton does not exist yet).
    uint32_t open_disputes() {
@@ -319,21 +334,17 @@ public:
          fixture_abi_yield_function());
    }
 
+   /// ETH's current consensus epoch index.
    uint32_t current_epoch() {
-      auto data = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, "epochstate"_n);
-      if (data.empty()) return 0;
-      auto v = epoch_abi.binary_to_variant("epoch_state", data,
-         fixture_abi_yield_function());
-      return v["current_epoch_index"].as<uint32_t>();
+      const auto v = epoch_state(eth_code());
+      return v.is_null() ? 0 : v["current_epoch_index"].as<uint32_t>();
    }
 
-   /// Members of the active batch-op group (epoch_state.batch_op_groups[current_batch_op_group]).
+   /// Members of ETH's active batch-op group (epoch_state.batch_op_groups[current_batch_op_group]).
    std::vector<name> current_group() {
       std::vector<name> members;
-      auto data = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, "epochstate"_n);
-      if (data.empty()) return members;
-      auto v = epoch_abi.binary_to_variant("epoch_state", data,
-         fixture_abi_yield_function());
+      const auto v = epoch_state(eth_code());
+      if (v.is_null()) return members;
       const uint64_t cur = v["current_batch_op_group"].as_uint64();
       const auto& groups = v["batch_op_groups"].get_array();
       if (cur >= groups.size()) return members;
@@ -995,21 +1006,25 @@ BOOST_FIXTURE_TEST_CASE(votedispute_after_fast_path_winner_rejected, sysio_dispu
       votedispute(NODE_DADDY, 1, cs_y));
 } FC_LOG_AND_RETHROW() }
 
-// sysio.epoch::is_paused is one flag shared by every dispute: resolving the FIRST of two
-// concurrently open disputes (a second EVM outpost's envelopes can split in the same epoch) must
-// not resume epoch advancement while the second is still voting. The pause lifts only when the
-// last open dispute resolves.
-BOOST_FIXTURE_TEST_CASE(chkdispute_unpauses_only_after_last_open_dispute, sysio_dispute_tester) { try {
+// Each outpost chain has its own pause: two disputes open concurrently on two outposts (a second EVM
+// outpost's envelopes can split too) pause both chains, and resolving one releases only its chain while
+// the other keeps voting.
+BOOST_FIXTURE_TEST_CASE(chkdispute_unpauses_only_the_disputed_chain, sysio_dispute_tester) { try {
    register_node_owner("voter1"_n, 1);
    register_node_owner("voter2"_n, 1);   // with nodedaddy: N = 3, Q = 2
 
-   // A second EVM outpost (distinct external_chain_id) so a second (outpost, epoch) dispute can
-   // exist concurrently with the ETH one.
+   // A second EVM outpost (distinct external_chain_id) with its own epoch, so a second (outpost,
+   // epoch) dispute can exist concurrently with the ETH one.
+   constexpr std::string_view BASE_CHAIN_CODE = "BASE";
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
-      ("kind", ChainKind::CHAIN_KIND_EVM)("code", "BASE")
+      ("kind", ChainKind::CHAIN_KIND_EVM)("code", BASE_CHAIN_CODE)
       ("external_chain_id", 8453)("name", std::string("base-test"))("description", std::string{})
       ("outpost", sysio_system::test_support::no_outpost_mvo())));
-   const uint64_t base_code = fc::slug_name{"BASE"}.value;
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "setconfig"_n, mvo()
+      ("chain_code", BASE_CHAIN_CODE)("epoch_duration_sec", 60)("operators_per_epoch", 1)
+      ("batch_operator_minimum_active", 1)("batch_op_groups", 1)("epoch_retention_envelope_log_count", 200)));
+   BOOST_REQUIRE_EQUAL(success(), schbatchgps(BASE_CHAIN_CODE));
+   const uint64_t base_code = fc::slug_name{BASE_CHAIN_CODE}.value;
 
    const uint32_t epoch = current_epoch();
    auto winner_eth  = encode_envelope(epoch, "winner-eth");
@@ -1029,25 +1044,28 @@ BOOST_FIXTURE_TEST_CASE(chkdispute_unpauses_only_after_last_open_dispute, sysio_
    BOOST_REQUIRE_EQUAL(success(), opendispute(eth_code(),  epoch, cands_for(cs_eth)));
    BOOST_REQUIRE_EQUAL(success(), opendispute(base_code, epoch, cands_for(cs_base)));
    BOOST_REQUIRE_EQUAL(2u, open_disputes());
-   BOOST_REQUIRE(epoch_paused());
+   BOOST_REQUIRE(epoch_paused(eth_code()));
+   BOOST_REQUIRE(epoch_paused(base_code));
    BOOST_REQUIRE_EQUAL(success(), deliver(eth_code(),  winner_eth));
    BOOST_REQUIRE_EQUAL(success(), deliver(base_code, winner_base));
 
-   // Resolve the ETH dispute: the BASE dispute is still open, so the epoch MUST stay paused.
+   // Resolve the ETH dispute: ETH resumes, BASE stays paused while its dispute is open.
    BOOST_REQUIRE_EQUAL(success(), votedispute("voter1"_n, 1, cs_eth));
    BOOST_REQUIRE_EQUAL(success(), votedispute("voter2"_n, 1, cs_eth));
    BOOST_REQUIRE_EQUAL(success(), chkdispute(1));
    BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_RESOLVED", get_dispute(1)["status"].as_string());
    BOOST_REQUIRE_EQUAL(1u, open_disputes());
-   BOOST_REQUIRE(epoch_paused());
+   BOOST_REQUIRE(!epoch_paused(eth_code()));
+   BOOST_REQUIRE(epoch_paused(base_code));
 
-   // Resolve the BASE dispute: last open dispute -> the pause lifts.
+   // Resolve the BASE dispute: its pause lifts.
    BOOST_REQUIRE_EQUAL(success(), votedispute("voter1"_n, 2, cs_base));
    BOOST_REQUIRE_EQUAL(success(), votedispute("voter2"_n, 2, cs_base));
    BOOST_REQUIRE_EQUAL(success(), chkdispute(2));
    BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_RESOLVED", get_dispute(2)["status"].as_string());
    BOOST_REQUIRE_EQUAL(0u, open_disputes());
-   BOOST_REQUIRE(!epoch_paused());
+   BOOST_REQUIRE(!epoch_paused(eth_code()));
+   BOOST_REQUIRE(!epoch_paused(base_code));
 } FC_LOG_AND_RETHROW() }
 
 // No cross-epoch double slash: the ACTIVE-only scheduling filter -- shared verbatim by
@@ -1070,11 +1088,12 @@ BOOST_FIXTURE_TEST_CASE(slashed_op_excluded_from_scheduling_no_double_slash, sys
 
    // Single 2-member group; with a and b the only ACTIVE batch ops, both are placed.
    BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "setconfig"_n, mvo()
+      ("chain_code", ETH_CHAIN_CODE)
       ("epoch_duration_sec", 60)("operators_per_epoch", 2)("batch_operator_minimum_active", 2)
       ("batch_op_groups", 1)("epoch_retention_envelope_log_count", 200)));
    BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "seteconomy"_n, mvo()
       ("epoch_duration_sec", 60)("start_time", fc::time_point_sec(control->head().block_time()))));
-   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "schbatchgps"_n, mvo()));
+   BOOST_REQUIRE_EQUAL(success(), schbatchgps());
    auto g0 = current_group();
    BOOST_REQUIRE(group_contains(g0, BATCHOP));
    BOOST_REQUIRE(group_contains(g0, BATCHOP_B));
@@ -1090,7 +1109,7 @@ BOOST_FIXTURE_TEST_CASE(slashed_op_excluded_from_scheduling_no_double_slash, sys
    // Bring c online so two ACTIVE ops remain, then re-schedule: the filter keeps the live ops
    // (a, c) and drops the slashed one (b).
    BOOST_REQUIRE_EQUAL(success(), regop(BATCHOP_C));
-   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "schbatchgps"_n, mvo()));
+   BOOST_REQUIRE_EQUAL(success(), schbatchgps());
    auto g1 = current_group();
    BOOST_REQUIRE(!group_contains(g1, BATCHOP_B));   // slashed -> never re-enters a group
    BOOST_REQUIRE(group_contains(g1, BATCHOP));
@@ -1181,7 +1200,7 @@ BOOST_FIXTURE_TEST_CASE(deliver_rejects_decollateralized_unknown_group_member, s
 
    // Schedule it into the single-slot group (non-bootstrapped sorts ahead of the
    // bootstrapped default op, so batchop.b takes the slot).
-   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "schbatchgps"_n, mvo()));
+   BOOST_REQUIRE_EQUAL(success(), schbatchgps());
    BOOST_REQUIRE(group_contains(current_group(), BATCHOP_B));
    const uint32_t epoch = current_epoch();
 

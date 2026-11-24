@@ -11,7 +11,12 @@
         {
             "name": "advance",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                }
+            ]
         },
         {
             "name": "blocklog_entry",
@@ -66,6 +71,16 @@
             ]
         },
         {
+            "name": "chain_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "economic_config",
             "base": "",
             "fields": [
@@ -102,6 +117,10 @@
             "base": "",
             "fields": [
                 {
+                    "name": "chain_code",
+                    "type": "uint64"
+                },
+                {
                     "name": "epoch_duration_sec",
                     "type": "uint32"
                 },
@@ -128,6 +147,10 @@
             "base": "",
             "fields": [
                 {
+                    "name": "chain_code",
+                    "type": "uint64"
+                },
+                {
                     "name": "current_epoch_index",
                     "type": "uint32"
                 },
@@ -148,10 +171,6 @@
                     "type": "B_vector_name_E[]"
                 },
                 {
-                    "name": "last_consensus_hash",
-                    "type": "checksum256"
-                },
-                {
                     "name": "is_paused",
                     "type": "bool"
                 }
@@ -162,15 +181,34 @@
             "base": "",
             "fields": [
                 {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
                     "name": "epoch_index",
                     "type": "uint32"
                 }
             ]
         },
         {
+            "name": "network_genesis",
+            "base": "",
+            "fields": [
+                {
+                    "name": "genesis_at",
+                    "type": "time_point"
+                }
+            ]
+        },
+        {
             "name": "pause",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                }
+            ]
         },
         {
             "name": "resendroster",
@@ -197,24 +235,23 @@
             ]
         },
         {
-            "name": "rostersent_key",
+            "name": "schbatchgps",
             "base": "",
             "fields": [
                 {
                     "name": "chain_code",
-                    "type": "uint64"
+                    "type": "slug_name"
                 }
             ]
-        },
-        {
-            "name": "schbatchgps",
-            "base": "",
-            "fields": []
         },
         {
             "name": "setconfig",
             "base": "",
             "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
                 {
                     "name": "epoch_duration_sec",
                     "type": "uint32"
@@ -264,7 +301,12 @@
         {
             "name": "unpause",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                }
+            ]
         }
     ],
     "actions": [
@@ -343,17 +385,25 @@
             "name": "epochcfg",
             "type": "epoch_config",
             "index_type": "i64",
-            "key_names": ["name"],
-            "key_types": ["name"],
+            "key_names": ["chain_code"],
+            "key_types": ["uint64"],
             "table_id": 36213
         },
         {
             "name": "epochstate",
             "type": "epoch_state",
             "index_type": "i64",
+            "key_names": ["chain_code"],
+            "key_types": ["uint64"],
+            "table_id": 59387
+        },
+        {
+            "name": "netgenesis",
+            "type": "network_genesis",
+            "index_type": "i64",
             "key_names": ["name"],
             "key_types": ["name"],
-            "table_id": 59387
+            "table_id": 29073
         },
         {
             "name": "rostersent",

@@ -195,7 +195,7 @@ class [[sysio::contract]] get_table_test : public sysio::contract {
 
     // kv::global — a SINGLE-row table with no scope, keyed on the table's own name.
     // Production contracts ship this shape (sysio.opreg::opconfig / opcounters,
-    // sysio.chalg::chalgstate, sysio.epoch::epochstate, ...) and the API doc
+    // sysio.chalg::chalgstate, sysio.epoch::economystate, ...) and the API doc
     // lists kv::global as supported, but nothing exercised it through
     // get_table_rows — so its ABI shape (key_names ["name"], key_types ["name"])
     // and its empty-vs-set behaviour were both unverified.

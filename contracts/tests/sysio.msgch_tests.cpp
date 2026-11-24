@@ -203,9 +203,9 @@ BOOST_AUTO_TEST_SUITE_END()
 
 // ---------------------------------------------------------------------------
 //  envelope_log tests — exercises the audit-trail row + cap-and-evict
-//  behaviour of `buildenv`. The fixture also deploys `sysio.epoch` so we
-//  can register an outpost and the `write_envelope_log` helper can derive
-//  `active_outposts × 2 × cfg.epoch_retention_envelope_log_count`.
+//  behaviour of `buildenv`. The fixture also deploys `sysio.epoch` so the
+//  `write_envelope_log` helper can read each outpost's
+//  `2 × cfg.epoch_retention_envelope_log_count` cap.
 // ---------------------------------------------------------------------------
 class sysio_msgch_envlog_tester : public tester {
 public:
@@ -250,20 +250,22 @@ public:
       }
    }
 
-   /// Bring `epoch_config` to a known retention value and register `n`
-   /// outposts so the `write_envelope_log` cap derivation has a stable
-   /// `active_outposts` to read.
+   /// Bring both outposts' `epoch_config` to a known retention value, the per-outpost
+   /// `write_envelope_log` cap.
    void bootstrap_epoch_config(uint32_t retention_count) {
       // setconfig: allow any group/operator-count combination; we don't
       // exercise group rotation here, just the outpost roster.
-      BOOST_REQUIRE_EQUAL(success(),
-         push_action(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "setconfig"_n, mvo()
-            ("epoch_duration_sec", 60)
-            ("operators_per_epoch", 1)
-            ("batch_operator_minimum_active", 3)
-            ("batch_op_groups", 3)
-            ("epoch_retention_envelope_log_count", retention_count)
-         ));
+      for (const std::string_view chain : {"ETH", "SOL"}) {
+         BOOST_REQUIRE_EQUAL(success(),
+            push_action(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "setconfig"_n, mvo()
+               ("chain_code", chain)
+               ("epoch_duration_sec", 60)
+               ("operators_per_epoch", 1)
+               ("batch_operator_minimum_active", 3)
+               ("batch_op_groups", 3)
+               ("epoch_retention_envelope_log_count", retention_count)
+            ));
+      }
    }
 
    /// Replacement for `regoutpost` — register a chain row in sysio.chains.

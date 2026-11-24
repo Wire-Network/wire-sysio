@@ -8,6 +8,10 @@
             "base": "",
             "fields": [
                 {
+                    "name": "chain_codes",
+                    "type": "uint64[]"
+                },
+                {
                     "name": "index",
                     "type": "uint32"
                 }

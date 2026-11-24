@@ -20,6 +20,12 @@ constexpr name ram_payer = "sysio"_n;
 
 namespace {
 
+/// Action identifiers owned by sysio.epoch and sent by dispute open and resolution.
+namespace epoch_actions {
+constexpr name PAUSE   = "pause"_n;
+constexpr name UNPAUSE = "unpause"_n;
+} // namespace epoch_actions
+
 /// Rejection text for a dispute without enough competing envelope versions to adjudicate.
 constexpr const char* DISPUTE_REQUIRES_TWO_CANDIDATES =
    "a dispute requires at least two candidate envelope versions";
@@ -149,14 +155,13 @@ void chalg::opendispute(uint64_t chain_code,
    ++st.open_disputes;
    chalgstate.set(st, ram_payer);
 
-   // Pause epoch advancement until every open dispute resolves. chkdispute releases the pause when
-   // the last open dispute goes RESOLVED; re-sending pause for a second concurrent dispute is an
-   // idempotent flag set.
+   // Pause the disputed chain's epoch advancement until the dispute resolves; other chains keep
+   // advancing. chkdispute releases the pause.
    action(
       permission_level{get_self(), "active"_n},
       EPOCH_ACCOUNT,
-      "pause"_n,
-      std::make_tuple()
+      epoch_actions::PAUSE,
+      std::make_tuple(sysio::slug_name{chain_code})
    ).send();
 }
 
@@ -246,17 +251,14 @@ void chalg::chkdispute(uint64_t dispute_id) {
       std::make_tuple(d.chain_code, d.epoch_index, *winner)
    ).send();
 
-   // Release the epoch pause only when no other dispute remains open -- sysio.epoch::is_paused is
-   // a single flag shared by every dispute, so an earlier resolution must not resume advancement
-   // while another (outpost, epoch) dispute is still voting.
-   if (st.open_disputes == 0) {
-      action(
-         permission_level{get_self(), "active"_n},
-         EPOCH_ACCOUNT,
-         "unpause"_n,
-         std::make_tuple()
-      ).send();
-   }
+   // Release the chain's pause. A paused chain cannot open another dispute: its epoch cannot move,
+   // and an (outpost, epoch) holds at most one dispute, so this was its only open one.
+   action(
+      permission_level{get_self(), "active"_n},
+      EPOCH_ACCOUNT,
+      epoch_actions::UNPAUSE,
+      std::make_tuple(sysio::slug_name{d.chain_code})
+   ).send();
 }
 
 } // namespace sysio

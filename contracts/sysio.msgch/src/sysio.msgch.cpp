@@ -44,6 +44,11 @@ constexpr auto     TOKENS_ACCOUNT  = "sysio.tokens"_n;
 
 constexpr auto     ROA_ACCOUNT     = "sysio.roa"_n;
 
+/// Action identifiers owned by sysio.epoch and sent by msgch.
+namespace epoch_actions {
+constexpr name ADVANCE = "advance"_n;
+} // namespace epoch_actions
+
 /// The syndication contract and the intake actions an accepted envelope's syndication value is
 /// routed to.
 namespace synd {
@@ -154,9 +159,9 @@ msgch::outbound_queue_entry outbound_queue_of(const msgch::outqueue_t& queues, u
       .value_or(msgch::outbound_queue_entry{.chain_code = chain_code, .queued = 0});
 }
 
-/// Size of the ACTIVE batch-operator group -- the set that can actually deliver for the current
-/// epoch. Every consensus threshold derives from THIS, never from the configured
-/// `operators_per_epoch`.
+/// Size of outpost `chain_code`'s ACTIVE batch-operator group -- the set that can actually deliver
+/// for the chain's current epoch. Every consensus threshold derives from THIS, never from the
+/// configured `operators_per_epoch`.
 ///
 /// The two differ routinely. `sysio.epoch::advance` fills a new tail only *up to* the configured
 /// size (`for (... && new_tail.size() < cfg.operators_per_epoch; ...)`) and documents a short group
@@ -186,15 +191,13 @@ msgch::outbound_queue_entry outbound_queue_of(const msgch::outqueue_t& queues, u
 /// `deliver` requires `is_batch_operator_active`, which requires the same epoch state, so there is
 /// nothing to tally in that window anyway. There is deliberately no configured-size fallback --
 /// `epochcfg.operators_per_epoch` sizes the schedule, it does not describe who can deliver now.
-std::vector<name> eligible_batch_operators() {
-   epoch::epochstate_t tbl(EPOCH_ACCOUNT);
-   if (!tbl.exists()) return {};
-   auto state = tbl.get();
-   if (state.current_batch_op_group >= state.batch_op_groups.size()) return {};
+std::vector<name> eligible_batch_operators(uint64_t chain_code) {
+   const std::optional<epoch::epoch_state> state = epoch::epoch_state_of(chain_code);
+   if (!state || state->current_batch_op_group >= state->batch_op_groups.size()) return {};
 
    opreg::operators_t ops(OPREG_ACCOUNT);
    std::vector<name> eligible;
-   for (const auto& member : state.batch_op_groups[state.current_batch_op_group]) {
+   for (const auto& member : state->batch_op_groups[state->current_batch_op_group]) {
       const auto key = opreg::operator_key{member.value};
       if (!ops.contains(key)) continue;
       if (ops.get(key).status == opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE) {
@@ -238,10 +241,10 @@ void write_envelope_log(name self,
       .emitted_at  = current_time_point(),
    });
 
-   epoch::epochcfg_t cfg_tbl(EPOCH_ACCOUNT);
-   if (!cfg_tbl.exists()) return;
-   const uint64_t cap =
-      uint64_t{ENVELOPE_LOG_ROWS_PER_EPOCH} * cfg_tbl.get().epoch_retention_envelope_log_count;
+   const std::optional<epoch::epoch_config> cfg =
+      epoch::epochcfg_t(EPOCH_ACCOUNT).try_get(epoch::chain_key{chain_code});
+   if (!cfg) return;
+   const uint64_t cap = uint64_t{ENVELOPE_LOG_ROWS_PER_EPOCH} * cfg->epoch_retention_envelope_log_count;
 
    auto oldest = by_chain.lower_bound(opp::outpost_sequence_key(chain_code, 0));
    for (uint32_t evicted = 0; evicted < ENVELOPE_LOG_EVICTION_BUDGET && oldest != by_chain.end() &&
@@ -917,6 +920,24 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
    return true;
 }
 
+/// True once outpost `chain_code`'s `next_epoch_start` has passed: the boundary that opens the
+/// majority (Option B) consensus path, the dispute trigger and `chkcons`'s advance. False while the
+/// chain has no epoch state.
+bool epoch_boundary_passed(uint64_t chain_code) {
+   const std::optional<epoch::epoch_state> state = epoch::epoch_state_of(chain_code);
+   return state && current_time_point() >= state->next_epoch_start;
+}
+
+/// Send `sysio.epoch::advance` for outpost `chain_code` under msgch's own authority.
+void send_advance(name self, uint64_t chain_code) {
+   action(
+      permission_level{self, "active"_n},
+      EPOCH_ACCOUNT,
+      epoch_actions::ADVANCE,
+      std::make_tuple(sysio::slug_name{chain_code})
+   ).send();
+}
+
 /// Evaluate the dispute trigger and, if met, open a Tier-1 dispute vote via sysio.chalg. A two-way
 /// split is actionable only after every eligible operator has delivered, preserving the chance for
 /// silent operators to create a strict majority. An existing three-or-more-version split remains
@@ -936,8 +957,7 @@ void maybe_open_dispute(name self, uint64_t chain_code, uint32_t epoch_index,
       return;
    }
 
-   epoch::epochstate_t state_tbl(EPOCH_ACCOUNT);
-   if (!state_tbl.exists() || current_time_point() < state_tbl.get().next_epoch_start) {
+   if (!epoch_boundary_passed(chain_code)) {
       sysio::print_f("msgch::maybe_open_dispute: no dispute for (chain=%llu, epoch=%u): epoch boundary not yet passed\n",
                      chain_code, epoch_index);
       return;
@@ -995,12 +1015,11 @@ void maybe_open_dispute(name self, uint64_t chain_code, uint32_t epoch_index,
 } // anonymous namespace
 
 // ---------------------------------------------------------------------------
-//  bootstrap — trigger first advance at epoch 0
+//  bootstrap — run the network genesis: every active outpost's genesis advance
 // ---------------------------------------------------------------------------
 void msgch::bootstrap() {
    require_auth(get_self());
-   uint32_t epoch = epoch::current_epoch_index();
-   check(epoch == 0, "bootstrap can only be called at epoch 0");
+   check(epoch::in_bootstrap_window(), "bootstrap can only run before the network genesis");
 
    // A missing economy is a bootstrap defect, not an operational state: refuse to
    // start a chain that cannot pay its first economic epoch. Without these checks
@@ -1016,19 +1035,34 @@ void msgch::bootstrap() {
    check(sysiosystem::emissions::t5state_t(SYSTEM_ACCOUNT).exists(),
          "msgch::bootstrap: emissions state uninitialized -- sysio.system::initt5 must run before bootstrap");
 
-   action(
-      permission_level{get_self(), "active"_n},
-      EPOCH_ACCOUNT,
-      "advance"_n,
-      std::make_tuple()
-   ).send();
+   // Each active outpost starts its own epoch 1; a chain without an epoch config fails the advance.
+   uint32_t started = 0;
+   sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
+   for (auto it = chains_tbl.begin(); it != chains_tbl.end(); ++it) {
+      if (!it->active || it->is_depot) continue;
+      send_advance(get_self(), it->code.value);
+      ++started;
+   }
+   check(started > 0, "msgch::bootstrap: no active outpost chain to start");
+}
+
+// ---------------------------------------------------------------------------
+//  bootchain — genesis advance of one outpost activated after the network genesis
+// ---------------------------------------------------------------------------
+void msgch::bootchain(uint64_t chain_code) {
+   require_auth(get_self());
+   check(!epoch::in_bootstrap_window(), "bootchain: the network has not started; run bootstrap");
+   check(sysio::chains::outpost_kind_of(CHAINS_ACCOUNT, sysio::slug_name{chain_code}).has_value(),
+         "bootchain: chain is not an active outpost");
+   check(epoch::current_epoch_index(chain_code) == 0, "bootchain: the chain's epoch has already started");
+   send_advance(get_self(), chain_code);
 }
 
 // ---------------------------------------------------------------------------
 //  deliver — batch operator delivers inbound OPP data for a specific outpost
 // ---------------------------------------------------------------------------
 void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> data) {
-   is_batch_operator_active(batch_op_name);
+   is_batch_operator_active(batch_op_name, chain_code);
 
    // Gate on the operator's *current* opreg status, not just resident-group
    // membership. The batch-op group is a snapshot taken at advance()/schbatchgps
@@ -1066,9 +1100,9 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
    check(!op_row.is_depot, "deliver: chain_code refers to the depot self-row");
    check(op_row.active, "deliver: outpost is not active");
 
-   // Decode envelope to validate epoch_index matches current WIRE epoch. The decoded envelope is
-   // re-used by the semantic-header/chain validation below (after the duplicate check).
-   uint32_t epoch = epoch::current_epoch_index();
+   // Decode envelope to validate epoch_index matches the chain's current epoch. The decoded envelope
+   // is re-used by the semantic-header/chain validation below (after the duplicate check).
+   const uint32_t epoch = epoch::current_epoch_index(chain_code);
    opp::Envelope env_check;
    {
       auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
@@ -1201,7 +1235,7 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
    // The eligible set is resolved BEFORE the tally so both the counts and the threshold come from
    // one snapshot -- see eligible_batch_operators(). A delivery from an operator that is no longer
    // eligible is skipped outright rather than counted against a group it is not part of.
-   const std::vector<name> eligible = eligible_batch_operators();
+   const std::vector<name> eligible = eligible_batch_operators(chain_code);
    if (eligible.empty()) {
       sysio::print_f("msgch::evalcons: no consensus for (chain=%llu, epoch=%u): no eligible batch operators\n",
                      chain_code, epoch_index);
@@ -1254,19 +1288,13 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
          consensus_group = g;
          break;
       }
-      // Option B: Majority at epoch boundary (current time >= next_epoch_start).
+      // Option B: Majority at the chain's epoch boundary (current time >= its next_epoch_start).
       // Strict majority written as `count * 2 > group_size` rather than `count > group_size / 2`:
       // a short tail can be EVEN, where integer division would accept an exact half as a majority.
-      if (checksum_counts[g] * 2 > group_size) {
-         epoch::epochstate_t state_tbl(EPOCH_ACCOUNT);
-         if (state_tbl.exists()) {
-            auto state = state_tbl.get();
-            if (current_time_point() >= state.next_epoch_start) {
-               consensus_reached = true;
-               consensus_group = g;
-               break;
-            }
-         }
+      if (checksum_counts[g] * 2 > group_size && epoch_boundary_passed(chain_code)) {
+         consensus_reached = true;
+         consensus_group = g;
+         break;
       }
    }
 
@@ -1290,69 +1318,40 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
 }
 
 // ---------------------------------------------------------------------------
-//  chkcons — check all-outpost consensus + time gate, trigger advance
+//  chkcons — check one outpost's consensus + time gate, trigger its advance
 // ---------------------------------------------------------------------------
-void msgch::chkcons() {
-   uint32_t epoch = epoch::current_epoch_index();
+void msgch::chkcons(uint64_t chain_code) {
+   check(sysio::chains::outpost_kind_of(CHAINS_ACCOUNT, sysio::slug_name{chain_code}).has_value(),
+         "chkcons: chain is not an active outpost");
+   const std::optional<epoch::epoch_state> state = epoch::epoch_state_of(chain_code);
+   if (!state) return;
+   const uint32_t epoch = state->current_epoch_index;
 
-   // Open-dispute gate: if any OPP dispute for the current epoch is still OPEN, hold advancement.
-   // Two overlapping holds protect a disputed epoch: `sysio.epoch::is_paused` (set by opendispute)
-   // is the hard stop -- advance() itself throws while paused -- and this gate is the soft one that
-   // returns BEFORE chkcons triggers advance, so it never hits that throw mid-dispute. chkdispute
-   // resolves each dispute (resolvedisp) and lifts the pause once the LAST open dispute resolves.
+   // Open-dispute gate: while this chain's current epoch has an OPEN OPP dispute, hold its
+   // advancement. Two overlapping holds protect a disputed epoch: the chain's
+   // `sysio.epoch::is_paused` (set by opendispute) is the hard stop -- advance() itself throws while
+   // paused -- and this gate is the soft one that returns BEFORE chkcons triggers advance, so it
+   // never hits that throw mid-dispute. chkdispute resolves the dispute (resolvedisp) and lifts the
+   // chain's pause. Another chain's dispute does not hold this one.
    {
       chalg::disputes_t disputes(CHALG_ACCOUNT);
-      auto ep_idx = disputes.get_index<"byepoch"_n>();
-      for (auto it = ep_idx.lower_bound(epoch);
-           it != ep_idx.end() && it->by_epoch() == epoch; ++it) {
-         if (it->status == opp::types::DisputeStatus::DISPUTE_STATUS_OPEN) return;
-      }
+      auto oe_idx = disputes.get_index<"byoutepoch"_n>();
+      const auto dispute = oe_idx.find(opp::outpost_epoch_key(chain_code, epoch));
+      if (dispute != oe_idx.end() && dispute->status == opp::types::DisputeStatus::DISPUTE_STATUS_OPEN) return;
    }
 
-   // Check all active outposts have consensus for the current epoch.
-   // Outpost set is sourced from `sysio.chains::chains` filtered to
-   // active && !is_depot per the data-model refactor; outpost ids
-   // in `outpcons` are slug_name values (chain_row::code.value).
-   outpost_consensus_t opcons(get_self());
-   sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
-   bool all_consensus = true;
-   uint32_t outpost_count = 0;
-   // Outposts with no current-epoch consensus row. Collected rather than short-circuited so the
-   // post-boundary re-evaluation below can re-drive EVERY laggard, not just the first one.
-   std::vector<uint64_t> awaiting_consensus;
+   // Readiness is the durable `epoch_index == current epoch` signal that apply_consensus writes on
+   // dispatch. We intentionally do NOT also gate on `consensus_reached`: advance() can return without
+   // bumping the epoch (its wall-clock check returns gracefully), and that
+   // commit is not rolled back, so a pre-emptive reset of consensus_reached would strand the epoch
+   // with nothing to re-arm it -- apply_consensus does not re-fire once the delivery set is complete.
+   // A stale row from a prior epoch fails this check; a fresh dispatch for the new epoch overwrites it.
+   const std::optional<outpost_consensus_entry> consensus =
+      outpost_consensus_t(get_self()).try_get(outpost_consensus_key{chain_code});
+   const bool has_consensus = consensus && consensus->epoch_index == epoch;
+   const bool past_boundary = current_time_point() >= state->next_epoch_start;
 
-   for (auto it = chains_tbl.begin(); it != chains_tbl.end(); ++it) {
-      if (!it->active || it->is_depot) continue;
-      ++outpost_count;
-      auto opc_pk = outpost_consensus_key{it->code.value};
-      if (!opcons.contains(opc_pk)) {
-         all_consensus = false;
-         awaiting_consensus.push_back(it->code.value);
-         continue;
-      }
-      auto opc = opcons.get(opc_pk);
-      // Readiness is the durable `epoch_index == current epoch` signal that apply_consensus writes on
-      // dispatch. We intentionally do NOT also gate on `consensus_reached`: advance() can return without
-      // bumping the epoch (its wall-clock check returns gracefully), and that
-      // commit is not rolled back, so a pre-emptive reset of consensus_reached would strand the epoch
-      // with nothing to re-arm it -- apply_consensus does not re-fire once the delivery set is complete.
-      // A stale row from a prior epoch fails this check; a fresh dispatch for the new epoch overwrites it.
-      if (opc.epoch_index != epoch) {
-         all_consensus = false;
-         awaiting_consensus.push_back(it->code.value);
-         continue;
-      }
-   }
-
-   if (outpost_count == 0) return;
-
-   // Check wall-clock: next_epoch_start must be in the past
-   epoch::epochstate_t estate(EPOCH_ACCOUNT);
-   if (!estate.exists()) return;
-   auto state = estate.get();
-   const bool past_boundary = current_time_point() >= state.next_epoch_start;
-
-   if (!all_consensus) {
+   if (!has_consensus) {
       // Post-boundary re-evaluation. evalcons runs ONLY as an inline of deliver(), and deliver()
       // rejects a second delivery from the same operator ("operator already delivered for this
       // outpost+epoch"). So a majority that formed BEFORE the boundary, with no further delivery
@@ -1366,14 +1365,12 @@ void msgch::chkcons() {
       // Gated on past_boundary because Option B cannot fire before it, so a pre-boundary re-drive
       // would be pure work with no possible effect.
       if (past_boundary) {
-         for (uint64_t outpost_code : awaiting_consensus) {
-            action(
-               permission_level{get_self(), "active"_n},
-               get_self(),
-               "evalcons"_n,
-               std::make_tuple(outpost_code, epoch)
-            ).send();
-         }
+         action(
+            permission_level{get_self(), "active"_n},
+            get_self(),
+            "evalcons"_n,
+            std::make_tuple(chain_code, epoch)
+         ).send();
       }
       return;
    }
@@ -1385,12 +1382,7 @@ void msgch::chkcons() {
    // not roll back a reset done beforehand, which would permanently strand the epoch. Stale consensus is
    // invalidated instead by the `epoch_index == epoch` check above once advance() actually bumps the
    // epoch, and the next epoch's dispatch overwrites the row.
-   action(
-      permission_level{get_self(), "active"_n},
-      EPOCH_ACCOUNT,
-      "advance"_n,
-      std::make_tuple()
-   ).send();
+   send_advance(get_self(), chain_code);
 }
 
 // ---------------------------------------------------------------------------
@@ -1503,7 +1495,7 @@ void msgch::queueout(uint64_t chain_code,
    atts.emplace(ram_payer, id_key{att_id}, attestation_entry{
       .id                  = att_id,
       .chain_code          = chain_code,
-      .epoch_index         = epoch::current_epoch_index(),
+      .epoch_index         = epoch::current_epoch_index(chain_code),
       .type                = attest_type,
       .status              = AttestationStatus::ATTESTATION_STATUS_READY,
       .data                = data,
@@ -1515,6 +1507,9 @@ void msgch::queueout(uint64_t chain_code,
 
 // ---------------------------------------------------------------------------
 //  buildenv — build outbound envelope from READY attestations
+//
+//  The envelope carries the outpost's own current epoch index: each outpost
+//  consumes its own sequential, chain-keyed stream.
 //
 //  Packs this outpost's READY attestations in queue order (schedule lane
 //  first, FIFO within a lane) into a single outbound envelope, up to
@@ -1540,7 +1535,7 @@ void msgch::queueout(uint64_t chain_code,
 void msgch::buildenv(uint64_t chain_code) {
    require_auth(EPOCH_ACCOUNT);
 
-   uint32_t epoch = epoch::current_epoch_index();
+   const uint32_t epoch = epoch::current_epoch_index(chain_code);
    attestations_t atts(get_self());
    // OPP wire timestamps (`MessageHeader.timestamp`, `Envelope.epoch_timestamp`) are milliseconds
    // since the Unix epoch (opp.proto). WIRE's half-second blocks make sub-second resolution

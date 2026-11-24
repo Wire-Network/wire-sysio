@@ -97,9 +97,9 @@ namespace sysio {
                     "production default percent-miss threshold must lie inside the accepted bounds");
 
       /// Minimum accepted `terminate_window_ms` for a given consecutive-miss
-      /// threshold and epoch schedule. Delivery records accrue one per DUTY
-      /// epoch: `sysio.epoch::advance` records each member of the expiring
-      /// group once, combined across the active outposts. The schedule is a
+      /// threshold and one outpost chain's epoch schedule. Delivery records
+      /// accrue one per DUTY epoch: `sysio.epoch::advance` records each member
+      /// of the chain's expiring group once. The schedule is a
       /// sliding window of `batch_op_groups` groups, so a resident operator's
       /// duty interval is `batch_op_groups` epochs. The rolling window must
       /// span the full terminating run (`consecutive_misses + 1` records,
@@ -110,9 +110,9 @@ namespace sysio {
       /// benched by a surplus roster accrue no records while benched, so no
       /// finite window observes them; the bound governs resident operators,
       /// whose duty interval the sliding schedule pins at `batch_op_groups`
-      /// epochs. Enforced from both `opreg::setconfig` (against the stored
-      /// epoch config) and `sysio.epoch::setconfig` (against the stored opreg
-      /// config) so no ordering of the two setters can accept a vacuous pair.
+      /// epochs. Enforced from both `opreg::setconfig` (against every chain's
+      /// stored epoch config) and `sysio.epoch::setconfig` (against the stored
+      /// opreg config) so no ordering of the two setters can accept a vacuous pair.
       /// Inputs are pre-bounded by those setters (misses <= 5, duration <= 30
       /// days, groups <= 255), so the product cannot overflow uint64.
       static constexpr uint64_t min_terminate_window_ms(uint32_t consecutive_misses,
@@ -228,8 +228,9 @@ namespace sysio {
       void cancelwtdw(name account, uint64_t request_id);
 
       /// Internal: drain matured rows from `withdraw_queue`. Called inline from
-      /// `sysio.epoch::tickeconomy` each economic epoch with the current economic and consensus
-      /// indexes; a row is matured once both of its waits have passed.
+      /// `sysio.epoch::tickeconomy` each economic epoch with the current economic index and the
+      /// slowest started outpost chain's consensus index (`sysio.epoch::slowest_epoch_index`); a row
+      /// is matured once both of its waits have passed.
       [[sysio::action]]
       void flushwtdw(uint32_t economic_epoch, uint32_t consensus_epoch);
 
@@ -461,7 +462,8 @@ namespace sysio {
          uint64_t          amount              = 0;
          /// requested_at_economic_epoch + WITHDRAW_WAIT_ECONOMIC_EPOCHS
          uint32_t          eligible_at_economic_epoch  = 0;
-         uint32_t          eligible_at_consensus_epoch = 0; ///< consensus index at the request + WITHDRAW_WAIT_EPOCHS
+         /// The slowest started chain's consensus index at the request + WITHDRAW_WAIT_EPOCHS.
+         uint32_t          eligible_at_consensus_epoch = 0;
          /// The economic epoch the grid was in at the request (`sysio.epoch::economic_epoch_index_at`), which
          /// can be ahead of the last epoch ticked.
          uint32_t          requested_at_economic_epoch = 0;

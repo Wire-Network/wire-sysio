@@ -1292,6 +1292,7 @@ public:
                                    uint32_t operators_per_epoch = 7,
                                    uint32_t batch_op_groups_count = 3) {
       auto r = push_epoch_action(EPOCH, "setconfig"_n, mvo()
+         ("chain_code", EPOCH_CHAIN)
          ("epoch_duration_sec", epoch_duration_sec)
          ("operators_per_epoch", operators_per_epoch)
          ("batch_operator_minimum_active", operators_per_epoch * batch_op_groups_count)
@@ -1356,7 +1357,7 @@ public:
    /// Tests cross the economic boundary with produce_blocks before every call after the first.
    action_result advance_epoch_state(account_name signer = EPOCH) {
       if (consensus_epoch_index() == 0) {
-         auto r = push_epoch_action(signer, "advance"_n, mvo());
+         auto r = push_epoch_action(signer, "advance"_n, mvo()("chain_code", EPOCH_CHAIN));
          if (r != success()) return r;
       }
       if (economic_epoch_index() == 0 && !economic_start_pinned) {
@@ -1387,8 +1388,12 @@ public:
          fixture_abi_yield_function());
    }
 
+   /// The outpost chain whose consensus epoch the fixture configures and advances. It is not
+   /// registered on sysio.chains, so its epoch closes owe no deliveries.
+   static constexpr std::string_view EPOCH_CHAIN = "ETH";
+
    fc::variant get_epoch_state_row() {
-      auto data = get_row_by_account(EPOCH, EPOCH, "epochstate"_n, "epochstate"_n);
+      auto data = get_row_by_id(EPOCH, EPOCH, "epochstate"_n, fc::slug_name{EPOCH_CHAIN}.value);
       if (data.empty()) return fc::variant();
       return epoch_abi_ser.binary_to_variant("epoch_state", data,
          fixture_abi_yield_function());
@@ -3205,10 +3210,11 @@ BOOST_FIXTURE_TEST_CASE( economic_clock_runs_while_consensus_is_paused, sysio_em
    create_t5_holding_accounts();
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name ) );
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
-   BOOST_REQUIRE_EQUAL( success(), push_epoch_action(CHALG, "pause"_n, mvo()) );
+   BOOST_REQUIRE_EQUAL( success(), push_epoch_action(CHALG, "pause"_n, mvo()("chain_code", EPOCH_CHAIN)) );
 
    produce_blocks(130);
-   require_substr( push_epoch_action(EPOCH, "advance"_n, mvo()), "epoch advancement is paused" );
+   require_substr( push_epoch_action(EPOCH, "advance"_n, mvo()("chain_code", EPOCH_CHAIN)),
+                   "epoch advancement is paused" );
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
    BOOST_REQUIRE_EQUAL( economic_epoch_index(), 2u );
    BOOST_REQUIRE_EQUAL( consensus_epoch_index(), 1u );
@@ -4459,7 +4465,7 @@ BOOST_FIXTURE_TEST_CASE( cadence_drop_midperiod_does_not_multiply_batch_payout,
    BOOST_REQUIRE_EQUAL( success(), init_epoch_state(60, /*operators_per_epoch*/1,
                                                     /*batch_op_groups_count*/1) );
    produce_blocks(1);
-   BOOST_REQUIRE_EQUAL( success(), push_epoch_action(EPOCH, "schbatchgps"_n, mvo()) );
+   BOOST_REQUIRE_EQUAL( success(), push_epoch_action(EPOCH, "schbatchgps"_n, mvo()("chain_code", EPOCH_CHAIN)) );
 
    setup_producers(1);
    wait_for_producer_schedule();
@@ -4924,7 +4930,7 @@ BOOST_FIXTURE_TEST_CASE( claimnodedis_reserves_outstanding_epoch_pay, sysio_emis
    BOOST_REQUIRE_EQUAL( success(), init_epoch_state(60, /*operators_per_epoch*/1,
                                                     /*batch_op_groups_count*/1) );
    produce_blocks(1);
-   BOOST_REQUIRE_EQUAL( success(), push_epoch_action(EPOCH, "schbatchgps"_n, mvo()) );
+   BOOST_REQUIRE_EQUAL( success(), push_epoch_action(EPOCH, "schbatchgps"_n, mvo()("chain_code", EPOCH_CHAIN)) );
    setup_producers(1);
    wait_for_producer_schedule();
    produce_complete_cycles(1, 2);

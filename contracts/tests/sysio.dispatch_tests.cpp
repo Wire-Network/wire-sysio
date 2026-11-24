@@ -442,8 +442,10 @@ public:
    void bootstrap_for_dispatch(const std::string& outpost_code = "ETH",
                                ChainKind outpost_kind = ChainKind::CHAIN_KIND_EVM,
                                bool with_economy = true) {
+      dispatch_chain = fc::slug_name{outpost_code}.value;
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
          "setconfig"_n, mvo()
+            ("chain_code",                          outpost_code)
             ("epoch_duration_sec",                  60)
             ("operators_per_epoch",                 1)
             ("batch_operator_minimum_active",       1)
@@ -481,10 +483,14 @@ public:
             ("outpost", sysio_system::test_support::no_outpost_mvo())));
 
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
-         "schbatchgps"_n, mvo()));
+         "schbatchgps"_n, mvo()("chain_code", outpost_code)));
 
       produce_blocks();
    }
+
+   /// The outpost `bootstrap_for_dispatch` registered and scheduled: the chain whose epoch the
+   /// fixture reads and cranks.
+   uint64_t dispatch_chain = 0;
 
    action_result deliver(uint64_t chain_code, const std::vector<char>& data) {
       return push(MSGCH_ACCOUNT, msgch_abi, BATCHOP, "deliver"_n, mvo()
@@ -501,18 +507,18 @@ public:
          ("data",          data));
    }
 
+   /// The scheduled outpost's current consensus epoch index (0 before its genesis advance).
    uint32_t current_epoch() {
-      auto data = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT,
-                                     "epochstate"_n, "epochstate"_n);
+      auto data = get_row_by_id(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, dispatch_chain);
       if (data.empty()) return 0;
       auto v = epoch_abi.binary_to_variant("epoch_state", data,
          fixture_abi_yield_function());
       return v["current_epoch_index"].as<uint32_t>();
    }
 
-   /// Permissionless consensus-and-time crank that triggers sysio.epoch::advance.
+   /// Permissionless consensus-and-time crank that triggers the scheduled outpost's sysio.epoch::advance.
    action_result chkcons() {
-      return push(MSGCH_ACCOUNT, msgch_abi, BATCHOP, "chkcons"_n, mvo());
+      return push(MSGCH_ACCOUNT, msgch_abi, BATCHOP, "chkcons"_n, mvo()("chain_code", dispatch_chain));
    }
 
    fc::variant get_operator(name account) {
@@ -1397,7 +1403,8 @@ BOOST_FIXTURE_TEST_CASE(chkcons_advances_without_a_treasury, sysio_dispatch_test
    const auto eth_code = fc::slug_name{"ETH"}.value;
 
    // The genesis advance is permissionless; it opens epoch 1 with BATCHOP's group scheduled.
-   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "advance"_n, mvo()));
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "advance"_n,
+                                       mvo()("chain_code", "ETH")));
    produce_blocks();
    const uint32_t epoch0 = current_epoch();
    BOOST_REQUIRE_EQUAL(epoch0, 1u);
@@ -1479,6 +1486,27 @@ BOOST_FIXTURE_TEST_CASE(bootstrap_advances_genesis_epoch_when_emissions_configur
       push(MSGCH_ACCOUNT, msgch_abi, MSGCH_ACCOUNT, "bootstrap"_n, mvo()));
    produce_blocks();
    BOOST_REQUIRE_EQUAL(current_epoch(), 1u);
+} FC_LOG_AND_RETHROW() }
+
+// The network genesis is one-shot: `bootchain` waits for it, its first genesis advance writes the
+// `netgenesis` marker, and `bootstrap` refuses to run again once it has happened.
+BOOST_FIXTURE_TEST_CASE(bootstrap_is_the_one_network_genesis, sysio_dispatch_tester) { try {
+   const auto network_genesis_row = [&] {
+      return get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "netgenesis"_n, "netgenesis"_n);
+   };
+   bootstrap_for_dispatch();
+   setup_wire_token();
+   enable_epoch_advancement();
+
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("bootchain: the network has not started; run bootstrap"),
+      push(MSGCH_ACCOUNT, msgch_abi, MSGCH_ACCOUNT, "bootchain"_n, mvo()("chain_code", dispatch_chain)));
+   BOOST_REQUIRE(network_genesis_row().empty());
+   BOOST_REQUIRE_EQUAL(success(), push(MSGCH_ACCOUNT, msgch_abi, MSGCH_ACCOUNT, "bootstrap"_n, mvo()));
+   produce_blocks();
+   BOOST_REQUIRE(!network_genesis_row().empty());
+   BOOST_REQUIRE_EQUAL(current_epoch(), 1u);
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("bootstrap can only run before the network genesis"),
+      push(MSGCH_ACCOUNT, msgch_abi, MSGCH_ACCOUNT, "bootstrap"_n, mvo()));
 } FC_LOG_AND_RETHROW() }
 
 // A forged/invalid delivery cannot strand the epoch. SEC-102's semantic-header check runs at

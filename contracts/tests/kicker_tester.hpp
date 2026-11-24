@@ -27,6 +27,8 @@ public:
    static constexpr auto EPOCH = "sysio.epoch"_n;
    /// Both clocks' epoch length: the consensus epoch and the economic grid.
    static constexpr uint32_t EPOCH_DURATION_SEC = 60;
+   /// The outpost chain whose consensus epoch the fixture configures; its genesis advance is the network genesis.
+   static constexpr std::string_view EPOCH_CHAIN = SOLANA;
    static constexpr uint64_t seed = 75'000 * UNIT;
    static constexpr uint64_t holder = 25'000 * UNIT;
    static constexpr uint64_t budget = 1'000'000 * UNIT;
@@ -40,7 +42,7 @@ public:
       deploy(KICKER, contracts::kicker_wasm(), contracts::kicker_abi(), kicker_ser, true);
       deploy(SYSIO_ACCOUNT, contracts::system_wasm(), contracts::system_abi(), system_ser, true);
       deploy(EPOCH, contracts::epoch_wasm(), contracts::epoch_abi(), epoch_ser, true);
-      BOOST_REQUIRE_EQUAL(success(), push(EPOCH, epoch_ser, EPOCH, "setconfig"_n, mvo()
+      BOOST_REQUIRE_EQUAL(success(), push(EPOCH, epoch_ser, EPOCH, "setconfig"_n, mvo()("chain_code", EPOCH_CHAIN)
          ("epoch_duration_sec", EPOCH_DURATION_SEC)("operators_per_epoch", 7)("batch_operator_minimum_active", 21)
          ("batch_op_groups", 3)("epoch_retention_envelope_log_count", 1000)));
       BOOST_REQUIRE_EQUAL(success(), anchor_economy());
@@ -235,7 +237,10 @@ public:
    /// not leave the crank behind. With `pay_cadence_epochs == 1` it is a pay epoch, so the emissions gate either pays
    /// the period or records why it held it.
    action_result open_first_pay_epoch() {
-      if (auto result = push(EPOCH, epoch_ser, EPOCH, "advance"_n, mvo()); result != success()) return result;
+      if (auto result = push(EPOCH, epoch_ser, EPOCH, "advance"_n, mvo()("chain_code", EPOCH_CHAIN));
+          result != success()) {
+         return result;
+      }
       if (auto result = anchor_economy(); result != success()) return result;
       return push(EPOCH, epoch_ser, EPOCH, "tickeconomy"_n, mvo()("epoch_index", 1));
    }

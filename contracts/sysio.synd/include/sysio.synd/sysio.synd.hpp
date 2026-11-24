@@ -112,7 +112,7 @@
  * `dropenv` and `sweepyield` are refused. Intake, `challenge` and `setconfig` run. A bucket never refills
  * beyond its burst cap; time spent frozen refills normally after clear. Challenge windows run on.
  *
- * Launch. `importsynd` replays pre-launch positions inside the epoch-0 bootstrap window, minting
+ * Launch. `importsynd` replays pre-launch positions inside the bootstrap window (before the network genesis), minting
  * straight to a linked account or into `parked`; `importdone` closes the import for good.
  *
  * Never-throw: `onsynd`, `onyield` and `closeenv` run inside `sysio.msgch`'s consensus transaction, and
@@ -477,7 +477,7 @@ namespace sysio {
                                         std::vector<uint64_t> request_ids);
 
       // -----------------------------------------------------------------------
-      //  Launch ingestion (privileged caller, epoch-0 bootstrap window)
+      //  Launch ingestion (privileged caller, bootstrap window)
       // -----------------------------------------------------------------------
 
       /// One pre-launch position: the holder's native pubkey (32-byte Ed25519 on SVM, 33-byte

@@ -103,6 +103,16 @@
             ]
         },
         {
+            "name": "bootchain",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "bootstrap",
             "base": "",
             "fields": []
@@ -120,7 +130,12 @@
         {
             "name": "chkcons",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                }
+            ]
         },
         {
             "name": "deliver",
@@ -428,6 +443,11 @@
         }
     ],
     "actions": [
+        {
+            "name": "bootchain",
+            "type": "bootchain",
+            "ricardian_contract": ""
+        },
         {
             "name": "bootstrap",
             "type": "bootstrap",

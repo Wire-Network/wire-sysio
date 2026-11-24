@@ -10,6 +10,9 @@
 #include <sysio/opp/types/types.pb.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
 
+#include <algorithm>
+#include <optional>
+
 namespace sysio {
 
    class [[sysio::contract("sysio.epoch")]] epoch : public contract {
@@ -20,21 +23,25 @@ namespace sysio {
       //  Actions
       // -----------------------------------------------------------------------
 
-      /// Set epoch configuration (privileged).
+      /// Set outpost `chain_code`'s consensus epoch configuration (privileged). Each outpost chain runs
+      /// its own consensus epoch: counter, pacing, schedule window and roster.
       [[sysio::action]]
-      void setconfig(uint32_t epoch_duration_sec,
+      void setconfig(sysio::slug_name chain_code,
+                     uint32_t epoch_duration_sec,
                      uint32_t operators_per_epoch,
                      uint32_t batch_operator_minimum_active,
                      uint32_t batch_op_groups,
                      uint32_t epoch_retention_envelope_log_count);
 
-      /// Advance epoch if duration elapsed (permissionless crank).
+      /// Close outpost `chain_code`'s current consensus epoch once its duration has elapsed. The chain's
+      /// genesis advance (epoch 0 -> 1) is permissionless; later advances need sysio.msgch (its `chkcons`)
+      /// or sysio.epoch. The first genesis advance of any chain is the network genesis.
       [[sysio::action]]
-      void advance();
+      void advance(sysio::slug_name chain_code);
 
-      /// Internal continuation after epoch-close operator mutations execute.
+      /// Internal continuation of `advance(chain_code)` after its epoch-close operator mutations execute.
       [[sysio::action]]
-      void finishadv(uint32_t epoch_index);
+      void finishadv(sysio::slug_name chain_code, uint32_t epoch_index);
 
       /// Set the economic clock (privileged): the duration of one economic epoch and the time its grid
       /// starts. `start_time` may lie in the past -- the clock then catches up through the elapsed
@@ -43,23 +50,23 @@ namespace sysio {
       void seteconomy(uint32_t epoch_duration_sec, sysio::time_point_sec start_time);
 
       /// Open economic epoch `epoch_index` (permissionless crank). Refused unless `epoch_index` is the
-      /// next index, its grid boundary has passed, and the consensus genesis advance has run. Never
-      /// waits on outpost consensus. Runs the emissions gate, then matures withdrawals, accrues the
-      /// epoch's emission share, pays on a pay epoch, and steps the batch-duty settlement.
+      /// next index, its grid boundary has passed, and the network genesis has happened. Never waits on
+      /// outpost consensus. Runs the emissions gate, then matures withdrawals, accrues the epoch's
+      /// emission share, pays on a pay epoch, and steps the batch-duty settlement.
       [[sysio::action]]
       void tickeconomy(uint32_t epoch_index);
 
-      /// Group assignment — reads AVAILABLE batch ops from sysio.opreg.
+      /// Fill outpost `chain_code`'s schedule window from the ACTIVE batch operators in sysio.opreg.
       [[sysio::action]]
-      void schbatchgps();
+      void schbatchgps(sysio::slug_name chain_code);
 
-      /// Set global pause (only callable by sysio.chalg).
+      /// Pause outpost `chain_code`'s epoch advancement (only callable by sysio.chalg).
       [[sysio::action]]
-      void pause();
+      void pause(sysio::slug_name chain_code);
 
-      /// Clear global pause (only callable by sysio.chalg).
+      /// Resume outpost `chain_code`'s epoch advancement (only callable by sysio.chalg).
       [[sysio::action]]
-      void unpause();
+      void unpause(sysio::slug_name chain_code);
 
       /// Forget the roster last queued to outpost `code`, so the next advance queues the roster to it
       /// again: the recovery for an outpost that lost the roster it held. Auth: sysio.epoch.
@@ -70,44 +77,62 @@ namespace sysio {
       //  Tables
       // -----------------------------------------------------------------------
 
-      /// Global epoch configuration singleton.
+      /// Primary key of the per-outpost tables: the outpost's `sysio.chains` code.
+      struct chain_key {
+         uint64_t chain_code;
+         uint64_t primary_key() const { return chain_code; }
+         SYSLIB_SERIALIZE(chain_key, (chain_code))
+      };
+
+      /// One outpost chain's consensus epoch configuration, set by `setconfig`.
       struct [[sysio::table("epochcfg")]] epoch_config {
+         uint64_t    chain_code = 0;
          uint32_t    epoch_duration_sec = 360;   // 6 minutes
          uint32_t    operators_per_epoch = 7;
          uint32_t    batch_operator_minimum_active = 21;
          uint32_t    batch_op_groups = 3;          // rotation groups (21 / 7)
 
-         /// Epochs of history each outpost keeps in the metadata-only `envelope_log` table on
-         /// `sysio.msgch`: an outpost holds at most `2 * epoch_retention_envelope_log_count` rows
-         /// (one inbound + one outbound record per epoch). Default 200 — matches the SOL/ETH
-         /// per-direction metadata-log cap. Each log write reads this directly; runtime changes via
-         /// `setconfig` take effect on the next write.
+         /// Epochs of history this outpost keeps in the metadata-only `envelope_log` table on
+         /// `sysio.msgch`: at most `2 * epoch_retention_envelope_log_count` rows (one inbound + one
+         /// outbound record per epoch). Default 200 — matches the SOL/ETH per-direction
+         /// metadata-log cap. Each log write reads this directly; runtime changes via `setconfig`
+         /// take effect on the next write.
          uint32_t    epoch_retention_envelope_log_count = 200;
 
          SYSLIB_SERIALIZE(epoch_config,
-            (epoch_duration_sec)(operators_per_epoch)
+            (chain_code)(epoch_duration_sec)(operators_per_epoch)
             (batch_operator_minimum_active)(batch_op_groups)
             (epoch_retention_envelope_log_count))
       };
 
-      using epochcfg_t = sysio::kv::global<"epochcfg"_n, epoch_config>;
+      using epochcfg_t = sysio::kv::table<"epochcfg"_n, chain_key, epoch_config>;
 
-      /// Current epoch state singleton.
+      /// One outpost chain's consensus epoch state.
       struct [[sysio::table("epochstate")]] epoch_state {
+         uint64_t                          chain_code = 0;
          uint32_t                          current_epoch_index = 0;
          time_point                        current_epoch_start{};
          time_point                        next_epoch_start{};
          uint8_t                           current_batch_op_group = 0; // 0, 1, or 2
          std::vector<std::vector<name>>    batch_op_groups;           // 3 groups of 7
-         checksum256                       last_consensus_hash;
          bool                              is_paused = false;
 
          SYSLIB_SERIALIZE(epoch_state,
-            (current_epoch_index)(current_epoch_start)(next_epoch_start)
-            (current_batch_op_group)(batch_op_groups)(last_consensus_hash)(is_paused))
+            (chain_code)(current_epoch_index)(current_epoch_start)(next_epoch_start)
+            (current_batch_op_group)(batch_op_groups)(is_paused))
       };
 
-      using epochstate_t = sysio::kv::global<"epochstate"_n, epoch_state>;
+      using epochstate_t = sysio::kv::table<"epochstate"_n, chain_key, epoch_state>;
+
+      /// Network genesis marker, written by the first genesis advance of any outpost chain and never
+      /// erased. Its presence closes the bootstrap window and lets the economic clock tick.
+      struct [[sysio::table("netgenesis")]] network_genesis {
+         time_point genesis_at{};   ///< when the first chain's genesis advance ran
+
+         SYSLIB_SERIALIZE(network_genesis, (genesis_at))
+      };
+
+      using netgenesis_t = sysio::kv::global<"netgenesis"_n, network_genesis>;
 
       /// Economic clock configuration singleton, set by `seteconomy`. The economic clock drives
       /// emissions accrual and pay, collateral-withdrawal maturity and the producer pay slot count;
@@ -168,12 +193,6 @@ namespace sysio {
       /// The last OPERATORS roster queued to each outpost, keyed by the outpost's `sysio.chains` code.
       /// `advance` queues the roster to an outpost only when its hash differs from the row's. An
       /// outpost activated after genesis has no row, so its first advance queues the roster to it.
-      struct rostersent_key {
-         uint64_t chain_code;
-         uint64_t primary_key() const { return chain_code; }
-         SYSLIB_SERIALIZE(rostersent_key, (chain_code))
-      };
-
       struct [[sysio::table("rostersent")]] roster_sent {
          uint64_t    chain_code = 0;
          checksum256 roster_hash; ///< SHA-256 of the encoded OPERATORS attestation last queued
@@ -181,7 +200,7 @@ namespace sysio {
          SYSLIB_SERIALIZE(roster_sent, (chain_code)(roster_hash))
       };
 
-      using rostersent_t = sysio::kv::table<"rostersent"_n, rostersent_key, roster_sent>;
+      using rostersent_t = sysio::kv::table<"rostersent"_n, chain_key, roster_sent>;
 
       // Well-known accounts
       static constexpr name CHALG_ACCOUNT  = "sysio.chalg"_n;
@@ -191,19 +210,40 @@ namespace sysio {
       static constexpr name AUTHEX_ACCOUNT = "sysio.authex"_n;
       static constexpr name CHAINS_ACCOUNT = "sysio.chains"_n;
 
-      /// True while the depot is in its epoch-0 bootstrap window: no epoch state yet, or the
-      /// current epoch index is still 0. Never throws. The one window test `sysio.liq`'s
-      /// `regliqpool` and `sysio.synd`'s `importsynd` gate their launch ingestion on.
-      static bool in_bootstrap_window() {
-         epochstate_t es(EPOCH_ACCOUNT);
-         return !es.exists() || es.get().current_epoch_index == 0;
+      /// True once the network genesis has happened: the first genesis advance of any outpost chain.
+      /// Never throws.
+      static bool network_genesis_done() {
+         return netgenesis_t(EPOCH_ACCOUNT).exists();
       }
 
-      /// The depot's current consensus epoch index, or 0 before the first epoch state is written.
-      /// Never throws. Read by `sysio.msgch` and by `sysio.opreg`'s withdrawal consensus guard.
-      static uint32_t current_epoch_index() {
-         epochstate_t es(EPOCH_ACCOUNT);
-         return es.exists() ? es.get().current_epoch_index : 0;
+      /// True while the depot is in its bootstrap window: before the network genesis. Never throws.
+      /// The one window test `sysio.chains`, `sysio.tokens`, `sysio.liq` and `sysio.synd` gate their
+      /// launch ingestion on.
+      static bool in_bootstrap_window() {
+         return !network_genesis_done();
+      }
+
+      /// Outpost `chain_code`'s consensus epoch state, or nullopt before it has any. Never throws.
+      static std::optional<epoch_state> epoch_state_of(uint64_t chain_code) {
+         return epochstate_t(EPOCH_ACCOUNT).try_get(chain_key{chain_code});
+      }
+
+      /// Outpost `chain_code`'s current consensus epoch index, or 0 before its genesis advance. Never throws.
+      static uint32_t current_epoch_index(uint64_t chain_code) {
+         const std::optional<epoch_state> state = epoch_state_of(chain_code);
+         return state ? state->current_epoch_index : 0;
+      }
+
+      /// The lowest current consensus epoch index among the outpost chains whose epochs have started,
+      /// or 0 before any has. Never throws. `sysio.opreg`'s withdrawal consensus guard waits on it.
+      static uint32_t slowest_epoch_index() {
+         uint32_t slowest = 0;
+         epochstate_t states(EPOCH_ACCOUNT);
+         for (auto it = states.begin(); it != states.end(); ++it) {
+            if (it->current_epoch_index == 0) continue;
+            if (slowest == 0 || it->current_epoch_index < slowest) slowest = it->current_epoch_index;
+         }
+         return slowest;
       }
 
       /// The current economic epoch index, or 0 before the economic clock's first tick. Never throws.
@@ -264,20 +304,19 @@ namespace sysio {
       using OperatorStatus = sysio::opp::types::OperatorStatus;
    };
 
-   /// Asserts the caller signed the transaction and is a member of the current
+   /// Asserts the caller signed the transaction and is a member of outpost `chain_code`'s current
    /// resident batch-operator group. This is a group-membership check only: the
    /// group is a snapshot from the last schedule, so current operator eligibility
    /// (sysio.opreg ACTIVE status) must be enforced separately at the delivery
    /// call site (see msgch::deliver).
-   inline void is_batch_operator_active(const name& batch_op_name) {
+   inline void is_batch_operator_active(const name& batch_op_name, uint64_t chain_code) {
       require_auth(batch_op_name);
-      epoch::epochstate_t epoch_tbl(epoch::EPOCH_ACCOUNT);
-      check(epoch_tbl.exists(), "epoch state not initialized");
-      auto state = epoch_tbl.get();
+      const std::optional<epoch::epoch_state> state = epoch::epoch_state_of(chain_code);
+      check(state.has_value(), "epoch state not initialized");
 
-      auto cur_group = state.current_batch_op_group;
-      check(cur_group < state.batch_op_groups.size(), "active group index out of range");
-      auto& active_members = state.batch_op_groups[cur_group];
+      const uint8_t cur_group = state->current_batch_op_group;
+      check(cur_group < state->batch_op_groups.size(), "active group index out of range");
+      const std::vector<name>& active_members = state->batch_op_groups[cur_group];
       check(
          std::find(active_members.begin(), active_members.end(), batch_op_name) != active_members.end(),
          "caller is not in the active batch operator group"

@@ -411,12 +411,17 @@ public:
       }
    }
 
-   /// Push `sysio.epoch::setconfig` with a 7-operators-per-group schedule of
+   /// The outpost chain whose epoch schedule the fixture configures by default.
+   static constexpr std::string_view EPOCH_CHAIN = "ETH";
+
+   /// Push `sysio.epoch::setconfig` for `chain` with a 7-operators-per-group schedule of
    /// the given duration and group count — installs the epochcfg row the
    /// SEC-28 window-span validation reads.
    action_result set_epoch_config(uint32_t epoch_duration_sec,
-                                  uint32_t batch_op_groups = kWindowBoundGroups) {
+                                  uint32_t batch_op_groups = kWindowBoundGroups,
+                                  std::string_view chain = EPOCH_CHAIN) {
       return push_epoch_action(EPOCH_ACCOUNT, "setconfig"_n, mvo()
+         ("chain_code",                         chain)
          ("epoch_duration_sec",                 epoch_duration_sec)
          ("operators_per_epoch",                7)
          ("batch_operator_minimum_active",      7 * batch_op_groups)
@@ -1039,6 +1044,27 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_window_narrower_than_consecutive_run, 
                 kMinWindowMsAtDefaults));
 } FC_LOG_AND_RETHROW() }
 
+/// Each outpost chain runs its own schedule, so the window must span the consecutive run of every
+/// configured chain: a chain with a longer epoch raises the bound for all.
+BOOST_FIXTURE_TEST_CASE(setconfig_window_spans_every_chains_schedule, sysio_opreg_tester) { try {
+   constexpr std::string_view kSlowChain = "SOL";
+   BOOST_REQUIRE_EQUAL(success(), set_epoch_config(kWindowBoundEpochDurationSec));
+   BOOST_REQUIRE_EQUAL(success(), set_epoch_config(2 * kWindowBoundEpochDurationSec, kWindowBoundGroups, kSlowChain));
+   produce_blocks();
+
+   // The window that covers the faster chain is too narrow for the slower one.
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: terminate_window_ms must span at least "
+            "terminate_max_consecutive_misses + 1 duty rotations"),
+      setconfig(kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h,
+                kMinWindowMsAtDefaults));
+   BOOST_REQUIRE_EQUAL(success(),
+      setconfig(kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h,
+                2 * kMinWindowMsAtDefaults));
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(setconfig_window_unchecked_before_epoch_config, sysio_opreg_tester) { try {
    // Bootstrap installs opreg config before sysio.epoch is configured; the
    // span bound must not reject it. sysio.epoch::setconfig's mirror check
@@ -1149,6 +1175,7 @@ BOOST_FIXTURE_TEST_CASE(epoch_setconfig_locks_batch_op_groups_after_schedule, sy
 
    auto epoch_setconfig = [&](uint32_t groups, uint32_t min_active) {
       return push_epoch_action(EPOCH_ACCOUNT, "setconfig"_n, mvo()
+         ("chain_code",                         EPOCH_CHAIN)
          ("epoch_duration_sec",                 90)
          ("operators_per_epoch",                1)
          ("batch_operator_minimum_active",      min_active)
@@ -1159,7 +1186,7 @@ BOOST_FIXTURE_TEST_CASE(epoch_setconfig_locks_batch_op_groups_after_schedule, sy
    // Before the schedule exists the group count is free; land on 3 and materialize.
    BOOST_REQUIRE_EQUAL(success(), epoch_setconfig(3, 3));
    produce_blocks();
-   BOOST_REQUIRE_EQUAL(success(), push_epoch_action(EPOCH_ACCOUNT, "schbatchgps"_n, mvo()));
+   BOOST_REQUIRE_EQUAL(success(), push_epoch_action(EPOCH_ACCOUNT, "schbatchgps"_n, mvo()("chain_code", EPOCH_CHAIN)));
    produce_blocks();
 
    // Decreasing the group count is now rejected -- before the window check, so the
@@ -1326,6 +1353,7 @@ BOOST_FIXTURE_TEST_CASE(multiple_bootstrapped_batch_ops, sysio_opreg_tester) { t
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op_c["status"].as<OperatorStatus>());
 
    BOOST_REQUIRE_EQUAL(success(), push_epoch_action(EPOCH_ACCOUNT, "setconfig"_n, mvo()
+      ("chain_code", EPOCH_CHAIN)
       ("epoch_duration_sec", 90)
       ("operators_per_epoch", 1)
       ("batch_operator_minimum_active", 3)
@@ -1334,10 +1362,11 @@ BOOST_FIXTURE_TEST_CASE(multiple_bootstrapped_batch_ops, sysio_opreg_tester) { t
    ));
    produce_blocks();
 
-   BOOST_REQUIRE_EQUAL(success(), push_epoch_action(EPOCH_ACCOUNT, "schbatchgps"_n, mvo()));
+   BOOST_REQUIRE_EQUAL(success(), push_epoch_action(EPOCH_ACCOUNT, "schbatchgps"_n, mvo()("chain_code", EPOCH_CHAIN)));
    produce_blocks();
 
-   auto epoch_state_data = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, "epochstate"_n);
+   auto epoch_state_data =
+      get_row_by_id(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, fc::slug_name{EPOCH_CHAIN}.value);
    BOOST_REQUIRE(!epoch_state_data.empty());
    auto epoch_state = epoch_abi_ser.binary_to_variant(
       "epoch_state", epoch_state_data,

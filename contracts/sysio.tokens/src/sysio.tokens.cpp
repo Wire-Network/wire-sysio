@@ -22,16 +22,6 @@ uint64_t current_time_ms() {
    return static_cast<uint64_t>(current_time_point().sec_since_epoch()) * 1000;
 }
 
-uint32_t get_current_epoch_index() {
-   sysio::epoch::epochstate_t es(tokens::EPOCH_ACCOUNT);
-   if (!es.exists()) return 0;
-   return es.get().current_epoch_index;
-}
-
-bool is_bootstrap_window() {
-   return get_current_epoch_index() == 0;
-}
-
 void require_priv_caller() {
    require_auth(current_receiver());
    sysio::check(sysio::is_privileged(current_receiver()),
@@ -66,7 +56,7 @@ void tokens::regtoken(opp::types::TokenKind    kind,
                 "sysio.tokens: token code already registered");
 
    const auto now = current_time_ms();
-   const bool bootstrap = is_bootstrap_window();
+   const bool bootstrap = epoch::in_bootstrap_window();
 
    tbl.emplace(ram_payer, pk, token_row{
       .code               = code,
@@ -112,7 +102,7 @@ void tokens::regctok(sysio::slug_name   chain_code,
                 "sysio.tokens: (chain_code, token_code) binding already registered");
 
    const auto now = current_time_ms();
-   const bool bootstrap = is_bootstrap_window();
+   const bool bootstrap = epoch::in_bootstrap_window();
 
    // Bootstrap inline-active path: enforce "exactly one is_native=true per chain".
    if (bootstrap && is_native) {

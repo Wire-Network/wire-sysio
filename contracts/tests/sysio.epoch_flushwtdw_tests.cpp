@@ -14,6 +14,8 @@
 #include <fc/variant_object.hpp>
 #include <fc/slug_name.hpp>
 
+#include <array>
+
 #include "contracts.hpp"
 #include "contract_test_support.hpp"
 
@@ -186,19 +188,22 @@ public:
             ("pay_cadence_epochs",     uint16_t(1))));
    }
 
-   /// One-shot bootstrap: epoch config + opreg config + a bootstrapped
+   /// The outpost chains the fixture registers, each with its own consensus epoch.
+   static constexpr std::array<std::string_view, 2> CHAINS{"SOL", "ETH"};
+
+   /// One-shot bootstrap: each chain's epoch config + opreg config + a bootstrapped
    /// batch op + a pending underwriter + sysio.chains rows.
    void bootstrap_for_flushwtdw() {
-      // sysio.epoch config must come first — sysio.system::initt5 reads
-      // epoch_duration_sec cross-contract via the canonical epochcfg
-      // singleton, and asserts that the table exists.
-      BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
-         "setconfig"_n, mvo()
-            ("epoch_duration_sec",                  EPOCH_DURATION_SEC)
-            ("operators_per_epoch",                 1)
-            ("batch_operator_minimum_active",       1)
-            ("batch_op_groups",                     1)
-            ("epoch_retention_envelope_log_count",  200)));
+      for (const std::string_view chain : CHAINS) {
+         BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
+            "setconfig"_n, mvo()
+               ("chain_code",                          chain)
+               ("epoch_duration_sec",                  EPOCH_DURATION_SEC)
+               ("operators_per_epoch",                 1)
+               ("batch_operator_minimum_active",       1)
+               ("batch_op_groups",                     1)
+               ("epoch_retention_envelope_log_count",  200)));
+      }
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "seteconomy"_n, mvo()
          ("epoch_duration_sec", EPOCH_DURATION_SEC)("start_time", fc::time_point_sec(control->head().block_time()))));
 
@@ -246,13 +251,13 @@ public:
             ("description",       std::string{})
             ("outpost", sysio_system::test_support::no_outpost_mvo())));
 
-      BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
-         "schbatchgps"_n, mvo()));
-
-      // Genesis advance — permissionless until current_epoch_index moves
-      // off zero.
-      BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
-         "advance"_n, mvo()));
+      // Each chain's genesis advance — permissionless until its current_epoch_index moves off zero.
+      for (const std::string_view chain : CHAINS) {
+         BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
+            "schbatchgps"_n, mvo()("chain_code", chain)));
+         BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
+            "advance"_n, mvo()("chain_code", chain)));
+      }
       produce_blocks();
 
       // Open economic epoch 1, as a relay's first crank after the genesis advance does, so a request
@@ -267,9 +272,15 @@ public:
       }
    }
 
-   /// Close the current consensus epoch, as sysio.msgch's chkcons would.
+   /// Close every chain's current consensus epoch, as sysio.msgch's chkcons would.
    void advance_consensus() {
-      BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, MSGCH_ACCOUNT, "advance"_n, mvo()));
+      for (const std::string_view chain : CHAINS) advance_chain(chain);
+   }
+
+   /// Close `chain`'s current consensus epoch alone.
+   void advance_chain(std::string_view chain) {
+      BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, MSGCH_ACCOUNT, "advance"_n,
+                                          mvo()("chain_code", chain)));
       produce_blocks();
    }
 
@@ -294,9 +305,9 @@ public:
          ["current_epoch_index"].as<uint32_t>();
    }
 
-   uint32_t current_epoch() {
-      auto data = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT,
-                                     "epochstate"_n, "epochstate"_n);
+   /// `chain`'s current consensus epoch index (0 before its genesis advance).
+   uint32_t current_epoch(std::string_view chain = CHAINS.front()) {
+      auto data = get_row_by_id(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, fc::slug_name{chain}.value);
       if (data.empty()) return 0;
       auto v = epoch_abi.binary_to_variant("epoch_state", data,
          fixture_abi_yield_function());
@@ -574,22 +585,29 @@ BOOST_FIXTURE_TEST_CASE(a_request_while_the_crank_is_behind_waits_for_later_boun
 
 BOOST_FIXTURE_TEST_CASE(dispute_pause_holds_withdrawals_while_the_economy_ticks,
                         sysio_epoch_flushwtdw_tester) { try {
-   // A dispute pause freezes the consensus index, so the guard holds every withdrawal requested
-   // since; the economic clock keeps ticking and releases them only after consensus resumes.
+   // A dispute pause freezes its chain's consensus index, and the guard waits on the slowest started
+   // chain, so it holds every withdrawal requested since even while the other chain keeps closing
+   // epochs; the economic clock keeps ticking and releases them only after the paused chain resumes.
    bootstrap_for_flushwtdw();
-   constexpr uint64_t INITIAL_DEPOSIT = 1'000'000;
-   constexpr uint64_t WITHDRAW_AMOUNT =   400'000;
+   constexpr uint64_t         INITIAL_DEPOSIT = 1'000'000;
+   constexpr uint64_t         WITHDRAW_AMOUNT =   400'000;
+   constexpr std::string_view PAUSED_CHAIN    = CHAINS.back();
+   constexpr std::string_view RUNNING_CHAIN   = CHAINS.front();
    BOOST_REQUIRE_EQUAL(success(), fund_and_bond(UWRIT_OP, "WIRE", "WIRE", INITIAL_DEPOSIT));
    BOOST_REQUIRE_EQUAL(success(), withdraw(UWRIT_OP, "WIRE", "WIRE", WITHDRAW_AMOUNT));
-   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, CHALG_ACCOUNT, "pause"_n, mvo()));
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, CHALG_ACCOUNT, "pause"_n,
+                                       mvo()("chain_code", PAUSED_CHAIN)));
 
    for (int i = 0; i < 4; ++i) {
       cross_epoch_boundary();
+      advance_chain(RUNNING_CHAIN);
       tick_economy();
    }
    BOOST_REQUIRE(!get_wtdw(1).is_null());
+   BOOST_REQUIRE_EQUAL(current_epoch(PAUSED_CHAIN) + 4, current_epoch(RUNNING_CHAIN));
 
-   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, CHALG_ACCOUNT, "unpause"_n, mvo()));
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, CHALG_ACCOUNT, "unpause"_n,
+                                       mvo()("chain_code", PAUSED_CHAIN)));
    advance_consensus();
    cross_epoch_boundary();
    advance_consensus();

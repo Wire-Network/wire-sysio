@@ -201,13 +201,15 @@ void preserve_yield_debt(name self, const opreg::operator_entry& op) {
    }
 }
 
-/// True while `account` holds a seat in any group of sysio.epoch's batch-operator schedule window.
-/// A seat stays until the window slides past it, whatever the operator's status in the meantime.
+/// True while `account` holds a seat in any group of any outpost chain's batch-operator schedule
+/// window. A seat stays until the window slides past it, whatever the operator's status in the
+/// meantime.
 bool holds_schedule_seat(name account) {
-   sysio::epoch::epochstate_t es(opreg::EPOCH_ACCOUNT);
-   if (!es.exists()) return false;
-   for (const auto& group : es.get().batch_op_groups) {
-      if (std::find(group.begin(), group.end(), account) != group.end()) return true;
+   sysio::epoch::epochstate_t states(opreg::EPOCH_ACCOUNT);
+   for (auto it = states.begin(); it != states.end(); ++it) {
+      for (const auto& group : it->batch_op_groups) {
+         if (std::find(group.begin(), group.end(), account) != group.end()) return true;
+      }
    }
    return false;
 }
@@ -240,18 +242,17 @@ void opreg::setconfig(uint64_t terminate_prune_delay_ms,
    // window narrower than the full consecutive-miss run of duty epochs makes
    // the consecutive rail structurally vacuous (records age out and are
    // pruned before `termcheck` can observe the run) and leaves only the
-   // hair-trigger percent rail. Validate against the live epoch schedule.
-   // Bootstrap installs opreg config before sysio.epoch is configured, so an
-   // absent epochcfg skips the check here; sysio.epoch::setconfig performs
-   // the mirror validation, so no ordering of the two setters can accept a
-   // vacuous pair.
+   // hair-trigger percent rail. Validate against every outpost chain's live
+   // epoch schedule. Bootstrap installs opreg config before sysio.epoch is
+   // configured, so a chain without an epochcfg row is not checked here;
+   // sysio.epoch::setconfig performs the mirror validation, so no ordering of
+   // the two setters can accept a vacuous pair.
    {
-      sysio::epoch::epochcfg_t epoch_cfg_tbl(EPOCH_ACCOUNT);
-      if (epoch_cfg_tbl.exists()) {
-         const auto epoch_cfg = epoch_cfg_tbl.get();
+      sysio::epoch::epochcfg_t epoch_cfgs(EPOCH_ACCOUNT);
+      for (auto it = epoch_cfgs.begin(); it != epoch_cfgs.end(); ++it) {
          check(terminate_window_ms >= min_terminate_window_ms(terminate_max_consecutive_misses,
-                                                              epoch_cfg.epoch_duration_sec,
-                                                              epoch_cfg.batch_op_groups),
+                                                              it->epoch_duration_sec,
+                                                              it->batch_op_groups),
                "terminate_window_ms must span at least terminate_max_consecutive_misses + 1 duty rotations");
       }
    }
@@ -863,7 +864,7 @@ enqueue_result try_enqueue_withdraw(name account,
    // The economic wait counts boundaries after the request, so it starts from the grid's epoch at the
    // request, not the last one ticked: catch-up ticks for boundaries already past must not count.
    const uint32_t economic_epoch  = sysio::epoch::economic_epoch_index_at(current_time_point());
-   const uint32_t consensus_epoch = sysio::epoch::current_epoch_index();
+   const uint32_t consensus_epoch = sysio::epoch::slowest_epoch_index();
    uint64_t request_id = next_withdraw_id();
 
    queue.emplace(ram_payer, opreg::withdraw_key{request_id}, opreg::withdraw_request{

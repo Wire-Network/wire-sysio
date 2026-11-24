@@ -54,10 +54,10 @@ namespace sysio {
       /// it alone has the live eligible group and delivery tally.
       /// Records the candidate checksums, snapshots the Tier-1 electorate (the Tier-1
       /// rows of `sysio.roa::nodeowners` for the current network generation) together with its
-      /// quorum, and pauses epoch advancement until a Tier-1 node-owner vote resolves the
-      /// canonical envelope. Defensively rejects direct calls when no Tier-1 node owner is
-      /// registered: an empty-electorate dispute could never resolve and would hold the epoch
-      /// paused forever.
+      /// quorum, and pauses the disputed chain's epoch advancement until a Tier-1 node-owner vote
+      /// resolves the canonical envelope. Defensively rejects direct calls when no Tier-1 node owner
+      /// is registered: an empty-electorate dispute could never resolve and would hold the chain's
+      /// epoch paused forever.
       [[sysio::action]]
       void opendispute(uint64_t chain_code,
                        uint32_t epoch_index,
@@ -75,8 +75,7 @@ namespace sysio {
       /// electorate of N owners and fixed quorum Q = floor(N/2)+1. When the threshold is met
       /// (fast path: a checksum reaches Q any time; after the 24h deadline: quorum of cast votes
       /// AND a strict majority of cast votes), record the winning checksum, dispatch it via
-      /// `sysio.msgch::resolvedisp`, and -- when this was the last open dispute -- unpause the
-      /// epoch.
+      /// `sysio.msgch::resolvedisp`, and unpause the disputed chain's epoch.
       [[sysio::action]]
       void chkdispute(uint64_t dispute_id);
 
@@ -154,9 +153,7 @@ namespace sysio {
 
       /// Contract-global dispute bookkeeping. `open_disputes` counts the disputes currently in
       /// `DISPUTE_STATUS_OPEN` across all (outpost, epoch) keys: `opendispute` increments it and
-      /// `chkdispute` decrements it on resolution, sending `sysio.epoch::unpause` only when it
-      /// reaches zero. `sysio.epoch::is_paused` is a single flag, so resolving one of several
-      /// concurrently open disputes must not resume epoch advancement while another is still open.
+      /// `chkdispute` decrements it on resolution.
       struct [[sysio::table("chalgstate")]] chalg_state {
          uint32_t open_disputes = 0;
 

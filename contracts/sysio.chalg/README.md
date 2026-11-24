@@ -24,9 +24,9 @@ OPP envelope dispute resolution and slash-execution contract.
 
 | Action | Auth | Description |
 |--------|------|-------------|
-| `opendispute` | `sysio.msgch` | Open a dispute, snapshot its Tier-1 electorate/quorum, and pause the epoch |
+| `opendispute` | `sysio.msgch` | Open a dispute, snapshot its Tier-1 electorate/quorum, and pause the disputed chain's epoch |
 | `votedispute` | `owner` (Tier-1) | Cast a Tier-1 node-owner vote for the canonical envelope checksum |
-| `chkdispute` | permissionless | Tally the votes; on resolution dispatch the winner and unpause the epoch |
+| `chkdispute` | permissionless | Tally the votes; on resolution dispatch the winner and unpause the chain's epoch |
 | `slashop` | `sysio.chalg` or `sysio.epoch` | Execute a slash on an operator via `sysio.opreg` |
 
 ## Dispute-vote flow
@@ -35,7 +35,8 @@ OPP envelope dispute resolution and slash-execution contract.
    no-majority split with at least two versions. A two-version split must be terminal (every
    eligible operator delivered); a three-or-more-version split may open at the boundary. The
    dispute records the candidate checksums, snapshots the active ROA generation's Tier-1 electorate
-   and fixed quorum, and pauses `sysio.epoch`.
+   and fixed quorum, and pauses the disputed chain's `sysio.epoch` advancement; other chains keep
+   advancing.
 2. **Vote**: owners in the dispute's frozen Tier-1 electorate call `votedispute` with one of the
    candidate checksums. Later ROA registrations cannot join an in-flight dispute. One vote per owner.
    Ballots stay open past the deadline while the tally has no winner; once it has one,
@@ -44,11 +45,10 @@ OPP envelope dispute resolution and slash-execution contract.
    fixed `Q = floor(N/2)+1`, a checksum reaching `Q` votes wins at any time (fast path); after the 24h
    deadline the bar relaxes to a quorum of cast votes (`cast >= Q`) plus a strict majority of cast
    (`2*votes > cast`). No plurality / tie-break -- an undecided tally remains open and keeps the
-   epoch paused until Tier-1 supplies a resolvable vote.
+   chain's epoch paused until Tier-1 supplies a resolvable vote.
 4. **Resolve**: the winning checksum is recorded and dispatched via `sysio.msgch::resolvedisp`.
-   `sysio.epoch` is unpaused when the final open dispute resolves. The next
-   `sysio.epoch::advance` then slashes every operator that delivered a non-canonical checksum for
-   the epoch (via `slashop`), deduped across outposts.
+   The disputed chain's epoch is unpaused. Its next `sysio.epoch::advance` then slashes every
+   operator that delivered a non-canonical checksum for the epoch (via `slashop`).
 
 ## Dependencies
 
@@ -58,4 +58,4 @@ OPP envelope dispute resolution and slash-execution contract.
 - Slashes via `sysio.opreg::slash`: opreg marks the operator `SLASHED` and removes its whole
   depot-native collateral balance from the operator's row; the slashed tokens stay in
   `sysio.opreg`'s custody
-- Pauses / unpauses via `sysio.epoch::pause` / `sysio.epoch::unpause`
+- Pauses / unpauses the disputed chain via `sysio.epoch::pause` / `sysio.epoch::unpause`

@@ -94,9 +94,16 @@ namespace sysio {
       //  Actions
       // -----------------------------------------------------------------------
 
-      /// Bootstrap: call at epoch 0 to trigger the first advance.
+      /// Network bootstrap: run the genesis advance of every active outpost chain. Refused once the
+      /// network genesis has happened. Auth: sysio.msgch.
       [[sysio::action]]
       void bootstrap();
+
+      /// Run the genesis advance of outpost `chain_code`, activated after the network genesis, so it
+      /// starts its own epoch 1. Refused before the network genesis (use `bootstrap`), for a chain that
+      /// is not an active outpost, and once the chain's epoch has started. Auth: sysio.msgch.
+      [[sysio::action]]
+      void bootchain(uint64_t chain_code);
 
       /// Batch operator delivers inbound OPP data for a specific outpost.
       /// Computes sha256 checksum trustlessly, stores in envelopes table,
@@ -106,7 +113,9 @@ namespace sysio {
       /// `uint64` of `sysio::slug_name`). The depot looks the row up directly
       /// on `sysio.chains::chains` keyed by `code.value == chain_code`; the
       /// numeric value IS the slug_name, and `sysio.epoch::advance` uses the
-      /// same convention when fanning out `queueout` / `buildenv` per outpost.
+      /// same convention when queueing `queueout` / `buildenv` for its outpost.
+      /// The envelope must be for the chain's current epoch, from a member of
+      /// the chain's active group.
       [[sysio::action]]
       void deliver(name batch_op_name, uint64_t chain_code, std::vector<char> data);
 
@@ -119,11 +128,11 @@ namespace sysio {
       [[sysio::action]]
       void evalcons(uint64_t chain_code, uint32_t epoch_index);
 
-      /// Check if all-outpost consensus is reached AND next_epoch_start
-      /// has passed. If yes, reset consensus and call advance.
-      /// Called by the batch operator after the time window elapses.
+      /// Check whether outpost `chain_code` reached consensus for its current epoch AND its
+      /// next_epoch_start has passed; if so, advance that chain's epoch. Permissionless crank, called
+      /// by the batch operator after the chain's time window elapses.
       [[sysio::action]]
-      void chkcons();
+      void chkcons(uint64_t chain_code);
 
       /// Dispatch the winning envelope of a resolved OPP dispute. Called inline by
       /// `sysio.chalg::chkdispute` once the Tier-1 vote selects a canonical checksum. Locates the
@@ -142,7 +151,7 @@ namespace sysio {
       /// (uint64). Called by sibling system contracts that need to send
       /// targeted depot → outpost envelopes:
       ///   * `sysio.epoch::advance` — `OPERATORS`, `BATCH_OPERATOR_GROUPS`
-      ///     fanout to every active outpost.
+      ///     to the outpost whose epoch closed.
       ///   * `sysio.synd::desyndicate` — `DESYNDICATE_LIQ` releases from
       ///     the destination's syndicated LIQ custody.
       ///
@@ -158,7 +167,8 @@ namespace sysio {
                     opp::types::AttestationType attest_type,
                     std::vector<char> data);
 
-      /// Build outbound envelope from READY attestations for an outpost.
+      /// Build outbound envelope from READY attestations for an outpost, stamped with the outpost's
+      /// own current epoch index.
       /// Walks only this outpost's READY rows, schedule lane first, and stops at MAX_ENVELOPE_BYTES or
       /// MAX_ENVELOPE_ATTESTATIONS, so its cost does not grow with the backlog. Packs the rows into an
       /// OPP Envelope, stores it in outenvelopes and erases them.

@@ -19,7 +19,7 @@
  * Yield intake: sysio.swap's tick sells reservoir shadow and pays the proceeds in
  * through `addyield`, which distributes only the supplied WIRE proceeds.
  * Yield pools: `regliqpool` seeds a shadow's yield pool on the swap, from the LCO liq inside the
- * epoch-0 bootstrap window and from shadow `sysio` already holds after it.
+ * bootstrap window and from shadow `sysio` already holds after it.
  *
  * Emergency stop: while the `sysio.andon` cord is pulled, `transfer` to anything but a
  * custody contract (sysio.bond, sysio.synd, sysio.opreg), `claim` by anyone but a custody
@@ -156,7 +156,7 @@ namespace sysio {
       /// `initial_chain_amount` of the shadow from `sysio` with
       /// `initial_wire_amount` WIRE from the `sysio` treasury into sysio.swap,
       /// create the pair with `sysio` as its fee authority and the shadow as its
-      /// yield leg, and set the tick parameters. Inside the epoch-0 bootstrap
+      /// yield leg, and set the tick parameters. Inside the bootstrap
       /// window the shadow seed is the LCO liq, already in outpost custody, and
       /// is minted to `sysio` first. After the window nothing is minted, so the
       /// pool adds no shadow beyond what outpost custody already covers: `sysio`

@@ -13,8 +13,8 @@ Inbound/outbound OPP message chain management and consensus tracking contract.
   attestations, and routes each attestation to its depot handler
 - Queues outbound attestations and packs them into one OPP envelope per outpost per epoch, schedule
   attestations first; whatever does not fit under the envelope caps stays queued for the next epoch
-- Drives the epoch: `chkcons` advances `sysio.epoch` once every active outpost has reached
-  consensus and the wall-clock boundary has passed
+- Drives each outpost chain's epoch: `chkcons(chain)` advances that chain's `sysio.epoch` epoch once
+  the outpost has reached consensus and the chain's wall-clock boundary has passed
 
 ## Tables
 
@@ -33,10 +33,11 @@ Inbound/outbound OPP message chain management and consensus tracking contract.
 
 | Action | Auth | Description |
 |--------|------|-------------|
-| `bootstrap` | `sysio.msgch` | Epoch-0 only: asserts the `sysio.system` emissions config is set, then triggers the first `sysio.epoch::advance` |
-| `deliver` | batch operator (resident active group, `ACTIVE` in `sysio.opreg`) | Deliver an inbound envelope for an outpost; calls `evalcons` inline |
+| `bootstrap` | `sysio.msgch` | Network genesis only: asserts the economic clock and `sysio.system` emissions config are set, then runs `sysio.epoch::advance` for every active outpost chain |
+| `bootchain` | `sysio.msgch` | After the network genesis: runs the genesis `sysio.epoch::advance` of one active outpost chain activated later |
+| `deliver` | batch operator (the chain's resident active group, `ACTIVE` in `sysio.opreg`) | Deliver an inbound envelope for an outpost's current epoch; calls `evalcons` inline |
 | `evalcons` | `sysio.msgch` | Evaluate consensus for an (outpost, epoch); on consensus store and dispatch the attestations; on an eligible split open a `sysio.chalg` dispute |
-| `chkcons` | permissionless | If no dispute is open, every active outpost has consensus and the boundary has passed, call `sysio.epoch::advance` |
+| `chkcons` | permissionless | For one active outpost chain: if no dispute is open on its current epoch, it has consensus and its boundary has passed, call `sysio.epoch::advance` for it |
 | `resolvedisp` | `sysio.chalg` | Dispatch the winning envelope of a resolved dispute |
 | `queueout` | `sysio.epoch`, `sysio.opreg`, `sysio.synd`, or `sysio.msgch` | Queue an outbound attestation for an outpost. Rejects `data` larger than `MAX_ATTESTATION_DATA_BYTES`, or `MAX_GENERAL_ATTESTATION_DATA_BYTES` (7,656) for a general-lane row, which must fit beside a full schedule lane, so every queued row ships. Also rejects a general-lane row once the outpost already holds `MAX_QUEUED_ATTESTATIONS` (512) of them |
 | `buildenv` | `sysio.epoch` | Pack the outpost's `READY` attestations into its outbound envelope for the epoch: the schedule lane (`OPERATORS`, `BATCH_OPERATOR_GROUPS`) first, then the general lane in `queueout` order, up to `MAX_ENVELOPE_BYTES` and `MAX_ENVELOPE_ATTESTATIONS` (64). It reads only that outpost's rows |
@@ -65,5 +66,5 @@ Outbound (depot → outpost), queued through `queueout`:
 
 - Reads epoch state from `sysio.epoch` and operator status from `sysio.opreg`
 - Opens disputes on `sysio.chalg` (`opendispute`); `sysio.chalg::chkdispute` calls back into `resolvedisp`
-- Triggers `sysio.epoch::advance` from `chkcons` (and from `bootstrap` at epoch 0)
+- Triggers `sysio.epoch::advance` from `chkcons` (and from `bootstrap` / `bootchain` at a chain's genesis)
 - Routes inbound attestations to `sysio.synd` and `sysio.roa`; node-owner linking can indirectly sweep funded DClaim imports

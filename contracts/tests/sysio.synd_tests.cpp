@@ -550,9 +550,10 @@ public:
    static mvo pruneenv_data(uint32_t limit, std::string_view token_code = LIQSOL) {
       return mvo()("chain_code", codename_mvo(SOLANA))("token_code", codename_mvo(token_code))("limit", limit);
    }
-   /// Move the depot's current epoch index, through the stand-in on sysio.epoch.
+   /// Move both outposts' current epoch index, through the stand-in on sysio.epoch.
    action_result set_epoch(uint32_t index) {
-      return push(EPOCH_ACCOUNT, epoch_abi_ser, EPOCH_ACCOUNT, "setindex"_n, mvo()("index", index));
+      return push(EPOCH_ACCOUNT, epoch_abi_ser, EPOCH_ACCOUNT, "setindex"_n, mvo()
+         ("chain_codes", std::vector<uint64_t>{slug_value(SOLANA), slug_value(ETH)})("index", index));
    }
    /// The pending block's time, in whole seconds: what a bucket tick records.
    uint32_t now_sec() { return control->pending_block_time().sec_since_epoch(); }

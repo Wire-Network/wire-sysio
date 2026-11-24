@@ -586,15 +586,17 @@ struct batch_operator_plugin::impl {
       if (!is_active) return;
       if (!relay_signer_valid) report_stale_signer(*relay_signer, "the relay");
 
-      // chkcons advances the epoch on consensus. Only the elected operator
-      // should push it — the contract verifies authorization regardless,
+      // chkcons advances an outpost chain's epoch on its consensus, one push per relayed outpost. Only
+      // the elected operator should push it — the contract verifies authorization regardless,
       // but pushing from every batch op wastes trx slots.
       if (election.is_elected) {
-         try {
-            push_action(msgch::account, msgch::action_chkcons, *relay_signer,
-                        fc::mutable_variant_object());
-         } catch (const fc::exception& e) {
-            dlog("batch_operator: chkcons: {}", e.to_string());
+         for (const outpost_descriptor& outpost : outposts) {
+            try {
+               push_action(msgch::account, msgch::action_chkcons, *relay_signer,
+                           fc::mutable_variant_object()(msgch::field::chain_code, outpost.id));
+            } catch (const fc::exception& e) {
+               dlog("batch_operator: chkcons({}): {}", fc::slug_name{outpost.id}.to_string(), e.to_string());
+            }
          }
       }
 
@@ -684,23 +686,21 @@ struct batch_operator_plugin::impl {
     * Not gated on `is_elected`: the economic clock never waits on consensus, and a dispute pause
     * suspends the election while the clock must keep running. Every ACTIVE operator pushes the due
     * epochs; the contract opens each one once and refuses the rest, so a redundant push costs only
-    * its refusal. Nothing is pushed before the consensus genesis advance, which the contract requires.
-    * The consensus index is read here rather than taken from `current_epoch`, which the election poll
-    * does not record while consensus is paused. The catch-up stops at the first push that is refused
-    * or times out, so one poll waits on at most one failed tick.
+    * its refusal. Nothing is pushed before the network genesis (the `netgenesis` marker), which the
+    * contract requires. The catch-up stops at the first push that is refused or times out, so one poll
+    * waits on at most one failed tick.
     */
    void crank_economic_clock() {
       using namespace batch_operator_detail;
-      sysio::chain_apis::read_only::get_table_rows_params consensus;
-      consensus.code        = chain::name(epoch::account);
-      consensus.scope       = epoch::account;
-      consensus.table       = epoch::table_epochstate;
-      consensus.limit       = SINGLETON_ROW_LIMIT;
-      consensus.values_only = true;
-      const auto consensus_rows = read_table_checked(std::move(consensus));
-      if (!consensus_rows || consensus_rows->rows.empty() || !consensus_rows->rows.front().is_object()) return;
-      const uint32_t consensus_epoch_index = static_cast<uint32_t>(
-         consensus_rows->rows.front().get_object()[epoch::field::current_epoch_index].as_uint64());
+      sysio::chain_apis::read_only::get_table_rows_params genesis;
+      genesis.code        = chain::name(economy::account);
+      genesis.scope       = economy::account;
+      genesis.table       = economy::table_netgenesis;
+      genesis.limit       = SINGLETON_ROW_LIMIT;
+      genesis.values_only = true;
+      const auto genesis_rows = read_table_checked(std::move(genesis));
+      if (!genesis_rows) return;   // a failed read is not "no genesis yet"
+      const bool network_genesis_done = !genesis_rows->rows.empty();
 
       sysio::chain_apis::read_only::get_table_rows_params config;
       config.code        = chain::name(economy::account);
@@ -726,7 +726,7 @@ struct batch_operator_plugin::impl {
       if (!clock) return;
 
       for (const uint32_t epoch_index :
-           economic_epochs_due(*clock, consensus_epoch_index, fc::time_point::now(), economy::ticks_per_poll)) {
+           economic_epochs_due(*clock, network_genesis_done, fc::time_point::now(), economy::ticks_per_poll)) {
          try {
             // A later index cannot open before this one, so a refused or timed-out push ends the
             // catch-up; the next poll re-reads the clock.

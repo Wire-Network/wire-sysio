@@ -22,7 +22,7 @@ namespace sysio {
     *
     * ## Lifecycle
     *
-    * - `regchain(...)`: priv-gated. Inserts row. If `current_epoch_index == 0`
+    * - `regchain(...)`: priv-gated. Inserts row. Before the network genesis
     *   (bootstrap window), sets `active=true` inline. Else `active=false`,
     *   awaiting `activchain`.
     * - `activchain(code)`: priv-gated. Sets `active=true` exactly once.
@@ -61,15 +61,12 @@ namespace sysio {
    public:
       using contract::contract;
 
-      // Well-known accounts
-      static constexpr name EPOCH_ACCOUNT = "sysio.epoch"_n;
-
       // -----------------------------------------------------------------------
       //  Actions
       // -----------------------------------------------------------------------
 
       /// Register a new chain (priv-gated). If called during the bootstrap
-      /// window (`current_epoch_index == 0`), inserts with `active=true`
+      /// window (before the network genesis), inserts with `active=true`
       /// inline; else `active=false`.
       ///
       /// Validation:
