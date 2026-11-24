@@ -216,7 +216,8 @@ tables keyed by chain, and `setconfig`, `schbatchgps`, `advance`, `finishadv`, `
 `sysio.chalg` drops its dispute counter and `byepoch` index, `batchduty` / `dutystate` count
 seat-seconds with one `batchduty` row per (operator, chain), and `termcheck` sends the new
 `sysio::forfeitduty` when it evicts. `sysio.opreg::setconfig` takes the new
-`terminate_min_pct_samples`, kept on `opconfig`. No migration is supplied: deploy
+`terminate_min_pct_samples`, kept on `opconfig`, and each `servchains` row carries
+the duty tally `termcheck` reads. No migration is supplied: deploy
 `sysio.epoch`, `sysio`, `sysio.opreg`, `sysio.msgch`, `sysio.chalg`, `sysio.chains`, `sysio.tokens`,
 `sysio.liq` and `sysio.synd` together on a fresh chain with the matching `batch_operator_plugin`.
 Before `sysio.msgch::bootstrap`, configure each active outpost with

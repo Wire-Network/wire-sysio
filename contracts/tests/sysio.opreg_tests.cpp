@@ -7,6 +7,8 @@
 
 #include <algorithm>
 #include <limits>
+#include <random>
+#include <utility>
 
 #include "contracts.hpp"
 #include "external_chain_simulator.hpp"
@@ -266,6 +268,12 @@ constexpr uint32_t kDellogPrunePerWrite = 4;
 
 /// Mirrors opreg's MAX_DELLOG_PRUNE_PER_CRANK.
 constexpr uint32_t kDellogPrunePerCrank = 64;
+
+/// Mirrors opreg's MAX_DELLOG_PRUNE_PER_CHECK.
+constexpr uint32_t kDellogPrunePerCheck = 16;
+
+/// Clock jump that ages every row recorded before it out of the 24 h window.
+constexpr auto kPastTheWindow = fc::hours(25);
 
 /// Shadow-yield forwarding: actions opreg and sysio.liq expose for it.
 namespace yield_action {
@@ -561,6 +569,71 @@ public:
                           row["status"].as_string());
       BOOST_REQUIRE_EQUAL(std::string(reason), row["status_reason"].as_string());
       BOOST_REQUIRE(status == get_operator(account)["status"].as<OperatorStatus>());
+   }
+
+   /// `account`'s duty tally on `chain`.
+   fc::variant tally(name account, std::string_view chain = EPOCH_CHAIN) {
+      const auto row = membership(account, chain);
+      BOOST_REQUIRE(!row.is_null());
+      return row["tally"];
+   }
+
+   /// What a walk of `account`'s dellog rows on `chain`, from log id `first_log_id` on, counts: the rails the
+   /// tally replaced read the log this way.
+   struct log_walk {
+      uint64_t duties       = 0;
+      uint64_t misses       = 0;
+      uint64_t trailing_run = 0;   ///< misses since the last delivery
+      uint64_t longest_run  = 0;   ///< the longest run of misses
+   };
+
+   log_walk walk_dellog(name account, uint64_t first_log_id, std::string_view chain = EPOCH_CHAIN) {
+      std::vector<std::pair<uint64_t, bool>> rows;
+      for (const auto& row : sysio_system::test_support::table_rows(*this, OPREG_ACCOUNT, "dellog"_n, opreg_abi_ser,
+                                                                     "delivery_log_entry")) {
+         if (row["account"].as_string() != account.to_string() || row["chain_code"].as_string() != chain) continue;
+         if (row["log_id"].as_uint64() < first_log_id) continue;
+         rows.emplace_back(row["log_id"].as_uint64(), row["delivered"].as_bool());
+      }
+      std::sort(rows.begin(), rows.end());
+      log_walk walk;
+      for (const auto& [log_id, delivered] : rows) {
+         ++walk.duties;
+         if (delivered) {
+            walk.trailing_run = 0;
+         } else {
+            ++walk.misses;
+            ++walk.trailing_run;
+         }
+         walk.longest_run = std::max(walk.longest_run, walk.trailing_run);
+      }
+      return walk;
+   }
+
+   /// Require `account`'s tally on `chain` to hold what `walk` counted.
+   void require_tally(name account, const log_walk& walk, std::string_view chain = EPOCH_CHAIN) {
+      const auto counted = tally(account, chain);
+      BOOST_REQUIRE_EQUAL(walk.duties, counted["duties"].as_uint64());
+      BOOST_REQUIRE_EQUAL(walk.misses, counted["misses"].as_uint64());
+      BOOST_REQUIRE_EQUAL(walk.trailing_run, counted["miss_run"].as_uint64());
+   }
+
+   /// Overwrite `account`'s tally on `chain` in the store, leaving its dellog rows as they are.
+   void rewrite_tally(name account, const fc::variant& value, std::string_view chain = EPOCH_CHAIN) {
+      std::string key;
+      const auto append_word = [&](uint64_t word) {
+         for (int shift = 56; shift >= 0; shift -= 8) key.push_back(char(word >> shift));
+      };
+      append_word(cn(chain).value);
+      append_word(account.to_uint64_t());
+      auto& store = const_cast<kv_store&>(control->kv());
+      const auto stored_row = store.find_row(OPREG_ACCOUNT, compute_table_id("servchains"_n.to_uint64_t()), key);
+      BOOST_REQUIRE(stored_row);
+      const std::vector<char> data(stored_row->value.begin(), stored_row->value.end());
+      mvo row(opreg_abi_ser.binary_to_variant("served_chain", data, fixture_abi_yield_function()).get_object());
+      row.set("tally", value);
+      const auto encoded = opreg_abi_ser.variant_to_binary("served_chain", row, fixture_abi_yield_function());
+      store.update_row(*stored_row, stored_row->payer, {encoded.data(), encoded.size()});
    }
 
    /// Produce blocks until the next block opens a new second, so actions pushed now and the
@@ -3053,6 +3126,190 @@ BOOST_FIXTURE_TEST_CASE(termcheck_unaffected_by_on_write_pruning, sysio_opreg_te
    // The in-window rows still drive the consecutive-miss rail as before.
    BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
    require_evicted("batchop.a"_n, "rolling-window: >5 consecutive misses");
+} FC_LOG_AND_RETHROW() }
+
+// ---- the duty tally termcheck reads ----
+
+/// The tally holds what a walk of the log counts, and the rails evict at the same duty the walk's rails
+/// would: a seeded mix of deliveries and misses, ended by the consecutive rail for one operator and by the
+/// percent rail for another.
+BOOST_FIXTURE_TEST_CASE(tally_matches_the_log_walk_over_mixed_duties, sysio_opreg_tester) { try {
+   struct mixed_case {
+      name        account;
+      uint32_t    max_consecutive;
+      uint32_t    max_pct;
+      uint32_t    min_samples;
+      uint32_t    miss_pct;   ///< chance of a miss per duty, in percent
+      std::string reason;
+   };
+   constexpr uint32_t kMaxDuties = 200;
+   const std::vector<mixed_case> cases = {
+      {"batchop.a"_n, 3, kMaxAcceptedPctMisses24h, kMaxAcceptedMinPctSamples, 40,
+       "rolling-window: >3 consecutive misses"},
+      {"batchop.b"_n, kDefaultMaxConsecutiveMisses, 20, 10, 25, "rolling-window: >20% miss rate"},
+   };
+   std::minstd_rand duty_outcomes(20261124);
+   for (const auto& c : cases) {
+      activate_batch_operator(c.account, c.max_consecutive, c.max_pct, c.min_samples);
+      bool evicted = false;
+      for (uint32_t epoch = 1; epoch <= kMaxDuties && !evicted; ++epoch) {
+         const bool delivered = duty_outcomes() % kPercentScale >= c.miss_pct;
+         BOOST_REQUIRE_EQUAL(success(), recorddel(c.account, epoch, delivered));
+         BOOST_REQUIRE_EQUAL(success(), termcheck(c.account));
+         produce_block();
+
+         const log_walk walk = walk_dellog(c.account, 0);
+         require_tally(c.account, walk);
+         evicted = walk.longest_run > c.max_consecutive ||
+                   (walk.duties >= c.min_samples && walk.misses * kPercentScale / walk.duties > c.max_pct);
+         if (evicted) require_evicted(c.account, c.reason);
+         else BOOST_REQUIRE_EQUAL(std::string(served::status::serving), membership_status(c.account));
+      }
+      BOOST_REQUIRE_MESSAGE(evicted, c.account.to_string() << " was never evicted");
+   }
+} FC_LOG_AND_RETHROW() }
+
+/// Both retention sweeps take what they erase out of the tally: the on-write sweep erases the oldest
+/// aged rows of any member, and `termcheck` erases the rest of its own member's before reading it.
+BOOST_FIXTURE_TEST_CASE(retention_sweeps_take_aged_duties_out_of_the_tally, sysio_opreg_tester) { try {
+   activate_batch_operator("batchop.a"_n);
+   uint32_t epoch = 1;
+   for (const bool delivered : {false, false, false, true, true, true, false, false, false}) {
+      BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch++, delivered));
+   }
+   produce_blocks();
+   require_tally("batchop.a"_n, {.duties = 9, .misses = 6, .trailing_run = 3});
+   produce_block(kPastTheWindow);
+
+   // The write sweeps the four oldest (three misses and a delivery) before counting its own delivery.
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch++, /*delivered=*/true));
+   produce_blocks();
+   require_tally("batchop.a"_n, {.duties = 6, .misses = 3, .trailing_run = 0});
+   require_tally("batchop.a"_n, walk_dellog("batchop.a"_n, 0));
+
+   // termcheck erases the five aged rows left, leaving the duty recorded in the window.
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+   produce_blocks();
+   require_tally("batchop.a"_n, {.duties = 1, .misses = 0, .trailing_run = 0});
+   require_tally("batchop.a"_n, walk_dellog("batchop.a"_n, 0));
+   BOOST_REQUIRE_EQUAL(std::string(served::status::serving), membership_status("batchop.a"_n));
+} FC_LOG_AND_RETHROW() }
+
+/// A run of misses that aged out of the window no longer counts: the crank erases it, and a later miss
+/// starts a new run.
+BOOST_FIXTURE_TEST_CASE(aged_run_of_misses_leaves_the_tally, sysio_opreg_tester) { try {
+   activate_batch_operator("batchop.a"_n, kSingleAllowedConsecutiveMiss, kMaxAcceptedPctMisses24h);
+   for (uint32_t epoch = 1; epoch <= kSingleAllowedConsecutiveMiss; ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/false));
+   }
+   produce_blocks();
+   produce_block(kPastTheWindow);
+   BOOST_REQUIRE_EQUAL(success(), prune());
+   produce_blocks();
+   require_tally("batchop.a"_n, {});
+
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, kSingleAllowedConsecutiveMiss + 1, /*delivered=*/false));
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+   produce_blocks();
+   require_tally("batchop.a"_n, {.duties = 1, .misses = 1, .trailing_run = 1});
+   BOOST_REQUIRE_EQUAL(std::string(served::status::serving), membership_status("batchop.a"_n));
+} FC_LOG_AND_RETHROW() }
+
+/// While the member's aged rows outnumber what one check erases, the rails wait rather than count duties
+/// from outside the window; once they are gone, the rails apply again.
+BOOST_FIXTURE_TEST_CASE(termcheck_waits_while_its_own_aged_rows_remain, sysio_opreg_tester) { try {
+   activate_batch_operator("batchop.a"_n, kSingleAllowedConsecutiveMiss, kMaxAcceptedPctMisses24h);
+   constexpr uint32_t kAgedRows = kDellogPrunePerWrite + kDellogPrunePerCheck + 1;
+   uint32_t epoch = 1;
+   for (; epoch <= kAgedRows; ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/false));
+   }
+   produce_blocks();
+   produce_block(kPastTheWindow);
+
+   // The write sweeps four and the check sixteen; one aged miss is left beside the new one, a run the
+   // window does not hold.
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch++, /*delivered=*/false));
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+   produce_blocks();
+   require_tally("batchop.a"_n, {.duties = 2, .misses = 2, .trailing_run = 2});
+   BOOST_REQUIRE_EQUAL(std::string(served::status::serving), membership_status("batchop.a"_n));
+
+   // The next write sweeps the last aged row; the rails apply to the window's duties again.
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch++, /*delivered=*/true));
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+   produce_blocks();
+   require_tally("batchop.a"_n, {.duties = 2, .misses = 1, .trailing_run = 0});
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch++, /*delivered=*/false));
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch++, /*delivered=*/false));
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+   require_evicted("batchop.a"_n, kSingleAllowedConsecutiveMissReason);
+} FC_LOG_AND_RETHROW() }
+
+/// A rejoin starts a new tally at the next log id: the rows of the earlier membership are not counted
+/// while they stay in the window, and erasing them later leaves the new tally as it is.
+BOOST_FIXTURE_TEST_CASE(rejoin_starts_a_tally_earlier_rows_never_touch, sysio_opreg_tester) { try {
+   activate_batch_operator("batchop.a"_n);
+   constexpr uint32_t kEarlierRows = 3;
+   for (uint32_t epoch = 1; epoch <= kEarlierRows; ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/false));
+   }
+   BOOST_REQUIRE_EQUAL(success(), served::leave(*this, "batchop.a"_n, EPOCH_CHAIN));
+   produce_blocks();
+   produce_block(fc::hours(23));
+
+   BOOST_REQUIRE_EQUAL(success(), served::join(*this, "batchop.a"_n, EPOCH_CHAIN, "batchop.a"_n));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(kEarlierRows + 1, tally("batchop.a"_n)["first_log_id"].as_uint64());
+   require_tally("batchop.a"_n, {});
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, kEarlierRows + 1, /*delivered=*/true));
+   produce_blocks();
+   require_tally("batchop.a"_n, {.duties = 1});
+
+   // Two hours on, the earlier rows have aged out: the write sweeps them without touching the tally.
+   produce_block(fc::hours(2));
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, kEarlierRows + 2, /*delivered=*/false));
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+   produce_blocks();
+   for (uint64_t log_id = kFirstDeliveryLogId; log_id <= kEarlierRows; ++log_id) {
+      BOOST_REQUIRE(get_dellog_entry(log_id).is_null());
+   }
+   require_tally("batchop.a"_n, {.duties = 2, .misses = 1, .trailing_run = 1});
+   require_tally("batchop.a"_n, walk_dellog("batchop.a"_n, kEarlierRows + 1));
+   BOOST_REQUIRE_EQUAL(std::string(served::status::serving), membership_status("batchop.a"_n));
+} FC_LOG_AND_RETHROW() }
+
+/// `termcheck` decides from the member's tally alone, one row whatever the log holds: among members with
+/// long, interleaved logs of deliveries, the one whose tally is rewritten to a breaching run is evicted,
+/// though its log shows no miss.
+BOOST_FIXTURE_TEST_CASE(termcheck_reads_one_tally_however_long_the_log, sysio_opreg_tester) { try {
+   const std::vector<name> members = {"batchop.a"_n, "batchop.b"_n, "batchop.c"_n};
+   for (const name member : members) activate_batch_operator(member);
+   constexpr uint32_t kDutiesEach = 60;
+   for (uint32_t epoch = 1; epoch <= kDutiesEach; ++epoch) {
+      for (const name member : members) {
+         BOOST_REQUIRE_EQUAL(success(), recorddel(member, epoch, /*delivered=*/true));
+      }
+      produce_block();
+   }
+   for (const name member : members) {
+      require_tally(member, {.duties = kDutiesEach});
+      require_tally(member, walk_dellog(member, 0));
+   }
+
+   rewrite_tally(members.front(), fc::variant(mvo()
+      ("first_log_id", tally(members.front())["first_log_id"])
+      ("duties",       kDutiesEach)
+      ("misses",       kDefaultMaxConsecutiveMisses + 1)
+      ("miss_run",     kDefaultMaxConsecutiveMisses + 1)));
+   for (const name member : members) BOOST_REQUIRE_EQUAL(success(), termcheck(member));
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(0u, walk_dellog(members.front(), 0).misses);
+   require_evicted(members.front(), "rolling-window: >5 consecutive misses");
+   for (size_t i = 1; i < members.size(); ++i) {
+      BOOST_REQUIRE_EQUAL(std::string(served::status::serving), membership_status(members[i]));
+   }
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(recorddel_succeeds_without_opconfig, sysio_opreg_tester) { try {

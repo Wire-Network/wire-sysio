@@ -256,6 +256,11 @@ std::optional<authex::links_s> authex_link_of(name account, opp::types::ChainKin
    return *it;
 }
 
+/// The id the next `dellog` row will get, without allocating it.
+uint64_t peek_next_dellog_id() {
+   return opreg::opcounters_t(opreg::OPREG_ACCOUNT).get_or_default(opreg::op_counters{}).next_dellog_id;
+}
+
 /// Erase every chain membership of `account`: its operator row is being pruned or replaced by a new
 /// registration, which serves no chain until it joins one.
 void erase_memberships(name self, name account) {
@@ -463,6 +468,7 @@ void opreg::joinchain(name account, sysio::slug_name chain_code) {
       check(!holds_schedule_seat(account, chain_code), still_seated_on_chain_msg);
    }
 
+   // A join starts new rails: rows recorded before it belong to an earlier membership.
    const uint64_t now = current_time_ms();
    members.set(ram_payer, key, served_chain{
       .account       = account,
@@ -470,6 +476,7 @@ void opreg::joinchain(name account, sysio::slug_name chain_code) {
       .status        = chain_service_status::SERVING,
       .joined_at_ms  = now,
       .updated_at_ms = now,
+      .tally         = duty_tally{.first_log_id = peek_next_dellog_id()},
    });
 }
 
@@ -791,18 +798,47 @@ uint64_t termination_window_open_ms(uint64_t now_ms, const opreg::op_config& cfg
    return now_ms > cfg.terminate_window_ms ? now_ms - cfg.terminate_window_ms : 0;
 }
 
+/// Take the erased dellog row `row` out of its membership's tally, when the row counts toward it.
+void untally(const opreg::delivery_log_entry& row) {
+   opreg::servchains_t                members(opreg::OPREG_ACCOUNT);
+   const opreg::served_chain_key      key{row.chain_code, row.account};
+   std::optional<opreg::served_chain> membership = members.try_get(key);
+   if (!membership || !membership->tally.counts(row.log_id)) return;
+   membership->tally.drop_oldest(row.delivered);
+   members.set(ram_payer, key, *membership);
+}
+
 /// Bounded oldest-first sweep of dellog rows, of every chain, that have aged out of the rolling
-/// window. `log_id` allocation order matches `ts_ms` order (both are monotonic), so the `bylogid`
-/// index walks oldest-first and the sweep stops at the first still-in-window row.
+/// window, each taken out of its membership's tally. `log_id` allocation order matches `ts_ms` order
+/// (both are monotonic), so the `bylogid` index walks oldest-first and the sweep stops at the first
+/// still-in-window row.
 void prune_dellog(uint64_t window_open_ms, uint32_t max_rows) {
    opreg::dellog_t log(opreg::OPREG_ACCOUNT);
    auto            by_log_id = log.get_index<"bylogid"_n>();
    uint32_t        removed   = 0;
    for (auto it = by_log_id.begin();
         it != by_log_id.end() && removed < max_rows && it->ts_ms < window_open_ms; ) {
+      const opreg::delivery_log_entry row = *it;
       it = by_log_id.erase(std::move(it));
+      untally(row);
       ++removed;
    }
+}
+
+/// Erase, oldest first, up to `max_rows` of `account`'s rows on `chain_code` that aged out of the
+/// rolling window, taking each out of `tally`. Returns whether none is left.
+bool prune_member_dellog(sysio::slug_name chain_code, name account, uint64_t window_open_ms, uint32_t max_rows,
+                         opreg::duty_tally& tally) {
+   opreg::dellog_t log(opreg::OPREG_ACCOUNT);
+   uint32_t        removed = 0;
+   for (auto it = log.lower_bound(opreg::delivery_key{chain_code, account, 0, 0});
+        it != log.end() && it->chain_code == chain_code && it->account == account && it->ts_ms < window_open_ms;) {
+      if (removed == max_rows) return false;
+      if (tally.counts(it->log_id)) tally.drop_oldest(it->delivered);
+      it = log.erase(std::move(it));
+      ++removed;
+   }
+   return true;
 }
 
 } // anonymous namespace
@@ -1669,6 +1705,15 @@ void opreg::recorddel(name account, sysio::slug_name chain_code, uint32_t epoch,
       .delivered  = delivered,
       .ts_ms      = now_ms,
    });
+
+   // Count the duty on the operator's rails for the chain. Read after the sweep, which may have changed the row.
+   servchains_t                members(get_self());
+   const served_chain_key      member_key{chain_code, account};
+   std::optional<served_chain> membership = members.try_get(member_key);
+   if (membership) {
+      membership->tally.add(delivered);
+      members.set(ram_payer, member_key, *membership);
+   }
 }
 
 void opreg::termcheck(name account, sysio::slug_name chain_code) {
@@ -1705,38 +1750,22 @@ void opreg::termcheck(name account, sysio::slug_name chain_code) {
    opconfig_t cfg_tbl(get_self());
    const auto cfg = cfg_tbl.get_or_default(op_config{});
 
-   // Both rails read only the current registration and the latest join of this chain: earlier rows
-   // stay in the log until they age out. Each start is the second after the event, because
-   // `current_time_ms` has second resolution and a close in that same second can still record
-   // against the previous registration or membership. A return to ACTIVE resets neither rail, so a
-   // cancelled withdrawal cannot clear the misses recorded while the operator was UNKNOWN.
-   const uint64_t now_ms      = current_time_ms();
-   const uint64_t window_open = std::max({termination_window_open_ms(now_ms, cfg), op.registered_at + 1,
-                                          membership->joined_at_ms + 1});
+   // Both rails read the tally of the latest join; a new registration joins afresh, so rows of an earlier
+   // registration or membership never count. A return to ACTIVE resets neither rail, so a cancelled
+   // withdrawal cannot clear the misses recorded while the operator was UNKNOWN. The member's aged rows
+   // the on-write sweep has not reached are erased first; while one is left the tally reaches past the
+   // window and the rails wait.
+   const uint64_t now_ms        = current_time_ms();
+   duty_tally&    tally         = membership->tally;
+   const uint64_t duties_before = tally.duties;
+   const bool     drained       = prune_member_dellog(chain_code, account, termination_window_open_ms(now_ms, cfg),
+                                                      MAX_DELLOG_PRUNE_PER_CHECK, tally);
 
-   dellog_t log(get_self());
-   uint32_t consecutive_misses = 0;
-   uint32_t worst_consecutive  = 0;
-   uint32_t total_misses       = 0;
-   uint32_t total_in_window    = 0;
-   for (auto it = log.lower_bound(delivery_key{chain_code, account, window_open, 0});
-        it != log.end() && it->chain_code == chain_code && it->account == account; ++it) {
-      total_in_window++;
-      if (!it->delivered) total_misses++;
-
-      if (!it->delivered) {
-         consecutive_misses++;
-         if (consecutive_misses > worst_consecutive) worst_consecutive = consecutive_misses;
-      } else {
-         consecutive_misses = 0;
-      }
-   }
-
-   // The percent rail waits for a minimum sample, so a miss among the first duties cannot evict alone.
-   const bool exceeds_consecutive = worst_consecutive > cfg.terminate_max_consecutive_misses;
-   const bool exceeds_percent     = total_in_window > 0 && total_in_window >= cfg.terminate_min_pct_samples &&
-                                    uint64_t{total_misses} * PERCENT_SCALE / total_in_window >
-                                       cfg.terminate_max_pct_misses_24h;
+   // termcheck follows every recorddel, so the run since the last delivery breaches at the duty that
+   // makes it too long. The percent rail waits for a minimum sample, so an early miss cannot evict alone.
+   const bool exceeds_consecutive = drained && tally.miss_run > cfg.terminate_max_consecutive_misses;
+   const bool exceeds_percent     = drained && tally.duties > 0 && tally.duties >= cfg.terminate_min_pct_samples &&
+                                    tally.misses * PERCENT_SCALE / tally.duties > cfg.terminate_max_pct_misses_24h;
    if (exceeds_consecutive || exceeds_percent) {
       membership->status        = chain_service_status::EVICTED;
       membership->updated_at_ms = now_ms;
@@ -1759,6 +1788,8 @@ void opreg::termcheck(name account, sysio::slug_name chain_code) {
             std::make_tuple(account, chain_code)
          ).send();
       }
+   } else if (tally.duties != duties_before) {
+      members.set(ram_payer, member_key, *membership);
    }
 }
 

@@ -297,6 +297,28 @@
             ]
         },
         {
+            "name": "duty_tally",
+            "base": "",
+            "fields": [
+                {
+                    "name": "first_log_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "duties",
+                    "type": "uint64"
+                },
+                {
+                    "name": "misses",
+                    "type": "uint64"
+                },
+                {
+                    "name": "miss_run",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "flushwtdw",
             "base": "",
             "fields": [
@@ -622,6 +644,10 @@
                 {
                     "name": "status_reason",
                     "type": "string"
+                },
+                {
+                    "name": "tally",
+                    "type": "duty_tally"
                 }
             ]
         },

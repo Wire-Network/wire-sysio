@@ -14,6 +14,7 @@
 #include <sysio.opp.common/shadow_custody_types.hpp>
 #include <magic_enum/magic_enum.hpp>
 
+#include <algorithm>
 #include <optional>
 
 namespace sysio {
@@ -156,6 +157,10 @@ namespace sysio {
       /// backlog faster when cranked.
       static constexpr uint32_t MAX_DELLOG_PRUNE_PER_WRITE = 4;
       static constexpr uint32_t MAX_DELLOG_PRUNE_PER_CRANK = 64;
+
+      /// Aged-out rows of its own member that `termcheck` erases before reading the member's tally. The on-write
+      /// sweep normally leaves none; while one is left the rails wait, so they never count a row past the window.
+      static constexpr uint32_t MAX_DELLOG_PRUNE_PER_CHECK = 16;
 
       static constexpr uint32_t MAX_OPERATOR_PRUNE_PER_CRANK = 20;
 
@@ -304,19 +309,22 @@ namespace sysio {
       void slash(name account, std::string reason);
 
       /// Record a batch operator's result for one duty epoch of outpost `chain_code` in the rolling
-      /// buffer. Called inline from `sysio.epoch::advance(chain_code)` once per expiring-group member,
-      /// whatever its status at the close; `delivered` only if it delivered to that chain. Each write
-      /// also prunes up to `MAX_DELLOG_PRUNE_PER_WRITE` rows, of any chain, that have aged out of the
-      /// window, so no dedicated crank is needed.
+      /// buffer and count it in the operator's duty tally on the chain. Called inline from
+      /// `sysio.epoch::advance(chain_code)` once per expiring-group member, whatever its status at the
+      /// close; `delivered` only if it delivered to that chain. Each write also prunes up to
+      /// `MAX_DELLOG_PRUNE_PER_WRITE` rows, of any chain, that have aged out of the window, taking each out
+      /// of its membership's tally, so no dedicated crank is needed.
       [[sysio::action]]
       void recorddel(name account, sysio::slug_name chain_code, uint32_t epoch, bool delivered);
 
       /// Evict the operator from outpost `chain_code` when its rolling buffer on that chain holds more
       /// than `terminate_max_consecutive_misses` consecutive misses, or, once it holds at least
       /// `terminate_min_pct_samples` duty epochs, a whole-percent miss rate (rounded down) above
-      /// `terminate_max_pct_misses_24h`. Both rails count the chain's duty epochs
-      /// recorded after the second of the operator's current registration and after the second of its
-      /// latest join of the chain; a return to ACTIVE resets neither. The membership becomes EVICTED
+      /// `terminate_max_pct_misses_24h`. Both rails read the membership's duty tally: the chain's duty
+      /// epochs recorded since the operator's latest join of the chain and within the window, the
+      /// consecutive rail counting the misses since the last delivery; a return to ACTIVE resets neither.
+      /// The check first erases up to `MAX_DELLOG_PRUNE_PER_CHECK` of the member's own rows that aged out
+      /// of the window, and while one is left the rails wait for a later check. The membership becomes EVICTED
       /// with the rail's reason, and the operator forfeits its unsettled batch duty on the chain
       /// (`sysio.system::forfeitduty`, once `initt5` has run); its status, bond, other chains and
       /// their duty are untouched. ACTIVE and UNKNOWN operators are both evaluated; bootstrapped
@@ -487,6 +495,40 @@ namespace sysio {
          SYSLIB_SERIALIZE(served_chain_key, (chain_code)(account))
       };
 
+      /// Running totals of one membership's duty epochs in the rolling window, which `termcheck` reads
+      /// whatever the size of the log: the membership's `dellog` rows from `first_log_id` on that the
+      /// retention sweeps have not erased. `recorddel` adds each row; the sweeps drop them oldest first.
+      struct duty_tally {
+         uint64_t first_log_id = 0;   ///< the first `dellog` id allocated after the latest join
+         uint64_t duties       = 0;   ///< duty epochs counted
+         uint64_t misses       = 0;   ///< counted duty epochs missed
+         uint64_t miss_run     = 0;   ///< misses since the last counted delivery
+
+         /// Whether `dellog` row `log_id` counts toward the tally: one recorded since the latest join.
+         bool counts(uint64_t log_id) const { return log_id >= first_log_id; }
+
+         /// Count a newly recorded duty epoch.
+         void add(bool delivered) {
+            ++duties;
+            if (delivered) {
+               miss_run = 0;
+            } else {
+               ++misses;
+               ++miss_run;
+            }
+         }
+
+         /// Drop the oldest counted duty epoch, erased by a sweep. The run keeps only the duties left.
+         void drop_oldest(bool delivered) {
+            if (duties == 0) return;
+            --duties;
+            if (!delivered && misses > 0) --misses;
+            miss_run = std::min(miss_run, duties);
+         }
+
+         SYSLIB_SERIALIZE(duty_tally, (first_log_id)(duties)(misses)(miss_run))
+      };
+
       /// One batch operator's membership of one outpost chain, written by `joinchain` and kept until
       /// the operator row is pruned or the account registers again.
       struct [[sysio::table("servchains")]] served_chain {
@@ -496,11 +538,12 @@ namespace sysio {
          uint64_t                          joined_at_ms  = 0;   ///< the latest `joinchain` that made the row SERVING
          uint64_t                          updated_at_ms = 0;   ///< the latest status change
          std::string                       status_reason;       ///< why the row was EVICTED; empty otherwise
+         duty_tally                        tally;               ///< the miss rails' totals since the latest join
 
          uint64_t by_account() const { return account.value; }
 
          SYSLIB_SERIALIZE(served_chain,
-            (account)(chain_code)(status)(joined_at_ms)(updated_at_ms)(status_reason))
+            (account)(chain_code)(status)(joined_at_ms)(updated_at_ms)(status_reason)(tally))
       };
 
       using servchains_t = sysio::kv::table<"servchains"_n, served_chain_key, served_chain,
@@ -609,8 +652,8 @@ namespace sysio {
       >;
 
       /// Key of the per-chain rolling delivery buffer: chain, then operator, then time, so one
-      /// operator's rows on one chain are a single time-ordered range `termcheck` seeks into at its
-      /// window's opening edge. `log_id` keeps two rows of the same second distinct.
+      /// operator's rows on one chain are a single time-ordered range whose aged-out head `termcheck`
+      /// erases. `log_id` keeps two rows of the same second distinct.
       struct delivery_key {
          sysio::slug_name chain_code;
          name             account;
@@ -620,8 +663,8 @@ namespace sysio {
       };
 
       /// One row per (outpost chain, operator, duty epoch), `delivered` only if the operator delivered
-      /// to that chain. Rows older than `terminate_window_ms` are discarded oldest-first, across
-      /// chains, by `prune` and on write.
+      /// to that chain: the audit trail behind the duty tallies. Rows older than `terminate_window_ms`
+      /// are discarded oldest-first, across chains by `prune` and on write, and per member by `termcheck`.
       struct [[sysio::table("dellog")]] delivery_log_entry {
          uint64_t         log_id    = 0;
          name             account;
