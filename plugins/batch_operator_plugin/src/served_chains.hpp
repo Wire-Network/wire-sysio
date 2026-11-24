@@ -1,9 +1,9 @@
 #pragma once
 /**
  * @file served_chains.hpp
- * @brief Which outpost chains one batch operator relays, from its `sysio.opreg::servchains` memberships and its seats
- *        in each chain's schedule window, and the build of the outpost clients it relays through. Pure functions over
- *        decoded rows, so the plugin's tests drive them without a chain.
+ * @brief Which outpost chains one batch operator relays, from its `sysio.opreg::servchains` memberships, its seats in
+ *        each chain's schedule window and its own `sysio.opreg::operators` status, and the build of the outpost clients
+ *        it relays through. Pure functions over decoded rows, so the plugin's tests drive them without a chain.
  */
 
 #include <cstdint>
@@ -123,6 +123,32 @@ inline std::vector<outpost_descriptor> relayed_outposts(const std::vector<outpos
       if (relayed.contains(op.id)) outposts.push_back(op);
    }
    return outposts;
+}
+
+/// The exact-lookup key of `account`'s `sysio.opreg::operators` row, as chain_plugin's key codec expects it.
+inline std::string operator_find_bound(chain::name account) {
+   return fc::json::to_string(fc::mutable_variant_object()(opreg_names::field::account, account.to_uint64_t()),
+                              fc::json::yield_function_t{});
+}
+
+/// The status spelling of `operator_account`'s row among `rows` (its exact `operators` lookup), or UNKNOWN's when it
+/// has none: `sysio.msgch::deliver` refuses an operator without a registration as it refuses an UNKNOWN one. Throws
+/// when the row does not decode.
+inline std::string own_status_of(const fc::variants& rows, chain::name operator_account) {
+   for (const fc::variant& row : rows) {
+      const fc::variant_object& entry = row.get_object();
+      if (chain::name(entry[opreg_names::field::account].as_string()) == operator_account) {
+         return entry[opreg_names::field::status].as_string();
+      }
+   }
+   return sysio::opp::types::OperatorStatus_Name(sysio::opp::types::OPERATOR_STATUS_UNKNOWN);
+}
+
+/// The outposts this operator runs relay jobs for: every `relayed` one while `sysio.msgch::deliver` accepts its own
+/// status (`opreg_status::compute_delivers`), none while it refuses it.
+inline std::vector<outpost_descriptor> relay_job_outposts(const std::vector<outpost_descriptor>& relayed,
+                                                          bool status_delivers) {
+   return status_delivers ? relayed : std::vector<outpost_descriptor>{};
 }
 
 /// A chain this node cannot serve, and why.

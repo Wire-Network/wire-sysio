@@ -10,15 +10,21 @@ minutes) and a sliding window of `batch_op_groups` groups of `operators_per_epoc
 operators (default 3 groups of 7) drawn from the operators serving that chain. The group
 at the front of a chain's window is elected for that chain's current epoch and its
 members execute the epoch cycle on that chain. Each poll the plugin also reads its own
-`sysio.opreg` status: once the operator is `SLASHED` or `TERMINATED` it stops pushing
-`chkcons` and the depot cranks. Its per-chain relay jobs keep running while the window
-seats it, and `sysio.msgch::deliver` refuses their deliveries from an operator that is
-not `ACTIVE`.
+`sysio.opreg` status (one exact lookup of its `operators` row):
+
+| Status | Relay jobs | `chkcons` and depot cranks |
+|--------|------------|----------------------------|
+| `ACTIVE` | run | push |
+| `UNKNOWN` (collateral under the minimum), or no row | stopped on every chain: `sysio.msgch::deliver` refuses any status but `ACTIVE` | keep their last state |
+| `SLASHED`, `TERMINATED` | stopped on every chain | stop |
+
+Stopped relay jobs are rebuilt on the first poll that reads `ACTIVE` again. A failed
+read changes nothing.
 
 ### Served chains
 
-The plugin relays a chain when its operator's `sysio.opreg::servchains` row on it
-(its rows read as one range of the `byaccount` index) is:
+While its status lets the relay jobs run, the plugin relays a chain when its operator's
+`sysio.opreg::servchains` row on it (its rows read as one range of the `byaccount` index) is:
 
 | Status | Relayed |
 |--------|---------|

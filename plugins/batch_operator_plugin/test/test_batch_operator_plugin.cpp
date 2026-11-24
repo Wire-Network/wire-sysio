@@ -24,6 +24,7 @@
 
 #include <sysio/batch_operator_plugin/batch_operator_plugin.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
+#include <sysio/opp/depot/opreg_status.hpp>
 #include <sysio/services/cron_service.hpp>
 
 #include <fc/slug_name.hpp>
@@ -410,6 +411,20 @@ chain_epoch_view view_seating(fc::slug_name chain, uint8_t group) {
 
 outpost_descriptor outpost(fc::slug_name chain) { return outpost_descriptor{.id = chain.value}; }
 
+/// An `operators` value as the ABI renders it, with `status`'s spelling.
+fc::variant operator_row(std::string_view account, sysio::opp::types::OperatorStatus status) {
+   return fc::variant(fc::mutable_variant_object()(sysio::opreg_names::field::account, std::string(account))
+                                                  (sysio::opreg_names::field::status,
+                                                   sysio::opp::types::OperatorStatus_Name(status)));
+}
+
+/// The chain codes of `outposts`, in order.
+std::vector<uint64_t> codes_of(const std::vector<outpost_descriptor>& outposts) {
+   std::vector<uint64_t> codes;
+   for (const outpost_descriptor& op : outposts) codes.push_back(op.id);
+   return codes;
+}
+
 } // namespace
 
 BOOST_AUTO_TEST_SUITE(batch_operator_served_chains_tests)
@@ -523,6 +538,59 @@ BOOST_AUTO_TEST_CASE(relayed_chains_follow_membership_and_seats) try {
    // Its seat on another chain does not keep a LEFT member on this one.
    const chain_memberships left_only{{left_free_chain.value, chain_service_status::LEFT}};
    BOOST_CHECK(relayed_chains(left_only, views).empty());
+} FC_LOG_AND_RETHROW();
+
+/// The own-status lookup is an exact read of the operator's `operators` row, keyed by its account's value.
+BOOST_AUTO_TEST_CASE(the_own_status_lookup_keys_the_account) try {
+   const uint64_t value = sysio::chain::name(self).to_uint64_t();
+   BOOST_CHECK_EQUAL(operator_find_bound(sysio::chain::name(self)), "{\"account\":\"" + std::to_string(value) + "\"}");
+} FC_LOG_AND_RETHROW();
+
+/// The own status is the operator's row's; with no row of its own the operator reads as UNKNOWN, whose deliveries
+/// `sysio.msgch::deliver` refuses.
+BOOST_AUTO_TEST_CASE(own_status_is_the_row_or_unknown_without_one) try {
+   using sysio::opp::types::OperatorStatus_Name;
+   const sysio::chain::name me(self);
+   BOOST_CHECK_EQUAL(own_status_of({operator_row(self, sysio::opp::types::OPERATOR_STATUS_SLASHED)}, me),
+                     OperatorStatus_Name(sysio::opp::types::OPERATOR_STATUS_SLASHED));
+   BOOST_CHECK_EQUAL(own_status_of({}, me), OperatorStatus_Name(sysio::opp::types::OPERATOR_STATUS_UNKNOWN));
+   BOOST_CHECK_EQUAL(own_status_of({operator_row(stranger, sysio::opp::types::OPERATOR_STATUS_ACTIVE)}, me),
+                     OperatorStatus_Name(sysio::opp::types::OPERATOR_STATUS_UNKNOWN));
+} FC_LOG_AND_RETHROW();
+
+/// Across polls the relay jobs follow `sysio.msgch::deliver`'s status gate: they run on every relayed chain while the
+/// operator reads ACTIVE, stop on all of them under UNKNOWN, without a row, or once SLASHED or TERMINATED, and restart
+/// when it reads ACTIVE again (a terminated operator that registers again). A failed read leaves them as they were.
+BOOST_AUTO_TEST_CASE(relay_jobs_run_only_while_deliver_accepts_the_status) try {
+   using namespace sysio::opp::types;
+   const std::vector<outpost_descriptor> relayed{outpost(serving_chain), outpost(left_seated_chain)};
+   struct poll {
+      std::optional<fc::variants> lookup;   ///< nullopt: the read failed
+      bool                        relays;
+   };
+   const std::vector<poll> polls{
+      {fc::variants{operator_row(self, OPERATOR_STATUS_ACTIVE)}, true},
+      {fc::variants{operator_row(self, OPERATOR_STATUS_UNKNOWN)}, false},
+      {std::nullopt, false},
+      {fc::variants{operator_row(self, OPERATOR_STATUS_ACTIVE)}, true},
+      {std::nullopt, true},
+      {fc::variants{}, false},
+      {fc::variants{operator_row(self, OPERATOR_STATUS_ACTIVE)}, true},
+      {fc::variants{operator_row(self, OPERATOR_STATUS_SLASHED)}, false},
+      {fc::variants{operator_row(self, OPERATOR_STATUS_ACTIVE)}, true},
+      {fc::variants{operator_row(self, OPERATOR_STATUS_TERMINATED)}, false},
+      {fc::variants{operator_row(self, OPERATOR_STATUS_UNKNOWN)}, false},
+      {fc::variants{operator_row(self, OPERATOR_STATUS_ACTIVE)}, true},
+   };
+   bool status_delivers = true;
+   for (const poll& each : polls) {
+      if (each.lookup) {
+         status_delivers = sysio::opp::depot::opreg_status::compute_delivers(
+            own_status_of(*each.lookup, sysio::chain::name(self)), status_delivers);
+      }
+      const std::vector<uint64_t> expected = each.relays ? codes_of(relayed) : std::vector<uint64_t>{};
+      BOOST_CHECK(codes_of(relay_job_outposts(relayed, status_delivers)) == expected);
+   }
 } FC_LOG_AND_RETHROW();
 
 /// Only relayed outposts are built: a chain this operator does not serve is never built, so no client for it is

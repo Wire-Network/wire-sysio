@@ -115,6 +115,10 @@ namespace {
    constexpr std::string_view SIGNER_PROBE = "batch_operator_plugin signer probe";
    /// A `kv::global` singleton table holds exactly one row.
    constexpr uint32_t SINGLETON_ROW_LIMIT = 1;
+   /// Why a relay job is dropped: its chain is no longer relayed, or `sysio.msgch::deliver` refuses the operator's own
+   /// status on every chain.
+   constexpr std::string_view JOB_DROP_UNRELAYED      = "unrelayed";
+   constexpr std::string_view JOB_DROP_REFUSED_STATUS = "refused-status";
 
    // ── WIRE contract identifiers (actions, tables, indexes, field names) ──
    // Centralised so a contract rename/refactor shows up as one search hit,
@@ -140,9 +144,9 @@ namespace {
       }
    }
 
-   // The awareness poll that gates chkcons and the cranks reads `operators::status`; the relayed chains come from this
-   // operator's `servchains` rows. The `OperatorStatus` spellings and the `is_active` decision live in
-   // `sysio/opp/depot/opreg_status.hpp`.
+   // The awareness poll that gates chkcons, the cranks and the relay jobs reads `operators::status`; the relayed chains
+   // come from this operator's `servchains` rows. The `OperatorStatus` spellings and the `is_active` and delivery
+   // decisions live in `sysio/opp/depot/opreg_status.hpp`.
    namespace opreg = sysio::opreg_names;
 
    /// The per-chain consensus epoch tables (`chain_epochs.hpp`).
@@ -353,11 +357,12 @@ struct batch_operator_plugin::impl {
    fc::time_point                      next_epoch_read;
 
    // Operator awareness — set by `poll_own_status()` from sysio.opreg::operators.
-   // A SLASHED / TERMINATED operator stops the pushes this gates: `chkcons`, the
-   // depot cranks and the kick crank. The per-chain relay jobs are not gated;
-   // msgch's deliver refuses a delivery from an operator that is not ACTIVE.
+   /// Whether `chkcons`, the depot cranks and the kick crank push: false once the operator is SLASHED or TERMINATED.
    /// Written by the epoch tick, read by the crank and kick cron jobs.
    std::atomic<bool>        is_active{true};
+   /// Whether the relay jobs run: `sysio.msgch::deliver` accepts the operator's status, which only ACTIVE passes.
+   /// Written and read by the epoch tick, and by the deferred startup before the cron service runs.
+   bool                     status_delivers = true;
 
    // Plugin references
    chain_plugin*                     chain_plug = nullptr;
@@ -599,11 +604,7 @@ struct batch_operator_plugin::impl {
       next_epoch_read = batch_operator_detail::next_epoch_read_at(
          now, batch_operator_detail::epoch_tick_interval(chain_epochs, relayed, epoch_poll),
          batch_operator_detail::epoch_tick_step(epoch_poll));
-      // Awareness: refresh own status from the depot's bond ledger. SLASHED
-      // / TERMINATED operators push nothing.
-      try {
-         poll_own_status();
-      } FC_LOG_AND_DROP();
+      // SLASHED / TERMINATED operators push nothing (`refresh_relay` read the status).
       if (!is_active) return;
       push_chkcons();
    }
@@ -679,8 +680,7 @@ struct batch_operator_plugin::impl {
     * push a cheap no-op.
     *
     * The scan is a full-table filter: the table retains RESOLVED rows as the
-    * audit trail, but disputes are rare and `poll_own_status` already scans a
-    * comparably-sized table each tick.
+    * audit trail, but disputes are rare.
     */
    void crank_open_disputes() {
       sysio::chain_apis::read_only::get_table_rows_params p;
@@ -1013,53 +1013,42 @@ struct batch_operator_plugin::impl {
    }
 
    /**
-    * Refresh `is_active` from `sysio.opreg::operators[operator_account]`.
-    *
-    * Reads the row's `status` field and sets `is_active` per:
-    *   * OPERATOR_STATUS_ACTIVE      -> true  (chkcons and the cranks push)
-    *   * OPERATOR_STATUS_SLASHED     -> false (they stop; operator forfeit bond)
-    *   * OPERATOR_STATUS_TERMINATED  -> false (they stop; bond remitted, slot freed)
-    *   * other / row missing         -> retain previous value (don't toggle on
-    *                                    transient table-read failure)
-    *
-    * Logs once per status transition so cluster operators can see the flip
-    * in the batch-op log without grep'ing every poll.
+    * Refresh the two gates set by this operator's own `sysio.opreg::operators` status, read by an exact lookup of its
+    * row:
+    *   * `is_active` (`opreg_status::compute_is_active`): `chkcons` and the cranks push; false once SLASHED or
+    *     TERMINATED, kept on any other status.
+    *   * `status_delivers` (`opreg_status::compute_delivers`): the relay jobs run; true only while
+    *     `sysio.msgch::deliver` accepts the status, which needs ACTIVE. `refresh_relay` stops the jobs on every chain
+    *     otherwise and rebuilds them once the status reads ACTIVE again.
+    * An operator with no row reads as UNKNOWN (`batch_operator_detail::own_status_of`). A failed read changes neither
+    * gate. Logs each flip.
     */
    void poll_own_status() {
-      // `sysio.opreg::operators` is a KV table whose PK is a struct `{account: name}`; the chain_plugin's
-      // `lower_bound` / `upper_bound` expects JSON-shaped key bounds for KV tables, not the bare name string. This
-      // reads every operator row and filters in-plugin. Nothing caps the table, so the scan grows with it.
       sysio::chain_apis::read_only::get_table_rows_params p;
       p.code        = chain::name(opreg::account);
       p.scope       = opreg::account;
       p.table       = opreg::table_operators;
-      p.all_rows    = true;
+      p.find        = batch_operator_detail::operator_find_bound(operator_account);
+      p.limit       = EXACT_LOOKUP_LIMIT;
       p.values_only = true;
-      auto rows = read_table(std::move(p));
-      if (rows.rows.empty()) return;
+      const std::optional<sysio::chain_apis::read_only::get_table_rows_result> rows = read_table_checked(std::move(p));
+      if (!rows) return;
+      const std::string status = batch_operator_detail::own_status_of(rows->rows, operator_account);
 
-      auto self = operator_account.to_string();
-      fc::variant_object obj;
-      bool found = false;
-      for (auto& r : rows.rows) {
-         auto row_obj = r.get_object();
-         auto acct_it = row_obj.find(opreg::field::account);
-         if (acct_it != row_obj.end() && acct_it->value().as_string() == self) {
-            obj = row_obj;
-            found = true;
-            break;
-         }
-      }
-      if (!found) return;
-      auto status = obj[opreg::field::status].as_string();
-
-      bool was_active = is_active;
+      const bool was_active = is_active;
       is_active = sysio::opp::depot::opreg_status::compute_is_active(status, was_active);
-
       if (was_active && !is_active) {
          elog("batch_operator: own status flipped to {} — halting chkcons and crank pushes", status);
       } else if (!was_active && is_active) {
          ilog("batch_operator: own status flipped to ACTIVE — resuming chkcons and crank pushes");
+      }
+
+      const bool was_delivering = status_delivers;
+      status_delivers = sysio::opp::depot::opreg_status::compute_delivers(status, was_delivering);
+      if (was_delivering && !status_delivers) {
+         elog("batch_operator: own status {} is refused by sysio.msgch::deliver — stopping the relay jobs", status);
+      } else if (!was_delivering && status_delivers) {
+         ilog("batch_operator: own status flipped to ACTIVE — restarting the relay jobs");
       }
    }
 
@@ -1153,13 +1142,18 @@ struct batch_operator_plugin::impl {
    }
 
    /**
-    * Re-read what the relay acts on and rebuild it: every chain's consensus epoch, this operator's memberships and the
-    * active outposts, then the chains it relays (active, and served per `batch_operator_detail::relays_chain`) and
-    * their jobs. A read that fails keeps that table's last good reading, so a transient failure neither drops a chain
+    * Re-read what the relay acts on and rebuild it: this operator's own status (`poll_own_status`), every chain's
+    * consensus epoch, its memberships and the active outposts, then the chains it relays (active, and served per
+    * `batch_operator_detail::relays_chain`) and their jobs, which run only while `sysio.msgch::deliver` accepts its
+    * status. A read that fails keeps that table's last good reading, so a transient failure neither drops a chain
     * nor clears an election. `build_opp_jobs` and `schedule_opp_jobs` are idempotent, so a chain this operator joins,
-    * or governance activates, starts relaying without a restart.
+    * or governance activates, starts relaying without a restart, and the jobs a refused status stopped restart once
+    * it reads ACTIVE again.
     */
    void refresh_relay() {
+      try {
+         poll_own_status();
+      } FC_LOG_AND_DROP();
       std::optional<batch_operator_detail::chain_epochs> views = read_chain_epochs();
       if (std::optional<batch_operator_detail::chain_memberships> read = read_memberships()) {
          memberships = std::move(*read);
@@ -1185,8 +1179,10 @@ struct batch_operator_plugin::impl {
       }
       relayed = std::move(now_relayed);
 
-      prune_stale_opp_jobs(relay_outposts);
-      build_opp_jobs(relay_outposts);
+      const std::vector<outpost_descriptor> job_outposts =
+         batch_operator_detail::relay_job_outposts(relay_outposts, status_delivers);
+      prune_stale_opp_jobs(job_outposts, status_delivers ? JOB_DROP_UNRELAYED : JOB_DROP_REFUSED_STATUS);
+      build_opp_jobs(job_outposts);
       schedule_opp_jobs();
    }
 
@@ -1394,15 +1390,16 @@ struct batch_operator_plugin::impl {
       scheduled_opp_jobs.erase(sched_it);
    }
 
-   /// Drop relay jobs that no longer match the relayed outposts: the chain went
-   /// inactive or is no longer relayed (left with no seat, evicted), or
-   /// governance moved its remote deployment with `setoutpost`.
+   /// Drop relay jobs that no longer match `job_outposts`: the chain went
+   /// inactive or is no longer relayed (left with no seat, evicted), the
+   /// operator's own status is refused by `sysio.msgch::deliver` (`absent_why`
+   /// names which), or governance moved its remote deployment with `setoutpost`.
    /// `build_opp_jobs` rebuilds what is dropped here on the same refresh, so an
    /// address change costs one tick rather than an operator restart — without
    /// it a redeployed outpost would keep receiving deliveries at a dead
    /// address, and inbound reads would keep polling the old contract.
-   void prune_stale_opp_jobs(const std::vector<outpost_descriptor>& relay_outposts) {
-      drop_stale(opp_jobs, relay_outposts, "unrelayed", [&](uint64_t chain_code, std::string_view why) {
+   void prune_stale_opp_jobs(const std::vector<outpost_descriptor>& job_outposts, std::string_view absent_why) {
+      drop_stale(opp_jobs, job_outposts, absent_why, [&](uint64_t chain_code, std::string_view why) {
          cancel_scheduled_opp_job(chain_code);
          ilog("batch_operator: removed outpost_opp_job for {} outpost {}", why, fc::slug_name{chain_code}.to_string());
       });
