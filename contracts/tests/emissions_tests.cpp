@@ -1299,16 +1299,34 @@ public:
          ("epoch_retention_envelope_log_count", 1000u)
       );
       if (r != success()) return r;
-      return seteconomy(epoch_duration_sec, tpsec(head_secs()));
+      return push_seteconomy(epoch_duration_sec, tpsec(head_secs()));
    }
 
-   /// Set the economic clock: its epoch length and the start of its grid.
+   /// Set the economic clock: its epoch length and the start of its grid. Pins the start: advance_epoch_state no
+   /// longer moves it to the first tick.
    action_result seteconomy(uint32_t epoch_duration_sec, time_point_sec start_time) {
+      economic_start_pinned = true;
+      return push_seteconomy(epoch_duration_sec, start_time);
+   }
+
+   /// Push `sysio.epoch::seteconomy` without pinning the start.
+   action_result push_seteconomy(uint32_t epoch_duration_sec, time_point_sec start_time) {
       return push_epoch_action(EPOCH, "seteconomy"_n, mvo()
          ("epoch_duration_sec", epoch_duration_sec)
          ("start_time", start_time)
       );
    }
+
+   /// The configured economic epoch duration.
+   uint32_t economic_duration_sec() {
+      auto data = get_row_by_account(EPOCH, EPOCH, "economycfg"_n, "economycfg"_n);
+      BOOST_REQUIRE( !data.empty() );
+      return epoch_abi_ser.binary_to_variant("economic_config", data, fixture_abi_yield_function())
+         ["epoch_duration_sec"].as<uint32_t>();
+   }
+
+   /// True once a test set the economic start itself; until then the first tick anchors the grid.
+   bool economic_start_pinned = false;
 
    /// The economic clock's current epoch index (0 before its first tick).
    uint32_t economic_epoch_index() {
@@ -1318,6 +1336,14 @@ public:
          ["current_epoch_index"].as<uint32_t>();
    }
 
+   /// Whether the economic grid has passed a boundary no tick has opened yet.
+   bool economic_epoch_due() {
+      auto data = get_row_by_account(EPOCH, EPOCH, "economystate"_n, "economystate"_n);
+      if (data.empty()) return true;
+      const auto state = epoch_abi_ser.binary_to_variant("economic_state", data, fixture_abi_yield_function());
+      return control->head().block_time() >= state["next_epoch_start"].as<fc::time_point>();
+   }
+
    /// The consensus epoch's current index (0 before the genesis advance).
    uint32_t consensus_epoch_index() {
       auto state = get_epoch_state_row();
@@ -1325,11 +1351,16 @@ public:
    }
 
    /// Open the next economic epoch -- the clock emissions run on. The first call also runs the
-   /// consensus genesis advance, which the economic clock waits for. Tests cross the economic
-   /// boundary with produce_blocks before every call after the first.
+   /// consensus genesis advance, which the economic clock waits for, and, unless the test pinned the
+   /// start, anchors the economic grid at itself so a long setup does not leave the crank behind.
+   /// Tests cross the economic boundary with produce_blocks before every call after the first.
    action_result advance_epoch_state(account_name signer = EPOCH) {
       if (consensus_epoch_index() == 0) {
          auto r = push_epoch_action(signer, "advance"_n, mvo());
+         if (r != success()) return r;
+      }
+      if (economic_epoch_index() == 0 && !economic_start_pinned) {
+         auto r = push_seteconomy(economic_duration_sec(), tpsec(head_secs()));
          if (r != success()) return r;
       }
       return push_epoch_action(signer, "tickeconomy"_n, mvo()("epoch_index", economic_epoch_index() + 1));
@@ -3145,8 +3176,11 @@ BOOST_FIXTURE_TEST_CASE( economic_clock_catches_up_on_a_fixed_grid, sysio_emissi
    BOOST_REQUIRE_EQUAL( economy["current_epoch_index"].as<uint32_t>(), 4u );
    BOOST_REQUIRE( economy["current_epoch_start"].as<fc::time_point>() ==
                   fc::time_point(fc::seconds(start + 3 * epoch_secs)) );
-   // Every caught-up epoch accrued, and with cadence 1 each one paid.
-   BOOST_REQUIRE_EQUAL( get_t5_state()["epoch_count"].as<uint64_t>(), 4u );
+   // Every caught-up epoch accrued. The pay epochs ticked while a later boundary had passed waited, so the tick
+   // that reached the grid paid all four at once.
+   BOOST_REQUIRE_EQUAL( get_t5_state()["epoch_count"].as<uint64_t>(), 1u );
+   BOOST_REQUIRE_EQUAL( get_t5_state()["pending_emission_amount"].as<int64_t>(), int64_t(0) );
+   BOOST_REQUIRE_EQUAL( 4u, get_epoch_log(4)["economic_epoch_index"].as<uint32_t>() );
    // The consensus clock did not move with it.
    BOOST_REQUIRE_EQUAL( consensus_epoch_index(), 1u );
 
@@ -3224,6 +3258,98 @@ BOOST_FIXTURE_TEST_CASE( emissions_pay_and_claim_while_the_andon_cord_is_pulled,
    const asset owner_before = get_wire_balance( owner );
    BOOST_REQUIRE_EQUAL( success(), claimnodedis( owner, owner ) );
    BOOST_REQUIRE_EQUAL( get_wire_balance( owner ), owner_before + vested );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( a_held_first_payout_decays_after_its_pay_epoch, sysio_emissions_tester ) try {
+   // The first pay period accrues the initial share only for its scheduled epochs. Held past its pay epoch, the
+   // period keeps accruing at the decayed rate, as it would have after paying.
+   constexpr uint32_t held_epochs = 3;
+   const account_name drain = "helddrain"_n;
+   create_t5_holding_accounts();
+   create_user_accounts({ drain });
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name ) );
+   base_tester::push_action(TOKEN, "transfer"_n,
+      vector<permission_level>{{ config::system_account_name, "active"_n }},
+      mvo()("from", config::system_account_name)("to", drain)
+           ("quantity", get_wire_balance(config::system_account_name))("memo", "hold every payout"));
+   produce_blocks(1);
+
+   const int64_t initial = test_scale_annual_to_epoch(ANNUAL_INITIAL_EMISSION, T_EPOCH_SECS);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );   // economic epoch 1: the first pay epoch, held
+   BOOST_REQUIRE( !get_blocklog_row(1).is_null() );
+   BOOST_REQUIRE_EQUAL( 0u, get_t5_state()["epoch_count"].as<uint64_t>() );
+   BOOST_REQUIRE_EQUAL( initial, get_t5_state()["pending_emission_amount"].as<int64_t>() );
+
+   int64_t share = initial;
+   for (uint32_t held = 0; held < held_epochs; ++held) {
+      const int64_t pending_before = get_t5_state()["pending_emission_amount"].as<int64_t>();
+      produce_blocks(130);
+      BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+      const int64_t decayed = std::clamp(test_apply_decay(share, TARGET_ANNUAL_DECAY_BPS, T_EPOCH_SECS),
+                                         test_scale_annual_to_epoch(ANNUAL_MIN_EMISSION, T_EPOCH_SECS),
+                                         test_scale_annual_to_epoch(ANNUAL_MAX_EMISSION, T_EPOCH_SECS));
+      BOOST_REQUIRE_LT( decayed, share );
+      BOOST_REQUIRE_EQUAL( decayed, get_t5_state()["pending_emission_amount"].as<int64_t>() - pending_before );
+      share = decayed;
+   }
+   BOOST_REQUIRE_EQUAL( 0u, get_t5_state()["epoch_count"].as<uint64_t>() );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( catch_up_pays_every_period_it_covers_in_one_payout, sysio_emissions_tester ) try {
+   // Two pay periods ticked back to back: the first payout waits for the tick that reaches the grid, which pays both
+   // periods' pools against both periods' blocks and duty, so nothing earned stays in the treasury.
+   const account_name batch_op = "batchcatch"_n;
+   const vector<account_name> producers{ "producera"_n, "producerb"_n, "producerc"_n };
+   create_t5_holding_accounts();
+   create_accounts( { batch_op }, false, false, false, true );
+   BOOST_REQUIRE_EQUAL( success(), register_operator( batch_op, OperatorType::OPERATOR_TYPE_BATCH, true ) );
+   setup_producers(3);
+   wait_for_producer_schedule();
+   produce_complete_cycles(3, 2);
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name ) );
+   // Catch up to the grid, then pay the next epoch as its boundary passes, so the block counters reset on the grid.
+   do {
+      BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   } while (economic_epoch_due());
+   while (!economic_epoch_due()) produce_blocks(1);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   const uint64_t paid_before = get_t5_state()["epoch_count"].as<uint64_t>();
+
+   // Two economic epochs of blocks, and a margin, with no tick; the batch operator serves a consensus epoch in each.
+   constexpr uint32_t blocks_per_epoch = T_EPOCH_SECS * 2;   // 0.5 s blocks
+   constexpr uint32_t margin_blocks    = 10;
+   produce_blocks(blocks_per_epoch);
+   BOOST_REQUIRE_EQUAL( success(), rcrdduty(1, { batch_op }) );
+   produce_blocks(blocks_per_epoch + margin_blocks);
+   BOOST_REQUIRE_EQUAL( success(), rcrdduty(2, { batch_op }) );
+   int64_t producer_owed_before = 0;
+   for (const auto& p : producers) producer_owed_before += pay_claimable(p);
+
+   // The first due pay epoch defers: a later boundary has passed. It accrues, pays nothing and is not a block.
+   const uint32_t deferred_epoch = economic_epoch_index() + 1;
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   BOOST_REQUIRE( economic_epoch_due() );
+   BOOST_REQUIRE_EQUAL( paid_before, get_t5_state()["epoch_count"].as<uint64_t>() );
+   BOOST_REQUIRE( get_blocklog_row(deferred_epoch).is_null() );
+   BOOST_REQUIRE_GT( get_t5_state()["pending_emission_amount"].as<int64_t>(), 0 );
+
+   // The tick that reaches the grid pays every period the catch-up covered, in one payout.
+   while (economic_epoch_due()) BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   const auto state = get_t5_state();
+   BOOST_REQUIRE_EQUAL( paid_before + 1, state["epoch_count"].as<uint64_t>() );
+   BOOST_REQUIRE_EQUAL( int64_t(0), state["pending_emission_amount"].as<int64_t>() );
+   const auto log = get_epoch_log(economic_epoch_index());
+   BOOST_REQUIRE( log["batch_settled"].as_bool() );
+   BOOST_REQUIRE_EQUAL( int64_t(0), log["batch_emission_retained"].as<int64_t>() );
+   BOOST_REQUIRE_EQUAL( log["batch_emission"].as<int64_t>(), pay_claimable(batch_op) );
+
+   // Full production over both periods: the active producer pool is paid out whole, less per-producer rounding.
+   const int64_t producer_pool = log["compute_amount"].as<int64_t>() - log["batch_emission"].as<int64_t>();
+   const int64_t active_pool   = producer_pool - test_split_bps(producer_pool, T_STANDBY_BPS);
+   int64_t producer_paid = -producer_owed_before;
+   for (const auto& p : producers) producer_paid += pay_claimable(p);
+   BOOST_REQUIRE_LE( active_pool - producer_paid, int64_t(producers.size()) );
+   BOOST_REQUIRE_GE( active_pool - producer_paid, int64_t(0) );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( advance_pays_after_epoch_duration, sysio_emissions_tester ) try {
@@ -5324,15 +5450,18 @@ public:
       BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
    }
 
-   /// The share the gate accrues next, mirroring compute_epoch_emission: the initial share during the first pay period,
-   /// then the decayed last positive share clamped to the per-epoch min/max, either way capped at the budget left net
-   /// of the pending accrual.
-   int64_t expected_share( const fc::variant& state, int64_t budget ) const {
+   /// The share the gate accrues next, mirroring compute_epoch_emission: the initial share during the first pay
+   /// period's scheduled epochs, then the decayed last positive share clamped to the per-epoch min/max, either way
+   /// capped at the budget left net of the pending accrual.
+   int64_t expected_share( const fc::variant& state, int64_t budget, uint16_t cadence ) const {
       const int64_t net = budget - state["total_distributed"].as<int64_t>()
                                  - state["pending_emission_amount"].as<int64_t>();
       if (net <= 0) return 0;
+      const uint64_t last_accrued   = state["last_epoch_index"].as<uint64_t>();
+      const bool     initial_window = state["epoch_count"].as<uint64_t>() == 0 &&
+         (last_accrued == 0 || last_accrued + 1 < state["period_start_epoch"].as<uint64_t>() + cadence);
       int64_t curve = initial_share;
-      if (state["epoch_count"].as<uint64_t>() > 0) {
+      if (!initial_window) {
          curve = std::clamp(
             test_apply_decay(state["last_epoch_emission"].as<int64_t>(), TARGET_ANNUAL_DECAY_BPS, T_EPOCH_SECS),
             test_scale_annual_to_epoch(ANNUAL_MIN_EMISSION, T_EPOCH_SECS),
@@ -5351,7 +5480,7 @@ public:
       uint32_t zero_shares = 0;
       for (uint32_t epoch = 1; epoch <= last_epoch; ++epoch) {
          const auto before = get_t5_state();
-         const int64_t share              = expected_share(before, budget);
+         const int64_t share              = expected_share(before, budget, cadence);
          const int64_t distributed_before = before["total_distributed"].as<int64_t>();
          const int64_t pending_before     = before["pending_emission_amount"].as<int64_t>();
          const int64_t capex_before       = get_wire_balance(CAPEX_ACCOUNT).get_amount();
@@ -5566,7 +5695,7 @@ BOOST_FIXTURE_TEST_CASE( balance_blocked_zero_share_boundary_records_the_period_
    const auto state = get_t5_state();
    const int64_t pending = state["pending_emission_amount"].as<int64_t>();
    BOOST_REQUIRE_GT( pending, 0 );
-   BOOST_REQUIRE_EQUAL( expected_share(state, budget), 0 );
+   BOOST_REQUIRE_EQUAL( expected_share(state, budget, cadence), 0 );
 
    create_user_accounts({ DRAIN });
    const int64_t drained = get_wire_balance(config::system_account_name).get_amount() - pending / 2;

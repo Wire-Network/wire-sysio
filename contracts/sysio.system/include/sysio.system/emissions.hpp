@@ -396,12 +396,21 @@ inline int64_t net_headroom(const emission_config& cfg, const t5_state& state) {
    return gross_headroom(cfg, state) - state.pending_emission_amount - state.unsettled_batch_emission;
 }
 
+/// Whether the next accrual is one of the first pay period's scheduled epochs, which accrue the initial emission: no
+/// payout has run, and the last epoch accrued, if any, was not yet that period's pay epoch. A first payout held or
+/// deferred past its pay epoch therefore decays from then on, as it would have after paying.
+inline bool in_initial_emission_window(const emission_config& cfg, const t5_state& state) {
+   if (state.epoch_count != 0) return false;
+   if (state.last_epoch_index == 0) return true;
+   return uint64_t{state.last_epoch_index} + 1 < uint64_t{state.period_start_epoch} + cfg.pay_cadence_epochs;
+}
+
 /// The per-epoch share the next accrual commits, capped at the net headroom.
 ///
-/// The first pay period (epoch_count == 0) accrues the scaled initial emission; later periods decay the last positive
-/// share, clamped to the per-epoch min and max. The share is 0 once the open period has committed the rest of the
-/// budget, or when the curve itself is 0. Shared by sysio.epoch's readiness gate, which accrues it, and viewepoch,
-/// which reports it, so the estimate cannot drift from the accrual.
+/// The first pay period's scheduled epochs (in_initial_emission_window) accrue the scaled initial emission; every
+/// later accrual decays the last positive share, clamped to the per-epoch min and max. The share is 0 once the open
+/// period has committed the rest of the budget, or when the curve itself is 0. Shared by sysio.epoch's readiness gate,
+/// which accrues it, and viewepoch, which reports it, so the estimate cannot drift from the accrual.
 ///
 /// epoch_duration_sec must be the canonical value from sysio.epoch::economycfg.
 inline int64_t compute_epoch_emission(const emission_config& cfg,
@@ -411,7 +420,7 @@ inline int64_t compute_epoch_emission(const emission_config& cfg,
    if (headroom <= 0) return 0;
 
    int64_t emission = 0;
-   if (state.epoch_count == 0) {
+   if (in_initial_emission_window(cfg, state)) {
       emission = scale_annual_to_epoch(cfg.annual_initial_emission, epoch_duration_sec);
    } else {
       const fp_math::fp_t factor =

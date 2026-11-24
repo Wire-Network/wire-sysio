@@ -85,6 +85,9 @@ struct emissions_gate_result {
    bool                  accrue             = false; ///< accrueepoch runs for this economic epoch
    bool                  pay                = false; ///< payepoch runs for this economic epoch
    bool                  is_pay_epoch       = false; ///< the open pay period has reached its cadence
+   /// A pay epoch ticked while a later boundary has already passed: the payout waits for the tick that catches up.
+   /// Not a block: the blocklog is left as it is.
+   bool                  deferred           = false;
    /// This epoch's share, sized on the net headroom. May be 0 when accruing: the open pay period has emission
    /// pending, and either it has committed the rest of the budget or the curve is zero.
    int64_t               emission_amount    = 0;
@@ -102,11 +105,12 @@ struct emissions_gate_result {
    int64_t attempted_emission() const { return is_pay_epoch ? period_emission : emission_amount; }
 };
 
-/// Decide what economic epoch `target_epoch`'s emissions may do. Never throws.
+/// Decide what economic epoch `target_epoch`'s emissions may do. `crank_behind` is true when a later economic boundary
+/// has already passed. Never throws.
 ///
 /// `epoch_duration_sec` is the canonical economic duration from sysio.epoch::economycfg, passed by
 /// tickeconomy so this gate and sysio.system see identical inputs.
-emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec, uint32_t target_epoch) {
+emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec, uint32_t target_epoch, bool crank_behind) {
    emissions_gate_result r;
 
    sysiosystem::emissions::emitcfg_t emit_cfg_tbl(SYSTEM_ACCOUNT);
@@ -144,6 +148,14 @@ emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec, uint32_
    // and fires at the first economic epoch that can pay it.
    r.is_pay_epoch = (target_epoch >= t5s.period_start_epoch + cfg.pay_cadence_epochs - 1);
    if (!r.is_pay_epoch) return r;
+
+   // While the crank catches up, the payout waits for the tick that reaches the grid: one payout then pairs the pools
+   // of every period it covers with the blocks and duty earned across them. Paying each period as its tick ran would
+   // credit all the work since the last payout to the first period's pools and leave the later periods none.
+   if (crank_behind) {
+      r.deferred = true;
+      return r;
+   }
 
    // Same saturating accumulation as sysio.system::accrueepoch (shared helper in emissions.hpp) so the gate's
    // period total exactly matches what accrueepoch will store and payepoch will assert against.
@@ -1021,11 +1033,12 @@ void epoch::tickeconomy(uint32_t epoch_index) {
       : state.next_epoch_start;
    check(current_time_point() >= boundary, "economic epoch boundary has not passed");
 
-   const auto gate = check_emissions_ready(cfg.epoch_duration_sec, epoch_index);
+   const bool crank_behind = economic_epoch_index_at(current_time_point()) > epoch_index;
+   const auto gate         = check_emissions_ready(cfg.epoch_duration_sec, epoch_index, crank_behind);
    if (gate.blocked()) {
       sysio::print_f("epoch::tickeconomy: economic epoch %u emissions held -- see blocklog\n", epoch_index);
       record_gate_block(get_self(), epoch_index, gate);
-   } else {
+   } else if (!gate.deferred) {
       clear_gate_block(get_self());
    }
 
