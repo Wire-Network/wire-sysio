@@ -150,11 +150,6 @@ void chalg::opendispute(uint64_t chain_code,
       .quorum           = quorum,
    });
 
-   chalgstate_t chalgstate(get_self());
-   auto st = chalgstate.get_or_default(chalg_state{});
-   ++st.open_disputes;
-   chalgstate.set(st, ram_payer);
-
    // Pause the disputed chain's epoch advancement until the dispute resolves; other chains keep
    // advancing. chkdispute releases the pause.
    action(
@@ -233,13 +228,6 @@ void chalg::chkdispute(uint64_t dispute_id) {
       r.status           = DisputeStatus::DISPUTE_STATUS_RESOLVED;
       r.winning_checksum = *winner;
    });
-
-   // This dispute leaves OPEN: drop the open-dispute count. The decrement is guarded so a row
-   // written before the counter existed cannot underflow it.
-   chalgstate_t chalgstate(get_self());
-   auto st = chalgstate.get_or_default(chalg_state{});
-   if (st.open_disputes > 0) --st.open_disputes;
-   chalgstate.set(st, ram_payer);
 
    // Dispatch the winning envelope via sysio.msgch (it still holds the raw bytes). The next
    // chkcons advances the epoch, where the single-path slash of every non-canonical deliverer

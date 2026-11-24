@@ -294,6 +294,7 @@ public:
    static constexpr uint32_t THREE_TO_THREE_TIE_GROUP_SIZE = 6;
    static constexpr uint32_t INCOMPLETE_TWO_WAY_SPLIT_GROUP_SIZE = 3;
    static constexpr uint64_t FIRST_DISPUTE_ID = 1;
+   static constexpr uint64_t SECOND_DISPUTE_ID = 2;
    static constexpr auto TIER_ONE_OWNER = "tierone"_n;
    static constexpr const char* EMPTY_ROA_TOTAL_SYSTEM = "75496.0000 SYS";
    static constexpr uint64_t EMPTY_ROA_BYTES_PER_UNIT = 104;
@@ -648,17 +649,20 @@ public:
          fixture_abi_yield_function());
    }
 
-   /// Assert that the full `chkcons -> evalcons -> opendispute` route recorded the exact split.
+   /// Assert that the full `chkcons -> evalcons -> opendispute` route recorded the exact split as
+   /// dispute `dispute_id` on `chain_code`.
    void assert_open_tie_dispute(uint32_t expected_epoch,
                                 const std::vector<fc::sha256>& expected_checksums,
-                                const std::vector<uint32_t>& expected_operator_counts) {
+                                const std::vector<uint32_t>& expected_operator_counts,
+                                uint64_t chain_code = ETH_OUTPOST_ID,
+                                uint64_t dispute_id = FIRST_DISPUTE_ID) {
       BOOST_REQUIRE_EQUAL(expected_checksums.size(), expected_operator_counts.size());
-      const auto dispute = get_dispute(FIRST_DISPUTE_ID);
+      const auto dispute = get_dispute(dispute_id);
       BOOST_REQUIRE(!dispute.is_null());
       BOOST_REQUIRE_EQUAL(
          dispute[chalg_fields::STATUS].as<opp::types::DisputeStatus>(),
          opp::types::DisputeStatus::DISPUTE_STATUS_OPEN);
-      BOOST_REQUIRE_EQUAL(dispute[chalg_fields::CHAIN_CODE].as_uint64(), ETH_OUTPOST_ID);
+      BOOST_REQUIRE_EQUAL(dispute[chalg_fields::CHAIN_CODE].as_uint64(), chain_code);
       BOOST_REQUIRE_EQUAL(dispute[chalg_fields::EPOCH_INDEX].as<uint32_t>(), expected_epoch);
 
       const auto candidates = dispute[chalg_fields::CANDIDATES].get_array();
@@ -679,18 +683,20 @@ public:
          (chalg_vote_fields::CHOSEN_CHECKSUM, chosen_checksum));
    }
 
-   /// Resolve the first dispute and verify that its selected envelope is durably accepted by msgch.
-   void resolve_tie_dispute(uint32_t expected_epoch, const fc::sha256& expected_winner) {
-      BOOST_REQUIRE_EQUAL(success(), vote_dispute(FIRST_DISPUTE_ID, expected_winner));
+   /// Resolve dispute `dispute_id` on `chain_code` and verify that its selected envelope is durably
+   /// accepted by msgch.
+   void resolve_tie_dispute(uint32_t expected_epoch, const fc::sha256& expected_winner,
+                            uint64_t chain_code = ETH_OUTPOST_ID, uint64_t dispute_id = FIRST_DISPUTE_ID) {
+      BOOST_REQUIRE_EQUAL(success(), vote_dispute(dispute_id, expected_winner));
       BOOST_REQUIRE_EQUAL(success(), push(CHALG_ACCOUNT, chalg_abi, BATCHOP,
                                          chalg_actions::CHECK_DISPUTE,
-                                         mvo()(chalg_vote_fields::DISPUTE_ID, FIRST_DISPUTE_ID)));
+                                         mvo()(chalg_vote_fields::DISPUTE_ID, dispute_id)));
 
-      const auto dispute = get_dispute(FIRST_DISPUTE_ID);
+      const auto dispute = get_dispute(dispute_id);
       BOOST_REQUIRE_EQUAL(
          dispute[chalg_fields::STATUS].as<opp::types::DisputeStatus>(),
          opp::types::DisputeStatus::DISPUTE_STATUS_RESOLVED);
-      const auto consensus = get_outpcons(ETH_OUTPOST_ID);
+      const auto consensus = get_outpcons(chain_code);
       BOOST_REQUIRE(!consensus.is_null());
       BOOST_REQUIRE_EQUAL(consensus[msgch_fields::EPOCH_INDEX].as<uint32_t>(), expected_epoch);
       BOOST_REQUIRE_EQUAL(consensus[msgch_fields::WINNING_CHECKSUM].as_string(), expected_winner.str());
@@ -3386,7 +3392,8 @@ BOOST_FIXTURE_TEST_CASE(chains_advance_independently_at_their_own_pace, sysio_ms
 } FC_LOG_AND_RETHROW() }
 
 /// A dispute pauses only its own chain: the disputed chain's chkcons holds while the other chain keeps
-/// reaching consensus and advancing, and resolving the dispute releases only the disputed chain.
+/// reaching consensus and advancing. A second chain's dispute opens at that chain's own epoch while the
+/// first is still open, and each resolution releases only its own chain, in either order.
 BOOST_FIXTURE_TEST_CASE(dispute_on_one_chain_does_not_hold_the_other, sysio_msgch_chain_tester) { try {
    const std::vector<name> ops{BATCHOP, BATCHOP_B};
    bootstrap(ONE_TO_ONE_TIE_GROUP_SIZE);
@@ -3418,11 +3425,48 @@ BOOST_FIXTURE_TEST_CASE(dispute_on_one_chain_does_not_hold_the_other, sysio_msgc
    BOOST_REQUIRE_EQUAL(epoch, current_epoch(ETH_OUTPOST_ID));
    BOOST_REQUIRE_EQUAL(epoch + 2, current_epoch(SOL_OUTPOST_ID));
 
+   // SOL splits 1-1 at its own epoch while ETH's dispute is still open: a second dispute opens and
+   // pauses SOL too.
+   const uint32_t sol_epoch           = epoch + 2;
+   const auto&    sol_tip             = tips[SOL_OUTPOST_ID];
+   const auto     sol_left            = encode_delivery(sol_epoch, std::string(ONE_TO_ONE_LEFT_PAYLOAD),
+                                                        sol_tip.envelope_digest, sol_tip.message_id);
+   const auto     sol_right           = encode_delivery(sol_epoch, std::string(ONE_TO_ONE_RIGHT_PAYLOAD),
+                                                        sol_tip.envelope_digest, sol_tip.message_id);
+   const auto     sol_left_checksum   = fc::sha256::hash(sol_left.data(), sol_left.size());
+   const auto     sol_right_checksum  = fc::sha256::hash(sol_right.data(), sol_right.size());
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, SOL_OUTPOST_ID, sol_left));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, SOL_OUTPOST_ID, sol_right));
+   elapse_epoch_boundary();
+   advance_via_consensus();
+
+   assert_open_tie_dispute(sol_epoch, {sol_left_checksum, sol_right_checksum},
+                           {ONE_OPERATOR_PER_TIED_VERSION, ONE_OPERATOR_PER_TIED_VERSION}, SOL_OUTPOST_ID,
+                           SECOND_DISPUTE_ID);
+   assert_open_tie_dispute(epoch, {left_checksum, right_checksum},
+                           {ONE_OPERATOR_PER_TIED_VERSION, ONE_OPERATOR_PER_TIED_VERSION});
+   BOOST_REQUIRE(epoch_is_paused(ETH_OUTPOST_ID));
+   BOOST_REQUIRE(epoch_is_paused(SOL_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(epoch, current_epoch(ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(sol_epoch, current_epoch(SOL_OUTPOST_ID));
+
+   // Resolve the later SOL dispute first: SOL resumes and advances, ETH stays paused.
+   resolve_tie_dispute(sol_epoch, sol_left_checksum, SOL_OUTPOST_ID, SECOND_DISPUTE_ID);
+   BOOST_REQUIRE(!epoch_is_paused(SOL_OUTPOST_ID));
+   BOOST_REQUIRE(epoch_is_paused(ETH_OUTPOST_ID));
+   advance_via_consensus();
+   BOOST_REQUIRE_EQUAL(epoch, current_epoch(ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(sol_epoch + 1, current_epoch(SOL_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED,
+                       get_operator(BATCHOP_B)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
+
+   // Resolve the ETH dispute: ETH resumes and advances; its own slash of the already-slashed
+   // deliverer is a no-op.
    resolve_tie_dispute(epoch, left_checksum);
    BOOST_REQUIRE(!epoch_is_paused(ETH_OUTPOST_ID));
    advance_via_consensus();
    BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch(ETH_OUTPOST_ID));
-   BOOST_REQUIRE_EQUAL(epoch + 2, current_epoch(SOL_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(sol_epoch + 1, current_epoch(SOL_OUTPOST_ID));
    BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED,
                        get_operator(BATCHOP_B)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
 } FC_LOG_AND_RETHROW() }

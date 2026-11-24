@@ -628,10 +628,10 @@ struct batch_operator_plugin::impl {
     * `sysio.chalg::opendispute` sends `sysio.epoch::pause`, and `chkdispute` is
     * the ONLY action that tallies the Tier-1 votes, dispatches the winning
     * envelope and lifts that pause. Nothing on chain drives it: an envelope
-    * dispute halts `sysio.epoch::advance` itself, so no inline poke from the
-    * epoch cycle can reach it. Without this crank a
-    * dispute stays OPEN after Tier-1 has already reached quorum, and epoch
-    * advancement is paused indefinitely.
+    * dispute halts the disputed chain's `sysio.epoch::advance` itself, so no
+    * inline poke from the epoch cycle can reach it. Without this crank a
+    * dispute stays OPEN after Tier-1 has already reached quorum, and the
+    * disputed chain's epoch advancement is paused indefinitely.
     *
     * Not gated on `is_elected` (unlike the `chkcons` push above): the elected
     * operator may be the very one that is offline or delivered the
@@ -640,11 +640,9 @@ struct batch_operator_plugin::impl {
     * `chkdispute` asserts the dispute is still OPEN, which makes a redundant
     * push a cheap no-op.
     *
-    * The scan is a full-table filter rather than a `byepoch` index lookup: the
-    * table retains RESOLVED rows as the audit trail, but disputes are rare and
-    * `poll_own_status` already scans a comparably-sized table each tick. If
-    * disputes ever become frequent, bound this by `current_epoch` via the
-    * `byepoch` secondary index.
+    * The scan is a full-table filter: the table retains RESOLVED rows as the
+    * audit trail, but disputes are rare and `poll_own_status` already scans a
+    * comparably-sized table each tick.
     */
    void crank_open_disputes() {
       sysio::chain_apis::read_only::get_table_rows_params p;

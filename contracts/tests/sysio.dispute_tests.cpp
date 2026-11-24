@@ -1,9 +1,9 @@
 /// Contract tests for the OPP envelope dispute vote (sysio.chalg dispute-vote flow).
 ///
 /// Covers the new chalg actions in isolation and against a minimally-bootstrapped OPP stack:
-///   * opendispute  -- auth (sysio.msgch), >=2 candidates, no duplicate (outpost,epoch), pauses
-///                     epoch, snapshots the Tier-1 electorate + quorum from sysio.roa::nodeowners
-///                     (rejecting an empty electorate)
+///   * opendispute  -- auth (sysio.msgch), >=2 candidates, no duplicate (outpost,epoch), pauses the
+///                     disputed chain's epoch, snapshots the Tier-1 electorate + quorum from
+///                     sysio.roa::nodeowners (rejecting an empty electorate)
 ///   * votedispute  -- electorate-snapshot eligibility (the Tier-1 set frozen at open; later
 ///                     registrations cannot join), candidate validation, one-vote,
 ///                     dispute-must-be-open, no ballot once the tally has a winner (late
@@ -13,7 +13,7 @@
 ///                     strict majority of cast votes), plus the non-resolving waits (sub-quorum
 ///                     before the deadline, tie after it). The fast-path and post-deadline
 ///                     resolves both exercise the winner dispatch (sysio.msgch::resolvedisp) +
-///                     epoch unpause, which waits for the LAST open dispute.
+///                     the disputed chain's epoch unpause.
 ///   * slash gate   -- the ACTIVE-only scheduling filter (shared by sysio.epoch::advance's
 ///                     window-slide and schbatchgps) drops a SLASHED batch op from the eligible
 ///                     pool, so it is never re-placed where advance could attempt a second
@@ -308,15 +308,6 @@ public:
    }
    bool epoch_paused() { return epoch_paused(eth_code()); }
 
-   /// `chalgstate.open_disputes` (0 when the singleton does not exist yet).
-   uint32_t open_disputes() {
-      auto data = get_row_by_account(CHALG_ACCOUNT, CHALG_ACCOUNT, "chalgstate"_n, "chalgstate"_n);
-      if (data.empty()) return 0;
-      auto v = chalg_abi.binary_to_variant("chalg_state", data,
-         fixture_abi_yield_function());
-      return v["open_disputes"].as<uint32_t>();
-   }
-
    /// The dispute's snapshotted electorate as a name vector.
    std::vector<name> dispute_electorate(uint64_t id) {
       std::vector<name> members;
@@ -553,7 +544,6 @@ BOOST_FIXTURE_TEST_CASE(opendispute_snapshots_electorate, sysio_dispute_tester) 
    for (auto v : {NODE_DADDY, "voter1"_n, "voter2"_n, "voter3"_n})
       BOOST_REQUIRE(std::find(members.begin(), members.end(), v) != members.end());
    BOOST_REQUIRE_EQUAL(3u, d["quorum"].as<uint32_t>());   // floor(4/2)+1
-   BOOST_REQUIRE_EQUAL(1u, open_disputes());
 } FC_LOG_AND_RETHROW() }
 
 // A dispute can never open against an empty Tier-1 electorate: it could never resolve, and
@@ -1043,7 +1033,6 @@ BOOST_FIXTURE_TEST_CASE(chkdispute_unpauses_only_the_disputed_chain, sysio_dispu
    // resolvedisp), then deliver each outpost's winner.
    BOOST_REQUIRE_EQUAL(success(), opendispute(eth_code(),  epoch, cands_for(cs_eth)));
    BOOST_REQUIRE_EQUAL(success(), opendispute(base_code, epoch, cands_for(cs_base)));
-   BOOST_REQUIRE_EQUAL(2u, open_disputes());
    BOOST_REQUIRE(epoch_paused(eth_code()));
    BOOST_REQUIRE(epoch_paused(base_code));
    BOOST_REQUIRE_EQUAL(success(), deliver(eth_code(),  winner_eth));
@@ -1054,7 +1043,7 @@ BOOST_FIXTURE_TEST_CASE(chkdispute_unpauses_only_the_disputed_chain, sysio_dispu
    BOOST_REQUIRE_EQUAL(success(), votedispute("voter2"_n, 1, cs_eth));
    BOOST_REQUIRE_EQUAL(success(), chkdispute(1));
    BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_RESOLVED", get_dispute(1)["status"].as_string());
-   BOOST_REQUIRE_EQUAL(1u, open_disputes());
+   BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_OPEN", get_dispute(2)["status"].as_string());
    BOOST_REQUIRE(!epoch_paused(eth_code()));
    BOOST_REQUIRE(epoch_paused(base_code));
 
@@ -1063,7 +1052,6 @@ BOOST_FIXTURE_TEST_CASE(chkdispute_unpauses_only_the_disputed_chain, sysio_dispu
    BOOST_REQUIRE_EQUAL(success(), votedispute("voter2"_n, 2, cs_base));
    BOOST_REQUIRE_EQUAL(success(), chkdispute(2));
    BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_RESOLVED", get_dispute(2)["status"].as_string());
-   BOOST_REQUIRE_EQUAL(0u, open_disputes());
    BOOST_REQUIRE(!epoch_paused(eth_code()));
    BOOST_REQUIRE(!epoch_paused(base_code));
 } FC_LOG_AND_RETHROW() }

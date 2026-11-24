@@ -3357,7 +3357,7 @@ BOOST_FIXTURE_TEST_CASE( get_kv_rows_scoped_bounds_test, validating_tester ) try
 ///
 /// The API doc lists kv::global among the supported table types and production
 /// singletons ship this shape (sysio.opreg::opconfig / opcounters,
-/// sysio.chalg::chalgstate, sysio.epoch::economystate, ...), but nothing read one
+/// sysio.roa::roastate, sysio.epoch::economystate, ...), but nothing read one
 /// through get_table_rows. Its ABI comes out key_names ["name"] / key_types ["name"],
 /// so the key decodes through the NAME leaf and the row's key is the table name itself.
 BOOST_FIXTURE_TEST_CASE( get_kv_rows_global_singleton_test, validating_tester ) try {

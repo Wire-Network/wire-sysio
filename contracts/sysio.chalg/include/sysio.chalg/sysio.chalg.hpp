@@ -3,7 +3,6 @@
 #include <sysio/sysio.hpp>
 #include <sysio/kv_table.hpp>
 #include <sysio/kv_scoped_table.hpp>
-#include <sysio/kv_global.hpp>
 #include <sysio/asset.hpp>
 #include <sysio/crypto.hpp>
 #include <sysio/system.hpp>
@@ -95,7 +94,8 @@ namespace sysio {
       /// to deliver, while a three-or-more-version split may open at the boundary. Resolved by a
       /// Tier-1 node-owner vote on the canonical checksum. The row is retained after resolution as
       /// the audit record (and as the guard that prevents re-opening the same (outpost, epoch)
-      /// dispute).
+      /// dispute). A chain holds at most one OPEN dispute: opening one pauses the chain's epoch, and
+      /// deliveries bind to the chain's current epoch.
       struct [[sysio::table("disputes")]] dispute_entry {
          uint64_t                       id;
          uint64_t                       chain_code;        ///< outpost slug_name value
@@ -114,7 +114,7 @@ namespace sysio {
          std::vector<name>              electorate;
          uint32_t                       quorum = 0;        ///< floor(electorate.size()/2)+1, fixed at open
 
-         uint64_t by_epoch() const { return epoch_index; }
+         /// `byoutepoch` key: one dispute per (outpost, epoch).
          uint128_t by_outpost_epoch() const {
             return opp::outpost_epoch_key(chain_code, epoch_index);
          }
@@ -125,8 +125,6 @@ namespace sysio {
       };
 
       using disputes_t = sysio::kv::table<"disputes"_n, dispute_key, dispute_entry,
-         sysio::kv::index<"byepoch"_n,
-            sysio::const_mem_fun<dispute_entry, uint64_t, &dispute_entry::by_epoch>>,
          sysio::kv::index<"byoutepoch"_n,
             sysio::const_mem_fun<dispute_entry, uint128_t, &dispute_entry::by_outpost_epoch>>
       >;
@@ -150,17 +148,6 @@ namespace sysio {
 
       using disputevotes_t =
          sysio::kv::scoped_table<"disputevote"_n, dispute_vote_key, dispute_vote>;
-
-      /// Contract-global dispute bookkeeping. `open_disputes` counts the disputes currently in
-      /// `DISPUTE_STATUS_OPEN` across all (outpost, epoch) keys: `opendispute` increments it and
-      /// `chkdispute` decrements it on resolution.
-      struct [[sysio::table("chalgstate")]] chalg_state {
-         uint32_t open_disputes = 0;
-
-         SYSLIB_SERIALIZE(chalg_state, (open_disputes))
-      };
-
-      using chalgstate_t = sysio::kv::global<"chalgstate"_n, chalg_state>;
 
    private:
       // Well-known accounts
