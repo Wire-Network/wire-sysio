@@ -408,7 +408,7 @@ public:
 
    action_result flushwtdw(uint32_t up_to_epoch) {
       return push(OPREG_ACCOUNT, opreg_abi, EPOCH_ACCOUNT, "flushwtdw"_n, mvo()
-         ("economic_epoch", up_to_epoch)("consensus_epoch", up_to_epoch));
+         ("economic_epoch", up_to_epoch));
    }
 
    action_result terminate(name account) {

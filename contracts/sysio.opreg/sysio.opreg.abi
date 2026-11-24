@@ -213,6 +213,20 @@
             ]
         },
         {
+            "name": "consensus_wait",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "eligible_at_epoch",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
             "name": "delivery_key",
             "base": "",
             "fields": [
@@ -289,10 +303,6 @@
                 {
                     "name": "economic_epoch",
                     "type": "uint32"
-                },
-                {
-                    "name": "consensus_epoch",
-                    "type": "uint32"
                 }
             ]
         },
@@ -368,6 +378,10 @@
                 },
                 {
                     "name": "next_dellog_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "flush_resume_id",
                     "type": "uint64"
                 }
             ]
@@ -784,8 +798,8 @@
                     "type": "uint32"
                 },
                 {
-                    "name": "eligible_at_consensus_epoch",
-                    "type": "uint32"
+                    "name": "consensus_waits",
+                    "type": "consensus_wait[]"
                 },
                 {
                     "name": "requested_at_economic_epoch",
@@ -1029,11 +1043,6 @@
             "key_types": ["uint64"],
             "table_id": 12732,
             "secondary_indexes": [
-                {
-                    "name": "byeligible",
-                    "key_type": "uint64",
-                    "table_id": 49033
-                },
                 {
                     "name": "byaccount",
                     "key_type": "uint64",

@@ -46,10 +46,11 @@ namespace sysio {
       /// Economic epochs between a withdrawal request and its release: the wall-clock wait.
       static constexpr uint32_t WITHDRAW_WAIT_ECONOMIC_EPOCHS = 2;
 
-      /// Consensus epochs that must also close after the request before release. Non-canonical
-      /// deliverers are slashed when their consensus epoch closes, and a dispute pause stops the
-      /// consensus index, so this guard keeps a deliverer's collateral in place until its
-      /// deliveries have been judged, however far the economic clock runs ahead.
+      /// Consensus epochs each waited-on chain must also close after the request before release (see
+      /// `withdraw_request::consensus_waits`). Non-canonical deliverers are slashed when their chain's
+      /// epoch closes, and a dispute pause stops that chain's index, so this guard keeps a deliverer's
+      /// collateral in place until its deliveries have been judged, however far the economic clock
+      /// runs ahead.
       static constexpr uint32_t WITHDRAW_WAIT_EPOCHS = 2;
 
       /// Per-(operator, chain, token) cap on pending collateral withdrawals
@@ -59,12 +60,17 @@ namespace sysio {
       static constexpr uint32_t MAX_OUTSTANDING_WITHDRAWS_PER_COLLATERAL_BUCKET = 1;
 
       /// Safety rail on collateral-withdraw flush work (SEC-78 / WSA-166).
-      /// MAX_WTDW_FLUSH_PER_EPOCH bounds the matured rows flushed per advance;
+      /// MAX_WTDW_FLUSH_PER_EPOCH bounds the matured rows flushed per `flushwtdw`;
       /// undrained rows stay queued (collateral stays in the operator's balance
-      /// until flushed) and flush a later epoch. Conservatively sized to stay
-      /// well under the transaction CPU ceiling shared with the rest of
-      /// advance's fan-out.
+      /// until flushed) and flush a later economic epoch. Conservatively sized to
+      /// stay well under the transaction CPU ceiling shared with the rest of
+      /// `tickeconomy`'s fan-out.
       static constexpr uint32_t MAX_WTDW_FLUSH_PER_EPOCH = 32;
+
+      /// Economically matured rows still held by a consensus wait that one `flushwtdw` steps over
+      /// before it stops; the next flush resumes at the row it stopped on. A held row is only read,
+      /// so this budget is larger than the per-flush bound on released rows.
+      static constexpr uint32_t MAX_WTDW_HELD_SKIPS_PER_FLUSH = 64;
 
       /// Rolling delivery-buffer thresholds for evicting a batch operator from one chain. Missing a
       /// delivery is NOT a slash; consistent missing on a chain evicts the operator from that chain.
@@ -245,12 +251,14 @@ namespace sysio {
       [[sysio::action]]
       void cancelwtdw(name account, uint64_t request_id);
 
-      /// Internal: drain matured rows from `withdraw_queue`. Called inline from
-      /// `sysio.epoch::tickeconomy` each economic epoch with the current economic index and the
-      /// slowest started outpost chain's consensus index (`sysio.epoch::slowest_epoch_index`); a row
-      /// is matured once both of its waits have passed.
+      /// Internal: release matured rows from `wtdwqueue`. Called inline from `sysio.epoch::tickeconomy`
+      /// each economic epoch with the current economic index. A row is matured once its economic wait
+      /// has passed and each chain in its `consensus_waits` has reached the row's index for it. The walk
+      /// runs in request order from where the last flush stopped and ends at the first row whose
+      /// economic wait has not passed; it skips a row still held by a consensus wait, and stops after
+      /// `MAX_WTDW_FLUSH_PER_EPOCH` released rows or `MAX_WTDW_HELD_SKIPS_PER_FLUSH` skipped ones.
       [[sysio::action]]
-      void flushwtdw(uint32_t economic_epoch, uint32_t consensus_epoch);
+      void flushwtdw(uint32_t economic_epoch);
 
       /// Read-only rollup of the operator's spendable balance for a given
       /// (chain, token_kind). Returns 0 if the operator is SLASHED /
@@ -511,13 +519,22 @@ namespace sysio {
       using opconfig_t = sysio::kv::global<"opconfig"_n, op_config>;
 
       /// Pending-withdraw row keyed by sequential `request_id`. Drained by
-      /// `flushwtdw` once `eligible_at_economic_epoch <= economic_epoch` and the consensus index has
-      /// reached `eligible_at_consensus_epoch`. Subtracted by `available()` so the queued amount
-      /// can't be double-used.
+      /// `flushwtdw` once `eligible_at_economic_epoch <= economic_epoch` and every chain in
+      /// `consensus_waits` has reached its `eligible_at_epoch`. Subtracted by `available()` so the
+      /// queued amount can't be double-used.
       struct withdraw_key {
          uint64_t request_id;
          uint64_t primary_key() const { return request_id; }
          SYSLIB_SERIALIZE(withdraw_key, (request_id))
+      };
+
+      /// One outpost chain a withdrawal waits on: released only once the chain's consensus epoch index
+      /// has reached `eligible_at_epoch`, its index at the request + WITHDRAW_WAIT_EPOCHS.
+      struct consensus_wait {
+         sysio::slug_name chain_code;
+         uint32_t         eligible_at_epoch = 0;
+
+         SYSLIB_SERIALIZE(consensus_wait, (chain_code)(eligible_at_epoch))
       };
 
       struct [[sysio::table("wtdwqueue")]] withdraw_request {
@@ -528,8 +545,10 @@ namespace sysio {
          uint64_t          amount              = 0;
          /// requested_at_economic_epoch + WITHDRAW_WAIT_ECONOMIC_EPOCHS
          uint32_t          eligible_at_economic_epoch  = 0;
-         /// The slowest started chain's consensus index at the request + WITHDRAW_WAIT_EPOCHS.
-         uint32_t          eligible_at_consensus_epoch = 0;
+         /// The chains the request waits on, each among those whose epoch had started at the request:
+         /// a batch operator's chains with a `servchains` row of any status, every chain for any other
+         /// operator type. Empty: only the economic wait applies.
+         std::vector<consensus_wait> consensus_waits;
          /// The economic epoch the grid was in at the request (`sysio.epoch::economic_epoch_index_at`), which
          /// can be ahead of the last epoch ticked.
          uint32_t          requested_at_economic_epoch = 0;
@@ -544,20 +563,15 @@ namespace sysio {
             std::memcpy(buf.data() + 16, &token_code.value, 8);
             return sysio::sha256(reinterpret_cast<const char*>(buf.data()), buf.size());
          }
-         /// Eligibility cursor for flushwtdw: the economic wait. Both clocks only move forward, so
-         /// the consensus guard is also non-decreasing along this index.
-         uint64_t  by_eligible() const { return static_cast<uint64_t>(eligible_at_economic_epoch); }
          /// Per-account scan (cancelwtdw lookup convenience).
          uint64_t  by_account()  const { return account.value; }
 
          SYSLIB_SERIALIZE(withdraw_request,
             (request_id)(account)(chain_code)(token_code)(amount)
-            (eligible_at_economic_epoch)(eligible_at_consensus_epoch)(requested_at_economic_epoch))
+            (eligible_at_economic_epoch)(consensus_waits)(requested_at_economic_epoch))
       };
 
       using wtdwqueue_t = sysio::kv::table<"wtdwqueue"_n, withdraw_key, withdraw_request,
-         sysio::kv::index<"byeligible"_n,
-            sysio::const_mem_fun<withdraw_request, uint64_t, &withdraw_request::by_eligible>>,
          sysio::kv::index<"byaccount"_n,
             sysio::const_mem_fun<withdraw_request, uint64_t, &withdraw_request::by_account>>
       >;
@@ -637,13 +651,15 @@ namespace sysio {
       /// drawing on the WIRE collateral held in the same `sysio.token` balance.
       using yieldpool_t = sysio::kv::table<"yieldpool"_n, yield_pool_key, opp::shadow::custody::yield_pool>;
 
-      /// Singleton holding the next-issued `request_id` / `log_id`. Keeps
-      /// the auto-increment monotonic across action calls.
+      /// Singleton holding the next-issued `request_id` / `log_id`, which keeps the auto-increment
+      /// monotonic across action calls, and the withdraw flush's resume point.
       struct [[sysio::table("opcounters")]] op_counters {
          uint64_t next_withdraw_id = 1;
          uint64_t next_dellog_id   = 1;
+         /// The `request_id` the next `flushwtdw` walk starts at; 0 starts at the head of the queue.
+         uint64_t flush_resume_id  = 0;
 
-         SYSLIB_SERIALIZE(op_counters, (next_withdraw_id)(next_dellog_id))
+         SYSLIB_SERIALIZE(op_counters, (next_withdraw_id)(next_dellog_id)(flush_resume_id))
       };
 
       using opcounters_t = sysio::kv::global<"opcounters"_n, op_counters>;

@@ -901,6 +901,50 @@ struct enqueue_result {
    std::string error_message;
 };
 
+/// The consensus waits a withdrawal by `op` takes: one per chain whose epoch has started, at its
+/// current index + WITHDRAW_WAIT_EPOCHS. A batch operator waits on each chain it has a `servchains` row
+/// for, whatever the row's status, since a LEFT or EVICTED member may still hold deliveries not yet
+/// judged there; any other operator type waits on every started chain.
+std::vector<opreg::consensus_wait> consensus_waits_for(const opreg::operator_entry& op) {
+   std::vector<opreg::consensus_wait> waits;
+   if (op.type == OperatorType::OPERATOR_TYPE_BATCH) {
+      opreg::servchains_t members(opreg::OPREG_ACCOUNT);
+      auto                by_account = members.get_index<"byaccount"_n>();
+      for (auto it = by_account.lower_bound(op.account.value);
+           it != by_account.end() && it->account == op.account; ++it) {
+         const uint32_t epoch_index = sysio::epoch::current_epoch_index(it->chain_code.value);
+         if (epoch_index == 0) continue;
+         waits.push_back(opreg::consensus_wait{
+            .chain_code        = it->chain_code,
+            .eligible_at_epoch = epoch_index + opreg::WITHDRAW_WAIT_EPOCHS,
+         });
+      }
+      return waits;
+   }
+   for (const sysio::epoch::chain_epoch_index& chain : sysio::epoch::started_chain_epochs()) {
+      waits.push_back(opreg::consensus_wait{
+         .chain_code        = sysio::slug_name{chain.chain_code},
+         .eligible_at_epoch = chain.epoch_index + opreg::WITHDRAW_WAIT_EPOCHS,
+      });
+   }
+   return waits;
+}
+
+/// True once every chain `request` waits on has reached its consensus guard. `started` holds the
+/// started chains' current indexes (`sysio::epoch::started_chain_epochs`); a waited-on chain always
+/// started before the request.
+bool consensus_waits_passed(const opreg::withdraw_request&                    request,
+                            const std::vector<sysio::epoch::chain_epoch_index>& started) {
+   for (const opreg::consensus_wait& wait : request.consensus_waits) {
+      const auto chain = std::find_if(started.begin(), started.end(),
+                                      [&](const sysio::epoch::chain_epoch_index& c) {
+                                         return c.chain_code == wait.chain_code.value;
+                                      });
+      if (chain == started.end() || chain->epoch_index < wait.eligible_at_epoch) return false;
+   }
+   return true;
+}
+
 /// Validate and queue a withdraw for `account`, whose operator row the caller has already checked
 /// exists. A validation failure is returned for the operator's action log instead of reverting.
 enqueue_result try_enqueue_withdraw(name account,
@@ -944,8 +988,7 @@ enqueue_result try_enqueue_withdraw(name account,
 
    // The economic wait counts boundaries after the request, so it starts from the grid's epoch at the
    // request, not the last one ticked: catch-up ticks for boundaries already past must not count.
-   const uint32_t economic_epoch  = sysio::epoch::economic_epoch_index_at(current_time_point());
-   const uint32_t consensus_epoch = sysio::epoch::slowest_epoch_index();
+   const uint32_t economic_epoch = sysio::epoch::economic_epoch_index_at(current_time_point());
    uint64_t request_id = next_withdraw_id();
 
    queue.emplace(ram_payer, opreg::withdraw_key{request_id}, opreg::withdraw_request{
@@ -955,7 +998,7 @@ enqueue_result try_enqueue_withdraw(name account,
       .token_code          = token_code,
       .amount              = amount,
       .eligible_at_economic_epoch  = economic_epoch + opreg::WITHDRAW_WAIT_ECONOMIC_EPOCHS,
-      .eligible_at_consensus_epoch = consensus_epoch + opreg::WITHDRAW_WAIT_EPOCHS,
+      .consensus_waits             = consensus_waits_for(op),
       .requested_at_economic_epoch = economic_epoch,
    });
    return { true, request_id, "" };
@@ -1184,31 +1227,49 @@ void opreg::deposit(name account, sysio::slug_name token_code, uint64_t amount) 
 // ---------------------------------------------------------------------------
 //  flushwtdw — drain matured rows from the withdraw queue
 // ---------------------------------------------------------------------------
-void opreg::flushwtdw(uint32_t economic_epoch, uint32_t consensus_epoch) {
+void opreg::flushwtdw(uint32_t economic_epoch) {
    require_auth(EPOCH_ACCOUNT);
 
-   operators_t ops(get_self());
-   wtdwqueue_t queue(get_self());
-   auto idx = queue.get_index<"byeligible"_n>();
+   operators_t    ops(get_self());
+   wtdwqueue_t    queue(get_self());
+   opcounters_t   counters_tbl(get_self());
+   const uint64_t start_id = counters_tbl.get_or_default(op_counters{}).flush_resume_id;
 
-   // Iterate matured rows. Erase as we go, hence the manual cursor. Bounded to
-   // MAX_WTDW_FLUSH_PER_EPOCH rows per economic epoch (SEC-78): the remaining matured
-   // rows flush on the next one, which keeps this inline action inside the
-   // transaction CPU deadline it shares with the rest of the economic tick.
-   // `flushed` is incremented at the top of every iteration, before any of the
-   // per-row `continue` branches, so it counts every attempt.
+   // Walk in request order from where the last flush stopped, to the first row whose economic wait
+   // has not passed; the next walk then starts at the head. Economic maturity never decreases along
+   // the queue, since request ids and the economic grid both move forward (a `seteconomy` change can
+   // re-date boundaries not yet ticked and let a later request mature first; it then waits for the
+   // rows ahead of it).
    //
-   // A row also waits for its consensus guard. Requests are queued in time order and both
-   // clocks only move forward, so along `byeligible` the guard never decreases: the first row
-   // the guard holds holds every row after it, and the walk stops there.
-   uint32_t flushed = 0;
-   auto it = idx.begin();
-   while (it != idx.end() && it->eligible_at_economic_epoch <= economic_epoch &&
-          it->eligible_at_consensus_epoch <= consensus_epoch &&
-          flushed < MAX_WTDW_FLUSH_PER_EPOCH) {
-      auto row     = *it;          // copy out before erase
-      auto wkey    = withdraw_key{row.request_id};
-      // Advance index iterator BEFORE erasing the row.
+   // A row a consensus wait still holds is skipped, so a stalled chain holds only the rows waiting on
+   // it. Each flush releases at most MAX_WTDW_FLUSH_PER_EPOCH rows and skips at most
+   // MAX_WTDW_HELD_SKIPS_PER_FLUSH, inside the CPU deadline it shares with the rest of the economic
+   // tick; the next flush resumes at the row this one stopped on. `flushed` is counted before the
+   // per-row `continue` branches, so it counts every released attempt.
+   std::optional<std::vector<sysio::epoch::chain_epoch_index>> started;   // read at the first matured row
+   uint64_t resume_id = 0;
+   uint32_t flushed   = 0;
+   uint32_t skipped   = 0;
+   auto     it        = queue.lower_bound(withdraw_key{start_id});
+   while (it != queue.end() && it->eligible_at_economic_epoch <= economic_epoch) {
+      if (flushed == MAX_WTDW_FLUSH_PER_EPOCH) {
+         resume_id = it->request_id;
+         break;
+      }
+      if (!started) started = sysio::epoch::started_chain_epochs();
+      if (!consensus_waits_passed(*it, *started)) {
+         if (skipped == MAX_WTDW_HELD_SKIPS_PER_FLUSH) {
+            resume_id = it->request_id;
+            break;
+         }
+         ++skipped;
+         ++it;
+         continue;
+      }
+
+      const withdraw_request row = *it;   // copy out before erase
+      const withdraw_key     wkey{row.request_id};
+      // Advance the iterator BEFORE erasing the row.
       ++it;
       ++flushed;
 
@@ -1277,6 +1338,12 @@ void opreg::flushwtdw(uint32_t economic_epoch, uint32_t consensus_epoch) {
       // Re-check eligibility — this withdraw may have dropped the operator
       // below the role minimum.
       reevaluate_eligibility(ops, op_pk, get_self(), row.account);
+   }
+
+   if (resume_id != start_id) {
+      op_counters counters     = counters_tbl.get_or_default(op_counters{});
+      counters.flush_resume_id = resume_id;
+      counters_tbl.set(counters, ram_payer);
    }
 }
 

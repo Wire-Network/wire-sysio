@@ -1,5 +1,6 @@
 /// Cross-contract tests for the `sysio.epoch::tickeconomy` ↔ `sysio.opreg::flushwtdw` integration:
-/// a withdrawal matures on the economic clock AND waits for its consensus guard.
+/// a withdrawal matures on the economic clock AND waits for the consensus guard of each chain it
+/// depends on.
 ///
 /// Data model: identity is now slug_name-keyed across opreg / chains.
 /// The fixture deploys `sysio.chains` so the chain-of-record exists and
@@ -14,7 +15,11 @@
 #include <fc/variant_object.hpp>
 #include <fc/slug_name.hpp>
 
+#include <algorithm>
 #include <array>
+#include <map>
+#include <string>
+#include <vector>
 
 #include "contracts.hpp"
 #include "contract_test_support.hpp"
@@ -42,7 +47,21 @@ public:
    static constexpr auto UWRIT_OP_B     = "uwrit.bob"_n;
    /// `sysio.opreg::WITHDRAW_WAIT_ECONOMIC_EPOCHS`: economic epochs between a request and its release.
    static constexpr uint32_t WITHDRAW_WAIT_ECONOMIC_EPOCHS = 2;
+   /// `sysio.opreg::WITHDRAW_WAIT_EPOCHS`: consensus epochs each waited-on chain closes before release.
+   static constexpr uint32_t WITHDRAW_WAIT_EPOCHS = 2;
+   /// `sysio.opreg::MAX_WTDW_FLUSH_PER_EPOCH`: rows one flush releases at most.
+   static constexpr uint32_t MAX_WTDW_FLUSH_PER_EPOCH = 32;
+   /// `sysio.opreg::MAX_WTDW_HELD_SKIPS_PER_FLUSH`: held rows one flush skips at most.
+   static constexpr uint32_t MAX_WTDW_HELD_SKIPS_PER_FLUSH = 64;
    static constexpr auto UWRIT_OP_C     = "uwrit.carl"_n;
+   static constexpr auto BATCHOP_ETH    = "batchop.eth"_n;    ///< a batch operator serving ETH alone
+   static constexpr auto BATCHOP_SOL    = "batchop.sol"_n;    ///< a batch operator serving SOL alone
+   static constexpr auto BATCHOP_BOTH   = "batchop.both"_n;   ///< a batch operator serving SOL and ETH
+   /// Collateral a test operator bonds, and the part of it a test withdraws.
+   static constexpr uint64_t OPERATOR_BOND       = 1'000'000;
+   static constexpr uint64_t OPERATOR_WITHDRAWAL =   400'000;
+   /// The `tickeconomy` refusal before the next economic boundary has passed.
+   static constexpr std::string_view ECONOMIC_BOUNDARY_NOT_PASSED = "economic epoch boundary has not passed";
 
    /// Must be >= the contract's MIN_EPOCH_DURATION_SEC (60) typo-guard floor.
    /// Each advance_one_epoch() crosses the boundary by producing
@@ -69,7 +88,7 @@ public:
       create_accounts({
          TOKEN_ACCOUNT, EPOCH_ACCOUNT, OPREG_ACCOUNT, MSGCH_ACCOUNT,
          CHALG_ACCOUNT, CHAINS_ACCOUNT, BATCHOP, UWRIT_OP,
-         UWRIT_OP_B, UWRIT_OP_C,
+         UWRIT_OP_B, UWRIT_OP_C, BATCHOP_ETH, BATCHOP_SOL, BATCHOP_BOTH,
          DCLAIM_ACCOUNT, "sysio.gov"_n, "sysio.ops"_n
       });
       produce_blocks(2);
@@ -195,6 +214,12 @@ public:
 
    /// The outpost chains the fixture registers, each with its own consensus epoch.
    static constexpr std::array<std::string_view, 2> CHAINS{"SOL", "ETH"};
+   static constexpr std::string_view SOL_CHAIN = CHAINS[0];
+   static constexpr std::string_view ETH_CHAIN = CHAINS[1];
+
+   using outpost = sysio_system::test_support::served_chains::outpost;
+   static constexpr outpost SOL_OUTPOST{SOL_CHAIN, ChainKind::CHAIN_KIND_SVM};
+   static constexpr outpost ETH_OUTPOST{ETH_CHAIN, ChainKind::CHAIN_KIND_EVM};
 
    /// One-shot bootstrap: each chain's epoch config + opreg config + a bootstrapped
    /// batch op + a pending underwriter + sysio.chains rows.
@@ -256,8 +281,7 @@ public:
             ("description",       std::string{})
             ("outpost", sysio_system::test_support::no_outpost_mvo())));
 
-      sysio_system::test_support::served_chains::serve(*this, {BATCHOP}, {
-         {CHAINS[0], ChainKind::CHAIN_KIND_SVM}, {CHAINS[1], ChainKind::CHAIN_KIND_EVM}});
+      sysio_system::test_support::served_chains::serve(*this, {BATCHOP}, {SOL_OUTPOST, ETH_OUTPOST});
 
       // Each chain's genesis advance — permissionless until its current_epoch_index moves off zero.
       for (const std::string_view chain : CHAINS) {
@@ -306,6 +330,49 @@ public:
       tick_economy();
    }
 
+   /// Close `epochs` consensus epochs of `chain` alone, crossing a boundary before each.
+   void close_epochs(std::string_view chain, uint32_t epochs) {
+      for (uint32_t i = 0; i < epochs; ++i) {
+         const uint32_t before = current_epoch(chain);
+         cross_epoch_boundary();
+         advance_chain(chain);
+         BOOST_REQUIRE_EQUAL(before + 1, current_epoch(chain));
+      }
+   }
+
+   /// Tick the economic clock up to `epoch_index`, crossing a boundary whenever the next one has not passed.
+   void tick_economy_to(uint32_t epoch_index) {
+      while (economic_epoch() < epoch_index) {
+         const action_result result = push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "tickeconomy"_n,
+                                           mvo()("epoch_index", economic_epoch() + 1));
+         if (result == success()) {
+            produce_blocks();
+            continue;
+         }
+         BOOST_REQUIRE(result.find(ECONOMIC_BOUNDARY_NOT_PASSED) != std::string::npos);
+         cross_epoch_boundary();
+      }
+   }
+
+   /// Register `account` as a non-bootstrapped batch operator serving `outposts` and bond `amount` WIRE.
+   void register_serving_batch_operator(name account, const std::vector<outpost>& outposts, uint64_t amount) {
+      BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n, mvo()
+         ("account",          account.to_string())
+         ("type",             OperatorType::OPERATOR_TYPE_BATCH)
+         ("is_bootstrapped",  false)));
+      sysio_system::test_support::served_chains::serve(*this, {account}, outposts);
+      BOOST_REQUIRE_EQUAL(success(), fund_and_bond(account, "WIRE", "WIRE", amount));
+      produce_blocks();
+   }
+
+   action_result pause_chain(std::string_view chain) {
+      return push(EPOCH_ACCOUNT, epoch_abi, CHALG_ACCOUNT, "pause"_n, mvo()("chain_code", chain));
+   }
+
+   action_result unpause_chain(std::string_view chain) {
+      return push(EPOCH_ACCOUNT, epoch_abi, CHALG_ACCOUNT, "unpause"_n, mvo()("chain_code", chain));
+   }
+
    uint32_t economic_epoch() {
       auto data = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "economystate"_n, "economystate"_n);
       if (data.empty()) return 0;
@@ -350,6 +417,48 @@ public:
       return data.empty() ? fc::variant() : opreg_abi.binary_to_variant(
          "withdraw_request", data,
          fixture_abi_yield_function());
+   }
+
+   /// Each chain withdrawal `request_id` waits on, by code, with the epoch index it waits for.
+   std::map<std::string, uint32_t> consensus_waits(uint64_t request_id) {
+      const fc::variant row = get_wtdw(request_id);
+      BOOST_REQUIRE(!row.is_null());
+      std::map<std::string, uint32_t> waits;
+      for (const fc::variant& wait : row["consensus_waits"].get_array()) {
+         waits[wait["chain_code"].as<fc::slug_name>().to_string()] = wait["eligible_at_epoch"].as<uint32_t>();
+      }
+      return waits;
+   }
+
+   /// The waits a request made now takes on `chains`: each one's current index + WITHDRAW_WAIT_EPOCHS.
+   std::map<std::string, uint32_t> waits_from_now(std::initializer_list<std::string_view> chains) {
+      std::map<std::string, uint32_t> waits;
+      for (const std::string_view chain : chains) waits[std::string{chain}] = current_epoch(chain) + WITHDRAW_WAIT_EPOCHS;
+      return waits;
+   }
+
+   /// The economic epoch withdrawal `request_id` becomes eligible at.
+   uint32_t eligible_economic_epoch(uint64_t request_id) {
+      const fc::variant row = get_wtdw(request_id);
+      BOOST_REQUIRE(!row.is_null());
+      return row["eligible_at_economic_epoch"].as<uint32_t>();
+   }
+
+   /// How many of the withdrawals with ids in [first_id, last_id] are still queued.
+   uint32_t queued(uint64_t first_id, uint64_t last_id) {
+      uint32_t n = 0;
+      for (uint64_t id = first_id; id <= last_id; ++id) {
+         if (!get_wtdw(id).is_null()) ++n;
+      }
+      return n;
+   }
+
+   /// The request id the next `flushwtdw` walk starts at (`opcounters.flush_resume_id`); 0 is the head.
+   uint64_t flush_resume_id() {
+      const auto data = get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, "opcounters"_n, "opcounters"_n);
+      if (data.empty()) return 0;
+      return opreg_abi.binary_to_variant("op_counters", data, fixture_abi_yield_function())
+         ["flush_resume_id"].as<uint64_t>();
    }
 
    uint64_t balance_of(name account, std::string_view chain_code,
@@ -415,8 +524,7 @@ BOOST_AUTO_TEST_SUITE(sysio_epoch_flushwtdw_tests)
 BOOST_FIXTURE_TEST_CASE(flushwtdw_requires_epoch_auth, sysio_epoch_flushwtdw_tester) { try {
    bootstrap_for_flushwtdw();
 
-   auto r = push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "flushwtdw"_n, mvo()
-      ("economic_epoch", 999)("consensus_epoch", 999));
+   auto r = push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "flushwtdw"_n, mvo()("economic_epoch", 999));
    BOOST_REQUIRE(r.find("missing authority of sysio.epoch") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
 
@@ -455,9 +563,14 @@ BOOST_FIXTURE_TEST_CASE(flushwtdw_credits_native_claim_without_outbound_attestat
    BOOST_REQUIRE_EQUAL(success(),
       withdraw(UWRIT_OP, "WIRE", "WIRE", WITHDRAW_AMOUNT));
 
+   // Satisfy the consensus waits, then flush directly far past the economic wait.
+   for (uint32_t i = 0; i < WITHDRAW_WAIT_EPOCHS; ++i) {
+      cross_epoch_boundary();
+      advance_consensus();
+   }
    constexpr uint32_t FUTURE_EPOCH = 100;
    BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, EPOCH_ACCOUNT,
-      "flushwtdw"_n, mvo()("economic_epoch", FUTURE_EPOCH)("consensus_epoch", FUTURE_EPOCH)));
+      "flushwtdw"_n, mvo()("economic_epoch", FUTURE_EPOCH)));
 
    BOOST_REQUIRE(get_wtdw(1).is_null());
    BOOST_REQUIRE_EQUAL(INITIAL_DEPOSIT - WITHDRAW_AMOUNT,
@@ -547,7 +660,7 @@ BOOST_FIXTURE_TEST_CASE(consensus_alone_does_not_release, sysio_epoch_flushwtdw_
    BOOST_REQUIRE_EQUAL(economic_epoch(), row["requested_at_economic_epoch"].as<uint32_t>());
    BOOST_REQUIRE_EQUAL(economic_epoch() + WITHDRAW_WAIT_ECONOMIC_EPOCHS,
                        row["eligible_at_economic_epoch"].as<uint32_t>());
-   BOOST_REQUIRE_EQUAL(current_epoch() + 2, row["eligible_at_consensus_epoch"].as<uint32_t>());
+   BOOST_REQUIRE(waits_from_now({SOL_CHAIN, ETH_CHAIN}) == consensus_waits(1));
 
    for (int i = 0; i < 3; ++i) {
       cross_epoch_boundary();
@@ -591,36 +704,257 @@ BOOST_FIXTURE_TEST_CASE(a_request_while_the_crank_is_behind_waits_for_later_boun
    BOOST_REQUIRE_EQUAL(INITIAL_DEPOSIT - WITHDRAW_AMOUNT, balance_of(UWRIT_OP, "WIRE", "WIRE"));
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(dispute_pause_holds_withdrawals_while_the_economy_ticks,
+BOOST_FIXTURE_TEST_CASE(dispute_pause_holds_only_the_withdrawals_waiting_on_the_paused_chain,
                         sysio_epoch_flushwtdw_tester) { try {
-   // A dispute pause freezes its chain's consensus index, and the guard waits on the slowest started
-   // chain, so it holds every withdrawal requested since even while the other chain keeps closing
-   // epochs; the economic clock keeps ticking and releases them only after the paused chain resumes.
+   // A dispute pause freezes its chain's consensus index. A withdrawal that waits on the paused chain
+   // stays held while the other chain keeps closing epochs and the economic clock keeps ticking; one
+   // that waits only on the running chain is released. The held ones release after the chain resumes.
    bootstrap_for_flushwtdw();
-   constexpr uint64_t         INITIAL_DEPOSIT = 1'000'000;
-   constexpr uint64_t         WITHDRAW_AMOUNT =   400'000;
-   constexpr std::string_view PAUSED_CHAIN    = CHAINS.back();
-   constexpr std::string_view RUNNING_CHAIN   = CHAINS.front();
-   BOOST_REQUIRE_EQUAL(success(), fund_and_bond(UWRIT_OP, "WIRE", "WIRE", INITIAL_DEPOSIT));
-   BOOST_REQUIRE_EQUAL(success(), withdraw(UWRIT_OP, "WIRE", "WIRE", WITHDRAW_AMOUNT));
-   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, CHALG_ACCOUNT, "pause"_n,
-                                       mvo()("chain_code", PAUSED_CHAIN)));
+   constexpr std::string_view PAUSED_CHAIN  = ETH_CHAIN;
+   constexpr std::string_view RUNNING_CHAIN = SOL_CHAIN;
+   constexpr uint64_t         EVERY_CHAIN   = 1;   // the underwriter's request
+   constexpr uint64_t         PAUSED_ONLY   = 2;
+   constexpr uint64_t         RUNNING_ONLY  = 3;
+   BOOST_REQUIRE_EQUAL(success(), fund_and_bond(UWRIT_OP, "WIRE", "WIRE", OPERATOR_BOND));
+   register_serving_batch_operator(BATCHOP_ETH, {ETH_OUTPOST}, OPERATOR_BOND);
+   register_serving_batch_operator(BATCHOP_SOL, {SOL_OUTPOST}, OPERATOR_BOND);
+   BOOST_REQUIRE_EQUAL(success(), withdraw(UWRIT_OP, "WIRE", "WIRE", OPERATOR_WITHDRAWAL));
+   BOOST_REQUIRE_EQUAL(success(), withdraw(BATCHOP_ETH, "WIRE", "WIRE", OPERATOR_WITHDRAWAL));
+   BOOST_REQUIRE_EQUAL(success(), withdraw(BATCHOP_SOL, "WIRE", "WIRE", OPERATOR_WITHDRAWAL));
+   BOOST_REQUIRE_EQUAL(success(), pause_chain(PAUSED_CHAIN));
 
    for (int i = 0; i < 4; ++i) {
       cross_epoch_boundary();
       advance_chain(RUNNING_CHAIN);
       tick_economy();
    }
-   BOOST_REQUIRE(!get_wtdw(1).is_null());
+   BOOST_REQUIRE(!get_wtdw(EVERY_CHAIN).is_null());
+   BOOST_REQUIRE(!get_wtdw(PAUSED_ONLY).is_null());
+   BOOST_REQUIRE(get_wtdw(RUNNING_ONLY).is_null());
+   BOOST_REQUIRE_EQUAL(OPERATOR_BOND - OPERATOR_WITHDRAWAL, balance_of(BATCHOP_SOL, "WIRE", "WIRE"));
    BOOST_REQUIRE_EQUAL(current_epoch(PAUSED_CHAIN) + 4, current_epoch(RUNNING_CHAIN));
 
-   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, CHALG_ACCOUNT, "unpause"_n,
-                                       mvo()("chain_code", PAUSED_CHAIN)));
+   BOOST_REQUIRE_EQUAL(success(), unpause_chain(PAUSED_CHAIN));
    advance_consensus();
    cross_epoch_boundary();
    advance_consensus();
    tick_economy();
+   BOOST_REQUIRE(get_wtdw(EVERY_CHAIN).is_null());
+   BOOST_REQUIRE(get_wtdw(PAUSED_ONLY).is_null());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(a_stalled_chain_does_not_hold_a_batch_operator_serving_only_another,
+                        sysio_epoch_flushwtdw_tester) { try {
+   // A batch operator waits only on the chains it serves: SOL stalls, and ETH alone releases it.
+   bootstrap_for_flushwtdw();
+   register_serving_batch_operator(BATCHOP_ETH, {ETH_OUTPOST}, OPERATOR_BOND);
+   BOOST_REQUIRE_EQUAL(success(), withdraw(BATCHOP_ETH, "WIRE", "WIRE", OPERATOR_WITHDRAWAL));
+   BOOST_REQUIRE(waits_from_now({ETH_CHAIN}) == consensus_waits(1));
+
+   const uint32_t stalled = current_epoch(SOL_CHAIN);
+   close_epochs(ETH_CHAIN, WITHDRAW_WAIT_EPOCHS);
+   tick_economy_to(eligible_economic_epoch(1));
    BOOST_REQUIRE(get_wtdw(1).is_null());
+   BOOST_REQUIRE_EQUAL(stalled, current_epoch(SOL_CHAIN));
+   BOOST_REQUIRE_EQUAL(OPERATOR_BOND - OPERATOR_WITHDRAWAL, balance_of(BATCHOP_ETH, "WIRE", "WIRE"));
+   claim_exact(BATCHOP_ETH, OPERATOR_WITHDRAWAL);
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(a_batch_operator_serving_two_chains_waits_on_both, sysio_epoch_flushwtdw_tester) { try {
+   bootstrap_for_flushwtdw();
+   register_serving_batch_operator(BATCHOP_BOTH, {SOL_OUTPOST, ETH_OUTPOST}, OPERATOR_BOND);
+   BOOST_REQUIRE_EQUAL(success(), withdraw(BATCHOP_BOTH, "WIRE", "WIRE", OPERATOR_WITHDRAWAL));
+   BOOST_REQUIRE(waits_from_now({SOL_CHAIN, ETH_CHAIN}) == consensus_waits(1));
+
+   close_epochs(ETH_CHAIN, WITHDRAW_WAIT_EPOCHS);
+   tick_economy_to(eligible_economic_epoch(1));
+   BOOST_REQUIRE(!get_wtdw(1).is_null());
+
+   // One SOL epoch short of its wait still holds the request; the last one releases it.
+   close_epochs(SOL_CHAIN, WITHDRAW_WAIT_EPOCHS - 1);
+   tick_economy_to(economic_epoch() + 1);
+   BOOST_REQUIRE(!get_wtdw(1).is_null());
+   close_epochs(SOL_CHAIN, 1);
+   tick_economy_to(economic_epoch() + 1);
+   BOOST_REQUIRE(get_wtdw(1).is_null());
+   BOOST_REQUIRE_EQUAL(OPERATOR_BOND - OPERATOR_WITHDRAWAL, balance_of(BATCHOP_BOTH, "WIRE", "WIRE"));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(a_left_membership_still_waits, sysio_epoch_flushwtdw_tester) { try {
+   // Leaving a chain stops new seats there, not the guard: the seats it held may hold deliveries not
+   // yet judged, so the request still waits on the chain it left.
+   bootstrap_for_flushwtdw();
+   register_serving_batch_operator(BATCHOP_BOTH, {SOL_OUTPOST, ETH_OUTPOST}, OPERATOR_BOND);
+   BOOST_REQUIRE_EQUAL(success(),
+      sysio_system::test_support::served_chains::leave(*this, BATCHOP_BOTH, SOL_CHAIN));
+   BOOST_REQUIRE_EQUAL(sysio_system::test_support::served_chains::status::left,
+      sysio_system::test_support::served_chains::membership(*this, opreg_abi, BATCHOP_BOTH, SOL_CHAIN)
+         ["status"].as_string());
+
+   BOOST_REQUIRE_EQUAL(success(), withdraw(BATCHOP_BOTH, "WIRE", "WIRE", OPERATOR_WITHDRAWAL));
+   BOOST_REQUIRE(waits_from_now({SOL_CHAIN, ETH_CHAIN}) == consensus_waits(1));
+
+   close_epochs(ETH_CHAIN, WITHDRAW_WAIT_EPOCHS);
+   tick_economy_to(eligible_economic_epoch(1));
+   BOOST_REQUIRE(!get_wtdw(1).is_null());
+   close_epochs(SOL_CHAIN, WITHDRAW_WAIT_EPOCHS);
+   tick_economy_to(economic_epoch() + 1);
+   BOOST_REQUIRE(get_wtdw(1).is_null());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(a_non_batch_operator_waits_on_every_started_chain, sysio_epoch_flushwtdw_tester) { try {
+   bootstrap_for_flushwtdw();
+   BOOST_REQUIRE_EQUAL(success(), fund_and_bond(UWRIT_OP, "WIRE", "WIRE", OPERATOR_BOND));
+   BOOST_REQUIRE_EQUAL(success(), withdraw(UWRIT_OP, "WIRE", "WIRE", OPERATOR_WITHDRAWAL));
+   BOOST_REQUIRE(waits_from_now({SOL_CHAIN, ETH_CHAIN}) == consensus_waits(1));
+
+   close_epochs(SOL_CHAIN, WITHDRAW_WAIT_EPOCHS);
+   tick_economy_to(eligible_economic_epoch(1));
+   BOOST_REQUIRE(!get_wtdw(1).is_null());
+   close_epochs(ETH_CHAIN, WITHDRAW_WAIT_EPOCHS);
+   tick_economy_to(economic_epoch() + 1);
+   BOOST_REQUIRE(get_wtdw(1).is_null());
+   BOOST_REQUIRE_EQUAL(OPERATOR_BOND - OPERATOR_WITHDRAWAL, balance_of(UWRIT_OP, "WIRE", "WIRE"));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(a_chain_started_after_the_request_is_not_waited_on, sysio_epoch_flushwtdw_tester) { try {
+   // A request waits only on the chains whose epochs had started when it was made. A chain activated
+   // and started later holds the requests made after its start, not the ones made before, even from a
+   // batch operator already serving it.
+   bootstrap_for_flushwtdw();
+   constexpr std::string_view LATE_CHAIN       = "BASE";
+   constexpr uint32_t         LATE_EXTERNAL_ID = 8453;
+   constexpr outpost          LATE_OUTPOST{LATE_CHAIN, ChainKind::CHAIN_KIND_EVM};
+   constexpr uint64_t         BEFORE_START     = 1;
+   constexpr uint64_t         SERVING_BEFORE   = 2;   // the batch operator's request, before the start
+   constexpr uint64_t         AFTER_START      = 3;
+   BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
+      ("kind",              ChainKind::CHAIN_KIND_EVM)
+      ("code",              LATE_CHAIN)
+      ("external_chain_id", LATE_EXTERNAL_ID)
+      ("name",              std::string("base-test"))
+      ("description",       std::string{})
+      ("outpost",           sysio_system::test_support::no_outpost_mvo())));
+   BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "activchain"_n,
+                                       mvo()("code", LATE_CHAIN)));
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "setconfig"_n, mvo()
+      ("chain_code",                          LATE_CHAIN)
+      ("epoch_duration_sec",                  EPOCH_DURATION_SEC)
+      ("operators_per_epoch",                 1)
+      ("batch_operator_minimum_active",       1)
+      ("batch_op_groups",                     1)
+      ("epoch_retention_envelope_log_count",  200)));
+
+   BOOST_REQUIRE_EQUAL(success(), fund_and_bond(UWRIT_OP, "WIRE", "WIRE", OPERATOR_BOND));
+   register_serving_batch_operator(BATCHOP_ETH, {ETH_OUTPOST, LATE_OUTPOST}, OPERATOR_BOND);
+   BOOST_REQUIRE_EQUAL(success(), withdraw(UWRIT_OP, "WIRE", "WIRE", OPERATOR_WITHDRAWAL));
+   BOOST_REQUIRE_EQUAL(success(), withdraw(BATCHOP_ETH, "WIRE", "WIRE", OPERATOR_WITHDRAWAL));
+   BOOST_REQUIRE(waits_from_now({SOL_CHAIN, ETH_CHAIN}) == consensus_waits(BEFORE_START));
+   BOOST_REQUIRE(waits_from_now({ETH_CHAIN}) == consensus_waits(SERVING_BEFORE));
+
+   // Start the late chain: the bootstrapped batch operator (already linked for EVM) serves it.
+   BOOST_REQUIRE_EQUAL(success(), sysio_system::test_support::served_chains::join(*this, BATCHOP, LATE_CHAIN));
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "schbatchgps"_n,
+                                       mvo()("chain_code", LATE_CHAIN)));
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "advance"_n,
+                                       mvo()("chain_code", LATE_CHAIN)));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(1u, current_epoch(LATE_CHAIN));
+
+   BOOST_REQUIRE_EQUAL(success(), regunderwriter(UWRIT_OP_B));
+   BOOST_REQUIRE_EQUAL(success(), fund_and_bond(UWRIT_OP_B, "WIRE", "WIRE", OPERATOR_BOND));
+   BOOST_REQUIRE_EQUAL(success(), withdraw(UWRIT_OP_B, "WIRE", "WIRE", OPERATOR_WITHDRAWAL));
+   BOOST_REQUIRE(waits_from_now({SOL_CHAIN, ETH_CHAIN, LATE_CHAIN}) == consensus_waits(AFTER_START));
+
+   // SOL and ETH close their waits while the late chain stalls at its first epoch.
+   for (uint32_t i = 0; i < WITHDRAW_WAIT_EPOCHS; ++i) {
+      cross_epoch_boundary();
+      advance_consensus();
+   }
+   tick_economy_to(std::max(eligible_economic_epoch(BEFORE_START), eligible_economic_epoch(AFTER_START)));
+   BOOST_REQUIRE(get_wtdw(BEFORE_START).is_null());
+   BOOST_REQUIRE(get_wtdw(SERVING_BEFORE).is_null());
+   BOOST_REQUIRE(!get_wtdw(AFTER_START).is_null());
+   BOOST_REQUIRE_EQUAL(1u, current_epoch(LATE_CHAIN));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(a_held_withdrawal_does_not_block_a_later_matured_one, sysio_epoch_flushwtdw_tester) { try {
+   // The flush skips a row a consensus wait still holds instead of stopping there.
+   bootstrap_for_flushwtdw();
+   constexpr uint64_t HELD     = 1;   // the underwriter's request, waiting on both chains
+   constexpr uint64_t RELEASED = 2;   // the ETH-only batch operator's request
+   BOOST_REQUIRE_EQUAL(success(), fund_and_bond(UWRIT_OP, "WIRE", "WIRE", OPERATOR_BOND));
+   register_serving_batch_operator(BATCHOP_ETH, {ETH_OUTPOST}, OPERATOR_BOND);
+   BOOST_REQUIRE_EQUAL(success(), withdraw(UWRIT_OP, "WIRE", "WIRE", OPERATOR_WITHDRAWAL));
+   BOOST_REQUIRE_EQUAL(success(), withdraw(BATCHOP_ETH, "WIRE", "WIRE", OPERATOR_WITHDRAWAL));
+
+   close_epochs(ETH_CHAIN, WITHDRAW_WAIT_EPOCHS);
+   tick_economy_to(std::max(eligible_economic_epoch(HELD), eligible_economic_epoch(RELEASED)));
+   BOOST_REQUIRE(!get_wtdw(HELD).is_null());
+   BOOST_REQUIRE(get_wtdw(RELEASED).is_null());
+   BOOST_REQUIRE_EQUAL(OPERATOR_BOND, balance_of(UWRIT_OP, "WIRE", "WIRE"));
+   BOOST_REQUIRE_EQUAL(OPERATOR_BOND - OPERATOR_WITHDRAWAL, balance_of(BATCHOP_ETH, "WIRE", "WIRE"));
+   BOOST_REQUIRE_EQUAL(0u, flush_resume_id());
+
+   close_epochs(SOL_CHAIN, WITHDRAW_WAIT_EPOCHS);
+   tick_economy_to(economic_epoch() + 1);
+   BOOST_REQUIRE(get_wtdw(HELD).is_null());
+   BOOST_REQUIRE_EQUAL(OPERATOR_BOND - OPERATOR_WITHDRAWAL, balance_of(UWRIT_OP, "WIRE", "WIRE"));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(the_held_skip_budget_bounds_a_flush_and_the_next_resumes, sysio_epoch_flushwtdw_tester) { try {
+   // More held rows than one flush may skip sit ahead of a releasable one: the first flush stops on a
+   // held row, and the next resumes there and releases the row behind the held run.
+   bootstrap_for_flushwtdw();
+   constexpr uint32_t HELD_ROWS     = MAX_WTDW_HELD_SKIPS_PER_FLUSH + 1;
+   constexpr uint64_t RELEASABLE_ID = uint64_t{HELD_ROWS} + 1;
+   constexpr uint64_t HELD_DEPOSIT  = 1'000;
+
+   std::vector<name> holders;
+   for (uint32_t i = 0; i < HELD_ROWS; ++i) {
+      holders.push_back(name{std::string{"uwskip."} + char('a' + i / 26) + char('a' + i % 26)});
+   }
+   create_accounts(holders);
+   for (const name holder : holders) {
+      BOOST_REQUIRE_EQUAL(success(), regunderwriter(holder));
+      BOOST_REQUIRE_EQUAL(success(), fund_and_bond(holder, "WIRE", "WIRE", HELD_DEPOSIT));
+      produce_blocks();
+   }
+   register_serving_batch_operator(BATCHOP_ETH, {ETH_OUTPOST}, OPERATOR_BOND);
+
+   // Every underwriter waits on both chains, so a stalled SOL holds it; the batch operator waits on ETH.
+   for (const name holder : holders) {
+      BOOST_REQUIRE_EQUAL(success(), withdraw(holder, "WIRE", "WIRE", HELD_DEPOSIT));
+   }
+   BOOST_REQUIRE_EQUAL(success(), withdraw(BATCHOP_ETH, "WIRE", "WIRE", OPERATOR_WITHDRAWAL));
+   produce_blocks();
+   BOOST_REQUIRE(waits_from_now({ETH_CHAIN}) == consensus_waits(RELEASABLE_ID));
+   const uint32_t eligible = eligible_economic_epoch(RELEASABLE_ID);
+   BOOST_REQUIRE_EQUAL(eligible, eligible_economic_epoch(1));
+
+   close_epochs(ETH_CHAIN, WITHDRAW_WAIT_EPOCHS);
+   tick_economy_to(eligible);
+   BOOST_REQUIRE_EQUAL(HELD_ROWS, queued(1, HELD_ROWS));
+   BOOST_REQUIRE(!get_wtdw(RELEASABLE_ID).is_null());
+   BOOST_REQUIRE_EQUAL(uint64_t{HELD_ROWS}, flush_resume_id());   // stopped on the last held row
+
+   tick_economy_to(eligible + 1);
+   BOOST_REQUIRE(get_wtdw(RELEASABLE_ID).is_null());
+   BOOST_REQUIRE_EQUAL(HELD_ROWS, queued(1, HELD_ROWS));
+   BOOST_REQUIRE_EQUAL(0u, flush_resume_id());
+
+   // Once SOL closes its wait the held rows drain, MAX_WTDW_FLUSH_PER_EPOCH per flush, each flush
+   // resuming where the last stopped.
+   close_epochs(SOL_CHAIN, WITHDRAW_WAIT_EPOCHS);
+   tick_economy_to(economic_epoch() + 1);
+   BOOST_REQUIRE_EQUAL(HELD_ROWS - MAX_WTDW_FLUSH_PER_EPOCH, queued(1, HELD_ROWS));
+   BOOST_REQUIRE_EQUAL(uint64_t{MAX_WTDW_FLUSH_PER_EPOCH} + 1, flush_resume_id());
+   tick_economy_to(economic_epoch() + 1);
+   BOOST_REQUIRE_EQUAL(HELD_ROWS - 2 * MAX_WTDW_FLUSH_PER_EPOCH, queued(1, HELD_ROWS));
+   BOOST_REQUIRE_EQUAL(uint64_t{2 * MAX_WTDW_FLUSH_PER_EPOCH} + 1, flush_resume_id());
+   tick_economy_to(economic_epoch() + 1);
+   BOOST_REQUIRE_EQUAL(0u, queued(1, HELD_ROWS));
+   BOOST_REQUIRE_EQUAL(0u, flush_resume_id());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

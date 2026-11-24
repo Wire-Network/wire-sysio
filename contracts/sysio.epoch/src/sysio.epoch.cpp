@@ -1002,14 +1002,14 @@ void epoch::tickeconomy(uint32_t epoch_index) {
    state.next_epoch_start    = boundary + microseconds(static_cast<int64_t>(cfg.epoch_duration_sec) * 1'000'000);
    state_tbl.set(state, ram_payer);
 
-   // Withdrawals mature on this clock, each held until its consensus guard has also passed (see
-   // sysio.opreg::flushwtdw): the slowest started chain must reach it. Matured rows credit
+   // Withdrawals mature on this clock, each held until every chain it waits on has also reached its
+   // consensus guard (sysio.opreg::flushwtdw reads the chains' epochs). Matured rows credit
    // remitclaims; no attestation is sent.
    action(
       permission_level{get_self(), "owner"_n},
       OPREG_ACCOUNT,
       opreg_actions::FLUSH_WITHDRAWALS,
-      std::make_tuple(epoch_index, slowest_epoch_index())
+      std::make_tuple(epoch_index)
    ).send();
 
    // Accrual precedes the payout sibling, so payepoch reads the period total including this epoch.

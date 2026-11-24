@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <optional>
+#include <vector>
 
 namespace sysio {
 
@@ -234,16 +235,23 @@ namespace sysio {
          return state ? state->current_epoch_index : 0;
       }
 
-      /// The lowest current consensus epoch index among the outpost chains whose epochs have started,
-      /// or 0 before any has. Never throws. `sysio.opreg`'s withdrawal consensus guard waits on it.
-      static uint32_t slowest_epoch_index() {
-         uint32_t slowest = 0;
+      /// One outpost chain's current consensus epoch index.
+      struct chain_epoch_index {
+         uint64_t chain_code  = 0;
+         uint32_t epoch_index = 0;
+      };
+
+      /// Every outpost chain whose consensus epoch has started (index > 0) with its current index, in
+      /// chain-code order. Never throws. `sysio.opreg`'s withdrawal consensus guard reads it.
+      static std::vector<chain_epoch_index> started_chain_epochs() {
+         std::vector<chain_epoch_index> started;
          epochstate_t states(EPOCH_ACCOUNT);
          for (auto it = states.begin(); it != states.end(); ++it) {
             if (it->current_epoch_index == 0) continue;
-            if (slowest == 0 || it->current_epoch_index < slowest) slowest = it->current_epoch_index;
+            started.push_back(chain_epoch_index{.chain_code  = it->chain_code,
+                                                .epoch_index = it->current_epoch_index});
          }
-         return slowest;
+         return started;
       }
 
       /// The current economic epoch index, or 0 before the economic clock's first tick. Never throws.

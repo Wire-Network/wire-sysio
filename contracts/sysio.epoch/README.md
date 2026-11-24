@@ -75,8 +75,8 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
    the first economic epoch that can cover it. Either way the episode is recorded in `blocklog`.
 2. Bump the economic epoch index; its boundaries come from the grid, never from when the crank ran,
    so a late or caught-up crank accrues exactly what an on-time one would.
-3. `sysio.opreg::flushwtdw` matures queued collateral withdrawals whose economic wait and consensus
-   guard (the slowest started chain's epoch index) have both passed.
+3. `sysio.opreg::flushwtdw` matures queued collateral withdrawals whose economic wait has passed and
+   whose waited-on chains have each reached the request's consensus guard for that chain.
 4. `sysio.system::accrueepoch`, plus `payepoch` on pay epochs, then `settleduty` (one bounded step of
    any open batch-duty settlement, skipped until `initt5` has run).
 
