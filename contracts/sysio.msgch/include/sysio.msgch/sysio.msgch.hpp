@@ -49,6 +49,13 @@ namespace sysio {
       static constexpr size_t MAX_ENVELOPE_ATTESTATIONS = 64;
 
       // -----------------------------------------------------------------------
+      //  Consensus
+      // -----------------------------------------------------------------------
+
+      /// Epoch durations of no eligible delivery after which a split is disputed without its silent minority.
+      static constexpr uint32_t DISPUTE_FALLBACK_EPOCHS = 3;
+
+      // -----------------------------------------------------------------------
       //  Outbound queue
       // -----------------------------------------------------------------------
 
@@ -123,22 +130,32 @@ namespace sysio {
       [[sysio::action]]
       void deliver(name batch_op_name, uint64_t chain_code, std::vector<char> data);
 
-      /// Evaluate consensus on inbound envelopes for an outpost+epoch.
-      /// Called inline from deliver and chkcons. On consensus: unpacks envelope,
-      /// stores messages + attestations, records per-outpost consensus.
+      /// Evaluate consensus on inbound envelopes for an outpost's current epoch.
+      /// Called inline from deliver and chkcons. The first strict majority of the
+      /// eligible group (`count * 2 > eligible`) decides the epoch, at any time: it
+      /// unpacks the envelope, stores messages + attestations, and records
+      /// per-outpost consensus. Without one, with at least two delivered versions
+      /// and fewer than a majority of the eligible members still silent, a
+      /// `sysio.chalg` dispute opens once no version can still reach a majority
+      /// with the silent members, or once the epoch has been idle for
+      /// `DISPUTE_FALLBACK_EPOCHS` of the chain's configured durations: since the
+      /// later of its start and its newest eligible delivery, each delivery
+      /// restarting the timer. The silent minority then counts as absent.
       ///
       /// `chain_code` is the originating chain's slug_name value
       /// (see `deliver` for the convention). No effect before the chain's
-      /// genesis advance, nor for an epoch that already reached consensus or
-      /// has a dispute: a decided epoch's later deliveries only feed the slash
-      /// classification at its close.
+      /// genesis advance, for an epoch that is not the chain's current one, nor
+      /// for an epoch that already reached consensus or has a dispute. Once an
+      /// epoch is decided, `deliver` records a later delivery of the accepted
+      /// bytes as delivered and refuses a differing one.
       [[sysio::action]]
       void evalcons(uint64_t chain_code, uint32_t epoch_index);
 
-      /// Check whether outpost `chain_code` reached consensus for its current epoch AND its
-      /// next_epoch_start has passed; if so, advance that chain's epoch. Permissionless crank, called
-      /// by the batch operator after the chain's time window elapses. No effect before the chain's
-      /// genesis advance, which only `bootstrap` / `bootchain` run.
+      /// Permissionless crank for outpost `chain_code`'s current epoch, held while a dispute is open
+      /// on it. An undecided epoch is re-tallied (`evalcons` inline, at any time), since its eligible
+      /// group can shrink with no new delivery and its idle dispute fallback can pass. A decided epoch
+      /// advances once its next_epoch_start has passed. No effect before the chain's genesis advance,
+      /// which only `bootstrap` / `bootchain` run.
       [[sysio::action]]
       void chkcons(uint64_t chain_code);
 
@@ -337,7 +354,7 @@ namespace sysio {
       /// One row per outpost. Rows reused (not erased) to avoid RAM churn.
       ///
       /// `winning_checksum` is the winning delivery checksum (sha256 of the raw delivered bytes)
-      /// for `epoch_index`, recorded when consensus is reached (majority/unanimous path) or when
+      /// for `epoch_index`, recorded when consensus is reached (strict-majority path) or when
       /// a Tier-1 dispute vote resolves (via `resolvedisp`). `sysio.epoch::advance` reads it to
       /// classify each operator's delivery: a matching checksum is a hit, a non-matching delivered
       /// checksum is slashed. Zero until a winner exists for the current epoch.

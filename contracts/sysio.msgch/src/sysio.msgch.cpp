@@ -123,10 +123,16 @@ constexpr const char* DISPUTE_TOO_FEW_CANDIDATES_LOG =
    "msgch::maybe_open_dispute: no dispute for (chain=%llu, epoch=%u): "
    "%u distinct version(s), a vote needs >=%u\n";
 
-/// Diagnostic for a two-version split that can still acquire a strict majority from silent operators.
-constexpr const char* DISPUTE_INCOMPLETE_TWO_WAY_LOG =
+/// Diagnostic for a split while at least a majority of the eligible members is still silent.
+constexpr const char* DISPUTE_MAJORITY_SILENT_LOG =
    "msgch::maybe_open_dispute: no dispute for (chain=%llu, epoch=%u): "
-   "two versions but only %u of %u eligible operators delivered\n";
+   "%u silent, at least the majority %u of %u eligible\n";
+
+/// Diagnostic for a split in which a version can still reach a strict majority with the silent members,
+/// before the epoch's idle dispute fallback.
+constexpr const char* DISPUTE_A_VERSION_CAN_STILL_WIN_LOG =
+   "msgch::maybe_open_dispute: no dispute for (chain=%llu, epoch=%u): "
+   "a version can still win (leading %u + silent %u, majority %u of %u eligible) before the idle fallback\n";
 
 /// Diagnostic for a terminal split that cannot be voted on until Tier-1 registration exists.
 constexpr const char* DISPUTE_NO_TIER_ONE_ELECTORATE_LOG =
@@ -170,9 +176,8 @@ msgch::outbound_queue_entry outbound_queue_of(const msgch::outqueue_t& queues, u
 /// The two differ routinely. `sysio.epoch::advance` fills a new tail only *up to* the configured
 /// size (`for (... && new_tail.size() < cfg.operators_per_epoch; ...)`) and documents a short group
 /// as "a degraded but non-fatal state: batch operators were terminated faster than replacements
-/// could activate". With the configured 7 and a live group of S, a config-derived threshold makes
-/// the unanimous path unreachable for any S < 7 and the majority path unreachable for S <= 3 --
-/// consensus becomes arithmetically impossible and the epoch stalls chain-wide.
+/// could activate". With the configured 7 and a live group of S <= 3, a config-derived majority of 4
+/// exceeds every member that can deliver.
 ///
 /// The count is of members who can ACTUALLY deliver, which is the resident group INTERSECTED with
 /// current opreg ACTIVE status and a membership of the chain that is not EVICTED
@@ -180,9 +185,9 @@ msgch::outbound_queue_entry outbound_queue_of(const msgch::outqueue_t& queues, u
 /// is a snapshot taken at schbatchgps/advance time; an operator slashed, terminated, or dropped
 /// below its collateral minimum mid-window stays in `batch_op_groups[current]` but is refused by
 /// `deliver` ("delivering operator is not ACTIVE in sysio.opreg"). Counting raw snapshot members
-/// would therefore still overstate the reachable set and leave the unanimous path unsatisfiable
-/// after a mid-window slash -- the very case WNS-15 names. A missing operator row counts as
-/// not-active, failing closed the same way `deliver` does.
+/// would therefore still overstate the reachable set and raise the majority above what the members
+/// that can deliver can reach after a mid-window slash. A missing operator row counts as not-active,
+/// failing closed the same way `deliver` does.
 ///
 /// Returned as the SET, not just a count, because the consensus tally must filter deliveries
 /// through the same membership test that produces the threshold. Counting every delivery row while
@@ -212,6 +217,16 @@ std::vector<name> eligible_batch_operators(uint64_t chain_code) {
    }
    return eligible;
 }
+
+/// Smallest delivery count that is a strict majority of `eligible_count` members (`count * 2 >
+/// eligible_count`). An even count needs more than half: 3 of 4, never 2.
+constexpr uint32_t strict_majority_size(uint32_t eligible_count) {
+   return eligible_count / 2 + 1;
+}
+
+static_assert(strict_majority_size(1) == 1 && strict_majority_size(2) == 2 && strict_majority_size(3) == 2 &&
+              strict_majority_size(4) == 3 && strict_majority_size(7) == 4,
+              "a strict majority is more than half of the eligible members");
 
 /// Insert a metadata row into `envelope_log` for outpost `chain_code`, then evict up to
 /// `ENVELOPE_LOG_EVICTION_BUDGET` of that outpost's oldest rows while it holds more than
@@ -752,7 +767,7 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
 /// Apply a consensus-reached inbound envelope for one (outpost, epoch): decode it, verify it
 /// continues the per-outpost envelope chain, store and dispatch its attestations, write the
 /// audit-log row, drain the working envelope rows, and record per-outpost consensus. Shared by
-/// `evalcons` (majority/unanimous path) and `resolvedisp` (dispute-resolution path) so both routes
+/// `evalcons` (strict-majority path) and `resolvedisp` (dispute-resolution path) so both routes
 /// process the winner identically.
 ///
 /// `raw` is the winning envelope's bytes; `winning_checksum` is its sha256 — recorded on `outpcons`
@@ -913,14 +928,6 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
    return true;
 }
 
-/// True once outpost `chain_code`'s `next_epoch_start` has passed: the boundary that opens the
-/// majority (Option B) consensus path, the dispute trigger and `chkcons`'s advance. False while the
-/// chain has no epoch state.
-bool epoch_boundary_passed(uint64_t chain_code) {
-   const std::optional<epoch::epoch_state> state = epoch::epoch_state_of(chain_code);
-   return state && current_time_point() >= state->next_epoch_start;
-}
-
 /// Send `sysio.epoch::advance` for outpost `chain_code` under msgch's own authority.
 void send_advance(name self, uint64_t chain_code) {
    action(
@@ -931,12 +938,33 @@ void send_advance(name self, uint64_t chain_code) {
    ).send();
 }
 
-/// Evaluate the dispute trigger and, if met, open a Tier-1 dispute vote via sysio.chalg. A two-way
-/// split is actionable only after every eligible operator has delivered, preserving the chance for
-/// silent operators to create a strict majority. An existing three-or-more-version split remains
-/// actionable at the boundary. A strict majority, one-version split, or pre-boundary split waits.
+/// True once outpost `chain_code`'s current epoch has been idle for `msgch::DISPUTE_FALLBACK_EPOCHS` of the
+/// chain's configured durations: since the later of its `current_epoch_start` and `last_delivery_at`, the
+/// newest delivery from a currently eligible member. False while the chain has no epoch state or config.
+bool idle_dispute_fallback_reached(uint64_t chain_code, time_point last_delivery_at) {
+   const std::optional<epoch::epoch_state>  state = epoch::epoch_state_of(chain_code);
+   const std::optional<epoch::epoch_config> cfg =
+      epoch::epochcfg_t(EPOCH_ACCOUNT).try_get(epoch::chain_key{chain_code});
+   if (!state || !cfg) return false;
+   const time_point idle_since   = std::max(state->current_epoch_start, last_delivery_at);
+   const int64_t    fallback_sec = int64_t{msgch::DISPUTE_FALLBACK_EPOCHS} * cfg->epoch_duration_sec;
+   return current_time_point() >= idle_since + seconds(fallback_sec);
+}
+
+static_assert(int64_t{msgch::DISPUTE_FALLBACK_EPOCHS} * std::numeric_limits<uint32_t>::max() <=
+                 std::numeric_limits<int64_t>::max() / 1'000'000,
+              "the dispute fallback offset of any configured duration fits in microseconds");
+
+/// Open a Tier-1 dispute vote via sysio.chalg for a split of (`chain_code`, `epoch_index`), the chain's
+/// current epoch, with at least two delivered versions and no strict majority of the `group_size` eligible
+/// members. With `s` eligible members still silent and `m` the majority, it needs `s < m`, and then either:
+/// - no version can still win: every version's count plus `s` falls short of `m`;
+/// - the epoch's idle fallback is reached (`idle_dispute_fallback_reached`, timed from `last_delivery_at`,
+///   the newest eligible delivery): the silent members then count as absent.
+/// Otherwise the split waits for more deliveries. `total_deliveries` and `checksum_counts` count eligible
+/// members only, one delivery each.
 void maybe_open_dispute(name self, uint64_t chain_code, uint32_t epoch_index,
-                        uint32_t group_size, uint32_t total_deliveries,
+                        uint32_t group_size, uint32_t total_deliveries, time_point last_delivery_at,
                         const std::vector<checksum256>& seen_checksums,
                         const std::vector<uint32_t>& checksum_counts,
                         const std::vector<std::vector<name>>& checksum_operators) {
@@ -950,31 +978,21 @@ void maybe_open_dispute(name self, uint64_t chain_code, uint32_t epoch_index,
       return;
    }
 
-   if (!epoch_boundary_passed(chain_code)) {
-      sysio::print_f("msgch::maybe_open_dispute: no dispute for (chain=%llu, epoch=%u): epoch boundary not yet passed\n",
-                     chain_code, epoch_index);
+   // The same majority size evalcons accepts, so before the idle fallback a split is disputed exactly
+   // when evalcons can no longer decide it.
+   const uint32_t majority_size = strict_majority_size(group_size);
+   const uint32_t silent        = group_size - total_deliveries;
+   uint32_t       leading_count = 0;
+   for (const uint32_t count : checksum_counts) leading_count = std::max(leading_count, count);
+   // At least a majority silent never disputes, the idle fallback included. Checked first, it also keeps the
+   // sum below from wrapping.
+   if (silent >= majority_size) {
+      sysio::print_f(DISPUTE_MAJORITY_SILENT_LOG, chain_code, epoch_index, silent, majority_size, group_size);
       return;
    }
-
-   uint32_t max_count = 0;
-   for (auto c : checksum_counts) {
-      if (c > max_count) max_count = c;
-   }
-   // Same strict-majority form as evalcons Option B -- these two MUST agree, or a split that
-   // evalcons treats as un-resolved could be declined a dispute here (or vice versa).
-   if (max_count * 2 > group_size) {  // a majority exists -> no vote needed
-      sysio::print_f("msgch::maybe_open_dispute: no dispute for (chain=%llu, epoch=%u): a version holds a majority (%u of group %u), resolved without a vote\n",
-                     chain_code, epoch_index, max_count, group_size);
-      return;
-   }
-
-   // A two-way split is not terminal while an eligible operator remains silent: that operator can
-   // still establish a strict majority. Three-or-more candidate splits intentionally retain the
-   // existing post-boundary dispute behavior.
-   if (seen_checksums.size() == chalg_limits::minimum_dispute_candidate_versions &&
-       total_deliveries != group_size) {
-      sysio::print_f(DISPUTE_INCOMPLETE_TWO_WAY_LOG,
-                     chain_code, epoch_index, total_deliveries, group_size);
+   if (leading_count + silent >= majority_size && !idle_dispute_fallback_reached(chain_code, last_delivery_at)) {
+      sysio::print_f(DISPUTE_A_VERSION_CAN_STILL_WIN_LOG,
+                     chain_code, epoch_index, leading_count, silent, majority_size, group_size);
       return;
    }
 
@@ -1143,7 +1161,7 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
    // REVERTING -- see `inbound_envelope_valid`. Runs AFTER the duplicate check, so a same-operator
    // re-delivery reports "already delivered" rather than a chain break once its first delivery has
    // reached consensus and advanced the tip. Validating here, rather than only soft-dropping at
-   // consensus, keeps an invalid envelope from ever being recorded: a post-boundary majority
+   // consensus, keeps an invalid envelope from ever being recorded: a majority
    // relaying the same invalid envelope can no longer reach consensus only to be soft-dropped, which
    // would strand the epoch with no `outpcons` row and no dispute path (consensus_reached stays
    // true). A reverted tx records nothing, so the operator can immediately deliver a corrected one.
@@ -1209,10 +1227,12 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
 void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
    require_auth(get_self());
 
-   // Consensus is reached only on a started chain's epochs (its epoch 1 onward).
-   if (epoch::current_epoch_index(chain_code) == 0) return;
+   // Consensus is reached only on a started chain's current epoch: the eligible set is its current group.
+   const uint32_t current_epoch = epoch::current_epoch_index(chain_code);
+   if (current_epoch == 0 || epoch_index != current_epoch) return;
 
-   // An epoch that reached consensus is decided: later deliveries only feed the slash classification at its close.
+   // A decided epoch stays decided: `deliver` records a later delivery of the accepted bytes as delivered and
+   // refuses a differing one.
    if (consensus_for_epoch(get_self(), chain_code, epoch_index)) return;
 
    envelopes_t envs(get_self());
@@ -1243,13 +1263,14 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
    };
 
    // Group envelopes by checksum, tracking the operators that delivered each version (CDT-compatible
-   // parallel vectors). The per-version operator lists become dispute candidates only for an
-   // all-delivered two-way tie or an existing multi-version split.
+   // parallel vectors). The per-version operator lists become dispute candidates once no version
+   // can still win.
    std::vector<checksum256>       seen_checksums;
    std::vector<uint32_t>          checksum_counts;
    std::vector<std::vector<char>> checksum_data;
    std::vector<std::vector<name>> checksum_operators;
-   uint32_t total_deliveries = 0;
+   uint32_t   total_deliveries = 0;
+   time_point last_delivery_at{};
 
    for (auto it = oe_idx.lower_bound(composite);
         it != oe_idx.end() && it->by_outpost_epoch() == composite; ++it) {
@@ -1270,51 +1291,40 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
          checksum_operators.push_back(std::vector<name>{it->batch_op_name});
       }
       total_deliveries++;
+      last_delivery_at = std::max(last_delivery_at, it->received_at);
    }
 
-   // Consensus check
-   bool consensus_reached = false;
-   size_t consensus_group = 0;
-
+   // Consensus on the first strict majority of the eligible set, whenever it forms. At most one
+   // version can hold one.
+   const uint32_t majority_size     = strict_majority_size(group_size);
+   bool           consensus_reached = false;
+   size_t         consensus_group   = 0;
    for (size_t g = 0; g < seen_checksums.size(); ++g) {
-      // Option A: ALL operators delivered identical data
-      if (checksum_counts[g] == group_size &&
-          total_deliveries == group_size) {
+      if (checksum_counts[g] >= majority_size) {
          consensus_reached = true;
-         consensus_group = g;
-         break;
-      }
-      // Option B: Majority at the chain's epoch boundary (current time >= its next_epoch_start).
-      // Strict majority written as `count * 2 > group_size` rather than `count > group_size / 2`:
-      // a short tail can be EVEN, where integer division would accept an exact half as a majority.
-      if (checksum_counts[g] * 2 > group_size && epoch_boundary_passed(chain_code)) {
-         consensus_reached = true;
-         consensus_group = g;
+         consensus_group   = g;
          break;
       }
    }
 
    if (!consensus_reached) {
-      // No automatic consensus. A terminal two-way tie or a three-or-more-version no-majority
-      // split past the epoch boundary opens a Tier-1 dispute vote; all other cases wait for more
-      // deliveries.
-      maybe_open_dispute(get_self(), chain_code, epoch_index, group_size, total_deliveries,
+      // A dispute opens once no version can still reach a majority; otherwise wait for more deliveries.
+      maybe_open_dispute(get_self(), chain_code, epoch_index, group_size, total_deliveries, last_delivery_at,
                          seen_checksums, checksum_counts, checksum_operators);
       return;
    }
 
    // Consensus reached: store + dispatch the winning envelope and record the per-outpost winner
-   // (so sysio.epoch::advance can classify each delivery). advance itself is triggered by chkcons
-   // once next_epoch_start has passed. On the evalcons path a rejected winner is a SOFT drop: the
-   // result is intentionally discarded and the epoch simply stays un-consensused (no outpcons row)
-   // until a valid delivery arrives or the split opens a dispute -- never throw here, a throw
-   // reverts the delivering operator's tx and stalls consensus chain-wide.
+   // (so sysio.epoch::advance can classify each delivery); chkcons advances the chain. A rejected
+   // winner is a SOFT drop on this path: the result is intentionally discarded and the epoch stays
+   // undecided (no outpcons row) until a valid delivery arrives or the split opens a dispute. The
+   // delivering operator's transaction never reverts here.
    (void)apply_consensus(get_self(), chain_code, epoch_index,
                          checksum_data[consensus_group], seen_checksums[consensus_group]);
 }
 
 // ---------------------------------------------------------------------------
-//  chkcons — check one outpost's consensus + time gate, trigger its advance
+//  chkcons — re-tally one outpost's undecided epoch, or advance a decided one past its boundary
 // ---------------------------------------------------------------------------
 void msgch::chkcons(uint64_t chain_code) {
    check(sysio::chains::outpost_kind_of(CHAINS_ACCOUNT, sysio::slug_name{chain_code}).has_value(),
@@ -1344,33 +1354,23 @@ void msgch::chkcons(uint64_t chain_code) {
    // with nothing to re-arm it -- apply_consensus does not re-fire once the delivery set is complete.
    // A stale row from a prior epoch fails this check; a fresh dispatch for the new epoch overwrites it.
    const bool has_consensus = consensus_for_epoch(get_self(), chain_code, epoch).has_value();
-   const bool past_boundary = current_time_point() >= state->next_epoch_start;
 
    if (!has_consensus) {
-      // Post-boundary re-evaluation. evalcons runs ONLY as an inline of deliver(), and deliver()
-      // rejects a second delivery from the same operator ("operator already delivered for this
-      // outpost+epoch"). So a majority that formed BEFORE the boundary, with no further delivery
-      // after it, is never re-examined once the time gate opens -- nothing on chain can trigger the
-      // evaluation and the epoch stalls permanently. Re-drive it from here: chkcons is
-      // permissionless and already cranked every tick by batch_operator_plugin.
-      //
-      // The inline is sent as msgch itself, so evalcons's require_auth(get_self()) still holds and
-      // its authority is unchanged. Inlines run after this action returns, so the refreshed
-      // outpcons row is observed by the NEXT tick -- this call still returns without advancing.
-      // Gated on past_boundary because Option B cannot fire before it, so a pre-boundary re-drive
-      // would be pure work with no possible effect.
-      if (past_boundary) {
-         action(
-            permission_level{get_self(), "active"_n},
-            get_self(),
-            "evalcons"_n,
-            std::make_tuple(chain_code, epoch)
-         ).send();
-      }
+      // Re-tally the undecided epoch, at any time: the eligible set can shrink mid-epoch (a slash, an
+      // eviction, a collateral drop) with no new delivery, which can decide the epoch or leave no
+      // version able to win. The inline is sent as msgch itself, so evalcons's require_auth holds. It
+      // runs after this action returns, so an epoch it decides advances on a later chkcons.
+      action(
+         permission_level{get_self(), "active"_n},
+         get_self(),
+         "evalcons"_n,
+         std::make_tuple(chain_code, epoch)
+      ).send();
       return;
    }
 
-   if (!past_boundary) return;
+   // A decided epoch advances once the chain's boundary has passed.
+   if (current_time_point() < state->next_epoch_start) return;
 
    // All conditions met. Trigger advance. Per-outpost consensus is intentionally NOT reset here:
    // advance() can legally return without advancing (its wall-clock check), and that graceful return does

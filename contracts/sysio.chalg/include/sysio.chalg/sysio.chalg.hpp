@@ -47,10 +47,10 @@ namespace sysio {
       //  OPP envelope dispute vote (Tier-1 node-owner resolution)
       // -----------------------------------------------------------------------
 
-      /// Open an OPP envelope dispute. Called inline by `sysio.msgch::evalcons` for a terminal
-      /// two-version tie or a post-boundary multi-version no-majority split. msgch owns the
-      /// consensus boundary, terminality, strict-majority, and electorate-preflight checks because
-      /// it alone has the live eligible group and delivery tally.
+      /// Open an OPP envelope dispute. Called inline by `sysio.msgch::evalcons` once no delivered
+      /// version can still reach a strict majority of the eligible group, or for a split past the
+      /// epoch's idle dispute fallback with fewer than a majority silent. msgch owns those checks and
+      /// the electorate preflight because it alone has the live eligible group and delivery tally.
       /// Records the candidate checksums, snapshots the Tier-1 electorate (the Tier-1
       /// rows of `sysio.roa::nodeowners` for the current network generation) together with its
       /// quorum, and pauses the disputed chain's epoch advancement until a Tier-1 node-owner vote
@@ -89,13 +89,14 @@ namespace sysio {
          SYSLIB_SERIALIZE(dispute_key, (id))
       };
 
-      /// OPP envelope dispute. Opened for an eligible post-boundary no-majority split with at least
-      /// two versions for one (outpost, epoch): exactly two versions require every eligible operator
-      /// to deliver, while a three-or-more-version split may open at the boundary. Resolved by a
-      /// Tier-1 node-owner vote on the canonical checksum. The row is retained after resolution as
-      /// the audit record (and as the guard that prevents re-opening the same (outpost, epoch)
-      /// dispute). A chain holds at most one OPEN dispute: opening one pauses the chain's epoch, and
-      /// deliveries bind to the chain's current epoch.
+      /// OPP envelope dispute. Opened for one (outpost, epoch) once no delivered version can still
+      /// reach a strict majority of the eligible group with the eligible operators still silent (so
+      /// at least two versions), or for a split of at least two versions, with fewer than a majority
+      /// silent, past the epoch's idle dispute fallback. Resolved by a Tier-1 node-owner vote on the
+      /// canonical checksum. The row is retained after resolution as the audit record (and as the
+      /// guard that prevents re-opening the same (outpost, epoch) dispute). A chain holds at most one
+      /// OPEN dispute: opening one pauses the chain's epoch, and deliveries bind to the chain's current
+      /// epoch.
       struct [[sysio::table("disputes")]] dispute_entry {
          uint64_t                       id;
          uint64_t                       chain_code;        ///< outpost slug_name value

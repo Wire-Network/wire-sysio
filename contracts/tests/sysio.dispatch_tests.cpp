@@ -1435,7 +1435,7 @@ BOOST_FIXTURE_TEST_CASE(chkcons_advances_without_a_treasury, sysio_dispatch_test
    start_dispatch_chain();
    const uint32_t epoch0 = current_epoch();
 
-   // operators_per_epoch == 1, so a single delivery is Option-A unanimous consensus; apply_consensus
+   // operators_per_epoch == 1, so a single delivery is a strict majority of the group; apply_consensus
    // records the outpcons row for ETH at epoch0.
    auto operator_payload = encode_operator_action(
       sysio::opp::attestations::OperatorAction::ACTION_TYPE_DEPOSIT_REQUEST,
@@ -1644,7 +1644,7 @@ BOOST_FIXTURE_TEST_CASE(forged_delivery_does_not_strand_chkcons, sysio_dispatch_
       deliver(eth_code, forged));
    produce_blocks();
 
-   // The valid delivery (operators_per_epoch == 1 => Option-A unanimous) reaches consensus normally.
+   // The valid delivery (operators_per_epoch == 1 => a strict majority) reaches consensus normally.
    BOOST_REQUIRE_EQUAL(success(), deliver(eth_code, valid));
    produce_blocks();
 

@@ -1143,8 +1143,8 @@ BOOST_FIXTURE_TEST_CASE(post_consensus_evalcons_refire_is_benign_noop, sysio_dis
    const uint32_t epoch = current_epoch();
    auto env = encode_envelope(epoch, "canonical");
 
-   // 1-op group: the first deliver reaches all-delivered consensus, dispatches, clears raw_data,
-   // erases the inbound message row, and records outpcons for this epoch.
+   // 1-op group: the first deliver is a strict majority, dispatches, clears raw_data, erases the
+   // inbound message row, and records outpcons for this epoch.
    BOOST_REQUIRE_EQUAL(success(), deliver(eth_code(), env));
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(epoch), outpcons_epoch(eth_code()));
 
