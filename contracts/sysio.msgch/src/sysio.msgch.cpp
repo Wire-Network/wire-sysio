@@ -772,28 +772,15 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
                                    const checksum256& winning_checksum) {
    const uint128_t composite = opp::outpost_epoch_key(chain_code, epoch_index);
 
-   // Idempotency guard, keyed off the DURABLE per-outpost consensus row. `outpcons.epoch_index` is
-   // written only here (apply_consensus) and never cleared, so `epoch_index == this epoch` reliably
-   // means the winning envelope for this (outpost, epoch) was already decoded, dispatched, and logged.
-   // chkcons keys its advance gate off this same signal.
-   //
-   // The guard matters because the consensus cleanup below clears `raw_data` from every delivery row.
-   // Without it, a post-quorum re-fire of evalcons would re-group the now-empty winning row and abort
-   // here on an empty-envelope decode -- turning a benign late delivery into a hard failure and, because
-   // the whole deliver tx reverts, dropping the late operator's own envelope row that epoch::advance
-   // needs to classify/slash. This no-op returns before any cleanup, so that row persists.
-   {
-      msgch::outpost_consensus_t opcons(self);
-      auto opc_pk = msgch::outpost_consensus_key{chain_code};
-      if (opcons.contains(opc_pk)) {
-         auto opc = opcons.get(opc_pk);
-         if (opc.epoch_index == epoch_index) {
-            sysio::print_f("apply_consensus: chain_code=%llu epoch=%u already dispatched, "
-                           "treating as benign no-op\n",
-                           static_cast<unsigned long long>(chain_code), epoch_index);
-            return true;   // winner already recorded for this epoch -- an accepted state
-         }
-      }
+   // Idempotency guard on the DURABLE per-outpost consensus row: a winner already recorded for this
+   // epoch was decoded, dispatched and logged, and is never applied again. Neither caller reaches it in
+   // normal operation (`evalcons` returns for a decided epoch, and a dispute opens only for an epoch
+   // without a winner), so it is defense in depth against a re-dispatch.
+   if (msgch::consensus_for_epoch(self, chain_code, epoch_index)) {
+      sysio::print_f("apply_consensus: chain_code=%llu epoch=%u already dispatched, "
+                     "treating as benign no-op\n",
+                     static_cast<unsigned long long>(chain_code), epoch_index);
+      return true;   // winner already recorded for this epoch -- an accepted state
    }
 
    const auto now     = current_time_point();
@@ -1172,16 +1159,8 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
    // re-validation. Anything else -- including a divergent envelope arriving after acceptance --
    // still validates against the advanced tip and reverts (fail closed: post-acceptance divergence
    // cannot open a dispute, so there is nothing to record it for).
-   bool late_confirmation = false;
-   {
-      msgch::outpost_consensus_t opcons(get_self());
-      auto opc_pk = msgch::outpost_consensus_key{chain_code};
-      if (opcons.contains(opc_pk)) {
-         const auto row    = opcons.get(opc_pk);
-         late_confirmation = row.epoch_index == epoch && row.consensus_reached &&
-                             row.winning_checksum == cs;
-      }
-   }
+   const std::optional<outpost_consensus_entry> consensus = consensus_for_epoch(get_self(), chain_code, epoch);
+   const bool late_confirmation = consensus && consensus->consensus_reached && consensus->winning_checksum == cs;
    if (!late_confirmation) {
       checksum256 ingress_digest{};
       checksum256 ingress_message_tip{};
@@ -1232,6 +1211,9 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
 
    // Consensus is reached only on a started chain's epochs (its epoch 1 onward).
    if (epoch::current_epoch_index(chain_code) == 0) return;
+
+   // An epoch that reached consensus is decided: later deliveries only feed the slash classification at its close.
+   if (consensus_for_epoch(get_self(), chain_code, epoch_index)) return;
 
    envelopes_t envs(get_self());
    auto oe_idx = envs.get_index<"byoutepoch"_n>();
@@ -1361,9 +1343,7 @@ void msgch::chkcons(uint64_t chain_code) {
    // commit is not rolled back, so a pre-emptive reset of consensus_reached would strand the epoch
    // with nothing to re-arm it -- apply_consensus does not re-fire once the delivery set is complete.
    // A stale row from a prior epoch fails this check; a fresh dispatch for the new epoch overwrites it.
-   const std::optional<outpost_consensus_entry> consensus =
-      outpost_consensus_t(get_self()).try_get(outpost_consensus_key{chain_code});
-   const bool has_consensus = consensus && consensus->epoch_index == epoch;
+   const bool has_consensus = consensus_for_epoch(get_self(), chain_code, epoch).has_value();
    const bool past_boundary = current_time_point() >= state->next_epoch_start;
 
    if (!has_consensus) {

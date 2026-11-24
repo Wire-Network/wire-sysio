@@ -434,8 +434,8 @@ void epoch::advance(sysio::slug_name chain_code) {
       // dispute resolution. Present only once a winner exists for the expiring epoch; absent it,
       // nothing is slashed (e.g. an epoch that never reached a winner).
       const std::optional<msgch::outpost_consensus_entry> consensus =
-         msgch::outpost_consensus_t(MSGCH_ACCOUNT).try_get(msgch::outpost_consensus_key{key.chain_code});
-      const bool have_winner = consensus && consensus->epoch_index == state.current_epoch_index;
+         msgch::consensus_for_epoch(MSGCH_ACCOUNT, key.chain_code, state.current_epoch_index);
+      const bool have_winner = consensus.has_value();
 
       /// One member's delivery result for the expiring epoch, retained until non-canonical
       /// offenders have been slashed. `recorddel` records every member, a newly slashed or evicted

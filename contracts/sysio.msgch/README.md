@@ -8,7 +8,8 @@ Inbound/outbound OPP message chain management and consensus tracking contract.
   operator per outpost per epoch (`MAX_ENVELOPE_BYTES` = 32,768; larger deliveries are rejected)
 - Evaluates consensus per (outpost, epoch): every eligible operator delivers an identical envelope
   (fast path), or a strict majority of the group agrees once the chain's epoch boundary has passed. A
-  post-boundary split with no strict majority opens a `sysio.chalg` dispute
+  post-boundary split with no strict majority opens a `sysio.chalg` dispute. An epoch that reached
+  consensus is decided: later deliveries are recorded only for the slash classification at its close
 - Validates the per-outpost envelope chain and message sequence, stores the accepted messages and
   attestations, and routes each attestation to its depot handler
 - Queues outbound attestations and packs them into one OPP envelope per outpost per epoch, schedule
@@ -36,7 +37,7 @@ Inbound/outbound OPP message chain management and consensus tracking contract.
 | `bootstrap` | `sysio.msgch` | Network genesis only: asserts the economic clock and `sysio.system` emissions config are set, then runs `sysio.epoch::advance` for every active outpost chain; fails if any has no seated schedule window |
 | `bootchain` | `sysio.msgch` | After the network genesis: runs the genesis `sysio.epoch::advance` of one active outpost chain activated later, whose schedule window must be seated |
 | `deliver` | batch operator (the chain's resident active group, `ACTIVE` in `sysio.opreg`, and a member of the chain that is not `EVICTED`) | Deliver an inbound envelope for an outpost's current epoch, from its epoch 1; calls `evalcons` inline |
-| `evalcons` | `sysio.msgch` | Evaluate consensus for an (outpost, epoch) of a started chain; on consensus store and dispatch the attestations; on an eligible split open a `sysio.chalg` dispute |
+| `evalcons` | `sysio.msgch` | Evaluate consensus for an (outpost, epoch) of a started chain; on consensus store and dispatch the attestations; on an eligible split open a `sysio.chalg` dispute. No effect once the epoch has reached consensus or has a dispute |
 | `chkcons` | permissionless | For one active outpost chain past its genesis: if no dispute is open on its current epoch, it has consensus and its boundary has passed, call `sysio.epoch::advance` for it |
 | `resolvedisp` | `sysio.chalg` | Dispatch the winning envelope of a resolved dispute |
 | `queueout` | `sysio.epoch`, `sysio.opreg`, `sysio.synd`, or `sysio.msgch` | Queue an outbound attestation for an outpost. Rejects `data` larger than `MAX_ATTESTATION_DATA_BYTES`, or `MAX_GENERAL_ATTESTATION_DATA_BYTES` (7,656) for a general-lane row, which must fit beside a full schedule lane, so every queued row ships. Also rejects a general-lane row once the outpost already holds `MAX_QUEUED_ATTESTATIONS` (512) of them |

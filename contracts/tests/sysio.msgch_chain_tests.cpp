@@ -2762,6 +2762,82 @@ BOOST_FIXTURE_TEST_CASE(chkcons_retries_terminal_tie_after_tier_one_registration
                            {ONE_OPERATOR_PER_TIED_VERSION, ONE_OPERATOR_PER_TIED_VERSION});
 } FC_LOG_AND_RETHROW() }
 
+/// An epoch that reached consensus is decided. When the chain's group then changes mid-epoch so that
+/// the deliveries of the new group split one to one, the epoch opens no dispute, keeps its recorded
+/// winner, and its close slashes only the delivery that differs from that winner.
+BOOST_FIXTURE_TEST_CASE(decided_epoch_opens_no_dispute_after_its_group_changes, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t         kOriginalGroupSize = 3;
+   constexpr uint32_t         kRebuiltGroupSize  = 2;
+   constexpr uint32_t         kGroups            = 1;
+   constexpr std::string_view kWinnerPayload     = "decided-winner";
+   constexpr std::string_view kDivergentPayload  = "decided-divergent";
+   namespace served = sysio_system::test_support::served_chains;
+
+   bootstrap(kOriginalGroupSize);
+   const uint32_t          epoch           = current_epoch();
+   const std::vector<char> winner          = encode_delivery(epoch, std::string(kWinnerPayload));
+   const std::vector<char> divergent       = encode_delivery(epoch, std::string(kDivergentPayload));
+   const fc::sha256        winner_checksum = fc::sha256::hash(winner.data(), winner.size());
+
+   // Group {A, B, C}: A and B deliver the winner and C a divergent envelope, all before the boundary.
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, winner));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, winner));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, divergent));
+   produce_blocks();
+
+   // Past the boundary the crank records the two-of-three majority.
+   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP));
+   produce_blocks();
+   {
+      const fc::variant consensus = get_outpcons(ETH_OUTPOST_ID);
+      BOOST_REQUIRE(!consensus.is_null());
+      BOOST_REQUIRE_EQUAL(consensus[msgch_fields::EPOCH_INDEX].as<uint32_t>(), epoch);
+      BOOST_REQUIRE_EQUAL(consensus[msgch_fields::WINNING_CHECKSUM].as_string(), winner_checksum.str());
+   }
+   BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, epoch), 1u);
+
+   // The group is rebuilt mid-epoch: A and B leave the chain, D joins it, and the schedule seats {C, D}.
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n,
+      mvo()("account", BATCHOP_D.to_string())("type", opp::types::OPERATOR_TYPE_BATCH)("is_bootstrapped", true)));
+   serve_chains({BATCHOP_D}, {ETH_CHAIN_CODE});
+   BOOST_REQUIRE_EQUAL(success(), served::leave(*this, BATCHOP, ETH_CHAIN_CODE));
+   BOOST_REQUIRE_EQUAL(success(), served::leave(*this, BATCHOP_B, ETH_CHAIN_CODE));
+   set_epoch_config(ETH_CHAIN_CODE, EPOCH_DURATION_SEC, kRebuiltGroupSize, kGroups);
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::SCHEDULE,
+                                       mvo()(epoch_fields::CHAIN_CODE, ETH_CHAIN_CODE)));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(epoch, current_epoch());
+   for (const name seated : {BATCHOP_C, BATCHOP_D}) BOOST_REQUIRE(seated_on(seated, ETH_OUTPOST_ID));
+   for (const name unseated : {BATCHOP, BATCHOP_B}) BOOST_REQUIRE(!seated_on(unseated, ETH_OUTPOST_ID));
+
+   // D confirms the recorded winner. Over the rebuilt group the epoch's deliveries now split one to one
+   // (C divergent, D the winner), yet the decided epoch opens no dispute, stays unpaused, and keeps its
+   // winner, dispatched once.
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_D, ETH_OUTPOST_ID, winner));
+   produce_blocks();
+   BOOST_REQUIRE(!find_inbound_delivery(ETH_OUTPOST_ID, epoch, BATCHOP_D).is_null());
+   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
+   BOOST_REQUIRE(!epoch_is_paused());
+   {
+      const fc::variant consensus = get_outpcons(ETH_OUTPOST_ID);
+      BOOST_REQUIRE_EQUAL(consensus[msgch_fields::EPOCH_INDEX].as<uint32_t>(), epoch);
+      BOOST_REQUIRE_EQUAL(consensus[msgch_fields::WINNING_CHECKSUM].as_string(), winner_checksum.str());
+   }
+   BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, epoch), 1u);
+
+   // The close slashes C, whose delivery differs from the recorded winner, and no one else.
+   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP_D));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED,
+                       get_operator(BATCHOP_C)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
+   for (const name canonical : {BATCHOP, BATCHOP_B, BATCHOP_D}) {
+      BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE,
+                          get_operator(canonical)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
+   }
+} FC_LOG_AND_RETHROW() }
+
 // Review follow-up on WNS-15(a): the consensus tally and the threshold must be drawn from the SAME
 // population. Sizing the group to the live set while still counting every delivery row lets a
 // slashed operator's pre-slash vote carry a threshold it is no longer part of:

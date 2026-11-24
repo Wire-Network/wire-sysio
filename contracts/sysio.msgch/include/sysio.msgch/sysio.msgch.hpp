@@ -11,6 +11,8 @@
 #include <sysio.opp.common/opp_keys.hpp>
 #include <magic_enum/magic_enum.hpp>
 
+#include <optional>
+
 namespace sysio {
 
 
@@ -122,12 +124,14 @@ namespace sysio {
       void deliver(name batch_op_name, uint64_t chain_code, std::vector<char> data);
 
       /// Evaluate consensus on inbound envelopes for an outpost+epoch.
-      /// Called inline from deliver. On consensus: unpacks envelope,
+      /// Called inline from deliver and chkcons. On consensus: unpacks envelope,
       /// stores messages + attestations, records per-outpost consensus.
       ///
       /// `chain_code` is the originating chain's slug_name value
       /// (see `deliver` for the convention). No effect before the chain's
-      /// genesis advance.
+      /// genesis advance, nor for an epoch that already reached consensus or
+      /// has a dispute: a decided epoch's later deliveries only feed the slash
+      /// classification at its close.
       [[sysio::action]]
       void evalcons(uint64_t chain_code, uint32_t epoch_index);
 
@@ -368,6 +372,17 @@ namespace sysio {
 
       using outpost_consensus_t =
          sysio::kv::table<"outpcons"_n, outpost_consensus_key, outpost_consensus_entry>;
+
+      /// Outpost `chain_code`'s `outpcons` row on `msgch_account` when it records the accepted winner of
+      /// `epoch_index`, else nullopt: `epoch_index` is written only on acceptance and never cleared, so
+      /// a row for another epoch records no winner for this one. Never throws.
+      static std::optional<outpost_consensus_entry> consensus_for_epoch(name msgch_account, uint64_t chain_code,
+                                                                        uint32_t epoch_index) {
+         std::optional<outpost_consensus_entry> consensus =
+            outpost_consensus_t(msgch_account).try_get(outpost_consensus_key{chain_code});
+         if (consensus && consensus->epoch_index != epoch_index) consensus.reset();
+         return consensus;
+      }
 
       /// Per-outpost outbound queue primary key.
       struct outbound_queue_key {

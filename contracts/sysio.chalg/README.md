@@ -33,7 +33,8 @@ OPP envelope dispute resolution and slash-execution contract.
 ## Dispute-vote flow
 
 1. **Open**: `sysio.msgch::evalcons` calls `opendispute` inline for an eligible post-boundary
-   no-majority split with at least two versions. A two-version split must be terminal (every
+   no-majority split with at least two versions, of an epoch that has not reached consensus.
+   A two-version split must be terminal (every
    eligible operator delivered); a three-or-more-version split may open at the boundary. The
    dispute records the candidate checksums, snapshots the active ROA generation's Tier-1 electorate
    and fixed quorum, and pauses the disputed chain's `sysio.epoch` advancement; other chains keep
