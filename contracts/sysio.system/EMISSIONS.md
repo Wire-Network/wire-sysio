@@ -51,7 +51,9 @@ catches up through many epochs, therefore pays every period exactly the work don
 in it, out of that period's own pools, as an on-time crank does; a period with no
 work leaves its pool in the treasury. Only state read at payout time can differ:
 a balance-held payout, and an operator's status or a producer's schedulability
-and standby position.
+and standby position. Snapshot attestations are not parked: they count toward the
+pay period open when they are recorded, so during a catch-up those made in later
+periods count toward an earlier period's late payout and can shift producer rank.
 
 Each `creditwork` credits at most `MAX_PARKED_WORK_ROWS` (100) rows, oldest
 epoch first, enough for a full producer schedule and the largest batch window
