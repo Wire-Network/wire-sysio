@@ -87,19 +87,28 @@ endif()
 set(UNIT_TEST_ARGS --report_level=detailed --log_level=test_suite --color_output)
 # Suites that run no WASM, so that the runtime does not matter to them: one entry each, <suite>_unit_test.
 string(CONCAT UNIT_TEST_NO_RUNTIME_SUITES
-    "^(authority_checker|be_key_codec|blake3_encoder|block_header|block_header_state|block_log_extraction|"
-    "block_timestamp|chainbase_fast_path|crypto_golden|ed25519|finality_core|finality_misc|int128|merkle_tree|name|"
+    "^(be_key_codec|blake3_encoder|block_header|block_header_state|block_log_extraction|block_timestamp|"
+    "chainbase_fast_path|crypto_golden|ed25519|finality_core|finality_misc|int128|merkle_tree|name|"
     "protocol_feature_digest|resource_limits|softfloat_golden|softfloat_thread_local|sysvmoc_code_cache|"
     "sysvmoc_signal_handler|thread_stack_size|transaction_dedup|wasm_jit_serialization)_tests?$")
 # Suites whose checks depend on wall-clock time: transaction deadlines and interrupts through the platform timer, and
-# CPU measured as elapsed time. They run alone, so other tests' load does not move those times.
+# work timed against a budget. They run alone, so other tests' load does not move those times. The first list runs no
+# WASM, like the suites above.
+set(UNIT_TEST_NO_RUNTIME_TIMED_SUITES "^(authority_checker|platform_timer)_tests$")
 set(UNIT_TEST_TIMED_SUITES
-    "^(abi|bls_primitives|checktime|crypto_primitives|platform_timer|receiver_cpu_billing)_tests$")
+    "^(abi|bls_primitives|checktime|crypto_primitives|ed25519_intrinsic|receiver_cpu_billing|sysvmoc_interrupt)_tests$")
 boost_test_discover_tests(unit_test
         NAME @NAME@_unit_test
         NAME_STRIP "s$" "_test$"
         INCLUDE "${UNIT_TEST_NO_RUNTIME_SUITES}"
         ARGS ${UNIT_TEST_ARGS})
+# RUN_SERIAL: ctest starts these only when no other test is running, and starts no other test until they end.
+boost_test_discover_tests(unit_test
+        NAME @NAME@_unit_test
+        NAME_STRIP "s$" "_test$"
+        INCLUDE "${UNIT_TEST_NO_RUNTIME_TIMED_SUITES}"
+        ARGS ${UNIT_TEST_ARGS}
+        PROPERTIES RUN_SERIAL TRUE)
 # One entry per suite per runtime, <suite without _tests>_unit_test_<runtime>, discovered from the built executable.
 # To run unit_test with all log from blockchain displayed, put "--verbose" after "--", i.e. "unit_test -- --verbose".
 # COST starts the longest suites first, even on a fresh run before ctest has measured them.
@@ -107,12 +116,12 @@ boost_test_discover_tests(unit_test
         NAME @NAME@_unit_test_@RUNTIME@
         NAME_STRIP "s$" "_test$"
         RUNTIMES ${UNIT_TEST_RUNTIMES}
-        EXCLUDE "${UNIT_TEST_NO_RUNTIME_SUITES}|${UNIT_TEST_TIMED_SUITES}"
+        EXCLUDE "${UNIT_TEST_NO_RUNTIME_SUITES}|${UNIT_TEST_NO_RUNTIME_TIMED_SUITES}|${UNIT_TEST_TIMED_SUITES}"
         ARGS ${UNIT_TEST_ARGS}
         COST_BY_NAME "^(api_part[1-3]|wasm_part[1-3]|wasm_config_part[1-5])$" 5000
              "^(snapshot_part[12]|finality)$" 4000
              "^delay$" 3000)
-# RUN_SERIAL: ctest holds these until no other test is running, then runs them one at a time.
+# The timed suites that run WASM, once per runtime, each alone.
 boost_test_discover_tests(unit_test
         NAME @NAME@_unit_test_@RUNTIME@
         NAME_STRIP "s$" "_test$"
@@ -150,7 +159,7 @@ add_test(NAME kv_doc_links_unit_test_check
          COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/check_kv_doc_test_links.py --unit-test $<TARGET_FILE:unit_test>
                  ${CMAKE_SOURCE_DIR}/docs/kv-behavior-spec.md ${CMAKE_SOURCE_DIR}/docs/kv-security-audit.md)
 # Include every unit_test entry, including the runtime-independent suites.
-set(ctest_tests "'_unit_test(_|$)' -LE wasm_spec_tests -j8")
+set(ctest_tests "_unit_test(_|$)")
 
 ### COVERAGE TESTING ###
 if(ENABLE_COVERAGE_TESTING)
@@ -165,20 +174,25 @@ if(ENABLE_COVERAGE_TESTING)
   if(NOT GENHTML_PATH)
     message(FATAL_ERROR "genhtml not found! Aborting...")
   endif()
-  # tests to skip during coverage testing
-  set(ctest_exclude_tests '') # no spaces allowed within tests list
-  # setup target
+  # setup target; VERBATIM hands each argument to its command unchanged, the test regex's `$` included
   add_custom_target(${Coverage_NAME}
     # cleanup lcov
     COMMAND ${LCOV_PATH} --directory . --zerocounters
     # run tests
-    COMMAND ./tools/ctestwrapper.sh -R ${ctest_tests} -E ${ctest_exclude_tests}
-    COMMAND ${LCOV_PATH} --directory . --capture --gcov-tool ${CMAKE_SOURCE_DIR}/tools/llvm-gcov.sh --output-file ${Coverage_NAME}.info
-    COMMAND ${LCOV_PATH} -remove ${Coverage_NAME}.info '*/boost/*' '/usr/lib/*' '/usr/include/*' '*/externals/*' '*/libfc/*' '*/wasm-jit/*' --output-file ${Coverage_NAME}_filtered.info
+    COMMAND ./tools/ctestwrapper.sh -R ${ctest_tests} -LE wasm_spec_tests -j8
+    COMMAND ${LCOV_PATH} --directory . --capture --gcov-tool ${CMAKE_SOURCE_DIR}/tools/llvm-gcov.sh
+            --output-file ${Coverage_NAME}.info
+    COMMAND ${LCOV_PATH} -remove ${Coverage_NAME}.info */boost/* /usr/lib/* /usr/include/* */externals/* */libfc/*
+            */wasm-jit/* --output-file ${Coverage_NAME}_filtered.info
     COMMAND ${GENHTML_PATH} -o ${Coverage_NAME} ${PROJECT_BINARY_DIR}/${Coverage_NAME}_filtered.info
-    COMMAND if [ "$CI" != "true" ]\; then ${CMAKE_COMMAND} -E remove ${Coverage_NAME}.base ${Coverage_NAME}.info ${Coverage_NAME}_filtered.info ${Coverage_NAME}.total ${PROJECT_BINARY_DIR}/${Coverage_NAME}.info.cleaned ${PROJECT_BINARY_DIR}/${Coverage_NAME}_filtered.info.cleaned\; fi
+    # outside CI, remove the intermediate files: sh runs `$0 -E remove $@` with the cmake and file arguments after it
+    COMMAND sh -c "if [ \"$CI\" != true ]; then \"$0\" -E remove \"$@\"; fi" ${CMAKE_COMMAND}
+            ${Coverage_NAME}.base ${Coverage_NAME}.info ${Coverage_NAME}_filtered.info ${Coverage_NAME}.total
+            ${PROJECT_BINARY_DIR}/${Coverage_NAME}.info.cleaned
+            ${PROJECT_BINARY_DIR}/${Coverage_NAME}_filtered.info.cleaned
     WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
     COMMENT "Resetting code coverage counters to zero. Processing code coverage counters and generating report. Report published in ./${Coverage_NAME}"
+    VERBATIM
   )
   # show info where to find the report
   add_custom_command(TARGET ${Coverage_NAME} POST_BUILD
