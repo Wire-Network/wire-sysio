@@ -35,6 +35,8 @@ public:
    static constexpr auto MSGCH_ACCOUNT  = "sysio.msgch"_n;
    static constexpr auto CHALG_ACCOUNT  = "sysio.chalg"_n;
    static constexpr auto CHAINS_ACCOUNT = "sysio.chains"_n;
+   static constexpr auto AUTHEX_ACCOUNT = "sysio.authex"_n;
+   static constexpr auto DCLAIM_ACCOUNT = "sysio.dclaim"_n;
    static constexpr auto BATCHOP        = "batchop.a"_n;
    static constexpr auto UWRIT_OP       = "uwrit.alice"_n;
    static constexpr auto UWRIT_OP_B     = "uwrit.bob"_n;
@@ -68,7 +70,7 @@ public:
          TOKEN_ACCOUNT, EPOCH_ACCOUNT, OPREG_ACCOUNT, MSGCH_ACCOUNT,
          CHALG_ACCOUNT, CHAINS_ACCOUNT, BATCHOP, UWRIT_OP,
          UWRIT_OP_B, UWRIT_OP_C,
-         "sysio.dclaim"_n, "sysio.gov"_n, "sysio.ops"_n
+         DCLAIM_ACCOUNT, "sysio.gov"_n, "sysio.ops"_n
       });
       produce_blocks(2);
 
@@ -82,6 +84,9 @@ public:
       deploy(MSGCH_ACCOUNT,  contracts::msgch_wasm(),  contracts::msgch_abi(),  msgch_abi);
       deploy(CHAINS_ACCOUNT, contracts::chains_wasm(), contracts::chains_abi(), chains_abi);
       deploy(TOKEN_ACCOUNT,  contracts::token_wasm(),  contracts::token_abi(),  token_abi);
+      // A batch operator serves a chain only with its authex link for the chain's kind.
+      deploy(AUTHEX_ACCOUNT, contracts::authex_wasm(), contracts::authex_abi(), authex_abi);
+      deploy(DCLAIM_ACCOUNT, contracts::dclaim_wasm(), contracts::dclaim_abi(), dclaim_abi);
       produce_blocks(1);
 
       // sysio.system on the system account replaces the default BIOS contract.
@@ -251,6 +256,9 @@ public:
             ("description",       std::string{})
             ("outpost", sysio_system::test_support::no_outpost_mvo())));
 
+      sysio_system::test_support::served_chains::serve(*this, {BATCHOP}, {
+         {CHAINS[0], ChainKind::CHAIN_KIND_SVM}, {CHAINS[1], ChainKind::CHAIN_KIND_EVM}});
+
       // Each chain's genesis advance — permissionless until its current_epoch_index moves off zero.
       for (const std::string_view chain : CHAINS) {
          BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
@@ -397,7 +405,7 @@ public:
          get_currency_balance(TOKEN_ACCOUNT, symbol(9, "WIRE"), account).get_amount());
    }
 
-   abi_serializer sysio_abi, token_abi, epoch_abi, opreg_abi, msgch_abi, chains_abi;
+   abi_serializer sysio_abi, token_abi, epoch_abi, opreg_abi, msgch_abi, chains_abi, authex_abi, dclaim_abi;
 };
 
 // ---- Tests ----

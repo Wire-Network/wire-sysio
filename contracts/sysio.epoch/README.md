@@ -13,7 +13,8 @@ The depot's two clocks, and batch operator scheduling, for the OPP (Outpost Prot
   the producer pay slot count, and never waits on outpost consensus.
 - Builds each chain's initial batch operator schedule with `schbatchgps` and maintains it as a sliding
   window of `batch_op_groups` groups of `operators_per_epoch` members; the group on duty is always the
-  front of the window. Every `ACTIVE` batch operator is eligible on every chain
+  front of the window. A chain seats only the `ACTIVE` batch operators that serve it (`SERVING` in
+  `sysio.opreg::servchains`)
 - Advances a chain's consensus epoch (`advance`), crank-driven by `sysio.msgch::chkcons` after its genesis
 - Opens economic epochs (`tickeconomy`), a permissionless crank the batch operators push
 - Gates each economic epoch's emissions on readiness: if `sysio.system` cannot accrue or pay, the
@@ -42,7 +43,7 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
 |--------|------|-------------|
 | `setconfig` | `sysio.epoch` | Set one chain's consensus epoch configuration. Requires `operators_per_epoch * batch_op_groups == batch_operator_minimum_active` and enforces the outposts' limits (`MAX_OPERATORS_PER_EPOCH` 7, Ethereum's group size; `MAX_BATCH_OP_GROUPS` 8, Solana's group count), so the window holds at most `MAX_SCHEDULED_BATCH_OPERATORS` (56) |
 | `seteconomy` | `sysio.epoch` | Set the economic clock's duration and grid start. The start is fixed once the clock has ticked; it is re-validated against `sysio.system`'s pay-period accrual bound |
-| `schbatchgps` | `sysio.epoch` | Build one chain's initial window from the `ACTIVE` batch operators on `sysio.opreg` (non-bootstrapped first, then bootstrapped, trimmed to `batch_operator_minimum_active`) |
+| `schbatchgps` | `sysio.epoch` | Build one chain's initial window from the `ACTIVE` batch operators on `sysio.opreg` that serve the chain (non-bootstrapped first, then bootstrapped, trimmed to `batch_operator_minimum_active`) |
 | `advance` | permissionless at a chain's genesis (epoch 0 → 1); afterwards `sysio.msgch` or `sysio.epoch` | Advance one chain's consensus epoch once its wall-clock boundary has passed and it is not paused |
 | `tickeconomy` | permissionless | Open economic epoch `epoch_index`: refused unless it is the next index, its grid boundary has passed, and the network genesis has happened |
 | `pause` | `sysio.chalg` | Pause one chain's epoch advancement |
@@ -57,9 +58,9 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
    `sysio.opreg::termcheck`, and each member of the group earns the epoch's scheduled length in
    seat-seconds through `sysio.system::rcrdduty` (skipped until `sysio.system::initt5` has run).
 2. Bump the chain's consensus epoch index, drop the expired group from the front of its window and
-   append a new tail group drawn from `ACTIVE` batch operators that are not already resident
-   (non-bootstrapped first). The resident groups stay disjoint, so an operator serves at most once
-   every `batch_op_groups` epochs.
+   append a new tail group drawn from the `ACTIVE` batch operators serving the chain that are not
+   already resident (non-bootstrapped first). The resident groups stay disjoint, so an operator serves
+   at most once every `batch_op_groups` epochs.
 3. Queue the chain's outpost `OPERATORS` (the operators its window seats, in account order, with their
    status and authex links; none for an empty window) when its `rostersent` hash differs, and
    `BATCH_OPERATOR_GROUPS` (withheld when the next group is empty), stamped with the chain's epoch

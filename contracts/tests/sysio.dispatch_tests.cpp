@@ -482,6 +482,7 @@ public:
             ("description",       std::string{})
             ("outpost", sysio_system::test_support::no_outpost_mvo())));
 
+      sysio_system::test_support::served_chains::serve(*this, {BATCHOP}, {{outpost_code, outpost_kind}});
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
          "schbatchgps"_n, mvo()("chain_code", outpost_code)));
 
@@ -983,9 +984,12 @@ BOOST_FIXTURE_TEST_CASE(dispatch_existing_node_owner_name_rejects_without_blocki
    create_accounts({CLAIM_ACCOUNT});
    constexpr auto fresh = "freshclaim"_n;
    const auto victim_key = get_public_key(CLAIM_ACCOUNT, "active");
+   // Bootstrap linked the underwriter (row 0) and the batch operator it schedules (row 1).
    const auto operator_link = get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 0);
+   const auto batch_link    = get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 1);
    BOOST_REQUIRE(!operator_link.empty());
-   BOOST_REQUIRE(get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 1).empty());
+   BOOST_REQUIRE(!batch_link.empty());
+   BOOST_REQUIRE(get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 2).empty());
    const auto eth_pub = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
    const auto eth_address = fc::crypto::ethereum::address_to_bytes(eth_pub);
    const std::vector<char> native_address(eth_address.begin(), eth_address.end());
@@ -1007,12 +1011,13 @@ BOOST_FIXTURE_TEST_CASE(dispatch_existing_node_owner_name_rejects_without_blocki
    BOOST_CHECK(get_nodeowner(CLAIM_ACCOUNT).is_null());
    BOOST_CHECK(get_dclaim_row("pclaims"_n, "pending_claim", CLAIM_ACCOUNT.to_uint64_t()).is_null());
    // Only the fresh account's link may consume the depositor's imported credit.
-   // Bootstrap already linked the underwriter; preserve it and add only the fresh owner's link.
+   // Preserve the bootstrap links and add only the fresh owner's link.
    BOOST_CHECK(get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 0) == operator_link);
-   const auto linked = get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 1);
+   BOOST_CHECK(get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 1) == batch_link);
+   const auto linked = get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 2);
    BOOST_REQUIRE(!linked.empty());
    BOOST_CHECK_EQUAL(authex_abi.binary_to_variant("links_s", linked, fixture_abi_yield_function())["username"].as<name>(), fresh);
-   BOOST_CHECK(get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 2).empty());
+   BOOST_CHECK(get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 3).empty());
    BOOST_REQUIRE(!get_nodeowner(fresh).is_null());
    BOOST_CHECK_EQUAL(get_nodeownerreg(fresh)["status"].as<uint64_t>(), audit::status_confirmed);
    BOOST_CHECK_EQUAL(get_dclaim_row("pclaims"_n, "pending_claim", fresh.to_uint64_t())["balance"].as<asset>().get_amount(), 4321);

@@ -100,6 +100,8 @@ public:
    static constexpr auto OPREG_ACCOUNT  = "sysio.opreg"_n;
    static constexpr auto CHAINS_ACCOUNT = "sysio.chains"_n;
    static constexpr auto ROA_ACCOUNT    = "sysio.roa"_n;
+   static constexpr auto AUTHEX_ACCOUNT = "sysio.authex"_n;
+   static constexpr auto DCLAIM_ACCOUNT = "sysio.dclaim"_n;
    static constexpr auto BATCHOP        = "batchop.a"_n;
    static constexpr uint64_t ROA_NETWORK_GEN = 0;
 
@@ -112,7 +114,7 @@ public:
 
       create_accounts({
          CHALG_ACCOUNT, EPOCH_ACCOUNT, MSGCH_ACCOUNT, OPREG_ACCOUNT,
-         CHAINS_ACCOUNT, BATCHOP, "sysio.token"_n
+         CHAINS_ACCOUNT, DCLAIM_ACCOUNT, BATCHOP, "sysio.token"_n
       });
       // Tier-1 voter accounts (node owners) and a Tier-2 account (ineligible voter). Created without
       // a roa policy.
@@ -126,6 +128,9 @@ public:
       deploy(MSGCH_ACCOUNT,  contracts::msgch_wasm(),  contracts::msgch_abi(),  msgch_abi);
       deploy(OPREG_ACCOUNT,  contracts::opreg_wasm(),  contracts::opreg_abi(),  opreg_abi);
       deploy(CHAINS_ACCOUNT, contracts::chains_wasm(), contracts::chains_abi(), chains_abi);
+      // A batch operator serves a chain only with its authex link for the chain's kind.
+      deploy(AUTHEX_ACCOUNT, contracts::authex_wasm(), contracts::authex_abi(), authex_abi);
+      deploy(DCLAIM_ACCOUNT, contracts::dclaim_wasm(), contracts::dclaim_abi(), dclaim_abi);
 
       // sysio.roa is a genesis system account already running this build's code; load its abi.
       load_abi(ROA_ACCOUNT, roa_abi);
@@ -217,12 +222,19 @@ public:
          ("external_chain_id", 31337)("name", std::string("ethereum-test"))("description", std::string{})
          ("outpost", sysio_system::test_support::no_outpost_mvo())));
 
+      serve_eth({BATCHOP});
       BOOST_REQUIRE_EQUAL(success(), schbatchgps());
       produce_blocks();
    }
 
    /// The outpost chain the stack registers and schedules.
    static constexpr std::string_view ETH_CHAIN_CODE = "ETH";
+
+   /// Link each of `ops` to a fresh EVM key and join it to the ETH outpost.
+   void serve_eth(const std::vector<name>& ops) {
+      sysio_system::test_support::served_chains::serve(
+         *this, ops, {{ETH_CHAIN_CODE, ChainKind::CHAIN_KIND_EVM}});
+   }
 
    uint64_t eth_code() const { return fc::slug_name{ETH_CHAIN_CODE}.value; }
 
@@ -410,7 +422,7 @@ public:
          ("batch_op_name", op.to_string())("chain_code", chain_code)("data", data));
    }
 
-   abi_serializer chalg_abi, epoch_abi, msgch_abi, opreg_abi, chains_abi, roa_abi, system_abi;
+   abi_serializer chalg_abi, epoch_abi, msgch_abi, opreg_abi, chains_abi, roa_abi, system_abi, authex_abi, dclaim_abi;
 };
 
 /// The same OPP stack WITHOUT the emissions configuration: for tests that register node owners
@@ -1013,6 +1025,8 @@ BOOST_FIXTURE_TEST_CASE(chkdispute_unpauses_only_the_disputed_chain, sysio_dispu
    BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "setconfig"_n, mvo()
       ("chain_code", BASE_CHAIN_CODE)("epoch_duration_sec", 60)("operators_per_epoch", 1)
       ("batch_operator_minimum_active", 1)("batch_op_groups", 1)("epoch_retention_envelope_log_count", 200)));
+   // batchop.a already holds the EVM link the ETH outpost needed.
+   BOOST_REQUIRE_EQUAL(success(), sysio_system::test_support::served_chains::join(*this, BATCHOP, BASE_CHAIN_CODE));
    BOOST_REQUIRE_EQUAL(success(), schbatchgps(BASE_CHAIN_CODE));
    const uint64_t base_code = fc::slug_name{BASE_CHAIN_CODE}.value;
 
@@ -1073,6 +1087,7 @@ BOOST_FIXTURE_TEST_CASE(slashed_op_excluded_from_scheduling_no_double_slash, sys
          ("account", op.to_string())("type", OperatorType::OPERATOR_TYPE_BATCH)("is_bootstrapped", true));
    };
    BOOST_REQUIRE_EQUAL(success(), regop(BATCHOP_B));
+   serve_eth({BATCHOP_B});
 
    // Single 2-member group; with a and b the only ACTIVE batch ops, both are placed.
    BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "setconfig"_n, mvo()
@@ -1097,6 +1112,7 @@ BOOST_FIXTURE_TEST_CASE(slashed_op_excluded_from_scheduling_no_double_slash, sys
    // Bring c online so two ACTIVE ops remain, then re-schedule: the filter keeps the live ops
    // (a, c) and drops the slashed one (b).
    BOOST_REQUIRE_EQUAL(success(), regop(BATCHOP_C));
+   serve_eth({BATCHOP_C});
    BOOST_REQUIRE_EQUAL(success(), schbatchgps());
    auto g1 = current_group();
    BOOST_REQUIRE(!group_contains(g1, BATCHOP_B));   // slashed -> never re-enters a group
@@ -1185,6 +1201,7 @@ BOOST_FIXTURE_TEST_CASE(deliver_rejects_decollateralized_unknown_group_member, s
       ("is_bootstrapped", false)));
    BOOST_REQUIRE_EQUAL(success(), fund_and_bond(BATCHOP_B, MIN_BOND));
    BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_ACTIVE", operator_status(BATCHOP_B));
+   serve_eth({BATCHOP_B});
 
    // Schedule it into the single-slot group (non-bootstrapped sorts ahead of the
    // bootstrapped default op, so batchop.b takes the slot).

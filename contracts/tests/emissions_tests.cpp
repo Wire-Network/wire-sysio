@@ -4525,7 +4525,6 @@ BOOST_FIXTURE_TEST_CASE( cadence_drop_midperiod_does_not_multiply_batch_payout,
    BOOST_REQUIRE_EQUAL( success(), init_epoch_state(60, /*operators_per_epoch*/1,
                                                     /*batch_op_groups_count*/1) );
    produce_blocks(1);
-   BOOST_REQUIRE_EQUAL( success(), push_epoch_action(EPOCH, "schbatchgps"_n, mvo()("chain_code", EPOCH_CHAIN)) );
 
    setup_producers(1);
    wait_for_producer_schedule();
@@ -4990,7 +4989,6 @@ BOOST_FIXTURE_TEST_CASE( claimnodedis_reserves_outstanding_epoch_pay, sysio_emis
    BOOST_REQUIRE_EQUAL( success(), init_epoch_state(60, /*operators_per_epoch*/1,
                                                     /*batch_op_groups_count*/1) );
    produce_blocks(1);
-   BOOST_REQUIRE_EQUAL( success(), push_epoch_action(EPOCH, "schbatchgps"_n, mvo()("chain_code", EPOCH_CHAIN)) );
    setup_producers(1);
    wait_for_producer_schedule();
    produce_complete_cycles(1, 2);

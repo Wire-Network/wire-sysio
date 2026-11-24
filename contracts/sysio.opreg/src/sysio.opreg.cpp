@@ -73,6 +73,19 @@ constexpr std::string_view wire_earns_no_yield_msg = "WIRE collateral earns no s
 constexpr std::string_view still_seated_msg =
    "operator still holds a batch schedule seat: it may register again once its seats have closed";
 
+/// Message of the `check` `regoperator` raises for an operator with no link for an active outpost.
+constexpr std::string_view missing_outpost_link_msg = "missing authex link for outpost chain";
+
+/// Messages of the `check`s `joinchain` and `leavechain` raise.
+constexpr std::string_view only_batch_serves_chains_msg = "only a batch operator serves chains";
+constexpr std::string_view terminal_operator_join_msg   = "a slashed or terminated operator cannot serve a chain";
+constexpr std::string_view chain_not_active_outpost_msg = "chain is not an active outpost";
+constexpr std::string_view missing_chain_link_msg       = "missing authex link for the chain's kind";
+constexpr std::string_view already_serving_msg          = "operator already serves this chain";
+constexpr std::string_view still_seated_on_chain_msg =
+   "operator still holds a seat in this chain's schedule: it may rejoin once its seats have closed";
+constexpr std::string_view not_serving_msg              = "operator does not serve this chain";
+
 /// Resolve a depot-native collateral `token_code` through the shared resolver, against this
 /// registry's custody contracts (`sysio.token` for WIRE, `sysio.liq` for a shadow LIQ symbol).
 ///
@@ -125,7 +138,7 @@ uint64_t current_time_ms() {
 /// (uint128) and `ChainAddress.kind` is still `ChainKind`; this helper is
 /// the bridge for opreg's slug_name-typed paths into those legacy surfaces.
 std::optional<opp::types::ChainKind> chain_kind_for_code(sysio::slug_name chain_code) {
-   sysio::chains::chains_t chains_tbl(name{"sysio.chains"_n});
+   sysio::chains::chains_t chains_tbl(opreg::CHAINS_ACCOUNT);
    sysio::chains::chain_key pk{chain_code};
    if (!chains_tbl.contains(pk)) return std::nullopt;
    return chains_tbl.get(pk).kind;
@@ -201,17 +214,48 @@ void preserve_yield_debt(name self, const opreg::operator_entry& op) {
    }
 }
 
-/// True while `account` holds a seat in any group of any outpost chain's batch-operator schedule
-/// window. A seat stays until the window slides past it, whatever the operator's status in the
-/// meantime.
+/// True while one chain's schedule window `state` seats `account` in any of its groups. A seat stays
+/// until the window slides past it, whatever the operator's status in the meantime.
+bool window_seats(const sysio::epoch::epoch_state& state, name account) {
+   for (const auto& group : state.batch_op_groups) {
+      if (std::find(group.begin(), group.end(), account) != group.end()) return true;
+   }
+   return false;
+}
+
+/// True while `account` holds a seat in any outpost chain's batch-operator schedule window.
 bool holds_schedule_seat(name account) {
    sysio::epoch::epochstate_t states(opreg::EPOCH_ACCOUNT);
    for (auto it = states.begin(); it != states.end(); ++it) {
-      for (const auto& group : it->batch_op_groups) {
-         if (std::find(group.begin(), group.end(), account) != group.end()) return true;
-      }
+      if (window_seats(*it, account)) return true;
    }
    return false;
+}
+
+/// True while `account` holds a seat in outpost `chain_code`'s batch-operator schedule window.
+bool holds_schedule_seat(name account, sysio::slug_name chain_code) {
+   const std::optional<sysio::epoch::epoch_state> state = sysio::epoch::epoch_state_of(chain_code.value);
+   return state && window_seats(*state, account);
+}
+
+/// `account`'s `sysio.authex` link for chain family `kind`, or nullopt when it has none.
+std::optional<authex::links_s> authex_link_of(name account, opp::types::ChainKind kind) {
+   authex::links_t links(opreg::AUTHEX_ACCOUNT);
+   auto            idx = links.get_index<"bynamechain"_n>();
+   auto            it  = idx.find(to_namechain_key(account, kind));
+   if (it == idx.end()) return std::nullopt;
+   return *it;
+}
+
+/// Erase every chain membership of `account`: its operator row is being pruned or replaced by a new
+/// registration, which serves no chain until it joins one.
+void erase_memberships(name self, name account) {
+   opreg::servchains_t members(self);
+   auto                by_account = members.get_index<"byaccount"_n>();
+   for (auto it = by_account.lower_bound(account.value);
+        it != by_account.end() && it->account == account;) {
+      it = by_account.erase(std::move(it));
+   }
 }
 
 } // anonymous namespace
@@ -339,6 +383,7 @@ void opreg::regoperator(name account,
             "re-register once its balances are drained");
       preserve_yield_debt(get_self(), existing);
       ops.erase(op_pk);
+      erase_memberships(get_self(), account);
    }
 
    // A seat left from an earlier registration would close against this one and record a miss for
@@ -346,26 +391,14 @@ void opreg::regoperator(name account,
    // window slides past them.
    check(!holds_schedule_seat(account), still_seated_msg);
 
-   // Verify authex links exist for all active outpost chains.
-   // Skip when: bootstrapped OR privileged caller (sysio.opreg registering on behalf)
-   //
-   // After the refactor: the outpost set lives in `sysio.chains::chains` keyed
-   // by slug_name. The depot self-row (`is_depot == true`) is skipped; only
-   // active outpost chains require an authex link. `authex::links.bynamechain`
-   // is still keyed by ChainKind (uint128 of (account, ChainKind)), so we
-   // pull `kind` off each chain row.
-   if (!is_bootstrapped && !has_auth(get_self())) {
-      sysio::chains::chains_t chains_tbl(name{"sysio.chains"_n});
-      authex::links_t links(AUTHEX_ACCOUNT);
-      auto namechain_idx = links.get_index<"bynamechain"_n>();
-
-      for (auto op_it = chains_tbl.begin(); op_it != chains_tbl.end(); ++op_it) {
-         if (op_it->is_depot) continue;       // depot self-row carries no outpost
-         if (!op_it->active)  continue;       // pre-active chain rows have no expectation yet
-         uint128_t composite_key = to_namechain_key(account, op_it->kind);
-         auto link_it = namechain_idx.find(composite_key);
-         check(link_it != namechain_idx.end(),
-               "missing authex link for outpost chain");
+   // An operator registering itself needs an authex link for every active outpost (the depot
+   // self-row and pre-active rows carry no expectation). A batch operator is checked per chain at
+   // `joinchain` instead, for only the chains it serves.
+   if (type != OperatorType::OPERATOR_TYPE_BATCH && !is_bootstrapped && !has_auth(get_self())) {
+      sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
+      for (auto chain_it = chains_tbl.begin(); chain_it != chains_tbl.end(); ++chain_it) {
+         if (chain_it->is_depot || !chain_it->active) continue;
+         check(authex_link_of(account, chain_it->kind).has_value(), missing_outpost_link_msg);
       }
    }
 
@@ -386,6 +419,57 @@ void opreg::regoperator(name account,
    // processprod for producers regardless of transition, which is the notification that does it.
    // Declared below; see the forward declaration above regoperator.
    reevaluate_eligibility(ops, op_pk, get_self(), account);
+}
+
+// ---------------------------------------------------------------------------
+//  joinchain / leavechain — the outpost chains a batch operator serves
+// ---------------------------------------------------------------------------
+void opreg::joinchain(name account, sysio::slug_name chain_code) {
+   // Privileged sysio.opreg joins on the operator's behalf at bootstrap; the link check still holds.
+   if (!has_auth(get_self())) {
+      require_auth(account);
+   }
+
+   operators_t ops(get_self());
+   const std::optional<operator_entry> op = ops.try_get(operator_key{account.value});
+   check(op.has_value(), operator_not_found_msg);
+   check(op->type == OperatorType::OPERATOR_TYPE_BATCH, only_batch_serves_chains_msg);
+   check(!op->has_terminal_status(), terminal_operator_join_msg);
+
+   // The chain's roster carries the operator's address from this link.
+   const std::optional<opp::types::ChainKind> kind = sysio::chains::outpost_kind_of(CHAINS_ACCOUNT, chain_code);
+   check(kind.has_value(), chain_not_active_outpost_msg);
+   check(authex_link_of(account, *kind).has_value(), missing_chain_link_msg);
+
+   servchains_t                       members(get_self());
+   const served_chain_key             key{chain_code, account};
+   const std::optional<served_chain> existing = members.try_get(key);
+   if (existing) {
+      check(existing->status != chain_service_status::SERVING, already_serving_msg);
+      check(!holds_schedule_seat(account, chain_code), still_seated_on_chain_msg);
+   }
+
+   const uint64_t now = current_time_ms();
+   members.set(ram_payer, key, served_chain{
+      .account       = account,
+      .chain_code    = chain_code,
+      .status        = chain_service_status::SERVING,
+      .joined_at_ms  = now,
+      .updated_at_ms = now,
+   });
+}
+
+void opreg::leavechain(name account, sysio::slug_name chain_code) {
+   require_auth(account);
+
+   servchains_t                 members(get_self());
+   const served_chain_key       key{chain_code, account};
+   std::optional<served_chain> membership = members.try_get(key);
+   check(membership && membership->status == chain_service_status::SERVING, not_serving_msg);
+
+   membership->status        = chain_service_status::LEFT;
+   membership->updated_at_ms = current_time_ms();
+   members.set(ram_payer, key, *membership);
 }
 
 // ---------------------------------------------------------------------------
@@ -731,12 +815,9 @@ opp::types::ChainAddress operator_chain_address(name account, sysio::slug_name c
    const opp::types::ChainKind kind = *kind_opt;
    addr.kind = kind;
 
-   authex::links_t links(opreg::AUTHEX_ACCOUNT);
-   auto idx = links.get_index<"bynamechain"_n>();
-   uint128_t key = to_namechain_key(account, kind);
-   auto it = idx.find(key);
-   if (it != idx.end()) {
-      addr.address = pubkey_to_bytes(it->pub_key);
+   const std::optional<authex::links_s> link = authex_link_of(account, kind);
+   if (link) {
+      addr.address = pubkey_to_bytes(link->pub_key);
    }
    return addr;
 }
@@ -1617,6 +1698,7 @@ void opreg::prune() {
                                  && now - it->terminated_at >= cfg.terminate_prune_delay_ms;
       if (delay_elapsed && is_fully_settled(*it)) {
          preserve_yield_debt(get_self(), *it);
+         erase_memberships(get_self(), it->account);
          it = status_idx.erase(std::move(it));
       } else {
          ++it;

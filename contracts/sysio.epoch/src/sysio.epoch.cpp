@@ -10,7 +10,6 @@
 #include <sysio.system/emissions.hpp>
 #include <sysio.chains/sysio.chains.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
-#include <magic_enum/magic_enum.hpp>
 #include <algorithm>
 #include <limits>
 
@@ -228,6 +227,35 @@ void clear_gate_block(name self) {
    if (open != log_tbl.end()) {
       log_tbl.erase(open);
    }
+}
+
+/// One batch operator a chain's schedule may seat.
+struct pool_member {
+   name account;
+   bool is_bootstrapped = false;
+};
+
+/// The batch operators outpost `chain_code`'s schedule may seat, leaving out `excluded`: every ACTIVE
+/// batch operator in `sysio.opreg` whose membership of the chain is SERVING, non-bootstrapped first,
+/// then by account. The ONE pool `schbatchgps` and `finishadv` draw seats from.
+std::vector<pool_member> schedule_pool(sysio::slug_name chain_code, const std::vector<name>& excluded) {
+   opreg::servchains_t members(epoch::OPREG_ACCOUNT);
+   opreg::operators_t  ops(epoch::OPREG_ACCOUNT);
+   std::vector<pool_member> pool;
+   for (auto it = members.lower_bound(opreg::served_chain_key{chain_code, name{}});
+        it != members.end() && it->chain_code == chain_code; ++it) {
+      if (it->status != opreg::chain_service_status::SERVING) continue;
+      if (std::find(excluded.begin(), excluded.end(), it->account) != excluded.end()) continue;
+      const std::optional<opreg::operator_entry> op = ops.try_get(opreg::operator_key{it->account.value});
+      if (!op || op->status != OperatorStatus::OPERATOR_STATUS_ACTIVE ||
+          op->type != OperatorType::OPERATOR_TYPE_BATCH) continue;
+      pool.push_back({.account = it->account, .is_bootstrapped = op->is_bootstrapped});
+   }
+   std::sort(pool.begin(), pool.end(), [](const pool_member& a, const pool_member& b) {
+      if (a.is_bootstrapped != b.is_bootstrapped) return !a.is_bootstrapped;
+      return a.account < b.account;
+   });
+   return pool;
 }
 
 /// The closing epoch's scheduled length in whole seconds (`next_epoch_start - current_epoch_start`, read
@@ -520,11 +548,10 @@ void epoch::finishadv(sysio::slug_name chain_code, uint32_t epoch_index) {
    // (1 → 2, 2 → 3, ...), the front group has just expired so we pop
    // it and compute a new tail.
    //
-   // Eligibility for the new tail: ACTIVE batch ops, sorted non-bootstrapped
-   // first (preference rule), MINUS anyone already resident in this chain's N-1
-   // surviving groups. The window itself encodes "scheduled in the last
-   // N-1 epochs" — no separate history table. Every ACTIVE batch op is
-   // eligible on every chain.
+   // Eligibility for the new tail: ACTIVE batch ops SERVING this chain, sorted
+   // non-bootstrapped first (preference rule), MINUS anyone already resident in
+   // this chain's N-1 surviving groups. The window itself encodes "scheduled in
+   // the last N-1 epochs" — no separate history table.
    //
    // After: window = [current, current+1, ..., current+N-1], front is
    // always the active group → current_batch_op_group stays at 0.
@@ -537,16 +564,7 @@ void epoch::finishadv(sysio::slug_name chain_code, uint32_t epoch_index) {
       for (const auto& g : state.batch_op_groups) {
          for (const auto& a : g) resident.push_back(a);
       }
-      auto is_resident = [&](name a) {
-         for (const auto& r : resident) if (r == a) return true;
-         return false;
-      };
 
-      // Pull ACTIVE batch ops, non-bootstrapped first. `exclude_resident`
-      // applies the load-spreading rule (an operator that served in one of the
-      // N-1 surviving groups is skipped, which is what makes "at most every
-      // Nth epoch" hold). One collector for both passes -- the only difference
-      // between them is whether that rule is enforced.
       // The tail is drawn ONLY from operators not already resident in the
       // surviving window groups. That residency exclusion is what makes "at
       // most every Nth epoch" hold, and -- less obviously -- it is what keeps
@@ -556,30 +574,15 @@ void epoch::finishadv(sysio::slug_name chain_code, uint32_t epoch_index) {
       // sender's index WITHIN that group as its chunk-staging header slot. An
       // operator seated in two groups therefore stages against a group it is
       // not serving in. Do not "fill" a short tail by re-seating a resident.
-      opreg::operators_t opreg_ops(OPREG_ACCOUNT);
-      auto status_idx = opreg_ops.get_index<"bystatus"_n>();
-      std::vector<std::pair<name, bool>> pool;
-      for (auto it = status_idx.lower_bound(
-              magic_enum::enum_integer(OperatorStatus::OPERATOR_STATUS_ACTIVE));
-           it != status_idx.end() &&
-           it->status == OperatorStatus::OPERATOR_STATUS_ACTIVE; ++it) {
-         if (it->type != OperatorType::OPERATOR_TYPE_BATCH) continue;
-         if (is_resident(it->account)) continue;
-         pool.push_back({it->account, it->is_bootstrapped});
-      }
-      std::sort(pool.begin(), pool.end(),
-         [](const auto& a, const auto& b) {
-            if (a.second != b.second) return !a.second; // non-bootstrapped first
-            return a.first < b.first;
-         });
+      const std::vector<pool_member> pool = schedule_pool(chain_code, resident);
 
       std::vector<name> new_tail;
       new_tail.reserve(cfg.operators_per_epoch);
       for (size_t i = 0; i < pool.size() && new_tail.size() < cfg.operators_per_epoch; ++i) {
-         new_tail.push_back(pool[i].first);
+         new_tail.push_back(pool[i].account);
       }
 
-      // A tail SHORTER than `operators_per_epoch` means the ACTIVE batch-operator
+      // A tail SHORTER than `operators_per_epoch` means the chain's serving ACTIVE batch-operator
       // roster has fallen below `batch_operator_minimum_active` (the config
       // equality at ::setconfig pins that minimum to
       // `operators_per_epoch * batch_op_groups`, i.e. exactly this window). The
@@ -864,14 +867,14 @@ void epoch::finishadv(sysio::slug_name chain_code, uint32_t epoch_index) {
 // ---------------------------------------------------------------------------
 //  schbatchgps — initial fill of one chain's N-group sliding window
 //
-//  Called ONCE per chain at bootstrap. Reads ACTIVE batch operators from sysio.opreg,
-//  sorts non-bootstrapped first (progressive-takeover preference per
+//  Called ONCE per chain at bootstrap. Reads the ACTIVE batch operators SERVING the
+//  chain from sysio.opreg, sorts non-bootstrapped first (progressive-takeover preference per
 //  .claude/rules/batch-operator-schedule-preference.md), and partitions
 //  them into N groups (`cfg.batch_op_groups`). The resulting window is
 //  [epoch_1_group, epoch_2_group, ..., epoch_N_group].
 //
 //  After this, every per-epoch `finishadv` pops the front group and pushes
-//  a new tail group, where the tail's members are drawn from the ACTIVE
+//  a new tail group, where the tail's members are drawn from the same
 //  pool MINUS anyone still resident in the N-1 surviving groups. The
 //  window itself encodes "scheduled in the last N-1 epochs"; no separate
 //  history table is needed.
@@ -882,34 +885,19 @@ void epoch::schbatchgps(sysio::slug_name chain_code) {
    const chain_key    key{chain_code.value};
    const epoch_config cfg = epochcfg_t(get_self()).get(key, "epoch config not initialized");
 
-   // Collect ACTIVE batch operators (non-bootstrapped first, then bootstrapped).
-   opreg::operators_t opreg_ops(OPREG_ACCOUNT);
-   auto status_idx = opreg_ops.get_index<"bystatus"_n>();
-   std::vector<std::pair<name, bool>> available_batch; // (account, is_bootstrapped)
-   for (auto it = status_idx.lower_bound(
-           magic_enum::enum_integer(OperatorStatus::OPERATOR_STATUS_ACTIVE));
-        it != status_idx.end() &&
-        it->status == OperatorStatus::OPERATOR_STATUS_ACTIVE; ++it) {
-      if (it->type == OperatorType::OPERATOR_TYPE_BATCH) {
-         available_batch.push_back({it->account, it->is_bootstrapped});
-      }
-   }
+   // The chain's ACTIVE serving batch operators, non-bootstrapped first, then bootstrapped.
+   std::vector<pool_member> available_batch = schedule_pool(chain_code, {});
    check(available_batch.size() >= cfg.batch_operator_minimum_active,
          "not enough available batch operators for group assignment");
-   std::sort(available_batch.begin(), available_batch.end(),
-      [](const auto& a, const auto& b) {
-         if (a.second != b.second) return !a.second; // non-bootstrapped first
-         return a.first < b.first;
-      });
    available_batch.resize(cfg.batch_operator_minimum_active);
 
    // Even/odd interleave to spread non-bootstrapped + bootstrapped across groups.
    std::vector<name> shuffled;
    shuffled.reserve(available_batch.size());
    for (size_t i = 0; i < available_batch.size(); i += 2)
-      shuffled.push_back(available_batch[i].first);
+      shuffled.push_back(available_batch[i].account);
    for (size_t i = 1; i < available_batch.size(); i += 2)
-      shuffled.push_back(available_batch[i].first);
+      shuffled.push_back(available_batch[i].account);
 
    // Partition into N groups of `operators_per_epoch` members.
    std::vector<std::vector<name>> new_groups;

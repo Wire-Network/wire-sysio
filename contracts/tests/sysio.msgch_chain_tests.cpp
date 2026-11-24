@@ -124,6 +124,14 @@ constexpr std::string_view ROTATION_DELIVERY_PAYLOAD = "rotation-duty";
 /// Reason passed to the privileged `sysio.opreg::terminate` that removes a still-seated operator.
 constexpr std::string_view SEATED_TERMINATION_REASON = "removed while seated";
 
+/// `joinchain`'s refusal for a chain that is not an active outpost.
+constexpr const char* NOT_ACTIVE_OUTPOST_JOIN_ERROR = "assertion failure with message: chain is not an active outpost";
+
+/// `joinchain`'s refusal for an operator the chain's schedule still seats.
+constexpr const char* STILL_SEATED_JOIN_ERROR =
+   "assertion failure with message: operator still holds a seat in this chain's schedule: it may rejoin once its "
+   "seats have closed";
+
 /// `regoperator`'s refusal for an account the batch schedule still seats.
 constexpr const char* STILL_SEATED_REGISTRATION_ERROR =
    "assertion failure with message: operator still holds a batch schedule seat: it may register again "
@@ -282,6 +290,8 @@ public:
    static constexpr auto CHALG_ACCOUNT  = "sysio.chalg"_n;
    static constexpr auto CHAINS_ACCOUNT = "sysio.chains"_n;
    static constexpr auto ROA_ACCOUNT    = "sysio.roa"_n;
+   static constexpr auto AUTHEX_ACCOUNT = "sysio.authex"_n;
+   static constexpr auto DCLAIM_ACCOUNT = "sysio.dclaim"_n;
    static constexpr auto BATCHOP        = "batchop.a"_n;
    static constexpr auto BATCHOP_B      = "batchop.b"_n;
    static constexpr auto BATCHOP_C      = "batchop.c"_n;
@@ -335,7 +345,7 @@ public:
          TOKEN_ACCOUNT, EPOCH_ACCOUNT, OPREG_ACCOUNT, MSGCH_ACCOUNT,
          CHALG_ACCOUNT, CHAINS_ACCOUNT,
          BATCHOP, BATCHOP_B, BATCHOP_C, BATCHOP_D, BATCHOP_E, BATCHOP_F,
-         "sysio.dclaim"_n, "sysio.gov"_n, "sysio.ops"_n
+         DCLAIM_ACCOUNT, "sysio.gov"_n, "sysio.ops"_n
       }, false, true, !empty_roa);
       produce_blocks(2);
 
@@ -345,6 +355,10 @@ public:
       deploy(MSGCH_ACCOUNT,  contracts::msgch_wasm(),  contracts::msgch_abi(),  msgch_abi);
       deploy(CHAINS_ACCOUNT, contracts::chains_wasm(), contracts::chains_abi(), chains_abi);
       deploy(TOKEN_ACCOUNT,  contracts::token_wasm(),  contracts::token_abi(),  token_abi);
+      // A batch operator joins a chain only with its authex link for the chain's kind, and a
+      // user-signed link needs a privileged sysio.dclaim.
+      deploy(AUTHEX_ACCOUNT, contracts::authex_wasm(), contracts::authex_abi(), authex_abi);
+      deploy(DCLAIM_ACCOUNT, contracts::dclaim_wasm(), contracts::dclaim_abi(), dclaim_abi);
       produce_blocks(1);
 
       load_abi(ROA_ACCOUNT, roa_abi);
@@ -493,6 +507,7 @@ public:
       if (!batchop_is_bootstrapped) {
          BOOST_REQUIRE_EQUAL(success(), fund_and_bond(BATCHOP, BATCH_OPERATOR_MINIMUM_COLLATERAL));
       }
+      serve_chains(batch_ops, epoch_chains);
 
       for (const std::string_view chain : epoch_chains) {
          if (build_schedule) {
@@ -530,6 +545,18 @@ public:
             ("name",              std::string("outpost-test"))
             ("description",       std::string{})
             ("outpost", sysio_system::test_support::no_outpost_mvo())));
+   }
+
+   /// The chain family of fixture outpost `code`: SOL is SVM, every other outpost EVM.
+   static opp::types::ChainKind outpost_kind(std::string_view code) {
+      return code == SOL_CHAIN_CODE ? opp::types::ChainKind::CHAIN_KIND_SVM : opp::types::ChainKind::CHAIN_KIND_EVM;
+   }
+
+   /// Link each of `ops` to a fresh key of each chain's kind and join it to every chain of `chains`.
+   void serve_chains(const std::vector<name>& ops, const std::vector<std::string_view>& chains) {
+      std::vector<sysio_system::test_support::served_chains::outpost> outposts;
+      for (const std::string_view code : chains) outposts.push_back({code, outpost_kind(code)});
+      sysio_system::test_support::served_chains::serve(*this, ops, outposts);
    }
 
    /// Cross the boundary and advance every configured chain's epoch, as sysio.msgch's chkcons would.
@@ -1145,17 +1172,23 @@ public:
       return members.empty() ? name{} : name(members[0].as_string());
    }
 
+   /// True while `account` holds a seat in any group of `chain_code`'s schedule window.
+   bool seated_on(name account, uint64_t chain_code) {
+      // Held in a local: a range-for over a member of the temporary would read freed memory.
+      const auto state = read_epoch_state(chain_code);
+      if (state.is_null()) return false;
+      for (const auto& group : state[epoch_fields::BATCH_OP_GROUPS].get_array()) {
+         for (const auto& member : group.get_array()) {
+            if (member.as_string() == account.to_string()) return true;
+         }
+      }
+      return false;
+   }
+
    /// True while `account` holds a seat in any group of any configured chain's schedule window.
    bool holds_schedule_seat(name account) {
       for (const std::string_view chain : epoch_chains) {
-         // Held in a local: a range-for over a member of the temporary would read freed memory.
-         const auto state = read_epoch_state(fc::slug_name{chain}.value);
-         if (state.is_null()) continue;
-         for (const auto& group : state[epoch_fields::BATCH_OP_GROUPS].get_array()) {
-            for (const auto& member : group.get_array()) {
-               if (member.as_string() == account.to_string()) return true;
-            }
-         }
+         if (seated_on(account, fc::slug_name{chain}.value)) return true;
       }
       return false;
    }
@@ -1313,9 +1346,13 @@ public:
       BOOST_REQUIRE_EQUAL(static_cast<uint64_t>(batchop_is_bootstrapped),
                           get_operator(BATCHOP)["is_bootstrapped"].as_uint64());
 
+      // Operators serve only an active outpost, so an unregistered chain's epoch runs with no window.
+      if (with_eth) serve_chains({BATCHOP, BATCHOP_B, BATCHOP_C}, epoch_chains);
       for (const std::string_view chain : epoch_chains) {
-         BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::SCHEDULE,
-                                             mvo()(epoch_fields::CHAIN_CODE, chain)));
+         if (with_eth) {
+            BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::SCHEDULE,
+                                                mvo()(epoch_fields::CHAIN_CODE, chain)));
+         }
          BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::ADVANCE,
                                              mvo()(epoch_fields::CHAIN_CODE, chain)));
       }
@@ -1386,7 +1423,8 @@ public:
       BOOST_REQUIRE(terminated);
    }
 
-   abi_serializer sysio_abi, token_abi, epoch_abi, opreg_abi, msgch_abi, chalg_abi, chains_abi, roa_abi;
+   abi_serializer sysio_abi, token_abi, epoch_abi, opreg_abi, msgch_abi, chalg_abi, chains_abi, roa_abi,
+                  authex_abi, dclaim_abi;
 };
 
 // ---------------------------------------------------------------------------
@@ -2371,14 +2409,17 @@ BOOST_FIXTURE_TEST_CASE(advance_records_one_row_per_member_per_chain_epoch, sysi
    }
 } FC_LOG_AND_RETHROW() }
 
-/// A chain that is not an active outpost owes no deliveries, so its advance() sends neither recorddel
-/// nor termcheck. Once the chain is an active outpost, its next advance records and checks the
-/// expiring member again.
+/// Only an active outpost can be served, so a chain that is not one runs its epoch with an empty window
+/// and its advance() sends neither recorddel nor termcheck. Once the chain is an active outpost its
+/// operators serve and a schedule seats, its next advance records and checks the expiring member.
 BOOST_FIXTURE_TEST_CASE(advance_without_active_outpost_records_nothing, sysio_msgch_chain_tester) { try {
    BOOST_REQUIRE(bootstrap_rotation(ROTATION_WINDOW_MS, /*batchop_is_bootstrapped=*/false,
                                     rotation_outposts::none).empty());
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::BATCH_OP_GROUPS].get_array().empty());
+   BOOST_REQUIRE_EQUAL(error(NOT_ACTIVE_OUTPOST_JOIN_ERROR),
+                       sysio_system::test_support::served_chains::join(*this, BATCHOP, ETH_CHAIN_CODE));
 
-   // One full rotation, so every group expires once.
+   // One full rotation's worth of advances.
    for (uint32_t step = 0; step < ROTATION_GROUPS; ++step) {
       const auto trace = advance_to_next_epoch_traces().front();
       BOOST_REQUIRE_EQUAL(0u, action_count(trace, OPREG_ACCOUNT, opreg_actions::RECORD_DELIVERY));
@@ -2392,7 +2433,10 @@ BOOST_FIXTURE_TEST_CASE(advance_without_active_outpost_records_nothing, sysio_ms
    register_chain(opp::types::ChainKind::CHAIN_KIND_EVM, ETH_CHAIN_CODE, ETH_EXTERNAL_CHAIN_ID);
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, chains_actions::ACTIVATE_CHAIN,
                                        mvo()("code", ETH_CHAIN_CODE)));
-   produce_blocks(); // land both before the advance's epoch-length jump expires them
+   serve_chains({BATCHOP, BATCHOP_B, BATCHOP_C}, {ETH_CHAIN_CODE});
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::SCHEDULE,
+                                       mvo()(epoch_fields::CHAIN_CODE, ETH_CHAIN_CODE)));
+   produce_blocks(); // land them before the advance's epoch-length jump expires them
    const name     expiring_member = duty_member();
    const uint32_t expiring_epoch  = current_epoch();
    const auto     trace           = advance_to_next_epoch_traces().front();
@@ -2859,6 +2903,7 @@ BOOST_FIXTURE_TEST_CASE(advance_roster_excludes_same_epoch_termination,
    BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
       "regoperator"_n, mvo()("account", BATCHOP_D.to_string())
          ("type", opp::types::OPERATOR_TYPE_BATCH)("is_bootstrapped", true)));
+   serve_chains({BATCHOP_D}, epoch_chains);
    produce_blocks();
    advance_to_next_epoch();
    BOOST_REQUIRE(get_operator(BATCHOP)["status"].as<opp::types::OperatorStatus>() ==
@@ -2932,6 +2977,75 @@ BOOST_FIXTURE_TEST_CASE(regoperator_refuses_account_still_seated, sysio_msgch_ch
                  get_operator(BATCHOP)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
 } FC_LOG_AND_RETHROW() }
 
+namespace served = sysio_system::test_support::served_chains;
+
+/// Leaving a chain stops new seats on that chain only: the slide passes the operator over on the chain
+/// it left and keeps seating it on the chain it still serves.
+BOOST_FIXTURE_TEST_CASE(leaving_a_chain_stops_new_seats_there_only, sysio_msgch_chain_tester) { try {
+   bootstrap_rotation(ROTATION_WINDOW_MS, /*batchop_is_bootstrapped=*/true, rotation_outposts::eth_and_sol);
+   // A spare serving both chains takes the seat the leaver gives up.
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n,
+      mvo()("account", BATCHOP_D.to_string())("type", opp::types::OPERATOR_TYPE_BATCH)("is_bootstrapped", true)));
+   serve_chains({BATCHOP_D}, epoch_chains);
+   BOOST_REQUIRE_EQUAL(BATCHOP, duty_member(ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(BATCHOP, duty_member(SOL_OUTPOST_ID));
+
+   BOOST_REQUIRE_EQUAL(success(), served::leave(*this, BATCHOP, ETH_CHAIN_CODE));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(std::string(served::status::left),
+                       served::membership(*this, opreg_abi, BATCHOP, ETH_CHAIN_CODE)["status"].as_string());
+   BOOST_REQUIRE_EQUAL(std::string(served::status::serving),
+                       served::membership(*this, opreg_abi, BATCHOP, SOL_CHAIN_CODE)["status"].as_string());
+   advance_to_next_epoch();
+
+   BOOST_REQUIRE(!seated_on(BATCHOP, ETH_OUTPOST_ID));
+   BOOST_REQUIRE(seated_on(BATCHOP_D, ETH_OUTPOST_ID));
+   BOOST_REQUIRE(seated_on(BATCHOP, SOL_OUTPOST_ID));
+   BOOST_REQUIRE(!seated_on(BATCHOP_D, SOL_OUTPOST_ID));
+} FC_LOG_AND_RETHROW() }
+
+/// A member that left a chain still owes the seats it holds there: `deliver` accepts it, its delivery
+/// counts toward consensus, and the close records it as delivered.
+BOOST_FIXTURE_TEST_CASE(a_member_that_left_delivers_its_remaining_seat, sysio_msgch_chain_tester) { try {
+   bootstrap_rotation(ROTATION_WINDOW_MS, /*batchop_is_bootstrapped=*/true);
+   BOOST_REQUIRE_EQUAL(BATCHOP, duty_member());
+   const uint32_t duty_epoch = current_epoch();
+
+   BOOST_REQUIRE_EQUAL(success(), served::leave(*this, BATCHOP, ETH_CHAIN_CODE));
+   BOOST_REQUIRE_EQUAL(success(),
+      deliver_as(BATCHOP, ETH_OUTPOST_ID, encode_chained_delivery(ROTATION_DELIVERY_PAYLOAD, {})));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(duty_epoch, get_outpcons(ETH_OUTPOST_ID)[msgch_fields::EPOCH_INDEX].as<uint32_t>());
+
+   advance_to_next_epoch();
+   const auto rows = dellog_rows(BATCHOP, duty_epoch);
+   BOOST_REQUIRE_EQUAL(1u, rows.size());
+   BOOST_REQUIRE(rows.front()[opreg_fields::DELIVERED].as<bool>());
+} FC_LOG_AND_RETHROW() }
+
+/// An operator that left a chain rejoins it only once its seats there have closed; after the rejoin
+/// the slide seats it there again.
+BOOST_FIXTURE_TEST_CASE(rejoining_a_chain_waits_for_its_seats_to_close, sysio_msgch_chain_tester) { try {
+   bootstrap_rotation(ROTATION_WINDOW_MS, /*batchop_is_bootstrapped=*/true);
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n,
+      mvo()("account", BATCHOP_D.to_string())("type", opp::types::OPERATOR_TYPE_BATCH)("is_bootstrapped", true)));
+   serve_chains({BATCHOP_D}, epoch_chains);
+   BOOST_REQUIRE_EQUAL(BATCHOP, duty_member());
+
+   BOOST_REQUIRE_EQUAL(success(), served::leave(*this, BATCHOP, ETH_CHAIN_CODE));
+   BOOST_REQUIRE_EQUAL(error(STILL_SEATED_JOIN_ERROR), served::join(*this, BATCHOP, ETH_CHAIN_CODE, BATCHOP));
+   produce_blocks();
+
+   // The leaver's only seat closes; the spare takes the new tail.
+   advance_to_next_epoch();
+   BOOST_REQUIRE(!seated_on(BATCHOP, ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(success(), served::join(*this, BATCHOP, ETH_CHAIN_CODE, BATCHOP));
+   produce_blocks();
+
+   advance_to_next_epoch();
+   BOOST_REQUIRE(seated_on(BATCHOP, ETH_OUTPOST_ID));
+} FC_LOG_AND_RETHROW() }
+
 /// WNS-56: the OPERATORS roster lists exactly the operators the window seats, so registrations cannot
 /// grow it. Unbonded registrations, an ACTIVE batch operator the window does not seat, and an ACTIVE
 /// challenger are all left out.
@@ -2940,6 +3054,7 @@ BOOST_FIXTURE_TEST_CASE(advance_roster_lists_only_the_window, sysio_msgch_chain_
    // The one group of three seats batchop.a-c; batchop.d sorts after them, so it stays unseated.
    BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n,
       mvo()("account", BATCHOP_D.to_string())("type", opp::types::OPERATOR_TYPE_BATCH)("is_bootstrapped", true)));
+   serve_chains({BATCHOP_D}, epoch_chains);
    BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n,
       mvo()("account", BATCHOP_E.to_string())("type", opp::types::OPERATOR_TYPE_CHALLENGER)("is_bootstrapped", true)));
    std::vector<name> registrants;
@@ -2978,6 +3093,7 @@ BOOST_FIXTURE_TEST_CASE(advance_roster_keeps_a_seated_slashed_member_until_it_le
    // A spare so the slide can refill the slashed member's seat.
    BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n,
       mvo()("account", BATCHOP_D.to_string())("type", opp::types::OPERATOR_TYPE_BATCH)("is_bootstrapped", true)));
+   serve_chains({BATCHOP_D}, epoch_chains);
    BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, CHALG_ACCOUNT, "slash"_n,
       mvo()("account", BATCHOP_C.to_string())("reason", std::string("seated slash"))));
    produce_blocks();
@@ -3019,6 +3135,7 @@ BOOST_FIXTURE_TEST_CASE(advance_queues_the_roster_only_when_it_changes, sysio_ms
    // A spare the slide seats once a member is slashed; it sorts after the seated three.
    BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n,
       mvo()("account", BATCHOP_D.to_string())("type", opp::types::OPERATOR_TYPE_BATCH)("is_bootstrapped", true)));
+   serve_chains({BATCHOP_D}, epoch_chains);
    produce_blocks();
    for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) BOOST_REQUIRE(tip_carries_roster(chain));
    const std::string genesis_hash = get_roster_sent(ETH_OUTPOST_ID)["roster_hash"].as_string();
@@ -3091,6 +3208,7 @@ BOOST_FIXTURE_TEST_CASE(outpost_activated_later_starts_its_own_epoch_one, sysio_
                        boot_chain(MSGCH_ACCOUNT));
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, chains_actions::ACTIVATE_CHAIN,
                                        mvo()("code", SOL_CHAIN_CODE)));
+   serve_chains({BATCHOP, BATCHOP_B, BATCHOP_C}, {SOL_CHAIN_CODE});
    set_epoch_config(SOL_CHAIN_CODE, kSolDurationSec, ROTATION_OPERATORS_PER_GROUP, ROTATION_GROUPS);
    BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::SCHEDULE,
                                        mvo()(epoch_fields::CHAIN_CODE, SOL_CHAIN_CODE)));

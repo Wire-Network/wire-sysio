@@ -14,6 +14,8 @@
 #include <sysio.opp.common/shadow_custody_types.hpp>
 #include <magic_enum/magic_enum.hpp>
 
+#include <optional>
+
 namespace sysio {
 
    /**
@@ -30,11 +32,13 @@ namespace sysio {
       using contract::contract;
 
       // Well-known accounts
+      static constexpr name OPREG_ACCOUNT  = name{opreg_names::account};
       static constexpr name EPOCH_ACCOUNT  = "sysio.epoch"_n;
       static constexpr name MSGCH_ACCOUNT  = "sysio.msgch"_n;
 
       static constexpr name CHALG_ACCOUNT  = "sysio.chalg"_n;
       static constexpr name AUTHEX_ACCOUNT = "sysio.authex"_n;
+      static constexpr name CHAINS_ACCOUNT = "sysio.chains"_n;
       static constexpr name TOKEN_ACCOUNT  = "sysio.token"_n;
       static constexpr name LIQ_ACCOUNT    = "sysio.liq"_n;
       static constexpr name SYSTEM_ACCOUNT = "sysio"_n;
@@ -190,11 +194,26 @@ namespace sysio {
                      std::vector<chain_min_bond> req_uw_collat);
 
       /// Register a new operator. A terminated account registers again only once its balances are
-      /// drained and it holds no seat in the batch-operator schedule.
+      /// drained and it holds no seat in the batch-operator schedule; the new registration serves no
+      /// chain. An operator registering itself needs a `sysio.authex` link for every active outpost,
+      /// except a batch operator, whose links `joinchain` checks chain by chain.
       [[sysio::action]]
       void regoperator(name account,
                        opp::types::OperatorType type,
                        bool is_bootstrapped);
+
+      /// Serve outpost `chain_code`: the operator becomes SERVING there and draws new schedule seats on
+      /// it. Auth = `account`, or `sysio.opreg` (the bootstrap path). Requires a batch operator that is
+      /// neither SLASHED nor TERMINATED, an active outpost, and the operator's `sysio.authex` link for
+      /// the chain's kind. A LEFT or EVICTED operator rejoins only once it holds no seat in that chain's
+      /// schedule window; rejoining restarts the chain's miss rails.
+      [[sysio::action]]
+      void joinchain(name account, sysio::slug_name chain_code);
+
+      /// Stop serving outpost `chain_code`: SERVING becomes LEFT. The operator draws no new seat there
+      /// and still owes the duty of every seat it holds. Auth = `account`.
+      [[sysio::action]]
+      void leavechain(name account, sysio::slug_name chain_code);
 
       /// Operator-callable: bond depot-native collateral held on WIRE itself rather than
       /// escrowed on an outpost. Two kinds of token qualify:
@@ -425,6 +444,53 @@ namespace sysio {
                     name{opreg_names::index_bytype} == "bytype"_n &&
                     name{opreg_names::index_bystatus} == "bystatus"_n,
                     "the host reads the roster under the shared names");
+
+      /// A batch operator's standing on one outpost chain. Only SERVING draws new seats there.
+      enum class chain_service_status : uint8_t {
+         SERVING,   ///< draws new seats on the chain
+         LEFT,      ///< left by the operator; the seats it holds still owe their duty
+         EVICTED,   ///< removed by the chain's miss rails; its deliveries on the chain are refused
+      };
+
+      /// Key of `servchains`: the chain first, so one chain's members are one contiguous range.
+      struct served_chain_key {
+         sysio::slug_name chain_code;
+         name             account;
+         SYSLIB_SERIALIZE(served_chain_key, (chain_code)(account))
+      };
+
+      /// One batch operator's membership of one outpost chain, written by `joinchain` and kept until
+      /// the operator row is pruned or the account registers again.
+      struct [[sysio::table("servchains")]] served_chain {
+         name                 account;
+         sysio::slug_name     chain_code;
+         chain_service_status status        = chain_service_status::SERVING;
+         uint64_t             joined_at_ms  = 0;   ///< the latest `joinchain` that made the row SERVING
+         uint64_t             updated_at_ms = 0;   ///< the latest status change
+         std::string          status_reason;       ///< why the row was EVICTED; empty otherwise
+
+         uint64_t by_account() const { return account.value; }
+
+         SYSLIB_SERIALIZE(served_chain,
+            (account)(chain_code)(status)(joined_at_ms)(updated_at_ms)(status_reason))
+      };
+
+      using servchains_t = sysio::kv::table<"servchains"_n, served_chain_key, served_chain,
+         sysio::kv::index<"byaccount"_n,
+            sysio::const_mem_fun<served_chain, uint64_t, &served_chain::by_account>>
+      >;
+
+      /// `account`'s membership row on outpost `chain_code`, or nullopt when it has none. Never throws.
+      static std::optional<served_chain> membership_of(name account, sysio::slug_name chain_code) {
+         return servchains_t(OPREG_ACCOUNT).try_get(served_chain_key{chain_code, account});
+      }
+
+      /// True when `account` may deliver the seats it holds on outpost `chain_code`: it has a membership
+      /// row there that is not EVICTED. A LEFT member still delivers its remaining seats. Never throws.
+      static bool delivers_on_chain(name account, sysio::slug_name chain_code) {
+         const std::optional<served_chain> membership = membership_of(account, chain_code);
+         return membership && membership->status != chain_service_status::EVICTED;
+      }
 
       /// Operator registry configuration singleton.
       struct [[sysio::table("opconfig")]] op_config {

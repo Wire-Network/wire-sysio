@@ -35,7 +35,7 @@ Inbound/outbound OPP message chain management and consensus tracking contract.
 |--------|------|-------------|
 | `bootstrap` | `sysio.msgch` | Network genesis only: asserts the economic clock and `sysio.system` emissions config are set, then runs `sysio.epoch::advance` for every active outpost chain |
 | `bootchain` | `sysio.msgch` | After the network genesis: runs the genesis `sysio.epoch::advance` of one active outpost chain activated later |
-| `deliver` | batch operator (the chain's resident active group, `ACTIVE` in `sysio.opreg`) | Deliver an inbound envelope for an outpost's current epoch; calls `evalcons` inline |
+| `deliver` | batch operator (the chain's resident active group, `ACTIVE` in `sysio.opreg`, and a member of the chain that is not `EVICTED`) | Deliver an inbound envelope for an outpost's current epoch; calls `evalcons` inline |
 | `evalcons` | `sysio.msgch` | Evaluate consensus for an (outpost, epoch); on consensus store and dispatch the attestations; on an eligible split open a `sysio.chalg` dispute |
 | `chkcons` | permissionless | For one active outpost chain: if no dispute is open on its current epoch, it has consensus and its boundary has passed, call `sysio.epoch::advance` for it |
 | `resolvedisp` | `sysio.chalg` | Dispatch the winning envelope of a resolved dispute |

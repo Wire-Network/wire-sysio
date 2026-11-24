@@ -293,6 +293,104 @@ inline fc::crypto::signature sign_createlink(const fc::crypto::private_key& priv
    return priv.sign(fc::sha256(reinterpret_cast<const char*>(msg_hash.data()), 32));
 }
 
+// ---------------------------------------------------------------------------
+//  Served chains: the sysio.authex links and sysio.opreg memberships a batch operator needs before
+//  a chain's schedule seats it
+// ---------------------------------------------------------------------------
+
+namespace served_chains {
+
+inline constexpr auto authex_account     = "sysio.authex"_n;
+inline constexpr auto opreg_account      = "sysio.opreg"_n;
+inline constexpr auto createlink_action  = "createlink"_n;
+inline constexpr auto joinchain_action   = "joinchain"_n;
+inline constexpr auto leavechain_action  = "leavechain"_n;
+inline constexpr auto membership_table   = "servchains"_n;
+inline constexpr auto membership_type    = "served_chain";
+
+/// `sysio.opreg`'s `chain_service_status` names, as a decoded `servchains` row spells them.
+namespace status {
+inline constexpr std::string_view serving = "SERVING";
+inline constexpr std::string_view left    = "LEFT";
+inline constexpr std::string_view evicted = "EVICTED";
+} // namespace status
+
+/// Link `account` to a freshly generated key of `kind`'s curve (EM for EVM, ED for SVM) through its own
+/// signed `sysio.authex::createlink`. Needs sysio.authex and a privileged sysio.dclaim deployed.
+template <typename Tester>
+void link_fresh_key(Tester& tester, name account, sysio::opp::types::ChainKind kind) {
+   const fc::crypto::private_key priv = fc::crypto::private_key::generate(
+      kind == sysio::opp::types::ChainKind::CHAIN_KIND_SVM ? fc::crypto::private_key::key_type::ed
+                                                           : fc::crypto::private_key::key_type::em);
+   const uint64_t nonce = tester.control->head().block_time().time_since_epoch().count() / 1000;
+   tester.push_action(authex_account, createlink_action, account, fc::mutable_variant_object()
+      ("chain_kind", kind)
+      ("account",    account)
+      ("sig",        sign_createlink(priv, account.to_string(), kind, nonce))
+      ("pub_key",    priv.get_public_key())
+      ("nonce",      nonce));
+}
+
+/// Push `sysio.opreg::joinchain(account, chain_code)` signed by `signer`: `sysio.opreg` (the bootstrap
+/// path, the default) or the operator itself.
+template <typename Tester>
+typename Tester::action_result join(Tester& tester, name account, std::string_view chain_code,
+                                    name signer = opreg_account) {
+   try {
+      tester.push_action(opreg_account, joinchain_action, signer, fc::mutable_variant_object()
+         ("account", account)("chain_code", chain_code));
+      return Tester::success();
+   } catch (const fc::exception& ex) {
+      return Tester::error(ex.top_message());
+   }
+}
+
+/// Push `sysio.opreg::leavechain(account, chain_code)` signed by the operator.
+template <typename Tester>
+typename Tester::action_result leave(Tester& tester, name account, std::string_view chain_code) {
+   try {
+      tester.push_action(opreg_account, leavechain_action, account, fc::mutable_variant_object()
+         ("account", account)("chain_code", chain_code));
+      return Tester::success();
+   } catch (const fc::exception& ex) {
+      return Tester::error(ex.top_message());
+   }
+}
+
+/// One outpost a fixture's batch operators serve: its `sysio.chains` code and chain family.
+struct outpost {
+   std::string_view                   code;
+   sysio::opp::types::ChainKind       kind;
+};
+
+/// Link each of `accounts` to a fresh key of every distinct kind among `outposts`, then join each to
+/// every outpost: the state a bootstrap leaves its batch operators in before `schbatchgps`.
+template <typename Tester>
+void serve(Tester& tester, const std::vector<name>& accounts, const std::vector<outpost>& outposts) {
+   std::vector<sysio::opp::types::ChainKind> kinds;
+   for (const outpost& chain : outposts) {
+      if (std::find(kinds.begin(), kinds.end(), chain.kind) == kinds.end()) kinds.push_back(chain.kind);
+   }
+   for (const name account : accounts) {
+      for (const sysio::opp::types::ChainKind kind : kinds) link_fresh_key(tester, account, kind);
+      for (const outpost& chain : outposts) {
+         BOOST_REQUIRE_EQUAL(Tester::success(), join(tester, account, chain.code));
+      }
+   }
+}
+
+/// `account`'s decoded `servchains` row on `chain_code`, or null when it has none. `opreg_abi` holds
+/// sysio.opreg's ABI. The row key is (chain, account), the `[scope][id]` layout `get_row_by_id` reads.
+template <typename Tester>
+fc::variant membership(Tester& tester, abi_serializer& opreg_abi, name account, std::string_view chain_code) {
+   const auto data = tester.get_row_by_id(opreg_account, name{fc::slug_name{chain_code}.value}, membership_table,
+                                          account.to_uint64_t());
+   return data.empty() ? fc::variant()
+                       : opreg_abi.binary_to_variant(membership_type, data, Tester::fixture_abi_yield_function());
+}
+
+} // namespace served_chains
+
 /// Mirrors of sysio.roa's `nodeownerreg` audit values (`reg_status` / `reject_reason` in sysio.roa.hpp).
 namespace nodeownerreg {
 inline constexpr uint64_t status_confirmed            = 0;

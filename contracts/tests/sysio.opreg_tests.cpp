@@ -323,6 +323,27 @@ constexpr int kDustRounds = 3;
 constexpr std::string_view kWireEarnsNoYieldError =
    "assertion failure with message: WIRE collateral earns no shadow yield";
 
+/// Refusals of `regoperator`, `joinchain` and `leavechain` the served-chain cases assert.
+constexpr std::string_view kMissingOutpostLinkError =
+   "assertion failure with message: missing authex link for outpost chain";
+constexpr std::string_view kOnlyBatchServesChainsError =
+   "assertion failure with message: only a batch operator serves chains";
+constexpr std::string_view kTerminalOperatorJoinError =
+   "assertion failure with message: a slashed or terminated operator cannot serve a chain";
+constexpr std::string_view kNotActiveOutpostError = "assertion failure with message: chain is not an active outpost";
+constexpr std::string_view kMissingChainLinkError =
+   "assertion failure with message: missing authex link for the chain's kind";
+constexpr std::string_view kAlreadyServingError = "assertion failure with message: operator already serves this chain";
+constexpr std::string_view kNotServingError = "assertion failure with message: operator does not serve this chain";
+constexpr std::string_view kNotEnoughBatchOperatorsError =
+   "assertion failure with message: not enough available batch operators for group assignment";
+
+/// An outpost the served-chain cases never register.
+constexpr std::string_view kUnregisteredChain = "SOL";
+
+/// Blocks that move `current_time_ms()`, which has second resolution, to a later second.
+constexpr uint32_t kBlocksPastOneSecond = 3;
+
 } // namespace
 
 /// Data model: per-chain identity has moved from `ChainKind` enums to
@@ -343,13 +364,15 @@ public:
    static constexpr auto SYND_ACCOUNT   = "sysio.synd"_n;
    static constexpr auto TOKENS_ACCOUNT = "sysio.tokens"_n;
    static constexpr auto CHAINS_ACCOUNT = "sysio.chains"_n;
+   static constexpr auto AUTHEX_ACCOUNT = "sysio.authex"_n;
+   static constexpr auto DCLAIM_ACCOUNT = "sysio.dclaim"_n;
 
    sysio_opreg_tester() {
       produce_blocks(2);
 
       create_accounts({
          OPREG_ACCOUNT, EPOCH_ACCOUNT, CHALG_ACCOUNT, MSGCH_ACCOUNT, TOKEN_ACCOUNT,
-         LIQ_ACCOUNT, SYND_ACCOUNT, TOKENS_ACCOUNT, CHAINS_ACCOUNT,
+         LIQ_ACCOUNT, SYND_ACCOUNT, TOKENS_ACCOUNT, CHAINS_ACCOUNT, DCLAIM_ACCOUNT,
          "batchop.a"_n, "batchop.b"_n, "batchop.c"_n,
          "uwrit.a"_n, "producer.a"_n,
          "uwrit.alice"_n, "uwrit.bob"_n,         // for Task 2 deposit/withdraw/cancel tests
@@ -746,7 +769,7 @@ public:
    /// other cases into real `sysio.msgch` queueouts and change what those cases exercise.
    void setup_shadow_liq(const std::vector<sysio::testing::external::asset_spec>& assets =
          {{"ETH", "LIQETH", ChainKind::CHAIN_KIND_EVM, kEthExternalChainId}}) {
-      deploy_privileged(CHAINS_ACCOUNT, contracts::chains_wasm(), contracts::chains_abi(), chains_abi_ser);
+      deploy_chain_registry_once();
       deploy_privileged(TOKENS_ACCOUNT, contracts::tokens_wasm(), contracts::tokens_abi(), tokens_abi_ser);
       deploy_privileged(LIQ_ACCOUNT,    contracts::liq_wasm(),    contracts::liq_abi(),    liq_abi_ser);
 
@@ -775,6 +798,40 @@ public:
             mvo()("sym", sym)("chain_code", codename_mvo(a.chain))
             ("token_code", codename_mvo(a.token))));
       }
+   }
+
+   bool chain_registry_deployed = false;
+
+   /// Deploy sysio.chains once per case; a second identical set_code is refused.
+   void deploy_chain_registry_once() {
+      if (chain_registry_deployed) return;
+      deploy_privileged(CHAINS_ACCOUNT, contracts::chains_wasm(), contracts::chains_abi(), chains_abi_ser);
+      chain_registry_deployed = true;
+   }
+
+   bool link_registry_deployed = false;
+
+   /// Stand up what a served-chain case needs: `chain` registered as an active outpost of `kind`
+   /// in sysio.chains, and sysio.authex with a privileged sysio.dclaim so operators can link keys.
+   /// Called per case for the same reason as `setup_shadow_liq`.
+   void setup_served_chain(std::string_view chain = EPOCH_CHAIN, ChainKind kind = ChainKind::CHAIN_KIND_EVM,
+                           uint32_t external_chain_id = kEthExternalChainId) {
+      deploy_chain_registry_once();
+      if (!link_registry_deployed) {
+         deploy_privileged(AUTHEX_ACCOUNT, contracts::authex_wasm(), contracts::authex_abi(), authex_abi_ser);
+         deploy_privileged(DCLAIM_ACCOUNT, contracts::dclaim_wasm(), contracts::dclaim_abi(), dclaim_abi_ser);
+         link_registry_deployed = true;
+      }
+      BOOST_REQUIRE_EQUAL(success(), push_contract(CHAINS_ACCOUNT, chains_abi_ser, CHAINS_ACCOUNT,
+         shadow_action::regchain, mvo()
+         ("kind", kind)("code", codename_mvo(chain))
+         ("external_chain_id", external_chain_id)("name", std::string(chain))
+         ("description", std::string{})("outpost", sysio_system::test_support::no_outpost_mvo())));
+   }
+
+   /// Link each of `ops` to a fresh EVM key and join it to `chain`.
+   void serve_evm_chain(const std::vector<name>& ops, std::string_view chain = EPOCH_CHAIN) {
+      sysio_system::test_support::served_chains::serve(*this, ops, {{chain, ChainKind::CHAIN_KIND_EVM}});
    }
 
    /// Put `amount` LIQETH shadow in `holder`'s hands the way the depot mints it: `sysio.synd`, the
@@ -923,6 +980,8 @@ public:
    abi_serializer opreg_abi_ser;
    abi_serializer epoch_abi_ser;
    abi_serializer chains_abi_ser;
+   abi_serializer authex_abi_ser;
+   abi_serializer dclaim_abi_ser;
    abi_serializer tokens_abi_ser;
    abi_serializer liq_abi_ser;
 };
@@ -1172,6 +1231,8 @@ BOOST_FIXTURE_TEST_CASE(epoch_setconfig_locks_batch_op_groups_after_schedule, sy
    produce_blocks();
    BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.c"_n, OPERATOR_TYPE_BATCH, true));
    produce_blocks();
+   setup_served_chain();
+   serve_evm_chain({"batchop.a"_n, "batchop.b"_n, "batchop.c"_n});
 
    auto epoch_setconfig = [&](uint32_t groups, uint32_t min_active) {
       return push_epoch_action(EPOCH_ACCOUNT, "setconfig"_n, mvo()
@@ -1351,6 +1412,8 @@ BOOST_FIXTURE_TEST_CASE(multiple_bootstrapped_batch_ops, sysio_opreg_tester) { t
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op_a["status"].as<OperatorStatus>());
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op_b["status"].as<OperatorStatus>());
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op_c["status"].as<OperatorStatus>());
+   setup_served_chain();
+   serve_evm_chain({"batchop.a"_n, "batchop.b"_n, "batchop.c"_n});
 
    BOOST_REQUIRE_EQUAL(success(), push_epoch_action(EPOCH_ACCOUNT, "setconfig"_n, mvo()
       ("chain_code", EPOCH_CHAIN)
@@ -1374,6 +1437,192 @@ BOOST_FIXTURE_TEST_CASE(multiple_bootstrapped_batch_ops, sysio_opreg_tester) { t
    auto groups = epoch_state["batch_op_groups"].get_array();
    BOOST_REQUIRE_EQUAL(3, groups.size());
 } FC_LOG_AND_RETHROW() }
+
+// ── Served chains (joinchain / leavechain) ──
+
+namespace served = sysio_system::test_support::served_chains;
+
+/// A batch operator registering itself needs no outpost link: `joinchain` checks the links chain by
+/// chain. Every other type registering itself still needs one for every active outpost.
+BOOST_FIXTURE_TEST_CASE(regoperator_leaves_batch_links_to_joinchain, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   setup_served_chain();
+
+   const auto self_register = [&](name account, OperatorType type) {
+      return push_opreg_action(account, "regoperator"_n, mvo()
+         ("account", account)("type", type)("is_bootstrapped", false));
+   };
+   BOOST_REQUIRE_EQUAL(error(std::string(kMissingOutpostLinkError)), self_register("uwrit.a"_n, OPERATOR_TYPE_UNDERWRITER));
+   BOOST_REQUIRE_EQUAL(success(), self_register("batchop.a"_n, OPERATOR_TYPE_BATCH));
+   BOOST_REQUIRE_EQUAL(error(std::string(kMissingChainLinkError)), served::join(*this, "batchop.a"_n, EPOCH_CHAIN, "batchop.a"_n));
+
+   served::link_fresh_key(*this, "batchop.a"_n, ChainKind::CHAIN_KIND_EVM);
+   BOOST_REQUIRE_EQUAL(success(), served::join(*this, "batchop.a"_n, EPOCH_CHAIN, "batchop.a"_n));
+} FC_LOG_AND_RETHROW() }
+
+/// `joinchain` signed by the operator or by sysio.opreg records a SERVING membership stamped with the
+/// join time; any other signer is refused.
+BOOST_FIXTURE_TEST_CASE(joinchain_records_a_serving_membership, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.a"_n, OPERATOR_TYPE_BATCH, true));
+   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.b"_n, OPERATOR_TYPE_BATCH, true));
+   setup_served_chain();
+   for (const name op : {"batchop.a"_n, "batchop.b"_n}) served::link_fresh_key(*this, op, ChainKind::CHAIN_KIND_EVM);
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(error("missing authority of batchop.a"),
+                       served::join(*this, "batchop.a"_n, EPOCH_CHAIN, "batchop.b"_n));
+   BOOST_REQUIRE_EQUAL(success(), served::join(*this, "batchop.a"_n, EPOCH_CHAIN, "batchop.a"_n));
+   BOOST_REQUIRE_EQUAL(success(), served::join(*this, "batchop.b"_n, EPOCH_CHAIN));
+   produce_blocks();
+
+   const uint64_t now_ms = static_cast<uint64_t>(control->head().block_time().sec_since_epoch()) * 1000;
+   for (const name op : {"batchop.a"_n, "batchop.b"_n}) {
+      const auto row = served::membership(*this, opreg_abi_ser, op, EPOCH_CHAIN);
+      BOOST_REQUIRE(!row.is_null());
+      BOOST_REQUIRE_EQUAL(op, row["account"].as<name>());
+      BOOST_REQUIRE_EQUAL(std::string(EPOCH_CHAIN), row["chain_code"].as_string());
+      BOOST_REQUIRE_EQUAL(std::string(served::status::serving), row["status"].as_string());
+      BOOST_REQUIRE_GT(row["joined_at_ms"].as_uint64(), 0u);
+      BOOST_REQUIRE_LE(row["joined_at_ms"].as_uint64(), now_ms);
+      BOOST_REQUIRE_EQUAL(row["joined_at_ms"].as_uint64(), row["updated_at_ms"].as_uint64());
+      BOOST_REQUIRE(row["status_reason"].as_string().empty());
+   }
+   BOOST_REQUIRE(served::membership(*this, opreg_abi_ser, "batchop.a"_n, kUnregisteredChain).is_null());
+} FC_LOG_AND_RETHROW() }
+
+/// `joinchain` refuses an account with no operator row, a non-batch operator, a slashed or a terminated
+/// operator, a chain that is not an active outpost, an operator with no link for the chain's kind, and
+/// an operator already serving the chain.
+BOOST_FIXTURE_TEST_CASE(joinchain_refusals, sysio_opreg_tester) { try {
+   constexpr auto kSlashed    = "batchop.b"_n;
+   constexpr auto kTerminated = "batchop.c"_n;
+   constexpr auto kUnlinked   = "batchop.d"_n;
+   create_accounts({kUnlinked});
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   for (const name op : {"batchop.a"_n, kSlashed, kTerminated, kUnlinked}) {
+      BOOST_REQUIRE_EQUAL(success(), regoperator(op, OPERATOR_TYPE_BATCH, true));
+   }
+   BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.a"_n, OPERATOR_TYPE_UNDERWRITER, false));
+   setup_served_chain();
+   for (const name op : {"batchop.a"_n, kSlashed, kTerminated, "uwrit.a"_n, "producer.a"_n}) {
+      served::link_fresh_key(*this, op, ChainKind::CHAIN_KIND_EVM);
+   }
+   BOOST_REQUIRE_EQUAL(success(), slash(kSlashed, "slashed before joining"));
+   BOOST_REQUIRE_EQUAL(success(), terminate(kTerminated, "terminated before joining"));
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(error(std::string(kOperatorNotFoundError)), served::join(*this, "producer.a"_n, EPOCH_CHAIN));
+   BOOST_REQUIRE_EQUAL(error(std::string(kOnlyBatchServesChainsError)), served::join(*this, "uwrit.a"_n, EPOCH_CHAIN));
+   BOOST_REQUIRE_EQUAL(error(std::string(kTerminalOperatorJoinError)), served::join(*this, kSlashed, EPOCH_CHAIN));
+   BOOST_REQUIRE_EQUAL(error(std::string(kTerminalOperatorJoinError)), served::join(*this, kTerminated, EPOCH_CHAIN));
+   BOOST_REQUIRE_EQUAL(error(std::string(kNotActiveOutpostError)), served::join(*this, "batchop.a"_n, kUnregisteredChain));
+   BOOST_REQUIRE_EQUAL(error(std::string(kMissingChainLinkError)), served::join(*this, kUnlinked, EPOCH_CHAIN));
+
+   BOOST_REQUIRE_EQUAL(success(), served::join(*this, "batchop.a"_n, EPOCH_CHAIN));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(error(std::string(kAlreadyServingError)), served::join(*this, "batchop.a"_n, EPOCH_CHAIN));
+} FC_LOG_AND_RETHROW() }
+
+/// `leavechain` moves a SERVING membership to LEFT under the operator's own signature and refuses any
+/// other state. With no seat held on the chain the operator rejoins at once, with a new join time.
+BOOST_FIXTURE_TEST_CASE(leavechain_then_rejoin, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.a"_n, OPERATOR_TYPE_BATCH, true));
+   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.b"_n, OPERATOR_TYPE_BATCH, true));
+   setup_served_chain();
+   serve_evm_chain({"batchop.a"_n});
+   produce_blocks();
+   const uint64_t first_join = served::membership(*this, opreg_abi_ser, "batchop.a"_n, EPOCH_CHAIN)["joined_at_ms"]
+                                  .as_uint64();
+
+   BOOST_REQUIRE_EQUAL(error(std::string(kNotServingError)), served::leave(*this, "batchop.b"_n, EPOCH_CHAIN));
+   BOOST_REQUIRE_EQUAL(error("missing authority of batchop.a"),
+                       push_opreg_action(OPREG_ACCOUNT, "leavechain"_n,
+                                         mvo()("account", "batchop.a"_n)("chain_code", EPOCH_CHAIN)));
+   produce_blocks(kBlocksPastOneSecond);
+   BOOST_REQUIRE_EQUAL(success(), served::leave(*this, "batchop.a"_n, EPOCH_CHAIN));
+   produce_blocks();
+
+   auto row = served::membership(*this, opreg_abi_ser, "batchop.a"_n, EPOCH_CHAIN);
+   BOOST_REQUIRE_EQUAL(std::string(served::status::left), row["status"].as_string());
+   BOOST_REQUIRE_EQUAL(first_join, row["joined_at_ms"].as_uint64());
+   BOOST_REQUIRE_GT(row["updated_at_ms"].as_uint64(), first_join);
+   BOOST_REQUIRE_EQUAL(error(std::string(kNotServingError)), served::leave(*this, "batchop.a"_n, EPOCH_CHAIN));
+
+   produce_blocks(kBlocksPastOneSecond);
+   BOOST_REQUIRE_EQUAL(success(), served::join(*this, "batchop.a"_n, EPOCH_CHAIN, "batchop.a"_n));
+   produce_blocks();
+   row = served::membership(*this, opreg_abi_ser, "batchop.a"_n, EPOCH_CHAIN);
+   BOOST_REQUIRE_EQUAL(std::string(served::status::serving), row["status"].as_string());
+   BOOST_REQUIRE_GT(row["joined_at_ms"].as_uint64(), first_join);
+} FC_LOG_AND_RETHROW() }
+
+/// The schedule seats only ACTIVE batch operators SERVING the chain: an operator that never joined and
+/// one that left are passed over, and too few servers leave `schbatchgps` short.
+BOOST_FIXTURE_TEST_CASE(schbatchgps_seats_only_operators_serving_the_chain, sysio_opreg_tester) { try {
+   constexpr auto kLeaver     = "batchop.d"_n;
+   constexpr auto kNeverJoins = "batchop.e"_n;
+   constexpr uint32_t kGroups = 3;
+   create_accounts({kLeaver, kNeverJoins});
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   for (const name op : {"batchop.a"_n, "batchop.b"_n, "batchop.c"_n, kLeaver, kNeverJoins}) {
+      BOOST_REQUIRE_EQUAL(success(), regoperator(op, OPERATOR_TYPE_BATCH, true));
+   }
+   setup_served_chain();
+   serve_evm_chain({"batchop.a"_n, "batchop.b"_n, "batchop.c"_n, kLeaver});
+   BOOST_REQUIRE_EQUAL(success(), served::leave(*this, kLeaver, EPOCH_CHAIN));
+   BOOST_REQUIRE_EQUAL(success(), served::leave(*this, "batchop.c"_n, EPOCH_CHAIN));
+   BOOST_REQUIRE_EQUAL(success(), push_epoch_action(EPOCH_ACCOUNT, "setconfig"_n, mvo()
+      ("chain_code", EPOCH_CHAIN)("epoch_duration_sec", kWindowBoundEpochDurationSec)("operators_per_epoch", 1)
+      ("batch_operator_minimum_active", kGroups)("batch_op_groups", kGroups)
+      ("epoch_retention_envelope_log_count", 200)));
+   produce_blocks();
+
+   // Two servers for a three-seat window.
+   BOOST_REQUIRE_EQUAL(error(std::string(kNotEnoughBatchOperatorsError)),
+                       push_epoch_action(EPOCH_ACCOUNT, "schbatchgps"_n, mvo()("chain_code", EPOCH_CHAIN)));
+
+   BOOST_REQUIRE_EQUAL(success(), served::join(*this, "batchop.c"_n, EPOCH_CHAIN));
+   BOOST_REQUIRE_EQUAL(success(), push_epoch_action(EPOCH_ACCOUNT, "schbatchgps"_n, mvo()("chain_code", EPOCH_CHAIN)));
+   produce_blocks();
+
+   const auto state = epoch_abi_ser.binary_to_variant("epoch_state",
+      get_row_by_id(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, cn(EPOCH_CHAIN).value),
+      fixture_abi_yield_function());
+   std::vector<name> seated;
+   for (const auto& group : state["batch_op_groups"].get_array()) {
+      for (const auto& member : group.get_array()) seated.push_back(member.as<name>());
+   }
+   std::sort(seated.begin(), seated.end());
+   BOOST_REQUIRE(seated == (std::vector<name>{"batchop.a"_n, "batchop.b"_n, "batchop.c"_n}));
+} FC_LOG_AND_RETHROW() }
+
+/// A registration ends its memberships: an account registering again after termination serves no
+/// chain, and `prune` erases a pruned operator's memberships with its row.
+BOOST_FIXTURE_TEST_CASE(memberships_end_with_the_registration, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.a"_n, OPERATOR_TYPE_BATCH, true));
+   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.b"_n, OPERATOR_TYPE_BATCH, true));
+   setup_served_chain();
+   serve_evm_chain({"batchop.a"_n, "batchop.b"_n});
+   BOOST_REQUIRE_EQUAL(success(), terminate("batchop.a"_n, "registers again"));
+   BOOST_REQUIRE_EQUAL(success(), terminate("batchop.b"_n, "is pruned"));
+   produce_blocks();
+   BOOST_REQUIRE(!served::membership(*this, opreg_abi_ser, "batchop.a"_n, EPOCH_CHAIN).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.a"_n, OPERATOR_TYPE_BATCH, true));
+   produce_blocks();
+   BOOST_REQUIRE(served::membership(*this, opreg_abi_ser, "batchop.a"_n, EPOCH_CHAIN).is_null());
+
+   produce_block(fc::milliseconds(kDefaultPruneDelayMs));
+   BOOST_REQUIRE(!served::membership(*this, opreg_abi_ser, "batchop.b"_n, EPOCH_CHAIN).is_null());
+   BOOST_REQUIRE_EQUAL(success(), prune());
+   produce_blocks();
+   BOOST_REQUIRE(get_operator("batchop.b"_n).is_null());
+   BOOST_REQUIRE(served::membership(*this, opreg_abi_ser, "batchop.b"_n, EPOCH_CHAIN).is_null());
+} FC_LOG_AND_RETHROW() }
+
 
 // ── deposit (Task 2: msgch-dispatched outpost-driven deposit) ──
 

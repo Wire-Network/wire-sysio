@@ -281,6 +281,34 @@
             ]
         },
         {
+            "name": "joinchain",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                }
+            ]
+        },
+        {
+            "name": "leavechain",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                }
+            ]
+        },
+        {
             "name": "op_config",
             "base": "",
             "fields": [
@@ -526,6 +554,50 @@
                 {
                     "name": "token_code",
                     "type": "slug_name"
+                }
+            ]
+        },
+        {
+            "name": "served_chain",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "status",
+                    "type": "chain_service_status"
+                },
+                {
+                    "name": "joined_at_ms",
+                    "type": "uint64"
+                },
+                {
+                    "name": "updated_at_ms",
+                    "type": "uint64"
+                },
+                {
+                    "name": "status_reason",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "served_chain_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "account",
+                    "type": "name"
                 }
             ]
         },
@@ -780,6 +852,16 @@
             "ricardian_contract": ""
         },
         {
+            "name": "joinchain",
+            "type": "joinchain",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "leavechain",
+            "type": "leavechain",
+            "ricardian_contract": ""
+        },
+        {
             "name": "processbatch",
             "type": "processbatch",
             "ricardian_contract": ""
@@ -899,6 +981,21 @@
             "key_names": ["account","token_code"],
             "key_types": ["uint64","slug_name"],
             "table_id": 45499
+        },
+        {
+            "name": "servchains",
+            "type": "served_chain",
+            "index_type": "i64",
+            "key_names": ["chain_code","account"],
+            "key_types": ["slug_name","name"],
+            "table_id": 17930,
+            "secondary_indexes": [
+                {
+                    "name": "byaccount",
+                    "key_type": "uint64",
+                    "table_id": 2055
+                }
+            ]
         },
         {
             "name": "wtdwqueue",
@@ -1047,6 +1144,24 @@
                 {
                     "name": "OPERATOR_TYPE_CHALLENGER",
                     "value": 4
+                }
+            ]
+        },
+        {
+            "name": "chain_service_status",
+            "type": "uint8",
+            "values": [
+                {
+                    "name": "SERVING",
+                    "value": 0
+                },
+                {
+                    "name": "LEFT",
+                    "value": 1
+                },
+                {
+                    "name": "EVICTED",
+                    "value": 2
                 }
             ]
         }

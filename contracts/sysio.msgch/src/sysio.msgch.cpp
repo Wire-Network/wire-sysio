@@ -171,7 +171,8 @@ msgch::outbound_queue_entry outbound_queue_of(const msgch::outqueue_t& queues, u
 /// consensus becomes arithmetically impossible and the epoch stalls chain-wide.
 ///
 /// The count is of members who can ACTUALLY deliver, which is the resident group INTERSECTED with
-/// current opreg ACTIVE status -- exactly the admission rule `deliver` enforces. The resident group
+/// current opreg ACTIVE status and a membership of the chain that is not EVICTED
+/// (`opreg::delivers_on_chain`) -- exactly the admission rule `deliver` enforces. The resident group
 /// is a snapshot taken at schbatchgps/advance time; an operator slashed, terminated, or dropped
 /// below its collateral minimum mid-window stays in `batch_op_groups[current]` but is refused by
 /// `deliver` ("delivering operator is not ACTIVE in sysio.opreg"). Counting raw snapshot members
@@ -200,7 +201,8 @@ std::vector<name> eligible_batch_operators(uint64_t chain_code) {
    for (const auto& member : state->batch_op_groups[state->current_batch_op_group]) {
       const auto key = opreg::operator_key{member.value};
       if (!ops.contains(key)) continue;
-      if (ops.get(key).status == opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE) {
+      if (ops.get(key).status == opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE &&
+          opreg::delivers_on_chain(member, sysio::slug_name{chain_code})) {
          eligible.push_back(member);
       }
    }
@@ -1076,6 +1078,9 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
                      "delivering operator has no sysio.opreg registration");
    check(op.status == opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE,
          "delivering operator is not ACTIVE in sysio.opreg");
+   // A member that left the chain still delivers the seats it holds; an evicted one does not.
+   check(opreg::delivers_on_chain(batch_op_name, sysio::slug_name{chain_code}),
+         "delivering operator does not serve this chain or was evicted from it");
 
    check(!data.empty(), "delivery data cannot be empty");
 
