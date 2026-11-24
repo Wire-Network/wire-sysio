@@ -64,6 +64,15 @@ public:
    bool is_epoch_boundary_past(uint64_t chain_code) const override {
       return knobs_of(chain_code).epoch_boundary_past;
    }
+   /// The chain's own knob, else `default_delivery_timeout`. Not an epoch query, so not recorded in `epoch_queries`.
+   fc::microseconds delivery_timeout(uint64_t chain_code) const override {
+      std::lock_guard<std::mutex> lock(_mx);
+      const auto it = chains.find(chain_code);
+      return it == chains.end() ? default_delivery_timeout : it->second.delivery_timeout;
+   }
+
+   /// The delivery timeout of every chain without its own knobs.
+   static constexpr fc::microseconds default_delivery_timeout = fc::seconds(2);
 
    /// One chain's epoch and election, as the epoch queries answer them.
    struct chain_knobs {
@@ -75,6 +84,8 @@ public:
       /// intact; tests targeting the retry path flip this to `true` to
       /// simulate wall-clock past `next_epoch_start`.
       bool     epoch_boundary_past = false;
+      /// What `delivery_timeout` answers: the deadline the job hands every outpost call.
+      fc::microseconds delivery_timeout = default_delivery_timeout;
    };
 
    // Knobs callers can set before driving the job under test. They answer for

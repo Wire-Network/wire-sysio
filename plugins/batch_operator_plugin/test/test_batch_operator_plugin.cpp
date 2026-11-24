@@ -37,9 +37,6 @@ constexpr auto simulated_push_failure = "simulated push failure";
 constexpr auto simulated_deferred_push_failure = "simulated deferred push failure";
 constexpr auto callback_failure_message = "callback failure";
 constexpr uint32_t expected_error_log_count = 1;
-/// Default delivery budget in milliseconds.
-constexpr auto delivery_timeout_option = "batch-delivery-timeout-ms";
-constexpr uint32_t expected_delivery_timeout_ms = 60'000;
 
 namespace callback_lifetime_action {
 constexpr auto contract = "sysio.system";
@@ -69,7 +66,6 @@ BOOST_AUTO_TEST_CASE(plugin_options_are_registered) try {
    }
    BOOST_CHECK(option_names.count("batch-operator-account") > 0);
    BOOST_CHECK(option_names.count("batch-epoch-poll-ms") > 0);
-   BOOST_CHECK(option_names.count("batch-delivery-timeout-ms") > 0);
    BOOST_CHECK(option_names.count("batch-yield-tick-interval-ms") > 0);
    BOOST_CHECK(option_names.count("batch-underwriter-max-exposure") > 0);
    BOOST_CHECK(option_names.count("batch-underwriter-unlimited-exposure") > 0);
@@ -84,9 +80,10 @@ BOOST_AUTO_TEST_CASE(plugin_options_are_registered) try {
    // chain is the one registered under that chain's own code.
    BOOST_CHECK(option_names.count("batch-outpost") == 0);
    BOOST_CHECK(option_names.count("batch-sol-client-id") == 0);
+   // Each chain's delivery timeout comes from its on-chain epoch duration.
+   BOOST_CHECK(option_names.count("batch-delivery-timeout-ms") == 0);
 } FC_LOG_AND_RETHROW();
 
-/// Defaults give a delivery room for confirmations and the progress-read retry budget.
 BOOST_AUTO_TEST_CASE(default_options_are_correct) try {
    sysio::batch_operator_plugin plugin;
    boost::program_options::options_description cli, cfg;
@@ -99,7 +96,6 @@ BOOST_AUTO_TEST_CASE(default_options_are_correct) try {
    boost::program_options::notify(vm);
 
    BOOST_CHECK_EQUAL(vm["batch-epoch-poll-ms"].as<uint32_t>(), 15000u);
-   BOOST_CHECK_EQUAL(vm[delivery_timeout_option].as<uint32_t>(), expected_delivery_timeout_ms);
    BOOST_CHECK_EQUAL(vm["batch-yield-tick-interval-ms"].as<uint32_t>(), 60000u);
    // The kick crank is on by default, like the other depot cranks, and retries a
    // pool no faster than the tickyield crank ticks one.

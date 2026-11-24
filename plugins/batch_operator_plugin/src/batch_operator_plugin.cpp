@@ -53,8 +53,6 @@ namespace eth = fc::network::ethereum;
 namespace sol = fc::network::solana;
 
 namespace {
-   /// Shared RPC/depot budget; see the SHARED KNOB comment in set_program_options.
-   constexpr fc::microseconds DELIVERY_TIMEOUT  = fc::seconds(60);
    /// `--batch-epoch-poll-ms` default: the longest interval between the relay's polls of a chain (the cadence of a
    /// chain at the default 360 s epoch), and the poll interval of the depot cranks and the underwriter.
    constexpr fc::microseconds EPOCH_POLL        = fc::seconds(15);
@@ -97,6 +95,9 @@ namespace {
    constexpr uint32_t RANGE_PAGE_ROWS = 50;
    /// How long past the head block's time a pushed transaction stays valid.
    constexpr fc::microseconds PUSH_EXPIRATION = fc::seconds(30);
+   /// How long a depot read, or a depot push tied to no one chain, may take: a push is not waited on past its
+   /// expiration. A chain's own pushes take its delivery timeout (`batch_operator_detail::derive_cadence`).
+   constexpr fc::microseconds DEPOT_CALL_TIMEOUT = PUSH_EXPIRATION;
 
    /// Work units of the `sysio.synd::crank` the underwriter pushes every pass.
    constexpr uint32_t UNDERWRITER_CRANK_LIMIT = 16;
@@ -274,7 +275,6 @@ struct batch_operator_plugin::impl {
    /// an account was configured. There is no separate enable flag.
    bool         enabled             = false;
    fc::microseconds epoch_poll          = EPOCH_POLL;
-   fc::microseconds delivery_timeout    = DELIVERY_TIMEOUT;
    fc::microseconds yield_tick_interval = YIELD_TICK_INTERVAL;
 
    /// `account@permission` the underwriter bonds and claims as (`batch-underwriter-account`).
@@ -449,7 +449,8 @@ struct batch_operator_plugin::impl {
             fc::mutable_variant_object()
                (msgch::field::batch_op_name, _impl.operator_account.to_string())
                (msgch::field::chain_code,    chain_code)
-               (msgch::field::data,          raw_messages));
+               (msgch::field::data,          raw_messages),
+            _impl.delivery_timeout_of(chain_code));
       }
 
       void emit_debug_envelope(sysio::opp::debugging::DebugEnvelopeEvent event) override {
@@ -478,6 +479,9 @@ struct batch_operator_plugin::impl {
          const std::optional<batch_operator_detail::chain_epoch_view> view = _impl.chain_epoch_of(chain_code);
          return view && batch_operator_detail::is_epoch_boundary_past(*view, fc::time_point::now());
       }
+      fc::microseconds delivery_timeout(uint64_t chain_code) const override {
+         return _impl.delivery_timeout_of(chain_code);
+      }
    };
 
    std::unique_ptr<depot_ops_impl_t>                              depot_ops_backing{
@@ -501,14 +505,14 @@ struct batch_operator_plugin::impl {
    /// so chainbase iteration runs during the controller's read window instead of racing with block apply.
    sysio::chain_apis::read_only::get_table_rows_result
    read_table(sysio::chain_apis::read_only::get_table_rows_params p) {
-      return chain_plug->read_table_rows(std::move(p), delivery_timeout, "batch_operator", shutting_down);
+      return chain_plug->read_table_rows(std::move(p), DEPOT_CALL_TIMEOUT, "batch_operator", shutting_down);
    }
 
    /// `read_table`, but nullopt when the read failed (logged by chain_plugin), so a caller that must not act on a
    /// partial view can tell a failure from an empty table.
    std::optional<sysio::chain_apis::read_only::get_table_rows_result>
    read_table_checked(sysio::chain_apis::read_only::get_table_rows_params p) {
-      return chain_plug->read_table_rows_checked(std::move(p), delivery_timeout,
+      return chain_plug->read_table_rows_checked(std::move(p), DEPOT_CALL_TIMEOUT,
                                                  chain_plug->get_abi_serializer_max_time(), "batch_operator",
                                                  shutting_down);
    }
@@ -614,7 +618,8 @@ struct batch_operator_plugin::impl {
          const std::string code = fc::slug_name{chain_code}.to_string();
          try {
             push_action(msgch::account, msgch::action_chkcons, *relay_signer,
-                        fc::mutable_variant_object()(msgch::field::chain_code, chain_code));
+                        fc::mutable_variant_object()(msgch::field::chain_code, chain_code),
+                        delivery_timeout_of(chain_code));
          } catch (const fc::exception& e) {
             dlog("batch_operator: chkcons({}): {}", code, e.to_string());
          } catch (const std::exception& e) {
@@ -626,7 +631,7 @@ struct batch_operator_plugin::impl {
    /**
     * The depot cranks no election gates: every OPEN envelope dispute, every due economic epoch and the yield cranks.
     * Runs as its own cron job every `epoch_poll`, so neither its pushes, each of which may wait out
-    * `delivery_timeout`, nor its cadence follow the epoch tick, which a short chain epoch speeds up. Pushes only for
+    * `DEPOT_CALL_TIMEOUT`, nor its cadence follow the epoch tick, which a short chain epoch speeds up. Pushes only for
     * an ACTIVE operator, as the epoch tick last read it.
     */
    void crank_tick() {
@@ -700,7 +705,7 @@ struct batch_operator_plugin::impl {
 
          try {
             push_action(chalg::account, chalg::action_chkdispute, *relay_signer,
-                        fc::mutable_variant_object()(chalg::field::dispute_id, dispute_id));
+                        fc::mutable_variant_object()(chalg::field::dispute_id, dispute_id), DEPOT_CALL_TIMEOUT);
          } catch (const fc::exception& e) {
             // Expected-transient: the dispute resolved between the scan and the push, or
             // another operator's crank won the race.
@@ -762,7 +767,8 @@ struct batch_operator_plugin::impl {
             // A later index cannot open before this one, so a refused or timed-out push ends the
             // catch-up; the next poll re-reads the clock.
             if (!push_action(economy::account, economy::action_tickeconomy, *relay_signer,
-                             fc::mutable_variant_object()(economy::field::epoch_index, epoch_index))) {
+                             fc::mutable_variant_object()(economy::field::epoch_index, epoch_index),
+                             DEPOT_CALL_TIMEOUT)) {
                break;
             }
          } catch (const fc::exception& e) {
@@ -873,7 +879,7 @@ struct batch_operator_plugin::impl {
          if (!yield_tick_spacing.due(pool, now, yield_tick_interval)) continue;
          try {
             push_action(swap::account, swap::action_tickyield, *relay_signer,
-                        fc::mutable_variant_object()(swap::field::pair_token, *code));
+                        fc::mutable_variant_object()(swap::field::pair_token, *code), DEPOT_CALL_TIMEOUT);
             yield_tick_spacing.mark(pool, now);
          } catch (const fc::exception& e) {
             // Expected-transient: another operator's tick sold the clip first, or the
@@ -898,7 +904,7 @@ struct batch_operator_plugin::impl {
          if (!code || !value || asset_amount(*value, liq::field::quantity) <= 0) continue;
          try {
             push_action(liq::account, liq::action_queueyield, *relay_signer,
-                        fc::mutable_variant_object()(liq::field::sym, *code));
+                        fc::mutable_variant_object()(liq::field::sym, *code), DEPOT_CALL_TIMEOUT);
          } catch (const fc::exception& e) {
             // Expected-transient: another operator queued it first. Persistent while
             // the shadow has no yield pool yet (`regliqpool` still to come).
@@ -909,7 +915,7 @@ struct batch_operator_plugin::impl {
 
    /**
     * One pass of the kick crank, run by its own cron job (`batch_operator_kick`) so that its pushes -- each may
-    * wait out a full `delivery_timeout` -- never hold up the epoch tick and the election state the per-outpost jobs
+    * wait out a full `DEPOT_CALL_TIMEOUT` -- never hold up the epoch tick and the election state the per-outpost jobs
     * read. Pushes only for an ACTIVE operator whose relay key still signs, like the epoch tick's own cranks, and
     * idles until `sysio.kicker` runs code.
     */
@@ -997,7 +1003,7 @@ struct batch_operator_plugin::impl {
       using namespace batch_operator_detail;
       try {
          push_action(kicker::account, kicker::action_kick, *relay_signer,
-                     fc::mutable_variant_object()(kicker::field::sym, code));
+                     fc::mutable_variant_object()(kicker::field::sym, code), DEPOT_CALL_TIMEOUT);
       } catch (const fc::exception& e) {
          // Expected-transient: governance removed the pool between the scan and
          // the push. Persistent while the pool's LIQ/WIRE swap pair is missing or
@@ -1086,6 +1092,12 @@ struct batch_operator_plugin::impl {
          wlog("batch_operator: memberships left as last read: a servchains row did not decode: {}", e.top_message());
          return std::nullopt;
       }
+   }
+
+   /// How long `chain_code`'s outpost calls and depot pushes may take, from its last-read epoch duration.
+   fc::microseconds delivery_timeout_of(uint64_t chain_code) const {
+      std::lock_guard<std::mutex> lock(chain_epochs_mx);
+      return batch_operator_detail::delivery_timeout_of(chain_epochs, chain_code);
    }
 
    /// `chain_code`'s last-read consensus epoch, or nullopt before its epoch state has been read.
@@ -1353,7 +1365,7 @@ struct batch_operator_plugin::impl {
          opp_jobs, relay_outposts, solana_outpost_role::batch_operator,
          [&](const outpost_descriptor& op, const std::shared_ptr<sysio::outpost_client>& client) {
             std::shared_ptr<sysio::outpost_opp_job> job =
-               std::make_shared<sysio::outpost_opp_job>(client, *depot_ops_backing, delivery_timeout);
+               std::make_shared<sysio::outpost_opp_job>(client, *depot_ops_backing);
             ilog("batch_operator: built outpost_opp_job for {}", client->to_string());
             return built_opp_job{std::move(job), outpost_deployment{op}};
          });
@@ -1620,7 +1632,7 @@ struct batch_operator_plugin::impl {
                           std::optional<fc::time_point_sec>* submitted_until = nullptr) {
       if (shutting_down) return false;
       try {
-         return push_action(contract, action, *underwriter_signer, data, submitted_until);
+         return push_action(contract, action, *underwriter_signer, data, DEPOT_CALL_TIMEOUT, submitted_until);
       } catch (const fc::exception& e) {
          wlog("batch_operator: underwriter {}::{}: {}", contract, action, e.to_string());
       } catch (const std::exception& e) {
@@ -2017,7 +2029,7 @@ struct batch_operator_plugin::impl {
             if (shutting_down) return std::nullopt;
             const auto client = underwriter_clients.find(chain_code);
             FC_ASSERT(client != underwriter_clients.end(), "this node has no client for it");
-            return client->second.client->read_emitted_envelope_digest(epoch, delivery_timeout);
+            return client->second.client->read_emitted_envelope_digest(epoch, delivery_timeout_of(chain_code.value));
          },
          [](fc::slug_name chain_code, const std::string& why) { report_unreadable(chain_code, why); },
          in.checkpoints, in.accepted);
@@ -2057,7 +2069,8 @@ struct batch_operator_plugin::impl {
                                               const chain::permission_level& auth, const fc::variant_object& data) {
       const chain::controller& chain = chain_plug->chain();
       try {
-         auto resolver = make_resolver(chain, delivery_timeout, throw_on_yield::no);
+         const fc::microseconds abi_time = chain_plug->get_abi_serializer_max_time();
+         auto resolver = make_resolver(chain, abi_time, throw_on_yield::no);
          const chain::abi_serializer_ptr abis = resolver(chain::name(contract));
          if (!abis) {
             elog("batch_operator: no ABI found for {}", contract);
@@ -2065,7 +2078,7 @@ struct batch_operator_plugin::impl {
          }
          const chain::type_name action_type = abis->get_action_type(chain::name(action_name));
          chain::bytes action_data = abis->variant_to_binary(
-            action_type, fc::variant(data), chain::abi_serializer::create_yield_function(delivery_timeout));
+            action_type, fc::variant(data), chain::abi_serializer::create_yield_function(abi_time));
          unsigned_trx out;
          out.trx.actions.emplace_back(std::vector<chain::permission_level>{auth}, chain::name(contract),
                                       chain::name(action_name), std::move(action_data));
@@ -2081,13 +2094,14 @@ struct batch_operator_plugin::impl {
       return std::nullopt;
    }
 
-   /// Submit a signed transaction through `read_write::push_transaction`, completing `completion`. Resolves ABIs:
-   /// call on the main thread.
+   /// Submit a signed transaction through `read_write::push_transaction`, completing `completion`, within `timeout`.
+   /// Resolves ABIs: call on the main thread.
    void submit(const std::shared_ptr<batch_operator_detail::async_action_completion>& completion,
-               const std::string& contract, const std::string& action_name, const fc::variant& packed_var) {
+               const std::string& contract, const std::string& action_name, const fc::variant& packed_var,
+               fc::microseconds timeout) {
       try {
          std::shared_ptr<read_write> rw =
-            std::make_shared<read_write>(chain_plug->get_read_write_api(delivery_timeout));
+            std::make_shared<read_write>(chain_plug->get_read_write_api(timeout));
          rw->push_transaction(
             packed_var.get_object(),
             batch_operator_detail::create_push_action_callback(rw, completion, contract, action_name));
@@ -2114,7 +2128,7 @@ struct batch_operator_plugin::impl {
    }
 
    /// Build, sign and submit a depot action, declaring `by.auth` and signed by `by.provider`. True when the node
-   /// accepted the transaction within `delivery_timeout`; a refusal is logged by the push callback.
+   /// accepted the transaction within `timeout`; a refusal is logged by the push callback.
    ///
    /// Called from cron threads, which may not read chain state: the build runs in a read window and the submission
    /// on the main thread, while the signature, possibly a remote signer, stays here. The waits do not cancel
@@ -2124,10 +2138,11 @@ struct batch_operator_plugin::impl {
                     const std::string& action_name,
                     const signer& by,
                     const fc::variant_object& data,
+                    fc::microseconds timeout,
                     std::optional<fc::time_point_sec>* submitted_until = nullptr) {
       if (submitted_until) submitted_until->reset();
       if (shutting_down) return false;
-      const fc::time_point deadline = fc::time_point::now() + delivery_timeout;
+      const fc::time_point deadline = fc::time_point::now() + timeout;
       const bool           on_main  = std::this_thread::get_id() == app().executor().get_main_thread_id();
 
       std::optional<unsigned_trx> trx;
@@ -2166,12 +2181,11 @@ struct batch_operator_plugin::impl {
       std::future<void> future = completion->get_future();
       if (submitted_until) *submitted_until = expiration;
       if (on_main) {
-         submit(completion, contract, action_name, packed_var);
+         submit(completion, contract, action_name, packed_var, timeout);
       } else {
          app().executor().post(appbase::priority::medium, appbase::exec_queue::read_write,
-                               [this, completion, contract, action_name, packed_var = std::move(packed_var)] {
-                                  submit(completion, contract, action_name, packed_var);
-                               });
+                               [this, completion, contract, action_name, packed_var = std::move(packed_var),
+                                timeout] { submit(completion, contract, action_name, packed_var, timeout); });
       }
       if (!ready_by(future, deadline)) {
          if (shutting_down) wlog("batch_operator: push {}::{} abandoned on shutdown", contract, action_name);
@@ -2259,7 +2273,7 @@ struct batch_operator_plugin::impl {
       if (underwriter_enabled) {
          schedule_poll("batch_operator_underwriter", [this]() { underwriter_tick(); }, epoch_poll);
       }
-      // The kick crank pushes serially and each push may wait out `delivery_timeout`: its own job keeps that off
+      // The kick crank pushes serially and each push may wait out `DEPOT_CALL_TIMEOUT`: its own job keeps that off
       // the epoch tick.
       if (enabled && kick_crank_enabled) schedule_poll("batch_operator_kick", [this]() { kick_tick(); }, epoch_poll);
 
@@ -2304,6 +2318,7 @@ signal<void(const opp::debugging::DebugEnvelopeEvent&)>& batch_operator_plugin::
 void batch_operator_plugin::set_program_options(options_description& cli,
                                                  options_description& cfg) {
    auto opts = cfg.add_options();
+   // Help texts must stay ASCII with no " --" sequence: PerformanceHarness splits nodeop --help output on that token.
    // Presence of this option IS the enable switch (mirrors producer_plugin's
    // producer-name): the relay runs when an account is configured. Keying off
    // the account rather than the plugin being listed matters because
@@ -2316,23 +2331,6 @@ void batch_operator_plugin::set_program_options(options_description& cli,
    opts("batch-epoch-poll-ms", bpo::value<uint32_t>()->default_value(whole_milliseconds(EPOCH_POLL)),
         "Longest interval between the relay's polls of a chain, which it polls every 1/24 of the chain's epoch but "
         "no more often than once a second, and the interval of the depot cranks and the underwriter's poll (ms)");
-   // SIZING RULE for batch-delivery-timeout-ms: it bounds the WHOLE outbound
-   // delivery, a sequence of confirmed transactions. Ethereum sends the envelope
-   // in ONE `epochIn` plus one continuation per dispatch spill (a handful at
-   // most for a full-cap envelope), and each receipt wait may use whatever of
-   // this budget is left; Solana chunks the envelope at 672 bytes. Size it as
-   //     expected transactions x (target block time + confirmation margin)
-   // for the largest expected envelope; the 60000 ms default leaves room for
-   // confirmation plus a 30 s progress-read retry. Undersizing is not fatal:
-   // the relay resumes from the outpost's on-chain cursor on the next cron tick.
-   // SHARED KNOB: this value also bounds the depot push_action completion wait
-   // (see push_action above), depot table reads, and the read-write API deadline.
-   // A timeout there is safe (the async_action_completion callback retains its
-   // own state), but raising this also lengthens depot waits, so size it deliberately.
-   // Help text below must stay ASCII with no " --" sequence (PerformanceHarness
-   // splits nodeop --help output on that token).
-   opts("batch-delivery-timeout-ms", bpo::value<uint32_t>()->default_value(whole_milliseconds(DELIVERY_TIMEOUT)),
-        "Max time for one outbound delivery, every transaction and confirmation wait included (ms)");
    opts("batch-yield-tick-interval-ms",
         bpo::value<uint32_t>()->default_value(whole_milliseconds(YIELD_TICK_INTERVAL)),
         "Minimum spacing between this operator's sysio.swap::tickyield pushes per yield pool (ms)");
@@ -2360,7 +2358,6 @@ void batch_operator_plugin::plugin_initialize(const variables_map& options) {
    if (options.count("batch-operator-account"))
       _impl->operator_account = chain::name(options["batch-operator-account"].as<std::string>());
    _impl->epoch_poll          = fc::milliseconds(options["batch-epoch-poll-ms"].as<uint32_t>());
-   _impl->delivery_timeout    = fc::milliseconds(options["batch-delivery-timeout-ms"].as<uint32_t>());
    _impl->yield_tick_interval = fc::milliseconds(options["batch-yield-tick-interval-ms"].as<uint32_t>());
    _impl->enabled             = _impl->operator_account.good();
    if (options.count("batch-underwriter-account")) {

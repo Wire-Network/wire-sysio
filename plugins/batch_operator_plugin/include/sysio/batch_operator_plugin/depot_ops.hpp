@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include <fc/time.hpp>
+
 #include <sysio/batch_operator_plugin/debug_envelope_event.hpp>
 
 namespace sysio {
@@ -56,8 +58,8 @@ struct depot_ops {
 
    /**
     * Push `sysio.msgch::deliver` with the concatenated inbound envelope bytes.
-    * Synchronous — blocks on the action's future until the configured
-    * delivery timeout elapses.
+    * Synchronous — blocks on the action's future for at most the chain's
+    * delivery timeout.
     */
    virtual void deliver_to_depot(uint64_t                 chain_code,
                                  const std::vector<char>& raw_messages) = 0;
@@ -110,6 +112,14 @@ struct depot_ops {
     * boundary has not yet elapsed for its current epoch.
     */
    virtual bool is_epoch_boundary_past(uint64_t chain_code) const = 0;
+
+   /**
+    * How long each call to outpost `chain_code`, and its push of
+    * `sysio.msgch::deliver`, may take: derived from the chain's on-chain epoch
+    * duration (`batch_operator_detail::derive_cadence`). The longest delivery
+    * timeout while the chain's epoch state has not been read.
+    */
+   virtual fc::microseconds delivery_timeout(uint64_t chain_code) const = 0;
 };
 
 } // namespace sysio

@@ -30,15 +30,15 @@ namespace sysio {
  * query the job makes of `depot_ops` names the job's own chain
  * (`client->chain_code()`).
  *
- * The `outpost_deadline` passed to every `outpost_client` RPC call is the
- * per-call deadline, not the cycle deadline. Concrete clients are required
- * to enforce it internally so a hung remote chain cannot starve the pool.
+ * Every `outpost_client` call gets the chain's delivery timeout
+ * (`depot_ops::delivery_timeout`, from its on-chain epoch duration) as its
+ * deadline, read each cycle. Concrete clients are required to enforce it
+ * internally so a hung remote chain cannot starve the pool.
  */
 class outpost_opp_job {
 public:
    outpost_opp_job(outpost_client_ptr client,
-                   depot_ops&         depot,
-                   fc::microseconds   outpost_deadline);
+                   depot_ops&         depot);
 
    /// Read the WIRE-side pending outbound record for this outpost+epoch and,
    /// if present, call `client->deliver_outbound_envelope` with it. Emits the
@@ -62,7 +62,6 @@ public:
 private:
    outpost_client_ptr _client;
    depot_ops&         _depot;
-   fc::microseconds   _outpost_deadline;
    std::mutex         _state_mx;
 
    /// Last successful submission, used to gate retries on the epoch boundary and

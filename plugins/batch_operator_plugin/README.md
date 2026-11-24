@@ -78,7 +78,7 @@ spot past the contract's spot-versus-TWAP guard —
 leaves `last_kick` where it was; the next attempt waits `--batch-kick-interval-ms`, and the
 wait doubles per unpaid attempt up to an hour, starting over once `last_kick` moves. The
 wait is spent on every attempt, failed or not. The crank runs as its own cron job, so its
-pushes, each of which can wait out `--batch-delivery-timeout-ms`, never delay the epoch tick.
+pushes, each of which can wait out its 30 s expiration, never delay the epoch tick.
 A failed pool-page read ends the poll and is retried from the same page; the plugin prunes
 removed symbols from the retry state only at the end of a complete sweep.
 `--batch-kick-crank=false` turns the kick crank off on this node, and the relay's
@@ -91,7 +91,6 @@ permission then need not be linked for `sysio.kicker::kick`.
 |--------|---------|-------------|
 | `--batch-operator-account` | — | WIRE account name for this operator. Configuring it enables the relay |
 | `--batch-epoch-poll-ms` | 15000 | Longest interval between the relay's polls of a chain (see [Cadence](#cadence)), and the interval of the depot cranks and the underwriter's poll (ms) |
-| `--batch-delivery-timeout-ms` | 60000 | Max time for one outbound delivery, every transaction and confirmation wait included (ms). On Ethereum a single receipt wait may use whatever of it is left, so size it past the outpost chain's block time. |
 | `--batch-yield-tick-interval-ms` | 60000 | Minimum spacing between this operator's `sysio.swap::tickyield` pushes per yield pool (ms) |
 | `--batch-underwriter-account` | none | `account` or `account@permission` (default `active`) the underwriter bonds from. Configuring it enables the underwriter |
 | `--batch-underwriter-max-exposure` | none | Most the underwriter may have bonded at once in one shadow token, as a positive asset (`100.000000000 LIQETH`). Repeat per token; cannot name the same token as unlimited exposure |
@@ -102,7 +101,7 @@ permission then need not be linked for `sysio.kicker::kick`.
 There is no separate enable flag: the relay runs when `--batch-operator-account`
 is configured, the way `producer_plugin` keys off `--producer-name`, and the
 underwriter when `--batch-underwriter-account` is; a node may run either or both,
-and the poll and timeout options apply to both. The plugin must also be listed under
+and the poll option applies to both. The plugin must also be listed under
 `plugin =` (or pulled in as a dependency by `external_debugging_plugin`), and
 requires `read-mode = irreversible`.
 
@@ -136,9 +135,15 @@ Each chain is paced by its own epoch duration:
 |---|---|---|---|
 | Poll interval | 1/24 of the epoch, no shorter than 1 s and no longer than `--batch-epoch-poll-ms` | 15 s | 1 s |
 | Edge buffer | 1/144 of the epoch, no shorter than one block (500 ms) | 2.5 s | 500 ms |
+| Delivery timeout | 1/2 of the epoch, from 5 s to 60 s | 60 s | 5 s |
 
 A chain's inbound and outbound jobs run at its own poll interval, and hold deliveries
 back within its edge buffer of either edge of its epoch (until the epoch is overdue).
+The delivery timeout bounds each call to the chain's outpost (an outbound delivery, every
+transaction and confirmation wait included; an inbound read; the outpost crank) and each
+depot push for the chain (`sysio.msgch::deliver`, `chkcons`); an outbound delivery cut short
+resumes from the outpost's on-chain cursor at the next poll. Depot reads and the depot cranks'
+pushes wait at most a push's 30 s expiration.
 The epoch tick, which reads every chain's `epochstate` and `epochcfg`, the operator's
 memberships and `sysio.chains`, fires every second and reads at the shortest poll
 interval of the chains it relays (`--batch-epoch-poll-ms` when it relays none). A change

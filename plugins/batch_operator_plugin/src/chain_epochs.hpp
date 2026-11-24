@@ -53,22 +53,33 @@ inline constexpr int64_t edge_buffers_per_epoch = 144;
 inline constexpr fc::microseconds min_poll_interval = fc::seconds(1);
 /// The shortest edge buffer of any chain: one WIRE block.
 inline constexpr fc::microseconds min_edge_buffer = fc::microseconds(chain::config::block_interval_us);
+/// Delivery timeouts per epoch: a 60 s epoch gives each outpost call 30 s, and leaves the rest for a retry.
+inline constexpr int64_t delivery_timeouts_per_epoch = 2;
+/// The shortest delivery timeout of any chain: that of sysio.epoch's shortest epoch, 10 s.
+inline constexpr fc::microseconds min_delivery_timeout = fc::seconds(5);
+/// The longest delivery timeout of any chain, so a hung outpost call holds a long epoch's relay no longer.
+inline constexpr fc::microseconds max_delivery_timeout = fc::seconds(60);
 
 /// How the relay paces itself on one chain.
 struct epoch_cadence {
-   fc::microseconds poll_interval;   ///< between two polls of the chain's epoch state and outpost
-   fc::microseconds edge_buffer;     ///< deliveries are held back this close to either edge of an epoch
+   fc::microseconds poll_interval;      ///< between two polls of the chain's epoch state and outpost
+   fc::microseconds edge_buffer;        ///< deliveries are held back this close to either edge of an epoch
+   fc::microseconds delivery_timeout;   ///< bounds each outpost call, and each depot push, for the chain
 };
 
 /// The cadence of a chain whose epochs last `epoch_duration`: a poll every 1/24 of the epoch, at least
-/// `min_poll_interval` and at most `max_poll_interval` (`--batch-epoch-poll-ms`) apart, and an edge buffer of 1/144 of
-/// the epoch, at least `min_edge_buffer`.
+/// `min_poll_interval` and at most `max_poll_interval` (`--batch-epoch-poll-ms`) apart; an edge buffer of 1/144 of
+/// the epoch, at least `min_edge_buffer`; and a delivery timeout of half the epoch, from `min_delivery_timeout` to
+/// `max_delivery_timeout`.
 inline epoch_cadence derive_cadence(fc::microseconds epoch_duration, fc::microseconds max_poll_interval) {
    const fc::microseconds poll = std::max(fc::microseconds(epoch_duration.count() / polls_per_epoch),
                                           min_poll_interval);
-   return {.poll_interval = std::min(poll, max_poll_interval),
-           .edge_buffer   = std::max(fc::microseconds(epoch_duration.count() / edge_buffers_per_epoch),
-                                     min_edge_buffer)};
+   const fc::microseconds delivery = std::max(fc::microseconds(epoch_duration.count() / delivery_timeouts_per_epoch),
+                                              min_delivery_timeout);
+   return {.poll_interval    = std::min(poll, max_poll_interval),
+           .edge_buffer      = std::max(fc::microseconds(epoch_duration.count() / edge_buffers_per_epoch),
+                                        min_edge_buffer),
+           .delivery_timeout = std::min(delivery, max_delivery_timeout)};
 }
 
 /// One outpost chain's consensus epoch as this operator last read it.
@@ -164,6 +175,13 @@ inline fc::microseconds poll_interval_of(const chain_epochs& views, uint64_t cha
                                          fc::microseconds max_poll_interval) {
    const auto view = views.find(chain_code);
    return view == views.end() ? max_poll_interval : view->second.cadence.poll_interval;
+}
+
+/// How long each outpost call of `chain_code`'s relay, and each of its depot pushes, may take: its cadence's delivery
+/// timeout, or `max_delivery_timeout` while it has no view.
+inline fc::microseconds delivery_timeout_of(const chain_epochs& views, uint64_t chain_code) {
+   const auto view = views.find(chain_code);
+   return view == views.end() ? max_delivery_timeout : view->second.cadence.delivery_timeout;
 }
 
 /// How often the epoch tick reads the chains: the shortest poll interval of the `relayed` chains, or

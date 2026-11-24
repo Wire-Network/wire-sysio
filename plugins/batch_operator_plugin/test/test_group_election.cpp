@@ -196,6 +196,8 @@ BOOST_AUTO_TEST_CASE(each_chain_reads_its_own_epoch_and_election) try {
    // Each chain's cadence follows its own duration.
    BOOST_CHECK_EQUAL(fast.cadence.poll_interval.count(), min_poll_interval.count());
    BOOST_CHECK_EQUAL(slow.cadence.poll_interval.count(), max_poll.count());
+   BOOST_CHECK_EQUAL(fast.cadence.delivery_timeout.count(), min_delivery_timeout.count());
+   BOOST_CHECK_EQUAL(slow.cadence.delivery_timeout.count(), max_delivery_timeout.count());
 } FC_LOG_AND_RETHROW();
 
 /// A paused chain elects nobody, though the operator's seat in its window still stands.
@@ -231,32 +233,47 @@ BOOST_AUTO_TEST_CASE(a_chain_without_config_or_a_bad_row_is_left_out) try {
    BOOST_CHECK(decoded.skipped[1].find("did not decode") != std::string::npos);
 } FC_LOG_AND_RETHROW();
 
-/// The poll is 1/24 of the epoch and the edge buffer 1/144, so the default 360 s epoch keeps today's 15 s poll and
-/// 2.5 s buffer; the poll is floored at a second and capped at `--batch-epoch-poll-ms`, the buffer floored at a block.
+/// The poll is 1/24 of the epoch, the edge buffer 1/144 and the delivery timeout 1/2, so the default 360 s epoch keeps
+/// today's 15 s poll, 2.5 s buffer and 60 s timeout; the poll is floored at a second and capped at
+/// `--batch-epoch-poll-ms`, the buffer floored at a block, and the timeout held between 5 s and 60 s.
 BOOST_AUTO_TEST_CASE(the_cadence_follows_the_epoch_duration) try {
    struct expectation {
       uint32_t         duration_sec;
       fc::microseconds max_poll_interval;
       fc::microseconds poll_interval;
       fc::microseconds edge_buffer;
+      fc::microseconds delivery_timeout;
    };
    const std::vector<expectation> expectations{
-      {slow_duration_sec, max_poll, fc::seconds(15), fc::milliseconds(2500)},
-      {fast_duration_sec, max_poll, min_poll_interval, min_edge_buffer},
-      {60, max_poll, fc::milliseconds(2500), min_edge_buffer},
-      {120, max_poll, fc::seconds(5), fc::microseconds(833'333)},
-      {3600, max_poll, max_poll, fc::seconds(25)},
+      {slow_duration_sec, max_poll, fc::seconds(15), fc::milliseconds(2500), max_delivery_timeout},
+      {fast_duration_sec, max_poll, min_poll_interval, min_edge_buffer, min_delivery_timeout},
+      {15, max_poll, min_poll_interval, min_edge_buffer, fc::milliseconds(7500)},
+      {60, max_poll, fc::milliseconds(2500), min_edge_buffer, fc::seconds(30)},
+      {120, max_poll, fc::seconds(5), fc::microseconds(833'333), max_delivery_timeout},
+      {3600, max_poll, max_poll, fc::seconds(25), max_delivery_timeout},
       // A poll option below the floor is honoured.
-      {slow_duration_sec, fc::milliseconds(500), fc::milliseconds(500), fc::milliseconds(2500)},
+      {slow_duration_sec, fc::milliseconds(500), fc::milliseconds(500), fc::milliseconds(2500), max_delivery_timeout},
+      // A duration under sysio.epoch's 10 s floor still gets the shortest timeout.
+      {1, max_poll, min_poll_interval, min_edge_buffer, min_delivery_timeout},
    };
    for (const expectation& e : expectations) {
       const epoch_cadence cadence = derive_cadence(fc::seconds(e.duration_sec), e.max_poll_interval);
       BOOST_TEST_CONTEXT("duration " << e.duration_sec << " s, max poll " << e.max_poll_interval.count() << " us") {
          BOOST_CHECK_EQUAL(cadence.poll_interval.count(), e.poll_interval.count());
          BOOST_CHECK_EQUAL(cadence.edge_buffer.count(), e.edge_buffer.count());
+         BOOST_CHECK_EQUAL(cadence.delivery_timeout.count(), e.delivery_timeout.count());
       }
    }
    BOOST_CHECK_EQUAL(min_edge_buffer.count(), fc::milliseconds(sysio::chain::config::block_interval_ms).count());
+} FC_LOG_AND_RETHROW();
+
+/// A chain's outpost calls and depot pushes take its own delivery timeout, and the longest one while it has no view.
+BOOST_AUTO_TEST_CASE(each_chain_takes_its_own_delivery_timeout) try {
+   const chain_epochs views = decode_both().views;
+   BOOST_CHECK_EQUAL(delivery_timeout_of(views, fast_chain.value).count(), min_delivery_timeout.count());
+   BOOST_CHECK_EQUAL(delivery_timeout_of(views, slow_chain.value).count(), max_delivery_timeout.count());
+   BOOST_CHECK_EQUAL(delivery_timeout_of(views, unconfigured_chain.value).count(), max_delivery_timeout.count());
+   BOOST_CHECK_EQUAL(delivery_timeout_of({}, fast_chain.value).count(), max_delivery_timeout.count());
 } FC_LOG_AND_RETHROW();
 
 /// The safe window and the boundary are each chain's own: the same instant can be inside the fast chain's window

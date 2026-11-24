@@ -61,6 +61,7 @@ BOOST_AUTO_TEST_CASE(defaults) {
    BOOST_CHECK_EQUAL(d.is_elected(0), true);
    BOOST_CHECK_EQUAL(d.current_epoch(0), 1u);
    BOOST_CHECK_EQUAL(d.is_epoch_boundary_past(0), false);
+   BOOST_CHECK(d.delivery_timeout(0) == mock_depot_ops::default_delivery_timeout);
    BOOST_CHECK(!d.read_pending_outbound(0, 1).has_value());
    BOOST_CHECK_EQUAL(d.has_delivered_envelope(0, 1), false);
 

@@ -47,11 +47,9 @@ outpost_depot_direction_for(sysio::opp::types::ChainKind kind) {
 } // namespace
 
 outpost_opp_job::outpost_opp_job(outpost_client_ptr client,
-                                 depot_ops&         depot,
-                                 fc::microseconds   outpost_deadline)
+                                 depot_ops&         depot)
    : _client(std::move(client))
-   , _depot(depot)
-   , _outpost_deadline(outpost_deadline) {}
+   , _depot(depot) {}
 
 void outpost_opp_job::run_outbound() {
    std::lock_guard<std::mutex> lock(_state_mx);
@@ -114,7 +112,8 @@ void outpost_opp_job::run_outbound() {
       // behind, continuation bound reached, a call at the gas ceiling that
       // advanced nothing) arrives as `outpost_delivery_incomplete_exception`
       // and is retried next tick.
-      auto tx_id = _client->deliver_outbound_envelope(epoch, pending->raw_envelope, _outpost_deadline);
+      auto tx_id = _client->deliver_outbound_envelope(epoch, pending->raw_envelope,
+                                                      _depot.delivery_timeout(chain_code));
       ilog("outpost_opp_job[{}]: {} outbound envelope ({} bytes) tx={}", _client->to_string(),
            retry_pending ? OUTBOUND_RETRY_LABEL : OUTBOUND_DELIVERED_LABEL, pending->raw_envelope.size(), tx_id);
 
@@ -145,7 +144,7 @@ void outpost_opp_job::run_outbound() {
    // a failed crank is retried by the next epoch's delivery.
    if (!retry_pending && _last_outbound_epoch == epoch) {
       try {
-         _client->crank_outpost(epoch, _outpost_deadline);
+         _client->crank_outpost(epoch, _depot.delivery_timeout(chain_code));
       } catch (const fc::exception& e) {
          wlog("outpost_opp_job[{}]: outpost crank failed for epoch {}: {}",
               _client->to_string(), epoch, e.to_detail_string());
@@ -181,7 +180,7 @@ void outpost_opp_job::run_inbound() {
          return;
       }
 
-      auto raw = _client->read_inbound_envelope(epoch, _outpost_deadline);
+      auto raw = _client->read_inbound_envelope(epoch, _depot.delivery_timeout(chain_code));
       if (raw.empty()) {
          dlog("outpost_opp_job[{}]: no inbound envelope for epoch {}",
               _client->to_string(), epoch);
