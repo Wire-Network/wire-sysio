@@ -95,7 +95,8 @@ namespace sysio {
       // -----------------------------------------------------------------------
 
       /// Network bootstrap: run the genesis advance of every active outpost chain. Refused once the
-      /// network genesis has happened. Auth: sysio.msgch.
+      /// network genesis has happened, and when any active outpost has no epoch config or no seated
+      /// schedule window (`sysio.epoch::schbatchgps`). Auth: sysio.msgch.
       [[sysio::action]]
       void bootstrap();
 
@@ -115,7 +116,8 @@ namespace sysio {
       /// numeric value IS the slug_name, and `sysio.epoch::advance` uses the
       /// same convention when queueing `queueout` / `buildenv` for its outpost.
       /// The envelope must be for the chain's current epoch, from a member of
-      /// the chain's active group.
+      /// the chain's active group. Refused until the chain's genesis advance has
+      /// opened its epoch 1.
       [[sysio::action]]
       void deliver(name batch_op_name, uint64_t chain_code, std::vector<char> data);
 
@@ -124,13 +126,15 @@ namespace sysio {
       /// stores messages + attestations, records per-outpost consensus.
       ///
       /// `chain_code` is the originating chain's slug_name value
-      /// (see `deliver` for the convention).
+      /// (see `deliver` for the convention). No effect before the chain's
+      /// genesis advance.
       [[sysio::action]]
       void evalcons(uint64_t chain_code, uint32_t epoch_index);
 
       /// Check whether outpost `chain_code` reached consensus for its current epoch AND its
       /// next_epoch_start has passed; if so, advance that chain's epoch. Permissionless crank, called
-      /// by the batch operator after the chain's time window elapses.
+      /// by the batch operator after the chain's time window elapses. No effect before the chain's
+      /// genesis advance, which only `bootstrap` / `bootchain` run.
       [[sysio::action]]
       void chkcons(uint64_t chain_code);
 

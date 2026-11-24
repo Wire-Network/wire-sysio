@@ -546,8 +546,8 @@ namespace sysio {
          /// requested_at_economic_epoch + WITHDRAW_WAIT_ECONOMIC_EPOCHS
          uint32_t          eligible_at_economic_epoch  = 0;
          /// The chains the request waits on, each among those whose epoch had started at the request:
-         /// a batch operator's chains with a `servchains` row of any status, every chain for any other
-         /// operator type. Empty: only the economic wait applies.
+         /// for a batch operator the chains it serves or still holds a seat in, every chain for any
+         /// other operator type. Empty: only the economic wait applies.
          std::vector<consensus_wait> consensus_waits;
          /// The economic epoch the grid was in at the request (`sysio.epoch::economic_epoch_index_at`), which
          /// can be ahead of the last epoch ticked.

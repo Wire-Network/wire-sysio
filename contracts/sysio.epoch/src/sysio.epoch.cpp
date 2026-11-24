@@ -75,6 +75,13 @@ constexpr const char* NON_CANONICAL_DELIVERY_REASON_PREFIX =
    "non-canonical OPP envelope delivery, chain ";
 constexpr const char* NON_CANONICAL_DELIVERY_REASON_EPOCH = " epoch ";
 
+/// Messages of the `check`s `advance` raises.
+constexpr std::string_view advance_auth_msg = "only sysio.msgch or sysio.epoch may advance a chain's epoch";
+constexpr std::string_view genesis_not_active_outpost_msg =
+   "a chain's genesis advance requires the chain to be an active outpost";
+constexpr std::string_view genesis_without_schedule_msg =
+   "a chain's genesis advance requires its schedule window: run schbatchgps for the chain first";
+
 // System-owned rows are billed to the sysio RAM pool rather than to this contract account (the
 // privileged-contract model sysio.token uses): the contract account stays finite at its code+abi
 // size while table growth draws from sysio's pool. Permitted because the contract is privileged.
@@ -237,19 +244,19 @@ struct pool_member {
 
 /// The batch operators outpost `chain_code`'s schedule may seat, leaving out `excluded`: every ACTIVE
 /// batch operator in `sysio.opreg` whose membership of the chain is SERVING, non-bootstrapped first,
-/// then by account. The ONE pool `schbatchgps` and `finishadv` draw seats from.
+/// then by account. The ONE pool `schbatchgps` and `finishadv` draw seats from. The walk visits only
+/// the ACTIVE operators (`bystatus`): a member without bonded collateral adds nothing to it.
 std::vector<pool_member> schedule_pool(sysio::slug_name chain_code, const std::vector<name>& excluded) {
-   opreg::servchains_t members(epoch::OPREG_ACCOUNT);
-   opreg::operators_t  ops(epoch::OPREG_ACCOUNT);
+   opreg::operators_t ops(epoch::OPREG_ACCOUNT);
+   auto               by_status = ops.get_index<"bystatus"_n>();
    std::vector<pool_member> pool;
-   for (auto it = members.lower_bound(opreg::served_chain_key{chain_code, name{}});
-        it != members.end() && it->chain_code == chain_code; ++it) {
-      if (it->status != opreg::chain_service_status::SERVING) continue;
+   for (auto it = by_status.lower_bound(magic_enum::enum_integer(OperatorStatus::OPERATOR_STATUS_ACTIVE));
+        it != by_status.end() && it->status == OperatorStatus::OPERATOR_STATUS_ACTIVE; ++it) {
+      if (it->type != OperatorType::OPERATOR_TYPE_BATCH) continue;
       if (std::find(excluded.begin(), excluded.end(), it->account) != excluded.end()) continue;
-      const std::optional<opreg::operator_entry> op = ops.try_get(opreg::operator_key{it->account.value});
-      if (!op || op->status != OperatorStatus::OPERATOR_STATUS_ACTIVE ||
-          op->type != OperatorType::OPERATOR_TYPE_BATCH) continue;
-      pool.push_back({.account = it->account, .is_bootstrapped = op->is_bootstrapped});
+      const std::optional<opreg::served_chain> membership = opreg::membership_of(it->account, chain_code);
+      if (!membership || membership->status != opreg::chain_service_status::SERVING) continue;
+      pool.push_back({.account = it->account, .is_bootstrapped = it->is_bootstrapped});
    }
    std::sort(pool.begin(), pool.end(), [](const pool_member& a, const pool_member& b) {
       if (a.is_bootstrapped != b.is_bootstrapped) return !a.is_bootstrapped;
@@ -368,11 +375,16 @@ void epoch::advance(sysio::slug_name chain_code) {
 
    check(!state.is_paused, "epoch advancement is paused");
 
-   // Post-genesis: only sysio.msgch (via chkcons consensus) may advance the chain.
-   // The chain's genesis (epoch 0→1): permissionless for bootstrap.
-   if (state.current_epoch_index > 0) {
-      check(has_auth(MSGCH_ACCOUNT) || has_auth(get_self()),
-            "only sysio.msgch may advance the epoch after genesis");
+   // sysio.msgch advances a chain: its genesis from `bootstrap` / `bootchain`, every later epoch from
+   // `chkcons`. sysio.epoch's own authority is the governance path.
+   check(has_auth(MSGCH_ACCOUNT) || has_auth(get_self()), advance_auth_msg);
+
+   // A chain starts only as an active outpost with its schedule window seated: the genesis advance
+   // opens epoch 1 with the window's front group on duty.
+   const bool active_outpost = sysio::chains::outpost_kind_of(CHAINS_ACCOUNT, chain_code).has_value();
+   if (state.current_epoch_index == 0) {
+      check(active_outpost, genesis_not_active_outpost_msg);
+      check(!state.batch_op_groups.empty(), genesis_without_schedule_msg);
    }
 
    // Wall-clock minimum: don't advance before next_epoch_start
@@ -396,7 +408,6 @@ void epoch::advance(sysio::slug_name chain_code) {
    // Only an active outpost (`sysio.chains::chains`, active && !is_depot) owes
    // deliveries; an inactive chain's close records nothing. Skipped on the
    // chain's genesis epoch (`current_epoch_index == 0`) — no group existed yet.
-   const bool active_outpost = sysio::chains::outpost_kind_of(CHAINS_ACCOUNT, chain_code).has_value();
    if (active_outpost && state.current_epoch_index > 0 &&
        !state.batch_op_groups.empty() &&
        state.current_batch_op_group < state.batch_op_groups.size()) {

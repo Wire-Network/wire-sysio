@@ -26,12 +26,14 @@ public:
    static constexpr auto CHALG_ACCOUNT  = "sysio.chalg"_n;
    static constexpr auto MSGCH_ACCOUNT  = "sysio.msgch"_n;
    static constexpr auto CHAINS_ACCOUNT = "sysio.chains"_n;
+   static constexpr auto OPREG_ACCOUNT  = "sysio.opreg"_n;
 
    sysio_epoch_tester() {
       produce_blocks(2);
 
+      // sysio.opreg stays codeless: an epoch close's delivery accounting is sent inline to it.
       create_accounts({
-         EPOCH_ACCOUNT, CHALG_ACCOUNT, MSGCH_ACCOUNT, CHAINS_ACCOUNT,
+         EPOCH_ACCOUNT, CHALG_ACCOUNT, MSGCH_ACCOUNT, CHAINS_ACCOUNT, OPREG_ACCOUNT,
          "operator1"_n, "operator2"_n, "operator3"_n,
          "operator4"_n,
       });
@@ -78,6 +80,15 @@ public:
       }
    }
 
+   /// `advance`'s refusals.
+   const action_result unauthorized_advance =
+      error("assertion failure with message: only sysio.msgch or sysio.epoch may advance a chain's epoch");
+   const action_result not_active_outpost =
+      error("assertion failure with message: a chain's genesis advance requires the chain to be an active outpost");
+   const action_result no_schedule_window = error(
+      "assertion failure with message: a chain's genesis advance requires its schedule window: run schbatchgps for "
+      "the chain first");
+
    /// The outpost chain the single-chain cases configure.
    static constexpr std::string_view ETH = "ETH";
    /// A second outpost chain, for the per-chain cases.
@@ -96,8 +107,31 @@ public:
       );
    }
 
-   action_result advance(std::string_view chain = ETH) {
-      return push_epoch_action(EPOCH_ACCOUNT, "advance"_n, mvo()("chain_code", chain));
+   action_result advance(std::string_view chain = ETH, name signer = EPOCH_ACCOUNT) {
+      return push_epoch_action(signer, "advance"_n, mvo()("chain_code", chain));
+   }
+
+   /// The placeholder members `seat_window` seats, one per group. The fixture deploys no sysio.opreg, so
+   /// none of them delivers.
+   static constexpr std::array WINDOW_MEMBERS{"operator1"_n, "operator2"_n, "operator3"_n, "operator4"_n};
+
+   /// Seat `chain`'s schedule window with `groups` one-member groups, the window a genesis advance needs.
+   void seat_window(std::string_view chain = ETH, uint32_t groups = 3) {
+      BOOST_REQUIRE_LE(groups, WINDOW_MEMBERS.size());
+      std::vector<std::vector<name>> window;
+      for (uint32_t g = 0; g < groups; ++g) window.push_back({WINDOW_MEMBERS[g]});
+      sysio_system::test_support::epoch_state::seat_window(*this, abi_ser, chain, window);
+   }
+
+   /// Make `chain` ready for its genesis advance: an active outpost of `kind` (registered inside the
+   /// bootstrap window) with its schedule window seated.
+   void ready_genesis(std::string_view chain, ChainKind kind) {
+      BOOST_REQUIRE_EQUAL(success(), regchain(kind, std::string(chain), 1));
+      seat_window(chain);
+   }
+
+   action_result activchain(std::string_view chain) {
+      return push_chains_action(CHAINS_ACCOUNT, "activchain"_n, mvo()("code", chain));
    }
 
    action_result seteconomy(uint32_t duration, time_point_sec start, name signer = EPOCH_ACCOUNT) {
@@ -407,10 +441,9 @@ BOOST_FIXTURE_TEST_CASE(tickeconomy_waits_for_config_and_consensus_genesis, sysi
 // Without emissions state the economic clock still ticks: the gate holds the epoch's emissions and
 // records why, and the duty settlement step is skipped, so the tick needs nothing from sysio.system.
 BOOST_FIXTURE_TEST_CASE(tickeconomy_runs_without_emissions_state, sysio_epoch_tester) { try {
-   create_accounts({"sysio.opreg"_n});   // the withdrawal flush's inline target; codeless here
-   produce_blocks();
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), seteconomy(360, time_point_sec{control->head().block_time()}));
+   ready_genesis(ETH, ChainKind::CHAIN_KIND_EVM);
    BOOST_REQUIRE_EQUAL(success(), advance());
    produce_blocks();
    BOOST_REQUIRE_EQUAL(success(), tickeconomy(1));
@@ -486,6 +519,7 @@ BOOST_FIXTURE_TEST_CASE(setconfig_bounds_the_epoch_duration_per_chain, sysio_epo
    BOOST_REQUIRE_EQUAL(kFloorSec, duration_of(ETH));
    BOOST_REQUIRE_EQUAL(kCeilingSec, duration_of(SOL));
 
+   ready_genesis(ETH, ChainKind::CHAIN_KIND_EVM);
    BOOST_REQUIRE_EQUAL(success(), advance(ETH));
    produce_blocks();
    BOOST_REQUIRE_EQUAL(int64_t{kFloorSec}, epoch_length_sec(ETH));
@@ -507,6 +541,8 @@ BOOST_FIXTURE_TEST_CASE(chains_advance_on_their_own_cadence, sysio_epoch_tester)
    };
    BOOST_REQUIRE_EQUAL(success(), setconfig(kEthDurationSec, 7, 21, 3, 200, ETH));
    BOOST_REQUIRE_EQUAL(success(), setconfig(kSolDurationSec, 7, 21, 3, 200, SOL));
+   ready_genesis(ETH, ChainKind::CHAIN_KIND_EVM);
+   ready_genesis(SOL, ChainKind::CHAIN_KIND_SVM);
    BOOST_REQUIRE_EQUAL(success(), advance(ETH));
    BOOST_REQUIRE_EQUAL(success(), advance(SOL));
    produce_blocks();
@@ -541,8 +577,8 @@ BOOST_FIXTURE_TEST_CASE(chains_advance_on_their_own_cadence, sysio_epoch_tester)
 } FC_LOG_AND_RETHROW() }
 
 /// The first chain's genesis advance is the network genesis: it writes the `netgenesis` marker, which
-/// closes the bootstrap window (a chain registered after it starts inactive), and a later chain's
-/// genesis leaves the marker as it was.
+/// closes the bootstrap window (a chain registered after it starts inactive, so it cannot start until
+/// it is activated), and a later chain's genesis leaves the marker as it was.
 BOOST_FIXTURE_TEST_CASE(first_genesis_advance_is_the_network_genesis, sysio_epoch_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regchain(ChainKind::CHAIN_KIND_EVM, std::string(ETH), 1));
    BOOST_REQUIRE(get_chain(std::string(ETH))["active"].as<bool>());
@@ -550,6 +586,7 @@ BOOST_FIXTURE_TEST_CASE(first_genesis_advance_is_the_network_genesis, sysio_epoc
 
    BOOST_REQUIRE_EQUAL(success(), setconfig(360, 7, 21, 3, 200, ETH));
    BOOST_REQUIRE_EQUAL(success(), setconfig(360, 7, 21, 3, 200, SOL));
+   seat_window(ETH);
    BOOST_REQUIRE_EQUAL(success(), advance(ETH));
    produce_blocks();
    const auto genesis = get_network_genesis();
@@ -558,11 +595,51 @@ BOOST_FIXTURE_TEST_CASE(first_genesis_advance_is_the_network_genesis, sysio_epoc
 
    BOOST_REQUIRE_EQUAL(success(), regchain(ChainKind::CHAIN_KIND_SVM, std::string(SOL), 1));
    BOOST_REQUIRE(!get_chain(std::string(SOL))["active"].as<bool>());
+   seat_window(SOL);
+   BOOST_REQUIRE_EQUAL(not_active_outpost, advance(SOL));
+   BOOST_REQUIRE_EQUAL(success(), activchain(SOL));
 
    BOOST_REQUIRE_EQUAL(success(), advance(SOL));
    produce_blocks();
    BOOST_REQUIRE_EQUAL(1u, get_epoch_state(SOL)["current_epoch_index"].as<uint32_t>());
    BOOST_REQUIRE(genesis_at == get_network_genesis()["genesis_at"].as<time_point>());
+} FC_LOG_AND_RETHROW() }
+
+/// Only sysio.msgch (bootstrap, bootchain, chkcons) or sysio.epoch advances a chain, its genesis included.
+BOOST_FIXTURE_TEST_CASE(advance_requires_msgch_or_epoch_authority, sysio_epoch_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setconfig(60, 7, 21, 3, 200, ETH));
+   ready_genesis(ETH, ChainKind::CHAIN_KIND_EVM);
+   BOOST_REQUIRE_EQUAL(unauthorized_advance, advance(ETH, "operator1"_n));
+   BOOST_REQUIRE(get_network_genesis().is_null());
+   BOOST_REQUIRE_EQUAL(0u, get_epoch_state(ETH)["current_epoch_index"].as<uint32_t>());
+
+   BOOST_REQUIRE_EQUAL(success(), advance(ETH, MSGCH_ACCOUNT));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(1u, get_epoch_state(ETH)["current_epoch_index"].as<uint32_t>());
+
+   constexpr uint32_t kBlocksPerSecond = 2;
+   produce_blocks(60 * kBlocksPerSecond + 1);
+   BOOST_REQUIRE_EQUAL(unauthorized_advance, advance(ETH, "operator1"_n));
+   BOOST_REQUIRE_EQUAL(success(), advance(ETH, MSGCH_ACCOUNT));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(2u, get_epoch_state(ETH)["current_epoch_index"].as<uint32_t>());
+} FC_LOG_AND_RETHROW() }
+
+/// A chain's genesis advance needs an active outpost whose schedule window is seated; each refusal
+/// leaves the chain and the network unstarted.
+BOOST_FIXTURE_TEST_CASE(genesis_advance_requires_an_active_outpost_with_a_window, sysio_epoch_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setconfig(60, 7, 21, 3, 200, ETH));
+   BOOST_REQUIRE_EQUAL(not_active_outpost, advance(ETH));
+
+   BOOST_REQUIRE_EQUAL(success(), regchain(ChainKind::CHAIN_KIND_EVM, std::string(ETH), 1));
+   BOOST_REQUIRE_EQUAL(no_schedule_window, advance(ETH));
+   BOOST_REQUIRE(get_network_genesis().is_null());
+
+   seat_window(ETH);
+   BOOST_REQUIRE_EQUAL(success(), advance(ETH));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(1u, get_epoch_state(ETH)["current_epoch_index"].as<uint32_t>());
+   BOOST_REQUIRE(!get_network_genesis().is_null());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(initgroups_no_opreg, sysio_epoch_tester) { try {

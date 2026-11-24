@@ -34,9 +34,11 @@ namespace sysio {
                      uint32_t batch_op_groups,
                      uint32_t epoch_retention_envelope_log_count);
 
-      /// Close outpost `chain_code`'s current consensus epoch once its duration has elapsed. The chain's
-      /// genesis advance (epoch 0 -> 1) is permissionless; later advances need sysio.msgch (its `chkcons`)
-      /// or sysio.epoch. The first genesis advance of any chain is the network genesis.
+      /// Close outpost `chain_code`'s current consensus epoch once its duration has elapsed. Auth:
+      /// sysio.msgch (`bootstrap` / `bootchain` for the genesis advance, `chkcons` afterwards) or
+      /// sysio.epoch. The genesis advance (epoch 0 -> 1) requires the chain to be an active outpost with
+      /// its schedule window seated (`schbatchgps`). The first genesis advance of any chain is the
+      /// network genesis.
       [[sysio::action]]
       void advance(sysio::slug_name chain_code);
 

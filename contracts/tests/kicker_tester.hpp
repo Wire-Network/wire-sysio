@@ -29,6 +29,8 @@ public:
    static constexpr uint32_t EPOCH_DURATION_SEC = 60;
    /// The outpost chain whose consensus epoch the fixture configures; its genesis advance is the network genesis.
    static constexpr std::string_view EPOCH_CHAIN = SOLANA;
+   /// The one member of `EPOCH_CHAIN`'s schedule window: no batch operator runs, so none delivers.
+   static constexpr auto WINDOW_MEMBER = "batchop"_n;
    static constexpr uint64_t seed = 75'000 * UNIT;
    static constexpr uint64_t holder = 25'000 * UNIT;
    static constexpr uint64_t budget = 1'000'000 * UNIT;
@@ -233,14 +235,17 @@ public:
       return push(EPOCH, epoch_ser, EPOCH, "seteconomy"_n, mvo()
          ("epoch_duration_sec", EPOCH_DURATION_SEC)("start_time", fc::time_point_sec(control->head().block_time())));
    }
+   /// Run `EPOCH_CHAIN`'s genesis advance, the network genesis. The fixture runs no batch operators, so its schedule
+   /// window is seated with `WINDOW_MEMBER` alone.
+   action_result open_consensus_genesis() {
+      sysio_system::test_support::epoch_state::seat_window(*this, epoch_ser, EPOCH_CHAIN, {{WINDOW_MEMBER}});
+      return push(EPOCH, epoch_ser, EPOCH, "advance"_n, mvo()("chain_code", EPOCH_CHAIN));
+   }
    /// Open consensus genesis, then tick economic epoch 1 on a grid anchored at this tick, so the fixture's waits do
    /// not leave the crank behind. With `pay_cadence_epochs == 1` it is a pay epoch, so the emissions gate either pays
    /// the period or records why it held it.
    action_result open_first_pay_epoch() {
-      if (auto result = push(EPOCH, epoch_ser, EPOCH, "advance"_n, mvo()("chain_code", EPOCH_CHAIN));
-          result != success()) {
-         return result;
-      }
+      if (auto result = open_consensus_genesis(); result != success()) return result;
       if (auto result = anchor_economy(); result != success()) return result;
       return push(EPOCH, epoch_ser, EPOCH, "tickeconomy"_n, mvo()("epoch_index", 1));
    }

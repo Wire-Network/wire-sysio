@@ -407,6 +407,85 @@ fc::variant membership(Tester& tester, abi_serializer& opreg_abi, name account, 
 
 } // namespace served_chains
 
+// ---------------------------------------------------------------------------
+//  Consensus epoch state written directly, for fixtures that run no batch operators or no outpost
+// ---------------------------------------------------------------------------
+
+namespace epoch_state {
+
+inline constexpr auto epoch_account = "sysio.epoch"_n;
+inline constexpr auto state_table   = "epochstate"_n;
+inline constexpr auto state_type    = "epoch_state";
+inline constexpr auto genesis_table = "netgenesis"_n;
+inline constexpr auto genesis_type  = "network_genesis";
+
+/// Field names of an `epochstate` / `netgenesis` row.
+namespace field {
+inline constexpr auto chain_code             = "chain_code";
+inline constexpr auto current_epoch_index    = "current_epoch_index";
+inline constexpr auto current_epoch_start    = "current_epoch_start";
+inline constexpr auto next_epoch_start       = "next_epoch_start";
+inline constexpr auto current_batch_op_group = "current_batch_op_group";
+inline constexpr auto batch_op_groups        = "batch_op_groups";
+inline constexpr auto is_paused              = "is_paused";
+inline constexpr auto genesis_at             = "genesis_at";
+} // namespace field
+
+/// `chain`'s `epochstate` row decoded with `epoch_abi`, or the row a chain starts from (index 0, no window).
+template <typename Tester>
+fc::mutable_variant_object state_of(Tester& tester, const abi_serializer& epoch_abi, std::string_view chain) {
+   const uint64_t chain_code = fc::slug_name{chain}.value;
+   const auto     data       = tester.get_row_by_id(epoch_account, epoch_account, state_table, chain_code);
+   if (!data.empty()) {
+      return fc::mutable_variant_object(
+         epoch_abi.binary_to_variant(state_type, data, Tester::fixture_abi_yield_function()).get_object());
+   }
+   return fc::mutable_variant_object()
+      (field::chain_code, chain_code)
+      (field::current_epoch_index, 0u)
+      (field::current_epoch_start, fc::time_point())
+      (field::next_epoch_start, fc::time_point())
+      (field::current_batch_op_group, 0u)
+      (field::batch_op_groups, std::vector<std::vector<name>>{})
+      (field::is_paused, false);
+}
+
+/// Store `state` as its chain's `epochstate` row.
+template <typename Tester>
+void write_state(Tester& tester, const abi_serializer& epoch_abi, const fc::mutable_variant_object& state) {
+   write_kv_row(tester, epoch_account, state_table, state[field::chain_code].as_uint64(),
+                epoch_abi.variant_to_binary(state_type, state, Tester::fixture_abi_yield_function()));
+}
+
+/// Seat `groups` as `chain`'s schedule window, front group on duty, as `schbatchgps` would from that many serving
+/// batch operators, for a fixture that registers none. The chain's index and timing are left as they are.
+template <typename Tester>
+void seat_window(Tester& tester, const abi_serializer& epoch_abi, std::string_view chain,
+                 const std::vector<std::vector<name>>& groups) {
+   fc::mutable_variant_object state = state_of(tester, epoch_abi, chain);
+   state(field::batch_op_groups, groups)(field::current_batch_op_group, 0u);
+   write_state(tester, epoch_abi, state);
+}
+
+/// Leave the state a network genesis leaves, for a fixture that runs no outpost (a genesis advance needs an active
+/// outpost with a seated window): `chain` at its epoch 1 from the head block, `epoch_duration_sec` long, and the
+/// `netgenesis` marker.
+template <typename Tester>
+void start_network(Tester& tester, const abi_serializer& epoch_abi, std::string_view chain,
+                   uint32_t epoch_duration_sec) {
+   const fc::time_point       now   = tester.control->head().block_time();
+   fc::mutable_variant_object state = state_of(tester, epoch_abi, chain);
+   state(field::current_epoch_index, 1u)
+        (field::current_epoch_start, now)
+        (field::next_epoch_start, now + fc::seconds(epoch_duration_sec));
+   write_state(tester, epoch_abi, state);
+   write_kv_row(tester, epoch_account, genesis_table, genesis_table.to_uint64_t(),
+                epoch_abi.variant_to_binary(genesis_type, fc::mutable_variant_object()(field::genesis_at, now),
+                                            Tester::fixture_abi_yield_function()));
+}
+
+} // namespace epoch_state
+
 /// Mirrors of sysio.roa's `nodeownerreg` audit values (`reg_status` / `reject_reason` in sysio.roa.hpp).
 namespace nodeownerreg {
 inline constexpr uint64_t status_confirmed            = 0;

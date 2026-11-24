@@ -15,8 +15,8 @@ The depot's two clocks, and batch operator scheduling, for the OPP (Outpost Prot
   window of `batch_op_groups` groups of `operators_per_epoch` members; the group on duty is always the
   front of the window. A chain seats only the `ACTIVE` batch operators that serve it (`SERVING` in
   `sysio.opreg::servchains`).
-- Advances a chain's consensus epoch (`advance`), crank-driven by `sysio.msgch::chkcons(chain)` after
-  the chain's genesis
+- Advances a chain's consensus epoch (`advance`): its genesis from `sysio.msgch::bootstrap` /
+  `bootchain`, every later epoch crank-driven by `sysio.msgch::chkcons(chain)`
 - Opens economic epochs (`tickeconomy`), a permissionless crank the batch operators push
 - Gates each economic epoch's emissions on readiness: if `sysio.system` cannot accrue or pay, the
   emissions are held and the episode recorded in `blocklog`; both clocks keep running
@@ -45,7 +45,7 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
 | `setconfig` | `sysio.epoch` | Set one chain's consensus epoch configuration. Bounds `epoch_duration_sec` to `MIN_EPOCH_DURATION_SEC` (10 s) .. `MAX_EPOCH_DURATION_SEC` (30 days). Requires `operators_per_epoch * batch_op_groups == batch_operator_minimum_active` and enforces the outposts' limits (`MAX_OPERATORS_PER_EPOCH` 7, Ethereum's group size; `MAX_BATCH_OP_GROUPS` 8, Solana's group count), so the window holds at most `MAX_SCHEDULED_BATCH_OPERATORS` (56) |
 | `seteconomy` | `sysio.epoch` | Set the economic clock's duration and grid start. The start is fixed once the clock has ticked; it is re-validated against `sysio.system`'s pay-period accrual bound |
 | `schbatchgps` | `sysio.epoch` | Build one chain's initial window from the `ACTIVE` batch operators on `sysio.opreg` that serve the chain (non-bootstrapped first, then bootstrapped, trimmed to `batch_operator_minimum_active`) |
-| `advance` | permissionless at a chain's genesis (epoch 0 → 1); afterwards `sysio.msgch` or `sysio.epoch` | Advance one chain's consensus epoch once its wall-clock boundary has passed and it is not paused |
+| `advance` | `sysio.msgch` or `sysio.epoch` | Advance one chain's consensus epoch once its wall-clock boundary has passed and it is not paused. The genesis advance (epoch 0 → 1) requires an active outpost whose schedule window `schbatchgps` has seated |
 | `tickeconomy` | permissionless | Open economic epoch `epoch_index`: refused unless it is the next index, its grid boundary has passed, and the network genesis has happened |
 | `pause` | `sysio.chalg` | Pause one chain's epoch advancement |
 | `unpause` | `sysio.chalg` | Resume one chain's epoch advancement |

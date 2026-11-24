@@ -902,9 +902,9 @@ struct enqueue_result {
 };
 
 /// The consensus waits a withdrawal by `op` takes: one per chain whose epoch has started, at its
-/// current index + WITHDRAW_WAIT_EPOCHS. A batch operator waits on each chain it has a `servchains` row
-/// for, whatever the row's status, since a LEFT or EVICTED member may still hold deliveries not yet
-/// judged there; any other operator type waits on every started chain.
+/// current index + WITHDRAW_WAIT_EPOCHS. A batch operator waits on each chain it serves (SERVING) or
+/// still holds a seat in: a LEFT or EVICTED member's seated epochs are not yet judged. Any other
+/// operator type waits on every started chain.
 std::vector<opreg::consensus_wait> consensus_waits_for(const opreg::operator_entry& op) {
    std::vector<opreg::consensus_wait> waits;
    if (op.type == OperatorType::OPERATOR_TYPE_BATCH) {
@@ -912,6 +912,8 @@ std::vector<opreg::consensus_wait> consensus_waits_for(const opreg::operator_ent
       auto                by_account = members.get_index<"byaccount"_n>();
       for (auto it = by_account.lower_bound(op.account.value);
            it != by_account.end() && it->account == op.account; ++it) {
+         if (it->status != opreg::chain_service_status::SERVING &&
+             !holds_schedule_seat(op.account, it->chain_code)) continue;
          const uint32_t epoch_index = sysio::epoch::current_epoch_index(it->chain_code.value);
          if (epoch_index == 0) continue;
          waits.push_back(opreg::consensus_wait{

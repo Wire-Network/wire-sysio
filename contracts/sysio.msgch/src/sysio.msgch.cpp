@@ -79,6 +79,10 @@ constexpr uint32_t SUPPORTED_PAYLOAD_VERSION = 1;
 /// Admission failure distinct from protobuf decoding, header validation, and consensus failures.
 constexpr auto UNSUPPORTED_PAYLOAD_VERSION = "unsupported OPP MessagePayload version";
 
+/// Message of the `check` `deliver` raises for a chain whose genesis advance has not run.
+constexpr std::string_view DELIVER_BEFORE_GENESIS =
+   "deliver: the chain's epoch has not started; envelopes are accepted from its epoch 1";
+
 // `operator""_s` is declared at global scope by <sysio/slug_name.hpp>.
 
 /// Codename of the Ethereum outpost — the sole source of node-owner NFT (ERC1155) deposits, which
@@ -1037,7 +1041,8 @@ void msgch::bootstrap() {
    check(sysiosystem::emissions::t5state_t(SYSTEM_ACCOUNT).exists(),
          "msgch::bootstrap: emissions state uninitialized -- sysio.system::initt5 must run before bootstrap");
 
-   // Each active outpost starts its own epoch 1; a chain without an epoch config fails the advance.
+   // Each active outpost starts its own epoch 1; a chain without an epoch config or a seated schedule
+   // window fails its advance, and with it the bootstrap.
    uint32_t started = 0;
    sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
    for (auto it = chains_tbl.begin(); it != chains_tbl.end(); ++it) {
@@ -1108,6 +1113,7 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
    // Decode envelope to validate epoch_index matches the chain's current epoch. The decoded envelope
    // is re-used by the semantic-header/chain validation below (after the duplicate check).
    const uint32_t epoch = epoch::current_epoch_index(chain_code);
+   check(epoch > 0, DELIVER_BEFORE_GENESIS);
    opp::Envelope env_check;
    {
       auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
@@ -1224,6 +1230,9 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
 void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
    require_auth(get_self());
 
+   // Consensus is reached only on a started chain's epochs (its epoch 1 onward).
+   if (epoch::current_epoch_index(chain_code) == 0) return;
+
    envelopes_t envs(get_self());
    auto oe_idx = envs.get_index<"byoutepoch"_n>();
    uint128_t composite = opp::outpost_epoch_key(chain_code, epoch_index);
@@ -1329,7 +1338,8 @@ void msgch::chkcons(uint64_t chain_code) {
    check(sysio::chains::outpost_kind_of(CHAINS_ACCOUNT, sysio::slug_name{chain_code}).has_value(),
          "chkcons: chain is not an active outpost");
    const std::optional<epoch::epoch_state> state = epoch::epoch_state_of(chain_code);
-   if (!state) return;
+   // A chain starts only through its genesis advance (`bootstrap` / `bootchain`).
+   if (!state || state->current_epoch_index == 0) return;
    const uint32_t epoch = state->current_epoch_index;
 
    // Open-dispute gate: while this chain's current epoch has an OPEN OPP dispute, hold its

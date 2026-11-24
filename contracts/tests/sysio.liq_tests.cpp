@@ -450,7 +450,7 @@ BOOST_FIXTURE_TEST_CASE(a_pool_registered_after_the_bootstrap_window_is_seeded_f
    };
    const auto eth_supply = [&] { return stat_row(LIQETH_SYM)["supply"].as<asset>().get_amount(); };
 
-   BOOST_REQUIRE_EQUAL(success(), push(EPOCH, epoch_ser, EPOCH, "advance"_n, mvo()("chain_code", EPOCH_CHAIN)));
+   BOOST_REQUIRE_EQUAL(success(), open_consensus_genesis());
    BOOST_REQUIRE_EQUAL(1u, decode(epoch_ser, "epoch_state", get_row_by_id(EPOCH, EPOCH, "epochstate"_n,
                                                                          fc::slug_name{EPOCH_CHAIN}.value))
                               ["current_epoch_index"].as_uint64());

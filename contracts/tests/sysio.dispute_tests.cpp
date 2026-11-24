@@ -194,7 +194,7 @@ public:
          *this, contract, ser, signer, action_name, data);
    }
 
-   // ── OPP stack bootstrap: one batch op, one outpost, left at epoch 0 ────
+   // ── OPP stack bootstrap: one batch op, one outpost, started at its epoch 1 ────
 
    void bootstrap_opp_stack() {
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "setconfig"_n, mvo()
@@ -224,7 +224,14 @@ public:
 
       serve_eth({BATCHOP});
       BOOST_REQUIRE_EQUAL(success(), schbatchgps());
+      BOOST_REQUIRE_EQUAL(success(), genesis_advance());
       produce_blocks();
+   }
+
+   /// Run `chain`'s genesis advance under sysio.epoch's authority (standing in for sysio.msgch's
+   /// bootstrap / bootchain), opening its epoch 1, the first that accepts deliveries.
+   action_result genesis_advance(std::string_view chain = ETH_CHAIN_CODE) {
+      return push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "advance"_n, mvo()("chain_code", chain));
    }
 
    /// The outpost chain the stack registers and schedules.
@@ -1016,18 +1023,23 @@ BOOST_FIXTURE_TEST_CASE(chkdispute_unpauses_only_the_disputed_chain, sysio_dispu
    register_node_owner("voter2"_n, 1);   // with nodedaddy: N = 3, Q = 2
 
    // A second EVM outpost (distinct external_chain_id) with its own epoch, so a second (outpost,
-   // epoch) dispute can exist concurrently with the ETH one.
+   // epoch) dispute can exist concurrently with the ETH one. Registered after the network genesis, it
+   // is activated before it can be served and started.
    constexpr std::string_view BASE_CHAIN_CODE = "BASE";
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
       ("kind", ChainKind::CHAIN_KIND_EVM)("code", BASE_CHAIN_CODE)
       ("external_chain_id", 8453)("name", std::string("base-test"))("description", std::string{})
       ("outpost", sysio_system::test_support::no_outpost_mvo())));
+   BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "activchain"_n,
+                                       mvo()("code", BASE_CHAIN_CODE)));
    BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "setconfig"_n, mvo()
       ("chain_code", BASE_CHAIN_CODE)("epoch_duration_sec", 60)("operators_per_epoch", 1)
       ("batch_operator_minimum_active", 1)("batch_op_groups", 1)("epoch_retention_envelope_log_count", 200)));
    // batchop.a already holds the EVM link the ETH outpost needed.
    BOOST_REQUIRE_EQUAL(success(), sysio_system::test_support::served_chains::join(*this, BATCHOP, BASE_CHAIN_CODE));
    BOOST_REQUIRE_EQUAL(success(), schbatchgps(BASE_CHAIN_CODE));
+   BOOST_REQUIRE_EQUAL(success(), genesis_advance(BASE_CHAIN_CODE));
+   produce_blocks();
    const uint64_t base_code = fc::slug_name{BASE_CHAIN_CODE}.value;
 
    const uint32_t epoch = current_epoch();

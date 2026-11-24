@@ -16,7 +16,7 @@
 // that production will use. Helpers:
 //   - register_operator(acct, type, bootstrapped=true) -> marks as OPERATOR_STATUS_ACTIVE
 //   - slash_operator(acct)                            -> marks as OPERATOR_STATUS_SLASHED
-//   - init_epoch_state() + advance_epoch_state()      -> drives sysio.epoch::current_epoch_index
+//   - init_epoch_state() + advance_epoch_state()      -> starts the network, then ticks the economic clock
 //   - setup_producers(N) registers each producer as an ACTIVE opreg operator before calling
 //     regproducer, matching the contract's collateral-admission gate.
 
@@ -441,12 +441,12 @@ public:
       BOOST_REQUIRE_EQUAL( success(), setemitcfg_defaults( config::system_account_name ) );
       produce_blocks(1);
 
-      // --- Bootstrap sysio.epoch (config only, no advance) ---
-      // bootstrap_epoch() sets epochcfg but defers genesis advance so each test
-      // controls when (and whether) the first advance fires. The first advance
-      // after init_epoch_state has next_epoch_start defaulted to 0, so it
-      // crosses the wall-clock check immediately; later advances need
-      // produce_blocks to cross the configured epoch duration first.
+      // --- Bootstrap sysio.epoch (config only, network not started) ---
+      // bootstrap_epoch() sets epochcfg and the economic clock; the first
+      // advance_epoch_state starts the network, so each test controls when
+      // (and whether) the economic clock opens its first epoch. Later
+      // advance_epoch_state calls need produce_blocks to cross the economic
+      // boundary first.
       bootstrap_epoch();
    }
 
@@ -1348,20 +1348,20 @@ public:
       return control->head().block_time() >= state["next_epoch_start"].as<fc::time_point>();
    }
 
-   /// The consensus epoch's current index (0 before the genesis advance).
+   /// The consensus epoch's current index (0 before the network starts).
    uint32_t consensus_epoch_index() {
       auto state = get_epoch_state_row();
       return state.is_null() ? 0 : state["current_epoch_index"].as<uint32_t>();
    }
 
-   /// Open the next economic epoch -- the clock emissions run on. The first call also runs the
-   /// consensus genesis advance, which the economic clock waits for, and, unless the test pinned the
-   /// start, anchors the economic grid at itself so a long setup does not leave the crank behind.
-   /// Tests cross the economic boundary with produce_blocks before every call after the first.
+   /// Open the next economic epoch -- the clock emissions run on. The first call also starts the
+   /// network, which the economic clock waits for, and, unless the test pinned the start, anchors the
+   /// economic grid at itself so a long setup does not leave the crank behind. Tests cross the economic
+   /// boundary with produce_blocks before every call after the first.
    action_result advance_epoch_state(account_name signer = EPOCH) {
       if (consensus_epoch_index() == 0) {
-         auto r = push_epoch_action(signer, "advance"_n, mvo()("chain_code", EPOCH_CHAIN));
-         if (r != success()) return r;
+         sysio_system::test_support::epoch_state::start_network(*this, epoch_abi_ser, EPOCH_CHAIN,
+                                                                consensus_epoch_duration_sec());
       }
       if (economic_epoch_index() == 0 && !economic_start_pinned) {
          auto r = push_seteconomy(economic_duration_sec(), tpsec(head_secs()));
@@ -1370,11 +1370,11 @@ public:
       return push_epoch_action(signer, "tickeconomy"_n, mvo()("epoch_index", economic_epoch_index() + 1));
    }
 
-   // Convenience: set epoch config only. Genesis advance is deferred so each
+   // Convenience: set epoch config only. The network start is deferred so each
    // test can decide whether to initt5 (and thus pass the emissions gate) or
-   // exercise gate-block behavior. Under the new model, the first
-   // advance_epoch_state ALSO fires payepoch inline -- which requires t5state
-   // to exist, so initt5 must precede any successful advance.
+   // exercise gate-block behavior. The first advance_epoch_state ALSO ticks the
+   // first economic epoch, whose payepoch requires t5state, so initt5 must
+   // precede any paying tick.
    void bootstrap_epoch() {
       BOOST_REQUIRE_EQUAL( success(), init_epoch_state() );
       produce_blocks(1);
@@ -1391,9 +1391,18 @@ public:
          fixture_abi_yield_function());
    }
 
-   /// The outpost chain whose consensus epoch the fixture configures and advances. It is not
-   /// registered on sysio.chains, so its epoch closes owe no deliveries.
+   /// The outpost chain whose consensus epoch the fixture configures. It is not registered on sysio.chains: the
+   /// fixture starts the network by writing the state the genesis leaves (`epoch_state::start_network`), and its
+   /// consensus epoch never closes, so it owes no deliveries.
    static constexpr std::string_view EPOCH_CHAIN = "ETH";
+
+   /// `EPOCH_CHAIN`'s configured consensus epoch length, in seconds.
+   uint32_t consensus_epoch_duration_sec() {
+      const auto data = get_row_by_id(EPOCH, EPOCH, "epochcfg"_n, fc::slug_name{EPOCH_CHAIN}.value);
+      BOOST_REQUIRE(!data.empty());
+      return epoch_abi_ser.binary_to_variant("epoch_config", data, fixture_abi_yield_function())
+         ["epoch_duration_sec"].as<uint32_t>();
+   }
 
    fc::variant get_epoch_state_row() {
       auto data = get_row_by_id(EPOCH, EPOCH, "epochstate"_n, fc::slug_name{EPOCH_CHAIN}.value);
@@ -3214,7 +3223,7 @@ BOOST_FIXTURE_TEST_CASE( gate_block_clears_on_unblock, sysio_emissions_tester ) 
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( economic_clock_catches_up_on_a_fixed_grid, sysio_emissions_tester ) try {
-   // A start time three and a half epochs in the past: after the consensus genesis the crank opens
+   // A start time three and a half epochs in the past: after the network genesis the crank opens
    // epochs 1..4 back to back, each dated by the grid rather than by when it ran, then waits.
    create_t5_holding_accounts();
    constexpr uint32_t epoch_secs = 60;
@@ -3222,7 +3231,7 @@ BOOST_FIXTURE_TEST_CASE( economic_clock_catches_up_on_a_fixed_grid, sysio_emissi
    BOOST_REQUIRE_EQUAL( success(), seteconomy(epoch_secs, tpsec(start)) );
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name ) );
 
-   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );   // consensus genesis + economic epoch 1
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );   // network genesis + economic epoch 1
    auto tick = [&](uint32_t index) {
       return push_epoch_action(EPOCH, "tickeconomy"_n, mvo()("epoch_index", index));
    };
@@ -5168,7 +5177,7 @@ BOOST_FIXTURE_TEST_CASE( epochlog_prunes_past_retention_cap, sysio_emissions_tes
 
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name ) );
 
-   // Epoch 1: genesis advance fires immediately (next_epoch_start = 0).
+   // Epoch 1: the network starts and the first economic epoch opens at once.
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
    // Epochs 2-5: cross the wall-clock boundary each time.
    for (int i = 0; i < 4; ++i) {

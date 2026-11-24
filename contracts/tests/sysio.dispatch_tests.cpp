@@ -438,7 +438,8 @@ public:
    // and reaches consensus; the non-EVM drop case passes an SVM "SOLANA" so its delivery also reaches
    // consensus and the drop is exercised at the source binding, not merely the consensus gate. The
    // outpost is registered before `schbatchgps`, so the batch op is scheduled for it. The chain is
-   // left at epoch 0, inside the bootstrap window.
+   // left at epoch 0, inside the bootstrap window: `start_dispatch_chain` runs its genesis once the
+   // test's own bootstrap-window registrations are done.
    void bootstrap_for_dispatch(const std::string& outpost_code = "ETH",
                                ChainKind outpost_kind = ChainKind::CHAIN_KIND_EVM,
                                bool with_economy = true) {
@@ -492,6 +493,16 @@ public:
    /// The outpost `bootstrap_for_dispatch` registered and scheduled: the chain whose epoch the
    /// fixture reads and cranks.
    uint64_t dispatch_chain = 0;
+
+   /// Run the dispatch outpost's genesis advance, the network genesis, under sysio.epoch's authority
+   /// (standing in for `sysio.msgch::bootstrap`): it opens epoch 1, the first that accepts deliveries,
+   /// and closes the bootstrap window.
+   void start_dispatch_chain() {
+      BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "advance"_n,
+                                          mvo()("chain_code", fc::slug_name{dispatch_chain}.to_string())));
+      produce_blocks();
+      BOOST_REQUIRE_EQUAL(1u, current_epoch());
+   }
 
    action_result deliver(uint64_t chain_code, const std::vector<char>& data) {
       return push(MSGCH_ACCOUNT, msgch_abi, BATCHOP, "deliver"_n, mvo()
@@ -601,10 +612,9 @@ public:
 
    // ── SEC-129 / WSA-223: real epoch-aging helpers ──────────────────────────
    //
-   // The bootstrap advance gate-blocks on missing emissions state, so every
-   // dispatch test normally runs at epoch 0. Tests that need real advances
-   // configure emissions the way emissions_tests.cpp does and then genuinely
-   // advance the epoch index.
+   // A dispatch test runs no sysio.system by default, so its epoch closes record
+   // no duty and pay nothing. Tests that need paying advances configure
+   // emissions the way emissions_tests.cpp does.
 
    /// Push a sysio.system action (ABI resolved from chain state — the system
    /// account runs this build's genesis code, like sysio.roa above).
@@ -851,6 +861,7 @@ BOOST_FIXTURE_TEST_CASE(dispatch_silently_drops_out_of_scope_types, sysio_dispat
    bootstrap_for_dispatch();
 
    const auto eth_code = fc::slug_name{"ETH"}.value;
+   start_dispatch_chain();
    auto envelope = encode_envelope_with_one_attestation(
       current_epoch(),
       sysio::opp::types::ATTESTATION_TYPE_OPERATORS,
@@ -873,6 +884,7 @@ BOOST_FIXTURE_TEST_CASE(deliver_duplicate_from_same_operator_reverts, sysio_disp
    bootstrap_for_dispatch();
 
    const auto eth_code = fc::slug_name{"ETH"}.value;
+   start_dispatch_chain();
    auto envelope = encode_envelope_with_one_attestation(
       current_epoch(),
       sysio::opp::types::ATTESTATION_TYPE_OPERATORS,
@@ -913,6 +925,7 @@ BOOST_FIXTURE_TEST_CASE(deliver_envelope_at_size_cap_succeeds, sysio_dispatch_te
    bootstrap_for_dispatch();
 
    const auto eth_code = fc::slug_name{"ETH"}.value;
+   start_dispatch_chain();
    auto boundary = encode_envelope_padded_to(current_epoch(), MAX_ENVELOPE_BYTES);
 
    BOOST_REQUIRE_EQUAL(success(), deliver(/*chain_code=*/eth_code, boundary));
@@ -949,6 +962,7 @@ BOOST_FIXTURE_TEST_CASE(dispatch_routes_node_owner_reg_to_roa, sysio_dispatch_te
    auto payload = encode_node_owner_registration(
       CLAIM_ACCOUNT.to_string(), /*tier=*/2,
       sysio::opp::types::WIRE_KEY_TYPE_K1, wire_key, eth_bytes, eth_address);
+   start_dispatch_chain();
    auto envelope = encode_envelope_with_one_attestation(
       current_epoch(), sysio::opp::types::ATTESTATION_TYPE_NODE_OWNER_REG, payload);
 
@@ -1002,6 +1016,7 @@ BOOST_FIXTURE_TEST_CASE(dispatch_existing_node_owner_name_rejects_without_blocki
          owner.to_string(), 2, sysio::opp::types::WIRE_KEY_TYPE_K1,
          k1_pubkey_bytes(get_public_key(owner, "active")), em_uncompressed_pubkey_bytes(eth_pub), eth_address));
    }
+   start_dispatch_chain();
    BOOST_REQUIRE_EQUAL(success(), deliver(fc::slug_name{"ETHEREUM"}.value,
       encode_envelope_with_attestations(current_epoch(), sysio::opp::types::ATTESTATION_TYPE_NODE_OWNER_REG, claims)));
    const auto rejected = get_nodeownerreg(CLAIM_ACCOUNT);
@@ -1046,6 +1061,7 @@ BOOST_FIXTURE_TEST_CASE(outbound_only_types_never_reach_node_owner_dispatch, sys
    for (auto type : {ATTESTATION_TYPE_OPERATORS, ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS}) {
       entries.emplace_back(type, payload);
    }
+   start_dispatch_chain();
    const auto trace = deliver_trace(eth_code,
       encode_envelope_with_mixed_attestations(current_epoch(), entries));
    BOOST_REQUIRE(trace != nullptr);
@@ -1067,6 +1083,7 @@ BOOST_FIXTURE_TEST_CASE(dispatch_node_owner_tier_cap_preserves_epoch_progress, s
    constexpr auto first = "claimb"_n;
    constexpr auto second = "claimc"_n;
    const auto eth_code = fc::slug_name{"ETHEREUM"}.value;
+   start_dispatch_chain();
    const auto epoch = current_epoch();
    std::vector<std::string> claims;
    for (const auto owner : {first, second}) {
@@ -1132,6 +1149,7 @@ BOOST_FIXTURE_TEST_CASE(node_owner_reg_with_compressed_actor_key_is_dropped, sys
    auto payload = encode_node_owner_registration(
       CLAIM_ACCOUNT.to_string(), /*tier=*/2,
       sysio::opp::types::WIRE_KEY_TYPE_K1, wire_key, compressed_eth_key, eth_address);
+   start_dispatch_chain();
    auto envelope = encode_envelope_with_one_attestation(
       current_epoch(), sysio::opp::types::ATTESTATION_TYPE_NODE_OWNER_REG, payload);
 
@@ -1177,6 +1195,7 @@ BOOST_FIXTURE_TEST_CASE(node_owner_reg_with_off_curve_actor_key_is_dropped, sysi
          CLAIM_ACCOUNT.to_string(), /*tier=*/2, sysio::opp::types::WIRE_KEY_TYPE_K1, wire_key, actor_key,
          std::vector<uint8_t>(20, uint8_t{0x01})));
    }
+   start_dispatch_chain();
    BOOST_REQUIRE_EQUAL(success(), deliver(/*chain_code=*/eth_code, encode_envelope_with_attestations(
       current_epoch(), sysio::opp::types::ATTESTATION_TYPE_NODE_OWNER_REG, claims)));
    BOOST_REQUIRE(get_nodeowner(CLAIM_ACCOUNT).is_null());
@@ -1207,6 +1226,7 @@ BOOST_FIXTURE_TEST_CASE(node_owner_reg_from_other_evm_outpost_is_dropped, sysio_
    auto payload   = encode_node_owner_registration(
       CLAIM_ACCOUNT.to_string(), /*tier=*/2,
       sysio::opp::types::WIRE_KEY_TYPE_K1, wire_key, eth_bytes, eth_address);
+   start_dispatch_chain();
    auto envelope  = encode_envelope_with_one_attestation(
       current_epoch(), sysio::opp::types::ATTESTATION_TYPE_NODE_OWNER_REG, payload);
 
@@ -1235,6 +1255,7 @@ BOOST_FIXTURE_TEST_CASE(node_owner_reg_from_non_evm_outpost_is_dropped, sysio_di
    auto payload   = encode_node_owner_registration(
       CLAIM_ACCOUNT.to_string(), /*tier=*/2,
       sysio::opp::types::WIRE_KEY_TYPE_K1, wire_key, eth_bytes, eth_address);
+   start_dispatch_chain();
    auto envelope  = encode_envelope_with_one_attestation(
       current_epoch(), sysio::opp::types::ATTESTATION_TYPE_NODE_OWNER_REG, payload);
 
@@ -1387,6 +1408,7 @@ BOOST_FIXTURE_TEST_CASE(node_owner_claim_rejects_reserved_system_name, node_owne
    bootstrap_for_dispatch(NODE_OWNER_SOURCE_CHAIN);
    deploy_system_contract();
 
+   start_dispatch_chain();
    assert_claim_rejected_as_name_invalid(RESERVED_SYSTEM_NAME);
 } FC_LOG_AND_RETHROW() }
 
@@ -1396,6 +1418,7 @@ BOOST_FIXTURE_TEST_CASE(node_owner_claim_rejects_dotted_name, node_owner_claim_t
    bootstrap_for_dispatch(NODE_OWNER_SOURCE_CHAIN);
    deploy_system_contract();
 
+   start_dispatch_chain();
    assert_claim_rejected_as_name_invalid(AUTH_MSG_ACCOUNT);
 } FC_LOG_AND_RETHROW() }
 
@@ -1407,12 +1430,9 @@ BOOST_FIXTURE_TEST_CASE(chkcons_advances_without_a_treasury, sysio_dispatch_test
    bootstrap_for_dispatch();
    const auto eth_code = fc::slug_name{"ETH"}.value;
 
-   // The genesis advance is permissionless; it opens epoch 1 with BATCHOP's group scheduled.
-   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "advance"_n,
-                                       mvo()("chain_code", "ETH")));
-   produce_blocks();
+   // The genesis advance opens epoch 1 with BATCHOP's group scheduled.
+   start_dispatch_chain();
    const uint32_t epoch0 = current_epoch();
-   BOOST_REQUIRE_EQUAL(epoch0, 1u);
 
    // operators_per_epoch == 1, so a single delivery is Option-A unanimous consensus; apply_consensus
    // records the outpcons row for ETH at epoch0.
@@ -1493,6 +1513,70 @@ BOOST_FIXTURE_TEST_CASE(bootstrap_advances_genesis_epoch_when_emissions_configur
    BOOST_REQUIRE_EQUAL(current_epoch(), 1u);
 } FC_LOG_AND_RETHROW() }
 
+// The genesis advance needs every active outpost's schedule window, so `bootstrap` refuses while one
+// active outpost has none and starts nothing: the network stays in its bootstrap window. Once that
+// outpost's window is seated, the bootstrap starts every chain.
+BOOST_FIXTURE_TEST_CASE(bootstrap_requires_every_active_outpost_scheduled, sysio_dispatch_tester) { try {
+   constexpr std::string_view base_chain = "BASE";
+   bootstrap_for_dispatch();
+   setup_wire_token();
+   enable_epoch_advancement();
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "setconfig"_n, mvo()
+      ("chain_code", base_chain)("epoch_duration_sec", 60)("operators_per_epoch", 1)
+      ("batch_operator_minimum_active", 1)("batch_op_groups", 1)("epoch_retention_envelope_log_count", 200)));
+   BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
+      ("kind", ChainKind::CHAIN_KIND_EVM)("code", base_chain)("external_chain_id", 8453)
+      ("name", std::string("base-test"))("description", std::string{})
+      ("outpost", sysio_system::test_support::no_outpost_mvo())));
+
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("a chain's genesis advance requires its schedule window: run schbatchgps for "
+                                       "the chain first"),
+                       push(MSGCH_ACCOUNT, msgch_abi, MSGCH_ACCOUNT, "bootstrap"_n, mvo()));
+   BOOST_REQUIRE(get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "netgenesis"_n, "netgenesis"_n).empty());
+   BOOST_REQUIRE_EQUAL(0u, current_epoch());
+
+   // BATCHOP already holds the EVM link ETH needed.
+   BOOST_REQUIRE_EQUAL(success(), sysio_system::test_support::served_chains::join(*this, BATCHOP, base_chain));
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "schbatchgps"_n,
+                                       mvo()("chain_code", base_chain)));
+   BOOST_REQUIRE_EQUAL(success(), push(MSGCH_ACCOUNT, msgch_abi, MSGCH_ACCOUNT, "bootstrap"_n, mvo()));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(1u, current_epoch());
+   const auto base_state = get_row_by_id(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, fc::slug_name{base_chain}.value);
+   BOOST_REQUIRE_EQUAL(1u, epoch_abi.binary_to_variant("epoch_state", base_state, fixture_abi_yield_function())
+                              ["current_epoch_index"].as<uint32_t>());
+} FC_LOG_AND_RETHROW() }
+
+// A scheduled chain accepts deliveries from its epoch 1: before its genesis advance a delivery is
+// refused, and neither `chkcons` nor `evalcons` reaches consensus on or advances the chain.
+BOOST_FIXTURE_TEST_CASE(deliveries_wait_for_the_chains_genesis, sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   const auto eth_code = fc::slug_name{"ETH"}.value;
+   const auto outpcons = [&] { return get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outpcons"_n, eth_code); };
+   const auto envelope_for = [&](uint32_t epoch) {
+      return encode_envelope_with_one_attestation(epoch, sysio::opp::types::ATTESTATION_TYPE_OPERATORS,
+                                                  std::string{});
+   };
+   BOOST_REQUIRE_EQUAL(0u, current_epoch());
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("deliver: the chain's epoch has not started; envelopes are accepted from its "
+                                       "epoch 1"),
+                       deliver(eth_code, envelope_for(0)));
+
+   const auto crank = push_trace(MSGCH_ACCOUNT, msgch_abi, BATCHOP, "chkcons"_n, mvo()("chain_code", eth_code));
+   BOOST_REQUIRE(crank && !crank->except);
+   BOOST_REQUIRE_EQUAL(1u, crank->action_traces.size());   // no inline evalcons, no advance
+   BOOST_REQUIRE_EQUAL(success(), push(MSGCH_ACCOUNT, msgch_abi, MSGCH_ACCOUNT, "evalcons"_n,
+                                       mvo()("chain_code", eth_code)("epoch_index", 0)));
+   produce_blocks();
+   BOOST_REQUIRE(outpcons().empty());
+   BOOST_REQUIRE_EQUAL(0u, current_epoch());
+
+   start_dispatch_chain();
+   BOOST_REQUIRE_EQUAL(success(), deliver(eth_code, envelope_for(current_epoch())));
+   produce_blocks();
+   BOOST_REQUIRE(!outpcons().empty());
+} FC_LOG_AND_RETHROW() }
+
 // The network genesis is one-shot: `bootchain` waits for it, its first genesis advance writes the
 // `netgenesis` marker, and `bootstrap` refuses to run again once it has happened.
 BOOST_FIXTURE_TEST_CASE(bootstrap_is_the_one_network_genesis, sysio_dispatch_tester) { try {
@@ -1524,6 +1608,7 @@ BOOST_FIXTURE_TEST_CASE(bootstrap_is_the_one_network_genesis, sysio_dispatch_tes
 BOOST_FIXTURE_TEST_CASE(forged_delivery_does_not_strand_chkcons, sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();
    const auto eth_code = fc::slug_name{"ETH"}.value;
+   start_dispatch_chain();
    const uint32_t epoch0 = current_epoch();
 
    auto operator_payload = encode_operator_action(
@@ -1592,6 +1677,7 @@ BOOST_FIXTURE_TEST_CASE(msgch_routes_syndicate_liq_to_synd,
    const auto stranger_key = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em);
    const auto stranger     = em_pubkey_bytes(stranger_key.get_public_key());
    constexpr auto EVM = ChainKind::CHAIN_KIND_EVM;
+   start_dispatch_chain();
    const uint32_t epoch = current_epoch();
 
    const auto env = encode_envelope_with_mixed_attestations(epoch, {
@@ -1710,6 +1796,7 @@ BOOST_FIXTURE_TEST_CASE(retired_attestations_do_not_mutate_collateral_or_block_l
    constexpr int32_t removed_challenge_response_type = 60932;
    constexpr int32_t removed_challenge_request_type = 60945;
    constexpr int32_t undeclared_type = 65000;
+   start_dispatch_chain();
    const auto trace = deliver_trace(eth,
       encode_envelope_with_mixed_attestations(current_epoch(), entries, {}, {},
                                              {removed_reward_type, removed_reserve_create_type,
@@ -1752,6 +1839,7 @@ BOOST_FIXTURE_TEST_CASE(msgch_forwards_the_custody_total_to_synd,
    const uint64_t second_total = 8 * LIQ_UNIT + 1;
    const uint64_t yield_total  = 10 * LIQ_UNIT + 1;
 
+   start_dispatch_chain();
    const auto env = encode_envelope_with_mixed_attestations(current_epoch(), {
       {ATTESTATION_TYPE_SYNDICATE_LIQ,
        encode_syndicate_liq(eth, EVM, uwrit_op_eth_pubkey, liqeth, 5 * LIQ_UNIT, 1, first_total)},
@@ -1807,6 +1895,7 @@ BOOST_FIXTURE_TEST_CASE(syndicate_liq_refuses_a_key_of_another_chain_family,
                                     .get_public_key().get<fc::crypto::ed::public_key_shim>().serialize();
    const std::vector<char> stranger_sol(stranger_sol_raw.begin(), stranger_sol_raw.end());
 
+   start_dispatch_chain();
    const auto env = encode_envelope_with_mixed_attestations(current_epoch(), {
       {ATTESTATION_TYPE_SYNDICATE_LIQ, encode_syndicate_liq(eth, SVM, linked_sol,          liqeth, 5 * LIQ_UNIT, 1)},
       {ATTESTATION_TYPE_SYNDICATE_LIQ, encode_syndicate_liq(eth, SVM, stranger_sol,        liqeth, 3 * LIQ_UNIT, 2)},
@@ -1860,6 +1949,7 @@ BOOST_FIXTURE_TEST_CASE(liq_yield_is_held_by_synd_and_refusals_are_dropped,
    constexpr auto EVM = ChainKind::CHAIN_KIND_EVM;
    constexpr int64_t oversized = std::numeric_limits<int64_t>::max();
    const std::vector<char> evm_address(20, '\x0c');   // an address, not the 33-byte pubkey a link holds
+   start_dispatch_chain();
    const uint32_t epoch = current_epoch();
 
    const auto env = encode_envelope_with_mixed_attestations(epoch, {
@@ -1930,6 +2020,7 @@ BOOST_FIXTURE_TEST_CASE(an_envelope_without_syndication_value_touches_synd_not_a
    const auto liqeth  = fc::slug_name{"LIQETH"}.value;
    const auto usdceth = fc::slug_name{"USDCETH"}.value;
    constexpr auto EVM = ChainKind::CHAIN_KIND_EVM;
+   start_dispatch_chain();
    const auto env = encode_envelope_with_mixed_attestations(current_epoch(), {
       {ATTESTATION_TYPE_DESYNDICATE_LIQ,
        encode_desyndicate_liq(eth, EVM, uwrit_op_eth_pubkey, liqeth, 1 * LIQ_UNIT, 77)},
@@ -1954,6 +2045,7 @@ BOOST_FIXTURE_TEST_CASE(liq_attestations_are_dropped_without_a_token_registry,
 
    const auto eth    = fc::slug_name{"ETH"}.value;
    const auto liqeth = fc::slug_name{"LIQETH"}.value;
+   start_dispatch_chain();
    const auto env = encode_envelope_with_mixed_attestations(current_epoch(), {
       {ATTESTATION_TYPE_SYNDICATE_LIQ, encode_syndicate_liq(eth, ChainKind::CHAIN_KIND_EVM, uwrit_op_eth_pubkey,
                                                             liqeth, 1 * LIQ_UNIT, 1)},
@@ -1985,6 +2077,7 @@ BOOST_FIXTURE_TEST_CASE(a_pulled_andon_cord_leaves_deliveries_running, sysio_dis
    const auto eth    = fc::slug_name{"ETH"}.value;
    const auto liqeth = fc::slug_name{"LIQETH"}.value;
    constexpr auto EVM = ChainKind::CHAIN_KIND_EVM;
+   start_dispatch_chain();
    const uint32_t epoch = current_epoch();
    const auto env = encode_envelope_with_mixed_attestations(epoch, {
       {ATTESTATION_TYPE_SYNDICATE_LIQ, encode_syndicate_liq(eth, EVM, uwrit_op_eth_pubkey, liqeth, 5 * LIQ_UNIT, 1)},
@@ -2042,6 +2135,7 @@ BOOST_FIXTURE_TEST_CASE(each_syndication_of_an_envelope_is_compared_after_its_ow
    const auto eth    = fc::slug_name{"ETH"}.value;
    const auto liqeth = fc::slug_name{"LIQETH"}.value;
    constexpr auto EVM = ChainKind::CHAIN_KIND_EVM;
+   start_dispatch_chain();
    const auto env = encode_envelope_with_mixed_attestations(current_epoch(), {
       {ATTESTATION_TYPE_SYNDICATE_LIQ,
        encode_syndicate_liq(eth, EVM, uwrit_op_eth_pubkey, liqeth, 5 * LIQ_UNIT, 1, 5 * LIQ_UNIT)},
@@ -2080,6 +2174,7 @@ BOOST_FIXTURE_TEST_CASE(a_custody_shortfall_pulls_the_cord_and_the_epoch_advance
    const auto eth    = fc::slug_name{"ETH"}.value;
    const auto liqeth = fc::slug_name{"LIQETH"}.value;
    constexpr auto EVM = ChainKind::CHAIN_KIND_EVM;
+   start_dispatch_chain();
    const uint32_t epoch = current_epoch();
    // The second syndication carries 7 against 8 outstanding after its mint.
    const auto env = encode_envelope_with_mixed_attestations(epoch, {
@@ -2172,6 +2267,7 @@ BOOST_FIXTURE_TEST_CASE(a_desyndication_return_expires_after_the_outposts_next_a
        encode_operator_action(sysio::opp::attestations::OperatorAction::ACTION_TYPE_DEPOSIT_REQUEST,
                               ChainKind::CHAIN_KIND_EVM, uwrit_op_eth_pubkey, eth, eth, 1'000'000)}};
 
+   start_dispatch_chain();
    const uint32_t first_epoch = current_epoch();
    BOOST_REQUIRE_EQUAL(success(), desyndicate());
    BOOST_REQUIRE((returns() == return_rows{{1, 0}}));
@@ -2246,6 +2342,7 @@ BOOST_FIXTURE_TEST_CASE(a_shortfall_freezes_the_same_envelopes_queue_step, sysio
       });
    };
 
+   start_dispatch_chain();
    // Envelope A: 10 for the linked user, exact custody. Its closeenv step requests the underwriting.
    const uint32_t first_epoch = current_epoch();
    const auto first = encode_envelope_with_mixed_attestations(first_epoch, {
@@ -2373,6 +2470,7 @@ try {
 
    const auto     eth    = fc::slug_name{"ETH"}.value;
    const auto     liqeth = fc::slug_name{"LIQETH"}.value;
+   start_dispatch_chain();
    const uint32_t epoch  = current_epoch();
    const auto     delivered = encode_envelope_with_mixed_attestations(epoch, {
       {ATTESTATION_TYPE_SYNDICATE_LIQ, encode_syndicate_liq(eth, ChainKind::CHAIN_KIND_EVM, user_pubkey, liqeth,
@@ -2438,6 +2536,7 @@ BOOST_AUTO_TEST_CASE(generic_external_simulator_drives_production_dispatch) {
          sysio_dispatch_tester t;
          t.bootstrap_for_dispatch(a.chain, a.kind);
          t.setup_liq_for_dispatch(a.chain, a.token, a.kind);
+         t.start_dispatch_chain();
          sysio::testing::external::chain outpost(a);
          const auto token = symbol::from_string(std::string("9,") + a.token);
          const auto key = a.kind == ChainKind::CHAIN_KIND_EVM ? t.uwrit_op_eth_pubkey : std::vector<char>(32, '\x42');

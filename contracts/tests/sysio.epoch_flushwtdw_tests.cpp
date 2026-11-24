@@ -284,7 +284,7 @@ public:
 
       sysio_system::test_support::served_chains::serve(*this, {BATCHOP}, {SOL_OUTPOST, ETH_OUTPOST});
 
-      // Each chain's genesis advance — permissionless until its current_epoch_index moves off zero.
+      // Each chain's schedule window, then its genesis advance (sysio.epoch's authority stands in for msgch's).
       for (const std::string_view chain : CHAINS) {
          BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
             "schbatchgps"_n, mvo()("chain_code", chain)));
@@ -379,6 +379,19 @@ public:
       if (data.empty()) return 0;
       return epoch_abi.binary_to_variant("economic_state", data, fixture_abi_yield_function())
          ["current_epoch_index"].as<uint32_t>();
+   }
+
+   /// Whether `chain`'s schedule window seats `account` in any group.
+   bool seated(name account, std::string_view chain) {
+      const auto data = get_row_by_id(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, fc::slug_name{chain}.value);
+      BOOST_REQUIRE(!data.empty());
+      const auto state = epoch_abi.binary_to_variant("epoch_state", data, fixture_abi_yield_function());
+      for (const auto& group : state["batch_op_groups"].get_array()) {
+         for (const auto& member : group.get_array()) {
+            if (name{member.as_string()} == account) return true;
+         }
+      }
+      return false;
    }
 
    /// `chain`'s current consensus epoch index (0 before its genesis advance).
@@ -781,26 +794,46 @@ BOOST_FIXTURE_TEST_CASE(a_batch_operator_serving_two_chains_waits_on_both, sysio
    BOOST_REQUIRE_EQUAL(OPERATOR_BOND - OPERATOR_WITHDRAWAL, balance_of(BATCHOP_BOTH, "WIRE", "WIRE"));
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(a_left_membership_still_waits, sysio_epoch_flushwtdw_tester) { try {
-   // Leaving a chain stops new seats there, not the guard: the seats it held may hold deliveries not
-   // yet judged, so the request still waits on the chain it left.
+BOOST_FIXTURE_TEST_CASE(a_left_member_waits_on_the_chain_only_while_seated, sysio_epoch_flushwtdw_tester) { try {
+   // Leaving a chain stops new seats there. A request still waits on the chain while the member holds a seat
+   // in its window, whose epochs are not yet judged, and not once the window has slid past its last seat.
    bootstrap_for_flushwtdw();
+   // A one-unit WIRE minimum, so a bonded non-bootstrapped batch operator turns ACTIVE and the slide seats it.
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "setconfig"_n, mvo()
+      ("terminate_prune_delay_ms",         600000)
+      ("terminate_max_consecutive_misses", 5)
+      ("terminate_max_pct_misses_24h",     5)
+      ("terminate_window_ms",              uint64_t{24ULL * 60 * 60 * 1000})
+      ("req_prod_collat",                  fc::variants{})
+      ("req_batchop_collat",               fc::variants{fc::variant(mvo()
+         ("chain_code", "WIRE")("token_code", "WIRE")("min_bond", 1)("config_timestamp_ms", 0))})
+      ("req_uw_collat",                    fc::variants{})));
    register_serving_batch_operator(BATCHOP_BOTH, {SOL_OUTPOST, ETH_OUTPOST}, OPERATOR_BOND);
+   BOOST_REQUIRE(get_operator(BATCHOP_BOTH)["status"].as<OperatorStatus>() == OperatorStatus::OPERATOR_STATUS_ACTIVE);
+   // The slide seats a non-bootstrapped operator first: SOL's next group is BATCHOP_BOTH alone.
+   close_epochs(SOL_CHAIN, 1);
+   BOOST_REQUIRE(seated(BATCHOP_BOTH, SOL_CHAIN));
    BOOST_REQUIRE_EQUAL(success(),
       sysio_system::test_support::served_chains::leave(*this, BATCHOP_BOTH, SOL_CHAIN));
    BOOST_REQUIRE_EQUAL(sysio_system::test_support::served_chains::status::left,
       sysio_system::test_support::served_chains::membership(*this, opreg_abi, BATCHOP_BOTH, SOL_CHAIN)
          ["status"].as_string());
 
+   // Still seated on the chain it left: the request waits on it.
    BOOST_REQUIRE_EQUAL(success(), withdraw(BATCHOP_BOTH, "WIRE", "WIRE", OPERATOR_WITHDRAWAL));
    BOOST_REQUIRE(waits_from_now({SOL_CHAIN, ETH_CHAIN}) == consensus_waits(1));
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, BATCHOP_BOTH, "cancelwtdw"_n,
+                                       mvo()("account", BATCHOP_BOTH)("request_id", 1)));
 
+   // SOL's window slides past its seat and a LEFT member gets no new one: a request now waits on ETH alone,
+   // and is released while SOL stands still.
+   close_epochs(SOL_CHAIN, 1);
+   BOOST_REQUIRE(!seated(BATCHOP_BOTH, SOL_CHAIN));
+   BOOST_REQUIRE_EQUAL(success(), withdraw(BATCHOP_BOTH, "WIRE", "WIRE", OPERATOR_WITHDRAWAL));
+   BOOST_REQUIRE(waits_from_now({ETH_CHAIN}) == consensus_waits(2));
    close_epochs(ETH_CHAIN, WITHDRAW_WAIT_EPOCHS);
-   tick_economy_to(eligible_economic_epoch(1));
-   BOOST_REQUIRE(!get_wtdw(1).is_null());
-   close_epochs(SOL_CHAIN, WITHDRAW_WAIT_EPOCHS);
-   tick_economy_to(economic_epoch() + 1);
-   BOOST_REQUIRE(get_wtdw(1).is_null());
+   tick_economy_to(eligible_economic_epoch(2));
+   BOOST_REQUIRE(get_wtdw(2).is_null());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(a_non_batch_operator_waits_on_every_started_chain, sysio_epoch_flushwtdw_tester) { try {

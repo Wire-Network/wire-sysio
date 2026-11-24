@@ -60,8 +60,8 @@ the collateral each has bonded, and the outpost chains each batch operator serve
 economic epochs after the request. The consensus waits are per chain: for each chain the request waits
 on, it records that chain's epoch index + `WITHDRAW_WAIT_EPOCHS` and is held until the chain reaches it.
 
-- A batch operator waits on each chain it has a `servchains` row for (`SERVING`, `LEFT` or `EVICTED`).
-  Any other operator type waits on every chain.
+- A batch operator waits on each chain it serves (`SERVING`) and each chain whose schedule window still
+  seats it (a `LEFT` or `EVICTED` member's remaining seats). Any other operator type waits on every chain.
 - Only a chain whose epoch has started at the request is waited on. With no chain to wait on, only the
   economic wait applies.
 
