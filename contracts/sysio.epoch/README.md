@@ -9,10 +9,12 @@ The depot's two clocks, and batch operator scheduling, for the OPP (Outpost Prot
   chain's minimum time between two envelopes. A chain's epoch advances once that outpost has reached
   consensus and the chain is due: it has traffic, and its minimum has passed since the later of its
   epoch start and that traffic. Traffic is a general-lane outbound attestation queued for the chain, a
-  backlog its last envelope left behind (`sysio.msgch` records both through `notetraffic`), or a
-  governance `resendroster`. An idle chain never advances. The first chain's genesis advance is the
-  network genesis (`netgenesis`); a genesis advance needs no traffic. An epoch's books (deliveries,
-  misses, duty) close at the advance after it.
+  backlog its last envelope left behind, a backlog on the outpost that a strict majority of the chain's
+  eligible group reports once its current epoch is decided (`sysio.msgch::reportqueue`, since the
+  majority-th earliest reported time; Solana reports the start of its current backlog, Ethereum its oldest
+  queued message), or a governance `resendroster`. `sysio.msgch` records the first three. An idle chain
+  never advances. The first chain's genesis advance is the network genesis (`netgenesis`); a genesis
+  advance needs no traffic. An epoch's books (deliveries, misses, duty) close at the advance after it.
 - On an idle chain the schedule window and `previous_group` stay as they are, so an operator they seat
   stays blocked from `sysio.opreg::regoperator` and `joinchain` until enough advances happen, each of
   which needs traffic or a `resendroster`.
@@ -54,7 +56,7 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
 | `seteconomy` | `sysio.epoch` | Set the economic clock's duration and grid start. The start is fixed once the clock has ticked; it is re-validated against `sysio.system`'s pay-period accrual bound |
 | `schbatchgps` | `sysio.epoch` | Build one chain's initial window from the `ACTIVE` batch operators on `sysio.opreg` that serve the chain (non-bootstrapped first, then bootstrapped, trimmed to `batch_operator_minimum_active`) |
 | `advance` | `sysio.msgch` or `sysio.epoch` | Advance one chain's consensus epoch once it is due (`due_at` set and passed) and it is not paused; otherwise it returns without effect, under either authority. The genesis advance (epoch 0 → 1) needs no traffic and requires an active outpost whose schedule window `schbatchgps` has seated |
-| `notetraffic` | `sysio.msgch` | Record traffic for one chain since `since` (a zero or future `since` counts as now): `traffic_since` keeps the earliest, `due_at` = max(`current_epoch_start`, `traffic_since`) + the chain's minimum. No effect before the chain's genesis advance. A paused chain records traffic but does not advance |
+| `notetraffic` | `sysio.msgch` (`buildenv`, `reportqueue`) | Record traffic for one chain since `since` (a zero or future `since` counts as now): `traffic_since` keeps the earliest, `due_at` = max(`current_epoch_start`, `traffic_since`) + the chain's minimum. No effect before the chain's genesis advance. A paused chain records traffic but does not advance |
 | `tickeconomy` | permissionless | Open economic epoch `epoch_index`: refused unless it is the next index, its grid boundary has passed, and the network genesis has happened |
 | `pause` | `sysio.chalg` | Pause one chain's epoch advancement |
 | `unpause` | `sysio.chalg` | Resume one chain's epoch advancement |
@@ -109,7 +111,8 @@ After the chain's genesis, `advance` returns without effect unless the chain is 
 
 - Each chain's consensus epoch advanced by `sysio.msgch` (`chkcons(chain)`, and `bootstrap` /
   `bootchain` at the chain's epoch 0), and its traffic recorded by `sysio.msgch` (`notetraffic` from
-  `queueout` and `buildenv`); economic epochs opened by the batch operators' `tickeconomy` crank
+  `buildenv` and `reportqueue`, and its `queueout` notification); economic epochs opened by the batch
+  operators' `tickeconomy` crank
 - Reads operators and their served chains from `sysio.opreg`, authex links from `sysio.authex`, outposts
   from `sysio.chains`
 - Calls `sysio.opreg::{recorddel,termcheck,flushwtdw}`,

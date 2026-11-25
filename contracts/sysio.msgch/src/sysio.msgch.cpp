@@ -113,6 +113,19 @@ constexpr std::string_view LATE_DELIVERER_NOT_IN_PREVIOUS_GROUP =
 constexpr std::string_view LATE_DELIVERY_DIFFERS_FROM_ACCEPTED =
    "deliver: late delivery differs from the previous epoch's accepted envelope";
 
+/// Messages of the `check`s `reportqueue` raises.
+constexpr std::string_view REPORT_NOT_ACTIVE_OUTPOST = "reportqueue: chain is not an active outpost";
+constexpr std::string_view REPORT_BEFORE_GENESIS =
+   "reportqueue: the chain's epoch has not started; backlogs are reported from its epoch 1";
+/// Prefix of the epoch-mismatch message: the report's epoch, then the chain's current one.
+constexpr std::string_view REPORT_EPOCH_MISMATCH = "reportqueue: report is not for the chain's current epoch: report=";
+constexpr std::string_view REPORT_UNDECIDED_EPOCH =
+   "reportqueue: the chain's current epoch has not reached consensus; its backlog is reported once it has";
+constexpr std::string_view REPORT_WITHOUT_BACKLOG =
+   "reportqueue: pending_count must be positive; an empty queue is not reported";
+constexpr std::string_view REPORTER_NOT_ELIGIBLE =
+   "reportqueue: reporter is not ACTIVE in sysio.opreg, or does not serve this chain or was evicted from it";
+
 // `operator""_s` is declared at global scope by <sysio/slug_name.hpp>.
 
 /// Codename of the Ethereum outpost — the sole source of node-owner NFT (ERC1155) deposits, which
@@ -1479,6 +1492,73 @@ void msgch::chkcons(uint64_t chain_code) {
    // invalidated instead by the `epoch_index == epoch` check above once advance() actually bumps the
    // epoch, and the next epoch's dispatch overwrites the row.
    send_advance(get_self(), chain_code);
+}
+
+// ---------------------------------------------------------------------------
+//  reportqueue — a batch operator reports its outpost's outbound backlog
+// ---------------------------------------------------------------------------
+void msgch::reportqueue(name batch_op, uint64_t chain_code, uint32_t epoch_index, uint32_t pending_count,
+                        uint64_t oldest_pending_ms) {
+   require_auth(batch_op);
+   check(sysio::chains::outpost_kind_of(CHAINS_ACCOUNT, sysio::slug_name{chain_code}).has_value(),
+         REPORT_NOT_ACTIVE_OUTPOST);
+   const std::optional<epoch::epoch_state> state = epoch::epoch_state_of(chain_code);
+   check(state.has_value() && state->current_epoch_index > 0, REPORT_BEFORE_GENESIS);
+   const uint32_t current_epoch = state->current_epoch_index;
+   check(epoch_index == current_epoch, [&] {
+      return std::string(REPORT_EPOCH_MISMATCH) + std::to_string(epoch_index) +
+             " current=" + std::to_string(current_epoch);
+   });
+   // The accepted envelope proves the outpost emitted the epoch, so no message that left in that emit is reported.
+   check(consensus_for_epoch(get_self(), chain_code, current_epoch).has_value(), REPORT_UNDECIDED_EPOCH);
+   // No idle heartbeat: only a pending backlog is reported.
+   check(pending_count > 0, REPORT_WITHOUT_BACKLOG);
+
+   // The reporter sits in the chain's group on duty and in its eligible set, the one consensus counts.
+   check(epoch::in_current_group(*state, batch_op), epoch::NOT_IN_ACTIVE_GROUP);
+   const std::vector<name> eligible    = eligible_batch_operators(chain_code);
+   const auto              is_eligible = [&eligible](name account) {
+      return std::find(eligible.begin(), eligible.end(), account) != eligible.end();
+   };
+   check(is_eligible(batch_op), REPORTER_NOT_ELIGIBLE);
+
+   // A missing time, or one later than now, counts as now, never earlier. Capped in milliseconds, so the conversion
+   // cannot overflow.
+   const int64_t    microseconds_per_millisecond = milliseconds(1).count();
+   const uint64_t   now_ms      = static_cast<uint64_t>(current_time_point().time_since_epoch().count() /
+                                                        microseconds_per_millisecond);
+   const uint64_t   reported_ms = oldest_pending_ms == 0 ? now_ms : std::min(oldest_pending_ms, now_ms);
+   const time_point oldest_pending_at{milliseconds(static_cast<int64_t>(reported_ms))};
+
+   qreports_t reports(get_self());
+   reports.set(ram_payer, queue_report_key{chain_code, batch_op}, queue_report_entry{
+      .chain_code        = chain_code,
+      .account           = batch_op,
+      .epoch_index       = current_epoch,
+      .pending_count     = pending_count,
+      .oldest_pending_at = oldest_pending_at,
+   });
+
+   // Collect the times of the eligible group's reports in the current epoch. A report of an earlier epoch never
+   // counts again, so the walk erases it.
+   std::vector<time_point> reported_since;
+   for (auto it = reports.lower_bound(queue_report_key{chain_code, name{}});
+        it != reports.end() && it->chain_code == chain_code;) {
+      if (it->epoch_index != current_epoch) {
+         it = reports.erase(std::move(it));
+         continue;
+      }
+      if (is_eligible(it->account)) reported_since.push_back(it->oldest_pending_at);
+      ++it;
+   }
+
+   // The majority-th earliest time, which a minority can never move earlier than the other members' earliest.
+   // sysio.epoch keeps the earliest traffic, so a repeat is harmless.
+   const uint32_t majority_size = strict_majority_size(static_cast<uint32_t>(eligible.size()));
+   if (reported_since.size() < majority_size) return;
+   const auto majority_th = reported_since.begin() + (majority_size - 1);
+   std::nth_element(reported_since.begin(), majority_th, reported_since.end());
+   send_note_traffic(get_self(), chain_code, *majority_th);
 }
 
 // ---------------------------------------------------------------------------

@@ -61,7 +61,8 @@ namespace sysio {
       /// its current value and `since`, and `due_at` becomes the later of `current_epoch_start` and
       /// `traffic_since`, plus the chain's minimum duration. A `since` that is zero or later than now counts as
       /// now. No effect before the chain's genesis advance. A paused chain records traffic but does not
-      /// advance until it resumes. Auth: sysio.msgch (`buildenv`).
+      /// advance until it resumes. Auth: sysio.msgch (`buildenv`, and `reportqueue` once a strict majority of
+      /// the chain's eligible group reports an outbound backlog on the outpost).
       [[sysio::action]]
       void notetraffic(sysio::slug_name chain_code, sysio::time_point since);
 
@@ -386,17 +387,5 @@ namespace sysio {
       using OperatorType   = sysio::opp::types::OperatorType;
       using OperatorStatus = sysio::opp::types::OperatorStatus;
    };
-
-   /// Asserts the caller signed the transaction and is a member of outpost `chain_code`'s current
-   /// resident batch-operator group. This is a group-membership check only: the
-   /// group is a snapshot from the last schedule, so current operator eligibility
-   /// (sysio.opreg ACTIVE status) must be enforced separately at the call site.
-   inline void is_batch_operator_active(const name& batch_op_name, uint64_t chain_code) {
-      require_auth(batch_op_name);
-      const std::optional<epoch::epoch_state> state = epoch::epoch_state_of(chain_code);
-      check(state.has_value(), epoch::EPOCH_STATE_NOT_INITIALIZED);
-      check(state->current_batch_op_group < state->batch_op_groups.size(), "active group index out of range");
-      check(epoch::in_current_group(*state, batch_op_name), epoch::NOT_IN_ACTIVE_GROUP);
-   }
 
 } // namespace sysio

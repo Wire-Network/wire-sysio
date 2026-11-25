@@ -172,6 +172,27 @@ namespace sysio {
       [[sysio::action]]
       void chkcons(uint64_t chain_code);
 
+      /// Batch operator `batch_op` reports outpost `chain_code`'s outbound backlog in the chain's current epoch
+      /// `epoch_index`: `pending_count` messages queued on the outpost, pending since `oldest_pending_ms`
+      /// (milliseconds since the Unix epoch; zero, or a time later than now, counts as now). Solana reports the
+      /// start of its current backlog, Ethereum its oldest queued message. The epoch must be decided: its accepted
+      /// envelope proves the outpost emitted it, so no message that left in that emit counts as a backlog.
+      ///
+      /// The report replaces the operator's `qreports` row for the chain, erases the chain's rows of earlier epochs
+      /// and runs the tally again, so a member's repeated report can reach a majority that the eligible set
+      /// shrank to after its first one. Once a strict majority of the chain's eligible group (the set `evalcons`
+      /// counts) has reported in the current epoch, it records the chain's traffic since the majority-th earliest
+      /// of their times (`sysio.epoch::notetraffic`), so a minority neither makes the chain due nor moves its
+      /// traffic earlier than the other members report.
+      ///
+      /// Auth: `batch_op`, a member of the chain's group on duty, ACTIVE in sysio.opreg and a member of the chain
+      /// that is not EVICTED. Refused for a chain that is not an active outpost or has not run its genesis advance,
+      /// for any other epoch, for an undecided epoch (a disputed one included), and with a zero `pending_count`. A
+      /// paused chain records the traffic but does not advance until it resumes.
+      [[sysio::action]]
+      void reportqueue(name batch_op, uint64_t chain_code, uint32_t epoch_index, uint32_t pending_count,
+                       uint64_t oldest_pending_ms);
+
       /// Dispatch the winning envelope of a resolved OPP dispute. Called inline by
       /// `sysio.chalg::chkdispute` once the Tier-1 vote selects a canonical checksum. Locates the
       /// winning envelope's raw bytes among this (outpost, epoch)'s deliveries and runs the shared
@@ -476,6 +497,30 @@ namespace sysio {
       };
 
       using outqueue_t = sysio::kv::table<"outqueue"_n, outbound_queue_key, outbound_queue_entry>;
+
+      /// Key of `qreports`: the outpost first, so one outpost's reports are one contiguous range.
+      struct queue_report_key {
+         uint64_t chain_code;
+         name     account;
+         SYSLIB_SERIALIZE(queue_report_key, (chain_code)(account))
+      };
+
+      /// A batch operator's latest outbound backlog report for an outpost (`reportqueue`). The tally counts the
+      /// outpost's rows of its current epoch from its eligible group. Each report erases the outpost's rows of
+      /// earlier epochs, so an outpost holds its current epoch's rows and, until its next report, its last reported
+      /// epoch's: one per reporting member of the group on duty, or of a group that a governance `schbatchgps`
+      /// replaced mid-epoch, which the tally ignores.
+      struct [[sysio::table("qreports")]] queue_report_entry {
+         uint64_t   chain_code;
+         name       account;
+         uint32_t   epoch_index;       ///< the outpost's epoch the report was made in
+         uint32_t   pending_count;     ///< messages queued on the outpost
+         time_point oldest_pending_at; ///< the reported start of the backlog; the report's time when zero or later
+
+         SYSLIB_SERIALIZE(queue_report_entry, (chain_code)(account)(epoch_index)(pending_count)(oldest_pending_at))
+      };
+
+      using qreports_t = sysio::kv::table<"qreports"_n, queue_report_key, queue_report_entry>;
 
       /// Singleton holding the monotonic next-attestation-id counter.
       ///
