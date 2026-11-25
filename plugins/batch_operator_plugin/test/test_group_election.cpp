@@ -170,10 +170,11 @@ fc::variant_object consensus_row(fc::slug_name chain, uint32_t epoch) {
    return mvo()(consensus::field::chain_code, chain.value)(consensus::field::epoch_index, epoch);
 }
 
-/// The fast chain's pending traffic: it began `fast_traffic_after_sec` into the epoch, so it is due one minimum later.
+/// The fast chain's pending traffic: it began `fast_traffic_after_sec` into the epoch, so it is due one minimum after
+/// the epoch start, its traffic wait (half the minimum) ending sooner.
 traffic fast_traffic() {
    const fc::time_point since = at_sec(fast_start_sec + fast_traffic_after_sec);
-   return {.since = since, .due_at = since + fc::seconds(fast_duration_sec)};
+   return {.since = since, .due_at = at_sec(fast_start_sec) + fc::seconds(fast_duration_sec)};
 }
 
 /// Both chains' rows: `self` sits in group 1, on duty on the fast chain only. The fast chain's epoch is decided and

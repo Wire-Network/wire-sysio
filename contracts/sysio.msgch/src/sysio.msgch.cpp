@@ -1444,8 +1444,8 @@ void msgch::chkcons(uint64_t chain_code) {
       return;
    }
 
-   // A decided epoch advances once the chain is due: it has traffic and its minimum duration has passed since the
-   // later of its epoch start and that traffic. An idle chain stays in its decided epoch.
+   // A decided epoch advances once the chain is due (`sysio.epoch` `due_at`). An idle chain stays in its decided
+   // epoch.
    if (!epoch::advance_due(*state, current_time_point())) return;
 
    // All conditions met. Trigger advance. Per-outpost consensus is intentionally NOT reset here:

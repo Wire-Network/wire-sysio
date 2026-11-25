@@ -78,8 +78,8 @@ up the chain's outbound or inbound job.
 
 The plugin also pushes the depot actions nothing on chain schedules.
 `sysio.msgch::chkcons(chain_code)` — which re-tallies a chain's undecided epoch, and
-advances a decided one once the chain is due (`sysio.epoch` `due_at`: it has traffic and its
-minimum has passed) — is pushed for each relayed chain:
+advances a decided one once the chain is due (`sysio.epoch` `due_at`: it has traffic, its minimum has
+passed since its epoch start, and its traffic wait since that traffic began) — is pushed for each relayed chain:
 
 | Pusher | When |
 |--------|------|

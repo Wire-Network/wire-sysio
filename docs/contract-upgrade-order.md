@@ -258,8 +258,10 @@ leaves behind, and by the new `sysio.msgch::reportqueue` once a strict majority 
 reports an outbound backlog on the outpost), by `sysio.epoch`'s handler of the `sysio.msgch::queueout`
 notification, and by `resendroster`. `reportqueue` keeps its reports in the new `sysio.msgch::qreports` table.
 `sysio.msgch::chkcons` advances a decided epoch once `due_at` has passed, and `rcrdduty` credits one chain
-minimum per duty epoch. The `epochstate` layout changes in place, so every reader is rebuilt: `sysio.msgch` and
-`sysio.opreg` read it, and the test-only `epoch_stub` writes it. No migration is supplied: deploy
+minimum per duty epoch. `epochcfg` gains `traffic_wait_sec`, a new `setconfig` argument after
+`epoch_duration_sec`, and `due_at` is the later of the epoch start plus the minimum and the traffic plus that wait.
+The `epochstate` and `epochcfg` layouts change in place, so every reader is rebuilt: `sysio.msgch` reads both,
+`sysio.opreg` reads `epochstate`, and the test-only `epoch_stub` writes `epochstate`. No migration is supplied: deploy
 `sysio.epoch` and `sysio.msgch` together, with the rebuilt `sysio.opreg`, on a fresh chain with the matching
 `batch_operator_plugin`, which reads `due_at` and `sysio.msgch::outpcons` to push `chkcons`. The plugin adds
 `sysio.msgch::reportqueue` to the relay's actions, so an operator whose `@active` has been restricted by a

@@ -26,11 +26,14 @@ namespace sysio {
 
       /// Set outpost `chain_code`'s consensus epoch configuration (privileged). Each outpost chain runs
       /// its own consensus epoch: counter, pacing, schedule window and roster. `epoch_duration_sec` is the
-      /// chain's minimum time between two of its epochs. While the chain has traffic pending, its `due_at`
-      /// is recomputed with the new minimum.
+      /// chain's minimum time between two of its epochs. `traffic_wait_sec` is how long the chain waits after
+      /// its traffic begins before it is due, at most `epoch_duration_sec`; zero sets the default, half the
+      /// minimum (`default_share_of_minimum`). While the chain has traffic pending, its `due_at` is recomputed
+      /// with the new values.
       [[sysio::action]]
       void setconfig(sysio::slug_name chain_code,
                      uint32_t epoch_duration_sec,
+                     uint32_t traffic_wait_sec,
                      uint32_t operators_per_epoch,
                      uint32_t batch_operator_minimum_active,
                      uint32_t batch_op_groups,
@@ -43,8 +46,9 @@ namespace sysio {
       /// chain is the network genesis.
       ///
       /// After its genesis a chain advances only once it is due (`advance_due`): it has traffic
-      /// (`notetraffic`, `resendroster`) and its minimum duration has passed since the later of its epoch
-      /// start and that traffic. Otherwise, under either authority, the action returns without effect. The
+      /// (`notetraffic`, `resendroster`), its minimum duration has passed since its epoch start, and its
+      /// `traffic_wait_sec` has passed since that traffic began. Otherwise, under either authority, the action
+      /// returns without effect. The
       /// advance clears the chain's traffic; outbound rows its envelope leaves behind mark it again.
       ///
       /// An epoch's books close one advance later, so its late deliveries count: `advance(N -> N+1)`
@@ -58,10 +62,10 @@ namespace sysio {
       void advance(sysio::slug_name chain_code);
 
       /// Record traffic for outpost `chain_code` that began at `since`: `traffic_since` becomes the earlier of
-      /// its current value and `since`, and `due_at` becomes the later of `current_epoch_start` and
-      /// `traffic_since`, plus the chain's minimum duration. A `since` that is zero or later than now counts as
-      /// now. No effect before the chain's genesis advance. A paused chain records traffic but does not
-      /// advance until it resumes. Auth: sysio.msgch (`buildenv`, `reportqueue` once a strict majority of
+      /// its current value and `since`, and `due_at` becomes the later of `current_epoch_start` plus the chain's
+      /// minimum duration and `traffic_since` plus its `traffic_wait_sec`. A `since` that is zero or later than
+      /// now counts as now. No effect before the chain's genesis advance. A paused chain records traffic but does
+      /// not advance until it resumes. Auth: sysio.msgch (`buildenv`, `reportqueue` once a strict majority of
       /// the seats of the chain's group report an outbound backlog on the outpost, and `resolvedisp`).
       [[sysio::action]]
       void notetraffic(sysio::slug_name chain_code, sysio::time_point since);
@@ -127,8 +131,12 @@ namespace sysio {
       struct [[sysio::table("epochcfg")]] epoch_config {
          uint64_t    chain_code = 0;
          /// The chain's minimum time between two of its epochs: an epoch closes no sooner than this long after
-         /// the later of its start and its first traffic.
+         /// its start.
          uint32_t    epoch_duration_sec = 360;   // 6 minutes
+         /// How long the chain waits after its traffic begins before it is due, so traffic arriving together
+         /// ships together: an epoch closes no sooner than this long after its first traffic. At most
+         /// `epoch_duration_sec`.
+         uint32_t    traffic_wait_sec = 180;     // half the minimum
          uint32_t    operators_per_epoch = 7;
          uint32_t    batch_operator_minimum_active = 21;
          uint32_t    batch_op_groups = 3;          // rotation groups (21 / 7)
@@ -141,7 +149,7 @@ namespace sysio {
          uint32_t    epoch_retention_envelope_log_count = 200;
 
          SYSLIB_SERIALIZE(epoch_config,
-            (chain_code)(epoch_duration_sec)(operators_per_epoch)
+            (chain_code)(epoch_duration_sec)(traffic_wait_sec)(operators_per_epoch)
             (batch_operator_minimum_active)(batch_op_groups)
             (epoch_retention_envelope_log_count))
       };
@@ -157,8 +165,8 @@ namespace sysio {
          /// When the chain's pending traffic began (`notetraffic`); zero while it has none. Cleared by each
          /// advance.
          time_point                        traffic_since{};
-         /// When the chain may next advance: the later of `current_epoch_start` and `traffic_since`, plus the
-         /// chain's minimum duration; zero while the chain is idle. Cleared by each advance.
+         /// When the chain may next advance: the later of `current_epoch_start` plus the chain's minimum duration and
+         /// `traffic_since` plus its `traffic_wait_sec`; zero while the chain is idle. Cleared by each advance.
          time_point                        due_at{};
          uint8_t                           current_batch_op_group = 0; // 0, 1, or 2
          std::vector<std::vector<name>>    batch_op_groups;           // 3 groups of 7
@@ -355,6 +363,17 @@ namespace sysio {
       /// configured longer. The ceiling stops a governance typo from setting a multi-year epoch.
       static constexpr uint32_t MIN_EPOCH_DURATION_SEC = 10;
       static constexpr uint32_t MAX_EPOCH_DURATION_SEC = 30u * 24u * 60u * 60u;
+
+      /// Parts of a chain's minimum duration that make the default of a per-chain wait set as zero: half of it.
+      static constexpr uint32_t DEFAULT_SHARE_OF_MINIMUM_DIVISOR = 2;
+      /// Least default of a per-chain wait set as zero.
+      static constexpr uint32_t MIN_DEFAULT_SHARE_OF_MINIMUM_SEC = 1;
+
+      /// The default of a per-chain wait `setconfig` takes as zero, for a chain of minimum `epoch_duration_sec`:
+      /// half of it, at least `MIN_DEFAULT_SHARE_OF_MINIMUM_SEC`.
+      static constexpr uint32_t default_share_of_minimum(uint32_t epoch_duration_sec) {
+         return std::max(MIN_DEFAULT_SHARE_OF_MINIMUM_SEC, epoch_duration_sec / DEFAULT_SHARE_OF_MINIMUM_DIVISOR);
+      }
 
       /// Bounds on the economic `epoch_duration_sec`. Floor is a typo-guard: below it a pay period
       /// holds fewer block slots than one producer rotation, so the per-block pay in

@@ -466,6 +466,7 @@ public:
       return push_epoch_action(EPOCH_ACCOUNT, "setconfig"_n, mvo()
          ("chain_code",                         chain)
          ("epoch_duration_sec",                 epoch_duration_sec)
+         ("traffic_wait_sec",                   0)
          ("operators_per_epoch",                7)
          ("batch_operator_minimum_active",      7 * batch_op_groups)
          ("batch_op_groups",                    batch_op_groups)
@@ -1319,6 +1320,7 @@ BOOST_FIXTURE_TEST_CASE(epoch_setconfig_locks_batch_op_groups_after_schedule, sy
       return push_epoch_action(EPOCH_ACCOUNT, "setconfig"_n, mvo()
          ("chain_code",                         EPOCH_CHAIN)
          ("epoch_duration_sec",                 90)
+         ("traffic_wait_sec",                   0)
          ("operators_per_epoch",                1)
          ("batch_operator_minimum_active",      min_active)
          ("batch_op_groups",                    groups)
@@ -1498,6 +1500,7 @@ BOOST_FIXTURE_TEST_CASE(multiple_bootstrapped_batch_ops, sysio_opreg_tester) { t
    BOOST_REQUIRE_EQUAL(success(), push_epoch_action(EPOCH_ACCOUNT, "setconfig"_n, mvo()
       ("chain_code", EPOCH_CHAIN)
       ("epoch_duration_sec", 90)
+      ("traffic_wait_sec", 0)
       ("operators_per_epoch", 1)
       ("batch_operator_minimum_active", 3)
       ("batch_op_groups", 3)
@@ -1655,7 +1658,8 @@ BOOST_FIXTURE_TEST_CASE(schbatchgps_seats_only_operators_serving_the_chain, sysi
    BOOST_REQUIRE_EQUAL(success(), served::leave(*this, kLeaver, EPOCH_CHAIN));
    BOOST_REQUIRE_EQUAL(success(), served::leave(*this, "batchop.c"_n, EPOCH_CHAIN));
    BOOST_REQUIRE_EQUAL(success(), push_epoch_action(EPOCH_ACCOUNT, "setconfig"_n, mvo()
-      ("chain_code", EPOCH_CHAIN)("epoch_duration_sec", kRotationEpochDurationSec)("operators_per_epoch", 1)
+      ("chain_code", EPOCH_CHAIN)("epoch_duration_sec", kRotationEpochDurationSec)("traffic_wait_sec", 0)
+      ("operators_per_epoch", 1)
       ("batch_operator_minimum_active", kGroups)("batch_op_groups", kGroups)
       ("epoch_retention_envelope_log_count", 200)));
    produce_blocks();

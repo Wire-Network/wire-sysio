@@ -253,13 +253,14 @@ std::vector<pool_member> schedule_pool(sysio::slug_name chain_code, const std::v
    return pool;
 }
 
-/// Recompute `state.due_at` from its pending traffic: the later of `current_epoch_start` and `traffic_since`, plus
-/// the chain's minimum duration `cfg.epoch_duration_sec`. Zero while the chain has no traffic.
+/// Recompute `state.due_at` from its pending traffic: the later of `current_epoch_start` plus the chain's minimum
+/// duration `cfg.epoch_duration_sec` and `traffic_since` plus its `cfg.traffic_wait_sec`. Zero while the chain has no
+/// traffic.
 void recompute_due(epoch::epoch_state& state, const epoch::epoch_config& cfg) {
    state.due_at = state.traffic_since == time_point{}
                      ? time_point{}
-                     : std::max(state.current_epoch_start, state.traffic_since) +
-                          seconds(static_cast<int64_t>(cfg.epoch_duration_sec));
+                     : std::max(state.current_epoch_start + seconds(static_cast<int64_t>(cfg.epoch_duration_sec)),
+                                state.traffic_since + seconds(static_cast<int64_t>(cfg.traffic_wait_sec)));
 }
 
 /// Record traffic that began at `since` on a chain past its genesis: `traffic_since` keeps the earlier of its value
@@ -293,6 +294,7 @@ void note_chain_traffic(name self, sysio::slug_name chain_code, time_point since
 // ---------------------------------------------------------------------------
 void epoch::setconfig(sysio::slug_name chain_code,
                       uint32_t epoch_duration_sec,
+                      uint32_t traffic_wait_sec,
                       uint32_t operators_per_epoch,
                       uint32_t batch_operator_minimum_active,
                       uint32_t batch_op_groups,
@@ -303,6 +305,9 @@ void epoch::setconfig(sysio::slug_name chain_code,
          "epoch_duration_sec must be >= MIN_EPOCH_DURATION_SEC");
    check(epoch_duration_sec <= MAX_EPOCH_DURATION_SEC,
          "epoch_duration_sec exceeds 30-day ceiling");
+   const uint32_t traffic_wait =
+      traffic_wait_sec == 0 ? default_share_of_minimum(epoch_duration_sec) : traffic_wait_sec;
+   check(traffic_wait <= epoch_duration_sec, "traffic_wait_sec must be <= epoch_duration_sec");
    check(operators_per_epoch > 0, "operators_per_epoch must be positive");
    check(batch_op_groups > 0, "batch_op_groups must be positive");
    check(batch_op_groups <= MAX_BATCH_OP_GROUPS,
@@ -343,6 +348,7 @@ void epoch::setconfig(sysio::slug_name chain_code,
    const epoch_config cfg{
       .chain_code                         = chain_code.value,
       .epoch_duration_sec                 = epoch_duration_sec,
+      .traffic_wait_sec                   = traffic_wait,
       .operators_per_epoch                = operators_per_epoch,
       .batch_operator_minimum_active      = batch_operator_minimum_active,
       .batch_op_groups                    = batch_op_groups,
@@ -351,7 +357,7 @@ void epoch::setconfig(sysio::slug_name chain_code,
    epochcfg_t cfg_tbl(get_self());
    cfg_tbl.set(ram_payer, chain_key{chain_code.value}, cfg);
 
-   // Pending traffic is due one new minimum after the later of the epoch start and the traffic.
+   // Pending traffic is due again under the new minimum and wait.
    if (state && state->traffic_since != time_point{}) {
       recompute_due(*state, cfg);
       epochstate_t(get_self()).set(ram_payer, chain_key{chain_code.value}, *state);

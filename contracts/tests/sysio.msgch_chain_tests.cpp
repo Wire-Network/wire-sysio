@@ -359,6 +359,7 @@ constexpr const char* CURRENT_EPOCH_START    = "current_epoch_start";
 constexpr const char* TRAFFIC_SINCE          = "traffic_since";
 constexpr const char* DUE_AT                 = "due_at";
 constexpr const char* EPOCH_DURATION_SEC     = "epoch_duration_sec";
+constexpr const char* TRAFFIC_WAIT_SEC       = "traffic_wait_sec";
 constexpr const char* EPOCH_INDEX            = "epoch_index";
 constexpr const char* PREVIOUS_GROUP         = "previous_group";
 } // namespace epoch_fields
@@ -696,6 +697,7 @@ public:
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::SET_CONFIG, mvo()
          (epoch_fields::CHAIN_CODE,             chain)
          ("epoch_duration_sec",                 duration_sec)
+         ("traffic_wait_sec",                   0)
          ("operators_per_epoch",                operators_per_group)
          ("batch_operator_minimum_active",      operators_per_group * groups)
          ("batch_op_groups",                    groups)
@@ -788,10 +790,26 @@ public:
 
    /// `chain_code`'s minimum duration, its `epochcfg` `epoch_duration_sec`.
    fc::microseconds minimum_duration(uint64_t chain_code = ETH_OUTPOST_ID) {
+      return fc::seconds(epoch_config(chain_code)[epoch_fields::EPOCH_DURATION_SEC].as<uint32_t>());
+   }
+
+   /// `chain_code`'s traffic wait, its `epochcfg` `traffic_wait_sec`.
+   fc::microseconds traffic_wait(uint64_t chain_code = ETH_OUTPOST_ID) {
+      return fc::seconds(epoch_config(chain_code)[epoch_fields::TRAFFIC_WAIT_SEC].as<uint32_t>());
+   }
+
+   /// When `chain_code` is due for traffic of its current epoch that began at `since`: the later of its epoch start
+   /// plus its minimum and `since` plus its traffic wait.
+   fc::time_point due_for(fc::time_point since, uint64_t chain_code = ETH_OUTPOST_ID) {
+      const fc::time_point start = read_epoch_state(chain_code)[epoch_fields::CURRENT_EPOCH_START].as<fc::time_point>();
+      return std::max(start + minimum_duration(chain_code), since + traffic_wait(chain_code));
+   }
+
+   /// `chain_code`'s `epochcfg` row.
+   fc::variant epoch_config(uint64_t chain_code) {
       const auto data = get_row_by_id(EPOCH_ACCOUNT, EPOCH_ACCOUNT, epoch_tables::EPOCH_CONFIG, chain_code);
       BOOST_REQUIRE(!data.empty());
-      return fc::seconds(epoch_abi.binary_to_variant(epoch_abi_types::EPOCH_CONFIG, data, fixture_abi_yield_function())
-                            [epoch_fields::EPOCH_DURATION_SEC].as<uint32_t>());
+      return epoch_abi.binary_to_variant(epoch_abi_types::EPOCH_CONFIG, data, fixture_abi_yield_function());
    }
 
    action_result queueout(uint64_t chain_code, uint32_t attest_type,
@@ -5906,7 +5924,7 @@ BOOST_FIXTURE_TEST_CASE(queueout_records_traffic_when_the_general_queue_fills, s
    const transaction_trace_ptr first     = queue_trace(opp::types::ATTESTATION_TYPE_OPERATOR_ACTION, 'a');
    BOOST_REQUIRE_EQUAL(1u, queueout_notifications(first));
    BOOST_REQUIRE_EQUAL(0u, action_count(first, EPOCH_ACCOUNT, epoch_actions::NOTE_TRAFFIC));
-   const fc::time_point due = queued_at + minimum_duration();
+   const fc::time_point due = due_for(queued_at);
    BOOST_REQUIRE(read_epoch_state()[epoch_fields::TRAFFIC_SINCE].as<fc::time_point>() == queued_at);
    BOOST_REQUIRE(read_epoch_state()[epoch_fields::DUE_AT].as<fc::time_point>() == due);
    produce_blocks();
@@ -6047,7 +6065,7 @@ BOOST_FIXTURE_TEST_CASE(a_queueout_on_a_paused_chain_records_traffic_that_waits,
    const fc::time_point queued_at = control->pending_block_time();
    BOOST_REQUIRE_EQUAL(1u, queueout_notifications(
                               queueout_trace(ETH_OUTPOST_ID, opp::types::ATTESTATION_TYPE_OPERATOR_ACTION, 'p')));
-   const fc::time_point due = queued_at + minimum_duration();
+   const fc::time_point due = due_for(queued_at);
    BOOST_REQUIRE(read_epoch_state()[epoch_fields::TRAFFIC_SINCE].as<fc::time_point>() == queued_at);
    BOOST_REQUIRE(read_epoch_state()[epoch_fields::DUE_AT].as<fc::time_point>() == due);
 
@@ -6065,19 +6083,20 @@ BOOST_FIXTURE_TEST_CASE(a_queueout_on_a_paused_chain_records_traffic_that_waits,
    BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
 } FC_LOG_AND_RETHROW() }
 
-/// `resendroster` records traffic at now on the chain it resends to, so an idle decided chain becomes due one minimum
-/// later and its next envelope carries the roster; the other chain stays idle.
+/// `resendroster` records traffic at now on the chain it resends to, so a decided chain idle past its minimum becomes
+/// due its traffic wait later and its next envelope carries the roster; the other chain stays idle.
 BOOST_FIXTURE_TEST_CASE(resendroster_makes_an_idle_chain_due, sysio_msgch_chain_tester) { try {
+   constexpr int64_t kIdleSec = 10;
    bootstrap();
    const uint32_t epoch = current_epoch();
    std::map<uint64_t, inbound_stream_tip> tips;
    deliver_chain_unanimous({BATCHOP}, ETH_OUTPOST_ID, "resend-roster", tips);
-   produce_blocks(10);
+   open_block_at(epoch_start() + minimum_duration() + fc::seconds(kIdleSec));
 
    const fc::time_point resent_at = control->pending_block_time();
    BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::RESEND_ROSTER,
                                        mvo()("code", ETH_CHAIN_CODE)));
-   const fc::time_point due = resent_at + minimum_duration();
+   const fc::time_point due = resent_at + traffic_wait();
    BOOST_REQUIRE(read_epoch_state()[epoch_fields::TRAFFIC_SINCE].as<fc::time_point>() == resent_at);
    BOOST_REQUIRE(read_epoch_state()[epoch_fields::DUE_AT].as<fc::time_point>() == due);
    BOOST_REQUIRE(read_epoch_state(SOL_OUTPOST_ID)[epoch_fields::DUE_AT].as<fc::time_point>() == fc::time_point());
@@ -6198,7 +6217,7 @@ BOOST_FIXTURE_TEST_CASE(a_lying_minority_never_moves_reported_traffic_earlier, s
    for (const name member : {BATCHOP_C, BATCHOP_D}) {
       BOOST_REQUIRE_EQUAL(1u, note_traffic_count(report_backlog(member, honest)));
       BOOST_REQUIRE(traffic_since() == honest);
-      BOOST_REQUIRE(due_at() == honest + minimum_duration());
+      BOOST_REQUIRE(due_at() == due_for(honest));
    }
 
    // {early, early, honest, later}: the third earliest is still the honest time.
@@ -6209,7 +6228,7 @@ BOOST_FIXTURE_TEST_CASE(a_lying_minority_never_moves_reported_traffic_earlier, s
    BOOST_REQUIRE_EQUAL(1u, note_traffic_count(report_backlog(BATCHOP, earlier)));
    require_queue_report(BATCHOP, current_epoch(), REPORTED_PENDING_COUNT, earlier);
    BOOST_REQUIRE(traffic_since() == honest);
-   BOOST_REQUIRE(due_at() == honest + minimum_duration());
+   BOOST_REQUIRE(due_at() == due_for(honest));
 } FC_LOG_AND_RETHROW() }
 
 /// The chain's traffic is the majority-th earliest of its eligible group's reported times, moving earlier as more
@@ -6238,7 +6257,7 @@ BOOST_FIXTURE_TEST_CASE(the_majority_th_earliest_report_makes_the_chain_due, sys
    BOOST_REQUIRE(traffic_since() == at(7));
    report_backlog(BATCHOP_E, at(4));
    BOOST_REQUIRE(traffic_since() == at(5));
-   const fc::time_point due = at(5) + minimum_duration();
+   const fc::time_point due = due_for(at(5));
    BOOST_REQUIRE(due_at() == due);
 
    open_block_at(due - block_interval);
@@ -6272,7 +6291,7 @@ BOOST_FIXTURE_TEST_CASE(a_backlog_report_from_the_future_or_without_a_time_count
    BOOST_REQUIRE_EQUAL(success(), report_queue(BATCHOP_B, ETH_OUTPOST_ID, epoch, REPORTED_PENDING_COUNT, 0));
    require_queue_report(BATCHOP_B, epoch, REPORTED_PENDING_COUNT, second_at);
    BOOST_REQUIRE(traffic_since() == second_at);
-   BOOST_REQUIRE(due_at() == second_at + minimum_duration());
+   BOOST_REQUIRE(due_at() == due_for(second_at));
 } FC_LOG_AND_RETHROW() }
 
 /// A report of an earlier epoch never counts: after the advance, one member's report is a minority though another
@@ -6321,7 +6340,7 @@ BOOST_FIXTURE_TEST_CASE(a_slashed_reporter_drops_out_of_the_tally, sysio_msgch_c
    BOOST_REQUIRE(traffic_since() == fc::time_point());
    BOOST_REQUIRE_EQUAL(1u, note_traffic_count(report_backlog(BATCHOP_C, start + fc::seconds(4))));
    BOOST_REQUIRE(traffic_since() == second);
-   BOOST_REQUIRE(due_at() == second + minimum_duration());
+   BOOST_REQUIRE(due_at() == due_for(second));
    require_queue_report(BATCHOP, epoch, REPORTED_PENDING_COUNT, slashed_at);
 
    produce_blocks();
@@ -6350,7 +6369,7 @@ BOOST_FIXTURE_TEST_CASE(slashed_seats_still_count_toward_the_reports_majority, s
 
    BOOST_REQUIRE_EQUAL(1u, note_traffic_count(report_backlog(BATCHOP_E, third)));
    BOOST_REQUIRE(traffic_since() == third);
-   BOOST_REQUIRE(due_at() == third + minimum_duration());
+   BOOST_REQUIRE(due_at() == due_for(third));
 } FC_LOG_AND_RETHROW() }
 
 /// A decided epoch takes reports, and a paused chain records their traffic but does not advance until it resumes.
@@ -6366,7 +6385,7 @@ BOOST_FIXTURE_TEST_CASE(a_paused_chain_records_reported_traffic_but_holds, sysio
 
    const fc::time_point backlog_since = control->head().block_time();
    for (const name member : {BATCHOP, BATCHOP_B}) report_backlog(member, backlog_since);
-   const fc::time_point due = backlog_since + minimum_duration();
+   const fc::time_point due = due_for(backlog_since);
    BOOST_REQUIRE(traffic_since() == backlog_since);
    BOOST_REQUIRE(due_at() == due);
 
@@ -6423,7 +6442,7 @@ BOOST_FIXTURE_TEST_CASE(a_backlog_report_waits_out_a_dispute, sysio_msgch_chain_
       BOOST_REQUIRE_EQUAL(0u, note_traffic_count(report_backlog(member, resolved_at)));
       require_queue_report(member, epoch, REPORTED_PENDING_COUNT, resolved_at);
    }
-   const fc::time_point due = resolved_at + minimum_duration();
+   const fc::time_point due = due_for(resolved_at);
    BOOST_REQUIRE(due_at() == due);
 
    open_block_at(due - block_interval);
@@ -6455,7 +6474,7 @@ BOOST_FIXTURE_TEST_CASE(a_dispute_resolution_makes_the_chain_due, sysio_msgch_ch
    resolve_tie_dispute(epoch, fc::sha256::hash(left.data(), left.size()));
    BOOST_REQUIRE(!epoch_is_paused());
    BOOST_REQUIRE(traffic_since() == resolved_at);
-   const fc::time_point due = resolved_at + minimum_duration();
+   const fc::time_point due = due_for(resolved_at);
    BOOST_REQUIRE(due_at() == due);
 
    open_block_at(due - block_interval);

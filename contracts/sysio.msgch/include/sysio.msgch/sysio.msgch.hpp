@@ -157,8 +157,8 @@ namespace sysio {
       /// Permissionless crank for outpost `chain_code`'s current epoch, held while a dispute is open
       /// on it. An undecided epoch is re-tallied (`evalcons` inline, at any time), since its eligible
       /// members can change with no new delivery. A decided epoch
-      /// advances once the chain is due (`sysio.epoch` `advance_due`: it has traffic and its minimum
-      /// duration has passed since the later of its epoch start and that traffic); an idle chain stays in
+      /// advances once the chain is due (`sysio.epoch` `advance_due`: it has traffic, its minimum duration
+      /// has passed since its epoch start, and its traffic wait since that traffic began); an idle chain stays in
       /// its decided epoch. No effect before the chain's genesis advance, which only `bootstrap` /
       /// `bootchain` run.
       [[sysio::action]]

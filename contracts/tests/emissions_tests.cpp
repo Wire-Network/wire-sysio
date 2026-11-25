@@ -1309,6 +1309,7 @@ public:
       auto r = push_epoch_action(EPOCH, "setconfig"_n, mvo()
          ("chain_code", EPOCH_CHAIN)
          ("epoch_duration_sec", epoch_duration_sec)
+         ("traffic_wait_sec", 0)
          ("operators_per_epoch", operators_per_epoch)
          ("batch_operator_minimum_active", operators_per_epoch * batch_op_groups_count)
          ("batch_op_groups", batch_op_groups_count)

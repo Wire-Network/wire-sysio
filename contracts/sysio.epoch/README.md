@@ -7,8 +7,9 @@ The depot's two clocks, and batch operator scheduling, for the OPP (Outpost Prot
 - Owns one **consensus epoch per outpost chain**: that chain's OPP envelope counter, schedule window and
   roster. `epochcfg.epoch_duration_sec` (default 360 s, bounded per chain to 10 s .. 30 days) is the
   chain's minimum time between two envelopes. A chain's epoch advances once that outpost has reached
-  consensus and the chain is due: it has traffic, and its minimum has passed since the later of its
-  epoch start and that traffic. Traffic is a general-lane outbound attestation queued for the chain, a
+  consensus and the chain is due: it has traffic, its minimum has passed since its epoch start, and its
+  `epochcfg.traffic_wait_sec` (default half the minimum, at most the minimum) has passed since that traffic
+  began, so traffic arriving together ships together. Traffic is a general-lane outbound attestation queued for the chain, a
   backlog its last envelope left behind, a backlog on the outpost that eligible members as many as a strict
   majority of the group's seats report once its current epoch is decided (`sysio.msgch::reportqueue`, since the
   majority-th earliest reported time; Solana reports the start of its current backlog, Ethereum its oldest
@@ -41,7 +42,7 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
 
 | Table | Type | Description |
 |-------|------|-------------|
-| `epochcfg` | `kv::table` | One row per outpost chain, keyed by its `sysio.chains` code: `epoch_duration_sec`, `operators_per_epoch` (default 7), `batch_operator_minimum_active` (default 21), `batch_op_groups` (default 3), `epoch_retention_envelope_log_count` (default 200) |
+| `epochcfg` | `kv::table` | One row per outpost chain, keyed by its `sysio.chains` code: `epoch_duration_sec`, `traffic_wait_sec` (half the minimum when set as zero), `operators_per_epoch` (default 7), `batch_operator_minimum_active` (default 21), `batch_op_groups` (default 3), `epoch_retention_envelope_log_count` (default 200) |
 | `epochstate` | `kv::table` | One row per outpost chain: its consensus epoch index, current epoch start, `traffic_since` (when its pending traffic began) and `due_at` (when it may next advance), both zero while it is idle, active group cursor, the resident group window, pause flag, and `previous_group`, the group that served the previous epoch (empty before epoch 2) |
 | `netgenesis` | `kv::global` | Network genesis marker, written by the first chain's genesis advance; closes the bootstrap window and starts the economic clock |
 | `economycfg` | `kv::global` | Economic clock: `epoch_duration_sec` (60 s .. 30 days) and the grid's `start_time` |
@@ -53,11 +54,11 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
 
 | Action | Auth | Description |
 |--------|------|-------------|
-| `setconfig` | `sysio.epoch` | Set one chain's consensus epoch configuration. Bounds `epoch_duration_sec` to `MIN_EPOCH_DURATION_SEC` (10 s) .. `MAX_EPOCH_DURATION_SEC` (30 days). Requires `operators_per_epoch * batch_op_groups == batch_operator_minimum_active` and enforces the outposts' limits (`MAX_OPERATORS_PER_EPOCH` 7, Ethereum's group size; `MAX_BATCH_OP_GROUPS` 8, Solana's group count), so the window holds at most `MAX_SCHEDULED_BATCH_OPERATORS` (56). Recomputes `due_at` with the new minimum while the chain has traffic |
+| `setconfig` | `sysio.epoch` | Set one chain's consensus epoch configuration. Bounds `epoch_duration_sec` to `MIN_EPOCH_DURATION_SEC` (10 s) .. `MAX_EPOCH_DURATION_SEC` (30 days) and `traffic_wait_sec` to at most `epoch_duration_sec`, zero taking half the minimum. Requires `operators_per_epoch * batch_op_groups == batch_operator_minimum_active` and enforces the outposts' limits (`MAX_OPERATORS_PER_EPOCH` 7, Ethereum's group size; `MAX_BATCH_OP_GROUPS` 8, Solana's group count), so the window holds at most `MAX_SCHEDULED_BATCH_OPERATORS` (56). Recomputes `due_at` with the new minimum and wait while the chain has traffic |
 | `seteconomy` | `sysio.epoch` | Set the economic clock's duration and grid start. The start is fixed once the clock has ticked; it is re-validated against `sysio.system`'s pay-period accrual bound |
 | `schbatchgps` | `sysio.epoch` | Build one chain's initial window from the `ACTIVE` batch operators on `sysio.opreg` that serve the chain (non-bootstrapped first, then bootstrapped, trimmed to `batch_operator_minimum_active`) |
 | `advance` | `sysio.msgch` or `sysio.epoch` | Advance one chain's consensus epoch once it is due (`due_at` set and passed) and it is not paused; otherwise it returns without effect, under either authority. The genesis advance (epoch 0 → 1) needs no traffic and requires an active outpost whose schedule window `schbatchgps` has seated |
-| `notetraffic` | `sysio.msgch` (`buildenv`, `reportqueue`, `resolvedisp`) | Record traffic for one chain since `since` (a zero or future `since` counts as now): `traffic_since` keeps the earliest, `due_at` = max(`current_epoch_start`, `traffic_since`) + the chain's minimum. No effect before the chain's genesis advance. A paused chain records traffic but does not advance |
+| `notetraffic` | `sysio.msgch` (`buildenv`, `reportqueue`, `resolvedisp`) | Record traffic for one chain since `since` (a zero or future `since` counts as now): `traffic_since` keeps the earliest, `due_at` = max(`current_epoch_start` + the chain's minimum, `traffic_since` + its `traffic_wait_sec`). No effect before the chain's genesis advance. A paused chain records traffic but does not advance |
 | `tickeconomy` | permissionless | Open economic epoch `epoch_index`: refused unless it is the next index, its grid boundary has passed, and the network genesis has happened |
 | `pause` | `sysio.chalg` | Pause one chain's epoch advancement |
 | `unpause` | `sysio.chalg` | Resume one chain's epoch advancement |

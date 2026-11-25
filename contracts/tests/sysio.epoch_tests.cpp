@@ -94,12 +94,14 @@ public:
    /// A second outpost chain, for the per-chain cases.
    static constexpr std::string_view SOL = "SOL";
 
+   /// `traffic_wait` zero takes the default, half the minimum.
    action_result setconfig(uint32_t duration = 360, uint32_t ops_per = 7,
                            uint32_t total = 21, uint32_t grps = 3,
-                           uint32_t retention = 200, std::string_view chain = ETH) {
+                           uint32_t retention = 200, std::string_view chain = ETH, uint32_t traffic_wait = 0) {
       return push_epoch_action(EPOCH_ACCOUNT, "setconfig"_n, mvo()
          ("chain_code", chain)
          ("epoch_duration_sec", duration)
+         ("traffic_wait_sec", traffic_wait)
          ("operators_per_epoch", ops_per)
          ("batch_operator_minimum_active", total)
          ("batch_op_groups", grps)
@@ -723,17 +725,22 @@ BOOST_FIXTURE_TEST_CASE(an_idle_chain_never_advances, sysio_epoch_tester) { try 
    BOOST_REQUIRE(time_point() == state_time(ETH, "due_at"));
 } FC_LOG_AND_RETHROW() }
 
-/// `notetraffic` keeps a chain's earliest traffic and makes it due one minimum after the later of its epoch start and
-/// that traffic: later traffic changes nothing, earlier traffic moves both, and traffic from before the epoch started
-/// is due one minimum after the start. A zero or future `since` counts as now. Only sysio.msgch records traffic.
-BOOST_FIXTURE_TEST_CASE(due_is_the_later_of_start_and_traffic_plus_the_minimum, sysio_epoch_tester) { try {
+/// `notetraffic` keeps a chain's earliest traffic and makes it due at the later of its epoch start plus the minimum and
+/// that traffic plus the chain's traffic wait, by default half the minimum. Traffic early in a busy epoch is due at the
+/// start plus the minimum, as is later traffic and traffic from before the epoch started. Traffic that begins once the
+/// minimum has passed is due the wait after it. A zero or future `since` counts as now. Only sysio.msgch records
+/// traffic.
+BOOST_FIXTURE_TEST_CASE(due_is_the_later_of_the_minimum_and_the_traffic_wait, sysio_epoch_tester) { try {
    constexpr uint32_t     kDurationSec = 60;
+   constexpr int64_t      kIdleSec     = 40;
    const fc::microseconds minimum      = fc::seconds(kDurationSec);
+   const fc::microseconds wait         = fc::seconds(kDurationSec / 2);
    constexpr std::string_view BASE     = "BASE";
    constexpr uint32_t     kBaseChainId = 8453;
-   BOOST_REQUIRE_EQUAL(success(), setconfig(kDurationSec, 7, 21, 3, 200, ETH));
-   BOOST_REQUIRE_EQUAL(success(), setconfig(kDurationSec, 7, 21, 3, 200, SOL));
-   BOOST_REQUIRE_EQUAL(success(), setconfig(kDurationSec, 7, 21, 3, 200, BASE));
+   for (const std::string_view chain : {ETH, SOL, BASE}) {
+      BOOST_REQUIRE_EQUAL(success(), setconfig(kDurationSec, 7, 21, 3, 200, chain));
+      BOOST_REQUIRE_EQUAL(kDurationSec / 2, get_epoch_config(chain)["traffic_wait_sec"].as<uint32_t>());
+   }
    ready_genesis(ETH, ChainKind::CHAIN_KIND_EVM);
    ready_genesis(SOL, ChainKind::CHAIN_KIND_SVM);
    BOOST_REQUIRE_EQUAL(success(), regchain(ChainKind::CHAIN_KIND_EVM, std::string(BASE), kBaseChainId));
@@ -746,30 +753,61 @@ BOOST_FIXTURE_TEST_CASE(due_is_the_later_of_start_and_traffic_plus_the_minimum, 
    BOOST_REQUIRE_EQUAL(error("missing authority of sysio.msgch"), notetraffic(ETH, start, EPOCH_ACCOUNT));
    BOOST_REQUIRE(time_point() == state_time(ETH, "traffic_since"));
 
+   // Traffic early in the epoch is due once the minimum has passed since the start.
    const time_point first = start + fc::seconds(5);
    BOOST_REQUIRE_EQUAL(success(), notetraffic(ETH, first));
    BOOST_REQUIRE(first == state_time(ETH, "traffic_since"));
-   BOOST_REQUIRE(first + minimum == state_time(ETH, "due_at"));
+   BOOST_REQUIRE(start + minimum == state_time(ETH, "due_at"));
 
    // Later traffic leaves the earliest in place.
    BOOST_REQUIRE_EQUAL(success(), notetraffic(ETH, first + fc::seconds(2)));
    BOOST_REQUIRE(first == state_time(ETH, "traffic_since"));
-   BOOST_REQUIRE(first + minimum == state_time(ETH, "due_at"));
+   BOOST_REQUIRE(start + minimum == state_time(ETH, "due_at"));
 
-   // Traffic from before the epoch started is due one minimum after the start.
+   // Traffic from before the epoch started is due once the minimum has passed since the start.
    const time_point before_start = start - fc::seconds(30);
    BOOST_REQUIRE_EQUAL(success(), notetraffic(ETH, before_start));
    BOOST_REQUIRE(before_start == state_time(ETH, "traffic_since"));
    BOOST_REQUIRE(start + minimum == state_time(ETH, "due_at"));
 
-   // A zero or a future `since` counts as now.
+   // On a chain idle past its minimum, traffic is due the wait after it begins. A zero or a future `since` counts as
+   // now.
+   open_block_at(start + minimum + fc::seconds(kIdleSec));
    const time_point now = control->pending_block_time();
    BOOST_REQUIRE_EQUAL(success(), notetraffic(SOL, time_point()));
    BOOST_REQUIRE_EQUAL(success(), notetraffic(BASE, now + fc::hours(1)));
    for (const std::string_view chain : {SOL, BASE}) {
       BOOST_REQUIRE(now == state_time(chain, "traffic_since"));
-      BOOST_REQUIRE(now + minimum == state_time(chain, "due_at"));
+      BOOST_REQUIRE(now + wait == state_time(chain, "due_at"));
    }
+} FC_LOG_AND_RETHROW() }
+
+/// `setconfig` takes a chain's traffic wait up to its minimum, zero for the default of half the minimum, and refuses a
+/// longer one. While the chain has traffic, the new wait moves its `due_at`.
+BOOST_FIXTURE_TEST_CASE(setconfig_sets_the_traffic_wait_up_to_the_minimum, sysio_epoch_tester) { try {
+   constexpr uint32_t kDurationSec  = 60;
+   constexpr uint32_t kShortWaitSec = 10;
+   constexpr int64_t  kIdleSec      = 40;
+   BOOST_REQUIRE_EQUAL(error("assertion failure with message: traffic_wait_sec must be <= epoch_duration_sec"),
+                       setconfig(kDurationSec, 7, 21, 3, 200, ETH, kDurationSec + 1));
+   BOOST_REQUIRE(get_epoch_config(ETH).is_null());
+   BOOST_REQUIRE_EQUAL(success(), setconfig(kDurationSec, 7, 21, 3, 200, ETH, kDurationSec));
+   BOOST_REQUIRE_EQUAL(kDurationSec, get_epoch_config(ETH)["traffic_wait_sec"].as<uint32_t>());
+   BOOST_REQUIRE_EQUAL(success(), setconfig(kDurationSec, 7, 21, 3, 200, ETH, kShortWaitSec));
+   BOOST_REQUIRE_EQUAL(kShortWaitSec, get_epoch_config(ETH)["traffic_wait_sec"].as<uint32_t>());
+
+   ready_genesis(ETH, ChainKind::CHAIN_KIND_EVM);
+   BOOST_REQUIRE_EQUAL(success(), advance(ETH));
+   produce_blocks();
+   const time_point start = state_time(ETH, "current_epoch_start");
+   open_block_at(start + fc::seconds(kDurationSec + kIdleSec));
+   const time_point since = control->pending_block_time();
+   BOOST_REQUIRE_EQUAL(success(), notetraffic(ETH, since));
+   BOOST_REQUIRE(since + fc::seconds(kShortWaitSec) == state_time(ETH, "due_at"));
+
+   BOOST_REQUIRE_EQUAL(success(), setconfig(kDurationSec, 7, 21, 3, 200, ETH));
+   BOOST_REQUIRE_EQUAL(kDurationSec / 2, get_epoch_config(ETH)["traffic_wait_sec"].as<uint32_t>());
+   BOOST_REQUIRE(since + fc::seconds(kDurationSec / 2) == state_time(ETH, "due_at"));
 } FC_LOG_AND_RETHROW() }
 
 /// A chain with traffic does not advance before it is due. Once due, the advance opens the next epoch at its own time
@@ -785,7 +823,7 @@ BOOST_FIXTURE_TEST_CASE(a_chain_advances_only_once_due_and_opens_the_next_epoch_
    const time_point since = state_time(ETH, "current_epoch_start") + fc::seconds(2);
    BOOST_REQUIRE_EQUAL(success(), notetraffic(ETH, since));
    const time_point due = state_time(ETH, "due_at");
-   BOOST_REQUIRE(since + fc::seconds(kDurationSec) == due);
+   BOOST_REQUIRE(state_time(ETH, "current_epoch_start") + fc::seconds(kDurationSec) == due);
 
    open_block_at(due - block_interval);
    BOOST_REQUIRE_EQUAL(success(), advance(ETH, MSGCH_ACCOUNT));

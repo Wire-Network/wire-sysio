@@ -39,7 +39,7 @@ Inbound/outbound OPP message chain management and consensus tracking contract.
 - Drives each outpost chain's epoch: `chkcons(chain)` re-tallies an undecided current epoch, whose
   eligible members can change with no new delivery, and advances that chain's `sysio.epoch` epoch once the
   outpost has reached consensus and the chain is due (`sysio.epoch` `due_at`: its minimum duration has
-  passed since the later of its epoch start and its traffic)
+  passed since its epoch start, and its traffic wait since its traffic began)
 
 ## Tables
 
