@@ -96,6 +96,12 @@ void assert_envelope_chunks_shape(opp_solana_outpost_client& program_client);
 /// @throws fc::exception when a cursor is missing or its byte offset disagrees with the IDL.
 void assert_envelope_chunk_gate_shapes(opp_solana_outpost_client& program_client);
 
+/// Round-trip an `OutboundMessageBuffer` probe through the loaded IDL; fail boot unless `attestation_count`, which the
+/// outbound backlog read takes from a fixed offset, decodes as a u16 at byte 20 of the `repr(C)` buffer.
+/// @param program_client Client holding the loaded outpost IDL.
+/// @throws fc::exception when the account or the field is missing, or the field's offset or width disagrees.
+void assert_outbound_backlog_shape(opp_solana_outpost_client& program_client);
+
 /// Round-trip an `EpochDeliveries` probe through the loaded IDL; fail boot if the `epoch_index` / `payer` offsets the
 /// tally sweep filters on drift. Run only when the IDL declares `cleanup_epoch_deliveries`.
 /// @param program_client Client holding the loaded outpost IDL.
@@ -457,19 +463,12 @@ envelope_chunk_reap_gates decode_envelope_chunk_reap_gates(
    opp_solana_outpost_client& program_client,
    const std::vector<std::optional<fc::network::solana::account_info>>& infos);
 
-/// Assert that the loaded IDL declares `OutboundMessageBuffer` opening with the fields the backlog read takes from
-/// fixed offsets: `oldest_pending_at` (i64), `used_data_bytes` (u32) and `attestation_count` (u16), in that order. The
-/// account is `repr(C)`, so those three lay out without padding right after the discriminator.
-/// @throws fc::exception naming the account and the first field that disagrees.
-void assert_outbound_backlog_shape(const fc::network::solana::idl::program& program);
-
 /// Decode the `getMultipleAccounts` pair in request order, `OutboundMessageBuffer` then `LatestOutboundEnvelope`,
-/// into the outpost's outbound backlog. The pending count is `attestation_count`; the backlog's age is
-/// `oldest_pending_at` (unix seconds) in milliseconds, trusted only while something is queued and zero otherwise;
-/// the outbound epoch is the latest one the outpost emitted. Each account must carry its discriminator, be owned by
-/// `program_client.program_id` and hold its whole header.
-/// @throws fc::exception for a wrong account count, invalid account data (naming the affected account), or a
-///         backlog age that is not a time.
+/// into the outpost's outbound backlog. The pending count is `attestation_count`, read at its fixed offset of the
+/// `repr(C)` buffer; the outbound epoch is the latest one the outpost emitted; the backlog's age is zero, since the
+/// buffer does not date it, and the depot counts it as the report's time. Each account must carry its discriminator,
+/// be owned by `program_client.program_id` and hold its whole header.
+/// @throws fc::exception for a wrong account count or invalid account data, naming the affected account.
 outbound_backlog decode_outbound_backlog(
    opp_solana_outpost_client& program_client,
    const std::vector<std::optional<fc::network::solana::account_info>>& infos);

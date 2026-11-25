@@ -87,6 +87,6 @@ Solana's epoch 1, whose recorded delivery re-sends its terminal call at most onc
 bootstrap reseed may replace the group under its open tally.
 
 `read_outbound_backlog` reports the latest epoch the outpost emitted, the messages queued for its next emit and
-when the backlog began, in milliseconds (zero while empty). Ethereum dates its oldest queued message; Solana dates
-the start of its current backlog, which a partial drain keeps. The relay reports it to the depot
+when the backlog began, in milliseconds (zero while empty). Ethereum dates its oldest queued message; Solana does
+not date its backlog and reports zero, which the depot counts as the report's time. The relay reports it to the depot
 (`sysio.msgch::reportqueue`) once the outpost has emitted the depot's current, decided epoch.

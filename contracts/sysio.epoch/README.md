@@ -12,8 +12,8 @@ The depot's two clocks, and batch operator scheduling, for the OPP (Outpost Prot
   began, so traffic arriving together ships together. Traffic is a general-lane outbound attestation queued for the chain, a
   backlog its last envelope left behind, a backlog on the outpost that eligible members as many as a strict
   majority of the group's seats report once its current epoch is decided (`sysio.msgch::reportqueue`, since the
-  majority-th earliest reported time; Solana reports the start of its current backlog, Ethereum its oldest
-  queued message), a dispute's resolution
+  majority-th earliest reported time; Ethereum reports its oldest queued message, and Solana no time, which
+  counts as the report's), a dispute's resolution
   (`sysio.msgch::resolvedisp`, at its time), or a governance `resendroster`. `sysio.msgch` records the first four. An idle chain
   never advances. The first chain's genesis advance is the network genesis (`netgenesis`); a genesis
   advance needs no traffic. An epoch's books (deliveries, misses, duty) close at the advance after it, so a

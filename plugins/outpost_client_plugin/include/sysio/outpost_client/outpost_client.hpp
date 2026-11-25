@@ -40,8 +40,9 @@ struct outbound_backlog {
    uint32_t outbound_epoch    = 0;
    /// Messages (Ethereum) or attestations (Solana) queued for the next emit.
    uint32_t pending_count     = 0;
-   /// When the backlog began, in milliseconds since the Unix epoch; 0 while nothing is queued. Ethereum reports its
-   /// oldest queued message, Solana the start of its current backlog.
+   /// When the backlog began, in milliseconds since the Unix epoch; 0 while nothing is queued, or when the outpost does
+   /// not date it, which the depot counts as the report's time. Ethereum reports its oldest queued message; Solana
+   /// reports 0.
    uint64_t oldest_pending_ms = 0;
 };
 

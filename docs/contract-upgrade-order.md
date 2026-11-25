@@ -267,8 +267,8 @@ The `epochstate` and `epochcfg` layouts change in place, so every reader is rebu
 `batch_operator_plugin`, which reads `due_at` and `sysio.msgch::outpcons` to push `chkcons`. The plugin adds
 `sysio.msgch::reportqueue` to the relay's actions, so an operator whose `@active` has been restricted by a
 `linkauth` must let it authorize that action too, or the plugin refuses to start. Its backlog reports read the
-outposts' new backlog state (Ethereum `OPP.pendingOutbound()`, Solana `OutboundMessageBuffer.oldest_pending_at`),
-so the outposts deploy with it.
+outposts' backlog state (Ethereum's new `OPP.pendingOutbound()`; Solana's `OutboundMessageBuffer.attestation_count`
+and `LatestOutboundEnvelope.epoch_index`, which need no program change), so the Ethereum outpost deploys with it.
 
 ## The two rules for future changes
 

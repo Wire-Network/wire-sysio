@@ -168,9 +168,9 @@ namespace sysio {
 
       /// Batch operator `batch_op` reports outpost `chain_code`'s outbound backlog in the chain's current epoch
       /// `epoch_index`: `pending_count` messages queued on the outpost, pending since `oldest_pending_ms`
-      /// (milliseconds since the Unix epoch; zero, or a time later than now, counts as now). Solana reports the
-      /// start of its current backlog, Ethereum its oldest queued message. The epoch must be decided: its accepted
-      /// envelope proves the outpost emitted it, so no message that left in that emit counts as a backlog.
+      /// (milliseconds since the Unix epoch; zero, or a time later than now, counts as now). Ethereum reports its
+      /// oldest queued message; Solana does not date its backlog and reports zero. The epoch must be decided: its
+      /// accepted envelope proves the outpost emitted it, so no message that left in that emit counts as a backlog.
       ///
       /// The report replaces the operator's `qreports` row for the chain, erases the chain's rows of earlier epochs
       /// and runs the tally. Once eligible members as many as a strict majority of the seats of the chain's group

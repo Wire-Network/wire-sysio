@@ -906,8 +906,8 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "oldest_pending_at",
-            "type": "i64"
+            "name": "next_swap_id",
+            "type": "u64"
           },
           {
             "name": "used_data_bytes",

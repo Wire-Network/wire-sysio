@@ -4286,9 +4286,11 @@ namespace {
 namespace backlog_fixture {
    constexpr auto buffer_name  = "OutboundMessageBuffer";
    constexpr auto latest_name  = "LatestOutboundEnvelope";
+   constexpr auto count_field  = "attestation_count";
    constexpr uint32_t emitted_epoch     = 17;
    constexpr uint16_t queued            = 3;
-   constexpr int64_t  oldest_sec        = 1'800'000'123;
+   /// The buffer's unused `next_swap_id`, nonzero so a read that took it for an age would show.
+   constexpr uint64_t next_swap_id      = 1'800'000'123;
    constexpr uint32_t used_data_bytes   = 211;
    constexpr uint8_t  bump              = 0xFE;
    constexpr uint8_t  version           = 1;
@@ -4303,14 +4305,14 @@ namespace backlog_fixture {
    constexpr size_t descriptor_bytes = 12;
 }
 
-/// An `OutboundMessageBuffer` header as the program lays it out: discriminator, `oldest_pending_at` i64,
+/// An `OutboundMessageBuffer` header as the program lays it out: discriminator, `next_swap_id` u64,
 /// `used_data_bytes` u32, `attestation_count` u16, bump, version, then one zeroed descriptor of the tail.
-std::vector<uint8_t> outbound_buffer_header(uint16_t count, int64_t oldest_sec) {
+std::vector<uint8_t> outbound_buffer_header(uint16_t count) {
    using namespace backlog_fixture;
    borsh::encoder enc;
    const auto disc = idl::compute_account_discriminator(buffer_name);
    enc.write_fixed_bytes(disc.data(), disc.size());
-   enc.write_i64(oldest_sec);
+   enc.write_u64(next_swap_id);
    enc.write_u32(used_data_bytes);
    enc.write_u16(count);
    enc.write_u8(bump);
@@ -4320,24 +4322,23 @@ std::vector<uint8_t> outbound_buffer_header(uint16_t count, int64_t oldest_sec) 
    return enc.data();
 }
 
-/// Both backlog accounts, the buffer holding `count` attestations pending since `oldest_sec`.
-std::vector<std::optional<account_info>> backlog_accounts(uint16_t count = backlog_fixture::queued,
-                                                          int64_t  oldest_sec = backlog_fixture::oldest_sec) {
+/// Both backlog accounts, the buffer holding `count` attestations.
+std::vector<std::optional<account_info>> backlog_accounts(uint16_t count = backlog_fixture::queued) {
    const std::array<uint8_t, 32> hash{};
-   return {program_owned(outbound_buffer_header(count, oldest_sec)),
+   return {program_owned(outbound_buffer_header(count)),
            program_owned(integrated_latest_account(backlog_fixture::emitted_epoch, {}, hash))};
 }
 
 } // anonymous namespace
 
-/// A queued buffer reports its count, its age in milliseconds and the latest emitted epoch, each from its own
-/// account and offset.
+/// A queued buffer reports its count and the latest emitted epoch, each from its own account and offset, and no age:
+/// the buffer does not date its backlog, and the depot counts a zero age as the report's time.
 BOOST_AUTO_TEST_CASE(outbound_backlog_decodes_a_queued_buffer) try {
    auto client = resume_program_client();
    const sysio::outbound_backlog backlog = reap_detail::decode_outbound_backlog(client, backlog_accounts());
    BOOST_CHECK_EQUAL(backlog.outbound_epoch, backlog_fixture::emitted_epoch);
    BOOST_CHECK_EQUAL(backlog.pending_count, backlog_fixture::queued);
-   BOOST_CHECK_EQUAL(backlog.oldest_pending_ms, static_cast<uint64_t>(backlog_fixture::oldest_sec) * 1000);
+   BOOST_CHECK_EQUAL(backlog.oldest_pending_ms, 0u);
 
    // The RPC's header-only slice decodes the same.
    auto sliced = backlog_accounts();
@@ -4345,38 +4346,55 @@ BOOST_AUTO_TEST_CASE(outbound_backlog_decodes_a_queued_buffer) try {
    const sysio::outbound_backlog from_slice = reap_detail::decode_outbound_backlog(client, sliced);
    BOOST_CHECK_EQUAL(from_slice.outbound_epoch, backlog.outbound_epoch);
    BOOST_CHECK_EQUAL(from_slice.pending_count, backlog.pending_count);
-   BOOST_CHECK_EQUAL(from_slice.oldest_pending_ms, backlog.oldest_pending_ms);
+   BOOST_CHECK_EQUAL(from_slice.oldest_pending_ms, 0u);
 } FC_LOG_AND_RETHROW();
 
-/// An empty buffer reports no backlog and no age, whatever its age field still holds.
-BOOST_AUTO_TEST_CASE(outbound_backlog_of_an_empty_buffer_has_no_age) try {
+/// An empty buffer reports no backlog, with the latest emitted epoch.
+BOOST_AUTO_TEST_CASE(outbound_backlog_of_an_empty_buffer_is_empty) try {
    auto client = resume_program_client();
-   for (const int64_t stale_sec : {int64_t{0}, backlog_fixture::oldest_sec, int64_t{-1}}) {
-      BOOST_TEST_CONTEXT("oldest_pending_at " << stale_sec) {
-         const sysio::outbound_backlog backlog =
-            reap_detail::decode_outbound_backlog(client, backlog_accounts(0, stale_sec));
-         BOOST_CHECK_EQUAL(backlog.pending_count, 0u);
-         BOOST_CHECK_EQUAL(backlog.oldest_pending_ms, 0u);
-         BOOST_CHECK_EQUAL(backlog.outbound_epoch, backlog_fixture::emitted_epoch);
-      }
-   }
+   const sysio::outbound_backlog backlog = reap_detail::decode_outbound_backlog(client, backlog_accounts(0));
+   BOOST_CHECK_EQUAL(backlog.pending_count, 0u);
+   BOOST_CHECK_EQUAL(backlog.oldest_pending_ms, 0u);
+   BOOST_CHECK_EQUAL(backlog.outbound_epoch, backlog_fixture::emitted_epoch);
 } FC_LOG_AND_RETHROW();
 
-/// A queued buffer whose age is not a time is a failed read, not a backlog dated arbitrarily.
-BOOST_AUTO_TEST_CASE(outbound_backlog_refuses_an_age_that_is_not_a_time) try {
+/// The boot probe accepts the deployed declaration and refuses, naming the account, one whose `attestation_count` is not
+/// the u16 at byte 20 the backlog read takes: moved by a narrower field before it, moved ahead, widened, or missing.
+BOOST_AUTO_TEST_CASE(outbound_backlog_count_offset_is_checked_at_boot) try {
    auto client = resume_program_client();
-   for (const int64_t bad_sec :
-        {int64_t{-1}, std::numeric_limits<int64_t>::min(), std::numeric_limits<int64_t>::max()}) {
-      BOOST_TEST_CONTEXT("oldest_pending_at " << bad_sec) {
-         BOOST_CHECK_THROW(
-            reap_detail::decode_outbound_backlog(client, backlog_accounts(backlog_fixture::queued, bad_sec)),
-            fc::exception);
-      }
-   }
-   // Zero while queued (never written so by the program) reads as no age; the depot counts that as now.
-   BOOST_CHECK_EQUAL(reap_detail::decode_outbound_backlog(client, backlog_accounts(backlog_fixture::queued, 0))
-                        .oldest_pending_ms,
-                     0u);
+   BOOST_CHECK_NO_THROW(reap_detail::assert_outbound_backlog_shape(client));
+
+   const auto with_fields = [](const std::function<void(std::vector<idl::field>&)>& edit) {
+      auto prog = load_idl_fixture(opp_outpost_idl_fixture);
+      auto type = std::ranges::find_if(prog.types, [](const idl::type_def& t) {
+         return t.name == backlog_fixture::buffer_name;
+      });
+      BOOST_REQUIRE(type != prog.types.end());
+      BOOST_REQUIRE(type->struct_fields.has_value());
+      edit(*type->struct_fields);
+      return prog;
+   };
+   const auto count_of = [](std::vector<idl::field>& fields) {
+      auto field = std::ranges::find_if(fields, [](const idl::field& f) {
+         return f.name == backlog_fixture::count_field;
+      });
+      BOOST_REQUIRE(field != fields.end());
+      return field;
+   };
+   const auto refused = [](idl::program prog) {
+      auto changed = resume_program_client(std::move(prog));
+      BOOST_CHECK_EXCEPTION(reap_detail::assert_outbound_backlog_shape(changed), fc::exception,
+                            [](const fc::exception& e) { return gate_error_names(e, backlog_fixture::buffer_name); });
+   };
+   const idl::idl_type u32 = idl::idl_type::make_primitive(idl::primitive_type::u32);
+   refused(with_fields([&](std::vector<idl::field>& fields) { fields.front().type = u32; }));
+   refused(with_fields([&](std::vector<idl::field>& fields) { std::iter_swap(fields.begin(), count_of(fields)); }));
+   refused(with_fields([&](std::vector<idl::field>& fields) { count_of(fields)->type = u32; }));
+   refused(with_fields([&](std::vector<idl::field>& fields) { count_of(fields)->name = "pending"; }));
+
+   auto without = load_idl_fixture(opp_outpost_idl_fixture);
+   std::erase_if(without.accounts, [](const idl::account& a) { return a.name == backlog_fixture::buffer_name; });
+   refused(std::move(without));
 } FC_LOG_AND_RETHROW();
 
 /// Each account must be present, non-empty, the program's, carrying its discriminator and its whole field; the
@@ -4420,39 +4438,6 @@ BOOST_AUTO_TEST_CASE(outbound_backlog_refuses_invalid_accounts) try {
    accounts = backlog_accounts();
    accounts.push_back(std::nullopt);
    BOOST_CHECK_THROW(reap_detail::decode_outbound_backlog(client, accounts), fc::exception);
-} FC_LOG_AND_RETHROW();
-
-/// The boot check accepts the deployed declaration and refuses one whose header would move the fixed offsets.
-BOOST_AUTO_TEST_CASE(outbound_backlog_shape_is_checked_at_boot) try {
-   const auto prog = load_idl_fixture(opp_outpost_idl_fixture);
-   BOOST_CHECK_NO_THROW(reap_detail::assert_outbound_backlog_shape(prog));
-
-   const auto with_fields = [&](const std::function<void(std::vector<idl::field>&)>& edit) {
-      auto changed = load_idl_fixture(opp_outpost_idl_fixture);
-      auto type = std::ranges::find_if(changed.types, [](const idl::type_def& t) {
-         return t.name == backlog_fixture::buffer_name;
-      });
-      BOOST_REQUIRE(type != changed.types.end());
-      BOOST_REQUIRE(type->struct_fields.has_value());
-      edit(*type->struct_fields);
-      return changed;
-   };
-   const auto refused = [](const idl::program& program) {
-      BOOST_CHECK_EXCEPTION(reap_detail::assert_outbound_backlog_shape(program), fc::exception,
-                            [](const fc::exception& e) { return gate_error_names(e, backlog_fixture::buffer_name); });
-   };
-   // Renamed, retyped, reordered and truncated headers.
-   refused(with_fields([](std::vector<idl::field>& fields) { fields[0].name = "unrecognized_age"; }));
-   refused(with_fields([](std::vector<idl::field>& fields) {
-      fields[2].type = idl::idl_type::make_primitive(idl::primitive_type::u32);
-   }));
-   refused(with_fields([](std::vector<idl::field>& fields) { std::swap(fields[1], fields[2]); }));
-   refused(with_fields([](std::vector<idl::field>& fields) { fields.resize(2); }));
-
-   // An IDL without the account at all.
-   auto without = load_idl_fixture(opp_outpost_idl_fixture);
-   std::erase_if(without.accounts, [](const idl::account& a) { return a.name == backlog_fixture::buffer_name; });
-   BOOST_CHECK_THROW(reap_detail::assert_outbound_backlog_shape(without), fc::exception);
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(chunk_buffer_discovery_filters_on_discriminator_and_operator) try {
@@ -5780,7 +5765,7 @@ BOOST_FIXTURE_TEST_CASE(read_outbound_backlog_reads_both_accounts_at_confirmed, 
    const sysio::outbound_backlog backlog = client.read_outbound_backlog(fc::seconds(5));
    BOOST_CHECK_EQUAL(backlog.outbound_epoch, backlog_fixture::emitted_epoch);
    BOOST_CHECK_EQUAL(backlog.pending_count, backlog_fixture::queued);
-   BOOST_CHECK_EQUAL(backlog.oldest_pending_ms, static_cast<uint64_t>(backlog_fixture::oldest_sec) * 1000);
+   BOOST_CHECK_EQUAL(backlog.oldest_pending_ms, 0u);
 
    const auto expected = resume_program_client();
    BOOST_CHECK_EQUAL(client.reads, 1u);

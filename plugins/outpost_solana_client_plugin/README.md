@@ -530,16 +530,13 @@ delivery.
 ## Outbound Backlog
 
 `read_outbound_backlog` reads `OutboundMessageBuffer` and `LatestOutboundEnvelope` in one
-`getMultipleAccounts` at `confirmed` with a header-only `dataSlice`, so the count, its age
-and the latest emitted epoch come from one bank. It reports `attestation_count` as the
-pending count, `oldest_pending_at` (unix seconds, the start of the current backlog, kept
-across a partial drain) in milliseconds while anything is queued and zero otherwise, and
-`LatestOutboundEnvelope.epoch_index` as the latest emitted epoch. Each account must be
-present, owned by the program and carry its IDL discriminator; a queued buffer whose age
-is negative or past the millisecond range is a failed read. The fields are read at fixed
-offsets of the `repr(C)` buffer, so boot checks that the loaded IDL declares
-`OutboundMessageBuffer` opening with `oldest_pending_at` (i64), `used_data_bytes` (u32) and
-`attestation_count` (u16), in that order.
+`getMultipleAccounts` at `confirmed` with a header-only `dataSlice`, so the count and the
+latest emitted epoch come from one bank. It reports `attestation_count`, read at its fixed
+offset of the `repr(C)` buffer, as the pending count and `LatestOutboundEnvelope.epoch_index`
+as the latest emitted epoch. Boot decodes an `OutboundMessageBuffer` probe through the loaded
+IDL and refuses one whose `attestation_count` is not a u16 at that offset. The buffer does not date its backlog, so the age is reported as
+zero, which the depot counts as the report's time. Each account must be present, owned by
+the program and carry its IDL discriminator.
 
 ---
 
