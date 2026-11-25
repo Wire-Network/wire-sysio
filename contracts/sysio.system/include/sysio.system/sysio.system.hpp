@@ -182,9 +182,7 @@ namespace sysiosystem {
       /// Blocks counted and not yet paid -- the ONE pay input. `payepoch` credits every block at
       /// the period's per-block rate and zeroes the count of every producer it pays; a block the
       /// producer's slot did not deliver is simply never counted, so its pay stays in the treasury.
-      /// At most one round per rotation is counted; see `last_paid_round`. A block made in an
-      /// economic epoch the economic clock has not opened yet is parked (`parkedwork`) and joins
-      /// this count when the tick opening that epoch has paid the periods before it.
+      /// At most one round per rotation is counted; see `last_paid_round`.
       /// The count SURVIVES a park, a demotion, a lost key, or a termination: a producer that is not
       /// schedulable at a payepoch is neither paid nor reset, and whatever was counted is paid at the
       /// first payepoch where it is schedulable again (never, for a slashed one).
@@ -768,8 +766,10 @@ namespace sysiosystem {
          /**
           * Pay the emissions accrued over the pay period ending at economic epoch `epoch_index`.
           * Called inline by sysio.epoch::tickeconomy on a pay epoch (the period boundary defined by
-          * emit_cfg.pay_cadence_epochs) whose spendable balance covers the period, right after
-          * that epoch's accrueepoch. Auth: require_auth("sysio.epoch").
+          * emit_cfg.pay_cadence_epochs) whose spendable balance covers the period and, once the economic
+          * clock has caught up to the grid, that no later boundary has passed, right after that epoch's
+          * accrueepoch: a late crank pays every overdue period in one payout, split over all the work
+          * counted since the last one. Auth: require_auth("sysio.epoch").
           *
           * `period_emission` is the gate-computed period total; payepoch asserts it equals the
           * accrued `pending_emission_amount` and distributes it across producer / batch / capex /
@@ -789,22 +789,24 @@ namespace sysiosystem {
           * including a pay epoch, where it runs first so payepoch observes the post-accrue state.
           * Auth: require_auth("sysio.epoch").
           *
-          * Adds `per_epoch_emission` to t5state.pending_emission_amount and the epoch's nominal
-          * block slots to pending_nominal_slots. A zero share is valid: the gate passes one to an
-          * open pay period with emission pending once the rest of the T5 budget is committed or the
-          * curve is zero, and `last_epoch_emission` (the decay base) keeps the last positive share.
+          * Adds `per_epoch_emission` to t5state.pending_emission_amount, and to pending_nominal_slots
+          * the block slots of `closed_epoch_duration_sec`: the economic epoch this tick closes, from
+          * the previous boundary to this epoch's (one epoch of the duration in force on the first
+          * tick). The share is sized on that length too; a positive one becomes `last_epoch_emission`
+          * (the decay base) with the length in `last_epoch_duration_sec`. A zero share is valid: the
+          * gate passes one to an open pay period with emission pending once the rest of the T5
+          * budget is committed or the curve is zero, and the decay base keeps the last positive share.
           *
           * No transfers happen here. Treasury / balance gating is the gate's responsibility upstream.
           */
          [[sysio::action]]
-         void accrueepoch(uint32_t epoch_index, int64_t per_epoch_emission);
+         void accrueepoch(uint32_t epoch_index, int64_t per_epoch_emission, uint32_t closed_epoch_duration_sec);
 
          /**
           * Credit one duty unit to each of `members`, the batch-operator group that served
-          * consensus epoch `epoch_index`. A member still holding units of the settling period is
-          * settled first. While the economic epoch the grid is in has not been opened by
-          * sysio.epoch::tickeconomy, the units are parked under it instead (see `parkedwork`).
-          * Called inline by sysio.epoch::advance; never throws. Auth: require_auth("sysio.epoch").
+          * consensus epoch `epoch_index`, in the pay period open when they are recorded. A member
+          * still holding units of the settling period is settled first. Called inline by
+          * sysio.epoch::advance; never throws. Auth: require_auth("sysio.epoch").
           */
          [[sysio::action]]
          void rcrdduty(uint32_t epoch_index, std::vector<sysio::name> members);
@@ -816,16 +818,6 @@ namespace sysiosystem {
           */
          [[sysio::action]]
          void settleduty();
-
-         /**
-          * Credit the work parked under economic epochs up to `epoch_index` to the open pay period:
-          * blocks to their producers' `unpaid_blocks`, duty units as `rcrdduty` credits them.
-          * At most MAX_PARKED_WORK_ROWS rows, oldest epoch first; the rest wait for the next call.
-          * Called inline by sysio.epoch::tickeconomy before its payout, up to the epoch before the one
-          * it opens, and after it, up to that epoch; never throws. Auth: require_auth("sysio.epoch").
-          */
-         [[sysio::action]]
-         void creditwork(uint32_t epoch_index);
 
          /**
           * Read-only: current T5 treasury emission state.

@@ -13,17 +13,14 @@ consensus. The OPP consensus epoch only feeds batch-operator duty.
 
 `sysio.epoch::tickeconomy` opens each economic epoch and drives emissions inline:
 
-- Every economic epoch first calls `creditwork` for the epochs before the one it
-  opens, crediting parked work an earlier call's bound left (below).
 - Every economic epoch whose readiness gate allows it calls `accrueepoch`, which
-  adds that epoch's curve share (`compute_epoch_emission`) to
+  adds the curve share of the epoch the tick closes (`compute_epoch_emission`) to
   `t5state.pending_emission_amount`.
 - On a pay-epoch boundary (`emitcfg.pay_cadence_epochs`) it then calls
   `payepoch`, which distributes the accumulated `period_emission` and opens the
   period's batch-duty settlement.
 - Every economic epoch then calls `settleduty`, one bounded step of any open
-  settlement, and `creditwork` again, which credits the work parked for the epoch
-  it opens.
+  settlement.
 
 Separately, every consensus epoch close (`sysio.epoch::advance`) calls `rcrdduty`,
 crediting one duty unit to each member of the group that served it. Both clocks
@@ -31,41 +28,43 @@ skip the duty actions until `initt5` has run: nothing can be paid before then,
 and consensus must not depend on `sysio.system`.
 
 A start time in the past makes the clock catch up, one epoch per tick, through
-the elapsed grid. Epochs before launch accrue their curve share, but nobody
-produced a block or served a consensus epoch in them, so their producer and
-batch-operator slices stay in the treasury.
+the elapsed grid. Until it first reaches the grid (`economystate.caught_up`) each
+pay epoch pays its own period, so every epoch before launch accrues its curve share
+and is paid on its own; nobody produced a block or served a consensus epoch in
+those epochs, so their producer and batch-operator slices stay in the treasury.
 
-### Work is paid in the period it was done
+### Work counts toward the open period
 
-A pay period's work is the blocks and duty recorded from the boundary of the
-epoch that paid the previous period up to the boundary of the epoch that pays
-it: [previous pay epoch's boundary, this pay epoch's boundary). Its pool accrues
-one epoch later, at the ticks after the previous payout through the paying one.
-Work recorded once the grid has passed a boundary whose tick has not run
-(`sysio.epoch::unopened_economic_epoch_at`) belongs to that later economic epoch,
-so `onblock` and `rcrdduty` park it in `parkedwork` under that epoch instead of
-counting it. The tick that opens the epoch pays its own period first, then
-`creditwork` credits the parked rows to the open period: blocks to
-`unpaid_blocks`, units as `rcrdduty` credits them. A crank that runs late, or
-catches up through many epochs, therefore pays every period exactly the work done
-in it, out of that period's own pools, as an on-time crank does; a period with no
-work leaves its pool in the treasury. Only state read at payout time can differ:
-a balance-held payout, and an operator's status or a producer's schedulability
-and standby position. Snapshot attestations are not parked: they count toward the
-pay period open when they are recorded, so during a catch-up those made in later
-periods count toward an earlier period's late payout and can shift producer rank.
+Blocks (`onblock`) and batch duty (`rcrdduty`) count toward the pay period open
+when they are recorded, and that period's payout pays them. A tick that runs late
+counts the work recorded between its boundary and the tick toward the period it
+pays, at that period's rate, and the next period's work starts that much later.
 
-Each `creditwork` credits at most `MAX_PARKED_WORK_ROWS` (100) rows, oldest
-epoch first, enough for a full producer schedule and the largest batch window
-working in one epoch. Rows past it are credited by the next tick's first
-`creditwork`, before its payout, so they still join their own period; only when
-more than twice that many accounts work in one economic epoch do the rest land a
-period late. Parking starts once `initt5` has run; work before then is counted as
-it happens.
+Once the clock has reached the grid, a pay epoch ticked while a later boundary has
+already passed defers its payout: the period stays open, and the tick that catches
+up to the grid pays every overdue period in one payout. That payout pairs all their
+pools, and all their block slots in the divisor, with every block and duty unit
+counted since the previous payout, at one rate. Producers are paid per block, so a
+slot nobody filled in any of those periods leaves its share in the treasury. The
+batch pools of all of them are split by the duty counted across them, so the pool of
+a period nobody served in goes to the operators who served in the others. A
+deferral is not a block and leaves the `blocklog` as it is. The batch operators keep
+the ticks current, and the economic clock is monitored.
 
 The curve decays from `annual_initial_emission` toward `annual_min_emission`
 (clamped by `annual_max_emission`), stops at `t5_floor`, and auto-throttles as
 `total_distributed` rises.
+
+### Emission follows elapsed time
+
+Each tick accrues the share of the economic epoch it closes, from the previous
+boundary to its own, sized and decayed over that epoch's length; the first tick
+closes one epoch of the configured duration. The decay base is the last positive
+share, rescaled from the length it accrued over (`last_epoch_duration_sec`) to the
+length of the epoch being accrued. A duration change spaces only the boundaries
+after the next one, so it moves neither the emission per second nor the producer
+pay per block slot: the epoch it finds open is accrued at its own length, and
+later epochs at the new one.
 
 ## Budget headroom
 
@@ -134,10 +133,11 @@ holding accounts with no code, so the notify-handler risk does not apply.
 Producer pay is per counted block. `onblock` counts the blocks a producer makes,
 at most one round per rotation of the schedule (a switch that hands a producer a
 second round in the same rotation does not count it). The active slice of the
-producer pool is divided by the period's nominal slot count (each economic epoch
-adds its duration's block slots as it accrues), raised to the blocks counted when
-carried blocks push the count past it, and each producer is paid for its counted
-blocks. Standbys
+producer pool is divided by the period's nominal slot count (each tick adds the
+block slots of the economic epoch it closes, from the previous boundary to its
+own, whatever duration is set when the tick runs), raised to the blocks counted
+when carried blocks, or blocks a late tick counts, push the count past it, and
+each producer is paid for its counted blocks. Standbys
 draw from a separate slice, at a rank-decreasing weight, and are not paid per
 block. Batch operators are paid from emission only, so `producer_bps` /
 `batch_op_bps` split the whole compute share.
@@ -146,7 +146,7 @@ block. Batch operators are paid from emission only, so `producer_bps` /
 
 Batch-op pay follows **duty units**. Each consensus epoch close credits one unit
 to every member of the group that served it (`rcrdduty`, a `batchduty` row per
-operator; parked first while its economic epoch is unopened). Each `payepoch` closes the open pay period and splits its batch pool
+operator). Each `payepoch` closes the open pay period and splits its batch pool
 pro rata to the period's units: an operator's share is
 `batch_pool * units / period_units`. Only opreg-ACTIVE batch operators are
 credited, at settlement time; the share of an operator slashed or terminated
@@ -376,11 +376,10 @@ period_emission
 | `addnodeowner` | `sysio.roa` | Register a node owner in a tier |
 | `claimnodedis` | node owner | Claim vested node-owner allocation (refused when it would spend pay reserved in `payclaimtot`) |
 | `claimpay` | the claiming account | Claim epoch pay credited by `payepoch` (producer / standby / batch-operator share) |
-| `accrueepoch` | `sysio.epoch` | Accrue this economic epoch's curve share |
-| `payepoch` | `sysio.epoch` | Distribute the period's compute / capex / governance (credits `payclaims`; pushes only the category buckets) and open its batch-duty settlement |
-| `rcrdduty` | `sysio.epoch` | Credit one duty unit to each member of the group that served a consensus epoch (parked while its economic epoch is unopened) |
+| `accrueepoch` | `sysio.epoch` | Accrue the curve share and the block slots of the economic epoch its tick closes (`closed_epoch_duration_sec`) |
+| `payepoch` | `sysio.epoch` | Distribute the period's compute / capex / governance (credits `payclaims`; pushes only the category buckets) and open its batch-duty settlement; waits while an earlier settlement is open |
+| `rcrdduty` | `sysio.epoch` | Credit one duty unit to each member of the group that served a consensus epoch, in the pay period open when it is recorded |
 | `settleduty` | `sysio.epoch` | One bounded step of the open batch-duty settlement |
-| `creditwork` | `sysio.epoch` | Credit the work parked under economic epochs up to `epoch_index` (at most `MAX_PARKED_WORK_ROWS` rows); sent before a tick's payout for the earlier epochs and after it for the epoch it opens |
 | `viewnodedist` | read-only | Preview a node owner's claimable amount |
 | `viewepoch` | read-only | Remaining budget / next-emission estimate |
 | `viewemitcfg` | read-only | Current emission config |
@@ -395,15 +394,14 @@ period_emission
 | `nodedist` | Table | Per-account node-owner vesting rows |
 | `payclaims` | Table | Per-account epoch pay credited by `payepoch` and not yet claimed |
 | `payclaimtot` | Singleton | Running total of outstanding `payclaims`, reserved by every gate that spends the treasury balance |
-| `t5state` | Singleton | Treasury state: pending emission, unsettled batch emission, total distributed, decay continuity |
+| `t5state` | Singleton | Treasury state: pending emission, unsettled batch emission, total distributed, decay continuity (the last positive share and the epoch length it accrued over) |
 | `batchduty` | Table | Per-operator unpaid duty units and the pay period they belong to; erased as they settle |
 | `dutystate` | Singleton | The open pay period's duty total and the settling period's pool, units and walk cursor |
-| `parkedwork` | Table | Blocks and duty units recorded in an economic epoch not yet opened, keyed by (epoch, account); credited and erased by `creditwork` |
 | `epochlog` | Table | Per-pay-epoch audit log (head-pruned to `epoch_log_retention_count`) |
 
 ## Dependencies
 
-- Driven inline by `sysio.epoch::tickeconomy` (`accrueepoch` + `payepoch` + `settleduty` + `creditwork`)
-  and `sysio.epoch::advance` (`rcrdduty`).
+- Driven inline by `sysio.epoch::tickeconomy` (`accrueepoch` + `payepoch` + `settleduty`) and
+  `sysio.epoch::advance` (`rcrdduty`).
 - Reads producer eligibility and operator status from `sysio.opreg`.
 - Reads the canonical economic epoch duration and start time from `sysio.epoch::economycfg`.

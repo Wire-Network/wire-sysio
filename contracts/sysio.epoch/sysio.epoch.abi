@@ -94,6 +94,10 @@
                 {
                     "name": "next_epoch_start",
                     "type": "time_point"
+                },
+                {
+                    "name": "caught_up",
+                    "type": "bool"
                 }
             ]
         },

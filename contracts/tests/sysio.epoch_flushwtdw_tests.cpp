@@ -14,6 +14,8 @@
 #include <fc/variant_object.hpp>
 #include <fc/slug_name.hpp>
 
+#include <optional>
+
 #include "contracts.hpp"
 #include "contract_test_support.hpp"
 
@@ -187,8 +189,9 @@ public:
    }
 
    /// One-shot bootstrap: epoch config + opreg config + a bootstrapped
-   /// batch op + a pending underwriter + sysio.chains rows.
-   void bootstrap_for_flushwtdw() {
+   /// batch op + a pending underwriter + sysio.chains rows. The economic grid starts now and its first epoch is
+   /// opened; given `economic_start`, the grid starts there and no economic epoch is opened.
+   void bootstrap_for_flushwtdw(std::optional<fc::time_point_sec> economic_start = std::nullopt) {
       // sysio.epoch config must come first — sysio.system::initt5 reads
       // epoch_duration_sec cross-contract via the canonical epochcfg
       // singleton, and asserts that the table exists.
@@ -200,7 +203,8 @@ public:
             ("batch_op_groups",                     1)
             ("epoch_retention_envelope_log_count",  200)));
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "seteconomy"_n, mvo()
-         ("epoch_duration_sec", EPOCH_DURATION_SEC)("start_time", fc::time_point_sec(control->head().block_time()))));
+         ("epoch_duration_sec", EPOCH_DURATION_SEC)
+         ("start_time", economic_start.value_or(fc::time_point_sec(control->head().block_time())))));
 
       // Emissions readiness gate prerequisites — without these tables the
       // gate at sysio.epoch::advance returns CONFIG_MISSING and every
@@ -257,7 +261,7 @@ public:
 
       // Open economic epoch 1, as a relay's first crank after the genesis advance does, so a request
       // made now finds the crank current.
-      tick_economy();
+      if (!economic_start) tick_economy();
    }
 
    /// Step the wall clock past both clocks' next boundary.
@@ -737,6 +741,44 @@ BOOST_FIXTURE_TEST_CASE(a_duration_decrease_cannot_bring_a_queued_withdrawal_for
    // The boundary that released it came a full (shortened) epoch after the first boundary past the request.
    BOOST_REQUIRE(economic_state()["current_epoch_start"].as<fc::time_point>() ==
                  scheduled + fc::seconds(EPOCH_DURATION_SEC));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(a_request_before_the_first_tick_keeps_its_wait_when_the_start_moves,
+                        sysio_epoch_flushwtdw_tester) { try {
+   // A request made before the economic clock's first tick waits for the grid's first two boundaries. Moving the start
+   // into the past would date boundaries before the request that catch-up ticks then count, so it is refused while the
+   // request is queued. A start still ahead may move, and the request still waits for two boundaries after it.
+   constexpr uint64_t INITIAL_DEPOSIT    = 1'000'000;
+   constexpr uint64_t WITHDRAW_AMOUNT    =   400'000;
+   constexpr uint32_t START_AHEAD_EPOCHS = 10;
+   const fc::microseconds start_offset = fc::seconds(START_AHEAD_EPOCHS * EPOCH_DURATION_SEC);
+   bootstrap_for_flushwtdw(fc::time_point_sec(control->head().block_time() + start_offset));
+   BOOST_REQUIRE_EQUAL(success(), fund_and_bond(UWRIT_OP, "WIRE", "WIRE", INITIAL_DEPOSIT));
+   const fc::time_point requested_at = control->pending_block_time();
+   BOOST_REQUIRE_EQUAL(success(), withdraw(UWRIT_OP, "WIRE", "WIRE", WITHDRAW_AMOUNT));
+   BOOST_REQUIRE_EQUAL(0u, get_wtdw(1)["requested_at_economic_epoch"].as<uint32_t>());
+   BOOST_REQUIRE_EQUAL(WITHDRAW_WAIT_ECONOMIC_EPOCHS, get_wtdw(1)["eligible_at_economic_epoch"].as<uint32_t>());
+
+   // Satisfy the consensus guard first, so only the economic wait holds the request.
+   for (int i = 0; i < 2; ++i) {
+      cross_epoch_boundary();
+      advance_consensus();
+   }
+
+   const fc::time_point_sec past{requested_at - start_offset};
+   BOOST_REQUIRE(seteconomy(EPOCH_DURATION_SEC, past)
+                    .find("economic start_time must be ahead while a collateral withdrawal is queued") !=
+                 std::string::npos);
+
+   const fc::time_point_sec later{control->head().block_time() + fc::seconds(EPOCH_DURATION_SEC)};
+   BOOST_REQUIRE_EQUAL(success(), seteconomy(EPOCH_DURATION_SEC, later));
+   while (control->head().block_time() < later.to_time_point()) produce_block();
+   tick_economy();
+   BOOST_REQUIRE(!get_wtdw(1).is_null());
+   cross_economic_boundary();
+   tick_economy();
+   BOOST_REQUIRE(get_wtdw(1).is_null());
+   BOOST_REQUIRE(economic_state()["current_epoch_start"].as<fc::time_point>() > requested_at);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

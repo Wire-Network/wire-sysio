@@ -118,7 +118,7 @@ Everything the two `sysio.epoch` clocks inline, directly:
 | `advance` | `sysio.msgch` | `queueout`, `buildenv` |
 | `advance` | `sysio` | `rcrdduty` |
 | `tickeconomy` (economic clock) | `sysio.opreg` | `flushwtdw` |
-| `tickeconomy` | `sysio` | `accrueepoch`, `payepoch`, `settleduty`, `creditwork` |
+| `tickeconomy` | `sysio` | `accrueepoch`, `payepoch`, `settleduty` |
 
 Those callees inline further (`slashop` → `sysio.opreg::slash`, `termcheck` → the
 `sysio.opreg` termination path that credits `remitclaims`, `payepoch` →
@@ -238,7 +238,7 @@ changes. For the edges on `advance`'s path today, and the one `sysio.bond::accep
 | Edge | Why |
 |---|---|
 | `sysio.opreg`, `sysio.chalg`, `sysio.msgch` before `sysio.epoch`, when the release adds or changes an action `advance` or `tickeconomy` inlines into them | Call edge: the new clock would otherwise reach a callee that cannot dispatch the action, and every advance or tick aborts. |
-| `sysio` (`sysio.system`) before `sysio.epoch`, when the release adds or changes `rcrdduty` / `accrueepoch` / `payepoch` / `settleduty` / `creditwork` | Call edge: the new clock would otherwise reach a `sysio.system` that cannot dispatch the action, and every advance or tick aborts. |
+| `sysio` (`sysio.system`) before `sysio.epoch`, when the release adds or changes `rcrdduty` / `accrueepoch` / `payepoch` / `settleduty` | Call edge: the new clock would otherwise reach a `sysio.system` that cannot dispatch the action, and every advance or tick aborts. |
 | `sysio.epoch` and `sysio.kicker` before `sysio.system`, when `sysio.system` gains state the emissions gate must reserve (as `payclaimtot` reserves unclaimed `payclaims`) | Table edge: the old gate counts the new backing as spendable, so a later pay period can double-commit it and leave credited claims underfunded; an old kicker counts it as available treasury and `kick` can draw it. |
 | `sysio.epoch` before `sysio.msgch`, when the release adds or changes an action `chkcons` inlines into `sysio.epoch` | Call edge in the other direction. |
 | `sysio` (`sysio.system`) before `sysio.bond` | Call edge: `accept` on a request from a `sysio.*` issuer sends `sysio::addsubjex`, and the dispatcher rejects an action the deployed contract does not define, so every such `accept` aborts. |
