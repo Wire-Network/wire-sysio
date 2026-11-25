@@ -126,10 +126,10 @@ namespace {
    // renamed to something else.
 
    namespace msgch {
-      constexpr auto account             = "sysio.msgch";
+      constexpr auto account             = batch_operator_detail::consensus::account;
       constexpr auto table_envelopes     = "envelopes";
       constexpr auto table_outenvelopes  = "outenvelopes";
-      constexpr auto table_outpcons      = "outpcons";
+      constexpr auto table_outpcons      = batch_operator_detail::consensus::table_outpcons;
       constexpr auto action_deliver      = "deliver";
       constexpr auto action_chkcons      = "chkcons";
       /// Field names on `envelope_entry` / `outbound_envelope` rows.
@@ -594,8 +594,8 @@ struct batch_operator_plugin::impl {
     *
     * A chain's genesis advance (epoch 0 -> 1) is not a batch operator's: `sysio.msgch::bootstrap` and `bootchain`
     * run it under msgch's own authority. From epoch 1 on the elected group TRIGGERS each advance with `chkcons`,
-    * which sends the inline `sysio.epoch::advance` (again under msgch's authority) once the chain's consensus and its
-    * time gate are met; an operator never authorizes an advance directly.
+    * which sends the inline `sysio.epoch::advance` (again under msgch's authority) once the chain's epoch is decided
+    * and the chain is due (`due_at`); an operator never authorizes an advance directly.
     */
    void poll_epoch_state() {
       if (shutting_down || !enabled) return;
@@ -612,10 +612,11 @@ struct batch_operator_plugin::impl {
       push_chkcons();
    }
 
-   /// Push `sysio.msgch::chkcons` for every relayed chain this operator is elected on whose epoch boundary has passed:
-   /// `chkcons` advances a chain only then, so an earlier push has no effect. The action is permissionless, but a push
-   /// from every batch operator would waste transaction slots, so only the elected group pushes it. A failed push is
-   /// logged and the next chain is still pushed.
+   /// Push `sysio.msgch::chkcons` for every relayed chain this operator is elected on whose decided epoch is due, or
+   /// whose undecided epoch is past its minimum end (`batch_operator_detail::pushes_chkcons`): `chkcons` advances the
+   /// first and re-tallies the second, and a decided epoch on an idle chain needs nothing. The action is
+   /// permissionless, but a push from every batch operator would waste transaction slots, so only the elected group
+   /// pushes it. A failed push is logged and the next chain is still pushed.
    void push_chkcons() {
       for (const uint64_t chain_code :
            batch_operator_detail::chkcons_chains(chain_epochs, relayed, fc::time_point::now())) {
@@ -1064,16 +1065,20 @@ struct batch_operator_plugin::impl {
       }
    }
 
-   /// Every chain's consensus epoch from all `epochstate` and `epochcfg` rows, or nullopt when either table could not
-   /// be read. A row that does not decode is logged and left out.
+   /// Every chain's consensus epoch from all `epochstate` and `epochcfg` rows, and whether its current epoch is decided
+   /// from all `sysio.msgch::outpcons` rows, or nullopt when any of the three tables could not be read. A row that does
+   /// not decode is logged and left out.
    std::optional<batch_operator_detail::chain_epochs> read_chain_epochs() {
       const std::optional<fc::variants> states =
          read_all_rows(epoch::account, epoch::account, epoch::table_epochstate);
       if (!states) return std::nullopt;
       const std::optional<fc::variants> configs = read_all_rows(epoch::account, epoch::account, epoch::table_epochcfg);
       if (!configs) return std::nullopt;
-      batch_operator_detail::decoded_chain_epochs decoded =
-         batch_operator_detail::decode_chain_epochs(*states, *configs, operator_account, epoch_poll);
+      const std::optional<fc::variants> consensus_rows =
+         read_all_rows(msgch::account, msgch::account, msgch::table_outpcons);
+      if (!consensus_rows) return std::nullopt;
+      batch_operator_detail::decoded_chain_epochs decoded = batch_operator_detail::decode_chain_epochs(
+         *states, *configs, *consensus_rows, operator_account, epoch_poll);
       for (const std::string& why : decoded.skipped) {
          wlog("batch_operator: chain epoch left out: {}", why);
       }

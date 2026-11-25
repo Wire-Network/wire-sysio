@@ -72,7 +72,8 @@ struct depot_ops {
 
    /**
     * True when the current wall-clock time is in the safe operating window of
-    * outpost `chain_code`'s current epoch (far enough from both edges, by that
+    * outpost `chain_code`'s current epoch (far enough from its start and from
+    * its minimum end, the start plus the chain's minimum duration, by that
     * chain's own edge buffer). The inbound and outbound jobs gate themselves on
     * this. False while the chain's epoch state has not been read.
     */
@@ -96,20 +97,19 @@ struct depot_ops {
    virtual uint32_t current_epoch(uint64_t chain_code) const = 0;
 
    /**
-    * True when wall-clock has advanced past the depot's `next_epoch_start` for
-    * outpost `chain_code`'s currently-cached epoch. Used by the outpost cranker
-    * to decide when a consensus-retry re-delivery is warranted on a stuck
-    * path-2 fallback case: once the WIRE depot's boundary has elapsed, the
-    * outpost-side boundary (same `epoch_duration_sec`) is also definitively
-    * past, so a re-delivery from an already-delivered operator can re-trigger
-    * the outpost's consensus evaluation and tip path-2 fallback. Without this
-    * gate the cranker would have to either re-deliver every tick (gas waste)
-    * or never re-deliver (chain stalls when initial deliveries fall short of
-    * unanimous). Mirrors the WIRE-side `sysio.msgch::chkcons` "time gate
-    * passed" check.
+    * True when wall-clock has advanced past the start of outpost `chain_code`'s
+    * currently-cached epoch plus the chain's minimum duration
+    * (`epoch_duration_sec`). Used by the outpost cranker to decide when a
+    * consensus-retry re-delivery is warranted on a stuck path-2 fallback case:
+    * the outpost opened its epoch after the depot did and times its path-2
+    * fallback from then with the same duration, so a re-delivery from an
+    * already-delivered operator can re-trigger the outpost's consensus
+    * evaluation and tip path-2 fallback. Without this gate the cranker would
+    * have to either re-deliver every tick (gas waste) or never re-deliver
+    * (chain stalls when initial deliveries fall short of unanimous).
     *
-    * Returns false when the chain's cache is empty (pre-bootstrap) or when the
-    * boundary has not yet elapsed for its current epoch.
+    * Returns false when the chain's cache is empty (pre-bootstrap) or when that
+    * time has not yet elapsed for its current epoch.
     */
    virtual bool is_epoch_boundary_past(uint64_t chain_code) const = 0;
 

@@ -159,7 +159,11 @@
                     "type": "time_point"
                 },
                 {
-                    "name": "next_epoch_start",
+                    "name": "traffic_since",
+                    "type": "time_point"
+                },
+                {
+                    "name": "due_at",
                     "type": "time_point"
                 },
                 {
@@ -200,6 +204,20 @@
             "fields": [
                 {
                     "name": "genesis_at",
+                    "type": "time_point"
+                }
+            ]
+        },
+        {
+            "name": "notetraffic",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "since",
                     "type": "time_point"
                 }
             ]
@@ -322,6 +340,11 @@
         {
             "name": "finishadv",
             "type": "finishadv",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "notetraffic",
+            "type": "notetraffic",
             "ricardian_contract": ""
         },
         {

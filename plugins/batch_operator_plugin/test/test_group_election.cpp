@@ -135,16 +135,25 @@ constexpr int64_t fast_start_sec = 1'800'000'400;
 constexpr int64_t slow_start_sec = 1'800'000'000;
 /// `--batch-epoch-poll-ms` at its default.
 constexpr fc::microseconds max_poll = fc::seconds(15);
+/// How long after the fast chain's epoch started its traffic began.
+constexpr int64_t fast_traffic_after_sec = 3;
 
 fc::time_point at_sec(int64_t unix_sec) { return fc::time_point(fc::seconds(unix_sec)); }
 
+/// A chain's pending traffic, as its `epochstate` carries it: zero while it has none.
+struct traffic {
+   fc::time_point since{};
+   fc::time_point due_at{};
+};
+
 /// An `epochstate` value as the chain renders it.
-fc::variant_object state_row(fc::slug_name chain, uint32_t epoch, int64_t start_sec, uint32_t duration_sec,
-                             uint8_t on_duty, bool paused = false) {
+fc::variant_object state_row(fc::slug_name chain, uint32_t epoch, int64_t start_sec, uint8_t on_duty,
+                             const traffic& pending = traffic(), bool paused = false) {
    return mvo()(epoch::field::chain_code, chain.value)
                (epoch::field::current_epoch_index, epoch)
                (epoch::field::current_epoch_start, at_sec(start_sec))
-               (epoch::field::next_epoch_start, at_sec(start_sec + duration_sec))
+               (epoch::field::traffic_since, pending.since)
+               (epoch::field::due_at, pending.due_at)
                (epoch::field::current_batch_op_group, on_duty)
                (epoch::field::batch_op_groups, sliding_window())
                (epoch::field::is_paused, paused);
@@ -155,13 +164,27 @@ fc::variant_object config_row(fc::slug_name chain, uint32_t duration_sec) {
    return mvo()(epoch::field::chain_code, chain.value)(epoch::field::epoch_duration_sec, duration_sec);
 }
 
-/// Both chains' rows: `self` sits in group 1, on duty on the fast chain only.
+/// A `sysio.msgch::outpcons` value as the chain renders it: `chain`'s accepted winner is for `epoch`.
+fc::variant_object consensus_row(fc::slug_name chain, uint32_t epoch) {
+   return mvo()(consensus::field::chain_code, chain.value)(consensus::field::epoch_index, epoch);
+}
+
+/// The fast chain's pending traffic: it began `fast_traffic_after_sec` into the epoch, so it is due one minimum later.
+traffic fast_traffic() {
+   const fc::time_point since = at_sec(fast_start_sec + fast_traffic_after_sec);
+   return {.since = since, .due_at = since + fc::seconds(fast_duration_sec)};
+}
+
+/// Both chains' rows: `self` sits in group 1, on duty on the fast chain only. The fast chain's epoch is decided and
+/// has traffic; the slow chain's is undecided, its row still holding the previous epoch's winner, and idle.
 decoded_chain_epochs decode_both() {
    return decode_chain_epochs(
-      fc::variants{fc::variant(state_row(fast_chain, fast_epoch, fast_start_sec, fast_duration_sec, self_group)),
-                   fc::variant(state_row(slow_chain, slow_epoch, slow_start_sec, slow_duration_sec, on_duty_group))},
+      fc::variants{fc::variant(state_row(fast_chain, fast_epoch, fast_start_sec, self_group, fast_traffic())),
+                   fc::variant(state_row(slow_chain, slow_epoch, slow_start_sec, on_duty_group))},
       fc::variants{fc::variant(config_row(fast_chain, fast_duration_sec)),
                    fc::variant(config_row(slow_chain, slow_duration_sec))},
+      fc::variants{fc::variant(consensus_row(fast_chain, fast_epoch)),
+                   fc::variant(consensus_row(slow_chain, slow_epoch - 1))},
       sysio::chain::name(self), max_poll);
 }
 
@@ -169,7 +192,8 @@ decoded_chain_epochs decode_both() {
 
 BOOST_AUTO_TEST_SUITE(batch_operator_chain_epoch_tests)
 
-/// Each chain's view carries its own epoch index, timing, duration and election, read from its own row.
+/// Each chain's view carries its own epoch index, timing, traffic, decision, duration and election, read from its own
+/// rows.
 BOOST_AUTO_TEST_CASE(each_chain_reads_its_own_epoch_and_election) try {
    const decoded_chain_epochs decoded = decode_both();
    BOOST_CHECK(decoded.skipped.empty());
@@ -179,7 +203,9 @@ BOOST_AUTO_TEST_CASE(each_chain_reads_its_own_epoch_and_election) try {
    BOOST_CHECK_EQUAL(fast.chain_code, fast_chain.value);
    BOOST_CHECK_EQUAL(fast.epoch_index, fast_epoch);
    BOOST_CHECK(fast.epoch_start == at_sec(fast_start_sec));
-   BOOST_CHECK(fast.next_epoch_start == at_sec(fast_start_sec + fast_duration_sec));
+   BOOST_CHECK(fast.traffic_since == fast_traffic().since);
+   BOOST_CHECK(fast.due_at == fast_traffic().due_at);
+   BOOST_CHECK(fast.decided);
    BOOST_CHECK_EQUAL(fast.epoch_duration.count(), fc::seconds(fast_duration_sec).count());
    BOOST_CHECK(fast.election.is_elected);
    BOOST_CHECK_EQUAL(static_cast<unsigned>(fast.election.my_group), static_cast<unsigned>(self_group));
@@ -187,7 +213,9 @@ BOOST_AUTO_TEST_CASE(each_chain_reads_its_own_epoch_and_election) try {
    const chain_epoch_view& slow = decoded.views.at(slow_chain.value);
    BOOST_CHECK_EQUAL(slow.epoch_index, slow_epoch);
    BOOST_CHECK(slow.epoch_start == at_sec(slow_start_sec));
-   BOOST_CHECK(slow.next_epoch_start == at_sec(slow_start_sec + slow_duration_sec));
+   BOOST_CHECK(slow.traffic_since == fc::time_point());
+   BOOST_CHECK(slow.due_at == fc::time_point());
+   BOOST_CHECK(!slow.decided);
    BOOST_CHECK_EQUAL(slow.epoch_duration.count(), fc::seconds(slow_duration_sec).count());
    BOOST_CHECK(!slow.election.is_elected);
    BOOST_CHECK_EQUAL(static_cast<unsigned>(slow.election.my_group), static_cast<unsigned>(self_group));
@@ -204,8 +232,9 @@ BOOST_AUTO_TEST_CASE(each_chain_reads_its_own_epoch_and_election) try {
 BOOST_AUTO_TEST_CASE(a_paused_chain_elects_nobody_but_keeps_the_seat) try {
    constexpr bool paused = true;
    const chain_epoch_view view =
-      decode_chain_epoch(state_row(fast_chain, fast_epoch, fast_start_sec, fast_duration_sec, self_group, paused),
-                         config_row(fast_chain, fast_duration_sec), sysio::chain::name(self), max_poll);
+      decode_chain_epoch(state_row(fast_chain, fast_epoch, fast_start_sec, self_group, fast_traffic(), paused),
+                         config_row(fast_chain, fast_duration_sec), decided_epochs{{fast_chain.value, fast_epoch}},
+                         sysio::chain::name(self), max_poll);
    BOOST_CHECK(view.is_paused);
    BOOST_CHECK(!view.election.is_elected);
    BOOST_CHECK_EQUAL(static_cast<unsigned>(view.election.my_group), static_cast<unsigned>(self_group));
@@ -217,13 +246,12 @@ BOOST_AUTO_TEST_CASE(a_paused_chain_elects_nobody_but_keeps_the_seat) try {
 BOOST_AUTO_TEST_CASE(a_chain_without_config_or_a_bad_row_is_left_out) try {
    const fc::variant_object broken = mvo()(epoch::field::chain_code, fast_chain.value);
    const decoded_chain_epochs decoded = decode_chain_epochs(
-      fc::variants{fc::variant(state_row(unconfigured_chain, fast_epoch, fast_start_sec, fast_duration_sec,
-                                         self_group)),
+      fc::variants{fc::variant(state_row(unconfigured_chain, fast_epoch, fast_start_sec, self_group)),
                    fc::variant(broken),
-                   fc::variant(state_row(slow_chain, slow_epoch, slow_start_sec, slow_duration_sec, self_group))},
+                   fc::variant(state_row(slow_chain, slow_epoch, slow_start_sec, self_group))},
       fc::variants{fc::variant(config_row(fast_chain, fast_duration_sec)),
                    fc::variant(config_row(slow_chain, slow_duration_sec))},
-      sysio::chain::name(self), max_poll);
+      fc::variants{}, sysio::chain::name(self), max_poll);
 
    BOOST_REQUIRE_EQUAL(decoded.views.size(), 1u);
    BOOST_CHECK(decoded.views.contains(slow_chain.value));
@@ -276,16 +304,42 @@ BOOST_AUTO_TEST_CASE(each_chain_takes_its_own_delivery_timeout) try {
    BOOST_CHECK_EQUAL(delivery_timeout_of({}, fast_chain.value).count(), max_delivery_timeout.count());
 } FC_LOG_AND_RETHROW();
 
-/// The safe window and the boundary are each chain's own: the same instant can be inside the fast chain's window
+/// A chain whose `outpcons` row does not decode reads as undecided, with the reason; a row for another epoch, or no
+/// row, leaves the epoch undecided too.
+BOOST_AUTO_TEST_CASE(a_bad_consensus_row_reads_as_undecided) try {
+   const fc::variant_object broken = mvo()(consensus::field::chain_code, fast_chain.value);
+   const decoded_chain_epochs decoded = decode_chain_epochs(
+      fc::variants{fc::variant(state_row(fast_chain, fast_epoch, fast_start_sec, self_group)),
+                   fc::variant(state_row(slow_chain, slow_epoch, slow_start_sec, self_group))},
+      fc::variants{fc::variant(config_row(fast_chain, fast_duration_sec)),
+                   fc::variant(config_row(slow_chain, slow_duration_sec))},
+      fc::variants{fc::variant(broken)}, sysio::chain::name(self), max_poll);
+
+   BOOST_REQUIRE_EQUAL(decoded.views.size(), 2u);
+   BOOST_CHECK(!decoded.views.at(fast_chain.value).decided);
+   BOOST_CHECK(!decoded.views.at(slow_chain.value).decided);
+   BOOST_REQUIRE_EQUAL(decoded.skipped.size(), 1u);
+   BOOST_CHECK(decoded.skipped[0].find("outpcons") != std::string::npos);
+
+   // Before its genesis advance a chain has no epoch to decide, whatever an `outpcons` row says.
+   const chain_epoch_view genesis =
+      decode_chain_epoch(state_row(fast_chain, 0, 0, self_group), config_row(fast_chain, fast_duration_sec),
+                         decided_epochs{{fast_chain.value, 0}}, sysio::chain::name(self), max_poll);
+   BOOST_CHECK(!genesis.decided);
+} FC_LOG_AND_RETHROW();
+
+/// The safe window and the minimum end are each chain's own: the same instant can be inside the fast chain's window
 /// and still inside the slow chain's start buffer.
 BOOST_AUTO_TEST_CASE(the_epoch_window_uses_the_chains_own_buffer) try {
    const decoded_chain_epochs decoded = decode_both();
    chain_epoch_view fast = decoded.views.at(fast_chain.value);
    chain_epoch_view slow = decoded.views.at(slow_chain.value);
-   // Line both epochs up on the same start so only their buffers differ.
-   slow.epoch_start      = fast.epoch_start;
-   slow.next_epoch_start = fast.epoch_start + slow.epoch_duration;
+   // Line both epochs up on the same start so only their buffers and minimums differ.
+   slow.epoch_start = fast.epoch_start;
    const fc::time_point start = fast.epoch_start;
+   const fc::time_point fast_minimum_end = start + fast.epoch_duration;
+   BOOST_CHECK(minimum_epoch_end(fast) == fast_minimum_end);
+   BOOST_CHECK(minimum_epoch_end(slow) == start + slow.epoch_duration);
 
    const fc::time_point inside_fast_buffer = start + fc::milliseconds(400);
    const fc::time_point past_fast_buffer   = start + fc::milliseconds(600);
@@ -294,22 +348,36 @@ BOOST_AUTO_TEST_CASE(the_epoch_window_uses_the_chains_own_buffer) try {
    BOOST_CHECK(!within_epoch_window(slow, past_fast_buffer));
    BOOST_CHECK(within_epoch_window(slow, start + fc::seconds(3)));
 
-   // The buffer before the fast chain's next epoch, then the overdue epoch.
-   BOOST_CHECK(!within_epoch_window(fast, fast.next_epoch_start - fc::milliseconds(400)));
-   BOOST_CHECK(!is_epoch_boundary_past(fast, fast.next_epoch_start - fc::milliseconds(1)));
-   BOOST_CHECK(within_epoch_window(fast, fast.next_epoch_start));
-   BOOST_CHECK(is_epoch_boundary_past(fast, fast.next_epoch_start));
-   BOOST_CHECK(!is_epoch_boundary_past(slow, fast.next_epoch_start));
+   // The buffer before the fast chain's minimum end, then the epoch past it, which stays open however long it runs.
+   BOOST_CHECK(!within_epoch_window(fast, fast_minimum_end - fc::milliseconds(400)));
+   BOOST_CHECK(!is_epoch_boundary_past(fast, fast_minimum_end - fc::milliseconds(1)));
+   BOOST_CHECK(within_epoch_window(fast, fast_minimum_end));
+   BOOST_CHECK(is_epoch_boundary_past(fast, fast_minimum_end));
+   BOOST_CHECK(within_epoch_window(fast, fast_minimum_end + fc::days(1)));
+   BOOST_CHECK(!is_epoch_boundary_past(slow, fast_minimum_end));
 
-   // A chain without a next epoch start has no boundary to pass.
+   // Before its genesis advance a chain has no minimum end to pass.
    chain_epoch_view genesis = fast;
-   genesis.next_epoch_start = fc::time_point();
+   genesis.epoch_index = 0;
+   BOOST_CHECK(minimum_epoch_end(genesis) == fc::time_point());
    BOOST_CHECK(!is_epoch_boundary_past(genesis, past_fast_buffer));
    BOOST_CHECK(within_epoch_window(genesis, past_fast_buffer));
 } FC_LOG_AND_RETHROW();
 
-/// `chkcons` goes to each relayed chain the operator is elected on, and only once that chain's boundary has passed.
-BOOST_AUTO_TEST_CASE(chkcons_goes_only_to_relayed_elected_chains_past_their_boundary) try {
+/// A chain is due once its `due_at` has passed, and never while it is idle.
+BOOST_AUTO_TEST_CASE(a_chain_is_due_only_with_traffic) try {
+   const chain_epochs views = decode_both().views;
+   const chain_epoch_view& fast = views.at(fast_chain.value);
+   BOOST_CHECK(!is_advance_due(fast, fast.due_at - fc::milliseconds(1)));
+   BOOST_CHECK(is_advance_due(fast, fast.due_at));
+   const chain_epoch_view& idle = views.at(slow_chain.value);
+   BOOST_CHECK(!is_advance_due(idle, idle.epoch_start + fc::days(30)));
+} FC_LOG_AND_RETHROW();
+
+/// `chkcons` goes to each relayed chain the operator is elected on: a decided epoch once its chain is due, which
+/// advances it, and an undecided one past its minimum end, which re-tallies it. A decided epoch on an idle chain, a
+/// chain before its genesis, and a chain the operator is not elected on get none.
+BOOST_AUTO_TEST_CASE(chkcons_goes_to_due_or_undecided_relayed_elected_chains) try {
    chain_epochs views = decode_both().views;
    // Elected on a chain it does not relay.
    chain_epoch_view unrelayed = views.at(fast_chain.value);
@@ -317,15 +385,34 @@ BOOST_AUTO_TEST_CASE(chkcons_goes_only_to_relayed_elected_chains_past_their_boun
    views.emplace(unconfigured_chain.value, unrelayed);
 
    const std::set<uint64_t> relayed{fast_chain.value, slow_chain.value};
-   const fc::time_point     boundary = views.at(fast_chain.value).next_epoch_start;
-   BOOST_CHECK(chkcons_chains(views, relayed, boundary) == std::vector<uint64_t>{fast_chain.value});
-   BOOST_CHECK(chkcons_chains(views, relayed, boundary - fc::milliseconds(1)).empty());
-   BOOST_CHECK(chkcons_chains(views, {slow_chain.value}, boundary).empty());
-   BOOST_CHECK(chkcons_chains({}, relayed, boundary).empty());
+   chain_epoch_view& fast = views.at(fast_chain.value);
+   const fc::time_point due = fast.due_at;
+   const fc::time_point minimum_end = minimum_epoch_end(fast);
+   BOOST_REQUIRE(due > minimum_end);
 
-   // A chain without a next epoch start has no boundary to pass.
-   views.at(fast_chain.value).next_epoch_start = fc::time_point();
-   BOOST_CHECK(chkcons_chains(views, relayed, boundary).empty());
+   // Decided: pushed once due, not at the minimum end before it.
+   BOOST_CHECK(chkcons_chains(views, relayed, due) == std::vector<uint64_t>{fast_chain.value});
+   BOOST_CHECK(chkcons_chains(views, relayed, due - fc::milliseconds(1)).empty());
+   BOOST_CHECK(chkcons_chains(views, relayed, minimum_end).empty());
+   BOOST_CHECK(chkcons_chains(views, {slow_chain.value}, due).empty());
+   BOOST_CHECK(chkcons_chains({}, relayed, due).empty());
+
+   // Decided and idle: never pushed.
+   fast.traffic_since = fc::time_point();
+   fast.due_at        = fc::time_point();
+   BOOST_CHECK(chkcons_chains(views, relayed, minimum_end + fc::days(1)).empty());
+
+   // Undecided: pushed from the minimum end on, with or without traffic, to re-tally.
+   fast.decided = false;
+   BOOST_CHECK(chkcons_chains(views, relayed, minimum_end - fc::milliseconds(1)).empty());
+   BOOST_CHECK(chkcons_chains(views, relayed, minimum_end) == std::vector<uint64_t>{fast_chain.value});
+
+   // Not elected, or before its genesis advance: never pushed.
+   fast.election.is_elected = false;
+   BOOST_CHECK(chkcons_chains(views, relayed, minimum_end + fc::days(1)).empty());
+   fast.election.is_elected = true;
+   fast.epoch_index         = 0;
+   BOOST_CHECK(chkcons_chains(views, relayed, minimum_end + fc::days(1)).empty());
 } FC_LOG_AND_RETHROW();
 
 /// The epoch tick reads at the shortest relayed chain's cadence, and at the poll option without one; a job polls its

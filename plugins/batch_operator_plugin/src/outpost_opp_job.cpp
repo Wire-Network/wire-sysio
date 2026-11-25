@@ -73,8 +73,9 @@ void outpost_opp_job::run_outbound() {
       return;
    }
    const bool retry_pending = epoch == _last_outbound_epoch;
-   // A recorded delivery cannot tip consensus again before the boundary. After
-   // it elapses, the cron tick rate-limits retries until the round trip finishes.
+   // A recorded delivery cannot tip consensus again before the epoch's minimum
+   // end (its start plus the chain's minimum duration). After it elapses, the
+   // cron tick rate-limits retries until the round trip finishes.
    if (retry_pending && !_depot.is_epoch_boundary_past(chain_code))
       return;
 

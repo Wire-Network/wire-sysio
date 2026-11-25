@@ -165,8 +165,10 @@ namespace sysio {
       /// Permissionless crank for outpost `chain_code`'s current epoch, held while a dispute is open
       /// on it. An undecided epoch is re-tallied (`evalcons` inline, at any time), since its eligible
       /// group can shrink with no new delivery and its idle dispute fallback can pass. A decided epoch
-      /// advances once its next_epoch_start has passed. No effect before the chain's genesis advance,
-      /// which only `bootstrap` / `bootchain` run.
+      /// advances once the chain is due (`sysio.epoch` `advance_due`: it has traffic and its minimum
+      /// duration has passed since the later of its epoch start and that traffic); an idle chain stays in
+      /// its decided epoch. No effect before the chain's genesis advance, which only `bootstrap` /
+      /// `bootchain` run.
       [[sysio::action]]
       void chkcons(uint64_t chain_code);
 
@@ -183,7 +185,8 @@ namespace sysio {
       /// Writes to the attestations table with status READY. Rejects `data` larger than
       /// MAX_ATTESTATION_DATA_BYTES (MAX_GENERAL_ATTESTATION_DATA_BYTES for a general-lane row), so every
       /// READY row ships, and a general-lane row once the outpost already holds MAX_QUEUED_ATTESTATIONS
-      /// of them.
+      /// of them. A general-lane row that finds the outpost's queue empty notifies sysio.epoch, which records
+      /// the chain's traffic at now (`sysio.epoch::onqueueout`).
       ///
       /// `chain_code` is the destination outpost's chain slug_name value
       /// (uint64). Called by sibling system contracts that need to send
@@ -215,7 +218,9 @@ namespace sysio {
       /// receiving outpost can reject an envelope a misconfigured relay
       /// delivered to the wrong same-kind chain.
       /// When the envelope carries DESYNDICATE_LIQ attestations, sends one inline
-      /// `sysio.synd::retsent` with the envelope's epoch and their request ids.
+      /// `sysio.synd::retsent` with the envelope's epoch and their request ids. When general-lane rows
+      /// stay READY after the build, records traffic for the chain since the oldest of them became ready
+      /// (`sysio.epoch::notetraffic`).
       [[sysio::action]]
       void buildenv(uint64_t chain_code);
 
@@ -439,6 +444,20 @@ namespace sysio {
          if (consensus->epoch_index == epoch_index) return consensus->winning_checksum;
          if (consensus->previous_epoch_index == epoch_index) return consensus->previous_winning_checksum;
          return std::nullopt;
+      }
+
+      /// When the oldest general-lane READY attestation queued for outpost `chain_code` on `msgch_account` became
+      /// ready (its `ready_timestamp`), or nullopt while none is queued. Never throws.
+      static std::optional<time_point> oldest_ready_general(name msgch_account, uint64_t chain_code) {
+         attestations_t atts(msgch_account);
+         auto           by_queue = atts.get_index<"byqueue"_n>();
+         const auto     row      = by_queue.lower_bound(
+            queue_key(chain_code, opp::types::AttestationStatus::ATTESTATION_STATUS_READY, queue_lane::general));
+         if (row == by_queue.end() || row->chain_code != chain_code ||
+             row->status != opp::types::AttestationStatus::ATTESTATION_STATUS_READY ||
+             lane_of(row->type) != queue_lane::general)
+            return std::nullopt;
+         return time_point{seconds(static_cast<int64_t>(row->ready_timestamp))};
       }
 
       /// Per-outpost outbound queue primary key.

@@ -27,9 +27,14 @@ Inbound/outbound OPP message chain management and consensus tracking contract.
   attestations, and routes each attestation to its depot handler
 - Queues outbound attestations and packs them into one OPP envelope per outpost per epoch, schedule
   attestations first; whatever does not fit under the envelope caps stays queued for the next epoch
+- Records each outpost chain's traffic on `sysio.epoch`: the first general-lane attestation queued to an
+  empty queue (notifying `sysio.epoch`, which records it at now), and general-lane rows an envelope leaves
+  behind (`sysio.epoch::notetraffic` since the oldest of them became ready). A chain with no traffic is
+  idle and never advances
 - Drives each outpost chain's epoch: `chkcons(chain)` re-tallies an undecided current epoch, whose
   eligible group can shrink with no new delivery, and advances that chain's `sysio.epoch` epoch once the
-  outpost has reached consensus and the chain's wall-clock boundary has passed
+  outpost has reached consensus and the chain is due (`sysio.epoch` `due_at`: its minimum duration has
+  passed since the later of its epoch start and its traffic)
 
 ## Tables
 
@@ -52,10 +57,10 @@ Inbound/outbound OPP message chain management and consensus tracking contract.
 | `bootchain` | `sysio.msgch` | After the network genesis: runs the genesis `sysio.epoch::advance` of one active outpost chain activated later, whose schedule window must be seated |
 | `deliver` | batch operator (`ACTIVE` in `sysio.opreg` and a member of the chain that is not `EVICTED`; the chain's resident active group, or for a late delivery the group that served its previous epoch) | Deliver an inbound envelope for an outpost's current epoch, from its epoch 1; once the epoch has reached consensus, only the accepted envelope's bytes. Calls `evalcons` inline. A late delivery, for the previous epoch, must be that epoch's accepted envelope; it is recorded without `evalcons`. Any older epoch is refused |
 | `evalcons` | `sysio.msgch` | Evaluate consensus for a started chain's current epoch; on the first strict majority of the eligible group store and dispatch the attestations and slash every operator whose delivery differs from the winner; with at least two versions delivered and fewer than a majority silent, open a `sysio.chalg` dispute once no version can still reach a majority, or once no eligible delivery has arrived for `DISPUTE_FALLBACK_EPOCHS` (3) of the chain's configured durations (timed from the later of the epoch's start and its newest eligible delivery). No effect for another epoch, or once the epoch has reached consensus or has a dispute |
-| `chkcons` | permissionless | For one active outpost chain past its genesis, unless a dispute is open on its current epoch: re-tally an undecided current epoch (`evalcons` inline, at any time); call `sysio.epoch::advance` for a decided one whose boundary has passed |
+| `chkcons` | permissionless | For one active outpost chain past its genesis, unless a dispute is open on its current epoch: re-tally an undecided current epoch (`evalcons` inline, at any time); call `sysio.epoch::advance` for a decided one once the chain is due. A decided epoch on an idle chain stays current |
 | `resolvedisp` | `sysio.chalg` | Dispatch the winning envelope of a resolved dispute and slash every operator whose delivery for the epoch differs from it |
-| `queueout` | `sysio.epoch`, `sysio.opreg`, `sysio.synd`, or `sysio.msgch` | Queue an outbound attestation for an outpost. Rejects `data` larger than `MAX_ATTESTATION_DATA_BYTES`, or `MAX_GENERAL_ATTESTATION_DATA_BYTES` (7,656) for a general-lane row, which must fit beside a full schedule lane, so every queued row ships. Also rejects a general-lane row once the outpost already holds `MAX_QUEUED_ATTESTATIONS` (512) of them |
-| `buildenv` | `sysio.epoch` | Pack the outpost's `READY` attestations into its outbound envelope for the epoch: the schedule lane (`OPERATORS`, `BATCH_OPERATOR_GROUPS`) first, then the general lane in `queueout` order, up to `MAX_ENVELOPE_BYTES` and `MAX_ENVELOPE_ATTESTATIONS` (64). It reads only that outpost's rows |
+| `queueout` | `sysio.epoch`, `sysio.opreg`, `sysio.synd`, or `sysio.msgch` | Queue an outbound attestation for an outpost. Rejects `data` larger than `MAX_ATTESTATION_DATA_BYTES`, or `MAX_GENERAL_ATTESTATION_DATA_BYTES` (7,656) for a general-lane row, which must fit beside a full schedule lane, so every queued row ships. Also rejects a general-lane row once the outpost already holds `MAX_QUEUED_ATTESTATIONS` (512) of them. A general-lane row that finds the outpost's queue empty notifies `sysio.epoch`, which records the chain's traffic at now |
+| `buildenv` | `sysio.epoch` | Pack the outpost's `READY` attestations into its outbound envelope for the epoch: the schedule lane (`OPERATORS`, `BATCH_OPERATOR_GROUPS`) first, then the general lane in `queueout` order, up to `MAX_ENVELOPE_BYTES` and `MAX_ENVELOPE_ATTESTATIONS` (64). It reads only that outpost's rows. General-lane rows left behind record the chain's traffic since the oldest of them became ready (`sysio.epoch::notetraffic`) |
 
 ## Attestation routing
 
@@ -84,5 +89,6 @@ Outbound (depot → outpost), queued through `queueout`:
 - Opens disputes on `sysio.chalg` (`opendispute`); `sysio.chalg::chkdispute` calls back into `resolvedisp`
 - Slashes non-canonical deliverers through `sysio.chalg::slashop`, under `sysio.msgch@active`, as it sends
   `opendispute`
-- Triggers `sysio.epoch::advance` from `chkcons` (and from `bootstrap` / `bootchain` at a chain's genesis)
+- Triggers `sysio.epoch::advance` from `chkcons` (and from `bootstrap` / `bootchain` at a chain's genesis),
+  and records chain traffic on `sysio.epoch` (`notetraffic` from `buildenv`; a `queueout` notification)
 - Routes inbound attestations to `sysio.synd` and `sysio.roa`; node-owner linking can indirectly sweep funded DClaim imports

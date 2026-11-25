@@ -46,7 +46,8 @@ constexpr auto     ROA_ACCOUNT     = "sysio.roa"_n;
 
 /// Action identifiers owned by sysio.epoch and sent by msgch.
 namespace epoch_actions {
-constexpr name ADVANCE = "advance"_n;
+constexpr name ADVANCE      = "advance"_n;
+constexpr name NOTE_TRAFFIC = "notetraffic"_n;
 } // namespace epoch_actions
 
 /// Action identifiers owned by sysio.chalg and sent by msgch.
@@ -1006,6 +1007,17 @@ void send_advance(name self, uint64_t chain_code) {
    ).send();
 }
 
+/// Send `sysio.epoch::notetraffic` for outpost `chain_code` under msgch's own authority: traffic for the outpost
+/// began at `since`.
+void send_note_traffic(name self, uint64_t chain_code, time_point since) {
+   action(
+      permission_level{self, "active"_n},
+      EPOCH_ACCOUNT,
+      epoch_actions::NOTE_TRAFFIC,
+      std::make_tuple(sysio::slug_name{chain_code}, since)
+   ).send();
+}
+
 /// True once outpost `chain_code`'s current epoch has been idle for `msgch::DISPUTE_FALLBACK_EPOCHS` of the
 /// chain's configured durations: since the later of its `current_epoch_start` and `last_delivery_at`, the
 /// newest delivery from a currently eligible member. False while the chain has no epoch state or config.
@@ -1417,7 +1429,7 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
 }
 
 // ---------------------------------------------------------------------------
-//  chkcons — re-tally one outpost's undecided epoch, or advance a decided one past its boundary
+//  chkcons — re-tally one outpost's undecided epoch, or advance a decided one once it is due
 // ---------------------------------------------------------------------------
 void msgch::chkcons(uint64_t chain_code) {
    check(sysio::chains::outpost_kind_of(CHAINS_ACCOUNT, sysio::slug_name{chain_code}).has_value(),
@@ -1437,7 +1449,7 @@ void msgch::chkcons(uint64_t chain_code) {
 
    // Readiness is the durable `epoch_index == current epoch` signal that apply_consensus writes on
    // dispatch. We intentionally do NOT also gate on `consensus_reached`: advance() can return without
-   // bumping the epoch (its wall-clock check returns gracefully), and that
+   // bumping the epoch (its due check returns gracefully), and that
    // commit is not rolled back, so a pre-emptive reset of consensus_reached would strand the epoch
    // with nothing to re-arm it -- apply_consensus does not re-fire once the delivery set is complete.
    // A stale row from a prior epoch fails this check; a fresh dispatch for the new epoch overwrites it.
@@ -1457,11 +1469,12 @@ void msgch::chkcons(uint64_t chain_code) {
       return;
    }
 
-   // A decided epoch advances once the chain's boundary has passed.
-   if (current_time_point() < state->next_epoch_start) return;
+   // A decided epoch advances once the chain is due: it has traffic and its minimum duration has passed since the
+   // later of its epoch start and that traffic. An idle chain stays in its decided epoch.
+   if (!epoch::advance_due(*state, current_time_point())) return;
 
    // All conditions met. Trigger advance. Per-outpost consensus is intentionally NOT reset here:
-   // advance() can legally return without advancing (its wall-clock check), and that graceful return does
+   // advance() can legally return without advancing (its due check), and that graceful return does
    // not roll back a reset done beforehand, which would permanently strand the epoch. Stale consensus is
    // invalidated instead by the `epoch_index == epoch` check above once advance() actually bumps the
    // epoch, and the next epoch's dispatch overwrites the row.
@@ -1566,6 +1579,11 @@ void msgch::queueout(uint64_t chain_code,
       outqueue_t queues(get_self());
       auto       queue = outbound_queue_of(queues, chain_code);
       check(queue.queued < MAX_QUEUED_ATTESTATIONS, "sysio.msgch::queueout: outbound queue is full for this outpost");
+      // The first general-lane row of an empty queue is the outpost's traffic: sysio.epoch records it at now
+      // (`epoch::onqueueout`), so the chain is due one minimum later. A notification rather than an inline action,
+      // so a queueout at the deepest inline level still succeeds. A queue that was already non-empty has its
+      // traffic recorded.
+      if (queue.queued == 0) require_recipient(EPOCH_ACCOUNT);
       ++queue.queued;
       queues.set(ram_payer, outbound_queue_key{chain_code}, queue);
    }
@@ -1811,6 +1829,11 @@ void msgch::buildenv(uint64_t chain_code) {
       // Saturating: the count only bounds `queueout`, and a short one must not abort `advance`.
       queue.queued -= std::min(queue.queued, general_shipped);
       queues.set(ram_payer, outbound_queue_key{chain_code}, queue);
+   }
+   // General-lane rows left behind are traffic since the oldest of them became ready: the advance that ran this
+   // build cleared the chain's traffic, so the chain is due one minimum after its new epoch starts.
+   if (const std::optional<time_point> oldest_ready = oldest_ready_general(get_self(), chain_code)) {
+      send_note_traffic(get_self(), chain_code, *oldest_ready);
    }
    // sysio.synd records this envelope's epoch on each shipped desyndication's `returns` row. A row can wait
    // in the queue past several envelopes, so only this build knows which envelope carried it.

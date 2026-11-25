@@ -5,8 +5,8 @@ Cranks Depot and Outpost contracts, ferrying OPP message chains between the WIRE
 ## Overview
 
 Every batch operator runs this plugin. Each outpost chain runs its own consensus epoch:
-`sysio.epoch` keeps, per chain, an epoch counter, a duration (`epochcfg`, default 6
-minutes) and a sliding window of `batch_op_groups` groups of `operators_per_epoch`
+`sysio.epoch` keeps, per chain, an epoch counter, a minimum duration between two envelopes
+(`epochcfg`, default 6 minutes) and a sliding window of `batch_op_groups` groups of `operators_per_epoch`
 operators (default 3 groups of 7) drawn from the operators serving that chain. The group
 at the front of a chain's window is elected for that chain's current epoch and its
 members execute the epoch cycle on that chain. Each poll the plugin also reads its own
@@ -56,9 +56,12 @@ Run by every member of a chain's elected group, on that chain, for the chain's o
 ## Depot cranks
 
 The plugin also pushes the depot actions nothing on chain schedules.
-`sysio.msgch::chkcons(chain_code)` — which advances one chain's epoch once that chain
-has consensus and its boundary has passed — comes from the epoch tick, only for each
-relayed chain the operator is elected on, once that chain's boundary has passed. The
+`sysio.msgch::chkcons(chain_code)` — which re-tallies a chain's undecided epoch, and
+advances a decided one once the chain is due (`sysio.epoch` `due_at`: it has traffic and its
+minimum has passed) — comes from the epoch tick, only for each relayed chain the operator is
+elected on: for a decided epoch once `due_at` has passed (`sysio.msgch::outpcons` records the
+epoch), and for an undecided one once its minimum end has passed. An idle decided chain gets
+none. The
 rest come every `--batch-epoch-poll-ms` from their own cron job, from every ACTIVE
 operator, because the elected one may be the operator that is offline, and each is a
 cheap no-op once its work is done:
@@ -144,7 +147,8 @@ Each chain is paced by its own epoch duration:
 | Delivery timeout | 1/2 of the epoch, from 5 s to 60 s | 60 s | 5 s |
 
 A chain's inbound and outbound jobs run at its own poll interval, and hold deliveries
-back within its edge buffer of either edge of its epoch (until the epoch is overdue).
+back within its edge buffer of its epoch's start and of its minimum end, the start plus the
+chain's minimum duration (open past that end however long the epoch runs).
 The delivery timeout bounds each call to the chain's outpost (an outbound delivery, every
 transaction and confirmation wait included; an inbound read; the outpost crank) and each
 depot push for the chain (`sysio.msgch::deliver`, `chkcons`); an outbound delivery cut short

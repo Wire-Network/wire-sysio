@@ -111,6 +111,40 @@ public:
       return push_epoch_action(signer, "advance"_n, mvo()("chain_code", chain));
    }
 
+   /// Record traffic on `chain` that began at `since`, as sysio.msgch does.
+   action_result notetraffic(std::string_view chain, time_point since, name signer = MSGCH_ACCOUNT) {
+      return push_epoch_action(signer, "notetraffic"_n, mvo()("chain_code", chain)("since", since));
+   }
+
+   /// Record traffic on `chain` since its epoch start (`epoch_state::mark_traffic`): it is then due one minimum
+   /// after that start.
+   void mark_traffic(std::string_view chain = ETH) {
+      sysio_system::test_support::epoch_state::mark_traffic(*this, abi_ser, chain);
+   }
+
+   /// Land the pending transactions, then produce blocks so the pending block, where the next push lands, opens at
+   /// `target`, a later multiple of the block interval.
+   void open_block_at(time_point target) {
+      produce_blocks();
+      const fc::microseconds block_interval = fc::milliseconds(config::block_interval_ms);
+      if (control->pending_block_time() != target) {
+         const fc::microseconds skip = target - block_interval - control->head().block_time();
+         BOOST_REQUIRE_GE(skip.count(), block_interval.count());
+         produce_block(skip);
+      }
+      BOOST_REQUIRE(control->pending_block_time() == target);
+   }
+
+   /// `chain`'s epochstate time point `field`.
+   time_point state_time(std::string_view chain, const char* field) {
+      return get_epoch_state(chain)[field].as<time_point>();
+   }
+
+   /// `chain`'s current epoch index.
+   uint32_t epoch_index(std::string_view chain = ETH) {
+      return get_epoch_state(chain)["current_epoch_index"].as<uint32_t>();
+   }
+
    /// The placeholder members `seat_window` seats, one per group. The fixture deploys no sysio.opreg, so
    /// none of them delivers.
    static constexpr std::array WINDOW_MEMBERS{"operator1"_n, "operator2"_n, "operator3"_n, "operator4"_n};
@@ -204,11 +238,11 @@ public:
          fixture_abi_yield_function() );
    }
 
-   /// Length of `chain`'s current epoch, in seconds.
+   /// Seconds from `chain`'s epoch start to its `due_at` once traffic since that start is recorded: its minimum.
    int64_t epoch_length_sec(std::string_view chain) {
+      mark_traffic(chain);
       const auto state = get_epoch_state(chain);
-      return (state["next_epoch_start"].as<time_point>() - state["current_epoch_start"].as<time_point>())
-         .to_seconds();
+      return (state["due_at"].as<time_point>() - state["current_epoch_start"].as<time_point>()).to_seconds();
    }
 
    /// Read a chain row from sysio.chains by code (slug_name PK).
@@ -530,8 +564,8 @@ BOOST_FIXTURE_TEST_CASE(setconfig_bounds_the_epoch_duration_per_chain, sysio_epo
    BOOST_REQUIRE_EQUAL(int64_t{kFloorSec}, epoch_length_sec(ETH));
 } FC_LOG_AND_RETHROW() }
 
-/// Two chains run their own counters on their own durations: a chain advances on its own boundary,
-/// and a paused chain holds only itself.
+/// Two chains run their own counters on their own minimum durations: a chain advances once it is due,
+/// and a paused chain holds only itself, recording traffic while it is paused.
 BOOST_FIXTURE_TEST_CASE(chains_advance_on_their_own_cadence, sysio_epoch_tester) { try {
    constexpr uint32_t kEthDurationSec = 60;
    constexpr uint32_t kSolDurationSec = 120;
@@ -548,10 +582,11 @@ BOOST_FIXTURE_TEST_CASE(chains_advance_on_their_own_cadence, sysio_epoch_tester)
    produce_blocks();
    BOOST_REQUIRE_EQUAL(1u, index(ETH));
    BOOST_REQUIRE_EQUAL(1u, index(SOL));
+   // Both now have traffic since their epoch start.
    BOOST_REQUIRE_EQUAL(kEthDurationSec, epoch_length_sec(ETH));
    BOOST_REQUIRE_EQUAL(kSolDurationSec, epoch_length_sec(SOL));
 
-   // Only ETH's boundary has passed: SOL's advance is a no-op.
+   // Only ETH is due: SOL's advance is a no-op.
    produce_blocks(kEthDurationSec * kBlocksPerSecond + 1);
    BOOST_REQUIRE_EQUAL(success(), advance(ETH));
    BOOST_REQUIRE_EQUAL(success(), advance(SOL));
@@ -559,8 +594,9 @@ BOOST_FIXTURE_TEST_CASE(chains_advance_on_their_own_cadence, sysio_epoch_tester)
    BOOST_REQUIRE_EQUAL(2u, index(ETH));
    BOOST_REQUIRE_EQUAL(1u, index(SOL));
 
-   // A paused SOL holds only itself.
+   // A paused SOL holds only itself, though it is due.
    BOOST_REQUIRE_EQUAL(success(), pause(SOL));
+   mark_traffic(ETH);
    produce_blocks(kEthDurationSec * kBlocksPerSecond + 1);
    BOOST_REQUIRE_EQUAL(success(), advance(ETH));
    BOOST_REQUIRE_EQUAL(error("assertion failure with message: epoch advancement is paused"), advance(SOL));
@@ -618,6 +654,7 @@ BOOST_FIXTURE_TEST_CASE(advance_requires_msgch_or_epoch_authority, sysio_epoch_t
    BOOST_REQUIRE_EQUAL(1u, get_epoch_state(ETH)["current_epoch_index"].as<uint32_t>());
 
    constexpr uint32_t kBlocksPerSecond = 2;
+   mark_traffic(ETH);
    produce_blocks(60 * kBlocksPerSecond + 1);
    BOOST_REQUIRE_EQUAL(unauthorized_advance, advance(ETH, "operator1"_n));
    BOOST_REQUIRE_EQUAL(success(), advance(ETH, MSGCH_ACCOUNT));
@@ -640,6 +677,203 @@ BOOST_FIXTURE_TEST_CASE(genesis_advance_requires_an_active_outpost_with_a_window
    produce_blocks();
    BOOST_REQUIRE_EQUAL(1u, get_epoch_state(ETH)["current_epoch_index"].as<uint32_t>());
    BOOST_REQUIRE(!get_network_genesis().is_null());
+} FC_LOG_AND_RETHROW() }
+
+// ---- Depot-paced advance: a chain advances only once it is due, which needs traffic ----
+
+/// The genesis advance needs no traffic and opens epoch 1 at its own time with none; traffic noted before it is
+/// ignored.
+BOOST_FIXTURE_TEST_CASE(the_genesis_advance_needs_no_traffic, sysio_epoch_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setconfig(60, 7, 21, 3, 200, ETH));
+   ready_genesis(ETH, ChainKind::CHAIN_KIND_EVM);
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), notetraffic(ETH, control->head().block_time()));
+   BOOST_REQUIRE(time_point() == state_time(ETH, "traffic_since"));
+   BOOST_REQUIRE(time_point() == state_time(ETH, "due_at"));
+   produce_blocks();
+
+   const time_point genesis_at = control->pending_block_time();
+   BOOST_REQUIRE_EQUAL(success(), advance(ETH, MSGCH_ACCOUNT));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(1u, epoch_index(ETH));
+   BOOST_REQUIRE(genesis_at == state_time(ETH, "current_epoch_start"));
+   BOOST_REQUIRE(time_point() == state_time(ETH, "traffic_since"));
+   BOOST_REQUIRE(time_point() == state_time(ETH, "due_at"));
+} FC_LOG_AND_RETHROW() }
+
+/// After its genesis an idle chain never advances, under sysio.msgch's authority or governance's: with no traffic it
+/// is never due, however long its epoch runs.
+BOOST_FIXTURE_TEST_CASE(an_idle_chain_never_advances, sysio_epoch_tester) { try {
+   constexpr uint32_t kDurationSec     = 60;
+   constexpr uint32_t kBlocksPerSecond = 2;
+   constexpr uint32_t kIdleMinimums    = 5;
+   BOOST_REQUIRE_EQUAL(success(), setconfig(kDurationSec, 7, 21, 3, 200, ETH));
+   ready_genesis(ETH, ChainKind::CHAIN_KIND_EVM);
+   BOOST_REQUIRE_EQUAL(success(), advance(ETH));
+   produce_blocks();
+   const time_point start = state_time(ETH, "current_epoch_start");
+
+   produce_blocks(kIdleMinimums * kDurationSec * kBlocksPerSecond);
+   BOOST_REQUIRE_EQUAL(success(), advance(ETH, MSGCH_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(success(), advance(ETH, EPOCH_ACCOUNT));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(1u, epoch_index(ETH));
+   BOOST_REQUIRE(start == state_time(ETH, "current_epoch_start"));
+   BOOST_REQUIRE(time_point() == state_time(ETH, "traffic_since"));
+   BOOST_REQUIRE(time_point() == state_time(ETH, "due_at"));
+} FC_LOG_AND_RETHROW() }
+
+/// `notetraffic` keeps a chain's earliest traffic and makes it due one minimum after the later of its epoch start and
+/// that traffic: later traffic changes nothing, earlier traffic moves both, and traffic from before the epoch started
+/// is due one minimum after the start. A zero or future `since` counts as now. Only sysio.msgch records traffic.
+BOOST_FIXTURE_TEST_CASE(due_is_the_later_of_start_and_traffic_plus_the_minimum, sysio_epoch_tester) { try {
+   constexpr uint32_t     kDurationSec = 60;
+   const fc::microseconds minimum      = fc::seconds(kDurationSec);
+   constexpr std::string_view BASE     = "BASE";
+   constexpr uint32_t     kBaseChainId = 8453;
+   BOOST_REQUIRE_EQUAL(success(), setconfig(kDurationSec, 7, 21, 3, 200, ETH));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(kDurationSec, 7, 21, 3, 200, SOL));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(kDurationSec, 7, 21, 3, 200, BASE));
+   ready_genesis(ETH, ChainKind::CHAIN_KIND_EVM);
+   ready_genesis(SOL, ChainKind::CHAIN_KIND_SVM);
+   BOOST_REQUIRE_EQUAL(success(), regchain(ChainKind::CHAIN_KIND_EVM, std::string(BASE), kBaseChainId));
+   seat_window(BASE);
+   for (const std::string_view chain : {ETH, SOL, BASE}) BOOST_REQUIRE_EQUAL(success(), advance(chain));
+   produce_blocks(20);
+   const time_point start = state_time(ETH, "current_epoch_start");
+
+   BOOST_REQUIRE_EQUAL(error("missing authority of sysio.msgch"), notetraffic(ETH, start, "operator1"_n));
+   BOOST_REQUIRE_EQUAL(error("missing authority of sysio.msgch"), notetraffic(ETH, start, EPOCH_ACCOUNT));
+   BOOST_REQUIRE(time_point() == state_time(ETH, "traffic_since"));
+
+   const time_point first = start + fc::seconds(5);
+   BOOST_REQUIRE_EQUAL(success(), notetraffic(ETH, first));
+   BOOST_REQUIRE(first == state_time(ETH, "traffic_since"));
+   BOOST_REQUIRE(first + minimum == state_time(ETH, "due_at"));
+
+   // Later traffic leaves the earliest in place.
+   BOOST_REQUIRE_EQUAL(success(), notetraffic(ETH, first + fc::seconds(2)));
+   BOOST_REQUIRE(first == state_time(ETH, "traffic_since"));
+   BOOST_REQUIRE(first + minimum == state_time(ETH, "due_at"));
+
+   // Traffic from before the epoch started is due one minimum after the start.
+   const time_point before_start = start - fc::seconds(30);
+   BOOST_REQUIRE_EQUAL(success(), notetraffic(ETH, before_start));
+   BOOST_REQUIRE(before_start == state_time(ETH, "traffic_since"));
+   BOOST_REQUIRE(start + minimum == state_time(ETH, "due_at"));
+
+   // A zero or a future `since` counts as now.
+   const time_point now = control->pending_block_time();
+   BOOST_REQUIRE_EQUAL(success(), notetraffic(SOL, time_point()));
+   BOOST_REQUIRE_EQUAL(success(), notetraffic(BASE, now + fc::hours(1)));
+   for (const std::string_view chain : {SOL, BASE}) {
+      BOOST_REQUIRE(now == state_time(chain, "traffic_since"));
+      BOOST_REQUIRE(now + minimum == state_time(chain, "due_at"));
+   }
+} FC_LOG_AND_RETHROW() }
+
+/// A chain with traffic does not advance before it is due. Once due, the advance opens the next epoch at its own time
+/// and clears the traffic; a late advance opens it late, not on a grid.
+BOOST_FIXTURE_TEST_CASE(a_chain_advances_only_once_due_and_opens_the_next_epoch_then, sysio_epoch_tester) { try {
+   constexpr uint32_t     kDurationSec   = 60;
+   const fc::microseconds block_interval = fc::milliseconds(config::block_interval_ms);
+   constexpr int64_t      kLateSec       = 7;
+   BOOST_REQUIRE_EQUAL(success(), setconfig(kDurationSec, 7, 21, 3, 200, ETH));
+   ready_genesis(ETH, ChainKind::CHAIN_KIND_EVM);
+   BOOST_REQUIRE_EQUAL(success(), advance(ETH));
+   produce_blocks(10);
+   const time_point since = state_time(ETH, "current_epoch_start") + fc::seconds(2);
+   BOOST_REQUIRE_EQUAL(success(), notetraffic(ETH, since));
+   const time_point due = state_time(ETH, "due_at");
+   BOOST_REQUIRE(since + fc::seconds(kDurationSec) == due);
+
+   open_block_at(due - block_interval);
+   BOOST_REQUIRE_EQUAL(success(), advance(ETH, MSGCH_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(success(), advance(ETH, EPOCH_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(1u, epoch_index(ETH));
+
+   open_block_at(due);
+   BOOST_REQUIRE_EQUAL(success(), advance(ETH, MSGCH_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(2u, epoch_index(ETH));
+   BOOST_REQUIRE(due == state_time(ETH, "current_epoch_start"));
+   BOOST_REQUIRE(time_point() == state_time(ETH, "traffic_since"));
+   BOOST_REQUIRE(time_point() == state_time(ETH, "due_at"));
+
+   // Due again one minimum after the new start, the governance advance runs late and opens epoch 3 when it runs.
+   mark_traffic(ETH);
+   const time_point late = state_time(ETH, "due_at") + fc::seconds(kLateSec);
+   open_block_at(late);
+   BOOST_REQUIRE_EQUAL(success(), advance(ETH, EPOCH_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(3u, epoch_index(ETH));
+   BOOST_REQUIRE(late == state_time(ETH, "current_epoch_start"));
+} FC_LOG_AND_RETHROW() }
+
+/// `setconfig` recomputes `due_at` from the new minimum while the chain has traffic, and leaves an idle chain idle.
+BOOST_FIXTURE_TEST_CASE(setconfig_recomputes_due_while_traffic_is_pending, sysio_epoch_tester) { try {
+   constexpr uint32_t kDurationSec        = 60;
+   constexpr uint32_t kLongerDurationSec  = 120;
+   constexpr uint32_t kShorterDurationSec = 30;
+   constexpr uint32_t kBlocksPerSecond    = 2;
+   BOOST_REQUIRE_EQUAL(success(), setconfig(kDurationSec, 7, 21, 3, 200, ETH));
+   ready_genesis(ETH, ChainKind::CHAIN_KIND_EVM);
+   BOOST_REQUIRE_EQUAL(success(), advance(ETH));
+   produce_blocks();
+   const time_point start = state_time(ETH, "current_epoch_start");
+
+   BOOST_REQUIRE_EQUAL(success(), setconfig(kLongerDurationSec, 7, 21, 3, 200, ETH));
+   BOOST_REQUIRE(time_point() == state_time(ETH, "due_at"));
+
+   mark_traffic(ETH);
+   BOOST_REQUIRE(start + fc::seconds(kLongerDurationSec) == state_time(ETH, "due_at"));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(kShorterDurationSec, 7, 21, 3, 200, ETH));
+   BOOST_REQUIRE(start == state_time(ETH, "traffic_since"));
+   BOOST_REQUIRE(start + fc::seconds(kShorterDurationSec) == state_time(ETH, "due_at"));
+
+   produce_blocks(kShorterDurationSec * kBlocksPerSecond + 1);
+   BOOST_REQUIRE_EQUAL(success(), advance(ETH, MSGCH_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(2u, epoch_index(ETH));
+} FC_LOG_AND_RETHROW() }
+
+/// A paused chain records traffic and becomes due, but does not advance until it resumes.
+BOOST_FIXTURE_TEST_CASE(a_paused_chain_records_traffic_but_holds, sysio_epoch_tester) { try {
+   constexpr uint32_t kDurationSec     = 60;
+   constexpr uint32_t kBlocksPerSecond = 2;
+   BOOST_REQUIRE_EQUAL(success(), setconfig(kDurationSec, 7, 21, 3, 200, ETH));
+   ready_genesis(ETH, ChainKind::CHAIN_KIND_EVM);
+   BOOST_REQUIRE_EQUAL(success(), advance(ETH));
+   produce_blocks();
+   const time_point start = state_time(ETH, "current_epoch_start");
+
+   BOOST_REQUIRE_EQUAL(success(), pause(ETH));
+   mark_traffic(ETH);
+   BOOST_REQUIRE(start == state_time(ETH, "traffic_since"));
+   BOOST_REQUIRE(start + fc::seconds(kDurationSec) == state_time(ETH, "due_at"));
+
+   produce_blocks(kDurationSec * kBlocksPerSecond + 1);
+   BOOST_REQUIRE_EQUAL(error("assertion failure with message: epoch advancement is paused"), advance(ETH));
+   BOOST_REQUIRE_EQUAL(1u, epoch_index(ETH));
+   BOOST_REQUIRE(start == state_time(ETH, "traffic_since"));
+
+   BOOST_REQUIRE_EQUAL(success(), unpause(ETH));
+   BOOST_REQUIRE_EQUAL(success(), advance(ETH));
+   BOOST_REQUIRE_EQUAL(2u, epoch_index(ETH));
+} FC_LOG_AND_RETHROW() }
+
+/// `resendroster` before the chain's genesis advance still forgets the roster, but records no traffic.
+BOOST_FIXTURE_TEST_CASE(resendroster_before_genesis_records_no_traffic, sysio_epoch_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setconfig(60, 7, 21, 3, 200, ETH));
+   ready_genesis(ETH, ChainKind::CHAIN_KIND_EVM);
+   const uint64_t chain_code = fc::slug_name{ETH}.value;
+   sysio_system::test_support::write_kv_row(
+      *this, EPOCH_ACCOUNT, "rostersent"_n, chain_code,
+      abi_ser.variant_to_binary("roster_sent", mvo()("chain_code", chain_code)("roster_hash", fc::sha256()),
+                                fixture_abi_yield_function()));
+
+   BOOST_REQUIRE_EQUAL(success(), push_epoch_action(EPOCH_ACCOUNT, "resendroster"_n, mvo()("code", ETH)));
+   BOOST_REQUIRE(get_row_by_id(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "rostersent"_n, chain_code).empty());
+   BOOST_REQUIRE_EQUAL(0u, epoch_index(ETH));
+   BOOST_REQUIRE(time_point() == state_time(ETH, "traffic_since"));
+   BOOST_REQUIRE(time_point() == state_time(ETH, "due_at"));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(initgroups_no_opreg, sysio_epoch_tester) { try {

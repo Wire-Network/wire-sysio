@@ -82,7 +82,7 @@ public:
       /// Drives the consensus-retry gate in `outpost_opp_job::run_outbound`.
       /// Default `false` keeps the existing tests' "no retry" expectation
       /// intact; tests targeting the retry path flip this to `true` to
-      /// simulate wall-clock past `next_epoch_start`.
+      /// simulate wall-clock past the epoch start plus the chain's minimum duration.
       bool     epoch_boundary_past = false;
       /// What `delivery_timeout` answers: the deadline the job hands every outpost call.
       fc::microseconds delivery_timeout = default_delivery_timeout;

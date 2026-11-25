@@ -37,7 +37,9 @@
 #include <magic_enum/magic_enum.hpp>
 
 #include <algorithm>
+#include <cstring>
 #include <functional>
+#include <limits>
 #include <map>
 #include <optional>
 #include <set>
@@ -208,7 +210,11 @@ constexpr name CHECK_CONSENSUS    = "chkcons"_n;
 constexpr name BOOT_CHAIN         = "bootchain"_n;
 constexpr name DELIVER            = "deliver"_n;
 constexpr name EVALUATE_CONSENSUS = "evalcons"_n;
+constexpr name QUEUE_OUT          = "queueout"_n;
 } // namespace msgch_actions
+
+/// Most attestations one outbound envelope carries: a mirror of `sysio.msgch::MAX_ENVELOPE_ATTESTATIONS`.
+constexpr uint32_t MAX_ENVELOPE_ATTESTATIONS = 64;
 
 /// sysio.epoch action identifiers the per-chain epoch fixtures push.
 namespace epoch_actions {
@@ -217,7 +223,14 @@ constexpr name SCHEDULE      = "schbatchgps"_n;
 constexpr name ADVANCE       = "advance"_n;
 constexpr name FINISH_ADVANCE = "finishadv"_n;
 constexpr name TICK_ECONOMY  = "tickeconomy"_n;
+constexpr name NOTE_TRAFFIC  = "notetraffic"_n;
+constexpr name RESEND_ROSTER = "resendroster"_n;
+constexpr name PAUSE         = "pause"_n;
+constexpr name UNPAUSE       = "unpause"_n;
 } // namespace epoch_actions
+
+/// `sysio.epoch::advance`'s refusal while a chain is paused.
+constexpr const char* EPOCH_PAUSED_ERROR = "epoch advancement is paused";
 
 /// sysio.msgch table identifiers used by the WNS-16 fixture.
 namespace msgch_tables {
@@ -253,6 +266,8 @@ constexpr const char* DATA              = "data";
 constexpr const char* RECEIVED_AT       = "received_at";
 constexpr const char* PREVIOUS_EPOCH_INDEX      = "previous_epoch_index";
 constexpr const char* PREVIOUS_WINNING_CHECKSUM = "previous_winning_checksum";
+constexpr const char* READY_TIMESTAMP           = "ready_timestamp";
+constexpr const char* ATTEST_TYPE               = "attest_type";
 } // namespace msgch_fields
 
 /// sysio.chalg table identifiers used by the split-consensus regressions.
@@ -320,16 +335,24 @@ constexpr const char* CURRENT_BATCH_OP_GROUP = "current_batch_op_group";
 constexpr const char* IS_PAUSED              = "is_paused";
 constexpr const char* CHAIN_CODE             = "chain_code";
 constexpr const char* CURRENT_EPOCH_INDEX    = "current_epoch_index";
-constexpr const char* NEXT_EPOCH_START       = "next_epoch_start";
 constexpr const char* CURRENT_EPOCH_START    = "current_epoch_start";
+constexpr const char* TRAFFIC_SINCE          = "traffic_since";
+constexpr const char* DUE_AT                 = "due_at";
+constexpr const char* EPOCH_DURATION_SEC     = "epoch_duration_sec";
 constexpr const char* EPOCH_INDEX            = "epoch_index";
 constexpr const char* PREVIOUS_GROUP         = "previous_group";
 } // namespace epoch_fields
 
 /// sysio.epoch tables the per-chain epoch fixtures read.
 namespace epoch_tables {
-constexpr name EPOCH_STATE = "epochstate"_n;
+constexpr name EPOCH_STATE  = "epochstate"_n;
+constexpr name EPOCH_CONFIG = "epochcfg"_n;
 } // namespace epoch_tables
+
+/// sysio.epoch ABI type names of those rows.
+namespace epoch_abi_types {
+constexpr const char* EPOCH_CONFIG = "epoch_config";
+} // namespace epoch_abi_types
 
 /// sysio.roa action identifiers used by the empty-electorate retry regression.
 namespace roa_actions {
@@ -685,11 +708,9 @@ public:
       sysio_system::test_support::served_chains::serve(*this, ops, outposts);
    }
 
-   /// Cross the boundary and advance every configured chain's epoch, as sysio.msgch's chkcons would.
+   /// Make every configured chain due (`elapse_epoch_boundary`) and advance its epoch, as sysio.msgch's chkcons would.
    uint32_t advance_one_epoch() {
-      for (uint32_t i = 0; i < EPOCH_DURATION_SEC * 2 + 1; ++i) {
-         produce_block();
-      }
+      elapse_epoch_boundary();
       for (const std::string_view chain : epoch_chains) {
          BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, MSGCH_ACCOUNT, epoch_actions::ADVANCE,
                                              mvo()(epoch_fields::CHAIN_CODE, chain)));
@@ -726,13 +747,31 @@ public:
                                          mvo()(roa_fields::OWNER, owner.to_string())(roa_fields::TIER, tier_one)));
    }
 
-   /// Let the chain's epoch boundary elapse WITHOUT advancing the epoch: `chkcons` advances a decided
-   /// epoch only once its boundary has passed, while `deliver`'s epoch gate keeps accepting envelopes
-   /// for the still-current epoch.
+   /// Record traffic on every configured chain since its epoch start (`mark_chain_traffic`), then let
+   /// `EPOCH_DURATION_SEC` elapse WITHOUT advancing the epoch: a chain of that minimum is then due, so
+   /// `chkcons` advances its decided epoch, while `deliver`'s epoch gate keeps accepting envelopes for the
+   /// still-current epoch.
    void elapse_epoch_boundary() {
+      mark_chain_traffic();
       for (uint32_t i = 0; i < EPOCH_DURATION_SEC * 2 + 1; ++i) {
          produce_block();
       }
+   }
+
+   /// Record traffic on every configured chain since its current epoch started (`epoch_state::mark_traffic`), as an
+   /// outbound attestation queued for it would: each chain is then due one minimum after its epoch start.
+   void mark_chain_traffic() {
+      for (const std::string_view chain : epoch_chains) {
+         sysio_system::test_support::epoch_state::mark_traffic(*this, epoch_abi, chain);
+      }
+   }
+
+   /// `chain_code`'s minimum duration, its `epochcfg` `epoch_duration_sec`.
+   fc::microseconds minimum_duration(uint64_t chain_code = ETH_OUTPOST_ID) {
+      const auto data = get_row_by_id(EPOCH_ACCOUNT, EPOCH_ACCOUNT, epoch_tables::EPOCH_CONFIG, chain_code);
+      BOOST_REQUIRE(!data.empty());
+      return fc::seconds(epoch_abi.binary_to_variant(epoch_abi_types::EPOCH_CONFIG, data, fixture_abi_yield_function())
+                            [epoch_fields::EPOCH_DURATION_SEC].as<uint32_t>());
    }
 
    action_result queueout(uint64_t chain_code, uint32_t attest_type,
@@ -741,6 +780,40 @@ public:
          ("chain_code",   chain_code)
          ("attest_type",  attest_type)
          ("data",         std::move(data)));
+   }
+
+   /// `queueout` of a `type` row of `fill` bytes for `chain_code` on `contract` (sysio.msgch, or another account
+   /// running its code), under that account's own authority, returning the trace.
+   transaction_trace_ptr queueout_trace(uint64_t chain_code, opp::types::AttestationType type, char fill,
+                                        name contract = MSGCH_ACCOUNT) {
+      return sysio_system::test_support::push_contract_action_trace(
+         *this, contract, msgch_abi, contract, msgch_actions::QUEUE_OUT,
+         mvo()(msgch_fields::CHAIN_CODE, chain_code)(msgch_fields::ATTEST_TYPE, type)
+              (msgch_fields::DATA, std::vector<char>(8, fill)));
+   }
+
+   /// How many times `trace` notified sysio.epoch of a `queueout` of `contract`.
+   static uint32_t queueout_notifications(const transaction_trace_ptr& trace, name contract = MSGCH_ACCOUNT) {
+      BOOST_REQUIRE(trace);
+      uint32_t n = 0;
+      for (const auto& at : trace->action_traces) {
+         if (at.receiver == EPOCH_ACCOUNT && at.act.account == contract && at.act.name == msgch_actions::QUEUE_OUT) ++n;
+      }
+      return n;
+   }
+
+   /// The ready time of `chain_code`'s oldest READY general-lane attestation (`ready_timestamp`, in seconds).
+   fc::time_point oldest_ready_general(uint64_t chain_code) {
+      uint64_t oldest = std::numeric_limits<uint64_t>::max();
+      for (const auto& row : table_rows(MSGCH_ACCOUNT, msgch_tables::ATTESTATIONS, msgch_abi,
+                                        msgch_abi_types::ATTESTATION_ENTRY)) {
+         if (row[msgch_fields::CHAIN_CODE].as_uint64() != chain_code ||
+             row[msgch_fields::STATUS].as<opp::types::AttestationStatus>() !=
+                opp::types::AttestationStatus::ATTESTATION_STATUS_READY) continue;
+         oldest = std::min(oldest, row[msgch_fields::READY_TIMESTAMP].as<uint64_t>());
+      }
+      BOOST_REQUIRE_NE(oldest, std::numeric_limits<uint64_t>::max());
+      return fc::time_point(fc::seconds(static_cast<int64_t>(oldest)));
    }
 
    action_result buildenv(uint64_t chain_code) {
@@ -1012,7 +1085,7 @@ public:
       tip = next_stream_tip(envelope);
    }
 
-   /// Cross the epoch boundary and advance through the production `chkcons -> advance` route.
+   /// Make the chain due and advance through the production `chkcons -> advance` route.
    void close_epoch() {
       const uint32_t epoch = current_epoch();
       elapse_epoch_boundary();
@@ -1409,11 +1482,10 @@ public:
       return false;
    }
 
-   /// Advance exactly one epoch, landing the advance at the fixed-cadence next_epoch_start. Because
-   /// next_epoch_start is a fixed cadence (advance sets current_epoch_start = prior next_epoch_start,
-   /// never `now`) and recorddel stamps at one-second granularity, running the advance in the second
-   /// of next_epoch_start spaces every epoch's records exactly epoch_duration apart -- the exact-span
-   /// timing the rotation tests pin the window's edge against, with no block-granularity drift.
+   /// Advance exactly one epoch, landing the advance at the chain's `due_at`. Traffic recorded since the epoch
+   /// start makes the chain due exactly one minimum after it, and the advance opens the next epoch at that
+   /// instant, so every epoch's records are spaced exactly epoch_duration apart -- the exact-span timing the
+   /// rotation tests pin the window's edge against, with no block-granularity drift.
    uint32_t advance_to_next_epoch() {
       advance_to_next_epoch_traces();
       return current_epoch();
@@ -1422,11 +1494,12 @@ public:
    /// `advance_to_next_epoch`, returning each configured chain's `advance` trace, in `epoch_chains`
    /// order, so a test can inspect its inline actions. The chains share one cadence.
    std::vector<transaction_trace_ptr> advance_to_next_epoch_traces() {
-      auto st = read_epoch_state(fc::slug_name{epoch_chains.front()}.value);
+      mark_chain_traffic();
+      const fc::variant st = read_epoch_state(fc::slug_name{epoch_chains.front()}.value);
       BOOST_REQUIRE(!st.is_null());
-      auto next  = st[epoch_fields::NEXT_EPOCH_START].as<fc::time_point>();
-      auto delta = next - control->head().block_time();
-      if (delta.count() > 0) produce_block(delta);
+      const fc::time_point due = st[epoch_fields::DUE_AT].as<fc::time_point>();
+      BOOST_REQUIRE(due != fc::time_point());
+      if (due > control->pending_block_time()) open_block_at(due);
       std::vector<transaction_trace_ptr> traces;
       for (const std::string_view chain : epoch_chains) {
          traces.push_back(sysio_system::test_support::push_contract_action_trace(
@@ -1437,7 +1510,7 @@ public:
       return traces;
    }
 
-   /// Advance `chain_code` past its boundary under sysio.epoch's own authority, the governance path that needs no
+   /// Make `chain_code` due and advance it under sysio.epoch's own authority, the governance path that needs no
    /// consensus, and return the advance's trace. An epoch's books close at the advance after it, so a test runs this
    /// to record the epoch the chain's previous advance closed.
    transaction_trace_ptr governance_advance_trace(uint64_t chain_code = ETH_OUTPOST_ID) {
@@ -1573,10 +1646,12 @@ public:
       return !consensus.is_null() && consensus[msgch_fields::EPOCH_INDEX].as<uint32_t>() == epoch_index;
    }
 
-   /// Whether the pending block still precedes `chain_code`'s epoch boundary.
+   /// Whether the pending block still precedes `chain_code`'s minimum epoch end, its epoch start plus its minimum
+   /// duration, before which the chain cannot be due.
    bool before_epoch_boundary(uint64_t chain_code = ETH_OUTPOST_ID) {
       return control->pending_block_time() <
-             read_epoch_state(chain_code)[epoch_fields::NEXT_EPOCH_START].as<fc::time_point>();
+             read_epoch_state(chain_code)[epoch_fields::CURRENT_EPOCH_START].as<fc::time_point>() +
+                minimum_duration(chain_code);
    }
 
    /// Land the pending transactions, then produce blocks so the pending block opens at `target`, a later
@@ -1855,7 +1930,7 @@ public:
       produce_blocks();
    }
 
-   /// Cross ETH's boundary and push `chkcons`, which advances its decided epoch.
+   /// Make ETH due and push `chkcons`, which advances its decided epoch.
    void advance_decided_epoch() {
       const uint32_t epoch = current_epoch();
       elapse_epoch_boundary();
@@ -3384,6 +3459,7 @@ BOOST_FIXTURE_TEST_CASE(late_delivery_repeats_a_winner_resolved_by_dispute, sysi
    resolve_tie_dispute(epoch, voted_checksum);
    produce_blocks();
    BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED, operator_status(first[1]));
+   mark_chain_traffic();
    BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID));
    produce_blocks();
    BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
@@ -5614,17 +5690,19 @@ BOOST_FIXTURE_TEST_CASE(dispute_resolves_while_envelopes_are_pruned, sysio_msgch
 //  Per-chain consensus epochs: each outpost chain runs its own counter, pacing and dispute pause.
 // ---------------------------------------------------------------------------
 
-/// Two chains with different durations advance on their own boundaries, and a chain that stops reaching
-/// consensus holds only itself. Each chain's outbound envelope and BATCH_OPERATOR_GROUPS carry that
-/// chain's own epoch index and duration.
+/// Two chains with different minimum durations advance once each is due, and a chain that stops reaching
+/// consensus holds only itself. Traffic since an epoch's start makes it due one chain minimum later. Each chain's
+/// outbound envelope and BATCH_OPERATOR_GROUPS carry that chain's own epoch index and duration.
 BOOST_FIXTURE_TEST_CASE(chains_advance_independently_at_their_own_pace, sysio_msgch_chain_tester) { try {
    constexpr uint32_t kBatchOperatorCount = 3;
    constexpr uint32_t kSolDurationSec     = 2 * EPOCH_DURATION_SEC;
    constexpr uint32_t kStalledEthEpochs   = 3;
    const std::vector<name> ops{BATCHOP, BATCHOP_B, BATCHOP_C};
+   // Seconds from `chain_code`'s epoch start to when traffic since that start makes it due.
    const auto epoch_length_sec = [&](uint64_t chain_code) {
+      sysio_system::test_support::epoch_state::mark_traffic(*this, epoch_abi, fc::slug_name{chain_code}.to_string());
       const auto state = read_epoch_state(chain_code);
-      return static_cast<uint32_t>((state[epoch_fields::NEXT_EPOCH_START].as<fc::time_point>() -
+      return static_cast<uint32_t>((state[epoch_fields::DUE_AT].as<fc::time_point>() -
                                     state[epoch_fields::CURRENT_EPOCH_START].as<fc::time_point>()).to_seconds());
    };
    const auto require_stamped = [&](uint64_t chain_code, uint32_t duration_sec) {
@@ -5645,7 +5723,7 @@ BOOST_FIXTURE_TEST_CASE(chains_advance_independently_at_their_own_pace, sysio_ms
    require_stamped(ETH_OUTPOST_ID, EPOCH_DURATION_SEC);
    require_stamped(SOL_OUTPOST_ID, kSolDurationSec);
 
-   // Both reach consensus; only ETH's boundary has passed, so only ETH advances.
+   // Both reach consensus; only ETH is due, so only ETH advances.
    std::map<uint64_t, inbound_stream_tip> tips;
    deliver_chain_unanimous(ops, ETH_OUTPOST_ID, "eth-1", tips);
    deliver_chain_unanimous(ops, SOL_OUTPOST_ID, "sol-1", tips);
@@ -5655,7 +5733,7 @@ BOOST_FIXTURE_TEST_CASE(chains_advance_independently_at_their_own_pace, sysio_ms
    BOOST_REQUIRE_EQUAL(1u, current_epoch(SOL_OUTPOST_ID));
    require_stamped(ETH_OUTPOST_ID, EPOCH_DURATION_SEC);
 
-   // SOL's longer epoch closes on its own boundary.
+   // SOL's longer epoch closes once SOL is due.
    deliver_chain_unanimous(ops, ETH_OUTPOST_ID, "eth-2", tips);
    elapse_epoch_boundary();
    advance_via_consensus();
@@ -5683,10 +5761,10 @@ BOOST_FIXTURE_TEST_CASE(chains_advance_independently_at_their_own_pace, sysio_ms
                                  sol_tip.message_id)));
 } FC_LOG_AND_RETHROW() }
 
-/// Each chain's advance credits the group of the epoch whose books it closes with that chain's scheduled epoch
-/// length in seat-seconds, on each member's row for that chain: a seat on the slower chain counts for its longer
-/// epoch. A chain's first advance, like its genesis, credits nothing.
-BOOST_FIXTURE_TEST_CASE(epoch_close_credits_the_chain_epoch_length_as_seat_seconds, sysio_msgch_chain_tester) { try {
+/// Each chain's advance credits the group of the epoch whose books it closes with that chain's minimum duration in
+/// seat-seconds, on each member's row for that chain: a seat on the chain with the longer minimum counts for more. A
+/// chain's first advance, like its genesis, credits nothing.
+BOOST_FIXTURE_TEST_CASE(epoch_close_credits_the_chain_minimum_as_seat_seconds, sysio_msgch_chain_tester) { try {
    constexpr uint32_t kSolDurationSec = 2 * EPOCH_DURATION_SEC;
    const std::vector<name> ops{BATCHOP};
    bootstrap(1, /*batchop_is_bootstrapped=*/true, kSolDurationSec);
@@ -5694,7 +5772,7 @@ BOOST_FIXTURE_TEST_CASE(epoch_close_credits_the_chain_epoch_length_as_seat_secon
       BOOST_REQUIRE_EQUAL(0u, batch_duty_seat_seconds(BATCHOP, chain));   // a genesis advance records no duty
    }
 
-   // Only ETH's boundary has passed; its first advance credits nothing.
+   // Only ETH is due; its first advance credits nothing.
    std::map<uint64_t, inbound_stream_tip> tips;
    deliver_chain_unanimous(ops, ETH_OUTPOST_ID, "eth-1", tips);
    deliver_chain_unanimous(ops, SOL_OUTPOST_ID, "sol-1", tips);
@@ -5816,6 +5894,260 @@ BOOST_FIXTURE_TEST_CASE(dispute_on_one_chain_does_not_hold_the_other, sysio_msgc
    BOOST_REQUIRE_EQUAL(sol_epoch + 1, current_epoch(SOL_OUTPOST_ID));
    BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED,
                        get_operator(BATCHOP_B)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
+} FC_LOG_AND_RETHROW() }
+
+// ---------------------------------------------------------------------------
+//  Depot-paced advance: a decided chain advances only once its traffic makes it due.
+// ---------------------------------------------------------------------------
+
+/// A decided epoch on an idle chain stays current: neither `chkcons` nor governance's `advance` moves it, however
+/// long it waits.
+BOOST_FIXTURE_TEST_CASE(an_idle_decided_chain_never_advances, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kIdleMinimums = 5;
+   bootstrap();
+   const uint32_t epoch = current_epoch();
+   std::map<uint64_t, inbound_stream_tip> tips;
+   deliver_chain_unanimous({BATCHOP}, ETH_OUTPOST_ID, "idle-decided", tips);
+   BOOST_REQUIRE(epoch_decided(ETH_OUTPOST_ID, epoch));
+
+   produce_blocks(kIdleMinimums * EPOCH_DURATION_SEC * 2);
+   const transaction_trace_ptr crank = check_consensus_trace(ETH_OUTPOST_ID, BATCHOP);
+   BOOST_REQUIRE_EQUAL(0u, action_count(crank, EPOCH_ACCOUNT, epoch_actions::ADVANCE));
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::ADVANCE,
+                                       mvo()(epoch_fields::CHAIN_CODE, ETH_CHAIN_CODE)));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(epoch, current_epoch());
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::DUE_AT].as<fc::time_point>() == fc::time_point());
+} FC_LOG_AND_RETHROW() }
+
+/// The first general-lane attestation queued to an empty outbound queue notifies sysio.epoch, which records the chain's
+/// traffic at that moment, so the chain is due one minimum later; a further row and a schedule-lane row notify nothing.
+/// `chkcons` advances the decided epoch only once it is due, and the advance that ships the rows leaves the chain idle.
+BOOST_FIXTURE_TEST_CASE(queueout_records_traffic_when_the_general_queue_fills, sysio_msgch_chain_tester) { try {
+   const fc::microseconds block_interval = fc::milliseconds(config::block_interval_ms);
+   bootstrap();
+   const uint32_t epoch = current_epoch();
+   std::map<uint64_t, inbound_stream_tip> tips;
+   deliver_chain_unanimous({BATCHOP}, ETH_OUTPOST_ID, "queued-traffic", tips);
+   produce_blocks(10);
+   const auto queue_trace = [&](opp::types::AttestationType type, char fill) {
+      return queueout_trace(ETH_OUTPOST_ID, type, fill);
+   };
+
+   const transaction_trace_ptr schedule = queue_trace(opp::types::ATTESTATION_TYPE_OPERATORS, 's');
+   BOOST_REQUIRE_EQUAL(0u, queueout_notifications(schedule));
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::DUE_AT].as<fc::time_point>() == fc::time_point());
+
+   const fc::time_point        queued_at = control->pending_block_time();
+   const transaction_trace_ptr first     = queue_trace(opp::types::ATTESTATION_TYPE_OPERATOR_ACTION, 'a');
+   BOOST_REQUIRE_EQUAL(1u, queueout_notifications(first));
+   BOOST_REQUIRE_EQUAL(0u, action_count(first, EPOCH_ACCOUNT, epoch_actions::NOTE_TRAFFIC));
+   const fc::time_point due = queued_at + minimum_duration();
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::TRAFFIC_SINCE].as<fc::time_point>() == queued_at);
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::DUE_AT].as<fc::time_point>() == due);
+   produce_blocks();
+   const transaction_trace_ptr second = queue_trace(opp::types::ATTESTATION_TYPE_OPERATOR_ACTION, 'b');
+   BOOST_REQUIRE_EQUAL(0u, queueout_notifications(second));
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::TRAFFIC_SINCE].as<fc::time_point>() == queued_at);
+   BOOST_REQUIRE(read_epoch_state(SOL_OUTPOST_ID)[epoch_fields::DUE_AT].as<fc::time_point>() == fc::time_point());
+
+   open_block_at(due - block_interval);
+   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP));
+   BOOST_REQUIRE_EQUAL(epoch, current_epoch());
+   open_block_at(due);
+   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::CURRENT_EPOCH_START].as<fc::time_point>() == due);
+   BOOST_REQUIRE_EQUAL(0u, attestation_status_count(ETH_OUTPOST_ID, opp::types::ATTESTATION_STATUS_READY));
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::TRAFFIC_SINCE].as<fc::time_point>() == fc::time_point());
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::DUE_AT].as<fc::time_point>() == fc::time_point());
+} FC_LOG_AND_RETHROW() }
+
+/// General-lane rows an envelope leaves behind are traffic since the oldest of them became ready: the advance that
+/// built it cleared the chain's traffic and its `buildenv` records it again, so the chain is due one minimum after its
+/// new epoch starts. The advance that ships the rest leaves the chain idle.
+BOOST_FIXTURE_TEST_CASE(a_backlog_left_by_buildenv_records_traffic, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kEarlyRows = MAX_ENVELOPE_ATTESTATIONS;
+   constexpr uint32_t kLateRows  = 4;
+   bootstrap();
+   std::map<uint64_t, inbound_stream_tip> tips;
+   deliver_chain_unanimous({BATCHOP}, ETH_OUTPOST_ID, "backlog-1", tips);
+   const auto queue_general = [&](uint32_t first, uint32_t count) {
+      for (uint32_t i = first; i < first + count; ++i) {
+         std::vector<char> data(sizeof(i));
+         std::memcpy(data.data(), &i, sizeof(i));
+         BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID, opp::types::ATTESTATION_TYPE_OPERATOR_ACTION, data));
+      }
+      produce_blocks();
+   };
+   queue_general(0, kEarlyRows);
+   produce_blocks(4);
+   queue_general(kEarlyRows, kLateRows);
+
+   advance_decided_epoch();
+   const fc::variant state = read_epoch_state();
+   const fc::time_point start = state[epoch_fields::CURRENT_EPOCH_START].as<fc::time_point>();
+   // The schedule lane rides first, so more than the late rows stay behind, the oldest from the early batch.
+   BOOST_REQUIRE_GT(attestation_status_count(ETH_OUTPOST_ID, opp::types::ATTESTATION_STATUS_READY), kLateRows);
+   const fc::time_point since = oldest_ready_general(ETH_OUTPOST_ID);
+   BOOST_REQUIRE(since < start);
+   BOOST_REQUIRE(state[epoch_fields::TRAFFIC_SINCE].as<fc::time_point>() == since);
+   BOOST_REQUIRE(state[epoch_fields::DUE_AT].as<fc::time_point>() == start + minimum_duration());
+
+   // The next advance ships the rest and leaves the chain idle.
+   deliver_chain_unanimous({BATCHOP}, ETH_OUTPOST_ID, "backlog-2", tips);
+   open_block_at(start + minimum_duration());
+   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(0u, attestation_status_count(ETH_OUTPOST_ID, opp::types::ATTESTATION_STATUS_READY));
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::TRAFFIC_SINCE].as<fc::time_point>() == fc::time_point());
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::DUE_AT].as<fc::time_point>() == fc::time_point());
+} FC_LOG_AND_RETHROW() }
+
+/// A governance advance of a chain that is not an active outpost builds no envelope, so the chain's queued general-lane
+/// rows stay queued and record its traffic again, since the oldest became ready. Active again, the chain is due and
+/// its next advance ships them.
+BOOST_FIXTURE_TEST_CASE(an_inactive_chains_queued_rows_stay_its_traffic, sysio_msgch_chain_tester) { try {
+   bootstrap();
+   std::map<uint64_t, inbound_stream_tip> tips;
+   deliver_chain_unanimous({BATCHOP}, ETH_OUTPOST_ID, "inactive-1", tips);
+   BOOST_REQUIRE_EQUAL(1u, queueout_notifications(
+                              queueout_trace(ETH_OUTPOST_ID, opp::types::ATTESTATION_TYPE_OPERATOR_ACTION, 'q')));
+   produce_blocks();
+   const fc::time_point queued_at = oldest_ready_general(ETH_OUTPOST_ID);
+
+   set_chain_active(ETH_OUTPOST_ID, false);
+   governance_advance_trace(ETH_OUTPOST_ID);
+   const fc::variant    state = read_epoch_state();
+   const fc::time_point start = state[epoch_fields::CURRENT_EPOCH_START].as<fc::time_point>();
+   BOOST_REQUIRE_EQUAL(1u, attestation_status_count(ETH_OUTPOST_ID, opp::types::ATTESTATION_STATUS_READY));
+   BOOST_REQUIRE(state[epoch_fields::TRAFFIC_SINCE].as<fc::time_point>() == queued_at);
+   BOOST_REQUIRE(state[epoch_fields::DUE_AT].as<fc::time_point>() == start + minimum_duration());
+
+   set_chain_active(ETH_OUTPOST_ID, true);
+   deliver_chain_unanimous({BATCHOP}, ETH_OUTPOST_ID, "inactive-2", tips);
+   open_block_at(start + minimum_duration());
+   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(3u, current_epoch());
+   BOOST_REQUIRE_EQUAL(0u, attestation_status_count(ETH_OUTPOST_ID, opp::types::ATTESTATION_STATUS_READY));
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::DUE_AT].as<fc::time_point>() == fc::time_point());
+} FC_LOG_AND_RETHROW() }
+
+/// sysio.epoch records traffic only from sysio.msgch's own `queueout`: the same code running on another account
+/// notifies sysio.epoch of its `queueout`, which changes nothing.
+BOOST_FIXTURE_TEST_CASE(a_foreign_queueout_notification_records_no_traffic, sysio_msgch_chain_tester) { try {
+   constexpr name kForeignQueue = "fake.msgch"_n;
+   bootstrap();
+   create_accounts({kForeignQueue});
+   abi_serializer foreign_abi;
+   deploy(kForeignQueue, contracts::msgch_wasm(), contracts::msgch_abi(), foreign_abi);
+   produce_blocks();
+
+   const transaction_trace_ptr foreign =
+      queueout_trace(ETH_OUTPOST_ID, opp::types::ATTESTATION_TYPE_OPERATOR_ACTION, 'f', kForeignQueue);
+   BOOST_REQUIRE_EQUAL(1u, queueout_notifications(foreign, kForeignQueue));
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::TRAFFIC_SINCE].as<fc::time_point>() == fc::time_point());
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::DUE_AT].as<fc::time_point>() == fc::time_point());
+   BOOST_REQUIRE_EQUAL(0u, attestation_status_count(ETH_OUTPOST_ID, opp::types::ATTESTATION_STATUS_READY));
+} FC_LOG_AND_RETHROW() }
+
+/// sysio.msgch's `queueout` notification records nothing before the chain's genesis advance.
+BOOST_FIXTURE_TEST_CASE(a_queueout_before_genesis_records_no_traffic, sysio_msgch_chain_tester) { try {
+   set_epoch_config(ETH_CHAIN_CODE, EPOCH_DURATION_SEC, 1, 1);
+   register_chain(opp::types::ChainKind::CHAIN_KIND_EVM, ETH_CHAIN_CODE, ETH_EXTERNAL_CHAIN_ID);
+   sysio_system::test_support::epoch_state::seat_window(*this, epoch_abi, ETH_CHAIN_CODE, {{BATCHOP}});
+   produce_blocks();
+
+   const transaction_trace_ptr trace =
+      queueout_trace(ETH_OUTPOST_ID, opp::types::ATTESTATION_TYPE_OPERATOR_ACTION, 'g');
+   BOOST_REQUIRE_EQUAL(1u, queueout_notifications(trace));
+   const fc::variant state = read_epoch_state();
+   BOOST_REQUIRE_EQUAL(0u, state[epoch_fields::CURRENT_EPOCH_INDEX].as<uint32_t>());
+   BOOST_REQUIRE(state[epoch_fields::TRAFFIC_SINCE].as<fc::time_point>() == fc::time_point());
+   BOOST_REQUIRE(state[epoch_fields::DUE_AT].as<fc::time_point>() == fc::time_point());
+} FC_LOG_AND_RETHROW() }
+
+/// sysio.msgch's `queueout` notification records a paused chain's traffic, but the chain does not advance until it
+/// resumes, though it is due.
+BOOST_FIXTURE_TEST_CASE(a_queueout_on_a_paused_chain_records_traffic_that_waits, sysio_msgch_chain_tester) { try {
+   bootstrap();
+   const uint32_t epoch = current_epoch();
+   std::map<uint64_t, inbound_stream_tip> tips;
+   deliver_chain_unanimous({BATCHOP}, ETH_OUTPOST_ID, "paused-traffic", tips);
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, CHALG_ACCOUNT, epoch_actions::PAUSE,
+                                       mvo()(epoch_fields::CHAIN_CODE, ETH_CHAIN_CODE)));
+   produce_blocks();
+
+   const fc::time_point queued_at = control->pending_block_time();
+   BOOST_REQUIRE_EQUAL(1u, queueout_notifications(
+                              queueout_trace(ETH_OUTPOST_ID, opp::types::ATTESTATION_TYPE_OPERATOR_ACTION, 'p')));
+   const fc::time_point due = queued_at + minimum_duration();
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::TRAFFIC_SINCE].as<fc::time_point>() == queued_at);
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::DUE_AT].as<fc::time_point>() == due);
+
+   open_block_at(due);
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(EPOCH_PAUSED_ERROR),
+                       push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::ADVANCE,
+                            mvo()(epoch_fields::CHAIN_CODE, ETH_CHAIN_CODE)));
+   BOOST_REQUIRE_EQUAL(epoch, current_epoch());
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::DUE_AT].as<fc::time_point>() == due);
+
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, CHALG_ACCOUNT, epoch_actions::UNPAUSE,
+                                       mvo()(epoch_fields::CHAIN_CODE, ETH_CHAIN_CODE)));
+   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
+} FC_LOG_AND_RETHROW() }
+
+/// `resendroster` records traffic at now on the chain it resends to, so an idle decided chain becomes due one minimum
+/// later and its next envelope carries the roster; the other chain stays idle.
+BOOST_FIXTURE_TEST_CASE(resendroster_makes_an_idle_chain_due, sysio_msgch_chain_tester) { try {
+   bootstrap();
+   const uint32_t epoch = current_epoch();
+   std::map<uint64_t, inbound_stream_tip> tips;
+   deliver_chain_unanimous({BATCHOP}, ETH_OUTPOST_ID, "resend-roster", tips);
+   produce_blocks(10);
+
+   const fc::time_point resent_at = control->pending_block_time();
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::RESEND_ROSTER,
+                                       mvo()("code", ETH_CHAIN_CODE)));
+   const fc::time_point due = resent_at + minimum_duration();
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::TRAFFIC_SINCE].as<fc::time_point>() == resent_at);
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::DUE_AT].as<fc::time_point>() == due);
+   BOOST_REQUIRE(read_epoch_state(SOL_OUTPOST_ID)[epoch_fields::DUE_AT].as<fc::time_point>() == fc::time_point());
+
+   open_block_at(due);
+   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
+   BOOST_REQUIRE(tip_carries_roster(ETH_OUTPOST_ID));
+} FC_LOG_AND_RETHROW() }
+
+/// The advance that closes an epoch's books credits each member one chain minimum of seat-seconds, however long the
+/// epoch ran: an epoch held idle for several minimums before its traffic earns no more than one that ran the minimum.
+BOOST_FIXTURE_TEST_CASE(duty_credits_the_chain_minimum_however_long_the_epoch_ran, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kIdleMinimums = 5;
+   bootstrap();
+   std::map<uint64_t, inbound_stream_tip> tips;
+
+   // Epoch 1 runs idle for several minimums before traffic makes it due.
+   const fc::time_point first_start = read_epoch_state()[epoch_fields::CURRENT_EPOCH_START].as<fc::time_point>();
+   deliver_chain_unanimous({BATCHOP}, ETH_OUTPOST_ID, "long-1", tips);
+   produce_blocks(kIdleMinimums * EPOCH_DURATION_SEC * 2);
+   advance_decided_epoch();
+   const fc::time_point second_start = read_epoch_state()[epoch_fields::CURRENT_EPOCH_START].as<fc::time_point>();
+   BOOST_REQUIRE_GT((second_start - first_start).to_seconds(), int64_t{kIdleMinimums * EPOCH_DURATION_SEC});
+   BOOST_REQUIRE_EQUAL(0u, batch_duty_seat_seconds(BATCHOP, ETH_OUTPOST_ID));
+
+   // Epoch 2's advance closes epoch 1's books with one minimum, then epoch 3's closes epoch 2's with another.
+   deliver_chain_unanimous({BATCHOP}, ETH_OUTPOST_ID, "long-2", tips);
+   advance_decided_epoch();
+   BOOST_REQUIRE_EQUAL(uint64_t{EPOCH_DURATION_SEC}, batch_duty_seat_seconds(BATCHOP, ETH_OUTPOST_ID));
+   deliver_chain_unanimous({BATCHOP}, ETH_OUTPOST_ID, "long-3", tips);
+   advance_decided_epoch();
+   BOOST_REQUIRE_EQUAL(uint64_t{2 * EPOCH_DURATION_SEC}, batch_duty_seat_seconds(BATCHOP, ETH_OUTPOST_ID));
 } FC_LOG_AND_RETHROW() }
 
 /// `chkcons` evaluates one chain and refuses a chain that is not an active outpost.

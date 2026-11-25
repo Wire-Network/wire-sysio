@@ -320,8 +320,10 @@ public:
       for (const std::string_view chain : CHAINS) advance_chain(chain);
    }
 
-   /// Close `chain`'s current consensus epoch alone.
+   /// Close `chain`'s current consensus epoch alone: record traffic since its epoch start
+   /// (`epoch_state::mark_traffic`), which makes it due once its minimum has passed, and advance it.
    void advance_chain(std::string_view chain) {
+      sysio_system::test_support::epoch_state::mark_traffic(*this, epoch_abi, chain);
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, MSGCH_ACCOUNT, "advance"_n,
                                           mvo()("chain_code", chain)));
       produce_blocks();

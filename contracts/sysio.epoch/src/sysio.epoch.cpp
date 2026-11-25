@@ -11,7 +11,6 @@
 #include <sysio.chains/sysio.chains.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <algorithm>
-#include <limits>
 
 namespace sysio {
 
@@ -254,14 +253,37 @@ std::vector<pool_member> schedule_pool(sysio::slug_name chain_code, const std::v
    return pool;
 }
 
-/// The closing epoch's scheduled length in whole seconds (`next_epoch_start - current_epoch_start`, read
-/// before the increment), or the chain's configured duration when that span is not positive. `advance`
-/// credits it for the epoch whose books it closes: on the fixed grid every epoch of a chain has this length
-/// while the chain's configured duration is unchanged.
-uint32_t scheduled_epoch_seconds(const epoch::epoch_state& state, const epoch::epoch_config& cfg) {
-   const int64_t span_sec = (state.next_epoch_start - state.current_epoch_start).to_seconds();
-   if (span_sec <= 0) return cfg.epoch_duration_sec;
-   return static_cast<uint32_t>(std::min<int64_t>(span_sec, std::numeric_limits<uint32_t>::max()));
+/// Recompute `state.due_at` from its pending traffic: the later of `current_epoch_start` and `traffic_since`, plus
+/// the chain's minimum duration `cfg.epoch_duration_sec`. Zero while the chain has no traffic.
+void recompute_due(epoch::epoch_state& state, const epoch::epoch_config& cfg) {
+   state.due_at = state.traffic_since == time_point{}
+                     ? time_point{}
+                     : std::max(state.current_epoch_start, state.traffic_since) +
+                          seconds(static_cast<int64_t>(cfg.epoch_duration_sec));
+}
+
+/// Record traffic that began at `since` on a chain past its genesis: `traffic_since` keeps the earlier of its value
+/// and `since`, and `due_at` follows. A `since` that is zero, which would read as no traffic, or later than `now`
+/// counts as `now`. Returns whether the state changed.
+bool record_traffic(epoch::epoch_state& state, const epoch::epoch_config& cfg, time_point since, time_point now) {
+   const time_point noted = since == time_point{} || since > now ? now : since;
+   if (state.traffic_since != time_point{} && state.traffic_since <= noted) return false;
+   state.traffic_since = noted;
+   recompute_due(state, cfg);
+   return true;
+}
+
+/// Record traffic that began at `since` on outpost `chain_code`, through `record_traffic`. No effect before the
+/// chain's genesis advance, which ships epoch 1 with no traffic. Never throws: `buildenv` reaches it inside an
+/// advance.
+void note_chain_traffic(name self, sysio::slug_name chain_code, time_point since) {
+   const epoch::chain_key            key{chain_code.value};
+   epoch::epochstate_t               state_tbl(self);
+   std::optional<epoch::epoch_state> state = state_tbl.try_get(key);
+   if (!state || state->current_epoch_index == 0) return;
+   const std::optional<epoch::epoch_config> cfg = epoch::epochcfg_t(self).try_get(key);
+   if (!cfg) return;
+   if (record_traffic(*state, *cfg, since, current_time_point())) state_tbl.set(ram_payer, key, *state);
 }
 
 } // anonymous namespace
@@ -312,23 +334,28 @@ void epoch::setconfig(sysio::slug_name chain_code,
    // the live rotation (which would mis-date newly scheduled groups).
    // Reshaping the rotation is a fresh schbatchgps, a bootstrap-time
    // operation.
-   {
-      const std::optional<epoch_state> state = epoch_state_of(chain_code.value);
-      if (state && !state->batch_op_groups.empty()) {
-         check(batch_op_groups == state->batch_op_groups.size(),
-               "batch_op_groups cannot change once the rotation schedule is materialized");
-      }
+   std::optional<epoch_state> state = epoch_state_of(chain_code.value);
+   if (state && !state->batch_op_groups.empty()) {
+      check(batch_op_groups == state->batch_op_groups.size(),
+            "batch_op_groups cannot change once the rotation schedule is materialized");
    }
 
-   epochcfg_t cfg_tbl(get_self());
-   cfg_tbl.set(ram_payer, chain_key{chain_code.value}, epoch_config{
+   const epoch_config cfg{
       .chain_code                         = chain_code.value,
       .epoch_duration_sec                 = epoch_duration_sec,
       .operators_per_epoch                = operators_per_epoch,
       .batch_operator_minimum_active      = batch_operator_minimum_active,
       .batch_op_groups                    = batch_op_groups,
       .epoch_retention_envelope_log_count = epoch_retention_envelope_log_count,
-   });
+   };
+   epochcfg_t cfg_tbl(get_self());
+   cfg_tbl.set(ram_payer, chain_key{chain_code.value}, cfg);
+
+   // Pending traffic is due one new minimum after the later of the epoch start and the traffic.
+   if (state && state->traffic_since != time_point{}) {
+      recompute_due(*state, cfg);
+      epochstate_t(get_self()).set(ram_payer, chain_key{chain_code.value}, *state);
+   }
 }
 
 // ---------------------------------------------------------------------------
@@ -357,9 +384,10 @@ void epoch::advance(sysio::slug_name chain_code) {
       check(!state.batch_op_groups.empty(), genesis_without_schedule_msg);
    }
 
-   // Wall-clock minimum: don't advance before next_epoch_start
-   auto now = current_time_point();
-   if (now < state.next_epoch_start) return;
+   // After its genesis a chain advances only once it is due, under either authority: an idle chain never moves, and
+   // governance recovers one with `resendroster`, which records traffic.
+   const time_point now = current_time_point();
+   if (state.current_epoch_index > 0 && !advance_due(state, now)) return;
 
    // Close the books of the epoch before the closing one, `current_epoch_index - 1`, so the late
    // deliveries `sysio.msgch::deliver` accepted for it during the closing epoch count. Each member of
@@ -405,7 +433,9 @@ void epoch::advance(sysio::slug_name chain_code) {
          ).send();
       }
 
-      // Each member earns the epoch's scheduled length in seat-seconds on this chain. sysio.system splits
+      // Each member earns the chain's minimum duration as configured now, when the epoch's books close, in
+      // seat-seconds on this chain, however long the epoch ran: duty pays epochs served, so an idle or stretched
+      // epoch earns nothing more. sysio.system splits
       // each economic pay period's one batch pool by seat-seconds over every chain; whether a member is
       // still ACTIVE is decided when it is paid, so a slashed member draws nothing, and a member the
       // termchecks above evicted from this chain is credited nothing here. Skipped until initt5 has run:
@@ -415,8 +445,7 @@ void epoch::advance(sysio::slug_name chain_code) {
             permission_level{get_self(), "owner"_n},
             SYSTEM_ACCOUNT,
             system_actions::RECORD_DUTY,
-            std::make_tuple(chain_code, previous_epoch, state.previous_group,
-                            scheduled_epoch_seconds(state, *cfg))
+            std::make_tuple(chain_code, previous_epoch, state.previous_group, cfg->epoch_duration_sec)
          ).send();
       }
 
@@ -430,11 +459,12 @@ void epoch::advance(sysio::slug_name chain_code) {
       if (!genesis_tbl.exists()) genesis_tbl.set(network_genesis{.genesis_at = now}, ram_payer);
    }
 
+   // The next epoch opens now, with no traffic: `buildenv` marks any outbound rows this advance's envelope leaves
+   // behind.
    state.current_epoch_index++;
-   state.current_epoch_start =
-      (state.next_epoch_start.sec_since_epoch() == 0) ? now : state.next_epoch_start;
-   state.next_epoch_start = state.current_epoch_start +
-      microseconds(static_cast<int64_t>(cfg->epoch_duration_sec) * 1'000'000);
+   state.current_epoch_start = now;
+   state.traffic_since       = time_point{};
+   state.due_at              = time_point{};
    state_tbl.set(ram_payer, key, state);
 
    action(
@@ -443,6 +473,20 @@ void epoch::advance(sysio::slug_name chain_code) {
       FINISH_ADVANCE,
       std::make_tuple(chain_code, state.current_epoch_index)
    ).send();
+}
+
+// ---------------------------------------------------------------------------
+//  notetraffic
+// ---------------------------------------------------------------------------
+void epoch::notetraffic(sysio::slug_name chain_code, time_point since) {
+   require_auth(MSGCH_ACCOUNT);
+   note_chain_traffic(get_self(), chain_code, since);
+}
+
+void epoch::onqueueout(uint64_t chain_code, AttestationType attest_type, [[maybe_unused]] std::vector<char> data) {
+   // Only a general-lane row is traffic: the schedule lane rides every advance's own envelope.
+   if (msgch::lane_of(attest_type) != msgch::queue_lane::general) return;
+   note_chain_traffic(get_self(), sysio::slug_name{chain_code}, current_time_point());
 }
 
 void epoch::finishadv(sysio::slug_name chain_code, uint32_t epoch_index) {
@@ -543,6 +587,14 @@ void epoch::finishadv(sysio::slug_name chain_code, uint32_t epoch_index) {
 
    // Note: last_elected_epoch tracking is epoch-internal state.
    // No operator table writes needed — group membership is in epoch_state.batch_op_groups.
+
+   // A chain that is not an active outpost builds no envelope below, so its general-lane rows stay queued: they are
+   // still its traffic, since the oldest became ready, which the advance cleared and no later `queueout` records.
+   if (!active_outpost) {
+      if (const std::optional<time_point> oldest_ready = msgch::oldest_ready_general(MSGCH_ACCOUNT, key.chain_code)) {
+         record_traffic(state, cfg, *oldest_ready, current_time_point());
+      }
+   }
 
    state_tbl.set(ram_payer, key, state);
 
@@ -996,6 +1048,9 @@ void epoch::resendroster(sysio::slug_name code) {
 
    rostersent_t sent_tbl(get_self());
    sent_tbl.erase(chain_key{code.value}, "no roster has been queued to this outpost");
+
+   // The roster rides the chain's next envelope, so the chain is due no later than one minimum from now.
+   note_chain_traffic(get_self(), code, current_time_point());
 }
 
 } // namespace sysio

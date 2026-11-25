@@ -529,8 +529,11 @@ public:
       return v["current_epoch_index"].as<uint32_t>();
    }
 
-   /// Permissionless consensus-and-time crank that triggers the scheduled outpost's sysio.epoch::advance.
+   /// Record traffic on the scheduled outpost since its epoch start (`epoch_state::mark_traffic`), then push the
+   /// permissionless `chkcons` crank, which advances its decided epoch once that traffic makes it due.
    action_result chkcons() {
+      sysio_system::test_support::epoch_state::mark_traffic(*this, epoch_abi,
+                                                            fc::slug_name{dispatch_chain}.to_string());
       return push(MSGCH_ACCOUNT, msgch_abi, BATCHOP, "chkcons"_n, mvo()("chain_code", dispatch_chain));
    }
 

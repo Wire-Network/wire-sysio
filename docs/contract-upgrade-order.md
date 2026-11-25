@@ -125,7 +125,10 @@ the pushed capex and governance buckets), so the transitive subtree — not just
 the table above — sits inside each clock's abort surface. `advance(chain)`
 itself is inlined by `sysio.msgch::chkcons(chain)` (and by
 `sysio.msgch::bootstrap` / `bootchain` at a chain's epoch 0), so `sysio.msgch`
-is both a caller and a callee of `sysio.epoch`. Outside the clocks, `sysio.msgch`'s
+is both a caller and a callee of `sysio.epoch`; inside `advance`, `sysio.msgch::buildenv` also inlines
+`sysio.epoch::notetraffic` when general-lane rows stay queued. Outside the clocks, `sysio.msgch::queueout`
+notifies `sysio.epoch` (`onqueueout`) when a chain's general-lane queue goes from empty to non-empty, and
+`sysio.msgch`'s
 acceptance of an epoch's winner (`evalcons` inside `deliver` and `chkcons`, and
 `resolvedisp` inside `sysio.chalg::chkdispute`) inlines `sysio.chalg::slashop` →
 `sysio.opreg::slash` for each non-canonical deliverer.
@@ -242,6 +245,18 @@ written in the shorter layout. Every reader is rebuilt: `sysio.msgch` and `sysio
 and `sysio.opreg` (`flushwtdw`) and `sysio.synd` read `outpcons`. `sysio.opreg::regoperator` and
 `joinchain` treat a member of `previous_group` as still seated. No migration is supplied: deploy
 `sysio.epoch`, `sysio.msgch`, `sysio.opreg` and `sysio.synd` together on a fresh chain.
+
+### Depot-paced epochs
+
+A chain advances only once it is due: `epochstate` drops `next_epoch_start` and gains `traffic_since` and
+`due_at`, both zero while the chain is idle, and each advance opens the next epoch at its own time. Traffic is
+recorded by the new `sysio.epoch::notetraffic` (auth `sysio.msgch`, inlined by `buildenv` for rows an envelope
+leaves behind), by `sysio.epoch`'s handler of the `sysio.msgch::queueout` notification, and by `resendroster`.
+`sysio.msgch::chkcons` advances a decided epoch once `due_at` has passed, and `rcrdduty` credits one chain
+minimum per duty epoch. The `epochstate` layout changes in place, so every reader is rebuilt: `sysio.msgch` and
+`sysio.opreg` read it, and the test-only `epoch_stub` writes it. No migration is supplied: deploy
+`sysio.epoch` and `sysio.msgch` together, with the rebuilt `sysio.opreg`, on a fresh chain with the matching
+`batch_operator_plugin`, which reads `due_at` and `sysio.msgch::outpcons` to push `chkcons`.
 
 ## The two rules for future changes
 
