@@ -51,7 +51,9 @@ namespace sysio {
       /// emission share of the epoch this tick closes, pays on a pay epoch, and steps the batch-duty
       /// settlement. Once the clock has caught up to the grid (`economic_state::caught_up`), a pay epoch ticked
       /// while a later boundary has passed defers its payout to the tick that catches up, which pays every overdue
-      /// period's pools in one payout, split over all the work counted since the last one.
+      /// period's pools in one payout, split over all the work counted since the last one. Until then each pay epoch's
+      /// payout spends nothing and is never held for balance: its whole period stays in the treasury, and the blocks
+      /// and duty counted meanwhile carry to the first payout after the clock has caught up.
       [[sysio::action]]
       void tickeconomy(uint32_t epoch_index);
 
@@ -133,8 +135,10 @@ namespace sysio {
          time_point current_epoch_start{};
          time_point next_epoch_start{};
          /// Set by the first tick that finds no later boundary passed, and never cleared. Until then the clock is
-         /// catching up through a grid started in the past, and each pay epoch pays its own period; from then on a
-         /// pay epoch ticked while a later boundary has passed defers its payout to the tick that catches up.
+         /// catching up, through a grid started in the past or behind a first tick run more than one epoch late, and
+         /// each pay epoch closes its own period without spending any of it (sysio.system::payepoch reads this flag);
+         /// from then on a pay epoch ticked while a later boundary has passed defers its payout to the tick that
+         /// catches up.
          bool       caught_up = false;
 
          SYSLIB_SERIALIZE(economic_state, (current_epoch_index)(current_epoch_start)(next_epoch_start)(caught_up))

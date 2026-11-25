@@ -68,7 +68,9 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
    clock has caught up to the grid (`caught_up`, set by the first tick that finds no later boundary passed),
    a pay epoch ticked while a later boundary has passed defers its payout, without a `blocklog` row, to the
    tick that catches up, which pays every overdue period's pools in one payout, split over all the work
-   counted since the last one. A grid started in the past pays each of its pre-launch periods on its own.
+   counted since the last one. Until then the clock is catching up (a grid started in the past, or a first tick
+   run more than one economic epoch late): each pay epoch's payout spends nothing and is never held for balance,
+   and the blocks and duty counted meanwhile carry to the first payout after the clock has caught up.
 2. Bump the economic epoch index; its boundaries come from the grid, never from when the crank ran,
    so a late or caught-up crank accrues exactly what an on-time one would.
 3. `sysio.opreg::flushwtdw` matures queued collateral withdrawals whose economic wait and consensus

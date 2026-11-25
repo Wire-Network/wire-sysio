@@ -28,10 +28,17 @@ skip the duty actions until `initt5` has run: nothing can be paid before then,
 and consensus must not depend on `sysio.system`.
 
 A start time in the past makes the clock catch up, one epoch per tick, through
-the elapsed grid. Until it first reaches the grid (`economystate.caught_up`) each
-pay epoch pays its own period, so every epoch before launch accrues its curve share
-and is paid on its own; nobody produced a block or served a consensus epoch in
-those epochs, so their producer and batch-operator slices stay in the treasury.
+the elapsed grid, and so does a cluster whose first tick runs more than one
+economic epoch late. Until a tick first finds no later boundary passed
+(`economystate.caught_up`, which `payepoch` reads), each pay epoch's payout spends
+nothing: the period's whole emission stays in the treasury, and the gate never
+holds such a payout for balance. It still drains the period's accrual and slots,
+starts the next period, writes the `epochlog` row (its total, with every category
+zero) and resets the snapshot-attestation counters. It credits and pushes nothing,
+clears no block count and leaves the duty period open: the blocks and duty counted
+before and during the catch-up carry to the first payout after it, which pays them
+from its own period's pools. Payouts therefore start at the first tick that reaches
+the grid; a launch whose first tick runs on time is caught up from that tick.
 
 ### Work counts toward the open period
 
@@ -78,8 +85,9 @@ epochs accrue zero, and its `payepoch` settles what was accrued. Emissions are
 held with `TREASURY_EXHAUSTED` once the budget is spent, or when the curve
 yields zero with nothing pending; a pay epoch whose period total exceeds the
 spendable balance is held with `BALANCE_INSUFFICIENT` and pays at the first
-economic epoch that can cover it. A held gate holds emissions only: the economic
-clock keeps ticking (withdrawals mature) and consensus never waits on it.
+economic epoch that can cover it, except during a catch-up, whose payouts spend
+nothing. A held gate holds emissions only: the economic clock keeps ticking
+(withdrawals mature) and consensus never waits on it.
 
 A paid period's batch pool that has not yet been credited to its operators
 (`t5state.unsettled_batch_emission`) is committed too: `net_headroom` and the
@@ -146,12 +154,12 @@ block. Batch operators are paid from emission only, so `producer_bps` /
 
 Batch-op pay follows **duty units**. Each consensus epoch close credits one unit
 to every member of the group that served it (`rcrdduty`, a `batchduty` row per
-operator). Each `payepoch` closes the open pay period and splits its batch pool
-pro rata to the period's units: an operator's share is
-`batch_pool * units / period_units`. Only opreg-ACTIVE batch operators are
-credited, at settlement time; the share of an operator slashed or terminated
-since stays in the treasury, as do integer-division remainders and the whole pool
-of a period with no duty.
+operator). Each `payepoch` made once the economic clock has caught up closes the
+open pay period and splits its batch pool pro rata to the period's units: an
+operator's share is `batch_pool * units / period_units`. Only opreg-ACTIVE batch
+operators are credited, at settlement time; the share of an operator slashed or
+terminated since stays in the treasury, as do integer-division remainders and the
+whole pool of a period with no duty.
 
 Settlement is bounded: one step examines at most `MAX_DUTY_SETTLEMENT_ROWS` (50)
 `batchduty` rows. `payepoch` takes the first step, and every economic epoch's
@@ -377,7 +385,7 @@ period_emission
 | `claimnodedis` | node owner | Claim vested node-owner allocation (refused when it would spend pay reserved in `payclaimtot`) |
 | `claimpay` | the claiming account | Claim epoch pay credited by `payepoch` (producer / standby / batch-operator share) |
 | `accrueepoch` | `sysio.epoch` | Accrue the curve share and the block slots of the economic epoch its tick closes (`closed_epoch_duration_sec`) |
-| `payepoch` | `sysio.epoch` | Distribute the period's compute / capex / governance (credits `payclaims`; pushes only the category buckets) and open its batch-duty settlement; waits while an earlier settlement is open |
+| `payepoch` | `sysio.epoch` | Distribute the period's compute / capex / governance (credits `payclaims`; pushes only the category buckets) and open its batch-duty settlement; waits while an earlier settlement is open; spends nothing while the economic clock catches up |
 | `rcrdduty` | `sysio.epoch` | Credit one duty unit to each member of the group that served a consensus epoch, in the pay period open when it is recorded |
 | `settleduty` | `sysio.epoch` | One bounded step of the open batch-duty settlement |
 | `viewnodedist` | read-only | Preview a node owner's claimable amount |

@@ -832,13 +832,21 @@ void system_contract::payepoch(uint32_t epoch_index, int64_t period_emission) {
       }
    }
 
+   // While the economic clock catches up (it has ticked but never reached the grid), a payout spends nothing and leaves
+   // the duty period open: the period stays in the treasury, and the blocks and duty counted meanwhile carry to the
+   // first payout after it. tickeconomy writes the clock state before this inline action.
+   const sysio::epoch::economic_state economy =
+      sysio::epoch::economystate_t(epoch_refs::account).get_or_default(sysio::epoch::economic_state{});
+   const bool    catching_up    = economy.current_epoch_index > 0 && !economy.caught_up;
+   const int64_t spent_emission = catching_up ? 0 : period_emission;
+
    // ----- Category splits -----
    // payepoch transfers compute + capex + governance only. The implicit
    // remainder (period_emission - compute - capex - governance) stays
    // in sysio's balance. Sum-to-10000 BPS means no unallocated remainder.
-   const int64_t compute_amount    = split_bps(period_emission, cfg.compute_bps);
-   const int64_t capex_amount      = split_bps(period_emission, cfg.capex_bps);
-   const int64_t governance_amount = split_bps(period_emission, cfg.governance_bps);
+   const int64_t compute_amount    = split_bps(spent_emission, cfg.compute_bps);
+   const int64_t capex_amount      = split_bps(spent_emission, cfg.capex_bps);
+   const int64_t governance_amount = split_bps(spent_emission, cfg.governance_bps);
 
    const int64_t producer_pool = split_bps(compute_amount, cfg.producer_bps);
    const int64_t batch_pool    = compute_amount - producer_pool;
@@ -1016,7 +1024,8 @@ void system_contract::payepoch(uint32_t epoch_index, int64_t period_emission) {
    // =======================================================================
    // Batch-op pay. The period's duty units split the batch pool: open a
    // settlement for the period now closing and take its first step. A period
-   // with no duty leaves the whole pool in the treasury.
+   // with no duty leaves the whole pool in the treasury. A catch-up payout
+   // leaves the duty period open.
    // =======================================================================
    const bool batch_has_duty = duty.open_units > 0 && batch_pool > 0;
    if (batch_has_duty) {
@@ -1028,8 +1037,10 @@ void system_contract::payepoch(uint32_t epoch_index, int64_t period_emission) {
       duty.settle_cursor        = 0;
       state.unsettled_batch_emission = batch_pool;
    }
-   duty.open_period += 1;
-   duty.open_units   = 0;
+   if (!catching_up) {
+      duty.open_period += 1;
+      duty.open_units   = 0;
+   }
 
    // =======================================================================
    // Category buckets: fixed accounts, no opreg filter. The unallocated
