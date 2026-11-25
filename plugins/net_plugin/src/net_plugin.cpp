@@ -3459,7 +3459,8 @@ namespace sysio {
       const size_t trx_size = ptr->get_estimated_size();
       if (!net_utils::fits_trx_in_progress_budget(in_progress_size, trx_size)) {
          drop_trx(in_progress_size);
-         my_impl->producer_plug->log_failed_transaction(trx_id, ptr, trx_in_progress_drop_reason.data());
+         // ABI resolution reads chain state and belongs on the application thread.
+         my_impl->producer_plug->log_failed_transaction(trx_id, {}, trx_in_progress_drop_reason.data());
          return true;
       }
 
