@@ -44,8 +44,7 @@ namespace sysio {
  */
 class outpost_opp_job {
 public:
-   /// @param clock the time `run_backlog` paces its reads and re-reports by: the wall clock unless a test injects
-   ///              its own.
+   /// @param clock the time `run_backlog` paces its reads by: the wall clock unless a test injects its own.
    outpost_opp_job(outpost_client_ptr              client,
                    depot_ops&                      depot,
                    std::function<fc::time_point()> clock = &fc::time_point::now);
@@ -74,24 +73,14 @@ public:
    /// chain's current epoch N, the depot has decided N, and the outpost's
    /// latest emitted epoch is N with messages still queued, so no message that
    /// left in N's emit counts. The count and its age come from one outpost read.
-   /// Reported once per epoch, and again while this operator's report for N
-   /// stands and the chain stays idle a chain minimum after the last one, since
-   /// a report re-runs the depot's tally over the eligible group. While nothing
-   /// is reported for N, the outpost is read at most a quarter of the chain
-   /// minimum apart rather than every cycle.
+   /// Reported once per epoch. While nothing is reported for N, the outpost is
+   /// read at most a quarter of the chain minimum apart rather than every cycle.
    void run_backlog();
 
    /// For logging / job labels.
    const outpost_client& client() const { return *_client; }
 
 private:
-   /// This operator's last backlog report on the chain: its epoch, and when it
-   /// was made or, after a restart, first seen standing.
-   struct backlog_report {
-      uint32_t       epoch_index = 0;
-      fc::time_point reported_at;
-   };
-
    outpost_client_ptr              _client;
    depot_ops&                      _depot;
    std::function<fc::time_point()> _clock;
@@ -103,8 +92,6 @@ private:
    /// The epoch whose outpost crank ran, after its first outbound call that
    /// returned. Never gates a delivery.
    uint32_t _last_outbound_epoch = 0;
-   /// See `backlog_report`; empty until the first report on the chain.
-   std::optional<backlog_report> _backlog_report;
    /// When `run_backlog` last read the outpost's backlog; zero before its first read.
    fc::time_point _last_backlog_read;
 };

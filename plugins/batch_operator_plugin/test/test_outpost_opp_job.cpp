@@ -696,14 +696,16 @@ BOOST_FIXTURE_TEST_CASE(run_backlog_reports_a_decided_epochs_backlog_once, backl
    BOOST_REQUIRE_EQUAL(client->backlog_calls.size(), 1u);
    BOOST_CHECK(client->backlog_calls[0] == kDeadline);
 
-   // The report now stands: within the grace nothing is read or reported again.
+   // The report now stands: however long the chain stays idle, the epoch is neither read nor reported again.
    reported.insert(kTestEpoch);
-   for (unsigned tick = 0; tick < kRepeatedPolls; ++tick) job.run_backlog();
+   for (unsigned tick = 0; tick < kRepeatedPolls; ++tick) {
+      now += depot.chain_minimum;
+      job.run_backlog();
+   }
    BOOST_CHECK_EQUAL(client->backlog_calls.size(), 1u);
    BOOST_CHECK_EQUAL(depot.report_calls.size(), 1u);
 
-   // The next epoch is reported afresh, once the read pace allows.
-   now += read_pace();
+   // The next epoch is reported afresh.
    depot.epoch = kTestEpoch + 1;
    client->backlog_response = [] {
       return outbound_backlog{.outbound_epoch = kTestEpoch + 1, .pending_count = 1, .oldest_pending_ms = oldest_ms};
@@ -811,37 +813,6 @@ BOOST_FIXTURE_TEST_CASE(run_backlog_never_holds_up_a_delivery, backlog_fixture) 
    release.set_value();
    backlog.join();
    BOOST_CHECK_EQUAL(depot.report_calls.size(), 1u);
-}
-
-/// A standing report is made again while the chain stays idle a chain minimum after the last one, re-running the
-/// depot's tally; never while the chain has traffic. A report found standing (after a restart) starts that grace then.
-BOOST_FIXTURE_TEST_CASE(run_backlog_reports_again_while_the_chain_stays_idle_past_the_grace, backlog_fixture) {
-   const fc::microseconds grace = depot.chain_minimum;
-   reported.insert(kTestEpoch);
-
-   job.run_backlog();   // found standing: the grace starts now
-   BOOST_CHECK(client->backlog_calls.empty());
-   now += grace - fc::microseconds(1);
-   job.run_backlog();
-   BOOST_CHECK(client->backlog_calls.empty());
-
-   now += fc::microseconds(1);
-   depot.traffic_recorded = true;
-   job.run_backlog();   // the chain has traffic: the report did its job
-   BOOST_CHECK(client->backlog_calls.empty());
-
-   depot.traffic_recorded = false;
-   job.run_backlog();   // idle past the grace: reported again
-   BOOST_CHECK_EQUAL(client->backlog_calls.size(), 1u);
-   BOOST_REQUIRE_EQUAL(depot.report_calls.size(), 1u);
-   BOOST_CHECK_EQUAL(depot.report_calls[0].epoch_index, kTestEpoch);
-
-   now += grace - fc::microseconds(1);
-   job.run_backlog();   // the grace runs from the re-report
-   BOOST_CHECK_EQUAL(depot.report_calls.size(), 1u);
-   now += fc::microseconds(1);
-   job.run_backlog();
-   BOOST_CHECK_EQUAL(depot.report_calls.size(), 2u);
 }
 
 // ─── per-chain epochs ───────────────────────────────────────────────────────

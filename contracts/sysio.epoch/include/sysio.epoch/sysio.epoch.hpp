@@ -61,8 +61,8 @@ namespace sysio {
       /// its current value and `since`, and `due_at` becomes the later of `current_epoch_start` and
       /// `traffic_since`, plus the chain's minimum duration. A `since` that is zero or later than now counts as
       /// now. No effect before the chain's genesis advance. A paused chain records traffic but does not
-      /// advance until it resumes. Auth: sysio.msgch (`buildenv`, and `reportqueue` once a strict majority of
-      /// the chain's eligible group reports an outbound backlog on the outpost).
+      /// advance until it resumes. Auth: sysio.msgch (`buildenv`, `reportqueue` once a strict majority of
+      /// the seats of the chain's group report an outbound backlog on the outpost, and `resolvedisp`).
       [[sysio::action]]
       void notetraffic(sysio::slug_name chain_code, sysio::time_point since);
 

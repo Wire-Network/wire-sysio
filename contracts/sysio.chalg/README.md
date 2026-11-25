@@ -6,7 +6,7 @@ OPP envelope dispute resolution and slash-execution contract.
 
 - Resolves conflicting OPP outpost envelopes via a Tier-1 node-owner vote when the automatic
   consensus rules in `sysio.msgch` see a split for one (outpost, epoch) in which no delivered version
-  can still reach a strict majority of the eligible group with the eligible operators still silent. A
+  can still reach a strict majority of the group's seats with the eligible operators still silent. A
   split that a silent operator can still decide is not disputed: it waits for that operator, or for
   governance.
 - Pauses the disputed chain's epoch advancement while its dispute is open and releases it on
@@ -35,7 +35,7 @@ OPP envelope dispute resolution and slash-execution contract.
 
 1. **Open**: `sysio.msgch::evalcons` calls `opendispute` inline, for an epoch that has not reached
    consensus, on the evaluation at which no delivered version can still reach a strict majority of
-   the eligible group with the eligible operators still silent (so at least two versions). The dispute
+   the group's seats with the eligible operators still silent (so at least two versions). The dispute
    records the candidate checksums, snapshots the active ROA generation's Tier-1 electorate
    and fixed quorum, and pauses the disputed chain's `sysio.epoch` advancement; other chains keep
    advancing.
@@ -50,7 +50,8 @@ OPP envelope dispute resolution and slash-execution contract.
    chain's epoch paused until Tier-1 supplies a resolvable vote.
 4. **Resolve**: the winning checksum is recorded and dispatched via `sysio.msgch::resolvedisp`, whose
    acceptance of the winner slashes, through `slashop`, every operator whose delivery for the epoch
-   differs from it, one delivered after the dispute opened included. The disputed chain's epoch is
+   differs from it, one delivered after the dispute opened included, and records the chain's traffic at
+   the resolution, so the chain becomes due and advances to its next group. The disputed chain's epoch is
    then unpaused.
 
 ## Dependencies

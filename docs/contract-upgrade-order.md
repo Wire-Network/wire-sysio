@@ -127,7 +127,8 @@ itself is inlined by `sysio.msgch::chkcons(chain)` (and by
 `sysio.msgch::bootstrap` / `bootchain` at a chain's epoch 0), so `sysio.msgch`
 is both a caller and a callee of `sysio.epoch`; inside `advance`, `sysio.msgch::buildenv` also inlines
 `sysio.epoch::notetraffic` when general-lane rows stay queued. Outside the clocks, `sysio.msgch::reportqueue`
-inlines `notetraffic` once a strict majority of a chain's eligible group reports an outbound backlog,
+inlines `notetraffic` once a strict majority of a chain's group seats reports an outbound backlog,
+`sysio.msgch::resolvedisp` inlines it when a dispute resolves,
 `sysio.msgch::queueout`
 notifies `sysio.epoch` (`onqueueout`) when a chain's general-lane queue goes from empty to non-empty, and
 `sysio.msgch`'s
@@ -253,7 +254,7 @@ and `sysio.opreg` (`flushwtdw`) and `sysio.synd` read `outpcons`. `sysio.opreg::
 A chain advances only once it is due: `epochstate` drops `next_epoch_start` and gains `traffic_since` and
 `due_at`, both zero while the chain is idle, and each advance opens the next epoch at its own time. Traffic is
 recorded by the new `sysio.epoch::notetraffic` (auth `sysio.msgch`, inlined by `buildenv` for rows an envelope
-leaves behind, and by the new `sysio.msgch::reportqueue` once a strict majority of the chain's eligible group
+leaves behind, and by the new `sysio.msgch::reportqueue` once a strict majority of the seats of the chain's group
 reports an outbound backlog on the outpost), by `sysio.epoch`'s handler of the `sysio.msgch::queueout`
 notification, and by `resendroster`. `reportqueue` keeps its reports in the new `sysio.msgch::qreports` table.
 `sysio.msgch::chkcons` advances a decided epoch once `due_at` has passed, and `rcrdduty` credits one chain

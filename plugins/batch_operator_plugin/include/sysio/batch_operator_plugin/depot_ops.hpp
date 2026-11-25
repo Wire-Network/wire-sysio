@@ -123,13 +123,6 @@ struct depot_ops {
    virtual bool is_decided(uint64_t chain_code) const = 0;
 
    /**
-    * True when outpost `chain_code` has traffic recorded, so it is or will be
-    * due (`epochstate.due_at` is set). False while it is idle or its epoch
-    * state has not been read.
-    */
-   virtual bool has_traffic(uint64_t chain_code) const = 0;
-
-   /**
     * Outpost `chain_code`'s minimum duration between two epochs
     * (`epochcfg.epoch_duration_sec`), or zero while its epoch state has not
     * been read.

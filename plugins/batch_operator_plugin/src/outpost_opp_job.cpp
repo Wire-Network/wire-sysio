@@ -15,8 +15,6 @@ namespace sysio {
 
 namespace {
 
-/// Chain minimums a standing backlog report waits, with the chain still idle, before it is made again.
-constexpr int64_t BACKLOG_REREPORT_GRACE_MINIMUMS = 1;
 /// Outpost backlog reads per chain minimum, at most, while this operator has nothing reported for the epoch.
 constexpr int64_t BACKLOG_READS_PER_MINIMUM = 4;
 
@@ -230,22 +228,11 @@ void outpost_opp_job::run_backlog() {
    }
 
    try {
-      const fc::time_point   now      = _clock();
-      const fc::microseconds minimum  = _depot.minimum_duration(chain_code);
-      const bool             reported = _depot.has_reported_backlog(chain_code, epoch);
-      if (reported) {
-         // A standing report for this epoch is made again only while the chain stays idle a grace after the last
-         // one: a report re-runs the tally, which an eligible group that shrank since may now pass. A report found
-         // standing after a restart starts that grace now.
-         if (!_backlog_report || _backlog_report->epoch_index != epoch) {
-            _backlog_report = backlog_report{.epoch_index = epoch, .reported_at = now};
-            return;
-         }
-         const fc::microseconds grace = batch_operator_detail::chain_minimums(minimum, BACKLOG_REREPORT_GRACE_MINIMUMS);
-         if (_depot.has_traffic(chain_code) || now < _backlog_report->reported_at + grace) return;
-      } else if (now < _last_backlog_read + fc::microseconds(minimum.count() / BACKLOG_READS_PER_MINIMUM)) {
-         return;
-      }
+      // One report per epoch: each eligible member's first report runs the depot's tally.
+      if (_depot.has_reported_backlog(chain_code, epoch)) return;
+      const fc::time_point   now     = _clock();
+      const fc::microseconds minimum = _depot.minimum_duration(chain_code);
+      if (now < _last_backlog_read + fc::microseconds(minimum.count() / BACKLOG_READS_PER_MINIMUM)) return;
 
       _last_backlog_read = now;
       const outbound_backlog backlog = _client->read_outbound_backlog(_depot.delivery_timeout(chain_code));
@@ -264,9 +251,8 @@ void outpost_opp_job::run_backlog() {
               _client->to_string(), epoch);
          return;
       }
-      _backlog_report = backlog_report{.epoch_index = epoch, .reported_at = now};
-      ilog("outpost_opp_job[{}]: {}reported an outbound backlog of {} pending since {} ms for epoch {}",
-           _client->to_string(), reported ? "re-" : "", backlog.pending_count, backlog.oldest_pending_ms, epoch);
+      ilog("outpost_opp_job[{}]: reported an outbound backlog of {} pending since {} ms for epoch {}",
+           _client->to_string(), backlog.pending_count, backlog.oldest_pending_ms, epoch);
    } catch (const fc::exception& e) {
       wlog("outpost_opp_job[{}]: backlog cycle failed: {}", _client->to_string(), e.to_string());
    } catch (const std::exception& e) {

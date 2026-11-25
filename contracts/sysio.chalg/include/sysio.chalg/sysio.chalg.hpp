@@ -49,8 +49,8 @@ namespace sysio {
       // -----------------------------------------------------------------------
 
       /// Open an OPP envelope dispute. Called inline by `sysio.msgch::evalcons` once no delivered
-      /// version can still reach a strict majority of the eligible group. msgch owns that check and
-      /// the electorate preflight because it alone has the live eligible group and delivery tally.
+      /// version can still reach a strict majority of the group's seats. msgch owns that check and
+      /// the electorate preflight because it alone has the live group and delivery tally.
       /// Records the candidate checksums, snapshots the Tier-1 electorate (the Tier-1
       /// rows of `sysio.roa::nodeowners` for the current network generation) together with its
       /// quorum, and pauses the disputed chain's epoch advancement until a Tier-1 node-owner vote
@@ -91,7 +91,7 @@ namespace sysio {
       };
 
       /// OPP envelope dispute. Opened for one (outpost, epoch) once no delivered version can still
-      /// reach a strict majority of the eligible group with the eligible operators still silent (so
+      /// reach a strict majority of the group's seats with the eligible operators still silent (so
       /// at least two versions). Resolved by a Tier-1 node-owner vote on the
       /// canonical checksum. The row is retained after resolution as the audit record (and as the
       /// guard that prevents re-opening the same (outpost, epoch) dispute). A chain holds at most one

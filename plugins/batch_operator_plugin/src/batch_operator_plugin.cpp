@@ -514,10 +514,6 @@ struct batch_operator_plugin::impl {
          const std::optional<batch_operator_detail::chain_epoch_view> view = _impl.chain_epoch_of(chain_code);
          return view && view->decided;
       }
-      bool has_traffic(uint64_t chain_code) const override {
-         const std::optional<batch_operator_detail::chain_epoch_view> view = _impl.chain_epoch_of(chain_code);
-         return view && view->due_at != fc::time_point();
-      }
       fc::microseconds minimum_duration(uint64_t chain_code) const override {
          const std::optional<batch_operator_detail::chain_epoch_view> view = _impl.chain_epoch_of(chain_code);
          return view ? view->epoch_duration : fc::microseconds();

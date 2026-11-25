@@ -221,7 +221,7 @@ enum class chkcons_reason {
    /// Elected, and the decided epoch is due: `chkcons` advances it.
    due,
    /// Elected, and the epoch has been undecided past the chain minimum: `chkcons` re-tallies it, since its eligible
-   /// group can shrink with no new delivery. At most once per chain minimum from this operator.
+   /// members can change with no new delivery. At most once per chain minimum from this operator.
    retally,
    /// Serving the chain, elected or not, and the decided epoch has stayed due past the liveness grace: `chkcons`
    /// advances it while its elected group does not.

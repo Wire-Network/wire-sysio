@@ -137,7 +137,7 @@ On Solana the outpost lives in the `liqsol-core` program (`instructions/opp/`), 
 
 ## Consensus & Security
 
-- **Group consensus**: An envelope is accepted on the first strict majority of the eligible operators in the chain's active group, at any time in the epoch.
+- **Group consensus**: An envelope is accepted on the first strict majority of the seats of the chain's active group, at any time in the epoch. Only the deliveries of operators eligible to deliver count, and every seat counts toward the majority, as on both outposts: a slashed or inactive operator never lowers the number needed.
 - **Envelope hash chains**: Each envelope carries the digest of its predecessor on the same stream, and messages carry sequence numbers, so envelopes and messages cannot be reordered or replayed.
 - **Disputes**: A split opens a `sysio.chalg` dispute once no delivered version can still reach a strict majority; a split a silent operator can still decide waits for it, or for governance. The dispute pauses that chain's epoch until Tier-1 node owners vote a canonical envelope; other chains keep advancing.
 - **Slashing**: Operators that delivered a non-canonical envelope are slashed when the epoch's winner is accepted, by consensus or by the vote; silence is never slashed.

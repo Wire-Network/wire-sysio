@@ -86,7 +86,6 @@ public:
    bool is_elected(uint64_t chain_code) const override { return knobs_of(chain_code).elected; }
    uint32_t current_epoch(uint64_t chain_code) const override { return knobs_of(chain_code).epoch; }
    bool is_decided(uint64_t chain_code) const override { return knobs_of(chain_code).decided; }
-   bool has_traffic(uint64_t chain_code) const override { return knobs_of(chain_code).traffic_recorded; }
    fc::microseconds minimum_duration(uint64_t chain_code) const override {
       return knobs_of(chain_code).chain_minimum;
    }
@@ -107,7 +106,6 @@ public:
       bool     elected               = true;
       uint32_t epoch                 = 1;
       bool     decided               = false;
-      bool     traffic_recorded      = false;   ///< what `has_traffic` answers
       fc::microseconds chain_minimum = default_minimum_duration;   ///< what `minimum_duration` answers
       /// What `delivery_timeout` answers: the deadline the job hands every outpost call.
       fc::microseconds delivery_timeout = default_delivery_timeout;
@@ -118,7 +116,6 @@ public:
    bool             elected               = true;
    uint32_t         epoch                 = 1;
    bool             decided               = false;
-   bool             traffic_recorded      = false;
    fc::microseconds chain_minimum         = default_minimum_duration;
    /// What `deliver_to_depot` answers once it records the call.
    bool             deliver_accepted  = true;
@@ -166,7 +163,6 @@ private:
       return chain_knobs{.elected               = elected,
                          .epoch                 = epoch,
                          .decided               = decided,
-                         .traffic_recorded      = traffic_recorded,
                          .chain_minimum         = chain_minimum};
    }
 

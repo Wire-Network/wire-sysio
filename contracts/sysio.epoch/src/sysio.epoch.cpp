@@ -787,10 +787,8 @@ void epoch::finishadv(sysio::slug_name chain_code, uint32_t epoch_index) {
       }
       attest.active_group_index = zpp::bits::vuint32_t{next_group_index};
       attest.epoch_index = zpp::bits::vuint32_t{state.current_epoch_index};
-      // Propagate this chain's epoch duration so the outpost can
-      // evaluate the fallback (path-2) majority consensus after this many
-      // seconds since the current epoch started — see
-      // .claude/rules/opp-consensus.md.
+      // Propagate this chain's minimum epoch duration. The outposts keep it for information only: their consensus
+      // tips on the first strict majority, at any time.
       attest.epoch_duration_sec = zpp::bits::vuint32_t{cfg.epoch_duration_sec};
       for (auto& group : state.batch_op_groups) {
          opp::attestations::BatchOperatorGroup grp;

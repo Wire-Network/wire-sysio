@@ -67,8 +67,7 @@ rest of the group. The outpost's per-epoch crank rides the first call of an epoc
    confirmation; SOL `OutboundMessageBuffer` and `LatestOutboundEnvelope` at `confirmed`)
 2. With messages queued, report the count and the backlog's age to the depot
    (`sysio.msgch::reportqueue`); a strict majority of the group's reports records the chain's traffic
-3. Report once per epoch, and again while this operator's report for N stands and the chain stays idle
-   (`due_at` zero) one chain minimum after the last one, which re-runs the depot's tally
+3. Report once per epoch
 4. While nothing is reported for N, read the outpost at most a quarter of the chain minimum apart, not
    every poll
 
@@ -86,7 +85,7 @@ minimum has passed) — is pushed for each relayed chain:
 |--------|------|
 | An elected operator, from the epoch tick | The epoch is decided (`sysio.msgch::outpcons` records it) and `due_at` has passed |
 | An elected operator, right after its own delivery of the current epoch | `due_at` has passed (the delivery may itself have decided the epoch) |
-| An elected operator, from the epoch tick | The epoch has stayed undecided one chain minimum past its start, at most once per chain minimum from this operator: its eligible group can shrink with no new delivery |
+| An elected operator, from the epoch tick | The epoch has stayed undecided one chain minimum past its start, at most once per chain minimum from this operator: its eligible members can change with no new delivery |
 | Any ACTIVE operator serving the chain, from the epoch tick | The epoch is decided and has stayed due one chain minimum past `due_at`, so its elected group is not advancing it |
 
 None goes to a chain before its genesis advance, to a paused chain, or to an idle decided

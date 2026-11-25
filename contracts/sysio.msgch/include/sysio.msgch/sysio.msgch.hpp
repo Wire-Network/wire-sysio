@@ -133,14 +133,16 @@ namespace sysio {
 
       /// Evaluate consensus on inbound envelopes for an outpost's current epoch.
       /// Called inline from deliver and chkcons. The first strict majority of the
-      /// eligible group (`count * 2 > eligible`) decides the epoch, at any time: it
-      /// unpacks the envelope, stores messages + attestations, records
-      /// per-outpost consensus, and slashes through `sysio.chalg::slashop` every
-      /// operator whose delivery for the epoch differs from the winner. Without
-      /// one, with at least two delivered versions, a `sysio.chalg` dispute opens
-      /// once no version can still reach a majority with the members still silent.
-      /// A split that a silent member can still decide waits for its delivery, or
-      /// for governance.
+      /// seats of the chain's group on duty (`count * 2 > seats`), counting only the
+      /// deliveries of members eligible to deliver (ACTIVE and not EVICTED from the
+      /// chain), decides the epoch, at any time: a slashed, evicted or inactive
+      /// member keeps its seat, so it never lowers the number needed. It unpacks the
+      /// envelope, stores messages + attestations, records per-outpost consensus,
+      /// and slashes through `sysio.chalg::slashop` every operator whose delivery
+      /// for the epoch differs from the winner. Without one, with at least two
+      /// delivered versions, a `sysio.chalg` dispute opens once no version can still
+      /// reach a majority with the eligible members still silent. A split that a
+      /// silent member can still decide waits for its delivery, or for governance.
       ///
       /// `chain_code` is the originating chain's slug_name value
       /// (see `deliver` for the convention). No effect before the chain's
@@ -154,7 +156,7 @@ namespace sysio {
 
       /// Permissionless crank for outpost `chain_code`'s current epoch, held while a dispute is open
       /// on it. An undecided epoch is re-tallied (`evalcons` inline, at any time), since its eligible
-      /// group can shrink with no new delivery. A decided epoch
+      /// members can change with no new delivery. A decided epoch
       /// advances once the chain is due (`sysio.epoch` `advance_due`: it has traffic and its minimum
       /// duration has passed since the later of its epoch start and that traffic); an idle chain stays in
       /// its decided epoch. No effect before the chain's genesis advance, which only `bootstrap` /
@@ -169,11 +171,10 @@ namespace sysio {
       /// envelope proves the outpost emitted it, so no message that left in that emit counts as a backlog.
       ///
       /// The report replaces the operator's `qreports` row for the chain, erases the chain's rows of earlier epochs
-      /// and runs the tally again, so a member's repeated report can reach a majority that the eligible set
-      /// shrank to after its first one. Once a strict majority of the chain's eligible group (the set `evalcons`
-      /// counts) has reported in the current epoch, it records the chain's traffic since the majority-th earliest
-      /// of their times (`sysio.epoch::notetraffic`), so a minority neither makes the chain due nor moves its
-      /// traffic earlier than the other members report.
+      /// and runs the tally. Once eligible members as many as a strict majority of the seats of the chain's group
+      /// on duty (the majority `evalcons` needs) have reported in the current epoch, it records the chain's traffic
+      /// since the majority-th earliest of their times (`sysio.epoch::notetraffic`), so a minority neither makes
+      /// the chain due nor moves its traffic earlier than the other members report.
       ///
       /// Auth: `batch_op`, a member of the chain's group on duty, ACTIVE in sysio.opreg and a member of the chain
       /// that is not EVICTED. Refused for a chain that is not an active outpost or has not run its genesis advance,
@@ -188,7 +189,8 @@ namespace sysio {
       /// winning envelope's raw bytes among this (outpost, epoch)'s deliveries and runs the shared
       /// consensus path (store + dispatch attestations, audit log, record the winner on `outpcons`,
       /// slash every operator whose delivery differs from the winner, one delivered after the
-      /// dispute opened included).
+      /// dispute opened included), then records the chain's traffic at the resolution
+      /// (`sysio.epoch::notetraffic`), so the chain becomes due and advances to its next group.
       [[sysio::action]]
       void resolvedisp(uint64_t chain_code, uint32_t epoch_index, checksum256 winning_checksum);
 
@@ -496,10 +498,10 @@ namespace sysio {
       };
 
       /// A batch operator's latest outbound backlog report for an outpost (`reportqueue`). The tally counts the
-      /// outpost's rows of its current epoch from its eligible group. Each report erases the outpost's rows of
-      /// earlier epochs, so an outpost holds its current epoch's rows and, until its next report, its last reported
-      /// epoch's: one per reporting member of the group on duty, or of a group that a governance `schbatchgps`
-      /// replaced mid-epoch, which the tally ignores.
+      /// outpost's rows of its current epoch from the eligible members of its group on duty. Each report erases the
+      /// outpost's rows of earlier epochs, so an outpost holds its current epoch's rows and, until its next report,
+      /// its last reported epoch's: one per reporting member of the group on duty, or of a group that a governance
+      /// `schbatchgps` replaced mid-epoch, which the tally ignores.
       struct [[sysio::table("qreports")]] queue_report_entry {
          uint64_t   chain_code;
          name       account;

@@ -60,7 +60,6 @@ BOOST_AUTO_TEST_CASE(defaults) {
    BOOST_CHECK_EQUAL(d.is_elected(0), true);
    BOOST_CHECK_EQUAL(d.current_epoch(0), 1u);
    BOOST_CHECK_EQUAL(d.is_decided(0), false);
-   BOOST_CHECK_EQUAL(d.has_traffic(0), false);
    BOOST_CHECK(d.minimum_duration(0) == mock_depot_ops::default_minimum_duration);
    BOOST_CHECK(d.delivery_timeout(0) == mock_depot_ops::default_delivery_timeout);
    BOOST_CHECK(!d.read_pending_outbound(0, 1).has_value());
@@ -87,19 +86,16 @@ BOOST_AUTO_TEST_CASE(epoch_queries_answer_per_chain) {
    d.chains[own_chain] = mock_depot_ops::chain_knobs{.elected               = false,
                                                      .epoch                 = own_epoch,
                                                      .decided               = true,
-                                                     .traffic_recorded      = true,
                                                      .chain_minimum         = own_minimum};
 
    BOOST_CHECK_EQUAL(d.current_epoch(own_chain), own_epoch);
    BOOST_CHECK_EQUAL(d.is_elected(own_chain), false);
    BOOST_CHECK_EQUAL(d.is_decided(own_chain), true);
-   BOOST_CHECK_EQUAL(d.has_traffic(own_chain), true);
    BOOST_CHECK(d.minimum_duration(own_chain) == own_minimum);
    BOOST_CHECK_EQUAL(d.current_epoch(default_chain), d.epoch);
    BOOST_CHECK_EQUAL(d.is_elected(default_chain), d.elected);
 
-   const std::vector<uint64_t> expected{own_chain, own_chain, own_chain, own_chain, own_chain, default_chain,
-                                        default_chain};
+   const std::vector<uint64_t> expected{own_chain, own_chain, own_chain, own_chain, default_chain, default_chain};
    BOOST_CHECK(d.epoch_queries == expected);
 }
 
