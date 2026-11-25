@@ -1,3 +1,5 @@
+#include "trx_admission.hpp"
+
 #include <sysio/net_plugin/net_plugin.hpp>
 #include <sysio/net_plugin/block_sync_rate_limiter.hpp>
 #include <sysio/net_plugin/buffer_factory.hpp>
@@ -292,7 +294,6 @@ namespace sysio {
    /**
     * default value initializers
     */
-   constexpr uint32_t def_max_trx_in_progress_size = 100u*1024u*1024u; // 100 MB
    constexpr uint32_t def_max_trx_entries_per_conn_size = 100u*1024u*1024u; // 100 MB = ~100K TPS
    constexpr auto     def_max_consecutive_immediate_connection_close = 9; // back off if client keeps closing
    constexpr auto     def_max_clients = 25; // 0 for unlimited clients
@@ -306,6 +307,11 @@ namespace sysio {
    // Since both notice and trx are sent when peer does not have a trx, set a minimum requirement for sending the notice.
    // 4096 chosen as an arbitrary threshold where an additional small notice adds little additional overhead.
    constexpr auto     def_trx_notice_min_size = 4096;
+
+   namespace {
+      constexpr auto trx_in_progress_drop_log_interval = fc::seconds(1);
+      constexpr char trx_in_progress_drop_reason[] = "per-peer in-flight byte limit reached or would be exceeded";
+   }
 
    class connections_manager {
    public:
@@ -829,6 +835,10 @@ namespace sysio {
 
       bool process_next_block_message(uint32_t message_length);
       bool process_next_trx_message(uint32_t message_length);
+      /// Apply duplicate tracking and relay policy before submitting a transaction that fits the in-flight budget.
+      void process_admitted_trx(const packed_transaction_ptr& trx, uint32_t trx_size, uint32_t message_length);
+      /// Count and rate-limit the diagnostic for a budget drop. A predecode drop has no verified transaction ID.
+      void drop_trx_for_in_progress_limit(uint32_t in_progress_size, const packed_transaction_ptr& trx);
       bool process_next_trx_notice_message(uint32_t message_length);
       bool process_next_vote_message(uint32_t message_length);
 
@@ -966,7 +976,7 @@ namespace sysio {
       void handle_message( const signed_block& msg ) = delete; // signed_block_ptr overload used instead
       void handle_message( const block_id_type& id, signed_block_ptr ptr, fc::time_point received_time );
       void handle_message( const transaction_message& msg ) = delete; // handled via process_next_trx_message
-      void handle_message( const packed_transaction_ptr& trx );
+      void handle_message( const packed_transaction_ptr& trx, uint32_t trx_size );
       void handle_message( const vote_message_ptr& msg );
       void handle_message( const vote_message& msg ) = delete; // vote_message_ptr overload used instead
       void handle_message( const block_nack_message& msg);
@@ -3403,67 +3413,48 @@ namespace sysio {
       // Early dedup: check if we already have this transaction — zero heap allocations on the duplicate path.
       // Consume which + trx_id from buffer
       // Wire format: [which (varint)][transaction_id (32 bytes)][packed_transaction ...]
-      // Bound the entire parse to the declared frame. A frame too short to hold which + trx_id (or a
-      // body that runs past message_length) throws here; process_next_message then closes the peer and
-      // returns false, stopping the read loop rather than consuming or acting on bytes from a following
-      // pipelined frame. Because the bound guarantees header_bytes <= message_length, the duplicate-path
-      // advance below cannot underflow.
-      const auto bytes_before = pending_message_buffer.bytes_to_read();
+      // Bound the header and any body decoding to this frame. A read past the bound throws and
+      // process_next_message closes the peer before any bytes of the next frame can be consumed.
       auto mb_ds = pending_message_buffer.create_datastream();
       fc::bounded_datastream ds( mb_ds, message_length );
       unsigned_int which{};
       fc::raw::unpack( ds, which );
       transaction_id_type trx_id;
       fc::raw::unpack( ds, trx_id );
-      const auto header_bytes = bytes_before - pending_message_buffer.bytes_to_read();
-
       if( my_impl->dispatcher.have_peer_txn( trx_id, *this ) ) {
          peer_dlog( p2p_trx_log, this, "got a duplicate transaction - dropping {}", trx_id );
-         pending_message_buffer.advance_read_ptr( message_length - header_bytes );
+         ds.skip( ds.remaining() );
          return true;
       }
 
-      const uint32_t trx_in_progress_sz = this->trx_in_progress_size.load();
+      net_utils::process_trx_message_body(
+         ds, trx_id, trx_in_progress_size,
+         [this](uint32_t in_progress_size, const packed_transaction_ptr& trx) {
+            drop_trx_for_in_progress_limit(in_progress_size, trx);
+         },
+         [this, &trx_id](const transaction_id_type& actual_id) {
+            peer_wlog( p2p_trx_log, this, "transaction_message ID mismatch: wire={} actual={}", trx_id, actual_id );
+            close();
+         },
+         [this, message_length](const packed_transaction_ptr& trx, uint32_t trx_size) {
+            process_admitted_trx(trx, trx_size, message_length);
+         });
+      return true;
+   }
 
-      auto now = fc::time_point::now();
-      // shared_ptr<packed_transaction> needed here because packed_transaction_ptr is shared_ptr<const packed_transaction>
-      std::shared_ptr<packed_transaction> ptr = std::make_shared<packed_transaction>();
-      // ds is bounded to message_length, so the body cannot be unpacked from bytes belonging to a
-      // following pipelined frame; advance to the frame boundary once the body is consumed.
-      fc::raw::unpack( ds, *ptr );
-      advance_to_frame_end( bytes_before, message_length );
-
-      // Validate that the wire ID matches the actual transaction ID.
-      if( ptr->id() != trx_id ) {
-         peer_wlog( p2p_trx_log, this, "transaction_message ID mismatch: wire={} actual={}", trx_id, ptr->id() );
-         close();
-         return true;
-      }
-
-      if( trx_in_progress_sz > def_max_trx_in_progress_size) {
-         char reason[72];
-         snprintf(reason, 72, "Dropping trx, too many trx in progress %u bytes", trx_in_progress_sz);
-         my_impl->producer_plug->log_failed_transaction(ptr->id(), ptr, reason);
-         if (now - fc::seconds(1) >= last_dropped_trx_msg_time) {
-            last_dropped_trx_msg_time = now;
-            peer_wlog(p2p_trx_log, this, "{}", reason);
-         }
-         if (my_impl->increment_dropped_trxs) {
-            my_impl->increment_dropped_trxs();
-         }
-         return true;
-      }
-
+   // called from connection strand
+   void connection::process_admitted_trx(const packed_transaction_ptr& ptr, uint32_t trx_size,
+                                        uint32_t message_length) {
       auto[trx_entries_sz, have_trx] = my_impl->dispatcher.add_peer_txn( ptr->id(), ptr->expiration(), *this );
       if (trx_entries_sz > def_max_trx_entries_per_conn_size) {
          peer_wlog(p2p_conn_log, this, "Max tracked trx reached {}, closing", trx_entries_sz);
          close();
-         return true;
+         return;
       }
 
       if( have_trx ) {
          peer_dlog( p2p_trx_log, this, "got a duplicate transaction - dropping" );
-         return true;
+         return;
       }
 
       const auto& tid = ptr->id();
@@ -3477,8 +3468,23 @@ namespace sysio {
          my_impl->dispatcher.bcast_transaction_notify(ptr);
       }
 
-      handle_message( ptr );
-      return true;
+      handle_message( ptr, trx_size );
+   }
+
+   // called from connection strand
+   void connection::drop_trx_for_in_progress_limit(uint32_t in_progress_size, const packed_transaction_ptr& trx) {
+      if (my_impl->increment_dropped_trxs) {
+         my_impl->increment_dropped_trxs();
+      }
+      const auto now = fc::time_point::now();
+      if (now - trx_in_progress_drop_log_interval >= last_dropped_trx_msg_time) {
+         last_dropped_trx_msg_time = now;
+         peer_wlog(p2p_trx_log, this, "Dropping trx: {} ({} bytes in progress)", trx_in_progress_drop_reason,
+                   in_progress_size);
+         if (trx) {
+            my_impl->producer_plug->log_failed_transaction(trx->id(), {}, trx_in_progress_drop_reason);
+         }
+      }
    }
 
    // called from connection strand
@@ -4282,16 +4288,10 @@ namespace sysio {
       });
    }
 
-   size_t calc_trx_size( const packed_transaction_ptr& trx ) {
-      return trx->get_estimated_size();
-   }
-
    // called from connection strand
-   void connection::handle_message( const packed_transaction_ptr& trx ) {
-      size_t trx_size = calc_trx_size( trx );
-      trx_in_progress_size += trx_size;
-      my_impl->chain_plug->accept_transaction( trx,
-         [weak = weak_from_this(), trx_size](const next_function_variant<transaction_trace_ptr>& result) mutable {
+   void connection::handle_message( const packed_transaction_ptr& trx, uint32_t trx_size ) {
+      auto next = net_utils::track_trx_in_progress(
+         *this, trx_size, [](const next_function_variant<transaction_trace_ptr>& result) {
          auto log_failed = [&](const fc::exception& e) {
             fc_dlog( p2p_trx_log, "bad packed_transaction : {}",
                      e.code() == tx_duplicate::code_value ? e.to_string() : e.what() );
@@ -4307,11 +4307,8 @@ namespace sysio {
                log_failed(*trace->except);
             }
          }
-         connection_ptr conn = weak.lock();
-         if( conn ) {
-            conn->trx_in_progress_size -= trx_size;
-         }
       });
+      my_impl->chain_plug->accept_transaction( trx, std::move(next) );
    }
 
    // called from connection strand

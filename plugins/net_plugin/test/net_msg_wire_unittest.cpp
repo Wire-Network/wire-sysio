@@ -1,3 +1,5 @@
+#include "../src/trx_admission.hpp"
+
 #include <boost/test/unit_test.hpp>
 
 #include <sysio/net_plugin/protocol.hpp>
@@ -7,12 +9,47 @@
 #include <fc/io/raw.hpp>
 #include <fc/crypto/private_key.hpp>
 #include <fc/crypto/bls_private_key.hpp>
+#include <fc/network/message_buffer.hpp>
+
+#include <atomic>
+#include <stdexcept>
 #include <string>
 
 using namespace sysio;
 using namespace sysio::chain;
 
 namespace {
+
+struct test_trx_connection : std::enable_shared_from_this<test_trx_connection> {
+   std::atomic<uint32_t> trx_in_progress_size{0};
+};
+
+struct trx_admission_fixture {
+   std::shared_ptr<test_trx_connection> conn = std::make_shared<test_trx_connection>();
+   uint32_t drops = 0;
+   uint32_t submissions = 0;
+   packed_transaction_ptr dropped_trx;
+   packed_transaction_ptr submitted_trx;
+   next_function<transaction_trace_ptr> completion;
+
+   template <typename Stream>
+   void receive(fc::bounded_datastream<Stream>& frame, const transaction_id_type& id) {
+      net_utils::process_trx_message_body(
+         frame, id, conn->trx_in_progress_size,
+         [&](uint32_t, const packed_transaction_ptr& trx) {
+            BOOST_CHECK_EQUAL(frame.remaining(), 0u);
+            ++drops;
+            dropped_trx = trx;
+         },
+         [](const transaction_id_type&) { BOOST_FAIL("unexpected transaction ID mismatch"); },
+         [&](const packed_transaction_ptr& trx, uint32_t trx_size) {
+            BOOST_CHECK_EQUAL(frame.remaining(), 0u);
+            ++submissions;
+            submitted_trx = trx;
+            completion = net_utils::track_trx_in_progress(*conn, trx_size, [](const auto&) {});
+         });
+   }
+};
 
 // Helper: create a minimal signed_transaction and return a packed_transaction.
 packed_transaction make_packed_trx(packed_transaction::compression_type compression =
@@ -183,6 +220,87 @@ BOOST_AUTO_TEST_CASE(test_trx_buffer_factory_format) {
    fc::raw::unpack( ds, unpacked_pt );
    BOOST_CHECK( unpacked_pt.id() == expected_id );
    BOOST_CHECK_EQUAL( ds.remaining(), 0u );
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_FIXTURE_TEST_SUITE(trx_admission, trx_admission_fixture)
+
+BOOST_AUTO_TEST_CASE(saturated_peer_skips_body_and_resumes_after_completion) {
+   const auto trx = make_packed_trx();
+   const auto trx_size = static_cast<uint32_t>(trx.get_estimated_size());
+   const auto limit = net_utils::def_max_trx_in_progress_size;
+   conn->trx_in_progress_size = limit - trx_size + 1;
+   auto prior_completion = net_utils::track_trx_in_progress(*conn, trx_size, [](const auto&) {});
+   BOOST_REQUIRE_EQUAL(conn->trx_in_progress_size.load(), limit + 1);
+
+   // Both saturated bodies are too short to unpack. The following body must remain readable.
+   constexpr uint32_t truncated_body_size = 1;
+   constexpr uint32_t buffer_chunk_size = 64;
+   auto next_body = fc::raw::pack(trx);
+   std::vector<char> wire(2 * truncated_body_size, 0);
+   wire.insert(wire.end(), next_body.begin(), next_body.end());
+   fc::message_buffer<buffer_chunk_size> buffer;
+   buffer.add_space(wire.size());
+   BOOST_REQUIRE_EQUAL(boost::asio::buffer_copy(buffer.get_buffer_sequence_for_boost_async_read(),
+                                                boost::asio::buffer(wire)), wire.size());
+   buffer.advance_write_ptr(wire.size());
+   auto stream = buffer.create_datastream();
+   fc::bounded_datastream over_limit_frame(stream, truncated_body_size);
+   receive(over_limit_frame, trx.id());
+   BOOST_CHECK_EQUAL(drops, 1u);
+   BOOST_CHECK(!dropped_trx);
+   BOOST_CHECK_EQUAL(submissions, 0u);
+   BOOST_REQUIRE_EQUAL(buffer.bytes_to_read(), truncated_body_size + next_body.size());
+
+   // Simulate completion freeing one byte and leaving the balance exactly at the cap.
+   --conn->trx_in_progress_size;
+   fc::bounded_datastream at_limit_frame(stream, truncated_body_size);
+   receive(at_limit_frame, trx.id());
+   BOOST_CHECK_EQUAL(drops, 2u);
+   BOOST_CHECK(!dropped_trx);
+   BOOST_CHECK_EQUAL(submissions, 0u);
+   BOOST_REQUIRE_EQUAL(buffer.bytes_to_read(), next_body.size());
+
+   // Completion releases the charge even if a copy of the one-shot callback outlives invocation.
+   const auto retained_completion = prior_completion;
+   prior_completion(transaction_trace_ptr{});
+   BOOST_CHECK_EQUAL(conn->trx_in_progress_size.load(), limit - trx_size);
+   fc::bounded_datastream next_frame(stream, next_body.size());
+   receive(next_frame, trx.id());
+   BOOST_CHECK_EQUAL(drops, 2u);
+   BOOST_CHECK_EQUAL(submissions, 1u);
+   BOOST_REQUIRE(submitted_trx);
+   BOOST_CHECK(submitted_trx->id() == trx.id());
+   BOOST_CHECK_EQUAL(conn->trx_in_progress_size.load(), limit);
+   BOOST_CHECK_EQUAL(buffer.bytes_to_read(), 0u);
+}
+
+BOOST_AUTO_TEST_CASE(transaction_one_byte_over_remaining_budget_skips_submission) {
+   const auto trx = make_packed_trx();
+   const auto trx_size = static_cast<uint32_t>(trx.get_estimated_size());
+   const auto limit = net_utils::def_max_trx_in_progress_size;
+   conn->trx_in_progress_size = limit - trx_size + 1;
+   const auto wire = fc::raw::pack(trx);
+   fc::datastream<const char*> stream(wire.data(), wire.size());
+   fc::bounded_datastream frame(stream, wire.size());
+   receive(frame, trx.id());
+   BOOST_CHECK_EQUAL(drops, 1u);
+   BOOST_REQUIRE(dropped_trx);
+   BOOST_CHECK(dropped_trx->id() == trx.id());
+   BOOST_CHECK_EQUAL(submissions, 0u);
+   BOOST_CHECK_EQUAL(conn->trx_in_progress_size.load(), limit - trx_size + 1);
+}
+
+BOOST_AUTO_TEST_CASE(submission_failure_releases_the_transaction_charge) {
+   const auto trx_size = static_cast<uint32_t>(make_packed_trx().get_estimated_size());
+   conn->trx_in_progress_size = trx_size;
+   const auto submit = [&](next_function<transaction_trace_ptr>) {
+      BOOST_CHECK_EQUAL(conn->trx_in_progress_size.load(), 2 * trx_size);
+      throw std::runtime_error("submission failure");
+   };
+   BOOST_CHECK_THROW(submit(net_utils::track_trx_in_progress(*conn, trx_size, [](const auto&) {})), std::runtime_error);
+   BOOST_CHECK_EQUAL(conn->trx_in_progress_size.load(), trx_size);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
