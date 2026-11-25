@@ -938,9 +938,9 @@ void epoch::tickeconomy(uint32_t epoch_index) {
    state.next_epoch_start    = boundary + microseconds(static_cast<int64_t>(cfg.epoch_duration_sec) * 1'000'000);
    state_tbl.set(state, ram_payer);
 
-   // Withdrawals mature on this clock, each held until every chain it waits on has also reached its
-   // consensus guard (sysio.opreg::flushwtdw reads the chains' epochs). Matured rows credit
-   // remitclaims; no attestation is sent.
+   // Withdrawals mature on this clock, each held until every chain it waits on has also passed its
+   // consensus guard (sysio.opreg::flushwtdw reads the chains' epochs and their decisions). Matured rows
+   // credit remitclaims; no attestation is sent.
    action(
       permission_level{get_self(), "owner"_n},
       OPREG_ACCOUNT,

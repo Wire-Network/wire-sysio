@@ -132,7 +132,10 @@ acceptance of an epoch's winner (`evalcons` inside `deliver` and `chkcons`, and
 
 Independently of inlines, the emissions readiness gate in `sysio.epoch` **reads**
 `sysio.system`'s `emitcfg`, `t5state` and `payclaimtot`, and `sysio.token`'s
-`accounts`. `sysio.kicker::kick` reads the same four tables to size the treasury
+`accounts`. `sysio.opreg::flushwtdw` (inline from `tickeconomy`) reads
+`sysio.epoch`'s `epochstate`, `sysio.msgch`'s `outpcons` and `sysio.chalg`'s
+`disputes` to judge each withdrawal's consensus waits, so a layout change to any
+of those tables needs `sysio.opreg` rebuilt and deployed with it. `sysio.kicker::kick` reads the same four tables to size the treasury
 reserve it never draws into, plus `sysio.swap`'s `stat` and `priceaccum` and
 `sysio.liq`'s `stat` to price and size each gift.
 

@@ -1386,12 +1386,7 @@ void msgch::chkcons(uint64_t chain_code) {
    // paused -- and this gate is the soft one that returns BEFORE chkcons triggers advance, so it
    // never hits that throw mid-dispute. chkdispute resolves the dispute (resolvedisp) and lifts the
    // chain's pause. Another chain's dispute does not hold this one.
-   {
-      chalg::disputes_t disputes(CHALG_ACCOUNT);
-      auto oe_idx = disputes.get_index<"byoutepoch"_n>();
-      const auto dispute = oe_idx.find(opp::outpost_epoch_key(chain_code, epoch));
-      if (dispute != oe_idx.end() && dispute->status == opp::types::DisputeStatus::DISPUTE_STATUS_OPEN) return;
-   }
+   if (chalg::has_open_dispute(CHALG_ACCOUNT, chain_code, epoch)) return;
 
    // Readiness is the durable `epoch_index == current epoch` signal that apply_consensus writes on
    // dispatch. We intentionally do NOT also gate on `consensus_reached`: advance() can return without

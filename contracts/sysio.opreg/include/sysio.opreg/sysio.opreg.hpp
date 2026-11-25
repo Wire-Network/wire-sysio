@@ -47,12 +47,15 @@ namespace sysio {
       /// Economic epochs between a withdrawal request and its release: the wall-clock wait.
       static constexpr uint32_t WITHDRAW_WAIT_ECONOMIC_EPOCHS = 2;
 
-      /// Consensus epochs each waited-on chain must also close after the request before release (see
-      /// `withdraw_request::consensus_waits`). Non-canonical deliverers are slashed when their epoch's
-      /// winner is accepted, `chkcons` advances a chain only once its current epoch is decided, and a
-      /// dispute pause stops that chain's index. So this guard keeps a deliverer's collateral in place,
-      /// however far the economic clock runs ahead, until its epochs have been decided and their
-      /// deliveries judged, or closed by a governance `advance`, whose undecided epoch judges none.
+      /// Consensus epochs each waited-on chain closes after the request before release (see
+      /// `withdraw_request::consensus_waits`), unless the chain's current epoch is decided first: its
+      /// winner accepted and no dispute open on it. Non-canonical deliverers are slashed when their
+      /// epoch's winner is accepted, `chkcons` advances a chain only once its current epoch is decided,
+      /// and a dispute pause stops that chain's index. So a chain at the request's index + this has
+      /// judged every delivery to the epochs before its current one; a decided current epoch has also
+      /// judged its own. A governance `advance` closes an undecided epoch judging none. This guard keeps
+      /// a deliverer's collateral in place until one of the two holds, however far the economic clock
+      /// runs ahead.
       static constexpr uint32_t WITHDRAW_WAIT_EPOCHS = 2;
 
       /// Per-(operator, chain, token) cap on pending collateral withdrawals
@@ -282,7 +285,8 @@ namespace sysio {
 
       /// Internal: release matured rows from `wtdwqueue`. Called inline from `sysio.epoch::tickeconomy`
       /// each economic epoch with the current economic index. A row is matured once its economic wait
-      /// has passed and each chain in its `consensus_waits` has reached the row's index for it. The walk
+      /// has passed and each chain in its `consensus_waits` has reached the row's index for it or has its
+      /// current epoch decided (see `WITHDRAW_WAIT_EPOCHS`). The walk
       /// runs in request order from where the last flush stopped and ends at the first row whose
       /// economic wait has not passed; it skips a row still held by a consensus wait, and stops after
       /// `MAX_WTDW_FLUSH_PER_EPOCH` released rows or `MAX_WTDW_HELD_SKIPS_PER_FLUSH` skipped ones.
@@ -598,7 +602,7 @@ namespace sysio {
 
       /// Pending-withdraw row keyed by sequential `request_id`. Drained by
       /// `flushwtdw` once `eligible_at_economic_epoch <= economic_epoch` and every chain in
-      /// `consensus_waits` has reached its `eligible_at_epoch`. Subtracted by `available()` so the
+      /// `consensus_waits` has passed its wait. Subtracted by `available()` so the
       /// queued amount can't be double-used.
       struct withdraw_key {
          uint64_t request_id;
@@ -606,8 +610,9 @@ namespace sysio {
          SYSLIB_SERIALIZE(withdraw_key, (request_id))
       };
 
-      /// One outpost chain a withdrawal waits on: released only once the chain's consensus epoch index
-      /// has reached `eligible_at_epoch`, its index at the request + WITHDRAW_WAIT_EPOCHS.
+      /// One outpost chain a withdrawal waits on: passed once the chain's consensus epoch index has
+      /// reached `eligible_at_epoch`, its index at the request + WITHDRAW_WAIT_EPOCHS, or once the chain's
+      /// current epoch is decided (its winner accepted, no dispute open on it).
       struct consensus_wait {
          sysio::slug_name chain_code;
          uint32_t         eligible_at_epoch = 0;

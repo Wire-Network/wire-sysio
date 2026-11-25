@@ -58,7 +58,9 @@ the collateral each has bonded, and the outpost chains each batch operator serve
 
 `withdraw` queues a request with two waits. The economic wait ends `WITHDRAW_WAIT_ECONOMIC_EPOCHS`
 economic epochs after the request. The consensus waits are per chain: for each chain the request waits
-on, it records that chain's epoch index + `WITHDRAW_WAIT_EPOCHS` and is held until the chain reaches it.
+on, it records that chain's epoch index + `WITHDRAW_WAIT_EPOCHS`. A chain's wait passes once the chain
+reaches that index or once its current epoch is decided (its winner accepted, no dispute open on it); an
+undecided or disputed current epoch holds the request.
 
 - A batch operator waits on each chain it serves (`SERVING`) and each chain whose schedule window still
   seats it (a `LEFT` or `EVICTED` member's remaining seats). Any other operator type waits on every chain.

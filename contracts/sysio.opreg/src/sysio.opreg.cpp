@@ -1,5 +1,7 @@
 #include <sysio.opreg/sysio.opreg.hpp>
 #include <sysio.epoch/sysio.epoch.hpp>
+#include <sysio.msgch/sysio.msgch.hpp>
+#include <sysio.chalg/sysio.chalg.hpp>
 #include <sysio.chains/sysio.chains.hpp>
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio.liq/sysio.liq.hpp>
@@ -1000,17 +1002,42 @@ std::vector<opreg::consensus_wait> consensus_waits_for(const opreg::operator_ent
    return waits;
 }
 
-/// True once every chain `request` waits on has reached its consensus guard. `started` holds the
-/// started chains' current indexes (`sysio::epoch::started_chain_epochs`); a waited-on chain always
-/// started before the request.
-bool consensus_waits_passed(const opreg::withdraw_request&                    request,
-                            const std::vector<sysio::epoch::chain_epoch_index>& started) {
+/// One started outpost chain as the withdrawal consensus guard reads it.
+struct chain_consensus_standing {
+   uint64_t chain_code  = 0;
+   uint32_t epoch_index = 0;       ///< the chain's current consensus epoch index
+   bool     decided     = false;   ///< the current epoch has an accepted winner and no open dispute
+};
+
+/// Every outpost chain whose consensus epoch has started, with its current index and whether that epoch is
+/// decided, in chain-code order. Never throws.
+std::vector<chain_consensus_standing> started_chain_standings() {
+   std::vector<chain_consensus_standing> standings;
+   for (const sysio::epoch::chain_epoch_index& chain : sysio::epoch::started_chain_epochs()) {
+      const bool accepted =
+         msgch::consensus_for_epoch(opreg::MSGCH_ACCOUNT, chain.chain_code, chain.epoch_index).has_value();
+      standings.push_back(chain_consensus_standing{
+         .chain_code  = chain.chain_code,
+         .epoch_index = chain.epoch_index,
+         .decided     = accepted && !chalg::has_open_dispute(opreg::CHALG_ACCOUNT, chain.chain_code,
+                                                             chain.epoch_index),
+      });
+   }
+   return standings;
+}
+
+/// True once every chain `request` waits on has passed its consensus wait: the chain's index has reached the
+/// wait's `eligible_at_epoch`, or its current epoch is decided. `started` holds every started chain's standing
+/// (`started_chain_standings`); a waited-on chain always started before the request.
+bool consensus_waits_passed(const opreg::withdraw_request&               request,
+                            const std::vector<chain_consensus_standing>& started) {
    for (const opreg::consensus_wait& wait : request.consensus_waits) {
       const auto chain = std::find_if(started.begin(), started.end(),
-                                      [&](const sysio::epoch::chain_epoch_index& c) {
+                                      [&](const chain_consensus_standing& c) {
                                          return c.chain_code == wait.chain_code.value;
                                       });
-      if (chain == started.end() || chain->epoch_index < wait.eligible_at_epoch) return false;
+      if (chain == started.end()) return false;
+      if (chain->epoch_index < wait.eligible_at_epoch && !chain->decided) return false;
    }
    return true;
 }
@@ -1316,7 +1343,7 @@ void opreg::flushwtdw(uint32_t economic_epoch) {
    // MAX_WTDW_HELD_SKIPS_PER_FLUSH, inside the CPU deadline it shares with the rest of the economic
    // tick; the next flush resumes at the row this one stopped on. `flushed` is counted before the
    // per-row `continue` branches, so it counts every released attempt.
-   std::optional<std::vector<sysio::epoch::chain_epoch_index>> started;   // read at the first matured row
+   std::optional<std::vector<chain_consensus_standing>> started;   // read at the first matured row
    uint64_t resume_id = 0;
    uint32_t flushed   = 0;
    uint32_t skipped   = 0;
@@ -1326,7 +1353,7 @@ void opreg::flushwtdw(uint32_t economic_epoch) {
          resume_id = it->request_id;
          break;
       }
-      if (!started) started = sysio::epoch::started_chain_epochs();
+      if (!started) started = started_chain_standings();
       if (!consensus_waits_passed(*it, *started)) {
          if (skipped == MAX_WTDW_HELD_SKIPS_PER_FLUSH) {
             resume_id = it->request_id;

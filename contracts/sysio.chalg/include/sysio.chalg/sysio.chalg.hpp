@@ -132,6 +132,15 @@ namespace sysio {
             sysio::const_mem_fun<dispute_entry, uint128_t, &dispute_entry::by_outpost_epoch>>
       >;
 
+      /// Whether `chalg_account` holds an OPEN dispute for outpost `chain_code`'s epoch `epoch_index`. Never throws.
+      static bool has_open_dispute(name chalg_account, uint64_t chain_code, uint32_t epoch_index) {
+         disputes_t disputes(chalg_account);
+         auto       by_outpost_epoch = disputes.get_index<"byoutepoch"_n>();
+         const auto dispute          = by_outpost_epoch.find(opp::outpost_epoch_key(chain_code, epoch_index));
+         return dispute != by_outpost_epoch.end() &&
+                dispute->status == opp::types::DisputeStatus::DISPUTE_STATUS_OPEN;
+      }
+
       /// Dispute-vote primary key (the voting Tier-1 owner). The vote table is scoped by
       /// `dispute_id`, so the owner alone is unique within a dispute.
       struct dispute_vote_key {
