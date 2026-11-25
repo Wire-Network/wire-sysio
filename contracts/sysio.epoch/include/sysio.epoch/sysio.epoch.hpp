@@ -53,6 +53,10 @@ namespace sysio {
       /// returns without effect. The
       /// advance clears the chain's traffic; outbound rows its envelope leaves behind mark it again.
       ///
+      /// Under sysio.epoch's own authority, the governance path, an active outpost past its genesis advances only
+      /// once its current epoch has reached consensus (`sysio.msgch::outpcons`): the outpost's next envelope chains
+      /// to that epoch's winner. A chain that is not an active outpost owes no envelope and is not refused.
+      ///
       /// An epoch's books close one advance later, so its late deliveries count: `advance(N -> N+1)`
       /// records each `previous_group` member's delivery of epoch N-1 (`sysio.opreg::recorddel`), runs its
       /// `termcheck`, and then credits the group's duty for N-1 (`sysio.system::rcrdduty`: per member, the chain

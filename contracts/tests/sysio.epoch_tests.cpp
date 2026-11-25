@@ -88,6 +88,9 @@ public:
    const action_result no_schedule_window = error(
       "assertion failure with message: a chain's genesis advance requires its schedule window: run schbatchgps for "
       "the chain first");
+   const action_result governance_advance_undecided = error(
+      "assertion failure with message: governance cannot advance an active outpost whose current epoch has not "
+      "reached consensus");
 
    /// The outpost chain the single-chain cases configure.
    static constexpr std::string_view ETH = "ETH";
@@ -111,7 +114,10 @@ public:
       );
    }
 
-   action_result advance(std::string_view chain = ETH, name signer = EPOCH_ACCOUNT) {
+   /// Push `advance` for `chain` as `signer`, by default sysio.msgch, as its `bootstrap` and `chkcons` do. Under
+   /// sysio.epoch's own authority, the governance path, an active outpost's undecided epoch is refused, and this
+   /// fixture decides none.
+   action_result advance(std::string_view chain = ETH, name signer = MSGCH_ACCOUNT) {
       return push_epoch_action(signer, "advance"_n, mvo()("chain_code", chain));
    }
 
@@ -705,8 +711,8 @@ BOOST_FIXTURE_TEST_CASE(the_genesis_advance_needs_no_traffic, sysio_epoch_tester
    BOOST_REQUIRE(time_point() == state_time(ETH, "due_at"));
 } FC_LOG_AND_RETHROW() }
 
-/// After its genesis an idle chain never advances, under sysio.msgch's authority or governance's: with no traffic it
-/// is never due, however long its epoch runs.
+/// After its genesis an idle chain never advances under sysio.msgch's authority: with no traffic it is never due,
+/// however long its epoch runs. Governance's advance is refused outright, as the epoch is undecided.
 BOOST_FIXTURE_TEST_CASE(an_idle_chain_never_advances, sysio_epoch_tester) { try {
    constexpr uint32_t kDurationSec     = 60;
    constexpr uint32_t kBlocksPerSecond = 2;
@@ -719,7 +725,7 @@ BOOST_FIXTURE_TEST_CASE(an_idle_chain_never_advances, sysio_epoch_tester) { try 
 
    produce_blocks(kIdleMinimums * kDurationSec * kBlocksPerSecond);
    BOOST_REQUIRE_EQUAL(success(), advance(ETH, MSGCH_ACCOUNT));
-   BOOST_REQUIRE_EQUAL(success(), advance(ETH, EPOCH_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(governance_advance_undecided, advance(ETH, EPOCH_ACCOUNT));
    produce_blocks();
    BOOST_REQUIRE_EQUAL(1u, epoch_index(ETH));
    BOOST_REQUIRE(start == state_time(ETH, "current_epoch_start"));
@@ -845,7 +851,6 @@ BOOST_FIXTURE_TEST_CASE(a_chain_advances_only_once_due_and_opens_the_next_epoch_
 
    open_block_at(due - block_interval);
    BOOST_REQUIRE_EQUAL(success(), advance(ETH, MSGCH_ACCOUNT));
-   BOOST_REQUIRE_EQUAL(success(), advance(ETH, EPOCH_ACCOUNT));
    BOOST_REQUIRE_EQUAL(1u, epoch_index(ETH));
 
    open_block_at(due);
@@ -855,11 +860,11 @@ BOOST_FIXTURE_TEST_CASE(a_chain_advances_only_once_due_and_opens_the_next_epoch_
    BOOST_REQUIRE(time_point() == state_time(ETH, "traffic_since"));
    BOOST_REQUIRE(time_point() == state_time(ETH, "due_at"));
 
-   // Due again one minimum after the new start, the governance advance runs late and opens epoch 3 when it runs.
+   // Due again one minimum after the new start, the advance runs late and opens epoch 3 when it runs.
    mark_traffic(ETH);
    const time_point late = state_time(ETH, "due_at") + fc::seconds(kLateSec);
    open_block_at(late);
-   BOOST_REQUIRE_EQUAL(success(), advance(ETH, EPOCH_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(success(), advance(ETH, MSGCH_ACCOUNT));
    BOOST_REQUIRE_EQUAL(3u, epoch_index(ETH));
    BOOST_REQUIRE(late == state_time(ETH, "current_epoch_start"));
 } FC_LOG_AND_RETHROW() }

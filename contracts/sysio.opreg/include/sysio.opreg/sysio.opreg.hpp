@@ -53,9 +53,9 @@ namespace sysio {
       /// epoch's winner is accepted, `chkcons` advances a chain only once its current epoch is decided,
       /// and a dispute pause stops that chain's index. So a chain at the request's index + this has
       /// judged every delivery to the epochs before its current one; a decided current epoch has also
-      /// judged its own. A governance `advance` closes an undecided epoch judging none. This guard keeps
-      /// a deliverer's collateral in place until one of the two holds, however far the economic clock
-      /// runs ahead.
+      /// judged its own. Governance `advance`s an undecided epoch, judging none, only on a chain that is no
+      /// longer an active outpost. This guard keeps a deliverer's collateral in place until one of the two
+      /// holds, however far the economic clock runs ahead.
       static constexpr uint32_t WITHDRAW_WAIT_EPOCHS = 2;
 
       /// Per-(operator, chain, token) cap on pending collateral withdrawals

@@ -92,6 +92,7 @@ constexpr name SET_CONFIG        = "setconfig"_n;
 constexpr name RECORD_DELIVERY   = "recorddel"_n;
 constexpr name TERMINATION_CHECK = "termcheck"_n;
 constexpr name SLASH             = "slash"_n;
+constexpr name TERMINATE         = "terminate"_n;
 } // namespace opreg_actions
 
 /// sysio.opreg ABI field identifiers used by the WNS-16 fixture.
@@ -248,6 +249,10 @@ constexpr name UNPAUSE       = "unpause"_n;
 
 /// `sysio.epoch::advance`'s refusal while a chain is paused.
 constexpr const char* EPOCH_PAUSED_ERROR = "epoch advancement is paused";
+
+/// `sysio.epoch::advance`'s refusal, under its own authority, of an active outpost's undecided epoch.
+constexpr const char* GOVERNANCE_ADVANCE_UNDECIDED_ERROR =
+   "governance cannot advance an active outpost whose current epoch has not reached consensus";
 
 /// sysio.msgch table identifiers used by the WNS-16 fixture.
 namespace msgch_tables {
@@ -458,6 +463,8 @@ public:
    static constexpr auto BATCHOP_G      = "batchop.g"_n;
    static constexpr auto BATCHOP_H      = "batchop.h"_n;
    static constexpr auto BATCHOP_I      = "batchop.i"_n;
+   static constexpr auto BATCHOP_J      = "batchop.j"_n;
+   static constexpr auto BATCHOP_K      = "batchop.k"_n;
 
    static constexpr uint32_t EPOCH_DURATION_SEC = 60;
    static constexpr uint32_t ONE_TO_ONE_TIE_GROUP_SIZE = 2;
@@ -1559,18 +1566,30 @@ public:
       return traces;
    }
 
-   /// Make `chain_code` due and advance it under sysio.epoch's own authority, the governance path that needs no
-   /// consensus, and return the advance's trace. An epoch's books close at the advance after it, so a test runs this
-   /// to record the epoch the chain's previous advance closed.
-   transaction_trace_ptr governance_advance_trace(uint64_t chain_code = ETH_OUTPOST_ID) {
+   /// Push `advance` for `chain_code` under sysio.epoch's own authority, the governance path.
+   action_result governance_advance(uint64_t chain_code = ETH_OUTPOST_ID) {
+      return push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::ADVANCE,
+                  mvo()(epoch_fields::CHAIN_CODE, fc::slug_name{chain_code}.to_string()));
+   }
+
+   /// Make `chain_code` due and advance it under `authority`, returning the advance's trace. sysio.msgch's stands in
+   /// for `chkcons`, with or without a decision on the chain's current epoch; sysio.epoch's own, the governance path,
+   /// needs that epoch decided unless the chain is no longer an active outpost. An epoch's books close at the advance
+   /// after it, so a test runs this to record the epoch the chain's previous advance closed.
+   transaction_trace_ptr advance_trace(uint64_t chain_code, name authority) {
       const uint32_t epoch = current_epoch(chain_code);
       elapse_epoch_boundary();
       const transaction_trace_ptr trace = sysio_system::test_support::push_contract_action_trace(
-         *this, EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::ADVANCE,
+         *this, EPOCH_ACCOUNT, epoch_abi, authority, epoch_actions::ADVANCE,
          mvo()(epoch_fields::CHAIN_CODE, fc::slug_name{chain_code}.to_string()));
       produce_blocks();
       BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch(chain_code));
       return trace;
+   }
+
+   /// `advance_trace` under sysio.epoch's own authority, the governance path.
+   transaction_trace_ptr governance_advance_trace(uint64_t chain_code = ETH_OUTPOST_ID) {
+      return advance_trace(chain_code, EPOCH_ACCOUNT);
    }
 
    /// One `sysio.chalg::slashop` a transaction ran: the operator it slashed, the reason it gave, and whether
@@ -3337,7 +3356,7 @@ BOOST_FIXTURE_TEST_CASE(divergent_delivery_after_the_decision_is_refused_and_mis
    BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP));
    produce_blocks();
    BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
-   governance_advance_trace(ETH_OUTPOST_ID);
+   advance_trace(ETH_OUTPOST_ID, MSGCH_ACCOUNT);
 
    BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE,
                        get_operator(BATCHOP_C)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
@@ -3466,7 +3485,7 @@ BOOST_FIXTURE_TEST_CASE(late_divergent_delivery_is_refused_and_missed, sysio_msg
    BOOST_REQUIRE(find_inbound_delivery(ETH_OUTPOST_ID, epoch, BATCHOP_C).is_null());
    BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(BATCHOP_C));
 
-   governance_advance_trace(ETH_OUTPOST_ID);
+   advance_trace(ETH_OUTPOST_ID, MSGCH_ACCOUNT);
    const std::vector<fc::variant> missed = dellog_rows(BATCHOP_C, epoch, ETH_OUTPOST_ID);
    BOOST_REQUIRE_EQUAL(1u, missed.size());
    BOOST_REQUIRE(!missed.front()[opreg_fields::DELIVERED].as<bool>());
@@ -3476,7 +3495,7 @@ BOOST_FIXTURE_TEST_CASE(late_divergent_delivery_is_refused_and_missed, sysio_msg
 /// A late delivery is admitted only from the group that served the previous epoch, and a current-epoch delivery
 /// only from the group on duty: with single-member groups the three are disjoint, so the current member's late
 /// delivery, the previous member's current-epoch delivery and the next member's delivery of either are refused. A
-/// previous epoch with no accepted winner, reached by a governance advance, takes no late delivery, and its books
+/// previous epoch with no accepted winner, which the fixture advances undecided, takes no late delivery, and its books
 /// record the miss.
 BOOST_FIXTURE_TEST_CASE(late_delivery_comes_only_from_the_previous_group, sysio_msgch_chain_tester) { try {
    bootstrap_rotation(ROTATION_WINDOW_MS, /*batchop_is_bootstrapped=*/true);
@@ -3510,7 +3529,7 @@ BOOST_FIXTURE_TEST_CASE(late_delivery_comes_only_from_the_previous_group, sysio_
    BOOST_REQUIRE(find_inbound_delivery(ETH_OUTPOST_ID, epoch, second).is_null());
    BOOST_REQUIRE(find_inbound_delivery(ETH_OUTPOST_ID, epoch, third).is_null());
 
-   // Epoch 2 is left undecided and advanced by governance: its member's late delivery has no winner to repeat.
+   // Epoch 2 is left undecided and advanced all the same: its member's late delivery has no winner to repeat.
    const uint32_t undecided = current_epoch();
    advance_to_next_epoch();
    BOOST_REQUIRE(previous_group() == std::vector<name>{second});
@@ -3798,7 +3817,7 @@ BOOST_FIXTURE_TEST_CASE(divergent_minority_is_slashed_in_the_tipping_delivery, s
    for (const name member : majority) {
       BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(member));
    }
-   const transaction_trace_ptr booked = governance_advance_trace(ETH_OUTPOST_ID);
+   const transaction_trace_ptr booked = advance_trace(ETH_OUTPOST_ID, MSGCH_ACCOUNT);
    BOOST_REQUIRE(slashops(booked).empty());
    BOOST_REQUIRE_EQUAL(0u, action_count(booked, OPREG_ACCOUNT, opreg_actions::SLASH));
    for (const std::vector<name>* members : {&minority, &majority}) {
@@ -3912,8 +3931,8 @@ BOOST_FIXTURE_TEST_CASE(delivery_after_resolution_takes_only_the_winner, sysio_m
 } FC_LOG_AND_RETHROW() }
 
 /// A governance advance (sysio.epoch's own authority) of a decided epoch slashes no one: the acceptance already
-/// slashed the member whose delivery differs from the winner. The next governance advance, which closes the
-/// epoch's books, slashes no one either and records it as delivered.
+/// slashed the member whose delivery differs from the winner. The next advance, which closes the epoch's books,
+/// slashes no one either and records it as delivered.
 BOOST_FIXTURE_TEST_CASE(governance_advance_of_a_decided_epoch_slashes_nothing, sysio_msgch_chain_tester) { try {
    constexpr uint32_t kGroupSize = 3;
    bootstrap(kGroupSize);
@@ -3942,12 +3961,123 @@ BOOST_FIXTURE_TEST_CASE(governance_advance_of_a_decided_epoch_slashes_nothing, s
    }
    BOOST_REQUIRE(dellog_rows(BATCHOP_C, epoch, ETH_OUTPOST_ID).empty());
 
-   const transaction_trace_ptr booked = governance_advance_trace(ETH_OUTPOST_ID);
+   const transaction_trace_ptr booked = advance_trace(ETH_OUTPOST_ID, MSGCH_ACCOUNT);
    BOOST_REQUIRE(slashops(booked).empty());
    BOOST_REQUIRE_EQUAL(0u, action_count(booked, OPREG_ACCOUNT, opreg_actions::SLASH));
    const std::vector<fc::variant> rows = dellog_rows(BATCHOP_C, epoch, ETH_OUTPOST_ID);
    BOOST_REQUIRE_EQUAL(1u, rows.size());
    BOOST_REQUIRE(rows.front()[opreg_fields::DELIVERED].as<bool>());
+} FC_LOG_AND_RETHROW() }
+
+/// Governance cannot advance an active outpost whose current epoch has not reached consensus, even once the chain is
+/// due: the outpost's next envelope chains to that epoch's winner. It advances the epoch once it is decided, and a
+/// chain that is no longer an active outpost undecided.
+BOOST_FIXTURE_TEST_CASE(governance_advance_refuses_an_active_outposts_undecided_epoch, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kGroupSize = 3;
+   bootstrap(kGroupSize);
+
+   const uint32_t epoch = current_epoch();
+   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(GOVERNANCE_ADVANCE_UNDECIDED_ERROR), governance_advance());
+   BOOST_REQUIRE_EQUAL(epoch, current_epoch());
+
+   deliver_all({BATCHOP, BATCHOP_B}, encode_delivery(epoch, "governance-decided"));
+   BOOST_REQUIRE(epoch_decided(ETH_OUTPOST_ID, epoch));
+   governance_advance_trace(ETH_OUTPOST_ID);
+   BOOST_REQUIRE(!epoch_decided(ETH_OUTPOST_ID, epoch + 1));
+
+   set_chain_active(ETH_OUTPOST_ID, false);
+   produce_blocks();
+   governance_advance_trace(ETH_OUTPOST_ID);
+   BOOST_REQUIRE_EQUAL(epoch + 2, current_epoch());
+} FC_LOG_AND_RETHROW() }
+
+/// Recovery of a split held open by a silent member. Of three seats, two deliver different versions and the third is
+/// silent, so either version can still win: the re-tally opens no dispute and governance cannot advance the epoch.
+/// Once governance terminates the silent member, the chkcons re-tally finds that no version can win and opens the
+/// dispute; its resolution decides the epoch, slashes the loser and records the chain's traffic, and the chain
+/// advances to its next group.
+BOOST_FIXTURE_TEST_CASE(split_held_open_by_a_silent_member_recovers_by_termination_and_retally,
+                        sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kGroupSize = 3;
+   bootstrap(kGroupSize);
+
+   const uint32_t          epoch         = current_epoch();
+   const std::vector<char> winner        = encode_delivery(epoch, "silent-member-winner");
+   const std::vector<char> loser         = encode_delivery(epoch, "silent-member-loser");
+   const fc::sha256        winner_digest = fc::sha256::hash(winner.data(), winner.size());
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, winner));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, loser));
+   elapse_epoch_boundary();
+   const transaction_trace_ptr waiting = check_consensus_trace(ETH_OUTPOST_ID, BATCHOP);
+   BOOST_REQUIRE_EQUAL(0u, action_count(waiting, CHALG_ACCOUNT, chalg_actions::OPEN_DISPUTE));
+   produce_blocks();
+   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(GOVERNANCE_ADVANCE_UNDECIDED_ERROR), governance_advance());
+
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, opreg_actions::TERMINATE,
+      mvo()(opreg_fields::ACCOUNT, BATCHOP_C.to_string())(opreg_fields::REASON, std::string("silent member"))));
+   produce_blocks();
+   const transaction_trace_ptr retally = check_consensus_trace(ETH_OUTPOST_ID, BATCHOP);
+   BOOST_REQUIRE_EQUAL(1u, action_count(retally, CHALG_ACCOUNT, chalg_actions::OPEN_DISPUTE));
+   produce_blocks();
+   assert_open_tie_dispute(epoch, {winner_digest, fc::sha256::hash(loser.data(), loser.size())},
+                           {ONE_OPERATOR_PER_TIED_VERSION, ONE_OPERATOR_PER_TIED_VERSION});
+   BOOST_REQUIRE(epoch_is_paused());
+
+   resolve_tie_dispute(epoch, winner_digest);
+   BOOST_REQUIRE(!epoch_is_paused());
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED, operator_status(BATCHOP_B));
+   advance_decided_epoch();
+} FC_LOG_AND_RETHROW() }
+
+/// The depot side of recovering a group that can no longer reach its seat majority; the outposts also need an upgrade
+/// that installs the reseated window. Of three seats, one member delivers and the other two are slashed: one delivery
+/// can never reach two of three, and one version leaves nothing to dispute, so the re-tally neither decides nor
+/// disputes and governance cannot advance the epoch. Once two replacements serve the chain, a `schbatchgps` reseat
+/// puts a group on duty that leaves out the slashed members; its deliveries of the outpost's envelope decide the
+/// epoch, and the chain advances.
+BOOST_FIXTURE_TEST_CASE(reseat_decides_an_epoch_below_the_seat_majority_on_the_depot, sysio_msgch_chain_tester) { try {
+   const std::vector<std::vector<name>> window   = bootstrap_disjoint_groups();
+   const std::vector<name>&             first    = window[0];
+   const uint32_t                       epoch    = current_epoch();
+   const std::vector<char>              envelope = encode_delivery(epoch, "reseat-envelope");
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(first[0], ETH_OUTPOST_ID, envelope));
+   produce_blocks();
+   slash_operator(first[1]);
+   slash_operator(first[2]);
+
+   const transaction_trace_ptr retally = check_consensus_trace(ETH_OUTPOST_ID, first[0]);
+   BOOST_REQUIRE_EQUAL(1u, action_count(retally, MSGCH_ACCOUNT, msgch_actions::EVALUATE_CONSENSUS));
+   BOOST_REQUIRE_EQUAL(0u, action_count(retally, CHALG_ACCOUNT, chalg_actions::OPEN_DISPUTE));
+   produce_blocks();
+   BOOST_REQUIRE(!epoch_decided(ETH_OUTPOST_ID, epoch));
+   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
+   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(GOVERNANCE_ADVANCE_UNDECIDED_ERROR), governance_advance());
+
+   // The reseat seats `batch_operator_minimum_active` ACTIVE operators serving the chain: the replacements make up
+   // for the slashed members.
+   const std::vector<name> replacements{BATCHOP_J, BATCHOP_K};
+   create_accounts(replacements);
+   for (const name op : replacements) {
+      BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n, mvo()
+         ("account", op.to_string())("type", opp::types::OperatorType::OPERATOR_TYPE_BATCH)("is_bootstrapped", true)));
+   }
+   serve_chains(replacements, epoch_chains);
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::SCHEDULE,
+                                       mvo()(epoch_fields::CHAIN_CODE, ETH_CHAIN_CODE)));
+   produce_blocks();
+
+   const std::vector<name> on_duty = current_group();
+   std::vector<name>       deliverers;
+   for (const name member : on_duty) {
+      BOOST_REQUIRE(member != first[1] && member != first[2]);
+      if (member != first[0]) deliverers.push_back(member);
+   }
+   deliver_all(deliverers, envelope);
+   require_outpcons_winner(ETH_OUTPOST_ID, epoch, fc::sha256::hash(envelope.data(), envelope.size()));
+   advance_decided_epoch();
 } FC_LOG_AND_RETHROW() }
 
 /// A slashed member keeps its seat, so it never lowers the number of deliveries a majority needs. Two of four is no
@@ -6658,7 +6788,7 @@ BOOST_FIXTURE_TEST_CASE(an_evicted_member_cannot_report_from_its_remaining_seat,
    // epoch 2 closes that epoch's books.
    set_termination_thresholds(ROTATION_MAX_CONSECUTIVE_MISSES, DEFAULT_MAX_PERCENT_MISSES,
                               PERCENT_RAIL_FROM_FIRST_DUTY);
-   while (current_epoch() < kSeatEpoch) governance_advance_trace(ETH_OUTPOST_ID);
+   while (current_epoch() < kSeatEpoch) advance_trace(ETH_OUTPOST_ID, MSGCH_ACCOUNT);
    BOOST_REQUIRE_EQUAL(std::string(served_status::evicted), membership_status(BATCHOP, ETH_OUTPOST_ID));
    BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(BATCHOP));
    const std::vector<name> group = current_group();

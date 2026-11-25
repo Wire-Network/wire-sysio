@@ -58,7 +58,7 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
 | `setconfig` | `sysio.epoch` | Set one chain's consensus epoch configuration. Bounds `epoch_duration_sec` to `MIN_EPOCH_DURATION_SEC` (10 s) .. `MAX_EPOCH_DURATION_SEC` (30 days) and `traffic_wait_sec` and `late_window_sec` each to at most `epoch_duration_sec`, zero taking half the minimum. Requires `operators_per_epoch * batch_op_groups == batch_operator_minimum_active` and enforces the outposts' limits (`MAX_OPERATORS_PER_EPOCH` 7, Ethereum's group size; `MAX_BATCH_OP_GROUPS` 8, Solana's group count), so the window holds at most `MAX_SCHEDULED_BATCH_OPERATORS` (56). Recomputes `due_at` with the new minimum and wait while the chain has traffic |
 | `seteconomy` | `sysio.epoch` | Set the economic clock's duration and grid start. The start is fixed once the clock has ticked; it is re-validated against `sysio.system`'s pay-period accrual bound |
 | `schbatchgps` | `sysio.epoch` | Build one chain's initial window from the `ACTIVE` batch operators on `sysio.opreg` that serve the chain (non-bootstrapped first, then bootstrapped, trimmed to `batch_operator_minimum_active`) |
-| `advance` | `sysio.msgch` or `sysio.epoch` | Advance one chain's consensus epoch once it is due (`due_at` set and passed) and it is not paused; otherwise it returns without effect, under either authority. The genesis advance (epoch 0 → 1) needs no traffic and requires an active outpost whose schedule window `schbatchgps` has seated |
+| `advance` | `sysio.msgch` or `sysio.epoch` | Advance one chain's consensus epoch once it is due (`due_at` set and passed) and it is not paused; otherwise it returns without effect, under either authority. Under `sysio.epoch`'s authority it refuses an active outpost whose current epoch has not reached consensus (see Recovery). The genesis advance (epoch 0 → 1) needs no traffic and requires an active outpost whose schedule window `schbatchgps` has seated |
 | `notetraffic` | `sysio.msgch` (`buildenv`, `reportqueue`, `resolvedisp`) | Record traffic for one chain since `since` (a zero or future `since` counts as now): `traffic_since` keeps the earliest, `due_at` = max(`current_epoch_start` + the chain's minimum, `traffic_since` + its `traffic_wait_sec`). No effect before the chain's genesis advance. A paused chain records traffic but does not advance |
 | `tickeconomy` | permissionless | Open economic epoch `epoch_index`: refused unless it is the next index, its grid boundary has passed, and the network genesis has happened |
 | `pause` | `sysio.chalg` | Pause one chain's epoch advancement |
@@ -97,6 +97,25 @@ After the chain's genesis, `advance` returns without effect unless the chain is 
    the last roster it received. General-lane rows the envelope leaves behind record traffic again, since
    the oldest of them became ready; a chain that is not an active outpost builds no envelope, and its
    queued general-lane rows record traffic the same way.
+
+## Recovery
+
+Governance cannot advance an active outpost whose current epoch has not reached consensus: the outpost's next
+envelope chains to that epoch's winner, which the depot never accepted, so the chain's inbound stream would break.
+A chain that is no longer an active outpost owes no envelope and may be advanced. An epoch that cannot be decided
+is recovered instead:
+
+- **A split held open by a silent member.** Two or more versions are delivered, none holds a strict majority of
+  the group's seats, and a silent eligible member could still give one its majority, so no dispute opens. Remove
+  the silent member from eligibility (`sysio.opreg::terminate`), then push `sysio.msgch::chkcons`: its re-tally
+  finds that no version can win and opens the dispute. Its resolution decides the epoch, slashes the losers and
+  records the chain's traffic, so the chain advances to its next group.
+- **A group that can no longer reach its seat majority.** Too few eligible members remain to give a version a strict
+  majority of the group's seats, and one version leaves nothing to dispute. The outposts admit only the groups of the
+  window the depot last sent them and cannot replace it after bootstrap, so the chain stalls on the outposts too.
+  Recovery reseats the depot's window with `schbatchgps` once at least `batch_operator_minimum_active` `ACTIVE`
+  operators serve the chain and upgrades each outpost to install that window; the new group on duty then decides
+  the epoch.
 
 ## What `tickeconomy` does
 

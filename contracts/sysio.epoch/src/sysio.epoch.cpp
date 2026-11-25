@@ -69,6 +69,8 @@ constexpr std::string_view genesis_not_active_outpost_msg =
    "a chain's genesis advance requires the chain to be an active outpost";
 constexpr std::string_view genesis_without_schedule_msg =
    "a chain's genesis advance requires its schedule window: run schbatchgps for the chain first";
+constexpr std::string_view governance_advance_undecided_msg =
+   "governance cannot advance an active outpost whose current epoch has not reached consensus";
 
 // System-owned rows are billed to the sysio RAM pool rather than to this contract account (the
 // privileged-contract model sysio.token uses): the contract account stays finite at its code+abi
@@ -393,6 +395,14 @@ void epoch::advance(sysio::slug_name chain_code) {
    if (state.current_epoch_index == 0) {
       check(active_outpost, genesis_not_active_outpost_msg);
       check(!state.batch_op_groups.empty(), genesis_without_schedule_msg);
+   }
+
+   // Governance never closes an active outpost's undecided epoch: the outpost's next envelope chains to that epoch's
+   // winner, which the depot never accepted, so the chain's inbound stream would break. sysio.msgch advances only a
+   // decided epoch. An undecided epoch is decided or disputed instead (README, Recovery).
+   if (state.current_epoch_index > 0 && active_outpost && !has_auth(MSGCH_ACCOUNT)) {
+      check(msgch::consensus_for_epoch(MSGCH_ACCOUNT, chain_code.value, state.current_epoch_index).has_value(),
+            governance_advance_undecided_msg);
    }
 
    // After its genesis a chain advances only once it is due, under either authority: an idle chain never moves, and

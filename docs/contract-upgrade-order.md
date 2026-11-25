@@ -270,6 +270,12 @@ The `epochstate` and `epochcfg` layouts change in place, so every reader is rebu
 outposts' backlog state (Ethereum's new `OPP.pendingOutbound()`; Solana's `OutboundMessageBuffer.attestation_count`
 and `LatestOutboundEnvelope.epoch_index`, which need no program change), so the Ethereum outpost deploys with it.
 
+### Governance advance of an undecided epoch
+
+`sysio.epoch::advance` under `sysio.epoch`'s own authority refuses an active outpost whose current epoch has not
+reached consensus, which it reads from `sysio.msgch::outpcons`, so `sysio.epoch` is rebuilt with any change to that
+row. `sysio.msgch`'s advances are unchanged. No state changes: deploy `sysio.epoch` alone.
+
 ## The two rules for future changes
 
 1. **A contract that gains an action `advance` inlines deploys BEFORE
