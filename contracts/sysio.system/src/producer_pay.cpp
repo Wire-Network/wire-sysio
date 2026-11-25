@@ -2,15 +2,16 @@
 #include <sysio.system/block_utils.hpp>
 #include <sysio.system/producer_score.hpp>
 #include <sysio.token/sysio.token.hpp>
+#include <sysio.opp.common/safe_ops.hpp>
 
 #include <algorithm>
-#include <limits>
 #include <vector>
 
 namespace sysiosystem {
 
    using sysio::microseconds;
    using sysio::token;
+   using sysio::opp::safe::add_sat;
 
    namespace {
       /// Milliseconds in a second, for the block interval.
@@ -22,6 +23,9 @@ namespace sysiosystem {
       static_assert( uint64_t{blocks_per_round} * sysio::block_timestamp::block_interval_ms
                         % milliseconds_per_second == 0,
                      "a round must last a whole number of seconds" );
+
+      /// Blocks one counted block adds to its producer's pay count.
+      constexpr uint32_t blocks_per_counted_block = 1;
    }
 
    void system_contract::onblock( ignore<block_header> ) {
@@ -51,6 +55,8 @@ namespace sysiosystem {
       // Seniority is credited for the same counted rounds: the scheduled time since the previously
       // counted one, at most a rotation. The round index comes from this producer's own block, so a
       // late successor takes nothing away, and a second round in one rotation is never counted.
+      //
+      // The block counts toward the pay period open when it is recorded.
       auto key = producer_key_t{producer.value};
       if ( _producers.contains(key) ) {
          const uint32_t round = timestamp.slot / blocks_per_round;
@@ -69,14 +75,12 @@ namespace sysiosystem {
                      ? rotation_sec
                      : std::min( rotation_sec, rounds_since * round_duration_sec );
                   const uint64_t before = producer_rank::seniority_credit( p.service_sec );
-                  p.service_sec = p.service_sec > std::numeric_limits<uint64_t>::max() - credit_sec
-                                     ? std::numeric_limits<uint64_t>::max()
-                                     : p.service_sec + credit_sec;
+                  p.service_sec = add_sat( p.service_sec, credit_sec );
                   seniority_moved = producer_rank::seniority_credit( p.service_sec ) != before;
                }
                p.last_paid_round = round;
             }
-            p.unpaid_blocks++;
+            p.unpaid_blocks = add_sat( p.unpaid_blocks, blocks_per_counted_block );
          });
          // The score reads seniority in whole hours, so only an hour crossed costs a rescore.
          if( seniority_moved ) rescore_producer( producer );

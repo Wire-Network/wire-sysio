@@ -767,8 +767,10 @@ namespace sysiosystem {
          /**
           * Pay the emissions accrued over the pay period ending at economic epoch `epoch_index`.
           * Called inline by sysio.epoch::tickeconomy on a pay epoch (the period boundary defined by
-          * emit_cfg.pay_cadence_epochs) whose spendable balance covers the period, right after
-          * that epoch's accrueepoch. Auth: require_auth("sysio.epoch").
+          * emit_cfg.pay_cadence_epochs) whose spendable balance covers the period and, once the economic
+          * clock has caught up to the grid, that no later boundary has passed, right after that epoch's
+          * accrueepoch: a late crank pays every overdue period in one payout, split over all the work
+          * counted since the last one. Auth: require_auth("sysio.epoch").
           *
           * `period_emission` is the gate-computed period total; payepoch asserts it equals the
           * accrued `pending_emission_amount` and distributes it across producer / batch / capex /
@@ -778,9 +780,16 @@ namespace sysiosystem {
           * While an earlier settlement is still open the payout waits: the step here advances that
           * settlement and, if it is still not done, returns with the period still pending, so the
           * next economic epoch's gate offers the payout again.
+          *
+          * `spend` is whether the economic clock had caught up to its grid before this payout's tick
+          * (sysio.epoch::economystate.caught_up as the tick found it). A payout with `spend` false,
+          * including the one on the tick that reaches the grid, spends nothing, and the gate never
+          * holds it for balance: it credits and pushes no category, clears no block count and leaves
+          * the duty period open, so the whole period stays in the treasury and the blocks and duty
+          * counted meanwhile carry to the first payout that spends, paid from that period's own pools.
           */
          [[sysio::action]]
-         void payepoch(uint32_t epoch_index, int64_t period_emission);
+         void payepoch(uint32_t epoch_index, int64_t period_emission, bool spend);
 
          /**
           * Accrue economic epoch `epoch_index`'s emission share onto t5state, without paying.
@@ -788,24 +797,27 @@ namespace sysiosystem {
           * including a pay epoch, where it runs first so payepoch observes the post-accrue state.
           * Auth: require_auth("sysio.epoch").
           *
-          * Adds `per_epoch_emission` to t5state.pending_emission_amount and the epoch's nominal
-          * block slots to pending_nominal_slots. A zero share is valid: the gate passes one to an
-          * open pay period with emission pending once the rest of the T5 budget is committed or the
-          * curve is zero, and `last_epoch_emission` (the decay base) keeps the last positive share.
+          * Adds `per_epoch_emission` to t5state.pending_emission_amount, and to pending_nominal_slots
+          * the block slots of `closed_epoch_duration_sec`: the economic epoch this tick closes, from
+          * the previous boundary to this epoch's (one epoch of the duration in force on the first
+          * tick). The share is sized on that length too; a positive one becomes `last_epoch_emission`
+          * (the decay base) with the length in `last_epoch_duration_sec`. A zero share is valid: the
+          * gate passes one to an open pay period with emission pending once the rest of the T5
+          * budget is committed or the curve is zero, and the decay base keeps the last positive share.
           *
           * No transfers happen here. Treasury / balance gating is the gate's responsibility upstream.
           */
          [[sysio::action]]
-         void accrueepoch(uint32_t epoch_index, int64_t per_epoch_emission);
+         void accrueepoch(uint32_t epoch_index, int64_t per_epoch_emission, uint32_t closed_epoch_duration_sec);
 
          /**
           * Credit `duty_seconds` seat-seconds to each of `members`, the batch-operator group that
           * served consensus epoch `epoch_index` of outpost chain `chain_code`, on the member's row for
           * that chain; `duty_seconds` is that epoch's scheduled length. Every chain's duty accrues to
-          * the one open pay period. A member whose sysio.opreg membership of the chain is EVICTED is
-          * credited nothing. A member still holding seat-seconds of the settling period on the chain is
-          * settled first. A zero `duty_seconds` credits nothing. Called inline by sysio.epoch::advance;
-          * never throws. Auth: require_auth("sysio.epoch").
+          * the one pay period open when it is recorded. A member whose sysio.opreg membership of the
+          * chain is EVICTED is credited nothing. A member still holding seat-seconds of the settling
+          * period on the chain is settled first. A zero `duty_seconds` credits nothing. Called inline
+          * by sysio.epoch::advance; never throws. Auth: require_auth("sysio.epoch").
           */
          [[sysio::action]]
          void rcrdduty(sysio::slug_name chain_code, uint32_t epoch_index, std::vector<sysio::name> members,

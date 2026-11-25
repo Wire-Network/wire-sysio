@@ -47,15 +47,23 @@ namespace sysio {
       void finishadv(sysio::slug_name chain_code, uint32_t epoch_index);
 
       /// Set the economic clock (privileged): the duration of one economic epoch and the time its grid
-      /// starts. `start_time` may lie in the past -- the clock then catches up through the elapsed
-      /// epochs once it starts -- and is fixed once the clock has ticked.
+      /// starts. The grid may start in the past -- the clock then catches up through the elapsed epochs
+      /// once it starts -- but no change is accepted while a boundary has passed without its tick, and a
+      /// new start must be ahead while a collateral withdrawal is queued. The start is fixed once the
+      /// clock has ticked, and a new duration spaces only the boundaries after the next one.
       [[sysio::action]]
       void seteconomy(uint32_t epoch_duration_sec, sysio::time_point_sec start_time);
 
       /// Open economic epoch `epoch_index` (permissionless crank). Refused unless `epoch_index` is the
       /// next index, its grid boundary has passed, and the network genesis has happened. Never waits on
-      /// outpost consensus. Runs the emissions gate, then matures withdrawals, accrues the epoch's
-      /// emission share, pays on a pay epoch, and steps the batch-duty settlement.
+      /// outpost consensus. Runs the emissions gate, then matures withdrawals, accrues the emission share
+      /// of the epoch this tick closes, pays on a pay epoch, and steps the batch-duty settlement. A payout
+      /// spends only if the clock had caught up to the grid (`economic_state::caught_up`) before its tick.
+      /// Until then, and on the tick that reaches the grid, each pay epoch's payout spends nothing and is
+      /// never held for balance: its whole period stays in the treasury, and the blocks and duty counted
+      /// meanwhile carry to the first payout that spends. Once caught up, a pay epoch ticked while a later
+      /// boundary has passed defers its payout to the tick that catches up, which pays every overdue
+      /// period's pools in one payout, split over all the work counted since the last one.
       [[sysio::action]]
       void tickeconomy(uint32_t epoch_index);
 
@@ -157,8 +165,13 @@ namespace sysio {
          uint32_t   current_epoch_index = 0;   ///< 0 until the first tick
          time_point current_epoch_start{};
          time_point next_epoch_start{};
+         /// Set by the first tick that finds no later boundary passed, and never cleared. A tick's payout spends only
+         /// if this was set before the tick (tickeconomy passes it to sysio.system::payepoch), so each pay epoch up
+         /// to and including the one that sets it closes its own period without spending any of it; from then on a
+         /// pay epoch ticked while a later boundary has passed defers its payout to the tick that catches up.
+         bool       caught_up = false;
 
-         SYSLIB_SERIALIZE(economic_state, (current_epoch_index)(current_epoch_start)(next_epoch_start))
+         SYSLIB_SERIALIZE(economic_state, (current_epoch_index)(current_epoch_start)(next_epoch_start)(caught_up))
       };
 
       using economystate_t = sysio::kv::global<"economystate"_n, economic_state>;
@@ -266,6 +279,10 @@ namespace sysio {
       /// The economic epoch the grid is in at `now`: the last one whose boundary has passed, counting
       /// boundaries `tickeconomy` has not yet processed. Equals `current_economic_epoch_index()` while
       /// the crank keeps up. 0 before the first boundary or when the clock is not configured. Never throws.
+      ///
+      /// `seteconomy` never moves a boundary that has passed, so the index never decreases as time
+      /// passes; once the clock has ticked it also keeps the next boundary, so the index of every time
+      /// before that boundary is fixed.
       static uint32_t economic_epoch_index_at(time_point now) {
          economycfg_t cfg_tbl(EPOCH_ACCOUNT);
          if (!cfg_tbl.exists()) return 0;
@@ -275,6 +292,20 @@ namespace sysio {
          if (now < next) return state.current_epoch_index;
          const int64_t duration_us = static_cast<int64_t>(cfg.epoch_duration_sec) * 1'000'000;
          return state.current_epoch_index + 1 + static_cast<uint32_t>((now - next).count() / duration_us);
+      }
+
+      /// Length of the economic epoch the next `tickeconomy` closes: from the last boundary ticked to the next one,
+      /// spaced when that boundary opened. The first tick has no earlier boundary and closes one epoch of the
+      /// configured duration. The tick accrues the emission share and the producer pay slots of this length.
+      static uint32_t closing_epoch_duration_sec(const economic_config& cfg, const economic_state& state) {
+         if (state.current_epoch_index == 0) return cfg.epoch_duration_sec;
+         return static_cast<uint32_t>((state.next_epoch_start - state.current_epoch_start).to_seconds());
+      }
+
+      /// The longest economic epoch a tick can still close: the one the next tick closes, or a later one of the
+      /// configured duration. Bounds one pay period's accrual (`sysio.system`'s period accrual check).
+      static uint32_t longest_accruing_epoch_sec(const economic_config& cfg, const economic_state& state) {
+         return std::max(cfg.epoch_duration_sec, closing_epoch_duration_sec(cfg, state));
       }
 
       /// Bounds on each chain's consensus `epoch_duration_sec`, checked by `setconfig(chain, ...)`. The

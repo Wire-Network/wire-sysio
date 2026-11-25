@@ -34,7 +34,7 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
 | `epochstate` | `kv::table` | One row per outpost chain: its consensus epoch index, current / next epoch start, active group cursor, the resident group window, pause flag |
 | `netgenesis` | `kv::global` | Network genesis marker, written by the first chain's genesis advance; closes the bootstrap window and starts the economic clock |
 | `economycfg` | `kv::global` | Economic clock: `epoch_duration_sec` (60 s .. 30 days) and the grid's `start_time` |
-| `economystate` | `kv::global` | Economic epoch index and its current / next boundary |
+| `economystate` | `kv::global` | Economic epoch index, its current / next boundary, and `caught_up`: whether a tick has found no later boundary passed (a payout spends only if it was set before its tick) |
 | `blocklog` | `kv::table` | At most one row: the open emissions block episode, keyed by its first blocked economic epoch, with the reason, attempted emission, treasury and balance figures, and how many economic epochs it has held. Erased when an economic epoch's emissions pass |
 | `rostersent` | `kv::table` | One row per outpost a roster has been queued to, keyed by its `sysio.chains` code: the SHA-256 of the last `OPERATORS` roster queued to it |
 
@@ -43,10 +43,10 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
 | Action | Auth | Description |
 |--------|------|-------------|
 | `setconfig` | `sysio.epoch` | Set one chain's consensus epoch configuration. Bounds `epoch_duration_sec` to `MIN_EPOCH_DURATION_SEC` (10 s) .. `MAX_EPOCH_DURATION_SEC` (30 days). Requires `operators_per_epoch * batch_op_groups == batch_operator_minimum_active` and enforces the outposts' limits (`MAX_OPERATORS_PER_EPOCH` 7, Ethereum's group size; `MAX_BATCH_OP_GROUPS` 8, Solana's group count), so the window holds at most `MAX_SCHEDULED_BATCH_OPERATORS` (56) |
-| `seteconomy` | `sysio.epoch` | Set the economic clock's duration and grid start. The start is fixed once the clock has ticked; it is re-validated against `sysio.system`'s pay-period accrual bound |
+| `seteconomy` | `sysio.epoch` | Set the economic clock's duration and grid start. The grid may start in the past, but no change is accepted while a boundary has passed without its tick. Until the first tick a start still ahead may move, into the past too unless a collateral withdrawal is queued (its wait counts only boundaries after the request); after it the start is fixed, and a new duration spaces only the boundaries after the next one. So no boundary that has passed ever moves, and once the clock has ticked neither does the next one. A start set in the past cannot be corrected once boundaries have passed without their ticks: the crank must first tick every one of them, or the contracts are redeployed. Re-validated against `sysio.system`'s pay-period accrual bound |
 | `schbatchgps` | `sysio.epoch` | Build one chain's initial window from the `ACTIVE` batch operators on `sysio.opreg` that serve the chain (non-bootstrapped first, then bootstrapped, trimmed to `batch_operator_minimum_active`) |
 | `advance` | `sysio.msgch` or `sysio.epoch` | Advance one chain's consensus epoch once its wall-clock boundary has passed and it is not paused. The genesis advance (epoch 0 → 1) requires an active outpost whose schedule window `schbatchgps` has seated |
-| `tickeconomy` | permissionless | Open economic epoch `epoch_index`: refused unless it is the next index, its grid boundary has passed, and the network genesis has happened |
+| `tickeconomy` | permissionless | Open economic epoch `epoch_index`: refused unless it is the next index, its grid boundary has passed, and the network genesis has happened. Its payout spends only if the clock had caught up to the grid before it |
 | `pause` | `sysio.chalg` | Pause one chain's epoch advancement |
 | `unpause` | `sysio.chalg` | Resume one chain's epoch advancement |
 | `resendroster` | `sysio.epoch` | Erase an outpost's `rostersent` row, so the next `advance` queues the roster to it again. Refused when no roster has been queued to that outpost |
@@ -74,13 +74,23 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
 
 1. Emissions readiness gate. A missing config or T5 state, or an exhausted treasury, accrues nothing;
    a pay epoch whose period total exceeds the spendable balance still accrues and leaves the payout to
-   the first economic epoch that can cover it. Either way the episode is recorded in `blocklog`.
+   the first economic epoch that can cover it. Either way the episode is recorded in `blocklog`. A payout
+   spends only if the clock had caught up to the grid before its tick (`caught_up`, set by the first tick
+   that finds no later boundary passed). Until then, and on the tick that sets it, each pay epoch's payout
+   spends nothing and is never held for balance, and the blocks and duty counted meanwhile carry to the first
+   payout that spends. A first tick run on time reaches the grid itself, so it spends nothing either. Once
+   caught up, a pay epoch ticked while a later boundary has passed defers its payout, without a `blocklog`
+   row, to the tick that catches up, which pays every overdue period's pools in one payout, split over all
+   the work counted since the last one.
 2. Bump the economic epoch index; its boundaries come from the grid, never from when the crank ran,
    so a late or caught-up crank accrues exactly what an on-time one would.
 3. `sysio.opreg::flushwtdw` matures queued collateral withdrawals whose economic wait has passed and
    whose waited-on chains have each reached the request's consensus guard for that chain.
-4. `sysio.system::accrueepoch`, plus `payepoch` on pay epochs, then `settleduty` (one bounded step of
-   any open batch-duty settlement, skipped until `initt5` has run).
+4. `sysio.system::accrueepoch` with the length of the epoch this tick closes (its emission share and the
+   pay divisor's slots), plus `payepoch` on pay epochs, then `settleduty` (one bounded step of any open
+   batch-duty settlement). None of them runs until `initt5` has: the gate holds accrual and payout, and
+   `settleduty` is skipped. Blocks and duty count toward the pay period open when they are recorded, so a
+   tick that runs late pays the work recorded before it ran.
 
 ## Dependencies
 
