@@ -34,6 +34,7 @@ namespace detail = outpost_ethereum_client_detail;
 constexpr std::string_view OP_DELIVER_OUTBOUND = "deliver_outbound_envelope";
 constexpr std::string_view OP_READ_INBOUND     = "read_inbound_envelope";
 constexpr std::string_view OP_READ_EMITTED_DIGEST = "read_emitted_envelope_digest";
+constexpr std::string_view OP_READ_OUTBOUND_BACKLOG = "read_outbound_backlog";
 
 constexpr std::string_view OP_REALIZE_YIELD    = "crank_outpost:realizeYield";
 
@@ -106,7 +107,13 @@ constexpr auto data  = "data_";
 /// `outboundEnvelopes(uint32)` record fields.
 constexpr auto record_epoch_index = "epochIndex";
 constexpr auto record_checksum    = "checksum";
+/// `pendingOutbound()` outputs.
+constexpr auto latest_outbound_epoch      = "latestOutboundEpoch_";
+constexpr auto queued_message_count       = "queuedMessageCount_";
+constexpr auto oldest_queued_timestamp_ms = "oldestQueuedTimestampMs";
 }
+/// Static words `pendingOutbound()` returns: `(uint32, uint256, uint64)`.
+constexpr size_t pending_outbound_words = 3;
 } // namespace opp_abi
 
 namespace syndication_pool_abi {
@@ -122,8 +129,6 @@ constexpr auto finalized               = "finalized";
 constexpr auto next_epoch              = "nextEpoch";
 constexpr auto agreeing                = "agreeing";
 constexpr auto group_size              = "groupSize";
-constexpr auto current_epoch_started_at = "currentEpochStartedAtTs";
-constexpr auto epoch_duration_sec      = "epochDurationSec_";
 }
 } // namespace opp_inbound_abi
 
@@ -288,6 +293,18 @@ std::optional<uint64_t> abi_uint_output(const fc::variant& value) {
       return value.as_uint64();
    }
    return std::nullopt;
+}
+
+/// The unsigned integer output `key` of a view's decoded result `object`, asserted present and numeric so a malformed
+/// read fails closed instead of reading 0.
+uint64_t uint_output(const fc::variant_object& object, std::string_view key, std::string_view client_label,
+                     std::string_view view) {
+   const fc::variant_object::iterator field = object.find(std::string{key});
+   FC_ASSERT(field != object.end(), "outpost_ethereum_client[{}]: {} result missing '{}'", client_label, view, key);
+   const std::optional<uint64_t> value = abi_uint_output(field->value());
+   FC_ASSERT(value.has_value(), "outpost_ethereum_client[{}]: {} '{}' was not a uint64 output", client_label, view,
+             key);
+   return *value;
 }
 
 /// The keccak256 of a Solidity signature as prefix-free lower-case hex: the
@@ -487,19 +504,10 @@ delivery_settlement classify_settlement(std::string_view own_digest, std::string
    return same_hex(own_digest, settled_digest) ? delivery_settlement::settled : delivery_settlement::divergent;
 }
 
-bool majority_tip_reachable(const pending_consensus& consensus, uint64_t now_sec) {
-   if (consensus.group_size == 0) return false;
-   const uint64_t boundary = consensus.epoch_started_at + consensus.epoch_duration_sec;
-   // STRICT majority, as the contract computes it (`groupSize / 2 + 1`).
-   const uint32_t majority = consensus.group_size / 2 + 1;
-   return now_sec >= boundary && consensus.agreeing >= majority;
-}
-
 delivery_action decide_delivery(uint32_t              next_epoch_index,
                                 uint32_t              epoch_index,
                                 const dispatch_spill& spill,
-                                delivery_settlement   settlement,
-                                bool                  majority_reachable) {
+                                delivery_settlement   settlement) {
    // The outpost is past this epoch, or has closed it: every transaction
    // would be a paid late no-op. `finalized` is checked as well as the epoch
    // cursor because the two are written in one call and reads that race a
@@ -520,10 +528,10 @@ delivery_action decide_delivery(uint32_t              next_epoch_index,
                                                         : delivery_action::wait_for_deliverer;
    }
    if (settlement == delivery_settlement::never_delivered) return delivery_action::deliver;
-   // Recorded and untipped: the rest of the group has yet to deliver. A
-   // re-delivery re-runs the tip, which only settles anything once the
-   // contract's path-2 predicate holds.
-   return majority_reachable ? delivery_action::retry_consensus : delivery_action::await_peers;
+   // Recorded and untipped: the rest of the group has yet to deliver. The
+   // outpost tips on the delivery that completes a strict majority, so only a
+   // peer's delivery can settle it.
+   return delivery_action::await_peers;
 }
 
 bool advanced(const delivery_progress& before, const delivery_progress& after) {
@@ -787,6 +795,12 @@ outpost_ethereum_client::outpost_ethereum_client(
    // crank binds it when it discovers the address.
    if (!_opp_addr.empty()) {
       _opp_client = _entry->client->get_contract<opp_contract_client>(_opp_addr, _abis);
+      // The relay reports the outpost's outbound backlog from this view, so an ABI set without it is refused here
+      // rather than on every backlog read.
+      SYS_ASSERT(_opp_client->pending_outbound, chain::plugin_config_exception,
+                 "outpost_ethereum_client[{}]: the loaded OPP ABI declares no {} view, which the relay reads the "
+                 "outpost's outbound backlog from",
+                 to_string(), opp_contract_client::view_pending_outbound);
    }
    if (!_opp_inbound_addr.empty()) {
       _opp_inbound_client =
@@ -885,22 +899,14 @@ detail::pending_consensus outpost_ethereum_client::read_pending_consensus(const 
       _opp_inbound_client->get_abi(opp_inbound_abi_name::pending_consensus_for_digest), raw);
    FC_ASSERT(decoded.is_object(),
              "outpost_ethereum_client[{}]: pendingConsensusForDigest result was not a variant object", to_string());
-   const auto& object = decoded.get_object();
-   const auto  read   = [&](const char* key) -> uint64_t {
-      FC_ASSERT(object.contains(key), "outpost_ethereum_client[{}]: pendingConsensusForDigest result missing '{}'",
-                to_string(), key);
-      const auto value = abi_uint_output(object[key]);
-      FC_ASSERT(value.has_value(),
-                "outpost_ethereum_client[{}]: pendingConsensusForDigest '{}' was not a numeric output", to_string(),
-                key);
-      return *value;
+   const fc::variant_object& object = decoded.get_object();
+   const auto                read   = [&](std::string_view key) {
+      return uint_output(object, key, to_string(), opp_inbound_abi_name::pending_consensus_for_digest);
    };
    detail::pending_consensus consensus;
-   consensus.next_epoch         = static_cast<uint32_t>(read(opp_inbound_abi::field::next_epoch));
-   consensus.agreeing           = static_cast<uint32_t>(read(opp_inbound_abi::field::agreeing));
-   consensus.group_size         = static_cast<uint32_t>(read(opp_inbound_abi::field::group_size));
-   consensus.epoch_started_at   = read(opp_inbound_abi::field::current_epoch_started_at);
-   consensus.epoch_duration_sec = static_cast<uint32_t>(read(opp_inbound_abi::field::epoch_duration_sec));
+   consensus.next_epoch = static_cast<uint32_t>(read(opp_inbound_abi::field::next_epoch));
+   consensus.agreeing   = static_cast<uint32_t>(read(opp_inbound_abi::field::agreeing));
+   consensus.group_size = static_cast<uint32_t>(read(opp_inbound_abi::field::group_size));
    return consensus;
 }
 
@@ -1305,20 +1311,8 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
       const auto progress = read_progress(epoch_index, pinned(pinned_block));
       const auto settlement =
          detail::classify_settlement(progress.own_digest, progress.settled_digest, progress.spill.tipped);
-
-      // A recorded, untipped delivery is re-sent only when the outpost's own
-      // numbers say the re-send would tip it — and only when this tick has
-      // not just sent one, whose tip check ran in that very transaction.
-      bool                                    majority_reachable = false;
-      std::optional<detail::pending_consensus> consensus;
-      if (sends == 0 && settlement == detail::delivery_settlement::recorded &&
-          progress.next_epoch_index == epoch_index) {
-         consensus = read_pending_consensus(progress.own_digest, pinned_block);
-         majority_reachable =
-            detail::majority_tip_reachable(*consensus, uint64_t{fc::time_point::now().sec_since_epoch()});
-      }
-      const auto action = detail::decide_delivery(progress.next_epoch_index, epoch_index, progress.spill,
-                                                  settlement, majority_reachable);
+      const detail::delivery_action action =
+         detail::decide_delivery(progress.next_epoch_index, epoch_index, progress.spill, settlement);
       dlog("outpost_ethereum_client[{}]: epoch={} action={} next_epoch={} "
            "spill(tipped={} dispatched={} complete={} finalized={}) settlement={} sends={}",
            to_string(), epoch_index, magic_enum::enum_name(action), progress.next_epoch_index,
@@ -1362,34 +1356,32 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
 
       case detail::delivery_action::await_peers:
          if (sends == 0) {
-            // A consensus retry that arrives before the OUTPOST's boundary (the
-            // job gates it on the depot's, which leads the outpost's) is not a
-            // used-up retry: the epoch stays open so the job tries again next
-            // tick, until the boundary passes and the majority view decides.
-            const uint64_t boundary = consensus->epoch_started_at + consensus->epoch_duration_sec;
-            if (uint64_t{fc::time_point::now().sec_since_epoch()} < boundary) {
-               ilog("outpost_ethereum_client[{}]: epoch={} delivery recorded; the outpost's boundary ({}) has not "
-                    "passed, so a re-delivery could not tip it yet; retrying next tick",
-                    to_string(), epoch_index, boundary);
-               SYS_THROW(chain::outpost_delivery_incomplete_exception,
-                         "outpost_ethereum_client[{}]: epoch={} recorded; outpost boundary {} not reached",
-                         to_string(), epoch_index, boundary);
+            // Found recorded when the tick began: the epoch waits on the rest
+            // of the group. The outpost's tally is read for this line only, so
+            // a failed read never fails the tick.
+            std::optional<detail::pending_consensus> consensus;
+            std::string                              unread_why;
+            try {
+               consensus = read_pending_consensus(progress.own_digest, pinned_block);
+            } catch (const fc::exception& e) {
+               unread_why = e.top_message();
+            } catch (const std::exception& e) {
+               unread_why = e.what();
             }
-            ilog("outpost_ethereum_client[{}]: epoch={} delivery already recorded; consensus not tipped "
-                 "(agreeing={} group={} boundary={}); nothing to send until more of the group delivers",
-                 to_string(), epoch_index, consensus->agreeing, consensus->group_size, boundary);
+            if (consensus) {
+               dlog("outpost_ethereum_client[{}]: epoch={} delivery already recorded; consensus not tipped "
+                    "(agreeing={} group={}); nothing to send until more of the group delivers",
+                    to_string(), epoch_index, consensus->agreeing, consensus->group_size);
+            } else {
+               dlog("outpost_ethereum_client[{}]: epoch={} delivery already recorded; consensus not tipped; "
+                    "nothing to send until more of the group delivers (tally unread: {})",
+                    to_string(), epoch_index, unread_why);
+            }
          } else {
             dlog("outpost_ethereum_client[{}]: epoch={} delivery recorded; consensus not yet tipped", to_string(),
                  epoch_index);
          }
          return handled();
-
-      case detail::delivery_action::retry_consensus:
-         ilog("outpost_ethereum_client[{}]: epoch={} re-delivering to run the boundary tip (agreeing={} "
-              "group={} boundary={})",
-              to_string(), epoch_index, consensus->agreeing, consensus->group_size,
-              consensus->epoch_started_at + consensus->epoch_duration_sec);
-         break;
 
       case detail::delivery_action::continue_dispatch:
          // The contract resumes only from the bytes that hash to the settled
@@ -1691,6 +1683,41 @@ std::optional<fc::sha256> outpost_ethereum_client::read_emitted_envelope_digest(
              "outpost_ethereum_client[{}]: {}({}) carried a malformed checksum", to_string(),
              opp_contract_client::view_outbound_envelopes, epoch_index);
    return fc::sha256(checksum);
+}
+
+outbound_backlog outpost_ethereum_client::read_outbound_backlog(fc::microseconds deadline) {
+   const fc::time_point     deadline_abs = fc::time_point::now() + deadline;
+   fc::task::deadline_scope rpc_deadline(deadline_abs);
+
+   throw_if_past_deadline(deadline_abs, OP_READ_OUTBOUND_BACKLOG);
+   FC_ASSERT(_opp_client, "outpost_ethereum_client[{}]: read_outbound_backlog requires an OPP address", to_string());
+
+   // At the read confirmation, as `read_inbound_envelope` reads: the epoch compared with the depot's is the one the
+   // relay delivered from there, and a message a reorg can still remove is not yet traffic.
+   const fc::variant raw_var = _opp_client->pending_outbound(read_settled_block());
+   constexpr size_t  result_hex_chars =
+      HEX_PREFIX_CHARS + opp_abi::pending_outbound_words * EVM_ABI_WORD_BYTES * HEX_CHARS_PER_BYTE;
+   FC_ASSERT(raw_var.is_string() && raw_var.as_string().size() == result_hex_chars,
+             "outpost_ethereum_client[{}]: {} did not return {} words", to_string(),
+             opp_contract_client::view_pending_outbound, opp_abi::pending_outbound_words);
+   const fc::variant decoded = eth::contract_decode_data(
+      _opp_client->get_abi(opp_contract_client::view_pending_outbound), raw_var.as_string());
+   FC_ASSERT(decoded.is_object(), "outpost_ethereum_client[{}]: {} did not decode", to_string(),
+             opp_contract_client::view_pending_outbound);
+   const fc::variant_object& result = decoded.get_object();
+   const auto                read   = [&](std::string_view key) {
+      return uint_output(result, key, to_string(), opp_contract_client::view_pending_outbound);
+   };
+
+   const uint64_t   queued = read(opp_abi::field::queued_message_count);
+   outbound_backlog backlog{
+      .outbound_epoch    = static_cast<uint32_t>(read(opp_abi::field::latest_outbound_epoch)),
+      .pending_count     = static_cast<uint32_t>(std::min<uint64_t>(queued, std::numeric_limits<uint32_t>::max())),
+      .oldest_pending_ms = read(opp_abi::field::oldest_queued_timestamp_ms),
+   };
+   dlog("outpost_ethereum_client[{}]: pendingOutbound outbound_epoch={} pending={} oldest_ms={}", to_string(),
+        backlog.outbound_epoch, backlog.pending_count, backlog.oldest_pending_ms);
+   return backlog;
 }
 
 void outpost_ethereum_client::bind_syndication_pool(

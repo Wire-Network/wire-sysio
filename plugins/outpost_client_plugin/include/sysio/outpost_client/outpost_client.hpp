@@ -30,6 +30,22 @@ namespace sysio {
 inline constexpr size_t OPP_MAX_ENVELOPE_BYTES = 32'768;
 
 /**
+ * @brief What an outpost has queued for WIRE and not yet emitted, read at one block or slot.
+ *
+ * The relay reports it to the depot (`sysio.msgch::reportqueue`) as the chain's outbound traffic, once the outpost has
+ * emitted the envelope of the depot's current epoch.
+ */
+struct outbound_backlog {
+   /// The latest WIRE epoch the outpost emitted an outbound envelope for; 0 before its first emit.
+   uint32_t outbound_epoch    = 0;
+   /// Messages (Ethereum) or attestations (Solana) queued for the next emit.
+   uint32_t pending_count     = 0;
+   /// When the backlog began, in milliseconds since the Unix epoch; 0 while nothing is queued. Ethereum reports its
+   /// oldest queued message, Solana the start of its current backlog.
+   uint64_t oldest_pending_ms = 0;
+};
+
+/**
  * @brief Chain-agnostic facade for OPP delivery on a single external outpost.
  *
  * This is the SPI (Service Provider Interface) between `batch_operator_plugin`
@@ -153,6 +169,16 @@ public:
     */
    virtual std::optional<fc::sha256> read_emitted_envelope_digest(uint32_t         epoch_index,
                                                                   fc::microseconds deadline) = 0;
+
+   /**
+    * @brief The outpost's outbound backlog and the latest epoch it emitted for, from ONE read at one block or slot,
+    *        so the count, its age and the epoch cannot disagree. Read at `confirmed` on Solana and at the client's
+    *        read confirmation on Ethereum.
+    *
+    * @param deadline  Upper bound on the total time spent talking to the remote chain for this call.
+    * @throws fc::exception on RPC failure, deadline expiry, or an outpost account or view that does not decode.
+    */
+   virtual outbound_backlog read_outbound_backlog(fc::microseconds deadline) = 0;
 
    /**
     * @brief OUTPOST CRANKS — drive the outpost's permissionless per-epoch

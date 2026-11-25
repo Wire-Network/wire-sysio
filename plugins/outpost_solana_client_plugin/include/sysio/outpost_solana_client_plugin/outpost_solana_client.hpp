@@ -428,6 +428,23 @@ envelope_chunk_reap_gates decode_envelope_chunk_reap_gates(
    opp_solana_outpost_client& program_client,
    const std::vector<std::optional<fc::network::solana::account_info>>& infos);
 
+/// Assert that the loaded IDL declares `OutboundMessageBuffer` opening with the fields the backlog read takes from
+/// fixed offsets: `oldest_pending_at` (i64), `used_data_bytes` (u32) and `attestation_count` (u16), in that order. The
+/// account is `repr(C)`, so those three lay out without padding right after the discriminator.
+/// @throws fc::exception naming the account and the first field that disagrees.
+void assert_outbound_backlog_shape(const fc::network::solana::idl::program& program);
+
+/// Decode the `getMultipleAccounts` pair in request order, `OutboundMessageBuffer` then `LatestOutboundEnvelope`,
+/// into the outpost's outbound backlog. The pending count is `attestation_count`; the backlog's age is
+/// `oldest_pending_at` (unix seconds) in milliseconds, trusted only while something is queued and zero otherwise;
+/// the outbound epoch is the latest one the outpost emitted. Each account must carry its discriminator, be owned by
+/// `program_client.program_id` and hold its whole header.
+/// @throws fc::exception for a wrong account count, invalid account data (naming the affected account), or a
+///         backlog age that is not a time.
+outbound_backlog decode_outbound_backlog(
+   opp_solana_outpost_client& program_client,
+   const std::vector<std::optional<fc::network::solana::account_info>>& infos);
+
 /// The program's own eligibility predicate for reaping `epoch_index`'s buffer
 /// or tally (wire-solana `epoch_reapable`, shared by `cleanup_envelope_chunks`
 /// and `cleanup_epoch_deliveries`). The relay mirrors it so it never pays for a
@@ -900,6 +917,10 @@ public:
    std::optional<fc::sha256> read_emitted_envelope_digest(uint32_t         epoch_index,
                                                           fc::microseconds deadline) override;
 
+   /// `OutboundMessageBuffer` and `LatestOutboundEnvelope` in one `getMultipleAccounts` at `confirmed`, header-only
+   /// (`decode_outbound_backlog`).
+   outbound_backlog read_outbound_backlog(fc::microseconds deadline) override;
+
    // Expose for inspection / tests
    const solana_client_entry_ptr&                entry()                 const { return _entry; }
    const fc::network::solana::solana_public_key& program_id()            const { return _program_id; }
@@ -945,8 +966,9 @@ protected:
    /// `epoch_index`, or empty when the PDA does not (yet) hold that epoch.
    virtual std::vector<char> read_latest_outbound_envelope(uint32_t epoch_index, fc::time_point deadline_abs);
 
-   /// RPC boundary for the ordered gate accounts; forwards the exact list, commitment and header slice.
-   virtual std::vector<std::optional<fc::network::solana::account_info>> read_chunk_reap_accounts(
+   /// RPC boundary for `getMultipleAccounts`, behind the reap gates and the outbound backlog; forwards the exact
+   /// ordered list, commitment and header slice.
+   virtual std::vector<std::optional<fc::network::solana::account_info>> read_multiple_accounts(
       const std::vector<fc::network::solana::solana_public_key>& accounts,
       fc::network::solana::commitment_t commitment,
       const std::optional<fc::network::solana::data_slice>& slice);

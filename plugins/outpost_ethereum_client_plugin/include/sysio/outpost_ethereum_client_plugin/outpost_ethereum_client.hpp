@@ -63,38 +63,22 @@ delivery_settlement classify_settlement(std::string_view own_digest, std::string
 /// Decoded `OPPInbound.pendingConsensusForDigest(bytes32)` view result.
 struct pending_consensus {
    /// The epoch the outpost is accepting.
-   uint32_t next_epoch         = 0;
+   uint32_t next_epoch = 0;
    /// Deliveries recorded for the digest in that epoch.
-   uint32_t agreeing           = 0;
+   uint32_t agreeing   = 0;
    /// Members of the group scheduled for that epoch.
-   uint32_t group_size         = 0;
-   /// `block.timestamp` at which the outpost's current epoch began.
-   uint64_t epoch_started_at   = 0;
-   /// The outpost's mirror of the depot's `epoch_duration_sec`.
-   uint32_t epoch_duration_sec = 0;
+   uint32_t group_size = 0;
 };
-
-/// The contract's path-2 predicate (`.claude/rules/opp-consensus.md`): the
-/// boundary has elapsed and a strict majority of the group agrees. A
-/// re-delivery sent while this is false is a paid no-op; one sent while it is
-/// true re-runs the tip and settles the epoch.
-///
-/// @param consensus  the view, read for the digest this relay delivered.
-/// @param now_sec    wall clock, seconds since the epoch.
-bool majority_tip_reachable(const pending_consensus& consensus, uint64_t now_sec);
 
 /// What the relay should do about the epoch it is holding, given the outpost's
 /// view of that epoch.
 enum class delivery_action {
    /// Nothing recorded and the epoch has not tipped: deliver the envelope.
    deliver,
-   /// This relay's delivery is recorded, the epoch has not tipped, and the
-   /// contract's path-2 predicate holds: re-send the same envelope so the
-   /// outpost re-runs the tip (idempotent on a same-digest re-delivery).
-   retry_consensus,
-   /// This relay's delivery is recorded and the epoch has not tipped; a
-   /// re-delivery would change nothing until more of the group delivers (or,
-   /// before the outpost's own boundary, until that boundary passes).
+   /// This relay's delivery is recorded and the epoch has not tipped. The
+   /// outpost tips on the delivery that completes a strict majority, so a
+   /// re-delivery changes nothing: nothing is sent until more of the group
+   /// delivers.
    await_peers,
    /// The epoch tipped on THIS relay's digest and is not finished: re-supply
    /// the envelope so the outpost dispatches the next stretch.
@@ -120,17 +104,14 @@ bool same_evm_address(std::string_view lhs, std::string_view rhs);
 /// Pure and side-effect free so the table is unit-testable without an EVM
 /// node; the caller performs whichever RPC the verdict names.
 ///
-/// @param next_epoch_index   the outpost's `nextEpochIndex()`.
-/// @param epoch_index        WIRE epoch being delivered.
-/// @param spill              the outpost's `dispatchSpill(epoch_index)`.
-/// @param settlement         this relay's delivery record, see `classify_settlement`.
-/// @param majority_reachable `majority_tip_reachable` for the digest this relay
-///                           delivered; consulted only for a recorded, untipped epoch.
+/// @param next_epoch_index the outpost's `nextEpochIndex()`.
+/// @param epoch_index      WIRE epoch being delivered.
+/// @param spill            the outpost's `dispatchSpill(epoch_index)`.
+/// @param settlement       this relay's delivery record, see `classify_settlement`.
 delivery_action decide_delivery(uint32_t              next_epoch_index,
                                 uint32_t              epoch_index,
                                 const dispatch_spill& spill,
-                                delivery_settlement   settlement,
-                                bool                  majority_reachable);
+                                delivery_settlement   settlement);
 
 /// Everything the relay reads about one epoch at ONE block, so the pieces
 /// cannot disagree with each other.
@@ -357,7 +338,8 @@ public:
    /// @throws chain::plugin_config_exception when an OPPInbound address is
    ///         given and the client's static gas ceiling is below
    ///         `DELIVERY_MINIMUM_GAS_CEILING`: no envelope at the platform cap
-   ///         could complete on it.
+   ///         could complete on it; or when an OPP address is given and the
+   ///         loaded ABI set declares no `pendingOutbound()` view.
    outpost_ethereum_client(ethereum_client_entry_ptr                                entry,
                            std::string                                              opp_addr,
                            std::string                                              opp_inbound_addr,
@@ -402,6 +384,11 @@ public:
    /// view.
    std::optional<fc::sha256> read_emitted_envelope_digest(uint32_t         epoch_index,
                                                           fc::microseconds deadline) override;
+
+   /// `OPP.pendingOutbound()` at the client's read confirmation (`read_settled_block`): the latest epoch the outpost
+   /// emitted for, its queued message count and its oldest queued message's timestamp in milliseconds. Throws when
+   /// its result is not three words.
+   outbound_backlog read_outbound_backlog(fc::microseconds deadline) override;
 
    /// The Ethereum crank: `SyndicationPool.realizeYield()` on the pool the
    /// outpost registers as its `DESYNDICATE_LIQ` handler. Idle, at debug level,
@@ -463,7 +450,6 @@ private:
    /// already shows this relay's part of `epoch_index` done: the epoch closed or
    /// tipped, or this relay's delivery recorded. The relay reports an epoch
    /// handled only then, so a delivery a reorg removes is delivered again.
-   /// The job retries after the boundary until inbound delivery reaches the depot.
    bool settled_past_delivery(uint32_t epoch_index);
 
    /// Settle the signer's journal before anything else is sent, the journal's

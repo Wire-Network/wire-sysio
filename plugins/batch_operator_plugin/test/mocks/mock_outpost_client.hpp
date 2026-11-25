@@ -109,9 +109,23 @@ public:
       crank_response(call);
    }
 
+   /// read_outbound_backlog response — scripted per call; the default is an outpost that has emitted nothing and
+   /// holds no backlog.
+   std::function<sysio::outbound_backlog()> backlog_response = [] { return sysio::outbound_backlog{}; };
+
+   sysio::outbound_backlog read_outbound_backlog(fc::microseconds deadline) override {
+      {
+         std::lock_guard<std::mutex> lock(_mx);
+         backlog_calls.push_back(deadline);
+      }
+      return backlog_response();
+   }
+
    std::vector<outbound_call> outbound_calls;
    std::vector<inbound_call>  inbound_calls;
    std::vector<inbound_call>  emitted_digest_calls;
+   /// The deadline of every read_outbound_backlog call, in call order.
+   std::vector<fc::microseconds> backlog_calls;
 
    std::vector<crank_call>    crank_calls;
    std::vector<uint8_t>       caller_address;

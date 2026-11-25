@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <array>
+#include <bit>
 #include <cstring>
 #include <limits>
 #include <map>
@@ -44,6 +45,7 @@ constexpr std::string_view OP_DISPATCH_ATTESTATIONS =
    "deliver_outbound_envelope:dispatch_attestations";
 constexpr std::string_view OP_READ_LATEST = "read_inbound_envelope:get_account_info";
 constexpr std::string_view OP_READ_EMITTED_DIGEST = "read_emitted_envelope_digest:get_account_info";
+constexpr std::string_view OP_READ_OUTBOUND_BACKLOG = "read_outbound_backlog:get_multiple_accounts";
 
 using outpost_solana_client_detail::derive_epoch_deliveries_pda;
 using outpost_solana_client_detail::derive_envelope_chunks_pda;
@@ -146,6 +148,30 @@ constexpr size_t REAP_GATE_ACCOUNT_COUNT = 2;
 /// Keep both discriminators and both complete u32 cursors, without the envelope payload.
 constexpr size_t REAP_GATE_HEADER_BYTES =
    std::max(outpost_config::epoch_offset, latest_envelope::epoch_offset) + sizeof(uint32_t);
+
+/// `OutboundMessageBuffer` -- the zero-copy `repr(C)` queue of attestations awaiting the next outbound emit. The
+/// backlog read takes its header from fixed offsets, checked against the loaded IDL at boot
+/// (`assert_outbound_backlog_shape`).
+namespace outbound_message_buffer {
+   constexpr auto account_name            = "OutboundMessageBuffer";
+   constexpr auto field_oldest_pending_at = "oldest_pending_at";
+   constexpr auto field_used_data_bytes   = "used_data_bytes";
+   constexpr auto field_attestation_count = "attestation_count";
+   /// `oldest_pending_at` i64 (unix seconds; zero while empty) right after the discriminator.
+   constexpr size_t oldest_pending_at_offset = ANCHOR_DISCRIMINATOR_BYTES;
+   /// `attestation_count` u16, after `oldest_pending_at` and `used_data_bytes` u32.
+   constexpr size_t attestation_count_offset = oldest_pending_at_offset + sizeof(int64_t) + sizeof(uint32_t);
+   static_assert(attestation_count_offset == 20, "must equal the program's OutboundMessageBuffer layout");
+} // namespace outbound_message_buffer
+
+/// Number of accounts requested together for the outbound backlog: the buffer, then the latest outbound envelope.
+constexpr size_t OUTBOUND_BACKLOG_ACCOUNT_COUNT = 2;
+/// Keep both discriminators, the buffer's count and age, and the latest outbound epoch, without either payload.
+constexpr size_t OUTBOUND_BACKLOG_HEADER_BYTES =
+   std::max(outbound_message_buffer::attestation_count_offset + sizeof(uint16_t),
+            latest_envelope::epoch_offset + sizeof(uint32_t));
+/// `OutboundMessageBuffer.oldest_pending_at` is in seconds; a backlog report is in milliseconds.
+constexpr int64_t MILLISECONDS_PER_SECOND = fc::seconds(1).count() / fc::milliseconds(1).count();
 
 /// Field names of one `getProgramAccounts` result entry, as the Solana JSON-RPC returns it.
 namespace program_account_entry {
@@ -900,6 +926,33 @@ uint32_t le_u32(const unsigned char* p) {
    return static_cast<uint32_t>(p[0]) | (static_cast<uint32_t>(p[1]) << 8)
         | (static_cast<uint32_t>(p[2]) << 16) | (static_cast<uint32_t>(p[3]) << 24);
 }
+int64_t le_i64(const unsigned char* p) {
+   uint64_t value = 0;
+   for (size_t i = sizeof(uint64_t); i-- > 0;) value = (value << 8) | static_cast<uint64_t>(p[i]);
+   return std::bit_cast<int64_t>(value);
+}
+
+/// `info`'s data once it is shown to be `account_name`'s whole header: present and not empty, owned by
+/// `program_client.program_id`, at least `header_bytes` long and opening with the loaded IDL's discriminator for the
+/// account.
+/// @throws fc::exception naming the account otherwise.
+const std::vector<uint8_t>& checked_account_header(
+   opp_solana_outpost_client& program_client, const std::optional<fc::network::solana::account_info>& info,
+   std::string_view account_name, size_t header_bytes) {
+   FC_ASSERT(info.has_value() && !info.value().data.empty(), "{} is absent or empty", account_name);
+   const auto& account = info.value();
+   FC_ASSERT(account.owner == program_client.program_id, "{} is owned by {} instead of program {}", account_name,
+             account.owner.to_string(fc::yield_function_t{}),
+             program_client.program_id.to_string(fc::yield_function_t{}));
+   const auto* declaration = program_client.get_program()->find_account(std::string{account_name});
+   FC_ASSERT(declaration != nullptr, "outpost program IDL declares no {}", account_name);
+   FC_ASSERT(account.data.size() >= header_bytes, "{} header is truncated", account_name);
+   FC_ASSERT(declaration->discriminator.size() <= account.data.size() &&
+                std::equal(declaration->discriminator.begin(), declaration->discriminator.end(),
+                           account.data.begin()),
+             "{} discriminator disagrees with the loaded IDL", account_name);
+   return account.data;
+}
 
 } // anonymous namespace
 
@@ -1415,26 +1468,63 @@ envelope_chunk_reap_gates decode_envelope_chunk_reap_gates(
    FC_ASSERT(infos.size() == REAP_GATE_ACCOUNT_COUNT, "getMultipleAccounts returned {} accounts for {} addresses",
              infos.size(), REAP_GATE_ACCOUNT_COUNT);
    const auto read_field = [&](const std::optional<fc::network::solana::account_info>& info,
-                               const char* account_name, size_t offset) -> uint32_t {
-      FC_ASSERT(info.has_value() && !info.value().data.empty(), "{} is absent or empty", account_name);
-      const auto& account = info.value();
-      FC_ASSERT(account.owner == program_client.program_id, "{} is owned by {} instead of program {}", account_name,
-                account.owner.to_string(fc::yield_function_t{}),
-                program_client.program_id.to_string(fc::yield_function_t{}));
-      const auto* declaration = program_client.get_program()->find_account(account_name);
-      FC_ASSERT(declaration != nullptr, "outpost program IDL declares no {}", account_name);
-      FC_ASSERT(account.data.size() >= offset + sizeof(uint32_t), "{} cursor header is truncated", account_name);
-      FC_ASSERT(declaration->discriminator.size() <= account.data.size() &&
-                   std::equal(declaration->discriminator.begin(), declaration->discriminator.end(),
-                              account.data.begin()),
-                "{} discriminator disagrees with the loaded IDL", account_name);
-      return le_u32(account.data.data() + offset);
+                               std::string_view account_name, size_t offset) -> uint32_t {
+      return le_u32(
+         checked_account_header(program_client, info, account_name, offset + sizeof(uint32_t)).data() + offset);
    };
    return {
       .next_epoch_index =
          read_field(infos[0], outpost_config::account_name, outpost_config::epoch_offset),
       .latest_outbound_epoch = read_field(infos[1], latest_envelope::account_name, latest_envelope::epoch_offset),
    };
+}
+
+void assert_outbound_backlog_shape(const fc::network::solana::idl::program& program) {
+   namespace idl = fc::network::solana::idl;
+   const std::vector<idl::field>& fields = declared_account_fields(program, outbound_message_buffer::account_name);
+   // The header the backlog read takes from fixed offsets, in declaration order.
+   constexpr std::array<std::pair<std::string_view, idl::primitive_type>, 3> header{{
+      {outbound_message_buffer::field_oldest_pending_at, idl::primitive_type::i64},
+      {outbound_message_buffer::field_used_data_bytes, idl::primitive_type::u32},
+      {outbound_message_buffer::field_attestation_count, idl::primitive_type::u16},
+   }};
+   FC_ASSERT(fields.size() >= header.size(), "{} IDL declares {} fields; the backlog read needs {} first, then {}",
+             outbound_message_buffer::account_name, fields.size(), header.front().first, header.back().first);
+   for (size_t i = 0; i < header.size(); ++i) {
+      const auto& [name, type] = header[i];
+      FC_ASSERT(fields[i].name == name && fields[i].type.is_primitive() && fields[i].type.primitive == type,
+                "{} IDL field {} must be '{}' of type {}, got '{}' of type '{}'; the backlog read's offsets disagree",
+                outbound_message_buffer::account_name, i, name, magic_enum::enum_name(type), fields[i].name,
+                describe_idl_type(fields[i].type));
+   }
+}
+
+outbound_backlog decode_outbound_backlog(
+   opp_solana_outpost_client&                                           program_client,
+   const std::vector<std::optional<fc::network::solana::account_info>>& infos) {
+   FC_ASSERT(program_client.get_program() != nullptr, "no IDL program loaded");
+   FC_ASSERT(infos.size() == OUTBOUND_BACKLOG_ACCOUNT_COUNT,
+             "getMultipleAccounts returned {} accounts for {} addresses", infos.size(), OUTBOUND_BACKLOG_ACCOUNT_COUNT);
+   const std::vector<uint8_t>& buffer =
+      checked_account_header(program_client, infos[0], outbound_message_buffer::account_name,
+                             outbound_message_buffer::attestation_count_offset + sizeof(uint16_t));
+   const std::vector<uint8_t>& latest = checked_account_header(program_client, infos[1], latest_envelope::account_name,
+                                                               latest_envelope::epoch_offset + sizeof(uint32_t));
+
+   outbound_backlog backlog{
+      .outbound_epoch = le_u32(latest.data() + latest_envelope::epoch_offset),
+      .pending_count  = le_u16(buffer.data() + outbound_message_buffer::attestation_count_offset),
+   };
+   // The program stamps the age when the buffer goes non-empty and clears it when a drain empties it, so it is
+   // read only while something is queued.
+   if (backlog.pending_count > 0) {
+      const int64_t oldest_sec = le_i64(buffer.data() + outbound_message_buffer::oldest_pending_at_offset);
+      FC_ASSERT(oldest_sec >= 0 && oldest_sec <= std::numeric_limits<int64_t>::max() / MILLISECONDS_PER_SECOND,
+                "{}.{} {} is not a time", outbound_message_buffer::account_name,
+                outbound_message_buffer::field_oldest_pending_at, oldest_sec);
+      backlog.oldest_pending_ms = static_cast<uint64_t>(oldest_sec * MILLISECONDS_PER_SECOND);
+   }
+   return backlog;
 }
 
 bool epoch_reapable(const envelope_chunk_reap_gates& gates, uint32_t epoch_index) {
@@ -2043,6 +2133,8 @@ outpost_solana_client::outpost_solana_client(
       }
       outpost_solana_client_detail::assert_envelope_chunks_shape(*_program_client);
       outpost_solana_client_detail::assert_envelope_chunk_gate_shapes(*_program_client);
+      // The relay reports the outpost's outbound backlog from fixed header offsets.
+      outpost_solana_client_detail::assert_outbound_backlog_shape(*_program_client->get_program());
       // The tally closer is newer than the chunk closer, so a program without it is accepted and its tallies are
       // left alone. Where it is declared, the sweep filters tallies on `payer` at a fixed offset; check it here.
       if (_program_client->has_idl(CLEANUP_EPOCH_DELIVERIES_INSTRUCTION)) {
@@ -2228,7 +2320,7 @@ std::string outpost_solana_client::send_dispatch_attestations(
    return _program_client->execute_tx_and_confirm(instr, accounts, params, pre_ixs);
 }
 
-std::vector<std::optional<fc::network::solana::account_info>> outpost_solana_client::read_chunk_reap_accounts(
+std::vector<std::optional<fc::network::solana::account_info>> outpost_solana_client::read_multiple_accounts(
    const std::vector<fc::network::solana::solana_public_key>& accounts, fc::network::solana::commitment_t commitment,
    const std::optional<fc::network::solana::data_slice>& slice) {
    return _entry->client->get_multiple_accounts(accounts, commitment, slice);
@@ -2242,7 +2334,7 @@ fc::variant outpost_solana_client::read_program_accounts(
 
 outpost_solana_client_detail::envelope_chunk_reap_gates outpost_solana_client::read_envelope_chunk_reap_gates() {
    // One confirmed bank observes the atomic drain and riding emit together.
-   const auto infos = read_chunk_reap_accounts(
+   const auto infos = read_multiple_accounts(
       {_program_client->config_pda, _program_client->latest_outbound_envelope_pda},
       fc::network::solana::commitment_t::confirmed,
       fc::network::solana::data_slice{.offset = 0, .length = REAP_GATE_HEADER_BYTES});
@@ -2721,6 +2813,22 @@ std::optional<fc::sha256> outpost_solana_client::read_emitted_envelope_digest(ui
              "outpost_solana_client[{}]: the outbound envelope log is owned by {} instead of program {}", to_string(),
              info->owner.to_string(fc::yield_function_t{}), _program_id.to_string(fc::yield_function_t{}));
    return outpost_solana_client_detail::decode_envelope_log_digest(*_program_client, info->data, epoch_index);
+}
+
+outbound_backlog outpost_solana_client::read_outbound_backlog(fc::microseconds deadline) {
+   const fc::time_point     deadline_abs = fc::time_point::now() + deadline;
+   fc::task::deadline_scope rpc_deadline(deadline_abs);
+   throw_if_past_deadline(deadline_abs, OP_READ_OUTBOUND_BACKLOG);
+
+   // One `confirmed` bank, the reap gates' commitment: the count, its age and the latest emitted epoch agree.
+   const std::vector<std::optional<fc::network::solana::account_info>> infos = read_multiple_accounts(
+      {_program_client->outbound_message_buffer_pda, _program_client->latest_outbound_envelope_pda},
+      fc::network::solana::commitment_t::confirmed,
+      fc::network::solana::data_slice{.offset = 0, .length = OUTBOUND_BACKLOG_HEADER_BYTES});
+   const outbound_backlog backlog = outpost_solana_client_detail::decode_outbound_backlog(*_program_client, infos);
+   dlog("outpost_solana_client[{}]: outbound backlog outbound_epoch={} pending={} oldest_ms={}", to_string(),
+        backlog.outbound_epoch, backlog.pending_count, backlog.oldest_pending_ms);
+   return backlog;
 }
 
 std::vector<char> outpost_solana_client::read_inbound_envelope(

@@ -4199,6 +4199,181 @@ BOOST_AUTO_TEST_CASE(chunk_reap_gates_reject_wrong_account_count) try {
    BOOST_CHECK_THROW(reap_detail::decode_envelope_chunk_reap_gates(client, accounts), fc::exception);
 } FC_LOG_AND_RETHROW();
 
+namespace {
+
+/// The outbound backlog's two accounts as the program lays them out, and the values the tests read back.
+namespace backlog_fixture {
+   constexpr auto buffer_name  = "OutboundMessageBuffer";
+   constexpr auto latest_name  = "LatestOutboundEnvelope";
+   constexpr uint32_t emitted_epoch     = 17;
+   constexpr uint16_t queued            = 3;
+   constexpr int64_t  oldest_sec        = 1'800'000'123;
+   constexpr uint32_t used_data_bytes   = 211;
+   constexpr uint8_t  bump              = 0xFE;
+   constexpr uint8_t  version           = 1;
+   constexpr size_t   account_count     = 2;
+   /// The shared RPC slice: the buffer's count ends at byte 22, the latest epoch at byte 13.
+   constexpr size_t   header_bytes      = 22;
+   /// Where the buffer's count and the latest epoch end: a header one byte shorter truncates the field.
+   constexpr std::array<size_t, account_count> field_ends = {22, 13};
+   constexpr std::array<const char*, account_count> account_names = {buffer_name, latest_name};
+   constexpr uint32_t foreign_program_seed = 43;
+   /// A descriptor's bytes (`AttestationDesc`: offset u32, len u32, attestation_type i32).
+   constexpr size_t descriptor_bytes = 12;
+}
+
+/// An `OutboundMessageBuffer` header as the program lays it out: discriminator, `oldest_pending_at` i64,
+/// `used_data_bytes` u32, `attestation_count` u16, bump, version, then one zeroed descriptor of the tail.
+std::vector<uint8_t> outbound_buffer_header(uint16_t count, int64_t oldest_sec) {
+   using namespace backlog_fixture;
+   borsh::encoder enc;
+   const auto disc = idl::compute_account_discriminator(buffer_name);
+   enc.write_fixed_bytes(disc.data(), disc.size());
+   enc.write_i64(oldest_sec);
+   enc.write_u32(used_data_bytes);
+   enc.write_u16(count);
+   enc.write_u8(bump);
+   enc.write_u8(version);
+   const std::array<uint8_t, descriptor_bytes> descriptor{};
+   enc.write_fixed_bytes(descriptor.data(), descriptor.size());
+   return enc.data();
+}
+
+/// Both backlog accounts, the buffer holding `count` attestations pending since `oldest_sec`.
+std::vector<std::optional<account_info>> backlog_accounts(uint16_t count = backlog_fixture::queued,
+                                                          int64_t  oldest_sec = backlog_fixture::oldest_sec) {
+   const std::array<uint8_t, 32> hash{};
+   return {program_owned(outbound_buffer_header(count, oldest_sec)),
+           program_owned(integrated_latest_account(backlog_fixture::emitted_epoch, {}, hash))};
+}
+
+} // anonymous namespace
+
+/// A queued buffer reports its count, its age in milliseconds and the latest emitted epoch, each from its own
+/// account and offset.
+BOOST_AUTO_TEST_CASE(outbound_backlog_decodes_a_queued_buffer) try {
+   auto client = resume_program_client();
+   const sysio::outbound_backlog backlog = reap_detail::decode_outbound_backlog(client, backlog_accounts());
+   BOOST_CHECK_EQUAL(backlog.outbound_epoch, backlog_fixture::emitted_epoch);
+   BOOST_CHECK_EQUAL(backlog.pending_count, backlog_fixture::queued);
+   BOOST_CHECK_EQUAL(backlog.oldest_pending_ms, static_cast<uint64_t>(backlog_fixture::oldest_sec) * 1000);
+
+   // The RPC's header-only slice decodes the same.
+   auto sliced = backlog_accounts();
+   for (auto& info : sliced) info->data.resize(std::min(info->data.size(), backlog_fixture::header_bytes));
+   const sysio::outbound_backlog from_slice = reap_detail::decode_outbound_backlog(client, sliced);
+   BOOST_CHECK_EQUAL(from_slice.outbound_epoch, backlog.outbound_epoch);
+   BOOST_CHECK_EQUAL(from_slice.pending_count, backlog.pending_count);
+   BOOST_CHECK_EQUAL(from_slice.oldest_pending_ms, backlog.oldest_pending_ms);
+} FC_LOG_AND_RETHROW();
+
+/// An empty buffer reports no backlog and no age, whatever its age field still holds.
+BOOST_AUTO_TEST_CASE(outbound_backlog_of_an_empty_buffer_has_no_age) try {
+   auto client = resume_program_client();
+   for (const int64_t stale_sec : {int64_t{0}, backlog_fixture::oldest_sec, int64_t{-1}}) {
+      BOOST_TEST_CONTEXT("oldest_pending_at " << stale_sec) {
+         const sysio::outbound_backlog backlog =
+            reap_detail::decode_outbound_backlog(client, backlog_accounts(0, stale_sec));
+         BOOST_CHECK_EQUAL(backlog.pending_count, 0u);
+         BOOST_CHECK_EQUAL(backlog.oldest_pending_ms, 0u);
+         BOOST_CHECK_EQUAL(backlog.outbound_epoch, backlog_fixture::emitted_epoch);
+      }
+   }
+} FC_LOG_AND_RETHROW();
+
+/// A queued buffer whose age is not a time is a failed read, not a backlog dated arbitrarily.
+BOOST_AUTO_TEST_CASE(outbound_backlog_refuses_an_age_that_is_not_a_time) try {
+   auto client = resume_program_client();
+   for (const int64_t bad_sec :
+        {int64_t{-1}, std::numeric_limits<int64_t>::min(), std::numeric_limits<int64_t>::max()}) {
+      BOOST_TEST_CONTEXT("oldest_pending_at " << bad_sec) {
+         BOOST_CHECK_THROW(
+            reap_detail::decode_outbound_backlog(client, backlog_accounts(backlog_fixture::queued, bad_sec)),
+            fc::exception);
+      }
+   }
+   // Zero while queued (never written so by the program) reads as no age; the depot counts that as now.
+   BOOST_CHECK_EQUAL(reap_detail::decode_outbound_backlog(client, backlog_accounts(backlog_fixture::queued, 0))
+                        .oldest_pending_ms,
+                     0u);
+} FC_LOG_AND_RETHROW();
+
+/// Each account must be present, non-empty, the program's, carrying its discriminator and its whole field; the
+/// diagnostic names the account that is not.
+BOOST_AUTO_TEST_CASE(outbound_backlog_refuses_invalid_accounts) try {
+   auto client = resume_program_client();
+   const auto names = [](size_t i) {
+      return [i](const fc::exception& e) { return gate_error_names(e, backlog_fixture::account_names[i]); };
+   };
+   for (size_t i = 0; i < backlog_fixture::account_count; ++i) {
+      BOOST_TEST_CONTEXT("account " << backlog_fixture::account_names[i]) {
+         auto absent = backlog_accounts();
+         absent[i] = std::nullopt;
+         BOOST_CHECK_EXCEPTION(reap_detail::decode_outbound_backlog(client, absent), fc::exception, names(i));
+
+         auto empty = backlog_accounts();
+         empty[i]->data.clear();
+         BOOST_CHECK_EXCEPTION(reap_detail::decode_outbound_backlog(client, empty), fc::exception, names(i));
+
+         auto foreign = backlog_accounts();
+         foreign[i]->owner = measurement_pubkey(backlog_fixture::foreign_program_seed);
+         BOOST_CHECK_EXCEPTION(reap_detail::decode_outbound_backlog(client, foreign), fc::exception, names(i));
+
+         auto unknown = backlog_accounts();
+         unknown[i]->data.front() ^= 1;
+         BOOST_CHECK_EXCEPTION(reap_detail::decode_outbound_backlog(client, unknown), fc::exception, names(i));
+
+         auto short_data = backlog_accounts();
+         short_data[i]->data.resize(backlog_fixture::field_ends[i] - 1);
+         BOOST_CHECK_EXCEPTION(reap_detail::decode_outbound_backlog(client, short_data), fc::exception, names(i));
+      }
+   }
+   // The two accounts swapped: neither carries the other's discriminator.
+   auto swapped = backlog_accounts();
+   std::swap(swapped[0], swapped[1]);
+   BOOST_CHECK_THROW(reap_detail::decode_outbound_backlog(client, swapped), fc::exception);
+   // A short or long RPC result is not the ordered pair the decoder requires.
+   auto accounts = backlog_accounts();
+   accounts.pop_back();
+   BOOST_CHECK_THROW(reap_detail::decode_outbound_backlog(client, accounts), fc::exception);
+   accounts = backlog_accounts();
+   accounts.push_back(std::nullopt);
+   BOOST_CHECK_THROW(reap_detail::decode_outbound_backlog(client, accounts), fc::exception);
+} FC_LOG_AND_RETHROW();
+
+/// The boot check accepts the deployed declaration and refuses one whose header would move the fixed offsets.
+BOOST_AUTO_TEST_CASE(outbound_backlog_shape_is_checked_at_boot) try {
+   const auto prog = load_idl_fixture(opp_outpost_idl_fixture);
+   BOOST_CHECK_NO_THROW(reap_detail::assert_outbound_backlog_shape(prog));
+
+   const auto with_fields = [&](const std::function<void(std::vector<idl::field>&)>& edit) {
+      auto changed = load_idl_fixture(opp_outpost_idl_fixture);
+      auto type = std::ranges::find_if(changed.types, [](const idl::type_def& t) {
+         return t.name == backlog_fixture::buffer_name;
+      });
+      BOOST_REQUIRE(type != changed.types.end());
+      BOOST_REQUIRE(type->struct_fields.has_value());
+      edit(*type->struct_fields);
+      return changed;
+   };
+   const auto refused = [](const idl::program& program) {
+      BOOST_CHECK_EXCEPTION(reap_detail::assert_outbound_backlog_shape(program), fc::exception,
+                            [](const fc::exception& e) { return gate_error_names(e, backlog_fixture::buffer_name); });
+   };
+   // Renamed, retyped, reordered and truncated headers.
+   refused(with_fields([](std::vector<idl::field>& fields) { fields[0].name = "unrecognized_age"; }));
+   refused(with_fields([](std::vector<idl::field>& fields) {
+      fields[2].type = idl::idl_type::make_primitive(idl::primitive_type::u32);
+   }));
+   refused(with_fields([](std::vector<idl::field>& fields) { std::swap(fields[1], fields[2]); }));
+   refused(with_fields([](std::vector<idl::field>& fields) { fields.resize(2); }));
+
+   // An IDL without the account at all.
+   auto without = load_idl_fixture(opp_outpost_idl_fixture);
+   std::erase_if(without.accounts, [](const idl::account& a) { return a.name == backlog_fixture::buffer_name; });
+   BOOST_CHECK_THROW(reap_detail::assert_outbound_backlog_shape(without), fc::exception);
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_CASE(chunk_buffer_discovery_filters_on_discriminator_and_operator) try {
    const auto me    = measurement_pubkey(7);
    const auto disc  = idl::compute_account_discriminator(std::string{envelope_chunks_name});
@@ -4466,14 +4641,14 @@ struct chunk_member_client : sysio::outpost_solana_client {
    bool allow_upload = false;
 
    /// Exercise the real gate reader and decoder, asserting the ordered RPC arguments.
-   std::vector<std::optional<account_info>> read_chunk_reap_accounts(
+   std::vector<std::optional<account_info>> read_multiple_accounts(
       const std::vector<solana_public_key>& accounts, commitment_t commitment,
       const std::optional<data_slice>& slice) override {
       ++gate_reads;
       BOOST_REQUIRE(slice);
       BOOST_CHECK_EQUAL(slice->offset, 0u);
       BOOST_CHECK_EQUAL(slice->length, reap_gate_fixture::header_bytes);
-      if (use_rpc_reads) return outpost_solana_client::read_chunk_reap_accounts(accounts, commitment, slice);
+      if (use_rpc_reads) return outpost_solana_client::read_multiple_accounts(accounts, commitment, slice);
       const auto expected = resume_program_client();
       BOOST_REQUIRE_EQUAL(accounts.size(), reap_gate_fixture::account_count);
       BOOST_CHECK(accounts[0] == expected.config_pda);
@@ -5483,6 +5658,61 @@ BOOST_AUTO_TEST_CASE(chunk_sweep_deadline_stop_backoff_logs_warning) try {
          BOOST_CHECK_EQUAL(std::count(warning.begin(), warning.end(), '\n'), 2);
       }
    }
+} FC_LOG_AND_RETHROW();
+
+namespace {
+
+/// The real `read_outbound_backlog` member over a scripted `getMultipleAccounts`, recording what it asked for.
+struct backlog_member_client : sysio::outpost_solana_client {
+   explicit backlog_member_client(sysio::solana_client_entry_ptr entry)
+      : outpost_solana_client(std::move(entry), resume_program_id, {load_idl_fixture(opp_outpost_idl_fixture)},
+                              1, 1, sysio::solana_outpost_role::batch_operator) {}
+
+   std::vector<solana_public_key>           requested;
+   std::optional<commitment_t>              commitment;
+   std::optional<data_slice>                slice;
+   std::vector<std::optional<account_info>> response = backlog_accounts();
+   uint32_t                                 reads = 0;
+
+   std::vector<std::optional<account_info>> read_multiple_accounts(
+      const std::vector<solana_public_key>& accounts, commitment_t read_commitment,
+      const std::optional<data_slice>& read_slice) override {
+      ++reads;
+      requested  = accounts;
+      commitment = read_commitment;
+      slice      = read_slice;
+      return response;
+   }
+};
+
+} // anonymous namespace
+
+/// One `getMultipleAccounts` at `confirmed` reads the buffer and the latest outbound envelope, header-only.
+BOOST_FIXTURE_TEST_CASE(read_outbound_backlog_reads_both_accounts_at_confirmed, chunk_member_fixture) try {
+   backlog_member_client client(entry);
+   const sysio::outbound_backlog backlog = client.read_outbound_backlog(fc::seconds(5));
+   BOOST_CHECK_EQUAL(backlog.outbound_epoch, backlog_fixture::emitted_epoch);
+   BOOST_CHECK_EQUAL(backlog.pending_count, backlog_fixture::queued);
+   BOOST_CHECK_EQUAL(backlog.oldest_pending_ms, static_cast<uint64_t>(backlog_fixture::oldest_sec) * 1000);
+
+   const auto expected = resume_program_client();
+   BOOST_CHECK_EQUAL(client.reads, 1u);
+   BOOST_REQUIRE_EQUAL(client.requested.size(), backlog_fixture::account_count);
+   BOOST_CHECK(client.requested[0] == expected.outbound_message_buffer_pda);
+   BOOST_CHECK(client.requested[1] == expected.latest_outbound_envelope_pda);
+   BOOST_REQUIRE(client.commitment);
+   BOOST_CHECK(*client.commitment == commitment_t::confirmed);
+   BOOST_REQUIRE(client.slice);
+   BOOST_CHECK_EQUAL(client.slice->offset, 0u);
+   BOOST_CHECK_EQUAL(client.slice->length, backlog_fixture::header_bytes);
+
+   // A malformed account propagates rather than reading as an empty backlog.
+   client.response[0] = std::nullopt;
+   BOOST_CHECK_THROW(client.read_outbound_backlog(fc::seconds(5)), fc::exception);
+   // An expired deadline reads nothing.
+   const uint32_t reads = client.reads;
+   BOOST_CHECK_THROW(client.read_outbound_backlog(fc::microseconds(0)), fc::timeout_exception);
+   BOOST_CHECK_EQUAL(client.reads, reads);
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_SUITE_END()

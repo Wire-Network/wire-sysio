@@ -11,6 +11,7 @@
 #include <chrono>
 #include <cstring>
 #include <iomanip>
+#include <limits>
 #include <map>
 #include <memory>
 #include <thread>
@@ -566,11 +567,9 @@ private:
 };
 
 /// Encode the raw return bytes for the `pendingConsensusForDigest(bytes32)`
-/// view — five static outputs, concatenated.
-std::string encode_pending_consensus_result(uint32_t next_epoch, uint32_t agreeing, uint32_t group_size,
-                                            uint64_t epoch_started_at, uint32_t epoch_duration_sec) {
-   return std::string(hex_prefix) + abi_word(next_epoch) + abi_word(agreeing) + abi_word(group_size) +
-          abi_word(epoch_started_at) + abi_word(epoch_duration_sec);
+/// view — three static outputs, concatenated.
+std::string encode_pending_consensus_result(uint32_t next_epoch, uint32_t agreeing, uint32_t group_size) {
+   return std::string(hex_prefix) + abi_word(next_epoch) + abi_word(agreeing) + abi_word(group_size);
 }
 
 /// One receipt log entry as a node returns it.
@@ -683,8 +682,10 @@ struct whole_envelope_delivery_fixture {
    /// Response the stubbed `pendingEpochHash` view returns.
    std::string pending_hash_response = encode_word_result(settled_digest_word);
    /// Response the stubbed `pendingConsensusForDigest` view returns. The
-   /// default: this relay alone has delivered, the boundary long past.
-   std::string consensus_response = encode_pending_consensus_result(test_wire_epoch, 1, test_group_size, 0, 0);
+   /// default: this relay alone has delivered.
+   std::string consensus_response = encode_pending_consensus_result(test_wire_epoch, 1, test_group_size);
+   /// An error the stubbed `pendingConsensusForDigest` view throws instead of answering.
+   std::optional<fc::network::json_rpc::json_rpc_error> consensus_refusal;
    /// Receipt logs per confirmed call, in order; the last repeats. The default
    /// is the delivery record alone. `std::nullopt` entries use the default.
    std::vector<std::optional<fc::variants>> receipt_logs;
@@ -1018,6 +1019,7 @@ create_whole_envelope_delivery_fixture(ethereum_transaction_policy transaction_p
          note_pinned(block);
          ++raw->consensus_reads;
          raw->consensus_digests.push_back(digest);
+         if (raw->consensus_refusal) throw *raw->consensus_refusal;
          return fc::variant(raw->consensus_response);
       };
 
@@ -1400,6 +1402,8 @@ BOOST_AUTO_TEST_CASE(opp_contract_client_construction) try {
    BOOST_REQUIRE(client);
    BOOST_CHECK(client->emit_outbound_envelope);
    BOOST_CHECK(client->get_latest_outbound_envelope);
+   BOOST_CHECK(client->outbound_envelopes);
+   BOOST_CHECK(client->pending_outbound);
 
    // Verify the live relay surface is present and the retired finalizer is not.
    bool has_emit = false, has_latest = false, has_finalize = false;
@@ -1723,6 +1727,103 @@ BOOST_AUTO_TEST_CASE(read_emitted_envelope_digest_reads_the_outpost_record) try 
    BOOST_CHECK_THROW(outpost_without_view->read_emitted_envelope_digest(test_wire_epoch, deadline), fc::exception);
 } FC_LOG_AND_RETHROW();
 
+/// `pendingOutbound()` returns `(uint32 latestOutboundEpoch_, uint256 queuedMessageCount_, uint64
+/// oldestQueuedTimestampMs)`.
+std::string encode_pending_outbound_result(uint64_t epoch, uint64_t queued, uint64_t oldest_ms) {
+   return std::string(hex_prefix) + abi_word(epoch) + abi_word(queued) + abi_word(oldest_ms);
+}
+
+/// The outpost's backlog view decodes into the relay's report at the read confirmation; an empty queue reports no
+/// age, and a result that is not the view's three words is a failed read rather than an empty backlog.
+BOOST_AUTO_TEST_CASE(read_outbound_backlog_reads_the_outpost_view) try {
+   auto clean_app = gsl_lite::finally([]() {
+      appbase::application::reset_app_singleton();
+   });
+   auto tester = create_app();
+   auto sig_provider = tester->plugin().create_provider(
+      std::string(latest_slot_test_entry_id),
+      chain_kind_ethereum,
+      chain_key_type_ethereum,
+      std::string(latest_slot_test_public_key),
+      to_private_key_spec(std::string(latest_slot_test_private_key)));
+
+   // One outpost per ABI set: the client caches its typed contract per address.
+   const std::string opp_address{test_opp_address};
+   auto make_outpost = [&](std::vector<fc::network::ethereum::abi::contract> abis) {
+      auto eth_client = std::make_shared<scripted_ethereum_client>(sig_provider, relay_test_policy(),
+                                                                   std::make_shared<scripted_rpc>());
+      auto typed_opp = eth_client->get_contract<sysio::opp_contract_client>(opp_address, abis);
+      auto entry = std::make_shared<sysio::ethereum_client_entry_t>();
+      entry->id = latest_slot_test_entry_id;
+      entry->signature_provider = sig_provider;
+      entry->client = eth_client;
+      entry->chain_id = test_evm_chain_id;
+      auto outpost = std::make_shared<sysio::outpost_ethereum_client>(
+         entry, opp_address, "", abis, test_outpost_chain_code, test_evm_chain_id);
+      return std::make_pair(typed_opp, outpost);
+   };
+
+   auto [typed_opp, outpost] = make_outpost(load_abi_fixture(opp_abi_fixture));
+   BOOST_REQUIRE(typed_opp->pending_outbound);
+   size_t reads = 0;
+   auto set_response = [&](fc::variant response) {
+      typed_opp->pending_outbound = [&reads, response = std::move(response)](const block_number_or_tag_t& block) {
+         BOOST_CHECK(block == block_number_or_tag_t{pinned_block_hex(scripted_rpc{}.settled_block())});
+         ++reads;
+         return response;
+      };
+   };
+   const auto deadline = fc::seconds(test_rpc_deadline_seconds);
+   constexpr uint64_t queued    = 4;
+   constexpr uint64_t oldest_ms = 1'800'000'000'123;
+
+   set_response(fc::variant(encode_pending_outbound_result(test_wire_epoch, queued, oldest_ms)));
+   const sysio::outbound_backlog backlog = outpost->read_outbound_backlog(deadline);
+   BOOST_CHECK_EQUAL(backlog.outbound_epoch, test_wire_epoch);
+   BOOST_CHECK_EQUAL(backlog.pending_count, queued);
+   BOOST_CHECK_EQUAL(backlog.oldest_pending_ms, oldest_ms);
+   BOOST_CHECK_EQUAL(reads, 1u);
+
+   // An empty queue: the contract reports no age.
+   set_response(fc::variant(encode_pending_outbound_result(test_wire_epoch, 0, 0)));
+   const sysio::outbound_backlog empty = outpost->read_outbound_backlog(deadline);
+   BOOST_CHECK_EQUAL(empty.outbound_epoch, test_wire_epoch);
+   BOOST_CHECK_EQUAL(empty.pending_count, 0u);
+   BOOST_CHECK_EQUAL(empty.oldest_pending_ms, 0u);
+
+   // Before the outpost's first emit.
+   set_response(fc::variant(encode_pending_outbound_result(0, queued, oldest_ms)));
+   BOOST_CHECK_EQUAL(outpost->read_outbound_backlog(deadline).outbound_epoch, 0u);
+
+   // A count past uint32 reports the most a report carries.
+   set_response(fc::variant(encode_pending_outbound_result(test_wire_epoch, uint64_t{1} << 40, oldest_ms)));
+   BOOST_CHECK_EQUAL(outpost->read_outbound_backlog(deadline).pending_count, std::numeric_limits<uint32_t>::max());
+
+   // A short, long, empty or non-string result is a failed read, never an empty backlog.
+   set_response(fc::variant(encode_pending_outbound_result(test_wire_epoch, queued, oldest_ms).substr(
+      0, std::string(hex_prefix).size() + 2 * 64)));
+   BOOST_CHECK_THROW(outpost->read_outbound_backlog(deadline), fc::exception);
+   set_response(fc::variant(encode_pending_outbound_result(test_wire_epoch, queued, oldest_ms) + abi_word(0)));
+   BOOST_CHECK_THROW(outpost->read_outbound_backlog(deadline), fc::exception);
+   set_response(fc::variant(std::string(hex_prefix)));
+   BOOST_CHECK_THROW(outpost->read_outbound_backlog(deadline), fc::exception);
+   set_response(fc::variant());
+   BOOST_CHECK_THROW(outpost->read_outbound_backlog(deadline), fc::exception);
+
+   // An ABI set without the view is refused when the client is built, not at the first backlog read.
+   auto abis_without_view = load_abi_fixture(opp_abi_fixture);
+   std::erase_if(abis_without_view, [](const fc::network::ethereum::abi::contract& c) {
+      return c.name == sysio::opp_contract_client::view_pending_outbound;
+   });
+   BOOST_CHECK_THROW(make_outpost(std::move(abis_without_view)), sysio::chain::plugin_config_exception);
+
+   // An expired deadline reads nothing.
+   const size_t before = reads;
+   set_response(fc::variant(encode_pending_outbound_result(test_wire_epoch, queued, oldest_ms)));
+   BOOST_CHECK_THROW(outpost->read_outbound_backlog(fc::microseconds(0)), fc::timeout_exception);
+   BOOST_CHECK_EQUAL(reads, before);
+} FC_LOG_AND_RETHROW();
+
 // ---------------------------------------------------------------------------
 //  Whole-envelope WIRE -> Ethereum delivery
 // ---------------------------------------------------------------------------
@@ -1869,32 +1970,32 @@ BOOST_AUTO_TEST_CASE(delivery_decision_table) try {
    const detail::dispatch_spill mid_flight{.tipped = true, .dispatched = 3, .complete = false, .finalized = false};
    const detail::dispatch_spill emit_pending{.tipped = true, .dispatched = 9, .complete = true, .finalized = false};
    const detail::dispatch_spill finalized{.tipped = true, .dispatched = 9, .complete = true, .finalized = true};
-   const auto decide = [](uint32_t next, const detail::dispatch_spill& spill, settlement s, bool majority) {
-      return detail::decide_delivery(next, test_wire_epoch, spill, s, majority);
+   const auto decide = [](uint32_t next, const detail::dispatch_spill& spill, settlement s) {
+      return detail::decide_delivery(next, test_wire_epoch, spill, s);
    };
 
    // Not tipped, nothing recorded: deliver.
-   BOOST_CHECK(decide(test_wire_epoch, untipped, settlement::never_delivered, false) == action::deliver);
-   BOOST_CHECK(decide(test_wire_epoch, untipped, settlement::never_delivered, true) == action::deliver);
-   // Not tipped, recorded: re-deliver only when the outpost's own majority view says it would tip.
-   BOOST_CHECK(decide(test_wire_epoch, untipped, settlement::recorded, true) == action::retry_consensus);
-   BOOST_CHECK(decide(test_wire_epoch, untipped, settlement::recorded, false) == action::await_peers);
+   BOOST_CHECK(decide(test_wire_epoch, untipped, settlement::never_delivered) == action::deliver);
+   // Not tipped, recorded: the outpost tips on the delivery that completes a majority, so only peers can settle it.
+   BOOST_CHECK(decide(test_wire_epoch, untipped, settlement::recorded) == action::await_peers);
 
    // Tipped and unfinished: only the settled digest's deliverer continues.
-   BOOST_CHECK(decide(test_wire_epoch, mid_flight, settlement::settled, false) == action::continue_dispatch);
-   BOOST_CHECK(decide(test_wire_epoch, emit_pending, settlement::settled, false) == action::continue_dispatch);
-   BOOST_CHECK(decide(test_wire_epoch, mid_flight, settlement::never_delivered, false) == action::wait_for_deliverer);
-   BOOST_CHECK(decide(test_wire_epoch, mid_flight, settlement::divergent, false) == action::wait_for_deliverer);
-   BOOST_CHECK(decide(test_wire_epoch, emit_pending, settlement::divergent, true) == action::wait_for_deliverer);
+   BOOST_CHECK(decide(test_wire_epoch, mid_flight, settlement::settled) == action::continue_dispatch);
+   BOOST_CHECK(decide(test_wire_epoch, emit_pending, settlement::settled) == action::continue_dispatch);
+   BOOST_CHECK(decide(test_wire_epoch, mid_flight, settlement::never_delivered) == action::wait_for_deliverer);
+   BOOST_CHECK(decide(test_wire_epoch, mid_flight, settlement::divergent) == action::wait_for_deliverer);
+   BOOST_CHECK(decide(test_wire_epoch, emit_pending, settlement::divergent) == action::wait_for_deliverer);
 
    // Closed, by either signal: nothing to send.
-   BOOST_CHECK(decide(test_wire_epoch, finalized, settlement::settled, false) == action::already_finalized);
-   BOOST_CHECK(decide(test_different_wire_epoch, untipped, settlement::never_delivered, false) == action::already_finalized);
-   BOOST_CHECK(decide(test_different_wire_epoch, mid_flight, settlement::settled, false) == action::already_finalized);
+   BOOST_CHECK(decide(test_wire_epoch, finalized, settlement::settled) == action::already_finalized);
+   BOOST_CHECK(decide(test_different_wire_epoch, untipped, settlement::never_delivered) == action::already_finalized);
+   BOOST_CHECK(decide(test_different_wire_epoch, untipped, settlement::recorded) == action::already_finalized);
+   BOOST_CHECK(decide(test_different_wire_epoch, mid_flight, settlement::settled) == action::already_finalized);
 
    // The outpost has not reached this epoch: a delivery would be refused as non-sequential.
-   BOOST_CHECK(decide(test_stale_wire_epoch, untipped, settlement::never_delivered, false) == action::outpost_behind);
-   BOOST_CHECK(decide(test_stale_wire_epoch, mid_flight, settlement::settled, false) == action::outpost_behind);
+   BOOST_CHECK(decide(test_stale_wire_epoch, untipped, settlement::never_delivered) == action::outpost_behind);
+   BOOST_CHECK(decide(test_stale_wire_epoch, untipped, settlement::recorded) == action::outpost_behind);
+   BOOST_CHECK(decide(test_stale_wire_epoch, mid_flight, settlement::settled) == action::outpost_behind);
 } FC_LOG_AND_RETHROW();
 
 /// This relay's record is classified against the settled digest only once the
@@ -1917,29 +2018,6 @@ BOOST_AUTO_TEST_CASE(delivery_settlement_classification) try {
    BOOST_CHECK_THROW(detail::classify_settlement(settled_digest_word, "0x", true), fc::exception);
    BOOST_CHECK_THROW(detail::classify_settlement(std::string(settled_digest_word) + "0", settled_digest_word, true),
                      fc::exception);
-} FC_LOG_AND_RETHROW();
-
-/// The contract's path-2 predicate, mirrored: the boundary elapsed AND a
-/// strict majority agreeing; an empty group never tips.
-BOOST_AUTO_TEST_CASE(majority_tip_is_the_contracts_path_2_predicate) try {
-   namespace detail = sysio::outpost_ethereum_client_detail;
-   constexpr uint64_t started  = 1'000;
-   constexpr uint32_t duration = 60;
-   constexpr uint64_t boundary = started + duration;
-   const auto view = [](uint32_t agreeing, uint32_t group) {
-      return detail::pending_consensus{.next_epoch = test_wire_epoch, .agreeing = agreeing, .group_size = group,
-                                       .epoch_started_at = started, .epoch_duration_sec = duration};
-   };
-
-   BOOST_CHECK(detail::majority_tip_reachable(view(test_majority, test_group_size), boundary));
-   BOOST_CHECK(detail::majority_tip_reachable(view(test_group_size, test_group_size), boundary + 1));
-   BOOST_CHECK(!detail::majority_tip_reachable(view(test_majority, test_group_size), boundary - 1));
-   BOOST_CHECK(!detail::majority_tip_reachable(view(test_majority - 1, test_group_size), boundary));
-   BOOST_CHECK(!detail::majority_tip_reachable(view(0, 0), boundary));
-   // A group of one tips on its own delivery; the strict majority of five is three.
-   BOOST_CHECK(detail::majority_tip_reachable(view(1, 1), boundary));
-   BOOST_CHECK(detail::majority_tip_reachable(view(3, 5), boundary));
-   BOOST_CHECK(!detail::majority_tip_reachable(view(2, 5), boundary));
 } FC_LOG_AND_RETHROW();
 
 /// The progress invariant: every field the outpost moves counts as progress,
@@ -2253,61 +2331,55 @@ BOOST_AUTO_TEST_CASE(delivery_does_not_continue_from_a_minority_digest) try {
    BOOST_CHECK_EQUAL(fixture->delivery_calls.size(), 0u);
 } FC_LOG_AND_RETHROW();
 
-/// A recorded, untipped delivery is re-sent only when the outpost's own
-/// consensus view says the re-send would tip it — the boundary elapsed and a
-/// strict majority agreeing — and only once per tick. The ordinary first
-/// delivery of a tick (`delivery_sends_the_whole_envelope_in_one_call`) is the
-/// recorded-untipped-after-a-send case, which returns normally.
-BOOST_AUTO_TEST_CASE(delivery_retries_consensus_only_when_the_outposts_majority_view_allows) try {
-   const uint64_t now = fc::time_point::now().sec_since_epoch();
-   constexpr uint32_t duration = 60;
-   const auto consensus = [&](uint32_t agreeing, uint64_t started_at) {
-      return encode_pending_consensus_result(test_wire_epoch, agreeing, test_group_size, started_at, duration);
-   };
+/// A recorded, untipped delivery is never re-sent, however many of the group
+/// agree: the outpost tips on the delivery that completes a strict majority,
+/// so only a peer's delivery can settle it. The tick reads the outpost's tally
+/// for its log and reports the epoch handled. The ordinary first delivery of a
+/// tick (`delivery_sends_the_whole_envelope_in_one_call`) is the
+/// recorded-untipped-after-a-send case, which reads no tally.
+BOOST_AUTO_TEST_CASE(a_recorded_untipped_delivery_sends_nothing_and_awaits_its_peers) try {
+   for (const uint32_t agreeing : {uint32_t{1}, test_majority, test_group_size}) {
+      BOOST_TEST_CONTEXT("agreeing " << agreeing) {
+         auto fixture  = create_whole_envelope_delivery_fixture();
+         auto envelope = make_envelope(mid_envelope_bytes);
+         fixture->own_delivery_responses = {encode_word_result(settled_digest_word)};
+         fixture->consensus_response     = encode_pending_consensus_result(test_wire_epoch, agreeing, test_group_size);
 
-   // Boundary elapsed, majority agreeing: one re-delivery, then the tick stops.
-   {
-      auto fixture  = create_whole_envelope_delivery_fixture();
-      auto envelope = make_envelope(mid_envelope_bytes);
-      fixture->own_delivery_responses = {encode_word_result(settled_digest_word)};
-      fixture->consensus_response     = consensus(test_majority, now - duration - 1);
+         const auto tx = fixture->outpost->deliver_outbound_envelope(
+            test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds));
 
-      const auto tx = fixture->outpost->deliver_outbound_envelope(
-         test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds));
-
-      BOOST_CHECK(!tx.empty());
-      check_delivery_calls(fixture->delivery_calls, envelope, test_wire_epoch, 1);
-      BOOST_CHECK_EQUAL(fixture->consensus_reads, 1u);
-      BOOST_REQUIRE_EQUAL(fixture->consensus_digests.size(), 1u);
-      BOOST_CHECK_EQUAL(fixture->consensus_digests.front(), prefixed(settled_digest_word));
+         BOOST_CHECK(tx.empty());
+         BOOST_CHECK_EQUAL(fixture->attempted_budgets.size(), 0u);
+         BOOST_CHECK_EQUAL(fixture->consensus_reads, 1u);
+         BOOST_REQUIRE_EQUAL(fixture->consensus_digests.size(), 1u);
+         BOOST_CHECK_EQUAL(fixture->consensus_digests.front(), prefixed(settled_digest_word));
+      }
    }
-   // Majority not reached: nothing to send.
-   {
-      auto fixture  = create_whole_envelope_delivery_fixture();
-      auto envelope = make_envelope(mid_envelope_bytes);
-      fixture->own_delivery_responses = {encode_word_result(settled_digest_word)};
-      fixture->consensus_response     = consensus(test_majority - 1, now - duration - 1);
+} FC_LOG_AND_RETHROW();
 
-      const auto tx = fixture->outpost->deliver_outbound_envelope(
-         test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds));
+/// The tally a recorded, untipped tick reads is for its log line only: a node
+/// that refuses it, or answers something that does not decode, leaves the
+/// epoch handled with nothing sent rather than failing the tick.
+BOOST_AUTO_TEST_CASE(a_recorded_untipped_delivery_is_handled_when_its_tally_is_unreadable) try {
+   for (const bool refused : {true, false}) {
+      BOOST_TEST_CONTEXT("tally " << (refused ? "refused" : "truncated")) {
+         auto fixture  = create_whole_envelope_delivery_fixture();
+         auto envelope = make_envelope(mid_envelope_bytes);
+         fixture->own_delivery_responses = {encode_word_result(settled_digest_word)};
+         if (refused) {
+            fixture->consensus_refusal = malformed_calldata_refusal();
+         } else {
+            fixture->consensus_response = std::string(hex_prefix) + abi_word(test_wire_epoch);
+         }
 
-      BOOST_CHECK(tx.empty());
-      BOOST_CHECK_EQUAL(fixture->attempted_budgets.size(), 0u);
-      BOOST_CHECK_EQUAL(fixture->consensus_reads, 1u);
-   }
-   // Boundary not elapsed on the outpost: nothing to send, however many agree
-   // — and not a used-up retry either: the epoch stays open for the next tick.
-   {
-      auto fixture  = create_whole_envelope_delivery_fixture();
-      auto envelope = make_envelope(mid_envelope_bytes);
-      fixture->own_delivery_responses = {encode_word_result(settled_digest_word)};
-      fixture->consensus_response     = consensus(test_group_size, now + duration);
+         std::string tx;
+         BOOST_CHECK_NO_THROW(tx = fixture->outpost->deliver_outbound_envelope(
+                                 test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds)));
 
-      BOOST_CHECK_THROW(fixture->outpost->deliver_outbound_envelope(
-                           test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds)),
-                        sysio::chain::outpost_delivery_incomplete_exception);
-      BOOST_CHECK_EQUAL(fixture->attempted_budgets.size(), 0u);
-      BOOST_CHECK_EQUAL(fixture->consensus_reads, 1u);
+         BOOST_CHECK(tx.empty());
+         BOOST_CHECK_EQUAL(fixture->attempted_budgets.size(), 0u);
+         BOOST_CHECK_EQUAL(fixture->consensus_reads, 1u);
+      }
    }
 } FC_LOG_AND_RETHROW();
 
