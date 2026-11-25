@@ -137,9 +137,10 @@ On Solana the outpost lives in the `liqsol-core` program (`instructions/opp/`), 
 
 ## Consensus & Security
 
-- **Group consensus**: An envelope is accepted when every eligible operator in the chain's active group delivers it identically, or by strict majority once the chain's epoch boundary has passed.
+- **Group consensus**: An envelope is accepted on the first strict majority of the eligible operators in the chain's active group, at any time in the epoch.
 - **Envelope hash chains**: Each envelope carries the digest of its predecessor on the same stream, and messages carry sequence numbers, so envelopes and messages cannot be reordered or replayed.
-- **Disputes**: A post-boundary split with no strict majority opens a `sysio.chalg` dispute that pauses that chain's epoch until Tier-1 node owners vote a canonical envelope; other chains keep advancing. Operators that delivered a non-canonical envelope are slashed.
+- **Disputes**: A split opens a `sysio.chalg` dispute once no delivered version can still reach a strict majority, or once the epoch has seen no eligible delivery for its idle fallback with fewer than a majority silent. The dispute pauses that chain's epoch until Tier-1 node owners vote a canonical envelope; other chains keep advancing.
+- **Slashing**: Operators that delivered a non-canonical envelope are slashed when the epoch's winner is accepted, by consensus or by the vote; silence is never slashed.
 - **Bonded syndication**: Syndicated value is released on the depot only after `sysio.bond` underwriters bond the syndication statement; anyone may challenge it during the challenge window.
 - **Emergency stop**: `sysio.andon` freezes depot fund egress; outposts pause independently (`SyndicationPool` pause on Ethereum, `frozen` on Solana).
 

@@ -33,6 +33,9 @@ constexpr const char* DISPUTE_REQUIRES_TWO_CANDIDATES =
 /// Rejection text for a ballot on a dispute whose tally already has a winner.
 constexpr const char* DISPUTE_ALREADY_HAS_WINNER = "dispute already has a winner";
 
+/// Rejection text for a `slashop` authorized by neither sysio.chalg nor sysio.msgch.
+constexpr const char* SLASHOP_REQUIRES_CHALG_OR_MSGCH = "slashop requires sysio.chalg or sysio.msgch authority";
+
 /// Snapshot the Tier-1 electorate: the Tier-1 rows of `sysio.roa::nodeowners` for `network_gen`,
 /// walked via the `bytier` index (bounded by the Tier-1 registration cap). Shared by
 /// `opendispute` and `openuwchal` so both case types freeze eligibility and quorum from the SAME
@@ -81,12 +84,10 @@ std::optional<checksum256> tally_winner(const chalg::dispute_entry& d, const cha
 //  slashop — execute a slash on an operator via sysio.opreg
 // ---------------------------------------------------------------------------
 void chalg::slashop(name operator_acct, std::string reason) {
-   // Authorised callers: sysio.chalg itself (dispute resolution) and sysio.epoch (the single-path
-   // slash of non-canonical OPP envelope deliverers at epoch close, per the dispute-vote design).
-   // Both are trusted system contracts; chalg is the single slashing chokepoint that holds
+   // Authorised callers: sysio.chalg itself and sysio.msgch, which slashes each non-canonical OPP envelope
+   // deliverer when it accepts the epoch's winner. chalg is the single slashing chokepoint that holds
    // opreg::slash authority.
-   check(has_auth(get_self()) || has_auth(EPOCH_ACCOUNT),
-         "slashop requires sysio.chalg or sysio.epoch authority");
+   check(has_auth(get_self()) || has_auth(MSGCH_ACCOUNT), SLASHOP_REQUIRES_CHALG_OR_MSGCH);
 
    // Slash via sysio.opreg — the canonical bond ledger. opreg removes every collateral balance the
    // operator holds, keeps the custody with the registry, marks the operator SLASHED, and records
@@ -229,9 +230,9 @@ void chalg::chkdispute(uint64_t dispute_id) {
       r.winning_checksum = *winner;
    });
 
-   // Dispatch the winning envelope via sysio.msgch (it still holds the raw bytes). The next
-   // chkcons advances the epoch, where the single-path slash of every non-canonical deliverer
-   // runs in sysio.epoch::advance.
+   // Dispatch the winning envelope via sysio.msgch (it still holds the raw bytes). The winner's
+   // acceptance in `resolvedisp` slashes the losers: every operator whose delivery for the epoch differs
+   // from it, one delivered after the dispute opened included.
    action(
       permission_level{get_self(), "active"_n},
       MSGCH_ACCOUNT,

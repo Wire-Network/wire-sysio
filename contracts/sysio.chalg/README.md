@@ -29,7 +29,7 @@ OPP envelope dispute resolution and slash-execution contract.
 | `opendispute` | `sysio.msgch` | Open a dispute, snapshot its Tier-1 electorate/quorum, and pause the disputed chain's epoch |
 | `votedispute` | `owner` (Tier-1) | Cast a Tier-1 node-owner vote for the canonical envelope checksum |
 | `chkdispute` | permissionless | Tally the votes; on resolution dispatch the winner and unpause the chain's epoch |
-| `slashop` | `sysio.chalg` or `sysio.epoch` | Execute a slash on an operator via `sysio.opreg` |
+| `slashop` | `sysio.chalg` or `sysio.msgch` | Execute a slash on an operator via `sysio.opreg` |
 
 ## Dispute-vote flow
 
@@ -50,13 +50,16 @@ OPP envelope dispute resolution and slash-execution contract.
    deadline the bar relaxes to a quorum of cast votes (`cast >= Q`) plus a strict majority of cast
    (`2*votes > cast`). No plurality / tie-break -- an undecided tally remains open and keeps the
    chain's epoch paused until Tier-1 supplies a resolvable vote.
-4. **Resolve**: the winning checksum is recorded and dispatched via `sysio.msgch::resolvedisp`.
-   The disputed chain's epoch is unpaused. Its next `sysio.epoch::advance` then slashes every
-   operator that delivered a non-canonical checksum for the epoch (via `slashop`).
+4. **Resolve**: the winning checksum is recorded and dispatched via `sysio.msgch::resolvedisp`, whose
+   acceptance of the winner slashes, through `slashop`, every operator whose delivery for the epoch
+   differs from it, one delivered after the dispute opened included. The disputed chain's epoch is
+   then unpaused.
 
 ## Dependencies
 
 - Triggered by `sysio.msgch::evalcons`; dispatches the winning envelope via `sysio.msgch::resolvedisp`
+- `slashop` is sent by `sysio.msgch` when it accepts an epoch's winner, by consensus or by dispute
+  resolution
 - Tier-1 electorate snapshot from `sysio.roa::nodeowners`; the active `network_gen` is read through
   the shared canonical ROA accessor
 - Slashes via `sysio.opreg::slash`: opreg marks the operator `SLASHED` and removes its whole

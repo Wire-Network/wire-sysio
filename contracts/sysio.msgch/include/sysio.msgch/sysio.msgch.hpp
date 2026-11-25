@@ -126,16 +126,19 @@ namespace sysio {
       /// same convention when queueing `queueout` / `buildenv` for its outpost.
       /// The envelope must be for the chain's current epoch, from a member of
       /// the chain's active group. Refused until the chain's genesis advance has
-      /// opened its epoch 1.
+      /// opened its epoch 1, and, once the epoch has reached consensus, unless it
+      /// is byte-identical to the accepted envelope.
       [[sysio::action]]
       void deliver(name batch_op_name, uint64_t chain_code, std::vector<char> data);
 
       /// Evaluate consensus on inbound envelopes for an outpost's current epoch.
       /// Called inline from deliver and chkcons. The first strict majority of the
       /// eligible group (`count * 2 > eligible`) decides the epoch, at any time: it
-      /// unpacks the envelope, stores messages + attestations, and records
-      /// per-outpost consensus. Without one, with at least two delivered versions
-      /// and fewer than a majority of the eligible members still silent, a
+      /// unpacks the envelope, stores messages + attestations, records
+      /// per-outpost consensus, and slashes through `sysio.chalg::slashop` every
+      /// operator whose delivery for the epoch differs from the winner. Without
+      /// one, with at least two delivered versions and fewer than a majority of
+      /// the eligible members still silent, a
       /// `sysio.chalg` dispute opens once no version can still reach a majority
       /// with the silent members, or once the epoch has been idle for
       /// `DISPUTE_FALLBACK_EPOCHS` of the chain's configured durations: since the
@@ -162,7 +165,9 @@ namespace sysio {
       /// Dispatch the winning envelope of a resolved OPP dispute. Called inline by
       /// `sysio.chalg::chkdispute` once the Tier-1 vote selects a canonical checksum. Locates the
       /// winning envelope's raw bytes among this (outpost, epoch)'s deliveries and runs the shared
-      /// consensus path (store + dispatch attestations, audit log, record the winner on `outpcons`).
+      /// consensus path (store + dispatch attestations, audit log, record the winner on `outpcons`,
+      /// slash every operator whose delivery differs from the winner, one delivered after the
+      /// dispute opened included).
       [[sysio::action]]
       void resolvedisp(uint64_t chain_code, uint32_t epoch_index, checksum256 winning_checksum);
 
@@ -355,9 +360,10 @@ namespace sysio {
       ///
       /// `winning_checksum` is the winning delivery checksum (sha256 of the raw delivered bytes)
       /// for `epoch_index`, recorded when consensus is reached (strict-majority path) or when
-      /// a Tier-1 dispute vote resolves (via `resolvedisp`). `sysio.epoch::advance` reads it to
-      /// classify each operator's delivery: a matching checksum is a hit, a non-matching delivered
-      /// checksum is slashed. Zero until a winner exists for the current epoch.
+      /// a Tier-1 dispute vote resolves (via `resolvedisp`). The acceptance that records it slashes
+      /// every operator whose delivery for the epoch has another checksum, and `deliver` then refuses
+      /// any delivery for the epoch but the winner's bytes. Zero until a winner exists for the current
+      /// epoch.
       ///
       /// `envelope_digest` is the inbound ENVELOPE chain tip: the canonical epoch digest (keccak256
       /// over the canonical field-complete encoding with `envelope_hash` blanked; see

@@ -49,6 +49,16 @@ namespace epoch_actions {
 constexpr name ADVANCE = "advance"_n;
 } // namespace epoch_actions
 
+/// Action identifiers owned by sysio.chalg and sent by msgch.
+namespace chalg_actions {
+constexpr name SLASH_OPERATOR = "slashop"_n;
+} // namespace chalg_actions
+
+/// Durable reason text for the slash of a non-canonical delivery: the prefix, the outpost chain, the epoch
+/// separator, then that chain's epoch index (see `non_canonical_delivery_reason`).
+constexpr std::string_view NON_CANONICAL_DELIVERY_REASON_PREFIX = "non-canonical OPP envelope delivery, chain ";
+constexpr std::string_view NON_CANONICAL_DELIVERY_REASON_EPOCH  = " epoch ";
+
 /// The syndication contract and the intake actions an accepted envelope's syndication value is
 /// routed to.
 namespace synd {
@@ -82,6 +92,10 @@ constexpr auto UNSUPPORTED_PAYLOAD_VERSION = "unsupported OPP MessagePayload ver
 /// Message of the `check` `deliver` raises for a chain whose genesis advance has not run.
 constexpr std::string_view DELIVER_BEFORE_GENESIS =
    "deliver: the chain's epoch has not started; envelopes are accepted from its epoch 1";
+
+/// Message of the `check` `deliver` raises for a delivery to a decided epoch that differs from its winner.
+constexpr std::string_view DELIVERY_DIFFERS_FROM_ACCEPTED =
+   "deliver: the epoch has reached consensus and the envelope differs from the accepted one";
 
 // `operator""_s` is declared at global scope by <sysio/slug_name.hpp>.
 
@@ -764,14 +778,43 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
                               epoch_index);
 }
 
+/// The `sysio.opreg` status reason of the slash of a delivery to outpost `chain_code`'s epoch `epoch_index`
+/// that differs from the epoch's winner.
+std::string non_canonical_delivery_reason(uint64_t chain_code, uint32_t epoch_index) {
+   return std::string(NON_CANONICAL_DELIVERY_REASON_PREFIX) + sysio::slug_name{chain_code}.to_string() +
+          std::string(NON_CANONICAL_DELIVERY_REASON_EPOCH) + std::to_string(epoch_index);
+}
+
+/// Slash, through `sysio.chalg::slashop`, the operator of every recorded delivery to outpost `chain_code`'s
+/// epoch `epoch_index` whose checksum differs from the accepted `winning_checksum`. Silence is never slashed.
+///
+/// Every row of the (outpost, epoch) bucket is judged, eligible or not, including a delivery recorded while
+/// a dispute was open. `deliver` admits one row per operator, each from a member seated in the chain's
+/// group, so the walk stays within the group, and refuses a differing delivery once the epoch is decided,
+/// so nothing recorded later escapes. `sysio.opreg::slash` returns without effect for an operator already
+/// slashed, terminated or pruned, so this never aborts the acceptance.
+void slash_non_canonical_deliverers(name self, uint64_t chain_code, uint32_t epoch_index,
+                                    const checksum256& winning_checksum) {
+   const uint128_t   composite = opp::outpost_epoch_key(chain_code, epoch_index);
+   msgch::envelopes_t envs(self);
+   auto               oe_idx = envs.get_index<"byoutepoch"_n>();
+   for (auto it = oe_idx.lower_bound(composite);
+        it != oe_idx.end() && it->by_outpost_epoch() == composite; ++it) {
+      if (it->checksum == winning_checksum) continue;
+      action(permission_level{self, "active"_n}, CHALG_ACCOUNT, chalg_actions::SLASH_OPERATOR,
+             std::make_tuple(it->batch_op_name, non_canonical_delivery_reason(chain_code, epoch_index)))
+         .send();
+   }
+}
+
 /// Apply a consensus-reached inbound envelope for one (outpost, epoch): decode it, verify it
 /// continues the per-outpost envelope chain, store and dispatch its attestations, write the
-/// audit-log row, drain the working envelope rows, and record per-outpost consensus. Shared by
-/// `evalcons` (strict-majority path) and `resolvedisp` (dispute-resolution path) so both routes
-/// process the winner identically.
+/// audit-log row, drain the working envelope rows, record per-outpost consensus, and slash every
+/// operator whose recorded delivery differs from the winner (`slash_non_canonical_deliverers`).
+/// Shared by `evalcons` (strict-majority path) and `resolvedisp` (dispute-resolution path) so both
+/// routes process the winner identically.
 ///
-/// `raw` is the winning envelope's bytes; `winning_checksum` is its sha256 — recorded on `outpcons`
-/// so `sysio.epoch::advance` can classify each operator's delivery as canonical or slashable.
+/// `raw` is the winning envelope's bytes; `winning_checksum` is its sha256, recorded on `outpcons`.
 /// Acceptance also records the envelope's canonical epoch digest on `outpcons.envelope_digest`,
 /// the inbound chain tip the next envelope from this outpost must continue from.
 ///
@@ -884,9 +927,9 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
       endpoints.end.id     = WIRE_CHAIN_ID;
       write_envelope_log(self, chain_code, endpoints, epoch_index, envelope_digest);
 
-      // Drop heavy raw_data from each per-batch-op envelope row but KEEP the metadata tuple so
-      // sysio.epoch::advance can still read per-op checksums + delivery for slash classification.
-      // `deliver` erases the rows once they leave the retention window.
+      // Drop heavy raw_data from each per-batch-op envelope row but KEEP the metadata tuple:
+      // sysio.epoch::advance reads who delivered. `deliver` erases the rows once they leave the
+      // retention window.
       msgch::envelopes_t envs(self);
       std::vector<uint64_t> ids_to_clear;
       auto modify_idx = envs.get_index<"byoutepoch"_n>();
@@ -902,9 +945,9 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
       }
    }
 
-   // Record per-outpost consensus: the winning delivery checksum (slash classification), the
-   // accepted envelope's canonical epoch digest (the new inbound ENVELOPE tip), and the last
-   // accepted message's id (the new inbound MESSAGE tip -- unchanged for a zero-message ack).
+   // Record per-outpost consensus: the winning delivery checksum, the accepted envelope's canonical
+   // epoch digest (the new inbound ENVELOPE tip), and the last accepted message's id (the new inbound
+   // MESSAGE tip -- unchanged for a zero-message ack).
    msgch::outpost_consensus_t opcons(self);
    auto opc_pk = msgch::outpost_consensus_key{chain_code};
    if (!opcons.contains(opc_pk)) {
@@ -925,6 +968,8 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
          r.message_tip       = new_message_tip;
       });
    }
+
+   slash_non_canonical_deliverers(self, chain_code, epoch_index, winning_checksum);
    return true;
 }
 
@@ -1166,19 +1211,20 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
    // would strand the epoch with no `outpcons` row and no dispute path (consensus_reached stays
    // true). A reverted tx records nothing, so the operator can immediately deliver a corrected one.
    //
+   // A decided epoch takes only its winner's bytes. Accepting the winner slashed every recorded delivery
+   // that differs from it, so a differing one now is refused, and its operator's close records a miss.
+   //
    // LATE CONFIRMATION bypass: once this epoch's winner is accepted, `outpcons.envelope_digest`
    // advances to the accepted envelope's own digest, so the winner no longer "continues" the chain
    // it just extended -- validating it against the advanced tip would revert every remaining
    // operator's delivery of the exact accepted bytes. Those rows are protocol-relevant:
-   // `sysio.epoch::advance` classifies each operator's delivery as canonical or slashable, and a
-   // reverted delivery would instead mark the confirmer as a non-deliverer. An envelope whose
-   // sha256 equals the recorded `winning_checksum` for THIS epoch is byte-identical to the winner
-   // that already passed full validation at ingress and acceptance, so it is recorded without
-   // re-validation. Anything else -- including a divergent envelope arriving after acceptance --
-   // still validates against the advanced tip and reverts (fail closed: post-acceptance divergence
-   // cannot open a dispute, so there is nothing to record it for).
+   // `sysio.epoch::advance` records each member's delivery, and a reverted delivery would instead mark
+   // the confirmer as a non-deliverer. An envelope whose sha256 equals the recorded `winning_checksum`
+   // for THIS epoch is byte-identical to the winner that already passed full validation at ingress and
+   // acceptance, so it is recorded without re-validation.
    const std::optional<outpost_consensus_entry> consensus = consensus_for_epoch(get_self(), chain_code, epoch);
-   const bool late_confirmation = consensus && consensus->consensus_reached && consensus->winning_checksum == cs;
+   const bool late_confirmation = consensus && consensus->consensus_reached;
+   check(!late_confirmation || consensus->winning_checksum == cs, DELIVERY_DIFFERS_FROM_ACCEPTED);
    if (!late_confirmation) {
       checksum256 ingress_digest{};
       checksum256 ingress_message_tip{};
@@ -1314,9 +1360,9 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
       return;
    }
 
-   // Consensus reached: store + dispatch the winning envelope and record the per-outpost winner
-   // (so sysio.epoch::advance can classify each delivery); chkcons advances the chain. A rejected
-   // winner is a SOFT drop on this path: the result is intentionally discarded and the epoch stays
+   // Consensus reached: store + dispatch the winning envelope, record the per-outpost winner and slash
+   // every delivery that differs from it, all in this delivery's transaction; chkcons advances the chain.
+   // A rejected winner is a SOFT drop on this path: the result is intentionally discarded and the epoch stays
    // undecided (no outpcons row) until a valid delivery arrives or the split opens a dispute. The
    // delivering operator's transaction never reverts here.
    (void)apply_consensus(get_self(), chain_code, epoch_index,

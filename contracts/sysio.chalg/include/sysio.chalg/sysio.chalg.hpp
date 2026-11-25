@@ -26,9 +26,9 @@ namespace sysio {
       /// the per-row record on `dispute_entry::candidates`.
       struct dispute_candidate {
          checksum256       checksum;   ///< sha256 of the candidate envelope bytes
-         /// Batch operators that delivered this checksum. Audit / off-chain only — the on-chain
-         /// slash path classifies via `outpcons.winning_checksum` vs each delivered checksum in
-         /// `sysio.epoch::advance`, not this list; it is never read back on chain.
+         /// Batch operators that delivered this checksum when the dispute opened. Audit / off-chain
+         /// only: the winner's acceptance in `sysio.msgch` slashes by comparing each recorded delivery's
+         /// checksum with the winner, not by this list, which is never read back on chain.
          std::vector<name> operators;
 
          SYSLIB_SERIALIZE(dispute_candidate, (checksum)(operators))
@@ -38,8 +38,9 @@ namespace sysio {
       //  Actions
       // -----------------------------------------------------------------------
 
-      /// Execute a slash on an operator. Auth: sysio.chalg (dispute resolution) or sysio.epoch
-      /// (the single-path slash of non-canonical OPP envelope deliverers at epoch close).
+      /// Execute a slash on an operator. Auth: sysio.chalg or sysio.msgch, which slashes every
+      /// non-canonical OPP envelope deliverer of an epoch when it accepts the epoch's winner, by
+      /// consensus or by dispute resolution.
       [[sysio::action]]
       void slashop(name operator_acct, std::string reason);
 
@@ -74,7 +75,8 @@ namespace sysio {
       /// electorate of N owners and fixed quorum Q = floor(N/2)+1. When the threshold is met
       /// (fast path: a checksum reaches Q any time; after the 24h deadline: quorum of cast votes
       /// AND a strict majority of cast votes), record the winning checksum, dispatch it via
-      /// `sysio.msgch::resolvedisp`, and unpause the disputed chain's epoch.
+      /// `sysio.msgch::resolvedisp`, and unpause the disputed chain's epoch. The winner's acceptance
+      /// in `resolvedisp` slashes the losers.
       [[sysio::action]]
       void chkdispute(uint64_t dispute_id);
 

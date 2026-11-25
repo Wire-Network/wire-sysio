@@ -53,9 +53,10 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
 
 ## What `advance(chain)` does
 
-1. Delivery audit of the chain's expiring group, when the chain is an active outpost: every operator
-   that delivered a non-canonical envelope to it is slashed through `sysio.chalg::slashop`; then each
-   member gets one `sysio.opreg::recorddel` for this chain (delivered if it delivered to it), followed
+1. Delivery audit of the chain's expiring group, when the chain is an active outpost: each
+   member gets one `sysio.opreg::recorddel` for this chain (delivered if it delivered to it, whatever
+   its envelope; a non-canonical deliverer was already slashed when `sysio.msgch` accepted the epoch's
+   winner), followed
    by `sysio.opreg::termcheck` for this chain, which evicts a member breaching the chain's miss rails
    from this chain alone and forfeits its unsettled duty there, and each member of the group not
    evicted from the chain earns the epoch's scheduled length in seat-seconds through
@@ -89,6 +90,6 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
   crank
 - Reads operators and their served chains from `sysio.opreg`, authex links from `sysio.authex`, outposts
   from `sysio.chains`
-- Calls `sysio.chalg::slashop`, `sysio.opreg::{recorddel,termcheck,flushwtdw}`,
+- Calls `sysio.opreg::{recorddel,termcheck,flushwtdw}`,
   `sysio.msgch::{queueout,buildenv}` and `sysio.system::{rcrdduty,accrueepoch,payepoch,settleduty}`
 - Per-chain pause/unpause controlled by `sysio.chalg`

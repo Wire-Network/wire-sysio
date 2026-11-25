@@ -18,12 +18,13 @@
 ///                     window-slide and schbatchgps) drops a SLASHED batch op from the eligible
 ///                     pool, so it is never re-placed where advance could attempt a second
 ///                     (aborting) slash of it (the no-cross-epoch-double-slash invariant). Also
-///                     covers the widened slashop auth (callable by sysio.epoch) and opreg's
-///                     already-slashed guard.
+///                     covers opreg's already-slashed guard.
+///   * slashop      -- auth: sysio.msgch (which slashes non-canonical deliverers when it accepts an
+///                     epoch's winner) and sysio.chalg, never sysio.epoch or anyone else
 ///
-/// The full 3-way deliver -> auto-opendispute -> resolve -> slash path (and the slash economics) is
-/// exercised end-to-end by the TS flow `flow-batch-operator-slashing`; here disputes are opened
-/// directly as sysio.msgch so the chalg logic can be tested without standing up divergent deliveries.
+/// The deliver -> auto-opendispute -> resolve -> slash path is covered in sysio.msgch_chain_tests and
+/// end-to-end by the TS flow `flow-batch-operator-slashing`; here disputes are opened directly as
+/// sysio.msgch so the chalg logic can be tested without standing up divergent deliveries.
 
 #include <boost/test/unit_test.hpp>
 #include <sysio/testing/tester.hpp>
@@ -147,11 +148,11 @@ public:
 
       // Inline-action delegation web (depot/governance analogue):
       //   epoch.active  trusts chalg@code   (epoch::pause/unpause called by chalg)
-      //   chalg.active  trusts msgch@code   (opendispute called by msgch) and epoch@code (slashop)
+      //   chalg.active  trusts msgch@code   (opendispute and slashop called by msgch)
       //   msgch.active  trusts chalg@code   (resolvedisp called by chalg)
       //   opreg.active  trusts chalg/epoch  (slash / recorddel / termcheck)
       grant_code_authors(EPOCH_ACCOUNT, {CHALG_ACCOUNT, MSGCH_ACCOUNT});
-      grant_code_authors(CHALG_ACCOUNT, {MSGCH_ACCOUNT, EPOCH_ACCOUNT});
+      grant_code_authors(CHALG_ACCOUNT, {MSGCH_ACCOUNT});
       grant_code_authors(MSGCH_ACCOUNT, {CHALG_ACCOUNT});
       grant_code_authors(OPREG_ACCOUNT, {CHALG_ACCOUNT, EPOCH_ACCOUNT, MSGCH_ACCOUNT});
       produce_blocks();
@@ -376,9 +377,9 @@ public:
       return v["status"].as_string();
    }
 
-   /// Slash `op` through sysio.chalg::slashop, authorised as `signer` (default sysio.epoch, the
-   /// widened auth path). Lands in its own block like the other action helpers.
-   action_result slashop(name op, name signer = EPOCH_ACCOUNT) {
+   /// Slash `op` through sysio.chalg::slashop, authorised as `signer` (default sysio.msgch, the
+   /// account that slashes non-canonical deliverers). Lands in its own block like the other action helpers.
+   action_result slashop(name op, name signer = MSGCH_ACCOUNT) {
       return push(CHALG_ACCOUNT, chalg_abi, signer, "slashop"_n, mvo()
          ("operator_acct", op.to_string())("reason", std::string("test non-canonical delivery")));
    }
@@ -1087,9 +1088,8 @@ BOOST_FIXTURE_TEST_CASE(chkdispute_unpauses_only_the_disputed_chain, sysio_dispu
 // sysio.epoch::advance's window-slide and schbatchgps -- drops a SLASHED batch op from the eligible
 // pool, so a slashed op is never re-placed into a future group where advance could attempt a second
 // slash of it. This exercises that filter directly via schbatchgps (advance's own slide is
-// additionally gated by emissions readiness, out of scope here), plus the widened slashop auth
-// (callable by sysio.epoch) and opreg's already-slashed guard. The full delivery-driven slash through
-// advance is covered end-to-end by the TS flow flow-batch-operator-slashing.
+// additionally gated by emissions readiness, out of scope here), plus opreg's already-slashed guard.
+// The delivery-driven slash at acceptance is covered in sysio.msgch_chain_tests.
 BOOST_FIXTURE_TEST_CASE(slashed_op_excluded_from_scheduling_no_double_slash, sysio_dispute_tester) { try {
    constexpr auto BATCHOP_B = "batchop.b"_n;
    constexpr auto BATCHOP_C = "batchop.c"_n;
@@ -1114,7 +1114,7 @@ BOOST_FIXTURE_TEST_CASE(slashed_op_excluded_from_scheduling_no_double_slash, sys
    BOOST_REQUIRE(group_contains(g0, BATCHOP));
    BOOST_REQUIRE(group_contains(g0, BATCHOP_B));
 
-   // Slash batchop.b as sysio.epoch (the widened auth path).
+   // Slash batchop.b as sysio.msgch.
    BOOST_REQUIRE_EQUAL(success(), slashop(BATCHOP_B));
    BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_SLASHED", operator_status(BATCHOP_B));
 
@@ -1133,11 +1133,33 @@ BOOST_FIXTURE_TEST_CASE(slashed_op_excluded_from_scheduling_no_double_slash, sys
    BOOST_REQUIRE(group_contains(g1, BATCHOP_C));
 } FC_LOG_AND_RETHROW() }
 
+/// `slashop` takes sysio.msgch's authority (its acceptance of an epoch's winner slashes the non-canonical
+/// deliverers) or sysio.chalg's own; sysio.epoch, a batch operator and any other account are refused and
+/// leave the operator untouched.
+BOOST_FIXTURE_TEST_CASE(slashop_accepts_msgch_and_chalg_only, sysio_dispute_tester) { try {
+   constexpr auto        BATCHOP_B         = "batchop.b"_n;
+   constexpr const char* SLASHOP_AUTH_ERROR =
+      "assertion failure with message: slashop requires sysio.chalg or sysio.msgch authority";
+   create_account(BATCHOP_B, config::system_account_name, false, true, /*include_roa_policy=*/false);
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n, mvo()
+      ("account", BATCHOP_B.to_string())("type", OperatorType::OPERATOR_TYPE_BATCH)("is_bootstrapped", true)));
+
+   for (const name refused : {EPOCH_ACCOUNT, BATCHOP, "stranger"_n}) {
+      BOOST_REQUIRE_EQUAL(error(SLASHOP_AUTH_ERROR), slashop(BATCHOP, refused));
+      BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_ACTIVE", operator_status(BATCHOP));
+   }
+
+   BOOST_REQUIRE_EQUAL(success(), slashop(BATCHOP, MSGCH_ACCOUNT));
+   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_SLASHED", operator_status(BATCHOP));
+   BOOST_REQUIRE_EQUAL(success(), slashop(BATCHOP_B, CHALG_ACCOUNT));
+   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_SLASHED", operator_status(BATCHOP_B));
+} FC_LOG_AND_RETHROW() }
+
 // Regression: after consensus, the winning delivery rows have raw_data cleared and the inbound
 // message row is erased, so the idempotency guard must key off the DURABLE outpcons row. A
 // post-quorum re-fire of evalcons (the path a late delivery takes through deliver) must be a benign
 // no-op, not an empty-envelope decode that aborts -- which would also revert the late delivery and
-// drop its envelope row, leaving epoch::advance nothing to classify/slash. Pre-fix this threw
+// drop its envelope row, leaving epoch::advance nothing to record. Pre-fix this threw
 // "failed to decode inbound OPP Envelope".
 BOOST_FIXTURE_TEST_CASE(post_consensus_evalcons_refire_is_benign_noop, sysio_dispute_tester) { try {
    const uint32_t epoch = current_epoch();

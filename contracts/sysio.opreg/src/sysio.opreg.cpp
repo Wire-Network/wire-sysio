@@ -1488,8 +1488,9 @@ void opreg::slash(name account, std::string reason) {
 
    operators_t ops(get_self());
    auto op_pk = operator_key{account.value};
-   // Nothing is left to slash on a pruned, slashed or terminated operator. Reached inline from
-   // `sysio.epoch::advance`, so this returns rather than aborting the epoch advance.
+   // Nothing is left to slash on a pruned, slashed or terminated operator. Reached inline from the
+   // acceptance of an epoch's winner in `sysio.msgch`, so this returns rather than aborting the delivery
+   // or dispute resolution that accepted it.
    if (!ops.contains(op_pk)) return;
    auto op = ops.get(op_pk);
    if (op.has_terminal_status()) return;

@@ -57,23 +57,12 @@ constexpr name QUEUE_OUT      = "queueout"_n;
 constexpr name BUILD_ENVELOPE = "buildenv"_n;
 } // namespace msgch_actions
 
-/// Action identifiers owned by sysio.chalg and invoked by epoch close.
-namespace chalg_actions {
-constexpr name SLASHOP = "slashop"_n;
-} // namespace chalg_actions
-
 /// Action identifiers owned by sysio.opreg and invoked by the consensus and economic clocks.
 namespace opreg_actions {
 constexpr name RECORD_DELIVERY   = "recorddel"_n;
 constexpr name TERMINATION_CHECK = "termcheck"_n;
 constexpr name FLUSH_WITHDRAWALS = "flushwtdw"_n;
 } // namespace opreg_actions
-
-/// Durable reason text for an epoch-delivery classification slash: the prefix, the outpost chain,
-/// the epoch separator, then that chain's epoch index.
-constexpr const char* NON_CANONICAL_DELIVERY_REASON_PREFIX =
-   "non-canonical OPP envelope delivery, chain ";
-constexpr const char* NON_CANONICAL_DELIVERY_REASON_EPOCH = " epoch ";
 
 /// Messages of the `check`s `advance` raises.
 constexpr std::string_view advance_auth_msg = "only sysio.msgch or sysio.epoch may advance a chain's epoch";
@@ -391,118 +380,54 @@ void epoch::advance(sysio::slug_name chain_code) {
    auto now = current_time_point();
    if (now < state.next_epoch_start) return;
 
-   // Before incrementing: evaluate per-op delivery state for the chain's
-   // EXPIRING epoch. The active group of the expiring epoch
-   // (`current_batch_op_group` BEFORE the increment) is the set of ops
-   // responsible for delivering this outpost's inbound envelope for
-   // `current_epoch_index`.
+   // Before incrementing, record the delivery result of each member of the chain's EXPIRING group
+   // (`current_batch_op_group` before the increment): delivered when `msgch::envelopes` holds its row for
+   // (chain, current_epoch_index), whatever the row's checksum. A delivery that differs from the epoch's
+   // winner was slashed when `sysio.msgch` accepted that winner.
    //
-   // For each member of the expiring group:
-   //   - scan `msgch::envelopes` (`byoutepoch` index) for any row matching
-   //     (chain_code, current_epoch_index, batch_op_name == member)
-   //   - note whether it delivered and collect every non-canonical deliverer
-   // Then slash the non-canonical deliverers before delivery accounting can
-   // evict them, and record one result per member: delivered to this
-   // outpost or not.
-   //
-   // Only an active outpost (`sysio.chains::chains`, active && !is_depot) owes
-   // deliveries; an inactive chain's close records nothing. Skipped on the
-   // chain's genesis epoch (`current_epoch_index == 0`) — no group existed yet.
+   // Only an active outpost (`sysio.chains::chains`, active && !is_depot) owes deliveries; an inactive
+   // chain's close records nothing. Skipped on the chain's genesis epoch (`current_epoch_index == 0`):
+   // no group existed yet.
    if (active_outpost && state.current_epoch_index > 0 &&
        !state.batch_op_groups.empty() &&
        state.current_batch_op_group < state.batch_op_groups.size()) {
       const auto& expiring_group =
          state.batch_op_groups[state.current_batch_op_group];
 
-      // Walk the (outpost, epoch) bucket and collect each distinct delivering batch op together
-      // with the checksum it delivered. Vector linear-scan is fine — group size is small
-      // (single-digit ops/group in every practical config).
+      // Walk the (outpost, epoch) bucket and collect each delivering batch op. `deliver` admits one row
+      // per operator, each from a member seated in the chain's group, so the walk stays within the group.
       msgch::envelopes_t envs(MSGCH_ACCOUNT);
       auto oe_idx = envs.get_index<"byoutepoch"_n>();
       const uint128_t composite = opp::outpost_epoch_key(key.chain_code, state.current_epoch_index);
-      std::vector<name>        delivered;
-      std::vector<checksum256> delivered_checksums;
+      std::vector<name> delivered;
       for (auto e = oe_idx.lower_bound(composite);
            e != oe_idx.end() && e->by_outpost_epoch() == composite; ++e) {
-         if (std::find(delivered.begin(), delivered.end(), e->batch_op_name) == delivered.end()) {
-            delivered.push_back(e->batch_op_name);
-            delivered_checksums.push_back(e->checksum);
-         }
+         delivered.push_back(e->batch_op_name);
       }
 
-      // Canonical envelope checksum for this (outpost, epoch), recorded by msgch consensus or by
-      // dispute resolution. Present only once a winner exists for the expiring epoch; absent it,
-      // nothing is slashed (e.g. an epoch that never reached a winner).
-      const std::optional<msgch::outpost_consensus_entry> consensus =
-         msgch::consensus_for_epoch(MSGCH_ACCOUNT, key.chain_code, state.current_epoch_index);
-      const bool have_winner = consensus.has_value();
-
-      /// One member's delivery result for the expiring epoch, retained until non-canonical
-      /// offenders have been slashed. `recorddel` records every member, a newly slashed or evicted
-      /// one included, while `termcheck` skips SLASHED and TERMINATED operators and EVICTED members.
-      struct delivery_observation {
-         name member;
-         bool delivered = false;
-      };
-      std::vector<delivery_observation> observations;
-      observations.reserve(expiring_group.size());
-
-      // Single slash path (dispute-vote design, per-operator outcome table): a delivered
-      // NON-canonical checksum is a fault -> slash. Silence (no delivery) is never slashed; it
-      // stays on the recorddel/termcheck miss ladder below.
-      std::vector<name> to_slash;
+      // Preserve this chain's delivery history and its eviction accounting. `recorddel` records every
+      // member, a slashed or evicted one included, while `termcheck` skips SLASHED and TERMINATED
+      // operators and EVICTED members. All mutations complete before finishadv reads the registry for
+      // outbound attestations.
       for (const auto& member : expiring_group) {
-         const size_t delivery    = std::distance(delivered.begin(),
-                                                  std::find(delivered.begin(), delivered.end(), member));
-         const bool   did_deliver = delivery < delivered.size();
-         observations.push_back({.member = member, .delivered = did_deliver});
-         if (did_deliver && have_winner && delivered_checksums[delivery] != consensus->winning_checksum) {
-            to_slash.push_back(member);
-         }
-      }
-
-      // Flush the non-canonical slashes. Routed through sysio.chalg (the slashing chokepoint that
-      // holds opreg::slash authority): the slashable bond is moved to the matching LP and the
-      // operator is marked SLASHED.
-      //
-      // A member slashed, terminated or pruned after its delivery is still collected above from its
-      // delivery row; opreg::slash returns without effect for it, so it cannot abort advance.
-      // These inline slashes execute only after advance returns. The finishadv continuation waits
-      // for those mutations before selecting the new tail. A removed member cannot create a later
-      // non-canonical observation: sysio.msgch::deliver requires its current sysio.opreg status
-      // to be ACTIVE before accepting delivery.
-      for (const auto& member : to_slash) {
-         action(
-            permission_level{get_self(), "owner"_n},
-            CHALG_ACCOUNT,
-            chalg_actions::SLASHOP,
-            std::make_tuple(member,
-                            std::string(NON_CANONICAL_DELIVERY_REASON_PREFIX) + chain_code.to_string()
-                               + NON_CANONICAL_DELIVERY_REASON_EPOCH + std::to_string(state.current_epoch_index))
-         ).send();
-      }
-
-      // Preserve this chain's delivery history and its eviction accounting. Inline
-      // slashing completes before these actions, and all mutations complete
-      // before finishadv reads the registry for outbound attestations.
-      for (const auto& observation : observations) {
+         const bool did_deliver = std::find(delivered.begin(), delivered.end(), member) != delivered.end();
          action(
             permission_level{get_self(), "owner"_n},
             OPREG_ACCOUNT,
             opreg_actions::RECORD_DELIVERY,
-            std::make_tuple(observation.member, chain_code, state.current_epoch_index, observation.delivered)
+            std::make_tuple(member, chain_code, state.current_epoch_index, did_deliver)
          ).send();
          action(
             permission_level{get_self(), "owner"_n},
             OPREG_ACCOUNT,
             opreg_actions::TERMINATION_CHECK,
-            std::make_tuple(observation.member, chain_code)
+            std::make_tuple(member, chain_code)
          ).send();
       }
 
       // Each member earns the closing epoch's scheduled length in seat-seconds on this chain. sysio.system
       // splits each economic pay period's one batch pool by seat-seconds over every chain; whether a
-      // member is still ACTIVE is decided when it is paid, so a member slashed above draws nothing, and a
+      // member is still ACTIVE is decided when it is paid, so a slashed member draws nothing, and a
       // member the termchecks above evicted from this chain is credited nothing here. Skipped until
       // initt5 has run: nothing can be paid before then, and consensus must not depend on sysio.system.
       if (sysiosystem::emissions::records_batch_duty(SYSTEM_ACCOUNT)) {

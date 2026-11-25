@@ -114,19 +114,21 @@ Everything the two `sysio.epoch` clocks inline, directly:
 | Caller | Callee | Actions |
 |---|---|---|
 | `advance` (consensus epoch) | `sysio.opreg` | `recorddel`, `termcheck` |
-| `advance` | `sysio.chalg` | `slashop` |
 | `advance` | `sysio.msgch` | `queueout`, `buildenv` |
 | `advance` | `sysio` | `rcrdduty` |
 | `tickeconomy` (economic clock) | `sysio.opreg` | `flushwtdw` |
 | `tickeconomy` | `sysio` | `accrueepoch`, `payepoch`, `settleduty` |
 
-Those callees inline further (`slashop` → `sysio.opreg::slash`, `termcheck` →
+Those callees inline further (`termcheck` →
 `sysio::forfeitduty` on an eviction, `payepoch` → `sysio.token::transfer` for
 the pushed capex and governance buckets), so the transitive subtree — not just
 the table above — sits inside each clock's abort surface. `advance(chain)`
 itself is inlined by `sysio.msgch::chkcons(chain)` (and by
 `sysio.msgch::bootstrap` / `bootchain` at a chain's epoch 0), so `sysio.msgch`
-is both a caller and a callee of `sysio.epoch`.
+is both a caller and a callee of `sysio.epoch`. Outside the clocks, `sysio.msgch`'s
+acceptance of an epoch's winner (`evalcons` inside `deliver` and `chkcons`, and
+`resolvedisp` inside `sysio.chalg::chkdispute`) inlines `sysio.chalg::slashop` →
+`sysio.opreg::slash` for each non-canonical deliverer.
 
 Independently of inlines, the emissions readiness gate in `sysio.epoch` **reads**
 `sysio.system`'s `emitcfg`, `t5state` and `payclaimtot`, and `sysio.token`'s
@@ -260,6 +262,7 @@ changes. For the edges on `advance`'s path today, and the one `sysio.bond::accep
 | `sysio` (`sysio.system`) before `sysio.opreg`, when the release adds or changes `forfeitduty` | Call edge: `termcheck` inlines it inside `advance`, so an old `sysio.system` aborts every advance that evicts, and every `regoperator` that forfeits an earlier registration's duty. |
 | `sysio.epoch` and `sysio.kicker` before `sysio.system`, when `sysio.system` gains state the emissions gate must reserve (as `payclaimtot` reserves unclaimed `payclaims`) | Table edge: the old gate counts the new backing as spendable, so a later pay period can double-commit it and leave credited claims underfunded; an old kicker counts it as available treasury and `kick` can draw it. |
 | `sysio.epoch` before `sysio.msgch`, when the release adds or changes an action `chkcons` inlines into `sysio.epoch` | Call edge in the other direction. |
+| `sysio.chalg` before `sysio.msgch`, when the release changes `slashop` or the authority it accepts | Call edge: `sysio.msgch`'s acceptance of an epoch's winner inlines `slashop` under `sysio.msgch@active`, so a `sysio.chalg` that refuses it aborts each `deliver`, `chkcons` or `chkdispute` that accepts a winner while a non-canonical delivery is on record. |
 | `sysio` (`sysio.system`) before `sysio.bond` | Call edge: `accept` on a request from a `sysio.*` issuer sends `sysio::addsubjex`, and the dispatcher rejects an action the deployed contract does not define, so every such `accept` aborts. |
 
 When a release changes both directions of one pair, the two contracts are a

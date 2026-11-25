@@ -48,10 +48,11 @@ namespace sysio {
       static constexpr uint32_t WITHDRAW_WAIT_ECONOMIC_EPOCHS = 2;
 
       /// Consensus epochs each waited-on chain must also close after the request before release (see
-      /// `withdraw_request::consensus_waits`). Non-canonical deliverers are slashed when their chain's
-      /// epoch closes, and a dispute pause stops that chain's index, so this guard keeps a deliverer's
-      /// collateral in place until its deliveries have been judged, however far the economic clock
-      /// runs ahead.
+      /// `withdraw_request::consensus_waits`). Non-canonical deliverers are slashed when their epoch's
+      /// winner is accepted, `chkcons` advances a chain only once its current epoch is decided, and a
+      /// dispute pause stops that chain's index. So this guard keeps a deliverer's collateral in place,
+      /// however far the economic clock runs ahead, until its epochs have been decided and their
+      /// deliveries judged, or closed by a governance `advance`, whose undecided epoch judges none.
       static constexpr uint32_t WITHDRAW_WAIT_EPOCHS = 2;
 
       /// Per-(operator, chain, token) cap on pending collateral withdrawals

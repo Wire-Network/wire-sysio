@@ -149,6 +149,16 @@ constexpr const char* STILL_SEATED_JOIN_ERROR =
    "assertion failure with message: operator still holds a seat in this chain's schedule: it may rejoin once its "
    "seats have closed";
 
+/// `deliver`'s refusal of a delivery to a decided epoch that differs from the accepted envelope.
+constexpr const char* DECIDED_EPOCH_DIFFERING_DELIVERY_ERROR =
+   "assertion failure with message: deliver: the epoch has reached consensus and the envelope differs from the "
+   "accepted one";
+
+/// Mirror of the `sysio.opreg` status reason sysio.msgch gives the slash of a non-canonical delivery: the
+/// prefix, the chain code, the epoch separator, then the chain's epoch index.
+constexpr std::string_view NON_CANONICAL_DELIVERY_REASON_PREFIX = "non-canonical OPP envelope delivery, chain ";
+constexpr std::string_view NON_CANONICAL_DELIVERY_REASON_EPOCH  = " epoch ";
+
 /// `deliver`'s refusal for a member evicted from the chain.
 constexpr const char* EVICTED_DELIVERY_ERROR =
    "assertion failure with message: delivering operator does not serve this chain or was evicted from it";
@@ -228,15 +238,23 @@ constexpr name DISPUTES = "disputes"_n;
 
 /// sysio.chalg action identifiers used by the two-version split regressions.
 namespace chalg_actions {
-constexpr name CHECK_DISPUTE = "chkdispute"_n;
-constexpr name VOTE_DISPUTE  = "votedispute"_n;
-constexpr name OPEN_DISPUTE  = "opendispute"_n;
+constexpr name CHECK_DISPUTE  = "chkdispute"_n;
+constexpr name VOTE_DISPUTE   = "votedispute"_n;
+constexpr name OPEN_DISPUTE   = "opendispute"_n;
+constexpr name SLASH_OPERATOR = "slashop"_n;
 } // namespace chalg_actions
 
 /// sysio.chalg ABI type identifiers used by the split-consensus regressions.
 namespace chalg_abi_types {
-constexpr const char* DISPUTE_ENTRY = "dispute_entry";
+constexpr const char* DISPUTE_ENTRY  = "dispute_entry";
+constexpr const char* SLASH_OPERATOR = "slashop";
 } // namespace chalg_abi_types
+
+/// sysio.chalg `slashop` ABI field identifiers.
+namespace chalg_slash_fields {
+constexpr const char* OPERATOR_ACCOUNT = "operator_acct";
+constexpr const char* REASON           = "reason";
+} // namespace chalg_slash_fields
 
 /// sysio.chalg ABI field identifiers used by the split-consensus regressions.
 namespace chalg_fields {
@@ -1339,6 +1357,43 @@ public:
       return traces;
    }
 
+   /// One `sysio.chalg::slashop` a transaction ran: the operator it slashed, the reason it gave, and whether
+   /// it carried exactly sysio.msgch's active authority.
+   struct slashop_record {
+      name        operator_account;
+      std::string reason;
+      bool        authorized_by_msgch = false;
+   };
+
+   /// Every `sysio.chalg::slashop` `trace` ran, inline actions included, in execution order.
+   std::vector<slashop_record> slashops(const transaction_trace_ptr& trace) {
+      BOOST_REQUIRE(trace);
+      const std::vector<permission_level> msgch_active{{MSGCH_ACCOUNT, config::active_name}};
+      std::vector<slashop_record> records;
+      for (const auto& at : trace->action_traces) {
+         if (at.receiver != CHALG_ACCOUNT || at.act.account != CHALG_ACCOUNT ||
+             at.act.name != chalg_actions::SLASH_OPERATOR) continue;
+         const fc::variant data = chalg_abi.binary_to_variant(chalg_abi_types::SLASH_OPERATOR, at.act.data,
+                                                               fixture_abi_yield_function());
+         records.push_back({.operator_account    = name(data[chalg_slash_fields::OPERATOR_ACCOUNT].as_string()),
+                            .reason              = data[chalg_slash_fields::REASON].as_string(),
+                            .authorized_by_msgch = at.act.authorization == msgch_active});
+      }
+      return records;
+   }
+
+   /// The reason sysio.msgch gives the slash of a delivery to `chain_code`'s epoch `epoch_index` that differs
+   /// from the epoch's winner.
+   static std::string non_canonical_delivery_reason(std::string_view chain_code, uint32_t epoch_index) {
+      return std::string(NON_CANONICAL_DELIVERY_REASON_PREFIX) + std::string(chain_code) +
+             std::string(NON_CANONICAL_DELIVERY_REASON_EPOCH) + std::to_string(epoch_index);
+   }
+
+   /// `account`'s sysio.opreg status.
+   opp::types::OperatorStatus operator_status(name account) {
+      return get_operator(account)[opreg_fields::STATUS].as<opp::types::OperatorStatus>();
+   }
+
    /// How many times `account` executed its `action` in `trace`, inline actions included.
    static uint32_t action_count(const transaction_trace_ptr& trace, name account, name action) {
       BOOST_REQUIRE(trace);
@@ -2325,11 +2380,11 @@ BOOST_FIXTURE_TEST_CASE(inbound_bootstrap_accepts_unverifiable_prev, sysio_msgch
 /// Late confirmation: once an epoch's winner is accepted, the per-stream tip advances to the
 /// winner's own digest, so the winner no longer "continues" the chain it just extended. The
 /// remaining operators of the group still deliver the exact accepted bytes (`sysio.epoch::advance`
-/// classifies every operator's delivery as canonical or slashable), and `deliver` must record --
-/// not chain-break-revert -- them. A three-operator group reaches majority consensus at the second
-/// delivery; the third operator's byte-identical delivery is the late confirmation.
-/// A DIVERGENT post-acceptance delivery still reverts (fail closed): post-acceptance divergence
-/// cannot open a dispute, so nothing legitimate is lost by rejecting it at ingress.
+/// records every member's delivery), and `deliver` must record -- not chain-break-revert -- them. A
+/// three-operator group reaches majority consensus at the second delivery; the third operator's
+/// byte-identical delivery is the late confirmation.
+/// A DIVERGENT post-acceptance delivery reverts (fail closed): the acceptance already judged every
+/// recorded delivery, so a decided epoch takes only the winner's bytes.
 BOOST_FIXTURE_TEST_CASE(late_confirmation_after_consensus_recorded, sysio_msgch_chain_tester) { try {
    bootstrap(/*n_batch_ops=*/3);
 
@@ -2362,12 +2417,10 @@ BOOST_FIXTURE_TEST_CASE(late_confirmation_after_consensus_recorded, sysio_msgch_
    }
 
    // A post-acceptance DIVERGENT envelope is not a late confirmation: its bytes differ from the
-   // recorded winner, so it validates against the advanced tip and reverts as a chain break.
+   // recorded winner, so the decided epoch refuses it.
    auto divergent = encode_delivery(epoch, "late-diverge");
-   BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: delivered envelope failed inbound-chain or "
-            "semantic-header validation"),
-      deliver_as(BATCHOP_C, ETH_OUTPOST_ID, divergent));
+   BOOST_REQUIRE_EQUAL(error(DECIDED_EPOCH_DIFFERING_DELIVERY_ERROR),
+                       deliver_as(BATCHOP_C, ETH_OUTPOST_ID, divergent));
    produce_blocks();
 
    // The third operator's byte-identical delivery IS a late confirmation: recorded, not reverted.
@@ -2381,7 +2434,7 @@ BOOST_FIXTURE_TEST_CASE(late_confirmation_after_consensus_recorded, sysio_msgch_
       error("assertion failure with message: operator already delivered for this outpost+epoch"),
       deliver_as(BATCHOP_C, ETH_OUTPOST_ID, winner));
 
-   // The confirmation row keeps only what advance() classifies: its checksum matches the winner,
+   // The confirmation row keeps only metadata: its checksum matches the winner,
    // and the bytes, which duplicate the already-applied winner, are not stored.
    {
       auto row = find_inbound_delivery(ETH_OUTPOST_ID, epoch, BATCHOP_C);
@@ -2405,9 +2458,9 @@ BOOST_FIXTURE_TEST_CASE(late_confirmation_after_consensus_recorded, sysio_msgch_
 /// WNS-16: a non-canonical delivery must be slashed before its historical
 /// miss window can evict it. The fixture builds its historical anchor and
 /// misses through real `chkcons -> advance` transitions, then lowers the
-/// consecutive-miss threshold before the divergent epoch. Pre-fix, `termcheck`
-/// marked BATCHOP TERMINATED before `slashop` rejected that state and rolled
-/// the entire epoch back.
+/// consecutive-miss threshold before the divergent epoch. The acceptance of the
+/// epoch's winner slashes BATCHOP, before the close's `termcheck` evaluates the
+/// rails, and the close still records its delivery.
 BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_msgch_chain_tester) { try {
    constexpr uint32_t kBatchOperatorCount                  = 3;
    constexpr uint32_t kExpectedInitialEpoch                = 1;
@@ -2479,7 +2532,7 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_
    }
 
    // The accumulated real misses now breach a rail. A non-canonical delivery is still recorded
-   // as delivered, so only slash-first ordering prevents termcheck from blocking this advance.
+   // as delivered; the slash at acceptance precedes the close's termcheck.
    set_termination_thresholds(kTerminatingMaxConsecutiveMisses, kPermissiveMaxPercentMisses);
 
    const uint32_t epoch = current_epoch();
@@ -2489,16 +2542,18 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_
    const auto divergent_checksum = fc::sha256::hash(divergent.data(), divergent.size());
    BOOST_REQUIRE_NE(canonical_checksum, divergent_checksum);
 
-   // Stage the split deliveries for both outposts before the boundary. BATCHOP
-   // is non-canonical everywhere, and `advance` deduplicates it before invoking
-   // slashop. BATCHOP_B/C establish canonical consensus after the boundary.
+   // Stage the split deliveries for both outposts. BATCHOP is non-canonical everywhere; BATCHOP_B/C
+   // establish canonical consensus, and ETH's acceptance slashes BATCHOP. SOL's acceptance slashes it
+   // again, without effect.
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP,   ETH_OUTPOST_ID, divergent));
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP,   SOL_OUTPOST_ID, divergent));
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, canonical));
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, SOL_OUTPOST_ID, canonical));
-   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(BATCHOP));
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, canonical));
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED, operator_status(BATCHOP));
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, SOL_OUTPOST_ID, canonical));
+   elapse_epoch_boundary();
    {
       auto eth_consensus = get_outpcons(ETH_OUTPOST_ID);
       BOOST_REQUIRE(!eth_consensus.is_null());
@@ -2537,9 +2592,9 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_
       BOOST_REQUIRE(!require_roster_is_window(chain).count(BATCHOP.to_string()));
 } FC_LOG_AND_RETHROW() }
 
-/// WNS-70: a member that delivered a non-canonical envelope and was terminated before the epoch
-/// closed leaves its delivery row behind. `advance` still queues it for a slash, which must not
-/// roll the epoch advance back.
+/// WNS-70: a member that delivered a non-canonical envelope and was terminated before the epoch's
+/// winner was accepted leaves its delivery row behind. The acceptance still sends a slash for it,
+/// which must not roll the accepting delivery back, and the close still advances.
 BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_then_termination_still_advances, sysio_msgch_chain_tester) { try {
    constexpr uint32_t    kBatchOperatorCount  = 3;
    constexpr uint32_t    kEpochAdvanceCount   = 1;
@@ -2560,9 +2615,14 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_then_termination_still_advances, s
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, SOL_OUTPOST_ID, canonical));
    BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "terminate"_n,
       mvo()("account", BATCHOP.to_string())("reason", kTerminationReason)));
+   for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
+      const transaction_trace_ptr trace = deliver_trace(BATCHOP_C, chain, canonical);
+      const std::vector<slashop_record> slashed = slashops(trace);
+      BOOST_REQUIRE_EQUAL(1u, slashed.size());
+      BOOST_REQUIRE_EQUAL(BATCHOP, slashed.front().operator_account);
+   }
+   produce_blocks();
    elapse_epoch_boundary();
-   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, canonical));
-   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, SOL_OUTPOST_ID, canonical));
    for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
       auto consensus = get_outpcons(chain);
       BOOST_REQUIRE(!consensus.is_null());
@@ -2796,8 +2856,9 @@ BOOST_FIXTURE_TEST_CASE(majority_decides_before_the_boundary_in_the_delivering_t
    BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
 } FC_LOG_AND_RETHROW() }
 
-/// Once the epoch is decided, a delivery that differs from the accepted bytes is refused, before the chain's
-/// boundary as after it. The member that sent it is not slashed: its close records a miss for that epoch.
+/// Once the epoch is decided, a delivery that differs from the accepted bytes is refused, a stale one and one
+/// that continues the advanced inbound tip alike, before the chain's boundary as after it. The member that
+/// sent it is not slashed: its close records a miss for that epoch.
 BOOST_FIXTURE_TEST_CASE(divergent_delivery_after_the_decision_is_refused_and_missed, sysio_msgch_chain_tester) { try {
    constexpr uint32_t kGroupSize = 3;
    bootstrap(kGroupSize);
@@ -2811,14 +2872,24 @@ BOOST_FIXTURE_TEST_CASE(divergent_delivery_after_the_decision_is_refused_and_mis
    produce_blocks();
    BOOST_REQUIRE(epoch_decided(ETH_OUTPOST_ID, epoch));
 
+   // An envelope chained from the accepted winner passes the inbound-chain validation; the decided epoch
+   // refuses it all the same.
+   const std::vector<char> continuing = encode_delivery(epoch, "decided-continuing",
+                                                        next_stream_tip(winner).envelope_digest,
+                                                        next_stream_tip(winner).message_id);
+
    BOOST_REQUIRE(before_epoch_boundary());
-   BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: delivered envelope failed inbound-chain or semantic-header validation"),
-      deliver_as(BATCHOP_C, ETH_OUTPOST_ID, divergent));
-   produce_blocks();
+   for (const std::vector<char>* refused : {&divergent, &continuing}) {
+      BOOST_REQUIRE_EQUAL(error(DECIDED_EPOCH_DIFFERING_DELIVERY_ERROR),
+                          deliver_as(BATCHOP_C, ETH_OUTPOST_ID, *refused));
+      produce_blocks();
+   }
    BOOST_REQUIRE(find_inbound_delivery(ETH_OUTPOST_ID, epoch, BATCHOP_C).is_null());
 
    elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(error(DECIDED_EPOCH_DIFFERING_DELIVERY_ERROR),
+                       deliver_as(BATCHOP_C, ETH_OUTPOST_ID, continuing));
+   produce_blocks();
    BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP));
    produce_blocks();
    BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
@@ -2833,6 +2904,202 @@ BOOST_FIXTURE_TEST_CASE(divergent_delivery_after_the_decision_is_refused_and_mis
       BOOST_REQUIRE_EQUAL(1u, delivered.size());
       BOOST_REQUIRE(delivered.front()[opreg_fields::DELIVERED].as<bool>());
    }
+} FC_LOG_AND_RETHROW() }
+
+/// The delivery that gives a version its strict majority slashes, in its own transaction and under sysio.msgch's
+/// authority, every member whose delivery differs from it: two minority versions of a group of five here. The
+/// members that delivered the winner are never slashed, the close slashes no one, and it records each slashed
+/// member as delivered.
+BOOST_FIXTURE_TEST_CASE(divergent_minority_is_slashed_in_the_tipping_delivery, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kGroupSize = 5;
+   bootstrap(kGroupSize);
+
+   const uint32_t          epoch    = current_epoch();
+   const std::vector<char> winner   = encode_delivery(epoch, "tipping-winner");
+   const std::vector<char> second   = encode_delivery(epoch, "tipping-second");
+   const std::vector<char> third    = encode_delivery(epoch, "tipping-third");
+   const std::vector<name> minority{BATCHOP_D, BATCHOP_E};
+   const std::vector<name> majority{BATCHOP, BATCHOP_B, BATCHOP_C};
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_D, ETH_OUTPOST_ID, second));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_E, ETH_OUTPOST_ID, third));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, winner));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, winner));
+   produce_blocks();
+   BOOST_REQUIRE(!epoch_decided(ETH_OUTPOST_ID, epoch));
+   for (const name member : minority) {
+      BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(member));
+   }
+
+   const transaction_trace_ptr tipping = deliver_trace(BATCHOP_C, ETH_OUTPOST_ID, winner);
+   const std::vector<slashop_record> slashed = slashops(tipping);
+   BOOST_REQUIRE_EQUAL(minority.size(), slashed.size());
+   for (size_t i = 0; i < slashed.size(); ++i) {
+      BOOST_REQUIRE_EQUAL(minority[i], slashed[i].operator_account);
+      BOOST_REQUIRE_EQUAL(non_canonical_delivery_reason(ETH_CHAIN_CODE, epoch), slashed[i].reason);
+      BOOST_REQUIRE(slashed[i].authorized_by_msgch);
+   }
+   BOOST_REQUIRE_EQUAL(minority.size(), action_count(tipping, OPREG_ACCOUNT, opreg_actions::SLASH));
+   produce_blocks();
+   BOOST_REQUIRE(epoch_decided(ETH_OUTPOST_ID, epoch));
+   for (const name member : minority) {
+      BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED, operator_status(member));
+   }
+   for (const name member : majority) {
+      BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(member));
+   }
+
+   elapse_epoch_boundary();
+   const transaction_trace_ptr close = check_consensus_trace(ETH_OUTPOST_ID, BATCHOP);
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
+   BOOST_REQUIRE_EQUAL(1u, action_count(close, EPOCH_ACCOUNT, epoch_actions::ADVANCE));
+   BOOST_REQUIRE(slashops(close).empty());
+   BOOST_REQUIRE_EQUAL(0u, action_count(close, OPREG_ACCOUNT, opreg_actions::SLASH));
+   for (const name member : majority) {
+      BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(member));
+   }
+   for (const std::vector<name>* members : {&minority, &majority}) {
+      for (const name member : *members) {
+         const std::vector<fc::variant> rows = dellog_rows(member, epoch, ETH_OUTPOST_ID);
+         BOOST_REQUIRE_EQUAL(1u, rows.size());
+         BOOST_REQUIRE(rows.front()[opreg_fields::DELIVERED].as<bool>());
+      }
+   }
+} FC_LOG_AND_RETHROW() }
+
+/// A dispute's resolution slashes its losers in the `chkdispute` transaction, before the epoch advances: every
+/// member whose delivery differs from the voted winner, including one that delivered after the dispute opened.
+/// Four versions in a group of five leave no version able to win, so the fourth delivery opens the dispute; the
+/// fifth member then delivers a losing version. The winner's deliverer is never slashed, and the close slashes
+/// no one.
+BOOST_FIXTURE_TEST_CASE(dispute_losers_are_slashed_at_resolution, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kGroupSize = 5;
+   bootstrap(kGroupSize);
+
+   const uint32_t          epoch   = current_epoch();
+   const std::vector<char> winner  = encode_delivery(epoch, "resolution-winner");
+   const std::vector<char> second  = encode_delivery(epoch, "resolution-second");
+   const std::vector<char> third   = encode_delivery(epoch, "resolution-third");
+   const std::vector<char> fourth  = encode_delivery(epoch, "resolution-fourth");
+   const fc::sha256        winner_checksum = fc::sha256::hash(winner.data(), winner.size());
+   const std::vector<name> losers{BATCHOP_B, BATCHOP_C, BATCHOP_D, BATCHOP_E};
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, winner));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, second));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, third));
+   produce_blocks();
+   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
+   const transaction_trace_ptr opening = deliver_trace(BATCHOP_D, ETH_OUTPOST_ID, fourth);
+   BOOST_REQUIRE_EQUAL(1u, action_count(opening, CHALG_ACCOUNT, chalg_actions::OPEN_DISPUTE));
+   BOOST_REQUIRE(slashops(opening).empty());
+   produce_blocks();
+   BOOST_REQUIRE(epoch_is_paused());
+
+   // E delivers a losing version while the dispute is open: recorded, and judged at the resolution.
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_E, ETH_OUTPOST_ID, second));
+   produce_blocks();
+   BOOST_REQUIRE(!find_inbound_delivery(ETH_OUTPOST_ID, epoch, BATCHOP_E).is_null());
+   for (const name member : losers) {
+      BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(member));
+   }
+
+   BOOST_REQUIRE_EQUAL(success(), vote_dispute(FIRST_DISPUTE_ID, winner_checksum));
+   const transaction_trace_ptr resolution = sysio_system::test_support::push_contract_action_trace(
+      *this, CHALG_ACCOUNT, chalg_abi, BATCHOP, chalg_actions::CHECK_DISPUTE,
+      mvo()(chalg_vote_fields::DISPUTE_ID, FIRST_DISPUTE_ID));
+   const std::vector<slashop_record> slashed = slashops(resolution);
+   BOOST_REQUIRE_EQUAL(losers.size(), slashed.size());
+   for (size_t i = 0; i < slashed.size(); ++i) {
+      BOOST_REQUIRE_EQUAL(losers[i], slashed[i].operator_account);
+      BOOST_REQUIRE_EQUAL(non_canonical_delivery_reason(ETH_CHAIN_CODE, epoch), slashed[i].reason);
+      BOOST_REQUIRE(slashed[i].authorized_by_msgch);
+   }
+   produce_blocks();
+   BOOST_REQUIRE(epoch_decided(ETH_OUTPOST_ID, epoch));
+   BOOST_REQUIRE(!epoch_is_paused());
+   BOOST_REQUIRE_EQUAL(epoch, current_epoch());
+   for (const name member : losers) {
+      BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED, operator_status(member));
+   }
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(BATCHOP));
+
+   elapse_epoch_boundary();
+   const transaction_trace_ptr close = check_consensus_trace(ETH_OUTPOST_ID, BATCHOP);
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
+   BOOST_REQUIRE(slashops(close).empty());
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(BATCHOP));
+} FC_LOG_AND_RETHROW() }
+
+/// Once a dispute's resolution has accepted the winner, the epoch takes only the winner's bytes: the member that
+/// stayed silent through the dispute has a delivery of the winner recorded, and a differing one refused.
+BOOST_FIXTURE_TEST_CASE(delivery_after_resolution_takes_only_the_winner, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kGroupSize = 5;
+   bootstrap(kGroupSize);
+
+   const uint32_t          epoch           = current_epoch();
+   const std::vector<char> winner          = encode_delivery(epoch, "resolved-winner");
+   const std::vector<char> second          = encode_delivery(epoch, "resolved-second");
+   const std::vector<char> third           = encode_delivery(epoch, "resolved-third");
+   const std::vector<char> fourth          = encode_delivery(epoch, "resolved-fourth");
+   const fc::sha256        winner_checksum = fc::sha256::hash(winner.data(), winner.size());
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, winner));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, second));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, third));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_D, ETH_OUTPOST_ID, fourth));
+   produce_blocks();
+   BOOST_REQUIRE(epoch_is_paused());
+   resolve_tie_dispute(epoch, winner_checksum);
+   produce_blocks();
+   BOOST_REQUIRE(epoch_decided(ETH_OUTPOST_ID, epoch));
+
+   BOOST_REQUIRE_EQUAL(error(DECIDED_EPOCH_DIFFERING_DELIVERY_ERROR), deliver_as(BATCHOP_E, ETH_OUTPOST_ID, second));
+   produce_blocks();
+   BOOST_REQUIRE(find_inbound_delivery(ETH_OUTPOST_ID, epoch, BATCHOP_E).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_E, ETH_OUTPOST_ID, winner));
+   produce_blocks();
+   const fc::variant row = find_inbound_delivery(ETH_OUTPOST_ID, epoch, BATCHOP_E);
+   BOOST_REQUIRE(!row.is_null());
+   BOOST_REQUIRE_EQUAL(row[msgch_fields::CHECKSUM].as_string(), winner_checksum.str());
+   BOOST_REQUIRE(row[msgch_fields::RAW_DATA].as<std::vector<char>>().empty());
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(BATCHOP_E));
+   BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, epoch), 1u);
+} FC_LOG_AND_RETHROW() }
+
+/// A governance advance (sysio.epoch's own authority) of a decided epoch slashes no one: the acceptance already
+/// slashed the member whose delivery differs from the winner, and the close records it as delivered.
+BOOST_FIXTURE_TEST_CASE(governance_advance_of_a_decided_epoch_slashes_nothing, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kGroupSize = 3;
+   bootstrap(kGroupSize);
+
+   const uint32_t          epoch     = current_epoch();
+   const std::vector<char> winner    = encode_delivery(epoch, "governance-winner");
+   const std::vector<char> divergent = encode_delivery(epoch, "governance-divergent");
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, divergent));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, winner));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, winner));
+   produce_blocks();
+   BOOST_REQUIRE(epoch_decided(ETH_OUTPOST_ID, epoch));
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED, operator_status(BATCHOP_C));
+
+   elapse_epoch_boundary();
+   const transaction_trace_ptr close = sysio_system::test_support::push_contract_action_trace(
+      *this, EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::ADVANCE,
+      mvo()(epoch_fields::CHAIN_CODE, ETH_CHAIN_CODE));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
+   BOOST_REQUIRE(slashops(close).empty());
+   BOOST_REQUIRE_EQUAL(0u, action_count(close, OPREG_ACCOUNT, opreg_actions::SLASH));
+   for (const name member : {BATCHOP, BATCHOP_B}) {
+      BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(member));
+   }
+   const std::vector<fc::variant> rows = dellog_rows(BATCHOP_C, epoch, ETH_OUTPOST_ID);
+   BOOST_REQUIRE_EQUAL(1u, rows.size());
+   BOOST_REQUIRE(rows.front()[opreg_fields::DELIVERED].as<bool>());
 } FC_LOG_AND_RETHROW() }
 
 /// The eligible set shrinks with no new delivery. Two of four is no majority; once a silent member is
@@ -2863,6 +3130,41 @@ BOOST_FIXTURE_TEST_CASE(eligibility_shrink_decides_on_the_chkcons_retally, sysio
    BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
    produce_blocks();
    BOOST_REQUIRE_EQUAL(epoch, current_epoch());
+} FC_LOG_AND_RETHROW() }
+
+/// An acceptance reached by the chkcons re-tally slashes in the chkcons transaction. In a group of four, two
+/// members deliver the winner and one a divergent envelope; once the silent member is slashed, two of the three
+/// left are a majority, and the re-tally's acceptance slashes the divergent deliverer.
+BOOST_FIXTURE_TEST_CASE(chkcons_retally_acceptance_slashes_in_its_transaction, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kGroupSize = 4;
+   bootstrap(kGroupSize);
+
+   const uint32_t          epoch     = current_epoch();
+   const std::vector<char> winner    = encode_delivery(epoch, "retally-winner");
+   const std::vector<char> divergent = encode_delivery(epoch, "retally-divergent");
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, winner));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, winner));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, divergent));
+   produce_blocks();
+   BOOST_REQUIRE(!epoch_decided(ETH_OUTPOST_ID, epoch));
+   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
+
+   slash_operator(BATCHOP_D);
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(BATCHOP_C));
+
+   const transaction_trace_ptr retally = check_consensus_trace(ETH_OUTPOST_ID, BATCHOP);
+   const std::vector<slashop_record> slashed = slashops(retally);
+   BOOST_REQUIRE_EQUAL(1u, slashed.size());
+   BOOST_REQUIRE_EQUAL(BATCHOP_C, slashed.front().operator_account);
+   BOOST_REQUIRE_EQUAL(non_canonical_delivery_reason(ETH_CHAIN_CODE, epoch), slashed.front().reason);
+   BOOST_REQUIRE(slashed.front().authorized_by_msgch);
+   produce_blocks();
+   BOOST_REQUIRE(epoch_decided(ETH_OUTPOST_ID, epoch));
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED, operator_status(BATCHOP_C));
+   for (const name member : {BATCHOP, BATCHOP_B}) {
+      BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(member));
+   }
 } FC_LOG_AND_RETHROW() }
 
 /// The eligible set shrinks with no new delivery. A 2-2 split of five can still be decided by the silent
@@ -3416,12 +3718,12 @@ BOOST_FIXTURE_TEST_CASE(chkcons_retries_terminal_tie_after_tier_one_registration
                            {ONE_OPERATOR_PER_TIED_VERSION, ONE_OPERATOR_PER_TIED_VERSION});
 } FC_LOG_AND_RETHROW() }
 
-/// An epoch that reached consensus is decided. When the chain's group then changes mid-epoch so that
-/// the deliveries of the new group split one to one, the epoch opens no dispute, keeps its recorded
-/// winner, and its close slashes only the delivery that differs from that winner.
+/// An epoch that reached consensus is decided. Its acceptance slashes the member whose delivery differs from
+/// the winner, in the delivery that tips it. When the chain's group then changes mid-epoch, the epoch opens no
+/// dispute and keeps its recorded winner, and its close slashes no one.
 BOOST_FIXTURE_TEST_CASE(decided_epoch_opens_no_dispute_after_its_group_changes, sysio_msgch_chain_tester) { try {
    constexpr uint32_t         kOriginalGroupSize = 3;
-   constexpr uint32_t         kRebuiltGroupSize  = 2;
+   constexpr uint32_t         kRebuiltGroupSize  = 1;
    constexpr uint32_t         kGroups            = 1;
    constexpr std::string_view kWinnerPayload     = "decided-winner";
    constexpr std::string_view kDivergentPayload  = "decided-divergent";
@@ -3434,8 +3736,8 @@ BOOST_FIXTURE_TEST_CASE(decided_epoch_opens_no_dispute_after_its_group_changes, 
    const fc::sha256        winner_checksum = fc::sha256::hash(winner.data(), winner.size());
 
    // Group {A, B, C}: C delivers a divergent envelope, then A and B the winner. B's delivery records the
-   // two-of-three majority. C delivers first because a divergent envelope after the acceptance no longer
-   // continues the inbound chain and is refused.
+   // two-of-three majority and slashes C. C delivers first because a divergent envelope after the
+   // acceptance is refused.
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, divergent));
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, winner));
    BOOST_REQUIRE(!epoch_decided(ETH_OUTPOST_ID, epoch));
@@ -3448,8 +3750,10 @@ BOOST_FIXTURE_TEST_CASE(decided_epoch_opens_no_dispute_after_its_group_changes, 
       BOOST_REQUIRE_EQUAL(consensus[msgch_fields::WINNING_CHECKSUM].as_string(), winner_checksum.str());
    }
    BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, epoch), 1u);
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED, operator_status(BATCHOP_C));
 
-   // The group is rebuilt mid-epoch: A and B leave the chain, D joins it, and the schedule seats {C, D}.
+   // The group is rebuilt mid-epoch: A and B leave the chain, D joins it, and the schedule seats {D}; the
+   // slashed C is no longer schedulable.
    BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n,
       mvo()("account", BATCHOP_D.to_string())("type", opp::types::OPERATOR_TYPE_BATCH)("is_bootstrapped", true)));
    serve_chains({BATCHOP_D}, {ETH_CHAIN_CODE});
@@ -3460,11 +3764,10 @@ BOOST_FIXTURE_TEST_CASE(decided_epoch_opens_no_dispute_after_its_group_changes, 
                                        mvo()(epoch_fields::CHAIN_CODE, ETH_CHAIN_CODE)));
    produce_blocks();
    BOOST_REQUIRE_EQUAL(epoch, current_epoch());
-   for (const name seated : {BATCHOP_C, BATCHOP_D}) BOOST_REQUIRE(seated_on(seated, ETH_OUTPOST_ID));
-   for (const name unseated : {BATCHOP, BATCHOP_B}) BOOST_REQUIRE(!seated_on(unseated, ETH_OUTPOST_ID));
+   BOOST_REQUIRE(seated_on(BATCHOP_D, ETH_OUTPOST_ID));
+   for (const name unseated : {BATCHOP, BATCHOP_B, BATCHOP_C}) BOOST_REQUIRE(!seated_on(unseated, ETH_OUTPOST_ID));
 
-   // D confirms the recorded winner. Over the rebuilt group the epoch's deliveries now split one to one
-   // (C divergent, D the winner), yet the decided epoch opens no dispute, stays unpaused, and keeps its
+   // D confirms the recorded winner. The decided epoch opens no dispute, stays unpaused, and keeps its
    // winner, dispatched once.
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_D, ETH_OUTPOST_ID, winner));
    produce_blocks();
@@ -3478,17 +3781,58 @@ BOOST_FIXTURE_TEST_CASE(decided_epoch_opens_no_dispute_after_its_group_changes, 
    }
    BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, epoch), 1u);
 
-   // The close, past the chain's boundary, slashes C, whose delivery differs from the recorded winner,
-   // and no one else.
+   // The close, past the chain's boundary, slashes no one; the members that delivered the winner stay ACTIVE.
    elapse_epoch_boundary();
-   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP_D));
+   const transaction_trace_ptr close = check_consensus_trace(ETH_OUTPOST_ID, BATCHOP_D);
    produce_blocks();
    BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
-   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED,
-                       get_operator(BATCHOP_C)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
+   BOOST_REQUIRE(slashops(close).empty());
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED, operator_status(BATCHOP_C));
    for (const name canonical : {BATCHOP, BATCHOP_B, BATCHOP_D}) {
-      BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE,
-                          get_operator(canonical)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
+      BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(canonical));
+   }
+} FC_LOG_AND_RETHROW() }
+
+/// A member that delivered a divergent envelope and is then seated out of the chain's group by a mid-epoch
+/// rebuild, while staying ACTIVE, is still slashed when the new group decides the epoch: the acceptance judges
+/// every recorded delivery, not only the eligible ones.
+BOOST_FIXTURE_TEST_CASE(divergent_deliverer_seated_out_mid_epoch_is_slashed_at_acceptance,
+                        sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kOriginalGroupSize = 3;
+   constexpr uint32_t kRebuiltGroupSize  = 2;
+   constexpr uint32_t kGroups            = 1;
+   bootstrap(kOriginalGroupSize);
+
+   const uint32_t          epoch     = current_epoch();
+   const std::vector<char> winner    = encode_delivery(epoch, "rebuilt-winner");
+   const std::vector<char> divergent = encode_delivery(epoch, "rebuilt-divergent");
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, divergent));
+   produce_blocks();
+
+   // The rebuild keeps the first two of the three ACTIVE serving operators: C leaves the group and stays ACTIVE.
+   set_epoch_config(ETH_CHAIN_CODE, EPOCH_DURATION_SEC, kRebuiltGroupSize, kGroups);
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::SCHEDULE,
+                                       mvo()(epoch_fields::CHAIN_CODE, ETH_CHAIN_CODE)));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(epoch, current_epoch());
+   BOOST_REQUIRE(!seated_on(BATCHOP_C, ETH_OUTPOST_ID));
+   for (const name seated : {BATCHOP, BATCHOP_B}) BOOST_REQUIRE(seated_on(seated, ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(BATCHOP_C));
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, winner));
+   produce_blocks();
+   BOOST_REQUIRE(!epoch_decided(ETH_OUTPOST_ID, epoch));
+
+   const transaction_trace_ptr tipping = deliver_trace(BATCHOP_B, ETH_OUTPOST_ID, winner);
+   const std::vector<slashop_record> slashed = slashops(tipping);
+   BOOST_REQUIRE_EQUAL(1u, slashed.size());
+   BOOST_REQUIRE_EQUAL(BATCHOP_C, slashed.front().operator_account);
+   produce_blocks();
+   BOOST_REQUIRE(epoch_decided(ETH_OUTPOST_ID, epoch));
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED, operator_status(BATCHOP_C));
+   for (const name member : {BATCHOP, BATCHOP_B}) {
+      BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(member));
    }
 } FC_LOG_AND_RETHROW() }
 
@@ -4554,8 +4898,8 @@ BOOST_FIXTURE_TEST_CASE(envelope_prune_is_per_outpost, sysio_msgch_chain_tester)
 
 /// Dispute resolution still works once the prune is live. Two clean epochs run first, so the
 /// disputed epoch's deliveries prune the oldest epoch; ETH then splits 1-1, a Tier-1 vote resolves
-/// it from the retained rows (`opendispute` pauses the epoch, so they stay current), and `advance`
-/// slashes the losing deliverer.
+/// it from the retained rows (`opendispute` pauses the epoch, so they stay current), and the
+/// resolution slashes the losing deliverer before the epoch advances.
 BOOST_FIXTURE_TEST_CASE(dispute_resolves_while_envelopes_are_pruned, sysio_msgch_chain_tester) { try {
    const std::vector<name> ops{BATCHOP, BATCHOP_B};
    bootstrap(ONE_TO_ONE_TIE_GROUP_SIZE);
@@ -4586,12 +4930,12 @@ BOOST_FIXTURE_TEST_CASE(dispute_resolves_while_envelopes_are_pruned, sysio_msgch
    BOOST_REQUIRE(epoch_is_paused());
 
    resolve_tie_dispute(epoch, left_checksum);
+   BOOST_REQUIRE_EQUAL(epoch, current_epoch());
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED, operator_status(BATCHOP_B));
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(BATCHOP));
    advance_via_consensus();
    BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
-   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED,
-                       get_operator(BATCHOP_B)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
-   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE,
-                       get_operator(BATCHOP)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(BATCHOP));
 } FC_LOG_AND_RETHROW() }
 
 // ---------------------------------------------------------------------------
@@ -4759,17 +5103,18 @@ BOOST_FIXTURE_TEST_CASE(dispute_on_one_chain_does_not_hold_the_other, sysio_msgc
    BOOST_REQUIRE_EQUAL(epoch, current_epoch(ETH_OUTPOST_ID));
    BOOST_REQUIRE_EQUAL(sol_epoch, current_epoch(SOL_OUTPOST_ID));
 
-   // Resolve the later SOL dispute first: SOL resumes and advances, ETH stays paused.
+   // Resolve the later SOL dispute first: its resolution slashes SOL's losing deliverer, SOL resumes and
+   // advances, ETH stays paused.
    resolve_tie_dispute(sol_epoch, sol_left_checksum, SOL_OUTPOST_ID, SECOND_DISPUTE_ID);
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED, operator_status(BATCHOP_B));
    BOOST_REQUIRE(!epoch_is_paused(SOL_OUTPOST_ID));
    BOOST_REQUIRE(epoch_is_paused(ETH_OUTPOST_ID));
    advance_via_consensus();
    BOOST_REQUIRE_EQUAL(epoch, current_epoch(ETH_OUTPOST_ID));
    BOOST_REQUIRE_EQUAL(sol_epoch + 1, current_epoch(SOL_OUTPOST_ID));
-   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED,
-                       get_operator(BATCHOP_B)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED, operator_status(BATCHOP_B));
 
-   // Resolve the ETH dispute: ETH resumes and advances; its own slash of the already-slashed
+   // Resolve the ETH dispute: ETH resumes and advances; its resolution's slash of the already-slashed
    // deliverer is a no-op.
    resolve_tie_dispute(epoch, left_checksum);
    BOOST_REQUIRE(!epoch_is_paused(ETH_OUTPOST_ID));
