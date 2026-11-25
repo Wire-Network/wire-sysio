@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sysio.system/fp_math.hpp>
+#include <sysio.opp.common/safe_ops.hpp>
 
 #include <sysio/asset.hpp>
 #include <sysio/kv_global.hpp>
@@ -16,11 +17,11 @@
 #include <vector>
 
 // Core emissions tables owned by sysio.system. This header is intentionally
-// free of OPP / protobuf dependencies so that downstream contracts (notably
-// sysio.roa) can include it to check emitcfg_t::exists() before invoking
-// addnodeowner. The opreg / token / epoch cross-contract reads used by
-// payepoch and viewepoch live in emissions.cpp (implementation detail,
-// not public API).
+// free of protobuf dependencies (its one sysio.opp.common include, safe_ops.hpp,
+// is dependency-free) so that downstream contracts (notably sysio.roa) can
+// include it to check emitcfg_t::exists() before invoking addnodeowner. The
+// opreg / token / epoch cross-contract reads used by payepoch and viewepoch
+// live in emissions.cpp (implementation detail, not public API).
 
 namespace sysiosystem::emissions {
 
@@ -257,6 +258,9 @@ struct [[sysio::table("t5state"), sysio::contract("sysio.system")]] t5_state {
    /// Most recent positive per-epoch share: the base the next share decays from. A zero-share epoch leaves it
    /// unchanged. Near the end of the budget it may itself be a share clamped to the remainder.
    int64_t                last_epoch_emission = 0;
+   /// Length of the economic epoch `last_epoch_emission` accrued for. The next share rescales the base from it to
+   /// the length of the epoch that share accrues for, so a duration change keeps the emission per second.
+   uint32_t               last_epoch_duration_sec = 0;
    int64_t                total_distributed   = 0;
 
    /// Pay-cadence accumulator. accrueepoch adds each economic epoch's share; the pay epoch
@@ -265,9 +269,9 @@ struct [[sysio::table("t5state"), sysio::contract("sysio.system")]] t5_state {
    int64_t                pending_emission_amount = 0;
    uint32_t               period_start_epoch      = 0;
 
-   /// Block slots the open pay period is entitled to, accumulated as each economic epoch accrues
-   /// at the duration in force for that epoch -- the same way the pool is built, so a period that
-   /// spans a duration change sizes its divisor correctly. Reset with `pending_emission_amount`.
+   /// Block slots the open pay period is entitled to: each accruing tick adds the slots of the economic
+   /// epoch it closes, from the previous boundary to its own, so the count spans the boundaries of the
+   /// blocks the period pays even across a duration change. Reset with `pending_emission_amount`.
    uint64_t               pending_nominal_slots = 0;
 
    /// Batch emission of a paid period not yet credited to its operators: the settling period's
@@ -278,7 +282,7 @@ struct [[sysio::table("t5state"), sysio::contract("sysio.system")]] t5_state {
 
    SYSLIB_SERIALIZE(t5_state,
       (start_time)(epoch_count)(last_epoch_index)
-      (last_epoch_time)(last_epoch_emission)(total_distributed)
+      (last_epoch_time)(last_epoch_emission)(last_epoch_duration_sec)(total_distributed)
       (pending_emission_amount)(period_start_epoch)
       (pending_nominal_slots)(unsettled_batch_emission))
 };
@@ -375,7 +379,7 @@ using dutystate_t = sysio::kv::global<"dutystate"_n, duty_state>;
 inline bool records_batch_duty(sysio::name system_account) { return t5state_t(system_account).exists(); }
 
 // ---------------------------------------------------------------------------
-// Per-economic-epoch derivations from annual config + the canonical economic epoch_duration_sec.
+// Per-economic-epoch derivations from annual config + an economic epoch's length.
 // Both the gate (sysio.epoch::check_emissions_ready) and the success path
 // (sysio.system::payepoch / viewepoch) call these so derived per-epoch
 // values cannot drift between the two contracts.
@@ -437,11 +441,14 @@ inline bool in_initial_emission_window(const emission_config& cfg, const t5_stat
 /// The per-epoch share the next accrual commits, capped at the net headroom.
 ///
 /// The first pay period's scheduled epochs (in_initial_emission_window) accrue the scaled initial emission; every
-/// later accrual decays the last positive share, clamped to the per-epoch min and max. The share is 0 once the open
-/// period has committed the rest of the budget, or when the curve itself is 0. Shared by sysio.epoch's readiness gate,
-/// which accrues it, and viewepoch, which reports it, so the estimate cannot drift from the accrual.
+/// later accrual decays the last positive share, rescaled from the length of the epoch it accrued for to this one's,
+/// and clamps it to the per-epoch min and max. Both the share and the decay follow the epoch's length, so the emission
+/// per second does not move when the duration changes. The share is 0 once the open period has committed the rest of
+/// the budget, or when the curve itself is 0. Shared by sysio.epoch's readiness gate, which accrues it, and viewepoch,
+/// which reports it, so the estimate cannot drift from the accrual.
 ///
-/// epoch_duration_sec must be the canonical value from sysio.epoch::economycfg.
+/// epoch_duration_sec is the length of the economic epoch the share accrues for: the one the tick closes
+/// (sysio.epoch::epoch::closing_epoch_duration_sec).
 inline int64_t compute_epoch_emission(const emission_config& cfg,
                                       uint32_t epoch_duration_sec,
                                       const t5_state& state) {
@@ -452,17 +459,21 @@ inline int64_t compute_epoch_emission(const emission_config& cfg,
    if (in_initial_emission_window(cfg, state)) {
       emission = scale_annual_to_epoch(cfg.annual_initial_emission, epoch_duration_sec);
    } else {
+      // Guards the division: a zero length takes the base unscaled.
+      const __int128 base = state.last_epoch_duration_sec == 0
+         ? static_cast<__int128>(state.last_epoch_emission)
+         : static_cast<__int128>(state.last_epoch_emission) * epoch_duration_sec / state.last_epoch_duration_sec;
       const fp_math::fp_t factor =
          compute_per_epoch_decay(cfg.target_annual_decay_bps, epoch_duration_sec);
-      const __int128 product = static_cast<__int128>(state.last_epoch_emission) * factor;
-      emission = static_cast<int64_t>(product / fp_math::ONE);
+      __int128 decayed = base * factor / fp_math::ONE;
 
       const int64_t per_epoch_max =
          scale_annual_to_epoch(cfg.annual_max_emission, epoch_duration_sec);
       const int64_t per_epoch_min =
          scale_annual_to_epoch(cfg.annual_min_emission, epoch_duration_sec);
-      if (emission > per_epoch_max) emission = per_epoch_max;
-      if (emission < per_epoch_min) emission = per_epoch_min;
+      if (decayed > per_epoch_max) decayed = per_epoch_max;
+      if (decayed < per_epoch_min) decayed = per_epoch_min;
+      emission = static_cast<int64_t>(decayed);
    }
 
    return std::min(emission, headroom);
@@ -501,7 +512,8 @@ inline int64_t per_epoch_emission_ceiling(const emission_config& cfg, uint32_t e
 /// boundaries that feed the accumulator -- sysio.system::setemitcfg (annual
 /// emission values, pay cadence) and sysio.epoch::seteconomy (economic epoch duration,
 /// which scales the per-epoch ceiling linearly) -- so no accepted
-/// configuration can drive saturating_accrue to its clamp mid-period.
+/// configuration can drive saturating_accrue to its clamp mid-period. Both pass the
+/// longest epoch a tick can still close (sysio.epoch::epoch::longest_accruing_epoch_sec).
 inline bool period_accrual_fits_asset_range(const emission_config& cfg,
                                             uint32_t epoch_duration_sec,
                                             int64_t pending_emission_amount) {

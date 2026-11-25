@@ -103,12 +103,14 @@ struct emissions_gate_result {
    int64_t attempted_emission() const { return is_pay_epoch ? period_emission : emission_amount; }
 };
 
-/// Decide what economic epoch `target_epoch`'s emissions may do. `crank_behind` is true when a later economic boundary
-/// has already passed. Never throws.
+/// Decide what economic epoch `target_epoch`'s emissions may do. `spend` is whether the clock had caught up to the grid
+/// before this tick, which decides whether its payout spends; `defer_payout` is `spend` with a later economic boundary
+/// already passed. Never throws.
 ///
-/// `epoch_duration_sec` is the canonical economic duration from sysio.epoch::economycfg, passed by
-/// tickeconomy so this gate and sysio.system see identical inputs.
-emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec, uint32_t target_epoch, bool crank_behind) {
+/// `closed_epoch_duration_sec` is the length of the economic epoch the tick closes, the one whose share it accrues
+/// (`epoch::closing_epoch_duration_sec`); tickeconomy passes the same value on to sysio.system::accrueepoch.
+emissions_gate_result check_emissions_ready(uint32_t closed_epoch_duration_sec, uint32_t target_epoch,
+                                            bool defer_payout, bool spend) {
    emissions_gate_result r;
 
    sysiosystem::emissions::emitcfg_t emit_cfg_tbl(SYSTEM_ACCOUNT);
@@ -127,7 +129,7 @@ emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec, uint32_
    r.treasury_remaining = sysiosystem::emissions::net_headroom(cfg, t5s);
 
    // Capped at the net headroom, so the open pay period can never commit more than the budget.
-   r.emission_amount = sysiosystem::emissions::compute_epoch_emission(cfg, epoch_duration_sec, t5s);
+   r.emission_amount = sysiosystem::emissions::compute_epoch_emission(cfg, closed_epoch_duration_sec, t5s);
 
    // TREASURY_EXHAUSTED is decided on the GROSS headroom: a spent budget accrues nothing. An open period whose share
    // drops to zero, because it has committed the rest of the budget or the curve is zero, still accrues (a zero
@@ -147,10 +149,9 @@ emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec, uint32_
    r.is_pay_epoch = (target_epoch >= t5s.period_start_epoch + cfg.pay_cadence_epochs - 1);
    if (!r.is_pay_epoch) return r;
 
-   // While the crank catches up, the payout waits for the tick that reaches the grid: one payout then pairs the pools
-   // of every period it covers with the blocks and duty earned across them. Paying each period as its tick ran would
-   // credit all the work since the last payout to the first period's pools and leave the later periods none.
-   if (crank_behind) {
+   // While the crank catches up, the payout waits for the tick that reaches the grid: one payout then pays the pools of
+   // every overdue period against all the blocks and duty counted since the last payout, at one rate.
+   if (defer_payout) {
       r.deferred = true;
       return r;
    }
@@ -158,6 +159,12 @@ emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec, uint32_
    // Same saturating accumulation as sysio.system::accrueepoch (shared helper in emissions.hpp) so the gate's
    // period total exactly matches what accrueepoch will store and payepoch will assert against.
    r.period_emission = sysiosystem::emissions::saturating_accrue(t5s.pending_emission_amount, r.emission_amount);
+
+   // A payout that does not spend (sysio.system::payepoch) is never held for balance.
+   if (!spend) {
+      r.pay = true;
+      return r;
+   }
 
    sysio::token::token::accounts acct_tbl(TOKEN_ACCOUNT, SYSTEM_ACCOUNT.value);
    sysio::token::token::acct_key key{WIRE_SYMBOL.code().raw()};
@@ -928,19 +935,45 @@ void epoch::seteconomy(uint32_t epoch_duration_sec, sysio::time_point_sec start_
 
    // The grid is anchored at start_time: once an economic epoch has opened, moving the anchor would
    // re-date every epoch already accrued.
-   economycfg_t cfg_tbl(get_self());
+   //
+   // While a boundary has passed without its tick, withdrawals are already dated by the boundaries still to be
+   // ticked, so the grid may not change until the crank is current. Once it is, a new duration spaces only the
+   // boundaries after the next one: no boundary that has passed moves, nor, once the clock has ticked, the next one.
+   // A grid whose start is still ahead may be re-anchored, even into the past unless a collateral withdrawal is
+   // queued.
+   economycfg_t         cfg_tbl(get_self());
+   const economic_state state = economystate_t(get_self()).get_or_default(economic_state{});
+   bool start_moves = true;
    if (cfg_tbl.exists()) {
-      economystate_t state_tbl(get_self());
-      if (state_tbl.exists() && state_tbl.get().current_epoch_index > 0) {
-         check(start_time == cfg_tbl.get().start_time,
+      const economic_config current = cfg_tbl.get();
+      if (state.current_epoch_index > 0) {
+         check(start_time == current.start_time,
                "economic start_time is fixed once the economic clock has started");
       }
+      start_moves = start_time != current.start_time;
+      const bool changes = epoch_duration_sec != current.epoch_duration_sec || start_moves;
+      check(!changes || economic_epoch_index_at(current_time_point()) == state.current_epoch_index,
+            "economic clock is behind: tick every passed boundary before changing it");
    }
 
-   // The emissions pay-period accumulation bound (see emissions.hpp) depends on the economic
-   // duration: scale_annual_to_epoch is linear in it, so raising the duration raises the per-epoch
-   // emission ceiling that sysio.system::setemitcfg validated against the pay cadence. Re-validate
-   // against the stored emission config so no ordering of the two setters can accept a period whose
+   // A queued withdrawal waits for boundaries after its request (sysio.opreg's economic wait). Every boundary of a
+   // start that is not ahead lies at or before now, so while one is queued the start may only be set ahead.
+   if (start_moves && time_point{start_time} <= current_time_point()) {
+      opreg::wtdwqueue_t withdrawals(OPREG_ACCOUNT);
+      check(withdrawals.begin() == withdrawals.end(),
+            "economic start_time must be ahead while a collateral withdrawal is queued");
+   }
+
+   const economic_config updated{
+      .epoch_duration_sec = epoch_duration_sec,
+      .start_time         = start_time,
+   };
+
+   // The emissions pay-period accumulation bound (see emissions.hpp) depends on the length of the epochs a tick
+   // accrues: scale_annual_to_epoch is linear in it, so a longer epoch raises the per-epoch emission ceiling that
+   // sysio.system::setemitcfg validated against the pay cadence. The next tick closes the open epoch at the length it
+   // opened with, and later ticks close epochs of the new duration, so the bound takes the longer of the two.
+   // Re-validated against the stored emission config so no ordering of the two setters can accept a period whose
    // accumulation would saturate the pending accumulator.
    {
       sysiosystem::emissions::emitcfg_t emit_cfg_tbl(SYSTEM_ACCOUNT);
@@ -948,15 +981,12 @@ void epoch::seteconomy(uint32_t epoch_duration_sec, sysio::time_point_sec start_
          sysiosystem::emissions::t5state_t t5s_tbl(SYSTEM_ACCOUNT);
          const int64_t pending = t5s_tbl.exists() ? t5s_tbl.get().pending_emission_amount : 0;
          check(sysiosystem::emissions::period_accrual_fits_asset_range(
-                  emit_cfg_tbl.get(), epoch_duration_sec, pending),
+                  emit_cfg_tbl.get(), longest_accruing_epoch_sec(updated, state), pending),
                "per-epoch emission ceiling x pay_cadence_epochs exceeds the asset range at this epoch_duration_sec");
       }
    }
 
-   cfg_tbl.set(economic_config{
-      .epoch_duration_sec = epoch_duration_sec,
-      .start_time         = start_time,
-   }, ram_payer);
+   cfg_tbl.set(updated, ram_payer);
 }
 
 // ---------------------------------------------------------------------------
@@ -982,8 +1012,17 @@ void epoch::tickeconomy(uint32_t epoch_index) {
       : state.next_epoch_start;
    check(current_time_point() >= boundary, "economic epoch boundary has not passed");
 
-   const bool crank_behind = economic_epoch_index_at(current_time_point()) > epoch_index;
-   const auto gate         = check_emissions_ready(cfg.epoch_duration_sec, epoch_index, crank_behind);
+   // The epoch this tick closes, from the previous boundary to this one, at the length it opened with: the tick
+   // accrues its emission share and its block slots, so neither follows a duration set since.
+   const uint32_t closed_epoch_duration_sec = closing_epoch_duration_sec(cfg, state);
+   const time_point next_boundary = boundary + microseconds(static_cast<int64_t>(cfg.epoch_duration_sec) * 1'000'000);
+
+   // A payout spends only if the clock had caught up to the grid before this tick, so the tick that reaches it spends
+   // nothing either. Until then each pay epoch closes its own period; from then on payouts merge while the crank is
+   // behind.
+   const bool spend        = state.caught_up;
+   const bool crank_behind = current_time_point() >= next_boundary;
+   const auto gate = check_emissions_ready(closed_epoch_duration_sec, epoch_index, crank_behind && spend, spend);
    if (gate.blocked()) {
       sysio::print_f("epoch::tickeconomy: economic epoch %u emissions held -- see blocklog\n", epoch_index);
       record_gate_block(get_self(), epoch_index, gate);
@@ -993,7 +1032,8 @@ void epoch::tickeconomy(uint32_t epoch_index) {
 
    state.current_epoch_index = epoch_index;
    state.current_epoch_start = boundary;
-   state.next_epoch_start    = boundary + microseconds(static_cast<int64_t>(cfg.epoch_duration_sec) * 1'000'000);
+   state.next_epoch_start    = next_boundary;
+   if (!crank_behind) state.caught_up = true;
    state_tbl.set(state, ram_payer);
 
    // Withdrawals mature on this clock, each held until every chain it waits on has also passed its
@@ -1012,7 +1052,7 @@ void epoch::tickeconomy(uint32_t epoch_index) {
          permission_level{get_self(), "owner"_n},
          SYSTEM_ACCOUNT,
          system_actions::ACCRUE_EPOCH,
-         std::make_tuple(epoch_index, gate.emission_amount)
+         std::make_tuple(epoch_index, gate.emission_amount, closed_epoch_duration_sec)
       ).send();
    }
    if (gate.pay) {
@@ -1020,7 +1060,7 @@ void epoch::tickeconomy(uint32_t epoch_index) {
          permission_level{get_self(), "owner"_n},
          SYSTEM_ACCOUNT,
          system_actions::PAY_EPOCH,
-         std::make_tuple(epoch_index, gate.period_emission)
+         std::make_tuple(epoch_index, gate.period_emission, spend)
       ).send();
    }
 

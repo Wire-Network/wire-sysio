@@ -942,10 +942,11 @@ public:
                                      [system_fields::BALANCE].as_uint64());
    }
 
-   /// Tick the economic clock through every boundary that has passed. A tick behind the grid only accrues;
-   /// the one that reaches it pays the open pay period, opening its batch-duty settlement. Returns the
-   /// economic epoch that paid.
-   uint32_t tick_economy_to_grid() {
+   /// Tick the economic clock to its first payout that spends. The ticks through every boundary that has passed
+   /// catch the clock up to its grid and spend nothing, the one that reaches it included, so the duty stays open;
+   /// the next boundary's tick pays the open pay period for all the duty counted so far, opening its batch-duty
+   /// settlement. Returns the economic epoch that paid.
+   uint32_t tick_first_spending_payout() {
       uint32_t       ticked = 0;
       action_result  result;
       while ((result = push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::TICK_ECONOMY,
@@ -954,8 +955,14 @@ public:
       }
       BOOST_REQUIRE_NE(std::string::npos, result.find(ECONOMIC_BOUNDARY_NOT_PASSED_ERROR));
       BOOST_REQUIRE_GT(ticked, 0u);
+      // The next boundary lies less than one economic epoch ahead.
+      for (uint32_t i = 0; i < EPOCH_DURATION_SEC * 2 + 1; ++i) {
+         produce_block();
+      }
+      BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::TICK_ECONOMY,
+                                          mvo()(epoch_fields::EPOCH_INDEX, ticked + 1)));
       produce_blocks();
-      return ticked;
+      return ticked + 1;
    }
 
    /// sysio.system's audit row of the economic epoch that paid a period.
@@ -5145,7 +5152,7 @@ BOOST_FIXTURE_TEST_CASE(eviction_forfeits_the_chain_duty_while_the_other_chain_p
       }
    }
 
-   const uint32_t paid_epoch = tick_economy_to_grid();
+   const uint32_t paid_epoch = tick_first_spending_payout();
    const auto     log        = epoch_log(paid_epoch);
    BOOST_REQUIRE(log[system_fields::BATCH_SETTLED].as<bool>());
    BOOST_REQUIRE_EQUAL(0u, duty_state()[system_fields::SETTLING_PERIOD].as<uint32_t>());
@@ -5360,7 +5367,7 @@ BOOST_FIXTURE_TEST_CASE(registering_again_forfeits_the_earlier_registrations_dut
       for (const uint64_t chain : chains) rows[op].push_back(batch_duty_seat_seconds(op, chain));
    }
 
-   const uint32_t paid_epoch = tick_economy_to_grid();
+   const uint32_t paid_epoch = tick_first_spending_payout();
    const auto     log        = epoch_log(paid_epoch);
    BOOST_REQUIRE(log[system_fields::BATCH_SETTLED].as<bool>());
    const int64_t pool = log[system_fields::BATCH_EMISSION].as<int64_t>();

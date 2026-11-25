@@ -59,6 +59,10 @@
                 {
                     "name": "per_epoch_emission",
                     "type": "int64"
+                },
+                {
+                    "name": "closed_epoch_duration_sec",
+                    "type": "uint32"
                 }
             ]
         },
@@ -1018,6 +1022,10 @@
                 {
                     "name": "period_emission",
                     "type": "int64"
+                },
+                {
+                    "name": "spend",
+                    "type": "bool"
                 }
             ]
         },
@@ -1709,6 +1717,10 @@
                 {
                     "name": "last_epoch_emission",
                     "type": "int64"
+                },
+                {
+                    "name": "last_epoch_duration_sec",
+                    "type": "uint32"
                 },
                 {
                     "name": "total_distributed",

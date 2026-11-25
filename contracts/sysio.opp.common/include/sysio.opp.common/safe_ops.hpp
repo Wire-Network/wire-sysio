@@ -26,8 +26,10 @@
  */
 
 #include <cstdint>
+#include <limits>
 #include <optional>
 #include <string_view>
+#include <type_traits>
 
 namespace sysio::opp::safe {
 
@@ -71,6 +73,17 @@ inline std::optional<uint64_t> to_depot_amount(int64_t amount) {
    return static_cast<uint64_t>(amount);
 }
 
+/// Saturating unsigned addition: `a + b`, clamped to `cap` instead of passing
+/// it or wrapping. `cap` defaults to the type's maximum; an `a` already at or
+/// above `cap` yields `cap`. Never throws. Every saturating unsigned counter and
+/// balance shares this one implementation.
+template <typename T>
+constexpr T add_sat(T a, T b, T cap = std::numeric_limits<T>::max()) {
+   static_assert(std::is_unsigned_v<T>, "add_sat is for unsigned types; see add_sat_i64");
+   if (a >= cap) return cap;
+   return b >= cap - a ? cap : T(a + b);
+}
+
 /// Saturating unsigned 64-bit addition. Returns `a + b`, clamped to
 /// `UINT64_MAX` on overflow instead of wrapping.
 ///
@@ -82,7 +95,7 @@ inline std::optional<uint64_t> to_depot_amount(int64_t amount) {
 /// Saturating keeps the guards monotonic and never throws; the cap is
 /// unreachable for any real token amount.
 inline uint64_t add_sat_u64(uint64_t a, uint64_t b) {
-   return (b > UINT64_MAX - a) ? UINT64_MAX : a + b;
+   return add_sat(a, b);
 }
 
 /// Saturating signed 64-bit addition. Returns `a + b`, clamped to `INT64_MAX`

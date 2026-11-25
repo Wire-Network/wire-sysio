@@ -12,6 +12,7 @@
  *     name_tests::literal_and_runtime_validation_agree. Historical note: the old
  *     cap wrongly rejected every 13-character WIRE depositor/recipient.
  *   - `add_sat_u64` clamps at UINT64_MAX instead of wrapping (r3444213199).
+ *   - `add_sat` clamps at its type's maximum or at an explicit cap.
  */
 
 #include <boost/test/unit_test.hpp>
@@ -20,6 +21,7 @@
 #include <cstdint>
 #include <string>
 
+using sysio::opp::safe::add_sat;
 using sysio::opp::safe::add_sat_i64;
 using sysio::opp::safe::add_sat_u64;
 using sysio::opp::safe::depot_amount_max;
@@ -44,6 +46,25 @@ BOOST_AUTO_TEST_CASE(add_sat_u64_saturates_instead_of_wrapping) {
    BOOST_CHECK_EQUAL(add_sat_u64(MAX - 3, 10), MAX);
    BOOST_CHECK_EQUAL(add_sat_u64(uint64_t{1} << 63, uint64_t{1} << 63), MAX);
    BOOST_CHECK_EQUAL(add_sat_u64(100, MAX - 50), MAX);
+}
+
+BOOST_AUTO_TEST_CASE(add_sat_saturates_at_the_type_maximum_or_a_cap) {
+   constexpr uint32_t MAX32 = ~uint32_t{0};
+
+   // 32-bit counters: ordinary sums, the boundary, and past it.
+   BOOST_CHECK_EQUAL(add_sat(uint32_t{5}, uint32_t{7}), uint32_t{12});
+   BOOST_CHECK_EQUAL(add_sat(MAX32 - 10, uint32_t{10}), MAX32);
+   BOOST_CHECK_EQUAL(add_sat(MAX32 - 3, uint32_t{10}), MAX32);
+   BOOST_CHECK_EQUAL(add_sat(MAX32, MAX32), MAX32);
+
+   // An explicit cap below the type maximum: the asset magnitude limit `claimable::add_capped` uses.
+   constexpr uint64_t cap = static_cast<uint64_t>(depot_amount_max);
+   BOOST_CHECK_EQUAL(add_sat(uint64_t{5}, uint64_t{7}, cap), uint64_t{12});
+   BOOST_CHECK_EQUAL(add_sat(cap - 10, uint64_t{10}, cap), cap);
+   BOOST_CHECK_EQUAL(add_sat(cap - 3, uint64_t{10}, cap), cap);
+   BOOST_CHECK_EQUAL(add_sat(uint64_t{0}, ~uint64_t{0}, cap), cap);
+   // A value already past the cap is pulled back to it.
+   BOOST_CHECK_EQUAL(add_sat(cap + 1, uint64_t{0}, cap), cap);
 }
 
 BOOST_AUTO_TEST_CASE(add_sat_i64_saturates_instead_of_wrapping) {

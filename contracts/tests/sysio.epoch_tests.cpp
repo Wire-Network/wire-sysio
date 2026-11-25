@@ -453,7 +453,7 @@ BOOST_FIXTURE_TEST_CASE(advance_before_config, sysio_epoch_tester) { try {
 
 BOOST_FIXTURE_TEST_CASE(seteconomy_validates_and_stores, sysio_epoch_tester) { try {
    constexpr uint32_t duration = 360;
-   const time_point_sec start{control->head().block_time()};
+   const time_point_sec start{control->head().block_time() + fc::seconds(duration)};
    constexpr uint32_t thirty_days = 30u * 24u * 60u * 60u;
 
    BOOST_REQUIRE_EQUAL(error("missing authority of sysio.epoch"), seteconomy(duration, start, "operator1"_n));
@@ -465,13 +465,23 @@ BOOST_FIXTURE_TEST_CASE(seteconomy_validates_and_stores, sysio_epoch_tester) { t
    BOOST_REQUIRE_EQUAL(error("assertion failure with message: economic start_time must be set"),
                        seteconomy(duration, time_point_sec{}));
 
-   // The bounds are inclusive, and a start in the past is accepted.
+   // The bounds are inclusive. While no boundary has passed the grid may move, into the past too: the clock then
+   // catches up through the elapsed epochs.
    BOOST_REQUIRE_EQUAL(success(), seteconomy(thirty_days, start));
    const time_point_sec past{start.sec_since_epoch() - 7u * 24u * 60u * 60u};
    BOOST_REQUIRE_EQUAL(success(), seteconomy(duration, past));
    const auto cfg = get_economic_config();
    BOOST_REQUIRE_EQUAL(duration, cfg["epoch_duration_sec"].as<uint32_t>());
    BOOST_REQUIRE(past == cfg["start_time"].as<time_point_sec>());
+
+   // Boundaries have now passed without their ticks: the grid stays as it is until the crank catches up, though
+   // restating it is accepted.
+   const std::string behind = "assertion failure with message: economic clock is behind: tick every passed boundary "
+                              "before changing it";
+   BOOST_REQUIRE_EQUAL(error(behind), seteconomy(duration * 2, past));
+   BOOST_REQUIRE_EQUAL(error(behind), seteconomy(duration, start));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), seteconomy(duration, past));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(tickeconomy_waits_for_config_and_consensus_genesis, sysio_epoch_tester) { try {
