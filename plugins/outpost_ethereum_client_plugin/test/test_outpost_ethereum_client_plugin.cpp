@@ -434,20 +434,22 @@ std::string abi_bytes_tail(const std::vector<char>& bytes) {
 }
 
 /// An OPP event log as a node returns it, at `block`.
-fc::variant opp_log(uint64_t block, const std::vector<std::string>& topics, std::string data_hex) {
+fc::variant opp_log(uint64_t block, const std::vector<std::string>& topics, std::string data_hex,
+                    uint32_t log_index = 0) {
    fc::variants topic_variants;
    for (const auto& topic : topics) topic_variants.emplace_back(topic);
    return fc::mutable_variant_object("address", std::string(hex_prefix) + std::string(test_opp_address))(
       "topics", std::move(topic_variants))("data", std::string(hex_prefix) + std::move(data_hex))(
-      "blockNumber", pinned_block_hex(block));
+      "blockNumber", pinned_block_hex(block))("logIndex", format_rpc_quantity(fc::uint256{log_index}));
 }
 
 /// An `OutboundMessage(messageIndex, chainHash, message)` log.
 fc::variant outbound_message_log(uint64_t block, uint64_t index, std::string_view chain_hash,
-                                 const std::vector<char>& message) {
+                                 const std::vector<char>& message, uint32_t log_index = 0) {
    return opp_log(block, {std::string(hex_prefix) + std::string(outbound_message_topic),
                           std::string(hex_prefix) + abi_word(index)},
-                  std::string(chain_hash) + abi_word(outbound_message_data_offset_bytes) + abi_bytes_tail(message));
+                  std::string(chain_hash) + abi_word(outbound_message_data_offset_bytes) + abi_bytes_tail(message),
+                  log_index);
 }
 
 /// An `OPPEnvelope(data)` log.
@@ -2762,9 +2764,10 @@ fc::variant outbound_epoch_finalized_receipt_log(uint32_t epoch, uint64_t first_
                          abi_word(test_finalized_timestamp));
 }
 
-/// Script a delivery whose one call tips and finalizes `test_wire_epoch`, closing an outbound envelope over a
-/// message the relay already followed (`0x01`) and one the call itself emits (`0x0203`). Returns the envelope.
-std::vector<char> script_finalizing_delivery(whole_envelope_delivery_fixture& fixture) {
+/// Script a delivery whose one call tips and finalizes `test_wire_epoch`, with the relay following OPP and
+/// holding one message (`0x01`, message `test_cursor_message_end`) of the epoch's open envelope. The receipt is
+/// left to the case. Returns the envelope.
+std::vector<char> script_followed_delivery(whole_envelope_delivery_fixture& fixture) {
    fixture.attach_opp();
    auto& opp = fixture.opp_script;
    opp.cursor = encode_outbound_cursor_result(std::string(evm_abi_word_hex_chars, '0'), test_cursor_message_end);
@@ -2780,16 +2783,29 @@ std::vector<char> script_finalizing_delivery(whole_envelope_delivery_fixture& fi
    fixture.settle_on(envelope, 1);
    fixture.spill_responses = {encode_dispatch_spill_result(false, 0, false, false),
                               encode_dispatch_spill_result(true, 1, true, true)};
+   return envelope;
+}
+
+/// The `OPPInbound` logs of the call that tips and finalizes `test_wire_epoch` on `envelope`.
+fc::variants finalizing_call_logs(whole_envelope_delivery_fixture& fixture, const std::vector<char>& envelope) {
    const std::string inbound{test_opp_inbound_address};
    const auto        digest = sysio::outpost_ethereum_client_detail::envelope_digest_word(envelope);
-   fixture.receipt_logs     = {fc::variants{
+   return {
       epoch_delivery_log(inbound, test_wire_epoch, fixture.outpost->signer_address_hex(), digest),
       epoch_consensus_log(inbound, test_wire_epoch, digest, test_group_size),
       epoch_complete_log(inbound, test_wire_epoch),
-      outbound_message_receipt_log(test_cursor_message_end + 1, chain_after_second_sample, {0x02, 0x03}),
-      outbound_epoch_finalized_receipt_log(test_wire_epoch, test_cursor_message_end, test_cursor_message_end + 2,
-                                           chain_after_second_sample),
-   }};
+   };
+}
+
+/// `script_followed_delivery`, with the call emitting a second message (`0x0203`) and finalizing the epoch over
+/// both. Returns the envelope.
+std::vector<char> script_finalizing_delivery(whole_envelope_delivery_fixture& fixture) {
+   auto envelope = script_followed_delivery(fixture);
+   auto logs     = finalizing_call_logs(fixture, envelope);
+   logs.push_back(outbound_message_receipt_log(test_cursor_message_end + 1, chain_after_second_sample, {0x02, 0x03}));
+   logs.push_back(outbound_epoch_finalized_receipt_log(test_wire_epoch, test_cursor_message_end,
+                                                       test_cursor_message_end + 2, chain_after_second_sample));
+   fixture.receipt_logs = {std::move(logs)};
    return envelope;
 }
 
@@ -2835,6 +2851,65 @@ BOOST_AUTO_TEST_CASE(delivery_survives_a_publication_that_fails) try {
    BOOST_CHECK(!tx.empty());
    BOOST_CHECK(fixture->opp_script.publications.empty());
    BOOST_CHECK_EQUAL(fixture->outpost->submissions().size(), 1u);
+} FC_LOG_AND_RETHROW();
+
+/// Messages race the call that finalizes the epoch. One another transaction adds in the call's block, ahead of
+/// it, belongs to the epoch, though the follow job has not reached that block: the relay reads it from the logs,
+/// from the envelope's first-message block through the call's. One added after the call in the same block
+/// belongs to the next envelope and is left out. What decides both is the end the call's receipt reports: the
+/// list published runs from the published cursor to exactly that message, on exactly that hash.
+BOOST_AUTO_TEST_CASE(delivery_publishes_the_messages_the_call_finalized_whatever_raced_it) try {
+   namespace detail    = sysio::outpost_ethereum_client_detail;
+   auto       fixture  = create_whole_envelope_delivery_fixture();
+   const auto envelope = script_followed_delivery(*fixture);
+
+   const uint64_t          c = test_cursor_message_end;
+   const uint64_t          call_block = test_head_block + 1;
+   const std::vector<char> followed{0x01};
+   const std::vector<char> ahead{0x04};
+   const std::vector<char> emitted{0x05};
+   const std::vector<char> after{0x06};
+   const std::string       ahead_hash   = detail::outbound_chain_hash(chain_after_first_sample, {ahead});
+   const std::string       emitted_hash = detail::outbound_chain_hash(ahead_hash, {emitted});
+   const std::string       after_hash   = detail::outbound_chain_hash(emitted_hash, {after});
+   // The call's block, in order: the message added ahead of the call, the one the call emitted, and the one
+   // added after it.
+   fixture->rpc->logs = {
+      outbound_message_log(test_first_message_block, c, chain_after_first_sample, followed),
+      outbound_message_log(call_block, c + 1, ahead_hash, ahead, 1),
+      outbound_message_log(call_block, c + 2, emitted_hash, emitted, 2),
+      outbound_message_log(call_block, c + 3, after_hash, after, 3),
+   };
+   fixture->opp_script.finalized[test_wire_epoch] =
+      encode_finalized_outbound_result(emitted_hash, c + 3, test_finalized_timestamp, test_first_message_block, 0);
+   auto logs = finalizing_call_logs(*fixture, envelope);
+   logs.push_back(outbound_message_receipt_log(c + 2, emitted_hash, emitted));
+   logs.push_back(outbound_epoch_finalized_receipt_log(test_wire_epoch, c, c + 3, emitted_hash));
+   fixture->receipt_logs = {std::move(logs)};
+
+   const auto tx = fixture->outpost->deliver_outbound_envelope(test_wire_epoch, envelope,
+                                                               fc::seconds(test_rpc_deadline_seconds));
+
+   BOOST_CHECK(!tx.empty());
+   const auto& publications = fixture->opp_script.publications;
+   BOOST_REQUIRE_EQUAL(publications.size(), 1u);
+   BOOST_CHECK_EQUAL(publications.front().first, test_wire_epoch);
+   BOOST_REQUIRE_EQUAL(publications.front().second.size(), 3u);
+   BOOST_CHECK_EQUAL(fc::to_lower(publications.front().second[0]), "01");
+   BOOST_CHECK_EQUAL(fc::to_lower(publications.front().second[1]), "04");
+   BOOST_CHECK_EQUAL(fc::to_lower(publications.front().second[2]), "05");
+
+   // The follow job's read, then the one read that filled the gap.
+   const auto& filters = fixture->rpc->log_filters;
+   BOOST_REQUIRE_EQUAL(filters.size(), 2u);
+   BOOST_CHECK_EQUAL(filters[1]["fromBlock"].as_string(), pinned_block_hex(test_first_message_block));
+   BOOST_CHECK_EQUAL(filters[1]["toBlock"].as_string(), pinned_block_hex(call_block));
+
+   const auto submissions = fixture->outpost->submissions();
+   BOOST_REQUIRE_EQUAL(submissions.size(), 2u);
+   BOOST_CHECK(submissions[1].purpose == sysio::submission_purpose::publish);
+   BOOST_CHECK_EQUAL(submissions[1].transaction.nonce.convert_to<uint64_t>(),
+                     submissions[0].transaction.nonce.convert_to<uint64_t>() + 1);
 } FC_LOG_AND_RETHROW();
 
 /// A continuation is sent only with the bytes consensus settled on: an
