@@ -1417,6 +1417,10 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
    // pending, nothing is sent.
    const std::unique_lock journal_lock(_entry->submissions->mutex);
    const auto             journal_landed_at = settle_submissions(deadline_abs);
+   // The job has moved past every earlier epoch: their envelopes reached the
+   // depot, and one this relay finalized but did not publish is the read
+   // path's to publish.
+   std::erase_if(_finalized_here, [&](const auto& entry) { return entry.first < epoch_index; });
 
    // Each call is funded to what it has left to carry (`delivery_gas_budget`),
    // never to a fixed figure: the attestations the outpost's cursor says are
@@ -1480,6 +1484,7 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
                    "confirmation; checking again next tick",
                    to_string(), epoch_index);
       }
+      if (_opp_client) publish_settled_finalization(epoch_index, deadline_abs);
       return last_tx;
    };
    for (;;) {
@@ -1650,9 +1655,8 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
            summary.tipped, summary.dispatched ? std::to_string(*summary.dispatched) : "-", summary.finalized);
 
       // The call that finalized the epoch closed its outbound envelope too.
-      // Published now, at the next nonce, it cannot land before this call, and
-      // a reorg that drops this call brings it back after it.
-      if (summary.finalized && _opp_client) publish_after_finalizing(epoch_index, receipt, deadline_abs);
+      // This relay publishes it once that finalization is settled.
+      if (summary.finalized && _opp_client) note_finalizing_call(epoch_index, receipt);
    }
 }
 
@@ -2017,18 +2021,17 @@ uint32_t outpost_ethereum_client::publish_through(uint32_t epoch_index, const fc
    return sent;
 }
 
-void outpost_ethereum_client::publish_after_finalizing(uint32_t epoch_index, const epoch_in_receipt& receipt,
-                                                       fc::time_point deadline_abs) {
+void outpost_ethereum_client::note_finalizing_call(uint32_t epoch_index, const epoch_in_receipt& receipt) {
    try {
       auto [messages, finalized] = receipt_outbound_events(receipt);
       if (!finalized || finalized->epoch_index != epoch_index) {
          wlog("outpost_ethereum_client[{}]: the call that finalized epoch {} carries no {} for it; the read path "
-              "publishes it",
+              "publishes the epoch",
               to_string(), epoch_index, opp_abi_name::event_epoch_finalized);
          return;
       }
       {
-         // The messages the tip itself emitted are in this receipt, possibly
+         // The messages the call itself emitted are in its receipt, possibly
          // before the follow job reaches its block. Ones past where the follow
          // job has read are left to it.
          const std::lock_guard lock(_follow_mutex);
@@ -2036,15 +2039,47 @@ void outpost_ethereum_client::publish_after_finalizing(uint32_t epoch_index, con
             follow_messages(messages);
          }
       }
-      publish_through(epoch_index, receipt.block_number, finalized, deadline_abs);
+      _finalized_here.insert_or_assign(epoch_index, *finalized);
+      dlog("outpost_ethereum_client[{}]: finalized outbound epoch {} through message {} in block {}; publishing it "
+           "once that is settled",
+           to_string(), epoch_index, finalized->end.message_end, receipt.block_number.str());
    } catch (const fc::exception& e) {
-      wlog("outpost_ethereum_client[{}]: publishing outbound epoch {} after finalizing it failed; the read path "
-           "publishes it: {}",
+      wlog("outpost_ethereum_client[{}]: the receipt of the call that finalized epoch {} did not read; the read "
+           "path publishes the epoch: {}",
            to_string(), epoch_index, e.to_detail_string());
-   } catch (const std::exception& e) {
-      wlog("outpost_ethereum_client[{}]: publishing outbound epoch {} after finalizing it failed; the read path "
-           "publishes it: {}",
-           to_string(), epoch_index, e.what());
+   }
+}
+
+void outpost_ethereum_client::publish_settled_finalization(uint32_t epoch_index, fc::time_point deadline_abs) {
+   const auto noted = _finalized_here.find(epoch_index);
+   if (noted == _finalized_here.end()) return;
+   try {
+      const auto settled = read_finalized_outbound(epoch_index, read_settled_block());
+      if (!settled) {
+         dlog("outpost_ethereum_client[{}]: the finalization of outbound epoch {} is not settled yet; publishing "
+              "it next tick",
+              to_string(), epoch_index);
+         return;
+      }
+      const auto& mine = noted->second;
+      if (settled->end.chain_hash != mine.end.chain_hash || settled->end.message_end != mine.end.message_end ||
+          settled->timestamp_ms != mine.timestamp_ms) {
+         // A reorg undid this relay's call and the epoch was finalized again:
+         // what is settled is another envelope, and the read path publishes it.
+         wlog("outpost_ethereum_client[{}]: outbound epoch {} settled at message {} ({}, timestamp {}), not where "
+              "this relay's call finalized it; leaving its publication to the read path",
+              to_string(), epoch_index, settled->end.message_end, settled->end.chain_hash, settled->timestamp_ms);
+         _finalized_here.erase(noted);
+         return;
+      }
+      _finalized_here.erase(noted);
+      if (settled->published_block != 0) return;
+      publish_through(epoch_index, _entry->client->get_block_number(), std::nullopt, deadline_abs);
+   } catch (const fc::exception& e) {
+      _finalized_here.erase(epoch_index);
+      wlog("outpost_ethereum_client[{}]: publishing outbound epoch {} once its finalization settled failed; the "
+           "read path publishes it: {}",
+           to_string(), epoch_index, e.to_detail_string());
    }
 }
 

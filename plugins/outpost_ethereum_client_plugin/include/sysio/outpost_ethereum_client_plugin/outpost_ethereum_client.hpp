@@ -2,6 +2,7 @@
 
 #include <atomic>
 #include <cstdint>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <optional>
@@ -488,12 +489,14 @@ public:
    /// every call paid for must move the outpost's cursor, or the next one is
    /// funded higher; a call at the ceiling that moves nothing is reported.
    ///
-   /// The call whose receipt shows the outpost finalizing the epoch is followed
-   /// at once by the publication of the outbound envelope that epoch closed,
-   /// from the followed messages and the receipt's own logs, at the next nonce:
-   /// it cannot land before the call, and a reorg that drops the call brings it
-   /// back after it. A publication that fails is logged and left to the read
-   /// path; it never fails the delivery.
+   /// The relay whose call finalized the epoch publishes the outbound envelope
+   /// that call closed, once the finalization is as deep as the read
+   /// confirmation: the envelope is fixed then, and no reorg the relay is
+   /// configured to survive can turn the publication into a revert. The job
+   /// calls again every tick until the depot holds the envelope, so a later
+   /// tick publishes what an earlier one could not. A finalization that settles
+   /// elsewhere than this relay's call put it, or a publication that fails, is
+   /// logged and left to the read path; neither fails the delivery.
    ///
    /// @return The last transaction hash sent, or EMPTY when nothing was sent
    ///         because the outpost had already finalized the epoch or there is
@@ -722,10 +725,16 @@ private:
    epoch_in_receipt send_publication(uint32_t epoch_index, const std::vector<std::vector<char>>& messages,
                                      fc::time_point deadline_abs);
 
-   /// After a call whose receipt shows the epoch finalized: follow the receipt's messages and publish through
-   /// `epoch_index` at the receipt's block. A failure is logged, never thrown. Caller holds the signer journal's
-   /// mutex.
-   void publish_after_finalizing(uint32_t epoch_index, const epoch_in_receipt& receipt, fc::time_point deadline_abs);
+   /// After a call whose receipt shows the epoch finalized: follow the messages the call emitted, and note the
+   /// finalization for `publish_settled_finalization`. A failure is logged, never thrown. Caller holds the signer
+   /// journal's mutex.
+   void note_finalizing_call(uint32_t epoch_index, const epoch_in_receipt& receipt);
+
+   /// Publish `epoch_index` if this relay's call finalized it and that finalization is now settled, i.e. the
+   /// record at the read confirmation is the one the call's receipt reported. A record not yet settled keeps the
+   /// note for a later tick; one that differs (a reorg undid the call) or a publication that fails drops it, and
+   /// the read path publishes the epoch. Never throws. Caller holds the signer journal's mutex.
+   void publish_settled_finalization(uint32_t epoch_index, fc::time_point deadline_abs);
 
    /// The block the reads of what the outpost emitted are made at, from the
    /// client's `read_confirmation`. Across a reorg deeper than the shallower of
@@ -757,6 +766,9 @@ private:
    /// error is reported once and repeats stay at debug level until the cursor
    /// moves.
    std::optional<std::pair<uint32_t, uint16_t>>           _reported_stall;
+   /// The epochs this relay's calls finalized and has yet to publish, with what each call's receipt reported.
+   /// Guarded by the signer journal's mutex, which every delivery holds.
+   std::map<uint32_t, outpost_ethereum_client_detail::finalized_epoch_event> _finalized_here;
    /// Serializes the followed-message cache between the follow job and the delivery and read paths.
    std::mutex                                             _follow_mutex;
    /// The outbound messages followed past the published cursor; see `follow_outpost`.

@@ -2811,18 +2811,42 @@ std::vector<char> script_finalizing_delivery(whole_envelope_delivery_fixture& fi
 
 } // namespace
 
-/// The call that finalizes an epoch is followed, at the next nonce, by the publication of the outbound envelope
-/// it closed: from the message followed before it and the one the call emitted, read from its receipt, with no
-/// logs read for it.
-BOOST_AUTO_TEST_CASE(delivery_publishes_the_envelope_its_call_finalized) try {
+namespace {
+
+/// A tick later than the call's: the head past the call's block, and the call's finalization settled at the
+/// read confirmation, as `finalized_end` with `test_finalized_timestamp`.
+void settle_finalization(whole_envelope_delivery_fixture& fixture, std::string_view finalized_end, uint64_t message_end,
+                         uint64_t timestamp_ms = test_finalized_timestamp) {
+   constexpr uint64_t blocks_past_the_call = 3;
+   fixture.rpc->head_block = fc::uint256{test_head_block + blocks_past_the_call};
+   fixture.opp_script.finalized[test_wire_epoch] = encode_finalized_outbound_result(
+      finalized_end, message_end, timestamp_ms, test_first_message_block, 0);
+}
+
+/// One delivery tick for `envelope`.
+std::string deliver_tick(whole_envelope_delivery_fixture& fixture, const std::vector<char>& envelope) {
+   return fixture.outpost->deliver_outbound_envelope(test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds));
+}
+
+} // namespace
+
+/// The relay whose call finalized the epoch publishes the envelope that call closed once the finalization is
+/// settled: not in the call's tick, which only notes it, but in the first tick that finds the outpost's record at
+/// the read confirmation to be the one the call's receipt reported. The messages come from the follow job and
+/// the call's receipt, with no logs read, and the publication is journaled behind the call.
+BOOST_AUTO_TEST_CASE(delivery_publishes_the_envelope_its_call_finalized_once_that_settles) try {
    auto       fixture  = create_whole_envelope_delivery_fixture();
    const auto envelope = script_finalizing_delivery(*fixture);
-
-   const auto tx = fixture->outpost->deliver_outbound_envelope(test_wire_epoch, envelope,
-                                                               fc::seconds(test_rpc_deadline_seconds));
-
-   BOOST_CHECK(!tx.empty());
    const auto& publications = fixture->opp_script.publications;
+
+   BOOST_CHECK(!deliver_tick(*fixture, envelope).empty());
+   BOOST_CHECK(publications.empty());   // Finalized at the head, not settled.
+   BOOST_CHECK(deliver_tick(*fixture, envelope).empty());
+   BOOST_CHECK(publications.empty());
+
+   settle_finalization(*fixture, chain_after_second_sample, test_cursor_message_end + 2);
+   BOOST_CHECK(deliver_tick(*fixture, envelope).empty());
+
    BOOST_REQUIRE_EQUAL(publications.size(), 1u);
    BOOST_CHECK_EQUAL(publications.front().first, test_wire_epoch);
    BOOST_REQUIRE_EQUAL(publications.front().second.size(), 2u);
@@ -2835,29 +2859,63 @@ BOOST_AUTO_TEST_CASE(delivery_publishes_the_envelope_its_call_finalized) try {
    BOOST_CHECK(submissions[0].purpose == sysio::submission_purpose::epoch_in);
    BOOST_CHECK(submissions[1].purpose == sysio::submission_purpose::publish);
    BOOST_CHECK_EQUAL(submissions[1].epoch_index, test_wire_epoch);
-   BOOST_CHECK_EQUAL(submissions[1].transaction.nonce.convert_to<uint64_t>(),
-                     submissions[0].transaction.nonce.convert_to<uint64_t>() + 1);
+
+   // Published once: a later tick sends nothing more.
+   deliver_tick(*fixture, envelope);
+   BOOST_CHECK_EQUAL(publications.size(), 1u);
 } FC_LOG_AND_RETHROW();
 
-/// A publication that fails never fails the delivery that finalized its epoch: the read path publishes it.
+/// A finalization that settles elsewhere than this relay's call put it (a reorg undid the call and the epoch was
+/// finalized again, in another block, with another timestamp) is not this relay's to publish: what it noted is
+/// dropped and the read path publishes the settled envelope.
+BOOST_AUTO_TEST_CASE(delivery_leaves_a_finalization_a_reorg_replaced_to_the_read_path) try {
+   constexpr uint64_t refinalized_later_ms = 12'000;
+   auto       fixture  = create_whole_envelope_delivery_fixture();
+   const auto envelope = script_finalizing_delivery(*fixture);
+   deliver_tick(*fixture, envelope);
+
+   settle_finalization(*fixture, chain_after_second_sample, test_cursor_message_end + 2,
+                       test_finalized_timestamp + refinalized_later_ms);
+   deliver_tick(*fixture, envelope);
+   BOOST_CHECK(fixture->opp_script.publications.empty());
+
+   // Settling as the call reported it afterwards changes nothing: the note is gone.
+   settle_finalization(*fixture, chain_after_second_sample, test_cursor_message_end + 2);
+   deliver_tick(*fixture, envelope);
+   BOOST_CHECK(fixture->opp_script.publications.empty());
+} FC_LOG_AND_RETHROW();
+
+/// Only the relay whose call finalized the epoch publishes from the delivery path. One that found the epoch
+/// already finalized leaves the publication to the read path, so the group does not race to pay for it.
+BOOST_AUTO_TEST_CASE(delivery_does_not_publish_an_epoch_another_relay_finalized) try {
+   auto       fixture  = create_whole_envelope_delivery_fixture();
+   const auto envelope = script_followed_delivery(*fixture);
+   fixture->spill_responses = {encode_dispatch_spill_result(true, 1, true, true)};
+   settle_finalization(*fixture, chain_after_first_sample, test_cursor_message_end + 1);
+
+   BOOST_CHECK(deliver_tick(*fixture, envelope).empty());
+   BOOST_CHECK(fixture->delivery_calls.empty());
+   BOOST_CHECK(fixture->opp_script.publications.empty());
+} FC_LOG_AND_RETHROW();
+
+/// A publication that fails never fails the delivery: the read path publishes the epoch.
 BOOST_AUTO_TEST_CASE(delivery_survives_a_publication_that_fails) try {
    auto       fixture  = create_whole_envelope_delivery_fixture();
    const auto envelope = script_finalizing_delivery(*fixture);
    fixture->opp_script.publication_refusal = epoch_in_refusal(non_sequential_epoch_selector, 2);
+   deliver_tick(*fixture, envelope);
+   settle_finalization(*fixture, chain_after_second_sample, test_cursor_message_end + 2);
 
-   const auto tx = fixture->outpost->deliver_outbound_envelope(test_wire_epoch, envelope,
-                                                               fc::seconds(test_rpc_deadline_seconds));
-
-   BOOST_CHECK(!tx.empty());
+   BOOST_CHECK_NO_THROW(deliver_tick(*fixture, envelope));
    BOOST_CHECK(fixture->opp_script.publications.empty());
    BOOST_CHECK_EQUAL(fixture->outpost->submissions().size(), 1u);
 } FC_LOG_AND_RETHROW();
 
 /// Messages race the call that finalizes the epoch. One another transaction adds in the call's block, ahead of
 /// it, belongs to the epoch, though the follow job has not reached that block: the relay reads it from the logs,
-/// from the envelope's first-message block through the call's. One added after the call in the same block
-/// belongs to the next envelope and is left out. What decides both is the end the call's receipt reports: the
-/// list published runs from the published cursor to exactly that message, on exactly that hash.
+/// from the envelope's first-message block on. One added after the call in the same block belongs to the next
+/// envelope and is left out. What decides both is the end the call's finalization settled at: the list published
+/// runs from the published cursor to exactly that message, on exactly that hash.
 BOOST_AUTO_TEST_CASE(delivery_publishes_the_messages_the_call_finalized_whatever_raced_it) try {
    namespace detail    = sysio::outpost_ethereum_client_detail;
    auto       fixture  = create_whole_envelope_delivery_fixture();
@@ -2880,17 +2938,15 @@ BOOST_AUTO_TEST_CASE(delivery_publishes_the_messages_the_call_finalized_whatever
       outbound_message_log(call_block, c + 2, emitted_hash, emitted, 2),
       outbound_message_log(call_block, c + 3, after_hash, after, 3),
    };
-   fixture->opp_script.finalized[test_wire_epoch] =
-      encode_finalized_outbound_result(emitted_hash, c + 3, test_finalized_timestamp, test_first_message_block, 0);
    auto logs = finalizing_call_logs(*fixture, envelope);
    logs.push_back(outbound_message_receipt_log(c + 2, emitted_hash, emitted));
    logs.push_back(outbound_epoch_finalized_receipt_log(test_wire_epoch, c, c + 3, emitted_hash));
    fixture->receipt_logs = {std::move(logs)};
 
-   const auto tx = fixture->outpost->deliver_outbound_envelope(test_wire_epoch, envelope,
-                                                               fc::seconds(test_rpc_deadline_seconds));
+   BOOST_CHECK(!deliver_tick(*fixture, envelope).empty());
+   settle_finalization(*fixture, emitted_hash, c + 3);
+   deliver_tick(*fixture, envelope);
 
-   BOOST_CHECK(!tx.empty());
    const auto& publications = fixture->opp_script.publications;
    BOOST_REQUIRE_EQUAL(publications.size(), 1u);
    BOOST_CHECK_EQUAL(publications.front().first, test_wire_epoch);
@@ -2903,13 +2959,7 @@ BOOST_AUTO_TEST_CASE(delivery_publishes_the_messages_the_call_finalized_whatever
    const auto& filters = fixture->rpc->log_filters;
    BOOST_REQUIRE_EQUAL(filters.size(), 2u);
    BOOST_CHECK_EQUAL(filters[1]["fromBlock"].as_string(), pinned_block_hex(test_first_message_block));
-   BOOST_CHECK_EQUAL(filters[1]["toBlock"].as_string(), pinned_block_hex(call_block));
-
-   const auto submissions = fixture->outpost->submissions();
-   BOOST_REQUIRE_EQUAL(submissions.size(), 2u);
-   BOOST_CHECK(submissions[1].purpose == sysio::submission_purpose::publish);
-   BOOST_CHECK_EQUAL(submissions[1].transaction.nonce.convert_to<uint64_t>(),
-                     submissions[0].transaction.nonce.convert_to<uint64_t>() + 1);
+   BOOST_CHECK_EQUAL(filters[1]["toBlock"].as_string(), pinned_block_hex(fixture->rpc->head_block.convert_to<uint64_t>()));
 } FC_LOG_AND_RETHROW();
 
 /// A continuation is sent only with the bytes consensus settled on: an

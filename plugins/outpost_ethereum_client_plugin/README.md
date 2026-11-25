@@ -267,11 +267,15 @@ starts from the outpost's state at the head: the published cursor, and the block
 rescans exactly the pending messages. A message that does not follow from what the cache holds (a reorg, or a
 node that skipped a log) clears it, and the next follow starts again.
 
-**Publishing.** The `epochIn` whose receipt shows the outpost finalizing the epoch is followed at once by
-`publishOutboundEnvelope` for the envelope it closed, from the cache and the messages in that receipt, at the next
-nonce: it cannot land before the call, and a reorg that drops the call brings it back after it. Publications go
-through the signer's journal (`submission_purpose::publish`) like `epochIn`, so they are repriced, replaced and
-settled the same way. A publication that cannot be made then is left to the read path.
+**Publishing.** The relay whose `epochIn` finalized the epoch publishes the envelope that call closed, once the
+finalization is as deep as the read confirmation, i.e. once `getFinalizedOutbound(epoch)` there is the record the
+call's receipt reported. The envelope is fixed then, and no reorg inside the window can turn the publication into
+a revert. The call's tick only notes it, and follows the messages the call emitted from its receipt; the job calls
+again every tick until the depot holds the envelope, and the first tick that finds the finalization settled
+publishes it from the cache (or the logs from the envelope's first-message block). A finalization that settles
+elsewhere than the call put it (a reorg undid the call) is dropped, and the read path publishes the settled one.
+Publications go through the signer's journal (`submission_purpose::publish`) like `epochIn`, so they are repriced,
+replaced and settled the same way; one that fails is left to the read path and never fails the delivery.
 
 **Reading.** `read_inbound_envelope` reads `getFinalizedOutbound(epoch)` at the client's **read confirmation**,
 never at the head. That record fixes the envelope: its end on the chain, its message count and its timestamp,
