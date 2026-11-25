@@ -6,9 +6,9 @@ OPP envelope dispute resolution and slash-execution contract.
 
 - Resolves conflicting OPP outpost envelopes via a Tier-1 node-owner vote when the automatic
   consensus rules in `sysio.msgch` see a split for one (outpost, epoch) in which no delivered version
-  can still reach a strict majority of the eligible group with the eligible operators still silent, or
-  a split of at least two versions, with fewer than a majority silent, that has seen no eligible delivery
-  for the epoch's idle dispute fallback.
+  can still reach a strict majority of the eligible group with the eligible operators still silent. A
+  split that a silent operator can still decide is not disputed: it waits for that operator, or for
+  governance.
 - Pauses the disputed chain's epoch advancement while its dispute is open and releases it on
   resolution; other chains keep advancing
 - Dispatches the winning envelope (via `sysio.msgch::resolvedisp`) once a checksum wins
@@ -35,10 +35,8 @@ OPP envelope dispute resolution and slash-execution contract.
 
 1. **Open**: `sysio.msgch::evalcons` calls `opendispute` inline, for an epoch that has not reached
    consensus, on the evaluation at which no delivered version can still reach a strict majority of
-   the eligible group with the eligible operators still silent (so at least two versions), or on the
-   first evaluation at or past the epoch's idle dispute fallback with at least two versions and fewer
-   than a majority silent. The
-   dispute records the candidate checksums, snapshots the active ROA generation's Tier-1 electorate
+   the eligible group with the eligible operators still silent (so at least two versions). The dispute
+   records the candidate checksums, snapshots the active ROA generation's Tier-1 electorate
    and fixed quorum, and pauses the disputed chain's `sysio.epoch` advancement; other chains keep
    advancing.
 2. **Vote**: owners in the dispute's frozen Tier-1 electorate call `votedispute` with one of the

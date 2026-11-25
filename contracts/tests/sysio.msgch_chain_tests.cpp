@@ -82,10 +82,6 @@ constexpr std::string_view THREE_TO_THREE_RIGHT_PAYLOAD = "three-to-three-right"
 constexpr uint32_t INBOUND_ENVELOPE_RETENTION_EPOCHS = 2;
 constexpr uint32_t ENVELOPE_PRUNE_BUDGET             = 4;
 
-/// Mirror of `msgch::DISPUTE_FALLBACK_EPOCHS`: epoch durations of no eligible delivery after which a split is
-/// disputed without its silent minority.
-constexpr uint32_t DISPUTE_FALLBACK_EPOCHS = 3;
-
 /// Unbonded registrations the roster tests add: `UNBONDED_REGISTRANT_PREFIX` plus one letter each.
 constexpr std::string_view UNBONDED_REGISTRANT_PREFIX = "rosterop.";
 constexpr uint32_t         UNBONDED_REGISTRANTS       = 16;
@@ -1689,31 +1685,6 @@ public:
          produce_block(skip);
       }
       BOOST_REQUIRE(control->pending_block_time() == target);
-   }
-
-   /// `DISPUTE_FALLBACK_EPOCHS` of `duration_sec` after `since`.
-   static fc::time_point dispute_fallback_after(fc::time_point since, uint32_t duration_sec = EPOCH_DURATION_SEC) {
-      return since + fc::seconds(int64_t{DISPUTE_FALLBACK_EPOCHS} * duration_sec);
-   }
-
-   /// `chain_code`'s current epoch start plus the dispute fallback: when the idle fallback would fire with no
-   /// delivery at all.
-   fc::time_point epoch_start_dispute_fallback(uint64_t chain_code) {
-      const fc::variant state = read_epoch_state(chain_code);
-      return dispute_fallback_after(state[epoch_fields::CURRENT_EPOCH_START].as<fc::time_point>());
-   }
-
-   /// When `chain_code`'s undecided epoch `epoch_index` reaches its idle dispute fallback: the later of its
-   /// start and its newest delivery's `received_at`, plus the fallback. Every delivery the callers make is
-   /// from an eligible member.
-   fc::time_point idle_dispute_fallback(uint64_t chain_code, uint32_t epoch_index) {
-      fc::time_point idle_since = read_epoch_state(chain_code)[epoch_fields::CURRENT_EPOCH_START].as<fc::time_point>();
-      for (const auto& row : envelope_rows()) {
-         if (row[msgch_fields::CHAIN_CODE].as_uint64() != chain_code ||
-             row[msgch_fields::EPOCH_INDEX].as<uint32_t>() != epoch_index) continue;
-         idle_since = std::max(idle_since, row[msgch_fields::RECEIVED_AT].as<fc::time_point>());
-      }
-      return dispute_fallback_after(idle_since);
    }
 
    /// Slash `account` through sysio.opreg, as sysio.chalg does: it leaves the eligible set mid-epoch.
@@ -3557,39 +3528,37 @@ BOOST_FIXTURE_TEST_CASE(disjoint_previous_group_member_delivers_only_late, sysio
 } FC_LOG_AND_RETHROW() }
 
 /// A previous epoch decided by dispute resolution takes a late delivery of the voted winner from the member that
-/// stayed silent through the dispute, and refuses the losing version; the advance after the next records it as
-/// delivered.
+/// stayed silent through the dispute, and refuses a losing version; the advance after the next records it as
+/// delivered. Four versions of five leave the silent member unable to lift any to three, so the fourth delivery
+/// opens the dispute.
 BOOST_FIXTURE_TEST_CASE(late_delivery_repeats_a_winner_resolved_by_dispute, sysio_msgch_chain_tester) { try {
-   const std::vector<std::vector<name>> window = bootstrap_disjoint_groups();
-   const std::vector<name>&             first  = window[0];
-   const name                           late   = first[2];
-   const uint32_t                       epoch  = current_epoch();
-   const std::vector<char>              voted  = encode_delivery(epoch, "dispute-voted");
-   const std::vector<char>              lost   = encode_delivery(epoch, "dispute-lost");
-   const fc::sha256 voted_checksum = fc::sha256::hash(voted.data(), voted.size());
-   deliver_all({first[0]}, voted);
-   deliver_all({first[1]}, lost);
-   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
+   constexpr uint32_t kGroupSize = 5;
+   bootstrap(kGroupSize);
+   const name              late   = BATCHOP_E;
+   const std::vector<name> losers{BATCHOP_B, BATCHOP_C, BATCHOP_D};
+   const uint32_t          epoch  = current_epoch();
+   const std::vector<char> voted  = encode_delivery(epoch, "dispute-voted");
+   const fc::sha256        voted_checksum = fc::sha256::hash(voted.data(), voted.size());
+   std::vector<std::vector<char>> lost;
+   for (const name loser : losers) lost.push_back(encode_delivery(epoch, "dispute-lost-" + loser.to_string()));
 
-   // One silent member could still make either version a majority: the idle fallback opens the dispute.
-   open_block_at(idle_dispute_fallback(ETH_OUTPOST_ID, epoch));
-   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID));
-   produce_blocks();
+   deliver_all({BATCHOP}, voted);
+   for (size_t i = 0; i < losers.size(); ++i) deliver_all({losers[i]}, lost[i]);
    BOOST_REQUIRE(epoch_is_paused());
    resolve_tie_dispute(epoch, voted_checksum);
    produce_blocks();
-   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED, operator_status(first[1]));
-   mark_chain_traffic();
-   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID));
-   produce_blocks();
-   BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
-
-   BOOST_REQUIRE_EQUAL(error(LATE_DELIVERY_DIFFERING_ERROR), deliver_as(late, ETH_OUTPOST_ID, lost));
-   BOOST_REQUIRE_EQUAL(success(), deliver_as(late, ETH_OUTPOST_ID, voted));
-   const std::vector<char> current = encode_chained_delivery("dispute-next", next_stream_tip(voted));
-   deliver_all({window[1][0], window[1][1]}, current);
+   for (const name loser : losers) {
+      BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED, operator_status(loser));
+   }
    advance_decided_epoch();
-   for (const name member : first) require_booked(member, epoch, true);
+
+   BOOST_REQUIRE_EQUAL(error(LATE_DELIVERY_DIFFERING_ERROR), deliver_as(late, ETH_OUTPOST_ID, lost.front()));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(late, ETH_OUTPOST_ID, voted));
+   // The next group is drawn from the members left ACTIVE.
+   const std::vector<char> current = encode_chained_delivery("dispute-next", next_stream_tip(voted));
+   deliver_all({BATCHOP, late}, current);
+   advance_decided_epoch();
+   for (const name member : {BATCHOP, BATCHOP_B, BATCHOP_C, BATCHOP_D, late}) require_booked(member, epoch, true);
    BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(late));
 } FC_LOG_AND_RETHROW() }
 
@@ -4267,118 +4236,24 @@ BOOST_FIXTURE_TEST_CASE(ineligible_delivery_is_not_a_dispute_candidate, sysio_ms
    BOOST_REQUIRE(!find_inbound_delivery(ETH_OUTPOST_ID, epoch, BATCHOP).is_null());
 } FC_LOG_AND_RETHROW() }
 
-/// A split that a silent minority keeps open waits until the epoch has been idle for the fallback: three
-/// durations after its LAST eligible delivery. 3-2-1 of seven with one silent can still reach four; the last
-/// delivery lands later than the rest, so the chkcons re-tally at three durations after the epoch's start
-/// and one block before three durations after that delivery both wait, and the one at the fallback opens
-/// the dispute with all three versions.
-BOOST_FIXTURE_TEST_CASE(split_kept_open_by_a_silent_member_disputes_once_idle, sysio_msgch_chain_tester) { try {
-   constexpr uint32_t     kFirstCount       = 3;
-   constexpr uint32_t     kSecondCount      = 2;
-   constexpr uint32_t     kThirdCount       = 1;
-   constexpr int64_t      kLastDeliveryLagS = 10;
-   const fc::microseconds kBlockInterval    = fc::milliseconds(config::block_interval_ms);
+/// A split that a silent member can still decide waits for that member, however long it stays silent. 3-2-1 of
+/// seven, with one member silent, can still reach four: the chkcons re-tally many minimums later opens no dispute
+/// and leaves the epoch undecided and unpaused, and the silent member's delivery of the leading version decides it.
+BOOST_FIXTURE_TEST_CASE(split_kept_open_by_a_silent_member_waits_for_its_delivery, sysio_msgch_chain_tester) { try {
+   constexpr int64_t kMinimumsSilent = 10;
    bootstrap(MAXIMUM_GROUP_SIZE);
 
    const uint32_t          epoch  = current_epoch();
-   const std::vector<char> first  = encode_delivery(epoch, "idle-first");
-   const std::vector<char> second = encode_delivery(epoch, "idle-second");
-   const std::vector<char> third  = encode_delivery(epoch, "idle-third");
-
+   const std::vector<char> first  = encode_delivery(epoch, "silent-first");
+   const std::vector<char> second = encode_delivery(epoch, "silent-second");
+   const std::vector<char> third  = encode_delivery(epoch, "silent-third");
    for (const name op : {BATCHOP, BATCHOP_B, BATCHOP_C}) {
       BOOST_REQUIRE_EQUAL(success(), deliver_as(op, ETH_OUTPOST_ID, first));
    }
    for (const name op : {BATCHOP_D, BATCHOP_E}) BOOST_REQUIRE_EQUAL(success(), deliver_as(op, ETH_OUTPOST_ID, second));
-   open_block_at(control->head().block_time() + fc::seconds(kLastDeliveryLagS));
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_F, ETH_OUTPOST_ID, third));
-   produce_blocks();
-   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
 
-   const fc::time_point fallback = idle_dispute_fallback(ETH_OUTPOST_ID, epoch);
-   BOOST_REQUIRE(fallback > epoch_start_dispute_fallback(ETH_OUTPOST_ID));
-   for (const fc::time_point early : {epoch_start_dispute_fallback(ETH_OUTPOST_ID), fallback - kBlockInterval}) {
-      open_block_at(early);
-      const transaction_trace_ptr trace = check_consensus_trace(ETH_OUTPOST_ID, BATCHOP);
-      BOOST_REQUIRE_EQUAL(1u, action_count(trace, MSGCH_ACCOUNT, msgch_actions::EVALUATE_CONSENSUS));
-      BOOST_REQUIRE_EQUAL(0u, action_count(trace, CHALG_ACCOUNT, chalg_actions::OPEN_DISPUTE));
-   }
-   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
-   BOOST_REQUIRE(!epoch_is_paused());
-
-   open_block_at(fallback);
-   const transaction_trace_ptr trace = check_consensus_trace(ETH_OUTPOST_ID, BATCHOP);
-   BOOST_REQUIRE_EQUAL(1u, action_count(trace, CHALG_ACCOUNT, chalg_actions::OPEN_DISPUTE));
-   produce_blocks();
-   assert_open_tie_dispute(epoch,
-                           {fc::sha256::hash(first.data(), first.size()),
-                            fc::sha256::hash(second.data(), second.size()),
-                            fc::sha256::hash(third.data(), third.size())},
-                           {kFirstCount, kSecondCount, kThirdCount});
-   BOOST_REQUIRE(epoch_is_paused());
-   BOOST_REQUIRE(!epoch_decided(ETH_OUTPOST_ID, epoch));
-} FC_LOG_AND_RETHROW() }
-
-/// Each eligible delivery restarts the idle timer. 3-2 of seven, two silent, would dispute at its idle
-/// fallback; a sixth delivery one block before it makes 3-2-1 and restarts the timer, so the re-tally at the
-/// old fallback waits and the dispute opens only three durations after that delivery.
-BOOST_FIXTURE_TEST_CASE(a_later_delivery_restarts_the_idle_dispute_timer, sysio_msgch_chain_tester) { try {
-   constexpr uint32_t     kFirstCount    = 3;
-   constexpr uint32_t     kSecondCount   = 2;
-   constexpr uint32_t     kThirdCount    = 1;
-   const fc::microseconds kBlockInterval = fc::milliseconds(config::block_interval_ms);
-   bootstrap(MAXIMUM_GROUP_SIZE);
-
-   const uint32_t          epoch  = current_epoch();
-   const std::vector<char> first  = encode_delivery(epoch, "restart-first");
-   const std::vector<char> second = encode_delivery(epoch, "restart-second");
-   const std::vector<char> third  = encode_delivery(epoch, "restart-third");
-
-   for (const name op : {BATCHOP, BATCHOP_B, BATCHOP_C}) {
-      BOOST_REQUIRE_EQUAL(success(), deliver_as(op, ETH_OUTPOST_ID, first));
-   }
-   for (const name op : {BATCHOP_D, BATCHOP_E}) BOOST_REQUIRE_EQUAL(success(), deliver_as(op, ETH_OUTPOST_ID, second));
-   const fc::time_point old_fallback = idle_dispute_fallback(ETH_OUTPOST_ID, epoch);
-
-   open_block_at(old_fallback - kBlockInterval);
-   {
-      const transaction_trace_ptr trace = deliver_trace(BATCHOP_F, ETH_OUTPOST_ID, third);
-      BOOST_REQUIRE_EQUAL(0u, action_count(trace, CHALG_ACCOUNT, chalg_actions::OPEN_DISPUTE));
-   }
-   const fc::time_point renewed_fallback = idle_dispute_fallback(ETH_OUTPOST_ID, epoch);
-   BOOST_REQUIRE(renewed_fallback == old_fallback - kBlockInterval + fc::seconds(int64_t{DISPUTE_FALLBACK_EPOCHS} *
-                                                                                  EPOCH_DURATION_SEC));
-
-   for (const fc::time_point early : {old_fallback, renewed_fallback - kBlockInterval}) {
-      open_block_at(early);
-      const transaction_trace_ptr trace = check_consensus_trace(ETH_OUTPOST_ID, BATCHOP);
-      BOOST_REQUIRE_EQUAL(0u, action_count(trace, CHALG_ACCOUNT, chalg_actions::OPEN_DISPUTE));
-   }
-   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
-
-   open_block_at(renewed_fallback);
-   const transaction_trace_ptr trace = check_consensus_trace(ETH_OUTPOST_ID, BATCHOP);
-   BOOST_REQUIRE_EQUAL(1u, action_count(trace, CHALG_ACCOUNT, chalg_actions::OPEN_DISPUTE));
-   produce_blocks();
-   assert_open_tie_dispute(epoch,
-                           {fc::sha256::hash(first.data(), first.size()),
-                            fc::sha256::hash(second.data(), second.size()),
-                            fc::sha256::hash(third.data(), third.size())},
-                           {kFirstCount, kSecondCount, kThirdCount});
-} FC_LOG_AND_RETHROW() }
-
-/// The idle fallback needs at least two delivered versions: three matching deliveries of seven, one short of
-/// a majority, never open a dispute however late the chkcons re-tally runs.
-BOOST_FIXTURE_TEST_CASE(single_version_never_disputes_however_late, sysio_msgch_chain_tester) { try {
-   constexpr int64_t kEpochsPastFallback = 10;
-   bootstrap(MAXIMUM_GROUP_SIZE);
-
-   const uint32_t          epoch    = current_epoch();
-   const std::vector<char> envelope = encode_delivery(epoch, "single-version");
-   for (const name op : {BATCHOP, BATCHOP_B, BATCHOP_C}) {
-      BOOST_REQUIRE_EQUAL(success(), deliver_as(op, ETH_OUTPOST_ID, envelope));
-   }
-
-   open_block_at(idle_dispute_fallback(ETH_OUTPOST_ID, epoch) + fc::seconds(kEpochsPastFallback * EPOCH_DURATION_SEC));
+   open_block_at(control->head().block_time() + fc::seconds(kMinimumsSilent * EPOCH_DURATION_SEC));
    const transaction_trace_ptr trace = check_consensus_trace(ETH_OUTPOST_ID, BATCHOP);
    BOOST_REQUIRE_EQUAL(1u, action_count(trace, MSGCH_ACCOUNT, msgch_actions::EVALUATE_CONSENSUS));
    BOOST_REQUIRE_EQUAL(0u, action_count(trace, CHALG_ACCOUNT, chalg_actions::OPEN_DISPUTE));
@@ -4386,65 +4261,11 @@ BOOST_FIXTURE_TEST_CASE(single_version_never_disputes_however_late, sysio_msgch_
    BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
    BOOST_REQUIRE(!epoch_is_paused());
    BOOST_REQUIRE(!epoch_decided(ETH_OUTPOST_ID, epoch));
-   BOOST_REQUIRE_EQUAL(epoch, current_epoch());
-} FC_LOG_AND_RETHROW() }
 
-/// A split with at least a majority silent never disputes, the idle fallback included: 1-1 of seven leaves
-/// five silent, and the chkcons re-tally well past the fallback still waits.
-BOOST_FIXTURE_TEST_CASE(split_with_a_silent_majority_never_disputes, sysio_msgch_chain_tester) { try {
-   constexpr int64_t kEpochsPastFallback = 10;
-   bootstrap(MAXIMUM_GROUP_SIZE);
-
-   const uint32_t epoch = current_epoch();
-   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, encode_delivery(epoch, "silent-majority-a")));
-   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, encode_delivery(epoch, "silent-majority-b")));
-
-   open_block_at(idle_dispute_fallback(ETH_OUTPOST_ID, epoch) + fc::seconds(kEpochsPastFallback * EPOCH_DURATION_SEC));
-   const transaction_trace_ptr trace = check_consensus_trace(ETH_OUTPOST_ID, BATCHOP);
-   BOOST_REQUIRE_EQUAL(1u, action_count(trace, MSGCH_ACCOUNT, msgch_actions::EVALUATE_CONSENSUS));
-   BOOST_REQUIRE_EQUAL(0u, action_count(trace, CHALG_ACCOUNT, chalg_actions::OPEN_DISPUTE));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_G, ETH_OUTPOST_ID, first));
    produce_blocks();
+   BOOST_REQUIRE(epoch_decided(ETH_OUTPOST_ID, epoch));
    BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
-   BOOST_REQUIRE(!epoch_is_paused());
-} FC_LOG_AND_RETHROW() }
-
-/// The delivery that makes 3-3 of seven, with one silent, lands at the 3-2 split's idle fallback. It restarts
-/// the timer, so its own transaction opens no dispute; the chkcons re-tally three durations after it does.
-BOOST_FIXTURE_TEST_CASE(three_three_split_of_seven_disputes_once_idle_after_its_last_delivery,
-                        sysio_msgch_chain_tester) { try {
-   const fc::microseconds kBlockInterval = fc::milliseconds(config::block_interval_ms);
-   bootstrap(MAXIMUM_GROUP_SIZE);
-
-   const uint32_t          epoch = current_epoch();
-   const std::vector<char> left  = encode_delivery(epoch, "idle-left");
-   const std::vector<char> right = encode_delivery(epoch, "idle-right");
-
-   for (const name op : {BATCHOP, BATCHOP_B, BATCHOP_C}) {
-      BOOST_REQUIRE_EQUAL(success(), deliver_as(op, ETH_OUTPOST_ID, left));
-   }
-   for (const name op : {BATCHOP_D, BATCHOP_E}) BOOST_REQUIRE_EQUAL(success(), deliver_as(op, ETH_OUTPOST_ID, right));
-
-   open_block_at(idle_dispute_fallback(ETH_OUTPOST_ID, epoch));
-   {
-      const transaction_trace_ptr trace = deliver_trace(BATCHOP_F, ETH_OUTPOST_ID, right);
-      BOOST_REQUIRE_EQUAL(1u, action_count(trace, MSGCH_ACCOUNT, msgch_actions::EVALUATE_CONSENSUS));
-      BOOST_REQUIRE_EQUAL(0u, action_count(trace, CHALG_ACCOUNT, chalg_actions::OPEN_DISPUTE));
-   }
-   const fc::time_point fallback = idle_dispute_fallback(ETH_OUTPOST_ID, epoch);
-
-   open_block_at(fallback - kBlockInterval);
-   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP));
-   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
-
-   open_block_at(fallback);
-   const transaction_trace_ptr trace = check_consensus_trace(ETH_OUTPOST_ID, BATCHOP);
-   BOOST_REQUIRE_EQUAL(1u, action_count(trace, CHALG_ACCOUNT, chalg_actions::OPEN_DISPUTE));
-   produce_blocks();
-   assert_open_tie_dispute(epoch,
-                           {fc::sha256::hash(left.data(), left.size()),
-                            fc::sha256::hash(right.data(), right.size())},
-                           {THREE_OPERATORS_PER_TIED_VERSION, THREE_OPERATORS_PER_TIED_VERSION});
-   BOOST_REQUIRE(epoch_is_paused());
 } FC_LOG_AND_RETHROW() }
 
 /// A 1-1 split with one silent eligible operator is not terminal. The chkcons re-tally leaves it

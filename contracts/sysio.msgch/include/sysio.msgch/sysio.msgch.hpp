@@ -49,13 +49,6 @@ namespace sysio {
       static constexpr size_t MAX_ENVELOPE_ATTESTATIONS = 64;
 
       // -----------------------------------------------------------------------
-      //  Consensus
-      // -----------------------------------------------------------------------
-
-      /// Epoch durations of no eligible delivery after which a split is disputed without its silent minority.
-      static constexpr uint32_t DISPUTE_FALLBACK_EPOCHS = 3;
-
-      // -----------------------------------------------------------------------
       //  Outbound queue
       // -----------------------------------------------------------------------
 
@@ -144,13 +137,10 @@ namespace sysio {
       /// unpacks the envelope, stores messages + attestations, records
       /// per-outpost consensus, and slashes through `sysio.chalg::slashop` every
       /// operator whose delivery for the epoch differs from the winner. Without
-      /// one, with at least two delivered versions and fewer than a majority of
-      /// the eligible members still silent, a
-      /// `sysio.chalg` dispute opens once no version can still reach a majority
-      /// with the silent members, or once the epoch has been idle for
-      /// `DISPUTE_FALLBACK_EPOCHS` of the chain's configured durations: since the
-      /// later of its start and its newest eligible delivery, each delivery
-      /// restarting the timer. The silent minority then counts as absent.
+      /// one, with at least two delivered versions, a `sysio.chalg` dispute opens
+      /// once no version can still reach a majority with the members still silent.
+      /// A split that a silent member can still decide waits for its delivery, or
+      /// for governance.
       ///
       /// `chain_code` is the originating chain's slug_name value
       /// (see `deliver` for the convention). No effect before the chain's
@@ -164,7 +154,7 @@ namespace sysio {
 
       /// Permissionless crank for outpost `chain_code`'s current epoch, held while a dispute is open
       /// on it. An undecided epoch is re-tallied (`evalcons` inline, at any time), since its eligible
-      /// group can shrink with no new delivery and its idle dispute fallback can pass. A decided epoch
+      /// group can shrink with no new delivery. A decided epoch
       /// advances once the chain is due (`sysio.epoch` `advance_due`: it has traffic and its minimum
       /// duration has passed since the later of its epoch start and that traffic); an idle chain stays in
       /// its decided epoch. No effect before the chain's genesis advance, which only `bootstrap` /

@@ -168,16 +168,10 @@ constexpr const char* DISPUTE_TOO_FEW_CANDIDATES_LOG =
    "msgch::maybe_open_dispute: no dispute for (chain=%llu, epoch=%u): "
    "%u distinct version(s), a vote needs >=%u\n";
 
-/// Diagnostic for a split while at least a majority of the eligible members is still silent.
-constexpr const char* DISPUTE_MAJORITY_SILENT_LOG =
-   "msgch::maybe_open_dispute: no dispute for (chain=%llu, epoch=%u): "
-   "%u silent, at least the majority %u of %u eligible\n";
-
-/// Diagnostic for a split in which a version can still reach a strict majority with the silent members,
-/// before the epoch's idle dispute fallback.
+/// Diagnostic for a split in which a version can still reach a strict majority with the silent members.
 constexpr const char* DISPUTE_A_VERSION_CAN_STILL_WIN_LOG =
    "msgch::maybe_open_dispute: no dispute for (chain=%llu, epoch=%u): "
-   "a version can still win (leading %u + silent %u, majority %u of %u eligible) before the idle fallback\n";
+   "a version can still win (leading %u + silent %u, majority %u of %u eligible)\n";
 
 /// Diagnostic for a terminal split that cannot be voted on until Tier-1 registration exists.
 constexpr const char* DISPUTE_NO_TIER_ONE_ELECTORATE_LOG =
@@ -1031,33 +1025,14 @@ void send_note_traffic(name self, uint64_t chain_code, time_point since) {
    ).send();
 }
 
-/// True once outpost `chain_code`'s current epoch has been idle for `msgch::DISPUTE_FALLBACK_EPOCHS` of the
-/// chain's configured durations: since the later of its `current_epoch_start` and `last_delivery_at`, the
-/// newest delivery from a currently eligible member. False while the chain has no epoch state or config.
-bool idle_dispute_fallback_reached(uint64_t chain_code, time_point last_delivery_at) {
-   const std::optional<epoch::epoch_state>  state = epoch::epoch_state_of(chain_code);
-   const std::optional<epoch::epoch_config> cfg =
-      epoch::epochcfg_t(EPOCH_ACCOUNT).try_get(epoch::chain_key{chain_code});
-   if (!state || !cfg) return false;
-   const time_point idle_since   = std::max(state->current_epoch_start, last_delivery_at);
-   const int64_t    fallback_sec = int64_t{msgch::DISPUTE_FALLBACK_EPOCHS} * cfg->epoch_duration_sec;
-   return current_time_point() >= idle_since + seconds(fallback_sec);
-}
-
-static_assert(int64_t{msgch::DISPUTE_FALLBACK_EPOCHS} * std::numeric_limits<uint32_t>::max() <=
-                 std::numeric_limits<int64_t>::max() / 1'000'000,
-              "the dispute fallback offset of any configured duration fits in microseconds");
-
 /// Open a Tier-1 dispute vote via sysio.chalg for a split of (`chain_code`, `epoch_index`), the chain's
 /// current epoch, with at least two delivered versions and no strict majority of the `group_size` eligible
-/// members. With `s` eligible members still silent and `m` the majority, it needs `s < m`, and then either:
-/// - no version can still win: every version's count plus `s` falls short of `m`;
-/// - the epoch's idle fallback is reached (`idle_dispute_fallback_reached`, timed from `last_delivery_at`,
-///   the newest eligible delivery): the silent members then count as absent.
-/// Otherwise the split waits for more deliveries. `total_deliveries` and `checksum_counts` count eligible
-/// members only, one delivery each.
+/// members, once no version can still win: with `s` eligible members still silent and `m` the majority, every
+/// version's count plus `s` falls short of `m`. Otherwise the split waits for more deliveries; one a silent
+/// member keeps open waits for that member or for governance. `total_deliveries` and `checksum_counts` count
+/// eligible members only, one delivery each.
 void maybe_open_dispute(name self, uint64_t chain_code, uint32_t epoch_index,
-                        uint32_t group_size, uint32_t total_deliveries, time_point last_delivery_at,
+                        uint32_t group_size, uint32_t total_deliveries,
                         const std::vector<checksum256>& seen_checksums,
                         const std::vector<uint32_t>& checksum_counts,
                         const std::vector<std::vector<name>>& checksum_operators) {
@@ -1071,19 +1046,12 @@ void maybe_open_dispute(name self, uint64_t chain_code, uint32_t epoch_index,
       return;
    }
 
-   // The same majority size evalcons accepts, so before the idle fallback a split is disputed exactly
-   // when evalcons can no longer decide it.
+   // The same majority size evalcons accepts, so a split is disputed exactly when evalcons can no longer decide it.
    const uint32_t majority_size = strict_majority_size(group_size);
    const uint32_t silent        = group_size - total_deliveries;
    uint32_t       leading_count = 0;
    for (const uint32_t count : checksum_counts) leading_count = std::max(leading_count, count);
-   // At least a majority silent never disputes, the idle fallback included. Checked first, it also keeps the
-   // sum below from wrapping.
-   if (silent >= majority_size) {
-      sysio::print_f(DISPUTE_MAJORITY_SILENT_LOG, chain_code, epoch_index, silent, majority_size, group_size);
-      return;
-   }
-   if (leading_count + silent >= majority_size && !idle_dispute_fallback_reached(chain_code, last_delivery_at)) {
+   if (leading_count + silent >= majority_size) {
       sysio::print_f(DISPUTE_A_VERSION_CAN_STILL_WIN_LOG,
                      chain_code, epoch_index, leading_count, silent, majority_size, group_size);
       return;
@@ -1387,8 +1355,7 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
    std::vector<uint32_t>          checksum_counts;
    std::vector<std::vector<char>> checksum_data;
    std::vector<std::vector<name>> checksum_operators;
-   uint32_t   total_deliveries = 0;
-   time_point last_delivery_at{};
+   uint32_t                       total_deliveries = 0;
 
    for (auto it = oe_idx.lower_bound(composite);
         it != oe_idx.end() && it->by_outpost_epoch() == composite; ++it) {
@@ -1409,7 +1376,6 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
          checksum_operators.push_back(std::vector<name>{it->batch_op_name});
       }
       total_deliveries++;
-      last_delivery_at = std::max(last_delivery_at, it->received_at);
    }
 
    // Consensus on the first strict majority of the eligible set, whenever it forms. At most one
@@ -1427,8 +1393,8 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
 
    if (!consensus_reached) {
       // A dispute opens once no version can still reach a majority; otherwise wait for more deliveries.
-      maybe_open_dispute(get_self(), chain_code, epoch_index, group_size, total_deliveries, last_delivery_at,
-                         seen_checksums, checksum_counts, checksum_operators);
+      maybe_open_dispute(get_self(), chain_code, epoch_index, group_size, total_deliveries, seen_checksums,
+                         checksum_counts, checksum_operators);
       return;
    }
 
