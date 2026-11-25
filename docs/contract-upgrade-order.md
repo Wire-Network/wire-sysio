@@ -230,6 +230,19 @@ Before `sysio.msgch::bootstrap`, configure each active outpost with
 `sysio.epoch::setconfig(chain, ...)`, have each batch operator `joinchain` the chains it serves, and
 build each chain's window with `schbatchgps(chain)`.
 
+### Late deliveries and an epoch's books one advance later
+
+`sysio.epoch::advance` closes an epoch's books (`sysio.opreg::recorddel` and `termcheck`, then
+`sysio::rcrdduty`) at the advance after it, for the group it keeps on `epochstate` as `previous_group`, and
+`sysio.msgch::deliver` accepts a late delivery for the previous epoch only byte-identical to that epoch's
+winner, which each acceptance shifts into `outpcons`'s new `previous_epoch_index` and
+`previous_winning_checksum`. Both rows gain their fields after the existing ones, so a reader built against
+the shorter row still decodes the fields it knows, but a reader built against the new row cannot decode one
+written in the shorter layout. Every reader is rebuilt: `sysio.msgch` and `sysio.opreg` read `epochstate`,
+and `sysio.opreg` (`flushwtdw`) and `sysio.synd` read `outpcons`. `sysio.opreg::regoperator` and
+`joinchain` treat a member of `previous_group` as still seated. No migration is supplied: deploy
+`sysio.epoch`, `sysio.msgch`, `sysio.opreg` and `sysio.synd` together on a fresh chain.
+
 ## The two rules for future changes
 
 1. **A contract that gains an action `advance` inlines deploys BEFORE

@@ -382,6 +382,14 @@
                 {
                     "name": "message_tip",
                     "type": "checksum256"
+                },
+                {
+                    "name": "previous_epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "previous_winning_checksum",
+                    "type": "checksum256"
                 }
             ]
         },

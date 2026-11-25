@@ -804,8 +804,8 @@ namespace sysiosystem {
           * that chain; `duty_seconds` is that epoch's scheduled length. Every chain's duty accrues to
           * the one open pay period. A member whose sysio.opreg membership of the chain is EVICTED is
           * credited nothing. A member still holding seat-seconds of the settling period on the chain is
-          * settled first. A zero `duty_seconds` credits nothing. Called inline by sysio.epoch::advance;
-          * never throws. Auth: require_auth("sysio.epoch").
+          * settled first. A zero `duty_seconds` credits nothing. Called inline by sysio.epoch::advance when
+          * the epoch after `epoch_index` closes; never throws. Auth: require_auth("sysio.epoch").
           */
          [[sysio::action]]
          void rcrdduty(sysio::slug_name chain_code, uint32_t epoch_index, std::vector<sysio::name> members,

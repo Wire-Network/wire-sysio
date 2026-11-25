@@ -881,7 +881,8 @@ public:
    /// its consensus path writes, which this fixture has no operators to drive.
    void accept_outpost_epoch(std::string_view chain_code, uint32_t epoch) {
       const mvo row = mvo()("chain_code", slug_value(chain_code))("epoch_index", epoch)("consensus_reached", true)
-         ("winning_checksum", fc::sha256())("envelope_digest", fc::sha256())("message_tip", fc::sha256());
+         ("winning_checksum", fc::sha256())("envelope_digest", fc::sha256())("message_tip", fc::sha256())
+         ("previous_epoch_index", 0)("previous_winning_checksum", fc::sha256());
       sysio_system::test_support::write_kv_row(
          *this, MSGCH_ACCOUNT, "outpcons"_n, slug_value(chain_code),
          msgch_abi_ser.variant_to_binary("outpost_consensus_entry", row, fixture_abi_yield_function()));

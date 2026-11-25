@@ -173,6 +173,10 @@
                 {
                     "name": "is_paused",
                     "type": "bool"
+                },
+                {
+                    "name": "previous_group",
+                    "type": "name[]"
                 }
             ]
         },

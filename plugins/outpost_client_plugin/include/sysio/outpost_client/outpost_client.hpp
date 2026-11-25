@@ -125,8 +125,9 @@ public:
     * Filters by `epoch_index` internally. Ethereum and Solana each expose a
     * single latest-outbound storage slot, so a poll may still observe the
     * preceding epoch until the delivery that emits this one overwrites it.
-    * Delivering that stale envelope to `sysio.msgch::deliver` trips an
-    * `envelope epoch_index mismatch` assertion.
+    * `sysio.msgch::deliver` takes that stale envelope only as a late delivery of
+    * the preceding epoch's accepted envelope from the group that served it, and
+    * refuses it otherwise.
     *
     * @param epoch_index  Only envelopes whose `epoch_index` field matches this
     *                     value are returned; all others are silently dropped.

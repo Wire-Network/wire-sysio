@@ -234,13 +234,25 @@ bool window_seats(const sysio::epoch::epoch_state& state, name account) {
    return false;
 }
 
-/// True while `account` holds a seat in any outpost chain's batch-operator schedule window.
-bool holds_schedule_seat(name account) {
+/// True while one chain's schedule `state` holds a seat of `account` whose books are open: one in its window, or
+/// one in `previous_group`, the group of the epoch whose books the chain's next advance closes.
+bool open_seat_on(const sysio::epoch::epoch_state& state, name account) {
+   return window_seats(state, account) || sysio::epoch::in_previous_group(state, account);
+}
+
+/// True while `account` holds a seat whose books are open on any outpost chain (see `open_seat_on`).
+bool holds_open_seat(name account) {
    sysio::epoch::epochstate_t states(opreg::EPOCH_ACCOUNT);
    for (auto it = states.begin(); it != states.end(); ++it) {
-      if (window_seats(*it, account)) return true;
+      if (open_seat_on(*it, account)) return true;
    }
    return false;
+}
+
+/// True while `account` holds a seat whose books are open on outpost `chain_code` (see `open_seat_on`).
+bool holds_open_seat(name account, sysio::slug_name chain_code) {
+   const std::optional<sysio::epoch::epoch_state> state = sysio::epoch::epoch_state_of(chain_code.value);
+   return state && open_seat_on(*state, account);
 }
 
 /// True while `account` holds a seat in outpost `chain_code`'s batch-operator schedule window.
@@ -400,8 +412,8 @@ void opreg::regoperator(name account,
 
    // A seat left from an earlier registration would close against this one and record a miss for
    // a duty it never received. `terminate` leaves the operator's later seats in place until the
-   // window slides past them.
-   check(!holds_schedule_seat(account), still_seated_msg);
+   // advance that closes their books.
+   check(!holds_open_seat(account), still_seated_msg);
 
    // An operator registering itself needs an authex link for every active outpost (the depot
    // self-row and pre-active rows carry no expectation). A batch operator is checked per chain at
@@ -465,7 +477,7 @@ void opreg::joinchain(name account, sysio::slug_name chain_code) {
    const std::optional<served_chain> existing = members.try_get(key);
    if (existing) {
       check(existing->status != chain_service_status::SERVING, already_serving_msg);
-      check(!holds_schedule_seat(account, chain_code), still_seated_on_chain_msg);
+      check(!holds_open_seat(account, chain_code), still_seated_on_chain_msg);
    }
 
    // A join starts new rails: rows recorded before it belong to an earlier membership.
@@ -962,6 +974,7 @@ std::vector<opreg::consensus_wait> consensus_waits_for(const opreg::operator_ent
       auto                by_account = members.get_index<"byaccount"_n>();
       for (auto it = by_account.lower_bound(op.account.value);
            it != by_account.end() && it->account == op.account; ++it) {
+         // Only window seats count: a seat in `previous_group` is of an epoch already judged.
          if (it->status != opreg::chain_service_status::SERVING &&
              !holds_schedule_seat(op.account, it->chain_code)) continue;
          const uint32_t epoch_index = sysio::epoch::current_epoch_index(it->chain_code.value);
@@ -1749,8 +1762,8 @@ void opreg::termcheck(name account, sysio::slug_name chain_code) {
    auto op_pk = operator_key{account.value};
    if (!ops.contains(op_pk)) return;
    auto op = ops.get(op_pk);
-   // UNKNOWN is evaluated too. This runs only when the operator's own duty epoch closes, and an
-   // operator that withdraws before each close and cancels after it is UNKNOWN every time.
+   // UNKNOWN is evaluated too. This runs only when the books of the operator's own duty epoch close, and
+   // an operator that withdraws before each of those advances and cancels after it is UNKNOWN every time.
    if (op.has_terminal_status()) return;
    // Bootstrapped operators are the genesis / chain-of-trust seed set and
    // are NEVER subject to rolling-window eviction — see

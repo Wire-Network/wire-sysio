@@ -36,7 +36,7 @@ the collateral each has bonded, and the outpost chains each batch operator serve
 | Action | Auth | Description |
 |--------|------|-------------|
 | `setconfig` | `sysio.opreg` | Set the eviction rails, the prune delay and the per-role minimum bonds |
-| `regoperator` | the account, or `sysio.opreg` | Register an operator. Only `sysio.opreg` registers a bootstrapped one. An account registering itself needs a `sysio.authex` link for every active outpost, except a batch operator, whose links `joinchain` checks. A terminated account registers again once its balances are drained and no schedule seats it; the new registration serves no chain and forfeits the account's unsettled batch duty from the earlier one |
+| `regoperator` | the account, or `sysio.opreg` | Register an operator. Only `sysio.opreg` registers a bootstrapped one. An account registering itself needs a `sysio.authex` link for every active outpost, except a batch operator, whose links `joinchain` checks. A terminated account registers again once its balances are drained and no schedule seats it, its last seat's books included; the new registration serves no chain and forfeits the account's unsettled batch duty from the earlier one |
 | `joinchain` | the operator, or `sysio.opreg` | Serve one active outpost: see below |
 | `leavechain` | the operator | Stop serving one outpost: see below |
 | `deposit` | the operator | Bond WIRE or a shadow LIQ token |
@@ -46,7 +46,7 @@ the collateral each has bonded, and the outpost chains each batch operator serve
 | `available` | read-only | An operator's spendable balance for one (chain, token) |
 | `processprod`, `processbatch`, `processuw` | `sysio.opreg` | Eligibility transitions after a balance change |
 | `slash` | `sysio.chalg` | Seize the operator's collateral and mark it `SLASHED` |
-| `recorddel` | `sysio.epoch` | Record one member's delivery result for a duty epoch one chain closed |
+| `recorddel` | `sysio.epoch` | Record one member's delivery result for a duty epoch of one chain, at the advance after it |
 | `termcheck` | `sysio.epoch` | Evict a batch operator from one chain when its rolling log there breaches a rail: see below |
 | `terminate` | `sysio.opreg` | Terminate an operator globally: its collateral is credited to `remitclaims` |
 | `claimremit` | the operator | Pull one token's credited collateral or yield |
@@ -81,8 +81,10 @@ is `SERVING`.
 - **`joinchain(account, chain_code)`** needs a batch operator that is neither `SLASHED` nor
   `TERMINATED`, an active outpost, and the operator's `sysio.authex` link for the chain's kind, since
   the chain's roster carries the operator's address from it. With no row the operator becomes
-  `SERVING`. A `LEFT` or `EVICTED` operator rejoins only once that chain's window holds none of its
-  seats, and rejoining restarts the join time.
+  `SERVING`. A `LEFT` or `EVICTED` operator rejoins only once that chain's schedule holds none of its
+  seats, and rejoining restarts the join time. A seat stays in the schedule until the advance that closes
+  its epoch's books: past its slide out of the window, it is the chain's `previous_group` for one more
+  advance.
 - **`leavechain(account, chain_code)`** turns `SERVING` into `LEFT`. The operator draws no new seat on
   the chain and still owes the duty of each seat it holds there.
 - **`EVICTED`** removes the operator from one chain. `sysio.msgch::deliver` refuses its deliveries on
@@ -91,8 +93,9 @@ is `SERVING`.
 
 ## Eviction
 
-`sysio.epoch::advance(chain)` sends `recorddel` and `termcheck` for each member of the chain's group
-whose epoch closed. Each membership keeps a duty tally: the duties recorded on the chain since the
+`sysio.epoch::advance(chain)` closes the books of the epoch before the closing one: it sends `recorddel`
+and `termcheck` for each member of the group that served that epoch, so a late delivery made during the
+following epoch counts as delivered. Each membership keeps a duty tally: the duties recorded on the chain since the
 operator's latest join, its misses, and its misses since the last delivery. `recorddel` adds to it, and
 every row the retention sweeps erase leaves its duties and misses, so `termcheck` reads one row however
 long the log is. It evicts the operator from the chain when its missed duty epochs since the last
@@ -103,8 +106,9 @@ early miss cannot evict alone; the consecutive rail applies from the first. `ter
 `MAX_DELLOG_PRUNE_PER_CHECK` of the member's own rows that aged out of `terminate_window_ms`, and while one
 is left the percent rail waits for a later check, so its rate never counts a duty from outside the window.
 The membership becomes `EVICTED` with the rail as its reason; the operator's status, its bond and its
-other chains are untouched. The window's groups are disjoint, so the close that evicts a member also
-slides out the only seat it held on the chain. An `EVICTED` member
+other chains are untouched. The window may already seat it once more, in the group drawn when its duty
+epoch slid out: it cannot deliver that seat, the chain's consensus leaves it out, and no group drawn after
+the eviction seats it. An `EVICTED` member
 is not evaluated again, and it rejoins as a `LEFT` operator does, which restarts the rails.
 Bootstrapped operators are never evicted. Governance's `terminate` is the global removal.
 

@@ -204,7 +204,8 @@ namespace sysio {
                      std::vector<chain_min_bond> req_uw_collat);
 
       /// Register a new operator. A terminated account registers again only once its balances are
-      /// drained and it holds no seat in the batch-operator schedule; the new registration serves no
+      /// drained and it holds no seat in the batch-operator schedule, a seat whose epoch's books are still
+      /// open (`sysio.epoch` `previous_group`) included; the new registration serves no
       /// chain, and the account forfeits the unsettled batch duty it still holds from an earlier
       /// registration (`sysio.system::forfeitduty` for each such chain). An operator registering itself
       /// needs a `sysio.authex` link for every active outpost, except a batch operator, whose links
@@ -218,7 +219,8 @@ namespace sysio {
       /// it. Auth = `account`, or `sysio.opreg` (the bootstrap path). Requires a batch operator that is
       /// neither SLASHED nor TERMINATED, an active outpost, and the operator's `sysio.authex` link for
       /// the chain's kind. A LEFT or EVICTED operator rejoins only once it holds no seat in that chain's
-      /// schedule window; rejoining restarts the chain's miss rails.
+      /// schedule window nor in its `previous_group`, whose books the next advance closes; rejoining restarts
+      /// the chain's miss rails.
       [[sysio::action]]
       void joinchain(name account, sysio::slug_name chain_code);
 
@@ -292,8 +294,9 @@ namespace sysio {
 
       /// Record a batch operator's result for one duty epoch of outpost `chain_code` in the rolling
       /// buffer and count it in the operator's duty tally on the chain. Called inline from
-      /// `sysio.epoch::advance(chain_code)` once per expiring-group member, whatever its status at the
-      /// close; `delivered` only if it delivered to that chain. Each write also prunes up to
+      /// `sysio.epoch::advance(chain_code)`, which closes the books of the epoch before the closing one, once
+      /// per member of the group that served it, whatever its status then; `delivered` only if it delivered
+      /// to that chain, in that epoch or late in the next. Each write also prunes up to
       /// `MAX_DELLOG_PRUNE_PER_WRITE` rows, of any chain, that have aged out of the window, taking each out
       /// of its membership's tally, so no dedicated crank is needed.
       [[sysio::action]]

@@ -40,8 +40,8 @@ remote chain cannot starve a cron worker; the protected helper `throw_if_past_de
 throws `fc::timeout_exception` labelled with `to_string()` and is meant to be called before each blocking
 RPC. And `read_inbound_envelope` must filter by `epoch_index` itself — both outposts expose a single
 latest-outbound storage slot, so a poll can still observe the preceding epoch until the delivery that emits
-this one overwrites it, and forwarding that stale envelope to `sysio.msgch::deliver` trips an
-`envelope epoch_index mismatch` assertion.
+this one overwrites it, and `sysio.msgch::deliver` takes that stale envelope only as a late delivery of the
+preceding epoch's accepted envelope from the group that served it, refusing it otherwise.
 
 The header also declares the cross-chain envelope cap:
 

@@ -7,7 +7,8 @@ The depot's two clocks, and batch operator scheduling, for the OPP (Outpost Prot
 - Owns one **consensus epoch per outpost chain** (`epochcfg.epoch_duration_sec`, default 360 s, bounded
   per chain to 10 s .. 30 days): that chain's OPP envelope cadence, counter, schedule window and
   roster. A chain's epoch advances once that outpost has reached consensus and its wall-clock boundary
-  has passed; the first chain's genesis advance is the network genesis (`netgenesis`).
+  has passed; the first chain's genesis advance is the network genesis (`netgenesis`). An epoch's books
+  (deliveries, misses, duty) close at the advance after it.
 - Owns the **economic clock** (`economycfg`): a fixed grid of economic epochs from a configured start
   time that may lie in the past. It drives emissions accrual and pay, collateral-withdrawal maturity and
   the producer pay slot count, and never waits on outpost consensus.
@@ -31,7 +32,7 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
 | Table | Type | Description |
 |-------|------|-------------|
 | `epochcfg` | `kv::table` | One row per outpost chain, keyed by its `sysio.chains` code: `epoch_duration_sec`, `operators_per_epoch` (default 7), `batch_operator_minimum_active` (default 21), `batch_op_groups` (default 3), `epoch_retention_envelope_log_count` (default 200) |
-| `epochstate` | `kv::table` | One row per outpost chain: its consensus epoch index, current / next epoch start, active group cursor, the resident group window, pause flag |
+| `epochstate` | `kv::table` | One row per outpost chain: its consensus epoch index, current / next epoch start, active group cursor, the resident group window, pause flag, and `previous_group`, the group that served the previous epoch (empty before epoch 2) |
 | `netgenesis` | `kv::global` | Network genesis marker, written by the first chain's genesis advance; closes the bootstrap window and starts the economic clock |
 | `economycfg` | `kv::global` | Economic clock: `epoch_duration_sec` (60 s .. 30 days) and the grid's `start_time` |
 | `economystate` | `kv::global` | Economic epoch index and its current / next boundary |
@@ -53,18 +54,24 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
 
 ## What `advance(chain)` does
 
-1. Delivery audit of the chain's expiring group, when the chain is an active outpost: each
-   member gets one `sysio.opreg::recorddel` for this chain (delivered if it delivered to it, whatever
-   its envelope; a non-canonical deliverer was already slashed when `sysio.msgch` accepted the epoch's
-   winner), followed
-   by `sysio.opreg::termcheck` for this chain, which evicts a member breaching the chain's miss rails
-   from this chain alone and forfeits its unsettled duty there, and each member of the group not
-   evicted from the chain earns the epoch's scheduled length in seat-seconds through
-   `sysio.system::rcrdduty` (skipped until `sysio.system::initt5` has run).
-2. Bump the chain's consensus epoch index, drop the expired group from the front of its window and
-   append a new tail group drawn from the `ACTIVE` batch operators serving the chain that are not
+1. Close the books of the previous epoch: an epoch's books close one advance after it, so the late
+   deliveries `sysio.msgch` accepted for it during the closing epoch count. An epoch the chain closed as
+   an active outpost is booked even if the chain is no longer one at this advance; an epoch it closed
+   while not an active outpost keeps no books. Each member of `previous_group` gets one
+   `sysio.opreg::recorddel` for this chain and that epoch (delivered if it delivered to it, in the epoch
+   or late, whatever its envelope; a non-canonical deliverer was already slashed when `sysio.msgch`
+   accepted the epoch's winner), followed by `sysio.opreg::termcheck` for this chain, which evicts a
+   member breaching the chain's miss rails from this chain alone and forfeits its unsettled duty there,
+   and each member of the group not evicted from the chain earns the epoch's scheduled length in
+   seat-seconds through `sysio.system::rcrdduty` (skipped until `sysio.system::initt5` has run). The
+   genesis advance and the advance from epoch 1, whose `previous_group` is empty, record nothing.
+2. Bump the chain's consensus epoch index, keep the window's front group, which served the closing
+   epoch, as `previous_group` (none when the chain is not an active outpost), drop it from the window
+   and append a new tail group drawn from the `ACTIVE` batch operators serving the chain that are not
    already resident (non-bootstrapped first). The resident groups stay disjoint, so an operator serves
-   at most once every `batch_op_groups` epochs.
+   at most once every `batch_op_groups` epochs. A member that an advance evicts keeps the seat the
+   previous slide may already have drawn for it, which it cannot deliver; that one group runs a member
+   short until the seat slides out. Bootstrapped operators are never evicted.
 3. Queue the chain's outpost `OPERATORS` (the operators its window seats, in account order, with their
    status and authex links; none for an empty window) when its `rostersent` hash differs, and
    `BATCH_OPERATOR_GROUPS` (withheld when the next group is empty), stamped with the chain's epoch

@@ -14,6 +14,11 @@ Inbound/outbound OPP message chain management and consensus tracking contract.
   newest eligible delivery, each delivery restarting the timer. The silent minority then counts as
   absent. An epoch that reached consensus stays decided: a later delivery of the accepted bytes is
   recorded as delivered, and a differing one is refused
+- Accepts a late delivery, for an outpost's previous epoch, from a member of the group that served it
+  (`sysio.epoch` `previous_group`) while the chain sits in the next epoch: only byte-identical to that
+  epoch's accepted envelope (`winner_of`), stored without its bytes, and never re-evaluated. The advance
+  that closes the previous epoch's books records it as delivered; a differing one is refused and is that
+  member's miss. Any older epoch is refused
 - Slashes non-canonical deliverers when an epoch's winner is accepted, by consensus or by dispute
   resolution: every operator whose recorded delivery for the epoch differs from the winner, one that
   delivered while a dispute was open included, is slashed through `sysio.chalg::slashop` in the
@@ -30,12 +35,12 @@ Inbound/outbound OPP message chain management and consensus tracking contract.
 
 | Table | Type | Description |
 |-------|------|-------------|
-| `envelopes` | `kv::table` | Inbound deliveries, one row per batch operator per outpost per epoch (working state, pruned per outpost to its current and previous epoch) |
+| `envelopes` | `kv::table` | Inbound deliveries, one row per batch operator per outpost per epoch (working state, pruned per outpost to its current and previous epoch; `sysio.epoch::advance` reads the previous epoch's rows, late deliveries included, when it closes that epoch's books) |
 | `messages` | `kv::table` | Individual OPP messages extracted from consensus-verified envelopes |
 | `attestations` | `kv::table` | Attestations extracted inbound, and outbound attestations queued (`READY`) for envelope packing. The `byqueue` index orders them by outpost, status and lane |
 | `outqueue` | `kv::table` | Per-outpost count of queued general-lane attestations, capped at `MAX_QUEUED_ATTESTATIONS` |
 | `outenvelopes` | `kv::table` | Built outbound envelopes awaiting relay, with their canonical epoch digest |
-| `outpcons` | `kv::table` | Per-outpost consensus record: accepted envelope digest and inbound message-chain tip |
+| `outpcons` | `kv::table` | Per-outpost consensus record: the latest accepted epoch and its winning checksum, the epoch and winner before it (`previous_epoch_index`, `previous_winning_checksum`, shifted on each acceptance), accepted envelope digest and inbound message-chain tip |
 | `attseq` | `kv::table` | Attestation sequence counter |
 | `envlog` | `kv::table` | Metadata-only envelope audit log; each outpost keeps its newest `2 * epoch_retention_envelope_log_count` rows |
 
@@ -45,7 +50,7 @@ Inbound/outbound OPP message chain management and consensus tracking contract.
 |--------|------|-------------|
 | `bootstrap` | `sysio.msgch` | Network genesis only: asserts the economic clock and `sysio.system` emissions config are set, then runs `sysio.epoch::advance` for every active outpost chain; fails if any has no seated schedule window |
 | `bootchain` | `sysio.msgch` | After the network genesis: runs the genesis `sysio.epoch::advance` of one active outpost chain activated later, whose schedule window must be seated |
-| `deliver` | batch operator (the chain's resident active group, `ACTIVE` in `sysio.opreg`, and a member of the chain that is not `EVICTED`) | Deliver an inbound envelope for an outpost's current epoch, from its epoch 1; once the epoch has reached consensus, only the accepted envelope's bytes. Calls `evalcons` inline |
+| `deliver` | batch operator (`ACTIVE` in `sysio.opreg` and a member of the chain that is not `EVICTED`; the chain's resident active group, or for a late delivery the group that served its previous epoch) | Deliver an inbound envelope for an outpost's current epoch, from its epoch 1; once the epoch has reached consensus, only the accepted envelope's bytes. Calls `evalcons` inline. A late delivery, for the previous epoch, must be that epoch's accepted envelope; it is recorded without `evalcons`. Any older epoch is refused |
 | `evalcons` | `sysio.msgch` | Evaluate consensus for a started chain's current epoch; on the first strict majority of the eligible group store and dispatch the attestations and slash every operator whose delivery differs from the winner; with at least two versions delivered and fewer than a majority silent, open a `sysio.chalg` dispute once no version can still reach a majority, or once no eligible delivery has arrived for `DISPUTE_FALLBACK_EPOCHS` (3) of the chain's configured durations (timed from the later of the epoch's start and its newest eligible delivery). No effect for another epoch, or once the epoch has reached consensus or has a dispute |
 | `chkcons` | permissionless | For one active outpost chain past its genesis, unless a dispute is open on its current epoch: re-tally an undecided current epoch (`evalcons` inline, at any time); call `sysio.epoch::advance` for a decided one whose boundary has passed |
 | `resolvedisp` | `sysio.chalg` | Dispatch the winning envelope of a resolved dispute and slash every operator whose delivery for the epoch differs from it |

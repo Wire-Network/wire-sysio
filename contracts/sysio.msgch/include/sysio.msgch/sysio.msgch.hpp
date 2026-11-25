@@ -128,6 +128,13 @@ namespace sysio {
       /// the chain's active group. Refused until the chain's genesis advance has
       /// opened its epoch 1, and, once the epoch has reached consensus, unless it
       /// is byte-identical to the accepted envelope.
+      ///
+      /// A late delivery, for the chain's previous epoch, is admitted only from a
+      /// member of the group that served it (`sysio.epoch` `previous_group`) and
+      /// only byte-identical to that epoch's accepted envelope (`winner_of`). It is
+      /// stored without its bytes and never runs `evalcons`; the advance that
+      /// closes the previous epoch's books records it as delivered. Any older
+      /// epoch is refused.
       [[sysio::action]]
       void deliver(name batch_op_name, uint64_t chain_code, std::vector<char> data);
 
@@ -150,7 +157,8 @@ namespace sysio {
       /// genesis advance, for an epoch that is not the chain's current one, nor
       /// for an epoch that already reached consensus or has a dispute. Once an
       /// epoch is decided, `deliver` records a later delivery of the accepted
-      /// bytes as delivered and refuses a differing one.
+      /// bytes as delivered and refuses a differing one, in that epoch and, as a
+      /// late delivery, in the next.
       [[sysio::action]]
       void evalcons(uint64_t chain_code, uint32_t epoch_index);
 
@@ -226,8 +234,9 @@ namespace sysio {
       /// Consensus is evaluated by comparing checksums across operators.
       ///
       /// Working state, not an audit trail (that is `envlog`). `deliver` prunes rows older than the
-      /// current and previous epoch (`INBOUND_ENVELOPE_RETENTION_EPOCHS` in `src/sysio.msgch.cpp`);
-      /// every on-chain reader only touches the current epoch.
+      /// current and previous epoch (`INBOUND_ENVELOPE_RETENTION_EPOCHS` in `src/sysio.msgch.cpp`).
+      /// Consensus reads the current epoch's rows; `sysio.epoch::advance` reads the previous epoch's,
+      /// late deliveries included, when it closes that epoch's books.
       struct [[sysio::table("envelopes")]] envelope_entry {
          uint64_t                  id;
          uint64_t                  chain_code;
@@ -236,7 +245,8 @@ namespace sysio {
          opp::types::ChainKind     chain_kind;
          checksum256               checksum;        ///< sha256 of the delivered bytes
          /// The delivered bytes. Cleared on the rows present when the epoch's winner is accepted and
-         /// never stored for a late confirmation of it; the retention prune bounds any others.
+         /// never stored for a later delivery of it, in the epoch or the next; the retention prune
+         /// bounds any others.
          std::vector<char>         raw_data;
          time_point                received_at{};
 
@@ -380,6 +390,14 @@ namespace sysio {
       /// correctly envelope-chained successor could replay an earlier valid `Message` verbatim and
       /// re-dispatch its attestations. Zero until the first message from this outpost is accepted
       /// (which may lag `envelope_digest` if the first accepted envelopes are empty-message acks).
+      ///
+      /// `previous_epoch_index` / `previous_winning_checksum` are the epoch and winner the row held
+      /// before its latest acceptance: each acceptance shifts `epoch_index` / `winning_checksum` into
+      /// them. `deliver` admits a late delivery only byte-identical to that winner. Zero until the
+      /// second acceptance.
+      ///
+      /// The previous fields follow every older one, so a reader built against the shorter row still
+      /// decodes the fields it knows.
       struct [[sysio::table("outpcons")]] outpost_consensus_entry {
          uint64_t    chain_code;
          uint32_t    epoch_index;
@@ -387,24 +405,40 @@ namespace sysio {
          checksum256 winning_checksum;
          checksum256 envelope_digest;
          checksum256 message_tip;
+         uint32_t    previous_epoch_index;
+         checksum256 previous_winning_checksum;
 
          SYSLIB_SERIALIZE(outpost_consensus_entry,
             (chain_code)(epoch_index)(consensus_reached)(winning_checksum)(envelope_digest)
-            (message_tip))
+            (message_tip)(previous_epoch_index)(previous_winning_checksum))
       };
 
       using outpost_consensus_t =
          sysio::kv::table<"outpcons"_n, outpost_consensus_key, outpost_consensus_entry>;
 
       /// Outpost `chain_code`'s `outpcons` row on `msgch_account` when it records the accepted winner of
-      /// `epoch_index`, else nullopt: `epoch_index` is written only on acceptance and never cleared, so
-      /// a row for another epoch records no winner for this one. Never throws.
+      /// `epoch_index` as its current epoch, else nullopt: `epoch_index` is written only on acceptance and
+      /// never cleared, so a row for another epoch records no winner for this one. The current epoch is
+      /// decided exactly when this holds for it. Never throws.
       static std::optional<outpost_consensus_entry> consensus_for_epoch(name msgch_account, uint64_t chain_code,
                                                                         uint32_t epoch_index) {
          std::optional<outpost_consensus_entry> consensus =
             outpost_consensus_t(msgch_account).try_get(outpost_consensus_key{chain_code});
          if (consensus && consensus->epoch_index != epoch_index) consensus.reset();
          return consensus;
+      }
+
+      /// The accepted winning checksum of outpost `chain_code`'s epoch `epoch_index` on `msgch_account`'s
+      /// `outpcons` row: its current winner when the row's `epoch_index` is `epoch_index`, its previous
+      /// winner when its `previous_epoch_index` is, else nullopt. Epoch 0 never has a winner. Never throws.
+      static std::optional<checksum256> winner_of(name msgch_account, uint64_t chain_code, uint32_t epoch_index) {
+         if (epoch_index == 0) return std::nullopt;
+         const std::optional<outpost_consensus_entry> consensus =
+            outpost_consensus_t(msgch_account).try_get(outpost_consensus_key{chain_code});
+         if (!consensus) return std::nullopt;
+         if (consensus->epoch_index == epoch_index) return consensus->winning_checksum;
+         if (consensus->previous_epoch_index == epoch_index) return consensus->previous_winning_checksum;
+         return std::nullopt;
       }
 
       /// Per-outpost outbound queue primary key.

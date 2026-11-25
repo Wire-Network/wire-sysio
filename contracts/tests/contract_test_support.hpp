@@ -428,6 +428,7 @@ inline constexpr auto next_epoch_start       = "next_epoch_start";
 inline constexpr auto current_batch_op_group = "current_batch_op_group";
 inline constexpr auto batch_op_groups        = "batch_op_groups";
 inline constexpr auto is_paused              = "is_paused";
+inline constexpr auto previous_group         = "previous_group";
 inline constexpr auto genesis_at             = "genesis_at";
 } // namespace field
 
@@ -447,7 +448,8 @@ fc::mutable_variant_object state_of(Tester& tester, const abi_serializer& epoch_
       (field::next_epoch_start, fc::time_point())
       (field::current_batch_op_group, 0u)
       (field::batch_op_groups, std::vector<std::vector<name>>{})
-      (field::is_paused, false);
+      (field::is_paused, false)
+      (field::previous_group, std::vector<name>{});
 }
 
 /// Store `state` as its chain's `epochstate` row.

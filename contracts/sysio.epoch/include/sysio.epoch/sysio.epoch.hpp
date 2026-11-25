@@ -39,10 +39,19 @@ namespace sysio {
       /// sysio.epoch. The genesis advance (epoch 0 -> 1) requires the chain to be an active outpost with
       /// its schedule window seated (`schbatchgps`). The first genesis advance of any chain is the
       /// network genesis.
+      ///
+      /// An epoch's books close one advance later, so its late deliveries count: `advance(N -> N+1)`
+      /// records each `previous_group` member's delivery of epoch N-1 (`sysio.opreg::recorddel`), runs its
+      /// `termcheck`, and then credits the group's duty for N-1 (`sysio.system::rcrdduty`), whether or not
+      /// the chain is still an active outpost. Nothing is recorded while `previous_group` is empty: the
+      /// genesis advance, the advance from epoch 1, and the advance after one the chain closed while not
+      /// an active outpost.
       [[sysio::action]]
       void advance(sysio::slug_name chain_code);
 
       /// Internal continuation of `advance(chain_code)` after its epoch-close operator mutations execute.
+      /// Stores the window's expiring front group as `previous_group` (empty when the chain is not an active
+      /// outpost), then slides the window.
       [[sysio::action]]
       void finishadv(sysio::slug_name chain_code, uint32_t epoch_index);
 
@@ -120,10 +129,14 @@ namespace sysio {
          uint8_t                           current_batch_op_group = 0; // 0, 1, or 2
          std::vector<std::vector<name>>    batch_op_groups;           // 3 groups of 7
          bool                              is_paused = false;
+         /// The group that served epoch `current_epoch_index - 1`, whose books the next `advance` closes.
+         /// `finishadv` stores the window's front group here before the slide erases it; empty before
+         /// epoch 2 and after an epoch the chain closed while not an active outpost.
+         std::vector<name>                 previous_group;
 
          SYSLIB_SERIALIZE(epoch_state,
             (chain_code)(current_epoch_index)(current_epoch_start)(next_epoch_start)
-            (current_batch_op_group)(batch_op_groups)(is_paused))
+            (current_batch_op_group)(batch_op_groups)(is_paused)(previous_group))
       };
 
       using epochstate_t = sysio::kv::table<"epochstate"_n, chain_key, epoch_state>;
@@ -206,6 +219,12 @@ namespace sysio {
 
       using rostersent_t = sysio::kv::table<"rostersent"_n, chain_key, roster_sent>;
 
+      /// Message of the `check`s that refuse a chain with no consensus epoch state.
+      static constexpr std::string_view EPOCH_STATE_NOT_INITIALIZED = "epoch state not initialized";
+
+      /// Message of the `check`s that refuse a caller outside the chain's group on duty.
+      static constexpr std::string_view NOT_IN_ACTIVE_GROUP = "caller is not in the active batch operator group";
+
       // Well-known accounts
       static constexpr name CHALG_ACCOUNT  = "sysio.chalg"_n;
       static constexpr name MSGCH_ACCOUNT  = "sysio.msgch"_n;
@@ -236,6 +255,20 @@ namespace sysio {
       static uint32_t current_epoch_index(uint64_t chain_code) {
          const std::optional<epoch_state> state = epoch_state_of(chain_code);
          return state ? state->current_epoch_index : 0;
+      }
+
+      /// Whether `account` sits in `state`'s group on duty (`current_batch_op_group`); false when that cursor is out
+      /// of range. Never throws.
+      static bool in_current_group(const epoch_state& state, name account) {
+         if (state.current_batch_op_group >= state.batch_op_groups.size()) return false;
+         const std::vector<name>& group = state.batch_op_groups[state.current_batch_op_group];
+         return std::find(group.begin(), group.end(), account) != group.end();
+      }
+
+      /// Whether `account` sits in `state.previous_group`, the group that served the previous epoch. Never throws.
+      static bool in_previous_group(const epoch_state& state, name account) {
+         return std::find(state.previous_group.begin(), state.previous_group.end(), account) !=
+                state.previous_group.end();
       }
 
       /// One outpost chain's current consensus epoch index.
@@ -296,7 +329,7 @@ namespace sysio {
 
       /// Upper bound on `operators_per_epoch` (the size of one schedule group): Ethereum's OPPInbound is
       /// sized and tested for `OPERATORS_PER_GROUP` (7), under Solana's `MAX_GROUP_MEMBERS` (16). Each
-      /// member of the expiring group also costs two inline actions in `advance` (opreg::recorddel +
+      /// member of the previous group also costs two inline actions in `advance` (opreg::recorddel +
       /// opreg::termcheck) and a payclaims credit in sysio.system::payepoch.
       static constexpr uint32_t MAX_OPERATORS_PER_EPOCH = 7;
 
@@ -318,20 +351,13 @@ namespace sysio {
    /// Asserts the caller signed the transaction and is a member of outpost `chain_code`'s current
    /// resident batch-operator group. This is a group-membership check only: the
    /// group is a snapshot from the last schedule, so current operator eligibility
-   /// (sysio.opreg ACTIVE status) must be enforced separately at the delivery
-   /// call site (see msgch::deliver).
+   /// (sysio.opreg ACTIVE status) must be enforced separately at the call site.
    inline void is_batch_operator_active(const name& batch_op_name, uint64_t chain_code) {
       require_auth(batch_op_name);
       const std::optional<epoch::epoch_state> state = epoch::epoch_state_of(chain_code);
-      check(state.has_value(), "epoch state not initialized");
-
-      const uint8_t cur_group = state->current_batch_op_group;
-      check(cur_group < state->batch_op_groups.size(), "active group index out of range");
-      const std::vector<name>& active_members = state->batch_op_groups[cur_group];
-      check(
-         std::find(active_members.begin(), active_members.end(), batch_op_name) != active_members.end(),
-         "caller is not in the active batch operator group"
-      );
+      check(state.has_value(), epoch::EPOCH_STATE_NOT_INITIALIZED);
+      check(state->current_batch_op_group < state->batch_op_groups.size(), "active group index out of range");
+      check(epoch::in_current_group(*state, batch_op_name), epoch::NOT_IN_ACTIVE_GROUP);
    }
 
 } // namespace sysio

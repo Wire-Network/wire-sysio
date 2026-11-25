@@ -97,6 +97,21 @@ constexpr std::string_view DELIVER_BEFORE_GENESIS =
 constexpr std::string_view DELIVERY_DIFFERS_FROM_ACCEPTED =
    "deliver: the epoch has reached consensus and the envelope differs from the accepted one";
 
+/// Message of the `check` `deliver` raises for a deliverer seated in neither the chain's current group nor
+/// the group that served its previous epoch.
+constexpr std::string_view DELIVERER_NOT_IN_GROUP =
+   "deliver: caller is in neither the chain's current batch operator group nor its previous one";
+
+/// Message of the `check` `deliver` raises for a late delivery from outside the group that served the
+/// previous epoch.
+constexpr std::string_view LATE_DELIVERER_NOT_IN_PREVIOUS_GROUP =
+   "deliver: a late delivery must come from the group that served the previous epoch";
+
+/// Message of the `check` `deliver` raises for a late delivery that is not byte-identical to the previous
+/// epoch's accepted envelope, or for a previous epoch with no accepted envelope.
+constexpr std::string_view LATE_DELIVERY_DIFFERS_FROM_ACCEPTED =
+   "deliver: late delivery differs from the previous epoch's accepted envelope";
+
 // `operator""_s` is declared at global scope by <sysio/slug_name.hpp>.
 
 /// Codename of the Ethereum outpost — the sole source of node-owner NFT (ERC1155) deposits, which
@@ -106,16 +121,18 @@ constexpr std::string_view DELIVERY_DIFFERS_FROM_ACCEPTED =
 /// binds inbound registrations to this exact outpost — see the WSA-005 note there.
 constexpr sysio::slug_name NODE_OWNER_SRC_CHAIN = "ETHEREUM"_s;
 
-/// Epochs of inbound `envelopes` rows kept: the current epoch, which every on-chain reader uses, and
-/// the previous one, so a batch operator whose cached epoch lags by one still finds its delivery.
+/// Epochs of inbound `envelopes` rows kept: the current epoch, which consensus reads, and the previous
+/// one, which takes late deliveries and whose rows `sysio.epoch::advance` reads when it closes that
+/// epoch's books. Every delivery of the current epoch prunes against it, so the previous epoch's rows
+/// survive until the advance after it.
 constexpr uint32_t INBOUND_ENVELOPE_RETENTION_EPOCHS = 2;
 
 /// Maximum expired `envelopes` rows a single `deliver` erases. Each delivery adds one row, so a
 /// budget above one outpaces inserts and clears an epoch with few deliveries after a full one.
 constexpr uint32_t ENVELOPE_PRUNE_BUDGET = 4;
 
-static_assert(INBOUND_ENVELOPE_RETENTION_EPOCHS >= 1,
-              "the prune must never reach the current epoch, which every reader depends on");
+static_assert(INBOUND_ENVELOPE_RETENTION_EPOCHS >= 2,
+              "the prune must keep the previous epoch, whose books the next advance closes");
 static_assert(ENVELOPE_PRUNE_BUDGET > 1, "the prune must outpace the one row each delivery adds");
 
 /// `envlog` rows an outpost logs per epoch: one accepted inbound envelope and one outbound emit. An
@@ -212,8 +229,8 @@ msgch::outbound_queue_entry outbound_queue_of(const msgch::outqueue_t& queues, u
 /// this one snapshot so they cannot diverge.
 ///
 /// Empty when epoch state is unreadable or the group cursor is out of range. That is fail-closed:
-/// `deliver` requires `is_batch_operator_active`, which requires the same epoch state, so there is
-/// nothing to tally in that window anyway. There is deliberately no configured-size fallback --
+/// `deliver` admits a current-epoch delivery only from the same group of the same epoch state, so there
+/// is nothing to tally in that window anyway. There is deliberately no configured-size fallback --
 /// `epochcfg.operators_per_epoch` sizes the schedule, it does not describe who can deliver now.
 std::vector<name> eligible_batch_operators(uint64_t chain_code) {
    const std::optional<epoch::epoch_state> state = epoch::epoch_state_of(chain_code);
@@ -295,7 +312,7 @@ void write_envelope_log(name self,
 /// is O(budget).
 ///
 /// Ids never restart: `deliver` calls this after inserting its row, the newest id, which is in the
-/// current epoch and so outside the pruned range.
+/// current or previous epoch and so outside the pruned range.
 void prune_expired_envelopes(name self, uint64_t chain_code, uint32_t current_epoch) {
    if (current_epoch < INBOUND_ENVELOPE_RETENTION_EPOCHS) return;
    const uint128_t newest_expired =
@@ -947,20 +964,26 @@ void slash_non_canonical_deliverers(name self, uint64_t chain_code, uint32_t epo
 
    // Record per-outpost consensus: the winning delivery checksum, the accepted envelope's canonical
    // epoch digest (the new inbound ENVELOPE tip), and the last accepted message's id (the new inbound
-   // MESSAGE tip -- unchanged for a zero-message ack).
+   // MESSAGE tip -- unchanged for a zero-message ack). The winner the row held moves to its previous
+   // fields, which a late delivery for that epoch must repeat. The idempotency guard above returned for
+   // a winner already recorded for this epoch, so the row holds an earlier one.
    msgch::outpost_consensus_t opcons(self);
    auto opc_pk = msgch::outpost_consensus_key{chain_code};
    if (!opcons.contains(opc_pk)) {
       opcons.emplace(ram_payer, opc_pk, msgch::outpost_consensus_entry{
-         .chain_code        = chain_code,
-         .epoch_index       = epoch_index,
-         .consensus_reached = true,
-         .winning_checksum  = winning_checksum,
-         .envelope_digest   = envelope_digest,
-         .message_tip       = new_message_tip,
+         .chain_code                = chain_code,
+         .epoch_index               = epoch_index,
+         .consensus_reached         = true,
+         .winning_checksum          = winning_checksum,
+         .envelope_digest           = envelope_digest,
+         .message_tip               = new_message_tip,
+         .previous_epoch_index      = 0,
+         .previous_winning_checksum = checksum256{},
       });
    } else {
       opcons.modify(same_payer, opc_pk, [&](auto& r) {
+         r.previous_epoch_index      = r.epoch_index;
+         r.previous_winning_checksum = r.winning_checksum;
          r.epoch_index       = epoch_index;
          r.consensus_reached = true;
          r.winning_checksum  = winning_checksum;
@@ -1119,7 +1142,14 @@ void msgch::bootchain(uint64_t chain_code) {
 //  deliver — batch operator delivers inbound OPP data for a specific outpost
 // ---------------------------------------------------------------------------
 void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> data) {
-   is_batch_operator_active(batch_op_name, chain_code);
+   // The deliverer signs and sits in the chain's group on duty or, for a late delivery, in the group that
+   // served its previous epoch. Which of the two it must be is checked against the envelope's epoch below.
+   require_auth(batch_op_name);
+   const std::optional<epoch::epoch_state> state = epoch::epoch_state_of(chain_code);
+   check(state.has_value(), epoch::EPOCH_STATE_NOT_INITIALIZED);
+   const bool in_current_group  = epoch::in_current_group(*state, batch_op_name);
+   const bool in_previous_group = epoch::in_previous_group(*state, batch_op_name);
+   check(in_current_group || in_previous_group, DELIVERER_NOT_IN_GROUP);
 
    // Gate on the operator's *current* opreg status, not just resident-group
    // membership. The batch-op group is a snapshot taken at advance()/schbatchgps
@@ -1160,10 +1190,11 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
    check(!op_row.is_depot, "deliver: chain_code refers to the depot self-row");
    check(op_row.active, "deliver: outpost is not active");
 
-   // Decode envelope to validate epoch_index matches the chain's current epoch. The decoded envelope
-   // is re-used by the semantic-header/chain validation below (after the duplicate check).
-   const uint32_t epoch = epoch::current_epoch_index(chain_code);
-   check(epoch > 0, DELIVER_BEFORE_GENESIS);
+   // Decode envelope to validate its epoch_index: the chain's current epoch, or its previous one for a late
+   // delivery. The decoded envelope is re-used by the semantic-header/chain validation below (after the
+   // duplicate check).
+   const uint32_t current_epoch = state->current_epoch_index;
+   check(current_epoch > 0, DELIVER_BEFORE_GENESIS);
    opp::Envelope env_check;
    {
       auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
@@ -1174,13 +1205,20 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
          check(static_cast<uint32_t>(message.payload.version) == SUPPORTED_PAYLOAD_VERSION,
                UNSUPPORTED_PAYLOAD_VERSION);
       }
-      uint32_t env_epoch = static_cast<uint32_t>(env_check.epoch_index);
-      // Lambda overload: the formatted message (triple std::to_string concat) is built only on the
-      // failure path, not on every successful delivery.
-      check(env_epoch == epoch, [&] {
-         return "envelope epoch_index mismatch: envelope=" + std::to_string(env_epoch) +
-                " current=" + std::to_string(epoch);
-      });
+   }
+   const uint32_t epoch = static_cast<uint32_t>(env_check.epoch_index);
+   // A late delivery is for the chain's previous epoch; any older epoch is refused.
+   const bool late_delivery = current_epoch > 1 && epoch == current_epoch - 1;
+   // Lambda overload: the formatted message (triple std::to_string concat) is built only on the failure
+   // path, not on every successful delivery.
+   check(epoch == current_epoch || late_delivery, [&] {
+      return "envelope epoch_index mismatch: envelope=" + std::to_string(epoch) +
+             " current=" + std::to_string(current_epoch);
+   });
+   if (late_delivery) {
+      check(in_previous_group, LATE_DELIVERER_NOT_IN_PREVIOUS_GROUP);
+   } else {
+      check(in_current_group, epoch::NOT_IN_ACTIVE_GROUP);
    }
 
    // Compute checksum trustlessly inside the contract
@@ -1212,20 +1250,26 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
    // true). A reverted tx records nothing, so the operator can immediately deliver a corrected one.
    //
    // A decided epoch takes only its winner's bytes. Accepting the winner slashed every recorded delivery
-   // that differs from it, so a differing one now is refused, and its operator's close records a miss.
+   // that differs from it, so a differing one now is refused, and the advance that closes the epoch's
+   // books records its operator's miss. A late delivery, for the previous epoch, is held to that epoch's
+   // winner the same way, and a previous epoch with no accepted winner takes none.
    //
    // LATE CONFIRMATION bypass: once this epoch's winner is accepted, `outpcons.envelope_digest`
    // advances to the accepted envelope's own digest, so the winner no longer "continues" the chain
    // it just extended -- validating it against the advanced tip would revert every remaining
    // operator's delivery of the exact accepted bytes. Those rows are protocol-relevant:
    // `sysio.epoch::advance` records each member's delivery, and a reverted delivery would instead mark
-   // the confirmer as a non-deliverer. An envelope whose sha256 equals the recorded `winning_checksum`
-   // for THIS epoch is byte-identical to the winner that already passed full validation at ingress and
-   // acceptance, so it is recorded without re-validation.
-   const std::optional<outpost_consensus_entry> consensus = consensus_for_epoch(get_self(), chain_code, epoch);
-   const bool late_confirmation = consensus && consensus->consensus_reached;
-   check(!late_confirmation || consensus->winning_checksum == cs, DELIVERY_DIFFERS_FROM_ACCEPTED);
-   if (!late_confirmation) {
+   // the confirmer as a non-deliverer. An envelope whose sha256 equals the recorded winner of ITS
+   // epoch (`winner_of`) is byte-identical to the winner that already passed full validation at ingress
+   // and acceptance, so it is recorded without re-validation.
+   const std::optional<checksum256> winner = winner_of(get_self(), chain_code, epoch);
+   if (late_delivery) {
+      check(winner.has_value() && *winner == cs, LATE_DELIVERY_DIFFERS_FROM_ACCEPTED);
+   } else {
+      check(!winner.has_value() || *winner == cs, DELIVERY_DIFFERS_FROM_ACCEPTED);
+   }
+   const bool repeats_winner = winner.has_value();
+   if (!repeats_winner) {
       checksum256 ingress_digest{};
       checksum256 ingress_message_tip{};
       check(inbound_envelope_valid(get_self(), env_check, chain_code, epoch, ingress_digest,
@@ -1248,15 +1292,18 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
       // is authoritative; this is just the cached projection.
       .chain_kind    = op_row.kind,
       .checksum      = cs,
-      // A late confirmation repeats this epoch's already-applied winner. `outpcons` records that
-      // acceptance, so `apply_consensus` never decodes this bucket's bytes again; `advance` needs
-      // only the metadata.
-      .raw_data      = late_confirmation ? std::vector<char>{} : std::move(data),
+      // A delivery that repeats its epoch's already-applied winner: `outpcons` records that acceptance,
+      // so `apply_consensus` never decodes this bucket's bytes again; `advance` needs only the metadata.
+      .raw_data      = repeats_winner ? std::vector<char>{} : std::move(data),
       .received_at   = current_time_point(),
    });
 
-   // After the emplace, so the newest id always survives (see prune_expired_envelopes).
-   prune_expired_envelopes(get_self(), chain_code, epoch);
+   // After the emplace, so the newest id always survives (see prune_expired_envelopes). Pruned against the
+   // chain's current epoch, so a late delivery's own epoch is kept.
+   prune_expired_envelopes(get_self(), chain_code, current_epoch);
+
+   // A late delivery's epoch is decided and no longer current: there is nothing to evaluate.
+   if (late_delivery) return;
 
    // Evaluate consensus inline
    action(
