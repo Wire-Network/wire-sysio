@@ -260,7 +260,11 @@ notification, and by `resendroster`. `reportqueue` keeps its reports in the new 
 minimum per duty epoch. The `epochstate` layout changes in place, so every reader is rebuilt: `sysio.msgch` and
 `sysio.opreg` read it, and the test-only `epoch_stub` writes it. No migration is supplied: deploy
 `sysio.epoch` and `sysio.msgch` together, with the rebuilt `sysio.opreg`, on a fresh chain with the matching
-`batch_operator_plugin`, which reads `due_at` and `sysio.msgch::outpcons` to push `chkcons`.
+`batch_operator_plugin`, which reads `due_at` and `sysio.msgch::outpcons` to push `chkcons`. The plugin adds
+`sysio.msgch::reportqueue` to the relay's actions, so an operator whose `@active` has been restricted by a
+`linkauth` must let it authorize that action too, or the plugin refuses to start. Its backlog reports read the
+outposts' new backlog state (Ethereum `OPP.pendingOutbound()`, Solana `OutboundMessageBuffer.oldest_pending_at`),
+so the outposts deploy with it.
 
 ## The two rules for future changes
 

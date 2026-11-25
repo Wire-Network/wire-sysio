@@ -187,9 +187,8 @@ relay's digest) first reads the outpost again at the read confirmation's block. 
 epoch closed or tipped, or this relay's delivery recorded, the tick ends in
 `outpost_delivery_incomplete_exception` and the next tick checks again, sending nothing while the head still
 shows the delivery. A delivery that a reorg removes before it is that deep is seen missing at the head on a
-later tick and delivered again. Once the depot epoch's minimum end (its start plus
-the chain's minimum duration) has passed, the job keeps retrying until this operator's inbound reply is
-recorded by the depot.
+later tick and delivered again. The job calls every tick until the depot records this operator's inbound
+reply; a recorded delivery sends nothing, so those calls cost only the reads.
 
 ### In-flight transactions
 

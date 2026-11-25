@@ -27,8 +27,11 @@
 #include <sysio/opp/depot/opreg_status.hpp>
 #include <sysio/services/cron_service.hpp>
 
+#include <fc/log/logger.hpp>
 #include <fc/slug_name.hpp>
 #include <fc/variant_object.hpp>
+
+#include <spdlog/sinks/ostream_sink.h>
 
 using namespace std::literals;
 
@@ -339,6 +342,60 @@ BOOST_AUTO_TEST_CASE(push_action_callback_retains_api_after_timeout) {
    BOOST_CHECK(api_lifetime.expired());
    BOOST_CHECK(api_destroyed);
 }
+
+namespace {
+
+/// Capture error-level log lines while preserving the process-wide logger on every test exit path.
+struct error_log_capture {
+   std::ostringstream               output;
+   fc::log_level                    saved_level = fc::logger::default_logger().get_log_level();
+   std::unique_ptr<spdlog::logger>  saved_agent;
+
+   error_log_capture() {
+      auto sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(output);
+      sink->set_pattern("%v");
+      auto agent = std::make_unique<spdlog::logger>("push-refusal-test", sink);
+      agent->set_level(spdlog::level::err);
+      auto& logger = fc::logger::default_logger();
+      saved_agent = std::move(logger.get_agent_logger());
+      logger.update_agent_logger(std::move(agent));
+      logger.set_log_level(fc::log_level::error);
+   }
+
+   ~error_log_capture() {
+      auto& logger = fc::logger::default_logger();
+      logger.update_agent_logger(std::move(saved_agent));
+      logger.set_log_level(saved_level);
+   }
+};
+
+} // namespace
+
+/// A refusal is logged as an error by default, and below it for a push whose refusal is an expected race; either
+/// way the push completes unsucceeded.
+BOOST_AUTO_TEST_CASE(push_refusal_is_logged_at_the_level_the_push_asks_for) try {
+   using push_result = sysio::chain::next_function_variant<sysio::chain_apis::read_write::push_transaction_results>;
+   using sysio::batch_operator_detail::refusal_log;
+   fc::exception_ptr push_error;
+   try {
+      FC_THROW_EXCEPTION(fc::assert_exception, simulated_push_failure);
+   } catch (const fc::exception& error) {
+      push_error = error.dynamic_copy_exception();
+   }
+   for (const refusal_log refusal : {refusal_log::error, refusal_log::info}) {
+      error_log_capture capture;
+      auto completion = std::make_shared<sysio::batch_operator_detail::async_action_completion>();
+      auto done       = completion->get_future();
+      auto callback   = sysio::batch_operator_detail::create_push_action_callback(
+         std::shared_ptr<void>{}, completion, callback_lifetime_action::contract, callback_lifetime_action::name,
+         refusal);
+      callback(push_result{push_error});
+      BOOST_CHECK(done.wait_for(immediate_wait) == std::future_status::ready);
+      BOOST_CHECK(!completion->succeeded());
+      const bool logged_as_error = capture.output.str().find(simulated_push_failure) != std::string::npos;
+      BOOST_CHECK_EQUAL(logged_as_error, refusal == refusal_log::error);
+   }
+} FC_LOG_AND_RETHROW();
 
 /// Regression coverage for SEC-7: the private cron service must support adding
 /// and cancelling per-outpost jobs after startup, which is how refreshed active

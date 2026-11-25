@@ -231,9 +231,13 @@ uint16_t decode_first_unstaged_chunk(opp_solana_outpost_client&                 
 /// every tick behind a dlog, the epoch would never close, and nothing in the
 /// logs would say why.
 ///
+/// `deliveries` must also be declared, as a vector of records carrying an
+/// `operator` pubkey: the outbound delivery reads it to send nothing for a
+/// delivery the outpost already recorded under this relay.
+///
 /// @param program  the program's loaded Anchor IDL.
-/// @throws fc::exception if the account, either field, or either field's type
-///         is absent or disagrees with what the cursor read decodes.
+/// @throws fc::exception if the account, a field, or a field's type is absent
+///         or disagrees with what the progress read decodes.
 void assert_epoch_deliveries_shape(const fc::network::solana::idl::program& program);
 
 /// Assert the loaded IDL declares the outbound `EnvelopeLog` the way `decode_envelope_log_digest` reads it: an
@@ -342,7 +346,32 @@ struct epoch_dispatch_progress {
    /// The on-chain cursor: attestations already settled, in envelope
    /// dispatch order. The relay resumes from here.
    uint32_t dispatched_count  = 0;
+   /// This relay's own delivery is among the epoch's recorded deliveries.
+   bool     delivered_by_self = false;
 };
+
+/// The epoch whose open tally an `opp_bootstrap` reseed may replace the group under: the program accepts a reseed
+/// only while `next_epoch_index` is 1.
+inline constexpr uint32_t RESEEDABLE_EPOCH = 1;
+
+/// The least time between two terminal calls re-sent for a recorded `RESEEDABLE_EPOCH` delivery: the shortest chain
+/// minimum `sysio.epoch` accepts (`MIN_EPOCH_DURATION_SEC`).
+inline constexpr fc::microseconds RESEEDABLE_RESEND_INTERVAL = fc::seconds(10);
+
+/// Decode an `EpochDeliveries` row, as the loaded IDL renders it, into the epoch's progress; `self` is this relay's
+/// signer, looked up among the recorded deliveries' operators.
+/// @throws fc::exception when the row lacks a field the progress read needs.
+epoch_dispatch_progress decode_epoch_dispatch_progress(const fc::variant_object&                      row,
+                                                       const fc::network::solana::solana_public_key& self);
+
+/// Whether `deliver_outbound_envelope` sends this relay's delivery of `epoch_index` (its upload and terminal
+/// `epoch_in`) at `now` given the outpost's `progress`: always while the outpost has not recorded it. A recorded
+/// delivery is not sent again, since the outpost tips on the delivery that completes a strict majority, so only the
+/// rest of the group can settle it. `RESEEDABLE_EPOCH` is the exception while it has not tipped, at most once per
+/// `RESEEDABLE_RESEND_INTERVAL` after `last_resend`: a reseed can leave the kept members' recorded deliveries a
+/// majority of the new group, which tips only on a re-sent terminal.
+bool sends_delivery(uint32_t epoch_index, const epoch_dispatch_progress& progress, fc::time_point now,
+                    fc::time_point last_resend);
 
 /// The `dispatch_attestations` crank loop, factored over its RPC touchpoints
 /// so the plugin's unit tests can drive the full state machine (packing,
@@ -498,7 +527,8 @@ inline constexpr fc::microseconds ENVELOPE_CHUNK_SWEEP_RETRY_BACKOFF = fc::minut
 /// Gate reads, discovery, closes and confirmation share five seconds, capped by the caller's deadline.
 inline constexpr fc::microseconds ENVELOPE_CHUNK_SWEEP_BUDGET = fc::seconds(5);
 
-/// The optional settled check shares the sweep's short budget so a stalled read leaves delivery time.
+/// The optional settled and delivery-record checks each take the sweep's short budget, so a stalled read leaves
+/// delivery time.
 inline constexpr fc::microseconds ENVELOPE_CHUNK_SETTLED_CHECK_BUDGET = ENVELOPE_CHUNK_SWEEP_BUDGET;
 
 /// Three consecutive no-progress sweep attempts tolerate occasional tight ticks while bounding slow discovery reads.
@@ -857,8 +887,10 @@ void assert_global_state_shape(const fc::network::solana::idl::program& program)
  * A delivery for an epoch the outpost has already settled (a later delivery
  * retry, possibly after the chunk-buffer sweep closed that epoch's buffer)
  * sends nothing and returns an empty signature, which the caller reads as
- * "outpost already settled". The job keeps retrying after the epoch boundary
- * until this operator's inbound reply is recorded by the depot.
+ * "outpost already settled". So does a delivery the outpost already recorded
+ * under this relay (`sends_delivery`), which awaits the rest of the group:
+ * the job calls every tick until this operator's inbound reply is recorded by
+ * the depot.
  *
  * Constructed by `outpost_solana_client_plugin::create_outpost_client` —
  * `batch_operator_plugin` never builds one directly.
@@ -927,12 +959,6 @@ public:
 
 private:
 
-   /// Read `EpochDeliveries` for `epoch_index`. A missing/empty account means
-   /// nothing has been delivered yet, reported as zero progress rather than
-   /// treated as an error.
-   outpost_solana_client_detail::epoch_dispatch_progress
-   read_epoch_dispatch_progress(uint32_t epoch_index);
-
    /// The first data chunk of `epoch_index`'s envelope this relay still has to upload, from its own on-chain
    /// `EnvelopeChunks` buffer (`decode_first_unstaged_chunk`). The resume is an optimisation the delivery must never
    /// depend on, so any failure -- signer or PDA lookup, the RPC read, or decoding -- is logged and yields 0. The
@@ -960,6 +986,11 @@ private:
 protected:
    // Subclasses and tests can override these reads and the private read_first_unstaged_chunk
    // to exercise member orchestration without a live endpoint.
+
+   /// Read `EpochDeliveries` for `epoch_index` at `processed`, the commitment the delivery's own writes confirm at.
+   /// A missing/empty account means nothing has been delivered yet, reported as zero progress rather than treated
+   /// as an error.
+   virtual outpost_solana_client_detail::epoch_dispatch_progress read_epoch_dispatch_progress(uint32_t epoch_index);
 
    /// The `finalized` read of the `latest_outbound_envelope` PDA behind
    /// `read_inbound_envelope`, after its pre-read drain: the envelope bytes for
@@ -1026,7 +1057,7 @@ protected:
    /// out of deadline -- before the sweep starts or partway through it -- is not
    /// a close failure; consecutive attempted sweeps stopped without progress back off on every path.
    ///
-   /// Sweeps only run while this operator is elected and within its epoch window. A buffer may
+   /// Sweeps only run while this operator is elected on the chain's current epoch. A buffer may
    /// wait for its owner's next election; an operator that leaves permanently strands its last buffer.
    /// Discovery has no paging and the RPC response cap is 4 MiB (roughly 16k header-only buffers).
    ///
@@ -1069,10 +1100,11 @@ private:
    /// can drain its epoch's dispatch cursor without depot access -- consensus
    /// can tip via OTHER operators' deliveries between our ticks, and the drain
    /// manifest can only be built from the envelope bytes themselves. In-memory
-   /// on purpose: after a restart the still-pending envelope is re-delivered by
-   /// the next outbound tick (re-staging chunks and a duplicate terminal call
-   /// are benign on-chain), which repopulates this memo.
+   /// on purpose: after a restart the next outbound tick repopulates it, whether
+   /// it delivers the envelope or finds the delivery already recorded.
    std::optional<std::pair<uint32_t, std::vector<char>>> _delivered_envelope;
+   /// When this relay last re-sent the terminal call of a recorded `RESEEDABLE_EPOCH` delivery (`sends_delivery`).
+   fc::time_point _last_reseedable_resend;
 
    /// When `reap_settled_envelope_chunks` next runs: the last complete sweep's
    /// cursor and any back-off after a failed one.

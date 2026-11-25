@@ -1,9 +1,9 @@
 #pragma once
 /**
  * @file chain_epochs.hpp
- * @brief Each outpost chain's consensus epoch as one batch operator reads it, and the relay cadence derived from the
- *        chain's epoch duration. Pure functions over decoded `sysio.epoch` rows, so the plugin's tests drive them
- *        without a chain.
+ * @brief Each outpost chain's consensus epoch as one batch operator reads it, the relay cadence derived from the
+ *        chain's epoch duration, and when the operator pushes `sysio.msgch::chkcons`. Pure functions over decoded
+ *        `sysio.epoch` and `sysio.msgch` rows, so the plugin's tests drive them without a chain.
  *
  * Every outpost chain runs its own consensus epoch: `epochstate` and `epochcfg` hold one row per chain, keyed by its
  * `sysio.chains` code, and an operator's election on a chain is decided by that chain's own schedule window. A chain's
@@ -15,15 +15,16 @@
 #include <cstdint>
 #include <format>
 #include <map>
+#include <optional>
 #include <set>
 #include <string>
 #include <vector>
 
+#include <fc/io/json.hpp>
 #include <fc/slug_name.hpp>
 #include <fc/time.hpp>
 #include <fc/variant.hpp>
 #include <fc/variant_object.hpp>
-#include <sysio/chain/config.hpp>
 #include <sysio/chain/name.hpp>
 
 #include "group_election.hpp"
@@ -59,40 +60,51 @@ namespace consensus {
    }
 }
 
+/// `sysio.msgch` identifiers of the outpost backlog reports: `reportqueue` keeps each operator's latest report for a
+/// chain in `qreports`, keyed by (chain, operator).
+namespace backlog {
+   constexpr auto account            = consensus::account;
+   constexpr auto table_qreports     = "qreports";
+   constexpr auto action_reportqueue = "reportqueue";
+   namespace field {
+      constexpr auto chain_code        = "chain_code";
+      constexpr auto account           = "account";             ///< the reporter, on a `qreports` row
+      constexpr auto epoch_index       = "epoch_index";         ///< the epoch the report was made in
+      constexpr auto batch_op          = "batch_op";            ///< `reportqueue`'s reporter
+      constexpr auto pending_count     = "pending_count";
+      constexpr auto oldest_pending_ms = "oldest_pending_ms";
+   }
+}
+
 /// Polls of a chain per epoch: a 360 s epoch is polled every 15 s.
 inline constexpr int64_t polls_per_epoch = 24;
-/// Edge buffers per epoch: a 360 s epoch holds deliveries back 2.5 s from either edge of its minimum duration.
-inline constexpr int64_t edge_buffers_per_epoch = 144;
 /// The shortest poll interval of any chain.
 inline constexpr fc::microseconds min_poll_interval = fc::seconds(1);
-/// The shortest edge buffer of any chain: one WIRE block.
-inline constexpr fc::microseconds min_edge_buffer = fc::microseconds(chain::config::block_interval_us);
 /// Delivery timeouts per epoch: a 60 s epoch gives each outpost call 30 s, and leaves the rest for a retry.
 inline constexpr int64_t delivery_timeouts_per_epoch = 2;
 /// The shortest delivery timeout of any chain: that of sysio.epoch's shortest epoch, 10 s.
 inline constexpr fc::microseconds min_delivery_timeout = fc::seconds(5);
 /// The longest delivery timeout of any chain, so a hung outpost call holds a long epoch's relay no longer.
 inline constexpr fc::microseconds max_delivery_timeout = fc::seconds(60);
+/// Chain minimums a decided epoch stays due before every operator serving the chain, elected or not, pushes
+/// `chkcons` for it: the elected group has that long, many of its polls, to advance it first.
+inline constexpr int64_t liveness_grace_minimums = 1;
 
 /// How the relay paces itself on one chain.
 struct epoch_cadence {
    fc::microseconds poll_interval;      ///< between two polls of the chain's epoch state and outpost
-   fc::microseconds edge_buffer;        ///< deliveries are held back this close to either edge of an epoch
    fc::microseconds delivery_timeout;   ///< bounds each outpost call, and each depot push, for the chain
 };
 
-/// The cadence of a chain whose epochs last `epoch_duration`: a poll every 1/24 of the epoch, at least
-/// `min_poll_interval` and at most `max_poll_interval` (`--batch-epoch-poll-ms`) apart; an edge buffer of 1/144 of
-/// the epoch, at least `min_edge_buffer`; and a delivery timeout of half the epoch, from `min_delivery_timeout` to
-/// `max_delivery_timeout`.
+/// The cadence of a chain whose epochs last at least `epoch_duration`: a poll every 1/24 of it, at least
+/// `min_poll_interval` and at most `max_poll_interval` (`--batch-epoch-poll-ms`) apart, and a delivery timeout of
+/// half of it, from `min_delivery_timeout` to `max_delivery_timeout`.
 inline epoch_cadence derive_cadence(fc::microseconds epoch_duration, fc::microseconds max_poll_interval) {
    const fc::microseconds poll = std::max(fc::microseconds(epoch_duration.count() / polls_per_epoch),
                                           min_poll_interval);
    const fc::microseconds delivery = std::max(fc::microseconds(epoch_duration.count() / delivery_timeouts_per_epoch),
                                               min_delivery_timeout);
    return {.poll_interval    = std::min(poll, max_poll_interval),
-           .edge_buffer      = std::max(fc::microseconds(epoch_duration.count() / edge_buffers_per_epoch),
-                                        min_edge_buffer),
            .delivery_timeout = std::min(delivery, max_delivery_timeout)};
 }
 
@@ -191,33 +203,118 @@ inline decoded_chain_epochs decode_chain_epochs(const fc::variants& state_rows, 
    return decoded;
 }
 
-/// The earliest time `view`'s current epoch can close: its start plus the chain's minimum duration. Zero before the
-/// chain's genesis advance.
-inline fc::time_point minimum_epoch_end(const chain_epoch_view& view) {
-   return view.epoch_index == 0 ? fc::time_point() : view.epoch_start + view.epoch_duration;
-}
-
-/// Whether `now` lies in `view`'s safe operating window: at least the chain's edge buffer after its epoch started and
-/// not within it before the epoch's minimum end (`minimum_epoch_end`). Once that end has passed the window is open.
-inline bool within_epoch_window(const chain_epoch_view& view, fc::time_point now) {
-   if (now < view.epoch_start + view.cadence.edge_buffer) return false;
-   const fc::time_point minimum_end = minimum_epoch_end(view);
-   if (minimum_end != fc::time_point() && now > minimum_end - view.cadence.edge_buffer && now < minimum_end)
-      return false;
-   return true;
-}
-
-/// Whether `now` has passed `view`'s minimum epoch end (`minimum_epoch_end`). False before the chain's genesis
-/// advance.
-inline bool is_epoch_boundary_past(const chain_epoch_view& view, fc::time_point now) {
-   const fc::time_point minimum_end = minimum_epoch_end(view);
-   return minimum_end != fc::time_point() && now >= minimum_end;
-}
-
 /// Whether `view`'s chain is due its next advance at `now`: it has traffic and its `due_at` has passed. An idle chain
 /// is never due.
 inline bool is_advance_due(const chain_epoch_view& view, fc::time_point now) {
    return view.due_at != fc::time_point() && now >= view.due_at;
+}
+
+/// Whether this operator pushes `sysio.msgch::chkcons` for `view`'s chain right after its own delivery of the chain's
+/// current epoch landed at `now`: the chain is past its genesis, not paused, and due. The delivery may itself have
+/// decided the epoch, which the last-read view cannot show yet; on an epoch it left undecided, `chkcons` re-tallies.
+inline bool pushes_chkcons_after_delivery(const chain_epoch_view& view, fc::time_point now) {
+   return view.epoch_index > 0 && !view.is_paused && is_advance_due(view, now);
+}
+
+/// Why this operator pushes `sysio.msgch::chkcons` for a chain on the epoch tick.
+enum class chkcons_reason {
+   /// Elected, and the decided epoch is due: `chkcons` advances it.
+   due,
+   /// Elected, and the epoch has been undecided past the chain minimum: `chkcons` re-tallies it, since its eligible
+   /// group can shrink with no new delivery. At most once per chain minimum from this operator.
+   retally,
+   /// Serving the chain, elected or not, and the decided epoch has stayed due past the liveness grace: `chkcons`
+   /// advances it while its elected group does not.
+   liveness
+};
+
+/// One `chkcons` push the epoch tick makes, and why.
+struct chkcons_push {
+   uint64_t       chain_code = 0;
+   chkcons_reason reason     = chkcons_reason::due;
+
+   bool operator==(const chkcons_push&) const = default;
+};
+
+/// When this operator last pushed a re-tally for each chain, by chain code.
+using retally_pushes = std::map<uint64_t, fc::time_point>;
+
+/// `count` times a chain's minimum duration `minimum`.
+inline fc::microseconds chain_minimums(fc::microseconds minimum, int64_t count) {
+   return fc::microseconds(minimum.count() * count);
+}
+
+/// How long past a decided epoch's `due_at` every serving operator pushes `chkcons` for it: `liveness_grace_minimums`
+/// of the chain's minimum duration.
+inline fc::microseconds liveness_grace(const chain_epoch_view& view) {
+   return chain_minimums(view.epoch_duration, liveness_grace_minimums);
+}
+
+/// Why this operator pushes `sysio.msgch::chkcons` for `view`'s chain at `now`, or nullopt when it does not. Nothing
+/// is pushed before the chain's genesis advance or while a dispute pauses it.
+///
+/// @param last_retally    when this operator last pushed a re-tally for the chain; zero when it never did.
+/// @param serves_actively this operator serves the chain and its status is ACTIVE, which the liveness push needs.
+inline std::optional<chkcons_reason> chkcons_reason_of(const chain_epoch_view& view, fc::time_point now,
+                                                       fc::time_point last_retally, bool serves_actively) {
+   if (view.epoch_index == 0 || view.is_paused) return std::nullopt;
+   if (view.election.is_elected) {
+      if (view.decided) return is_advance_due(view, now) ? std::optional(chkcons_reason::due) : std::nullopt;
+      // Undecided a chain minimum past its start, and a chain minimum past this operator's last re-tally.
+      const fc::time_point retally_at = std::max(view.epoch_start, last_retally) + view.epoch_duration;
+      return now >= retally_at ? std::optional(chkcons_reason::retally) : std::nullopt;
+   }
+   if (serves_actively && view.decided && is_advance_due(view, now) && now >= view.due_at + liveness_grace(view)) {
+      return chkcons_reason::liveness;
+   }
+   return std::nullopt;
+}
+
+/// The `relayed` chains this operator pushes `sysio.msgch::chkcons` for at `now`, in chain-code order, and why
+/// (`chkcons_reason_of`, with each chain's entry of `retallied` as its last re-tally). `serves_actively` is whether
+/// the operator's status is ACTIVE, which the liveness push needs.
+inline std::vector<chkcons_push> chkcons_chains(const chain_epochs& views, const std::set<uint64_t>& relayed,
+                                                fc::time_point now, const retally_pushes& retallied,
+                                                bool serves_actively) {
+   std::vector<chkcons_push> pushed;
+   for (const uint64_t chain_code : relayed) {
+      const auto view = views.find(chain_code);
+      if (view == views.end()) continue;
+      const auto           last_retally = retallied.find(chain_code);
+      const fc::time_point last         = last_retally == retallied.end() ? fc::time_point() : last_retally->second;
+      if (const std::optional<chkcons_reason> reason = chkcons_reason_of(view->second, now, last, serves_actively)) {
+         pushed.push_back({.chain_code = chain_code, .reason = *reason});
+      }
+   }
+   return pushed;
+}
+
+/// Record `now` in `retallied` as the last re-tally of each chain `pushes` re-tallies, so `chkcons_chains` holds this
+/// operator's next re-tally of it back a chain minimum.
+inline void record_retallies(retally_pushes& retallied, const std::vector<chkcons_push>& pushes, fc::time_point now) {
+   for (const chkcons_push& push : pushes) {
+      if (push.reason == chkcons_reason::retally) retallied[push.chain_code] = now;
+   }
+}
+
+/// The exact-lookup key of `account`'s `sysio.msgch::qreports` row for `chain_code`, as chain_plugin's key codec
+/// expects it.
+inline std::string queue_report_find_bound(uint64_t chain_code, chain::name account) {
+   return fc::json::to_string(fc::mutable_variant_object()(backlog::field::chain_code, chain_code)(
+                                 backlog::field::account, account.to_string()),
+                              fc::json::yield_function_t{});
+}
+
+/// Whether `rows`, the result of `account`'s exact `qreports` lookup for `chain_code`, hold its report made in
+/// `epoch_index`. Throws when the row does not decode.
+inline bool reported_in_epoch(const fc::variants& rows, uint64_t chain_code, chain::name account,
+                              uint32_t epoch_index) {
+   return std::ranges::any_of(rows, [&](const fc::variant& row) {
+      const fc::variant_object& report = row.get_object();
+      return report[backlog::field::chain_code].as_uint64() == chain_code &&
+             chain::name(report[backlog::field::account].as_string()) == account &&
+             report[backlog::field::epoch_index].as<uint32_t>() == epoch_index;
+   });
 }
 
 /// How often the relay polls `chain_code`: its cadence's poll interval, or `max_poll_interval` while it has no view.
@@ -255,26 +352,6 @@ inline fc::microseconds epoch_tick_step(fc::microseconds max_poll_interval) {
 inline fc::time_point next_epoch_read_at(fc::time_point read_at, fc::microseconds interval,
                                          fc::microseconds tick_step) {
    return read_at + interval - fc::microseconds(tick_step.count() / 2);
-}
-
-/// Whether this operator pushes `sysio.msgch::chkcons` for `view`'s chain at `now`: it is elected on the chain, past
-/// its genesis, and either the epoch is decided and the chain is due (`chkcons` advances it), or the epoch is undecided
-/// past its minimum end (`chkcons` re-tallies it). A decided epoch on an idle chain gets no push.
-inline bool pushes_chkcons(const chain_epoch_view& view, fc::time_point now) {
-   if (!view.election.is_elected || view.epoch_index == 0) return false;
-   return view.decided ? is_advance_due(view, now) : is_epoch_boundary_past(view, now);
-}
-
-/// The `relayed` chains this operator pushes `sysio.msgch::chkcons` for at `now` (`pushes_chkcons`), in chain-code
-/// order.
-inline std::vector<uint64_t> chkcons_chains(const chain_epochs& views, const std::set<uint64_t>& relayed,
-                                            fc::time_point now) {
-   std::vector<uint64_t> pushed;
-   for (const uint64_t chain_code : relayed) {
-      const auto view = views.find(chain_code);
-      if (view != views.end() && pushes_chkcons(view->second, now)) pushed.push_back(chain_code);
-   }
-   return pushed;
 }
 
 } // namespace sysio::batch_operator_detail

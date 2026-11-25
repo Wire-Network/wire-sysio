@@ -121,10 +121,12 @@ public:
     *                        remote chain for this call.
     * @return Chain-native transaction id / signature suitable for logs, or
     *         EMPTY when the relay found nothing to send (the outpost had already
-    *         settled it, or it settled on another relay's envelope). Neither a
-    *         signature nor an empty return permanently marks the job complete:
-    *         after the epoch boundary it retries each cron tick until inbound
-    *         delivery establishes completion.
+    *         settled it, it settled on another relay's envelope, or this relay's
+    *         delivery is already recorded and awaits the rest of the group).
+    *         Neither a signature nor an empty return marks the job complete: it
+    *         calls again each cron tick until the depot records this operator's
+    *         inbound delivery of the epoch, so a recorded delivery must send
+    *         nothing.
     * @throws chain::outpost_delivery_incomplete_exception when the epoch is
     *         left open for THIS relay to finish on a later tick; the job does
     *         not mark it handled.

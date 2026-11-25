@@ -9,6 +9,7 @@
 #include <vector>
 
 #include <fc/exception/exception.hpp>
+#include <fc/io/json.hpp>
 #include <fc/slug_name.hpp>
 #include <fc/time.hpp>
 #include <fc/variant.hpp>
@@ -261,38 +262,35 @@ BOOST_AUTO_TEST_CASE(a_chain_without_config_or_a_bad_row_is_left_out) try {
    BOOST_CHECK(decoded.skipped[1].find("did not decode") != std::string::npos);
 } FC_LOG_AND_RETHROW();
 
-/// The poll is 1/24 of the epoch, the edge buffer 1/144 and the delivery timeout 1/2, so the default 360 s epoch keeps
-/// today's 15 s poll, 2.5 s buffer and 60 s timeout; the poll is floored at a second and capped at
-/// `--batch-epoch-poll-ms`, the buffer floored at a block, and the timeout held between 5 s and 60 s.
+/// The poll is 1/24 of the chain minimum and the delivery timeout 1/2, so the default 360 s minimum keeps a 15 s poll
+/// and a 60 s timeout; the poll is floored at a second and capped at `--batch-epoch-poll-ms`, and the timeout held
+/// between 5 s and 60 s.
 BOOST_AUTO_TEST_CASE(the_cadence_follows_the_epoch_duration) try {
    struct expectation {
       uint32_t         duration_sec;
       fc::microseconds max_poll_interval;
       fc::microseconds poll_interval;
-      fc::microseconds edge_buffer;
       fc::microseconds delivery_timeout;
    };
    const std::vector<expectation> expectations{
-      {slow_duration_sec, max_poll, fc::seconds(15), fc::milliseconds(2500), max_delivery_timeout},
-      {fast_duration_sec, max_poll, min_poll_interval, min_edge_buffer, min_delivery_timeout},
-      {15, max_poll, min_poll_interval, min_edge_buffer, fc::milliseconds(7500)},
-      {60, max_poll, fc::milliseconds(2500), min_edge_buffer, fc::seconds(30)},
-      {120, max_poll, fc::seconds(5), fc::microseconds(833'333), max_delivery_timeout},
-      {3600, max_poll, max_poll, fc::seconds(25), max_delivery_timeout},
+      {slow_duration_sec, max_poll, fc::seconds(15), max_delivery_timeout},
+      {fast_duration_sec, max_poll, min_poll_interval, min_delivery_timeout},
+      {15, max_poll, min_poll_interval, fc::milliseconds(7500)},
+      {60, max_poll, fc::milliseconds(2500), fc::seconds(30)},
+      {120, max_poll, fc::seconds(5), max_delivery_timeout},
+      {3600, max_poll, max_poll, max_delivery_timeout},
       // A poll option below the floor is honoured.
-      {slow_duration_sec, fc::milliseconds(500), fc::milliseconds(500), fc::milliseconds(2500), max_delivery_timeout},
+      {slow_duration_sec, fc::milliseconds(500), fc::milliseconds(500), max_delivery_timeout},
       // A duration under sysio.epoch's 10 s floor still gets the shortest timeout.
-      {1, max_poll, min_poll_interval, min_edge_buffer, min_delivery_timeout},
+      {1, max_poll, min_poll_interval, min_delivery_timeout},
    };
    for (const expectation& e : expectations) {
       const epoch_cadence cadence = derive_cadence(fc::seconds(e.duration_sec), e.max_poll_interval);
       BOOST_TEST_CONTEXT("duration " << e.duration_sec << " s, max poll " << e.max_poll_interval.count() << " us") {
          BOOST_CHECK_EQUAL(cadence.poll_interval.count(), e.poll_interval.count());
-         BOOST_CHECK_EQUAL(cadence.edge_buffer.count(), e.edge_buffer.count());
          BOOST_CHECK_EQUAL(cadence.delivery_timeout.count(), e.delivery_timeout.count());
       }
    }
-   BOOST_CHECK_EQUAL(min_edge_buffer.count(), fc::milliseconds(sysio::chain::config::block_interval_ms).count());
 } FC_LOG_AND_RETHROW();
 
 /// A chain's outpost calls and depot pushes take its own delivery timeout, and the longest one while it has no view.
@@ -328,42 +326,6 @@ BOOST_AUTO_TEST_CASE(a_bad_consensus_row_reads_as_undecided) try {
    BOOST_CHECK(!genesis.decided);
 } FC_LOG_AND_RETHROW();
 
-/// The safe window and the minimum end are each chain's own: the same instant can be inside the fast chain's window
-/// and still inside the slow chain's start buffer.
-BOOST_AUTO_TEST_CASE(the_epoch_window_uses_the_chains_own_buffer) try {
-   const decoded_chain_epochs decoded = decode_both();
-   chain_epoch_view fast = decoded.views.at(fast_chain.value);
-   chain_epoch_view slow = decoded.views.at(slow_chain.value);
-   // Line both epochs up on the same start so only their buffers and minimums differ.
-   slow.epoch_start = fast.epoch_start;
-   const fc::time_point start = fast.epoch_start;
-   const fc::time_point fast_minimum_end = start + fast.epoch_duration;
-   BOOST_CHECK(minimum_epoch_end(fast) == fast_minimum_end);
-   BOOST_CHECK(minimum_epoch_end(slow) == start + slow.epoch_duration);
-
-   const fc::time_point inside_fast_buffer = start + fc::milliseconds(400);
-   const fc::time_point past_fast_buffer   = start + fc::milliseconds(600);
-   BOOST_CHECK(!within_epoch_window(fast, inside_fast_buffer));
-   BOOST_CHECK(within_epoch_window(fast, past_fast_buffer));
-   BOOST_CHECK(!within_epoch_window(slow, past_fast_buffer));
-   BOOST_CHECK(within_epoch_window(slow, start + fc::seconds(3)));
-
-   // The buffer before the fast chain's minimum end, then the epoch past it, which stays open however long it runs.
-   BOOST_CHECK(!within_epoch_window(fast, fast_minimum_end - fc::milliseconds(400)));
-   BOOST_CHECK(!is_epoch_boundary_past(fast, fast_minimum_end - fc::milliseconds(1)));
-   BOOST_CHECK(within_epoch_window(fast, fast_minimum_end));
-   BOOST_CHECK(is_epoch_boundary_past(fast, fast_minimum_end));
-   BOOST_CHECK(within_epoch_window(fast, fast_minimum_end + fc::days(1)));
-   BOOST_CHECK(!is_epoch_boundary_past(slow, fast_minimum_end));
-
-   // Before its genesis advance a chain has no minimum end to pass.
-   chain_epoch_view genesis = fast;
-   genesis.epoch_index = 0;
-   BOOST_CHECK(minimum_epoch_end(genesis) == fc::time_point());
-   BOOST_CHECK(!is_epoch_boundary_past(genesis, past_fast_buffer));
-   BOOST_CHECK(within_epoch_window(genesis, past_fast_buffer));
-} FC_LOG_AND_RETHROW();
-
 /// A chain is due once its `due_at` has passed, and never while it is idle.
 BOOST_AUTO_TEST_CASE(a_chain_is_due_only_with_traffic) try {
    const chain_epochs views = decode_both().views;
@@ -374,10 +336,32 @@ BOOST_AUTO_TEST_CASE(a_chain_is_due_only_with_traffic) try {
    BOOST_CHECK(!is_advance_due(idle, idle.epoch_start + fc::days(30)));
 } FC_LOG_AND_RETHROW();
 
-/// `chkcons` goes to each relayed chain the operator is elected on: a decided epoch once its chain is due, which
-/// advances it, and an undecided one past its minimum end, which re-tallies it. A decided epoch on an idle chain, a
-/// chain before its genesis, and a chain the operator is not elected on get none.
-BOOST_AUTO_TEST_CASE(chkcons_goes_to_due_or_undecided_relayed_elected_chains) try {
+/// The relay pushes `chkcons` for a chain right after its own delivery of the current epoch once the chain is due:
+/// the delivery may have decided it. Never while the chain is idle, paused, or before its genesis.
+BOOST_AUTO_TEST_CASE(chkcons_follows_an_own_delivery_once_the_chain_is_due) try {
+   chain_epoch_view fast = decode_both().views.at(fast_chain.value);
+   BOOST_CHECK(pushes_chkcons_after_delivery(fast, fast.due_at));
+   BOOST_CHECK(!pushes_chkcons_after_delivery(fast, fast.due_at - fc::milliseconds(1)));
+   // An undecided epoch too: the last-read view cannot show what the delivery just decided.
+   fast.decided = false;
+   BOOST_CHECK(pushes_chkcons_after_delivery(fast, fast.due_at));
+   // The election does not enter into it: the delivery itself was the elected operator's.
+   fast.election.is_elected = false;
+   BOOST_CHECK(pushes_chkcons_after_delivery(fast, fast.due_at));
+
+   chain_epoch_view paused = fast;
+   paused.is_paused = true;
+   BOOST_CHECK(!pushes_chkcons_after_delivery(paused, fast.due_at));
+   chain_epoch_view genesis = fast;
+   genesis.epoch_index = 0;
+   BOOST_CHECK(!pushes_chkcons_after_delivery(genesis, fast.due_at));
+   const chain_epoch_view& idle = decode_both().views.at(slow_chain.value);
+   BOOST_CHECK(!pushes_chkcons_after_delivery(idle, idle.epoch_start + fc::days(30)));
+} FC_LOG_AND_RETHROW();
+
+/// The elected group pushes `chkcons` for a decided epoch once its chain is due, which advances it; never for a decided
+/// epoch on an idle chain.
+BOOST_AUTO_TEST_CASE(chkcons_goes_to_a_due_decided_epoch_from_the_elected_group) try {
    chain_epochs views = decode_both().views;
    // Elected on a chain it does not relay.
    chain_epoch_view unrelayed = views.at(fast_chain.value);
@@ -385,34 +369,152 @@ BOOST_AUTO_TEST_CASE(chkcons_goes_to_due_or_undecided_relayed_elected_chains) tr
    views.emplace(unconfigured_chain.value, unrelayed);
 
    const std::set<uint64_t> relayed{fast_chain.value, slow_chain.value};
-   chain_epoch_view& fast = views.at(fast_chain.value);
-   const fc::time_point due = fast.due_at;
-   const fc::time_point minimum_end = minimum_epoch_end(fast);
-   BOOST_REQUIRE(due > minimum_end);
+   chain_epoch_view&        fast = views.at(fast_chain.value);
+   const fc::time_point     due  = fast.due_at;
+   const std::vector<chkcons_push> pushed_due{{.chain_code = fast_chain.value, .reason = chkcons_reason::due}};
 
-   // Decided: pushed once due, not at the minimum end before it.
-   BOOST_CHECK(chkcons_chains(views, relayed, due) == std::vector<uint64_t>{fast_chain.value});
-   BOOST_CHECK(chkcons_chains(views, relayed, due - fc::milliseconds(1)).empty());
-   BOOST_CHECK(chkcons_chains(views, relayed, minimum_end).empty());
-   BOOST_CHECK(chkcons_chains(views, {slow_chain.value}, due).empty());
-   BOOST_CHECK(chkcons_chains({}, relayed, due).empty());
+   BOOST_CHECK(chkcons_chains(views, relayed, due, {}, true) == pushed_due);
+   BOOST_CHECK(chkcons_chains(views, relayed, due + fc::days(1), {}, false) == pushed_due);
+   BOOST_CHECK(chkcons_chains(views, relayed, due - fc::milliseconds(1), {}, true).empty());
+   BOOST_CHECK(chkcons_chains(views, {slow_chain.value}, due, {}, true).empty());
+   BOOST_CHECK(chkcons_chains({}, relayed, due, {}, true).empty());
+   // A re-tally pushed earlier does not hold back an advance.
+   BOOST_CHECK(chkcons_chains(views, relayed, due, {{fast_chain.value, due}}, true) == pushed_due);
 
    // Decided and idle: never pushed.
    fast.traffic_since = fc::time_point();
    fast.due_at        = fc::time_point();
-   BOOST_CHECK(chkcons_chains(views, relayed, minimum_end + fc::days(1)).empty());
+   BOOST_CHECK(chkcons_chains(views, relayed, due + fc::days(1), {}, true).empty());
 
-   // Undecided: pushed from the minimum end on, with or without traffic, to re-tally.
-   fast.decided = false;
-   BOOST_CHECK(chkcons_chains(views, relayed, minimum_end - fc::milliseconds(1)).empty());
-   BOOST_CHECK(chkcons_chains(views, relayed, minimum_end) == std::vector<uint64_t>{fast_chain.value});
-
-   // Not elected, or before its genesis advance: never pushed.
-   fast.election.is_elected = false;
-   BOOST_CHECK(chkcons_chains(views, relayed, minimum_end + fc::days(1)).empty());
+   // Paused by a dispute, or before its genesis advance: never pushed, whatever the election says.
+   fast.due_at              = due;
+   fast.is_paused           = true;
    fast.election.is_elected = true;
-   fast.epoch_index         = 0;
-   BOOST_CHECK(chkcons_chains(views, relayed, minimum_end + fc::days(1)).empty());
+   BOOST_CHECK(chkcons_chains(views, relayed, due, {}, true).empty());
+   fast.is_paused   = false;
+   fast.epoch_index = 0;
+   BOOST_CHECK(chkcons_chains(views, relayed, due, {}, true).empty());
+} FC_LOG_AND_RETHROW();
+
+/// The elected group re-tallies an epoch undecided a chain minimum past its start, with or without traffic, and again
+/// at most once per chain minimum after its own last re-tally.
+BOOST_AUTO_TEST_CASE(chkcons_retallies_an_undecided_epoch_once_per_minimum) try {
+   chain_epochs views = decode_both().views;
+   const std::set<uint64_t> relayed{fast_chain.value};
+   chain_epoch_view&        fast = views.at(fast_chain.value);
+   fast.decided                  = false;
+   const fc::time_point first    = fast.epoch_start + fast.epoch_duration;
+   const std::vector<chkcons_push> retally{{.chain_code = fast_chain.value, .reason = chkcons_reason::retally}};
+
+   BOOST_CHECK(chkcons_chains(views, relayed, first - fc::milliseconds(1), {}, true).empty());
+   BOOST_CHECK(chkcons_chains(views, relayed, first, {}, true) == retally);
+   // Once pushed at `first`, not again for a chain minimum.
+   const retally_pushes pushed{{fast_chain.value, first}};
+   BOOST_CHECK(chkcons_chains(views, relayed, first + fast.epoch_duration - fc::milliseconds(1), pushed, true).empty());
+   BOOST_CHECK(chkcons_chains(views, relayed, first + fast.epoch_duration, pushed, true) == retally);
+   // A re-tally pushed in an earlier epoch does not hold this one back past its own first chain minimum.
+   BOOST_CHECK(chkcons_chains(views, relayed, first, {{fast_chain.value, fast.epoch_start - fc::seconds(1)}}, true) ==
+               retally);
+   // Idle or not makes no difference.
+   fast.traffic_since = fc::time_point();
+   fast.due_at        = fc::time_point();
+   BOOST_CHECK(chkcons_chains(views, relayed, first, {}, true) == retally);
+
+   // Only the elected group re-tallies, ACTIVE or not.
+   fast.election.is_elected = false;
+   BOOST_CHECK(chkcons_chains(views, relayed, first + fc::days(1), {}, true).empty());
+} FC_LOG_AND_RETHROW();
+
+/// The epoch tick records each re-tally it pushes, which holds this operator's next re-tally of the chain back a chain
+/// minimum; an advance or a liveness push records nothing.
+BOOST_AUTO_TEST_CASE(the_epoch_tick_records_its_retallies) try {
+   chain_epochs views = decode_both().views;
+   const std::set<uint64_t> relayed{fast_chain.value};
+   chain_epoch_view&        fast = views.at(fast_chain.value);
+   fast.decided                  = false;
+   const fc::time_point first    = fast.epoch_start + fast.epoch_duration;
+   const fc::time_point second   = first + fast.epoch_duration;
+   retally_pushes       retallied;
+   // One epoch tick as the plugin runs it: name the pushes, then record them.
+   const auto tick = [&](fc::time_point now) {
+      const std::vector<chkcons_push> pushes = chkcons_chains(views, relayed, now, retallied, true);
+      record_retallies(retallied, pushes, now);
+      return pushes.size();
+   };
+
+   BOOST_CHECK_EQUAL(tick(first), 1u);
+   BOOST_CHECK(retallied.at(fast_chain.value) == first);
+   BOOST_CHECK_EQUAL(tick(first), 0u);
+   BOOST_CHECK_EQUAL(tick(second - fc::milliseconds(1)), 0u);
+   BOOST_CHECK_EQUAL(tick(second), 1u);
+   BOOST_CHECK(retallied.at(fast_chain.value) == second);
+
+   retally_pushes untouched;
+   record_retallies(untouched,
+                    {{.chain_code = fast_chain.value, .reason = chkcons_reason::due},
+                     {.chain_code = slow_chain.value, .reason = chkcons_reason::liveness}},
+                    first);
+   BOOST_CHECK(untouched.empty());
+} FC_LOG_AND_RETHROW();
+
+/// Once a decided epoch has stayed due past the liveness grace, every ACTIVE operator serving the chain pushes
+/// `chkcons` for it, elected or not; an undecided or idle epoch, or an operator that is not ACTIVE, gets none.
+BOOST_AUTO_TEST_CASE(chkcons_from_every_serving_operator_once_due_past_the_grace) try {
+   chain_epochs views = decode_both().views;
+   const std::set<uint64_t> relayed{fast_chain.value, slow_chain.value};
+   chain_epoch_view&        fast = views.at(fast_chain.value);
+   fast.election.is_elected      = false;
+   const fc::time_point due      = fast.due_at;
+   const fc::time_point live     = due + liveness_grace(fast);
+   BOOST_CHECK_EQUAL(liveness_grace(fast).count(), fast.epoch_duration.count() * liveness_grace_minimums);
+   BOOST_CHECK(chain_minimums(fast.epoch_duration, 2) == fast.epoch_duration + fast.epoch_duration);
+   const std::vector<chkcons_push> liveness{{.chain_code = fast_chain.value, .reason = chkcons_reason::liveness}};
+
+   BOOST_CHECK(chkcons_chains(views, relayed, due, {}, true).empty());
+   BOOST_CHECK(chkcons_chains(views, relayed, live - fc::milliseconds(1), {}, true).empty());
+   BOOST_CHECK(chkcons_chains(views, relayed, live, {}, true) == liveness);
+   BOOST_CHECK(chkcons_chains(views, relayed, live + fc::days(1), {}, true) == liveness);
+   // Not ACTIVE: left to the others.
+   BOOST_CHECK(chkcons_chains(views, relayed, live, {}, false).empty());
+   // A chain it does not serve.
+   BOOST_CHECK(chkcons_chains(views, {slow_chain.value}, live, {}, true).empty());
+
+   // Undecided: the liveness push only advances, and re-tallies stay with the elected group.
+   fast.decided = false;
+   BOOST_CHECK(chkcons_chains(views, relayed, live, {}, true).empty());
+   fast.decided = true;
+   // Paused, or idle: none.
+   fast.is_paused = true;
+   BOOST_CHECK(chkcons_chains(views, relayed, live, {}, true).empty());
+   fast.is_paused = false;
+   fast.due_at    = fc::time_point();
+   BOOST_CHECK(chkcons_chains(views, relayed, live, {}, true).empty());
+} FC_LOG_AND_RETHROW();
+
+/// An operator's `qreports` row is looked up by its (chain, operator) key, and counts as reported only for the epoch it
+/// was made in.
+BOOST_AUTO_TEST_CASE(a_backlog_report_counts_for_the_epoch_it_was_made_in) try {
+   constexpr uint32_t report_epoch = 7;
+   // Both key fields, by the ABI's key names: the chain code as a number, the account by name.
+   const fc::variant_object bound =
+      fc::json::from_string(queue_report_find_bound(fast_chain.value, sysio::chain::name(self))).get_object();
+   BOOST_CHECK_EQUAL(bound.size(), 2u);
+   BOOST_CHECK_EQUAL(bound[backlog::field::chain_code].as_uint64(), fast_chain.value);
+   BOOST_CHECK_EQUAL(bound[backlog::field::account].as_string(), std::string(self));
+   const auto row = [](fc::slug_name chain, const char* account, uint32_t epoch_index) {
+      return fc::variant(mvo()(backlog::field::chain_code, chain.value)(backlog::field::account, account)(
+         backlog::field::epoch_index, epoch_index)(backlog::field::pending_count, 2)(
+         "oldest_pending_at", at_sec(fast_start_sec)));
+   };
+   const sysio::chain::name me(self);
+   BOOST_CHECK(reported_in_epoch({row(fast_chain, self, report_epoch)}, fast_chain.value, me, report_epoch));
+   BOOST_CHECK(!reported_in_epoch({row(fast_chain, self, report_epoch - 1)}, fast_chain.value, me, report_epoch));
+   BOOST_CHECK(!reported_in_epoch({row(slow_chain, self, report_epoch)}, fast_chain.value, me, report_epoch));
+   BOOST_CHECK(!reported_in_epoch({row(fast_chain, group_peer, report_epoch)}, fast_chain.value, me, report_epoch));
+   BOOST_CHECK(!reported_in_epoch({}, fast_chain.value, me, report_epoch));
+   BOOST_CHECK_THROW(reported_in_epoch({fc::variant(mvo()(backlog::field::chain_code, fast_chain.value))},
+                                       fast_chain.value, me, report_epoch),
+                     fc::exception);
 } FC_LOG_AND_RETHROW();
 
 /// The epoch tick reads at the shortest relayed chain's cadence, and at the poll option without one; a job polls its

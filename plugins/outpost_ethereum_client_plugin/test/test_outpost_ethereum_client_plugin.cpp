@@ -2193,9 +2193,9 @@ BOOST_AUTO_TEST_CASE(delivery_sends_the_whole_envelope_in_one_call) try {
    BOOST_CHECK_EQUAL(fixture->consensus_reads, 0u);
 } FC_LOG_AND_RETHROW();
 
-/// A consensus retry against an epoch the outpost has already moved past is
-/// abandoned before a single transaction is signed — it would only buy a late
-/// no-op — and the EMPTY tx id marks the epoch handled.
+/// A delivery of an epoch the outpost has already moved past is abandoned
+/// before a single transaction is signed — it would only buy a late no-op —
+/// and the EMPTY tx id marks the epoch handled.
 BOOST_AUTO_TEST_CASE(delivery_skips_when_the_outpost_epoch_advanced) try {
    auto fixture  = create_whole_envelope_delivery_fixture();
    auto envelope = make_envelope(mid_envelope_bytes);

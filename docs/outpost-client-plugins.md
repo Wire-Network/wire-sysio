@@ -67,3 +67,26 @@ auto& client       = client_entry->client;
 // `chain_id` will have the type `fc::uint256`
 auto chain_id = client->get_chain_id();
 ```
+
+## The relay's outpost calls
+
+`batch_operator_plugin` relays through the chain-agnostic `outpost_client` SPI
+(`plugins/outpost_client_plugin/include/sysio/outpost_client/outpost_client.hpp`), one client per outpost:
+
+| Call | Ethereum | Solana |
+|---|---|---|
+| `deliver_outbound_envelope` | One `OPPInbound.epochIn` with the whole envelope, continued while dispatch spills | `epoch_in` chunks, then a terminal call; a separate `dispatch_attestations` drain |
+| `read_inbound_envelope` | `OPP.getLatestOutboundEnvelope()` at the read confirmation | `LatestOutboundEnvelope` at `finalized` |
+| `read_outbound_backlog` | `OPP.pendingOutbound()` at the read confirmation | `OutboundMessageBuffer` and `LatestOutboundEnvelope` in one `getMultipleAccounts` at `confirmed` |
+| `read_emitted_envelope_digest` | `OPP.outboundEnvelopes(epoch)` | The outbound `EnvelopeLog` at `finalized` |
+
+The relay calls `deliver_outbound_envelope` at every poll until the depot records its inbound delivery of the
+epoch, so a client sends nothing for a delivery its outpost already recorded: both outposts tip on the delivery
+that completes a strict majority of the group, and a recorded delivery awaits the rest of it. The one exception is
+Solana's epoch 1, whose recorded delivery re-sends its terminal call at most once per 10 s until it tips, since a
+bootstrap reseed may replace the group under its open tally.
+
+`read_outbound_backlog` reports the latest epoch the outpost emitted, the messages queued for its next emit and
+when the backlog began, in milliseconds (zero while empty). Ethereum dates its oldest queued message; Solana dates
+the start of its current backlog, which a partial drain keeps. The relay reports it to the depot
+(`sysio.msgch::reportqueue`) once the outpost has emitted the depot's current, decided epoch.

@@ -475,9 +475,19 @@ than on the first drain.
 ### Solana Transaction Budgets
 
 Data chunk uploads confirm at `processed`; the terminal `epoch_in` waits for
-`confirmed`. The job retries once the depot epoch's minimum end (its start plus the
-chain's minimum duration) has passed, until this operator's inbound reply, read at `finalized`, is recorded by
-the depot.
+`confirmed`. The job calls every tick until this operator's inbound reply, read at
+`finalized`, is recorded by the depot. A delivery the outpost already recorded under
+this relay (its key among `EpochDeliveries.deliveries`, read at `processed`) is not
+sent again: the outpost tips on the delivery that completes a strict majority, so only
+the rest of the group can settle it. When that epoch has tipped the call drains its
+dispatch instead. The read gets the settled check's short budget, and a failed or
+timed-out read is not known recorded, so the delivery goes out.
+Epoch 1 is the exception: until it tips, a recorded delivery re-sends its terminal
+call at most once per 10 s (`RESEEDABLE_RESEND_INTERVAL`, the shortest chain minimum
+`sysio.epoch` accepts), because an `opp_bootstrap` reseed can replace the group under
+the open tally and leave the kept members' recorded deliveries a majority of the new
+group, which tips only on a terminal call. The batch-operator role boot-checks that
+`EpochDeliveries` declares `deliveries` as records carrying an `operator` pubkey.
 
 Envelope data chunks stay bare so the full 668-byte chunk remains within Solana's
 1,232-byte packet limit. The separate zero-data terminal `epoch_in` call and every

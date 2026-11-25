@@ -15,7 +15,15 @@ namespace sysio::batch_operator_detail {
 namespace push_action_log {
 inline constexpr auto success = "batch_operator: pushed {}::{} ok";
 inline constexpr auto failure = "batch_operator: push {}::{} failed: {}";
+inline constexpr auto refused = "batch_operator: push {}::{} refused: {}";
 } // namespace push_action_log
+
+/// How a push's refusal is logged: as an error, or at info for an action whose refusal is an expected race with
+/// chain state the relay read a poll earlier.
+enum class refusal_log {
+   error,
+   info
+};
 
 /// Owns completion notification for an asynchronous batch-operator action.
 ///
@@ -88,16 +96,19 @@ private:
    std::promise<void> done;
 };
 
-/// Creates the transaction callback while retaining its API through deferred completion.
+/// Creates the transaction callback while retaining its API through deferred completion. A refusal is logged at
+/// `refusal`'s level.
 inline chain::plugin_interface::next_function<chain_apis::read_write::push_transaction_results>
 create_push_action_callback(std::shared_ptr<void> api_lifetime,
       std::shared_ptr<async_action_completion> completion,
       std::string contract,
-      std::string action_name) {
+      std::string action_name,
+      refusal_log refusal = refusal_log::error) {
    return [api_lifetime = std::move(api_lifetime),
            completion = std::move(completion),
            contract = std::move(contract),
-           action_name = std::move(action_name)](const auto& result) {
+           action_name = std::move(action_name),
+           refusal](const auto& result) {
       // `read_write::push_transaction` retains a raw `this` in its own callback.
       (void)api_lifetime;
       completion->complete_push_result(
@@ -105,8 +116,12 @@ create_push_action_callback(std::shared_ptr<void> api_lifetime,
          [&contract, &action_name] {
             ilog(push_action_log::success, contract, action_name);
          },
-         [&contract, &action_name](const fc::exception_ptr& error) {
-            elog(push_action_log::failure, contract, action_name, error->to_string());
+         [&contract, &action_name, refusal](const fc::exception_ptr& error) {
+            if (refusal == refusal_log::info) {
+               ilog(push_action_log::refused, contract, action_name, error->to_string());
+            } else {
+               elog(push_action_log::failure, contract, action_name, error->to_string());
+            }
          });
    };
 }

@@ -37,31 +37,60 @@ A chain with no row is not relayed. The relayed set is re-read every poll, so a
 
 ## Epoch Cycle
 
-Run by every member of a chain's elected group, on that chain, for the chain's own epoch:
+Run by every member of a chain's elected group, on that chain, for the chain's own epoch. A
+chain advances only once its traffic makes it due (`sysio.epoch` `due_at`), so nothing is held
+back within an epoch: each of the chain's three relay jobs acts at every poll while the chain's
+state calls for it.
 
 **Outbound (WIRE → Outposts):**
 1. Read the outpost's outbound envelope that `sysio.epoch::advance` built
    (`sysio.msgch::buildenv`) from the depot's `outenvelopes` table
 2. Deliver it to the Outpost contract (ETH: one `OPPInbound.epochIn()` carrying the whole envelope,
    continued while its dispatch spills; SOL: `epoch_in`, chunked)
-3. The outpost reaches consensus once enough group members have delivered identical bytes
+3. The outpost reaches consensus on the delivery that completes a strict majority of the group
+
+The job calls the outpost client every poll until the depot records this operator's inbound
+delivery of the epoch. A delivery the outpost already recorded is not sent again: it awaits the
+rest of the group. The outpost's per-epoch crank rides the first call of an epoch that returns.
 
 **Inbound (Outposts → WIRE):**
 1. The outpost emits its outbound envelope once it has dispatched the inbound one (ETH: in the `epochIn`
    that finishes dispatch, a continuation if it spilled; SOL: in the consensus-reaching `epoch_in`)
 2. Read the latest outbound envelope from Outpost storage
 3. Deliver its raw protobuf bytes to Depot (`sysio.msgch::deliver`)
-4. Depot evaluates consensus across the group's deliveries
+4. Depot accepts the first strict majority of the group's deliveries; right after its own delivery
+   lands, the operator pushes `sysio.msgch::chkcons` if the chain is due, which advances it
+
+**Backlog (Outposts → WIRE):**
+1. Once the depot has decided the chain's current epoch N and the outpost's latest emitted epoch is N,
+   read the outpost's outbound backlog in one read (ETH `OPP.pendingOutbound()` at the read
+   confirmation; SOL `OutboundMessageBuffer` and `LatestOutboundEnvelope` at `confirmed`)
+2. With messages queued, report the count and the backlog's age to the depot
+   (`sysio.msgch::reportqueue`); a strict majority of the group's reports records the chain's traffic
+3. Report once per epoch, and again while this operator's report for N stands and the chain stays idle
+   (`due_at` zero) one chain minimum after the last one, which re-runs the depot's tally
+4. While nothing is reported for N, read the outpost at most a quarter of the chain minimum apart, not
+   every poll
+
+The backlog job keeps its state under its own lock, so its outpost read and depot push never hold
+up the chain's outbound or inbound job.
 
 ## Depot cranks
 
 The plugin also pushes the depot actions nothing on chain schedules.
 `sysio.msgch::chkcons(chain_code)` — which re-tallies a chain's undecided epoch, and
 advances a decided one once the chain is due (`sysio.epoch` `due_at`: it has traffic and its
-minimum has passed) — comes from the epoch tick, only for each relayed chain the operator is
-elected on: for a decided epoch once `due_at` has passed (`sysio.msgch::outpcons` records the
-epoch), and for an undecided one once its minimum end has passed. An idle decided chain gets
-none. The
+minimum has passed) — is pushed for each relayed chain:
+
+| Pusher | When |
+|--------|------|
+| An elected operator, from the epoch tick | The epoch is decided (`sysio.msgch::outpcons` records it) and `due_at` has passed |
+| An elected operator, right after its own delivery of the current epoch | `due_at` has passed (the delivery may itself have decided the epoch) |
+| An elected operator, from the epoch tick | The epoch has stayed undecided one chain minimum past its start, at most once per chain minimum from this operator: its eligible group can shrink with no new delivery |
+| Any ACTIVE operator serving the chain, from the epoch tick | The epoch is decided and has stayed due one chain minimum past `due_at`, so its elected group is not advancing it |
+
+None goes to a chain before its genesis advance, to a paused chain, or to an idle decided
+chain. The
 rest come every `--batch-epoch-poll-ms` from their own cron job, from every ACTIVE
 operator, because the elected one may be the operator that is offline, and each is a
 cheap no-op once its work is done:
@@ -120,8 +149,12 @@ the relay, the configured permission for the underwriter. The provider may hold 
 key remotely, as a `KMS:` WIRE K1 key does
 ([signature_provider_kms_plugin](../signature_provider_kms_plugin/README.md)). At startup the node also
 checks that the key's signatures recover to it and that the authorization may
-declare every action the role pushes (`linkauth`). A role that fails either check,
-or matches no provider or more than one, stops the node. A transient signing failure
+declare every action the role pushes (`linkauth`): for the relay `sysio.msgch::deliver`,
+`chkcons` and `reportqueue`, `sysio.chalg::chkdispute`, `sysio.epoch::tickeconomy`,
+`sysio.swap::tickyield`, `sysio.liq::queueyield`, and `sysio.kicker::kick` while the kick
+crank is on. A role that fails either check, or matches no provider or more than one, stops
+the node. A `reportqueue` the depot refuses is logged at info: the chain's epoch moved on, or
+its group changed, since the poll that read it. A transient signing failure
 during the key check, such as KMS throttling, is logged and passes the check.
 
 The node exempts the accounts it signs as from subjective CPU billing: both roles
@@ -140,19 +173,16 @@ new key.
 
 Each chain is paced by its own epoch duration:
 
-| | Rule | 360 s epoch | 10 s epoch |
+| | Rule | 360 s minimum | 10 s minimum |
 |---|---|---|---|
-| Poll interval | 1/24 of the epoch, no shorter than 1 s and no longer than `--batch-epoch-poll-ms` | 15 s | 1 s |
-| Edge buffer | 1/144 of the epoch, no shorter than one block (500 ms) | 2.5 s | 500 ms |
-| Delivery timeout | 1/2 of the epoch, from 5 s to 60 s | 60 s | 5 s |
+| Poll interval | 1/24 of the chain minimum, no shorter than 1 s and no longer than `--batch-epoch-poll-ms` | 15 s | 1 s |
+| Delivery timeout | 1/2 of the chain minimum, from 5 s to 60 s | 60 s | 5 s |
 
-A chain's inbound and outbound jobs run at its own poll interval, and hold deliveries
-back within its edge buffer of its epoch's start and of its minimum end, the start plus the
-chain's minimum duration (open past that end however long the epoch runs).
+A chain's outbound, inbound and backlog jobs run at its own poll interval.
 The delivery timeout bounds each call to the chain's outpost (an outbound delivery, every
-transaction and confirmation wait included; an inbound read; the outpost crank) and each
-depot push for the chain (`sysio.msgch::deliver`, `chkcons`); an outbound delivery cut short
-resumes from the outpost's on-chain cursor at the next poll. Depot reads and the depot cranks'
+transaction and confirmation wait included; an inbound read; a backlog read; the outpost
+crank) and each depot push for the chain (`sysio.msgch::deliver`, `chkcons`, `reportqueue`); an
+outbound delivery cut short resumes from the outpost's on-chain cursor at the next poll. Depot reads and the depot cranks'
 pushes wait at most a push's 30 s expiration.
 The epoch tick, which reads every chain's `epochstate` and `epochcfg`, the operator's
 memberships and `sysio.chains`, fires every second and reads at the shortest poll

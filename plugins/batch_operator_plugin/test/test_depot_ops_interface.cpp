@@ -57,18 +57,23 @@ BOOST_AUTO_TEST_CASE(delivered_by_searches_every_deliverer) {
 
 BOOST_AUTO_TEST_CASE(defaults) {
    mock_depot_ops d;
-   BOOST_CHECK_EQUAL(d.within_epoch_window(0), true);
    BOOST_CHECK_EQUAL(d.is_elected(0), true);
    BOOST_CHECK_EQUAL(d.current_epoch(0), 1u);
-   BOOST_CHECK_EQUAL(d.is_epoch_boundary_past(0), false);
+   BOOST_CHECK_EQUAL(d.is_decided(0), false);
+   BOOST_CHECK_EQUAL(d.has_traffic(0), false);
+   BOOST_CHECK(d.minimum_duration(0) == mock_depot_ops::default_minimum_duration);
    BOOST_CHECK(d.delivery_timeout(0) == mock_depot_ops::default_delivery_timeout);
    BOOST_CHECK(!d.read_pending_outbound(0, 1).has_value());
    BOOST_CHECK_EQUAL(d.has_delivered_envelope(0, 1), false);
+   BOOST_CHECK_EQUAL(d.has_reported_backlog(0, 1), false);
 
    BOOST_REQUIRE_EQUAL(d.read_pending_calls.size(), 1u);
    BOOST_CHECK_EQUAL(d.read_pending_calls[0].chain_code, 0u);
    BOOST_CHECK_EQUAL(d.read_pending_calls[0].epoch_index, 1u);
    BOOST_REQUIRE_EQUAL(d.has_delivered_calls.size(), 1u);
+   BOOST_REQUIRE_EQUAL(d.has_reported_calls.size(), 1u);
+   BOOST_CHECK(d.chkcons_if_due_calls.empty());
+   BOOST_CHECK(d.report_calls.empty());
 }
 
 /// Each epoch query answers for the chain it names: a chain's own knobs override the defaults, and every query
@@ -77,18 +82,24 @@ BOOST_AUTO_TEST_CASE(epoch_queries_answer_per_chain) {
    constexpr uint64_t own_chain     = 2;
    constexpr uint64_t default_chain = 3;
    constexpr uint32_t own_epoch     = 9;
+   const fc::microseconds own_minimum = fc::seconds(30);
    mock_depot_ops d;
-   d.chains[own_chain] = mock_depot_ops::chain_knobs{
-      .window_open = false, .elected = false, .epoch = own_epoch, .epoch_boundary_past = true};
+   d.chains[own_chain] = mock_depot_ops::chain_knobs{.elected               = false,
+                                                     .epoch                 = own_epoch,
+                                                     .decided               = true,
+                                                     .traffic_recorded      = true,
+                                                     .chain_minimum         = own_minimum};
 
    BOOST_CHECK_EQUAL(d.current_epoch(own_chain), own_epoch);
    BOOST_CHECK_EQUAL(d.is_elected(own_chain), false);
-   BOOST_CHECK_EQUAL(d.within_epoch_window(own_chain), false);
-   BOOST_CHECK_EQUAL(d.is_epoch_boundary_past(own_chain), true);
+   BOOST_CHECK_EQUAL(d.is_decided(own_chain), true);
+   BOOST_CHECK_EQUAL(d.has_traffic(own_chain), true);
+   BOOST_CHECK(d.minimum_duration(own_chain) == own_minimum);
    BOOST_CHECK_EQUAL(d.current_epoch(default_chain), d.epoch);
    BOOST_CHECK_EQUAL(d.is_elected(default_chain), d.elected);
 
-   const std::vector<uint64_t> expected{own_chain, own_chain, own_chain, own_chain, default_chain, default_chain};
+   const std::vector<uint64_t> expected{own_chain, own_chain, own_chain, own_chain, own_chain, default_chain,
+                                        default_chain};
    BOOST_CHECK(d.epoch_queries == expected);
 }
 
@@ -115,10 +126,36 @@ BOOST_AUTO_TEST_CASE(outbound_envelope_record_round_trip) {
 BOOST_AUTO_TEST_CASE(deliver_to_depot_records_payload) {
    mock_depot_ops d;
    std::vector<char> payload{'h', 'i'};
-   d.deliver_to_depot(/*chain_code=*/2, payload);
-   BOOST_REQUIRE_EQUAL(d.deliver_calls.size(), 1u);
+   BOOST_CHECK(d.deliver_to_depot(/*chain_code=*/2, payload));
+   d.deliver_accepted = false;
+   BOOST_CHECK(!d.deliver_to_depot(/*chain_code=*/2, payload));
+   BOOST_REQUIRE_EQUAL(d.deliver_calls.size(), 2u);
    BOOST_CHECK_EQUAL(d.deliver_calls[0].chain_code, 2u);
    BOOST_CHECK(d.deliver_calls[0].raw_messages == payload);
+}
+
+/// A backlog report and the post-delivery `chkcons` request are recorded with what they named.
+BOOST_AUTO_TEST_CASE(backlog_reports_and_chkcons_requests_are_recorded) {
+   mock_depot_ops d;
+   constexpr uint64_t chain_code = 2;
+   constexpr uint32_t epoch      = 9;
+   constexpr uint32_t pending    = 3;
+   constexpr uint64_t oldest_ms  = 1'800'000'000'000;
+   BOOST_CHECK(d.report_backlog(chain_code, epoch, pending, oldest_ms));
+   d.report_accepted = false;
+   BOOST_CHECK(!d.report_backlog(chain_code, epoch, pending, oldest_ms));
+   BOOST_REQUIRE_EQUAL(d.report_calls.size(), 2u);
+   BOOST_CHECK_EQUAL(d.report_calls[0].chain_code, chain_code);
+   BOOST_CHECK_EQUAL(d.report_calls[0].epoch_index, epoch);
+   BOOST_CHECK_EQUAL(d.report_calls[0].pending_count, pending);
+   BOOST_CHECK_EQUAL(d.report_calls[0].oldest_pending_ms, oldest_ms);
+
+   d.has_reported_response = [](uint64_t, uint32_t epoch_index) { return epoch_index == epoch; };
+   BOOST_CHECK(d.has_reported_backlog(chain_code, epoch));
+   BOOST_CHECK(!d.has_reported_backlog(chain_code, epoch + 1));
+
+   d.push_chkcons_if_due(chain_code);
+   BOOST_CHECK(d.chkcons_if_due_calls == std::vector<uint64_t>{chain_code});
 }
 
 BOOST_AUTO_TEST_CASE(emit_debug_envelope_stores_event) {

@@ -199,6 +199,9 @@ namespace epoch_deliveries {
    constexpr auto field_dispatched_count  = "dispatched_count";
    constexpr auto field_epoch_index       = "epoch_index";
    constexpr auto field_payer             = "payer";
+   /// The recorded deliveries, each an `OperatorDelivery` record carrying the deliverer's `operator` key.
+   constexpr auto field_deliveries        = "deliveries";
+   constexpr auto field_operator          = "operator";
    /// Byte offset of `epoch_index`: discriminator, then bump u8.
    constexpr size_t epoch_offset = ANCHOR_DISCRIMINATOR_BYTES + sizeof(uint8_t);
    /// Byte offset of `payer`: discriminator, bump u8, epoch_index u32. The program keeps `payer` ahead of the
@@ -449,6 +452,24 @@ void assert_epoch_deliveries_shape(const fc::network::solana::idl::program& prog
              "EpochDeliveries IDL missing '{}' field; the dispatch crank would resume from 0 on "
              "every tick and re-send settled windows forever",
              epoch_deliveries::field_dispatched_count);
+
+   // The outbound delivery looks itself up among the recorded deliverers.
+   const auto deliveries =
+      std::ranges::find(fields, std::string_view{epoch_deliveries::field_deliveries}, &idl::field::name);
+   FC_ASSERT(deliveries != fields.end(), "EpochDeliveries IDL missing '{}' field", epoch_deliveries::field_deliveries);
+   FC_ASSERT(deliveries->type.is_vec() && deliveries->type.vec_element && deliveries->type.vec_element->is_defined() &&
+                deliveries->type.vec_element->defined_name,
+             "EpochDeliveries '{}' must be declared a Vec of a defined record type, got '{}'",
+             epoch_deliveries::field_deliveries, describe_idl_type(deliveries->type));
+   const std::string&   record_name = *deliveries->type.vec_element->defined_name;
+   const idl::type_def* record      = program.find_type(record_name);
+   FC_ASSERT(record && record->is_struct() && record->struct_fields, "IDL '{}' has no struct field definition",
+             record_name);
+   const auto deliverer =
+      std::ranges::find(*record->struct_fields, std::string_view{epoch_deliveries::field_operator}, &idl::field::name);
+   FC_ASSERT(deliverer != record->struct_fields->end() && deliverer->type.is_primitive() &&
+                deliverer->type.primitive == idl::primitive_type::pubkey,
+             "{} '{}' must be declared pubkey", record_name, epoch_deliveries::field_operator);
 }
 
 /// Assert the loaded IDL declares the outbound `EnvelopeLog` the way the digest reader decodes it. Full contract on
@@ -1527,6 +1548,37 @@ outbound_backlog decode_outbound_backlog(
    return backlog;
 }
 
+epoch_dispatch_progress decode_epoch_dispatch_progress(const fc::variant_object&                      row,
+                                                       const fc::network::solana::solana_public_key& self) {
+   // Every field is boot-validated for this role (`assert_epoch_deliveries_shape`), so an absent one means the
+   // loaded IDL changed under a running relay. Assert rather than default: a defaulted `consensus_reached` reads as
+   // "not reached" and would no-op the crank on every tick with only a dlog, which is exactly the silent epoch stall
+   // the boot check exists to prevent; a defaulted delivery list would re-send a recorded delivery every tick.
+   FC_ASSERT(row.contains(epoch_deliveries::field_consensus_reached) &&
+                row.contains(epoch_deliveries::field_dispatched_count) &&
+                row.contains(epoch_deliveries::field_deliveries),
+             "EpochDeliveries decoded without '{}' / '{}' / '{}'; the loaded IDL disagrees with the deployed program "
+             "and the epoch's progress cannot be read",
+             epoch_deliveries::field_consensus_reached, epoch_deliveries::field_dispatched_count,
+             epoch_deliveries::field_deliveries);
+   epoch_dispatch_progress progress;
+   progress.consensus_reached = row[epoch_deliveries::field_consensus_reached].as_bool();
+   progress.dispatched_count  = static_cast<uint32_t>(row[epoch_deliveries::field_dispatched_count].as_uint64());
+   progress.delivered_by_self =
+      std::ranges::any_of(row[epoch_deliveries::field_deliveries].get_array(), [&](const fc::variant& delivery) {
+         return fc::network::solana::solana_public_key::from_base58_string(
+                   delivery.get_object()[epoch_deliveries::field_operator].as_string()) == self;
+      });
+   return progress;
+}
+
+bool sends_delivery(uint32_t epoch_index, const epoch_dispatch_progress& progress, fc::time_point now,
+                    fc::time_point last_resend) {
+   if (!progress.delivered_by_self) return true;
+   return epoch_index == RESEEDABLE_EPOCH && !progress.consensus_reached &&
+          now >= last_resend + RESEEDABLE_RESEND_INTERVAL;
+}
+
 bool epoch_reapable(const envelope_chunk_reap_gates& gates, uint32_t epoch_index) {
    return gates.next_epoch_index > epoch_index && gates.latest_outbound_epoch >= epoch_index;
 }
@@ -2201,23 +2253,10 @@ outpost_solana_client::read_epoch_dispatch_progress(uint32_t epoch_index) {
       return progress;
    }
 
-   const auto decoded =
+   const fc::variant decoded =
       _program_client->decode_account_info_data(epoch_deliveries::account_name, account_info->data);
-   const auto& row = decoded.get_object();
-   // Both fields are boot-validated for this role (`assert_epoch_deliveries_shape`),
-   // so their absence here means the loaded IDL changed under a running relay.
-   // Assert rather than default: a defaulted `consensus_reached` reads as "not
-   // reached" and would no-op the crank on every tick with only a dlog, which
-   // is exactly the silent epoch stall the boot check exists to prevent.
-   FC_ASSERT(row.contains(epoch_deliveries::field_consensus_reached) &&
-                row.contains(epoch_deliveries::field_dispatched_count),
-             "EpochDeliveries decoded without '{}' / '{}'; the loaded IDL disagrees with the "
-             "deployed program and the dispatch cursor cannot be read",
-             epoch_deliveries::field_consensus_reached, epoch_deliveries::field_dispatched_count);
-   progress.consensus_reached = row[epoch_deliveries::field_consensus_reached].as_bool();
-   progress.dispatched_count =
-      static_cast<uint32_t>(row[epoch_deliveries::field_dispatched_count].as_uint64());
-   return progress;
+   return outpost_solana_client_detail::decode_epoch_dispatch_progress(decoded.get_object(),
+                                                                      _entry->client->get_pubkey());
 }
 
 uint16_t outpost_solana_client::read_first_unstaged_chunk(uint32_t epoch_index, uint16_t total_chunks,
@@ -2679,6 +2718,51 @@ std::string outpost_solana_client::deliver_outbound_envelope(
           },
           to_string())) {
       return {};
+   }
+
+   // A delivery the outpost already recorded under this relay is not sent again (`sends_delivery`): it awaits the
+   // rest of the group, and the job calls every tick until the depot records this operator's inbound reply. A failed
+   // or timed-out read is not known recorded, and the delivery goes out as usual.
+   std::optional<outpost_solana_client_detail::epoch_dispatch_progress> progress;
+   try {
+      // Like the settled check, this optional read must leave time for the upload even when the endpoint stalls.
+      fc::task::deadline_scope check_deadline(fc::time_point::now() +
+                                              outpost_solana_client_detail::ENVELOPE_CHUNK_SETTLED_CHECK_BUDGET);
+      progress = read_epoch_dispatch_progress(epoch_index);
+   } catch (const fc::exception& e) {
+      wlog("outpost_solana_client[{}]: delivery record read for epoch={} failed: {}; delivering normally", to_string(),
+           epoch_index, e.to_detail_string());
+   } catch (const std::exception& e) {
+      wlog("outpost_solana_client[{}]: delivery record read for epoch={} failed: {}; delivering normally", to_string(),
+           epoch_index, e.what());
+   }
+   const fc::time_point now = fc::time_point::now();
+   if (progress &&
+       !outpost_solana_client_detail::sends_delivery(epoch_index, *progress, now, _last_reseedable_resend)) {
+      // Kept so the inbound read drains the epoch once it tips, after a restart too.
+      _delivered_envelope = std::make_pair(epoch_index, envelope_bytes);
+      dlog("outpost_solana_client[{}]: epoch={} delivery already recorded (consensus_reached={}); nothing to send",
+           to_string(), epoch_index, progress->consensus_reached);
+      if (progress->consensus_reached) {
+         try {
+            drain_dispatch(epoch_index, envelope_bytes, deadline_abs - fc::time_point::now());
+         } catch (const fc::exception& e) {
+            wlog("outpost_solana_client[{}]: dispatch drain of recorded epoch={} failed: {}; a later drain resumes "
+                 "from the on-chain cursor",
+                 to_string(), epoch_index, e.to_detail_string());
+         } catch (const std::exception& e) {
+            wlog("outpost_solana_client[{}]: dispatch drain of recorded epoch={} failed: {}; a later drain resumes "
+                 "from the on-chain cursor",
+                 to_string(), epoch_index, e.what());
+         }
+      }
+      return {};
+   }
+   if (progress && progress->delivered_by_self) {
+      _last_reseedable_resend = now;
+      ilog("outpost_solana_client[{}]: epoch={} delivery recorded and not tipped; re-sending the terminal call so the "
+           "outpost re-runs its tally over the epoch's current group",
+           to_string(), epoch_index);
    }
 
    // Stream the envelope into the per-(epoch, signer) chunk buffer. Each call
