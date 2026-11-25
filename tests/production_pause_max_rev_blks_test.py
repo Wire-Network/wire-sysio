@@ -141,7 +141,10 @@ try:
     node0.kill(signal.SIGTERM)
     assert not node0.verifyAlive(), "node0 did not shutdown"
 
-    higherMaxReversibleBlocks=maxReversibleBlocks+10 # 10 is just a value chosen for test
+    # Room for node0 to keep producing until finalizerbNode votes again in test 3, so a node0 block carries the QC
+    # that advances LIB. With producerbNode paused, node0 produces about one block per second, over at most
+    # finalizerbNode's relaunch (Utils.systemWaitTimeout, 90 s) and the LIB wait (30 s).
+    higherMaxReversibleBlocks=maxReversibleBlocks+150
     addSwapFlags={"--max-reversible-blocks": str(higherMaxReversibleBlocks)}
     Print("Restart node0 with a higher max-reversible-blocks")
     node0.relaunch(addSwapFlags=addSwapFlags) # enable-stale-production was already configured in last relaunch

@@ -62,7 +62,8 @@ A failed pool-page read ends the poll and is retried from the same page; the plu
 removed symbols from the retry state only at the end of a complete sweep.
 `--batch-kick-crank=false` turns the kick crank off on this node, and the relay's
 permission then need not be linked for `sysio.kicker::kick`.
-`sysio.synd::crank` is pushed by the underwriter every poll (see [Underwriter](#underwriter)).
+`sysio.synd::crank` is scheduled by the underwriter from epoch changes and crank progress
+(see [Underwriter](#underwriter)).
 
 ## Configuration
 
@@ -178,8 +179,17 @@ requests `sysio.synd` issues for syndication envelopes. Each poll it:
    transactions cannot be repeated even after failover to a node with an older
    LIB. Approvals and claims continue during that wait.
 3. **Cranks** `sysio.synd::crank`, which releases what bonding allows and issues the
-   next request: every poll while an envelope request is in play or has an outcome
-   `sysio.synd` has not acknowledged, otherwise every 5 minutes.
+   next request: when the depot epoch changes, after a pass plans accepts or approvals,
+   while an outcome remains unacknowledged, and on the next poll after a successful
+   crank emits inline actions. Otherwise the fallback interval is 5 minutes.
+   The epoch trigger remains active after requests are acknowledged or pruned, and
+   after restart. It adds one bounded local epoch-singleton read per pass; the
+   contract remains responsible for queue traversal, FIFO, rate limits and freezes.
+   An empty queue still receives one crank per epoch, but does not crank every poll.
+   Cursor-only progress emits no inline actions and waits for the next epoch.
+   If epochs are shorter than the polling interval (15 seconds by default), bucket
+   burst capacity needs headroom over refill or the polling interval must decrease
+   to avoid losing release capacity. A failed epoch read omits only that trigger.
 4. **Approves** its requests once their challenge window has passed by chain time,
    and **claims** them once approved or ruled VALID, and again while yield the pool
    could not yet cover is owed. Every 10 minutes it claims what a forfeited bond
@@ -201,10 +211,11 @@ those lines is left to log tooling:
 | A first contribution would be below 1/64 of the request's coverage and not the whole remainder | The request waits |
 | An accept is submitted but not yet accounted for by the irreversible view | Its funds stay reserved and that request waits |
 | Startup finality wait | New accepts wait; approvals and claims continue |
-| The `sysio.andon` cord is pulled | Nothing is bonded, approved or claimed until it clears |
+| The `sysio.andon` cord is pulled | Nothing is bonded, approved or claimed until it clears; cranks continue so the contract can synchronize outcomes and issue requests while holding releases and burns |
 | A request is challenged (HELD) | Reported, whether or not we bonded it: a judge rules it |
 | A bond of ours is ruled INVALID while the node runs, even one since claimed or pruned | Bonding stops until a restart; approvals and claims go on. A forfeited bond's principal is not returned |
 | A required funding/freeze table read fails, or a row behind one of our bonds does not decode | The pass does nothing |
+| The epoch singleton cannot be read | Only epoch-triggered cranking is omitted; other triggers and planned work continue |
 
 ### Underwriter setup
 

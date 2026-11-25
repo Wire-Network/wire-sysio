@@ -2,6 +2,7 @@
 
 #include <atomic>
 #include <fc/exception/exception.hpp>
+#include <fc/variant_object.hpp>
 #include <functional>
 #include <future>
 #include <memory>
@@ -17,6 +18,31 @@ inline constexpr auto success = "batch_operator: pushed {}::{} ok";
 inline constexpr auto failure = "batch_operator: push {}::{} failed: {}";
 } // namespace push_action_log
 
+namespace transaction_trace_field {
+inline constexpr auto action_traces = "action_traces";
+inline constexpr auto inline_traces = "inline_traces";
+inline constexpr auto creator_action_ordinal = "creator_action_ordinal";
+} // namespace transaction_trace_field
+
+/// The API returns nested action traces, or the flat trace when ABI conversion is unavailable.
+inline bool trace_has_inline_actions(const fc::variant& processed) {
+   if (!processed.is_object()) return false;
+   const fc::variant_object& trace = processed.get_object();
+   const fc::variant_object::iterator actions = trace.find(transaction_trace_field::action_traces);
+   if (actions == trace.end() || !actions->value().is_array()) return false;
+   for (const fc::variant& value : actions->value().get_array()) {
+      if (!value.is_object()) continue;
+      const fc::variant_object& action = value.get_object();
+      const fc::variant_object::iterator children = action.find(transaction_trace_field::inline_traces);
+      if (children != action.end() && children->value().is_array() && !children->value().get_array().empty())
+         return true;
+      const fc::variant_object::iterator creator = action.find(transaction_trace_field::creator_action_ordinal);
+      if (creator != action.end() && creator->value().is_uint64() && creator->value().as_uint64() != 0)
+         return true;
+   }
+   return false;
+}
+
 /// Owns completion notification for an asynchronous batch-operator action.
 ///
 /// The state is intentionally shared with the completion callback so a caller
@@ -30,6 +56,9 @@ public:
 
    /// Whether the push completed and the transaction succeeded. Read after the future is ready.
    bool succeeded() const { return success.load(std::memory_order_acquire); }
+
+   /// True only after a successful push returned a trace containing inline actions; safe after a caller timeout.
+   bool has_inline_actions() const { return inline_actions.load(std::memory_order_acquire); }
 
    /// Invokes `on_complete` once, suppresses callback exceptions, and signals
    /// the waiter without allowing duplicate asynchronous completions to throw.
@@ -66,7 +95,7 @@ public:
          if (const auto* error = std::get_if<fc::exception_ptr>(&result)) {
             on_failure(*error);
          } else if (std::holds_alternative<chain_apis::read_write::push_transaction_results>(result)) {
-            success.store(true, std::memory_order_release);
+            note_success(std::get<chain_apis::read_write::push_transaction_results>(result));
             on_success();
          } else {
             const auto& deferred = std::get<std::function<
@@ -75,7 +104,7 @@ public:
             if (const auto* error = std::get_if<fc::exception_ptr>(&deferred_result)) {
                on_failure(*error);
             } else {
-               success.store(true, std::memory_order_release);
+               note_success(std::get<chain_apis::read_write::push_transaction_results>(deferred_result));
                on_success();
             }
          }
@@ -83,8 +112,15 @@ public:
    }
 
 private:
+   /// Publish trace progress before making a successful result visible to the waiting job.
+   void note_success(const chain_apis::read_write::push_transaction_results& result) {
+      inline_actions.store(trace_has_inline_actions(result.processed), std::memory_order_release);
+      success.store(true, std::memory_order_release);
+   }
+
    std::atomic<bool> completed{false};
    std::atomic<bool> success{false};
+   std::atomic<bool> inline_actions{false};
    std::promise<void> done;
 };
 
