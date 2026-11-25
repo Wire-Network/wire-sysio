@@ -30,9 +30,11 @@
 #include <boost/asio/basic_stream_socket.hpp>
 #include <boost/asio/detail/config.hpp>
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <filesystem>
+#include <limits>
 #include <map>
 #include <optional>
 #include <regex>
@@ -64,12 +66,12 @@ struct abstract_conn {
    virtual std::string verify_max_bytes_in_flight(size_t extra_bytes) = 0;
    virtual std::string verify_max_requests_in_flight() = 0;
 
-   /// Reserve sz bytes against the bytes_in_flight budget. Used to account for request/response payload
-   /// memory held while work is in flight. Must be paired with exactly one decrement_bytes_in_flight(sz).
-   virtual void increment_bytes_in_flight(size_t sz) = 0;
+   /// Atomically check and reserve sz request-body bytes. Returns an error on refusal, or an empty string on
+   /// success. A successful reservation must be paired with exactly one release_bytes_in_flight(sz).
+   [[nodiscard]] virtual std::string try_reserve_request_body(size_t sz) = 0;
 
-   /// Release sz bytes previously reserved with increment_bytes_in_flight.
-   virtual void decrement_bytes_in_flight(size_t sz) = 0;
+   /// Release sz bytes previously reserved with try_reserve_request_body.
+   virtual void release_bytes_in_flight(size_t sz) = 0;
    virtual void send_busy_response(std::string&& what) = 0;
 
    /// Answer the exception being handled with an error response. Call only from a catch block, as the caller's last
@@ -161,7 +163,6 @@ struct http_plugin_state {
    bool access_control_allow_credentials = false;
    size_t max_body_size{2 * 1024 * 1024};
 
-   std::atomic<size_t> bytes_in_flight{0};
    std::atomic<int32_t> requests_in_flight{0};
    size_t max_bytes_in_flight = 0;
    int32_t max_requests_in_flight = -1;
@@ -187,6 +188,51 @@ struct http_plugin_state {
    explicit http_plugin_state(fc::logger& log)
        : logger(log) {}
 
+   /// Return a snapshot of the bytes currently counted against the budget.
+   size_t bytes_in_flight() const noexcept {
+      return bytes_in_flight_.load();
+   }
+
+   /// Count response bytes, including responses that must be sent over budget.
+   void account_response_bytes(size_t size) noexcept {
+      bytes_in_flight_ += size;
+   }
+
+   /// Release bytes previously counted by request admission or response accounting.
+   void release_bytes_in_flight(size_t size) noexcept {
+      bytes_in_flight_ -= size;
+   }
+
+   /// Check whether extra response bytes fit without reserving them.
+   std::string verify_max_bytes_in_flight(size_t extra_bytes) {
+      const auto current = bytes_in_flight_.load(std::memory_order_relaxed);
+      return bytes_fit(current, extra_bytes) ? std::string{} : bytes_in_flight_error(current, extra_bytes);
+   }
+
+   /// Check and reserve body bytes against the same counter value, retrying when another operation changes it.
+   [[nodiscard]] std::string try_reserve_request_body(size_t size) {
+      auto current = bytes_in_flight_.load(std::memory_order_relaxed);
+      do {
+         if (!bytes_fit(current, size))
+            return bytes_in_flight_error(current, size);
+      } while (!bytes_in_flight_.compare_exchange_weak(current, current + size, std::memory_order_relaxed));
+      return {};
+   }
+
+private:
+   std::atomic<size_t> bytes_in_flight_{0};
+
+   /// Check before subtracting because response writes can put the shared counter over budget.
+   bool bytes_fit(size_t current, size_t extra_bytes) const {
+      return current <= max_bytes_in_flight && extra_bytes <= max_bytes_in_flight - current;
+   }
+
+   /// Report the refused total, saturated at the counter's maximum representable value.
+   std::string bytes_in_flight_error(size_t current, size_t extra_bytes) {
+      const auto total = current + std::min(extra_bytes, std::numeric_limits<size_t>::max() - current);
+      fc_dlog(get_logger(), "503 - too many bytes in flight: {}", total);
+      return "Too many bytes in flight: " + std::to_string(total);
+   }
 };
 
 /**
@@ -204,13 +250,15 @@ inline auto make_http_response_handler(http_plugin_state& plugin_state, detail::
    return [&plugin_state, session_ptr{std::move(session_ptr)}, content_type,
            response_policy](int code, std::optional<fc::variant> response) mutable {
       auto payload_size = detail::in_flight_sizeof(response);
-      plugin_state.bytes_in_flight += payload_size;
+      plugin_state.account_response_bytes(payload_size);
 
       // post back to an HTTP thread to allow the response handler to be called from any thread
       boost::asio::dispatch(plugin_state.thread_pool.get_executor(),
                         [&plugin_state, session_ptr{std::move(session_ptr)}, code, payload_size,
                          response = std::move(response), content_type, response_policy]() {
-                           auto on_exit = fc::make_scoped_exit([&](){plugin_state.bytes_in_flight -= payload_size;});
+                           auto on_exit = fc::make_scoped_exit([&] {
+                              plugin_state.release_bytes_in_flight(payload_size);
+                           });
 
                            // Why the budget refuses the response with `extra_bytes` more in flight; empty to send it.
                            const auto refusal = [&](size_t extra_bytes) -> std::string {

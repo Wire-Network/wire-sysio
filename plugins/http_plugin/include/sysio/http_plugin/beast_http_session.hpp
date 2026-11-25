@@ -240,15 +240,9 @@ private:
       return req_parser_->content_length().value_or(0);
    }
 
-   /// Reserve the body of the request being read against bytes_in_flight, until release_request_body().
-   void reserve_request_body(size_t size) {
-      increment_bytes_in_flight(size);
-      body_reservation_ = size;
-   }
-
-   /// Release the reservation of reserve_request_body(), if any.
+   /// Release the reservation for the request being read, if any.
    void release_request_body() {
-      decrement_bytes_in_flight(std::exchange(body_reservation_, 0));
+      release_bytes_in_flight(std::exchange(body_reservation_, 0));
    }
 
    /// Start the deadline for the `transfer` of `size` bytes about to begin; see transfer_timeout(). Runs on the strand.
@@ -290,7 +284,7 @@ private:
    /// strand, where its deadline runs. The caller must leave the socket and `message` alone afterwards.
    template <typename Message, typename OnWritten>
    void write_response(Message& message, size_t size, OnWritten&& on_written) {
-      increment_bytes_in_flight(size);
+      plugin_state_->account_response_bytes(size);
       boost::asio::dispatch(strand_, [self = this->shared_from_this(), &message, size,
                                       on_written = std::forward<OnWritten>(on_written)]() mutable {
          self->start_deadline(transfer_t::response, size);
@@ -299,7 +293,7 @@ private:
             boost::asio::bind_executor(self->strand_, [self, size, on_written = std::move(on_written)](
                                                          beast::error_code ec, std::size_t transferred) mutable {
                self->stop_deadline();
-               self->decrement_bytes_in_flight(size);
+               self->plugin_state_->release_bytes_in_flight(size);
                on_written(ec, transferred);
             }));
       });
@@ -332,12 +326,12 @@ public:
    }
    
    virtual std::string verify_max_bytes_in_flight(size_t extra_bytes) final {
-      auto bytes_in_flight_size = plugin_state_->bytes_in_flight.load() + extra_bytes;
-      if(bytes_in_flight_size > plugin_state_->max_bytes_in_flight) {
-         fc_dlog(plugin_state_->get_logger(), "503 - too many bytes in flight: {}", bytes_in_flight_size);
-         return "Too many bytes in flight: " + std::to_string( bytes_in_flight_size );
-      }
-      return {};
+      return plugin_state_->verify_max_bytes_in_flight(extra_bytes);
+   }
+
+   /// @copydoc detail::abstract_conn::try_reserve_request_body
+   std::string try_reserve_request_body(size_t size) final {
+      return plugin_state_->try_reserve_request_body(size);
    }
 
    virtual std::string verify_max_requests_in_flight() final {
@@ -412,12 +406,12 @@ public:
 
       // Admit the body against the budget before reading any of it, since the parser holds it all until it is complete.
       if (const size_t body_size = request_body_size(); body_size > 0) {
-         if (auto error_str = verify_max_bytes_in_flight(body_size); !error_str.empty()) {
+         if (auto error_str = try_reserve_request_body(body_size); !error_str.empty()) {
             res_->keep_alive(false); // the body stays unread, so the connection cannot carry another request
             send_busy_response(std::move(error_str));
             return;
          }
-         reserve_request_body(body_size);
+         body_reservation_ = body_size;
          start_deadline(transfer_t::request_body, body_size);
       }
 
@@ -592,14 +586,9 @@ public:
       }
    }
 
-   /// @copydoc detail::abstract_conn::increment_bytes_in_flight
-   virtual void increment_bytes_in_flight(size_t sz) final {
-      plugin_state_->bytes_in_flight += sz;
-   }
-
-   /// @copydoc detail::abstract_conn::decrement_bytes_in_flight
-   virtual void decrement_bytes_in_flight(size_t sz) final {
-      plugin_state_->bytes_in_flight -= sz;
+   /// @copydoc detail::abstract_conn::release_bytes_in_flight
+   void release_bytes_in_flight(size_t sz) final {
+      plugin_state_->release_bytes_in_flight(sz);
    }
 
    virtual std::string get_request_header(std::string_view field_name) const final {

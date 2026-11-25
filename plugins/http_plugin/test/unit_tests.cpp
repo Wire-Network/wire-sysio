@@ -20,6 +20,7 @@
 #include <array>
 #include <deque>
 #include <iostream>
+#include <limits>
 #include <mutex>
 #include <sstream>
 #include <thread>
@@ -1374,6 +1375,48 @@ struct body_size_client {
    }
 };
 } // namespace
+
+/// Concurrent reservations share one limit and released bytes can be claimed again.
+BOOST_AUTO_TEST_CASE(request_body_reservations_share_a_byte_budget) {
+   constexpr size_t body_size = 256;
+   constexpr size_t available_slots = 4;
+   fc::logger logger{"http_reservation_test"};
+   http_plugin_state state{logger};
+   state.max_bytes_in_flight = available_slots * body_size;
+
+   std::promise<void> start;
+   const auto ready = start.get_future().share();
+   std::array<std::future<bool>, 2 * available_slots> reservations;
+   auto open_gate = fc::make_scoped_exit([&] { start.set_value(); });
+   for (auto& reservation : reservations) {
+      reservation = std::async(std::launch::async, [&] {
+         ready.wait();
+         return state.try_reserve_request_body(body_size).empty();
+      });
+   }
+   start.set_value();
+   open_gate.cancel();
+
+   size_t accepted = 0;
+   for (auto& reservation : reservations)
+      accepted += reservation.get();
+   BOOST_CHECK_EQUAL(accepted, available_slots);
+   BOOST_CHECK_EQUAL(state.bytes_in_flight(), state.max_bytes_in_flight);
+   BOOST_CHECK(!state.try_reserve_request_body(1).empty());
+
+   state.release_bytes_in_flight(body_size);
+   BOOST_CHECK(state.try_reserve_request_body(body_size).empty());
+
+   // Response accounting may put the shared counter above the limit.
+   state.account_response_bytes(body_size);
+   BOOST_CHECK(!state.try_reserve_request_body(1).empty());
+   BOOST_CHECK_EQUAL(state.bytes_in_flight(), state.max_bytes_in_flight + body_size);
+
+   state.max_bytes_in_flight = std::numeric_limits<size_t>::max(); // unlimited
+   BOOST_CHECK(state.try_reserve_request_body(body_size).empty());
+   BOOST_CHECK_EQUAL(state.bytes_in_flight(), (available_slots + 2) * body_size);
+   BOOST_CHECK(!state.try_reserve_request_body(std::numeric_limits<size_t>::max()).empty());
+}
 
 /// A request body is reserved against bytes_in_flight from the moment its header is read, so the budget bounds bodies
 /// that are still arriving. A body that does not fit is refused with a 503 before any of it is read, in place of the

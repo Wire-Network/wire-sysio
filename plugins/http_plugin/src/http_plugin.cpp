@@ -29,27 +29,33 @@ namespace sysio {
       }
 
       /**
-       * RAII reservation against http_plugin_state::bytes_in_flight.  The increment runs in the
-       * constructor and the decrement in the destructor, so the reservation is bound to a successfully
-       * constructed guard: if allocating the guard throws (e.g. std::bad_alloc while admitting a request
-       * under memory pressure) the increment never runs, and once constructed the matching decrement is
-       * guaranteed exactly once, by release() or when the guard is destroyed.  Held via shared_ptr at the call
-       * site so the posted app-thread lambda stays copyable (boost::asio::post requires a copyable handler) and
-       * the destructor's release fires only when the final copy is destroyed.
+       * RAII reservation against the HTTP byte budget. The local guard holds the reservation until
+       * it is moved into a shared_ptr, so allocation failure releases it. Shared ownership keeps the posted
+       * app-thread lambda copyable, and the reservation ends on explicit release or destruction of the last copy.
        */
       struct bytes_in_flight_reservation {
          detail::abstract_conn_ptr conn;
          size_t                    size = 0;
 
-         bytes_in_flight_reservation(detail::abstract_conn_ptr c, size_t sz)
-            : conn(std::move(c)), size(sz) { conn->increment_bytes_in_flight(size); }
+         explicit bytes_in_flight_reservation(detail::abstract_conn_ptr c) : conn(std::move(c)) {}
+         /// Transfer ownership and disarm the source guard.
+         bytes_in_flight_reservation(bytes_in_flight_reservation&& other) noexcept
+            : conn(std::move(other.conn)), size(std::exchange(other.size, 0)) {}
          ~bytes_in_flight_reservation() { release(); }
+
+         /// Arm this guard once, after the request body is admitted.
+         [[nodiscard]] std::string reserve(size_t sz) {
+            if (auto error = conn->try_reserve_request_body(sz); !error.empty())
+               return error;
+            size = sz;
+            return {};
+         }
 
          /// End the reservation before the guard is destroyed, and stop holding the connection. Called by one holder
          /// at most, which keeps the guard alive meanwhile.
          void release() {
-            if (conn)
-               conn->decrement_bytes_in_flight(std::exchange(size, 0));
+            if (size != 0)
+               conn->release_bytes_in_flight(std::exchange(size, 0));
             conn.reset();
          }
 
@@ -64,11 +70,12 @@ namespace sysio {
        */
       std::shared_ptr<bytes_in_flight_reservation> admit_request(const detail::abstract_conn_ptr& conn,
                                                                  size_t body_size) {
-         if (std::string error_str = conn->verify_max_bytes_in_flight(body_size); !error_str.empty()) {
+         bytes_in_flight_reservation reservation{conn};
+         if (auto error_str = reservation.reserve(body_size); !error_str.empty()) {
             conn->send_busy_response(std::move(error_str));
             return {};
          }
-         return std::make_shared<bytes_in_flight_reservation>(conn, body_size);
+         return std::make_shared<bytes_in_flight_reservation>(std::move(reservation));
       }
 
       /// What the exception being handled says. Call only from a catch block.
@@ -163,8 +170,10 @@ namespace sysio {
             return conn_->verify_max_bytes_in_flight(extra_bytes);
          }
          std::string verify_max_requests_in_flight() override { return conn_->verify_max_requests_in_flight(); }
-         void increment_bytes_in_flight(size_t sz) override { conn_->increment_bytes_in_flight(sz); }
-         void decrement_bytes_in_flight(size_t sz) override { conn_->decrement_bytes_in_flight(sz); }
+         /// @copydoc detail::abstract_conn::try_reserve_request_body
+         std::string try_reserve_request_body(size_t sz) override { return conn_->try_reserve_request_body(sz); }
+         /// @copydoc detail::abstract_conn::release_bytes_in_flight
+         void release_bytes_in_flight(size_t sz) override { conn_->release_bytes_in_flight(sz); }
 
          // The rest uses the session, so only until the request is answered.
          void set_content_type_header(http_content_type content_type) override {
@@ -899,7 +908,7 @@ namespace sysio {
    }
 
    size_t http_plugin::bytes_in_flight() const {
-      return my->plugin_state->bytes_in_flight;
+      return my->plugin_state->bytes_in_flight();
    }
 
    std::atomic<bool>& http_plugin::listening() {
