@@ -782,7 +782,7 @@ void system_contract::settleduty() {
 //   - t5state exists
 //   - the gross headroom is positive and period_emission is too (this epoch's share may be 0 once earlier epochs
 //     of the period have accrued, if they committed the rest of the budget or the curve has dropped to zero)
-//   - sysio's spendable WIRE balance >= period_emission (pending + this epoch's share)
+//   - sysio's spendable WIRE balance >= period_emission (pending + this epoch's share), when it spends
 //
 // The unallocated remainder (period_emission - compute - capex - governance)
 // stays in sysio's balance. LIQ yield draws no treasury bonus.
@@ -796,7 +796,7 @@ void system_contract::settleduty() {
 // payepoch trusts the gate-computed period_emission and does not recompute.
 // Strict sysio::check throws inside payepoch flag true bugs (arithmetic
 // invariants, BPS sums).
-void system_contract::payepoch(uint32_t epoch_index, int64_t period_emission) {
+void system_contract::payepoch(uint32_t epoch_index, int64_t period_emission, bool spend) {
    require_auth(epoch_refs::account);
 
    // Defense in depth. Single-trx semantics make these conditions gate-guaranteed in normal operation; firing
@@ -832,13 +832,10 @@ void system_contract::payepoch(uint32_t epoch_index, int64_t period_emission) {
       }
    }
 
-   // While the economic clock catches up (it has ticked but never reached the grid), a payout spends nothing and leaves
-   // the duty period open: the period stays in the treasury, and the blocks and duty counted meanwhile carry to the
-   // first payout after it. tickeconomy writes the clock state before this inline action.
-   const sysio::epoch::economic_state economy =
-      sysio::epoch::economystate_t(epoch_refs::account).get_or_default(sysio::epoch::economic_state{});
-   const bool    catching_up    = economy.current_epoch_index > 0 && !economy.caught_up;
-   const int64_t spent_emission = catching_up ? 0 : period_emission;
+   // Without `spend` (the economic clock had not caught up before this tick) the payout spends nothing and leaves the
+   // duty period open: the period stays in the treasury, and the blocks and duty counted meanwhile carry to the first
+   // payout that spends.
+   const int64_t spent_emission = spend ? period_emission : 0;
 
    // ----- Category splits -----
    // payepoch transfers compute + capex + governance only. The implicit
@@ -1024,8 +1021,8 @@ void system_contract::payepoch(uint32_t epoch_index, int64_t period_emission) {
    // =======================================================================
    // Batch-op pay. The period's duty units split the batch pool: open a
    // settlement for the period now closing and take its first step. A period
-   // with no duty leaves the whole pool in the treasury. A catch-up payout
-   // leaves the duty period open.
+   // with no duty leaves the whole pool in the treasury. A payout that does
+   // not spend leaves the duty period open.
    // =======================================================================
    const bool batch_has_duty = duty.open_units > 0 && batch_pool > 0;
    if (batch_has_duty) {
@@ -1037,7 +1034,7 @@ void system_contract::payepoch(uint32_t epoch_index, int64_t period_emission) {
       duty.settle_cursor        = 0;
       state.unsettled_batch_emission = batch_pool;
    }
-   if (!catching_up) {
+   if (spend) {
       duty.open_period += 1;
       duty.open_units   = 0;
    }

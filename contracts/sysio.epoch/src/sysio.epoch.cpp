@@ -105,13 +105,14 @@ struct emissions_gate_result {
    int64_t attempted_emission() const { return is_pay_epoch ? period_emission : emission_amount; }
 };
 
-/// Decide what economic epoch `target_epoch`'s emissions may do. A later economic boundary has already passed when
-/// `defer_payout` (the clock has caught up to the grid before) or `catching_up` (it never has). Never throws.
+/// Decide what economic epoch `target_epoch`'s emissions may do. `spend` is whether the clock had caught up to the grid
+/// before this tick, which decides whether its payout spends; `defer_payout` is `spend` with a later economic boundary
+/// already passed. Never throws.
 ///
 /// `closed_epoch_duration_sec` is the length of the economic epoch the tick closes, the one whose share it accrues
 /// (`epoch::closing_epoch_duration_sec`); tickeconomy passes the same value on to sysio.system::accrueepoch.
 emissions_gate_result check_emissions_ready(uint32_t closed_epoch_duration_sec, uint32_t target_epoch,
-                                            bool defer_payout, bool catching_up) {
+                                            bool defer_payout, bool spend) {
    emissions_gate_result r;
 
    sysiosystem::emissions::emitcfg_t emit_cfg_tbl(SYSTEM_ACCOUNT);
@@ -161,8 +162,8 @@ emissions_gate_result check_emissions_ready(uint32_t closed_epoch_duration_sec, 
    // period total exactly matches what accrueepoch will store and payepoch will assert against.
    r.period_emission = sysiosystem::emissions::saturating_accrue(t5s.pending_emission_amount, r.emission_amount);
 
-   // A catch-up payout spends nothing (sysio.system::payepoch), so the balance never holds it.
-   if (catching_up) {
+   // A payout that does not spend (sysio.system::payepoch) is never held for balance.
+   if (!spend) {
       r.pay = true;
       return r;
    }
@@ -1067,11 +1068,12 @@ void epoch::tickeconomy(uint32_t epoch_index) {
    const uint32_t closed_epoch_duration_sec = closing_epoch_duration_sec(cfg, state);
    const time_point next_boundary = boundary + microseconds(static_cast<int64_t>(cfg.epoch_duration_sec) * 1'000'000);
 
-   // A grid started in the past catches up one period at a time, each paid on its own, and payouts merge only once the
-   // clock has reached the grid. Until then a payout spends nothing: payepoch reads caught_up as written below.
+   // A payout spends only if the clock had caught up to the grid before this tick, so the tick that reaches it spends
+   // nothing either. Until then each pay epoch closes its own period; from then on payouts merge while the crank is
+   // behind.
+   const bool spend        = state.caught_up;
    const bool crank_behind = current_time_point() >= next_boundary;
-   const auto gate = check_emissions_ready(closed_epoch_duration_sec, epoch_index, crank_behind && state.caught_up,
-                                           crank_behind && !state.caught_up);
+   const auto gate = check_emissions_ready(closed_epoch_duration_sec, epoch_index, crank_behind && spend, spend);
    if (gate.blocked()) {
       sysio::print_f("epoch::tickeconomy: economic epoch %u emissions held -- see blocklog\n", epoch_index);
       record_gate_block(get_self(), epoch_index, gate);
@@ -1108,7 +1110,7 @@ void epoch::tickeconomy(uint32_t epoch_index) {
          permission_level{get_self(), "owner"_n},
          SYSTEM_ACCOUNT,
          system_actions::PAY_EPOCH,
-         std::make_tuple(epoch_index, gate.period_emission)
+         std::make_tuple(epoch_index, gate.period_emission, spend)
       ).send();
    }
 

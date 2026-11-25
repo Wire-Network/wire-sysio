@@ -30,7 +30,7 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
 | `epochcfg` | `kv::global` | Consensus epoch: `epoch_duration_sec`, `operators_per_epoch` (default 7), `batch_operator_minimum_active` (default 21), `batch_op_groups` (default 3), `epoch_retention_envelope_log_count` (default 200) |
 | `epochstate` | `kv::global` | Consensus epoch index, current / next epoch start, active group cursor, the resident group window, last consensus hash, pause flag |
 | `economycfg` | `kv::global` | Economic clock: `epoch_duration_sec` (60 s .. 30 days) and the grid's `start_time` |
-| `economystate` | `kv::global` | Economic epoch index, its current / next boundary, and `caught_up`: whether a tick has found no later boundary passed |
+| `economystate` | `kv::global` | Economic epoch index, its current / next boundary, and `caught_up`: whether a tick has found no later boundary passed (a payout spends only if it was set before its tick) |
 | `blocklog` | `kv::table` | At most one row: the open emissions block episode, keyed by its first blocked economic epoch, with the reason, attempted emission, treasury and balance figures, and how many economic epochs it has held. Erased when an economic epoch's emissions pass |
 
 ## Actions
@@ -41,7 +41,7 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
 | `seteconomy` | `sysio.epoch` | Set the economic clock's duration and grid start. The grid may start in the past, but no change is accepted while a boundary has passed without its tick. Until the first tick a start still ahead may move, into the past too unless a collateral withdrawal is queued (its wait counts only boundaries after the request); after it the start is fixed, and a new duration spaces only the boundaries after the next one. So no boundary that has passed ever moves, and once the clock has ticked neither does the next one. A start set in the past cannot be corrected once boundaries have passed without their ticks: the crank must first tick every one of them, or the contracts are redeployed. Re-validated against `sysio.system`'s pay-period accrual bound |
 | `schbatchgps` | `sysio.epoch` | Build the initial window from the `ACTIVE` batch operators on `sysio.opreg` (non-bootstrapped first, then bootstrapped, trimmed to `batch_operator_minimum_active`) |
 | `advance` | permissionless at genesis (epoch 0 → 1); afterwards `sysio.msgch` or `sysio.epoch` | Advance the consensus epoch once its wall-clock boundary has passed and the contract is not paused |
-| `tickeconomy` | permissionless | Open economic epoch `epoch_index`: refused unless it is the next index, its grid boundary has passed, and the consensus genesis advance has run |
+| `tickeconomy` | permissionless | Open economic epoch `epoch_index`: refused unless it is the next index, its grid boundary has passed, and the consensus genesis advance has run. Its payout spends only if the clock had caught up to the grid before it |
 | `pause` | `sysio.chalg` | Set the global pause |
 | `unpause` | `sysio.chalg` | Clear the global pause |
 
@@ -64,13 +64,14 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
 
 1. Emissions readiness gate. A missing config or T5 state, or an exhausted treasury, accrues nothing;
    a pay epoch whose period total exceeds the spendable balance still accrues and leaves the payout to
-   the first economic epoch that can cover it. Either way the episode is recorded in `blocklog`. Once the
-   clock has caught up to the grid (`caught_up`, set by the first tick that finds no later boundary passed),
-   a pay epoch ticked while a later boundary has passed defers its payout, without a `blocklog` row, to the
-   tick that catches up, which pays every overdue period's pools in one payout, split over all the work
-   counted since the last one. Until then the clock is catching up (a grid started in the past, or a first tick
-   run more than one economic epoch late): each pay epoch's payout spends nothing and is never held for balance,
-   and the blocks and duty counted meanwhile carry to the first payout after the clock has caught up.
+   the first economic epoch that can cover it. Either way the episode is recorded in `blocklog`. A payout
+   spends only if the clock had caught up to the grid before its tick (`caught_up`, set by the first tick
+   that finds no later boundary passed). Until then, and on the tick that sets it, each pay epoch's payout
+   spends nothing and is never held for balance, and the blocks and duty counted meanwhile carry to the first
+   payout that spends. A first tick run on time reaches the grid itself, so it spends nothing either. Once
+   caught up, a pay epoch ticked while a later boundary has passed defers its payout, without a `blocklog`
+   row, to the tick that catches up, which pays every overdue period's pools in one payout, split over all
+   the work counted since the last one.
 2. Bump the economic epoch index; its boundaries come from the grid, never from when the crank ran,
    so a late or caught-up crank accrues exactly what an on-time one would.
 3. `sysio.opreg::flushwtdw` matures queued collateral withdrawals whose economic wait and consensus

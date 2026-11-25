@@ -237,17 +237,27 @@ public:
       return push(EPOCH, epoch_ser, EPOCH, "seteconomy"_n, mvo()
          ("epoch_duration_sec", EPOCH_DURATION_SEC)("start_time", start));
    }
-   /// Start the economic grid at the head block time. Allowed while no boundary has passed without its tick.
-   action_result anchor_economy() {
-      return configure_economy(fc::time_point_sec(control->head().block_time()));
-   }
-   /// Open consensus genesis, then tick economic epoch 1 on a grid anchored at this tick, so the fixture's waits do
-   /// not leave the crank behind. With `pay_cadence_epochs == 1` it is a pay epoch, so the emissions gate either pays
-   /// the period or records why it held it.
-   action_result open_first_pay_epoch() {
+   /// How far ahead of the head block reach_the_grid leaves the boundary after the first tick.
+   static constexpr uint32_t REACHING_TICK_MARGIN_SEC = 5;
+   /// The economic epoch open_first_spending_pay_epoch opens.
+   static constexpr uint32_t FIRST_SPENDING_EPOCH = 2;
+   /// Open consensus genesis and tick economic epoch 1 on a grid started one epoch, less REACHING_TICK_MARGIN_SEC,
+   /// before now. That tick reaches the grid, so its payout spends nothing; then cross the next boundary, so the next
+   /// tick runs on time and is the clock's first payout that spends.
+   action_result reach_the_grid() {
       if (auto result = push(EPOCH, epoch_ser, EPOCH, "advance"_n, mvo()); result != success()) return result;
-      if (auto result = anchor_economy(); result != success()) return result;
-      return push(EPOCH, epoch_ser, EPOCH, "tickeconomy"_n, mvo()("epoch_index", 1));
+      const fc::time_point start = control->head().block_time() + fc::seconds(REACHING_TICK_MARGIN_SEC)
+                                 - fc::seconds(EPOCH_DURATION_SEC);
+      if (auto result = configure_economy(fc::time_point_sec(start)); result != success()) return result;
+      if (auto result = push(EPOCH, epoch_ser, EPOCH, "tickeconomy"_n, mvo()("epoch_index", 1)); result != success())
+         return result;
+      wait(REACHING_TICK_MARGIN_SEC);
+      return success();
+   }
+   /// Tick the first pay epoch that spends, after reach_the_grid. With `pay_cadence_epochs == 1` the emissions gate
+   /// either pays the period or records why it held it.
+   action_result open_first_spending_pay_epoch() {
+      return push(EPOCH, epoch_ser, EPOCH, "tickeconomy"_n, mvo()("epoch_index", FIRST_SPENDING_EPOCH));
    }
 };
 } // namespace kicker_test_support

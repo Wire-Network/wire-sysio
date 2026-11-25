@@ -1000,6 +1000,10 @@
                 {
                     "name": "period_emission",
                     "type": "int64"
+                },
+                {
+                    "name": "spend",
+                    "type": "bool"
                 }
             ]
         },

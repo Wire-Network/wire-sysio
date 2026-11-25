@@ -780,14 +780,15 @@ namespace sysiosystem {
           * settlement and, if it is still not done, returns with the period still pending, so the
           * next economic epoch's gate offers the payout again.
           *
-          * While the economic clock catches up (sysio.epoch::economystate.caught_up not yet set) the
-          * payout spends nothing, and the gate never holds it for balance: it credits and pushes no
-          * category, clears no block count and leaves the duty period open, so the whole period stays
-          * in the treasury and the blocks and duty counted meanwhile carry to the first payout after
-          * the clock has caught up, paid from that period's own pools.
+          * `spend` is whether the economic clock had caught up to its grid before this payout's tick
+          * (sysio.epoch::economystate.caught_up as the tick found it). A payout with `spend` false,
+          * including the one on the tick that reaches the grid, spends nothing, and the gate never
+          * holds it for balance: it credits and pushes no category, clears no block count and leaves
+          * the duty period open, so the whole period stays in the treasury and the blocks and duty
+          * counted meanwhile carry to the first payout that spends, paid from that period's own pools.
           */
          [[sysio::action]]
-         void payepoch(uint32_t epoch_index, int64_t period_emission);
+         void payepoch(uint32_t epoch_index, int64_t period_emission, bool spend);
 
          /**
           * Accrue economic epoch `epoch_index`'s emission share onto t5state, without paying.
