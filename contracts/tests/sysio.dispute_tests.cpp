@@ -202,6 +202,7 @@ public:
          ("chain_code", ETH_CHAIN_CODE)
          ("epoch_duration_sec", 60)
          ("traffic_wait_sec", 0)
+         ("late_window_sec", 0)
          ("operators_per_epoch", 1)
          ("batch_operator_minimum_active", 1)
          ("batch_op_groups", 1)
@@ -1036,7 +1037,8 @@ BOOST_FIXTURE_TEST_CASE(chkdispute_unpauses_only_the_disputed_chain, sysio_dispu
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "activchain"_n,
                                        mvo()("code", BASE_CHAIN_CODE)));
    BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "setconfig"_n, mvo()
-      ("chain_code", BASE_CHAIN_CODE)("epoch_duration_sec", 60)("traffic_wait_sec", 0)("operators_per_epoch", 1)
+      ("chain_code", BASE_CHAIN_CODE)("epoch_duration_sec", 60)("traffic_wait_sec", 0)("late_window_sec", 0)
+      ("operators_per_epoch", 1)
       ("batch_operator_minimum_active", 1)("batch_op_groups", 1)("epoch_retention_envelope_log_count", 200)));
    // batchop.a already holds the EVM link the ETH outpost needed.
    BOOST_REQUIRE_EQUAL(success(), sysio_system::test_support::served_chains::join(*this, BATCHOP, BASE_CHAIN_CODE));
@@ -1106,7 +1108,8 @@ BOOST_FIXTURE_TEST_CASE(slashed_op_excluded_from_scheduling_no_double_slash, sys
    // Single 2-member group; with a and b the only ACTIVE batch ops, both are placed.
    BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "setconfig"_n, mvo()
       ("chain_code", ETH_CHAIN_CODE)
-      ("epoch_duration_sec", 60)("traffic_wait_sec", 0)("operators_per_epoch", 2)("batch_operator_minimum_active", 2)
+      ("epoch_duration_sec", 60)("traffic_wait_sec", 0)("late_window_sec", 0)
+      ("operators_per_epoch", 2)("batch_operator_minimum_active", 2)
       ("batch_op_groups", 1)("epoch_retention_envelope_log_count", 200)));
    BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "seteconomy"_n, mvo()
       ("epoch_duration_sec", 60)("start_time", fc::time_point_sec(control->head().block_time()))));

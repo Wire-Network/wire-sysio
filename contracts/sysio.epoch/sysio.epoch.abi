@@ -129,6 +129,10 @@
                     "type": "uint32"
                 },
                 {
+                    "name": "late_window_sec",
+                    "type": "uint32"
+                },
+                {
                     "name": "operators_per_epoch",
                     "type": "uint32"
                 },
@@ -284,6 +288,10 @@
                 },
                 {
                     "name": "traffic_wait_sec",
+                    "type": "uint32"
+                },
+                {
+                    "name": "late_window_sec",
                     "type": "uint32"
                 },
                 {

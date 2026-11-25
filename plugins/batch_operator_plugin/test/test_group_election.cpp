@@ -147,9 +147,10 @@ struct traffic {
    fc::time_point due_at{};
 };
 
-/// An `epochstate` value as the chain renders it.
+/// An `epochstate` value as the chain renders it; `previous` is the group that served the previous epoch.
 fc::variant_object state_row(fc::slug_name chain, uint32_t epoch, int64_t start_sec, uint8_t on_duty,
-                             const traffic& pending = traffic(), bool paused = false) {
+                             const traffic& pending = traffic(), bool paused = false,
+                             std::initializer_list<const char*> previous = {}) {
    return mvo()(epoch::field::chain_code, chain.value)
                (epoch::field::current_epoch_index, epoch)
                (epoch::field::current_epoch_start, at_sec(start_sec))
@@ -157,12 +158,17 @@ fc::variant_object state_row(fc::slug_name chain, uint32_t epoch, int64_t start_
                (epoch::field::due_at, pending.due_at)
                (epoch::field::current_batch_op_group, on_duty)
                (epoch::field::batch_op_groups, sliding_window())
-               (epoch::field::is_paused, paused);
+               (epoch::field::is_paused, paused)
+               (epoch::field::previous_group, group(previous));
 }
 
-/// An `epochcfg` value as the chain renders it.
+/// Parts of a chain's minimum that make its late-delivery window in these rows: half of it, the contract's default.
+constexpr uint32_t late_window_divisor = 2;
+
+/// An `epochcfg` value as the chain renders it, its late-delivery window half its minimum.
 fc::variant_object config_row(fc::slug_name chain, uint32_t duration_sec) {
-   return mvo()(epoch::field::chain_code, chain.value)(epoch::field::epoch_duration_sec, duration_sec);
+   return mvo()(epoch::field::chain_code, chain.value)(epoch::field::epoch_duration_sec, duration_sec)(
+      epoch::field::late_window_sec, duration_sec / late_window_divisor);
 }
 
 /// A `sysio.msgch::outpcons` value as the chain renders it: `chain`'s accepted winner is for `epoch`.
@@ -208,7 +214,9 @@ BOOST_AUTO_TEST_CASE(each_chain_reads_its_own_epoch_and_election) try {
    BOOST_CHECK(fast.traffic_since == fast_traffic().since);
    BOOST_CHECK(fast.due_at == fast_traffic().due_at);
    BOOST_CHECK(fast.decided);
+   BOOST_CHECK(!fast.in_previous_group);
    BOOST_CHECK_EQUAL(fast.epoch_duration.count(), fc::seconds(fast_duration_sec).count());
+   BOOST_CHECK_EQUAL(fast.late_window.count(), fc::seconds(fast_duration_sec / late_window_divisor).count());
    BOOST_CHECK(fast.election.is_elected);
    BOOST_CHECK_EQUAL(static_cast<unsigned>(fast.election.my_group), static_cast<unsigned>(self_group));
 
@@ -228,6 +236,55 @@ BOOST_AUTO_TEST_CASE(each_chain_reads_its_own_epoch_and_election) try {
    BOOST_CHECK_EQUAL(slow.cadence.poll_interval.count(), max_poll.count());
    BOOST_CHECK_EQUAL(fast.cadence.delivery_timeout.count(), min_delivery_timeout.count());
    BOOST_CHECK_EQUAL(slow.cadence.delivery_timeout.count(), max_delivery_timeout.count());
+} FC_LOG_AND_RETHROW();
+
+/// The operator's seat in the group that served the previous epoch is read from `previous_group`, whatever its
+/// standing in the current window; a row without the field does not decode.
+BOOST_AUTO_TEST_CASE(previous_group_membership_is_read_from_its_own_field) try {
+   const auto view_with_previous = [](std::initializer_list<const char*> previous) {
+      return decode_chain_epoch(state_row(slow_chain, slow_epoch, slow_start_sec, on_duty_group, traffic(), false,
+                                          previous),
+                                config_row(slow_chain, slow_duration_sec), decided_epochs{},
+                                sysio::chain::name(self), max_poll);
+   };
+   const chain_epoch_view sat = view_with_previous({on_duty_peer, self});
+   BOOST_CHECK(sat.in_previous_group);
+   BOOST_CHECK(!sat.election.is_elected);
+   BOOST_CHECK(!view_with_previous({on_duty_peer, stranger}).in_previous_group);
+   BOOST_CHECK(!view_with_previous({}).in_previous_group);
+
+   fc::mutable_variant_object without(state_row(slow_chain, slow_epoch, slow_start_sec, on_duty_group));
+   without.erase(epoch::field::previous_group);
+   BOOST_CHECK_THROW(decode_chain_epoch(without, config_row(slow_chain, slow_duration_sec), decided_epochs{},
+                                        sysio::chain::name(self), max_poll),
+                     fc::exception);
+} FC_LOG_AND_RETHROW();
+
+/// A member of the previous epoch's group may deliver it late only while the chain's late-delivery window, from the
+/// current epoch's start, is open: never after it, never from outside the group, and never in epoch 1, which has no
+/// previous epoch.
+BOOST_AUTO_TEST_CASE(a_late_delivery_is_open_only_within_the_window) try {
+   chain_epoch_view view = decode_chain_epoch(
+      state_row(slow_chain, slow_epoch, slow_start_sec, on_duty_group, traffic(), false, {on_duty_peer, self}),
+      config_row(slow_chain, slow_duration_sec), decided_epochs{}, sysio::chain::name(self), max_poll);
+   const fc::time_point closes = view.epoch_start + view.late_window;
+   BOOST_CHECK(late_delivery_open(view, view.epoch_start));
+   BOOST_CHECK(late_delivery_open(view, closes - fc::milliseconds(1)));
+   BOOST_CHECK(!late_delivery_open(view, closes));
+
+   chain_epoch_view outsider = view;
+   outsider.in_previous_group = false;
+   BOOST_CHECK(!late_delivery_open(outsider, view.epoch_start));
+
+   chain_epoch_view first_epoch = view;
+   first_epoch.epoch_index = 1;
+   BOOST_CHECK(!late_delivery_open(first_epoch, view.epoch_start));
+
+   fc::mutable_variant_object no_window(config_row(slow_chain, slow_duration_sec));
+   no_window.erase(epoch::field::late_window_sec);
+   BOOST_CHECK_THROW(decode_chain_epoch(state_row(slow_chain, slow_epoch, slow_start_sec, on_duty_group), no_window,
+                                        decided_epochs{}, sysio::chain::name(self), max_poll),
+                     fc::exception);
 } FC_LOG_AND_RETHROW();
 
 /// A paused chain elects nobody, though the operator's seat in its window still stands.
@@ -346,7 +403,7 @@ BOOST_AUTO_TEST_CASE(chkcons_follows_an_own_delivery_once_the_chain_is_due) try 
    // An undecided epoch too: the last-read view cannot show what the delivery just decided.
    fast.decided = false;
    BOOST_CHECK(pushes_chkcons_after_delivery(fast, fast.due_at));
-   // The election does not enter into it: the delivery itself was the elected operator's.
+   // Not elected on the epoch that follows its own (late) delivery makes no difference either.
    fast.election.is_elected = false;
    BOOST_CHECK(pushes_chkcons_after_delivery(fast, fast.due_at));
 

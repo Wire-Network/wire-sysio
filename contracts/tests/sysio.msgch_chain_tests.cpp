@@ -156,6 +156,10 @@ constexpr const char* DECIDED_EPOCH_DIFFERING_DELIVERY_ERROR =
 constexpr const char* LATE_DELIVERY_DIFFERING_ERROR =
    "assertion failure with message: deliver: late delivery differs from the previous epoch's accepted envelope";
 
+/// `deliver`'s refusal of a late delivery once the chain's late-delivery window has closed.
+constexpr const char* LATE_DELIVERY_AFTER_WINDOW_ERROR =
+   "assertion failure with message: deliver: the late-delivery window for the previous epoch has closed";
+
 /// `deliver`'s refusal of a late delivery from outside the group that served the previous epoch.
 constexpr const char* LATE_DELIVERER_NOT_IN_PREVIOUS_GROUP_ERROR =
    "assertion failure with message: deliver: a late delivery must come from the group that served the previous "
@@ -360,6 +364,7 @@ constexpr const char* TRAFFIC_SINCE          = "traffic_since";
 constexpr const char* DUE_AT                 = "due_at";
 constexpr const char* EPOCH_DURATION_SEC     = "epoch_duration_sec";
 constexpr const char* TRAFFIC_WAIT_SEC       = "traffic_wait_sec";
+constexpr const char* LATE_WINDOW_SEC        = "late_window_sec";
 constexpr const char* EPOCH_INDEX            = "epoch_index";
 constexpr const char* PREVIOUS_GROUP         = "previous_group";
 } // namespace epoch_fields
@@ -698,6 +703,7 @@ public:
          (epoch_fields::CHAIN_CODE,             chain)
          ("epoch_duration_sec",                 duration_sec)
          ("traffic_wait_sec",                   0)
+         ("late_window_sec",                    0)
          ("operators_per_epoch",                operators_per_group)
          ("batch_operator_minimum_active",      operators_per_group * groups)
          ("batch_op_groups",                    groups)
@@ -796,6 +802,11 @@ public:
    /// `chain_code`'s traffic wait, its `epochcfg` `traffic_wait_sec`.
    fc::microseconds traffic_wait(uint64_t chain_code = ETH_OUTPOST_ID) {
       return fc::seconds(epoch_config(chain_code)[epoch_fields::TRAFFIC_WAIT_SEC].as<uint32_t>());
+   }
+
+   /// `chain_code`'s late-delivery window, its `epochcfg` `late_window_sec`.
+   fc::microseconds late_window(uint64_t chain_code = ETH_OUTPOST_ID) {
+      return fc::seconds(epoch_config(chain_code)[epoch_fields::LATE_WINDOW_SEC].as<uint32_t>());
    }
 
    /// When `chain_code` is due for traffic of its current epoch that began at `since`: the later of its epoch start
@@ -3543,6 +3554,33 @@ BOOST_FIXTURE_TEST_CASE(disjoint_previous_group_member_delivers_only_late, sysio
       BOOST_REQUIRE_EQUAL(uint64_t{EPOCH_DURATION_SEC}, batch_duty_seat_seconds(member, ETH_OUTPOST_ID));
    }
    for (const name member : second) BOOST_REQUIRE(dellog_rows(member, epoch + 1, ETH_OUTPOST_ID).empty());
+} FC_LOG_AND_RETHROW() }
+
+/// A late delivery counts only within the chain's late-delivery window, `late_window_sec` (by default half the
+/// minimum) from the next epoch's start: one block before it closes a member's late delivery is taken, and from its
+/// close another member's is refused, so the advance that closes the epoch's books records that member's miss.
+BOOST_FIXTURE_TEST_CASE(a_late_delivery_counts_only_within_its_window, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t     kGroupSize     = 5;
+   const fc::microseconds block_interval = fc::milliseconds(config::block_interval_ms);
+   bootstrap(kGroupSize);
+   BOOST_REQUIRE(late_window() == fc::seconds(EPOCH_DURATION_SEC / 2));
+   const uint32_t          epoch  = current_epoch();
+   const std::vector<char> winner = encode_delivery(epoch, "windowed-winner");
+   deliver_all({BATCHOP, BATCHOP_B, BATCHOP_C}, winner);
+   advance_decided_epoch();
+
+   const fc::time_point closes = epoch_start() + late_window();
+   open_block_at(closes - block_interval);
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_D, ETH_OUTPOST_ID, winner));
+   open_block_at(closes);
+   BOOST_REQUIRE_EQUAL(error(LATE_DELIVERY_AFTER_WINDOW_ERROR), deliver_as(BATCHOP_E, ETH_OUTPOST_ID, winner));
+   BOOST_REQUIRE(find_inbound_delivery(ETH_OUTPOST_ID, epoch, BATCHOP_E).is_null());
+
+   const std::vector<char> current = encode_chained_delivery("windowed-next", next_stream_tip(winner));
+   deliver_all({BATCHOP, BATCHOP_B, BATCHOP_C}, current);
+   advance_decided_epoch();
+   for (const name member : {BATCHOP, BATCHOP_B, BATCHOP_C, BATCHOP_D}) require_booked(member, epoch, true);
+   require_booked(BATCHOP_E, epoch, false);
 } FC_LOG_AND_RETHROW() }
 
 /// A previous epoch decided by dispute resolution takes a late delivery of the voted winner from the member that

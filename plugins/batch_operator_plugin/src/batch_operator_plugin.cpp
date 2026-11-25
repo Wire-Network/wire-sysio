@@ -455,8 +455,8 @@ struct batch_operator_plugin::impl {
          return _impl.has_delivered_envelope(chain_code, epoch_index);
       }
 
-      bool deliver_to_depot(uint64_t chain_code,
-                            const std::vector<char>& raw_messages) override {
+      push_outcome deliver_to_depot(uint64_t chain_code,
+                                    const std::vector<char>& raw_messages) override {
          return _impl.push_action(
             msgch::account, msgch::action_deliver, *_impl.relay_signer,
             fc::mutable_variant_object()
@@ -489,7 +489,7 @@ struct batch_operator_plugin::impl {
                                      (backlog::field::pending_count,     pending_count)
                                      (backlog::field::oldest_pending_ms, oldest_pending_ms),
                                   _impl.delivery_timeout_of(chain_code), nullptr,
-                                  batch_operator_detail::refusal_log::info);
+                                  batch_operator_detail::refusal_log::info) == push_outcome::accepted;
       }
 
       void emit_debug_envelope(sysio::opp::debugging::DebugEnvelopeEvent event) override {
@@ -509,6 +509,10 @@ struct batch_operator_plugin::impl {
       uint32_t current_epoch(uint64_t chain_code) const override {
          const std::optional<batch_operator_detail::chain_epoch_view> view = _impl.chain_epoch_of(chain_code);
          return view ? view->epoch_index : 0;
+      }
+      bool late_delivery_open(uint64_t chain_code) const override {
+         const std::optional<batch_operator_detail::chain_epoch_view> view = _impl.chain_epoch_of(chain_code);
+         return view && batch_operator_detail::late_delivery_open(*view, fc::time_point::now());
       }
       bool is_decided(uint64_t chain_code) const override {
          const std::optional<batch_operator_detail::chain_epoch_view> view = _impl.chain_epoch_of(chain_code);
@@ -838,9 +842,9 @@ struct batch_operator_plugin::impl {
          try {
             // A later index cannot open before this one, so a refused or timed-out push ends the
             // catch-up; the next poll re-reads the clock.
-            if (!push_action(economy::account, economy::action_tickeconomy, *relay_signer,
-                             fc::mutable_variant_object()(economy::field::epoch_index, epoch_index),
-                             DEPOT_CALL_TIMEOUT)) {
+            if (push_action(economy::account, economy::action_tickeconomy, *relay_signer,
+                            fc::mutable_variant_object()(economy::field::epoch_index, epoch_index),
+                            DEPOT_CALL_TIMEOUT) != push_outcome::accepted) {
                break;
             }
          } catch (const fc::exception& e) {
@@ -1719,7 +1723,8 @@ struct batch_operator_plugin::impl {
                           std::optional<fc::time_point_sec>* submitted_until = nullptr) {
       if (shutting_down) return false;
       try {
-         return push_action(contract, action, *underwriter_signer, data, DEPOT_CALL_TIMEOUT, submitted_until);
+         return push_action(contract, action, *underwriter_signer, data, DEPOT_CALL_TIMEOUT, submitted_until) ==
+                push_outcome::accepted;
       } catch (const fc::exception& e) {
          wlog("batch_operator: underwriter {}::{}: {}", contract, action, e.to_string());
       } catch (const std::exception& e) {
@@ -2214,22 +2219,23 @@ struct batch_operator_plugin::impl {
       }
    }
 
-   /// Build, sign and submit a depot action, declaring `by.auth` and signed by `by.provider`. True when the node
-   /// accepted the transaction within `timeout`; a refusal is logged by the push callback, at `refusal`'s level.
+   /// Build, sign and submit a depot action, declaring `by.auth` and signed by `by.provider`. Accepted when the node
+   /// accepted the transaction within `timeout`, refused when the contract refused it, otherwise unconfirmed; a refusal
+   /// or failure is logged by the push callback, at `refusal`'s level.
    ///
    /// Called from cron threads, which may not read chain state: the build runs in a read window and the submission
    /// on the main thread, while the signature, possibly a remote signer, stays here. The waits do not cancel
    /// anything: each posted task owns what it uses, so returning on a timeout is safe. `submitted_until`, when
    /// supplied, records the exact signed expiration before submission and remains set on a callback timeout.
-   bool push_action(const std::string& contract,
-                    const std::string& action_name,
-                    const signer& by,
-                    const fc::variant_object& data,
-                    fc::microseconds timeout,
-                    std::optional<fc::time_point_sec>* submitted_until = nullptr,
-                    batch_operator_detail::refusal_log refusal = batch_operator_detail::refusal_log::error) {
+   push_outcome push_action(const std::string& contract,
+                            const std::string& action_name,
+                            const signer& by,
+                            const fc::variant_object& data,
+                            fc::microseconds timeout,
+                            std::optional<fc::time_point_sec>* submitted_until = nullptr,
+                            batch_operator_detail::refusal_log refusal = batch_operator_detail::refusal_log::error) {
       if (submitted_until) submitted_until->reset();
-      if (shutting_down) return false;
+      if (shutting_down) return push_outcome::unconfirmed;
       const fc::time_point deadline = fc::time_point::now() + timeout;
       const bool           on_main  = std::this_thread::get_id() == app().executor().get_main_thread_id();
 
@@ -2252,11 +2258,11 @@ struct batch_operator_plugin::impl {
          if (!ready_by(built_future, deadline)) {
             if (shutting_down) wlog("batch_operator: push {}::{} abandoned on shutdown", contract, action_name);
             else elog("batch_operator: push {}::{} timed out before signing", contract, action_name);
-            return false;
+            return push_outcome::unconfirmed;
          }
          trx = built_future.get();
       }
-      if (!trx) return false;
+      if (!trx) return push_outcome::unconfirmed;
       trx->trx.signatures.push_back(by.provider->sign(trx->digest));
       const fc::time_point_sec expiration = trx->trx.expiration;
 
@@ -2278,9 +2284,10 @@ struct batch_operator_plugin::impl {
       if (!ready_by(future, deadline)) {
          if (shutting_down) wlog("batch_operator: push {}::{} abandoned on shutdown", contract, action_name);
          else elog("batch_operator: push {}::{} timed out", contract, action_name);
-         return false;
+         return push_outcome::unconfirmed;
       }
-      return completion->succeeded();
+      if (completion->succeeded()) return push_outcome::accepted;
+      return completion->refused_by_contract() ? push_outcome::refused : push_outcome::unconfirmed;
    }
 
    // -----------------------------------------------------------------------

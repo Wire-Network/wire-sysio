@@ -295,6 +295,7 @@ void note_chain_traffic(name self, sysio::slug_name chain_code, time_point since
 void epoch::setconfig(sysio::slug_name chain_code,
                       uint32_t epoch_duration_sec,
                       uint32_t traffic_wait_sec,
+                      uint32_t late_window_sec,
                       uint32_t operators_per_epoch,
                       uint32_t batch_operator_minimum_active,
                       uint32_t batch_op_groups,
@@ -308,6 +309,9 @@ void epoch::setconfig(sysio::slug_name chain_code,
    const uint32_t traffic_wait =
       traffic_wait_sec == 0 ? default_share_of_minimum(epoch_duration_sec) : traffic_wait_sec;
    check(traffic_wait <= epoch_duration_sec, "traffic_wait_sec must be <= epoch_duration_sec");
+   const uint32_t late_window =
+      late_window_sec == 0 ? default_share_of_minimum(epoch_duration_sec) : late_window_sec;
+   check(late_window <= epoch_duration_sec, "late_window_sec must be <= epoch_duration_sec");
    check(operators_per_epoch > 0, "operators_per_epoch must be positive");
    check(batch_op_groups > 0, "batch_op_groups must be positive");
    check(batch_op_groups <= MAX_BATCH_OP_GROUPS,
@@ -349,6 +353,7 @@ void epoch::setconfig(sysio::slug_name chain_code,
       .chain_code                         = chain_code.value,
       .epoch_duration_sec                 = epoch_duration_sec,
       .traffic_wait_sec                   = traffic_wait,
+      .late_window_sec                    = late_window,
       .operators_per_epoch                = operators_per_epoch,
       .batch_operator_minimum_active      = batch_operator_minimum_active,
       .batch_op_groups                    = batch_op_groups,
@@ -371,7 +376,7 @@ void epoch::advance(sysio::slug_name chain_code) {
    const chain_key key{chain_code.value};
    epochcfg_t cfg_tbl(get_self());
    const std::optional<epoch_config> cfg = cfg_tbl.try_get(key);
-   check(cfg.has_value(), "epoch config not initialized");
+   check(cfg.has_value(), EPOCH_CONFIG_NOT_INITIALIZED);
 
    epochstate_t state_tbl(get_self());
    epoch_state state = state_tbl.try_get(key).value_or(epoch_state{.chain_code = key.chain_code});
@@ -499,7 +504,7 @@ void epoch::finishadv(sysio::slug_name chain_code, uint32_t epoch_index) {
    require_auth(get_self());
    check(get_sender() == get_self(), "finishadv must be sent inline by sysio.epoch");
    const chain_key key{chain_code.value};
-   const epoch_config cfg = epochcfg_t(get_self()).get(key, "epoch config not initialized");
+   const epoch_config cfg = epochcfg_t(get_self()).get(key, EPOCH_CONFIG_NOT_INITIALIZED.data());
    epochstate_t state_tbl(get_self());
    epoch_state state = state_tbl.get(key, "epoch state not initialized");
    check(state.current_epoch_index == epoch_index, "finishadv epoch mismatch");
@@ -862,7 +867,7 @@ void epoch::schbatchgps(sysio::slug_name chain_code) {
    require_auth(get_self());
 
    const chain_key    key{chain_code.value};
-   const epoch_config cfg = epochcfg_t(get_self()).get(key, "epoch config not initialized");
+   const epoch_config cfg = epochcfg_t(get_self()).get(key, EPOCH_CONFIG_NOT_INITIALIZED.data());
 
    // The chain's ACTIVE serving batch operators, non-bootstrapped first, then bootstrapped.
    std::vector<pool_member> available_batch = schedule_pool(chain_code, {});

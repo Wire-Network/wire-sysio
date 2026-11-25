@@ -114,6 +114,11 @@ constexpr std::string_view DELIVERER_NOT_SERVING    =
 constexpr std::string_view LATE_DELIVERER_NOT_IN_PREVIOUS_GROUP =
    "deliver: a late delivery must come from the group that served the previous epoch";
 
+/// Message of the `check` `deliver` raises for a late delivery once the chain's late-delivery window, from its
+/// current epoch's start, has closed.
+constexpr std::string_view LATE_DELIVERY_AFTER_WINDOW =
+   "deliver: the late-delivery window for the previous epoch has closed";
+
 /// Message of the `check` `deliver` raises for a late delivery that is not byte-identical to the previous
 /// epoch's accepted envelope, or for a previous epoch with no accepted envelope.
 constexpr std::string_view LATE_DELIVERY_DIFFERS_FROM_ACCEPTED =
@@ -1211,6 +1216,12 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
    });
    if (late_delivery) {
       check(in_previous_group, LATE_DELIVERER_NOT_IN_PREVIOUS_GROUP);
+      // Only within the chain's late-delivery window; a later one is the member's miss when the books close.
+      const std::optional<epoch::epoch_config> cfg =
+         epoch::epochcfg_t(EPOCH_ACCOUNT).try_get(epoch::chain_key{chain_code});
+      check(cfg.has_value(), epoch::EPOCH_CONFIG_NOT_INITIALIZED);
+      check(current_time_point() < state->current_epoch_start + seconds(static_cast<int64_t>(cfg->late_window_sec)),
+            LATE_DELIVERY_AFTER_WINDOW);
    } else {
       check(in_current_group, epoch::NOT_IN_ACTIVE_GROUP);
    }

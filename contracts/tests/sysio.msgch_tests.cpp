@@ -261,6 +261,7 @@ public:
                ("chain_code", chain)
                ("epoch_duration_sec", 60)
                ("traffic_wait_sec", 0)
+               ("late_window_sec", 0)
                ("operators_per_epoch", 1)
                ("batch_operator_minimum_active", 3)
                ("batch_op_groups", 3)

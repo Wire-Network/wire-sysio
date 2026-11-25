@@ -45,8 +45,8 @@ public:
       return false;
    }
 
-   bool deliver_to_depot(uint64_t                 chain_code,
-                         const std::vector<char>& raw_messages) override {
+   sysio::push_outcome deliver_to_depot(uint64_t                 chain_code,
+                                        const std::vector<char>& raw_messages) override {
       // `deliver_thrower` runs before recording so a test can simulate the
       // WIRE-side push_action failing without losing the call evidence —
       // any throw from the hook propagates to the caller, which is what
@@ -54,7 +54,7 @@ public:
       if (deliver_thrower) deliver_thrower();
       std::lock_guard<std::mutex> lock(_mx);
       deliver_calls.push_back({chain_code, raw_messages});
-      return deliver_accepted;
+      return deliver_outcome;
    }
 
    void push_chkcons_if_due(uint64_t chain_code) override {
@@ -85,6 +85,7 @@ public:
 
    bool is_elected(uint64_t chain_code) const override { return knobs_of(chain_code).elected; }
    uint32_t current_epoch(uint64_t chain_code) const override { return knobs_of(chain_code).epoch; }
+   bool late_delivery_open(uint64_t chain_code) const override { return knobs_of(chain_code).owes_late_delivery; }
    bool is_decided(uint64_t chain_code) const override { return knobs_of(chain_code).decided; }
    fc::microseconds minimum_duration(uint64_t chain_code) const override {
       return knobs_of(chain_code).chain_minimum;
@@ -105,6 +106,7 @@ public:
    struct chain_knobs {
       bool     elected               = true;
       uint32_t epoch                 = 1;
+      bool     owes_late_delivery    = false;   ///< what `late_delivery_open` answers
       bool     decided               = false;
       fc::microseconds chain_minimum = default_minimum_duration;   ///< what `minimum_duration` answers
       /// What `delivery_timeout` answers: the deadline the job hands every outpost call.
@@ -115,10 +117,11 @@ public:
    // every chain without its own entry in `chains`.
    bool             elected               = true;
    uint32_t         epoch                 = 1;
+   bool             owes_late_delivery    = false;
    bool             decided               = false;
    fc::microseconds chain_minimum         = default_minimum_duration;
    /// What `deliver_to_depot` answers once it records the call.
-   bool             deliver_accepted  = true;
+   sysio::push_outcome deliver_outcome = sysio::push_outcome::accepted;
    /// What `report_backlog` answers once it records the call.
    bool             report_accepted   = true;
 
@@ -162,6 +165,7 @@ private:
       if (it != chains.end()) return it->second;
       return chain_knobs{.elected               = elected,
                          .epoch                 = epoch,
+                         .owes_late_delivery    = owes_late_delivery,
                          .decided               = decided,
                          .chain_minimum         = chain_minimum};
    }

@@ -258,8 +258,9 @@ leaves behind, and by the new `sysio.msgch::reportqueue` once a strict majority 
 reports an outbound backlog on the outpost), by `sysio.epoch`'s handler of the `sysio.msgch::queueout`
 notification, and by `resendroster`. `reportqueue` keeps its reports in the new `sysio.msgch::qreports` table.
 `sysio.msgch::chkcons` advances a decided epoch once `due_at` has passed, and `rcrdduty` credits one chain
-minimum per duty epoch. `epochcfg` gains `traffic_wait_sec`, a new `setconfig` argument after
-`epoch_duration_sec`, and `due_at` is the later of the epoch start plus the minimum and the traffic plus that wait.
+minimum per duty epoch. `epochcfg` gains `traffic_wait_sec` and `late_window_sec`, new `setconfig` arguments after
+`epoch_duration_sec`: `due_at` is the later of the epoch start plus the minimum and the traffic plus that wait, and
+`sysio.msgch::deliver` takes a late delivery only within the late window from the current epoch's start.
 The `epochstate` and `epochcfg` layouts change in place, so every reader is rebuilt: `sysio.msgch` reads both,
 `sysio.opreg` reads `epochstate`, and the test-only `epoch_stub` writes `epochstate`. No migration is supplied: deploy
 `sysio.epoch` and `sysio.msgch` together, with the rebuilt `sysio.opreg`, on a fresh chain with the matching

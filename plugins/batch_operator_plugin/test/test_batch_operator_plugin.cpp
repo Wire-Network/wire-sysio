@@ -39,6 +39,7 @@ namespace {
 constexpr auto immediate_wait = 0ms;
 constexpr auto simulated_push_failure = "simulated push failure";
 constexpr auto simulated_deferred_push_failure = "simulated deferred push failure";
+constexpr auto simulated_contract_refusal = "simulated contract refusal";
 constexpr auto callback_failure_message = "callback failure";
 constexpr uint32_t expected_error_log_count = 1;
 
@@ -294,6 +295,43 @@ BOOST_AUTO_TEST_CASE(async_action_completion_handles_deferred_push_failure) try 
    BOOST_CHECK(!success_logged);
    BOOST_CHECK_EQUAL(error_logs, expected_error_log_count);
    BOOST_CHECK(done.wait_for(immediate_wait) == std::future_status::ready);
+} FC_LOG_AND_RETHROW();
+
+/// A failed push is the contract's refusal only when one of its checks failed, immediately or deferred; any other
+/// failure, and a success, is not.
+BOOST_AUTO_TEST_CASE(async_action_completion_tells_a_contract_refusal) try {
+   using push_result = sysio::chain::next_function_variant<sysio::chain_apis::read_write::push_transaction_results>;
+   using deferred_t  = sysio::chain::t_or_exception<sysio::chain_apis::read_write::push_transaction_results>;
+   const auto error_of = [](const auto& raise) {
+      try {
+         raise();
+      } catch (const fc::exception& error) {
+         return error.dynamic_copy_exception();
+      }
+      return fc::exception_ptr{};
+   };
+   const fc::exception_ptr assert_message = error_of([] {
+      FC_THROW_EXCEPTION(sysio::chain::sysio_assert_message_exception, simulated_contract_refusal);
+   });
+   const fc::exception_ptr assert_code = error_of([] {
+      FC_THROW_EXCEPTION(sysio::chain::sysio_assert_code_exception, simulated_contract_refusal);
+   });
+   const fc::exception_ptr other = error_of([] { FC_THROW_EXCEPTION(fc::assert_exception, simulated_push_failure); });
+   const auto refused = [](const push_result& result) {
+      sysio::batch_operator_detail::async_action_completion completion;
+      completion.complete_push_result(result, [] {}, [](const fc::exception_ptr&) {});
+      return completion.refused_by_contract();
+   };
+   const auto deferred = [](const fc::exception_ptr& error) {
+      return push_result{std::function<deferred_t()>{[error] { return deferred_t{error}; }}};
+   };
+
+   BOOST_CHECK(refused(push_result{assert_message}));
+   BOOST_CHECK(refused(push_result{assert_code}));
+   BOOST_CHECK(refused(deferred(assert_message)));
+   BOOST_CHECK(!refused(push_result{other}));
+   BOOST_CHECK(!refused(deferred(other)));
+   BOOST_CHECK(!refused(push_result{sysio::chain_apis::read_write::push_transaction_results{}}));
 } FC_LOG_AND_RETHROW();
 
 /// Callback-side exceptions are contained and still release the waiting relay job.

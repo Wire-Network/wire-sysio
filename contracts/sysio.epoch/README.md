@@ -16,7 +16,8 @@ The depot's two clocks, and batch operator scheduling, for the OPP (Outpost Prot
   queued message), a dispute's resolution
   (`sysio.msgch::resolvedisp`, at its time), or a governance `resendroster`. `sysio.msgch` records the first four. An idle chain
   never advances. The first chain's genesis advance is the network genesis (`netgenesis`); a genesis
-  advance needs no traffic. An epoch's books (deliveries, misses, duty) close at the advance after it.
+  advance needs no traffic. An epoch's books (deliveries, misses, duty) close at the advance after it, so a
+  late delivery made within the chain's `epochcfg.late_window_sec` of the next epoch's start counts.
 - On an idle chain the schedule window and `previous_group` stay as they are, so an operator they seat
   stays blocked from `sysio.opreg::regoperator` and `joinchain` until enough advances happen, each of
   which needs traffic or a `resendroster`.
@@ -42,7 +43,7 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
 
 | Table | Type | Description |
 |-------|------|-------------|
-| `epochcfg` | `kv::table` | One row per outpost chain, keyed by its `sysio.chains` code: `epoch_duration_sec`, `traffic_wait_sec` (half the minimum when set as zero), `operators_per_epoch` (default 7), `batch_operator_minimum_active` (default 21), `batch_op_groups` (default 3), `epoch_retention_envelope_log_count` (default 200) |
+| `epochcfg` | `kv::table` | One row per outpost chain, keyed by its `sysio.chains` code: `epoch_duration_sec`, `traffic_wait_sec` (half the minimum when set as zero), `late_window_sec` (how long after an epoch starts a late delivery of the previous one is taken; half the minimum when set as zero), `operators_per_epoch` (default 7), `batch_operator_minimum_active` (default 21), `batch_op_groups` (default 3), `epoch_retention_envelope_log_count` (default 200) |
 | `epochstate` | `kv::table` | One row per outpost chain: its consensus epoch index, current epoch start, `traffic_since` (when its pending traffic began) and `due_at` (when it may next advance), both zero while it is idle, active group cursor, the resident group window, pause flag, and `previous_group`, the group that served the previous epoch (empty before epoch 2) |
 | `netgenesis` | `kv::global` | Network genesis marker, written by the first chain's genesis advance; closes the bootstrap window and starts the economic clock |
 | `economycfg` | `kv::global` | Economic clock: `epoch_duration_sec` (60 s .. 30 days) and the grid's `start_time` |
@@ -54,7 +55,7 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
 
 | Action | Auth | Description |
 |--------|------|-------------|
-| `setconfig` | `sysio.epoch` | Set one chain's consensus epoch configuration. Bounds `epoch_duration_sec` to `MIN_EPOCH_DURATION_SEC` (10 s) .. `MAX_EPOCH_DURATION_SEC` (30 days) and `traffic_wait_sec` to at most `epoch_duration_sec`, zero taking half the minimum. Requires `operators_per_epoch * batch_op_groups == batch_operator_minimum_active` and enforces the outposts' limits (`MAX_OPERATORS_PER_EPOCH` 7, Ethereum's group size; `MAX_BATCH_OP_GROUPS` 8, Solana's group count), so the window holds at most `MAX_SCHEDULED_BATCH_OPERATORS` (56). Recomputes `due_at` with the new minimum and wait while the chain has traffic |
+| `setconfig` | `sysio.epoch` | Set one chain's consensus epoch configuration. Bounds `epoch_duration_sec` to `MIN_EPOCH_DURATION_SEC` (10 s) .. `MAX_EPOCH_DURATION_SEC` (30 days) and `traffic_wait_sec` and `late_window_sec` each to at most `epoch_duration_sec`, zero taking half the minimum. Requires `operators_per_epoch * batch_op_groups == batch_operator_minimum_active` and enforces the outposts' limits (`MAX_OPERATORS_PER_EPOCH` 7, Ethereum's group size; `MAX_BATCH_OP_GROUPS` 8, Solana's group count), so the window holds at most `MAX_SCHEDULED_BATCH_OPERATORS` (56). Recomputes `due_at` with the new minimum and wait while the chain has traffic |
 | `seteconomy` | `sysio.epoch` | Set the economic clock's duration and grid start. The start is fixed once the clock has ticked; it is re-validated against `sysio.system`'s pay-period accrual bound |
 | `schbatchgps` | `sysio.epoch` | Build one chain's initial window from the `ACTIVE` batch operators on `sysio.opreg` that serve the chain (non-bootstrapped first, then bootstrapped, trimmed to `batch_operator_minimum_active`) |
 | `advance` | `sysio.msgch` or `sysio.epoch` | Advance one chain's consensus epoch once it is due (`due_at` set and passed) and it is not paused; otherwise it returns without effect, under either authority. The genesis advance (epoch 0 → 1) needs no traffic and requires an active outpost whose schedule window `schbatchgps` has seated |

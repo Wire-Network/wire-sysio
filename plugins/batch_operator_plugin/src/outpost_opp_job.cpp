@@ -155,27 +155,51 @@ void outpost_opp_job::run_inbound() {
    std::lock_guard<std::mutex> lock(_state_mx);
 
    const uint64_t chain_code = _client->chain_code();
-   if (!_depot.is_elected(chain_code)) {
-      dlog("outpost_opp_job[{}]: inbound skipped — not elected for the chain's current epoch",
-           _client->to_string());
-      return;
-   }
-
-   const uint32_t epoch = _depot.current_epoch(chain_code);
+   const uint32_t epoch      = _depot.current_epoch(chain_code);
    if (epoch == 0) return;
 
+   // Bytes for an epoch older than the previous one are owed no more: the depot refuses its delivery.
+   std::erase_if(_inbound_envelopes,
+                 [epoch](const std::pair<const uint32_t, std::vector<char>>& kept) { return kept.first + 1 < epoch; });
+
+   if (_depot.is_elected(chain_code)) {
+      deliver_inbound(chain_code, epoch, /*late=*/false);
+   } else {
+      dlog("outpost_opp_job[{}]: inbound skipped for epoch {} — not elected for it", _client->to_string(), epoch);
+   }
+   // A member of the previous epoch's group may still deliver it within the chain's late-delivery window, credited
+   // when the current epoch closes. Once the window has closed the depot takes it no more, so its bytes go.
+   if (epoch > 1) {
+      if (_depot.late_delivery_open(chain_code)) {
+         deliver_inbound(chain_code, epoch - 1, /*late=*/true);
+      } else {
+         _inbound_envelopes.erase(epoch - 1);
+      }
+   }
+}
+
+void outpost_opp_job::deliver_inbound(uint64_t chain_code, uint32_t epoch_index, bool late) {
    try {
-      if (_depot.has_delivered_envelope(chain_code, epoch)) {
+      if (_depot.has_delivered_envelope(chain_code, epoch_index)) {
          dlog("outpost_opp_job[{}]: already delivered for epoch {}",
-              _client->to_string(), epoch);
+              _client->to_string(), epoch_index);
          return;
       }
 
-      const std::vector<char> raw = _client->read_inbound_envelope(epoch, _depot.delivery_timeout(chain_code));
-      if (raw.empty()) {
-         dlog("outpost_opp_job[{}]: no inbound envelope for epoch {}",
-              _client->to_string(), epoch);
-         return;
+      // The outpost overwrites its one latest-envelope slot at its next emit, so a late delivery uses the bytes kept
+      // from an earlier read when there are any. The current epoch is read afresh.
+      std::vector<char> raw;
+      const auto        kept = _inbound_envelopes.find(epoch_index);
+      if (late && kept != _inbound_envelopes.end()) {
+         raw = kept->second;
+      } else {
+         raw = _client->read_inbound_envelope(epoch_index, _depot.delivery_timeout(chain_code));
+         if (raw.empty()) {
+            dlog("outpost_opp_job[{}]: no inbound envelope for epoch {}",
+                 _client->to_string(), epoch_index);
+            return;
+         }
+         _inbound_envelopes[epoch_index] = raw;
       }
 
       // Emit BEFORE deliver_to_depot for the same reason as run_outbound:
@@ -185,29 +209,34 @@ void outpost_opp_job::run_inbound() {
       // throwing slot can't break the inbound path.
       try {
          _depot.emit_debug_envelope(sysio::opp::debugging::DebugEnvelopeEvent{
-            epoch,
+            epoch_index,
             outpost_depot_direction_for(_client->chain_kind()),
             ::sysio::chain::name{}, // batch_op_name filled in by the depot
             raw
          });
       } FC_LOG_AND_DROP("outpost_opp_job[{}]: emit_debug_envelope threw", _client->to_string());
 
-      if (!_depot.deliver_to_depot(chain_code, raw)) {
-         // The push logged the depot's reason; the next cycle reads the outpost again.
-         ilog("outpost_opp_job[{}]: the depot did not accept the delivery for epoch {}; the next cycle decides again",
-              _client->to_string(), epoch);
+      const push_outcome delivered = _depot.deliver_to_depot(chain_code, raw);
+      if (delivered != push_outcome::accepted) {
+         // The push logged the depot's reason. Kept bytes the depot refused are not offered again: the next cycle
+         // reads the outpost afresh, which has moved on once it emitted the following epoch. A push the depot never
+         // answered, timed out or not built, keeps them for the next cycle while the window is open.
+         if (late && delivered == push_outcome::refused) _inbound_envelopes.erase(epoch_index);
+         ilog("outpost_opp_job[{}]: the depot did not accept the {}delivery for epoch {}; the next cycle decides "
+              "again",
+              _client->to_string(), late ? "late " : "", epoch_index);
          return;
       }
-      ilog("outpost_opp_job[{}]: delivered {} inbound bytes to depot for epoch {}",
-           _client->to_string(), raw.size(), epoch);
+      ilog("outpost_opp_job[{}]: delivered {} inbound bytes to depot for {}epoch {}",
+           _client->to_string(), raw.size(), late ? "previous " : "", epoch_index);
       // This delivery may have decided the epoch; a due chain then advances without waiting for the epoch tick.
-      _depot.push_chkcons_if_due(chain_code);
+      if (!late) _depot.push_chkcons_if_due(chain_code);
    } catch (const fc::exception& e) {
-      wlog("outpost_opp_job[{}]: inbound cycle failed: {}",
-           _client->to_string(), e.to_string());
+      wlog("outpost_opp_job[{}]: inbound cycle for epoch {} failed: {}",
+           _client->to_string(), epoch_index, e.to_string());
    } catch (const std::exception& e) {
-      wlog("outpost_opp_job[{}]: inbound cycle failed: {}",
-           _client->to_string(), e.what());
+      wlog("outpost_opp_job[{}]: inbound cycle for epoch {} failed: {}",
+           _client->to_string(), epoch_index, e.what());
    }
 }
 

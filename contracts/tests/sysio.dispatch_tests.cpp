@@ -450,6 +450,7 @@ public:
             ("chain_code",                          outpost_code)
             ("epoch_duration_sec",                  60)
             ("traffic_wait_sec",                    0)
+            ("late_window_sec",                     0)
             ("operators_per_epoch",                 1)
             ("batch_operator_minimum_active",       1)
             ("batch_op_groups",                     1)
@@ -1527,7 +1528,8 @@ BOOST_FIXTURE_TEST_CASE(bootstrap_requires_every_active_outpost_scheduled, sysio
    setup_wire_token();
    enable_epoch_advancement();
    BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "setconfig"_n, mvo()
-      ("chain_code", base_chain)("epoch_duration_sec", 60)("traffic_wait_sec", 0)("operators_per_epoch", 1)
+      ("chain_code", base_chain)("epoch_duration_sec", 60)("traffic_wait_sec", 0)("late_window_sec", 0)
+      ("operators_per_epoch", 1)
       ("batch_operator_minimum_active", 1)("batch_op_groups", 1)("epoch_retention_envelope_log_count", 200)));
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
       ("kind", ChainKind::CHAIN_KIND_EVM)("code", base_chain)("external_chain_id", 8453)

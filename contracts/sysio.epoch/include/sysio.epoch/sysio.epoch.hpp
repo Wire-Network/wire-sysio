@@ -27,13 +27,15 @@ namespace sysio {
       /// Set outpost `chain_code`'s consensus epoch configuration (privileged). Each outpost chain runs
       /// its own consensus epoch: counter, pacing, schedule window and roster. `epoch_duration_sec` is the
       /// chain's minimum time between two of its epochs. `traffic_wait_sec` is how long the chain waits after
-      /// its traffic begins before it is due, at most `epoch_duration_sec`; zero sets the default, half the
-      /// minimum (`default_share_of_minimum`). While the chain has traffic pending, its `due_at` is recomputed
-      /// with the new values.
+      /// its traffic begins before it is due, and `late_window_sec` how long after an epoch starts
+      /// `sysio.msgch::deliver` takes a late delivery of the previous one; each is at most `epoch_duration_sec`,
+      /// and zero sets its default, half the minimum (`default_share_of_minimum`). While the chain has traffic
+      /// pending, its `due_at` is recomputed with the new values.
       [[sysio::action]]
       void setconfig(sysio::slug_name chain_code,
                      uint32_t epoch_duration_sec,
                      uint32_t traffic_wait_sec,
+                     uint32_t late_window_sec,
                      uint32_t operators_per_epoch,
                      uint32_t batch_operator_minimum_active,
                      uint32_t batch_op_groups,
@@ -137,6 +139,10 @@ namespace sysio {
          /// ships together: an epoch closes no sooner than this long after its first traffic. At most
          /// `epoch_duration_sec`.
          uint32_t    traffic_wait_sec = 180;     // half the minimum
+         /// How long after an epoch starts `sysio.msgch::deliver` takes a late delivery of the previous epoch from a
+         /// member of its group; a later one is refused, and the advance that closes that epoch's books records the
+         /// member's miss. At most `epoch_duration_sec`.
+         uint32_t    late_window_sec = 180;      // half the minimum
          uint32_t    operators_per_epoch = 7;
          uint32_t    batch_operator_minimum_active = 21;
          uint32_t    batch_op_groups = 3;          // rotation groups (21 / 7)
@@ -149,7 +155,7 @@ namespace sysio {
          uint32_t    epoch_retention_envelope_log_count = 200;
 
          SYSLIB_SERIALIZE(epoch_config,
-            (chain_code)(epoch_duration_sec)(traffic_wait_sec)(operators_per_epoch)
+            (chain_code)(epoch_duration_sec)(traffic_wait_sec)(late_window_sec)(operators_per_epoch)
             (batch_operator_minimum_active)(batch_op_groups)
             (epoch_retention_envelope_log_count))
       };
@@ -263,6 +269,9 @@ namespace sysio {
 
       /// Message of the `check`s that refuse a chain with no consensus epoch state.
       static constexpr std::string_view EPOCH_STATE_NOT_INITIALIZED = "epoch state not initialized";
+
+      /// Message of the `check`s that refuse a chain with no consensus epoch configuration.
+      static constexpr std::string_view EPOCH_CONFIG_NOT_INITIALIZED = "epoch config not initialized";
 
       /// Message of the `check`s that refuse a caller outside the chain's group on duty.
       static constexpr std::string_view NOT_IN_ACTIVE_GROUP = "caller is not in the active batch operator group";

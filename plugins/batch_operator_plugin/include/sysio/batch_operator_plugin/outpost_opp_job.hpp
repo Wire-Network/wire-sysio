@@ -2,8 +2,9 @@
 
 #include <cstdint>
 #include <functional>
+#include <map>
 #include <mutex>
-#include <optional>
+#include <vector>
 
 #include <fc/time.hpp>
 
@@ -60,10 +61,17 @@ public:
    /// when no envelope is pending.
    void run_outbound();
 
-   /// While this operator is elected on the chain's current epoch, read the
-   /// outpost's envelope for it and deliver it to the depot
-   /// (`sysio.msgch::deliver`). Right after its delivery lands, asks the depot
-   /// to push `sysio.msgch::chkcons` if the chain is due. Emits the
+   /// Deliver the outpost's envelope to the depot (`sysio.msgch::deliver`): for
+   /// the chain's current epoch while this operator is elected on it, and for
+   /// the previous epoch while this operator sat in that epoch's group, the
+   /// chain's late-delivery window is open (`depot_ops::late_delivery_open`)
+   /// and the depot holds no delivery of its for it, which the depot credits as
+   /// a late delivery. The outpost keeps only its latest emitted envelope, so the
+   /// bytes read for an epoch are kept while the epoch is current, then while
+   /// its late-delivery window is open, unless the depot refuses their late
+   /// delivery.
+   /// Right after its own current-epoch delivery lands, asks the depot to push
+   /// `sysio.msgch::chkcons` if the chain is due. Emits the
    /// `OUTPOST_{ETHEREUM|SOLANA}_DEPOT` debug event before each push. Skips an
    /// epoch already delivered.
    void run_inbound();
@@ -81,10 +89,16 @@ public:
    const outpost_client& client() const { return *_client; }
 
 private:
+   /// Deliver the outpost's envelope for `epoch_index` to the depot unless the
+   /// depot already holds this operator's delivery of it. `late` marks the
+   /// previous epoch's delivery: its bytes are the kept ones when there are
+   /// any, and no `chkcons` follows it.
+   void deliver_inbound(uint64_t chain_code, uint32_t epoch_index, bool late);
+
    outpost_client_ptr              _client;
    depot_ops&                      _depot;
    std::function<fc::time_point()> _clock;
-   /// Serializes `run_outbound` and `run_inbound`, and guards `_last_outbound_epoch`.
+   /// Serializes `run_outbound` and `run_inbound`, and guards `_last_outbound_epoch` and `_inbound_envelopes`.
    std::mutex                      _state_mx;
    /// Guards `run_backlog`'s state below.
    std::mutex                      _backlog_mx;
@@ -92,6 +106,10 @@ private:
    /// The epoch whose outpost crank ran, after its first outbound call that
    /// returned. Never gates a delivery.
    uint32_t _last_outbound_epoch = 0;
+   /// The envelope bytes read from the outpost for each epoch this operator may
+   /// still owe the depot: the current epoch, and the previous one while its
+   /// late-delivery window is open and the depot has not refused them.
+   std::map<uint32_t, std::vector<char>> _inbound_envelopes;
    /// When `run_backlog` last read the outpost's backlog; zero before its first read.
    fc::time_point _last_backlog_read;
 };

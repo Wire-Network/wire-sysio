@@ -94,14 +94,16 @@ public:
    /// A second outpost chain, for the per-chain cases.
    static constexpr std::string_view SOL = "SOL";
 
-   /// `traffic_wait` zero takes the default, half the minimum.
+   /// `traffic_wait` and `late_window` zero take their default, half the minimum.
    action_result setconfig(uint32_t duration = 360, uint32_t ops_per = 7,
                            uint32_t total = 21, uint32_t grps = 3,
-                           uint32_t retention = 200, std::string_view chain = ETH, uint32_t traffic_wait = 0) {
+                           uint32_t retention = 200, std::string_view chain = ETH, uint32_t traffic_wait = 0,
+                           uint32_t late_window = 0) {
       return push_epoch_action(EPOCH_ACCOUNT, "setconfig"_n, mvo()
          ("chain_code", chain)
          ("epoch_duration_sec", duration)
          ("traffic_wait_sec", traffic_wait)
+         ("late_window_sec", late_window)
          ("operators_per_epoch", ops_per)
          ("batch_operator_minimum_active", total)
          ("batch_op_groups", grps)
@@ -808,6 +810,22 @@ BOOST_FIXTURE_TEST_CASE(setconfig_sets_the_traffic_wait_up_to_the_minimum, sysio
    BOOST_REQUIRE_EQUAL(success(), setconfig(kDurationSec, 7, 21, 3, 200, ETH));
    BOOST_REQUIRE_EQUAL(kDurationSec / 2, get_epoch_config(ETH)["traffic_wait_sec"].as<uint32_t>());
    BOOST_REQUIRE(since + fc::seconds(kDurationSec / 2) == state_time(ETH, "due_at"));
+} FC_LOG_AND_RETHROW() }
+
+/// `setconfig` takes a chain's late-delivery window up to its minimum, zero for the default of half the minimum, and
+/// refuses a longer one.
+BOOST_FIXTURE_TEST_CASE(setconfig_sets_the_late_window_up_to_the_minimum, sysio_epoch_tester) { try {
+   constexpr uint32_t kDurationSec    = 60;
+   constexpr uint32_t kShortWindowSec = 10;
+   BOOST_REQUIRE_EQUAL(error("assertion failure with message: late_window_sec must be <= epoch_duration_sec"),
+                       setconfig(kDurationSec, 7, 21, 3, 200, ETH, 0, kDurationSec + 1));
+   BOOST_REQUIRE(get_epoch_config(ETH).is_null());
+   BOOST_REQUIRE_EQUAL(success(), setconfig(kDurationSec, 7, 21, 3, 200, ETH, 0, kDurationSec));
+   BOOST_REQUIRE_EQUAL(kDurationSec, get_epoch_config(ETH)["late_window_sec"].as<uint32_t>());
+   BOOST_REQUIRE_EQUAL(success(), setconfig(kDurationSec, 7, 21, 3, 200, ETH, 0, kShortWindowSec));
+   BOOST_REQUIRE_EQUAL(kShortWindowSec, get_epoch_config(ETH)["late_window_sec"].as<uint32_t>());
+   BOOST_REQUIRE_EQUAL(success(), setconfig(kDurationSec, 7, 21, 3, 200, ETH));
+   BOOST_REQUIRE_EQUAL(kDurationSec / 2, get_epoch_config(ETH)["late_window_sec"].as<uint32_t>());
 } FC_LOG_AND_RETHROW() }
 
 /// A chain with traffic does not advance before it is due. Once due, the advance opens the next epoch at its own time

@@ -28,6 +28,15 @@ struct outbound_envelope_record {
 };
 
 /**
+ * @brief How a push of a depot action ended.
+ */
+enum class push_outcome {
+   accepted,   ///< the node accepted the transaction
+   refused,    ///< the contract refused it: one of its checks failed
+   unconfirmed ///< no answer from the contract: the push timed out, was never made, or failed otherwise
+};
+
+/**
  * @brief WIRE-side orchestration contract consumed by `outpost_opp_job`.
  *
  * Every method here reads or writes WIRE chain state — they belong to
@@ -60,11 +69,12 @@ struct depot_ops {
    /**
     * Push `sysio.msgch::deliver` with the concatenated inbound envelope bytes.
     * Synchronous — blocks on the action's future for at most the chain's
-    * delivery timeout. True when the depot accepted the push; a refusal is
-    * logged by the push.
+    * delivery timeout. `push_outcome::refused` only when `sysio.msgch` refused
+    * the delivery; a timeout or a push that could not be built is
+    * `push_outcome::unconfirmed`. A refusal or failure is logged by the push.
     */
-   virtual bool deliver_to_depot(uint64_t                 chain_code,
-                                 const std::vector<char>& raw_messages) = 0;
+   virtual push_outcome deliver_to_depot(uint64_t                 chain_code,
+                                         const std::vector<char>& raw_messages) = 0;
 
    /**
     * Push `sysio.msgch::chkcons` for outpost `chain_code` when its last-read
@@ -114,6 +124,16 @@ struct depot_ops {
     * the depot implementation; refreshed by the epoch tick.
     */
    virtual uint32_t current_epoch(uint64_t chain_code) const = 0;
+
+   /**
+    * True while this operator sat in the group that served outpost
+    * `chain_code`'s previous epoch (`epochstate.previous_group`) and the
+    * chain's late-delivery window (`epochcfg.late_window_sec` from its current
+    * epoch's start) is still open, so the depot still accepts its late
+    * delivery of that epoch. False while the chain's epoch state has not been
+    * read.
+    */
+   virtual bool late_delivery_open(uint64_t chain_code) const = 0;
 
    /**
     * True when outpost `chain_code`'s current epoch has its accepted winner

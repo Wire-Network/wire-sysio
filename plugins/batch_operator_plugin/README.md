@@ -61,6 +61,14 @@ rest of the group. The outpost's per-epoch crank rides the first call of an epoc
 4. Depot accepts the first strict majority of the group's deliveries; right after its own delivery
    lands, the operator pushes `sysio.msgch::chkcons` if the chain is due, which advances it
 
+A member of the group that served the chain's previous epoch (`epochstate.previous_group`) that has
+no delivery recorded for that epoch delivers it late, credited when the current epoch closes, while
+the chain's late-delivery window is open (`epochcfg.late_window_sec` from the current epoch's start);
+the depot refuses one after it, and none is attempted. The outpost keeps only its latest emitted
+envelope, so the job keeps the bytes it read for the current epoch, and for the previous one until the
+window closes. Only a late delivery the depot refuses drops them; one that times out or cannot be
+built is retried from them on the next cycle.
+
 **Backlog (Outposts → WIRE):**
 1. Once the depot has decided the chain's current epoch N and the outpost's latest emitted epoch is N,
    read the outpost's outbound backlog in one read (ETH `OPP.pendingOutbound()` at the read

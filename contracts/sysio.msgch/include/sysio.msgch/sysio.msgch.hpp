@@ -123,11 +123,13 @@ namespace sysio {
       /// is byte-identical to the accepted envelope.
       ///
       /// A late delivery, for the chain's previous epoch, is admitted only from a
-      /// member of the group that served it (`sysio.epoch` `previous_group`) and
-      /// only byte-identical to that epoch's accepted envelope (`winner_of`). It is
-      /// stored without its bytes and never runs `evalcons`; the advance that
-      /// closes the previous epoch's books records it as delivered. Any older
-      /// epoch is refused.
+      /// member of the group that served it (`sysio.epoch` `previous_group`),
+      /// only within the chain's late-delivery window (`epochcfg.late_window_sec`
+      /// from the current epoch's start), and only byte-identical to that epoch's
+      /// accepted envelope (`winner_of`). It is stored without its bytes and never
+      /// runs `evalcons`; the advance that closes the previous epoch's books
+      /// records it as delivered, and a member refused one records a miss. Any
+      /// older epoch is refused.
       [[sysio::action]]
       void deliver(name batch_op_name, uint64_t chain_code, std::vector<char> data);
 

@@ -45,7 +45,9 @@ namespace epoch {
       constexpr auto current_batch_op_group = "current_batch_op_group";
       constexpr auto batch_op_groups        = "batch_op_groups";
       constexpr auto is_paused              = "is_paused";
+      constexpr auto previous_group         = "previous_group";  ///< the group that served the previous epoch
       constexpr auto epoch_duration_sec     = "epoch_duration_sec";   ///< on `epochcfg`
+      constexpr auto late_window_sec        = "late_window_sec";      ///< on `epochcfg`
    }
 }
 
@@ -116,8 +118,12 @@ struct chain_epoch_view {
    fc::time_point   traffic_since;         ///< when the chain's pending traffic began; zero while it has none
    fc::time_point   due_at;                ///< when the chain may advance; zero while it is idle
    fc::microseconds epoch_duration;        ///< the chain's minimum duration, from its `epochcfg` row
+   /// How long after the current epoch's start the depot takes a late delivery of the previous one, from `epochcfg`.
+   fc::microseconds late_window;
    bool             decided     = false;   ///< the current epoch has its accepted winner (`outpcons`)
    bool             is_paused   = false;   ///< a dispute holds the chain's advance; nobody is elected on it
+   /// This operator sat in the group that served the previous epoch, which may still deliver for it late.
+   bool             in_previous_group = false;
    group_election   election;              ///< this operator's standing on the chain's own window
    epoch_cadence    cadence;               ///< derived from `epoch_duration`
 };
@@ -135,6 +141,12 @@ struct decoded_chain_epochs {
 /// The epoch each chain's `outpcons` row records a winner for, by chain code.
 using decided_epochs = std::map<uint64_t, uint32_t>;
 
+/// Whether `operator_account` is among `members`, an `epochstate` group as the chain renders it.
+inline bool group_has(const fc::variants& members, chain::name operator_account) {
+   return std::ranges::any_of(
+      members, [&](const fc::variant& member) { return chain::name(member.as_string()) == operator_account; });
+}
+
 /// Decode one chain's `epochstate` value against its `epochcfg` value and the `decided` epochs. While the chain is
 /// paused nobody is elected on it, though this operator's seat in its window still stands. Throws when a field is
 /// missing.
@@ -148,7 +160,9 @@ inline chain_epoch_view decode_chain_epoch(const fc::variant_object& state, cons
    view.traffic_since  = state[epoch::field::traffic_since].as<fc::time_point>();
    view.due_at         = state[epoch::field::due_at].as<fc::time_point>();
    view.epoch_duration = fc::seconds(config[epoch::field::epoch_duration_sec].as<uint32_t>());
+   view.late_window    = fc::seconds(config[epoch::field::late_window_sec].as<uint32_t>());
    view.is_paused      = state[epoch::field::is_paused].as_bool();
+   view.in_previous_group = group_has(state[epoch::field::previous_group].get_array(), operator_account);
    const auto decided_epoch = decided.find(view.chain_code);
    view.decided  = view.epoch_index > 0 && decided_epoch != decided.end() && decided_epoch->second == view.epoch_index;
    view.election = evaluate_group_election(state[epoch::field::current_batch_op_group].as<uint8_t>(),
@@ -207,6 +221,12 @@ inline decoded_chain_epochs decode_chain_epochs(const fc::variants& state_rows, 
 /// is never due.
 inline bool is_advance_due(const chain_epoch_view& view, fc::time_point now) {
    return view.due_at != fc::time_point() && now >= view.due_at;
+}
+
+/// Whether this operator may still deliver `view`'s previous epoch late at `now`: it sat in the group that served it,
+/// and the chain's late-delivery window, from its current epoch's start, is open. The depot refuses one after it.
+inline bool late_delivery_open(const chain_epoch_view& view, fc::time_point now) {
+   return view.epoch_index > 1 && view.in_previous_group && now < view.epoch_start + view.late_window;
 }
 
 /// Whether this operator pushes `sysio.msgch::chkcons` for `view`'s chain right after its own delivery of the chain's

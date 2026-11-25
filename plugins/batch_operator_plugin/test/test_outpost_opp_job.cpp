@@ -26,6 +26,7 @@ using sysio::opp::types::CHAIN_KIND_SVM;
 using sysio::outbound_backlog;
 using sysio::outbound_envelope_record;
 using sysio::outpost_opp_job;
+using sysio::push_outcome;
 using sysio::test::mock_depot_ops;
 using sysio::test::mock_outpost_client;
 
@@ -637,15 +638,200 @@ BOOST_AUTO_TEST_CASE(run_inbound_asks_for_chkcons_after_its_own_accepted_deliver
    client->inbound_response = [](const auto&) { return std::vector<char>{'i'}; };
 
    outpost_opp_job job(client, depot);
-   depot.deliver_accepted = false;
+   depot.deliver_outcome = push_outcome::refused;
    job.run_inbound();
    BOOST_CHECK_EQUAL(depot.deliver_calls.size(), 1u);
    BOOST_CHECK(depot.chkcons_if_due_calls.empty());
 
-   depot.deliver_accepted = true;
+   depot.deliver_outcome = push_outcome::accepted;
    job.run_inbound();
    BOOST_CHECK_EQUAL(depot.deliver_calls.size(), 2u);
    BOOST_CHECK(depot.chkcons_if_due_calls == std::vector<uint64_t>{chain_code});
+}
+
+// ─── late delivery of the previous epoch ────────────────────────────────────
+
+namespace {
+
+/// An operator that sat in epoch `kTestEpoch`'s group and is not elected on the next one: the outpost emitted
+/// `kTestEpoch`'s envelope, then (once `emitted_next`) the next epoch's, overwriting its one latest slot. Once the
+/// depot advances, the chain's late-delivery window is open until a case closes it.
+struct late_delivery_fixture {
+   std::shared_ptr<mock_outpost_client> client = make_client(CHAIN_KIND_EVM, 0, 31337);
+   mock_depot_ops  depot;
+   outpost_opp_job job{client, depot};
+   const std::vector<char> previous{'p', 'r', 'e', 'v'};
+   const std::vector<char> next{'n', 'e', 'x', 't'};
+   bool emitted_next = false;
+   /// The epochs whose delivery the depot records.
+   std::set<uint32_t> recorded;
+
+   late_delivery_fixture() {
+      depot.epoch = kTestEpoch;
+      client->inbound_response = [this](const auto& call) {
+         if (call.epoch_index == kTestEpoch && !emitted_next) return previous;
+         if (call.epoch_index == kTestEpoch + 1 && emitted_next) return next;
+         return std::vector<char>{};
+      };
+      depot.has_delivered_response = [this](uint64_t, uint32_t epoch) { return recorded.contains(epoch); };
+   }
+
+   /// The depot advances: this operator served the epoch just closed, and is not elected on the new one.
+   void advance() {
+      depot.epoch              = kTestEpoch + 1;
+      depot.elected            = false;
+      depot.owes_late_delivery = true;
+   }
+
+   /// The epochs `read_inbound_envelope` was asked for, in call order.
+   std::vector<uint32_t> inbound_reads() const {
+      std::vector<uint32_t> epochs;
+      for (const auto& call : client->inbound_calls) epochs.push_back(call.epoch_index);
+      return epochs;
+   }
+};
+
+} // namespace
+
+/// Bytes read while the epoch was current are kept: once the depot moved on and the outpost overwrote its slot, a
+/// member of the previous group with no delivery row for the epoch delivers them late, and asks for no `chkcons`.
+BOOST_FIXTURE_TEST_CASE(run_inbound_delivers_the_previous_epoch_late_from_the_bytes_it_kept, late_delivery_fixture) {
+   depot.deliver_outcome = push_outcome::unconfirmed;   // the epoch's own delivery did not land
+   job.run_inbound();
+   BOOST_REQUIRE_EQUAL(depot.deliver_calls.size(), 1u);
+
+   advance();
+   emitted_next          = true;
+   depot.deliver_outcome = push_outcome::accepted;
+   job.run_inbound();
+   BOOST_REQUIRE_EQUAL(depot.deliver_calls.size(), 2u);
+   BOOST_CHECK(depot.deliver_calls.back().raw_messages == previous);
+   // The kept bytes were used: the outpost was read for the previous epoch only while it was current.
+   BOOST_CHECK(inbound_reads() == std::vector<uint32_t>{kTestEpoch});
+   BOOST_CHECK(depot.chkcons_if_due_calls.empty());
+   BOOST_REQUIRE_EQUAL(depot.emitted_events.size(), 2u);
+   BOOST_CHECK_EQUAL(std::get<0>(depot.emitted_events.back()), kTestEpoch);
+}
+
+/// Without kept bytes, a late delivery reads the outpost, which still holds the previous epoch until its next emit.
+BOOST_FIXTURE_TEST_CASE(run_inbound_reads_the_outpost_for_a_late_delivery_it_kept_nothing_for, late_delivery_fixture) {
+   advance();
+   job.run_inbound();
+   BOOST_REQUIRE_EQUAL(depot.deliver_calls.size(), 1u);
+   BOOST_CHECK(depot.deliver_calls.front().raw_messages == previous);
+   BOOST_CHECK(inbound_reads() == std::vector<uint32_t>{kTestEpoch});
+
+   // Once the outpost emitted the next epoch there is nothing to read.
+   late_delivery_fixture other;
+   other.advance();
+   other.emitted_next = true;
+   other.job.run_inbound();
+   BOOST_CHECK(other.depot.deliver_calls.empty());
+}
+
+/// The previous epoch is delivered late only while the depot takes it (`late_delivery_open`: a member of its group,
+/// within the chain's late-delivery window), and only while the depot holds no delivery of its: once the window
+/// closes, nothing is read or delivered for it.
+BOOST_FIXTURE_TEST_CASE(run_inbound_delivers_late_only_within_the_window_without_a_row, late_delivery_fixture) {
+   advance();
+   depot.owes_late_delivery = false;
+   job.run_inbound();
+   BOOST_CHECK(depot.deliver_calls.empty());
+   BOOST_CHECK(client->inbound_calls.empty());
+
+   depot.owes_late_delivery = true;
+   recorded.insert(kTestEpoch);
+   job.run_inbound();
+   BOOST_CHECK(depot.deliver_calls.empty());
+   BOOST_CHECK(client->inbound_calls.empty());
+}
+
+/// Elected on the new epoch and a member of the previous group, the operator delivers both: the current epoch first,
+/// then the previous one late.
+BOOST_FIXTURE_TEST_CASE(run_inbound_delivers_the_current_epoch_and_the_previous_one_late, late_delivery_fixture) {
+   depot.deliver_outcome = push_outcome::unconfirmed;
+   job.run_inbound();   // read and kept while current, but not delivered
+   BOOST_REQUIRE_EQUAL(depot.deliver_calls.size(), 1u);
+   advance();
+   depot.elected         = true;
+   depot.deliver_outcome = push_outcome::accepted;
+   emitted_next          = true;
+   job.run_inbound();
+   BOOST_REQUIRE_EQUAL(depot.deliver_calls.size(), 3u);
+   BOOST_CHECK(depot.deliver_calls[1].raw_messages == next);
+   BOOST_CHECK(depot.deliver_calls[2].raw_messages == previous);
+   // After the current-epoch delivery only, not after the late one.
+   BOOST_CHECK_EQUAL(depot.chkcons_if_due_calls.size(), 1u);
+}
+
+/// Kept bytes the depot refused for a late delivery are not offered again: the next cycle reads the outpost afresh.
+BOOST_FIXTURE_TEST_CASE(run_inbound_drops_kept_bytes_the_depot_refused_late, late_delivery_fixture) {
+   depot.deliver_outcome = push_outcome::unconfirmed;
+   job.run_inbound();
+   advance();
+   emitted_next          = true;
+   depot.deliver_outcome = push_outcome::refused;
+   job.run_inbound();   // refused late, from the kept bytes
+   BOOST_CHECK_EQUAL(depot.deliver_calls.size(), 2u);
+   job.run_inbound();   // the outpost moved on: nothing to deliver
+   BOOST_CHECK_EQUAL(depot.deliver_calls.size(), 2u);
+   BOOST_CHECK(inbound_reads() == (std::vector<uint32_t>{kTestEpoch, kTestEpoch}));
+}
+
+/// A late delivery the depot never answered keeps its bytes, whether the push timed out or could not be built: each
+/// next cycle delivers them again without reading the outpost, which has moved on, until the depot refuses them.
+BOOST_FIXTURE_TEST_CASE(run_inbound_keeps_late_bytes_until_the_depot_refuses_them, late_delivery_fixture) {
+   depot.deliver_outcome = push_outcome::unconfirmed;
+   job.run_inbound();   // read and kept while current, but not delivered
+   advance();
+   emitted_next = true;
+   job.run_inbound();   // the late delivery times out
+   depot.deliver_thrower = [] { FC_THROW("push could not be built"); };
+   job.run_inbound();   // the push fails before it is made
+   depot.deliver_thrower = nullptr;
+   job.run_inbound();   // times out again
+   BOOST_REQUIRE_EQUAL(depot.deliver_calls.size(), 3u);
+   BOOST_CHECK(depot.deliver_calls[1].raw_messages == previous);
+   BOOST_CHECK(depot.deliver_calls[2].raw_messages == previous);
+   BOOST_CHECK(inbound_reads() == std::vector<uint32_t>{kTestEpoch});
+
+   depot.deliver_outcome = push_outcome::refused;
+   job.run_inbound();   // refused, from the kept bytes
+   job.run_inbound();   // the outpost moved on: nothing to deliver
+   BOOST_REQUIRE_EQUAL(depot.deliver_calls.size(), 4u);
+   BOOST_CHECK(depot.deliver_calls[3].raw_messages == previous);
+   BOOST_CHECK(inbound_reads() == (std::vector<uint32_t>{kTestEpoch, kTestEpoch}));
+}
+
+/// The previous epoch's kept bytes go once its late-delivery window closes, as the depot takes it no more: opened
+/// again, the window would find nothing kept, and the outpost has moved on.
+BOOST_FIXTURE_TEST_CASE(run_inbound_drops_kept_bytes_once_the_window_closes, late_delivery_fixture) {
+   depot.deliver_outcome = push_outcome::unconfirmed;
+   job.run_inbound();   // read and kept while current, but not delivered
+   advance();
+   emitted_next             = true;
+   depot.owes_late_delivery = false;
+   job.run_inbound();
+   BOOST_CHECK_EQUAL(depot.deliver_calls.size(), 1u);
+
+   depot.owes_late_delivery = true;
+   job.run_inbound();
+   BOOST_CHECK_EQUAL(depot.deliver_calls.size(), 1u);
+   BOOST_CHECK(inbound_reads() == (std::vector<uint32_t>{kTestEpoch, kTestEpoch}));
+}
+
+/// Bytes are kept back to the previous epoch only: two advances later the operator owes the older epoch nothing.
+BOOST_FIXTURE_TEST_CASE(run_inbound_keeps_bytes_back_to_the_previous_epoch_only, late_delivery_fixture) {
+   depot.deliver_outcome = push_outcome::unconfirmed;
+   job.run_inbound();   // kept for kTestEpoch, not delivered
+   depot.epoch              = kTestEpoch + 2;
+   depot.elected            = false;
+   depot.owes_late_delivery = true;
+   depot.deliver_outcome    = push_outcome::accepted;
+   job.run_inbound();
+   // Only the epoch before the current one is delivered late, and the outpost holds nothing for it.
+   BOOST_CHECK_EQUAL(depot.deliver_calls.size(), 1u);
+   BOOST_CHECK(inbound_reads() == (std::vector<uint32_t>{kTestEpoch, kTestEpoch + 1}));
 }
 
 // ─── run_backlog ────────────────────────────────────────────────────────────
@@ -933,8 +1119,9 @@ BOOST_FIXTURE_TEST_CASE(each_job_delivers_its_own_chains_epoch_index, two_chain_
    BOOST_CHECK(depot.chkcons_if_due_calls == (std::vector<uint64_t>{kChainA, kChainB}));
 }
 
-/// Each job answers to its own chain's completion: A's recorded reply stops A alone.
-BOOST_FIXTURE_TEST_CASE(each_job_follows_its_own_chains_completion, two_chain_fixture) {
+/// Each job answers to its own chain's completion and late delivery: A's recorded reply stops A alone, and B's open
+/// late-delivery window makes B alone deliver late.
+BOOST_FIXTURE_TEST_CASE(each_job_follows_its_own_chains_completion_and_previous_group, two_chain_fixture) {
    depot.chains[kChainB].elected = true;
    job_a.run_outbound();
    job_b.run_outbound();
@@ -947,6 +1134,20 @@ BOOST_FIXTURE_TEST_CASE(each_job_follows_its_own_chains_completion, two_chain_fi
    job_b.run_outbound();
    BOOST_CHECK_EQUAL(client_a->outbound_calls.size(), 1u);
    BOOST_CHECK_EQUAL(client_b->outbound_calls.size(), 2u);
+
+   // Both move on, neither elected; B's operator owes B's previous epoch a late delivery, A's owes A nothing.
+   depot.has_delivered_response = {};
+   depot.chains[kChainA] = mock_depot_ops::chain_knobs{.elected = false, .epoch = kChainAEpoch + 1};
+   depot.chains[kChainB] =
+      mock_depot_ops::chain_knobs{.elected = false, .epoch = kChainBEpoch + 1, .owes_late_delivery = true};
+   client_b->inbound_response = [](const auto&) { return std::vector<char>{'b'}; };
+   job_a.run_inbound();
+   job_b.run_inbound();
+   BOOST_CHECK(client_a->inbound_calls.empty());
+   BOOST_REQUIRE_EQUAL(client_b->inbound_calls.size(), 1u);
+   BOOST_CHECK_EQUAL(client_b->inbound_calls[0].epoch_index, kChainBEpoch);
+   BOOST_REQUIRE_EQUAL(depot.deliver_calls.size(), 1u);
+   BOOST_CHECK_EQUAL(depot.deliver_calls[0].chain_code, kChainB);
 }
 
 BOOST_AUTO_TEST_CASE(run_outbound_and_run_inbound_serialize_on_state_mx) {

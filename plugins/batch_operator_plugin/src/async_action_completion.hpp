@@ -6,6 +6,7 @@
 #include <future>
 #include <memory>
 #include <string>
+#include <sysio/chain/exceptions.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <utility>
 #include <variant>
@@ -25,6 +26,12 @@ enum class refusal_log {
    info
 };
 
+/// Whether `error` is the contract refusing a transaction: one of its checks failed.
+inline bool is_contract_refusal(const fc::exception& error) {
+   return error.code() == chain::sysio_assert_message_exception::code_value ||
+          error.code() == chain::sysio_assert_code_exception::code_value;
+}
+
 /// Owns completion notification for an asynchronous batch-operator action.
 ///
 /// The state is intentionally shared with the completion callback so a caller
@@ -38,6 +45,10 @@ public:
 
    /// Whether the push completed and the transaction succeeded. Read after the future is ready.
    bool succeeded() const { return success.load(std::memory_order_acquire); }
+
+   /// Whether the push completed with the contract refusing the transaction (`is_contract_refusal`). Read after the
+   /// future is ready.
+   bool refused_by_contract() const { return refused.load(std::memory_order_acquire); }
 
    /// Invokes `on_complete` once, suppresses callback exceptions, and signals
    /// the waiter without allowing duplicate asynchronous completions to throw.
@@ -71,8 +82,12 @@ public:
       FailureHandler&& on_failure) {
       // `complete` runs this before returning, so the references cannot outlive what they name.
       return complete([this, &result, &on_success, &on_failure] {
+         const auto fail = [this, &on_failure](const fc::exception_ptr& error) {
+            refused.store(error && is_contract_refusal(*error), std::memory_order_release);
+            on_failure(error);
+         };
          if (const auto* error = std::get_if<fc::exception_ptr>(&result)) {
-            on_failure(*error);
+            fail(*error);
          } else if (std::holds_alternative<chain_apis::read_write::push_transaction_results>(result)) {
             success.store(true, std::memory_order_release);
             on_success();
@@ -81,7 +96,7 @@ public:
                chain::t_or_exception<chain_apis::read_write::push_transaction_results>()>>(result);
             const auto deferred_result = deferred();
             if (const auto* error = std::get_if<fc::exception_ptr>(&deferred_result)) {
-               on_failure(*error);
+               fail(*error);
             } else {
                success.store(true, std::memory_order_release);
                on_success();
@@ -93,6 +108,7 @@ public:
 private:
    std::atomic<bool> completed{false};
    std::atomic<bool> success{false};
+   std::atomic<bool> refused{false};
    std::promise<void> done;
 };
 
