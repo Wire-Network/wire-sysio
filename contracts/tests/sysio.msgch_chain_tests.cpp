@@ -406,10 +406,12 @@ public:
    /// Percent-rail sample that applies the rail from the first duty epoch.
    static constexpr uint32_t PERCENT_RAIL_FROM_FIRST_DUTY = 1;
 
-   /// Exact minimum window the span bound accepts for the rotation schedule: (misses + 1) duty
-   /// rotations.
-   static constexpr uint64_t ROTATION_WINDOW_MS =
-      (uint64_t{ROTATION_MAX_CONSECUTIVE_MISSES} + 1) * ROTATION_GROUPS * EPOCH_DURATION_SEC * MS_PER_SEC;
+   /// One duty rotation of the rotation schedule: a window this narrow keeps only a member's latest record.
+   static constexpr uint64_t ROTATION_DUTY_MS = uint64_t{ROTATION_GROUPS} * EPOCH_DURATION_SEC * MS_PER_SEC;
+
+   /// A window of (misses + 1) duty rotations: a run evicting on the rotation fixture's threshold has its
+   /// delivered anchor on the window's edge at the evicting miss.
+   static constexpr uint64_t ROTATION_WINDOW_MS = (uint64_t{ROTATION_MAX_CONSECUTIVE_MISSES} + 1) * ROTATION_DUTY_MS;
 
    /// Outposts the rotation fixture registers.
    enum class rotation_outposts { none, eth, eth_and_sol };
@@ -1333,7 +1335,7 @@ public:
    /// next_epoch_start is a fixed cadence (advance sets current_epoch_start = prior next_epoch_start,
    /// never `now`) and recorddel stamps at one-second granularity, running the advance in the second
    /// of next_epoch_start spaces every epoch's records exactly epoch_duration apart -- the exact-span
-   /// timing the SEC-28 window bound is defined against, with no block-granularity drift.
+   /// timing the rotation tests pin the window's edge against, with no block-granularity drift.
    uint32_t advance_to_next_epoch() {
       advance_to_next_epoch_traces();
       return current_epoch();
@@ -1615,9 +1617,9 @@ public:
    /// Walk the rotation through advance() until BATCHOP is evicted from every outpost in `outposts`. On
    /// its first duty epoch BATCHOP delivers to each of them (the anchor that keeps the percent rail below
    /// its ceiling) and never again. Each chain counts its own rows, so every chain evicts it at the same
-   /// duty: the first whose misses exceed the threshold, with the anchor still inside the window. Its
-   /// global status, and so its bond, is untouched.
-   void walk_rotation_to_consecutive_eviction(const std::vector<uint64_t>& outposts) {
+   /// duty: the first whose misses exceed the threshold, with the anchor still inside the window when
+   /// `anchor_in_window` and long erased otherwise. Its global status, and so its bond, is untouched.
+   void walk_rotation_to_consecutive_eviction(const std::vector<uint64_t>& outposts, bool anchor_in_window = true) {
       // The anchor, then enough missed duties to exceed the threshold.
       const uint32_t evicting_duty = 1 + ROTATION_MAX_CONSECUTIVE_MISSES + 1;
       std::map<uint64_t, inbound_stream_tip> tips;
@@ -1664,10 +1666,11 @@ public:
                BOOST_REQUIRE(!seated_on(BATCHOP, outpost));
                BOOST_REQUIRE(!require_roster_is_window(outpost).count(BATCHOP.to_string()));
             }
-            // The delivered anchor rows must survive the evicting advance's prune. With one outpost
-            // the anchor sits exactly on the window edge at this miss, which pins the exact boundary:
-            // an off-by-one in the span or the prune bound would erase it.
-            BOOST_REQUIRE_EQUAL(outposts.size(), delivered_dellog_count(BATCHOP));
+            // At ROTATION_WINDOW_MS the delivered anchor rows must survive the evicting advance's prune.
+            // With one outpost the anchor sits exactly on the window edge at this miss, which pins the
+            // exact boundary: an off-by-one in the prune bound would erase it. A narrower window erased
+            // them long before, and the run still evicts.
+            BOOST_REQUIRE_EQUAL(anchor_in_window ? outposts.size() : 0u, delivered_dellog_count(BATCHOP));
          } else {
             // Still serving: BATCHOP must not be evicted before its evicting duty.
             BOOST_REQUIRE_EQUAL(std::string(served_status::serving), status);
@@ -2709,9 +2712,8 @@ BOOST_FIXTURE_TEST_CASE(a_chain_starts_only_as_an_active_outpost_with_a_window, 
 } FC_LOG_AND_RETHROW() }
 
 // SEC-28 (huang review): evict on the CONSECUTIVE-miss rail through the REAL rotation -- a
-// materialized three-group schedule driven by advance() with one outpost, at exactly the minimum
-// window the span bound accepts. A resident operator is on duty once per three-epoch rotation, and
-// the window spans exactly (max_consecutive_misses + 1) rotations, so the delivered anchor that
+// materialized three-group schedule driven by advance() with one outpost. A resident operator is on
+// duty once per three-epoch rotation, and the window spans exactly (max_consecutive_misses + 1) rotations, so the delivered anchor that
 // keeps the percent rail below its ceiling sits exactly on the window edge at the evicting miss.
 // Eviction alone does NOT pin that edge: the six miss rows fire the consecutive rail whether or
 // not the anchor is pruned, and termcheck prefers the consecutive reason over percent. So the test
@@ -2732,6 +2734,13 @@ BOOST_FIXTURE_TEST_CASE(evict_at_duty_rotation_via_advance_with_two_outposts, sy
    const auto outposts = bootstrap_rotation(ROTATION_WINDOW_MS, /*batchop_is_bootstrapped=*/false,
                                             rotation_outposts::eth_and_sol);
    walk_rotation_to_consecutive_eviction(outposts);
+} FC_LOG_AND_RETHROW() }
+
+/// A window of one rotation keeps only a member's latest record, yet the consecutive rail counts every missed
+/// duty epoch since the last delivery: the same rotation evicts BATCHOP at the same duty, its delivered anchor
+/// long erased.
+BOOST_FIXTURE_TEST_CASE(evict_a_run_whose_rows_aged_out_via_advance, sysio_msgch_chain_tester) { try {
+   walk_rotation_to_consecutive_eviction(bootstrap_rotation(ROTATION_DUTY_MS), /*anchor_in_window=*/false);
 } FC_LOG_AND_RETHROW() }
 
 /// Delivering to one of two active outposts is a delivery on the chain reached and a miss on the other,
@@ -4686,8 +4695,8 @@ BOOST_FIXTURE_TEST_CASE(outpost_activated_later_starts_its_own_epoch_one, sysio_
       return push(MSGCH_ACCOUNT, msgch_abi, signer, msgch_actions::BOOT_CHAIN,
                   mvo()(msgch_fields::CHAIN_CODE, SOL_OUTPOST_ID));
    };
-   // A window wide enough for SOL's longer schedule: opreg's window must span every chain's run.
-   bootstrap_rotation(2 * ROTATION_WINDOW_MS, /*batchop_is_bootstrapped=*/true);
+   // SOL's longer schedule is set later against the stored opreg window, which constrains no schedule.
+   bootstrap_rotation(ROTATION_WINDOW_MS, /*batchop_is_bootstrapped=*/true);
    register_chain(opp::types::ChainKind::CHAIN_KIND_SVM, SOL_CHAIN_CODE, SOL_EXTERNAL_CHAIN_ID);
    produce_blocks();
    advance_to_next_epoch();

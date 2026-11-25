@@ -35,7 +35,7 @@ the collateral each has bonded, and the outpost chains each batch operator serve
 
 | Action | Auth | Description |
 |--------|------|-------------|
-| `setconfig` | `sysio.opreg` | Set the eviction rails, the prune delay and the per-role minimum bonds. `terminate_window_ms` must span `terminate_max_consecutive_misses + 1` duty rotations of every chain's epoch schedule |
+| `setconfig` | `sysio.opreg` | Set the eviction rails, the prune delay and the per-role minimum bonds |
 | `regoperator` | the account, or `sysio.opreg` | Register an operator. Only `sysio.opreg` registers a bootstrapped one. An account registering itself needs a `sysio.authex` link for every active outpost, except a batch operator, whose links `joinchain` checks. A terminated account registers again once its balances are drained and no schedule seats it; the new registration serves no chain and forfeits the account's unsettled batch duty from the earlier one |
 | `joinchain` | the operator, or `sysio.opreg` | Serve one active outpost: see below |
 | `leavechain` | the operator | Stop serving one outpost: see below |
@@ -94,16 +94,17 @@ is `SERVING`.
 `sysio.epoch::advance(chain)` sends `recorddel` and `termcheck` for each member of the chain's group
 whose epoch closed. Each membership keeps a duty tally: the duties recorded on the chain since the
 operator's latest join, its misses, and its misses since the last delivery. `recorddel` adds to it, and
-every row the retention sweeps erase leaves it, so `termcheck` reads one row however long the log is. It
-evicts the operator from the chain when its misses since the last delivery number more than
-`terminate_max_consecutive_misses`, or a whole-percent miss rate is above
-`terminate_max_pct_misses_24h`. The percent rail applies only once the tally holds at least
-`terminate_min_pct_samples` duties (default 20), so one early miss cannot evict alone; the consecutive
-rail applies from the first. `termcheck` first erases up to `MAX_DELLOG_PRUNE_PER_CHECK` of the member's
-own rows that aged out of `terminate_window_ms`, and while one is left the rails wait for a later check,
-so they never count a duty from outside the window. The membership becomes `EVICTED` with the rail as
-its reason; the operator's status, its bond and its other chains are untouched. The window's groups are disjoint, so
-the close that evicts a member also slides out the only seat it held on the chain. An `EVICTED` member
+every row the retention sweeps erase leaves its duties and misses, so `termcheck` reads one row however
+long the log is. It evicts the operator from the chain when its missed duty epochs since the last
+delivery, whatever their age, number more than `terminate_max_consecutive_misses`, or the whole-percent
+miss rate of its duties within `terminate_window_ms` is above `terminate_max_pct_misses_24h`. The percent
+rail applies only once the tally holds at least `terminate_min_pct_samples` duties (default 20), so one
+early miss cannot evict alone; the consecutive rail applies from the first. `termcheck` first erases up to
+`MAX_DELLOG_PRUNE_PER_CHECK` of the member's own rows that aged out of `terminate_window_ms`, and while one
+is left the percent rail waits for a later check, so its rate never counts a duty from outside the window.
+The membership becomes `EVICTED` with the rail as its reason; the operator's status, its bond and its
+other chains are untouched. The window's groups are disjoint, so the close that evicts a member also
+slides out the only seat it held on the chain. An `EVICTED` member
 is not evaluated again, and it rejoins as a `LEFT` operator does, which restarts the rails.
 Bootstrapped operators are never evicted. Governance's `terminate` is the global removal.
 

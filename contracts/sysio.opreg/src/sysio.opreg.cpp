@@ -312,26 +312,6 @@ void opreg::setconfig(uint64_t terminate_prune_delay_ms,
          "terminate_min_pct_samples must be in [1, 100]");
    check(terminate_window_ms > 0, "terminate_window_ms must be positive");
 
-   // SEC-28 residual: delivery records accrue only on duty epochs -- one per
-   // `batch_op_groups`-epoch rotation for a resident operator -- so a rolling
-   // window narrower than the full consecutive-miss run of duty epochs makes
-   // the consecutive rail structurally vacuous (records age out and are
-   // pruned before `termcheck` can observe the run) and leaves only the
-   // hair-trigger percent rail. Validate against every outpost chain's live
-   // epoch schedule. Bootstrap installs opreg config before sysio.epoch is
-   // configured, so a chain without an epochcfg row is not checked here;
-   // sysio.epoch::setconfig performs the mirror validation, so no ordering of
-   // the two setters can accept a vacuous pair.
-   {
-      sysio::epoch::epochcfg_t epoch_cfgs(EPOCH_ACCOUNT);
-      for (auto it = epoch_cfgs.begin(); it != epoch_cfgs.end(); ++it) {
-         check(terminate_window_ms >= min_terminate_window_ms(terminate_max_consecutive_misses,
-                                                              it->epoch_duration_sec,
-                                                              it->batch_op_groups),
-               "terminate_window_ms must span at least terminate_max_consecutive_misses + 1 duty rotations");
-      }
-   }
-
    require_canonical_codes(req_prod_collat,    "req_prod_collat");
    require_canonical_codes(req_batchop_collat, "req_batchop_collat");
    require_canonical_codes(req_uw_collat,      "req_uw_collat");
@@ -1799,8 +1779,9 @@ void opreg::termcheck(name account, sysio::slug_name chain_code) {
    // Both rails read the tally of the latest join; a new registration joins afresh, so rows of an earlier
    // registration or membership never count. A return to ACTIVE resets neither rail, so a cancelled
    // withdrawal cannot clear the misses recorded while the operator was UNKNOWN. The member's aged rows
-   // the on-write sweep has not reached are erased first; while one is left the tally reaches past the
-   // window and the rails wait.
+   // the on-write sweep has not reached are erased first; while one is left the tally's duties reach past
+   // the window and the percent rail waits. The consecutive run counts missed duty epochs whatever their
+   // age, so it never waits.
    const uint64_t now_ms        = current_time_ms();
    duty_tally&    tally         = membership->tally;
    const uint64_t duties_before = tally.duties;
@@ -1809,7 +1790,7 @@ void opreg::termcheck(name account, sysio::slug_name chain_code) {
 
    // termcheck follows every recorddel, so the run since the last delivery breaches at the duty that
    // makes it too long. The percent rail waits for a minimum sample, so an early miss cannot evict alone.
-   const bool exceeds_consecutive = drained && tally.miss_run > cfg.terminate_max_consecutive_misses;
+   const bool exceeds_consecutive = tally.miss_run > cfg.terminate_max_consecutive_misses;
    const bool exceeds_percent     = drained && tally.duties > 0 && tally.duties >= cfg.terminate_min_pct_samples &&
                                     tally.misses * PERCENT_SCALE / tally.duties > cfg.terminate_max_pct_misses_24h;
    if (exceeds_consecutive || exceeds_percent) {
