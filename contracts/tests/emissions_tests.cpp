@@ -3082,11 +3082,13 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_post_initt5_rejects_unreachable_min_emission
    // floor would otherwise drain the treasury faster than the decay curve
    // suggests.
    create_t5_holding_accounts();
+   reach_the_grid();
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name ) );
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    auto state = get_t5_state();
    const int64_t total_distributed = state["total_distributed"].as<int64_t>();
+   BOOST_REQUIRE_GT( total_distributed, 0 );
 
    // Make remaining_distributable a small handful of subunits, then pick an
    // annual_min whose per-epoch share at the fixture's 60-sec epoch duration
@@ -3125,14 +3127,16 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_post_initt5_counts_pending_emission, sysio_e
    create_t5_holding_accounts();
    constexpr uint16_t cadence = 2;
    BOOST_REQUIRE_EQUAL( success(), setemitcfg_with_cadence( config::system_account_name, cadence ) );
+   reach_the_grid();
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name ) );
-   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );   // epoch 1: the shortened genesis period pays
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );   // epoch 2: the shortened genesis period pays
    produce_blocks(130);
-   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );   // epoch 2: accrues toward epoch 3
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );   // epoch 3: accrues toward epoch 4
 
    const auto state = get_t5_state();
    const int64_t pending = state["pending_emission_amount"].as<int64_t>();
    BOOST_REQUIRE_GT( pending, 0 );
+   BOOST_REQUIRE_GT( state["total_distributed"].as<int64_t>(), 0 );
    const int64_t committed = T5_FLOOR + state["total_distributed"].as<int64_t>() + pending;
    const int64_t per_epoch_min = test_scale_annual_to_epoch(ANNUAL_MIN_EMISSION, T_EPOCH_SECS);
 
@@ -3154,8 +3158,8 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_post_initt5_counts_pending_emission, sysio_e
    // in full.
    BOOST_REQUIRE_EQUAL( success(), setemitcfg( config::system_account_name, budget_cfg(committed, 0) ) );
    produce_blocks(130);
-   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );   // epoch 3
-   BOOST_REQUIRE_EQUAL( get_epoch_log(3)["total_emission"].as<int64_t>(), pending );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );   // epoch 4
+   BOOST_REQUIRE_EQUAL( get_epoch_log(4)["total_emission"].as<int64_t>(), pending );
    BOOST_REQUIRE_EQUAL( get_t5_state()["pending_emission_amount"].as<int64_t>(), 0 );
 } FC_LOG_AND_RETHROW()
 
@@ -4038,11 +4042,13 @@ BOOST_FIXTURE_TEST_CASE( emission_clamped_to_max, sysio_emissions_tester ) try {
 
 BOOST_FIXTURE_TEST_CASE( emission_capped_at_distributable_ceiling, sysio_emissions_tester ) try {
    create_t5_holding_accounts();
+   reach_the_grid();
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name ) );
 
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    auto state = get_t5_state();
+   BOOST_REQUIRE_GT( state["total_distributed"].as<int64_t>(), 0 );
    BOOST_REQUIRE( state["total_distributed"].as<int64_t>() <= T5_DISTRIBUTABLE );
 } FC_LOG_AND_RETHROW()
 
@@ -4475,6 +4481,7 @@ BOOST_FIXTURE_TEST_CASE( viewepoch_estimates_next_emission, sysio_emissions_test
 BOOST_FIXTURE_TEST_CASE( non_producing_active_excluded, sysio_emissions_tester ) try {
    // Producers holding active positions but with 0 blocks made are paid nothing
    create_t5_holding_accounts();
+   reach_the_grid();
    setup_producers(3);
    // Do NOT produce extra blocks — schedule hasn't activated, so no producer has made a block
 
@@ -4485,6 +4492,7 @@ BOOST_FIXTURE_TEST_CASE( non_producing_active_excluded, sysio_emissions_tester )
    asset bal_c_before = get_wire_balance_paid("producerc"_n);
 
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   BOOST_REQUIRE_GT( get_epoch_log(FIRST_SPENDING_EPOCH)["compute_amount"].as<int64_t>(), 0 );
 
    // Producers should receive nothing (0 blocks → nothing to pay for)
    BOOST_REQUIRE_EQUAL( get_wire_balance_paid("producera"_n), bal_a_before );
@@ -4714,6 +4722,7 @@ BOOST_FIXTURE_TEST_CASE( producer_unregistered_mid_epoch, sysio_emissions_tester
    wait_for_producer_schedule();
    produce_complete_cycles(21, 1);
 
+   reach_the_grid();
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name ) );
 
    // An unregistered producer holds NO rank position -- it is not merely pushed into the standby
@@ -4724,6 +4733,7 @@ BOOST_FIXTURE_TEST_CASE( producer_unregistered_mid_epoch, sysio_emissions_tester
 
    asset demoted_before = get_wire_balance_paid("producera"_n);
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   BOOST_REQUIRE_GT( get_epoch_log(FIRST_SPENDING_EPOCH)["compute_amount"].as<int64_t>(), 0 );
 
    // No position means no pay at THIS payout -- neither block pay nor the standby retainer. The
    // blocks it made before parking stay on the row and are paid at the first payout after it
@@ -4824,6 +4834,7 @@ BOOST_FIXTURE_TEST_CASE( park_across_a_payout_defers_the_blocks_to_the_return, s
    wait_for_producer_schedule();
    produce_complete_cycles(3, 2);
 
+   reach_the_grid();
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name ) );
 
    BOOST_REQUIRE_EQUAL( success(), push_system_action("producera"_n, "unregprod"_n,
@@ -4831,9 +4842,12 @@ BOOST_FIXTURE_TEST_CASE( park_across_a_payout_defers_the_blocks_to_the_return, s
    const uint32_t carried = unpaid_blocks_of("producera"_n);
    BOOST_REQUIRE_GT( carried, 0u );
 
-   // Payout 1: parked, so nothing -- and the count is untouched.
+   // Payout 1 pays the producers in the walk; producera is parked, so nothing -- and its count is untouched.
    asset bal_a_before = get_wire_balance_paid("producera"_n);
+   const asset bal_b_before = get_wire_balance_paid("producerb"_n);
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   BOOST_REQUIRE_GT( get_epoch_log(FIRST_SPENDING_EPOCH)["compute_amount"].as<int64_t>(), 0 );
+   BOOST_REQUIRE_GT( get_wire_balance_paid("producerb"_n).get_amount(), bal_b_before.get_amount() );
    BOOST_REQUIRE_EQUAL( get_wire_balance_paid("producera"_n), bal_a_before );
    BOOST_REQUIRE_EQUAL( carried, unpaid_blocks_of("producera"_n) );
 
@@ -4854,7 +4868,8 @@ BOOST_FIXTURE_TEST_CASE( park_across_a_payout_defers_the_blocks_to_the_return, s
    // Payout 2: the carried blocks are paid with this period's, at this period's rate.
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
    const int64_t got_a = get_wire_balance_paid("producera"_n).get_amount() - bal_a_before.get_amount();
-   const int64_t active_pool = test_active_pool(get_epoch_log(2)["compute_amount"].as<int64_t>());
+   const int64_t active_pool =
+      test_active_pool(get_epoch_log(FIRST_SPENDING_EPOCH + 1)["compute_amount"].as<int64_t>());
    const uint64_t divisor = std::max<uint64_t>(produced, test_nominal_slots(T_EPOCH_SECS));
    BOOST_REQUIRE_EQUAL( got_a, test_block_pay(active_pool, blocks_a, divisor) );
    BOOST_REQUIRE_GT( got_a, 0 );
@@ -5173,6 +5188,7 @@ BOOST_FIXTURE_TEST_CASE( vacant_standby_positions_pay_nobody, sysio_emissions_te
    wait_for_producer_schedule();
    produce_complete_cycles(21, 1);
 
+   reach_the_grid();
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name ) );
 
    const name standby = producer_name_at(21);
@@ -5181,8 +5197,11 @@ BOOST_FIXTURE_TEST_CASE( vacant_standby_positions_pay_nobody, sysio_emissions_te
 
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
-   const int64_t standby_pool = test_standby_pool(get_epoch_log(1)["compute_amount"].as<int64_t>());
+   const int64_t standby_pool =
+      test_standby_pool(get_epoch_log(FIRST_SPENDING_EPOCH)["compute_amount"].as<int64_t>());
+   BOOST_REQUIRE_GT( standby_pool, 0 );
    const int64_t got = get_wire_balance_paid(standby).get_amount() - standby_before.get_amount();
+   BOOST_REQUIRE_GT( got, 0 );
    BOOST_REQUIRE_EQUAL( got, test_standby_pay(standby_pool, 22) );
    BOOST_REQUIRE_EQUAL( got, standby_pool * 7 / 28 );
 } FC_LOG_AND_RETHROW()
@@ -5197,6 +5216,7 @@ BOOST_FIXTURE_TEST_CASE( period_running_long_scales_the_rate_down, sysio_emissio
    // Four rotations of three producers: 144 blocks, past the 120 slots a 60s period holds.
    produce_complete_cycles(3, 4);
 
+   reach_the_grid();
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name ) );
 
    const std::vector<name> producers{ "producera"_n, "producerb"_n, "producerc"_n };
@@ -5212,10 +5232,13 @@ BOOST_FIXTURE_TEST_CASE( period_running_long_scales_the_rate_down, sysio_emissio
 
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
-   const int64_t active_pool = test_active_pool(get_epoch_log(1)["compute_amount"].as<int64_t>());
+   const int64_t active_pool =
+      test_active_pool(get_epoch_log(FIRST_SPENDING_EPOCH)["compute_amount"].as<int64_t>());
+   BOOST_REQUIRE_GT( active_pool, 0 );
    int64_t paid = 0;
    for (const auto& p : producers) {
       const int64_t got = get_wire_balance_paid(p).get_amount() - before.at(p).get_amount();
+      BOOST_REQUIRE_GT( got, 0 );
       BOOST_REQUIRE_EQUAL( got, test_block_pay(active_pool, blocks.at(p), produced) );
       paid += got;
    }
@@ -5231,6 +5254,7 @@ BOOST_FIXTURE_TEST_CASE( period_running_long_scales_the_rate_down, sysio_emissio
 BOOST_FIXTURE_TEST_CASE( sysio_balance_decreases_by_distributed_amount, sysio_emissions_tester ) try {
    // The sysio account should lose exactly (emission - undistributed_producer) in WIRE balance
    create_t5_holding_accounts();
+   reach_the_grid();
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name ) );
 
    asset sysio_before = get_wire_balance_paid(config::system_account_name);
@@ -5239,6 +5263,7 @@ BOOST_FIXTURE_TEST_CASE( sysio_balance_decreases_by_distributed_amount, sysio_em
 
    auto state = get_t5_state();
    int64_t distributed = state["total_distributed"].as<int64_t>();
+   BOOST_REQUIRE_GT( distributed, 0 );
 
    // payepoch commits `distributed` but no longer MOVES it -- recipients are credited and
    // the WIRE stays in the treasury's balance until each one pulls it. The conservation law is
@@ -5341,6 +5366,7 @@ BOOST_FIXTURE_TEST_CASE( rank_29_and_above_get_nothing, sysio_emissions_tester )
    wait_for_producer_schedule();
    produce_complete_cycles(21, 1);
 
+   reach_the_grid();
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name ) );
 
    // Producers at index 28 and 29 should be rank 29 and 30
@@ -5351,6 +5377,7 @@ BOOST_FIXTURE_TEST_CASE( rank_29_and_above_get_nothing, sysio_emissions_tester )
    asset beyond2_before = get_wire_balance_paid(beyond2);
 
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   BOOST_REQUIRE_GT( get_epoch_log(FIRST_SPENDING_EPOCH)["compute_amount"].as<int64_t>(), 0 );
 
    auto b1_info = get_producer_info(beyond1);
    auto b2_info = get_producer_info(beyond2);
@@ -5408,10 +5435,12 @@ BOOST_FIXTURE_TEST_CASE( inactive_producer_excluded_from_distribution, sysio_emi
    );
    produce_blocks(1);
 
+   reach_the_grid();
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name ) );
 
    asset bal_a_before = get_wire_balance_paid("producera"_n);
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   BOOST_REQUIRE_GT( get_epoch_log(FIRST_SPENDING_EPOCH)["compute_amount"].as<int64_t>(), 0 );
 
    // Inactive producer should receive nothing
    auto pa_info = get_producer_info("producera"_n);
