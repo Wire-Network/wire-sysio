@@ -10,6 +10,7 @@
 #include <sysio/chain/apply_context.hpp>
 #include <sysio/chain/wasm_interface.hpp>
 #include <sysio/chain/resource_limits.hpp>
+#include <sysio/chain/s_root_extension.hpp>
 
 #include <test_contracts.hpp>
 #include <test_utils.hpp>
@@ -115,12 +116,48 @@ struct endless_trx_block_t {
    }
 };
 
-/// Two testers that read the mock clock, engaged before they start their threads and released after they stop.
-struct mock_clock_testers_t {
+/// Engages the mock clock at the default genesis time. As the first base of a fixture, it is engaged before the
+/// fixture's nodes start their threads and released after they stop.
+struct mock_clock_t {
    fc::scoped_mock_clock clock{tester::default_genesis().initial_timestamp};
-   savanna_tester        t;
-   savanna_tester        other;
 };
+
+/// Two testers that read the mock clock.
+struct mock_clock_testers_t : mock_clock_t {
+   savanna_tester t;
+   savanna_tester other;
+};
+
+/// A savanna cluster whose nodes read the mock clock.
+struct mock_clock_cluster_t : mock_clock_t, savanna_cluster::cluster_t {};
+
+/// Node A's head and node C's own branch after split_with_better_branch_on_c().
+struct split_branches_t {
+   block_id_type                 a_head;
+   std::vector<signed_block_ptr> c_branch; ///< oldest block first; A has not received it
+};
+
+/// Partitions nodes C and D from A, then produces on A and on C, with later timestamps on C so that fork choice prefers
+/// C's branch.
+split_branches_t split_with_better_branch_on_c(savanna_cluster::cluster_t& cluster) {
+   savanna_cluster::node_t& A = cluster._nodes[0];
+   savanna_cluster::node_t& C = cluster._nodes[2];
+   savanna_cluster::node_t& D = cluster._nodes[3];
+   A.produce_blocks(4);
+
+   cluster.set_partition({&C, &D});
+   A.produce_blocks(3);
+
+   const uint32_t c_first = C.head().block_num() + 1; // the first block of C's own branch
+   C.produce_block();
+   C.produce_block(fc::milliseconds(config::block_interval_ms * 14)); // later timestamps make C's branch the best
+   C.produce_blocks(5);
+
+   split_branches_t split{.a_head = A.head().id()};
+   for (uint32_t n = c_first; n <= C.head().block_num(); ++n)
+      split.c_branch.push_back(C.fetch_block_by_number(n));
+   return split;
+}
 
 }
 
@@ -510,23 +547,12 @@ BOOST_FIXTURE_TEST_CASE( apply_deadline_between_transactions_stops_the_next, moc
 BOOST_FIXTURE_TEST_CASE( apply_interrupt_before_fork_switch_keeps_head, savanna_cluster::cluster_t ) { try {
    savanna_cluster::node_t& A = _nodes[0];
    savanna_cluster::node_t& C = _nodes[2];
-   savanna_cluster::node_t& D = _nodes[3];
-   A.produce_blocks(4);
-
-   set_partition({&C, &D});
-   A.produce_blocks(3);
-   const block_id_type a_head = A.head().id();
-
-   const uint32_t c_first = C.head().block_num() + 1; // the first block of C's own branch
-   C.produce_block();
-   C.produce_block(fc::milliseconds(config::block_interval_ms * 14)); // later timestamps make C's branch the best
-   C.produce_blocks(5);
+   const split_branches_t split = split_with_better_branch_on_c(*this);
+   const block_id_type a_head = split.a_head;
 
    // A receives C's branch without applying it
-   for (uint32_t n = c_first; n <= C.head().block_num(); ++n) {
-      const signed_block_ptr b = C.fetch_block_by_number(n);
+   for (const signed_block_ptr& b : split.c_branch)
       A.control->accept_block(b->calculate_id(), b);
-   }
    BOOST_REQUIRE(A.control->fork_db_head().id() == C.head().id());
 
    A.control->abort_block();
@@ -541,6 +567,59 @@ BOOST_FIXTURE_TEST_CASE( apply_interrupt_before_fork_switch_keeps_head, savanna_
 
    A.apply_blocks();
    BOOST_TEST(A.head().id() == C.head().id());
+} FC_LOG_AND_RETHROW() }
+
+// A fork switch whose last block fails validation re-applies the branch it popped. A deadline passed after the failing
+// block's last transaction, or an interrupt requested while the branch is re-applied, does not stop that: the head
+// returns to its branch and the validation error reaches the caller. (Aborting the failed block discards a request made
+// before it fails.)
+BOOST_AUTO_TEST_CASE( failed_fork_switch_restores_head_despite_interrupt_or_deadline ) { try {
+   for (const bool by_deadline : {false, true}) {
+      BOOST_TEST_CONTEXT((by_deadline ? "deadline" : "interrupt request")) {
+         mock_clock_cluster_t     cluster;
+         savanna_cluster::node_t& A = cluster._nodes[0];
+         savanna_cluster::node_t& C = cluster._nodes[2];
+         split_branches_t         split = split_with_better_branch_on_c(cluster);
+
+         // C's last block, changed so that it still links to C's branch but fails validation after its trxs run
+         mutable_block_ptr copy_b = split.c_branch.back()->clone();
+         emplace_extension(copy_b->header_extensions, s_root_extension::extension_id(),
+                           fc::raw::pack(s_root_extension()));
+         copy_b->producer_signatures = {C.get_private_key(copy_b->producer, "active").sign(copy_b->calculate_id())};
+         const signed_block_ptr bad = signed_block::create_signed_block(std::move(copy_b));
+         split.c_branch.back() = bad;
+
+         for (const signed_block_ptr& b : split.c_branch)
+            A.control->accept_block(b->calculate_id(), b);
+         BOOST_REQUIRE(A.control->fork_db_head().id() == bad->calculate_id());
+
+         const fc::time_point deadline =
+            by_deadline ? fc::time_point::now() + fc::seconds(1) : fc::time_point::maximum();
+         bool failing = false; // the bad block's onblock, its only trx, has run
+         bool stopped = false;
+         boost::signals2::scoped_connection conn = A.control->applied_transaction().connect(
+            [&](std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> applied) {
+               if (stopped)
+                  return;
+               if (std::get<0>(applied)->block_num == bad->block_num()) {
+                  failing = true;
+                  if (by_deadline) {
+                     stopped = true;
+                     fc::mock_time_traits::set_now(deadline);
+                  }
+               } else if (failing) { // the first trx of the re-applied branch
+                  stopped = true;
+                  A.control->interrupt_transaction(controller::interrupt_t::apply_block_trx);
+               }
+            });
+         A.control->abort_block();
+         BOOST_CHECK_EXCEPTION(A.control->apply_blocks({}, {}, deadline), fc::exception,
+                               fc_exception_message_starts_with("Block ID does not match"));
+         conn.disconnect();
+         BOOST_TEST(stopped);
+         BOOST_TEST(A.head().id() == split.a_head);
+      }
+   }
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( checktime_speculative_max_trx_test ) { try {

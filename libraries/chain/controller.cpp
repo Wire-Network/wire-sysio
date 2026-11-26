@@ -778,6 +778,9 @@ struct controller_impl {
    /// The deadline given to the apply_blocks() call in progress, maximum outside one. A block trx that starts once it
    /// has passed is interrupted. Main thread only.
    fc::time_point                  apply_deadline = fc::time_point::maximum();
+   /// Set while a failed fork switch re-applies the branch it popped. Those blocks were validated before, and neither
+   /// an apply-block interrupt request nor the deadline stops their trxs. Main thread only.
+   bool                            restoring_branch = false;
    platform_timer&                 main_thread_timer;
    peer_keys_db_t                  peer_keys_db;
 
@@ -2037,10 +2040,10 @@ struct controller_impl {
 
          const signed_transaction& trn = trx->packed_trx()->get_signed_transaction();
          // a requested apply-block interrupt and the apply_blocks() deadline stop the block's trxs, not the read-only
-         // ones run during its setup
-         const bool block_trx = applying_block && !trx->is_read_only();
-         transaction_checktime_timer trx_timer(timer, block_trx ? &apply_block_interrupt_requested : nullptr,
-                                               block_trx ? apply_deadline : fc::time_point::maximum());
+         // ones run during its setup or those of a branch restored after a failed fork switch
+         const bool interruptible = applying_block && !trx->is_read_only() && !restoring_branch;
+         transaction_checktime_timer trx_timer(timer, interruptible ? &apply_block_interrupt_requested : nullptr,
+                                               interruptible ? apply_deadline : fc::time_point::maximum());
          transaction_context trx_context(self,
                                          *trx->packed_trx(),
                                          std::move(trx_timer),
@@ -3280,6 +3283,7 @@ struct controller_impl {
                            "loss of sync between fork_db and chainbase during fork switch reversal" ); // _should_ never fail
 
                // re-apply good blocks
+               fc::scoped_set_value restoring(restoring_branch, true);
                for( auto ritr = old_head_branch.rbegin(); ritr != old_head_branch.rend(); ++ritr ) {
                   apply_block( *ritr, controller::block_status::validated /* we previously validated these blocks*/, trx_lookup );
                }
