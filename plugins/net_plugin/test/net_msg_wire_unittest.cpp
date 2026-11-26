@@ -1,3 +1,5 @@
+#include "../src/trx_admission.hpp"
+
 #include <boost/test/unit_test.hpp>
 
 #include <sysio/net_plugin/protocol.hpp>
@@ -183,6 +185,20 @@ BOOST_AUTO_TEST_CASE(test_trx_buffer_factory_format) {
    fc::raw::unpack( ds, unpacked_pt );
    BOOST_CHECK( unpacked_pt.id() == expected_id );
    BOOST_CHECK_EQUAL( ds.remaining(), 0u );
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(trx_admission)
+
+/// An exact fit is accepted. An oversized transaction or a saturated balance is rejected.
+BOOST_AUTO_TEST_CASE(in_flight_budget_boundary) {
+   constexpr auto limit = net_utils::def_max_trx_in_progress_size;
+   constexpr uint32_t trx_size = 256;
+   BOOST_CHECK(net_utils::fits_trx_in_progress_budget(limit - trx_size, trx_size));
+   BOOST_CHECK(!net_utils::fits_trx_in_progress_budget(limit - trx_size + 1, trx_size));
+   BOOST_CHECK(!net_utils::fits_trx_in_progress_budget(limit, trx_size));
+   BOOST_CHECK(!net_utils::fits_trx_in_progress_budget(limit + 1, trx_size));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
