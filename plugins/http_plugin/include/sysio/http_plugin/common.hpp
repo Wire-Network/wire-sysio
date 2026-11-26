@@ -32,14 +32,17 @@
 
 #include <algorithm>
 #include <atomic>
+#include <cassert>
 #include <chrono>
 #include <filesystem>
 #include <limits>
 #include <map>
+#include <memory>
 #include <optional>
 #include <regex>
 #include <set>
 #include <string>
+#include <utility>
 
 
 namespace sysio {
@@ -66,12 +69,6 @@ struct abstract_conn {
    virtual std::string verify_max_bytes_in_flight(size_t extra_bytes) = 0;
    virtual std::string verify_max_requests_in_flight() = 0;
 
-   /// Atomically check and reserve sz request-body bytes. Returns an error on refusal, or an empty string on
-   /// success. A successful reservation must be paired with exactly one release_bytes_in_flight(sz).
-   [[nodiscard]] virtual std::string try_reserve_request_body(size_t sz) = 0;
-
-   /// Release sz bytes previously reserved with try_reserve_request_body.
-   virtual void release_bytes_in_flight(size_t sz) = 0;
    virtual void send_busy_response(std::string&& what) = 0;
 
    /// Answer the exception being handled with an error response. Call only from a catch block, as the caller's last
@@ -95,11 +92,13 @@ struct abstract_conn {
 };
 
 using abstract_conn_ptr = std::shared_ptr<abstract_conn>;
+class request_body_reservation;
 
 /**
 * internal url handler that contains more parameters than the handlers provided by external systems
 */
-using internal_url_handler_fn = std::function<void(abstract_conn_ptr, string&&, string&&, url_response_callback&&)>;
+using internal_url_handler_fn =
+   std::function<void(abstract_conn_ptr, string&&, string&&, url_response_callback&&, request_body_reservation)>;
 struct internal_url_handler {
    internal_url_handler_fn fn;
    api_category category;
@@ -234,6 +233,41 @@ private:
       return "Too many bytes in flight: " + std::to_string(total);
    }
 };
+
+namespace detail {
+/// Owns request-body bytes already admitted by the session.
+class request_body_reservation {
+public:
+   request_body_reservation(const std::shared_ptr<http_plugin_state>& state, size_t reserved) noexcept
+      : state_(reserved != 0 ? state : nullptr), size_(reserved) {}
+
+   request_body_reservation(request_body_reservation&& other) noexcept
+      : state_(std::move(other.state_)), size_(std::exchange(other.size_, 0)) {}
+
+   ~request_body_reservation() { release(); }
+
+   /// True even when a chunked request used none of its allowance.
+   [[nodiscard]] bool admitted() const noexcept { return bool(state_); }
+
+   void shrink_to(size_t size) noexcept {
+      assert(size <= size_);
+      if (size < size_) {
+         state_->release_bytes_in_flight(size_ - size);
+         size_ = size;
+      }
+   }
+
+   void release() noexcept {
+      if (size_ != 0)
+         state_->release_bytes_in_flight(std::exchange(size_, 0));
+      state_.reset();
+   }
+
+private:
+   std::shared_ptr<http_plugin_state> state_;
+   size_t size_;
+};
+} // namespace detail
 
 /**
 * Construct a lambda appropriate for url_response_callback that will

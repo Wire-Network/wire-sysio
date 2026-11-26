@@ -124,7 +124,8 @@ class beast_http_session : public detail::abstract_conn,
    template<
          class Body, class Allocator>
    void
-   handle_request(http::request<Body, http::basic_fields<Allocator>>&& req) {
+   handle_request(http::request<Body, http::basic_fields<Allocator>>&& req,
+                  detail::request_body_reservation reservation) {
       res_->version(req.version());
       res_->set(http::field::content_type, "application/json");
       res_->keep_alive(req.keep_alive());
@@ -187,7 +188,8 @@ class beast_http_session : public detail::abstract_conn,
                                 std::move(resource),
                                 std::move(body),
                                 make_http_response_handler(*plugin_state_, this->shared_from_this(), content_type,
-                                                           handler_itr->second.response_policy));
+                                                           handler_itr->second.response_policy),
+                                std::move(reservation));
          } else if (resource == "/v1/node/get_supported_apis") {
             http_plugin::get_supported_apis_result result;
             for (const auto& handler : plugin_state_->url_handlers) {
@@ -242,7 +244,8 @@ private:
 
    /// Release the reservation for the request being read, if any.
    void release_request_body() {
-      release_bytes_in_flight(std::exchange(body_reservation_, 0));
+      if (body_reservation_ != 0)
+         plugin_state_->release_bytes_in_flight(std::exchange(body_reservation_, 0));
    }
 
    /// Start the deadline for the `transfer` of `size` bytes about to begin; see transfer_timeout(). Runs on the strand.
@@ -329,11 +332,6 @@ public:
       return plugin_state_->verify_max_bytes_in_flight(extra_bytes);
    }
 
-   /// @copydoc detail::abstract_conn::try_reserve_request_body
-   [[nodiscard]] std::string try_reserve_request_body(size_t size) final {
-      return plugin_state_->try_reserve_request_body(size);
-   }
-
    virtual std::string verify_max_requests_in_flight() final {
       if(plugin_state_->max_requests_in_flight < 0)
          return {};
@@ -406,7 +404,7 @@ public:
 
       // Admit the body against the budget before reading any of it, since the parser holds it all until it is complete.
       if (const size_t body_size = request_body_size(); body_size > 0) {
-         if (auto error_str = try_reserve_request_body(body_size); !error_str.empty()) {
+         if (auto error_str = plugin_state_->try_reserve_request_body(body_size); !error_str.empty()) {
             res_->keep_alive(false); // the body stays unread, so the connection cannot carry another request
             send_busy_response(std::move(error_str));
             return;
@@ -468,12 +466,10 @@ public:
       // Store request fields for potential raw handler access
       last_request_fields_ = req.base();
 
-      // The body is read; the handler path accounts for it from here, an app-thread handler by reserving it before it
-      // queues. Released first so that admission does not count the same bytes twice.
-      release_request_body();
-
-      // Send the response
-      handle_request(std::move(req));
+      // Pass on the existing reservation, returning any unused allowance for a chunked body.
+      detail::request_body_reservation reservation{plugin_state_, std::exchange(body_reservation_, 0)};
+      reservation.shrink_to(req.body().size());
+      handle_request(std::move(req), std::move(reservation));
    }
 
    void on_write(beast::error_code ec,
@@ -584,11 +580,6 @@ public:
          // keep_alive is false, so the write completion closes the connection
          send_response(std::move(err_str), static_cast<unsigned int>(http::status::internal_server_error));
       }
-   }
-
-   /// @copydoc detail::abstract_conn::release_bytes_in_flight
-   void release_bytes_in_flight(size_t sz) final {
-      plugin_state_->release_bytes_in_flight(sz);
    }
 
    virtual std::string get_request_header(std::string_view field_name) const final {

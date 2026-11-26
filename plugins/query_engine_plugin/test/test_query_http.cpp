@@ -777,7 +777,7 @@ BOOST_AUTO_TEST_CASE(query_and_chain_read_share_http_body_budget) {
          std::this_thread::yield();
       return ready();
    };
-   // Dispatch is observed after the socket releases its reservation. Wait for the app queue to count the bytes again.
+   // Wait for the chain read to be dispatched with its body still counted against the budget.
    BOOST_REQUIRE(wait_for([&] {
       return server.chain_read_requests.load() == 1 && plugin.bytes_in_flight() == chain_body_size;
    }));
