@@ -15,12 +15,21 @@
 namespace sysio::chain {
    static constexpr int64_t large_number_no_overflow = std::numeric_limits<int64_t>::max()/2;
 
-   transaction_checktime_timer::transaction_checktime_timer(platform_timer& timer)
-         : _timer(timer) {
+   transaction_checktime_timer::transaction_checktime_timer(platform_timer& timer,
+                                                            const std::atomic<bool>* interrupt_requested,
+                                                            fc::time_point interrupt_deadline)
+         : _timer(timer)
+         , _interrupt_requested(interrupt_requested)
+         , _interrupt_deadline(interrupt_deadline) {
    }
 
    void transaction_checktime_timer::start(fc::time_point tp) {
       _timer.start(tp);
+      // Read after start(), both seq_cst: the requester sets the flag before interrupting the timer, so a request made
+      // before this read is seen here and one made after it finds the timer running.
+      if ((_interrupt_requested && _interrupt_requested->load()) ||
+          (_interrupt_deadline != fc::time_point::maximum() && fc::time_point::now() >= _interrupt_deadline))
+         _timer.interrupt_timer();
    }
 
    void transaction_checktime_timer::stop() {

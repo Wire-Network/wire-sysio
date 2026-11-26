@@ -304,8 +304,9 @@ namespace {
          return true;  // only block number is signaled,
 
       case block_signal::accepted_block_header:
-         // should get accepted_block_header signal only once, and before accepted_block signal;
-         return !present;
+         // should get accepted_block_header signal before accepted_block signal; more than once only when an
+         // interrupted application of the block is retried
+         return !present || itr->second == block_signal::accepted_block_header;
 
       case block_signal::accepted_block:
          // should get accepted_block signal after accepted_block_header signal

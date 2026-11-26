@@ -3,6 +3,8 @@
 #include <sysio/chain/trace.hpp>
 #include <sysio/chain/platform_timer.hpp>
 
+#include <atomic>
+
 namespace sysio::benchmark {
    struct interface_in_benchmark; // for benchmark testing
 }
@@ -14,9 +16,15 @@ namespace sysio::chain {
          transaction_checktime_timer() = delete;
          transaction_checktime_timer(const transaction_checktime_timer&) = delete;
          transaction_checktime_timer(transaction_checktime_timer&&) = default;
-         transaction_checktime_timer(platform_timer& timer);
+         /// @param interrupt_requested when given, a start() while it is set interrupts the timer it starts
+         /// @param interrupt_deadline a start() at or past it interrupts the timer it starts
+         explicit transaction_checktime_timer(platform_timer& timer,
+                                              const std::atomic<bool>* interrupt_requested = nullptr,
+                                              fc::time_point interrupt_deadline = fc::time_point::maximum());
          ~transaction_checktime_timer();
 
+         /// Starts the timer, then interrupts it if the interrupt flag given at construction is set or its interrupt
+         /// deadline has passed: the next checktime throws interrupt_exception.
          void start(fc::time_point tp);
          void stop();
          void set_expired() { _timer.set_expired(); }
@@ -29,7 +37,9 @@ namespace sysio::chain {
          void set_expiration_callback(void(*func)(void*), void* user);
 
       private:
-         platform_timer& _timer;
+         platform_timer&          _timer;
+         const std::atomic<bool>* _interrupt_requested = nullptr;
+         fc::time_point           _interrupt_deadline;
 
          friend controller_impl;
    };

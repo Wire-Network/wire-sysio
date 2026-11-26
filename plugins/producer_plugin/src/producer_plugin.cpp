@@ -2522,13 +2522,14 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block() {
       return r;
 
    auto process_pending_blocks = [&]() -> start_block_result {
-      auto apply_blocks = [&]() -> controller::apply_blocks_result_t {
+      auto apply_blocks = [&](fc::time_point deadline) -> controller::apply_blocks_result_t {
          try {
             return chain.apply_blocks([this](const transaction_metadata_ptr& trx) {
                                          fc_dlog(_trx_log, "adding forked trx {} to unapplied queue", trx->id());
                                          _unapplied_transactions.add_forked(trx);
                                       },
-                                      [this](const transaction_id_type& id) { return _unapplied_transactions.get_trx(id); });
+                                      [this](const transaction_id_type& id) { return _unapplied_transactions.get_trx(id); },
+                                      deadline);
          } catch (...) {} // errors logged in apply_blocks
          return controller::apply_blocks_result_t{.status = controller::apply_blocks_result_t::status_t::incomplete};
       };
@@ -2542,10 +2543,15 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block() {
          return chain.fork_db_head().extends(head.id());
       };
       while (in_speculating_mode() || !chain.is_head_descendant_of_pending_lib() || fork_db_ahead_on_same_chain()) {
-         if (is_configured_producer())
-            schedule_delayed_production_loop(this->weak_from_this(), _pending_block_deadline); // interrupt apply_blocks at deadline
+         // a producer stops applying blocks at the deadline: the timer stops the trx running then, and apply_blocks()
+         // the next one to start
+         fc::time_point deadline = fc::time_point::maximum();
+         if (is_configured_producer()) {
+            deadline = _pending_block_deadline;
+            schedule_delayed_production_loop(this->weak_from_this(), deadline);
+         }
 
-         auto result = apply_blocks();
+         auto result = apply_blocks(deadline);
          if (result.num_blocks_applied == 0) {
             // No progress: either nothing to apply (status complete), or apply was interrupted on a block that
             // cannot complete within deadline (e.g., infinite trx). Exit the loop -- retrying would hit the same
@@ -3138,7 +3144,7 @@ void producer_plugin_impl::schedule_production_loop() {
       // we failed to start a block, so try again later?
       _timer.async_wait([this, cid = ++_timer_corelation_id](const boost::system::error_code& ec) {
          if (ec != boost::asio::error::operation_aborted && cid == _timer_corelation_id) {
-            interrupt_transaction(controller::interrupt_t::all_trx);
+            interrupt_transaction(controller::interrupt_t::running_trx);
             // Recheck cid in the posted lambda: another schedule_* call may have bumped _timer_corelation_id between the
             // timer firing and the post running. Same pattern as schedule_maybe_produce_block / schedule_delayed_production_loop.
             app().executor().post(priority::high, exec_queue::read_write, [this, cid]() {
@@ -3234,7 +3240,7 @@ void producer_plugin_impl::schedule_delayed_production_loop(const std::weak_ptr<
       _timer.expires_at(fc::system_clock::from_time_point(*wake_up_time));
       _timer.async_wait([this, cid = ++_timer_corelation_id](const boost::system::error_code& ec) {
          if (ec != boost::asio::error::operation_aborted && cid == _timer_corelation_id) {
-            interrupt_transaction(controller::interrupt_t::all_trx);
+            interrupt_transaction(controller::interrupt_t::running_trx);
             // Recheck cid inside the posted lambda: between the timer callback firing and the executor
             // running this lambda, another schedule_* call may have bumped _timer_corelation_id (typically
             // the schedule_maybe_produce_block invoked after the next start_block). If we ran

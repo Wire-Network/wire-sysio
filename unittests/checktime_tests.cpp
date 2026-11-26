@@ -3,6 +3,7 @@
 #include <boost/test/unit_test.hpp>
 #pragma GCC diagnostic pop
 
+#include <fc/mock_time.hpp>
 #include <fc/scoped_exit.hpp>
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/exceptions.hpp>
@@ -12,6 +13,9 @@
 
 #include <test_contracts.hpp>
 #include <test_utils.hpp>
+#include "savanna_cluster.hpp"
+
+#include <magic_enum/magic_enum.hpp>
 
 #include <algorithm>
 #include <chrono>
@@ -60,6 +64,63 @@ void warm_pause_contract(savanna_tester& tester) {
    push_trx( tester, test_pause_action<WASM_TEST_ACTION("test_checktime", "checktime_pass")>{},
              warmup_billed_cpu_us, UINT32_MAX, warmup_max_block_cpu_ms, true, {}, "pause"_n );
 }
+
+/**
+ * A block `b` whose last transaction runs test_checktime::checktime_failure, which loops until it is stopped, and a
+ * node `other` that has not applied it, with the test_api WASM cached.
+ */
+struct endless_trx_block_t {
+   savanna_tester   t;
+   savanna_tester   other;
+   signed_block_ptr b;
+
+   endless_trx_block_t() {
+      auto block = t.produce_block();
+      other.push_block(block);
+      t.create_account( "testapi"_n );
+      t.set_code( "testapi"_n, test_contracts::test_api_wasm() );
+      block = t.produce_block();
+      other.push_block(block);
+
+      auto [trace, pass_b] = CALL_TEST_FUNCTION_WITH_BLOCK( t, "test_checktime", "checktime_pass", {});
+      BOOST_REQUIRE_EQUAL( pass_b->transactions.size(), 1 );
+
+      // Warm other without advancing its head; push_block aborts this pending transaction but keeps the WASM cached.
+      auto warmup_trx = pass_b->transactions.back().trx.get_signed_transaction();
+      other.push_transaction( warmup_trx, fc::time_point::maximum(), savanna_tester::DEFAULT_BILLED_CPU_TIME_US );
+
+      // Make a copy of the valid block and swicth the checktime_pass transaction with checktime_failure
+      auto copy_b = pass_b->clone();
+      auto signed_tx = copy_b->transactions.back().trx.get_signed_transaction();
+      auto& act = signed_tx.actions.back();
+      constexpr chain::name checktime_fail_n{WASM_TEST_ACTION("test_checktime", "checktime_failure")};
+      act.name = checktime_fail_n;
+      act.data = fc::raw::pack(10000000000000000000ULL);
+      // Re-sign the transaction
+      signed_tx.signatures.clear();
+      signed_tx.sign(t.get_private_key("testapi"_n, "active"), t.get_chain_id());
+      // Replace the transaction
+      auto new_packed_tx = packed_transaction(signed_tx);
+      copy_b->transactions.back().trx = std::move(new_packed_tx);
+
+      // Re-calculate the transaction merkle
+      deque<digest_type> trx_digests;
+      const auto& trxs = copy_b->transactions;
+      for( const auto& a : trxs )
+         trx_digests.emplace_back( a.digest() );
+      copy_b->transaction_mroot = calculate_merkle( std::move(trx_digests) );
+      // Re-sign the block
+      copy_b->producer_signatures = {t.get_private_key(config::system_account_name, "active").sign(copy_b->calculate_id())};
+      b = signed_block::create_signed_block(std::move(copy_b));
+   }
+};
+
+/// Two testers that read the mock clock, engaged before they start their threads and released after they stop.
+struct mock_clock_testers_t {
+   fc::scoped_mock_clock clock{tester::default_genesis().initial_timestamp};
+   savanna_tester        t;
+   savanna_tester        other;
+};
 
 }
 
@@ -169,46 +230,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( checktime_fail_tests, T, validating_testers ) { t
    BOOST_REQUIRE_EQUAL( t.validate(), true );
 } FC_LOG_AND_RETHROW() }
 
-BOOST_AUTO_TEST_CASE( checktime_interrupt_test) { try {
-   savanna_tester t;
-   savanna_tester other;
-   auto block = t.produce_block();
-   other.push_block(block);
-   t.create_account( "testapi"_n );
-   t.set_code( "testapi"_n, test_contracts::test_api_wasm() );
-   block = t.produce_block();
-   other.push_block(block);
-
-   auto [trace, b] = CALL_TEST_FUNCTION_WITH_BLOCK( t, "test_checktime", "checktime_pass", {});
-   BOOST_REQUIRE_EQUAL( b->transactions.size(), 1 );
-
-   // Warm other without advancing its head; push_block aborts this pending transaction but keeps the WASM cached.
-   auto warmup_trx = b->transactions.back().trx.get_signed_transaction();
-   other.push_transaction( warmup_trx, fc::time_point::maximum(), savanna_tester::DEFAULT_BILLED_CPU_TIME_US );
-
-   // Make a copy of the valid block and swicth the checktime_pass transaction with checktime_failure
-   auto copy_b = b->clone();
-   auto signed_tx = copy_b->transactions.back().trx.get_signed_transaction();
-   auto& act = signed_tx.actions.back();
-   constexpr chain::name checktime_fail_n{WASM_TEST_ACTION("test_checktime", "checktime_failure")};
-   act.name = checktime_fail_n;
-   act.data = fc::raw::pack(10000000000000000000ULL);
-   // Re-sign the transaction
-   signed_tx.signatures.clear();
-   signed_tx.sign(t.get_private_key("testapi"_n, "active"), t.get_chain_id());
-   // Replace the transaction
-   auto new_packed_tx = packed_transaction(signed_tx);
-   copy_b->transactions.back().trx = std::move(new_packed_tx);
-
-   // Re-calculate the transaction merkle
-   deque<digest_type> trx_digests;
-   const auto& trxs = copy_b->transactions;
-   for( const auto& a : trxs )
-      trx_digests.emplace_back( a.digest() );
-   copy_b->transaction_mroot = calculate_merkle( std::move(trx_digests) );
-   // Re-sign the block
-   copy_b->producer_signatures = {t.get_private_key(config::system_account_name, "active").sign(copy_b->calculate_id())};
-
+/// Pushes the endless block to `f.other`, and interrupts its endless transaction with `interrupt` while it runs.
+void push_interrupting_the_endless_trx(endless_trx_block_t& f, controller::interrupt_t interrupt) {
+   savanna_tester& other = f.other;
+   const signed_block_ptr& b = f.b;
    // Wait for the warmed transaction's timer, skipping onblock's earlier WASM entry.
    std::promise<void> interrupt_start_promise;
    auto interrupt_start_future = interrupt_start_promise.get_future();
@@ -238,7 +263,7 @@ BOOST_AUTO_TEST_CASE( checktime_interrupt_test) { try {
          interrupt_ready_promise.set_value();
          acknowledged = true;
          std::this_thread::sleep_for( std::chrono::milliseconds(100) );
-         other.control->interrupt_transaction(controller::interrupt_t::apply_block_trx);
+         other.control->interrupt_transaction(interrupt);
       } catch (...) {
          interrupt_thread_exception = std::current_exception();
          if (!acknowledged)
@@ -248,13 +273,274 @@ BOOST_AUTO_TEST_CASE( checktime_interrupt_test) { try {
    auto thread_join_guard = join_thread_on_scope_exit(th);
 
    // apply block, caught in an "infinite" loop
-   BOOST_CHECK_THROW( other.push_block(signed_block::create_signed_block(std::move(copy_b))), interrupt_exception);
+   BOOST_CHECK_THROW( other.push_block(b), interrupt_exception);
 
    th.join();
    thread_join_guard.cancel();
    if (interrupt_thread_exception)
       std::rethrow_exception(interrupt_thread_exception);
+}
 
+// An apply-block interrupt, and a running_trx interrupt as the producer's timer makes, stop a running block
+// transaction.
+BOOST_AUTO_TEST_CASE( checktime_interrupt_test ) { try {
+   for (const controller::interrupt_t interrupt : {controller::interrupt_t::apply_block_trx,
+                                                   controller::interrupt_t::running_trx}) {
+      BOOST_TEST_CONTEXT("interrupt " << magic_enum::enum_name(interrupt)) {
+         endless_trx_block_t f;
+         push_interrupting_the_endless_trx(f, interrupt);
+      }
+   }
+} FC_LOG_AND_RETHROW() }
+
+// An apply-block interrupt that no running transaction catches still stops the block application: the next
+// transaction to start is interrupted.
+
+// Between transactions: from the applied_transaction signal of the block's onblock, after its last checktime and
+// before its own transaction starts.
+BOOST_AUTO_TEST_CASE( apply_interrupt_between_transactions_stops_the_next ) { try {
+   savanna_tester t;
+   savanna_tester other;
+   other.push_block(t.produce_block());
+   t.create_account("interrupted"_n);
+   const signed_block_ptr b = t.produce_block();
+   BOOST_REQUIRE_EQUAL(b->transactions.size(), 1u);
+   const block_id_type head_before = other.control->head().id();
+
+   bool requested = false;
+   boost::signals2::scoped_connection conn = other.control->applied_transaction().connect(
+      [&](std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> applied) {
+         const transaction_trace_ptr& trace = std::get<0>(applied);
+         if (!requested && !trace->action_traces.empty() && trace->action_traces.front().act.name == "onblock"_n) {
+            requested = true;
+            other.control->interrupt_transaction(controller::interrupt_t::apply_block_trx);
+         }
+      });
+   BOOST_CHECK_THROW(other.push_block(b), interrupt_exception);
+   conn.disconnect();
+   BOOST_TEST(requested);
+   BOOST_TEST(other.control->head().id() == head_before);
+
+   // The block stays in the fork database, and the interrupt was consumed: applying again completes it.
+   other.apply_blocks();
+   BOOST_TEST(other.control->head().id() == b->calculate_id());
+} FC_LOG_AND_RETHROW() }
+
+// Before the application starts: requested after the pending block is aborted, while nothing runs, it stops the block
+// application.
+BOOST_AUTO_TEST_CASE( apply_interrupt_before_apply_stops_it ) { try {
+   for (const controller::interrupt_t interrupt : {controller::interrupt_t::apply_block_trx,
+                                                   controller::interrupt_t::all_trx}) {
+      BOOST_TEST_CONTEXT("interrupt " << magic_enum::enum_name(interrupt)) {
+         savanna_tester t;
+         savanna_tester other;
+         other.push_block(t.produce_block());
+         const signed_block_ptr b = t.produce_block();
+         const block_id_type b_id = b->calculate_id();
+         const block_id_type head_before = other.control->head().id();
+
+         other.control->accept_block(b_id, b);
+         other.control->abort_block();
+         other.control->interrupt_transaction(interrupt);
+         BOOST_CHECK_THROW(other.control->apply_blocks({}, {}), interrupt_exception);
+         BOOST_TEST(other.control->head().id() == head_before);
+
+         other.apply_blocks();
+         BOOST_TEST(other.control->head().id() == b->calculate_id());
+      }
+   }
+} FC_LOG_AND_RETHROW() }
+
+// Between blocks: from the accepted_block signal of the first of two blocks applied together.
+BOOST_AUTO_TEST_CASE( apply_interrupt_between_blocks_stops_the_next_block ) { try {
+   savanna_tester t;
+   savanna_tester other;
+   other.push_block(t.produce_block());
+   const signed_block_ptr b1 = t.produce_block();
+   const signed_block_ptr b2 = t.produce_block();
+   const block_id_type b1_id = b1->calculate_id();
+   const block_id_type b2_id = b2->calculate_id();
+
+   bool requested = false;
+   boost::signals2::scoped_connection conn =
+      other.control->accepted_block().connect([&](const block_signal_params& accepted) {
+         if (!requested && std::get<1>(accepted) == b1_id) {
+            requested = true;
+            other.control->interrupt_transaction(controller::interrupt_t::apply_block_trx);
+         }
+      });
+   other.control->accept_block(b1_id, b1);
+   other.control->accept_block(b2_id, b2);
+   other.control->abort_block();
+   BOOST_CHECK_THROW(other.control->apply_blocks({}, {}), interrupt_exception);
+   conn.disconnect();
+   BOOST_TEST(requested);
+   BOOST_TEST(other.control->head().id() == b1_id);
+
+   other.apply_blocks();
+   BOOST_TEST(other.control->head().id() == b2_id);
+} FC_LOG_AND_RETHROW() }
+
+// An interrupt requested after the last transaction of an application that completes is spent by it: it does not stop
+// the next one.
+BOOST_AUTO_TEST_CASE( apply_interrupt_after_last_transaction_is_spent ) { try {
+   savanna_tester t;
+   savanna_tester other;
+   other.push_block(t.produce_block());
+   const signed_block_ptr b1 = t.produce_block();
+   const signed_block_ptr b2 = t.produce_block();
+   const block_id_type b1_id = b1->calculate_id();
+
+   bool requested = false;
+   boost::signals2::scoped_connection conn =
+      other.control->accepted_block().connect([&](const block_signal_params& accepted) {
+         if (!requested && std::get<1>(accepted) == b1_id) {
+            requested = true;
+            other.control->interrupt_transaction(controller::interrupt_t::apply_block_trx);
+         }
+      });
+   other.push_block(b1);
+   BOOST_TEST(requested);
+   BOOST_TEST(other.control->head().id() == b1_id);
+
+   // applied without aborting a pending block, so only the end of b1's application can have discarded the request
+   const block_id_type b2_id = b2->calculate_id();
+   other.control->accept_block(b2_id, b2);
+   other.control->apply_blocks({}, {});
+   BOOST_TEST(other.control->head().id() == b2_id);
+} FC_LOG_AND_RETHROW() }
+
+// An apply-block interrupt requested before the pending block is aborted does not stop the next block application.
+BOOST_AUTO_TEST_CASE( apply_interrupt_before_abort_block_does_not_stop_apply ) { try {
+   savanna_tester t;
+   savanna_tester other;
+   other.push_block(t.produce_block());
+   const signed_block_ptr b = t.produce_block();
+
+   other.control->interrupt_transaction(controller::interrupt_t::apply_block_trx);
+   other.push_block(b); // aborts the pending block, then applies
+   BOOST_TEST(other.control->head().id() == b->calculate_id());
+} FC_LOG_AND_RETHROW() }
+
+// A speculative or running_trx interrupt made while nothing runs leaves no request: the next block application
+// completes.
+BOOST_AUTO_TEST_CASE( interrupt_without_request_before_apply_does_not_stop_it ) { try {
+   for (const controller::interrupt_t interrupt : {controller::interrupt_t::speculative_block_trx,
+                                                   controller::interrupt_t::running_trx}) {
+      BOOST_TEST_CONTEXT("interrupt " << magic_enum::enum_name(interrupt)) {
+         savanna_tester t;
+         savanna_tester other;
+         other.push_block(t.produce_block());
+         const signed_block_ptr b = t.produce_block();
+         const block_id_type b_id = b->calculate_id();
+
+         other.control->accept_block(b_id, b);
+         other.control->abort_block();
+         other.control->interrupt_transaction(interrupt);
+         other.control->apply_blocks({}, {});
+         BOOST_TEST(other.control->head().id() == b_id);
+      }
+   }
+} FC_LOG_AND_RETHROW() }
+
+// A requested apply-block interrupt does not interrupt speculative transactions.
+BOOST_AUTO_TEST_CASE( apply_interrupt_spares_speculative_transactions ) { try {
+   savanna_tester t;
+   BOOST_REQUIRE(t.control->is_building_block()); // so the push below does not abort a block first
+
+   t.control->interrupt_transaction(controller::interrupt_t::apply_block_trx);
+   const transaction_trace_ptr trace = t.create_account("spared"_n);
+   BOOST_TEST(!trace->except);
+} FC_LOG_AND_RETHROW() }
+
+// A deadline already passed stops the block application at its first transaction. It holds only for its call: the next
+// one, with a deadline ahead, applies the block.
+BOOST_AUTO_TEST_CASE( apply_deadline_passed_stops_apply ) { try {
+   savanna_tester t;
+   savanna_tester other;
+   other.push_block(t.produce_block());
+   t.create_account("applied"_n);
+   const signed_block_ptr b = t.produce_block();
+   BOOST_REQUIRE_EQUAL(b->transactions.size(), 1u);
+   const block_id_type b_id = b->calculate_id();
+   const block_id_type head_before = other.control->head().id();
+
+   other.control->accept_block(b_id, b);
+   other.control->abort_block();
+   BOOST_CHECK_THROW(other.control->apply_blocks({}, {}, fc::time_point::now()), interrupt_exception);
+   BOOST_TEST(other.control->head().id() == head_before);
+
+   other.control->apply_blocks({}, {}, fc::time_point::now() + fc::hours(1));
+   BOOST_TEST(other.control->head().id() == b_id);
+} FC_LOG_AND_RETHROW() }
+
+// A deadline that passes between transactions, here from the applied_transaction signal of the block's onblock, stops
+// the next one to start.
+BOOST_FIXTURE_TEST_CASE( apply_deadline_between_transactions_stops_the_next, mock_clock_testers_t ) { try {
+   other.push_block(t.produce_block());
+   t.create_account("interrupted"_n);
+   const signed_block_ptr b = t.produce_block();
+   BOOST_REQUIRE_EQUAL(b->transactions.size(), 1u);
+   const block_id_type b_id = b->calculate_id();
+   const block_id_type head_before = other.control->head().id();
+   const fc::time_point deadline = fc::time_point::now() + fc::seconds(1);
+
+   bool passed = false;
+   boost::signals2::scoped_connection conn = other.control->applied_transaction().connect(
+      [&](std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> applied) {
+         const transaction_trace_ptr& trace = std::get<0>(applied);
+         if (!passed && !trace->action_traces.empty() && trace->action_traces.front().act.name == "onblock"_n) {
+            passed = true;
+            fc::mock_time_traits::set_now(deadline);
+         }
+      });
+   other.control->accept_block(b_id, b);
+   other.control->abort_block();
+   BOOST_CHECK_THROW(other.control->apply_blocks({}, {}, deadline), interrupt_exception);
+   conn.disconnect();
+   BOOST_TEST(passed);
+   BOOST_TEST(other.control->head().id() == head_before);
+
+   other.control->apply_blocks({}, {});
+   BOOST_TEST(other.control->head().id() == b_id);
+} FC_LOG_AND_RETHROW() }
+
+// An apply-block interrupt requested, or a deadline passed, before a fork switch stops it before the current branch is
+// popped: the head stays on that branch, and the next application switches.
+BOOST_FIXTURE_TEST_CASE( apply_interrupt_before_fork_switch_keeps_head, savanna_cluster::cluster_t ) { try {
+   savanna_cluster::node_t& A = _nodes[0];
+   savanna_cluster::node_t& C = _nodes[2];
+   savanna_cluster::node_t& D = _nodes[3];
+   A.produce_blocks(4);
+
+   set_partition({&C, &D});
+   A.produce_blocks(3);
+   const block_id_type a_head = A.head().id();
+
+   const uint32_t c_first = C.head().block_num() + 1; // the first block of C's own branch
+   C.produce_block();
+   C.produce_block(fc::milliseconds(config::block_interval_ms * 14)); // later timestamps make C's branch the best
+   C.produce_blocks(5);
+
+   // A receives C's branch without applying it
+   for (uint32_t n = c_first; n <= C.head().block_num(); ++n) {
+      const signed_block_ptr b = C.fetch_block_by_number(n);
+      A.control->accept_block(b->calculate_id(), b);
+   }
+   BOOST_REQUIRE(A.control->fork_db_head().id() == C.head().id());
+
+   A.control->abort_block();
+   BOOST_CHECK_EXCEPTION(A.control->apply_blocks({}, {}, fc::time_point::now()), interrupt_exception,
+                         fc_exception_message_contains("switching forks"));
+   BOOST_TEST(A.head().id() == a_head);
+
+   A.control->interrupt_transaction(controller::interrupt_t::apply_block_trx);
+   BOOST_CHECK_EXCEPTION(A.control->apply_blocks({}, {}), interrupt_exception,
+                         fc_exception_message_contains("switching forks"));
+   BOOST_TEST(A.head().id() == a_head);
+
+   A.apply_blocks();
+   BOOST_TEST(A.head().id() == C.head().id());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( checktime_speculative_max_trx_test ) { try {

@@ -221,7 +221,10 @@ namespace sysio::chain {
          deque<transaction_metadata_ptr> abort_block();
 
          /// Expected to be called from signal handler or producer_plugin
-         enum class interrupt_t { all_trx, apply_block_trx, speculative_block_trx };
+         enum class interrupt_t { all_trx, apply_block_trx, speculative_block_trx, running_trx };
+         /// all_trx and apply_block_trx stop the block application in progress, or else the next one, at its next
+         /// transaction. The request holds until the pending block is aborted or apply_blocks() returns or throws.
+         /// running_trx stops only the transaction running now, speculative or in a block, and leaves no request.
          void interrupt_transaction(interrupt_t interrupt);
 
          transaction_trace_ptr push_transaction( const transaction_metadata_ptr& trx,
@@ -265,7 +268,10 @@ namespace sysio::chain {
             status_t status = status_t::complete;
             size_t   num_blocks_applied = 0;
          };
-         apply_blocks_result_t apply_blocks(const forked_callback_t& cb, const trx_meta_cache_lookup& trx_lookup);
+         /// A block transaction that starts once `deadline` has passed is interrupted, which leaves its block in the
+         /// fork database to be applied again. One already running stops only on an interrupt.
+         apply_blocks_result_t apply_blocks(const forked_callback_t& cb, const trx_meta_cache_lookup& trx_lookup,
+                                            fc::time_point deadline = fc::time_point::maximum());
 
          boost::asio::io_context& get_thread_pool();
 

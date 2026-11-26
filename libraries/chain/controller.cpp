@@ -772,6 +772,12 @@ struct controller_impl {
    std::atomic<bool>               writing_snapshot = false;
    block_root_processor_ptr        merkle_processor;
    std::atomic<bool>               applying_block = false;
+   /// Set by an all_trx or apply_block_trx interrupt, cleared when the pending block is aborted and when
+   /// apply_blocks() returns or throws. While it is set, every block trx that starts is interrupted.
+   std::atomic<bool>               apply_block_interrupt_requested = false;
+   /// The deadline given to the apply_blocks() call in progress, maximum outside one. A block trx that starts once it
+   /// has passed is interrupted. Main thread only.
+   fc::time_point                  apply_deadline = fc::time_point::maximum();
    platform_timer&                 main_thread_timer;
    peer_keys_db_t                  peer_keys_db;
 
@@ -2030,7 +2036,11 @@ struct controller_impl {
          auto& bb = std::get<building_block>(pending->_block_stage);
 
          const signed_transaction& trn = trx->packed_trx()->get_signed_transaction();
-         transaction_checktime_timer trx_timer(timer);
+         // a requested apply-block interrupt and the apply_blocks() deadline stop the block's trxs, not the read-only
+         // ones run during its setup
+         const bool block_trx = applying_block && !trx->is_read_only();
+         transaction_checktime_timer trx_timer(timer, block_trx ? &apply_block_interrupt_requested : nullptr,
+                                               block_trx ? apply_deadline : fc::time_point::maximum());
          transaction_context trx_context(self,
                                          *trx->packed_trx(),
                                          std::move(trx_timer),
@@ -3129,7 +3139,11 @@ struct controller_impl {
       } FC_LOG_AND_RETHROW( )
    }
 
-   controller::apply_blocks_result_t apply_blocks(const forked_callback_t& cb, const trx_meta_cache_lookup& trx_lookup) {
+   controller::apply_blocks_result_t apply_blocks(const forked_callback_t& cb, const trx_meta_cache_lookup& trx_lookup,
+                                                  fc::time_point deadline) {
+      // clear interrupt request on exit, interrupted or not, so it does not carry over to the next call
+      auto clear_interrupt = fc::make_scoped_exit([this]() { apply_block_interrupt_requested = false; });
+      fc::scoped_set_value set_deadline(apply_deadline, deadline);
       try {
          if( !irreversible_mode() ) {
             return maybe_apply_blocks( cb, trx_lookup );
@@ -3158,6 +3172,11 @@ struct controller_impl {
 
       bool switch_fork = !old_head_branch.empty();
       if( switch_fork ) {
+         // checked before the current branch is popped, so an interrupt requested already, or a deadline already
+         // passed, leaves the head in place
+         if (apply_block_interrupt_requested || fc::time_point::now() >= apply_deadline)
+            SYS_THROW(interrupt_exception, "interrupt before switching forks from {} to {}",
+                      chain_head.id(), new_head->id());
          auto head_fork_comp_str = log_fork_comparison(*chain_head.internal());
          ilog("switching forks from {} (block number {} {}) {} to {} (block number {} {}) {}",
               chain_head.id(), chain_head.block_num(), chain_head.producer(), head_fork_comp_str,
@@ -3289,6 +3308,8 @@ struct controller_impl {
    }
 
    deque<transaction_metadata_ptr> abort_block() {
+      // clear interrupt request, since block is aborting
+      apply_block_interrupt_requested = false;
       deque<transaction_metadata_ptr> applied_trxs;
       if( pending ) {
          applied_trxs = pending->extract_trx_metas();
@@ -3304,13 +3325,21 @@ struct controller_impl {
       // This is to allow killing a long-running transaction in a block being validated during apply block.
       // This also allows killing a trx when a block is received to prioritize block validation.
       if (!replaying) {
+         const bool apply_block_interrupt = interrupt == controller::interrupt_t::all_trx ||
+                                            interrupt == controller::interrupt_t::apply_block_trx;
+         // Set before the timer is interrupted, for a block trx that starts its timer after this point: an interrupt
+         // between block trxs, or before the block application starts, is not lost.
+         if (apply_block_interrupt)
+            apply_block_interrupt_requested = true;
          if (applying_block) {
-            if (interrupt == controller::interrupt_t::all_trx || interrupt == controller::interrupt_t::apply_block_trx) {
+            if (apply_block_interrupt || interrupt == controller::interrupt_t::running_trx) {
                dlog("Interrupting apply block trx...");
                main_thread_timer.interrupt_timer();
             }
          } else {
-            if (interrupt == controller::interrupt_t::all_trx || interrupt == controller::interrupt_t::speculative_block_trx) {
+            if (interrupt == controller::interrupt_t::all_trx ||
+                interrupt == controller::interrupt_t::speculative_block_trx ||
+                interrupt == controller::interrupt_t::running_trx) {
                dlog("Interrupting speculative block trx...");
                main_thread_timer.interrupt_timer();
             }
@@ -4025,9 +4054,11 @@ void controller::set_async_aggregation(async_t val) {
    my->async_aggregation = val;
 }
 
-controller::apply_blocks_result_t controller::apply_blocks(const forked_callback_t& cb, const trx_meta_cache_lookup& trx_lookup) {
+controller::apply_blocks_result_t controller::apply_blocks(const forked_callback_t& cb,
+                                                           const trx_meta_cache_lookup& trx_lookup,
+                                                           fc::time_point deadline) {
    validate_db_available_size();
-   return my->apply_blocks(cb, trx_lookup);
+   return my->apply_blocks(cb, trx_lookup, deadline);
 }
 
 
