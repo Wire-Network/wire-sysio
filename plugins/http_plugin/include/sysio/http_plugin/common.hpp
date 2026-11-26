@@ -202,7 +202,7 @@ struct http_plugin_state {
       bytes_in_flight_ -= size;
    }
 
-   /// Check whether extra response bytes fit without reserving them.
+   /// Check whether extra bytes fit in a snapshot of the budget. Response writes account for their bytes separately.
    std::string verify_max_bytes_in_flight(size_t extra_bytes) {
       const auto current = bytes_in_flight_.load(std::memory_order_relaxed);
       return bytes_fit(current, extra_bytes) ? std::string{} : bytes_in_flight_error(current, extra_bytes);
@@ -221,7 +221,7 @@ struct http_plugin_state {
 private:
    std::atomic<size_t> bytes_in_flight_{0};
 
-   /// Whether extra_bytes more fit. Unconditional response accounting can put current over budget.
+   /// Whether `extra_bytes` fit alongside `current`, which response writes can push over the budget.
    bool bytes_fit(size_t current, size_t extra_bytes) const {
       return current <= max_bytes_in_flight && extra_bytes <= max_bytes_in_flight - current;
    }
@@ -238,17 +238,21 @@ namespace detail {
 /// Owns request-body bytes already admitted by the session.
 class request_body_reservation {
 public:
+   /// Adopt bytes already reserved by the session. A zero byte count creates an empty guard.
    request_body_reservation(const std::shared_ptr<http_plugin_state>& state, size_t reserved) noexcept
       : state_(reserved != 0 ? state : nullptr), size_(reserved) {}
 
+   /// Transfer the reservation and leave the source empty.
    request_body_reservation(request_body_reservation&& other) noexcept
       : state_(std::move(other.state_)), size_(std::exchange(other.size_, 0)) {}
 
+   /// Return any bytes this guard still owns.
    ~request_body_reservation() { release(); }
 
    /// True even when a chunked request used none of its allowance.
    [[nodiscard]] bool admitted() const noexcept { return bool(state_); }
 
+   /// Return the unused allowance after a chunked read and retain admission for the decoded size.
    void shrink_to(size_t size) noexcept {
       assert(size <= size_);
       if (size < size_) {
@@ -257,6 +261,7 @@ public:
       }
    }
 
+   /// Return the remaining bytes and clear the admission state.
    void release() noexcept {
       if (size_ != 0)
          state_->release_bytes_in_flight(std::exchange(size_, 0));
