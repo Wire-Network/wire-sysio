@@ -615,8 +615,8 @@ BOOST_AUTO_TEST_CASE(serving_and_seated_left_members_relay) try {
    }
 } FC_LOG_AND_RETHROW();
 
-/// The relayed chains: SERVING (seated or not), LEFT while seated in that chain's own window; not LEFT without a
-/// seat, EVICTED though seated, or a chain with no membership.
+/// The relayed chains: SERVING (seated or not), LEFT while seated in that chain's own window or previous group; not
+/// LEFT without a seat, EVICTED though seated, or a chain with no membership.
 BOOST_AUTO_TEST_CASE(relayed_chains_follow_membership_and_seats) try {
    const chain_memberships memberships{{serving_chain.value, chain_service_status::SERVING},
                                        {left_seated_chain.value, chain_service_status::LEFT},
@@ -633,6 +633,9 @@ BOOST_AUTO_TEST_CASE(relayed_chains_follow_membership_and_seats) try {
    // Its seat on another chain does not keep a LEFT member on this one.
    const chain_memberships left_only{{left_free_chain.value, chain_service_status::LEFT}};
    BOOST_CHECK(relayed_chains(left_only, views).empty());
+   // A LEFT member whose last seat slid into the previous group still relays, to deliver that epoch late.
+   views.at(left_free_chain.value).in_previous_group = true;
+   BOOST_CHECK(relayed_chains(left_only, views) == std::set<uint64_t>{left_free_chain.value});
 } FC_LOG_AND_RETHROW();
 
 /// The own-status lookup is an exact read of the operator's `operators` row, keyed by its account's value.
