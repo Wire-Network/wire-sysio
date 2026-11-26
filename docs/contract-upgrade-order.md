@@ -254,9 +254,10 @@ and `sysio.opreg` (`flushwtdw`) and `sysio.synd` read `outpcons`. `sysio.opreg::
 A chain advances only once it is due: `epochstate` drops `next_epoch_start` and gains `traffic_since` and
 `due_at`, both zero while the chain is idle, and each advance opens the next epoch at its own time. Traffic is
 recorded by the new `sysio.epoch::notetraffic` (auth `sysio.msgch`, inlined by `buildenv` for rows an envelope
-leaves behind, and by the new `sysio.msgch::reportqueue` once a strict majority of the seats of the chain's group
-reports an outbound backlog on the outpost), by `sysio.epoch`'s handler of the `sysio.msgch::queueout`
-notification, and by `resendroster`. `reportqueue` keeps its reports in the new `sysio.msgch::qreports` table.
+leaves behind, by the new `sysio.msgch::reportqueue` once a strict majority of the seats of the chain's group
+reports an outbound backlog on the outpost, and by `resolvedisp` at a dispute's resolution), by `sysio.epoch`'s
+handler of the `sysio.msgch::queueout` notification, and by `resendroster`. `reportqueue` keeps its reports in the
+new `sysio.msgch::qreports` table.
 `sysio.msgch::chkcons` advances a decided epoch once `due_at` has passed, and `rcrdduty` credits one chain
 minimum per duty epoch. `epochcfg` gains `traffic_wait_sec` and `late_window_sec`, new `setconfig` arguments after
 `epoch_duration_sec`: `due_at` is the later of the epoch start plus the minimum and the traffic plus that wait, and
@@ -310,7 +311,7 @@ changes. For the edges on `advance`'s path today, and the one `sysio.bond::accep
 | `sysio` (`sysio.system`) before `sysio.epoch`, when the release adds or changes `rcrdduty` / `accrueepoch` / `payepoch` / `settleduty` | Call edge: the new clock would otherwise reach a `sysio.system` that cannot dispatch the action, and every advance or tick aborts. |
 | `sysio` (`sysio.system`) before `sysio.opreg`, when the release adds or changes `forfeitduty` | Call edge: `termcheck` inlines it inside `advance`, so an old `sysio.system` aborts every advance that evicts, and every `regoperator` that forfeits an earlier registration's duty. |
 | `sysio.epoch` and `sysio.kicker` before `sysio.system`, when `sysio.system` gains state the emissions gate must reserve (as `payclaimtot` reserves unclaimed `payclaims`) | Table edge: the old gate counts the new backing as spendable, so a later pay period can double-commit it and leave credited claims underfunded; an old kicker counts it as available treasury and `kick` can draw it. |
-| `sysio.epoch` before `sysio.msgch`, when the release adds or changes an action `chkcons` (`advance`) or `buildenv` / `reportqueue` (`notetraffic`) inlines into `sysio.epoch` | Call edge in the other direction. |
+| `sysio.epoch` before `sysio.msgch`, when the release adds or changes an action `chkcons` (`advance`) or `buildenv` / `reportqueue` / `resolvedisp` (`notetraffic`) inlines into `sysio.epoch` | Call edge in the other direction. |
 | `sysio.chalg` before `sysio.msgch`, when the release changes `slashop` or the authority it accepts | Call edge: `sysio.msgch`'s acceptance of an epoch's winner inlines `slashop` under `sysio.msgch@active`, so a `sysio.chalg` that refuses it aborts each `deliver`, `chkcons` or `chkdispute` that accepts a winner while a non-canonical delivery is on record. |
 | `sysio` (`sysio.system`) before `sysio.bond` | Call edge: `accept` on a request from a `sysio.*` issuer sends `sysio::addsubjex`, and the dispatcher rejects an action the deployed contract does not define, so every such `accept` aborts. |
 

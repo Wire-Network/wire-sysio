@@ -274,7 +274,8 @@ warning level when it starts and at info level when it ends.
 **Each operator chooses its own read confirmation, and bears the consequences.** Consensus is what the group's
 majority delivers. An operator reading weaker than its group delivers first, and across a reorg deeper than
 its setting can deliver an envelope the chain no longer holds and be slashed for it. One reading stronger
-delivers after the group has reached consensus, so its delivery is a no-op recorded as a miss each epoch; and
+delivers after the group has reached consensus: its delivery is recorded while the depot still takes it, in
+the epoch or within the chain's late-delivery window, and is a miss after that; and
 across a reorg deeper than the group's setting, the group's envelope is the canonical one and it is the
 minority. Reading as the group does is the setting that avoids both.
 

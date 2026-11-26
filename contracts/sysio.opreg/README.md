@@ -90,15 +90,16 @@ is `SERVING`.
 - **`leavechain(account, chain_code)`** turns `SERVING` into `LEFT`. The operator draws no new seat on
   the chain and still owes the duty of each seat it holds there.
 - **`EVICTED`** removes the operator from one chain. `sysio.msgch::deliver` refuses its deliveries on
-  that chain, and the chain's consensus threshold leaves it out. A `LEFT` member still delivers its
-  remaining seats.
+  that chain and consensus no longer counts one it made, while each seat it holds still counts toward
+  the group's majority. A `LEFT` member still delivers its remaining seats.
 
 ## Eviction
 
 `sysio.epoch::advance(chain)` closes the books of the epoch before the closing one: it sends `recorddel`
-and `termcheck` for each member of the group that served that epoch, so a late delivery made during the
-following epoch counts as delivered. Each membership keeps a duty tally: the duties recorded on the chain since the
-operator's latest join, its misses, and its misses since the last delivery. `recorddel` adds to it, and
+and `termcheck` for each member of the group that served that epoch, so a late delivery made within the
+chain's late window (`sysio.epoch` `epochcfg.late_window_sec`) counts as delivered. Each membership keeps a
+duty tally: the duties recorded on the chain since the operator's latest join, its misses, and its misses
+since the last delivery. `recorddel` adds to it, and
 every row the retention sweeps erase leaves its duties and misses, so `termcheck` reads one row however
 long the log is. It evicts the operator from the chain when its missed duty epochs since the last
 delivery, whatever their age, number more than `terminate_max_consecutive_misses`, or the whole-percent
@@ -109,8 +110,8 @@ early miss cannot evict alone; the consecutive rail applies from the first. `ter
 is left the percent rail waits for a later check, so its rate never counts a duty from outside the window.
 The membership becomes `EVICTED` with the rail as its reason; the operator's status, its bond and its
 other chains are untouched. The window may already seat it once more, in the group drawn when its duty
-epoch slid out: it cannot deliver that seat, the chain's consensus leaves it out, and no group drawn after
-the eviction seats it. An `EVICTED` member
+epoch slid out: it cannot deliver that seat, which still counts toward that group's majority, and no group
+drawn after the eviction seats it. An `EVICTED` member
 is not evaluated again, and it rejoins as a `LEFT` operator does, which restarts the rails.
 Bootstrapped operators are never evicted. Governance's `terminate` is the global removal.
 

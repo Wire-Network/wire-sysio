@@ -145,8 +145,8 @@ public:
     * single latest-outbound storage slot, so a poll may still observe the
     * preceding epoch until the delivery that emits this one overwrites it.
     * `sysio.msgch::deliver` takes that stale envelope only as a late delivery of
-    * the preceding epoch's accepted envelope from the group that served it, and
-    * refuses it otherwise.
+    * the preceding epoch's accepted envelope from the group that served it,
+    * within the chain's late window, and refuses it otherwise.
     *
     * @param epoch_index  Only envelopes whose `epoch_index` field matches this
     *                     value are returned; all others are silently dropped.

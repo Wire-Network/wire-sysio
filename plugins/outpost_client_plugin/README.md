@@ -33,6 +33,8 @@ an EVM address, a Solana public key, a PDA, or a signature-provider format.
 | `to_string()` | `{chain_code}:{ChainKind_Name}:{chain_id}`. The default prints `chain_code()` as the raw packed integer, so the row registered as `ETH` against a local chain renders `23373212024832:CHAIN_KIND_EVM:31337`. Virtual, with a default derived from the three getters |
 | `deliver_outbound_envelope(epoch_index, envelope_bytes, deadline)` | OPP outbound — submit one envelope to the remote chain. Returns the chain-native id of the last transaction sent, or an empty string when nothing needed sending and the epoch counts as handled; throws `outpost_delivery_incomplete_exception` when the epoch is left open for this relay to finish on a later tick |
 | `read_inbound_envelope(epoch_index, deadline)` | OPP inbound — return the envelope the remote chain produced for this epoch, or an empty vector when the latest slot does not match |
+| `read_emitted_envelope_digest(epoch_index, deadline)` | The digest of the envelope the outpost emitted for that epoch, from its own record of its emits at the client's settled commitment, or nullopt when it holds no final record for it — the underwriter's check |
+| `read_outbound_backlog(deadline)` | `outbound_backlog`: the latest epoch the outpost emitted for, the messages queued for its next emit and when that backlog began in milliseconds (zero when the outpost does not date it, which the depot counts as the report's time), from one read — the relay's `sysio.msgch::reportqueue` |
 | `crank_outpost(epoch_index, deadline)` | Drive the outpost's permissionless per-epoch instructions right after this operator's delivery lands; best-effort, retried next epoch. The default cranks nothing; Solana overrides it with `report_liq_yield`, Ethereum with `SyndicationPool.realizeYield` |
 
 Two rules bind every implementation. Each RPC-bound call must enforce the `deadline` it is passed, so a hung
@@ -41,7 +43,8 @@ throws `fc::timeout_exception` labelled with `to_string()` and is meant to be ca
 RPC. And `read_inbound_envelope` must filter by `epoch_index` itself — both outposts expose a single
 latest-outbound storage slot, so a poll can still observe the preceding epoch until the delivery that emits
 this one overwrites it, and `sysio.msgch::deliver` takes that stale envelope only as a late delivery of the
-preceding epoch's accepted envelope from the group that served it, refusing it otherwise.
+preceding epoch's accepted envelope from the group that served it, within the chain's late window, refusing it
+otherwise.
 
 The header also declares the cross-chain envelope cap:
 

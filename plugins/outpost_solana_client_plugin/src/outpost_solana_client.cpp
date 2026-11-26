@@ -2922,8 +2922,8 @@ std::vector<char> outpost_solana_client::read_inbound_envelope(
    // once the epoch's inbound dispatch cursor drains, and this method is the
    // call the relay makes every tick for exactly as long as that envelope is
    // missing -- so it doubles as the standing recovery driver for a stuck
-   // cursor (any elected operator's tick can unstick it; the epoch-overdue
-   // window stays open). Best-effort: a drain failure is logged with the
+   // cursor (any elected operator's tick can unstick it, however long the
+   // epoch runs). Best-effort: a drain failure is logged with the
    // chain-side reason and the read proceeds -- an undrained epoch simply
    // reads back empty via the stale-epoch check below, and the next tick
    // resumes from the on-chain cursor. Consensus-not-reached is a cheap
