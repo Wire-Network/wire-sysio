@@ -330,7 +330,7 @@ public:
    }
 
    /// @copydoc detail::abstract_conn::try_reserve_request_body
-   std::string try_reserve_request_body(size_t size) final {
+   [[nodiscard]] std::string try_reserve_request_body(size_t size) final {
       return plugin_state_->try_reserve_request_body(size);
    }
 

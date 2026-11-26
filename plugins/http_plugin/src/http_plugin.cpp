@@ -11,6 +11,7 @@
 #include <boost/asio.hpp>
 
 #include <atomic>
+#include <cassert>
 #include <filesystem>
 #include <functional>
 #include <memory>
@@ -29,22 +30,19 @@ namespace sysio {
       }
 
       /**
-       * RAII reservation against the HTTP byte budget. The local guard holds the reservation until
-       * it is moved into a shared_ptr, so allocation failure releases it. Shared ownership keeps the posted
-       * app-thread lambda copyable, and the reservation ends on explicit release or destruction of the last copy.
+       * RAII reservation against the HTTP byte budget. Shared ownership keeps the posted app-thread lambda copyable.
+       * The reservation ends on explicit release or destruction of the last copy.
        */
       struct bytes_in_flight_reservation {
          detail::abstract_conn_ptr conn;
          size_t                    size = 0;
 
          explicit bytes_in_flight_reservation(detail::abstract_conn_ptr c) : conn(std::move(c)) {}
-         /// Transfer ownership and disarm the source guard.
-         bytes_in_flight_reservation(bytes_in_flight_reservation&& other) noexcept
-            : conn(std::move(other.conn)), size(std::exchange(other.size, 0)) {}
          ~bytes_in_flight_reservation() { release(); }
 
-         /// Arm this guard once, after the request body is admitted.
+         /// Reserve bytes on an unarmed guard.
          [[nodiscard]] std::string reserve(size_t sz) {
+            assert(conn && size == 0);
             if (auto error = conn->try_reserve_request_body(sz); !error.empty())
                return error;
             size = sz;
@@ -70,12 +68,12 @@ namespace sysio {
        */
       std::shared_ptr<bytes_in_flight_reservation> admit_request(const detail::abstract_conn_ptr& conn,
                                                                  size_t body_size) {
-         bytes_in_flight_reservation reservation{conn};
-         if (auto error_str = reservation.reserve(body_size); !error_str.empty()) {
+         auto reservation = std::make_shared<bytes_in_flight_reservation>(conn);
+         if (auto error_str = reservation->reserve(body_size); !error_str.empty()) {
             conn->send_busy_response(std::move(error_str));
             return {};
          }
-         return std::make_shared<bytes_in_flight_reservation>(std::move(reservation));
+         return reservation;
       }
 
       /// What the exception being handled says. Call only from a catch block.
@@ -171,7 +169,9 @@ namespace sysio {
          }
          std::string verify_max_requests_in_flight() override { return conn_->verify_max_requests_in_flight(); }
          /// @copydoc detail::abstract_conn::try_reserve_request_body
-         std::string try_reserve_request_body(size_t sz) override { return conn_->try_reserve_request_body(sz); }
+         [[nodiscard]] std::string try_reserve_request_body(size_t sz) override {
+            return conn_->try_reserve_request_body(sz);
+         }
          /// @copydoc detail::abstract_conn::release_bytes_in_flight
          void release_bytes_in_flight(size_t sz) override { conn_->release_bytes_in_flight(sz); }
 
@@ -359,12 +359,8 @@ namespace sysio {
             handler.fn = [priority, to_queue, next_ptr=std::move(next_ptr),
                           path=std::make_shared<const std::string>(entry.path), response_policy]
                        ( detail::abstract_conn_ptr conn, string&& r, string&& b, url_response_callback&& then ) {
-               // The request body is about to be moved into the (unbounded) app-thread queue, where it can
-               // sit until a possibly-slow handler runs.  Reserve its bytes against bytes_in_flight once
-               // admitted, so the queued memory is visible to concurrent verify_max_bytes_in_flight()
-               // checks instead of accumulating uncounted.  The reservation is released exactly once when the
-               // posted work below is destroyed -- whether it runs to completion, throws, returns early on
-               // shutdown, or is discarded unrun when the queue is cleared.
+               // Reserve before queueing so the queued body counts against concurrent request admission.
+               // The posted work holds the reservation through completion or cancellation.
                std::shared_ptr<bytes_in_flight_reservation> body_in_flight_guard = admit_request(conn, b.size());
                if (!body_in_flight_guard)
                   return; // admission rejected before any reservation was made, nothing to release

@@ -31,6 +31,7 @@ constexpr auto all_rows_sql = "SELECT beneficiary, COUNT(*) AS records, SUM(amou
 constexpr auto selected_sql = "SELECT * FROM sample.positions WHERE key.id = 1";
 constexpr auto table_route = "/v1/chain/get_table_rows";
 constexpr auto chain_read_route = "/v1/chain/get_block_info";
+constexpr auto expect_continue = "100-continue";
 constexpr int http_version = 11;
 constexpr uint32_t default_read_threads = 2;
 constexpr auto write_window_option = "read-only-write-window-time-us";
@@ -215,8 +216,12 @@ struct http_application {
       result.get();
    }
 
-   /// Every response from the production route is validated in its actual wire encoding.
-   http::response<http::string_body> request(std::string body, const char* route = constants::endpoint) {
+   /// Choose whether to send the request body.
+   enum class request_write { full, header_only };
+
+   /// Send a production request and read its first reply. Header-only mode leaves the body unsent.
+   http::response<http::string_body> request(std::string body, const char* route = constants::endpoint,
+                                            request_write write = request_write::full) {
       boost::asio::io_context io;
       boost::beast::basic_stream<boost::asio::local::stream_protocol> stream(io);
       http::request<http::string_body> request{http::verb::post, route, http_version};
@@ -224,6 +229,9 @@ struct http_application {
       request.set(http::field::content_type, "application/json");
       request.body() = std::move(body);
       request.prepare_payload();
+      if (write == request_write::header_only)
+         request.set(http::field::expect, expect_continue);
+      http::request_serializer<http::string_body> serializer{request};
       boost::beast::flat_buffer buffer;
       http::response<http::string_body> response;
       boost::system::error_code failure;
@@ -234,14 +242,18 @@ struct http_application {
                                  failure = error;
                                  return;
                               }
-                              http::async_write(stream, request, [&](boost::system::error_code error, size_t) {
+                              const auto read_reply = [&](boost::system::error_code error, size_t) {
                                  if (error) {
                                     failure = error;
                                     return;
                                  }
                                  http::async_read(stream, buffer, response,
                                                   [&](boost::system::error_code error, size_t) { failure = error; });
-                              });
+                              };
+                              if (write == request_write::header_only)
+                                 http::async_write_header(stream, serializer, read_reply);
+                              else
+                                 http::async_write(stream, serializer, read_reply);
                            });
       io.run();
       if (failure)
@@ -769,7 +781,7 @@ BOOST_AUTO_TEST_CASE(query_and_chain_read_share_http_body_budget) {
    BOOST_REQUIRE(wait_for([&] {
       return server.chain_read_requests.load() == 1 && plugin.bytes_in_flight() == chain_body_size;
    }));
-   const auto refused = server.request(query_body);
+   const auto refused = server.request(query_body, constants::endpoint, http_application::request_write::header_only);
    BOOST_CHECK(refused.result() == http::status::service_unavailable);
    BOOST_CHECK(refused.body().find("Too many bytes in flight") != std::string::npos);
    BOOST_CHECK_EQUAL(server.query_requests.load(), 0);

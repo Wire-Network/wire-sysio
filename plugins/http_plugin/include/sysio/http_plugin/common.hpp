@@ -222,7 +222,7 @@ struct http_plugin_state {
 private:
    std::atomic<size_t> bytes_in_flight_{0};
 
-   /// Check before subtracting because response writes can put the shared counter over budget.
+   /// Whether extra_bytes more fit. Unconditional response accounting can put current over budget.
    bool bytes_fit(size_t current, size_t extra_bytes) const {
       return current <= max_bytes_in_flight && extra_bytes <= max_bytes_in_flight - current;
    }

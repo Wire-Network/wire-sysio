@@ -17,7 +17,9 @@
 #define BOOST_TEST_MODULE http_plugin unit tests
 #include <boost/test/included/unit_test.hpp>
 
+#include <algorithm>
 #include <array>
+#include <barrier>
 #include <deque>
 #include <iostream>
 #include <limits>
@@ -1384,24 +1386,50 @@ BOOST_AUTO_TEST_CASE(request_body_reservations_share_a_byte_budget) {
    http_plugin_state state{logger};
    state.max_bytes_in_flight = available_slots * body_size;
 
-   std::promise<void> start;
+   constexpr size_t contention_rounds = 1'000;
+   constexpr size_t contender_count = 2 * available_slots;
+   std::barrier round(contender_count + 1);
+   std::array<bool, contender_count> accepted{};
+   std::array<std::future<void>, contender_count> workers;
+   std::promise<bool> start;
    const auto ready = start.get_future().share();
-   std::array<std::future<bool>, 2 * available_slots> reservations;
-   auto open_gate = fc::make_scoped_exit([&] { start.set_value(); });
-   for (auto& reservation : reservations) {
-      reservation = std::async(std::launch::async, [&] {
-         ready.wait();
-         return state.try_reserve_request_body(body_size).empty();
+   auto abort_start = fc::make_scoped_exit([&] { start.set_value(false); });
+   for (size_t contender = 0; contender < contender_count; ++contender) {
+      workers[contender] = std::async(std::launch::async, [&, contender, ready] {
+         if (!ready.get())
+            return;
+         for (size_t i = 0; i < contention_rounds; ++i) {
+            round.arrive_and_wait();
+            try {
+               accepted[contender] = state.try_reserve_request_body(body_size).empty();
+            } catch (...) {
+               accepted[contender] = false;
+               round.arrive_and_drop();
+               throw;
+            }
+            round.arrive_and_wait();
+         }
       });
    }
-   start.set_value();
-   open_gate.cancel();
+   start.set_value(true);
+   abort_start.cancel();
 
-   size_t accepted = 0;
-   for (auto& reservation : reservations)
-      accepted += reservation.get();
-   BOOST_CHECK_EQUAL(accepted, available_slots);
-   BOOST_CHECK_EQUAL(state.bytes_in_flight(), state.max_bytes_in_flight);
+   // Keep every successful reservation until the round ends, then restore the empty budget.
+   size_t failed_rounds = 0;
+   for (size_t i = 0; i < contention_rounds; ++i) {
+      round.arrive_and_wait();
+      round.arrive_and_wait();
+      const size_t granted = std::count(accepted.begin(), accepted.end(), true);
+      const size_t reserved = state.bytes_in_flight();
+      if (granted != available_slots || reserved != state.max_bytes_in_flight)
+         ++failed_rounds;
+      state.release_bytes_in_flight(reserved);
+   }
+   for (auto& worker : workers)
+      worker.get();
+   BOOST_CHECK_EQUAL(failed_rounds, 0u);
+
+   BOOST_REQUIRE(state.try_reserve_request_body(state.max_bytes_in_flight).empty());
    BOOST_CHECK(!state.try_reserve_request_body(1).empty());
 
    state.release_bytes_in_flight(body_size);
