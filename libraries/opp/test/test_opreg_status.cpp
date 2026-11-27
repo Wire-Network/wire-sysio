@@ -1,6 +1,7 @@
-/// Pure-logic unit tests for `sysio::opp::depot::opreg_status::compute_is_active`.
+/// Pure-logic unit tests for `sysio::opp::depot::opreg_status::compute_is_active`
+/// and `compute_delivers`.
 ///
-/// Exercises the awareness decision table consumed by `batch_operator_plugin`
+/// Exercises the awareness decision tables consumed by `batch_operator_plugin`
 /// each tick. The actual chain read happens through
 /// `chain_plugin::read_table_rows` (integration territory; covered by the
 /// flow tests in `wire-tools-ts`); this test pins the status-to-decision
@@ -84,6 +85,46 @@ BOOST_AUTO_TEST_CASE(every_declared_status_is_parsed_and_accounted_for) {
                                    || parsed == t::OPERATOR_STATUS_SLASHED;
       BOOST_REQUIRE_MESSAGE(decided == terminal_or_active,
                             "unclassified OperatorStatus: " << spelling);
+   }
+}
+
+/// `sysio.msgch::deliver` accepts only an ACTIVE operator, so the relay jobs run
+/// only while the status reads ACTIVE, whatever the previous decision.
+BOOST_AUTO_TEST_CASE(only_active_status_delivers_regardless_of_previous) {
+   for (const bool previous : {false, true}) {
+      BOOST_REQUIRE_EQUAL(true,  s::compute_delivers(name_of(t::OPERATOR_STATUS_ACTIVE),     previous));
+      BOOST_REQUIRE_EQUAL(false, s::compute_delivers(name_of(t::OPERATOR_STATUS_UNKNOWN),    previous));
+      BOOST_REQUIRE_EQUAL(false, s::compute_delivers(name_of(t::OPERATOR_STATUS_WARMUP),     previous));
+      BOOST_REQUIRE_EQUAL(false, s::compute_delivers(name_of(t::OPERATOR_STATUS_COOLDOWN),   previous));
+      BOOST_REQUIRE_EQUAL(false, s::compute_delivers(name_of(t::OPERATOR_STATUS_TERMINATED), previous));
+      BOOST_REQUIRE_EQUAL(false, s::compute_delivers(name_of(t::OPERATOR_STATUS_SLASHED),    previous));
+   }
+}
+
+/// A spelling the enum does not carry keeps the previous delivery decision.
+BOOST_AUTO_TEST_CASE(unrecognized_spelling_preserves_previous_delivery_decision) {
+   BOOST_REQUIRE_EQUAL(true,  s::compute_delivers("",                        /*previous=*/true));
+   BOOST_REQUIRE_EQUAL(false, s::compute_delivers("",                        /*previous=*/false));
+   BOOST_REQUIRE_EQUAL(true,  s::compute_delivers("OPERATOR_STATUS_STANDBY", /*previous=*/true));
+   BOOST_REQUIRE_EQUAL(false, s::compute_delivers("OPERATOR_STATUS_STANDBY", /*previous=*/false));
+}
+
+/// Coverage guard for the delivery gate: every declared status decides it
+/// independently of `previous`, true for ACTIVE alone, and a status that
+/// delivers never halts the pushes.
+BOOST_AUTO_TEST_CASE(every_declared_status_decides_delivery) {
+   const auto* descriptor = t::OperatorStatus_descriptor();
+   for (int i = 0; i < descriptor->value_count(); ++i) {
+      const auto& spelling = descriptor->value(i)->name();
+      const bool  delivers = s::compute_delivers(spelling, false);
+      BOOST_REQUIRE_MESSAGE(delivers == s::compute_delivers(spelling, true),
+                            "delivery undecided for OperatorStatus: " << spelling);
+      BOOST_REQUIRE_MESSAGE(delivers == (descriptor->value(i)->number() == t::OPERATOR_STATUS_ACTIVE),
+                            "delivery misclassified for OperatorStatus: " << spelling);
+      if (delivers) {
+         BOOST_REQUIRE_MESSAGE(s::compute_is_active(spelling, false),
+                               "a delivering status halts the pushes: " << spelling);
+      }
    }
 }
 

@@ -11,6 +11,8 @@
 #include <sysio.opp.common/opp_keys.hpp>
 #include <magic_enum/magic_enum.hpp>
 
+#include <optional>
+
 namespace sysio {
 
 
@@ -94,9 +96,17 @@ namespace sysio {
       //  Actions
       // -----------------------------------------------------------------------
 
-      /// Bootstrap: call at epoch 0 to trigger the first advance.
+      /// Network bootstrap: run the genesis advance of every active outpost chain. Refused once the
+      /// network genesis has happened, and when any active outpost has no epoch config or no seated
+      /// schedule window (`sysio.epoch::schbatchgps`). Auth: sysio.msgch.
       [[sysio::action]]
       void bootstrap();
+
+      /// Run the genesis advance of outpost `chain_code`, activated after the network genesis, so it
+      /// starts its own epoch 1. Refused before the network genesis (use `bootstrap`), for a chain that
+      /// is not an active outpost, and once the chain's epoch has started. Auth: sysio.msgch.
+      [[sysio::action]]
+      void bootchain(uint64_t chain_code);
 
       /// Batch operator delivers inbound OPP data for a specific outpost.
       /// Computes sha256 checksum trustlessly, stores in envelopes table,
@@ -106,24 +116,31 @@ namespace sysio {
       /// `uint64` of `sysio::slug_name`). The depot looks the row up directly
       /// on `sysio.chains::chains` keyed by `code.value == chain_code`; the
       /// numeric value IS the slug_name, and `sysio.epoch::advance` uses the
-      /// same convention when fanning out `queueout` / `buildenv` per outpost.
+      /// same convention when queueing `queueout` / `buildenv` for its outpost.
+      /// The envelope must be for the chain's current epoch, from a member of
+      /// the chain's active group. Refused until the chain's genesis advance has
+      /// opened its epoch 1.
       [[sysio::action]]
       void deliver(name batch_op_name, uint64_t chain_code, std::vector<char> data);
 
       /// Evaluate consensus on inbound envelopes for an outpost+epoch.
-      /// Called inline from deliver. On consensus: unpacks envelope,
+      /// Called inline from deliver and chkcons. On consensus: unpacks envelope,
       /// stores messages + attestations, records per-outpost consensus.
       ///
       /// `chain_code` is the originating chain's slug_name value
-      /// (see `deliver` for the convention).
+      /// (see `deliver` for the convention). No effect before the chain's
+      /// genesis advance, nor for an epoch that already reached consensus or
+      /// has a dispute: a decided epoch's later deliveries only feed the slash
+      /// classification at its close.
       [[sysio::action]]
       void evalcons(uint64_t chain_code, uint32_t epoch_index);
 
-      /// Check if all-outpost consensus is reached AND next_epoch_start
-      /// has passed. If yes, reset consensus and call advance.
-      /// Called by the batch operator after the time window elapses.
+      /// Check whether outpost `chain_code` reached consensus for its current epoch AND its
+      /// next_epoch_start has passed; if so, advance that chain's epoch. Permissionless crank, called
+      /// by the batch operator after the chain's time window elapses. No effect before the chain's
+      /// genesis advance, which only `bootstrap` / `bootchain` run.
       [[sysio::action]]
-      void chkcons();
+      void chkcons(uint64_t chain_code);
 
       /// Dispatch the winning envelope of a resolved OPP dispute. Called inline by
       /// `sysio.chalg::chkdispute` once the Tier-1 vote selects a canonical checksum. Locates the
@@ -142,7 +159,7 @@ namespace sysio {
       /// (uint64). Called by sibling system contracts that need to send
       /// targeted depot → outpost envelopes:
       ///   * `sysio.epoch::advance` — `OPERATORS`, `BATCH_OPERATOR_GROUPS`
-      ///     fanout to every active outpost.
+      ///     to the outpost whose epoch closed.
       ///   * `sysio.synd::desyndicate` — `DESYNDICATE_LIQ` releases from
       ///     the destination's syndicated LIQ custody.
       ///
@@ -158,7 +175,8 @@ namespace sysio {
                     opp::types::AttestationType attest_type,
                     std::vector<char> data);
 
-      /// Build outbound envelope from READY attestations for an outpost.
+      /// Build outbound envelope from READY attestations for an outpost, stamped with the outpost's
+      /// own current epoch index.
       /// Walks only this outpost's READY rows, schedule lane first, and stops at MAX_ENVELOPE_BYTES or
       /// MAX_ENVELOPE_ATTESTATIONS, so its cost does not grow with the backlog. Packs the rows into an
       /// OPP Envelope, stores it in outenvelopes and erases them.
@@ -355,6 +373,17 @@ namespace sysio {
       using outpost_consensus_t =
          sysio::kv::table<"outpcons"_n, outpost_consensus_key, outpost_consensus_entry>;
 
+      /// Outpost `chain_code`'s `outpcons` row on `msgch_account` when it records the accepted winner of
+      /// `epoch_index`, else nullopt: `epoch_index` is written only on acceptance and never cleared, so
+      /// a row for another epoch records no winner for this one. Never throws.
+      static std::optional<outpost_consensus_entry> consensus_for_epoch(name msgch_account, uint64_t chain_code,
+                                                                        uint32_t epoch_index) {
+         std::optional<outpost_consensus_entry> consensus =
+            outpost_consensus_t(msgch_account).try_get(outpost_consensus_key{chain_code});
+         if (consensus && consensus->epoch_index != epoch_index) consensus.reset();
+         return consensus;
+      }
+
       /// Per-outpost outbound queue primary key.
       struct outbound_queue_key {
          uint64_t chain_code;
@@ -409,25 +438,32 @@ namespace sysio {
       /// consumed inline by the consensus + dispatch path and never stored.
       /// Off-chain audit reconstruction is out of scope.
       ///
-      /// Total row count is capped at
-      /// `active_outposts * 2 * epoch_retention_envelope_log_count`
-      /// (one inbound + one outbound row per active outpost per epoch).
-      /// Eviction is head-first on overflow — see
-      /// `write_envelope_log` in `src/sysio.msgch.cpp`.
+      /// Retention is per outpost: each outpost keeps at most
+      /// `2 * epoch_retention_envelope_log_count` rows (one inbound + one
+      /// outbound per epoch), and a write evicts only its own outpost's oldest
+      /// rows — see `write_envelope_log` in `src/sysio.msgch.cpp`.
       struct [[sysio::table("envlog")]] envelope_log_entry {
          uint64_t        id;                ///< monotonic auto-increment PK
+         uint64_t        chain_code;        ///< the outpost the envelope came from or went to
+         /// This outpost's own row sequence: contiguous over its retained rows, so the newest minus the
+         /// oldest plus one is its row count.
+         uint64_t        chain_seq;
          opp::Endpoints  endpoints;         ///< start + end ChainId
          uint32_t        epoch_index;
          checksum256     checksum;          ///< sha256/keccak of envelope bytes
          time_point      emitted_at;
 
          uint64_t primary_key() const { return id; }
+         uint128_t by_chain() const { return opp::outpost_sequence_key(chain_code, chain_seq); }
 
          SYSLIB_SERIALIZE(envelope_log_entry,
-            (id)(endpoints)(epoch_index)(checksum)(emitted_at))
+            (id)(chain_code)(chain_seq)(endpoints)(epoch_index)(checksum)(emitted_at))
       };
 
-      using envelope_log_t = sysio::kv::table<"envlog"_n, id_key, envelope_log_entry>;
+      using envelope_log_t = sysio::kv::table<"envlog"_n, id_key, envelope_log_entry,
+         sysio::kv::index<"bychain"_n,
+            sysio::const_mem_fun<envelope_log_entry, uint128_t, &envelope_log_entry::by_chain>>
+      >;
 
    private:
 

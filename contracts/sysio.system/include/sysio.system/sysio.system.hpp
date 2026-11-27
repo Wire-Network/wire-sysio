@@ -7,6 +7,7 @@
 #include <sysio/binary_extension.hpp>
 #include <sysio/crypto.hpp>
 #include <sysio/privileged.hpp>
+#include <sysio/slug_name.hpp>
 #include <sysio/producer_schedule.hpp>
 #include <sysio/system.hpp>
 #include <sysio/time.hpp>
@@ -774,7 +775,7 @@ namespace sysiosystem {
           * `period_emission` is the gate-computed period total; payepoch asserts it equals the
           * accrued `pending_emission_amount` and distributes it across producer / batch / capex /
           * gov pools. The batch pool is not credited here in full: it opens a duty settlement that
-          * splits it pro rata to the period's duty units (see rcrdduty), paid in bounded steps.
+          * splits it pro rata to the period's seat-seconds (see rcrdduty), paid in bounded steps.
           *
           * While an earlier settlement is still open the payout waits: the step here advances that
           * settlement and, if it is still not done, returns with the period still pending, so the
@@ -810,13 +811,29 @@ namespace sysiosystem {
          void accrueepoch(uint32_t epoch_index, int64_t per_epoch_emission, uint32_t closed_epoch_duration_sec);
 
          /**
-          * Credit one duty unit to each of `members`, the batch-operator group that served
-          * consensus epoch `epoch_index`, in the pay period open when they are recorded. A member
-          * still holding units of the settling period is settled first. Called inline by
-          * sysio.epoch::advance; never throws. Auth: require_auth("sysio.epoch").
+          * Credit `duty_seconds` seat-seconds to each of `members`, the batch-operator group that
+          * served consensus epoch `epoch_index` of outpost chain `chain_code`, on the member's row for
+          * that chain; `duty_seconds` is that epoch's scheduled length. Every chain's duty accrues to
+          * the one pay period open when it is recorded. A member whose sysio.opreg membership of the
+          * chain is EVICTED is credited nothing. A member still holding seat-seconds of the settling
+          * period on the chain is settled first. A zero `duty_seconds` credits nothing. Called inline
+          * by sysio.epoch::advance; never throws. Auth: require_auth("sysio.epoch").
           */
          [[sysio::action]]
-         void rcrdduty(uint32_t epoch_index, std::vector<sysio::name> members);
+         void rcrdduty(sysio::slug_name chain_code, uint32_t epoch_index, std::vector<sysio::name> members,
+                       uint32_t duty_seconds);
+
+         /**
+          * Forfeit `account`'s unsettled duty on outpost chain `chain_code`: erase its `batchduty` row
+          * for the chain, whether it belongs to the open or the settling period. The period totals keep
+          * the seat-seconds, so no operator is credited the share and its settlement leaves it in the
+          * treasury. The operator's duty on its other chains is untouched. Called inline by
+          * sysio.opreg::termcheck when it evicts the operator from the chain, and by
+          * sysio.opreg::regoperator for each chain the account still holds duty on from an earlier
+          * registration; never throws. Auth: require_auth("sysio.opreg").
+          */
+         [[sysio::action]]
+         void forfeitduty(sysio::name account, sysio::slug_name chain_code);
 
          /**
           * Advance the open batch-duty settlement by one bounded step (MAX_DUTY_SETTLEMENT_ROWS

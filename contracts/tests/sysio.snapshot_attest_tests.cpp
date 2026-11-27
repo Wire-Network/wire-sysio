@@ -195,6 +195,7 @@ public:
          ("terminate_prune_delay_ms",         uint64_t{600'000})
          ("terminate_max_consecutive_misses", uint32_t{5})
          ("terminate_max_pct_misses_24h",     uint32_t{5})
+         ("terminate_min_pct_samples",        uint32_t{20})
          ("terminate_window_ms",              uint64_t{24ULL * 60 * 60 * 1000})
          ("req_prod_collat",                  fc::variants{fc::variant(mvo()
             ("chain_code",          bond_chain)

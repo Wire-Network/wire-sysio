@@ -7,6 +7,8 @@
 
 #include <algorithm>
 #include <limits>
+#include <random>
+#include <utility>
 
 #include "contracts.hpp"
 #include "external_chain_simulator.hpp"
@@ -22,6 +24,7 @@ using namespace sysio::opp::types;
 
 using mvo = fc::mutable_variant_object;
 using sysio_system::test_support::codename_mvo;
+namespace served = sysio_system::test_support::served_chains;
 
 namespace {
 
@@ -79,6 +82,18 @@ constexpr uint32_t kMaxAcceptedPctMisses24h = 99;
 
 /// Disabling percent threshold rejected because an all-miss window cannot exceed it.
 constexpr uint32_t kDisablingPctMisses24h = 100;
+
+/// Mirrors opreg's PERCENT_SCALE: the denominator of the whole-percent miss rate.
+constexpr uint32_t kPercentScale = 100;
+
+/// Mirrors opreg's DEFAULT_TERMINATE_MIN_PCT_SAMPLES: duty epochs before the percent rail applies.
+constexpr uint32_t kDefaultMinPctSamples = kPercentScale / kDefaultMaxPctMisses24h;
+
+/// Percent-rail sample that applies the rail from the first duty epoch, the lowest accepted.
+constexpr uint32_t kPercentRailFromFirstDuty = 1;
+
+/// Highest accepted percent-rail sample (opreg's MAX_TERMINATE_MIN_PCT_SAMPLES).
+constexpr uint32_t kMaxAcceptedMinPctSamples = kPercentScale;
 
 /// Compact collateral amount used to activate non-bootstrapped batch operators.
 constexpr uint64_t kTestMinBond = 1;
@@ -203,7 +218,6 @@ constexpr char account[]       = "account";
 constexpr char amount[]        = "amount";
 constexpr char request_id[]    = "request_id";
 constexpr char economic_epoch[]  = "economic_epoch";
-constexpr char consensus_epoch[] = "consensus_epoch";
 constexpr char chain_code[]    = "chain_code";
 constexpr char token_code[]    = "token_code";
 } // namespace withdrawal_field
@@ -248,12 +262,38 @@ constexpr uint64_t kMinWindowMsAtDefaults =
 /// the wall-clock gap between a resident operator's consecutive records.
 constexpr uint64_t kDutyRotationMs = uint64_t{kWindowBoundGroups} * kWindowBoundEpochDurationSec * 1000;
 
+/// Records the consecutive rail needs at the production threshold. As the percent-rail sample minimum it
+/// leaves the consecutive rail the binding bound on the window.
+constexpr uint32_t kConsecutiveRunDuties = kDefaultMaxConsecutiveMisses + 1;
+
+/// Smallest `terminate_window_ms` the percent-rail sample bound accepts at
+/// kWindowBoundEpochDurationSec with the production sample minimum: 20 duty
+/// rotations of 3 epochs x 360 s each, in ms.
+constexpr uint64_t kMinPctWindowMsAtDefaults = uint64_t{kDefaultMinPctSamples} * kDutyRotationMs;
+
+/// Longest epoch at which the production 24 h window holds the production sample minimum with
+/// kWindowBoundGroups groups: a duty every 72 minutes, 20 of them in the window.
+constexpr uint32_t kPctBoundEpochDurationSec = 1440;
+
+/// An hourly epoch: with kWindowBoundGroups groups a resident operator is on duty every three hours,
+/// so the 24 h window holds 8 duties.
+constexpr uint32_t kHourlyEpochDurationSec = 3600;
+
+/// Duties the 24 h window holds at kHourlyEpochDurationSec with kWindowBoundGroups groups.
+constexpr uint32_t kHourlyDutiesPerWindow = 8;
+
 /// Mirrors opreg's MAX_DELLOG_PRUNE_PER_WRITE (the contract header is not
 /// includable from native test code).
 constexpr uint32_t kDellogPrunePerWrite = 4;
 
 /// Mirrors opreg's MAX_DELLOG_PRUNE_PER_CRANK.
 constexpr uint32_t kDellogPrunePerCrank = 64;
+
+/// Mirrors opreg's MAX_DELLOG_PRUNE_PER_CHECK.
+constexpr uint32_t kDellogPrunePerCheck = 16;
+
+/// Clock jump that ages every row recorded before it out of the 24 h window.
+constexpr auto kPastTheWindow = fc::hours(25);
 
 /// Shadow-yield forwarding: actions opreg and sysio.liq expose for it.
 namespace yield_action {
@@ -323,6 +363,31 @@ constexpr int kDustRounds = 3;
 constexpr std::string_view kWireEarnsNoYieldError =
    "assertion failure with message: WIRE collateral earns no shadow yield";
 
+/// Refusals of `regoperator`, `joinchain` and `leavechain` the served-chain cases assert.
+constexpr std::string_view kMissingOutpostLinkError =
+   "assertion failure with message: missing authex link for outpost chain";
+constexpr std::string_view kOnlyBatchServesChainsError =
+   "assertion failure with message: only a batch operator serves chains";
+constexpr std::string_view kTerminalOperatorJoinError =
+   "assertion failure with message: a slashed or terminated operator cannot serve a chain";
+constexpr std::string_view kNotActiveOutpostError = "assertion failure with message: chain is not an active outpost";
+constexpr std::string_view kMissingChainLinkError =
+   "assertion failure with message: missing authex link for the chain's kind";
+constexpr std::string_view kAlreadyServingError = "assertion failure with message: operator already serves this chain";
+constexpr std::string_view kNotServingError = "assertion failure with message: operator does not serve this chain";
+constexpr std::string_view kNotEnoughBatchOperatorsError =
+   "assertion failure with message: not enough available batch operators for group assignment";
+
+/// An outpost the served-chain cases never register.
+constexpr std::string_view kUnregisteredChain = "SOL";
+
+/// A second EVM outpost for the per-chain eviction cases, and its external chain id.
+constexpr std::string_view kSecondEvmChain     = "BASE";
+constexpr uint32_t         kSecondEvmChainId   = 8453;
+
+/// Blocks that move `current_time_ms()`, which has second resolution, to a later second.
+constexpr uint32_t kBlocksPastOneSecond = 3;
+
 } // namespace
 
 /// Data model: per-chain identity has moved from `ChainKind` enums to
@@ -343,13 +408,15 @@ public:
    static constexpr auto SYND_ACCOUNT   = "sysio.synd"_n;
    static constexpr auto TOKENS_ACCOUNT = "sysio.tokens"_n;
    static constexpr auto CHAINS_ACCOUNT = "sysio.chains"_n;
+   static constexpr auto AUTHEX_ACCOUNT = "sysio.authex"_n;
+   static constexpr auto DCLAIM_ACCOUNT = "sysio.dclaim"_n;
 
    sysio_opreg_tester() {
       produce_blocks(2);
 
       create_accounts({
          OPREG_ACCOUNT, EPOCH_ACCOUNT, CHALG_ACCOUNT, MSGCH_ACCOUNT, TOKEN_ACCOUNT,
-         LIQ_ACCOUNT, SYND_ACCOUNT, TOKENS_ACCOUNT, CHAINS_ACCOUNT,
+         LIQ_ACCOUNT, SYND_ACCOUNT, TOKENS_ACCOUNT, CHAINS_ACCOUNT, DCLAIM_ACCOUNT,
          "batchop.a"_n, "batchop.b"_n, "batchop.c"_n,
          "uwrit.a"_n, "producer.a"_n,
          "uwrit.alice"_n, "uwrit.bob"_n,         // for Task 2 deposit/withdraw/cancel tests
@@ -411,12 +478,17 @@ public:
       }
    }
 
-   /// Push `sysio.epoch::setconfig` with a 7-operators-per-group schedule of
+   /// The outpost chain whose epoch schedule the fixture configures by default.
+   static constexpr std::string_view EPOCH_CHAIN = "ETH";
+
+   /// Push `sysio.epoch::setconfig` for `chain` with a 7-operators-per-group schedule of
    /// the given duration and group count — installs the epochcfg row the
    /// SEC-28 window-span validation reads.
    action_result set_epoch_config(uint32_t epoch_duration_sec,
-                                  uint32_t batch_op_groups = kWindowBoundGroups) {
+                                  uint32_t batch_op_groups = kWindowBoundGroups,
+                                  std::string_view chain = EPOCH_CHAIN) {
       return push_epoch_action(EPOCH_ACCOUNT, "setconfig"_n, mvo()
+         ("chain_code",                         chain)
          ("epoch_duration_sec",                 epoch_duration_sec)
          ("operators_per_epoch",                7)
          ("batch_operator_minimum_active",      7 * batch_op_groups)
@@ -441,6 +513,7 @@ public:
    action_result setconfig(uint64_t prune_delay = 600000,
                            uint32_t max_consec_misses = 5,
                            uint32_t max_pct_misses_24h = 5,
+                           uint32_t min_pct_samples = kDefaultMinPctSamples,
                            uint64_t terminate_window_ms = 24ULL * 60 * 60 * 1000,
                            std::vector<fc::variant> req_prod_collat    = {},
                            std::vector<fc::variant> req_batchop_collat = {},
@@ -449,6 +522,7 @@ public:
          ("terminate_prune_delay_ms",         prune_delay)
          ("terminate_max_consecutive_misses", max_consec_misses)
          ("terminate_max_pct_misses_24h",     max_pct_misses_24h)
+         ("terminate_min_pct_samples",        min_pct_samples)
          ("terminate_window_ms",              terminate_window_ms)
          ("req_prod_collat",                  req_prod_collat)
          ("req_batchop_collat",               req_batchop_collat)
@@ -475,20 +549,111 @@ public:
       return push_opreg_action(OPREG_ACCOUNT, "prune"_n, mvo());
    }
 
-   /// Record a delivery hit/miss through the same opreg action invoked by
-   /// `sysio.epoch::advance`.
-   action_result recorddel(name account, uint32_t epoch, bool delivered) {
+   /// Record a delivery hit/miss on `chain` through the same opreg action invoked by
+   /// `sysio.epoch::advance(chain)`.
+   action_result recorddel(name account, uint32_t epoch, bool delivered, std::string_view chain = EPOCH_CHAIN) {
       return push_opreg_action(EPOCH_ACCOUNT, "recorddel"_n, mvo()
-         ("account",   account)
-         ("epoch",     epoch)
-         ("delivered", delivered));
+         ("account",    account)
+         ("chain_code", chain)
+         ("epoch",      epoch)
+         ("delivered",  delivered));
    }
 
-   /// Run opreg's rolling-window termination check through the epoch-authorized
+   /// Run opreg's rolling-window eviction check for `chain` through the epoch-authorized
    /// action surface.
-   action_result termcheck(name account) {
+   action_result termcheck(name account, std::string_view chain = EPOCH_CHAIN) {
       return push_opreg_action(EPOCH_ACCOUNT, "termcheck"_n, mvo()
-         ("account", account));
+         ("account",    account)
+         ("chain_code", chain));
+   }
+
+   /// `account`'s `servchains` row on `chain`; null when it has none.
+   fc::variant membership(name account, std::string_view chain = EPOCH_CHAIN) {
+      return sysio_system::test_support::served_chains::membership(*this, opreg_abi_ser, account, chain);
+   }
+
+   /// `account`'s membership status on `chain`, as the ABI spells it.
+   std::string membership_status(name account, std::string_view chain = EPOCH_CHAIN) {
+      const auto row = membership(account, chain);
+      BOOST_REQUIRE(!row.is_null());
+      return row["status"].as_string();
+   }
+
+   /// Require `account` EVICTED from `chain` for `reason`, its global status still `status`.
+   void require_evicted(name account, std::string_view reason,
+                        OperatorStatus status = OperatorStatus::OPERATOR_STATUS_ACTIVE,
+                        std::string_view chain = EPOCH_CHAIN) {
+      const auto row = membership(account, chain);
+      BOOST_REQUIRE(!row.is_null());
+      BOOST_REQUIRE_EQUAL(std::string(sysio_system::test_support::served_chains::status::evicted),
+                          row["status"].as_string());
+      BOOST_REQUIRE_EQUAL(std::string(reason), row["status_reason"].as_string());
+      BOOST_REQUIRE(status == get_operator(account)["status"].as<OperatorStatus>());
+   }
+
+   /// `account`'s duty tally on `chain`.
+   fc::variant tally(name account, std::string_view chain = EPOCH_CHAIN) {
+      const auto row = membership(account, chain);
+      BOOST_REQUIRE(!row.is_null());
+      return row["tally"];
+   }
+
+   /// What a walk of `account`'s dellog rows on `chain`, from log id `first_log_id` on, counts: the rails the
+   /// tally replaced read the log this way.
+   struct log_walk {
+      uint64_t duties       = 0;
+      uint64_t misses       = 0;
+      uint64_t trailing_run = 0;   ///< misses since the last delivery
+      uint64_t longest_run  = 0;   ///< the longest run of misses
+   };
+
+   log_walk walk_dellog(name account, uint64_t first_log_id, std::string_view chain = EPOCH_CHAIN) {
+      std::vector<std::pair<uint64_t, bool>> rows;
+      for (const auto& row : sysio_system::test_support::table_rows(*this, OPREG_ACCOUNT, "dellog"_n, opreg_abi_ser,
+                                                                     "delivery_log_entry")) {
+         if (row["account"].as_string() != account.to_string() || row["chain_code"].as_string() != chain) continue;
+         if (row["log_id"].as_uint64() < first_log_id) continue;
+         rows.emplace_back(row["log_id"].as_uint64(), row["delivered"].as_bool());
+      }
+      std::sort(rows.begin(), rows.end());
+      log_walk walk;
+      for (const auto& [log_id, delivered] : rows) {
+         ++walk.duties;
+         if (delivered) {
+            walk.trailing_run = 0;
+         } else {
+            ++walk.misses;
+            ++walk.trailing_run;
+         }
+         walk.longest_run = std::max(walk.longest_run, walk.trailing_run);
+      }
+      return walk;
+   }
+
+   /// Require `account`'s tally on `chain` to hold what `walk` counted.
+   void require_tally(name account, const log_walk& walk, std::string_view chain = EPOCH_CHAIN) {
+      const auto counted = tally(account, chain);
+      BOOST_REQUIRE_EQUAL(walk.duties, counted["duties"].as_uint64());
+      BOOST_REQUIRE_EQUAL(walk.misses, counted["misses"].as_uint64());
+      BOOST_REQUIRE_EQUAL(walk.trailing_run, counted["miss_run"].as_uint64());
+   }
+
+   /// Overwrite `account`'s tally on `chain` in the store, leaving its dellog rows as they are.
+   void rewrite_tally(name account, const fc::variant& value, std::string_view chain = EPOCH_CHAIN) {
+      std::string key;
+      const auto append_word = [&](uint64_t word) {
+         for (int shift = 56; shift >= 0; shift -= 8) key.push_back(char(word >> shift));
+      };
+      append_word(cn(chain).value);
+      append_word(account.to_uint64_t());
+      auto& store = const_cast<kv_store&>(control->kv());
+      const auto stored_row = store.find_row(OPREG_ACCOUNT, compute_table_id("servchains"_n.to_uint64_t()), key);
+      BOOST_REQUIRE(stored_row);
+      const std::vector<char> data(stored_row->value.begin(), stored_row->value.end());
+      mvo row(opreg_abi_ser.binary_to_variant("served_chain", data, fixture_abi_yield_function()).get_object());
+      row.set("tally", value);
+      const auto encoded = opreg_abi_ser.variant_to_binary("served_chain", row, fixture_abi_yield_function());
+      store.update_row(*stored_row, stored_row->payer, {encoded.data(), encoded.size()});
    }
 
    /// Produce blocks until the next block opens a new second, so actions pushed now and the
@@ -505,11 +670,13 @@ public:
    void activate_batch_operator(name account,
                                 uint32_t max_consec_misses = kDefaultMaxConsecutiveMisses,
                                 uint32_t max_pct_misses_24h = kMaxAcceptedPctMisses24h,
+                                uint32_t min_pct_samples = kDefaultMinPctSamples,
                                 uint64_t terminate_window_ms = kTerminateWindowMs) {
       BOOST_REQUIRE_EQUAL(success(), setconfig(
          /*prune_delay=*/kDefaultPruneDelayMs,
          /*max_consec_misses=*/max_consec_misses,
          /*max_pct_misses_24h=*/max_pct_misses_24h,
+         /*min_pct_samples=*/min_pct_samples,
          /*terminate_window_ms=*/terminate_window_ms,
          /*req_prod_collat=*/{},
          /*req_batchop_collat=*/{
@@ -519,6 +686,9 @@ public:
 
       BOOST_REQUIRE_EQUAL(success(),
          regoperator(account, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/false));
+      // Serves EPOCH_CHAIN, whose rows the termination cases record and evaluate.
+      setup_served_chain();
+      serve_evm_chain({account});
       BOOST_REQUIRE_EQUAL(success(),
          bond_generic(account, "NTA", kTestMinBond));
       produce_blocks();
@@ -564,10 +734,10 @@ public:
          (withdrawal_field::request_id, request_id));
    }
 
-   /// Flush every withdrawal matured by `epoch` on both clocks through the epoch-authorized action.
+   /// Flush every withdrawal economically matured by `epoch` through the epoch-authorized action.
    action_result flushwtdw(uint32_t epoch) {
       return push_opreg_action(EPOCH_ACCOUNT, withdrawal_action::flush, mvo()
-         (withdrawal_field::economic_epoch, epoch)(withdrawal_field::consensus_epoch, epoch));
+         (withdrawal_field::economic_epoch, epoch));
    }
 
    action_result terminate(name account, std::string reason) {
@@ -608,12 +778,13 @@ public:
          fixture_abi_yield_function());
    }
 
-   /// Raw dellog row by log_id; empty variant when the row does not exist.
+   /// The dellog row allocated `log_id`, of any chain; empty variant when the row does not exist.
    fc::variant get_dellog_entry(uint64_t log_id) {
-      auto data = get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, "dellog"_n, name{log_id});
-      return data.empty() ? fc::variant() : opreg_abi_ser.binary_to_variant(
-         "delivery_log_entry", data,
-         fixture_abi_yield_function());
+      for (auto& row : sysio_system::test_support::table_rows(*this, OPREG_ACCOUNT, "dellog"_n, opreg_abi_ser,
+                                                              "delivery_log_entry")) {
+         if (row["log_id"].as_uint64() == log_id) return row;
+      }
+      return fc::variant();
    }
 
    /// Newest entry in the operator's `recent_actions` ring buffer.
@@ -741,13 +912,13 @@ public:
    /// other cases into real `sysio.msgch` queueouts and change what those cases exercise.
    void setup_shadow_liq(const std::vector<sysio::testing::external::asset_spec>& assets =
          {{"ETH", "LIQETH", ChainKind::CHAIN_KIND_EVM, kEthExternalChainId}}) {
-      deploy_privileged(CHAINS_ACCOUNT, contracts::chains_wasm(), contracts::chains_abi(), chains_abi_ser);
+      deploy_chain_registry_once();
       deploy_privileged(TOKENS_ACCOUNT, contracts::tokens_wasm(), contracts::tokens_abi(), tokens_abi_ser);
       deploy_privileged(LIQ_ACCOUNT,    contracts::liq_wasm(),    contracts::liq_abi(),    liq_abi_ser);
 
       for (const auto& a : assets) {
          const auto sym = symbol::from_string(std::string("9,") + a.token);
-         // Registered inside the epoch-0 bootstrap window, so the rows land ACTIVE.
+         // Registered before the network genesis (the bootstrap window), so the rows land ACTIVE.
          BOOST_REQUIRE_EQUAL(success(), push_contract(CHAINS_ACCOUNT, chains_abi_ser, CHAINS_ACCOUNT,
             shadow_action::regchain, mvo()
             ("kind", a.kind)("code", codename_mvo(a.chain))
@@ -770,6 +941,44 @@ public:
             mvo()("sym", sym)("chain_code", codename_mvo(a.chain))
             ("token_code", codename_mvo(a.token))));
       }
+   }
+
+   bool chain_registry_deployed = false;
+
+   /// Deploy sysio.chains once per case; a second identical set_code is refused.
+   void deploy_chain_registry_once() {
+      if (chain_registry_deployed) return;
+      deploy_privileged(CHAINS_ACCOUNT, contracts::chains_wasm(), contracts::chains_abi(), chains_abi_ser);
+      chain_registry_deployed = true;
+   }
+
+   bool link_registry_deployed = false;
+   std::vector<std::string> served_chains_registered;
+
+   /// Stand up what a served-chain case needs: `chain` registered as an active outpost of `kind`
+   /// in sysio.chains, and sysio.authex with a privileged sysio.dclaim so operators can link keys.
+   /// Called per case for the same reason as `setup_shadow_liq`; a chain already set up is left as is.
+   void setup_served_chain(std::string_view chain = EPOCH_CHAIN, ChainKind kind = ChainKind::CHAIN_KIND_EVM,
+                           uint32_t external_chain_id = kEthExternalChainId) {
+      if (std::find(served_chains_registered.begin(), served_chains_registered.end(), chain) !=
+          served_chains_registered.end()) return;
+      served_chains_registered.emplace_back(chain);
+      deploy_chain_registry_once();
+      if (!link_registry_deployed) {
+         deploy_privileged(AUTHEX_ACCOUNT, contracts::authex_wasm(), contracts::authex_abi(), authex_abi_ser);
+         deploy_privileged(DCLAIM_ACCOUNT, contracts::dclaim_wasm(), contracts::dclaim_abi(), dclaim_abi_ser);
+         link_registry_deployed = true;
+      }
+      BOOST_REQUIRE_EQUAL(success(), push_contract(CHAINS_ACCOUNT, chains_abi_ser, CHAINS_ACCOUNT,
+         shadow_action::regchain, mvo()
+         ("kind", kind)("code", codename_mvo(chain))
+         ("external_chain_id", external_chain_id)("name", std::string(chain))
+         ("description", std::string{})("outpost", sysio_system::test_support::no_outpost_mvo())));
+   }
+
+   /// Link each of `ops` to a fresh EVM key and join it to `chain`.
+   void serve_evm_chain(const std::vector<name>& ops, std::string_view chain = EPOCH_CHAIN) {
+      sysio_system::test_support::served_chains::serve(*this, ops, {{chain, ChainKind::CHAIN_KIND_EVM}});
    }
 
    /// Put `amount` LIQETH shadow in `holder`'s hands the way the depot mints it: `sysio.synd`, the
@@ -918,6 +1127,8 @@ public:
    abi_serializer opreg_abi_ser;
    abi_serializer epoch_abi_ser;
    abi_serializer chains_abi_ser;
+   abi_serializer authex_abi_ser;
+   abi_serializer dclaim_abi_ser;
    abi_serializer tokens_abi_ser;
    abi_serializer liq_abi_ser;
 };
@@ -937,6 +1148,24 @@ BOOST_FIXTURE_TEST_CASE(setconfig_basic, sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(kDefaultMaxConsecutiveMisses,
                        cfg["terminate_max_consecutive_misses"].as_uint64());
    BOOST_REQUIRE_EQUAL(kDefaultMaxPctMisses24h, cfg["terminate_max_pct_misses_24h"].as_uint64());
+   BOOST_REQUIRE_EQUAL(kDefaultMinPctSamples, cfg["terminate_min_pct_samples"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(setconfig_bounds_min_pct_samples, sysio_opreg_tester) { try {
+   constexpr std::string_view kOutOfBounds =
+      "assertion failure with message: terminate_min_pct_samples must be in [1, 100]";
+   for (const uint32_t rejected : {kPercentRailFromFirstDuty - 1, kMaxAcceptedMinPctSamples + 1}) {
+      BOOST_REQUIRE_EQUAL(error(std::string(kOutOfBounds)),
+                          setconfig(kDefaultPruneDelayMs, kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h,
+                                    rejected, kTerminateWindowMs));
+   }
+   for (const uint32_t accepted : {kPercentRailFromFirstDuty, kMaxAcceptedMinPctSamples}) {
+      BOOST_REQUIRE_EQUAL(success(),
+                          setconfig(kDefaultPruneDelayMs, kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h,
+                                    accepted, kTerminateWindowMs));
+      BOOST_REQUIRE_EQUAL(accepted, get_opconfig()["terminate_min_pct_samples"].as_uint64());
+      produce_blocks();
+   }
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(setconfig_rejects_zero_prune_delay, sysio_opreg_tester) { try {
@@ -950,7 +1179,8 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_disabling_percent_miss_threshold, sysi
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: terminate_max_pct_misses_24h must be in [1, 99]"),
       setconfig(kDefaultPruneDelayMs,
-                kDefaultMaxConsecutiveMisses, kDisablingPctMisses24h, kTerminateWindowMs)
+                kDefaultMaxConsecutiveMisses, kDisablingPctMisses24h, kDefaultMinPctSamples,
+                kTerminateWindowMs)
    );
 } FC_LOG_AND_RETHROW() }
 
@@ -958,13 +1188,15 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_disabling_consecutive_miss_threshold, 
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: terminate_max_consecutive_misses must be in [1, 5]"),
       setconfig(kDefaultPruneDelayMs,
-                kDefaultMaxConsecutiveMisses + 1, kMaxAcceptedPctMisses24h, kTerminateWindowMs)
+                kDefaultMaxConsecutiveMisses + 1, kMaxAcceptedPctMisses24h, kDefaultMinPctSamples,
+                kTerminateWindowMs)
    );
 
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: terminate_max_consecutive_misses must be in [1, 5]"),
       setconfig(kDefaultPruneDelayMs,
-                std::numeric_limits<uint32_t>::max(), kMaxAcceptedPctMisses24h, kTerminateWindowMs)
+                std::numeric_limits<uint32_t>::max(), kMaxAcceptedPctMisses24h, kDefaultMinPctSamples,
+                kTerminateWindowMs)
    );
 } FC_LOG_AND_RETHROW() }
 
@@ -976,14 +1208,14 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_zero_min_bond, sysio_opreg_tester) { t
       error("assertion failure with message: req_uw_collat: min_bond must be positive "
             "(an empty requirement set imposes no bond)"),
       setconfig(kDefaultPruneDelayMs,
-                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kTerminateWindowMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kDefaultMinPctSamples, kTerminateWindowMs,
                 {}, {}, { make_chain_min_bond("WIRE", "NTA", kRejectedZeroMinBond) })
    );
    // The identical shape with a positive min_bond is accepted.
    BOOST_REQUIRE_EQUAL(
       success(),
       setconfig(kDefaultPruneDelayMs,
-                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kTerminateWindowMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kDefaultMinPctSamples, kTerminateWindowMs,
                 {}, {}, { make_chain_min_bond("WIRE", "NTA", kTestMinBond) })
    );
 } FC_LOG_AND_RETHROW() }
@@ -1007,7 +1239,7 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_uncanonical_collateral_code, sysio_opr
       error("assertion failure with message: req_uw_collat: code 7 has no canonical "
             "slug_name spelling"),
       setconfig(kDefaultPruneDelayMs,
-                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kTerminateWindowMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kDefaultMinPctSamples, kTerminateWindowMs,
                 {}, {}, { bad_chain })
    );
 
@@ -1015,7 +1247,7 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_uncanonical_collateral_code, sysio_opr
    BOOST_REQUIRE_EQUAL(
       success(),
       setconfig(kDefaultPruneDelayMs,
-                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kTerminateWindowMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kDefaultMinPctSamples, kTerminateWindowMs,
                 {}, {}, { make_chain_min_bond("WIRE", "NTA", kTestMinBond) })
    );
 } FC_LOG_AND_RETHROW() }
@@ -1028,15 +1260,48 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_window_narrower_than_consecutive_run, 
       error("assertion failure with message: terminate_window_ms must span at least "
             "terminate_max_consecutive_misses + 1 duty rotations"),
       setconfig(kDefaultPruneDelayMs,
-                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kConsecutiveRunDuties,
                 kMinWindowMsAtDefaults - 1)
    );
 
    // The exact span boundary is the smallest accepted window.
    BOOST_REQUIRE_EQUAL(success(),
       setconfig(kDefaultPruneDelayMs,
-                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kConsecutiveRunDuties,
                 kMinWindowMsAtDefaults));
+} FC_LOG_AND_RETHROW() }
+
+/// Each outpost chain runs its own schedule, so the window must span the consecutive run of every
+/// configured chain: a chain with a longer epoch raises the bound for all.
+BOOST_FIXTURE_TEST_CASE(setconfig_window_spans_every_chains_schedule, sysio_opreg_tester) { try {
+   constexpr std::string_view kSlowChain = "SOL";
+   BOOST_REQUIRE_EQUAL(success(), set_epoch_config(kWindowBoundEpochDurationSec));
+   BOOST_REQUIRE_EQUAL(success(), set_epoch_config(2 * kWindowBoundEpochDurationSec, kWindowBoundGroups, kSlowChain));
+   produce_blocks();
+
+   // The window that covers the faster chain is too narrow for the slower one.
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: terminate_window_ms must span at least "
+            "terminate_max_consecutive_misses + 1 duty rotations"),
+      setconfig(kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kConsecutiveRunDuties,
+                kMinWindowMsAtDefaults));
+   BOOST_REQUIRE_EQUAL(success(),
+      setconfig(kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kConsecutiveRunDuties,
+                2 * kMinWindowMsAtDefaults));
+
+   // The sample minimum is checked against every chain's schedule the same way.
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: terminate_window_ms must span at least "
+            "terminate_min_pct_samples duty rotations"),
+      setconfig(kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kDefaultMinPctSamples,
+                kMinPctWindowMsAtDefaults));
+   BOOST_REQUIRE_EQUAL(success(),
+      setconfig(kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kDefaultMinPctSamples,
+                2 * kMinPctWindowMsAtDefaults));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(setconfig_window_unchecked_before_epoch_config, sysio_opreg_tester) { try {
@@ -1045,7 +1310,7 @@ BOOST_FIXTURE_TEST_CASE(setconfig_window_unchecked_before_epoch_config, sysio_op
    // closes the gap when the epoch duration arrives.
    BOOST_REQUIRE_EQUAL(success(),
       setconfig(kDefaultPruneDelayMs,
-                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kDefaultMinPctSamples,
                 /*terminate_window_ms=*/1));
 } FC_LOG_AND_RETHROW() }
 
@@ -1054,7 +1319,7 @@ BOOST_FIXTURE_TEST_CASE(epoch_setconfig_rejects_duration_that_vacates_stored_win
    produce_blocks();
    BOOST_REQUIRE_EQUAL(success(),
       setconfig(kDefaultPruneDelayMs,
-                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kConsecutiveRunDuties,
                 kMinWindowMsAtDefaults));
    produce_blocks();
 
@@ -1078,7 +1343,63 @@ BOOST_FIXTURE_TEST_CASE(epoch_setconfig_rejects_duration_that_vacates_stored_win
    BOOST_REQUIRE_EQUAL(success(), set_epoch_config(kWindowBoundEpochDurationSec / 2));
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(termcheck_terminates_at_duty_rotation_cadence, sysio_opreg_tester) { try {
+/// The percent rail applies once a member's tally holds `terminate_min_pct_samples` duties, so the window
+/// must hold that many duty rotations of every chain's schedule.
+BOOST_FIXTURE_TEST_CASE(setconfig_rejects_window_short_of_pct_samples, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), set_epoch_config(kWindowBoundEpochDurationSec));
+   produce_blocks();
+
+   // One millisecond short of 20 duty rotations: the consecutive run fits, the sample minimum does not.
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: terminate_window_ms must span at least "
+            "terminate_min_pct_samples duty rotations"),
+      setconfig(kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kDefaultMinPctSamples,
+                kMinPctWindowMsAtDefaults - 1));
+
+   // The exact boundary is the smallest accepted window.
+   BOOST_REQUIRE_EQUAL(success(),
+      setconfig(kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kDefaultMinPctSamples,
+                kMinPctWindowMsAtDefaults));
+} FC_LOG_AND_RETHROW() }
+
+/// An hourly three-group schedule puts a resident operator on duty every three hours: the 24 h window holds
+/// 8 duties, so it accepts a sample minimum of 8 and refuses 9 and the production 20.
+BOOST_FIXTURE_TEST_CASE(setconfig_bounds_pct_samples_by_the_duties_in_the_window, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), set_epoch_config(kHourlyEpochDurationSec));
+   produce_blocks();
+
+   const action_result short_of_samples = error("assertion failure with message: terminate_window_ms must span "
+                                                "at least terminate_min_pct_samples duty rotations");
+   BOOST_REQUIRE_EQUAL(short_of_samples, setconfig());
+   BOOST_REQUIRE_EQUAL(short_of_samples,
+      setconfig(kDefaultPruneDelayMs, kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h,
+                kHourlyDutiesPerWindow + 1, kTerminateWindowMs));
+   BOOST_REQUIRE_EQUAL(success(),
+      setconfig(kDefaultPruneDelayMs, kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h,
+                kHourlyDutiesPerWindow, kTerminateWindowMs));
+} FC_LOG_AND_RETHROW() }
+
+/// sysio.epoch::setconfig mirrors the sample bound against the stored opreg config: a duration or group count
+/// that leaves the window holding fewer duties than the sample minimum is refused.
+BOOST_FIXTURE_TEST_CASE(epoch_setconfig_rejects_schedule_short_of_stored_pct_samples, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setconfig());   // 24 h window, 20 samples
+   produce_blocks();
+
+   const action_result short_of_samples = error("assertion failure with message: epoch schedule would leave "
+                                                "sysio.opreg's terminate_window_ms narrower than the percent-rail "
+                                                "sample minimum");
+   // A duty every 72 minutes fills the window with exactly 20; one second longer holds 19.
+   BOOST_REQUIRE_EQUAL(success(), set_epoch_config(kPctBoundEpochDurationSec));
+   BOOST_REQUIRE_EQUAL(short_of_samples, set_epoch_config(kPctBoundEpochDurationSec + 1));
+   // A fourth group stretches the duty rotation the same way.
+   BOOST_REQUIRE_EQUAL(short_of_samples, set_epoch_config(kPctBoundEpochDurationSec, kWindowBoundGroups + 1));
+   // The hourly schedule holds 8.
+   BOOST_REQUIRE_EQUAL(short_of_samples, set_epoch_config(kHourlyEpochDurationSec));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(termcheck_evicts_at_duty_rotation_cadence, sysio_opreg_tester) { try {
    // Delivery records accrue only on duty epochs: with a 3-group schedule a
    // resident operator is recorded once per 3-epoch rotation, so a
    // consecutive-miss run reaching the threshold spans
@@ -1091,6 +1412,7 @@ BOOST_FIXTURE_TEST_CASE(termcheck_terminates_at_duty_rotation_cadence, sysio_opr
    activate_batch_operator("batchop.a"_n,
                            kDefaultMaxConsecutiveMisses,
                            kMaxAcceptedPctMisses24h,
+                           kConsecutiveRunDuties,
                            kMinWindowMsAtDefaults + kDutyRotationMs);
 
    // Duty epoch 1: a delivered record anchors the window and keeps the
@@ -1109,8 +1431,7 @@ BOOST_FIXTURE_TEST_CASE(termcheck_terminates_at_duty_rotation_cadence, sysio_opr
    }
    BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
    produce_blocks();
-   auto op = get_operator("batchop.a"_n);
-   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op["status"].as<OperatorStatus>());
+   BOOST_REQUIRE_EQUAL(std::string(served::status::serving), membership_status("batchop.a"_n));
 
    // The sixth missed rotation crosses the threshold. Every record of the
    // run — including the anchor a full span earlier — must still be
@@ -1124,9 +1445,7 @@ BOOST_FIXTURE_TEST_CASE(termcheck_terminates_at_duty_rotation_cadence, sysio_opr
    BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
    produce_blocks();
 
-   op = get_operator("batchop.a"_n);
-   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_TERMINATED == op["status"].as<OperatorStatus>());
-   BOOST_REQUIRE_EQUAL("rolling-window: >5 consecutive misses", op["status_reason"].as_string());
+   require_evicted("batchop.a"_n, "rolling-window: >5 consecutive misses");
 } FC_LOG_AND_RETHROW() }
 
 // SEC-28 residual (schedule drift): the live rotation (epoch_state.batch_op_groups)
@@ -1146,9 +1465,12 @@ BOOST_FIXTURE_TEST_CASE(epoch_setconfig_locks_batch_op_groups_after_schedule, sy
    produce_blocks();
    BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.c"_n, OPERATOR_TYPE_BATCH, true));
    produce_blocks();
+   setup_served_chain();
+   serve_evm_chain({"batchop.a"_n, "batchop.b"_n, "batchop.c"_n});
 
    auto epoch_setconfig = [&](uint32_t groups, uint32_t min_active) {
       return push_epoch_action(EPOCH_ACCOUNT, "setconfig"_n, mvo()
+         ("chain_code",                         EPOCH_CHAIN)
          ("epoch_duration_sec",                 90)
          ("operators_per_epoch",                1)
          ("batch_operator_minimum_active",      min_active)
@@ -1159,7 +1481,7 @@ BOOST_FIXTURE_TEST_CASE(epoch_setconfig_locks_batch_op_groups_after_schedule, sy
    // Before the schedule exists the group count is free; land on 3 and materialize.
    BOOST_REQUIRE_EQUAL(success(), epoch_setconfig(3, 3));
    produce_blocks();
-   BOOST_REQUIRE_EQUAL(success(), push_epoch_action(EPOCH_ACCOUNT, "schbatchgps"_n, mvo()));
+   BOOST_REQUIRE_EQUAL(success(), push_epoch_action(EPOCH_ACCOUNT, "schbatchgps"_n, mvo()("chain_code", EPOCH_CHAIN)));
    produce_blocks();
 
    // Decreasing the group count is now rejected -- before the window check, so the
@@ -1324,8 +1646,11 @@ BOOST_FIXTURE_TEST_CASE(multiple_bootstrapped_batch_ops, sysio_opreg_tester) { t
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op_a["status"].as<OperatorStatus>());
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op_b["status"].as<OperatorStatus>());
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op_c["status"].as<OperatorStatus>());
+   setup_served_chain();
+   serve_evm_chain({"batchop.a"_n, "batchop.b"_n, "batchop.c"_n});
 
    BOOST_REQUIRE_EQUAL(success(), push_epoch_action(EPOCH_ACCOUNT, "setconfig"_n, mvo()
+      ("chain_code", EPOCH_CHAIN)
       ("epoch_duration_sec", 90)
       ("operators_per_epoch", 1)
       ("batch_operator_minimum_active", 3)
@@ -1334,10 +1659,11 @@ BOOST_FIXTURE_TEST_CASE(multiple_bootstrapped_batch_ops, sysio_opreg_tester) { t
    ));
    produce_blocks();
 
-   BOOST_REQUIRE_EQUAL(success(), push_epoch_action(EPOCH_ACCOUNT, "schbatchgps"_n, mvo()));
+   BOOST_REQUIRE_EQUAL(success(), push_epoch_action(EPOCH_ACCOUNT, "schbatchgps"_n, mvo()("chain_code", EPOCH_CHAIN)));
    produce_blocks();
 
-   auto epoch_state_data = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, "epochstate"_n);
+   auto epoch_state_data =
+      get_row_by_id(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, fc::slug_name{EPOCH_CHAIN}.value);
    BOOST_REQUIRE(!epoch_state_data.empty());
    auto epoch_state = epoch_abi_ser.binary_to_variant(
       "epoch_state", epoch_state_data,
@@ -1345,6 +1671,193 @@ BOOST_FIXTURE_TEST_CASE(multiple_bootstrapped_batch_ops, sysio_opreg_tester) { t
    auto groups = epoch_state["batch_op_groups"].get_array();
    BOOST_REQUIRE_EQUAL(3, groups.size());
 } FC_LOG_AND_RETHROW() }
+
+// ── Served chains (joinchain / leavechain) ──
+
+/// A batch operator registering itself needs no outpost link: `joinchain` checks the links chain by
+/// chain. Every other type registering itself still needs one for every active outpost.
+BOOST_FIXTURE_TEST_CASE(regoperator_leaves_batch_links_to_joinchain, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   setup_served_chain();
+
+   const auto self_register = [&](name account, OperatorType type) {
+      return push_opreg_action(account, "regoperator"_n, mvo()
+         ("account", account)("type", type)("is_bootstrapped", false));
+   };
+   BOOST_REQUIRE_EQUAL(error(std::string(kMissingOutpostLinkError)),
+                       self_register("uwrit.a"_n, OPERATOR_TYPE_UNDERWRITER));
+   BOOST_REQUIRE_EQUAL(success(), self_register("batchop.a"_n, OPERATOR_TYPE_BATCH));
+   BOOST_REQUIRE_EQUAL(error(std::string(kMissingChainLinkError)),
+                       served::join(*this, "batchop.a"_n, EPOCH_CHAIN, "batchop.a"_n));
+
+   served::link_fresh_key(*this, "batchop.a"_n, ChainKind::CHAIN_KIND_EVM);
+   BOOST_REQUIRE_EQUAL(success(), served::join(*this, "batchop.a"_n, EPOCH_CHAIN, "batchop.a"_n));
+} FC_LOG_AND_RETHROW() }
+
+/// `joinchain` signed by the operator or by sysio.opreg records a SERVING membership stamped with the
+/// join time; any other signer is refused.
+BOOST_FIXTURE_TEST_CASE(joinchain_records_a_serving_membership, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.a"_n, OPERATOR_TYPE_BATCH, true));
+   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.b"_n, OPERATOR_TYPE_BATCH, true));
+   setup_served_chain();
+   for (const name op : {"batchop.a"_n, "batchop.b"_n}) served::link_fresh_key(*this, op, ChainKind::CHAIN_KIND_EVM);
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(error("missing authority of batchop.a"),
+                       served::join(*this, "batchop.a"_n, EPOCH_CHAIN, "batchop.b"_n));
+   BOOST_REQUIRE_EQUAL(success(), served::join(*this, "batchop.a"_n, EPOCH_CHAIN, "batchop.a"_n));
+   BOOST_REQUIRE_EQUAL(success(), served::join(*this, "batchop.b"_n, EPOCH_CHAIN));
+   produce_blocks();
+
+   const uint64_t now_ms = static_cast<uint64_t>(control->head().block_time().sec_since_epoch()) * 1000;
+   for (const name op : {"batchop.a"_n, "batchop.b"_n}) {
+      const auto row = served::membership(*this, opreg_abi_ser, op, EPOCH_CHAIN);
+      BOOST_REQUIRE(!row.is_null());
+      BOOST_REQUIRE_EQUAL(op, row["account"].as<name>());
+      BOOST_REQUIRE_EQUAL(std::string(EPOCH_CHAIN), row["chain_code"].as_string());
+      BOOST_REQUIRE_EQUAL(std::string(served::status::serving), row["status"].as_string());
+      BOOST_REQUIRE_GT(row["joined_at_ms"].as_uint64(), 0u);
+      BOOST_REQUIRE_LE(row["joined_at_ms"].as_uint64(), now_ms);
+      BOOST_REQUIRE_EQUAL(row["joined_at_ms"].as_uint64(), row["updated_at_ms"].as_uint64());
+      BOOST_REQUIRE(row["status_reason"].as_string().empty());
+   }
+   BOOST_REQUIRE(served::membership(*this, opreg_abi_ser, "batchop.a"_n, kUnregisteredChain).is_null());
+} FC_LOG_AND_RETHROW() }
+
+/// `joinchain` refuses an account with no operator row, a non-batch operator, a slashed or a terminated
+/// operator, a chain that is not an active outpost, an operator with no link for the chain's kind, and
+/// an operator already serving the chain.
+BOOST_FIXTURE_TEST_CASE(joinchain_refusals, sysio_opreg_tester) { try {
+   constexpr auto kSlashed    = "batchop.b"_n;
+   constexpr auto kTerminated = "batchop.c"_n;
+   constexpr auto kUnlinked   = "batchop.d"_n;
+   create_accounts({kUnlinked});
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   for (const name op : {"batchop.a"_n, kSlashed, kTerminated, kUnlinked}) {
+      BOOST_REQUIRE_EQUAL(success(), regoperator(op, OPERATOR_TYPE_BATCH, true));
+   }
+   BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.a"_n, OPERATOR_TYPE_UNDERWRITER, false));
+   setup_served_chain();
+   for (const name op : {"batchop.a"_n, kSlashed, kTerminated, "uwrit.a"_n, "producer.a"_n}) {
+      served::link_fresh_key(*this, op, ChainKind::CHAIN_KIND_EVM);
+   }
+   BOOST_REQUIRE_EQUAL(success(), slash(kSlashed, "slashed before joining"));
+   BOOST_REQUIRE_EQUAL(success(), terminate(kTerminated, "terminated before joining"));
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(error(std::string(kOperatorNotFoundError)), served::join(*this, "producer.a"_n, EPOCH_CHAIN));
+   BOOST_REQUIRE_EQUAL(error(std::string(kOnlyBatchServesChainsError)), served::join(*this, "uwrit.a"_n, EPOCH_CHAIN));
+   BOOST_REQUIRE_EQUAL(error(std::string(kTerminalOperatorJoinError)), served::join(*this, kSlashed, EPOCH_CHAIN));
+   BOOST_REQUIRE_EQUAL(error(std::string(kTerminalOperatorJoinError)), served::join(*this, kTerminated, EPOCH_CHAIN));
+   BOOST_REQUIRE_EQUAL(error(std::string(kNotActiveOutpostError)),
+                       served::join(*this, "batchop.a"_n, kUnregisteredChain));
+   BOOST_REQUIRE_EQUAL(error(std::string(kMissingChainLinkError)), served::join(*this, kUnlinked, EPOCH_CHAIN));
+
+   BOOST_REQUIRE_EQUAL(success(), served::join(*this, "batchop.a"_n, EPOCH_CHAIN));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(error(std::string(kAlreadyServingError)), served::join(*this, "batchop.a"_n, EPOCH_CHAIN));
+} FC_LOG_AND_RETHROW() }
+
+/// `leavechain` moves a SERVING membership to LEFT under the operator's own signature and refuses any
+/// other state. With no seat held on the chain the operator rejoins at once, with a new join time.
+BOOST_FIXTURE_TEST_CASE(leavechain_then_rejoin, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.a"_n, OPERATOR_TYPE_BATCH, true));
+   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.b"_n, OPERATOR_TYPE_BATCH, true));
+   setup_served_chain();
+   serve_evm_chain({"batchop.a"_n});
+   produce_blocks();
+   const uint64_t first_join = served::membership(*this, opreg_abi_ser, "batchop.a"_n, EPOCH_CHAIN)["joined_at_ms"]
+                                  .as_uint64();
+
+   BOOST_REQUIRE_EQUAL(error(std::string(kNotServingError)), served::leave(*this, "batchop.b"_n, EPOCH_CHAIN));
+   BOOST_REQUIRE_EQUAL(error("missing authority of batchop.a"),
+                       push_opreg_action(OPREG_ACCOUNT, "leavechain"_n,
+                                         mvo()("account", "batchop.a"_n)("chain_code", EPOCH_CHAIN)));
+   produce_blocks(kBlocksPastOneSecond);
+   BOOST_REQUIRE_EQUAL(success(), served::leave(*this, "batchop.a"_n, EPOCH_CHAIN));
+   produce_blocks();
+
+   auto row = served::membership(*this, opreg_abi_ser, "batchop.a"_n, EPOCH_CHAIN);
+   BOOST_REQUIRE_EQUAL(std::string(served::status::left), row["status"].as_string());
+   BOOST_REQUIRE_EQUAL(first_join, row["joined_at_ms"].as_uint64());
+   BOOST_REQUIRE_GT(row["updated_at_ms"].as_uint64(), first_join);
+   BOOST_REQUIRE_EQUAL(error(std::string(kNotServingError)), served::leave(*this, "batchop.a"_n, EPOCH_CHAIN));
+
+   produce_blocks(kBlocksPastOneSecond);
+   BOOST_REQUIRE_EQUAL(success(), served::join(*this, "batchop.a"_n, EPOCH_CHAIN, "batchop.a"_n));
+   produce_blocks();
+   row = served::membership(*this, opreg_abi_ser, "batchop.a"_n, EPOCH_CHAIN);
+   BOOST_REQUIRE_EQUAL(std::string(served::status::serving), row["status"].as_string());
+   BOOST_REQUIRE_GT(row["joined_at_ms"].as_uint64(), first_join);
+} FC_LOG_AND_RETHROW() }
+
+/// The schedule seats only ACTIVE batch operators SERVING the chain: an operator that never joined and
+/// one that left are passed over, and too few servers leave `schbatchgps` short.
+BOOST_FIXTURE_TEST_CASE(schbatchgps_seats_only_operators_serving_the_chain, sysio_opreg_tester) { try {
+   constexpr auto kLeaver     = "batchop.d"_n;
+   constexpr auto kNeverJoins = "batchop.e"_n;
+   constexpr uint32_t kGroups = 3;
+   create_accounts({kLeaver, kNeverJoins});
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   for (const name op : {"batchop.a"_n, "batchop.b"_n, "batchop.c"_n, kLeaver, kNeverJoins}) {
+      BOOST_REQUIRE_EQUAL(success(), regoperator(op, OPERATOR_TYPE_BATCH, true));
+   }
+   setup_served_chain();
+   serve_evm_chain({"batchop.a"_n, "batchop.b"_n, "batchop.c"_n, kLeaver});
+   BOOST_REQUIRE_EQUAL(success(), served::leave(*this, kLeaver, EPOCH_CHAIN));
+   BOOST_REQUIRE_EQUAL(success(), served::leave(*this, "batchop.c"_n, EPOCH_CHAIN));
+   BOOST_REQUIRE_EQUAL(success(), push_epoch_action(EPOCH_ACCOUNT, "setconfig"_n, mvo()
+      ("chain_code", EPOCH_CHAIN)("epoch_duration_sec", kWindowBoundEpochDurationSec)("operators_per_epoch", 1)
+      ("batch_operator_minimum_active", kGroups)("batch_op_groups", kGroups)
+      ("epoch_retention_envelope_log_count", 200)));
+   produce_blocks();
+
+   // Two servers for a three-seat window.
+   BOOST_REQUIRE_EQUAL(error(std::string(kNotEnoughBatchOperatorsError)),
+                       push_epoch_action(EPOCH_ACCOUNT, "schbatchgps"_n, mvo()("chain_code", EPOCH_CHAIN)));
+
+   BOOST_REQUIRE_EQUAL(success(), served::join(*this, "batchop.c"_n, EPOCH_CHAIN));
+   BOOST_REQUIRE_EQUAL(success(), push_epoch_action(EPOCH_ACCOUNT, "schbatchgps"_n, mvo()("chain_code", EPOCH_CHAIN)));
+   produce_blocks();
+
+   const auto state = epoch_abi_ser.binary_to_variant("epoch_state",
+      get_row_by_id(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, cn(EPOCH_CHAIN).value),
+      fixture_abi_yield_function());
+   std::vector<name> seated;
+   for (const auto& group : state["batch_op_groups"].get_array()) {
+      for (const auto& member : group.get_array()) seated.push_back(member.as<name>());
+   }
+   std::sort(seated.begin(), seated.end());
+   BOOST_REQUIRE(seated == (std::vector<name>{"batchop.a"_n, "batchop.b"_n, "batchop.c"_n}));
+} FC_LOG_AND_RETHROW() }
+
+/// A registration ends its memberships: an account registering again after termination serves no
+/// chain, and `prune` erases a pruned operator's memberships with its row.
+BOOST_FIXTURE_TEST_CASE(memberships_end_with_the_registration, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.a"_n, OPERATOR_TYPE_BATCH, true));
+   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.b"_n, OPERATOR_TYPE_BATCH, true));
+   setup_served_chain();
+   serve_evm_chain({"batchop.a"_n, "batchop.b"_n});
+   BOOST_REQUIRE_EQUAL(success(), terminate("batchop.a"_n, "registers again"));
+   BOOST_REQUIRE_EQUAL(success(), terminate("batchop.b"_n, "is pruned"));
+   produce_blocks();
+   BOOST_REQUIRE(!served::membership(*this, opreg_abi_ser, "batchop.a"_n, EPOCH_CHAIN).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.a"_n, OPERATOR_TYPE_BATCH, true));
+   produce_blocks();
+   BOOST_REQUIRE(served::membership(*this, opreg_abi_ser, "batchop.a"_n, EPOCH_CHAIN).is_null());
+
+   produce_block(fc::milliseconds(kDefaultPruneDelayMs));
+   BOOST_REQUIRE(!served::membership(*this, opreg_abi_ser, "batchop.b"_n, EPOCH_CHAIN).is_null());
+   BOOST_REQUIRE_EQUAL(success(), prune());
+   produce_blocks();
+   BOOST_REQUIRE(get_operator("batchop.b"_n).is_null());
+   BOOST_REQUIRE(served::membership(*this, opreg_abi_ser, "batchop.b"_n, EPOCH_CHAIN).is_null());
+} FC_LOG_AND_RETHROW() }
+
 
 // ── deposit (Task 2: msgch-dispatched outpost-driven deposit) ──
 
@@ -1390,6 +1903,7 @@ BOOST_FIXTURE_TEST_CASE(deposit_custodies_and_credits_wire_units, sysio_opreg_te
       /*prune_delay=*/kDefaultPruneDelayMs,
       /*max_consec_misses=*/kDefaultMaxConsecutiveMisses,
       /*max_pct_misses_24h=*/kDefaultMaxPctMisses24h,
+      /*min_pct_samples=*/kDefaultMinPctSamples,
       /*terminate_window_ms=*/kTerminateWindowMs,
       /*req_prod_collat=*/{},
       /*req_batchop_collat=*/{},
@@ -1607,6 +2121,7 @@ BOOST_FIXTURE_TEST_CASE(withdraw_rechecks_eligibility_after_enqueue, sysio_opreg
       /*prune_delay=*/kDefaultPruneDelayMs,
       /*max_consec_misses=*/kDefaultMaxConsecutiveMisses,
       /*max_pct_misses_24h=*/kMaxAcceptedPctMisses24h,
+      /*min_pct_samples=*/kDefaultMinPctSamples,
       /*terminate_window_ms=*/kTerminateWindowMs,
       /*req_prod_collat=*/{
          make_chain_min_bond(kWireCodename, kWireCodename, kTestMinBond),
@@ -2019,6 +2534,7 @@ BOOST_FIXTURE_TEST_CASE(shadow_row_satisfies_role_minimum, sysio_opreg_tester) {
       /*prune_delay=*/kDefaultPruneDelayMs,
       /*max_consec_misses=*/kDefaultMaxConsecutiveMisses,
       /*max_pct_misses_24h=*/kMaxAcceptedPctMisses24h,
+      /*min_pct_samples=*/kDefaultMinPctSamples,
       /*terminate_window_ms=*/kTerminateWindowMs,
       /*req_prod_collat=*/{},
       /*req_batchop_collat=*/{
@@ -2165,19 +2681,18 @@ BOOST_FIXTURE_TEST_CASE(terminate_rejects_already_slashed_operator, sysio_opreg_
       terminate("batchop.a"_n, "post-slash terminate attempt"));
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(termcheck_terminates_all_miss_window_at_max_accepted_percent, sysio_opreg_tester) { try {
-   activate_batch_operator("batchop.a"_n);
+BOOST_FIXTURE_TEST_CASE(termcheck_evicts_all_miss_window_at_max_accepted_percent, sysio_opreg_tester) { try {
+   activate_batch_operator("batchop.a"_n, kDefaultMaxConsecutiveMisses, kMaxAcceptedPctMisses24h,
+                           kPercentRailFromFirstDuty);
 
    BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, 1, /*delivered=*/false));
    produce_blocks();
    BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
 
-   auto op = get_operator("batchop.a"_n);
-   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_TERMINATED == op["status"].as<OperatorStatus>());
-   BOOST_REQUIRE_EQUAL("rolling-window: >99% miss rate", op["status_reason"].as_string());
+   require_evicted("batchop.a"_n, "rolling-window: >99% miss rate");
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(termcheck_terminates_after_default_consecutive_boundary, sysio_opreg_tester) { try {
+BOOST_FIXTURE_TEST_CASE(termcheck_evicts_after_default_consecutive_boundary, sysio_opreg_tester) { try {
    activate_batch_operator("batchop.a"_n);
 
    BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, 1, /*delivered=*/true));
@@ -2188,16 +2703,53 @@ BOOST_FIXTURE_TEST_CASE(termcheck_terminates_after_default_consecutive_boundary,
       produce_blocks();
    }
    BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
-   auto op = get_operator("batchop.a"_n);
-   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op["status"].as<OperatorStatus>());
+   BOOST_REQUIRE_EQUAL(std::string(served::status::serving), membership_status("batchop.a"_n));
 
    BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, 7, /*delivered=*/false));
    produce_blocks();
    BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
 
-   op = get_operator("batchop.a"_n);
-   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_TERMINATED == op["status"].as<OperatorStatus>());
-   BOOST_REQUIRE_EQUAL("rolling-window: >5 consecutive misses", op["status_reason"].as_string());
+   require_evicted("batchop.a"_n, "rolling-window: >5 consecutive misses");
+} FC_LOG_AND_RETHROW() }
+
+/// The percent rail waits for `terminate_min_pct_samples` duty epochs: a miss rate above the threshold
+/// evicts only once the sample is reached.
+BOOST_FIXTURE_TEST_CASE(termcheck_percent_rail_waits_for_min_samples, sysio_opreg_tester) { try {
+   activate_batch_operator("batchop.a"_n, kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h);
+   constexpr uint32_t kEarlyMisses = 2;
+
+   // An early miss alone, then a second: each is above the threshold but short of the sample.
+   uint32_t epoch = 1;
+   for (; epoch <= kEarlyMisses; ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/false));
+      BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+      produce_block();
+      BOOST_REQUIRE_EQUAL(std::string(served::status::serving), membership_status("batchop.a"_n));
+   }
+   // Deliveries up to one short of the sample keep the rate above the threshold.
+   for (; epoch < kDefaultMinPctSamples; ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/true));
+      BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+      produce_block();
+   }
+   BOOST_REQUIRE_EQUAL(std::string(served::status::serving), membership_status("batchop.a"_n));
+   BOOST_REQUIRE_GT(uint64_t{kEarlyMisses} * kPercentScale / (kDefaultMinPctSamples - 1), kDefaultMaxPctMisses24h);
+
+   // The duty that reaches the sample applies the rail.
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/true));
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+   require_evicted("batchop.a"_n, kDefaultMaxPctMissesReason);
+} FC_LOG_AND_RETHROW() }
+
+/// The sample grace holds back only the percent rail: a consecutive run evicts before it is reached.
+BOOST_FIXTURE_TEST_CASE(termcheck_consecutive_rail_applies_during_the_percent_grace, sysio_opreg_tester) { try {
+   activate_batch_operator("batchop.a"_n, kSingleAllowedConsecutiveMiss, kDefaultMaxPctMisses24h);
+   for (uint32_t epoch = 1; epoch <= kSingleAllowedConsecutiveMiss + 1; ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/false));
+   }
+   BOOST_REQUIRE_LT(kSingleAllowedConsecutiveMiss + 1, kDefaultMinPctSamples);
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+   require_evicted("batchop.a"_n, kSingleAllowedConsecutiveMissReason);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(termcheck_keeps_bootstrapped_operator_exempt, sysio_opreg_tester) { try {
@@ -2205,9 +2757,13 @@ BOOST_FIXTURE_TEST_CASE(termcheck_keeps_bootstrapped_operator_exempt, sysio_opre
       /*prune_delay=*/kDefaultPruneDelayMs,
       /*max_consec_misses=*/1,
       /*max_pct_misses_24h=*/kMaxAcceptedPctMisses24h,
+      /*min_pct_samples=*/kDefaultMinPctSamples,
       /*terminate_window_ms=*/kTerminateWindowMs));
    BOOST_REQUIRE_EQUAL(success(),
       regoperator("batchop.a"_n, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/true));
+   setup_served_chain();
+   serve_evm_chain({"batchop.a"_n});
+   produce_blocks(kBlocksPastOneSecond);
 
    BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, 1, /*delivered=*/false));
    produce_blocks();
@@ -2216,12 +2772,12 @@ BOOST_FIXTURE_TEST_CASE(termcheck_keeps_bootstrapped_operator_exempt, sysio_opre
    auto op = get_operator("batchop.a"_n);
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op["status"].as<OperatorStatus>());
    BOOST_REQUIRE_EQUAL(1, op["is_bootstrapped"].as_uint64());
+   BOOST_REQUIRE_EQUAL(std::string(served::status::serving), membership_status("batchop.a"_n));
 } FC_LOG_AND_RETHROW() }
 
 /// A miss is recorded while a queued withdrawal holds the operator UNKNOWN, joins the run of
-/// misses from before the withdrawal, and termcheck evaluates the operator in that state.
-/// Termination remits the whole bond, the queued amount included, and the later flush of the
-/// queued row pays nothing more.
+/// misses from before the withdrawal, and termcheck evaluates the operator in that state: it is
+/// evicted from the chain. Eviction leaves the bond alone, so the queued withdrawal flushes as usual.
 BOOST_FIXTURE_TEST_CASE(termcheck_counts_misses_while_withdrawal_ineligible, sysio_opreg_tester) { try {
    activate_batch_operator(
       kEligibilityBatchOperator,
@@ -2251,11 +2807,9 @@ BOOST_FIXTURE_TEST_CASE(termcheck_counts_misses_while_withdrawal_ineligible, sys
    produce_blocks();
 
    BOOST_REQUIRE_EQUAL(success(), termcheck(kEligibilityBatchOperator));
-   auto op = get_operator(kEligibilityBatchOperator);
-   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_TERMINATED ==
-                 op[eligibility_field::status].as<OperatorStatus>());
-   BOOST_REQUIRE_EQUAL(kSingleAllowedConsecutiveMissReason, op["status_reason"].as_string());
-   BOOST_REQUIRE_EQUAL(kTestMinBond, get_remitclaim(kEligibilityBatchOperator, "NTA")["balance"].as_uint64());
+   require_evicted(kEligibilityBatchOperator, kSingleAllowedConsecutiveMissReason,
+                   OperatorStatus::OPERATOR_STATUS_UNKNOWN);
+   BOOST_REQUIRE(get_remitclaim(kEligibilityBatchOperator, "NTA").is_null());
 
    BOOST_REQUIRE_EQUAL(success(), flushwtdw(kFlushAllMaturedEpoch));
    BOOST_REQUIRE(get_wtdw(kFirstWithdrawalRequestId).is_null());
@@ -2264,8 +2818,8 @@ BOOST_FIXTURE_TEST_CASE(termcheck_counts_misses_while_withdrawal_ineligible, sys
 
 /// The O1 cycle: queue a withdrawal below the minimum before each duty close and cancel it after.
 /// Each skipped seat is a recorded miss, and the cancel's return to ACTIVE does not restart the
-/// run, so the second skipped seat terminates the operator.
-BOOST_FIXTURE_TEST_CASE(termcheck_terminates_withdraw_cancel_cycling, sysio_opreg_tester) { try {
+/// run, so the second skipped seat evicts the operator from the chain.
+BOOST_FIXTURE_TEST_CASE(termcheck_evicts_withdraw_cancel_cycling, sysio_opreg_tester) { try {
    activate_batch_operator(
       kEligibilityBatchOperator,
       /*max_consec_misses=*/kSingleAllowedConsecutiveMiss,
@@ -2284,6 +2838,7 @@ BOOST_FIXTURE_TEST_CASE(termcheck_terminates_withdraw_cancel_cycling, sysio_opre
    BOOST_REQUIRE_EQUAL(success(), termcheck(kEligibilityBatchOperator));
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_UNKNOWN ==
                  get_operator(kEligibilityBatchOperator)[eligibility_field::status].as<OperatorStatus>());
+   BOOST_REQUIRE_EQUAL(std::string(served::status::serving), membership_status(kEligibilityBatchOperator));
 
    // Cancel in a later block, so the reactivation stamp strictly follows the recorded miss.
    produce_block(fc::seconds(kDeliveryTimestampSeparationSeconds));
@@ -2307,15 +2862,13 @@ BOOST_FIXTURE_TEST_CASE(termcheck_terminates_withdraw_cancel_cycling, sysio_opre
    produce_blocks();
    BOOST_REQUIRE_EQUAL(success(), termcheck(kEligibilityBatchOperator));
 
-   auto op = get_operator(kEligibilityBatchOperator);
-   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_TERMINATED ==
-                 op[eligibility_field::status].as<OperatorStatus>());
-   BOOST_REQUIRE_EQUAL(kSingleAllowedConsecutiveMissReason, op["status_reason"].as_string());
+   require_evicted(kEligibilityBatchOperator, kSingleAllowedConsecutiveMissReason,
+                   OperatorStatus::OPERATOR_STATUS_UNKNOWN);
 } FC_LOG_AND_RETHROW() }
 
-/// A terminated account that registers again starts a new consecutive run, even within the
-/// second of the block that terminated it: the previous registration's misses stay in the log
-/// but do not count against it.
+/// A terminated account that registers again and rejoins the chain starts a new consecutive run, even
+/// within the second of the block that terminated it: the previous registration's misses stay in the
+/// log but do not count against it.
 BOOST_FIXTURE_TEST_CASE(termcheck_starts_a_new_run_for_a_new_registration, sysio_opreg_tester) { try {
    activate_batch_operator(
       kEligibilityBatchOperator,
@@ -2331,10 +2884,8 @@ BOOST_FIXTURE_TEST_CASE(termcheck_starts_a_new_run_for_a_new_registration, sysio
    BOOST_REQUIRE_EQUAL(success(),
       recorddel(kEligibilityBatchOperator, kPriorRegistrationSecondMissEpoch, /*delivered=*/false));
    BOOST_REQUIRE_EQUAL(success(), termcheck(kEligibilityBatchOperator));
-   auto terminated = get_operator(kEligibilityBatchOperator);
-   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_TERMINATED ==
-                 terminated[eligibility_field::status].as<OperatorStatus>());
-   BOOST_REQUIRE_EQUAL(kSingleAllowedConsecutiveMissReason, terminated["status_reason"].as_string());
+   require_evicted(kEligibilityBatchOperator, kSingleAllowedConsecutiveMissReason);
+   BOOST_REQUIRE_EQUAL(success(), terminate(kEligibilityBatchOperator, "registers again"));
 
    produce_block();
    BOOST_REQUIRE_EQUAL(success(),
@@ -2344,33 +2895,32 @@ BOOST_FIXTURE_TEST_CASE(termcheck_starts_a_new_run_for_a_new_registration, sysio
    BOOST_REQUIRE_EQUAL(success(), bond_generic(kEligibilityBatchOperator, "NTA", kTestMinBond));
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE ==
                  get_operator(kEligibilityBatchOperator)[eligibility_field::status].as<OperatorStatus>());
+   BOOST_REQUIRE_EQUAL(success(), served::join(*this, kEligibilityBatchOperator, EPOCH_CHAIN));
 
    BOOST_REQUIRE_EQUAL(success(),
       recorddel(kEligibilityBatchOperator, kReRegistrationDeliveredEpoch, /*delivered=*/true));
    produce_blocks();
    BOOST_REQUIRE_EQUAL(success(), termcheck(kEligibilityBatchOperator));
 
-   auto op = get_operator(kEligibilityBatchOperator);
-   BOOST_REQUIRE_MESSAGE(OperatorStatus::OPERATOR_STATUS_ACTIVE ==
-                            op[eligibility_field::status].as<OperatorStatus>(),
-                         op["status_reason"].as_string());
+   const auto row = membership(kEligibilityBatchOperator);
+   BOOST_REQUIRE_MESSAGE(std::string(served::status::serving) == row["status"].as_string(),
+                         row["status_reason"].as_string());
 } FC_LOG_AND_RETHROW() }
 
-/// A terminated account that registers again starts a new miss-rate sample: the previous
-/// registration's misses stay in the log but do not count against it.
+/// A terminated account that registers again and rejoins the chain starts a new miss-rate sample: the
+/// previous registration's misses stay in the log but do not count against it.
 BOOST_FIXTURE_TEST_CASE(termcheck_starts_a_new_sample_for_a_new_registration, sysio_opreg_tester) { try {
    activate_batch_operator(
       kEligibilityBatchOperator,
       /*max_consec_misses=*/kDefaultMaxConsecutiveMisses,
-      /*max_pct_misses_24h=*/kDefaultMaxPctMisses24h);
+      /*max_pct_misses_24h=*/kDefaultMaxPctMisses24h,
+      /*min_pct_samples=*/kPercentRailFromFirstDuty);
 
    BOOST_REQUIRE_EQUAL(success(),
       recorddel(kEligibilityBatchOperator, kPriorRegistrationFirstMissEpoch, /*delivered=*/false));
    BOOST_REQUIRE_EQUAL(success(), termcheck(kEligibilityBatchOperator));
-   auto terminated = get_operator(kEligibilityBatchOperator);
-   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_TERMINATED ==
-                 terminated[eligibility_field::status].as<OperatorStatus>());
-   BOOST_REQUIRE_EQUAL(kDefaultMaxPctMissesReason, terminated["status_reason"].as_string());
+   require_evicted(kEligibilityBatchOperator, kDefaultMaxPctMissesReason);
+   BOOST_REQUIRE_EQUAL(success(), terminate(kEligibilityBatchOperator, "registers again"));
 
    // Register again in a later second than the old row.
    produce_blocks();
@@ -2380,17 +2930,18 @@ BOOST_FIXTURE_TEST_CASE(termcheck_starts_a_new_sample_for_a_new_registration, sy
    BOOST_REQUIRE_EQUAL(success(), bond_generic(kEligibilityBatchOperator, "NTA", kTestMinBond));
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE ==
                  get_operator(kEligibilityBatchOperator)[eligibility_field::status].as<OperatorStatus>());
+   BOOST_REQUIRE_EQUAL(success(), served::join(*this, kEligibilityBatchOperator, EPOCH_CHAIN));
    BOOST_REQUIRE(!get_dellog_entry(kFirstDeliveryLogId).is_null());
 
+   produce_blocks(kBlocksPastOneSecond);
    BOOST_REQUIRE_EQUAL(success(),
       recorddel(kEligibilityBatchOperator, kReRegistrationDeliveredEpoch, /*delivered=*/true));
    produce_blocks();
    BOOST_REQUIRE_EQUAL(success(), termcheck(kEligibilityBatchOperator));
 
-   auto op = get_operator(kEligibilityBatchOperator);
-   BOOST_REQUIRE_MESSAGE(OperatorStatus::OPERATOR_STATUS_ACTIVE ==
-                            op[eligibility_field::status].as<OperatorStatus>(),
-                         op["status_reason"].as_string());
+   const auto row = membership(kEligibilityBatchOperator);
+   BOOST_REQUIRE_MESSAGE(std::string(served::status::serving) == row["status"].as_string(),
+                         row["status_reason"].as_string());
 } FC_LOG_AND_RETHROW() }
 
 /// Healthy observations from before a withdrawal and its cancellation remain in
@@ -2402,7 +2953,8 @@ BOOST_FIXTURE_TEST_CASE(termcheck_preserves_percent_sample_across_withdrawal_ine
    activate_batch_operator(
       kEligibilityBatchOperator,
       /*max_consec_misses=*/kDefaultMaxConsecutiveMisses,
-      /*max_pct_misses_24h=*/kDefaultMaxPctMisses24h);
+      /*max_pct_misses_24h=*/kDefaultMaxPctMisses24h,
+      /*min_pct_samples=*/kPercentRailFromFirstDuty);
 
    for (uint32_t epoch = kFirstPercentRailHistoryEpoch;
         epoch < kPercentRailPostReactivationMissEpoch;
@@ -2429,10 +2981,132 @@ BOOST_FIXTURE_TEST_CASE(termcheck_preserves_percent_sample_across_withdrawal_ine
       kEligibilityBatchOperator, kPercentRailPostReactivationMissEpoch, /*delivered=*/false));
    BOOST_REQUIRE_EQUAL(success(), termcheck(kEligibilityBatchOperator));
 
-   auto op = get_operator(kEligibilityBatchOperator);
-   BOOST_REQUIRE_MESSAGE(OperatorStatus::OPERATOR_STATUS_ACTIVE ==
-                            op[eligibility_field::status].as<OperatorStatus>(),
-                         op["status_reason"].as_string());
+   const auto row = membership(kEligibilityBatchOperator);
+   BOOST_REQUIRE_MESSAGE(std::string(served::status::serving) == row["status"].as_string(),
+                         row["status_reason"].as_string());
+} FC_LOG_AND_RETHROW() }
+
+// ---- per-chain eviction ----
+
+/// The rails count one chain's rows only: misses on one chain evict the operator from it while its
+/// deliveries on the other keep it serving there, and its global status is untouched.
+BOOST_FIXTURE_TEST_CASE(termcheck_evicts_from_the_missed_chain_only, sysio_opreg_tester) { try {
+   activate_batch_operator("batchop.a"_n, kSingleAllowedConsecutiveMiss, kMaxAcceptedPctMisses24h);
+   setup_served_chain(kSecondEvmChain, ChainKind::CHAIN_KIND_EVM, kSecondEvmChainId);
+   // The operator already holds the EVM link EPOCH_CHAIN needed.
+   BOOST_REQUIRE_EQUAL(success(), served::join(*this, "batchop.a"_n, kSecondEvmChain));
+   produce_blocks(kBlocksPastOneSecond);
+
+   for (uint32_t epoch = 1; epoch <= kSingleAllowedConsecutiveMiss + 1; ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/true));
+      BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/false, kSecondEvmChain));
+      produce_blocks();
+   }
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n, kSecondEvmChain));
+   produce_blocks();
+
+   require_evicted("batchop.a"_n, kSingleAllowedConsecutiveMissReason, OperatorStatus::OPERATOR_STATUS_ACTIVE,
+                   kSecondEvmChain);
+   BOOST_REQUIRE_EQUAL(std::string(served::status::serving), membership_status("batchop.a"_n));
+   BOOST_REQUIRE(get_remitclaim("batchop.a"_n, "NTA").is_null());
+   BOOST_REQUIRE_EQUAL(kTestMinBond, available("batchop.a"_n, kWireCodename, "NTA"));
+} FC_LOG_AND_RETHROW() }
+
+/// An EVICTED membership is not evaluated again: later misses on the chain leave its eviction, reason and
+/// stamp as they were.
+BOOST_FIXTURE_TEST_CASE(termcheck_leaves_an_evicted_member_alone, sysio_opreg_tester) { try {
+   activate_batch_operator("batchop.a"_n, kDefaultMaxConsecutiveMisses, kMaxAcceptedPctMisses24h);
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, 1, /*delivered=*/true));
+   for (uint32_t epoch = 2; epoch <= kDefaultMaxConsecutiveMisses + 2; ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/false));
+      produce_blocks();
+   }
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+   produce_blocks();
+   require_evicted("batchop.a"_n, "rolling-window: >5 consecutive misses");
+   const uint64_t evicted_at = membership("batchop.a"_n)["updated_at_ms"].as_uint64();
+
+   // A further miss a second later: a second eviction would restamp the row.
+   produce_blocks(kBlocksPastOneSecond);
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, kDefaultMaxConsecutiveMisses + 3, /*delivered=*/false));
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+   produce_blocks();
+
+   require_evicted("batchop.a"_n, "rolling-window: >5 consecutive misses");
+   BOOST_REQUIRE_EQUAL(evicted_at, membership("batchop.a"_n)["updated_at_ms"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
+/// An evicted operator rejoins once it holds no seat on the chain, and its rails restart at the rejoin:
+/// the misses that evicted it stay in the log but no longer count.
+BOOST_FIXTURE_TEST_CASE(termcheck_starts_a_new_run_for_a_new_membership, sysio_opreg_tester) { try {
+   activate_batch_operator("batchop.a"_n, kSingleAllowedConsecutiveMiss, kMaxAcceptedPctMisses24h);
+
+   // The rows and the rejoin share one second: the rails start after it.
+   align_next_block_to_second_start();
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, kPriorRegistrationDeliveredEpoch, /*delivered=*/true));
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, kPriorRegistrationFirstMissEpoch, /*delivered=*/false));
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, kPriorRegistrationSecondMissEpoch, /*delivered=*/false));
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+   require_evicted("batchop.a"_n, kSingleAllowedConsecutiveMissReason);
+   produce_block();
+
+   BOOST_REQUIRE_EQUAL(success(), served::join(*this, "batchop.a"_n, EPOCH_CHAIN, "batchop.a"_n));
+   produce_blocks();
+   const auto rejoined = membership("batchop.a"_n);
+   BOOST_REQUIRE_EQUAL(std::string(served::status::serving), rejoined["status"].as_string());
+   BOOST_REQUIRE(rejoined["status_reason"].as_string().empty());
+   BOOST_REQUIRE_EQUAL(get_dellog_entry(kThirdDeliveryLogId)["ts_ms"].as_uint64(),
+                       rejoined["joined_at_ms"].as_uint64());
+
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, kReRegistrationDeliveredEpoch, /*delivered=*/true));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+   BOOST_REQUIRE_EQUAL(std::string(served::status::serving), membership_status("batchop.a"_n));
+} FC_LOG_AND_RETHROW() }
+
+/// `termcheck` evaluates a LEFT member's remaining seats like a SERVING one's, and evicts it.
+BOOST_FIXTURE_TEST_CASE(termcheck_evicts_a_member_that_left, sysio_opreg_tester) { try {
+   activate_batch_operator("batchop.a"_n, kSingleAllowedConsecutiveMiss, kMaxAcceptedPctMisses24h);
+   BOOST_REQUIRE_EQUAL(success(), served::leave(*this, "batchop.a"_n, EPOCH_CHAIN));
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, 1, /*delivered=*/true));
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, 2, /*delivered=*/false));
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, 3, /*delivered=*/false));
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+   require_evicted("batchop.a"_n, kSingleAllowedConsecutiveMissReason);
+} FC_LOG_AND_RETHROW() }
+
+/// An operator with no membership of the chain is not evaluated there.
+BOOST_FIXTURE_TEST_CASE(termcheck_skips_a_chain_the_operator_never_joined, sysio_opreg_tester) { try {
+   activate_batch_operator("batchop.a"_n, kSingleAllowedConsecutiveMiss, kMaxAcceptedPctMisses24h);
+   for (uint32_t epoch = 1; epoch <= kSingleAllowedConsecutiveMiss + 1; ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/false, kSecondEvmChain));
+   }
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n, kSecondEvmChain));
+   BOOST_REQUIRE(membership("batchop.a"_n, kSecondEvmChain).is_null());
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == get_operator("batchop.a"_n)["status"].as<OperatorStatus>());
+} FC_LOG_AND_RETHROW() }
+
+/// The retention sweep runs across chains in age order: a write on one chain prunes another chain's
+/// aged-out rows, and `termcheck` still reads each chain's own rows only.
+BOOST_FIXTURE_TEST_CASE(recorddel_prunes_aged_rows_of_every_chain, sysio_opreg_tester) { try {
+   activate_batch_operator("batchop.a"_n);
+   constexpr uint32_t kAgedRows = 2;
+   for (uint32_t epoch = 1; epoch <= kAgedRows; ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/false, kSecondEvmChain));
+      produce_blocks();
+   }
+   for (uint64_t id = 1; id <= kAgedRows; ++id) {
+      BOOST_REQUIRE_EQUAL(std::string(kSecondEvmChain), get_dellog_entry(id)["chain_code"].as_string());
+   }
+   produce_block(fc::hours(25));
+
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, kAgedRows + 1, /*delivered=*/true));
+   produce_blocks();
+   for (uint64_t id = 1; id <= kAgedRows; ++id) BOOST_REQUIRE(get_dellog_entry(id).is_null());
+   const auto row = get_dellog_entry(kAgedRows + 1);
+   BOOST_REQUIRE_EQUAL(std::string(EPOCH_CHAIN), row["chain_code"].as_string());
+   BOOST_REQUIRE_EQUAL(kAgedRows + 1, row["epoch"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
 // ---- dellog retention: bounded pruning of rows outside the rolling window ----
@@ -2512,10 +3186,9 @@ BOOST_FIXTURE_TEST_CASE(prune_sweeps_expired_dellog_rows, sysio_opreg_tester) { 
    produce_blocks();
    BOOST_REQUIRE(get_dellog_entry(SEEDED_ROWS).is_null());
 
-   // With no rows left in the window the operator stays ACTIVE.
+   // With no rows left in the window the operator keeps serving.
    BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
-   auto op = get_operator("batchop.a"_n);
-   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op["status"].as<OperatorStatus>());
+   BOOST_REQUIRE_EQUAL(std::string(served::status::serving), membership_status("batchop.a"_n));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(termcheck_unaffected_by_on_write_pruning, sysio_opreg_tester) { try {
@@ -2540,9 +3213,191 @@ BOOST_FIXTURE_TEST_CASE(termcheck_unaffected_by_on_write_pruning, sysio_opreg_te
 
    // The in-window rows still drive the consecutive-miss rail as before.
    BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
-   auto op = get_operator("batchop.a"_n);
-   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_TERMINATED == op["status"].as<OperatorStatus>());
-   BOOST_REQUIRE_EQUAL("rolling-window: >5 consecutive misses", op["status_reason"].as_string());
+   require_evicted("batchop.a"_n, "rolling-window: >5 consecutive misses");
+} FC_LOG_AND_RETHROW() }
+
+// ---- the duty tally termcheck reads ----
+
+/// The tally holds what a walk of the log counts, and the rails evict at the same duty the walk's rails
+/// would: a seeded mix of deliveries and misses, ended by the consecutive rail for one operator and by the
+/// percent rail for another.
+BOOST_FIXTURE_TEST_CASE(tally_matches_the_log_walk_over_mixed_duties, sysio_opreg_tester) { try {
+   struct mixed_case {
+      name        account;
+      uint32_t    max_consecutive;
+      uint32_t    max_pct;
+      uint32_t    min_samples;
+      uint32_t    miss_pct;   ///< chance of a miss per duty, in percent
+      std::string reason;
+   };
+   constexpr uint32_t kMaxDuties = 200;
+   const std::vector<mixed_case> cases = {
+      {"batchop.a"_n, 3, kMaxAcceptedPctMisses24h, kMaxAcceptedMinPctSamples, 40,
+       "rolling-window: >3 consecutive misses"},
+      {"batchop.b"_n, kDefaultMaxConsecutiveMisses, 20, 10, 25, "rolling-window: >20% miss rate"},
+   };
+   std::minstd_rand duty_outcomes(20261124);
+   for (const auto& c : cases) {
+      activate_batch_operator(c.account, c.max_consecutive, c.max_pct, c.min_samples);
+      bool evicted = false;
+      for (uint32_t epoch = 1; epoch <= kMaxDuties && !evicted; ++epoch) {
+         const bool delivered = duty_outcomes() % kPercentScale >= c.miss_pct;
+         BOOST_REQUIRE_EQUAL(success(), recorddel(c.account, epoch, delivered));
+         BOOST_REQUIRE_EQUAL(success(), termcheck(c.account));
+         produce_block();
+
+         const log_walk walk = walk_dellog(c.account, 0);
+         require_tally(c.account, walk);
+         evicted = walk.longest_run > c.max_consecutive ||
+                   (walk.duties >= c.min_samples && walk.misses * kPercentScale / walk.duties > c.max_pct);
+         if (evicted) require_evicted(c.account, c.reason);
+         else BOOST_REQUIRE_EQUAL(std::string(served::status::serving), membership_status(c.account));
+      }
+      BOOST_REQUIRE_MESSAGE(evicted, c.account.to_string() << " was never evicted");
+   }
+} FC_LOG_AND_RETHROW() }
+
+/// Both retention sweeps take what they erase out of the tally: the on-write sweep erases the oldest
+/// aged rows of any member, and `termcheck` erases the rest of its own member's before reading it.
+BOOST_FIXTURE_TEST_CASE(retention_sweeps_take_aged_duties_out_of_the_tally, sysio_opreg_tester) { try {
+   activate_batch_operator("batchop.a"_n);
+   uint32_t epoch = 1;
+   for (const bool delivered : {false, false, false, true, true, true, false, false, false}) {
+      BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch++, delivered));
+   }
+   produce_blocks();
+   require_tally("batchop.a"_n, {.duties = 9, .misses = 6, .trailing_run = 3});
+   produce_block(kPastTheWindow);
+
+   // The write sweeps the four oldest (three misses and a delivery) before counting its own delivery.
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch++, /*delivered=*/true));
+   produce_blocks();
+   require_tally("batchop.a"_n, {.duties = 6, .misses = 3, .trailing_run = 0});
+   require_tally("batchop.a"_n, walk_dellog("batchop.a"_n, 0));
+
+   // termcheck erases the five aged rows left, leaving the duty recorded in the window.
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+   produce_blocks();
+   require_tally("batchop.a"_n, {.duties = 1, .misses = 0, .trailing_run = 0});
+   require_tally("batchop.a"_n, walk_dellog("batchop.a"_n, 0));
+   BOOST_REQUIRE_EQUAL(std::string(served::status::serving), membership_status("batchop.a"_n));
+} FC_LOG_AND_RETHROW() }
+
+/// A run of misses that aged out of the window no longer counts: the crank erases it, and a later miss
+/// starts a new run.
+BOOST_FIXTURE_TEST_CASE(aged_run_of_misses_leaves_the_tally, sysio_opreg_tester) { try {
+   activate_batch_operator("batchop.a"_n, kSingleAllowedConsecutiveMiss, kMaxAcceptedPctMisses24h);
+   for (uint32_t epoch = 1; epoch <= kSingleAllowedConsecutiveMiss; ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/false));
+   }
+   produce_blocks();
+   produce_block(kPastTheWindow);
+   BOOST_REQUIRE_EQUAL(success(), prune());
+   produce_blocks();
+   require_tally("batchop.a"_n, {});
+
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, kSingleAllowedConsecutiveMiss + 1, /*delivered=*/false));
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+   produce_blocks();
+   require_tally("batchop.a"_n, {.duties = 1, .misses = 1, .trailing_run = 1});
+   BOOST_REQUIRE_EQUAL(std::string(served::status::serving), membership_status("batchop.a"_n));
+} FC_LOG_AND_RETHROW() }
+
+/// While the member's aged rows outnumber what one check erases, the rails wait rather than count duties
+/// from outside the window; once they are gone, the rails apply again.
+BOOST_FIXTURE_TEST_CASE(termcheck_waits_while_its_own_aged_rows_remain, sysio_opreg_tester) { try {
+   activate_batch_operator("batchop.a"_n, kSingleAllowedConsecutiveMiss, kMaxAcceptedPctMisses24h);
+   constexpr uint32_t kAgedRows = kDellogPrunePerWrite + kDellogPrunePerCheck + 1;
+   uint32_t epoch = 1;
+   for (; epoch <= kAgedRows; ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/false));
+   }
+   produce_blocks();
+   produce_block(kPastTheWindow);
+
+   // The write sweeps four and the check sixteen; one aged miss is left beside the new one, a run the
+   // window does not hold.
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch++, /*delivered=*/false));
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+   produce_blocks();
+   require_tally("batchop.a"_n, {.duties = 2, .misses = 2, .trailing_run = 2});
+   BOOST_REQUIRE_EQUAL(std::string(served::status::serving), membership_status("batchop.a"_n));
+
+   // The next write sweeps the last aged row; the rails apply to the window's duties again.
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch++, /*delivered=*/true));
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+   produce_blocks();
+   require_tally("batchop.a"_n, {.duties = 2, .misses = 1, .trailing_run = 0});
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch++, /*delivered=*/false));
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch++, /*delivered=*/false));
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+   require_evicted("batchop.a"_n, kSingleAllowedConsecutiveMissReason);
+} FC_LOG_AND_RETHROW() }
+
+/// A rejoin starts a new tally at the next log id: the rows of the earlier membership are not counted
+/// while they stay in the window, and erasing them later leaves the new tally as it is.
+BOOST_FIXTURE_TEST_CASE(rejoin_starts_a_tally_earlier_rows_never_touch, sysio_opreg_tester) { try {
+   activate_batch_operator("batchop.a"_n);
+   constexpr uint32_t kEarlierRows = 3;
+   for (uint32_t epoch = 1; epoch <= kEarlierRows; ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/false));
+   }
+   BOOST_REQUIRE_EQUAL(success(), served::leave(*this, "batchop.a"_n, EPOCH_CHAIN));
+   produce_blocks();
+   produce_block(fc::hours(23));
+
+   BOOST_REQUIRE_EQUAL(success(), served::join(*this, "batchop.a"_n, EPOCH_CHAIN, "batchop.a"_n));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(kEarlierRows + 1, tally("batchop.a"_n)["first_log_id"].as_uint64());
+   require_tally("batchop.a"_n, {});
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, kEarlierRows + 1, /*delivered=*/true));
+   produce_blocks();
+   require_tally("batchop.a"_n, {.duties = 1});
+
+   // Two hours on, the earlier rows have aged out: the write sweeps them without touching the tally.
+   produce_block(fc::hours(2));
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, kEarlierRows + 2, /*delivered=*/false));
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+   produce_blocks();
+   for (uint64_t log_id = kFirstDeliveryLogId; log_id <= kEarlierRows; ++log_id) {
+      BOOST_REQUIRE(get_dellog_entry(log_id).is_null());
+   }
+   require_tally("batchop.a"_n, {.duties = 2, .misses = 1, .trailing_run = 1});
+   require_tally("batchop.a"_n, walk_dellog("batchop.a"_n, kEarlierRows + 1));
+   BOOST_REQUIRE_EQUAL(std::string(served::status::serving), membership_status("batchop.a"_n));
+} FC_LOG_AND_RETHROW() }
+
+/// `termcheck` decides from the member's tally alone, one row whatever the log holds: among members with
+/// long, interleaved logs of deliveries, the one whose tally is rewritten to a breaching run is evicted,
+/// though its log shows no miss.
+BOOST_FIXTURE_TEST_CASE(termcheck_reads_one_tally_however_long_the_log, sysio_opreg_tester) { try {
+   const std::vector<name> members = {"batchop.a"_n, "batchop.b"_n, "batchop.c"_n};
+   for (const name member : members) activate_batch_operator(member);
+   constexpr uint32_t kDutiesEach = 60;
+   for (uint32_t epoch = 1; epoch <= kDutiesEach; ++epoch) {
+      for (const name member : members) {
+         BOOST_REQUIRE_EQUAL(success(), recorddel(member, epoch, /*delivered=*/true));
+      }
+      produce_block();
+   }
+   for (const name member : members) {
+      require_tally(member, {.duties = kDutiesEach});
+      require_tally(member, walk_dellog(member, 0));
+   }
+
+   rewrite_tally(members.front(), fc::variant(mvo()
+      ("first_log_id", tally(members.front())["first_log_id"])
+      ("duties",       kDutiesEach)
+      ("misses",       kDefaultMaxConsecutiveMisses + 1)
+      ("miss_run",     kDefaultMaxConsecutiveMisses + 1)));
+   for (const name member : members) BOOST_REQUIRE_EQUAL(success(), termcheck(member));
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(0u, walk_dellog(members.front(), 0).misses);
+   require_evicted(members.front(), "rolling-window: >5 consecutive misses");
+   for (size_t i = 1; i < members.size(); ++i) {
+      BOOST_REQUIRE_EQUAL(std::string(served::status::serving), membership_status(members[i]));
+   }
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(recorddel_succeeds_without_opconfig, sysio_opreg_tester) { try {
@@ -2561,6 +3416,7 @@ BOOST_FIXTURE_TEST_CASE(setconfig_two_native_asset_bond_activation, sysio_opreg_
    BOOST_REQUIRE_EQUAL(success(), setconfig(
       /*prune_delay=*/600000,
       /*max_consec_misses=*/5, /*max_pct_misses_24h=*/5,
+      /*min_pct_samples=*/kDefaultMinPctSamples,
       /*terminate_window_ms=*/24ULL * 60 * 60 * 1000,
       /*req_prod_collat=*/{},
       /*req_batchop_collat=*/{
@@ -2599,7 +3455,7 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_duplicate_chain_token_in_collat, sysio
    // The duplicate-detection assertion text refers to "(chain, token_kind)"
    // historically; the contract message may be updated to "(chain_code,
    // token_code)" — match on the stable prefix to tolerate either spelling.
-   auto r = setconfig(600000, 5, 5, 24ULL * 60 * 60 * 1000,
+   auto r = setconfig(600000, 5, 5, kDefaultMinPctSamples, 24ULL * 60 * 60 * 1000,
                 /*req_prod_collat=*/{},
                 /*req_batchop_collat=*/duplicate_vec,
                 /*req_uw_collat=*/{});
@@ -2608,7 +3464,7 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_duplicate_chain_token_in_collat, sysio
 
 BOOST_FIXTURE_TEST_CASE(setconfig_stamps_collat_config_timestamp, sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig(
-      600000, 5, 5, 24ULL * 60 * 60 * 1000,
+      600000, 5, 5, kDefaultMinPctSamples, 24ULL * 60 * 60 * 1000,
       /*req_prod_collat=*/{},
       /*req_batchop_collat=*/{
          make_chain_min_bond("WIRE", "NTA", 1000),
@@ -2640,7 +3496,7 @@ BOOST_FIXTURE_TEST_CASE(flushwtdw_terminated_operator_does_not_abort, sysio_opre
    // Flush at an epoch well past the withdraw's eligibility. Pre-fix this aborted with a
    // "balance underflow"; the TERMINATED branch erases the matured row instead.
    BOOST_REQUIRE_EQUAL(success(),
-      push_opreg_action(EPOCH_ACCOUNT, "flushwtdw"_n, mvo()("economic_epoch", 1000000u)("consensus_epoch", 1000000u)));
+      push_opreg_action(EPOCH_ACCOUNT, "flushwtdw"_n, mvo()("economic_epoch", 1000000u)));
    BOOST_REQUIRE(get_wtdw(1).is_null());   // matured row erased, not stuck re-throwing every advance
 } FC_LOG_AND_RETHROW() }
 
@@ -2684,7 +3540,7 @@ BOOST_FIXTURE_TEST_CASE(flushwtdw_bounds_rows_per_epoch, sysio_opreg_tester) { t
 
    // First flush drains exactly MAX_WTDW_FLUSH_PER_EPOCH rows; the remainder stays queued.
    BOOST_REQUIRE_EQUAL(success(),
-      push_opreg_action(EPOCH_ACCOUNT, "flushwtdw"_n, mvo()("economic_epoch", 1'000'000u)("consensus_epoch", 1'000'000u)));
+      push_opreg_action(EPOCH_ACCOUNT, "flushwtdw"_n, mvo()("economic_epoch", 1'000'000u)));
    BOOST_REQUIRE_EQUAL(N - MAX_WTDW_FLUSH_PER_EPOCH, count_pending());
 
    // Cross a block boundary so the second flush is a distinct transaction — an identical action in
@@ -2692,7 +3548,7 @@ BOOST_FIXTURE_TEST_CASE(flushwtdw_bounds_rows_per_epoch, sysio_opreg_tester) { t
    produce_blocks();
    // Second flush drains the rest -- progress resumes where the first stopped.
    BOOST_REQUIRE_EQUAL(success(),
-      push_opreg_action(EPOCH_ACCOUNT, "flushwtdw"_n, mvo()("economic_epoch", 1'000'000u)("consensus_epoch", 1'000'000u)));
+      push_opreg_action(EPOCH_ACCOUNT, "flushwtdw"_n, mvo()("economic_epoch", 1'000'000u)));
    BOOST_REQUIRE_EQUAL(0u, count_pending());
 } FC_LOG_AND_RETHROW() }
 
@@ -3207,7 +4063,7 @@ BOOST_FIXTURE_TEST_CASE(two_generic_depot_assets_are_both_required_and_withdrawa
    constexpr uint64_t Funding = 4 * Unit;
    const auto account = kEligibilityProducer;
    BOOST_REQUIRE_EQUAL(success(), setconfig(kDefaultPruneDelayMs, kDefaultMaxConsecutiveMisses,
-      kMaxAcceptedPctMisses24h, kTerminateWindowMs,
+      kMaxAcceptedPctMisses24h, kDefaultMinPctSamples, kTerminateWindowMs,
       {make_chain_min_bond(kWireCodename, First.token, Minimum),
        make_chain_min_bond(kWireCodename, Second.token, Minimum)}, {}, {}));
    BOOST_REQUIRE_EQUAL(success(), regoperator(account, OPERATOR_TYPE_PRODUCER, false));
@@ -3258,7 +4114,7 @@ BOOST_FIXTURE_TEST_CASE(native_wire_partial_withdrawal_stays_active_and_claims_e
    constexpr uint64_t Bond = 2 * Minimum;
    const auto account = kEligibilityBatchOperator;
    BOOST_REQUIRE_EQUAL(success(), setconfig(kDefaultPruneDelayMs, kDefaultMaxConsecutiveMisses,
-      kMaxAcceptedPctMisses24h, kTerminateWindowMs,
+      kMaxAcceptedPctMisses24h, kDefaultMinPctSamples, kTerminateWindowMs,
       {}, {make_chain_min_bond(kWireCodename, kWireCodename, Minimum)}, {}));
    BOOST_REQUIRE_EQUAL(success(), regoperator(account, OPERATOR_TYPE_BATCH, false));
    setup_wire_token_and_fund(account, kWireFundingQuantity);

@@ -103,6 +103,16 @@
             ]
         },
         {
+            "name": "bootchain",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "bootstrap",
             "base": "",
             "fields": []
@@ -120,7 +130,12 @@
         {
             "name": "chkcons",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                }
+            ]
         },
         {
             "name": "deliver",
@@ -184,6 +199,14 @@
             "fields": [
                 {
                     "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                },
+                {
+                    "name": "chain_seq",
                     "type": "uint64"
                 },
                 {
@@ -421,6 +444,11 @@
     ],
     "actions": [
         {
+            "name": "bootchain",
+            "type": "bootchain",
+            "ricardian_contract": ""
+        },
+        {
             "name": "bootstrap",
             "type": "bootstrap",
             "ricardian_contract": ""
@@ -501,7 +529,14 @@
             "index_type": "i64",
             "key_names": ["id"],
             "key_types": ["uint64"],
-            "table_id": 31386
+            "table_id": 31386,
+            "secondary_indexes": [
+                {
+                    "name": "bychain",
+                    "key_type": "uint128",
+                    "table_id": 45782
+                }
+            ]
         },
         {
             "name": "messages",

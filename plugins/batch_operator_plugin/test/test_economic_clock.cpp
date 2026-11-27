@@ -18,8 +18,8 @@ constexpr uint32_t duration_sec = 360;
 /// Grid start in unix seconds (an arbitrary fixed instant).
 constexpr uint32_t start_sec = 1'800'000'000;
 constexpr uint32_t opened_index = 4;
-/// A consensus index past the genesis advance; the economic clock does not depend on its value otherwise.
-constexpr uint32_t consensus_index = 7;
+/// The network genesis has happened, so due epochs go through.
+constexpr bool network_started = true;
 
 fc::time_point at(uint64_t unix_sec) { return fc::time_point(fc::seconds(static_cast<int64_t>(unix_sec))); }
 
@@ -74,21 +74,22 @@ BOOST_AUTO_TEST_CASE(a_config_without_a_duration_is_not_a_clock) {
 BOOST_AUTO_TEST_CASE(only_passed_boundaries_are_due) {
    const auto clock = decode_economic_clock(config_row(), nullptr);
    BOOST_REQUIRE(clock);
-   BOOST_CHECK(economic_epochs_due(*clock, consensus_index, at(start_sec - 1), economy::ticks_per_poll).empty());
-   BOOST_CHECK(economic_epochs_due(*clock, consensus_index, at(start_sec), economy::ticks_per_poll)
+   BOOST_CHECK(economic_epochs_due(*clock, network_started, at(start_sec - 1), economy::ticks_per_poll).empty());
+   BOOST_CHECK(economic_epochs_due(*clock, network_started, at(start_sec), economy::ticks_per_poll)
                == std::vector<uint32_t>{1});
-   BOOST_CHECK((economic_epochs_due(*clock, consensus_index, at(start_sec + duration_sec), economy::ticks_per_poll)
+   BOOST_CHECK((economic_epochs_due(*clock, network_started, at(start_sec + duration_sec), economy::ticks_per_poll)
                 == std::vector<uint32_t>{1, 2}));
 }
 
-/// Nothing is due before the consensus genesis advance, however far past its boundary the clock is; any later
-/// consensus index, a paused one included, lets the due epochs through.
-BOOST_AUTO_TEST_CASE(nothing_is_due_before_the_consensus_genesis_advance) {
+/// Nothing is due before the network genesis, however far past its boundary the clock is; once it has happened
+/// the due epochs go through, whatever any chain's consensus epoch is doing.
+BOOST_AUTO_TEST_CASE(nothing_is_due_before_the_network_genesis) {
    const auto clock = decode_economic_clock(config_row(), nullptr);
    BOOST_REQUIRE(clock);
    const fc::time_point late = at(start_sec + 100 * duration_sec);
-   BOOST_CHECK(economic_epochs_due(*clock, 0, late, economy::ticks_per_poll).empty());
-   BOOST_CHECK_EQUAL(economy::ticks_per_poll, economic_epochs_due(*clock, 1, late, economy::ticks_per_poll).size());
+   BOOST_CHECK(economic_epochs_due(*clock, !network_started, late, economy::ticks_per_poll).empty());
+   BOOST_CHECK_EQUAL(economy::ticks_per_poll,
+                     economic_epochs_due(*clock, network_started, late, economy::ticks_per_poll).size());
 }
 
 /// A start far in the past catches up in order, a bounded number of epochs per poll.
@@ -99,7 +100,7 @@ BOOST_AUTO_TEST_CASE(catch_up_is_ordered_and_bounded_per_poll) {
    BOOST_REQUIRE(clock);
 
    const auto due =
-      economic_epochs_due(*clock, consensus_index, at(next_sec + 1000 * duration_sec), economy::ticks_per_poll);
+      economic_epochs_due(*clock, network_started, at(next_sec + 1000 * duration_sec), economy::ticks_per_poll);
    BOOST_REQUIRE_EQUAL(economy::ticks_per_poll, due.size());
    for (uint32_t i = 0; i < due.size(); ++i) BOOST_CHECK_EQUAL(opened_index + 1 + i, due[i]);
 }

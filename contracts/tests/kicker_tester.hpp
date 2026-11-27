@@ -27,6 +27,10 @@ public:
    static constexpr auto EPOCH = "sysio.epoch"_n;
    /// Both clocks' epoch length: the consensus epoch and the economic grid.
    static constexpr uint32_t EPOCH_DURATION_SEC = 60;
+   /// The outpost chain whose consensus epoch the fixture configures; its genesis advance is the network genesis.
+   static constexpr std::string_view EPOCH_CHAIN = SOLANA;
+   /// The one member of `EPOCH_CHAIN`'s schedule window: no batch operator runs, so none delivers.
+   static constexpr auto WINDOW_MEMBER = "batchop"_n;
    static constexpr uint64_t seed = 75'000 * UNIT;
    static constexpr uint64_t holder = 25'000 * UNIT;
    static constexpr uint64_t budget = 1'000'000 * UNIT;
@@ -40,7 +44,7 @@ public:
       deploy(KICKER, contracts::kicker_wasm(), contracts::kicker_abi(), kicker_ser, true);
       deploy(SYSIO_ACCOUNT, contracts::system_wasm(), contracts::system_abi(), system_ser, true);
       deploy(EPOCH, contracts::epoch_wasm(), contracts::epoch_abi(), epoch_ser, true);
-      BOOST_REQUIRE_EQUAL(success(), push(EPOCH, epoch_ser, EPOCH, "setconfig"_n, mvo()
+      BOOST_REQUIRE_EQUAL(success(), push(EPOCH, epoch_ser, EPOCH, "setconfig"_n, mvo()("chain_code", EPOCH_CHAIN)
          ("epoch_duration_sec", EPOCH_DURATION_SEC)("operators_per_epoch", 7)("batch_operator_minimum_active", 21)
          ("batch_op_groups", 3)("epoch_retention_envelope_log_count", 1000)));
       BOOST_REQUIRE_EQUAL(success(), configure_economy(unanchored_start()));
@@ -232,6 +236,12 @@ public:
    fc::time_point_sec unanchored_start() {
       return fc::time_point_sec(control->head().block_time() + fc::seconds(UNANCHORED_ECONOMIC_START_SEC));
    }
+   /// Run `EPOCH_CHAIN`'s genesis advance, the network genesis. The fixture runs no batch operators, so its schedule
+   /// window is seated with `WINDOW_MEMBER` alone.
+   action_result open_consensus_genesis() {
+      sysio_system::test_support::epoch_state::seat_window(*this, epoch_ser, EPOCH_CHAIN, {{WINDOW_MEMBER}});
+      return push(EPOCH, epoch_ser, EPOCH, "advance"_n, mvo()("chain_code", EPOCH_CHAIN));
+   }
    /// Configure the economic clock to start its grid at `start`.
    action_result configure_economy(fc::time_point_sec start) {
       return push(EPOCH, epoch_ser, EPOCH, "seteconomy"_n, mvo()
@@ -245,7 +255,7 @@ public:
    /// before now. That tick reaches the grid, so its payout spends nothing; then cross the next boundary, so the next
    /// tick runs on time and is the clock's first payout that spends.
    action_result reach_the_grid() {
-      if (auto result = push(EPOCH, epoch_ser, EPOCH, "advance"_n, mvo()); result != success()) return result;
+      if (auto result = open_consensus_genesis(); result != success()) return result;
       const fc::time_point start = control->head().block_time() + fc::seconds(REACHING_TICK_MARGIN_SEC)
                                  - fc::seconds(EPOCH_DURATION_SEC);
       if (auto result = configure_economy(fc::time_point_sec(start)); result != success()) return result;

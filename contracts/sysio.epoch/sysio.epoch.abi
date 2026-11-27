@@ -11,7 +11,12 @@
         {
             "name": "advance",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                }
+            ]
         },
         {
             "name": "blocklog_entry",
@@ -66,6 +71,16 @@
             ]
         },
         {
+            "name": "chain_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "economic_config",
             "base": "",
             "fields": [
@@ -106,6 +121,10 @@
             "base": "",
             "fields": [
                 {
+                    "name": "chain_code",
+                    "type": "uint64"
+                },
+                {
                     "name": "epoch_duration_sec",
                     "type": "uint32"
                 },
@@ -132,6 +151,10 @@
             "base": "",
             "fields": [
                 {
+                    "name": "chain_code",
+                    "type": "uint64"
+                },
+                {
                     "name": "current_epoch_index",
                     "type": "uint32"
                 },
@@ -152,10 +175,6 @@
                     "type": "B_vector_name_E[]"
                 },
                 {
-                    "name": "last_consensus_hash",
-                    "type": "checksum256"
-                },
-                {
                     "name": "is_paused",
                     "type": "bool"
                 }
@@ -166,25 +185,77 @@
             "base": "",
             "fields": [
                 {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
                     "name": "epoch_index",
                     "type": "uint32"
                 }
             ]
         },
         {
+            "name": "network_genesis",
+            "base": "",
+            "fields": [
+                {
+                    "name": "genesis_at",
+                    "type": "time_point"
+                }
+            ]
+        },
+        {
             "name": "pause",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                }
+            ]
+        },
+        {
+            "name": "resendroster",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "slug_name"
+                }
+            ]
+        },
+        {
+            "name": "roster_sent",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                },
+                {
+                    "name": "roster_hash",
+                    "type": "checksum256"
+                }
+            ]
         },
         {
             "name": "schbatchgps",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                }
+            ]
         },
         {
             "name": "setconfig",
             "base": "",
             "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
                 {
                     "name": "epoch_duration_sec",
                     "type": "uint32"
@@ -234,7 +305,12 @@
         {
             "name": "unpause",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                }
+            ]
         }
     ],
     "actions": [
@@ -251,6 +327,11 @@
         {
             "name": "pause",
             "type": "pause",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "resendroster",
+            "type": "resendroster",
             "ricardian_contract": ""
         },
         {
@@ -308,17 +389,33 @@
             "name": "epochcfg",
             "type": "epoch_config",
             "index_type": "i64",
-            "key_names": ["name"],
-            "key_types": ["name"],
+            "key_names": ["chain_code"],
+            "key_types": ["uint64"],
             "table_id": 36213
         },
         {
             "name": "epochstate",
             "type": "epoch_state",
             "index_type": "i64",
+            "key_names": ["chain_code"],
+            "key_types": ["uint64"],
+            "table_id": 59387
+        },
+        {
+            "name": "netgenesis",
+            "type": "network_genesis",
+            "index_type": "i64",
             "key_names": ["name"],
             "key_types": ["name"],
-            "table_id": 59387
+            "table_id": 29073
+        },
+        {
+            "name": "rostersent",
+            "type": "roster_sent",
+            "index_type": "i64",
+            "key_names": ["chain_code"],
+            "key_types": ["uint64"],
+            "table_id": 63183
         }
     ],
     "ricardian_clauses": [],

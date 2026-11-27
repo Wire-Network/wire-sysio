@@ -27,6 +27,7 @@ namespace economy {
    constexpr auto account            = "sysio.epoch";
    constexpr auto table_economycfg   = "economycfg";     ///< the `kv::global` config singleton
    constexpr auto table_economystate = "economystate";   ///< the `kv::global` state singleton
+   constexpr auto table_netgenesis   = "netgenesis";     ///< the `kv::global` network genesis marker
    constexpr auto action_tickeconomy = "tickeconomy";
    namespace field {
       constexpr auto epoch_duration_sec  = "epoch_duration_sec";
@@ -74,12 +75,12 @@ inline std::optional<economic_clock_view> decode_economic_clock(const fc::varian
 
 /// The economic epoch indexes due at `now`, oldest first, at most `limit`. Each later boundary is the
 /// previous one plus the configured duration, the same grid `tickeconomy` walks. None before the
-/// consensus genesis advance (`consensus_epoch_index` 0), which `tickeconomy` waits for; a dispute
-/// pause does not hold the economic clock.
-inline std::vector<uint32_t> economic_epochs_due(const economic_clock_view& clock, uint32_t consensus_epoch_index,
+/// network genesis (`network_genesis_done` false), which `tickeconomy` waits for; a dispute pause does
+/// not hold the economic clock.
+inline std::vector<uint32_t> economic_epochs_due(const economic_clock_view& clock, bool network_genesis_done,
                                                  fc::time_point now, uint32_t limit) {
    std::vector<uint32_t> due;
-   if (consensus_epoch_index == 0) return due;
+   if (!network_genesis_done) return due;
    fc::time_point boundary = clock.next_boundary;
    for (uint32_t index = clock.current_epoch_index + 1; due.size() < limit && now >= boundary; ++index) {
       due.push_back(index);

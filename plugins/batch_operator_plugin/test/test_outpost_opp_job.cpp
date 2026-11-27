@@ -33,7 +33,8 @@ auto make_client(sysio::opp::types::ChainKind k, uint64_t id, uint32_t cid) {
    return std::make_shared<mock_outpost_client>(k, id, cid);
 }
 
-constexpr fc::microseconds kDeadline = fc::seconds(2);
+/// The delivery timeout the mock depot gives a chain without its own knobs.
+constexpr fc::microseconds kDeadline = mock_depot_ops::default_delivery_timeout;
 constexpr auto kTestEpoch = 5u;
 constexpr auto kSolanaChainCode = 1u;
 constexpr auto kSolanaChainId = 0u;
@@ -47,7 +48,7 @@ constexpr auto kRepeatedPolls = 100u;
 struct outbound_retry_fixture {
    std::shared_ptr<mock_outpost_client> client = make_client(CHAIN_KIND_SVM, kSolanaChainCode, kSolanaChainId);
    mock_depot_ops depot;
-   outpost_opp_job job{client, depot, kDeadline};
+   outpost_opp_job job{client, depot};
 
    /// Keep a single envelope pending until a test supplies completion evidence.
    outbound_retry_fixture() {
@@ -72,7 +73,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_skips_when_epoch_window_closed) {
    mock_depot_ops depot;
    depot.window_open = false;
 
-   outpost_opp_job job(client, depot, kDeadline);
+   outpost_opp_job job(client, depot);
    job.run_outbound();
 
    BOOST_CHECK(client->outbound_calls.empty());
@@ -85,7 +86,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_skips_when_not_elected) {
    mock_depot_ops depot;
    depot.elected = false;
 
-   outpost_opp_job job(client, depot, kDeadline);
+   outpost_opp_job job(client, depot);
    job.run_outbound();
 
    BOOST_CHECK(client->outbound_calls.empty());
@@ -98,7 +99,7 @@ BOOST_AUTO_TEST_CASE(run_inbound_skips_when_not_elected) {
    mock_depot_ops depot;
    depot.elected = false;
 
-   outpost_opp_job job(client, depot, kDeadline);
+   outpost_opp_job job(client, depot);
    job.run_inbound();
 
    BOOST_CHECK(client->inbound_calls.empty());
@@ -111,7 +112,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_noop_when_no_pending_envelope) {
    mock_depot_ops depot;
    // depot.pending_response returns nullopt by default.
 
-   outpost_opp_job job(client, depot, kDeadline);
+   outpost_opp_job job(client, depot);
    job.run_outbound();
 
    BOOST_REQUIRE_EQUAL(depot.read_pending_calls.size(), 1u);
@@ -133,7 +134,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_delivers_and_emits_eth_depot_direction) {
    };
    client->deliver_response = [](const auto&) { return std::string{"0x1234"}; };
 
-   outpost_opp_job job(client, depot, kDeadline);
+   outpost_opp_job job(client, depot);
    job.run_outbound();
 
    BOOST_REQUIRE_EQUAL(client->outbound_calls.size(), 1u);
@@ -158,7 +159,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_emits_sol_depot_direction) {
       return rec;
    };
 
-   outpost_opp_job job(client, depot, kDeadline);
+   outpost_opp_job job(client, depot);
    job.run_outbound();
 
    BOOST_REQUIRE_EQUAL(depot.emitted_events.size(), 1u);
@@ -177,7 +178,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_waits_for_boundary_before_retrying) {
       return rec;
    };
 
-   outpost_opp_job job(client, depot, kDeadline);
+   outpost_opp_job job(client, depot);
    job.run_outbound();
    job.run_outbound(); // Second fire in the same epoch.
 
@@ -203,7 +204,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_cranks_the_outpost_once_per_epoch_after_delive
       return rec;
    };
 
-   outpost_opp_job job(client, depot, kDeadline);
+   outpost_opp_job job(client, depot);
    job.run_outbound();
    BOOST_REQUIRE_EQUAL(client->outbound_calls.size(), 1u);
    BOOST_REQUIRE_EQUAL(client->crank_calls.size(), 1u);
@@ -232,7 +233,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_consensus_retry_does_not_crank_again) {
       return rec;
    };
 
-   outpost_opp_job job(client, depot, kDeadline);
+   outpost_opp_job job(client, depot);
    job.run_outbound();
    BOOST_REQUIRE_EQUAL(client->crank_calls.size(), 1u);
 
@@ -255,7 +256,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_does_not_crank_when_delivery_fails) {
    };
    client->deliver_response = [](const auto&) -> std::string { FC_THROW("rpc down"); };
 
-   outpost_opp_job job(client, depot, kDeadline);
+   outpost_opp_job job(client, depot);
    job.run_outbound();
    BOOST_CHECK_EQUAL(client->outbound_calls.size(), 1u);
    BOOST_CHECK(client->crank_calls.empty());
@@ -275,7 +276,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_crank_failure_leaves_the_delivery_marked) {
    };
    client->crank_response = [](const auto&) { FC_THROW("crank refused"); };
 
-   outpost_opp_job job(client, depot, kDeadline);
+   outpost_opp_job job(client, depot);
    job.run_outbound();
    BOOST_CHECK_EQUAL(client->outbound_calls.size(), 1u);
    BOOST_CHECK_EQUAL(client->crank_calls.size(), 1u);
@@ -302,7 +303,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_swallows_exceptions_and_does_not_mark_epoch) {
       FC_THROW("boom");
    };
 
-   outpost_opp_job job(client, depot, kDeadline);
+   outpost_opp_job job(client, depot);
    BOOST_CHECK_NO_THROW(job.run_outbound());
    // Visibility fix: emit fires BEFORE delivery, so a failed attempt still
    // lands a debug event with the attempted bytes.
@@ -332,7 +333,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_retries_an_incomplete_delivery_next_tick_witho
       SYS_THROW(sysio::chain::outpost_delivery_incomplete_exception, "still open");
    };
 
-   outpost_opp_job job(client, depot, kDeadline);
+   outpost_opp_job job(client, depot);
    BOOST_CHECK_NO_THROW(job.run_outbound());
    BOOST_CHECK_EQUAL(client->outbound_calls.size(), 1u);
    BOOST_CHECK_EQUAL(client->crank_calls.size(), 0u);
@@ -363,7 +364,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_emits_event_on_failure_and_retries_next_tick) 
       throw fc::network::json_rpc::json_rpc_error(-32602, "", fc::variant{});
    };
 
-   outpost_opp_job job(client, depot, kDeadline);
+   outpost_opp_job job(client, depot);
    BOOST_CHECK_NO_THROW(job.run_outbound());
 
    BOOST_REQUIRE_EQUAL(depot.emitted_events.size(), 1u);
@@ -396,7 +397,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_emit_failure_does_not_break_delivery) {
    client->deliver_response = [](const auto&) { return std::string{"0xdeadbeef"}; };
    depot.emit_thrower = [] { FC_THROW("debug sink down"); };
 
-   outpost_opp_job job(client, depot, kDeadline);
+   outpost_opp_job job(client, depot);
    BOOST_CHECK_NO_THROW(job.run_outbound());
 
    BOOST_REQUIRE_EQUAL(client->outbound_calls.size(), 1u);
@@ -567,7 +568,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_recovers_rolled_back_success_with_two_online_o
          clients[op]->inbound_response = [&](const auto&) {
             return canonical_consensus && finalized ? inbound : std::vector<char>{};
          };
-         jobs[op] = std::make_unique<outpost_opp_job>(clients[op], depots[op], kDeadline);
+         jobs[op] = std::make_unique<outpost_opp_job>(clients[op], depots[op]);
          jobs[op]->run_outbound();
       }
       fork_deliveries = canonical_deliveries;
@@ -623,7 +624,7 @@ BOOST_AUTO_TEST_CASE(run_inbound_skips_when_epoch_window_closed) {
    mock_depot_ops depot;
    depot.window_open = false;
 
-   outpost_opp_job job(client, depot, kDeadline);
+   outpost_opp_job job(client, depot);
    job.run_inbound();
 
    BOOST_CHECK(client->inbound_calls.empty());
@@ -635,7 +636,7 @@ BOOST_AUTO_TEST_CASE(run_inbound_skips_when_already_delivered) {
    mock_depot_ops depot;
    depot.has_delivered_response = [](uint64_t, uint32_t) { return true; };
 
-   outpost_opp_job job(client, depot, kDeadline);
+   outpost_opp_job job(client, depot);
    job.run_inbound();
 
    BOOST_REQUIRE_EQUAL(depot.has_delivered_calls.size(), 1u);
@@ -647,7 +648,7 @@ BOOST_AUTO_TEST_CASE(run_inbound_noop_when_remote_has_nothing) {
    auto client = make_client(CHAIN_KIND_EVM, 0, 31337);
    mock_depot_ops depot;
 
-   outpost_opp_job job(client, depot, kDeadline);
+   outpost_opp_job job(client, depot);
    job.run_inbound();
 
    BOOST_REQUIRE_EQUAL(client->inbound_calls.size(), 1u);
@@ -662,7 +663,7 @@ BOOST_AUTO_TEST_CASE(run_inbound_delivers_to_depot_and_emits_eth_depot_signal) {
    std::vector<char> raw{'i', 'n', 'b'};
    client->inbound_response = [raw](const auto&) { return raw; };
 
-   outpost_opp_job job(client, depot, kDeadline);
+   outpost_opp_job job(client, depot);
    job.run_inbound();
 
    BOOST_REQUIRE_EQUAL(depot.deliver_calls.size(), 1u);
@@ -682,7 +683,7 @@ BOOST_AUTO_TEST_CASE(run_inbound_emits_sol_depot_signal) {
    std::vector<char> raw{'s'};
    client->inbound_response = [raw](const auto&) { return raw; };
 
-   outpost_opp_job job(client, depot, kDeadline);
+   outpost_opp_job job(client, depot);
    job.run_inbound();
 
    BOOST_REQUIRE_EQUAL(depot.emitted_events.size(), 1u);
@@ -700,7 +701,7 @@ BOOST_AUTO_TEST_CASE(run_inbound_emits_before_deliver_to_depot) {
    client->inbound_response = [raw](const auto&) { return raw; };
    depot.deliver_thrower = [] { FC_THROW("transient mempool"); };
 
-   outpost_opp_job job(client, depot, kDeadline);
+   outpost_opp_job job(client, depot);
    BOOST_CHECK_NO_THROW(job.run_inbound());
 
    BOOST_REQUIRE_EQUAL(depot.emitted_events.size(), 1u);
@@ -722,7 +723,7 @@ BOOST_AUTO_TEST_CASE(run_inbound_emit_failure_does_not_break_delivery) {
    client->inbound_response = [raw](const auto&) { return raw; };
    depot.emit_thrower = [] { FC_THROW("debug sink down"); };
 
-   outpost_opp_job job(client, depot, kDeadline);
+   outpost_opp_job job(client, depot);
    BOOST_CHECK_NO_THROW(job.run_inbound());
 
    BOOST_REQUIRE_EQUAL(depot.deliver_calls.size(), 1u);
@@ -731,6 +732,141 @@ BOOST_AUTO_TEST_CASE(run_inbound_emit_failure_does_not_break_delivery) {
 }
 
 // ─── concurrency ────────────────────────────────────────────────────────────
+
+// ─── per-chain epochs ───────────────────────────────────────────────────────
+
+namespace {
+
+/// Two outposts sharing one depot, each on its own consensus epoch: this operator is elected on chain A's epoch 7
+/// and not on chain B's epoch 3.
+constexpr uint64_t kChainA      = 11;
+constexpr uint64_t kChainB      = 12;
+constexpr uint32_t kChainAEpoch = 7;
+constexpr uint32_t kChainBEpoch = 3;
+constexpr uint32_t kChainAId    = 31337;
+constexpr uint32_t kChainBId    = 0;
+
+/// A depot with chain A elected at its epoch and chain B not, every envelope pending.
+struct two_chain_fixture {
+   std::shared_ptr<mock_outpost_client> client_a = make_client(CHAIN_KIND_EVM, kChainA, kChainAId);
+   std::shared_ptr<mock_outpost_client> client_b = make_client(CHAIN_KIND_SVM, kChainB, kChainBId);
+   mock_depot_ops  depot;
+   outpost_opp_job job_a{client_a, depot};
+   outpost_opp_job job_b{client_b, depot};
+
+   two_chain_fixture() {
+      // The defaults would elect every chain; each chain answers with its own knobs instead.
+      depot.elected        = false;
+      depot.chains[kChainA] = mock_depot_ops::chain_knobs{.elected = true, .epoch = kChainAEpoch};
+      depot.chains[kChainB] = mock_depot_ops::chain_knobs{.elected = false, .epoch = kChainBEpoch};
+      depot.pending_response = [](uint64_t chain_code, uint32_t epoch) -> std::optional<outbound_envelope_record> {
+         outbound_envelope_record record;
+         record.chain_code   = chain_code;
+         record.epoch_index  = epoch;
+         record.raw_envelope = {'x'};
+         return record;
+      };
+   }
+
+   /// Whether every epoch query so far named `chain_code`.
+   bool queried_only(uint64_t chain_code) const {
+      return !depot.epoch_queries.empty() &&
+             std::ranges::all_of(depot.epoch_queries, [&](uint64_t queried) { return queried == chain_code; });
+   }
+};
+
+} // namespace
+
+/// A job for chain A consults chain A's epoch and election, never chain B's: it delivers A's epoch, and B's job,
+/// not elected on B's own epoch, does nothing.
+BOOST_FIXTURE_TEST_CASE(each_job_consults_its_own_chains_epoch, two_chain_fixture) {
+   job_a.run_outbound();
+   BOOST_CHECK(queried_only(kChainA));
+   BOOST_REQUIRE_EQUAL(client_a->outbound_calls.size(), 1u);
+   BOOST_CHECK_EQUAL(client_a->outbound_calls[0].epoch_index, kChainAEpoch);
+   BOOST_REQUIRE_EQUAL(depot.read_pending_calls.size(), 1u);
+   BOOST_CHECK_EQUAL(depot.read_pending_calls[0].chain_code, kChainA);
+   BOOST_CHECK_EQUAL(depot.read_pending_calls[0].epoch_index, kChainAEpoch);
+
+   depot.epoch_queries.clear();
+   job_b.run_outbound();
+   job_b.run_inbound();
+   BOOST_CHECK(queried_only(kChainB));
+   BOOST_CHECK(client_b->outbound_calls.empty());
+   BOOST_CHECK(client_b->inbound_calls.empty());
+   BOOST_CHECK_EQUAL(depot.read_pending_calls.size(), 1u);
+}
+
+/// Each job hands every outpost call its own chain's delivery timeout: the delivery, the crank and the inbound read.
+BOOST_FIXTURE_TEST_CASE(each_job_gives_its_outpost_calls_its_chains_delivery_timeout, two_chain_fixture) {
+   const fc::microseconds chain_a_timeout = fc::seconds(30);
+   const fc::microseconds chain_b_timeout = fc::seconds(7);
+   depot.chains[kChainA].delivery_timeout = chain_a_timeout;
+   depot.chains[kChainB] =
+      mock_depot_ops::chain_knobs{.elected = true, .epoch = kChainBEpoch, .delivery_timeout = chain_b_timeout};
+
+   for (outpost_opp_job* job : {&job_a, &job_b}) {
+      job->run_outbound();
+      job->run_inbound();
+   }
+   for (const auto& [client, timeout] : {std::pair{client_a, chain_a_timeout}, std::pair{client_b, chain_b_timeout}}) {
+      BOOST_REQUIRE_EQUAL(client->outbound_calls.size(), 1u);
+      BOOST_REQUIRE_EQUAL(client->crank_calls.size(), 1u);
+      BOOST_REQUIRE_EQUAL(client->inbound_calls.size(), 1u);
+      BOOST_CHECK(client->outbound_calls[0].deadline == timeout);
+      BOOST_CHECK(client->crank_calls[0].deadline == timeout);
+      BOOST_CHECK(client->inbound_calls[0].deadline == timeout);
+   }
+}
+
+/// Electing chain B on its own epoch lets B's job deliver B's epoch, while A keeps delivering A's.
+BOOST_FIXTURE_TEST_CASE(each_job_delivers_its_own_chains_epoch_index, two_chain_fixture) {
+   depot.chains[kChainB].elected = true;
+   const std::vector<char> inbound{'i', 'n'};
+   client_a->inbound_response = [inbound](const auto&) { return inbound; };
+   client_b->inbound_response = [inbound](const auto&) { return inbound; };
+
+   job_a.run_inbound();
+   job_b.run_inbound();
+
+   BOOST_REQUIRE_EQUAL(client_a->inbound_calls.size(), 1u);
+   BOOST_CHECK_EQUAL(client_a->inbound_calls[0].epoch_index, kChainAEpoch);
+   BOOST_REQUIRE_EQUAL(client_b->inbound_calls.size(), 1u);
+   BOOST_CHECK_EQUAL(client_b->inbound_calls[0].epoch_index, kChainBEpoch);
+   BOOST_REQUIRE_EQUAL(depot.has_delivered_calls.size(), 2u);
+   BOOST_CHECK_EQUAL(depot.has_delivered_calls[0].chain_code, kChainA);
+   BOOST_CHECK_EQUAL(depot.has_delivered_calls[0].epoch_index, kChainAEpoch);
+   BOOST_CHECK_EQUAL(depot.has_delivered_calls[1].chain_code, kChainB);
+   BOOST_CHECK_EQUAL(depot.has_delivered_calls[1].epoch_index, kChainBEpoch);
+   BOOST_REQUIRE_EQUAL(depot.deliver_calls.size(), 2u);
+   BOOST_CHECK_EQUAL(depot.deliver_calls[0].chain_code, kChainA);
+   BOOST_CHECK_EQUAL(depot.deliver_calls[1].chain_code, kChainB);
+}
+
+/// Each job's window and retry boundary are its own chain's: A's closed window holds A alone, and B's passed
+/// boundary retries B alone.
+BOOST_FIXTURE_TEST_CASE(each_job_gates_on_its_own_chains_window_and_boundary, two_chain_fixture) {
+   depot.chains[kChainB].elected = true;
+   job_a.run_outbound();
+   job_b.run_outbound();
+   BOOST_CHECK_EQUAL(client_a->outbound_calls.size(), 1u);
+   BOOST_CHECK_EQUAL(client_b->outbound_calls.size(), 1u);
+
+   // B's boundary has passed, A's has not: only B retries its delivered epoch.
+   depot.chains[kChainB].epoch_boundary_past = true;
+   job_a.run_outbound();
+   job_b.run_outbound();
+   BOOST_CHECK_EQUAL(client_a->outbound_calls.size(), 1u);
+   BOOST_CHECK_EQUAL(client_b->outbound_calls.size(), 2u);
+
+   // A's next epoch opens, but its window is closed: A waits while B keeps retrying.
+   depot.chains[kChainA].epoch       = kChainAEpoch + 1;
+   depot.chains[kChainA].window_open = false;
+   job_a.run_outbound();
+   job_b.run_outbound();
+   BOOST_CHECK_EQUAL(client_a->outbound_calls.size(), 1u);
+   BOOST_CHECK_EQUAL(client_b->outbound_calls.size(), 3u);
+}
 
 BOOST_AUTO_TEST_CASE(run_outbound_and_run_inbound_serialize_on_state_mx) {
    auto client = make_client(CHAIN_KIND_EVM, 0, 31337);
@@ -754,7 +890,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_and_run_inbound_serialize_on_state_mx) {
       return std::string{"tx"};
    };
 
-   outpost_opp_job job(client, depot, kDeadline);
+   outpost_opp_job job(client, depot);
 
    std::thread outbound([&] { job.run_outbound(); });
    while (!outbound_started) std::this_thread::sleep_for(1ms);

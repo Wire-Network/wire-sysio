@@ -157,11 +157,11 @@ The crank runs behind the existing `outpost_client` SPI, entirely inside
 - `read_inbound_envelope` = drain-then-read. `run_inbound` already calls it
   every tick for exactly as long as the epoch's outbound envelope is missing
   -- and that envelope only exists once the cursor drains -- so the read path
-  is the standing recovery driver. `within_epoch_window()` stays open when the
-  epoch is overdue, and every elected operator ticks it, so any group
-  operator's tick can unstick a wedged cursor. The envelope bytes come from a
-  client-side delivered-envelope memo, repopulated after a restart by the next
-  outbound tick's redelivery.
+  is the standing recovery driver. `within_epoch_window(chain)` stays open when
+  the chain's epoch is overdue, and every operator elected on the chain ticks
+  it, so any group operator's tick can unstick a wedged cursor. The envelope
+  bytes come from a client-side delivered-envelope memo, repopulated after a
+  restart by the next outbound tick's redelivery.
 
 `_last_outbound_epoch` semantics are unchanged from master: it advances on
 successful **delivery**, which is its actual job (do not re-upload chunks).

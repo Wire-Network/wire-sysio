@@ -120,13 +120,13 @@ Everything the two `sysio.epoch` clocks inline, directly:
 | `tickeconomy` (economic clock) | `sysio.opreg` | `flushwtdw` |
 | `tickeconomy` | `sysio` | `accrueepoch`, `payepoch`, `settleduty` |
 
-Those callees inline further (`slashop` → `sysio.opreg::slash`, `termcheck` → the
-`sysio.opreg` termination path that credits `remitclaims`, `payepoch` →
-`sysio.token::transfer` for the pushed capex and governance buckets), so the
-transitive subtree — not just the table above — sits inside each clock's abort
-surface. `advance` itself is inlined by `sysio.msgch::chkcons` (and by
-`sysio.msgch::bootstrap` at epoch 0), so `sysio.msgch` is both a caller and a
-callee of `sysio.epoch`.
+Those callees inline further (`slashop` → `sysio.opreg::slash`, `termcheck` →
+`sysio::forfeitduty` on an eviction, `payepoch` → `sysio.token::transfer` for
+the pushed capex and governance buckets), so the transitive subtree — not just
+the table above — sits inside each clock's abort surface. `advance(chain)`
+itself is inlined by `sysio.msgch::chkcons(chain)` (and by
+`sysio.msgch::bootstrap` / `bootchain` at a chain's epoch 0), so `sysio.msgch`
+is both a caller and a callee of `sysio.epoch`.
 
 Independently of inlines, the emissions readiness gate in `sysio.epoch` **reads**
 `sysio.system`'s `emitcfg`, `t5state` and `payclaimtot`, and `sysio.token`'s
@@ -162,7 +162,7 @@ On a fresh deployment, finish the DClaim import before the first `createlink` or
 `recordlink`: fund `sysio.dclaim` with the total of the credits, push every
 `importseed` batch, reconcile the `unmapped` rows against the export, and only
 then seal the import with `importdone`. The LCO import in the cluster bootstrap
-(`LcoImportSteps` in wire-tools-ts) runs these steps in the epoch-0 window and
+(`LcoImportSteps` in wire-tools-ts) runs these steps in the bootstrap window and
 stops before the seal when a row differs. A link sweeps only the credits already
 in `unmapped`, and its holder cannot trigger the sweep again: `createlink`
 accepts one link per account and chain, and only `sysio.authex` may send
@@ -207,6 +207,24 @@ and before `sysio.msgch::bootstrap` (which refuses to start without it). `batch_
 `sysio.epoch::tickeconomy` to the relay's actions, so an operator whose `@active` has been restricted
 by a `linkauth` must let it authorize that action too, or the plugin refuses to start.
 
+### Per-chain consensus epochs
+
+Each outpost chain runs its own consensus epoch. `sysio.epoch`'s `epochcfg` and `epochstate` become
+tables keyed by chain, and `setconfig`, `schbatchgps`, `advance`, `finishadv`, `pause`, `unpause`,
+`sysio.msgch::chkcons`, `sysio.opreg::recorddel` / `termcheck` and `sysio::rcrdduty` take the chain.
+`sysio.opreg` adds `servchains` and keys `dellog` and the `wtdwqueue` consensus waits by chain,
+`sysio.chalg` drops its dispute counter and `byepoch` index, `batchduty` / `dutystate` count
+seat-seconds with one `batchduty` row per (operator, chain), and `termcheck` sends the new
+`sysio::forfeitduty` when it evicts, as `regoperator` does for each chain an account registering
+again still holds duty on. `sysio.opreg::setconfig` takes the new
+`terminate_min_pct_samples`, kept on `opconfig`, and each `servchains` row carries
+the duty tally `termcheck` reads. No migration is supplied: deploy
+`sysio.epoch`, `sysio`, `sysio.opreg`, `sysio.msgch`, `sysio.chalg`, `sysio.chains`, `sysio.tokens`,
+`sysio.liq` and `sysio.synd` together on a fresh chain with the matching `batch_operator_plugin`.
+Before `sysio.msgch::bootstrap`, configure each active outpost with
+`sysio.epoch::setconfig(chain, ...)`, have each batch operator `joinchain` the chains it serves, and
+build each chain's window with `schbatchgps(chain)`.
+
 ## The two rules for future changes
 
 1. **A contract that gains an action `advance` inlines deploys BEFORE
@@ -239,6 +257,7 @@ changes. For the edges on `advance`'s path today, and the one `sysio.bond::accep
 |---|---|
 | `sysio.opreg`, `sysio.chalg`, `sysio.msgch` before `sysio.epoch`, when the release adds or changes an action `advance` or `tickeconomy` inlines into them | Call edge: the new clock would otherwise reach a callee that cannot dispatch the action, and every advance or tick aborts. |
 | `sysio` (`sysio.system`) before `sysio.epoch`, when the release adds or changes `rcrdduty` / `accrueepoch` / `payepoch` / `settleduty` | Call edge: the new clock would otherwise reach a `sysio.system` that cannot dispatch the action, and every advance or tick aborts. |
+| `sysio` (`sysio.system`) before `sysio.opreg`, when the release adds or changes `forfeitduty` | Call edge: `termcheck` inlines it inside `advance`, so an old `sysio.system` aborts every advance that evicts, and every `regoperator` that forfeits an earlier registration's duty. |
 | `sysio.epoch` and `sysio.kicker` before `sysio.system`, when `sysio.system` gains state the emissions gate must reserve (as `payclaimtot` reserves unclaimed `payclaims`) | Table edge: the old gate counts the new backing as spendable, so a later pay period can double-commit it and leave credited claims underfunded; an old kicker counts it as available treasury and `kick` can draw it. |
 | `sysio.epoch` before `sysio.msgch`, when the release adds or changes an action `chkcons` inlines into `sysio.epoch` | Call edge in the other direction. |
 | `sysio` (`sysio.system`) before `sysio.bond` | Call edge: `accept` on a request from a `sysio.*` issuer sends `sysio::addsubjex`, and the dispatcher rejects an action the deployed contract does not define, so every such `accept` aborts. |

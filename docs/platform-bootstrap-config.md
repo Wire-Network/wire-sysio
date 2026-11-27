@@ -3,8 +3,8 @@
 Launch-day chains, tokens, shadow-liq yield pools and pre-launch syndicated
 positions are described by a single human-authored JSON file validated against
 a protobuf schema. The bootstrap tool replays that file onto the chain inside
-the epoch-0 bootstrap window (`sysio.epoch` `current_epoch_index == 0`), where
-every registration is privilege-gated and lands active inline.
+the bootstrap window (before the network genesis: no `sysio.epoch` `netgenesis`
+row), where every registration is privilege-gated and lands active inline.
 
 | Need | Artifact |
 |---|---|

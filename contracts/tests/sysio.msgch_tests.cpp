@@ -203,9 +203,9 @@ BOOST_AUTO_TEST_SUITE_END()
 
 // ---------------------------------------------------------------------------
 //  envelope_log tests — exercises the audit-trail row + cap-and-evict
-//  behaviour of `buildenv`. The fixture also deploys `sysio.epoch` so we
-//  can register an outpost and the `write_envelope_log` helper can derive
-//  `active_outposts × 2 × cfg.epoch_retention_envelope_log_count`.
+//  behaviour of `buildenv`. The fixture also deploys `sysio.epoch` so the
+//  `write_envelope_log` helper can read each outpost's
+//  `2 × cfg.epoch_retention_envelope_log_count` cap.
 // ---------------------------------------------------------------------------
 class sysio_msgch_envlog_tester : public tester {
 public:
@@ -250,20 +250,22 @@ public:
       }
    }
 
-   /// Bring `epoch_config` to a known retention value and register `n`
-   /// outposts so the `write_envelope_log` cap derivation has a stable
-   /// `active_outposts` to read.
+   /// Bring both outposts' `epoch_config` to a known retention value, the per-outpost
+   /// `write_envelope_log` cap.
    void bootstrap_epoch_config(uint32_t retention_count) {
       // setconfig: allow any group/operator-count combination; we don't
       // exercise group rotation here, just the outpost roster.
-      BOOST_REQUIRE_EQUAL(success(),
-         push_action(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "setconfig"_n, mvo()
-            ("epoch_duration_sec", 60)
-            ("operators_per_epoch", 1)
-            ("batch_operator_minimum_active", 3)
-            ("batch_op_groups", 3)
-            ("epoch_retention_envelope_log_count", retention_count)
-         ));
+      for (const std::string_view chain : {"ETH", "SOL"}) {
+         BOOST_REQUIRE_EQUAL(success(),
+            push_action(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "setconfig"_n, mvo()
+               ("chain_code", chain)
+               ("epoch_duration_sec", 60)
+               ("operators_per_epoch", 1)
+               ("batch_operator_minimum_active", 3)
+               ("batch_op_groups", 3)
+               ("epoch_retention_envelope_log_count", retention_count)
+            ));
+      }
    }
 
    /// Replacement for `regoutpost` — register a chain row in sysio.chains.
@@ -393,6 +395,18 @@ public:
       return n;
    }
 
+   /// The `envlog` rows of outpost `chain_code` in the id range `[0, max_id_exclusive)`, in id order.
+   std::vector<fc::variant> envlog_rows_of(uint64_t chain_code, uint64_t max_id_exclusive) {
+      std::vector<fc::variant> rows;
+      for (uint64_t id = 0; id < max_id_exclusive; ++id) {
+         const auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "envlog"_n, id);
+         if (data.empty()) continue;
+         auto row = msgch_abi.binary_to_variant("envelope_log_entry", data, fixture_abi_yield_function());
+         if (row["chain_code"].as_uint64() == chain_code) rows.push_back(std::move(row));
+      }
+      return rows;
+   }
+
    /// Count populated `envlog` rows in the id range `[0, max_id_exclusive)`.
    /// Cheap enough for the test scales here (≤ a few thousand probes).
    uint32_t envlog_row_count_until(uint64_t max_id_exclusive) {
@@ -469,6 +483,8 @@ BOOST_FIXTURE_TEST_CASE(buildenv_writes_envlog_row, sysio_msgch_envlog_tester) {
       "envelope_log_entry", data,
       fixture_abi_yield_function());
    BOOST_REQUIRE_EQUAL(1u, row["id"].as_uint64());
+   BOOST_REQUIRE_EQUAL(ETH_OUTPOST_ID, row["chain_code"].as_uint64());
+   BOOST_REQUIRE_EQUAL(1u, row["chain_seq"].as_uint64());
    // start = WIRE/1, end = ETH/31337. ABI serializer reflects the
    // ChainKind enum back as its symbolic name; the `chain_id` field is a
    // `vuint32_t` and surfaces as `{"value": N}`.
@@ -480,80 +496,66 @@ BOOST_FIXTURE_TEST_CASE(buildenv_writes_envlog_row, sysio_msgch_envlog_tester) {
    BOOST_REQUIRE_EQUAL(31337u, row["endpoints"]["end"]["id"]["value"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
-/// Eviction at the boundary. Set `retention=2` and one outpost →
-/// `cap = 1*2*2 = 4`. After 5 buildenv rounds (5 rows inserted), the
-/// oldest full epoch (`per_epoch = 1*2 = 2` rows) gets evicted; final
-/// row count is 4.
-BOOST_FIXTURE_TEST_CASE(envlog_evicts_oldest_epoch_on_overflow, sysio_msgch_envlog_tester) { try {
+/// Eviction at the boundary. With `retention=2` an outpost keeps `2 * 2 = 4` rows, so the fifth
+/// write evicts the outpost's oldest row and leaves ids 2..5.
+BOOST_FIXTURE_TEST_CASE(envlog_evicts_oldest_rows_on_overflow, sysio_msgch_envlog_tester) { try {
    bootstrap_epoch_config(/*retention=*/2);
    register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
    produce_blocks();
 
-   // Drive 5 queueout+buildenv rounds → 5 envlog rows inserted, last
-   // overflow triggers a 2-row head drop. Final survivors: ids 2,3,4
-   // (or higher set, depending on cap arithmetic). cap = 1*2*2 = 4 →
-   // when live_count = 5 (after 5th insert) the helper drops 2 rows.
    for (uint32_t i = 0; i < 5; ++i) {
       BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID, EVM_TEST_ATTESTATION_TYPE));
       BOOST_REQUIRE_EQUAL(success(), buildenv(ETH_OUTPOST_ID));
       produce_blocks();
    }
 
-   // Count surviving rows in [0..5].
-   uint32_t alive = 0;
-   uint64_t oldest_alive_id = std::numeric_limits<uint64_t>::max();
-   for (uint64_t id = 0; id < 10; ++id) {
-      auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "envlog"_n, id);
-      if (data.empty()) continue;
-      ++alive;
-      if (id < oldest_alive_id) oldest_alive_id = id;
+   const auto rows = envlog_rows_of(ETH_OUTPOST_ID, 10);
+   BOOST_REQUIRE_EQUAL(4u, rows.size());
+   for (uint64_t i = 0; i < rows.size(); ++i) {
+      BOOST_REQUIRE_EQUAL(i + 2, rows[i]["id"].as_uint64());
+      BOOST_REQUIRE_EQUAL(i + 2, rows[i]["chain_seq"].as_uint64());
    }
-   // After 5 inserts (ids 1..5) and a 2-row head eviction (on the 5th
-   // insert when live_count crossed cap=4), 3 rows remain: ids 3, 4, 5.
-   BOOST_REQUIRE_EQUAL(3u, alive);
-   BOOST_REQUIRE_EQUAL(3u, oldest_alive_id);
 } FC_LOG_AND_RETHROW() }
 
-/// Roster change updates the cap. Start with 1 outpost (cap = 1*2*2 =
-/// 4). Drive 4 rounds → 4 rows. Register a second outpost (cap now
-/// 2*2*2 = 8). Drive 4 more rounds → 8 rows. No eviction yet because
-/// each round only writes for outpost 0; the second outpost was added
-/// but never received traffic. The cap math reads the current
-/// outposts table size on every write.
-BOOST_FIXTURE_TEST_CASE(envlog_cap_tracks_outpost_count, sysio_msgch_envlog_tester) { try {
-   bootstrap_epoch_config(/*retention=*/2);
+/// Retention is per outpost. SOL logs two rows first, so they hold the lowest ids; ETH then logs far
+/// past its own cap. ETH evicts only its own oldest rows, keeping its newest four, and SOL's rows
+/// survive untouched.
+BOOST_FIXTURE_TEST_CASE(envlog_retention_is_per_outpost, sysio_msgch_envlog_tester) { try {
+   constexpr uint32_t kRetention    = 2;
+   constexpr uint32_t kRowsPerEpoch = 2;   ///< mirror of ENVELOPE_LOG_ROWS_PER_EPOCH
+   constexpr uint32_t kCap          = kRetention * kRowsPerEpoch;
+   constexpr uint32_t kSolWrites    = 2;
+   constexpr uint32_t kEthWrites    = 10;
+   constexpr uint64_t kScan         = kSolWrites + kEthWrites + 4;
+   bootstrap_epoch_config(kRetention);
    register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
-   produce_blocks();
-
-   for (uint32_t i = 0; i < 4; ++i) {
-      BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID, EVM_TEST_ATTESTATION_TYPE));
-      BOOST_REQUIRE_EQUAL(success(), buildenv(ETH_OUTPOST_ID));
-      produce_blocks();
-   }
-   // After 4 rounds with cap=4, no eviction yet.
-   uint32_t alive = 0;
-   for (uint64_t id = 0; id < 10; ++id) {
-      auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "envlog"_n, id);
-      if (!data.empty()) ++alive;
-   }
-   BOOST_REQUIRE_EQUAL(4u, alive);
-
-   // Add a second outpost — cap doubles to 8.
    register_outpost(opp::types::CHAIN_KIND_SVM, 0);
    produce_blocks();
 
-   // Three more rounds on outpost 0 → 7 rows total, still under cap=8.
-   for (uint32_t i = 0; i < 3; ++i) {
+   for (uint32_t i = 0; i < kSolWrites; ++i) {
+      BOOST_REQUIRE_EQUAL(success(), queueout_with_data(SOL_OUTPOST_ID, EVM_TEST_ATTESTATION_TYPE, indexed_payload(i)));
+      BOOST_REQUIRE_EQUAL(success(), buildenv(SOL_OUTPOST_ID));
+      produce_blocks();
+   }
+   for (uint32_t i = 0; i < kEthWrites; ++i) {
       BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID, EVM_TEST_ATTESTATION_TYPE));
       BOOST_REQUIRE_EQUAL(success(), buildenv(ETH_OUTPOST_ID));
       produce_blocks();
    }
-   alive = 0;
-   for (uint64_t id = 0; id < 10; ++id) {
-      auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "envlog"_n, id);
-      if (!data.empty()) ++alive;
+
+   const auto sol_rows = envlog_rows_of(SOL_OUTPOST_ID, kScan);
+   BOOST_REQUIRE_EQUAL(kSolWrites, sol_rows.size());
+   for (uint64_t i = 0; i < sol_rows.size(); ++i) {
+      BOOST_REQUIRE_EQUAL(i + 1, sol_rows[i]["id"].as_uint64());
+      BOOST_REQUIRE_EQUAL(i + 1, sol_rows[i]["chain_seq"].as_uint64());
    }
-   BOOST_REQUIRE_EQUAL(7u, alive);
+
+   const auto eth_rows = envlog_rows_of(ETH_OUTPOST_ID, kScan);
+   BOOST_REQUIRE_EQUAL(kCap, eth_rows.size());
+   for (uint64_t i = 0; i < eth_rows.size(); ++i) {
+      BOOST_REQUIRE_EQUAL(kEthWrites - kCap + 1 + i, eth_rows[i]["chain_seq"].as_uint64());
+      BOOST_REQUIRE_EQUAL(kSolWrites + kEthWrites - kCap + 1 + i, eth_rows[i]["id"].as_uint64());
+   }
 } FC_LOG_AND_RETHROW() }
 
 /// WNS-18 / WIRE-348: without inbound consensus nothing is acknowledged, so `buildenv` keeps every

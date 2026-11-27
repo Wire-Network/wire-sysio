@@ -336,7 +336,7 @@ public:
 
    // --- registries ---
 
-   // Registrations inside the epoch-0 bootstrap window land ACTIVE, as the launch bootstrap's do.
+   // Registrations before the network genesis (the bootstrap window) land ACTIVE, as the launch bootstrap's do.
    action_result regchain(ChainKind kind, std::string_view code, uint32_t external_chain_id) {
       return push(CHAINS_ACCOUNT, chains_abi_ser, CHAINS_ACCOUNT, "regchain"_n, mvo()
          ("kind", kind)("code", codename_mvo(code))("external_chain_id", external_chain_id)
@@ -550,9 +550,10 @@ public:
    static mvo pruneenv_data(uint32_t limit, std::string_view token_code = LIQSOL) {
       return mvo()("chain_code", codename_mvo(SOLANA))("token_code", codename_mvo(token_code))("limit", limit);
    }
-   /// Move the depot's current epoch index, through the stand-in on sysio.epoch.
+   /// Move both outposts' current epoch index, through the stand-in on sysio.epoch.
    action_result set_epoch(uint32_t index) {
-      return push(EPOCH_ACCOUNT, epoch_abi_ser, EPOCH_ACCOUNT, "setindex"_n, mvo()("index", index));
+      return push(EPOCH_ACCOUNT, epoch_abi_ser, EPOCH_ACCOUNT, "setindex"_n, mvo()
+         ("chain_codes", std::vector<uint64_t>{slug_value(SOLANA), slug_value(ETH)})("index", index));
    }
    /// The pending block's time, in whole seconds: what a bucket tick records.
    uint32_t now_sec() { return control->pending_block_time().sec_since_epoch(); }

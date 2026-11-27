@@ -31,12 +31,11 @@ namespace sysio {
     *    truth); the outpost owns the
     *    chain-native ↔ depot-frame conversion at its boundary.
     *
-    * ## Lifecycle (unified bootstrap + post-bootstrap, per
-    * /data/shared/code/wire/.claude/rules/epoch-duration-global.md):
+    * ## Lifecycle (unified bootstrap + post-bootstrap):
     *
-    *  * `regtoken` / `regchaintoken`: priv-gated. If
-    *    `current_epoch_index == 0` (bootstrap window) sets `active=true`
-    *    inline; else `active=false`.
+    *  * `regtoken` / `regchaintoken`: priv-gated. Before the network
+    *    genesis (bootstrap window) sets `active=true` inline; else
+    *    `active=false`.
     *  * `activtoken` / `activchaintoken`: priv-gated. Sets `active=true`
     *    exactly once. `activchaintoken` additionally enforces "exactly one
     *    `is_native=true` per Chain" at activation time.
@@ -44,9 +43,6 @@ namespace sysio {
    class [[sysio::contract("sysio.tokens")]] tokens : public contract {
    public:
       using contract::contract;
-
-      // Well-known accounts
-      static constexpr name EPOCH_ACCOUNT = "sysio.epoch"_n;
 
       // -----------------------------------------------------------------------
       //  Actions

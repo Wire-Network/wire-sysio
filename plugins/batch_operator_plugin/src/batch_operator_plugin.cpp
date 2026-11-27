@@ -20,9 +20,11 @@
 #include <thread>
 
 #include "async_action_completion.hpp"
+#include "chain_epochs.hpp"
 #include "economic_clock.hpp"
 #include "group_election.hpp"
 #include "role_config.hpp"
+#include "served_chains.hpp"
 #include "underwriter.hpp"
 #include "yield_cranks.hpp"
 
@@ -51,10 +53,9 @@ namespace eth = fc::network::ethereum;
 namespace sol = fc::network::solana;
 
 namespace {
-   /// Shared RPC/depot budget; see the SHARED KNOB comment in set_program_options.
-   constexpr fc::microseconds DELIVERY_TIMEOUT  = fc::seconds(60);
+   /// `--batch-epoch-poll-ms` default: the longest interval between the relay's polls of a chain (the cadence of a
+   /// chain at the default 360 s epoch), and the poll interval of the depot cranks and the underwriter.
    constexpr fc::microseconds EPOCH_POLL        = fc::seconds(15);
-   constexpr fc::microseconds EPOCH_EDGE_BUFFER = fc::milliseconds(2500);
    /// Minimum spacing between this operator's `sysio.swap::tickyield` pushes per
    /// yield pool (`--batch-yield-tick-interval-ms`).
    constexpr fc::microseconds YIELD_TICK_INTERVAL = fc::minutes(1);
@@ -78,18 +79,25 @@ namespace {
    /// discovered at startup — keeps `epoch_tick` viable so a cold-sync node
    /// that finds outposts later still responds.
    constexpr std::size_t MIN_CRON_THREADS = 5;
-   /// Inbound plus outbound cron entries for each active outpost.
+   /// Inbound plus outbound cron entries for each relayed outpost.
    constexpr std::size_t OPP_CRON_JOBS_PER_OUTPOST = 2;
    /// The plugin-wide epoch polling cron entry.
    constexpr std::size_t EPOCH_TICK_CRON_JOBS = 1;
+   /// The depot cranks' polling cron entry (disputes, economic clock, yield).
+   constexpr std::size_t CRANK_CRON_JOBS = 1;
    /// The underwriter's polling cron entry.
    constexpr std::size_t UNDERWRITER_CRON_JOBS = 1;
    /// The kick crank's polling cron entry.
    constexpr std::size_t KICK_CRON_JOBS = 1;
    /// Exact secondary-index lookups should return at most the matching row.
    constexpr uint32_t EXACT_LOOKUP_LIMIT = 1;
+   /// Rows per page of a secondary-index range read (`read_index_range`), which pages until the range is done.
+   constexpr uint32_t RANGE_PAGE_ROWS = 50;
    /// How long past the head block's time a pushed transaction stays valid.
    constexpr fc::microseconds PUSH_EXPIRATION = fc::seconds(30);
+   /// How long a depot read, or a depot push tied to no one chain, may take: a push is not waited on past its
+   /// expiration. A chain's own pushes take its delivery timeout (`batch_operator_detail::derive_cadence`).
+   constexpr fc::microseconds DEPOT_CALL_TIMEOUT = PUSH_EXPIRATION;
 
    /// Work units of the `sysio.synd::crank` the underwriter pushes every pass.
    constexpr uint32_t UNDERWRITER_CRANK_LIMIT = 16;
@@ -107,6 +115,10 @@ namespace {
    constexpr std::string_view SIGNER_PROBE = "batch_operator_plugin signer probe";
    /// A `kv::global` singleton table holds exactly one row.
    constexpr uint32_t SINGLETON_ROW_LIMIT = 1;
+   /// Why a relay job is dropped: its chain is no longer relayed, or `sysio.msgch::deliver` refuses the operator's own
+   /// status on every chain.
+   constexpr std::string_view JOB_DROP_UNRELAYED      = "unrelayed";
+   constexpr std::string_view JOB_DROP_REFUSED_STATUS = "refused-status";
 
    // ── WIRE contract identifiers (actions, tables, indexes, field names) ──
    // Centralised so a contract rename/refactor shows up as one search hit,
@@ -127,28 +139,18 @@ namespace {
          constexpr auto status         = "status";
          constexpr auto raw_envelope   = "raw_envelope";
          constexpr auto envelope_hash  = "envelope_hash";
-         constexpr auto batch_op_name  = "batch_op_name";
+         constexpr auto batch_op_name  = batch_operator_detail::envelope_batch_op_field;
          constexpr auto data           = "data";
       }
    }
 
-   // The awareness poll that gates the relay loop reads `field::status`. The `OperatorStatus` spellings and the
-   // `is_active` decision live in `sysio/opp/depot/opreg_status.hpp`.
+   // The awareness poll that gates chkcons, the cranks and the relay jobs reads `operators::status`; the relayed chains
+   // come from this operator's `servchains` rows. The `OperatorStatus` spellings and the `is_active` and delivery
+   // decisions live in `sysio/opp/depot/opreg_status.hpp`.
    namespace opreg = sysio::opreg_names;
 
-   namespace epoch {
-      constexpr auto account            = "sysio.epoch";
-      constexpr auto table_epochstate   = "epochstate";
-      /// Field names on `epoch_state` singleton.
-      namespace field {
-         constexpr auto current_epoch_index    = "current_epoch_index";
-         constexpr auto current_batch_op_group = "current_batch_op_group";
-         constexpr auto is_paused              = "is_paused";
-         constexpr auto batch_op_groups        = "batch_op_groups";
-         constexpr auto current_epoch_start    = "current_epoch_start";
-         constexpr auto next_epoch_start       = "next_epoch_start";
-      }
-   }
+   /// The per-chain consensus epoch tables (`chain_epochs.hpp`).
+   namespace epoch = batch_operator_detail::epoch;
 
    namespace chalg {
       constexpr auto account           = "sysio.chalg";
@@ -202,20 +204,8 @@ namespace {
                                               batch_operator_detail::liq::account};
 }
 
-// ---------------------------------------------------------------------------
-//  Outpost descriptor — one per registered outpost
-// ---------------------------------------------------------------------------
-struct outpost_descriptor {
-   uint64_t  id          = 0;
-   ChainKind chain_kind  = CHAIN_KIND_UNKNOWN;
-   uint32_t  chain_id    = 0;
-   /// Remote contract identities from the row's nested `outpost` struct. EVM
-   /// rows carry both; an SVM row carries `opp_addr` alone, because the single
-   /// outpost program serves both directions. Either may be empty while the
-   /// remote contract is not yet deployed — `build_opp_jobs` fails closed.
-   std::string opp_addr;
-   std::string opp_inbound_addr;
-};
+using batch_operator_detail::outpost_descriptor;
+using batch_operator_detail::unserviceable_chain;
 
 namespace {
    /// The remote contract identities a relay job or an underwriter client was built for, so a `setoutpost`
@@ -238,12 +228,6 @@ namespace {
    struct built_outpost_client {
       std::shared_ptr<sysio::outpost_client> client;
       outpost_deployment                     deployment;
-   };
-
-   /// A chain this node cannot serve, and why.
-   struct unserviceable_chain {
-      std::string code;
-      std::string why;
    };
 
    /// A `sysio.liq` shadow, as the underwriter uses it.
@@ -295,7 +279,6 @@ struct batch_operator_plugin::impl {
    /// an account was configured. There is no separate enable flag.
    bool         enabled             = false;
    fc::microseconds epoch_poll          = EPOCH_POLL;
-   fc::microseconds delivery_timeout    = DELIVERY_TIMEOUT;
    fc::microseconds yield_tick_interval = YIELD_TICK_INTERVAL;
 
    /// `account@permission` the underwriter bonds and claims as (`batch-underwriter-account`).
@@ -357,23 +340,32 @@ struct batch_operator_plugin::impl {
    /// Fair bounded traversal of kicker pools across polls.
    batch_operator_detail::kick_pool_scan kick_scan;
 
-   // Epoch state tracked across polls
-   uint32_t                 current_epoch = 0;
-   /// This operator's standing for `current_epoch`. Retained across polls
-   /// because the election is decided in `parse_epoch_state` but reported in
-   /// `do_poll_epoch_state`.
-   batch_operator_detail::group_election election;
-   fc::time_point           epoch_start;
-   fc::time_point           next_epoch_start;
-   std::vector<outpost_descriptor> outposts;
+   // Relay state, written by the epoch tick, and by the deferred startup before the cron service runs. Only
+   // `chain_epochs` is read from other threads: the per-outpost jobs read it through `depot_ops`.
+   /// Each outpost chain's consensus epoch and this operator's election on it, from the last good read.
+   batch_operator_detail::chain_epochs chain_epochs;
+   /// Guards `chain_epochs` between the epoch tick that replaces it and the per-outpost jobs that read it.
+   mutable std::mutex                  chain_epochs_mx;
+   /// This operator's `servchains` memberships, from the last good read.
+   batch_operator_detail::chain_memberships memberships;
+   /// The chains this operator relays (`batch_operator_detail::relayed_chains`), recomputed every read.
+   std::set<uint64_t>                  relayed;
+   /// Every active outpost on `sysio.chains`, from the last good read.
+   std::vector<outpost_descriptor>     outposts;
+   /// When the epoch tick next reads the chains. Its cron entry fires every `epoch_tick_step`; the read waits for the
+   /// shortest poll interval of the relayed chains (`batch_operator_detail::epoch_tick_interval`).
+   fc::time_point                      next_epoch_read;
 
    // Operator awareness — set by `poll_own_status()` from sysio.opreg::operators.
-   // SLASHED / TERMINATED operators MUST stop relaying: continued deliveries
-   // would be wasted CPU on the WIRE chain (msgch's deliver action will reject
-   // since the operator no longer holds bond) AND a TERMINATED operator's
-   // bond is already remitted, so any continued participation is misleading.
-   /// Written by the epoch tick, read by the kick crank's own cron job.
+   /// Whether `chkcons`, the depot cranks and the kick crank push: false once the operator is SLASHED or TERMINATED.
+   /// Written by the epoch tick, read by the crank and kick cron jobs.
    std::atomic<bool>        is_active{true};
+   /// Whether the relay jobs run: `sysio.msgch::deliver` accepts the operator's status, which only ACTIVE passes.
+   /// False until a read of the status shows ACTIVE. Written and read by the epoch tick, and by the deferred startup
+   /// before the cron service runs.
+   bool                     status_delivers = false;
+   /// Whether `poll_own_status` has read the status once. Same threads as `status_delivers`.
+   bool                     status_read = false;
 
    // Plugin references
    chain_plugin*                     chain_plug = nullptr;
@@ -386,14 +378,15 @@ struct batch_operator_plugin::impl {
    signal<void(const opp::debugging::DebugEnvelopeEvent&)> debug_envelope_signal;
 
    /// Private cron_service owned by this plugin, created by `run_deferred_startup` and sized from the outposts
-   /// discovered then. It runs the relay's epoch_tick and per-outpost jobs, which `refresh_outposts` adds and
-   /// removes as governance changes the active set, and the underwriter's poll. Stopped at plugin_shutdown.
+   /// discovered then. It runs the relay's epoch_tick, cranks and per-outpost jobs, which `refresh_relay` adds and
+   /// removes as the relayed chain set changes, and the underwriter's poll. Stopped at plugin_shutdown.
    sysio::services::cron_service_ptr cron_svc;
    std::vector<cron_service::job_id_t> cron_job_ids;
-   /// Cron job IDs for a scheduled outpost relay pair.
+   /// Cron job IDs for a scheduled outpost relay pair, and the chain's poll interval they run at.
    struct scheduled_opp_job_ids {
       cron_service::job_id_t outbound = 0;
       cron_service::job_id_t inbound  = 0;
+      fc::microseconds       interval;
    };
    std::map<uint64_t, scheduled_opp_job_ids> scheduled_opp_jobs;
    std::atomic<bool>                 shutting_down{false};
@@ -464,7 +457,8 @@ struct batch_operator_plugin::impl {
             fc::mutable_variant_object()
                (msgch::field::batch_op_name, _impl.operator_account.to_string())
                (msgch::field::chain_code,    chain_code)
-               (msgch::field::data,          raw_messages));
+               (msgch::field::data,          raw_messages),
+            _impl.delivery_timeout_of(chain_code));
       }
 
       void emit_debug_envelope(sysio::opp::debugging::DebugEnvelopeEvent event) override {
@@ -476,16 +470,25 @@ struct batch_operator_plugin::impl {
          _impl.debug_envelope_signal(event);
       }
 
-      bool     within_epoch_window() const override { return _impl.within_epoch_window(); }
-      bool     is_elected()         const override { return _impl.election.is_elected; }
-      uint32_t current_epoch()      const override { return _impl.current_epoch; }
-      bool     is_epoch_boundary_past() const override {
-         // `next_epoch_start` is cached on `_impl` from
-         // `sysio.epoch::epochstate`. Empty time_point = no cache yet
-         // (pre-bootstrap) → conservative `false`. Otherwise compare
-         // against wall clock.
-         if (_impl.next_epoch_start == fc::time_point()) return false;
-         return fc::time_point::now() >= _impl.next_epoch_start;
+      // Each query reads the chain's last-read view; a chain without one answers false or 0.
+      bool within_epoch_window(uint64_t chain_code) const override {
+         const std::optional<batch_operator_detail::chain_epoch_view> view = _impl.chain_epoch_of(chain_code);
+         return view && batch_operator_detail::within_epoch_window(*view, fc::time_point::now());
+      }
+      bool is_elected(uint64_t chain_code) const override {
+         const std::optional<batch_operator_detail::chain_epoch_view> view = _impl.chain_epoch_of(chain_code);
+         return view && view->election.is_elected;
+      }
+      uint32_t current_epoch(uint64_t chain_code) const override {
+         const std::optional<batch_operator_detail::chain_epoch_view> view = _impl.chain_epoch_of(chain_code);
+         return view ? view->epoch_index : 0;
+      }
+      bool is_epoch_boundary_past(uint64_t chain_code) const override {
+         const std::optional<batch_operator_detail::chain_epoch_view> view = _impl.chain_epoch_of(chain_code);
+         return view && batch_operator_detail::is_epoch_boundary_past(*view, fc::time_point::now());
+      }
+      fc::microseconds delivery_timeout(uint64_t chain_code) const override {
+         return _impl.delivery_timeout_of(chain_code);
       }
    };
 
@@ -510,14 +513,14 @@ struct batch_operator_plugin::impl {
    /// so chainbase iteration runs during the controller's read window instead of racing with block apply.
    sysio::chain_apis::read_only::get_table_rows_result
    read_table(sysio::chain_apis::read_only::get_table_rows_params p) {
-      return chain_plug->read_table_rows(std::move(p), delivery_timeout, "batch_operator", shutting_down);
+      return chain_plug->read_table_rows(std::move(p), DEPOT_CALL_TIMEOUT, "batch_operator", shutting_down);
    }
 
    /// `read_table`, but nullopt when the read failed (logged by chain_plugin), so a caller that must not act on a
    /// partial view can tell a failure from an empty table.
    std::optional<sysio::chain_apis::read_only::get_table_rows_result>
    read_table_checked(sysio::chain_apis::read_only::get_table_rows_params p) {
-      return chain_plug->read_table_rows_checked(std::move(p), delivery_timeout,
+      return chain_plug->read_table_rows_checked(std::move(p), DEPOT_CALL_TIMEOUT,
                                                  chain_plug->get_abi_serializer_max_time(), "batch_operator",
                                                  shutting_down);
    }
@@ -538,79 +541,120 @@ struct batch_operator_plugin::impl {
       return std::move(rows->rows);
    }
 
-   /// Check if this operator already delivered an envelope for the
-   /// given outpost + epoch by querying msgch::envelopes via the
-   /// byoutepoch secondary index.
+   /// Every row of `code::table` whose `index` secondary key lies in `range`, values only, read page by page until the
+   /// range is done; nullopt when a read failed (logged by chain_plugin). A non-unique key spans several rows, which an
+   /// exact-match `find` would cut to its first.
+   std::optional<fc::variants> read_index_range(std::string_view code, std::string_view table, std::string_view index,
+                                                const batch_operator_detail::index_range& range) {
+      return batch_operator_detail::read_range(
+         range, [&](const std::string& lower_bound,
+                    const std::string& upper_bound) -> std::optional<batch_operator_detail::table_page> {
+            sysio::chain_apis::read_only::get_table_rows_params p;
+            p.code        = chain::name(code);
+            p.scope       = std::string(code);
+            p.table       = std::string(table);
+            p.index_name  = std::string(index);
+            p.lower_bound = lower_bound;
+            p.upper_bound = upper_bound;
+            p.limit       = RANGE_PAGE_ROWS;
+            p.values_only = true;
+            std::optional<sysio::chain_apis::read_only::get_table_rows_result> rows = read_table_checked(std::move(p));
+            if (!rows) return std::nullopt;
+            return batch_operator_detail::table_page{
+               .rows = std::move(rows->rows), .more = rows->more, .next_key = std::move(rows->next_key)};
+         });
+   }
+
+   /// Whether this operator already delivered an envelope for outpost `chain_code`'s epoch `epoch_index`: every
+   /// `sysio.msgch::envelopes` row of that chain epoch (its `byoutepoch` range, one row per deliverer), searched for
+   /// this operator. False when the read failed: a delivery the depot already holds is refused as a duplicate.
    bool has_delivered_envelope(uint64_t chain_code, uint32_t epoch_index) {
-      // Canonical (outpost, epoch) packing per sysio.opp.common/opp_keys.hpp —
-      // chain_code (a slug_name, up to 48 bits) occupies bits 32-79, epoch bits 0-31.
-      // The byoutepoch index is uint128; serialize the bound as a decimal string so
-      // the JSON round-trip stays lossless past 2^64.
-      auto op_account = operator_account;
-      // chain_plugin::get_table_rows forwards secondary-index bounds through
-      // be_key_codec::encode_key, which unconditionally calls get_object() on
-      // the JSON-parsed bound. A bare scalar like "5" therefore throws
-      // bad_cast. Wrap the composite key under the `byoutepoch` field to
-      // satisfy the codec. Use `find=` rather than equal lower/upper bounds
-      // because chain_plugin's secondary-index iteration breaks on
-      // `sk >= ub_sv` — `find` mode appends a null byte to the upper bound
-      // so the secondary key compares strictly less than it.
-      sysio::chain_apis::read_only::get_table_rows_params p;
-      p.code        = chain::name(msgch::account);
-      p.scope       = msgch::account;
-      p.table       = msgch::table_envelopes;
-      p.find        = batch_operator_detail::byoutepoch_find_bound(chain_code, epoch_index);
-      p.index_name  = batch_operator_detail::byoutepoch_index_name;
-      p.values_only = true;
-      p.filter      = [op_account](const fc::variant& row) {
-         return chain::name(row[msgch::field::batch_op_name].as_string()) == op_account;
-      };
-      auto rows = read_table(std::move(p));
-      return !rows.rows.empty();
+      const std::optional<fc::variants> rows =
+         read_index_range(msgch::account, msgch::table_envelopes, batch_operator_detail::byoutepoch_index_name,
+                          batch_operator_detail::byoutepoch_range(chain_code, epoch_index));
+      if (!rows) return false;
+      try {
+         return batch_operator_detail::delivered_by(*rows, operator_account);
+      } catch (const fc::exception& e) {
+         wlog("batch_operator: an envelopes row did not decode: {}", e.top_message());
+         return false;
+      }
    }
 
    // -----------------------------------------------------------------------
    //  Epoch state polling
    // -----------------------------------------------------------------------
 
+   /**
+    * The epoch tick. Re-reads every chain's consensus epoch, this operator's memberships and the active outposts,
+    * rebuilds the relay over the chains it relays (`refresh_relay`), then pushes `sysio.msgch::chkcons` for each of
+    * them it is elected on. Its cron entry fires every `epoch_tick_step` (a second); a tick reads only once the
+    * shortest poll interval of the relayed chains has passed since the last read: 1/24 of the shortest relayed
+    * chain epoch, no more often than once a second and at least every `epoch_poll`.
+    *
+    * A chain's genesis advance (epoch 0 -> 1) is not a batch operator's: `sysio.msgch::bootstrap` and `bootchain`
+    * run it under msgch's own authority. From epoch 1 on the elected group TRIGGERS each advance with `chkcons`,
+    * which sends the inline `sysio.epoch::advance` (again under msgch's authority) once the chain's consensus and its
+    * time gate are met; an operator never authorizes an advance directly.
+    */
    void poll_epoch_state() {
       if (shutting_down || !enabled) return;
+      const fc::time_point now = fc::time_point::now();
+      if (now < next_epoch_read) return;
       try {
-         do_poll_epoch_state();
+         refresh_relay();
       } FC_LOG_AND_DROP();
-      // Awareness: refresh own status from the depot's bond ledger. SLASHED
-      // / TERMINATED operators short-circuit the relay loop below.
-      try {
-         poll_own_status();
-      } FC_LOG_AND_DROP();
+      next_epoch_read = batch_operator_detail::next_epoch_read_at(
+         now, batch_operator_detail::epoch_tick_interval(chain_epochs, relayed, epoch_poll),
+         batch_operator_detail::epoch_tick_step(epoch_poll));
+      // SLASHED / TERMINATED operators push nothing (`refresh_relay` read the status).
       if (!is_active) return;
-      if (!relay_signer_valid) report_stale_signer(*relay_signer, "the relay");
+      push_chkcons();
+   }
 
-      // chkcons advances the epoch on consensus. Only the elected operator
-      // should push it — the contract verifies authorization regardless,
-      // but pushing from every batch op wastes trx slots.
-      if (election.is_elected) {
+   /// Push `sysio.msgch::chkcons` for every relayed chain this operator is elected on whose epoch boundary has passed:
+   /// `chkcons` advances a chain only then, so an earlier push has no effect. The action is permissionless, but a push
+   /// from every batch operator would waste transaction slots, so only the elected group pushes it. A failed push is
+   /// logged and the next chain is still pushed.
+   void push_chkcons() {
+      for (const uint64_t chain_code :
+           batch_operator_detail::chkcons_chains(chain_epochs, relayed, fc::time_point::now())) {
+         const std::string code = fc::slug_name{chain_code}.to_string();
          try {
             push_action(msgch::account, msgch::action_chkcons, *relay_signer,
-                        fc::mutable_variant_object());
+                        fc::mutable_variant_object()(msgch::field::chain_code, chain_code),
+                        delivery_timeout_of(chain_code));
          } catch (const fc::exception& e) {
-            dlog("batch_operator: chkcons: {}", e.to_string());
+            dlog("batch_operator: chkcons({}): {}", code, e.to_string());
+         } catch (const std::exception& e) {
+            dlog("batch_operator: chkcons({}): {}", code, e.what());
          }
       }
+   }
 
-      // Tally any OPEN envelope dispute. Deliberately NOT gated on `is_elected`
+   /**
+    * The depot cranks no election gates: every OPEN envelope dispute, every due economic epoch and the yield cranks.
+    * Runs as its own cron job every `epoch_poll`, so neither its pushes, each of which may wait out
+    * `DEPOT_CALL_TIMEOUT`, nor its cadence follow the epoch tick, which a short chain epoch speeds up. Pushes only for
+    * an ACTIVE operator, as the epoch tick last read it.
+    */
+   void crank_tick() {
+      if (shutting_down || !enabled || !is_active) return;
+      if (!relay_signer_valid) report_stale_signer(*relay_signer, "the relay");
+
+      // Tally any OPEN envelope dispute. Deliberately NOT gated on election
       // — see crank_open_disputes.
       try {
          crank_open_disputes();
       } FC_LOG_AND_DROP();
 
-      // Open every due economic epoch. Not gated on `is_elected` either — see
+      // Open every due economic epoch. Not gated on election either — see
       // crank_economic_clock.
       try {
          crank_economic_clock();
       } FC_LOG_AND_DROP();
 
-      // Sell queued yield and queue reported yield. Not gated on `is_elected`
+      // Sell queued yield and queue reported yield. Not gated on election
       // either — see crank_yield. Idle until both contracts are deployed.
       refresh_yield_contract_presence();
       if (yield_contracts_deployed) {
@@ -626,10 +670,10 @@ struct batch_operator_plugin::impl {
     * `sysio.chalg::opendispute` sends `sysio.epoch::pause`, and `chkdispute` is
     * the ONLY action that tallies the Tier-1 votes, dispatches the winning
     * envelope and lifts that pause. Nothing on chain drives it: an envelope
-    * dispute halts `sysio.epoch::advance` itself, so no inline poke from the
-    * epoch cycle can reach it. Without this crank a
-    * dispute stays OPEN after Tier-1 has already reached quorum, and epoch
-    * advancement is paused indefinitely.
+    * dispute halts the disputed chain's `sysio.epoch::advance` itself, so no
+    * inline poke from the epoch cycle can reach it. Without this crank a
+    * dispute stays OPEN after Tier-1 has already reached quorum, and the
+    * disputed chain's epoch advancement is paused indefinitely.
     *
     * Not gated on `is_elected` (unlike the `chkcons` push above): the elected
     * operator may be the very one that is offline or delivered the
@@ -638,11 +682,8 @@ struct batch_operator_plugin::impl {
     * `chkdispute` asserts the dispute is still OPEN, which makes a redundant
     * push a cheap no-op.
     *
-    * The scan is a full-table filter rather than a `byepoch` index lookup: the
-    * table retains RESOLVED rows as the audit trail, but disputes are rare and
-    * `poll_own_status` already scans a comparably-sized table each tick. If
-    * disputes ever become frequent, bound this by `current_epoch` via the
-    * `byepoch` secondary index.
+    * The scan is a full-table filter: the table retains RESOLVED rows as the
+    * audit trail, but disputes are rare.
     */
    void crank_open_disputes() {
       sysio::chain_apis::read_only::get_table_rows_params p;
@@ -667,7 +708,7 @@ struct batch_operator_plugin::impl {
 
          try {
             push_action(chalg::account, chalg::action_chkdispute, *relay_signer,
-                        fc::mutable_variant_object()(chalg::field::dispute_id, dispute_id));
+                        fc::mutable_variant_object()(chalg::field::dispute_id, dispute_id), DEPOT_CALL_TIMEOUT);
          } catch (const fc::exception& e) {
             // Expected-transient: the dispute resolved between the scan and the push, or
             // another operator's crank won the race.
@@ -684,23 +725,21 @@ struct batch_operator_plugin::impl {
     * Not gated on `is_elected`: the economic clock never waits on consensus, and a dispute pause
     * suspends the election while the clock must keep running. Every ACTIVE operator pushes the due
     * epochs; the contract opens each one once and refuses the rest, so a redundant push costs only
-    * its refusal. Nothing is pushed before the consensus genesis advance, which the contract requires.
-    * The consensus index is read here rather than taken from `current_epoch`, which the election poll
-    * does not record while consensus is paused. The catch-up stops at the first push that is refused
-    * or times out, so one poll waits on at most one failed tick.
+    * its refusal. Nothing is pushed before the network genesis (the `netgenesis` marker), which the
+    * contract requires. The catch-up stops at the first push that is refused or times out, so one poll
+    * waits on at most one failed tick.
     */
    void crank_economic_clock() {
       using namespace batch_operator_detail;
-      sysio::chain_apis::read_only::get_table_rows_params consensus;
-      consensus.code        = chain::name(epoch::account);
-      consensus.scope       = epoch::account;
-      consensus.table       = epoch::table_epochstate;
-      consensus.limit       = SINGLETON_ROW_LIMIT;
-      consensus.values_only = true;
-      const auto consensus_rows = read_table_checked(std::move(consensus));
-      if (!consensus_rows || consensus_rows->rows.empty() || !consensus_rows->rows.front().is_object()) return;
-      const uint32_t consensus_epoch_index = static_cast<uint32_t>(
-         consensus_rows->rows.front().get_object()[epoch::field::current_epoch_index].as_uint64());
+      sysio::chain_apis::read_only::get_table_rows_params genesis;
+      genesis.code        = chain::name(economy::account);
+      genesis.scope       = economy::account;
+      genesis.table       = economy::table_netgenesis;
+      genesis.limit       = SINGLETON_ROW_LIMIT;
+      genesis.values_only = true;
+      const auto genesis_rows = read_table_checked(std::move(genesis));
+      if (!genesis_rows) return;   // a failed read is not "no genesis yet"
+      const bool network_genesis_done = !genesis_rows->rows.empty();
 
       sysio::chain_apis::read_only::get_table_rows_params config;
       config.code        = chain::name(economy::account);
@@ -726,12 +765,13 @@ struct batch_operator_plugin::impl {
       if (!clock) return;
 
       for (const uint32_t epoch_index :
-           economic_epochs_due(*clock, consensus_epoch_index, fc::time_point::now(), economy::ticks_per_poll)) {
+           economic_epochs_due(*clock, network_genesis_done, fc::time_point::now(), economy::ticks_per_poll)) {
          try {
             // A later index cannot open before this one, so a refused or timed-out push ends the
             // catch-up; the next poll re-reads the clock.
             if (!push_action(economy::account, economy::action_tickeconomy, *relay_signer,
-                             fc::mutable_variant_object()(economy::field::epoch_index, epoch_index))) {
+                             fc::mutable_variant_object()(economy::field::epoch_index, epoch_index),
+                             DEPOT_CALL_TIMEOUT)) {
                break;
             }
          } catch (const fc::exception& e) {
@@ -842,7 +882,7 @@ struct batch_operator_plugin::impl {
          if (!yield_tick_spacing.due(pool, now, yield_tick_interval)) continue;
          try {
             push_action(swap::account, swap::action_tickyield, *relay_signer,
-                        fc::mutable_variant_object()(swap::field::pair_token, *code));
+                        fc::mutable_variant_object()(swap::field::pair_token, *code), DEPOT_CALL_TIMEOUT);
             yield_tick_spacing.mark(pool, now);
          } catch (const fc::exception& e) {
             // Expected-transient: another operator's tick sold the clip first, or the
@@ -867,7 +907,7 @@ struct batch_operator_plugin::impl {
          if (!code || !value || asset_amount(*value, liq::field::quantity) <= 0) continue;
          try {
             push_action(liq::account, liq::action_queueyield, *relay_signer,
-                        fc::mutable_variant_object()(liq::field::sym, *code));
+                        fc::mutable_variant_object()(liq::field::sym, *code), DEPOT_CALL_TIMEOUT);
          } catch (const fc::exception& e) {
             // Expected-transient: another operator queued it first. Persistent while
             // the shadow has no yield pool yet (`regliqpool` still to come).
@@ -878,7 +918,7 @@ struct batch_operator_plugin::impl {
 
    /**
     * One pass of the kick crank, run by its own cron job (`batch_operator_kick`) so that its pushes -- each may
-    * wait out a full `delivery_timeout` -- never hold up the epoch tick and the election state the per-outpost jobs
+    * wait out a full `DEPOT_CALL_TIMEOUT` -- never hold up the epoch tick and the election state the per-outpost jobs
     * read. Pushes only for an ACTIVE operator whose relay key still signs, like the epoch tick's own cranks, and
     * idles until `sysio.kicker` runs code.
     */
@@ -966,7 +1006,7 @@ struct batch_operator_plugin::impl {
       using namespace batch_operator_detail;
       try {
          push_action(kicker::account, kicker::action_kick, *relay_signer,
-                     fc::mutable_variant_object()(kicker::field::sym, code));
+                     fc::mutable_variant_object()(kicker::field::sym, code), DEPOT_CALL_TIMEOUT);
       } catch (const fc::exception& e) {
          // Expected-transient: governance removed the pool between the scan and
          // the push. Persistent while the pool's LIQ/WIRE swap pair is missing or
@@ -976,135 +1016,186 @@ struct batch_operator_plugin::impl {
    }
 
    /**
-    * Refresh `is_active` from `sysio.opreg::operators[operator_account]`.
-    *
-    * Reads the row's `status` field and sets `is_active` per:
-    *   * OPERATOR_STATUS_ACTIVE      -> true  (relay loop runs normally)
-    *   * OPERATOR_STATUS_SLASHED     -> false (halt; operator forfeit bond)
-    *   * OPERATOR_STATUS_TERMINATED  -> false (halt; bond remitted, slot freed)
-    *   * other / row missing         -> retain previous value (don't toggle on
-    *                                    transient table-read failure)
-    *
-    * Logs once per status transition so cluster operators can see the flip
-    * in the batch-op log without grep'ing every poll.
+    * Refresh the two gates set by this operator's own `sysio.opreg::operators` status, read by an exact lookup of its
+    * row:
+    *   * `is_active` (`opreg_status::compute_is_active`): `chkcons` and the cranks push; false once SLASHED or
+    *     TERMINATED, kept on any other status.
+    *   * `status_delivers` (`opreg_status::compute_delivers`): the relay jobs run; true only while
+    *     `sysio.msgch::deliver` accepts the status, which needs ACTIVE. The jobs start at the first read of ACTIVE;
+    *     `refresh_relay` stops them on every chain once the status is refused and rebuilds them once it reads ACTIVE
+    *     again.
+    * An operator with no row reads as UNKNOWN (`batch_operator_detail::own_status_of`). A failed read changes neither
+    * gate. Logs the first read's relay decision and each flip after it.
     */
    void poll_own_status() {
-      // `sysio.opreg::operators` is a KV table whose PK is a struct `{account: name}`; the chain_plugin's
-      // `lower_bound` / `upper_bound` expects JSON-shaped key bounds for KV tables, not the bare name string. This
-      // reads every operator row and filters in-plugin. Nothing caps the table, so the scan grows with it.
       sysio::chain_apis::read_only::get_table_rows_params p;
       p.code        = chain::name(opreg::account);
       p.scope       = opreg::account;
       p.table       = opreg::table_operators;
-      p.all_rows    = true;
+      p.find        = batch_operator_detail::operator_find_bound(operator_account);
+      p.limit       = EXACT_LOOKUP_LIMIT;
       p.values_only = true;
-      auto rows = read_table(std::move(p));
-      if (rows.rows.empty()) return;
+      const std::optional<sysio::chain_apis::read_only::get_table_rows_result> rows = read_table_checked(std::move(p));
+      if (!rows) return;
+      const std::string status = batch_operator_detail::own_status_of(rows->rows, operator_account);
 
-      auto self = operator_account.to_string();
-      fc::variant_object obj;
-      bool found = false;
-      for (auto& r : rows.rows) {
-         auto row_obj = r.get_object();
-         auto acct_it = row_obj.find("account");
-         if (acct_it != row_obj.end() && acct_it->value().as_string() == self) {
-            obj = row_obj;
-            found = true;
-            break;
-         }
-      }
-      if (!found) return;
-      auto status = obj[opreg::field::status].as_string();
-
-      bool was_active = is_active;
+      const bool was_active = is_active;
       is_active = sysio::opp::depot::opreg_status::compute_is_active(status, was_active);
-
       if (was_active && !is_active) {
-         elog("batch_operator: own status flipped to {} — halting relay loop", status);
+         elog("batch_operator: own status flipped to {} — halting chkcons and crank pushes", status);
       } else if (!was_active && is_active) {
-         ilog("batch_operator: own status flipped to ACTIVE — resuming relay loop");
+         ilog("batch_operator: own status flipped to ACTIVE — resuming chkcons and crank pushes");
+      }
+
+      const bool was_delivering = status_delivers;
+      status_delivers = sysio::opp::depot::opreg_status::compute_delivers(status, was_delivering);
+      if (!status_read) {
+         status_read = true;
+         if (status_delivers) {
+            ilog("batch_operator: own status reads ACTIVE — starting the relay jobs");
+         } else {
+            wlog("batch_operator: own status {} is refused by sysio.msgch::deliver — the relay jobs start once it "
+                 "reads ACTIVE", status);
+         }
+      } else if (was_delivering && !status_delivers) {
+         elog("batch_operator: own status {} is refused by sysio.msgch::deliver — stopping the relay jobs", status);
+      } else if (!was_delivering && status_delivers) {
+         ilog("batch_operator: own status flipped to ACTIVE — restarting the relay jobs");
+      }
+   }
+
+   /// Every chain's consensus epoch from all `epochstate` and `epochcfg` rows, or nullopt when either table could not
+   /// be read. A row that does not decode is logged and left out.
+   std::optional<batch_operator_detail::chain_epochs> read_chain_epochs() {
+      const std::optional<fc::variants> states =
+         read_all_rows(epoch::account, epoch::account, epoch::table_epochstate);
+      if (!states) return std::nullopt;
+      const std::optional<fc::variants> configs = read_all_rows(epoch::account, epoch::account, epoch::table_epochcfg);
+      if (!configs) return std::nullopt;
+      batch_operator_detail::decoded_chain_epochs decoded =
+         batch_operator_detail::decode_chain_epochs(*states, *configs, operator_account, epoch_poll);
+      for (const std::string& why : decoded.skipped) {
+         wlog("batch_operator: chain epoch left out: {}", why);
+      }
+      return std::move(decoded.views);
+   }
+
+   /// This operator's `servchains` memberships, one per chain, read as its range of the `byaccount` index, or nullopt
+   /// when the table could not be read or a row did not decode.
+   std::optional<batch_operator_detail::chain_memberships> read_memberships() {
+      const std::optional<fc::variants> rows =
+         read_index_range(opreg::account, opreg::table_servchains, opreg::index_byaccount,
+                          batch_operator_detail::membership_range(operator_account));
+      if (!rows) return std::nullopt;
+      try {
+         return batch_operator_detail::decode_memberships(*rows, operator_account);
+      } catch (const fc::exception& e) {
+         wlog("batch_operator: memberships left as last read: a servchains row did not decode: {}", e.top_message());
+         return std::nullopt;
+      }
+   }
+
+   /// How long `chain_code`'s outpost calls and depot pushes may take, from its last-read epoch duration.
+   fc::microseconds delivery_timeout_of(uint64_t chain_code) const {
+      std::lock_guard<std::mutex> lock(chain_epochs_mx);
+      return batch_operator_detail::delivery_timeout_of(chain_epochs, chain_code);
+   }
+
+   /// `chain_code`'s last-read consensus epoch, or nullopt before its epoch state has been read.
+   std::optional<batch_operator_detail::chain_epoch_view> chain_epoch_of(uint64_t chain_code) const {
+      std::lock_guard<std::mutex> lock(chain_epochs_mx);
+      const auto view = chain_epochs.find(chain_code);
+      if (view == chain_epochs.end()) return std::nullopt;
+      return view->second;
+   }
+
+   /// The chain codes of `chains` as slugs, or "none".
+   static std::string describe_chains(const std::set<uint64_t>& chains) {
+      std::string names;
+      for (const uint64_t chain_code : chains) {
+         if (!names.empty()) names += ", ";
+         names += fc::slug_name{chain_code}.to_string();
+      }
+      return names.empty() ? std::string("none") : names;
+   }
+
+   /// Log, for each chain in `now_relayed`, what changed between the last-read `chain_epochs` and `views`: a new
+   /// epoch or a chain newly relayed (this operator's election on it), and a dispute pause starting or ending.
+   void report_epoch_changes(const batch_operator_detail::chain_epochs& views,
+                             const std::set<uint64_t>& now_relayed) const {
+      for (const uint64_t chain_code : now_relayed) {
+         const auto view = views.find(chain_code);
+         if (view == views.end()) continue;
+         const batch_operator_detail::chain_epoch_view& current = view->second;
+         const auto previous = chain_epochs.find(chain_code);
+         const bool known    = previous != chain_epochs.end() && relayed.contains(chain_code);
+         const std::string code = fc::slug_name{chain_code}.to_string();
+
+         if (current.is_paused && !(known && previous->second.is_paused)) {
+            ilog("batch_operator: chain {} epoch {} is paused by a dispute; nobody is elected on it until it resumes",
+                 code, current.epoch_index);
+         } else if (!current.is_paused && known && previous->second.is_paused) {
+            ilog("batch_operator: chain {} epoch {} resumed", code, current.epoch_index);
+         }
+
+         if (known && previous->second.epoch_index == current.epoch_index) {
+            if (current.election.is_elected) {
+               dlog("batch_operator: chain {} epoch {} elected", code, current.epoch_index);
+            }
+            continue;
+         }
+         if (current.election.is_elected) {
+            ilog("batch_operator: chain {} ELECTED for epoch {} (group {}, {} members)", code, current.epoch_index,
+                 current.election.my_group, current.election.current_group_members.size());
+         } else {
+            ilog("{}", batch_operator_detail::not_elected_message(chain_code, current.epoch_index, current.election));
+         }
       }
    }
 
    /**
-    * Parse epoch state into local fields.
-    * Returns {true, epoch_index} on success, {false, 0} if state is unavailable.
+    * Re-read what the relay acts on and rebuild it: this operator's own status (`poll_own_status`), every chain's
+    * consensus epoch, its memberships and the active outposts, then the chains it relays (active, and served per
+    * `batch_operator_detail::relays_chain`) and their jobs, which run only while `sysio.msgch::deliver` accepts its
+    * status. A read that fails keeps that table's last good reading, so a transient failure neither drops a chain
+    * nor clears an election. `build_opp_jobs` and `schedule_opp_jobs` are idempotent, so a chain this operator joins,
+    * or governance activates, starts relaying without a restart, and the jobs a refused status stopped restart once
+    * it reads ACTIVE again.
     */
-   std::pair<bool, uint32_t> parse_epoch_state() {
-      sysio::chain_apis::read_only::get_table_rows_params p;
-      p.code        = chain::name(epoch::account);
-      p.scope       = epoch::account;
-      p.table       = epoch::table_epochstate;
-      p.limit       = 1;
-      p.values_only = true;
-      auto state_rows = read_table(std::move(p));
-      if (state_rows.rows.empty()) return {false, 0};
-
-      auto obj = state_rows.rows[0].get_object();
-      uint32_t epoch_index = static_cast<uint32_t>(obj[epoch::field::current_epoch_index].as_uint64());
-      uint8_t  cur_group   = static_cast<uint8_t>(obj[epoch::field::current_batch_op_group].as_uint64());
-      bool     paused      = obj[epoch::field::is_paused].as_bool();
-
-      if (paused) {
-         if (election.is_elected) {
-            ilog("batch_operator: epoch paused, suspending");
-            election.is_elected = false;
-         }
-         return {false, 0};
+   void refresh_relay() {
+      try {
+         poll_own_status();
+      } FC_LOG_AND_DROP();
+      std::optional<batch_operator_detail::chain_epochs> views = read_chain_epochs();
+      if (std::optional<batch_operator_detail::chain_memberships> read = read_memberships()) {
+         memberships = std::move(*read);
+      }
+      if (std::optional<std::vector<outpost_descriptor>> active = read_active_outposts()) {
+         outposts = std::move(*active);
+         dlog("batch_operator: loaded {} outposts (sysio.chains)", outposts.size());
       }
 
-      // Determine group assignment
-      election = batch_operator_detail::evaluate_group_election(
-         cur_group, obj[epoch::field::batch_op_groups].get_array(), operator_account);
+      const std::vector<outpost_descriptor> relay_outposts = batch_operator_detail::relayed_outposts(
+         outposts, batch_operator_detail::relayed_chains(memberships, views ? *views : chain_epochs));
+      std::set<uint64_t> now_relayed;
+      for (const outpost_descriptor& op : relay_outposts) now_relayed.insert(op.id);
 
-      // Parse epoch timing
-      fc::from_variant(obj[epoch::field::current_epoch_start], epoch_start);
-      fc::from_variant(obj[epoch::field::next_epoch_start],    next_epoch_start);
-
-      if (election.is_elected) {
-         ilog("batch_operator: current_epoch={}", epoch_index);
+      if (views) {
+         report_epoch_changes(*views, now_relayed);
+         std::lock_guard<std::mutex> lock(chain_epochs_mx);
+         chain_epochs = std::move(*views);
       }
-
-      return {true, epoch_index};
-   }
-
-   void do_poll_epoch_state() {
-      auto [ok, epoch_index] = parse_epoch_state();
-      if (!ok) return;
-
-      // The genesis advance (epoch 0 -> 1) is a SYSTEM responsibility, not a
-      // batch operator's: `sysio.msgch::bootstrap` gates on
-      // `require_auth(get_self())`, so only the holder of `sysio.msgch`'s own
-      // authority (the genesis / bootstrap process) can trigger it. A batch
-      // operator signs with its own account authority, so an operator-side push
-      // fails unconditionally with `missing authority of sysio.msgch` before the
-      // epoch check — it never advanced anything, it only produced boot-window
-      // error-log noise. From epoch 1 onward batch operators still TRIGGER
-      // advancement — the elected operator's poll cranks `msgch::chkcons`
-      // (see poll_epoch_state), which sends the inline `sysio.epoch::advance`
-      // (again under msgch's own authority) once the per-outpost consensus
-      // recorded during `evalcons` dispatch and the epoch time gate are met —
-      // but they never AUTHORIZE bootstrap or advance directly.
-
-      if (!election.is_elected) {
-         if (epoch_index != current_epoch) {
-            ilog("{}", batch_operator_detail::not_elected_message(epoch_index, election));
-         }
-         // Keep current_epoch fresh even when not elected: per-outpost jobs
-         // consult it via depot_ops, and they bail on !is_elected anyway.
-         current_epoch = epoch_index;
-         return;
+      if (now_relayed != relayed) {
+         ilog("batch_operator: relaying {} of {} active chain(s): {}", now_relayed.size(), outposts.size(),
+              describe_chains(now_relayed));
       }
+      relayed = std::move(now_relayed);
 
-      if (epoch_index != current_epoch) {
-         ilog("batch_operator: ELECTED for epoch {} (group {}, {} members)",
-              epoch_index, election.my_group, election.current_group_members.size());
-      }
-      current_epoch = epoch_index;
-      // Refresh the outpost list so governance-added outposts become visible.
-      // `build_opp_jobs` and `schedule_opp_jobs` are idempotent, so newly
-      // active outposts start relaying without a batch-operator restart.
-      refresh_outposts();
+      const std::vector<outpost_descriptor> job_outposts =
+         batch_operator_detail::relay_job_outposts(relay_outposts, status_delivers);
+      prune_stale_opp_jobs(job_outposts, status_delivers ? JOB_DROP_UNRELAYED : JOB_DROP_REFUSED_STATUS);
+      build_opp_jobs(job_outposts);
+      schedule_opp_jobs();
    }
 
    // -----------------------------------------------------------------------
@@ -1159,24 +1250,6 @@ struct batch_operator_plugin::impl {
       return active;
    }
 
-   void refresh_outposts() {
-      std::optional<std::vector<outpost_descriptor>> active = read_active_outposts();
-      if (!active) return;   // keep the last-known set; jobs built from it continue to work
-      outposts = std::move(*active);
-      ilog("batch_operator: loaded {} outposts (sysio.chains)", outposts.size());
-      prune_stale_opp_jobs();
-      build_opp_jobs();
-      schedule_opp_jobs();
-   }
-
-   /// An outpost client, or why there is none.
-   struct client_build {
-      std::shared_ptr<sysio::outpost_client> client;
-      /// Why this node cannot serve the chain at all; empty when `client` is set, or when the row only lacks
-      /// its remote contract address or is awaiting Ethereum chain-ID discovery.
-      std::string                            unserviceable;
-   };
-
    /// Build the outpost client for `op` with the chain-specific plugin factories, for `role` (which Solana IDL
    /// declarations it validates at boot).
    ///
@@ -1184,7 +1257,7 @@ struct batch_operator_plugin::impl {
    /// operator can fix, reported as `unserviceable`. Missing CONTRACT ADDRESSES are governance state on the row,
    /// fixable with `sysio.chains::setoutpost` without touching any node, so the chain is skipped (no client, no
    /// reason) and picked up on a later refresh. Pending Ethereum discovery is likewise retried by either role.
-   client_build make_outpost_client(const outpost_descriptor& op, solana_outpost_role role) {
+   batch_operator_detail::client_build make_outpost_client(const outpost_descriptor& op, solana_outpost_role role) {
       const std::string code_str = fc::slug_name{op.id}.to_string();
       try {
          if (op.chain_kind == CHAIN_KIND_EVM) {
@@ -1245,77 +1318,68 @@ struct batch_operator_plugin::impl {
       }
    }
 
-   /// Build, with `wrap(op, client)`, what `built` lacks for each chain in `active`, the clients made for `role`.
-   /// Returns the chains this node cannot serve; a chain whose row has no remote address yet is skipped until
-   /// `setoutpost` supplies one. Pending Ethereum clients wait for discovery on a later refresh.
+   /// `batch_operator_detail::build_missing` with each client made for `role` by `make_outpost_client`.
    template <typename Key, typename Built, typename Wrap>
    std::vector<unserviceable_chain> build_missing(std::map<Key, Built>& built,
-                                                  const std::vector<outpost_descriptor>& active,
+                                                  const std::vector<outpost_descriptor>& chains,
                                                   solana_outpost_role role, Wrap&& wrap) {
-      std::vector<unserviceable_chain> unserviceable;
-      for (const outpost_descriptor& op : active) {
-         const Key key{op.id};
-         if (built.contains(key)) continue;
-         client_build made = make_outpost_client(op, role);
-         if (!made.unserviceable.empty()) {
-            unserviceable.push_back({fc::slug_name{op.id}.to_string(), std::move(made.unserviceable)});
-            continue;
-         }
-         if (!made.client) continue;   // remote address or Ethereum discovery is still pending
-         built.emplace(key, wrap(op, made.client));
-      }
-      return unserviceable;
+      return batch_operator_detail::build_missing(
+         built, chains, [&](const outpost_descriptor& op) { return make_outpost_client(op, role); },
+         std::forward<Wrap>(wrap));
    }
 
-   /// Drop what `built` holds for a chain that left `active`, or whose deployment moved (`setoutpost`), calling
-   /// `on_drop(chain_code, why)` for each, so the next `build_missing` builds it again for the new address.
+   /// Drop what `built` holds for a chain that left `chains`, or whose deployment moved (`setoutpost`), calling
+   /// `on_drop(chain_code, why)` for each, `why` being `absent_why` or "redeployed", so the next `build_missing` builds
+   /// it again for the new address.
    template <typename Key, typename Built, typename OnDrop>
-   static void drop_stale(std::map<Key, Built>& built, const std::vector<outpost_descriptor>& active,
-                          OnDrop&& on_drop) {
+   static void drop_stale(std::map<Key, Built>& built, const std::vector<outpost_descriptor>& chains,
+                          std::string_view absent_why, OnDrop&& on_drop) {
       for (auto it = built.begin(); it != built.end();) {
-         const outpost_descriptor* current = find_outpost(active, it->first);
+         const outpost_descriptor* current = find_outpost(chains, it->first);
          if (current != nullptr && it->second.deployment.matches(*current)) {
             ++it;
             continue;
          }
-         on_drop(it->first, current == nullptr ? "inactive" : "redeployed");
+         on_drop(it->first, current == nullptr ? absent_why : std::string_view{"redeployed"});
          it = built.erase(it);
       }
    }
 
-   /// Name the chains this node cannot serve and shut it down, so the failure is visible to a supervisor
+   /// Name the relayed chains this node cannot serve and shut it down, so the failure is visible to a supervisor
    /// instead of hiding behind a running process. Only the operator can fix it (it is local config).
-   void quit_unserviceable(const std::vector<unserviceable_chain>& unserviceable, size_t active_count,
+   void quit_unserviceable(const std::vector<unserviceable_chain>& unserviceable, size_t relayed_count,
                            std::string_view why_every_chain) {
       for (const auto& [code, why] : unserviceable) {
-         elog("batch_operator: cannot serve active chain {}: {}", code, why);
+         elog("batch_operator: cannot relay chain {}: {}", code, why);
       }
-      elog("batch_operator: cannot serve {} of {} active chain(s), shutting down node ({})",
-           unserviceable.size(), active_count, why_every_chain);
+      elog("batch_operator: cannot relay {} of the {} chain(s) this operator serves, shutting down node ({})",
+           unserviceable.size(), relayed_count, why_every_chain);
       app().quit();
    }
 
-   /// Construct an `outpost_opp_job` per registered outpost. Idempotent: already-built jobs stay.
-   /// Called from `refresh_outposts`; scheduling is handled separately so
-   /// startup-created jobs and governance-added jobs share the same path.
+   /// Construct an `outpost_opp_job` per relayed outpost. Idempotent: already-built jobs stay.
+   /// Called from `refresh_relay`; scheduling is handled separately so
+   /// startup-created jobs and later-relayed jobs share the same path.
    ///
-   /// An elected group fans the epoch cycle out across EVERY active chain, so a
-   /// batch operator that cannot reach one of them cannot do its job — it would
-   /// simply withhold deliveries for that chain and drag its group below
-   /// consensus. An unserviceable chain is therefore FATAL, not skippable; this
+   /// A chain this operator serves seats it in that chain's groups, so an
+   /// operator that cannot reach the chain cannot do its job — it would simply
+   /// withhold deliveries for that chain and drag its group below consensus.
+   /// An unserviceable relayed chain is therefore FATAL, not skippable; a chain
+   /// the operator does not serve is never built, so it is never refused. This
    /// runs after the sync gate, where `sysio.chains` is actually readable.
-   void build_opp_jobs() {
+   void build_opp_jobs(const std::vector<outpost_descriptor>& relay_outposts) {
       if (!depot_ops_backing) return; // plugin not initialized yet
       const std::vector<unserviceable_chain> unserviceable = build_missing(
-         opp_jobs, outposts, solana_outpost_role::batch_operator,
+         opp_jobs, relay_outposts, solana_outpost_role::batch_operator,
          [&](const outpost_descriptor& op, const std::shared_ptr<sysio::outpost_client>& client) {
             std::shared_ptr<sysio::outpost_opp_job> job =
-               std::make_shared<sysio::outpost_opp_job>(client, *depot_ops_backing, delivery_timeout);
+               std::make_shared<sysio::outpost_opp_job>(client, *depot_ops_backing);
             ilog("batch_operator: built outpost_opp_job for {}", client->to_string());
             return built_opp_job{std::move(job), outpost_deployment{op}};
          });
       if (!unserviceable.empty()) {
-         quit_unserviceable(unserviceable, outposts.size(), "an elected group must deliver on every active chain");
+         quit_unserviceable(unserviceable, relay_outposts.size(),
+                            "a group member must deliver on every chain it serves");
       }
    }
 
@@ -1338,26 +1402,29 @@ struct batch_operator_plugin::impl {
       scheduled_opp_jobs.erase(sched_it);
    }
 
-   /// Drop relay jobs that no longer match `sysio.chains`: the chain went
-   /// inactive, or governance moved its remote deployment with `setoutpost`.
+   /// Drop relay jobs that no longer match `job_outposts`: the chain went
+   /// inactive or is no longer relayed (left with no seat, evicted), the
+   /// operator's own status is refused by `sysio.msgch::deliver` (`absent_why`
+   /// names which), or governance moved its remote deployment with `setoutpost`.
    /// `build_opp_jobs` rebuilds what is dropped here on the same refresh, so an
    /// address change costs one tick rather than an operator restart — without
    /// it a redeployed outpost would keep receiving deliveries at a dead
    /// address, and inbound reads would keep polling the old contract.
-   void prune_stale_opp_jobs() {
-      drop_stale(opp_jobs, outposts, [&](uint64_t chain_code, std::string_view why) {
+   void prune_stale_opp_jobs(const std::vector<outpost_descriptor>& job_outposts, std::string_view absent_why) {
+      drop_stale(opp_jobs, job_outposts, absent_why, [&](uint64_t chain_code, std::string_view why) {
          cancel_scheduled_opp_job(chain_code);
          ilog("batch_operator: removed outpost_opp_job for {} outpost {}", why, fc::slug_name{chain_code}.to_string());
       });
    }
 
-   /// Schedule one cron direction for an outpost relay job.
+   /// Schedule one cron direction for an outpost relay job, every `interval`.
    cron_service::job_id_t schedule_opp_job_direction(uint64_t chain_code,
                                                      const std::shared_ptr<sysio::outpost_opp_job>& job,
                                                      std::string_view direction,
-                                                     void (sysio::outpost_opp_job::*runner)()) {
+                                                     void (sysio::outpost_opp_job::*runner)(),
+                                                     fc::microseconds interval) {
       sysio::services::cron_service::job_schedule sched;
-      sched.milliseconds = {sysio::services::cron_service::job_schedule::step_value{whole_milliseconds(epoch_poll)}};
+      sched.milliseconds = {sysio::services::cron_service::job_schedule::step_value{whole_milliseconds(interval)}};
       sysio::services::cron_service::job_metadata_t meta;
       meta.label         = std::format("outpost_opp_{}_{}", direction, chain_code);
       meta.one_at_a_time = true;
@@ -1368,45 +1435,38 @@ struct batch_operator_plugin::impl {
                               meta);
       cron_job_ids.push_back(id);
       ilog("batch_operator_plugin: scheduled {} for {} (id={}, every {}ms)",
-           meta.label, job->client().to_string(), id, whole_milliseconds(epoch_poll));
+           meta.label, job->client().to_string(), id, whole_milliseconds(interval));
       return id;
    }
 
-   /// Schedule inbound and outbound cron jobs for a single active outpost.
-   void schedule_opp_job(uint64_t chain_code, const std::shared_ptr<sysio::outpost_opp_job>& job) {
-      if (!cron_svc || shutting_down || scheduled_opp_jobs.contains(chain_code)) return;
-      auto outbound_id = schedule_opp_job_direction(chain_code, job, "outbound",
-                                                    &sysio::outpost_opp_job::run_outbound);
-      auto inbound_id = schedule_opp_job_direction(chain_code, job, "inbound",
-                                                   &sysio::outpost_opp_job::run_inbound);
+   /// Schedule inbound and outbound cron jobs for a single relayed outpost, every `interval`. A pair already
+   /// scheduled at another interval (the chain's epoch duration changed) is rescheduled; the job's own mutex
+   /// serializes a run of the old entries with one of the new.
+   void schedule_opp_job(uint64_t chain_code, const std::shared_ptr<sysio::outpost_opp_job>& job,
+                         fc::microseconds interval) {
+      if (!cron_svc || shutting_down) return;
+      if (const auto scheduled = scheduled_opp_jobs.find(chain_code); scheduled != scheduled_opp_jobs.end()) {
+         if (scheduled->second.interval == interval) return;
+         cancel_scheduled_opp_job(chain_code);
+      }
+      const cron_service::job_id_t outbound_id = schedule_opp_job_direction(
+         chain_code, job, "outbound", &sysio::outpost_opp_job::run_outbound, interval);
+      const cron_service::job_id_t inbound_id = schedule_opp_job_direction(
+         chain_code, job, "inbound", &sysio::outpost_opp_job::run_inbound, interval);
       scheduled_opp_jobs.emplace(chain_code, scheduled_opp_job_ids{
          .outbound = outbound_id,
          .inbound  = inbound_id,
+         .interval = interval,
       });
    }
 
-   /// Schedule every built active outpost job that does not already have cron entries.
+   /// Schedule every built relay job at its chain's poll interval.
    void schedule_opp_jobs() {
       for (const auto& [chain_code, built] : opp_jobs) {
-         schedule_opp_job(chain_code, built.job);
+         schedule_opp_job(chain_code, built.job,
+                          batch_operator_detail::poll_interval_of(chain_epochs, chain_code, epoch_poll));
       }
    }
-
-   /// Returns true if we are within the safe operating window for this epoch.
-   /// Blocks operations only in the narrow buffer zones at epoch boundaries.
-   /// Once past next_epoch_start, operations are allowed (epoch is overdue).
-   bool within_epoch_window() const {
-      const fc::time_point now = fc::time_point::now();
-      if (now < epoch_start + EPOCH_EDGE_BUFFER) return false;  // too close to epoch start
-      // Only block in the narrow window BEFORE next_epoch_start.
-      // Once past next_epoch_start, the epoch is overdue — allow operations.
-      if (next_epoch_start != fc::time_point() &&
-          now > next_epoch_start - EPOCH_EDGE_BUFFER &&
-          now < next_epoch_start) return false;
-      return true;
-   }
-
-
 
    // -----------------------------------------------------------------------
    //  Signers
@@ -1581,7 +1641,7 @@ struct batch_operator_plugin::impl {
                           std::optional<fc::time_point_sec>* submitted_until = nullptr) {
       if (shutting_down) return false;
       try {
-         return push_action(contract, action, *underwriter_signer, data, submitted_until);
+         return push_action(contract, action, *underwriter_signer, data, DEPOT_CALL_TIMEOUT, submitted_until);
       } catch (const fc::exception& e) {
          wlog("batch_operator: underwriter {}::{}: {}", contract, action, e.to_string());
       } catch (const std::exception& e) {
@@ -1717,7 +1777,7 @@ struct batch_operator_plugin::impl {
       try {
          const std::optional<std::vector<outpost_descriptor>> active = read_active_outposts();
          if (!active) return;
-         drop_stale(underwriter_clients, *active, [](fc::slug_name chain_code, std::string_view why) {
+         drop_stale(underwriter_clients, *active, "inactive", [](fc::slug_name chain_code, std::string_view why) {
             ilog("batch_operator: underwriter dropped its client for {} outpost {}", why, chain_code.to_string());
          });
          const std::vector<unserviceable_chain> unserviceable = build_missing(
@@ -1978,7 +2038,7 @@ struct batch_operator_plugin::impl {
             if (shutting_down) return std::nullopt;
             const auto client = underwriter_clients.find(chain_code);
             FC_ASSERT(client != underwriter_clients.end(), "this node has no client for it");
-            return client->second.client->read_emitted_envelope_digest(epoch, delivery_timeout);
+            return client->second.client->read_emitted_envelope_digest(epoch, delivery_timeout_of(chain_code.value));
          },
          [](fc::slug_name chain_code, const std::string& why) { report_unreadable(chain_code, why); },
          in.checkpoints, in.accepted);
@@ -2018,7 +2078,8 @@ struct batch_operator_plugin::impl {
                                               const chain::permission_level& auth, const fc::variant_object& data) {
       const chain::controller& chain = chain_plug->chain();
       try {
-         auto resolver = make_resolver(chain, delivery_timeout, throw_on_yield::no);
+         const fc::microseconds abi_time = chain_plug->get_abi_serializer_max_time();
+         auto resolver = make_resolver(chain, abi_time, throw_on_yield::no);
          const chain::abi_serializer_ptr abis = resolver(chain::name(contract));
          if (!abis) {
             elog("batch_operator: no ABI found for {}", contract);
@@ -2026,7 +2087,7 @@ struct batch_operator_plugin::impl {
          }
          const chain::type_name action_type = abis->get_action_type(chain::name(action_name));
          chain::bytes action_data = abis->variant_to_binary(
-            action_type, fc::variant(data), chain::abi_serializer::create_yield_function(delivery_timeout));
+            action_type, fc::variant(data), chain::abi_serializer::create_yield_function(abi_time));
          unsigned_trx out;
          out.trx.actions.emplace_back(std::vector<chain::permission_level>{auth}, chain::name(contract),
                                       chain::name(action_name), std::move(action_data));
@@ -2042,13 +2103,14 @@ struct batch_operator_plugin::impl {
       return std::nullopt;
    }
 
-   /// Submit a signed transaction through `read_write::push_transaction`, completing `completion`. Resolves ABIs:
-   /// call on the main thread.
+   /// Submit a signed transaction through `read_write::push_transaction`, completing `completion`, within `timeout`.
+   /// Resolves ABIs: call on the main thread.
    void submit(const std::shared_ptr<batch_operator_detail::async_action_completion>& completion,
-               const std::string& contract, const std::string& action_name, const fc::variant& packed_var) {
+               const std::string& contract, const std::string& action_name, const fc::variant& packed_var,
+               fc::microseconds timeout) {
       try {
          std::shared_ptr<read_write> rw =
-            std::make_shared<read_write>(chain_plug->get_read_write_api(delivery_timeout));
+            std::make_shared<read_write>(chain_plug->get_read_write_api(timeout));
          rw->push_transaction(
             packed_var.get_object(),
             batch_operator_detail::create_push_action_callback(rw, completion, contract, action_name));
@@ -2075,7 +2137,7 @@ struct batch_operator_plugin::impl {
    }
 
    /// Build, sign and submit a depot action, declaring `by.auth` and signed by `by.provider`. True when the node
-   /// accepted the transaction within `delivery_timeout`; a refusal is logged by the push callback.
+   /// accepted the transaction within `timeout`; a refusal is logged by the push callback.
    ///
    /// Called from cron threads, which may not read chain state: the build runs in a read window and the submission
    /// on the main thread, while the signature, possibly a remote signer, stays here. The waits do not cancel
@@ -2085,10 +2147,11 @@ struct batch_operator_plugin::impl {
                     const std::string& action_name,
                     const signer& by,
                     const fc::variant_object& data,
+                    fc::microseconds timeout,
                     std::optional<fc::time_point_sec>* submitted_until = nullptr) {
       if (submitted_until) submitted_until->reset();
       if (shutting_down) return false;
-      const fc::time_point deadline = fc::time_point::now() + delivery_timeout;
+      const fc::time_point deadline = fc::time_point::now() + timeout;
       const bool           on_main  = std::this_thread::get_id() == app().executor().get_main_thread_id();
 
       std::optional<unsigned_trx> trx;
@@ -2127,12 +2190,11 @@ struct batch_operator_plugin::impl {
       std::future<void> future = completion->get_future();
       if (submitted_until) *submitted_until = expiration;
       if (on_main) {
-         submit(completion, contract, action_name, packed_var);
+         submit(completion, contract, action_name, packed_var, timeout);
       } else {
          app().executor().post(appbase::priority::medium, appbase::exec_queue::read_write,
-                               [this, completion, contract, action_name, packed_var = std::move(packed_var)] {
-                                  submit(completion, contract, action_name, packed_var);
-                               });
+                               [this, completion, contract, action_name, packed_var = std::move(packed_var),
+                                timeout] { submit(completion, contract, action_name, packed_var, timeout); });
       }
       if (!ready_by(future, deadline)) {
          if (shutting_down) wlog("batch_operator: push {}::{} abandoned on shutdown", contract, action_name);
@@ -2165,11 +2227,11 @@ struct batch_operator_plugin::impl {
          return;
       }
 
-      // Discover outposts before the private cron_service starts. Later refresh
-      // ticks add/remove per-outpost cron jobs as the active chain set changes.
+      // Discover the relayed outposts before the private cron_service starts. Later epoch
+      // ticks add/remove per-outpost cron jobs as the relayed chain set changes.
       if (enabled) {
          try {
-            refresh_outposts();
+            refresh_relay();
          } catch (const fc::exception& e) {
             wlog("batch_operator_plugin: initial outpost discovery failed: {}. "
                  "Starting with 0 per-outpost jobs; refresh ticks will retry after "
@@ -2177,12 +2239,12 @@ struct batch_operator_plugin::impl {
          }
       }
 
-      // Size the pool for startup outposts. Later dynamic outposts are added to
-      // the same queued cron service; the minimum keeps the polls viable even
-      // when no outposts are known yet.
-      const std::size_t outpost_count    = opp_jobs.size();
+      // Size the pool for every active outpost, not only the ones relayed now: a chain this operator joins later
+      // gets its relay jobs on the same queued cron service. The minimum keeps the polls viable even when no
+      // outposts are known yet.
+      const std::size_t outpost_count    = outposts.size();
       const std::size_t relay_jobs =
-         enabled ? outpost_count * OPP_CRON_JOBS_PER_OUTPOST + EPOCH_TICK_CRON_JOBS +
+         enabled ? outpost_count * OPP_CRON_JOBS_PER_OUTPOST + EPOCH_TICK_CRON_JOBS + CRANK_CRON_JOBS +
                       (kick_crank_enabled ? KICK_CRON_JOBS : 0)
                  : 0;
       const std::size_t underwriter_jobs = underwriter_enabled ? UNDERWRITER_CRON_JOBS : 0;
@@ -2194,28 +2256,35 @@ struct batch_operator_plugin::impl {
       svc_opts.autostart   = true;
 
       cron_svc = sysio::services::cron_service::create(svc_opts);
-      ilog("batch_operator_plugin: cron_service started with {} thread(s) ({} outpost(s) discovered)",
-           thread_count, outpost_count);
+      ilog("batch_operator_plugin: cron_service started with {} thread(s) ({} active outpost(s), {} relayed)",
+           thread_count, outpost_count, opp_jobs.size());
 
-      const uint32_t poll_ms = whole_milliseconds(epoch_poll);
-      auto schedule_poll = [&](std::string label, std::function<void()> poll) {
+      auto schedule_poll = [&](std::string label, std::function<void()> poll, fc::microseconds interval) {
+         const uint32_t interval_ms = whole_milliseconds(interval);
          sysio::services::cron_service::job_schedule sched;
-         sched.milliseconds = {sysio::services::cron_service::job_schedule::step_value{poll_ms}};
+         sched.milliseconds = {sysio::services::cron_service::job_schedule::step_value{interval_ms}};
          sysio::services::cron_service::job_metadata_t meta;
          meta.label          = std::move(label);
          meta.one_at_a_time  = true;
          sysio::services::cron_service::job_id_t id = cron_svc->add(sched, std::move(poll), meta);
          cron_job_ids.push_back(id);
-         ilog("batch_operator_plugin: scheduled {} (id={}, every {}ms)", meta.label, id, poll_ms);
+         ilog("batch_operator_plugin: scheduled {} (id={}, every {}ms)", meta.label, id, interval_ms);
       };
 
-      // epoch_tick: refresh epoch state + election. Keeps `current_epoch`
-      // and `within_epoch_window` accurate for every per-outpost job.
-      if (enabled) schedule_poll("batch_operator_epoch_tick", [this]() { poll_epoch_state(); });
-      if (underwriter_enabled) schedule_poll("batch_operator_underwriter", [this]() { underwriter_tick(); });
-      // The kick crank pushes serially and each push may wait out `delivery_timeout`: its own job keeps that off
+      // epoch_tick: refresh every chain's epoch state and election, and the relayed set. Keeps the per-chain
+      // epoch, election and window accurate for every per-outpost job. It fires often enough for the shortest
+      // chain epoch and reads at the relayed chains' cadence (see poll_epoch_state).
+      if (enabled) {
+         schedule_poll("batch_operator_epoch_tick", [this]() { poll_epoch_state(); },
+                       batch_operator_detail::epoch_tick_step(epoch_poll));
+         schedule_poll("batch_operator_cranks", [this]() { crank_tick(); }, epoch_poll);
+      }
+      if (underwriter_enabled) {
+         schedule_poll("batch_operator_underwriter", [this]() { underwriter_tick(); }, epoch_poll);
+      }
+      // The kick crank pushes serially and each push may wait out `DEPOT_CALL_TIMEOUT`: its own job keeps that off
       // the epoch tick.
-      if (enabled && kick_crank_enabled) schedule_poll("batch_operator_kick", [this]() { kick_tick(); });
+      if (enabled && kick_crank_enabled) schedule_poll("batch_operator_kick", [this]() { kick_tick(); }, epoch_poll);
 
       if (enabled) schedule_opp_jobs();
    }
@@ -2258,6 +2327,7 @@ signal<void(const opp::debugging::DebugEnvelopeEvent&)>& batch_operator_plugin::
 void batch_operator_plugin::set_program_options(options_description& cli,
                                                  options_description& cfg) {
    auto opts = cfg.add_options();
+   // Help texts must stay ASCII with no " --" sequence: PerformanceHarness splits nodeop --help output on that token.
    // Presence of this option IS the enable switch (mirrors producer_plugin's
    // producer-name): the relay runs when an account is configured. Keying off
    // the account rather than the plugin being listed matters because
@@ -2265,25 +2335,11 @@ void batch_operator_plugin::set_program_options(options_description& cli,
    // would otherwise silently promote a debug node to a batch operator.
    opts("batch-operator-account", bpo::value<std::string>(),
         "WIRE account name for this batch operator. Configuring an account enables the relay.");
+   // The relay polls each chain it serves every 1/24 of that chain's epoch (15 s at the default 360 s epoch), no
+   // more often than once a second; this option caps that interval (`batch_operator_detail::derive_cadence`).
    opts("batch-epoch-poll-ms", bpo::value<uint32_t>()->default_value(whole_milliseconds(EPOCH_POLL)),
-        "How often to check epoch state (ms)");
-   // SIZING RULE for batch-delivery-timeout-ms: it bounds the WHOLE outbound
-   // delivery, a sequence of confirmed transactions. Ethereum sends the envelope
-   // in ONE `epochIn` plus one continuation per dispatch spill (a handful at
-   // most for a full-cap envelope), and each receipt wait may use whatever of
-   // this budget is left; Solana chunks the envelope at 672 bytes. Size it as
-   //     expected transactions x (target block time + confirmation margin)
-   // for the largest expected envelope; the 60000 ms default leaves room for
-   // confirmation plus a 30 s progress-read retry. Undersizing is not fatal:
-   // the relay resumes from the outpost's on-chain cursor on the next cron tick.
-   // SHARED KNOB: this value also bounds the depot push_action completion wait
-   // (see push_action above), depot table reads, and the read-write API deadline.
-   // A timeout there is safe (the async_action_completion callback retains its
-   // own state), but raising this also lengthens depot waits, so size it deliberately.
-   // Help text below must stay ASCII with no " --" sequence (PerformanceHarness
-   // splits nodeop --help output on that token).
-   opts("batch-delivery-timeout-ms", bpo::value<uint32_t>()->default_value(whole_milliseconds(DELIVERY_TIMEOUT)),
-        "Max time for one outbound delivery, every transaction and confirmation wait included (ms)");
+        "Longest interval between the relay's polls of a chain, which it polls every 1/24 of the chain's epoch but "
+        "no more often than once a second, and the interval of the depot cranks and the underwriter's poll (ms)");
    opts("batch-yield-tick-interval-ms",
         bpo::value<uint32_t>()->default_value(whole_milliseconds(YIELD_TICK_INTERVAL)),
         "Minimum spacing between this operator's sysio.swap::tickyield pushes per yield pool (ms)");
@@ -2311,7 +2367,6 @@ void batch_operator_plugin::plugin_initialize(const variables_map& options) {
    if (options.count("batch-operator-account"))
       _impl->operator_account = chain::name(options["batch-operator-account"].as<std::string>());
    _impl->epoch_poll          = fc::milliseconds(options["batch-epoch-poll-ms"].as<uint32_t>());
-   _impl->delivery_timeout    = fc::milliseconds(options["batch-delivery-timeout-ms"].as<uint32_t>());
    _impl->yield_tick_interval = fc::milliseconds(options["batch-yield-tick-interval-ms"].as<uint32_t>());
    _impl->enabled             = _impl->operator_account.good();
    if (options.count("batch-underwriter-account")) {

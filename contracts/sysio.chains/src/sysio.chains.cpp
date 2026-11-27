@@ -16,16 +16,6 @@ uint64_t current_time_ms() {
    return static_cast<uint64_t>(current_time_point().sec_since_epoch()) * 1000;
 }
 
-uint32_t get_current_epoch_index() {
-   sysio::epoch::epochstate_t es(chains::EPOCH_ACCOUNT);
-   if (!es.exists()) return 0;
-   return es.get().current_epoch_index;
-}
-
-bool is_bootstrap_window() {
-   return get_current_epoch_index() == 0;
-}
-
 void require_priv_caller() {
    require_auth(current_receiver());
    sysio::check(sysio::is_privileged(current_receiver()),
@@ -202,7 +192,7 @@ void chains::regchain(opp::types::ChainKind kind,
    }
 
    const auto now = current_time_ms();
-   const bool bootstrap = is_bootstrap_window();
+   const bool bootstrap = epoch::in_bootstrap_window();
 
    tbl.emplace(ram_payer, pk, chain_row{
       .code               = code,

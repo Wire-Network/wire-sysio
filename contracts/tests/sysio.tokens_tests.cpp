@@ -27,8 +27,8 @@ using namespace sysio::opp::types;
 using mvo = fc::mutable_variant_object;
 
 /// Minimal fixture: deploy the privileged sysio.tokens registry on a plain
-/// (non-ROA) tester. With no sysio.epoch deployed, `current_epoch_index`
-/// reads as 0 — the bootstrap window — so registrations come up `active`.
+/// (non-ROA) tester. With no sysio.epoch deployed there is no network genesis
+/// marker — the bootstrap window — so registrations come up `active`.
 class sysio_tokens_tester : public tester {
 public:
    static constexpr auto TOKENS_ACCOUNT = "sysio.tokens"_n;

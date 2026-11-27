@@ -19,10 +19,12 @@ target_include_directories(batch_operator_plugin PRIVATE
         ${CMAKE_SOURCE_DIR}/contracts/sysio.bond/include
         ${CMAKE_SOURCE_DIR}/contracts/sysio.opreg/include)
 
-# The kick crank's tests decode table rows with the committed contract ABIs, the way the node renders them.
+# The kick crank's tests decode table rows with the committed contract ABIs, the way the node renders them, and the
+# served-chain tests read the sysio.opreg membership names.
 if(TARGET test_batch_operator_plugin)
    target_include_directories(test_batch_operator_plugin PRIVATE
-           ${CMAKE_SOURCE_DIR}/contracts/sysio.bond/include)
+           ${CMAKE_SOURCE_DIR}/contracts/sysio.bond/include
+           ${CMAKE_SOURCE_DIR}/contracts/sysio.opreg/include)
    target_compile_definitions(test_batch_operator_plugin PRIVATE
            KICKER_ABI_PATH="${CMAKE_SOURCE_DIR}/contracts/sysio.kicker/sysio.kicker.abi"
            LIQ_ABI_PATH="${CMAKE_SOURCE_DIR}/contracts/sysio.liq/sysio.liq.abi")

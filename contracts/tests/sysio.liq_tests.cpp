@@ -435,7 +435,7 @@ BOOST_FIXTURE_TEST_CASE(a_freeze_admits_transfers_into_custody_and_refuses_the_r
 // A yield pool registered after the bootstrap window
 // ---------------------------------------------------------------------------
 
-// A shadow opened after epoch 0 gets its pool from shadow sysio already holds and WIRE the treasury has
+// A shadow opened after the network genesis gets its pool from shadow sysio already holds and WIRE the treasury has
 // not reserved: regliqpool mints nothing, fails without either, and the yield that waited in liqpending
 // queues once the pool exists.
 BOOST_FIXTURE_TEST_CASE(a_pool_registered_after_the_bootstrap_window_is_seeded_from_held_shadow,
@@ -450,9 +450,9 @@ BOOST_FIXTURE_TEST_CASE(a_pool_registered_after_the_bootstrap_window_is_seeded_f
    };
    const auto eth_supply = [&] { return stat_row(LIQETH_SYM)["supply"].as<asset>().get_amount(); };
 
-   BOOST_REQUIRE_EQUAL(success(), push(EPOCH, epoch_ser, EPOCH, "advance"_n, mvo()));
+   BOOST_REQUIRE_EQUAL(success(), open_consensus_genesis());
    BOOST_REQUIRE_EQUAL(1u, decode(epoch_ser, "epoch_state", get_row_by_id(EPOCH, EPOCH, "epochstate"_n,
-                                                                         "epochstate"_n.value))
+                                                                         fc::slug_name{EPOCH_CHAIN}.value))
                               ["current_epoch_index"].as_uint64());
 
    BOOST_REQUIRE_EQUAL(success(), create(LIQETH_SYM, ETH, LIQETH));

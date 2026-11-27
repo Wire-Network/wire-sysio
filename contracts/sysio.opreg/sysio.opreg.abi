@@ -213,9 +213,35 @@
             ]
         },
         {
+            "name": "consensus_wait",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "eligible_at_epoch",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
             "name": "delivery_key",
             "base": "",
             "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "ts_ms",
+                    "type": "uint64"
+                },
                 {
                     "name": "log_id",
                     "type": "uint64"
@@ -233,6 +259,10 @@
                 {
                     "name": "account",
                     "type": "name"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
                 },
                 {
                     "name": "epoch",
@@ -267,16 +297,62 @@
             ]
         },
         {
+            "name": "duty_tally",
+            "base": "",
+            "fields": [
+                {
+                    "name": "first_log_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "duties",
+                    "type": "uint64"
+                },
+                {
+                    "name": "misses",
+                    "type": "uint64"
+                },
+                {
+                    "name": "miss_run",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "flushwtdw",
             "base": "",
             "fields": [
                 {
                     "name": "economic_epoch",
                     "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "joinchain",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
                 },
                 {
-                    "name": "consensus_epoch",
-                    "type": "uint32"
+                    "name": "chain_code",
+                    "type": "slug_name"
+                }
+            ]
+        },
+        {
+            "name": "leavechain",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
                 }
             ]
         },
@@ -309,6 +385,10 @@
                     "type": "uint32"
                 },
                 {
+                    "name": "terminate_min_pct_samples",
+                    "type": "uint32"
+                },
+                {
                     "name": "terminate_window_ms",
                     "type": "uint64"
                 }
@@ -324,6 +404,10 @@
                 },
                 {
                     "name": "next_dellog_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "flush_resume_id",
                     "type": "uint64"
                 }
             ]
@@ -470,6 +554,10 @@
                     "type": "name"
                 },
                 {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
                     "name": "epoch",
                     "type": "uint32"
                 },
@@ -530,6 +618,54 @@
             ]
         },
         {
+            "name": "served_chain",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "status",
+                    "type": "chain_service_status"
+                },
+                {
+                    "name": "joined_at_ms",
+                    "type": "uint64"
+                },
+                {
+                    "name": "updated_at_ms",
+                    "type": "uint64"
+                },
+                {
+                    "name": "status_reason",
+                    "type": "string"
+                },
+                {
+                    "name": "tally",
+                    "type": "duty_tally"
+                }
+            ]
+        },
+        {
+            "name": "served_chain_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "account",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "setconfig",
             "base": "",
             "fields": [
@@ -543,6 +679,10 @@
                 },
                 {
                     "name": "terminate_max_pct_misses_24h",
+                    "type": "uint32"
+                },
+                {
+                    "name": "terminate_min_pct_samples",
                     "type": "uint32"
                 },
                 {
@@ -594,6 +734,10 @@
                 {
                     "name": "account",
                     "type": "name"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
                 }
             ]
         },
@@ -688,8 +832,8 @@
                     "type": "uint32"
                 },
                 {
-                    "name": "eligible_at_consensus_epoch",
-                    "type": "uint32"
+                    "name": "consensus_waits",
+                    "type": "consensus_wait[]"
                 },
                 {
                     "name": "requested_at_economic_epoch",
@@ -780,6 +924,16 @@
             "ricardian_contract": ""
         },
         {
+            "name": "joinchain",
+            "type": "joinchain",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "leavechain",
+            "type": "leavechain",
+            "ricardian_contract": ""
+        },
+        {
             "name": "processbatch",
             "type": "processbatch",
             "ricardian_contract": ""
@@ -845,14 +999,14 @@
             "name": "dellog",
             "type": "delivery_log_entry",
             "index_type": "i64",
-            "key_names": ["log_id"],
-            "key_types": ["uint64"],
+            "key_names": ["chain_code","account","ts_ms","log_id"],
+            "key_types": ["slug_name","name","uint64","uint64"],
             "table_id": 14972,
             "secondary_indexes": [
                 {
-                    "name": "byaccountts",
-                    "key_type": "uint128",
-                    "table_id": 30319
+                    "name": "bylogid",
+                    "key_type": "uint64",
+                    "table_id": 9629
                 }
             ]
         },
@@ -901,6 +1055,21 @@
             "table_id": 45499
         },
         {
+            "name": "servchains",
+            "type": "served_chain",
+            "index_type": "i64",
+            "key_names": ["chain_code","account"],
+            "key_types": ["slug_name","name"],
+            "table_id": 17930,
+            "secondary_indexes": [
+                {
+                    "name": "byaccount",
+                    "key_type": "uint64",
+                    "table_id": 2055
+                }
+            ]
+        },
+        {
             "name": "wtdwqueue",
             "type": "withdraw_request",
             "index_type": "i64",
@@ -908,11 +1077,6 @@
             "key_types": ["uint64"],
             "table_id": 12732,
             "secondary_indexes": [
-                {
-                    "name": "byeligible",
-                    "key_type": "uint64",
-                    "table_id": 49033
-                },
                 {
                     "name": "byaccount",
                     "key_type": "uint64",
@@ -1047,6 +1211,24 @@
                 {
                     "name": "OPERATOR_TYPE_CHALLENGER",
                     "value": 4
+                }
+            ]
+        },
+        {
+            "name": "chain_service_status",
+            "type": "uint8",
+            "values": [
+                {
+                    "name": "SERVING",
+                    "value": 0
+                },
+                {
+                    "name": "LEFT",
+                    "value": 1
+                },
+                {
+                    "name": "EVICTED",
+                    "value": 2
                 }
             ]
         }

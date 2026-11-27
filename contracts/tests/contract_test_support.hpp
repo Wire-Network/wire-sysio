@@ -53,6 +53,22 @@ void write_kv_row(Tester& tester, name code, name table, uint64_t id, const std:
    else store.insert_row(code, table_id, config::system_account_name, key_view, value);
 }
 
+/// Every row of `code`'s `table`, decoded as `abi_type`, in primary-key order across every scope.
+template <typename Tester>
+std::vector<fc::variant> table_rows(Tester& tester, name code, name table, const abi_serializer& abi,
+                                    const char* abi_type) {
+   const auto               table_id = compute_table_id(table.to_uint64_t());
+   std::vector<fc::variant> rows;
+   auto                     cursor = tester.control->kv().open_row_cursor();
+   kv_row                   row;
+   for (bool more = cursor->seek_lower({code, table_id}, row);
+        more && row.code == code && row.table_id == table_id; more = cursor->next(row)) {
+      const std::vector<char> raw(row.value.begin(), row.value.end());
+      rows.push_back(abi.binary_to_variant(abi_type, raw, Tester::fixture_abi_yield_function()));
+   }
+   return rows;
+}
+
 /// The authorization an action needs when an unprivileged contract bills RAM to `signer`
 /// (a deposit row emplaced for a user, say): the signer's `sysio.payer` beside `active`.
 /// The active key satisfies both.
@@ -292,6 +308,183 @@ inline fc::crypto::signature sign_createlink(const fc::crypto::private_key& priv
    const auto msg_hash = fc::crypto::keccak256::hash(message);
    return priv.sign(fc::sha256(reinterpret_cast<const char*>(msg_hash.data()), 32));
 }
+
+// ---------------------------------------------------------------------------
+//  Served chains: the sysio.authex links and sysio.opreg memberships a batch operator needs before
+//  a chain's schedule seats it
+// ---------------------------------------------------------------------------
+
+namespace served_chains {
+
+inline constexpr auto authex_account     = "sysio.authex"_n;
+inline constexpr auto opreg_account      = "sysio.opreg"_n;
+inline constexpr auto createlink_action  = "createlink"_n;
+inline constexpr auto joinchain_action   = "joinchain"_n;
+inline constexpr auto leavechain_action  = "leavechain"_n;
+inline constexpr auto membership_table   = "servchains"_n;
+inline constexpr auto membership_type    = "served_chain";
+
+/// `sysio.opreg`'s `chain_service_status` names, as a decoded `servchains` row spells them.
+namespace status {
+inline constexpr std::string_view serving = "SERVING";
+inline constexpr std::string_view left    = "LEFT";
+inline constexpr std::string_view evicted = "EVICTED";
+} // namespace status
+
+/// Link `account` to a freshly generated key of `kind`'s curve (EM for EVM, ED for SVM) through its own
+/// signed `sysio.authex::createlink`. Needs sysio.authex and a privileged sysio.dclaim deployed.
+template <typename Tester>
+void link_fresh_key(Tester& tester, name account, sysio::opp::types::ChainKind kind) {
+   const fc::crypto::private_key priv = fc::crypto::private_key::generate(
+      kind == sysio::opp::types::ChainKind::CHAIN_KIND_SVM ? fc::crypto::private_key::key_type::ed
+                                                           : fc::crypto::private_key::key_type::em);
+   const uint64_t nonce = tester.control->head().block_time().time_since_epoch().count() / 1000;
+   tester.push_action(authex_account, createlink_action, account, fc::mutable_variant_object()
+      ("chain_kind", kind)
+      ("account",    account)
+      ("sig",        sign_createlink(priv, account.to_string(), kind, nonce))
+      ("pub_key",    priv.get_public_key())
+      ("nonce",      nonce));
+}
+
+/// Push `sysio.opreg::joinchain(account, chain_code)` signed by `signer`: `sysio.opreg` (the bootstrap
+/// path, the default) or the operator itself.
+template <typename Tester>
+typename Tester::action_result join(Tester& tester, name account, std::string_view chain_code,
+                                    name signer = opreg_account) {
+   try {
+      tester.push_action(opreg_account, joinchain_action, signer, fc::mutable_variant_object()
+         ("account", account)("chain_code", chain_code));
+      return Tester::success();
+   } catch (const fc::exception& ex) {
+      return Tester::error(ex.top_message());
+   }
+}
+
+/// Push `sysio.opreg::leavechain(account, chain_code)` signed by the operator.
+template <typename Tester>
+typename Tester::action_result leave(Tester& tester, name account, std::string_view chain_code) {
+   try {
+      tester.push_action(opreg_account, leavechain_action, account, fc::mutable_variant_object()
+         ("account", account)("chain_code", chain_code));
+      return Tester::success();
+   } catch (const fc::exception& ex) {
+      return Tester::error(ex.top_message());
+   }
+}
+
+/// One outpost a fixture's batch operators serve: its `sysio.chains` code and chain family.
+struct outpost {
+   std::string_view                   code;
+   sysio::opp::types::ChainKind       kind;
+};
+
+/// Link each of `accounts` to a fresh key of every distinct kind among `outposts`, then join each to
+/// every outpost: the state a bootstrap leaves its batch operators in before `schbatchgps`.
+template <typename Tester>
+void serve(Tester& tester, const std::vector<name>& accounts, const std::vector<outpost>& outposts) {
+   std::vector<sysio::opp::types::ChainKind> kinds;
+   for (const outpost& chain : outposts) {
+      if (std::find(kinds.begin(), kinds.end(), chain.kind) == kinds.end()) kinds.push_back(chain.kind);
+   }
+   for (const name account : accounts) {
+      for (const sysio::opp::types::ChainKind kind : kinds) link_fresh_key(tester, account, kind);
+      for (const outpost& chain : outposts) {
+         BOOST_REQUIRE_EQUAL(Tester::success(), join(tester, account, chain.code));
+      }
+   }
+}
+
+/// `account`'s decoded `servchains` row on `chain_code`, or null when it has none. `opreg_abi` holds
+/// sysio.opreg's ABI. The row key is (chain, account), the `[scope][id]` layout `get_row_by_id` reads.
+template <typename Tester>
+fc::variant membership(Tester& tester, abi_serializer& opreg_abi, name account, std::string_view chain_code) {
+   const auto data = tester.get_row_by_id(opreg_account, name{fc::slug_name{chain_code}.value}, membership_table,
+                                          account.to_uint64_t());
+   return data.empty() ? fc::variant()
+                       : opreg_abi.binary_to_variant(membership_type, data, Tester::fixture_abi_yield_function());
+}
+
+} // namespace served_chains
+
+// ---------------------------------------------------------------------------
+//  Consensus epoch state written directly, for fixtures that run no batch operators or no outpost
+// ---------------------------------------------------------------------------
+
+namespace epoch_state {
+
+inline constexpr auto epoch_account = "sysio.epoch"_n;
+inline constexpr auto state_table   = "epochstate"_n;
+inline constexpr auto state_type    = "epoch_state";
+inline constexpr auto genesis_table = "netgenesis"_n;
+inline constexpr auto genesis_type  = "network_genesis";
+
+/// Field names of an `epochstate` / `netgenesis` row.
+namespace field {
+inline constexpr auto chain_code             = "chain_code";
+inline constexpr auto current_epoch_index    = "current_epoch_index";
+inline constexpr auto current_epoch_start    = "current_epoch_start";
+inline constexpr auto next_epoch_start       = "next_epoch_start";
+inline constexpr auto current_batch_op_group = "current_batch_op_group";
+inline constexpr auto batch_op_groups        = "batch_op_groups";
+inline constexpr auto is_paused              = "is_paused";
+inline constexpr auto genesis_at             = "genesis_at";
+} // namespace field
+
+/// `chain`'s `epochstate` row decoded with `epoch_abi`, or the row a chain starts from (index 0, no window).
+template <typename Tester>
+fc::mutable_variant_object state_of(Tester& tester, const abi_serializer& epoch_abi, std::string_view chain) {
+   const uint64_t chain_code = fc::slug_name{chain}.value;
+   const auto     data       = tester.get_row_by_id(epoch_account, epoch_account, state_table, chain_code);
+   if (!data.empty()) {
+      return fc::mutable_variant_object(
+         epoch_abi.binary_to_variant(state_type, data, Tester::fixture_abi_yield_function()).get_object());
+   }
+   return fc::mutable_variant_object()
+      (field::chain_code, chain_code)
+      (field::current_epoch_index, 0u)
+      (field::current_epoch_start, fc::time_point())
+      (field::next_epoch_start, fc::time_point())
+      (field::current_batch_op_group, 0u)
+      (field::batch_op_groups, std::vector<std::vector<name>>{})
+      (field::is_paused, false);
+}
+
+/// Store `state` as its chain's `epochstate` row.
+template <typename Tester>
+void write_state(Tester& tester, const abi_serializer& epoch_abi, const fc::mutable_variant_object& state) {
+   write_kv_row(tester, epoch_account, state_table, state[field::chain_code].as_uint64(),
+                epoch_abi.variant_to_binary(state_type, state, Tester::fixture_abi_yield_function()));
+}
+
+/// Seat `groups` as `chain`'s schedule window, front group on duty, as `schbatchgps` would from that many serving
+/// batch operators, for a fixture that registers none. The chain's index and timing are left as they are.
+template <typename Tester>
+void seat_window(Tester& tester, const abi_serializer& epoch_abi, std::string_view chain,
+                 const std::vector<std::vector<name>>& groups) {
+   fc::mutable_variant_object state = state_of(tester, epoch_abi, chain);
+   state(field::batch_op_groups, groups)(field::current_batch_op_group, 0u);
+   write_state(tester, epoch_abi, state);
+}
+
+/// Leave the state a network genesis leaves, for a fixture that runs no outpost (a genesis advance needs an active
+/// outpost with a seated window): `chain` at its epoch 1 from the head block, `epoch_duration_sec` long, and the
+/// `netgenesis` marker.
+template <typename Tester>
+void start_network(Tester& tester, const abi_serializer& epoch_abi, std::string_view chain,
+                   uint32_t epoch_duration_sec) {
+   const fc::time_point       now   = tester.control->head().block_time();
+   fc::mutable_variant_object state = state_of(tester, epoch_abi, chain);
+   state(field::current_epoch_index, 1u)
+        (field::current_epoch_start, now)
+        (field::next_epoch_start, now + fc::seconds(epoch_duration_sec));
+   write_state(tester, epoch_abi, state);
+   write_kv_row(tester, epoch_account, genesis_table, genesis_table.to_uint64_t(),
+                epoch_abi.variant_to_binary(genesis_type, fc::mutable_variant_object()(field::genesis_at, now),
+                                            Tester::fixture_abi_yield_function()));
+}
+
+} // namespace epoch_state
 
 /// Mirrors of sysio.roa's `nodeownerreg` audit values (`reg_status` / `reject_reason` in sysio.roa.hpp).
 namespace nodeownerreg {

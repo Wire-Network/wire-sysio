@@ -15,9 +15,12 @@ namespace sysio {
    /// Batch operator plugin — cranks Depot and Outpost contracts, ferries OPP
    /// message chains between WIRE chain and external blockchains (ETH, SOL).
    ///
-   /// All 21 batch operators run this plugin in perpetuity. The epoch scheduler
-   /// (sysio.epoch) assigns operators into 3 groups of 7. Each epoch, one group
-   /// is elected; those 7 execute the full epoch cycle (outbound then inbound).
+   /// Every batch operator runs this plugin in perpetuity. Each outpost chain runs
+   /// its own consensus epoch: the epoch scheduler (sysio.epoch) seats the
+   /// operators serving that chain into groups (3 of 7 by default), and each of
+   /// the chain's epochs one group is elected; its members execute that chain's
+   /// epoch cycle (outbound then inbound). An operator relays only the chains it
+   /// serves (`sysio.opreg::servchains`).
    ///
    /// With `batch-underwriter-account` it also runs, or only runs, the
    /// underwriter: it bonds each sysio.synd envelope request once the outpost

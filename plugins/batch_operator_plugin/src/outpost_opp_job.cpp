@@ -47,27 +47,27 @@ outpost_depot_direction_for(sysio::opp::types::ChainKind kind) {
 } // namespace
 
 outpost_opp_job::outpost_opp_job(outpost_client_ptr client,
-                                 depot_ops&         depot,
-                                 fc::microseconds   outpost_deadline)
+                                 depot_ops&         depot)
    : _client(std::move(client))
-   , _depot(depot)
-   , _outpost_deadline(outpost_deadline) {}
+   , _depot(depot) {}
 
 void outpost_opp_job::run_outbound() {
    std::lock_guard<std::mutex> lock(_state_mx);
 
-   if (!_depot.is_elected()) {
-      dlog("outpost_opp_job[{}]: outbound skipped — not elected for current epoch",
+   // Every epoch query names this job's own chain: each outpost chain runs its own consensus epoch.
+   const uint64_t chain_code = _client->chain_code();
+   if (!_depot.is_elected(chain_code)) {
+      dlog("outpost_opp_job[{}]: outbound skipped — not elected for the chain's current epoch",
            _client->to_string());
       return;
    }
-   if (!_depot.within_epoch_window()) {
+   if (!_depot.within_epoch_window(chain_code)) {
       dlog("outpost_opp_job[{}]: outbound skipped — outside epoch window",
            _client->to_string());
       return;
    }
 
-   const auto epoch = _depot.current_epoch();
+   const uint32_t epoch = _depot.current_epoch(chain_code);
    if (epoch == 0) {
       // Genesis epoch is handled by the depot's bootstrap path, not here.
       return;
@@ -75,17 +75,17 @@ void outpost_opp_job::run_outbound() {
    const bool retry_pending = epoch == _last_outbound_epoch;
    // A recorded delivery cannot tip consensus again before the boundary. After
    // it elapses, the cron tick rate-limits retries until the round trip finishes.
-   if (retry_pending && !_depot.is_epoch_boundary_past())
+   if (retry_pending && !_depot.is_epoch_boundary_past(chain_code))
       return;
 
    try {
       // This is completion evidence, not the outbound signature. Solana's
       // inbound bytes are read at finalized commitment before depot delivery.
       // Re-read instead of latching so a WIRE-side rollback also permits recovery.
-      if (_depot.has_delivered_envelope(_client->chain_code(), epoch))
+      if (_depot.has_delivered_envelope(chain_code, epoch))
          return;
 
-      auto pending = _depot.read_pending_outbound(_client->chain_code(), epoch);
+      auto pending = _depot.read_pending_outbound(chain_code, epoch);
       if (!pending) {
          dlog("outpost_opp_job[{}]: no pending outbound for epoch {}",
               _client->to_string(), epoch);
@@ -112,7 +112,8 @@ void outpost_opp_job::run_outbound() {
       // behind, continuation bound reached, a call at the gas ceiling that
       // advanced nothing) arrives as `outpost_delivery_incomplete_exception`
       // and is retried next tick.
-      auto tx_id = _client->deliver_outbound_envelope(epoch, pending->raw_envelope, _outpost_deadline);
+      auto tx_id = _client->deliver_outbound_envelope(epoch, pending->raw_envelope,
+                                                      _depot.delivery_timeout(chain_code));
       ilog("outpost_opp_job[{}]: {} outbound envelope ({} bytes) tx={}", _client->to_string(),
            retry_pending ? OUTBOUND_RETRY_LABEL : OUTBOUND_DELIVERED_LABEL, pending->raw_envelope.size(), tx_id);
 
@@ -143,7 +144,7 @@ void outpost_opp_job::run_outbound() {
    // a failed crank is retried by the next epoch's delivery.
    if (!retry_pending && _last_outbound_epoch == epoch) {
       try {
-         _client->crank_outpost(epoch, _outpost_deadline);
+         _client->crank_outpost(epoch, _depot.delivery_timeout(chain_code));
       } catch (const fc::exception& e) {
          wlog("outpost_opp_job[{}]: outpost crank failed for epoch {}: {}",
               _client->to_string(), epoch, e.to_detail_string());
@@ -157,28 +158,29 @@ void outpost_opp_job::run_outbound() {
 void outpost_opp_job::run_inbound() {
    std::lock_guard<std::mutex> lock(_state_mx);
 
-   if (!_depot.is_elected()) {
-      dlog("outpost_opp_job[{}]: inbound skipped — not elected for current epoch",
+   const uint64_t chain_code = _client->chain_code();
+   if (!_depot.is_elected(chain_code)) {
+      dlog("outpost_opp_job[{}]: inbound skipped — not elected for the chain's current epoch",
            _client->to_string());
       return;
    }
-   if (!_depot.within_epoch_window()) {
+   if (!_depot.within_epoch_window(chain_code)) {
       dlog("outpost_opp_job[{}]: inbound skipped — outside epoch window",
            _client->to_string());
       return;
    }
 
-   const auto epoch = _depot.current_epoch();
+   const uint32_t epoch = _depot.current_epoch(chain_code);
    if (epoch == 0) return;
 
    try {
-      if (_depot.has_delivered_envelope(_client->chain_code(), epoch)) {
+      if (_depot.has_delivered_envelope(chain_code, epoch)) {
          dlog("outpost_opp_job[{}]: already delivered for epoch {}",
               _client->to_string(), epoch);
          return;
       }
 
-      auto raw = _client->read_inbound_envelope(epoch, _outpost_deadline);
+      auto raw = _client->read_inbound_envelope(epoch, _depot.delivery_timeout(chain_code));
       if (raw.empty()) {
          dlog("outpost_opp_job[{}]: no inbound envelope for epoch {}",
               _client->to_string(), epoch);
@@ -199,7 +201,7 @@ void outpost_opp_job::run_inbound() {
          });
       } FC_LOG_AND_DROP("outpost_opp_job[{}]: emit_debug_envelope threw", _client->to_string());
 
-      _depot.deliver_to_depot(_client->chain_code(), raw);
+      _depot.deliver_to_depot(chain_code, raw);
       ilog("outpost_opp_job[{}]: delivered {} inbound bytes to depot for epoch {}",
            _client->to_string(), raw.size(), epoch);
    } catch (const fc::exception& e) {

@@ -4,6 +4,12 @@
 
 #include <sysio/batch_operator_plugin/outpost_epoch_lookup.hpp>
 
+#include <fc/variant_object.hpp>
+
+#include <limits>
+#include <string>
+#include <string_view>
+
 using sysio::outbound_envelope_record;
 using sysio::test::mock_depot_ops;
 
@@ -22,10 +28,40 @@ BOOST_AUTO_TEST_CASE(byoutepoch_find_bound_preserves_slug_high_bits) {
                      "{\"byoutepoch\":\"18889465931478580854793\"}");
 }
 
+/// A chain epoch's `byoutepoch` range runs from its own key to the next key, exclusive: the next epoch of the chain,
+/// or the next chain's epoch 0 after the last epoch.
+BOOST_AUTO_TEST_CASE(byoutepoch_range_spans_one_chain_epoch) {
+   namespace detail = sysio::batch_operator_detail;
+   constexpr uint64_t chain_code  = 1ull << 42;
+   constexpr uint32_t epoch_index = 9;
+   const detail::index_range range = detail::byoutepoch_range(chain_code, epoch_index);
+   BOOST_CHECK_EQUAL(range.lower_bound, detail::byoutepoch_find_bound(chain_code, epoch_index));
+   BOOST_CHECK_EQUAL(range.upper_bound, detail::byoutepoch_find_bound(chain_code, epoch_index + 1));
+
+   const detail::index_range last = detail::byoutepoch_range(chain_code, std::numeric_limits<uint32_t>::max());
+   BOOST_CHECK_EQUAL(last.upper_bound, detail::byoutepoch_find_bound(chain_code + 1, 0));
+}
+
+/// Every deliverer's row of a chain epoch is searched: the operator is found whether it delivered first or later.
+BOOST_AUTO_TEST_CASE(delivered_by_searches_every_deliverer) {
+   namespace detail = sysio::batch_operator_detail;
+   const auto row = [](std::string_view batch_op) {
+      return fc::variant(fc::mutable_variant_object()(detail::envelope_batch_op_field, std::string(batch_op)));
+   };
+   const sysio::chain::name self{"batchop.b"};
+   BOOST_CHECK(detail::delivered_by({row("batchop.a"), row("batchop.b")}, self));
+   BOOST_CHECK(detail::delivered_by({row("batchop.b"), row("batchop.a")}, self));
+   BOOST_CHECK(!detail::delivered_by({row("batchop.a"), row("batchop.c")}, self));
+   BOOST_CHECK(!detail::delivered_by({}, self));
+}
+
 BOOST_AUTO_TEST_CASE(defaults) {
    mock_depot_ops d;
-   BOOST_CHECK_EQUAL(d.within_epoch_window(), true);
-   BOOST_CHECK_EQUAL(d.current_epoch(), 1u);
+   BOOST_CHECK_EQUAL(d.within_epoch_window(0), true);
+   BOOST_CHECK_EQUAL(d.is_elected(0), true);
+   BOOST_CHECK_EQUAL(d.current_epoch(0), 1u);
+   BOOST_CHECK_EQUAL(d.is_epoch_boundary_past(0), false);
+   BOOST_CHECK(d.delivery_timeout(0) == mock_depot_ops::default_delivery_timeout);
    BOOST_CHECK(!d.read_pending_outbound(0, 1).has_value());
    BOOST_CHECK_EQUAL(d.has_delivered_envelope(0, 1), false);
 
@@ -33,6 +69,27 @@ BOOST_AUTO_TEST_CASE(defaults) {
    BOOST_CHECK_EQUAL(d.read_pending_calls[0].chain_code, 0u);
    BOOST_CHECK_EQUAL(d.read_pending_calls[0].epoch_index, 1u);
    BOOST_REQUIRE_EQUAL(d.has_delivered_calls.size(), 1u);
+}
+
+/// Each epoch query answers for the chain it names: a chain's own knobs override the defaults, and every query
+/// records the chain it asked about.
+BOOST_AUTO_TEST_CASE(epoch_queries_answer_per_chain) {
+   constexpr uint64_t own_chain     = 2;
+   constexpr uint64_t default_chain = 3;
+   constexpr uint32_t own_epoch     = 9;
+   mock_depot_ops d;
+   d.chains[own_chain] = mock_depot_ops::chain_knobs{
+      .window_open = false, .elected = false, .epoch = own_epoch, .epoch_boundary_past = true};
+
+   BOOST_CHECK_EQUAL(d.current_epoch(own_chain), own_epoch);
+   BOOST_CHECK_EQUAL(d.is_elected(own_chain), false);
+   BOOST_CHECK_EQUAL(d.within_epoch_window(own_chain), false);
+   BOOST_CHECK_EQUAL(d.is_epoch_boundary_past(own_chain), true);
+   BOOST_CHECK_EQUAL(d.current_epoch(default_chain), d.epoch);
+   BOOST_CHECK_EQUAL(d.is_elected(default_chain), d.elected);
+
+   const std::vector<uint64_t> expected{own_chain, own_chain, own_chain, own_chain, default_chain, default_chain};
+   BOOST_CHECK(d.epoch_queries == expected);
 }
 
 BOOST_AUTO_TEST_CASE(outbound_envelope_record_round_trip) {

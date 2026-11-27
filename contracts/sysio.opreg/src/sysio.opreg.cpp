@@ -3,6 +3,7 @@
 #include <sysio.chains/sysio.chains.hpp>
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio.liq/sysio.liq.hpp>
+#include <sysio.system/emissions.hpp>
 #include <sysio/slug_name.hpp>
 #include <sysio.opp.common/safe_ops.hpp>
 #include <sysio.opp.common/claimable.hpp>
@@ -38,6 +39,9 @@ void reevaluate_eligibility(opreg::operators_t& ops,
 // model, as sysio.token uses): the account stays finite at code+abi size; growth draws from the pool.
 constexpr name ram_payer = "sysio"_n;
 
+/// Permission this contract authorizes its inline actions with.
+constexpr name active_permission = "active"_n;
+
 /// Memo on the transfer that moves a `deposit` into the registry's custody.
 constexpr std::string_view deposit_transfer_memo = "opreg::deposit";
 
@@ -72,6 +76,30 @@ constexpr std::string_view wire_earns_no_yield_msg = "WIRE collateral earns no s
 /// Message of the `check` `regoperator` raises for an account the batch schedule still seats.
 constexpr std::string_view still_seated_msg =
    "operator still holds a batch schedule seat: it may register again once its seats have closed";
+
+/// Message of the `check` `regoperator` raises for an operator with no link for an active outpost.
+constexpr std::string_view missing_outpost_link_msg = "missing authex link for outpost chain";
+
+/// Messages of the `check`s `joinchain` and `leavechain` raise.
+constexpr std::string_view only_batch_serves_chains_msg = "only a batch operator serves chains";
+constexpr std::string_view terminal_operator_join_msg   = "a slashed or terminated operator cannot serve a chain";
+constexpr std::string_view chain_not_active_outpost_msg = "chain is not an active outpost";
+constexpr std::string_view missing_chain_link_msg       = "missing authex link for the chain's kind";
+constexpr std::string_view already_serving_msg          = "operator already serves this chain";
+constexpr std::string_view still_seated_on_chain_msg =
+   "operator still holds a seat in this chain's schedule: it may rejoin once its seats have closed";
+constexpr std::string_view not_serving_msg              = "operator does not serve this chain";
+
+/// Messages of the `check`s `setconfig` raises for a window too short for a miss rail at a chain's schedule.
+constexpr std::string_view window_short_of_consecutive_run_msg =
+   "terminate_window_ms must span at least terminate_max_consecutive_misses + 1 duty rotations";
+constexpr std::string_view window_short_of_pct_samples_msg =
+   "terminate_window_ms must span at least terminate_min_pct_samples duty rotations";
+
+/// Action identifiers owned by sysio.system and invoked by an eviction or a new registration.
+namespace system_actions {
+constexpr name FORFEIT_DUTY = "forfeitduty"_n;
+} // namespace system_actions
 
 /// Resolve a depot-native collateral `token_code` through the shared resolver, against this
 /// registry's custody contracts (`sysio.token` for WIRE, `sysio.liq` for a shadow LIQ symbol).
@@ -125,7 +153,7 @@ uint64_t current_time_ms() {
 /// (uint128) and `ChainAddress.kind` is still `ChainKind`; this helper is
 /// the bridge for opreg's slug_name-typed paths into those legacy surfaces.
 std::optional<opp::types::ChainKind> chain_kind_for_code(sysio::slug_name chain_code) {
-   sysio::chains::chains_t chains_tbl(name{"sysio.chains"_n});
+   sysio::chains::chains_t chains_tbl(opreg::CHAINS_ACCOUNT);
    sysio::chains::chain_key pk{chain_code};
    if (!chains_tbl.contains(pk)) return std::nullopt;
    return chains_tbl.get(pk).kind;
@@ -201,15 +229,64 @@ void preserve_yield_debt(name self, const opreg::operator_entry& op) {
    }
 }
 
-/// True while `account` holds a seat in any group of sysio.epoch's batch-operator schedule window.
-/// A seat stays until the window slides past it, whatever the operator's status in the meantime.
-bool holds_schedule_seat(name account) {
-   sysio::epoch::epochstate_t es(opreg::EPOCH_ACCOUNT);
-   if (!es.exists()) return false;
-   for (const auto& group : es.get().batch_op_groups) {
+/// True while one chain's schedule window `state` seats `account` in any of its groups. A seat stays
+/// until the window slides past it, whatever the operator's status in the meantime.
+bool window_seats(const sysio::epoch::epoch_state& state, name account) {
+   for (const auto& group : state.batch_op_groups) {
       if (std::find(group.begin(), group.end(), account) != group.end()) return true;
    }
    return false;
+}
+
+/// True while `account` holds a seat in any outpost chain's batch-operator schedule window.
+bool holds_schedule_seat(name account) {
+   sysio::epoch::epochstate_t states(opreg::EPOCH_ACCOUNT);
+   for (auto it = states.begin(); it != states.end(); ++it) {
+      if (window_seats(*it, account)) return true;
+   }
+   return false;
+}
+
+/// True while `account` holds a seat in outpost `chain_code`'s batch-operator schedule window.
+bool holds_schedule_seat(name account, sysio::slug_name chain_code) {
+   const std::optional<sysio::epoch::epoch_state> state = sysio::epoch::epoch_state_of(chain_code.value);
+   return state && window_seats(*state, account);
+}
+
+/// `account`'s `sysio.authex` link for chain family `kind`, or nullopt when it has none.
+std::optional<authex::links_s> authex_link_of(name account, opp::types::ChainKind kind) {
+   authex::links_t links(opreg::AUTHEX_ACCOUNT);
+   auto            idx = links.get_index<"bynamechain"_n>();
+   auto            it  = idx.find(to_namechain_key(account, kind));
+   if (it == idx.end()) return std::nullopt;
+   return *it;
+}
+
+/// The id the next `dellog` row will get, without allocating it.
+uint64_t peek_next_dellog_id() {
+   return opreg::opcounters_t(opreg::OPREG_ACCOUNT).get_or_default(opreg::op_counters{}).next_dellog_id;
+}
+
+/// Erase every chain membership of `account`: its operator row is being pruned or replaced by a new
+/// registration, which serves no chain until it joins one.
+void erase_memberships(name self, name account) {
+   opreg::servchains_t members(self);
+   auto                by_account = members.get_index<"byaccount"_n>();
+   for (auto it = by_account.lower_bound(account.value);
+        it != by_account.end() && it->account == account;) {
+      it = by_account.erase(std::move(it));
+   }
+}
+
+/// Send `sysio.system::forfeitduty(account, chain_code)` inline: the account's unsettled batch duty on the
+/// chain, open or settling, is erased while the period totals keep its seat-seconds, so no operator is paid
+/// the share.
+void forfeit_duty(name self, name account, sysio::slug_name chain_code) {
+   action(
+      permission_level{self, active_permission},
+      opreg::SYSTEM_ACCOUNT, system_actions::FORFEIT_DUTY,
+      std::make_tuple(account, chain_code)
+   ).send();
 }
 
 } // anonymous namespace
@@ -220,6 +297,7 @@ bool holds_schedule_seat(name account) {
 void opreg::setconfig(uint64_t terminate_prune_delay_ms,
                       uint32_t terminate_max_consecutive_misses,
                       uint32_t terminate_max_pct_misses_24h,
+                      uint32_t terminate_min_pct_samples,
                       uint64_t terminate_window_ms,
                       std::vector<chain_min_bond> req_prod_collat,
                       std::vector<chain_min_bond> req_batchop_collat,
@@ -233,26 +311,24 @@ void opreg::setconfig(uint64_t terminate_prune_delay_ms,
    check(terminate_max_pct_misses_24h >= MIN_TERMINATE_MAX_PCT_MISSES_24H &&
          terminate_max_pct_misses_24h <= MAX_TERMINATE_MAX_PCT_MISSES_24H,
          "terminate_max_pct_misses_24h must be in [1, 99]");
+   check(terminate_min_pct_samples >= MIN_TERMINATE_MIN_PCT_SAMPLES &&
+         terminate_min_pct_samples <= MAX_TERMINATE_MIN_PCT_SAMPLES,
+         "terminate_min_pct_samples must be in [1, 100]");
    check(terminate_window_ms > 0, "terminate_window_ms must be positive");
 
-   // SEC-28 residual: delivery records accrue only on duty epochs -- one per
-   // `batch_op_groups`-epoch rotation for a resident operator -- so a rolling
-   // window narrower than the full consecutive-miss run of duty epochs makes
-   // the consecutive rail structurally vacuous (records age out and are
-   // pruned before `termcheck` can observe the run) and leaves only the
-   // hair-trigger percent rail. Validate against the live epoch schedule.
-   // Bootstrap installs opreg config before sysio.epoch is configured, so an
-   // absent epochcfg skips the check here; sysio.epoch::setconfig performs
-   // the mirror validation, so no ordering of the two setters can accept a
-   // vacuous pair.
+   // Delivery records accrue only on duty epochs -- one per `batch_op_groups`-epoch
+   // rotation for a resident operator -- so the rolling window must hold the
+   // consecutive rail's run and the percent rail's sample minimum at every
+   // outpost chain's live epoch schedule (see duties_in_window). Bootstrap
+   // installs opreg config before sysio.epoch is configured, so a chain without
+   // an epochcfg row is not checked here; sysio.epoch::setconfig performs the
+   // mirror validation, so no ordering of the two setters can accept a vacuous pair.
    {
-      sysio::epoch::epochcfg_t epoch_cfg_tbl(EPOCH_ACCOUNT);
-      if (epoch_cfg_tbl.exists()) {
-         const auto epoch_cfg = epoch_cfg_tbl.get();
-         check(terminate_window_ms >= min_terminate_window_ms(terminate_max_consecutive_misses,
-                                                              epoch_cfg.epoch_duration_sec,
-                                                              epoch_cfg.batch_op_groups),
-               "terminate_window_ms must span at least terminate_max_consecutive_misses + 1 duty rotations");
+      sysio::epoch::epochcfg_t epoch_cfgs(EPOCH_ACCOUNT);
+      for (auto it = epoch_cfgs.begin(); it != epoch_cfgs.end(); ++it) {
+         const uint64_t duties = duties_in_window(terminate_window_ms, it->epoch_duration_sec, it->batch_op_groups);
+         check(duties >= uint64_t{terminate_max_consecutive_misses} + 1, window_short_of_consecutive_run_msg);
+         check(duties >= terminate_min_pct_samples, window_short_of_pct_samples_msg);
       }
    }
 
@@ -286,6 +362,7 @@ void opreg::setconfig(uint64_t terminate_prune_delay_ms,
    cfg.terminate_prune_delay_ms         = terminate_prune_delay_ms;
    cfg.terminate_max_consecutive_misses = terminate_max_consecutive_misses;
    cfg.terminate_max_pct_misses_24h     = terminate_max_pct_misses_24h;
+   cfg.terminate_min_pct_samples        = terminate_min_pct_samples;
    cfg.terminate_window_ms              = terminate_window_ms;
    cfg.req_prod_collat                  = std::move(req_prod_collat);
    cfg.req_batchop_collat               = std::move(req_batchop_collat);
@@ -338,6 +415,7 @@ void opreg::regoperator(name account,
             "re-register once its balances are drained");
       preserve_yield_debt(get_self(), existing);
       ops.erase(op_pk);
+      erase_memberships(get_self(), account);
    }
 
    // A seat left from an earlier registration would close against this one and record a miss for
@@ -345,27 +423,22 @@ void opreg::regoperator(name account,
    // window slides past them.
    check(!holds_schedule_seat(account), still_seated_msg);
 
-   // Verify authex links exist for all active outpost chains.
-   // Skip when: bootstrapped OR privileged caller (sysio.opreg registering on behalf)
-   //
-   // After the refactor: the outpost set lives in `sysio.chains::chains` keyed
-   // by slug_name. The depot self-row (`is_depot == true`) is skipped; only
-   // active outpost chains require an authex link. `authex::links.bynamechain`
-   // is still keyed by ChainKind (uint128 of (account, ChainKind)), so we
-   // pull `kind` off each chain row.
-   if (!is_bootstrapped && !has_auth(get_self())) {
-      sysio::chains::chains_t chains_tbl(name{"sysio.chains"_n});
-      authex::links_t links(AUTHEX_ACCOUNT);
-      auto namechain_idx = links.get_index<"bynamechain"_n>();
-
-      for (auto op_it = chains_tbl.begin(); op_it != chains_tbl.end(); ++op_it) {
-         if (op_it->is_depot) continue;       // depot self-row carries no outpost
-         if (!op_it->active)  continue;       // pre-active chain rows have no expectation yet
-         uint128_t composite_key = to_namechain_key(account, op_it->kind);
-         auto link_it = namechain_idx.find(composite_key);
-         check(link_it != namechain_idx.end(),
-               "missing authex link for outpost chain");
+   // An operator registering itself needs an authex link for every active outpost (the depot
+   // self-row and pre-active rows carry no expectation). A batch operator is checked per chain at
+   // `joinchain` instead, for only the chains it serves.
+   if (type != OperatorType::OPERATOR_TYPE_BATCH && !is_bootstrapped && !has_auth(get_self())) {
+      sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
+      for (auto chain_it = chains_tbl.begin(); chain_it != chains_tbl.end(); ++chain_it) {
+         if (chain_it->is_depot || !chain_it->active) continue;
+         check(authex_link_of(account, chain_it->kind).has_value(), missing_outpost_link_msg);
       }
+   }
+
+   // A registration is never paid for an earlier one's duty: forfeit what the account still holds on any
+   // chain, whether its old row was replaced above or pruned before. Its last seat has closed, so no
+   // earlier seat credits more.
+   for (const sysio::slug_name chain_code : sysiosystem::emissions::duty_chains_of(SYSTEM_ACCOUNT, account)) {
+      forfeit_duty(get_self(), account, chain_code);
    }
 
    auto now = current_time_ms();
@@ -385,6 +458,59 @@ void opreg::regoperator(name account,
    // processprod for producers regardless of transition, which is the notification that does it.
    // Declared below; see the forward declaration above regoperator.
    reevaluate_eligibility(ops, op_pk, get_self(), account);
+}
+
+// ---------------------------------------------------------------------------
+//  joinchain / leavechain — the outpost chains a batch operator serves
+// ---------------------------------------------------------------------------
+void opreg::joinchain(name account, sysio::slug_name chain_code) {
+   // Privileged sysio.opreg joins on the operator's behalf at bootstrap; the link check still holds.
+   if (!has_auth(get_self())) {
+      require_auth(account);
+   }
+
+   operators_t ops(get_self());
+   const std::optional<operator_entry> op = ops.try_get(operator_key{account.value});
+   check(op.has_value(), operator_not_found_msg);
+   check(op->type == OperatorType::OPERATOR_TYPE_BATCH, only_batch_serves_chains_msg);
+   check(!op->has_terminal_status(), terminal_operator_join_msg);
+
+   // The chain's roster carries the operator's address from this link.
+   const std::optional<opp::types::ChainKind> kind = sysio::chains::outpost_kind_of(CHAINS_ACCOUNT, chain_code);
+   check(kind.has_value(), chain_not_active_outpost_msg);
+   check(authex_link_of(account, *kind).has_value(), missing_chain_link_msg);
+
+   servchains_t                       members(get_self());
+   const served_chain_key             key{chain_code, account};
+   const std::optional<served_chain> existing = members.try_get(key);
+   if (existing) {
+      check(existing->status != chain_service_status::SERVING, already_serving_msg);
+      check(!holds_schedule_seat(account, chain_code), still_seated_on_chain_msg);
+   }
+
+   // A join starts new rails: rows recorded before it belong to an earlier membership.
+   const uint64_t now = current_time_ms();
+   members.set(ram_payer, key, served_chain{
+      .account       = account,
+      .chain_code    = chain_code,
+      .status        = chain_service_status::SERVING,
+      .joined_at_ms  = now,
+      .updated_at_ms = now,
+      .tally         = duty_tally{.first_log_id = peek_next_dellog_id()},
+   });
+}
+
+void opreg::leavechain(name account, sysio::slug_name chain_code) {
+   require_auth(account);
+
+   servchains_t                 members(get_self());
+   const served_chain_key       key{chain_code, account};
+   std::optional<served_chain> membership = members.try_get(key);
+   check(membership && membership->status == chain_service_status::SERVING, not_serving_msg);
+
+   membership->status        = chain_service_status::LEFT;
+   membership->updated_at_ms = current_time_ms();
+   members.set(ram_payer, key, *membership);
 }
 
 // ---------------------------------------------------------------------------
@@ -692,18 +818,47 @@ uint64_t termination_window_open_ms(uint64_t now_ms, const opreg::op_config& cfg
    return now_ms > cfg.terminate_window_ms ? now_ms - cfg.terminate_window_ms : 0;
 }
 
-/// Bounded oldest-first sweep of dellog rows that have aged out of the
-/// rolling termination window. `log_id` allocation order matches `ts_ms`
-/// order (both are monotonic), so the primary index walks oldest-first and
-/// the sweep stops at the first still-in-window row.
+/// Take the erased dellog row `row` out of its membership's tally, when the row counts toward it.
+void untally(const opreg::delivery_log_entry& row) {
+   opreg::servchains_t                members(opreg::OPREG_ACCOUNT);
+   const opreg::served_chain_key      key{row.chain_code, row.account};
+   std::optional<opreg::served_chain> membership = members.try_get(key);
+   if (!membership || !membership->tally.counts(row.log_id)) return;
+   membership->tally.drop_oldest(row.delivered);
+   members.set(ram_payer, key, *membership);
+}
+
+/// Bounded oldest-first sweep of dellog rows, of every chain, that have aged out of the rolling
+/// window, each taken out of its membership's tally. `log_id` allocation order matches `ts_ms` order
+/// (both are monotonic), so the `bylogid` index walks oldest-first and the sweep stops at the first
+/// still-in-window row.
 void prune_dellog(uint64_t window_open_ms, uint32_t max_rows) {
-   opreg::dellog_t log(name{"sysio.opreg"_n});
-   uint32_t removed = 0;
-   for (auto it = log.begin();
-        it != log.end() && removed < max_rows && it->ts_ms < window_open_ms; ) {
+   opreg::dellog_t log(opreg::OPREG_ACCOUNT);
+   auto            by_log_id = log.get_index<"bylogid"_n>();
+   uint32_t        removed   = 0;
+   for (auto it = by_log_id.begin();
+        it != by_log_id.end() && removed < max_rows && it->ts_ms < window_open_ms; ) {
+      const opreg::delivery_log_entry row = *it;
+      it = by_log_id.erase(std::move(it));
+      untally(row);
+      ++removed;
+   }
+}
+
+/// Erase, oldest first, up to `max_rows` of `account`'s rows on `chain_code` that aged out of the
+/// rolling window, taking each out of `tally`. Returns whether none is left.
+bool prune_member_dellog(sysio::slug_name chain_code, name account, uint64_t window_open_ms, uint32_t max_rows,
+                         opreg::duty_tally& tally) {
+   opreg::dellog_t log(opreg::OPREG_ACCOUNT);
+   uint32_t        removed = 0;
+   for (auto it = log.lower_bound(opreg::delivery_key{chain_code, account, 0, 0});
+        it != log.end() && it->chain_code == chain_code && it->account == account && it->ts_ms < window_open_ms;) {
+      if (removed == max_rows) return false;
+      if (tally.counts(it->log_id)) tally.drop_oldest(it->delivered);
       it = log.erase(std::move(it));
       ++removed;
    }
+   return true;
 }
 
 } // anonymous namespace
@@ -730,12 +885,9 @@ opp::types::ChainAddress operator_chain_address(name account, sysio::slug_name c
    const opp::types::ChainKind kind = *kind_opt;
    addr.kind = kind;
 
-   authex::links_t links(opreg::AUTHEX_ACCOUNT);
-   auto idx = links.get_index<"bynamechain"_n>();
-   uint128_t key = to_namechain_key(account, kind);
-   auto it = idx.find(key);
-   if (it != idx.end()) {
-      addr.address = pubkey_to_bytes(it->pub_key);
+   const std::optional<authex::links_s> link = authex_link_of(account, kind);
+   if (link) {
+      addr.address = pubkey_to_bytes(link->pub_key);
    }
    return addr;
 }
@@ -819,6 +971,52 @@ struct enqueue_result {
    std::string error_message;
 };
 
+/// The consensus waits a withdrawal by `op` takes: one per chain whose epoch has started, at its
+/// current index + WITHDRAW_WAIT_EPOCHS. A batch operator waits on each chain it serves (SERVING) or
+/// still holds a seat in: a LEFT or EVICTED member's seated epochs are not yet judged. Any other
+/// operator type waits on every started chain.
+std::vector<opreg::consensus_wait> consensus_waits_for(const opreg::operator_entry& op) {
+   std::vector<opreg::consensus_wait> waits;
+   if (op.type == OperatorType::OPERATOR_TYPE_BATCH) {
+      opreg::servchains_t members(opreg::OPREG_ACCOUNT);
+      auto                by_account = members.get_index<"byaccount"_n>();
+      for (auto it = by_account.lower_bound(op.account.value);
+           it != by_account.end() && it->account == op.account; ++it) {
+         if (it->status != opreg::chain_service_status::SERVING &&
+             !holds_schedule_seat(op.account, it->chain_code)) continue;
+         const uint32_t epoch_index = sysio::epoch::current_epoch_index(it->chain_code.value);
+         if (epoch_index == 0) continue;
+         waits.push_back(opreg::consensus_wait{
+            .chain_code        = it->chain_code,
+            .eligible_at_epoch = epoch_index + opreg::WITHDRAW_WAIT_EPOCHS,
+         });
+      }
+      return waits;
+   }
+   for (const sysio::epoch::chain_epoch_index& chain : sysio::epoch::started_chain_epochs()) {
+      waits.push_back(opreg::consensus_wait{
+         .chain_code        = sysio::slug_name{chain.chain_code},
+         .eligible_at_epoch = chain.epoch_index + opreg::WITHDRAW_WAIT_EPOCHS,
+      });
+   }
+   return waits;
+}
+
+/// True once every chain `request` waits on has reached its consensus guard. `started` holds the
+/// started chains' current indexes (`sysio::epoch::started_chain_epochs`); a waited-on chain always
+/// started before the request.
+bool consensus_waits_passed(const opreg::withdraw_request&                    request,
+                            const std::vector<sysio::epoch::chain_epoch_index>& started) {
+   for (const opreg::consensus_wait& wait : request.consensus_waits) {
+      const auto chain = std::find_if(started.begin(), started.end(),
+                                      [&](const sysio::epoch::chain_epoch_index& c) {
+                                         return c.chain_code == wait.chain_code.value;
+                                      });
+      if (chain == started.end() || chain->epoch_index < wait.eligible_at_epoch) return false;
+   }
+   return true;
+}
+
 /// Validate and queue a withdraw for `account`, whose operator row the caller has already checked
 /// exists. A validation failure is returned for the operator's action log instead of reverting.
 enqueue_result try_enqueue_withdraw(name account,
@@ -862,8 +1060,7 @@ enqueue_result try_enqueue_withdraw(name account,
 
    // The economic wait counts boundaries after the request, so it starts from the grid's epoch at the
    // request, not the last one ticked: catch-up ticks for boundaries already past must not count.
-   const uint32_t economic_epoch  = sysio::epoch::economic_epoch_index_at(current_time_point());
-   const uint32_t consensus_epoch = sysio::epoch::current_epoch_index();
+   const uint32_t economic_epoch = sysio::epoch::economic_epoch_index_at(current_time_point());
    uint64_t request_id = next_withdraw_id();
 
    queue.emplace(ram_payer, opreg::withdraw_key{request_id}, opreg::withdraw_request{
@@ -873,7 +1070,7 @@ enqueue_result try_enqueue_withdraw(name account,
       .token_code          = token_code,
       .amount              = amount,
       .eligible_at_economic_epoch  = economic_epoch + opreg::WITHDRAW_WAIT_ECONOMIC_EPOCHS,
-      .eligible_at_consensus_epoch = consensus_epoch + opreg::WITHDRAW_WAIT_EPOCHS,
+      .consensus_waits             = consensus_waits_for(op),
       .requested_at_economic_epoch = economic_epoch,
    });
    return { true, request_id, "" };
@@ -1030,7 +1227,7 @@ void reevaluate_eligibility(opreg::operators_t& ops,
       return;
    }
    action(
-      permission_level{self, "active"_n},
+      permission_level{self, active_permission},
       self, handler,
       std::make_tuple(account, was_eligible, is_eligible)
    ).send();
@@ -1046,7 +1243,7 @@ void reevaluate_eligibility(opreg::operators_t& ops,
 void notify_producer_standing(name self, const opreg::operator_entry& op) {
    if (op.type != OperatorType::OPERATOR_TYPE_PRODUCER) return;
    action(
-      permission_level{self, "active"_n},
+      permission_level{self, active_permission},
       self, "processprod"_n,
       std::make_tuple(op.account, false, false)
    ).send();
@@ -1102,31 +1299,49 @@ void opreg::deposit(name account, sysio::slug_name token_code, uint64_t amount) 
 // ---------------------------------------------------------------------------
 //  flushwtdw — drain matured rows from the withdraw queue
 // ---------------------------------------------------------------------------
-void opreg::flushwtdw(uint32_t economic_epoch, uint32_t consensus_epoch) {
+void opreg::flushwtdw(uint32_t economic_epoch) {
    require_auth(EPOCH_ACCOUNT);
 
-   operators_t ops(get_self());
-   wtdwqueue_t queue(get_self());
-   auto idx = queue.get_index<"byeligible"_n>();
+   operators_t    ops(get_self());
+   wtdwqueue_t    queue(get_self());
+   opcounters_t   counters_tbl(get_self());
+   const uint64_t start_id = counters_tbl.get_or_default(op_counters{}).flush_resume_id;
 
-   // Iterate matured rows. Erase as we go, hence the manual cursor. Bounded to
-   // MAX_WTDW_FLUSH_PER_EPOCH rows per economic epoch (SEC-78): the remaining matured
-   // rows flush on the next one, which keeps this inline action inside the
-   // transaction CPU deadline it shares with the rest of the economic tick.
-   // `flushed` is incremented at the top of every iteration, before any of the
-   // per-row `continue` branches, so it counts every attempt.
+   // Walk in request order from where the last flush stopped, to the first row whose economic wait
+   // has not passed; the next walk then starts at the head. Economic maturity never decreases along
+   // the queue, since request ids and the economic grid both move forward (a `seteconomy` change can
+   // re-date boundaries not yet ticked and let a later request mature first; it then waits for the
+   // rows ahead of it).
    //
-   // A row also waits for its consensus guard. Requests are queued in time order and both
-   // clocks only move forward, so along `byeligible` the guard never decreases: the first row
-   // the guard holds holds every row after it, and the walk stops there.
-   uint32_t flushed = 0;
-   auto it = idx.begin();
-   while (it != idx.end() && it->eligible_at_economic_epoch <= economic_epoch &&
-          it->eligible_at_consensus_epoch <= consensus_epoch &&
-          flushed < MAX_WTDW_FLUSH_PER_EPOCH) {
-      auto row     = *it;          // copy out before erase
-      auto wkey    = withdraw_key{row.request_id};
-      // Advance index iterator BEFORE erasing the row.
+   // A row a consensus wait still holds is skipped, so a stalled chain holds only the rows waiting on
+   // it. Each flush releases at most MAX_WTDW_FLUSH_PER_EPOCH rows and skips at most
+   // MAX_WTDW_HELD_SKIPS_PER_FLUSH, inside the CPU deadline it shares with the rest of the economic
+   // tick; the next flush resumes at the row this one stopped on. `flushed` is counted before the
+   // per-row `continue` branches, so it counts every released attempt.
+   std::optional<std::vector<sysio::epoch::chain_epoch_index>> started;   // read at the first matured row
+   uint64_t resume_id = 0;
+   uint32_t flushed   = 0;
+   uint32_t skipped   = 0;
+   auto     it        = queue.lower_bound(withdraw_key{start_id});
+   while (it != queue.end() && it->eligible_at_economic_epoch <= economic_epoch) {
+      if (flushed == MAX_WTDW_FLUSH_PER_EPOCH) {
+         resume_id = it->request_id;
+         break;
+      }
+      if (!started) started = sysio::epoch::started_chain_epochs();
+      if (!consensus_waits_passed(*it, *started)) {
+         if (skipped == MAX_WTDW_HELD_SKIPS_PER_FLUSH) {
+            resume_id = it->request_id;
+            break;
+         }
+         ++skipped;
+         ++it;
+         continue;
+      }
+
+      const withdraw_request row = *it;   // copy out before erase
+      const withdraw_key     wkey{row.request_id};
+      // Advance the iterator BEFORE erasing the row.
       ++it;
       ++flushed;
 
@@ -1195,6 +1410,12 @@ void opreg::flushwtdw(uint32_t economic_epoch, uint32_t consensus_epoch) {
       // Re-check eligibility — this withdraw may have dropped the operator
       // below the role minimum.
       reevaluate_eligibility(ops, op_pk, get_self(), row.account);
+   }
+
+   if (resume_id != start_id) {
+      op_counters counters     = counters_tbl.get_or_default(op_counters{});
+      counters.flush_resume_id = resume_id;
+      counters_tbl.set(counters, ram_payer);
    }
 }
 
@@ -1314,15 +1535,13 @@ void opreg::slash(name account, std::string reason) {
 }
 
 // ---------------------------------------------------------------------------
-//  terminate / termcheck / recorddel — administrative removal
+//  terminate — administrative removal; recorddel / termcheck — per-chain eviction
 // ---------------------------------------------------------------------------
 
 namespace {
 
-/// Internal terminate body — used by both the operator-removal path
-/// (`termcheck` -> `terminate` inline) and the slashing-equivalent path for
-/// completeness. Marks status TERMINATED and remits each
-/// depot-native token balance to a pull claim for the operator.
+/// Body of the governance `terminate`. Marks status TERMINATED and remits each depot-native token
+/// balance to a pull claim for the operator.
 void terminate_inline(name self, name account, const std::string& reason) {
    opreg::operators_t ops(self);
    auto op_pk = opreg::operator_key{account.value};
@@ -1482,7 +1701,7 @@ void opreg::claimyield(name account, sysio::slug_name token_code) {
    credit_remit_claim(get_self(), account, opp::wire::token_code, credited);
 }
 
-void opreg::recorddel(name account, uint32_t epoch, bool delivered) {
+void opreg::recorddel(name account, sysio::slug_name chain_code, uint32_t epoch, bool delivered) {
    require_auth(EPOCH_ACCOUNT);
 
    // Recorded whatever the operator's status at close: the seat is the duty. A withdrawal below
@@ -1496,18 +1715,28 @@ void opreg::recorddel(name account, uint32_t epoch, bool delivered) {
    const auto cfg = cfg_tbl.get_or_default(op_config{});
    prune_dellog(termination_window_open_ms(now_ms, cfg), MAX_DELLOG_PRUNE_PER_WRITE);
 
-   dellog_t log(get_self());
-   uint64_t id = next_dellog_id();
-   log.emplace(ram_payer, delivery_key{id}, delivery_log_entry{
-      .log_id    = id,
-      .account   = account,
-      .epoch     = epoch,
-      .delivered = delivered,
-      .ts_ms     = now_ms,
+   dellog_t       log(get_self());
+   const uint64_t id = next_dellog_id();
+   log.emplace(ram_payer, delivery_key{chain_code, account, now_ms, id}, delivery_log_entry{
+      .log_id     = id,
+      .account    = account,
+      .chain_code = chain_code,
+      .epoch      = epoch,
+      .delivered  = delivered,
+      .ts_ms      = now_ms,
    });
+
+   // Count the duty on the operator's rails for the chain. Read after the sweep, which may have changed the row.
+   servchains_t                members(get_self());
+   const served_chain_key      member_key{chain_code, account};
+   std::optional<served_chain> membership = members.try_get(member_key);
+   if (membership) {
+      membership->tally.add(delivered);
+      members.set(ram_payer, member_key, *membership);
+   }
 }
 
-void opreg::termcheck(name account) {
+void opreg::termcheck(name account, sysio::slug_name chain_code) {
    require_auth(EPOCH_ACCOUNT);
 
    operators_t ops(get_self());
@@ -1518,7 +1747,7 @@ void opreg::termcheck(name account) {
    // operator that withdraws before each close and cancels after it is UNKNOWN every time.
    if (op.has_terminal_status()) return;
    // Bootstrapped operators are the genesis / chain-of-trust seed set and
-   // are NEVER subject to rolling-window termination — see
+   // are NEVER subject to rolling-window eviction — see
    // .claude/rules/bootstrapped-operator-invariants.md at the wire root. A
    // transient bug in the deliver / consensus / advance pipeline (or a
    // benign operator-side outage) must not be able to tear the
@@ -1526,68 +1755,57 @@ void opreg::termcheck(name account) {
    // `batch_operator_minimum_active` with no remaining ACTIVE operators
    // to advance consensus and no recovery path.
    if (op.is_bootstrapped) return;
-   // Termination on rolling-buffer underperformance is scoped to batch operators, and for
-   // producers that is now a DECISION rather than an open question.
-   //
-   // A producer that misses `max_consecutive_missed_rounds` consecutive scheduled rounds is
-   // DEMOTED by sysio.system -- moved to a categorical tier no score can climb out of, so it
-   // leaves the schedule and draws no pay. Demotion is deliberately recoverable: the producer
-   // re-registers via `regproducer` when it is ready again. Termination is not recoverable, and
-   // it also returns the bond, so applying it to an offline-but-bonded producer would convert a
-   // reversible outage into a permanent exit and hand back the collateral that makes the operator
-   // accountable. An indefinitely-demoted producer therefore stays demoted -- holding its row and
-   // its bond -- until it either re-registers or withdraws of its own accord.
-   //
-   // Underwriter offline-too-long remains open; they have no committee and no schedule to miss.
+   // Only batch operators serve chains. A producer that keeps missing its rounds is demoted by
+   // sysio.system instead.
    if (op.type != OperatorType::OPERATOR_TYPE_BATCH) return;
+
+   // Nothing to evaluate for an operator that never joined the chain, nor for one already EVICTED from it.
+   servchains_t                 members(get_self());
+   const served_chain_key       member_key{chain_code, account};
+   std::optional<served_chain> membership = members.try_get(member_key);
+   if (!membership || membership->status == chain_service_status::EVICTED) return;
 
    // Thresholds come from opconfig — tests can dial them down so the
    // miss-window evaluation fits the test timeout budget.
    opconfig_t cfg_tbl(get_self());
    const auto cfg = cfg_tbl.get_or_default(op_config{});
 
-   // Both rails read only the current registration: a re-registered account's earlier rows stay
-   // in the log until they age out. They start after the registration's own second, because
-   // `current_time_ms` has second resolution and the block that terminated the previous
-   // registration can share it. A return to ACTIVE within a registration resets neither rail,
-   // so a cancelled withdrawal cannot clear the misses recorded while the operator was UNKNOWN.
-   uint64_t now_ms      = current_time_ms();
-   uint64_t window_open = std::max(termination_window_open_ms(now_ms, cfg), op.registered_at + 1);
+   // Both rails read the tally of the latest join; a new registration joins afresh, so rows of an earlier
+   // registration or membership never count. A return to ACTIVE resets neither rail, so a cancelled
+   // withdrawal cannot clear the misses recorded while the operator was UNKNOWN. The member's aged rows
+   // the on-write sweep has not reached are erased first; while one is left the tally reaches past the
+   // window and the rails wait.
+   const uint64_t now_ms        = current_time_ms();
+   duty_tally&    tally         = membership->tally;
+   const uint64_t duties_before = tally.duties;
+   const bool     drained       = prune_member_dellog(chain_code, account, termination_window_open_ms(now_ms, cfg),
+                                                      MAX_DELLOG_PRUNE_PER_CHECK, tally);
 
-   dellog_t log(get_self());
-   auto idx = log.get_index<"byaccountts"_n>();
-   uint128_t lower_key = (static_cast<uint128_t>(account.value) << 64) | window_open;
-   uint128_t upper_key = (static_cast<uint128_t>(account.value) << 64) | std::numeric_limits<uint64_t>::max();
-
-   uint32_t consecutive_misses = 0;
-   uint32_t worst_consecutive  = 0;
-   uint32_t total_misses       = 0;
-   uint32_t total_in_window    = 0;
-   for (auto it = idx.lower_bound(lower_key); it != idx.end() && it->by_account_ts() <= upper_key; ++it) {
-      if (it->account != account) break;
-      total_in_window++;
-      if (!it->delivered) total_misses++;
-
-      if (!it->delivered) {
-         consecutive_misses++;
-         if (consecutive_misses > worst_consecutive) worst_consecutive = consecutive_misses;
-      } else {
-         consecutive_misses = 0;
-      }
-   }
-
-   bool exceeds_consecutive = worst_consecutive > cfg.terminate_max_consecutive_misses;
-   bool exceeds_percent     = total_in_window > 0 &&
-                              (total_misses * 100u / total_in_window) > cfg.terminate_max_pct_misses_24h;
+   // termcheck follows every recorddel, so the run since the last delivery breaches at the duty that
+   // makes it too long. The percent rail waits for a minimum sample, so an early miss cannot evict alone.
+   const bool exceeds_consecutive = drained && tally.miss_run > cfg.terminate_max_consecutive_misses;
+   const bool exceeds_percent     = drained && tally.duties > 0 && tally.duties >= cfg.terminate_min_pct_samples &&
+                                    tally.misses * PERCENT_SCALE / tally.duties > cfg.terminate_max_pct_misses_24h;
    if (exceeds_consecutive || exceeds_percent) {
-      terminate_inline(get_self(), account,
+      membership->status        = chain_service_status::EVICTED;
+      membership->updated_at_ms = now_ms;
+      membership->status_reason =
          exceeds_consecutive
             ? std::string{"rolling-window: >"}
                  + std::to_string(cfg.terminate_max_consecutive_misses)
                  + " consecutive misses"
             : std::string{"rolling-window: >"}
                  + std::to_string(cfg.terminate_max_pct_misses_24h)
-                 + "% miss rate");
+                 + "% miss rate";
+      members.set(ram_payer, member_key, *membership);
+
+      // The eviction forfeits the operator's unsettled batch duty on this chain; its other chains keep
+      // theirs. No duty is recorded before initt5, so there is nothing to forfeit until then.
+      if (sysiosystem::emissions::records_batch_duty(SYSTEM_ACCOUNT)) {
+         forfeit_duty(get_self(), account, chain_code);
+      }
+   } else if (tally.duties != duties_before) {
+      members.set(ram_payer, member_key, *membership);
    }
 }
 
@@ -1616,6 +1834,7 @@ void opreg::prune() {
                                  && now - it->terminated_at >= cfg.terminate_prune_delay_ms;
       if (delay_elapsed && is_fully_settled(*it)) {
          preserve_yield_debt(get_self(), *it);
+         erase_memberships(get_self(), it->account);
          it = status_idx.erase(std::move(it));
       } else {
          ++it;

@@ -16,8 +16,8 @@ namespace sysio {
  * Holds an `outpost_client_ptr` (the chain-specific SPI, owned by
  * `outpost_client_plugin`) and a reference to a `depot_ops` (the WIRE-side
  * contract, owned by `batch_operator_plugin`). The batch operator plugin
- * constructs one per registered outpost at startup and schedules two cron
- * jobs against it:
+ * constructs one per outpost chain the operator relays and schedules two cron
+ * jobs against it, each at that chain's poll interval:
  *
  *   - `outpost_opp_outbound_<id>` calls `run_outbound()` every cycle.
  *   - `outpost_opp_inbound_<id>`  calls `run_inbound()`  every cycle.
@@ -26,15 +26,19 @@ namespace sysio {
  * `_state_mx` serializes mutable state access between them. `one_at_a_time`
  * on each cron job prevents a single job from re-entering itself.
  *
- * The `outpost_deadline` passed to every `outpost_client` RPC call is the
- * per-call deadline, not the cycle deadline. Concrete clients are required
- * to enforce it internally so a hung remote chain cannot starve the pool.
+ * Each outpost chain runs its own consensus epoch, so every epoch and election
+ * query the job makes of `depot_ops` names the job's own chain
+ * (`client->chain_code()`).
+ *
+ * Every `outpost_client` call gets the chain's delivery timeout
+ * (`depot_ops::delivery_timeout`, from its on-chain epoch duration) as its
+ * deadline, read each cycle. Concrete clients are required to enforce it
+ * internally so a hung remote chain cannot starve the pool.
  */
 class outpost_opp_job {
 public:
    outpost_opp_job(outpost_client_ptr client,
-                   depot_ops&         depot,
-                   fc::microseconds   outpost_deadline);
+                   depot_ops&         depot);
 
    /// Read the WIRE-side pending outbound record for this outpost+epoch and,
    /// if present, call `client->deliver_outbound_envelope` with it. Emits the
@@ -58,7 +62,6 @@ public:
 private:
    outpost_client_ptr _client;
    depot_ops&         _depot;
-   fc::microseconds   _outpost_deadline;
    std::mutex         _state_mx;
 
    /// Last successful submission, used to gate retries on the epoch boundary and

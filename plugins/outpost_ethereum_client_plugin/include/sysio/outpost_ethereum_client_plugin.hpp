@@ -274,8 +274,8 @@ inline uint64_t delivery_gas_budget(const delivery_gas_request& request) {
  *
  * The receipt wait replaces the library's default retry budget, which would
  * otherwise cap every wait at its own 15 s however long the delivery was
- * given: on a chain whose blocks come slower than that, raising
- * `batch-delivery-timeout-ms` would not let a single wait outlast one block.
+ * given: on a chain whose blocks come slower than that, a longer delivery
+ * timeout would not let a single wait outlast one block.
  *
  * @param gas_budget   The budget from `delivery_gas_budget`.
  * @param receipt_wait How long to wait for the receipt.

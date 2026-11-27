@@ -4,16 +4,6 @@
     "types": [],
     "structs": [
         {
-            "name": "chalg_state",
-            "base": "",
-            "fields": [
-                {
-                    "name": "open_disputes",
-                    "type": "uint32"
-                }
-            ]
-        },
-        {
             "name": "chkdispute",
             "base": "",
             "fields": [
@@ -200,14 +190,6 @@
     ],
     "tables": [
         {
-            "name": "chalgstate",
-            "type": "chalg_state",
-            "index_type": "i64",
-            "key_names": ["name"],
-            "key_types": ["name"],
-            "table_id": 32990
-        },
-        {
             "name": "disputes",
             "type": "dispute_entry",
             "index_type": "i64",
@@ -215,11 +197,6 @@
             "key_types": ["uint64"],
             "table_id": 22555,
             "secondary_indexes": [
-                {
-                    "name": "byepoch",
-                    "key_type": "uint64",
-                    "table_id": 12458
-                },
                 {
                     "name": "byoutepoch",
                     "key_type": "uint128",
