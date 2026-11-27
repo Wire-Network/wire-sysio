@@ -51,7 +51,10 @@ state calls for it.
 
 The job calls the outpost client every poll until the depot records this operator's inbound
 delivery of the epoch. A delivery the outpost already recorded is not sent again: it awaits the
-rest of the group. The outpost's per-epoch crank rides the first call of an epoch that returns.
+rest of the group. After the delivery call, at most once per chain minimum whether or not the
+chain advances, the job runs the outpost's crank (`crank_outpost`: Ethereum `realizeYield`,
+Solana `report_liq_yield`), so yield the outpost accrues while the chain is idle is still queued,
+and its backlog makes the chain due.
 
 **Inbound (Outposts → WIRE):**
 1. The outpost emits its outbound envelope once it has dispatched the inbound one (ETH: in the `epochIn`
@@ -62,14 +65,21 @@ rest of the group. The outpost's per-epoch crank rides the first call of an epoc
    lands, the operator pushes `sysio.msgch::chkcons` if the chain is due, which advances it
 
 A member of the group that served the chain's previous epoch (`epochstate.previous_group`) that has
-no delivery recorded for that epoch delivers it late, credited when the current epoch closes, while
+no delivery recorded for that epoch delivers it late, credited when that epoch's books close, while
 the chain's late-delivery window is open (`epochcfg.late_window_sec` from the current epoch's start);
-the depot refuses one after it, and none is attempted. The outpost keeps only its latest emitted
+the depot refuses one after it, and none is attempted. The late delivery goes first in each cycle,
+its outpost read and depot push bounded by what is left of the window, then the current epoch's.
+The outpost keeps only its latest emitted
 envelope, so the job keeps the bytes it read for the current epoch, and for the previous one until the
 window closes. Only a late delivery the depot refuses drops them; one that times out or cannot be
 built is retried from them on the next cycle.
 
 **Backlog (Outposts → WIRE):**
+
+Run by the members of the elected group and, once the chain has stayed not due a chain minimum past its
+epoch start, by the members of the window's next group, whose own strict majority makes the chain due
+when the group on duty no longer holds a majority of eligible reporters:
+
 1. Once the depot has decided the chain's current epoch N and the outpost's latest emitted epoch is N,
    read the outpost's outbound backlog in one read (ETH `OPP.pendingOutbound()` at the read
    confirmation; SOL `OutboundMessageBuffer` and `LatestOutboundEnvelope` at `confirmed`)
@@ -94,10 +104,11 @@ passed since its epoch start, and its traffic wait since that traffic began) —
 | An elected operator, from the epoch tick | The epoch is decided (`sysio.msgch::outpcons` records it) and `due_at` has passed |
 | An elected operator, right after its own delivery of the current epoch | `due_at` has passed (the delivery may itself have decided the epoch) |
 | An elected operator, from the epoch tick | The epoch has stayed undecided one chain minimum past its start, at most once per chain minimum from this operator: its eligible members can change with no new delivery |
+| An elected operator, from the epoch tick | The previous epoch's books are still open past its late-delivery window, at most once per chain minimum from this operator, in step with the re-tally: `chkcons` closes them |
 | Any ACTIVE operator serving the chain, from the epoch tick | The epoch is decided and has stayed due one chain minimum past `due_at`, so its elected group is not advancing it |
 
 None goes to a chain before its genesis advance, to a paused chain, or to an idle decided
-chain. The
+chain whose books have closed. The
 rest come every `--batch-epoch-poll-ms` from their own cron job, from every ACTIVE
 operator, because the elected one may be the operator that is offline, and each is a
 cheap no-op once its work is done:

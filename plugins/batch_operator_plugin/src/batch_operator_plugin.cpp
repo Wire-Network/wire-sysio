@@ -356,9 +356,9 @@ struct batch_operator_plugin::impl {
    /// When the epoch tick next reads the chains. Its cron entry fires every `epoch_tick_step`; the read waits for the
    /// shortest poll interval of the relayed chains (`batch_operator_detail::epoch_tick_interval`).
    fc::time_point                      next_epoch_read;
-   /// When this operator last pushed a re-tally `chkcons` for each chain (`batch_operator_detail::chkcons_reason`).
-   /// Touched only by the epoch tick.
-   batch_operator_detail::retally_pushes retallied;
+   /// When this operator last pushed a paced `chkcons`, a re-tally or a books close, for each chain
+   /// (`batch_operator_detail::chkcons_reason`). Touched only by the epoch tick.
+   batch_operator_detail::paced_pushes paced_chkcons;
 
    // Operator awareness — set by `poll_own_status()` from sysio.opreg::operators.
    /// Whether `chkcons`, the depot cranks and the kick crank push: false once the operator is SLASHED or TERMINATED.
@@ -456,14 +456,15 @@ struct batch_operator_plugin::impl {
       }
 
       push_outcome deliver_to_depot(uint64_t chain_code,
-                                    const std::vector<char>& raw_messages) override {
+                                    const std::vector<char>& raw_messages,
+                                    fc::microseconds timeout) override {
          return _impl.push_action(
             msgch::account, msgch::action_deliver, *_impl.relay_signer,
             fc::mutable_variant_object()
                (msgch::field::batch_op_name, _impl.operator_account.to_string())
                (msgch::field::chain_code,    chain_code)
                (msgch::field::data,          raw_messages),
-            _impl.delivery_timeout_of(chain_code));
+            timeout);
       }
 
       void push_chkcons_if_due(uint64_t chain_code) override {
@@ -510,9 +511,13 @@ struct batch_operator_plugin::impl {
          const std::optional<batch_operator_detail::chain_epoch_view> view = _impl.chain_epoch_of(chain_code);
          return view ? view->epoch_index : 0;
       }
-      bool late_delivery_open(uint64_t chain_code) const override {
+      fc::microseconds late_window_left(uint64_t chain_code) const override {
          const std::optional<batch_operator_detail::chain_epoch_view> view = _impl.chain_epoch_of(chain_code);
-         return view && batch_operator_detail::late_delivery_open(*view, fc::time_point::now());
+         return view ? batch_operator_detail::late_window_left(*view, fc::time_point::now()) : fc::microseconds();
+      }
+      bool reports_backlog(uint64_t chain_code) const override {
+         const std::optional<batch_operator_detail::chain_epoch_view> view = _impl.chain_epoch_of(chain_code);
+         return view && batch_operator_detail::reports_backlog(*view, fc::time_point::now());
       }
       bool is_decided(uint64_t chain_code) const override {
          const std::optional<batch_operator_detail::chain_epoch_view> view = _impl.chain_epoch_of(chain_code);
@@ -670,18 +675,19 @@ struct batch_operator_plugin::impl {
    }
 
    /// Push `sysio.msgch::chkcons` for every relayed chain `batch_operator_detail::chkcons_chains` names: as an
-   /// elected operator, for a decided epoch once the chain is due (`chkcons` advances it) and for an epoch undecided
-   /// past the chain minimum, at most once per minimum (`chkcons` re-tallies it); as any ACTIVE operator serving the
-   /// chain, for a decided epoch that has stayed due past the liveness grace, which its elected group has not
-   /// advanced. A decided epoch on an idle chain needs nothing. The action is permissionless, but a push from every
+   /// elected operator, for a decided epoch once the chain is due (`chkcons` advances it), and at most once per chain
+   /// minimum for an epoch undecided past the chain minimum (`chkcons` re-tallies it) or for previous-epoch books
+   /// open past the late-delivery window (`chkcons` closes them); as any ACTIVE operator serving the chain, for a
+   /// decided epoch that has stayed due past the liveness grace, which its elected group has not advanced. A decided
+   /// epoch on an idle chain whose books have closed needs nothing. The action is permissionless, but a push from every
    /// batch operator every poll would waste transaction slots. A failed push is logged and the next chain is still
    /// pushed.
    void push_chkcons() {
       using batch_operator_detail::chkcons_reason;
       const fc::time_point                                   now = fc::time_point::now();
       const std::vector<batch_operator_detail::chkcons_push> pushes =
-         batch_operator_detail::chkcons_chains(chain_epochs, relayed, now, retallied, status_delivers);
-      batch_operator_detail::record_retallies(retallied, pushes, now);
+         batch_operator_detail::chkcons_chains(chain_epochs, relayed, now, paced_chkcons, status_delivers);
+      batch_operator_detail::record_paced_pushes(paced_chkcons, pushes, now);
       for (const batch_operator_detail::chkcons_push& push : pushes) {
          if (push.reason == chkcons_reason::liveness) {
             wlog("batch_operator: chain {} has stayed due past the liveness grace without advancing; pushing "

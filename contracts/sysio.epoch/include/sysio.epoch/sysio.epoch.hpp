@@ -57,15 +57,23 @@ namespace sysio {
       /// once its current epoch has reached consensus (`sysio.msgch::outpcons`): the outpost's next envelope chains
       /// to that epoch's winner. A chain that is not an active outpost owes no envelope and is not refused.
       ///
-      /// An epoch's books close one advance later, so its late deliveries count: `advance(N -> N+1)`
-      /// records each `previous_group` member's delivery of epoch N-1 (`sysio.opreg::recorddel`), runs its
-      /// `termcheck`, and then credits the group's duty for N-1 (`sysio.system::rcrdduty`: per member, the chain
-      /// minimum configured when those books close, however long the epoch ran), whether or not the chain is
-      /// still an active outpost.
+      /// An epoch's books close once its late deliveries can no longer come: at `closebooks`, once the next
+      /// epoch's late-delivery window has passed, or at the advance after it, whichever runs first. The
+      /// advance `N -> N+1` closes epoch N-1's books if they are still open (`previous_group` not empty):
+      /// each `previous_group` member's delivery of it (`sysio.opreg::recorddel`), its `termcheck`, then the
+      /// group's duty (`sysio.system::rcrdduty`: per member, the chain minimum configured when the books close,
+      /// however long the epoch ran), whether or not the chain is still an active outpost.
       /// Nothing is recorded while `previous_group` is empty: the genesis advance, the advance from epoch 1,
-      /// and the advance after one the chain closed while not an active outpost.
+      /// the advance after one the chain closed while not an active outpost, and an advance whose books
+      /// `closebooks` already closed.
       [[sysio::action]]
       void advance(sysio::slug_name chain_code);
+
+      /// Close outpost `chain_code`'s previous epoch's books once its late-delivery window has passed
+      /// (`books_closable`), as `advance` would, then empty `previous_group`, so they close once and the
+      /// late deliveries they counted end. No effect otherwise. Auth: sysio.msgch (`chkcons`).
+      [[sysio::action]]
+      void closebooks(sysio::slug_name chain_code);
 
       /// Record traffic for outpost `chain_code` that began at `since`: `traffic_since` becomes the earlier of
       /// its current value and `since`, and `due_at` becomes the later of `current_epoch_start` plus the chain's
@@ -152,8 +160,8 @@ namespace sysio {
          /// `epoch_duration_sec`.
          uint32_t    traffic_wait_sec = 180;     // half the minimum
          /// How long after an epoch starts `sysio.msgch::deliver` takes a late delivery of the previous epoch from a
-         /// member of its group; a later one is refused, and the advance that closes that epoch's books records the
-         /// member's miss. At most `epoch_duration_sec`.
+         /// member of its group; a later one is refused, and that epoch's books, which can close from then on, record
+         /// the member's miss. At most `epoch_duration_sec`.
          uint32_t    late_window_sec = 180;      // half the minimum
          uint32_t    operators_per_epoch = 7;
          uint32_t    batch_operator_minimum_active = 21;
@@ -189,9 +197,10 @@ namespace sysio {
          uint8_t                           current_batch_op_group = 0; // 0, 1, or 2
          std::vector<std::vector<name>>    batch_op_groups;           // 3 groups of 7
          bool                              is_paused = false;
-         /// The group that served epoch `current_epoch_index - 1`, whose books the next `advance` closes.
-         /// `finishadv` stores the window's front group here before the slide erases it; empty before
-         /// epoch 2 and after an epoch the chain closed while not an active outpost.
+         /// The group that served epoch `current_epoch_index - 1`, while that epoch's books are open.
+         /// `finishadv` stores the window's front group here before the slide erases it, and closing the
+         /// books (`closebooks` or the next `advance`) empties it; empty before epoch 2 and after an epoch the
+         /// chain closed while not an active outpost.
          std::vector<name>                 previous_group;
 
          SYSLIB_SERIALIZE(epoch_state,
@@ -343,6 +352,19 @@ namespace sysio {
       /// `due_at` has passed. An idle chain is never due. Never throws.
       static bool advance_due(const epoch_state& state, time_point now) {
          return state.due_at != time_point{} && now >= state.due_at;
+      }
+
+      /// When the late-delivery window of the chain in `state`, configured by `cfg`, closes: `late_window_sec`
+      /// after its current epoch's start. `sysio.msgch::deliver` takes a late delivery of the previous epoch only
+      /// before it. Never throws.
+      static time_point late_window_end(const epoch_state& state, const epoch_config& cfg) {
+         return state.current_epoch_start + seconds(static_cast<int64_t>(cfg.late_window_sec));
+      }
+
+      /// Whether the previous epoch's books of the chain in `state`, configured by `cfg`, are open and its late
+      /// deliveries can no longer come at `now`, so `closebooks` closes them. Never throws.
+      static bool books_closable(const epoch_state& state, const epoch_config& cfg, time_point now) {
+         return !state.previous_group.empty() && now >= late_window_end(state, cfg);
       }
 
       /// One outpost chain's current consensus epoch index.

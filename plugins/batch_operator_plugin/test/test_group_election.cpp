@@ -249,9 +249,15 @@ BOOST_AUTO_TEST_CASE(previous_group_membership_is_read_from_its_own_field) try {
    };
    const chain_epoch_view sat = view_with_previous({on_duty_peer, self});
    BOOST_CHECK(sat.in_previous_group);
+   BOOST_CHECK(sat.books_open);
    BOOST_CHECK(!sat.election.is_elected);
-   BOOST_CHECK(!view_with_previous({on_duty_peer, stranger}).in_previous_group);
-   BOOST_CHECK(!view_with_previous({}).in_previous_group);
+   const chain_epoch_view other = view_with_previous({on_duty_peer, stranger});
+   BOOST_CHECK(!other.in_previous_group);
+   BOOST_CHECK(other.books_open);
+   // An empty previous group: its books have closed, or there is no previous epoch.
+   const chain_epoch_view closed = view_with_previous({});
+   BOOST_CHECK(!closed.in_previous_group);
+   BOOST_CHECK(!closed.books_open);
 
    fc::mutable_variant_object without(state_row(slow_chain, slow_epoch, slow_start_sec, on_duty_group));
    without.erase(epoch::field::previous_group);
@@ -261,24 +267,26 @@ BOOST_AUTO_TEST_CASE(previous_group_membership_is_read_from_its_own_field) try {
 } FC_LOG_AND_RETHROW();
 
 /// A member of the previous epoch's group may deliver it late only while the chain's late-delivery window, from the
-/// current epoch's start, is open: never after it, never from outside the group, and never in epoch 1, which has no
-/// previous epoch.
+/// current epoch's start, is open, for what is left of it: never after it, never from outside the group, and never in
+/// epoch 1, which has no previous epoch.
 BOOST_AUTO_TEST_CASE(a_late_delivery_is_open_only_within_the_window) try {
    chain_epoch_view view = decode_chain_epoch(
       state_row(slow_chain, slow_epoch, slow_start_sec, on_duty_group, traffic(), false, {on_duty_peer, self}),
       config_row(slow_chain, slow_duration_sec), decided_epochs{}, sysio::chain::name(self), max_poll);
    const fc::time_point closes = view.epoch_start + view.late_window;
-   BOOST_CHECK(late_delivery_open(view, view.epoch_start));
-   BOOST_CHECK(late_delivery_open(view, closes - fc::milliseconds(1)));
-   BOOST_CHECK(!late_delivery_open(view, closes));
+   BOOST_CHECK(late_window_end(view) == closes);
+   BOOST_CHECK(late_window_left(view, view.epoch_start) == view.late_window);
+   BOOST_CHECK(late_window_left(view, closes - fc::milliseconds(1)) == fc::milliseconds(1));
+   BOOST_CHECK(late_window_left(view, closes) == fc::microseconds());
+   BOOST_CHECK(late_window_left(view, closes + fc::days(1)) == fc::microseconds());
 
    chain_epoch_view outsider = view;
    outsider.in_previous_group = false;
-   BOOST_CHECK(!late_delivery_open(outsider, view.epoch_start));
+   BOOST_CHECK(late_window_left(outsider, view.epoch_start) == fc::microseconds());
 
    chain_epoch_view first_epoch = view;
    first_epoch.epoch_index = 1;
-   BOOST_CHECK(!late_delivery_open(first_epoch, view.epoch_start));
+   BOOST_CHECK(late_window_left(first_epoch, view.epoch_start) == fc::microseconds());
 
    fc::mutable_variant_object no_window(config_row(slow_chain, slow_duration_sec));
    no_window.erase(epoch::field::late_window_sec);
@@ -467,7 +475,7 @@ BOOST_AUTO_TEST_CASE(chkcons_retallies_an_undecided_epoch_once_per_minimum) try 
    BOOST_CHECK(chkcons_chains(views, relayed, first - fc::milliseconds(1), {}, true).empty());
    BOOST_CHECK(chkcons_chains(views, relayed, first, {}, true) == retally);
    // Once pushed at `first`, not again for a chain minimum.
-   const retally_pushes pushed{{fast_chain.value, first}};
+   const paced_pushes pushed{{fast_chain.value, first}};
    BOOST_CHECK(chkcons_chains(views, relayed, first + fast.epoch_duration - fc::milliseconds(1), pushed, true).empty());
    BOOST_CHECK(chkcons_chains(views, relayed, first + fast.epoch_duration, pushed, true) == retally);
    // A re-tally pushed in an earlier epoch does not hold this one back past its own first chain minimum.
@@ -483,36 +491,120 @@ BOOST_AUTO_TEST_CASE(chkcons_retallies_an_undecided_epoch_once_per_minimum) try 
    BOOST_CHECK(chkcons_chains(views, relayed, first + fc::days(1), {}, true).empty());
 } FC_LOG_AND_RETHROW();
 
-/// The epoch tick records each re-tally it pushes, which holds this operator's next re-tally of the chain back a chain
-/// minimum; an advance or a liveness push records nothing.
-BOOST_AUTO_TEST_CASE(the_epoch_tick_records_its_retallies) try {
+/// The epoch tick records each paced push, a re-tally or a books close, which holds this operator's next paced push for
+/// the chain back a chain minimum; an advance or a liveness push records nothing.
+BOOST_AUTO_TEST_CASE(the_epoch_tick_records_its_paced_pushes) try {
    chain_epochs views = decode_both().views;
    const std::set<uint64_t> relayed{fast_chain.value};
    chain_epoch_view&        fast = views.at(fast_chain.value);
    fast.decided                  = false;
    const fc::time_point first    = fast.epoch_start + fast.epoch_duration;
    const fc::time_point second   = first + fast.epoch_duration;
-   retally_pushes       retallied;
+   paced_pushes         paced;
    // One epoch tick as the plugin runs it: name the pushes, then record them.
    const auto tick = [&](fc::time_point now) {
-      const std::vector<chkcons_push> pushes = chkcons_chains(views, relayed, now, retallied, true);
-      record_retallies(retallied, pushes, now);
+      const std::vector<chkcons_push> pushes = chkcons_chains(views, relayed, now, paced, true);
+      record_paced_pushes(paced, pushes, now);
       return pushes.size();
    };
 
    BOOST_CHECK_EQUAL(tick(first), 1u);
-   BOOST_CHECK(retallied.at(fast_chain.value) == first);
+   BOOST_CHECK(paced.at(fast_chain.value) == first);
    BOOST_CHECK_EQUAL(tick(first), 0u);
    BOOST_CHECK_EQUAL(tick(second - fc::milliseconds(1)), 0u);
    BOOST_CHECK_EQUAL(tick(second), 1u);
-   BOOST_CHECK(retallied.at(fast_chain.value) == second);
+   BOOST_CHECK(paced.at(fast_chain.value) == second);
 
-   retally_pushes untouched;
-   record_retallies(untouched,
-                    {{.chain_code = fast_chain.value, .reason = chkcons_reason::due},
-                     {.chain_code = slow_chain.value, .reason = chkcons_reason::liveness}},
-                    first);
+   paced_pushes books;
+   record_paced_pushes(books, {{.chain_code = slow_chain.value, .reason = chkcons_reason::books}}, first);
+   BOOST_CHECK(books == (paced_pushes{{slow_chain.value, first}}));
+
+   paced_pushes untouched;
+   record_paced_pushes(untouched,
+                       {{.chain_code = fast_chain.value, .reason = chkcons_reason::due},
+                        {.chain_code = slow_chain.value, .reason = chkcons_reason::liveness}},
+                       first);
    BOOST_CHECK(untouched.empty());
+} FC_LOG_AND_RETHROW();
+
+/// The elected group pushes `chkcons` for previous-epoch books still open once the chain's late-delivery window has
+/// passed, at most once per chain minimum and in step with the re-tally, which the same push carries: never while the
+/// window is open, once the books have closed, from an operator not elected, or while the chain is paused. A due
+/// decided epoch is pushed as an advance, which closes them too.
+BOOST_AUTO_TEST_CASE(chkcons_closes_previous_books_once_the_late_window_passes) try {
+   chain_epochs views = decode_both().views;
+   const std::set<uint64_t> relayed{fast_chain.value};
+   chain_epoch_view&        fast = views.at(fast_chain.value);
+   fast.traffic_since            = fc::time_point();
+   fast.due_at                   = fc::time_point();
+   fast.books_open               = true;
+   const fc::time_point closes   = late_window_end(fast);
+   const std::vector<chkcons_push> books{{.chain_code = fast_chain.value, .reason = chkcons_reason::books}};
+
+   BOOST_CHECK(!books_closable(fast, closes - fc::milliseconds(1)));
+   BOOST_CHECK(books_closable(fast, closes));
+   BOOST_CHECK(chkcons_chains(views, relayed, closes - fc::milliseconds(1), {}, true).empty());
+   BOOST_CHECK(chkcons_chains(views, relayed, closes, {}, true) == books);
+   BOOST_CHECK(chkcons_chains(views, relayed, closes + fc::days(1), {}, true) == books);
+   // At most once per chain minimum from this operator.
+   const paced_pushes pushed{{fast_chain.value, closes}};
+   const fc::time_point next_push = closes + fast.epoch_duration;
+   BOOST_CHECK(chkcons_chains(views, relayed, next_push - fc::milliseconds(1), pushed, true).empty());
+   BOOST_CHECK(chkcons_chains(views, relayed, next_push, pushed, true) == books);
+
+   // Undecided past the chain minimum: the re-tally push, which closes them too.
+   fast.decided = false;
+   const fc::time_point retally_at = fast.epoch_start + fast.epoch_duration;
+   BOOST_CHECK(chkcons_chains(views, relayed, retally_at, {}, true) ==
+               (std::vector<chkcons_push>{{.chain_code = fast_chain.value, .reason = chkcons_reason::retally}}));
+   BOOST_CHECK(chkcons_chains(views, relayed, retally_at - fc::milliseconds(1), {}, true) == books);
+   fast.decided = true;
+
+   // Due: the advance push.
+   fast.due_at = closes;
+   BOOST_CHECK(chkcons_chains(views, relayed, closes, {}, true) ==
+               (std::vector<chkcons_push>{{.chain_code = fast_chain.value, .reason = chkcons_reason::due}}));
+   fast.due_at = fc::time_point();
+
+   // Closed, not elected, or paused: none.
+   fast.books_open = false;
+   BOOST_CHECK(chkcons_chains(views, relayed, closes, {}, true).empty());
+   fast.books_open          = true;
+   fast.election.is_elected = false;
+   BOOST_CHECK(chkcons_chains(views, relayed, closes + fc::days(1), {}, true).empty());
+   fast.election.is_elected = true;
+   fast.is_paused           = true;
+   BOOST_CHECK(chkcons_chains(views, relayed, closes, {}, true).empty());
+} FC_LOG_AND_RETHROW();
+
+/// The group on duty reports the chain's backlog at any time; the next group of the window only once the chain has
+/// stayed not due the liveness grace past its epoch start, and never once it is due; any other seat never does.
+BOOST_AUTO_TEST_CASE(the_next_group_reports_the_backlog_once_the_chain_stays_not_due) try {
+   const chain_epochs views = decode_both().views;
+   const chain_epoch_view& elected = views.at(fast_chain.value);
+   BOOST_CHECK(!in_next_group(elected));
+   BOOST_CHECK(reports_backlog(elected, elected.epoch_start));
+
+   // `self` sits in group 1, after the slow chain's group 0 on duty.
+   chain_epoch_view next = views.at(slow_chain.value);
+   BOOST_CHECK(in_next_group(next));
+   const fc::time_point reports_from = next.epoch_start + liveness_grace(next);
+   BOOST_CHECK(!reports_backlog(next, reports_from - fc::milliseconds(1)));
+   BOOST_CHECK(reports_backlog(next, reports_from));
+   BOOST_CHECK(reports_backlog(next, reports_from + fc::days(1)));
+   next.due_at = reports_from;
+   BOOST_CHECK(!reports_backlog(next, reports_from + fc::days(1)));
+
+   // Group 2 on duty, `self` in group 1: neither on duty nor next.
+   chain_epoch_view behind = views.at(slow_chain.value);
+   behind.election = evaluate_group_election(idle_group, sliding_window(), sysio::chain::name(self));
+   BOOST_CHECK(!in_next_group(behind));
+   BOOST_CHECK(!reports_backlog(behind, reports_from + fc::days(1)));
+   // Seated in no group.
+   chain_epoch_view unseated = views.at(slow_chain.value);
+   unseated.election = evaluate_group_election(on_duty_group, sliding_window(), sysio::chain::name("batchop.z"));
+   BOOST_CHECK(!in_next_group(unseated));
+   BOOST_CHECK(!reports_backlog(unseated, reports_from + fc::days(1)));
 } FC_LOG_AND_RETHROW();
 
 /// Once a decided epoch has stayed due past the liveness grace, every ACTIVE operator serving the chain pushes

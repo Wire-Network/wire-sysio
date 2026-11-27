@@ -235,7 +235,7 @@ bool window_seats(const sysio::epoch::epoch_state& state, name account) {
 }
 
 /// True while one chain's schedule `state` holds a seat of `account` whose books are open: one in its window, or
-/// one in `previous_group`, the group of the epoch whose books the chain's next advance closes.
+/// one in `previous_group`, the group of the previous epoch while its books are still open.
 bool open_seat_on(const sysio::epoch::epoch_state& state, name account) {
    return window_seats(state, account) || sysio::epoch::in_previous_group(state, account);
 }
@@ -411,8 +411,8 @@ void opreg::regoperator(name account,
    }
 
    // A seat left from an earlier registration would close against this one and record a miss for
-   // a duty it never received. `terminate` leaves the operator's later seats in place until the
-   // advance that closes their books.
+   // a duty it never received. `terminate` leaves the operator's later seats in place until their
+   // books close.
    check(!holds_open_seat(account), still_seated_msg);
 
    // An operator registering itself needs an authex link for every active outpost (the depot

@@ -296,6 +296,57 @@ void note_chain_traffic(name self, sysio::slug_name chain_code, time_point since
    if (record_traffic(*state, *cfg, since, current_time_point())) state_tbl.set(ram_payer, key, *state);
 }
 
+/// Close the books of outpost `chain_code`'s previous epoch, `state.current_epoch_index - 1`, which
+/// `state.previous_group` served, then empty `previous_group` so they close once. Each member is recorded delivered
+/// when `msgch::envelopes` holds its row for that epoch, in the epoch or late, whatever the row's checksum: a
+/// delivery that differs from the epoch's winner was slashed when `sysio.msgch` accepted that winner.
+///
+/// `finishadv` keeps `previous_group` only for an epoch the chain closed as an active outpost
+/// (`sysio.chains::chains`, active && !is_depot), so its books are recorded here even when the chain is no longer
+/// active. The caller checks that the books are open.
+void close_books(name self, sysio::slug_name chain_code, epoch::epoch_state& state, const epoch::epoch_config& cfg) {
+   const uint32_t previous_epoch = state.current_epoch_index - 1;
+
+   // Walk the (outpost, epoch) bucket and collect each delivering batch op. `deliver` admits one row per operator,
+   // each from a member of the group that served the epoch, so the walk stays within it.
+   msgch::envelopes_t envs(epoch::MSGCH_ACCOUNT);
+   auto               oe_idx    = envs.get_index<"byoutepoch"_n>();
+   const uint128_t    composite = opp::outpost_epoch_key(chain_code.value, previous_epoch);
+   std::vector<name>  delivered;
+   for (auto e = oe_idx.lower_bound(composite); e != oe_idx.end() && e->by_outpost_epoch() == composite; ++e) {
+      delivered.push_back(e->batch_op_name);
+   }
+
+   // Preserve this chain's delivery history and its eviction accounting. `recorddel` records every member, a slashed
+   // or evicted one included, while `termcheck` skips SLASHED and TERMINATED operators and EVICTED members. All
+   // mutations complete before an advance's finishadv reads the registry for outbound attestations.
+   for (const name member : state.previous_group) {
+      const bool did_deliver = std::find(delivered.begin(), delivered.end(), member) != delivered.end();
+      action(permission_level{self, "owner"_n}, epoch::OPREG_ACCOUNT, opreg_actions::RECORD_DELIVERY,
+             std::make_tuple(member, chain_code, previous_epoch, did_deliver))
+         .send();
+      action(permission_level{self, "owner"_n}, epoch::OPREG_ACCOUNT, opreg_actions::TERMINATION_CHECK,
+             std::make_tuple(member, chain_code))
+         .send();
+   }
+
+   // Each member earns the chain's minimum duration as configured now, when the epoch's books close, in seat-seconds
+   // on this chain, however long the epoch ran: duty pays epochs served, so an idle or stretched epoch earns nothing
+   // more. sysio.system splits each economic pay period's one batch pool by seat-seconds over every chain; whether a
+   // member is still ACTIVE is decided when it is paid, so a slashed member draws nothing, and a member the termchecks
+   // above evicted from this chain is credited nothing here. Skipped until initt5 has run: nothing can be paid before
+   // then, and consensus must not depend on sysio.system.
+   if (sysiosystem::emissions::records_batch_duty(SYSTEM_ACCOUNT)) {
+      action(permission_level{self, "owner"_n}, SYSTEM_ACCOUNT, system_actions::RECORD_DUTY,
+             std::make_tuple(chain_code, previous_epoch, state.previous_group, cfg.epoch_duration_sec))
+         .send();
+   }
+
+   // The envelope rows read above are left in place: `sysio.msgch::deliver` erases them once they fall out of its
+   // retention window.
+   state.previous_group.clear();
+}
+
 } // anonymous namespace
 
 // ---------------------------------------------------------------------------
@@ -417,68 +468,11 @@ void epoch::advance(sysio::slug_name chain_code) {
    const time_point now = current_time_point();
    if (state.current_epoch_index > 0 && !advance_due(state, now)) return;
 
-   // Close the books of the epoch before the closing one, `current_epoch_index - 1`, so the late
-   // deliveries `sysio.msgch::deliver` accepted for it during the closing epoch count. Each member of
-   // `previous_group`, the group that served it, is recorded delivered when `msgch::envelopes` holds its
-   // row for (chain, current_epoch_index - 1), whatever the row's checksum: a delivery that differs from
-   // the epoch's winner was slashed when `sysio.msgch` accepted that winner.
-   //
-   // `finishadv` keeps `previous_group` only for an epoch the chain closed as an active outpost
-   // (`sysio.chains::chains`, active && !is_depot), so its books are recorded here even when the chain is
-   // no longer active. `previous_group` is empty on the genesis advance and on the advance from epoch 1,
-   // so neither records anything.
+   // Close the books of the epoch before the closing one, `current_epoch_index - 1`, unless `closebooks` already has,
+   // so the late deliveries `sysio.msgch::deliver` accepted for it during the closing epoch count. `previous_group`
+   // is empty on the genesis advance and on the advance from epoch 1, so neither records anything.
    if (state.current_epoch_index > 1 && !state.previous_group.empty()) {
-      const uint32_t previous_epoch = state.current_epoch_index - 1;
-
-      // Walk the (outpost, epoch) bucket and collect each delivering batch op. `deliver` admits one row
-      // per operator, each from a member of the group that served the epoch, so the walk stays within it.
-      msgch::envelopes_t envs(MSGCH_ACCOUNT);
-      auto oe_idx = envs.get_index<"byoutepoch"_n>();
-      const uint128_t composite = opp::outpost_epoch_key(key.chain_code, previous_epoch);
-      std::vector<name> delivered;
-      for (auto e = oe_idx.lower_bound(composite);
-           e != oe_idx.end() && e->by_outpost_epoch() == composite; ++e) {
-         delivered.push_back(e->batch_op_name);
-      }
-
-      // Preserve this chain's delivery history and its eviction accounting. `recorddel` records every
-      // member, a slashed or evicted one included, while `termcheck` skips SLASHED and TERMINATED
-      // operators and EVICTED members. All mutations complete before finishadv reads the registry for
-      // outbound attestations.
-      for (const auto& member : state.previous_group) {
-         const bool did_deliver = std::find(delivered.begin(), delivered.end(), member) != delivered.end();
-         action(
-            permission_level{get_self(), "owner"_n},
-            OPREG_ACCOUNT,
-            opreg_actions::RECORD_DELIVERY,
-            std::make_tuple(member, chain_code, previous_epoch, did_deliver)
-         ).send();
-         action(
-            permission_level{get_self(), "owner"_n},
-            OPREG_ACCOUNT,
-            opreg_actions::TERMINATION_CHECK,
-            std::make_tuple(member, chain_code)
-         ).send();
-      }
-
-      // Each member earns the chain's minimum duration as configured now, when the epoch's books close, in
-      // seat-seconds on this chain, however long the epoch ran: duty pays epochs served, so an idle or stretched
-      // epoch earns nothing more. sysio.system splits
-      // each economic pay period's one batch pool by seat-seconds over every chain; whether a member is
-      // still ACTIVE is decided when it is paid, so a slashed member draws nothing, and a member the
-      // termchecks above evicted from this chain is credited nothing here. Skipped until initt5 has run:
-      // nothing can be paid before then, and consensus must not depend on sysio.system.
-      if (sysiosystem::emissions::records_batch_duty(SYSTEM_ACCOUNT)) {
-         action(
-            permission_level{get_self(), "owner"_n},
-            SYSTEM_ACCOUNT,
-            system_actions::RECORD_DUTY,
-            std::make_tuple(chain_code, previous_epoch, state.previous_group, cfg->epoch_duration_sec)
-         ).send();
-      }
-
-      // The envelope rows read above are left in place: `sysio.msgch::deliver`
-      // erases them once they fall out of its retention window.
+      close_books(get_self(), chain_code, state, *cfg);
    }
 
    // The first chain's genesis advance is the network genesis.
@@ -501,6 +495,24 @@ void epoch::advance(sysio::slug_name chain_code) {
       FINISH_ADVANCE,
       std::make_tuple(chain_code, state.current_epoch_index)
    ).send();
+}
+
+// ---------------------------------------------------------------------------
+//  closebooks
+// ---------------------------------------------------------------------------
+void epoch::closebooks(sysio::slug_name chain_code) {
+   require_auth(MSGCH_ACCOUNT);
+   const chain_key                   key{chain_code.value};
+   const std::optional<epoch_config> cfg = epochcfg_t(get_self()).try_get(key);
+   check(cfg.has_value(), EPOCH_CONFIG_NOT_INITIALIZED);
+   epochstate_t state_tbl(get_self());
+   epoch_state  state = state_tbl.get(key, EPOCH_STATE_NOT_INITIALIZED.data());
+
+   // Only once no late delivery of the previous epoch can come, and only once: closing the books empties
+   // `previous_group`, which also ends that epoch's late deliveries.
+   if (!books_closable(state, *cfg, current_time_point())) return;
+   close_books(get_self(), chain_code, state, *cfg);
+   state_tbl.set(ram_payer, key, state);
 }
 
 // ---------------------------------------------------------------------------
@@ -529,9 +541,9 @@ void epoch::finishadv(sysio::slug_name chain_code, uint32_t epoch_index) {
    // Outbound attestations go to this chain only, and only while it is an active outpost.
    const bool active_outpost = sysio::chains::outpost_kind_of(CHAINS_ACCOUNT, chain_code).has_value();
 
-   // The front group just served epoch `epoch_index - 1`. Keep it, before the slide below erases it, for the
-   // next `advance`, which closes that epoch's books. Only an active outpost owes deliveries, so an epoch
-   // closed while the chain is not one keeps no books. The genesis advance leaves it empty.
+   // The front group just served epoch `epoch_index - 1`. Keep it, before the slide below erases it, while that
+   // epoch's books are open: `closebooks` or the next `advance` closes them. Only an active outpost owes deliveries,
+   // so an epoch closed while the chain is not one keeps no books. The genesis advance leaves it empty.
    state.previous_group = had_expiring_group && active_outpost && !state.batch_op_groups.empty()
                              ? state.batch_op_groups.front()
                              : std::vector<name>{};

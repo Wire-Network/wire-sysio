@@ -281,8 +281,9 @@ minority. Reading as the group does is the setting that avoids both.
 
 ### Outpost cranks
 
-Once per epoch, right after this operator's envelope delivery lands, the outbound relay job calls
-`crank_outpost`. On Ethereum that is the liq syndication pool's `realizeYield()`
+While this operator is elected on the chain, the outbound relay job calls `crank_outpost` after its delivery
+call, at most once per chain minimum, whether or not the chain advances. On Ethereum that is the liq syndication
+pool's `realizeYield()`
 (Wire-Network/wire-ethereum#207): the pool folds the liqETH yield it accrued since its last report into its
 principal and reports the delta as one `LIQ_YIELD` attestation — the counterpart of the Solana relay's
 `report_liq_yield`. Nothing has to tell the relay the pool's address: it reads
@@ -296,9 +297,10 @@ level.
 refusals as outcomes rather than failures: `WIRE_NoYield()` and `WIRE_YieldBelowDeadband(uint64,uint64)` are
 the quiet steady state (debug), `WIRE_PoolUnderbacked(uint64,uint64)` is a warning (the loss path is not in
 that contract), and `EnforcedPause()` — raised only by `SyndicationPool`'s own pause, when its panic role has
-frozen the pool (the OPP endpoint has no pause) — is logged at info every epoch until it is unpaused. Any other
+frozen the pool (the OPP endpoint has no pause) — is logged at info on every crank until it is unpaused. Any other
 revert — a signer without the pool's `yield_operator` role, a foreign implementation — and any transport failure
-propagate to the job, which logs the failed crank and retries with the next epoch's delivery. The relay never cranks `payPendingDesyndication`; paying a
+propagate to the job, which logs the failed crank and tries again a chain minimum later. The relay never cranks
+`payPendingDesyndication`; paying a
 desyndication stored while the pool was paused is the operator playbook's step.
 
 ## Enabling / configuration

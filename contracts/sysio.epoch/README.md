@@ -16,11 +16,13 @@ The depot's two clocks, and batch operator scheduling, for the OPP (Outpost Prot
   counts as the report's), a dispute's resolution
   (`sysio.msgch::resolvedisp`, at its time), or a governance `resendroster`. `sysio.msgch` records the first four. An idle chain
   never advances. The first chain's genesis advance is the network genesis (`netgenesis`); a genesis
-  advance needs no traffic. An epoch's books (deliveries, misses, duty) close at the advance after it, so a
-  late delivery made within the chain's `epochcfg.late_window_sec` of the next epoch's start counts.
-- On an idle chain the schedule window and `previous_group` stay as they are, so an operator they seat
-  stays blocked from `sysio.opreg::regoperator` and `joinchain` until enough advances happen, each of
-  which needs traffic or a `resendroster`.
+  advance needs no traffic. An epoch's books (deliveries, misses, duty) close once its late deliveries can
+  no longer come: once the chain's `epochcfg.late_window_sec` from the next epoch's start has passed
+  (`sysio.msgch::chkcons`, through `closebooks`), or at the advance after it, whichever runs first. A late
+  delivery made within that window counts, and an idle next epoch holds none of the epoch's duty back.
+- On an idle chain the schedule window stays as it is, so an operator it seats stays blocked from
+  `sysio.opreg::regoperator` and `joinchain` until enough advances happen, each of which needs traffic or
+  a `resendroster`; a seat in `previous_group` blocks them until its epoch's books close.
 - Owns the **economic clock** (`economycfg`): a fixed grid of economic epochs from a configured start
   time that may lie in the past. It drives emissions accrual and pay, collateral-withdrawal maturity and
   the producer pay slot count, and never waits on outpost consensus.
@@ -44,7 +46,7 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
 | Table | Type | Description |
 |-------|------|-------------|
 | `epochcfg` | `kv::table` | One row per outpost chain, keyed by its `sysio.chains` code: `epoch_duration_sec`, `traffic_wait_sec` (half the minimum when set as zero), `late_window_sec` (how long after an epoch starts a late delivery of the previous one is taken; half the minimum when set as zero), `operators_per_epoch` (default 7), `batch_operator_minimum_active` (default 21), `batch_op_groups` (default 3), `epoch_retention_envelope_log_count` (default 200) |
-| `epochstate` | `kv::table` | One row per outpost chain: its consensus epoch index, current epoch start, `traffic_since` (when its pending traffic began) and `due_at` (when it may next advance), both zero while it is idle, active group cursor, the resident group window, pause flag, and `previous_group`, the group that served the previous epoch (empty before epoch 2) |
+| `epochstate` | `kv::table` | One row per outpost chain: its consensus epoch index, current epoch start, `traffic_since` (when its pending traffic began) and `due_at` (when it may next advance), both zero while it is idle, active group cursor, the resident group window, pause flag, and `previous_group`, the group that served the previous epoch while that epoch's books are open (empty before epoch 2 and once they close) |
 | `netgenesis` | `kv::global` | Network genesis marker, written by the first chain's genesis advance; closes the bootstrap window and starts the economic clock |
 | `economycfg` | `kv::global` | Economic clock: `epoch_duration_sec` (60 s .. 30 days) and the grid's `start_time` |
 | `economystate` | `kv::global` | Economic epoch index, its current / next boundary, and `caught_up`: whether a tick has found no later boundary passed (a payout spends only if it was set before its tick) |
@@ -59,6 +61,7 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
 | `seteconomy` | `sysio.epoch` | Set the economic clock's duration and grid start. The grid may start in the past, but no change is accepted while a boundary has passed without its tick. Until the first tick a start still ahead may move, into the past too unless a collateral withdrawal is queued (its wait counts only boundaries after the request); after it the start is fixed, and a new duration spaces only the boundaries after the next one. So no boundary that has passed ever moves, and once the clock has ticked neither does the next one. A start set in the past cannot be corrected once boundaries have passed without their ticks: the crank must first tick every one of them, or the contracts are redeployed. Re-validated against `sysio.system`'s pay-period accrual bound |
 | `schbatchgps` | `sysio.epoch` | Build one chain's initial window from the `ACTIVE` batch operators on `sysio.opreg` that serve the chain (non-bootstrapped first, then bootstrapped, trimmed to `batch_operator_minimum_active`) |
 | `advance` | `sysio.msgch` or `sysio.epoch` | Advance one chain's consensus epoch once it is due (`due_at` set and passed); until then it returns without effect, under either authority. Refused while the chain is paused. Under `sysio.epoch`'s authority it refuses an active outpost whose current epoch has not reached consensus (see Recovery). The genesis advance (epoch 0 → 1) needs no traffic and requires an active outpost whose schedule window `schbatchgps` has seated |
+| `closebooks` | `sysio.msgch` (`chkcons`) | Close the previous epoch's books as `advance` does, once its late-delivery window (`epochcfg.late_window_sec` from the current epoch's start) has passed and they are still open, then empty `previous_group`: they close once, and the epoch takes no more late deliveries. No effect otherwise |
 | `notetraffic` | `sysio.msgch` (`buildenv`, `reportqueue`, `resolvedisp`) | Record traffic for one chain since `since` (a zero or future `since` counts as now): `traffic_since` keeps the earliest, `due_at` = max(`current_epoch_start` + the chain's minimum, `traffic_since` + its `traffic_wait_sec`). No effect before the chain's genesis advance. A paused chain records traffic but does not advance |
 | `tickeconomy` | permissionless | Open economic epoch `epoch_index`: refused unless it is the next index, its grid boundary has passed, and the network genesis has happened. Its payout spends only if the clock had caught up to the grid before it |
 | `pause` | `sysio.chalg` | Pause one chain's epoch advancement |
@@ -69,8 +72,8 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
 
 After the chain's genesis, `advance` returns without effect unless the chain is due. Then:
 
-1. Close the books of the previous epoch: an epoch's books close one advance after it, so the late
-   deliveries `sysio.msgch` accepted for it during the closing epoch count. An epoch the chain closed as
+1. Close the books of the previous epoch, unless `closebooks` already has once its late-delivery
+   window passed, so the late deliveries `sysio.msgch` accepted for it count. An epoch the chain closed as
    an active outpost is booked even if the chain is no longer one at this advance; an epoch it closed
    while not an active outpost keeps no books. Each member of `previous_group` gets one
    `sysio.opreg::recorddel` for this chain and that epoch (delivered if it delivered to it, in the epoch
@@ -78,10 +81,10 @@ After the chain's genesis, `advance` returns without effect unless the chain is 
    accepted the epoch's winner), followed by `sysio.opreg::termcheck` for this chain, which evicts a
    member breaching the chain's miss rails from this chain alone and forfeits its unsettled duty there,
    and each member of the group not evicted from the chain earns the chain's minimum duration, as
-   configured at this advance, in seat-seconds through `sysio.system::rcrdduty`, however long the epoch
-   ran (skipped until
-   `sysio.system::initt5` has run). The genesis advance and the advance from epoch 1, whose
-   `previous_group` is empty, record nothing.
+   configured when the books close, in seat-seconds through `sysio.system::rcrdduty`, however long the
+   epoch ran (skipped until `sysio.system::initt5` has run). The genesis advance and the advance from
+   epoch 1, whose `previous_group` is empty, record nothing, and neither does an advance whose books
+   `closebooks` closed.
 2. Bump the chain's consensus epoch index and open the next epoch at the current time with no traffic.
    Keep the window's front group, which served the closing epoch, as `previous_group` (none when the
    chain is not an active outpost), drop it from the window and append a new tail group drawn from the
@@ -142,7 +145,8 @@ is recovered instead:
 ## Dependencies
 
 - Each chain's consensus epoch advanced by `sysio.msgch` (`chkcons(chain)`, and `bootstrap` /
-  `bootchain` at the chain's epoch 0), and its traffic recorded by `sysio.msgch` (`notetraffic` from
+  `bootchain` at the chain's epoch 0), its previous epoch's books closed by `chkcons` (`closebooks`)
+  once the late-delivery window has passed, and its traffic recorded by `sysio.msgch` (`notetraffic` from
   `buildenv`, `reportqueue` and `resolvedisp`, and its `queueout` notification); economic epochs opened by the batch
   operators' `tickeconomy` crank
 - Reads operators and their served chains from `sysio.opreg`, authex links from `sysio.authex`, outposts

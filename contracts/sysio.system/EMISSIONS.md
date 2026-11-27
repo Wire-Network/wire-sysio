@@ -164,8 +164,10 @@ duration (`epochcfg.epoch_duration_sec`) as configured when the epoch's books
 close, in seconds, however long the epoch ran (`rcrdduty`, a `batchduty` row per
 operator and chain): pay follows epochs served, so a seat on a chain with a 120 s
 minimum earns twice a seat on a 60 s one, and an idle or stretched epoch earns no
-more. The credit is made when the following epoch closes, the advance that closes
-the epoch's books after its late deliveries. Every chain's duty accrues to the one
+more. The credit is made when the epoch's books close, once its late deliveries
+can no longer come: when the following epoch's late-delivery window has passed
+(`sysio.msgch::chkcons`), or at the advance that closes the following epoch, if
+that runs first. Every chain's duty accrues to the one
 open pay period. Each `payepoch` that spends closes that period and splits its
 batch pool pro rata to the period's seat-seconds: an operator's share is
 `batch_pool * seat_seconds / period_seat_seconds`. Only opreg-ACTIVE batch

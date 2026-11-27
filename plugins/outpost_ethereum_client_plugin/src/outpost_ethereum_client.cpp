@@ -1802,8 +1802,8 @@ void outpost_ethereum_client::crank_outpost(uint32_t epoch_index, fc::microsecon
               to_string(), _syndication_pool_addr, epoch_index);
          return;
       case detail::realize_yield_refusal::paused:
-         // The emergency stop: an expected state the andon playbook clears, reported every
-         // epoch at info so it stays visible without reading as a failed crank.
+         // The emergency stop: an expected state the andon playbook clears, reported on every
+         // crank at info so it stays visible without reading as a failed crank.
          ilog("outpost_ethereum_client[{}]: syndication pool {} is paused; realizeYield not reported "
               "for epoch {}",
               to_string(), _syndication_pool_addr, epoch_index);

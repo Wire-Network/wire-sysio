@@ -277,6 +277,15 @@ and `LatestOutboundEnvelope.epoch_index`, which need no program change), so the 
 reached consensus, which it reads from `sysio.msgch::outpcons`, so `sysio.epoch` is rebuilt with any change to that
 row. `sysio.msgch`'s advances are unchanged. No state changes: deploy `sysio.epoch` alone.
 
+### Books close once the late window passes; the next group reports a backlog
+
+`sysio.epoch` gains `closebooks` (auth `sysio.msgch`), which `sysio.msgch::chkcons` inlines once the previous epoch's
+late-delivery window has passed while its books are open: it closes them as `advance` does and empties
+`previous_group`, so the next advance skips them and the epoch takes no late delivery after. `sysio.msgch::reportqueue`
+also takes a report from a member of the chain's next group, tallied toward that group's own strict majority of its
+seats. No state changes: deploy `sysio.epoch` with or before `sysio.msgch`, with the matching
+`batch_operator_plugin`, which pushes `chkcons` once the late window has passed and lets a next-group member report.
+
 ## The two rules for future changes
 
 1. **A contract that gains an action `advance` inlines deploys BEFORE
@@ -311,7 +320,7 @@ changes. For the edges on `advance`'s path today, and the one `sysio.bond::accep
 | `sysio` (`sysio.system`) before `sysio.epoch`, when the release adds or changes `rcrdduty` / `accrueepoch` / `payepoch` / `settleduty` | Call edge: the new clock would otherwise reach a `sysio.system` that cannot dispatch the action, and every advance or tick aborts. |
 | `sysio` (`sysio.system`) before `sysio.opreg`, when the release adds or changes `forfeitduty` | Call edge: `termcheck` inlines it inside `advance`, so an old `sysio.system` aborts every advance that evicts, and every `regoperator` that forfeits an earlier registration's duty. |
 | `sysio.epoch` and `sysio.kicker` before `sysio.system`, when `sysio.system` gains state the emissions gate must reserve (as `payclaimtot` reserves unclaimed `payclaims`) | Table edge: the old gate counts the new backing as spendable, so a later pay period can double-commit it and leave credited claims underfunded; an old kicker counts it as available treasury and `kick` can draw it. |
-| `sysio.epoch` before `sysio.msgch`, when the release adds or changes an action `chkcons` (`advance`) or `buildenv` / `reportqueue` / `resolvedisp` (`notetraffic`) inlines into `sysio.epoch` | Call edge in the other direction. |
+| `sysio.epoch` before `sysio.msgch`, when the release adds or changes an action `chkcons` (`advance`, `closebooks`) or `buildenv` / `reportqueue` / `resolvedisp` (`notetraffic`) inlines into `sysio.epoch` | Call edge in the other direction. |
 | `sysio.chalg` before `sysio.msgch`, when the release changes `slashop` or the authority it accepts | Call edge: `sysio.msgch`'s acceptance of an epoch's winner inlines `slashop` under `sysio.msgch@active`, so a `sysio.chalg` that refuses it aborts each `deliver`, `chkcons` or `chkdispute` that accepts a winner while a non-canonical delivery is on record. |
 | `sysio` (`sysio.system`) before `sysio.bond` | Call edge: `accept` on a request from a `sysio.*` issuer sends `sysio::addsubjex`, and the dispatcher rejects an action the deployed contract does not define, so every such `accept` aborts. |
 

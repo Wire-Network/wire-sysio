@@ -162,8 +162,8 @@ the outpost have diverged. The relay skips the yield report of a frozen or pause
 | `LiqEthToken` | every liqETH transfer, mint and burn | views |
 | `StakingModule` | `batchDeposit`, `topUpValidator` | the rest |
 
-The relay reads `EnforcedPause` from `realizeYield` as expected and logs it at info every epoch until
-the pool is unpaused. A `DESYNDICATE_LIQ` with request id 0, or with a request id already stored, is
+The relay reads `EnforcedPause` from `realizeYield` as expected and logs it at info on every crank, at most
+once per chain minimum, until the pool is unpaused. A `DESYNDICATE_LIQ` with request id 0, or with a request id already stored, is
 dropped (`DesyndicationDropped`). While the pool is paused a release is stored with no solvency
 comparison (wire-ethereum `contracts/outpost/SyndicationPool.sol:620-627` at d4fbb8f8).
 

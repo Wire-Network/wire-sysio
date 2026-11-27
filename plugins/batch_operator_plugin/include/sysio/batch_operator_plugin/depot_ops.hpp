@@ -68,13 +68,14 @@ struct depot_ops {
 
    /**
     * Push `sysio.msgch::deliver` with the concatenated inbound envelope bytes.
-    * Synchronous — blocks on the action's future for at most the chain's
-    * delivery timeout. `push_outcome::refused` only when `sysio.msgch` refused
-    * the delivery; a timeout or a push that could not be built is
-    * `push_outcome::unconfirmed`. A refusal or failure is logged by the push.
+    * Synchronous — blocks on the action's future for at most `timeout`.
+    * `push_outcome::refused` only when `sysio.msgch` refused the delivery; a
+    * timeout or a push that could not be built is `push_outcome::unconfirmed`.
+    * A refusal or failure is logged by the push.
     */
    virtual push_outcome deliver_to_depot(uint64_t                 chain_code,
-                                         const std::vector<char>& raw_messages) = 0;
+                                         const std::vector<char>& raw_messages,
+                                         fc::microseconds         timeout) = 0;
 
    /**
     * Push `sysio.msgch::chkcons` for outpost `chain_code` when its last-read
@@ -126,14 +127,24 @@ struct depot_ops {
    virtual uint32_t current_epoch(uint64_t chain_code) const = 0;
 
    /**
-    * True while this operator sat in the group that served outpost
-    * `chain_code`'s previous epoch (`epochstate.previous_group`) and the
-    * chain's late-delivery window (`epochcfg.late_window_sec` from its current
-    * epoch's start) is still open, so the depot still accepts its late
-    * delivery of that epoch. False while the chain's epoch state has not been
-    * read.
+    * What is left of outpost `chain_code`'s late-delivery window
+    * (`epochcfg.late_window_sec` from its current epoch's start) while this
+    * operator sat in the group that served the chain's previous epoch
+    * (`epochstate.previous_group`), so the depot still accepts its late
+    * delivery of that epoch. Zero once the window has closed, otherwise, and
+    * while the chain's epoch state has not been read.
     */
-   virtual bool late_delivery_open(uint64_t chain_code) const = 0;
+   virtual fc::microseconds late_window_left(uint64_t chain_code) const = 0;
+
+   /**
+    * True when this operator reports outpost `chain_code`'s outbound backlog
+    * (`sysio.msgch::reportqueue`): it is elected on the chain's current epoch,
+    * or sits in the chain's next group while the chain has stayed not due a
+    * chain minimum past its epoch start
+    * (`batch_operator_detail::reports_backlog`). False while the chain's epoch
+    * state has not been read.
+    */
+   virtual bool reports_backlog(uint64_t chain_code) const = 0;
 
    /**
     * True when outpost `chain_code`'s current epoch has its accepted winner

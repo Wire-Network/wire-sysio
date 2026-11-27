@@ -127,9 +127,9 @@ namespace sysio {
       /// only within the chain's late-delivery window (`epochcfg.late_window_sec`
       /// from the current epoch's start), and only byte-identical to that epoch's
       /// accepted envelope (`winner_of`). It is stored without its bytes and never
-      /// runs `evalcons`; the advance that closes the previous epoch's books
-      /// records it as delivered, and a member refused one records a miss. Any
-      /// older epoch is refused.
+      /// runs `evalcons`; the previous epoch's books record it as delivered when
+      /// they close, and a member refused one records a miss. None is taken once
+      /// they have closed. Any older epoch is refused.
       [[sysio::action]]
       void deliver(name batch_op_name, uint64_t chain_code, std::vector<char> data);
 
@@ -157,7 +157,9 @@ namespace sysio {
       void evalcons(uint64_t chain_code, uint32_t epoch_index);
 
       /// Permissionless crank for outpost `chain_code`'s current epoch, held while a dispute is open
-      /// on it. An undecided epoch is re-tallied (`evalcons` inline, at any time), since its eligible
+      /// on it. Once the previous epoch's late-delivery window has passed with its books still open, it
+      /// closes them (`sysio.epoch::closebooks`), so an idle current epoch holds none of that epoch's duty
+      /// back. An undecided epoch is re-tallied (`evalcons` inline, at any time), since its eligible
       /// members can change with no new delivery. A decided epoch
       /// advances once the chain is due (`sysio.epoch` `advance_due`: it has traffic, its minimum duration
       /// has passed since its epoch start, and its traffic wait since that traffic began); an idle chain stays in
@@ -173,15 +175,17 @@ namespace sysio {
       /// accepted envelope proves the outpost emitted it, so no message that left in that emit counts as a backlog.
       ///
       /// The report replaces the operator's `qreports` row for the chain, erases the chain's rows of earlier epochs
-      /// and runs the tally. Once eligible members as many as a strict majority of the seats of the chain's group
-      /// on duty (the majority `evalcons` needs) have reported in the current epoch, it records the chain's traffic
-      /// since the majority-th earliest of their times (`sysio.epoch::notetraffic`), so a minority neither makes
-      /// the chain due nor moves its traffic earlier than the other members report.
+      /// and runs the tally of the reporter's group: the chain's group on duty, or the next group of its window,
+      /// which can report for a group on duty left without a majority of eligible reporters. Once that group's
+      /// eligible members as many as a strict majority of its seats (the majority `evalcons` needs) have reported
+      /// in the current epoch, it records the chain's traffic since the majority-th earliest of their times
+      /// (`sysio.epoch::notetraffic`), so a minority neither makes the chain due nor moves its traffic earlier than
+      /// the other members report. The two groups' reports never add up to one majority.
       ///
-      /// Auth: `batch_op`, a member of the chain's group on duty, ACTIVE in sysio.opreg and a member of the chain
-      /// that is not EVICTED. Refused for a chain that is not an active outpost or has not run its genesis advance,
-      /// for any other epoch, for an undecided epoch (a disputed one included), and with a zero `pending_count`. A
-      /// paused chain records the traffic but does not advance until it resumes.
+      /// Auth: `batch_op`, a member of the chain's group on duty or its next group, ACTIVE in sysio.opreg and a
+      /// member of the chain that is not EVICTED. Refused for a chain that is not an active outpost or has not run its
+      /// genesis advance, for any other epoch, for an undecided epoch (a disputed one included), and with a zero
+      /// `pending_count`. A paused chain records the traffic but does not advance until it resumes.
       [[sysio::action]]
       void reportqueue(name batch_op, uint64_t chain_code, uint32_t epoch_index, uint32_t pending_count,
                        uint64_t oldest_pending_ms);
@@ -255,8 +259,8 @@ namespace sysio {
       ///
       /// Working state, not an audit trail (that is `envlog`). `deliver` prunes rows older than the
       /// current and previous epoch (`INBOUND_ENVELOPE_RETENTION_EPOCHS` in `src/sysio.msgch.cpp`).
-      /// Consensus reads the current epoch's rows; `sysio.epoch::advance` reads the previous epoch's,
-      /// late deliveries included, when it closes that epoch's books.
+      /// Consensus reads the current epoch's rows; `sysio.epoch` reads the previous epoch's, late
+      /// deliveries included, when it closes that epoch's books (`closebooks`, or the advance after it).
       struct [[sysio::table("envelopes")]] envelope_entry {
          uint64_t                  id;
          uint64_t                  chain_code;
@@ -499,11 +503,11 @@ namespace sysio {
          SYSLIB_SERIALIZE(queue_report_key, (chain_code)(account))
       };
 
-      /// A batch operator's latest outbound backlog report for an outpost (`reportqueue`). The tally counts the
-      /// outpost's rows of its current epoch from the eligible members of its group on duty. Each report erases the
-      /// outpost's rows of earlier epochs, so an outpost holds its current epoch's rows and, until its next report,
-      /// its last reported epoch's: one per reporting member of the group on duty, or of a group that a governance
-      /// `schbatchgps` replaced mid-epoch, which the tally ignores.
+      /// A batch operator's latest outbound backlog report for an outpost (`reportqueue`). Each tally counts the
+      /// outpost's rows of its current epoch from the eligible members of one group: its group on duty or its next
+      /// group. Each report erases the outpost's rows of earlier epochs, so an outpost holds its current epoch's rows
+      /// and, until its next report, its last reported epoch's: one per reporting member of those two groups, or of
+      /// a group that a governance `schbatchgps` replaced mid-epoch, which the tally ignores.
       struct [[sysio::table("qreports")]] queue_report_entry {
          uint64_t   chain_code;
          name       account;

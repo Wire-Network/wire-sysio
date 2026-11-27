@@ -510,8 +510,9 @@ The tests report measured sizes for the current IDL and account layout.
 
 ## Outpost Cranks
 
-Once per epoch, right after this operator's envelope delivery lands, the outbound relay
-job calls `crank_outpost`. On Solana that is liqsol-core's permissionless
+While this operator is elected on the chain, the outbound relay job calls `crank_outpost`
+after its delivery call, at most once per chain minimum, whether or not the chain advances.
+On Solana that is liqsol-core's permissionless
 `report_liq_yield`: it claims the syndicated pool's pending rewards and reports the delta
 since the previous report as one `LIQ_YIELD` attestation (a no-op on chain when nothing
 new was claimed). The relay reads `GlobalState` first and submits only when it is
@@ -524,8 +525,7 @@ mismatch can be diagnosed. Reports request 800,000 compute units, matching liqso
 `executeReportLiqYield` helper. The relay derives
 every account of the instruction (`report_liq_yield_overrides`),
 signs with the operator's Solana key, and skips on a program that does not declare the
-instruction. A failed crank is logged by the job and retried with the next epoch's
-delivery.
+instruction. A failed crank is logged by the job and tried again a chain minimum later.
 
 ## Outbound Backlog
 

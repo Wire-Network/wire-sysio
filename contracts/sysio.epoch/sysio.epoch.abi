@@ -81,6 +81,16 @@
             ]
         },
         {
+            "name": "closebooks",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                }
+            ]
+        },
+        {
             "name": "economic_config",
             "base": "",
             "fields": [
@@ -355,6 +365,11 @@
         {
             "name": "advance",
             "type": "advance",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "closebooks",
+            "type": "closebooks",
             "ricardian_contract": ""
         },
         {

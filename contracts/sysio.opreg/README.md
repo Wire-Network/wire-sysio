@@ -82,10 +82,11 @@ is `SERVING`.
   `TERMINATED`, an active outpost, and the operator's `sysio.authex` link for the chain's kind, since
   the chain's roster carries the operator's address from it. With no row the operator becomes
   `SERVING`. A `LEFT` or `EVICTED` operator rejoins only once that chain's schedule holds none of its
-  seats, and rejoining restarts the join time. A seat stays in the schedule until the advance that closes
-  its epoch's books: past its slide out of the window, it is the chain's `previous_group` for one more
-  advance. A chain advances only with traffic, so on an idle chain a seat, and the `regoperator` and
-  `joinchain` refusals it causes, holds until enough advances happen (each needs traffic or a
+  seats, and rejoining restarts the join time. A seat stays in the schedule until its epoch's books close:
+  past its slide out of the window, it is the chain's `previous_group` until the next epoch's late-delivery
+  window has passed and `sysio.msgch::chkcons` closes those books, or the next advance does. A chain
+  advances only with traffic, so on an idle chain a window seat, and the `regoperator` and `joinchain`
+  refusals it causes, holds until enough advances happen (each needs traffic or a
   `sysio.epoch::resendroster`).
 - **`leavechain(account, chain_code)`** turns `SERVING` into `LEFT`. The operator draws no new seat on
   the chain and still owes the duty of each seat it holds there.

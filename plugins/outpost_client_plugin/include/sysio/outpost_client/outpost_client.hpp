@@ -187,11 +187,12 @@ public:
     * @brief OUTPOST CRANKS — drive the outpost's permissionless per-epoch
     *        instructions that nothing on the outpost schedules.
     *
-    * Called by the outbound relay job once per epoch, right after this
-    * operator's envelope delivery for that epoch lands, so the cranks ride the
-    * same cadence and the same operator key as the delivery. Best-effort: a
-    * failure is logged by the job and retried at the next epoch, and it never
-    * travels back into the delivery result.
+    * Called by the outbound relay job after its delivery call, at most once
+    * per chain minimum while this operator is elected on the chain, whether
+    * or not the chain advances, so what the outpost accrues on an idle chain
+    * is still queued. It rides the same operator key as the delivery, after
+    * it. Best-effort: a failure is logged by the job and tried again a chain
+    * minimum later, and it never travels back into the delivery result.
     *
     * The default cranks nothing. The Solana relay overrides it with the liqSOL
     * pool's `report_liq_yield` (PostLaunch only; a no-op on chain when nothing
@@ -200,7 +201,7 @@ public:
     * `DESYNDICATE_LIQ` handler (idle until one is, and quiet when the pool has
     * nothing to report).
     *
-    * @param epoch_index  The WIRE epoch whose delivery just landed.
+    * @param epoch_index  The chain's current WIRE epoch.
     * @param deadline     Upper bound on the total time spent talking to the
     *                     remote chain for this call.
     * @throws fc::exception on RPC failure, tx revert, or deadline expiry.

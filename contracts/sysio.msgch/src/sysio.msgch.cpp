@@ -47,6 +47,7 @@ constexpr auto     ROA_ACCOUNT     = "sysio.roa"_n;
 /// Action identifiers owned by sysio.epoch and sent by msgch.
 namespace epoch_actions {
 constexpr name ADVANCE      = "advance"_n;
+constexpr name CLOSE_BOOKS  = "closebooks"_n;
 constexpr name NOTE_TRAFFIC = "notetraffic"_n;
 } // namespace epoch_actions
 
@@ -136,6 +137,8 @@ constexpr std::string_view REPORT_WITHOUT_BACKLOG =
    "reportqueue: pending_count must be positive; an empty queue is not reported";
 constexpr std::string_view REPORTER_NOT_ELIGIBLE =
    "reportqueue: reporter is not ACTIVE in sysio.opreg, or does not serve this chain or was evicted from it";
+constexpr std::string_view REPORTER_NOT_IN_GROUP =
+   "reportqueue: reporter is in neither the chain's group on duty nor its next group";
 
 // `operator""_s` is declared at global scope by <sysio/slug_name.hpp>.
 
@@ -147,9 +150,9 @@ constexpr std::string_view REPORTER_NOT_ELIGIBLE =
 constexpr sysio::slug_name NODE_OWNER_SRC_CHAIN = "ETHEREUM"_s;
 
 /// Epochs of inbound `envelopes` rows kept: the current epoch, which consensus reads, and the previous
-/// one, which takes late deliveries and whose rows `sysio.epoch::advance` reads when it closes that
-/// epoch's books. Every delivery of the current epoch prunes against it, so the previous epoch's rows
-/// survive until the advance after it.
+/// one, which takes late deliveries and whose rows `sysio.epoch` reads when it closes that epoch's
+/// books (`closebooks`, or the advance after it). Every delivery of the current epoch prunes against it,
+/// so the previous epoch's rows survive until the advance after it.
 constexpr uint32_t INBOUND_ENVELOPE_RETENTION_EPOCHS = 2;
 
 /// Maximum expired `envelopes` rows a single `deliver` erases. Each delivery adds one row, so a
@@ -157,7 +160,7 @@ constexpr uint32_t INBOUND_ENVELOPE_RETENTION_EPOCHS = 2;
 constexpr uint32_t ENVELOPE_PRUNE_BUDGET = 4;
 
 static_assert(INBOUND_ENVELOPE_RETENTION_EPOCHS >= 2,
-              "the prune must keep the previous epoch, whose books the next advance closes");
+              "the prune must keep the previous epoch, whose books close no later than the next advance");
 static_assert(ENVELOPE_PRUNE_BUDGET > 1, "the prune must outpace the one row each delivery adds");
 
 /// `envlog` rows an outpost logs per epoch: one accepted inbound envelope and one outbound emit. An
@@ -247,26 +250,44 @@ struct duty_group {
    }
 };
 
-/// Outpost `chain_code`'s group on duty, its seats and its eligible members read from one snapshot of its epoch
-/// state, so the majority and the deliveries counted toward it cannot diverge.
+/// `members`, a group of outpost `chain_code`'s window, as consensus counts it: a seat per member and the eligible
+/// members, read in one pass so the majority and the members counted toward it cannot diverge.
 ///
 /// The group is a snapshot taken at `schbatchgps` / `advance`; it may be shorter than the configured
 /// `operators_per_epoch` when the chain's serving roster could not fill it, and the seats are the members it holds.
 /// A member slashed, terminated, evicted or dropped below its collateral minimum mid-epoch keeps its seat but is no
 /// longer eligible: `deliver` refuses it, and a delivery it made earlier no longer counts.
-///
-/// Empty when the epoch state is unreadable or the group cursor is out of range: fail-closed, as `deliver` admits a
-/// current-epoch delivery only from the same group of the same epoch state.
-duty_group duty_group_of(uint64_t chain_code) {
-   const std::optional<epoch::epoch_state> state = epoch::epoch_state_of(chain_code);
-   if (!state || state->current_batch_op_group >= state->batch_op_groups.size()) return {};
-
-   const std::vector<name>& members = state->batch_op_groups[state->current_batch_op_group];
-   duty_group               group{.seats = static_cast<uint32_t>(members.size())};
+duty_group duty_group_from(const std::vector<name>& members, uint64_t chain_code) {
+   duty_group group{.seats = static_cast<uint32_t>(members.size())};
    for (const name member : members) {
       if (!delivery_refusal(member, chain_code)) group.eligible.push_back(member);
    }
    return group;
+}
+
+/// Outpost `chain_code`'s group on duty as consensus counts it (`duty_group_from`). Empty when the epoch state is
+/// unreadable or the group cursor is out of range: fail-closed, as `deliver` admits a current-epoch delivery only
+/// from the same group of the same epoch state.
+duty_group duty_group_of(uint64_t chain_code) {
+   const std::optional<epoch::epoch_state> state = epoch::epoch_state_of(chain_code);
+   if (!state || state->current_batch_op_group >= state->batch_op_groups.size()) return {};
+   return duty_group_from(state->batch_op_groups[state->current_batch_op_group], chain_code);
+}
+
+/// Groups of a chain's window whose members report its outbound backlog: the group on duty and the next one.
+constexpr size_t REPORTING_GROUPS = 2;
+
+/// The group of `state`'s window that `account` reports the chain's backlog in: the group on duty or the one after it
+/// (`batch_op_groups[current + 1]`), each of which makes the chain due by its own strict majority. Empty when
+/// `account` sits in neither.
+std::vector<name> reporting_group_of(const epoch::epoch_state& state, name account) {
+   const size_t on_duty = state.current_batch_op_group;
+   const size_t end     = std::min(on_duty + REPORTING_GROUPS, state.batch_op_groups.size());
+   for (size_t g = on_duty; g < end; ++g) {
+      const std::vector<name>& members = state.batch_op_groups[g];
+      if (std::find(members.begin(), members.end(), account) != members.end()) return members;
+   }
+   return {};
 }
 
 /// Smallest delivery count that is a strict majority of a group of `seats` (`count * 2 > seats`). An even group
@@ -1220,8 +1241,7 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
       const std::optional<epoch::epoch_config> cfg =
          epoch::epochcfg_t(EPOCH_ACCOUNT).try_get(epoch::chain_key{chain_code});
       check(cfg.has_value(), epoch::EPOCH_CONFIG_NOT_INITIALIZED);
-      check(current_time_point() < state->current_epoch_start + seconds(static_cast<int64_t>(cfg->late_window_sec)),
-            LATE_DELIVERY_AFTER_WINDOW);
+      check(current_time_point() < epoch::late_window_end(*state, *cfg), LATE_DELIVERY_AFTER_WINDOW);
    } else {
       check(in_current_group, epoch::NOT_IN_ACTIVE_GROUP);
    }
@@ -1255,8 +1275,8 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
    // true). A reverted tx records nothing, so the operator can immediately deliver a corrected one.
    //
    // A decided epoch takes only its winner's bytes. Accepting the winner slashed every recorded delivery
-   // that differs from it, so a differing one now is refused, and the advance that closes the epoch's
-   // books records its operator's miss. A late delivery, for the previous epoch, is held to that epoch's
+   // that differs from it, so a differing one now is refused, and the epoch's books record its operator's
+   // miss when they close. A late delivery, for the previous epoch, is held to that epoch's
    // winner the same way, and a previous epoch with no accepted winner takes none.
    //
    // LATE CONFIRMATION bypass: once this epoch's winner is accepted, `outpcons.envelope_digest`
@@ -1415,7 +1435,8 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
 }
 
 // ---------------------------------------------------------------------------
-//  chkcons — re-tally one outpost's undecided epoch, or advance a decided one once it is due
+//  chkcons — close one outpost's previous epoch's books once they can close, then re-tally its undecided epoch,
+//  or advance a decided one once it is due
 // ---------------------------------------------------------------------------
 void msgch::chkcons(uint64_t chain_code) {
    check(sysio::chains::outpost_kind_of(CHAINS_ACCOUNT, sysio::slug_name{chain_code}).has_value(),
@@ -1432,6 +1453,17 @@ void msgch::chkcons(uint64_t chain_code) {
    // never hits that throw mid-dispute. chkdispute resolves the dispute (resolvedisp) and lifts the
    // chain's pause. Another chain's dispute does not hold this one.
    if (chalg::has_open_dispute(CHALG_ACCOUNT, chain_code, epoch)) return;
+
+   // Close the previous epoch's books once its late deliveries can no longer come, so a current epoch that stays idle
+   // holds none of that epoch's duty back. The inline runs before the re-tally or advance below; an advance finds them
+   // closed.
+   const std::optional<epoch::epoch_config> cfg =
+      epoch::epochcfg_t(EPOCH_ACCOUNT).try_get(epoch::chain_key{chain_code});
+   if (cfg && epoch::books_closable(*state, *cfg, current_time_point())) {
+      action(permission_level{get_self(), "active"_n}, EPOCH_ACCOUNT, epoch_actions::CLOSE_BOOKS,
+             std::make_tuple(sysio::slug_name{chain_code}))
+         .send();
+   }
 
    // Readiness is the durable `epoch_index == current epoch` signal that apply_consensus writes on
    // dispatch. We intentionally do NOT also gate on `consensus_reached`: advance() can return without
@@ -1487,10 +1519,10 @@ void msgch::reportqueue(name batch_op, uint64_t chain_code, uint32_t epoch_index
    // No idle heartbeat: only a pending backlog is reported.
    check(pending_count > 0, REPORT_WITHOUT_BACKLOG);
 
-   // The reporter sits in the chain's group on duty and is one of its eligible members, whose deliveries consensus
-   // counts.
-   check(epoch::in_current_group(*state, batch_op), epoch::NOT_IN_ACTIVE_GROUP);
-   const duty_group group = duty_group_of(chain_code);
+   // The reporter sits in the chain's group on duty or the next one, and is one of that group's eligible members.
+   const std::vector<name> members = reporting_group_of(*state, batch_op);
+   check(!members.empty(), REPORTER_NOT_IN_GROUP);
+   const duty_group group = duty_group_from(members, chain_code);
    check(group.is_eligible(batch_op), REPORTER_NOT_ELIGIBLE);
 
    // A missing time, or one later than now, counts as now, never earlier. Capped in milliseconds, so the conversion
@@ -1510,8 +1542,9 @@ void msgch::reportqueue(name batch_op, uint64_t chain_code, uint32_t epoch_index
       .oldest_pending_at = oldest_pending_at,
    });
 
-   // Collect the times of the eligible members' reports in the current epoch. A report of an earlier epoch never
-   // counts again, so the walk erases it.
+   // Collect the times of the reporter's group's eligible members' reports in the current epoch: the groups are
+   // disjoint, so the other group's reports never count toward this one's majority. A report of an earlier epoch
+   // never counts again, so the walk erases it.
    std::vector<time_point> reported_since;
    for (auto it = reports.lower_bound(queue_report_key{chain_code, name{}});
         it != reports.end() && it->chain_code == chain_code;) {
@@ -1523,9 +1556,9 @@ void msgch::reportqueue(name batch_op, uint64_t chain_code, uint32_t epoch_index
       ++it;
    }
 
-   // A strict majority of the group's seats, as consensus needs; the majority-th earliest time, which a minority can
-   // never move earlier than the other members' earliest. sysio.epoch keeps the earliest traffic, so a repeat is
-   // harmless.
+   // A strict majority of the reporter's group's seats, as consensus needs; the majority-th earliest time, which a
+   // minority can never move earlier than the other members' earliest. sysio.epoch keeps the earliest traffic, so a
+   // repeat, or the other group's majority, is harmless.
    const uint32_t majority_size = strict_majority_size(group.seats);
    if (reported_since.size() < majority_size) return;
    const auto majority_th = reported_since.begin() + (majority_size - 1);

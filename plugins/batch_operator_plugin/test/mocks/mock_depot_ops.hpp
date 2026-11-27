@@ -18,6 +18,7 @@ public:
    struct deliver_call {
       uint64_t          chain_code = 0;
       std::vector<char> raw_messages;
+      fc::microseconds  timeout;
    };
    struct report_call {
       uint64_t chain_code        = 0;
@@ -46,14 +47,15 @@ public:
    }
 
    sysio::push_outcome deliver_to_depot(uint64_t                 chain_code,
-                                        const std::vector<char>& raw_messages) override {
+                                        const std::vector<char>& raw_messages,
+                                        fc::microseconds         timeout) override {
       // `deliver_thrower` runs before recording so a test can simulate the
       // WIRE-side push_action failing without losing the call evidence —
       // any throw from the hook propagates to the caller, which is what
       // the production failure path looks like.
       if (deliver_thrower) deliver_thrower();
       std::lock_guard<std::mutex> lock(_mx);
-      deliver_calls.push_back({chain_code, raw_messages});
+      deliver_calls.push_back({chain_code, raw_messages, timeout});
       return deliver_outcome;
    }
 
@@ -85,7 +87,16 @@ public:
 
    bool is_elected(uint64_t chain_code) const override { return knobs_of(chain_code).elected; }
    uint32_t current_epoch(uint64_t chain_code) const override { return knobs_of(chain_code).epoch; }
-   bool late_delivery_open(uint64_t chain_code) const override { return knobs_of(chain_code).owes_late_delivery; }
+   /// The chain's `late_window_remaining` while it owes a late delivery, else zero.
+   fc::microseconds late_window_left(uint64_t chain_code) const override {
+      const chain_knobs knobs = knobs_of(chain_code);
+      return knobs.owes_late_delivery ? knobs.late_window_remaining : fc::microseconds();
+   }
+   /// Elected, or reporting for the chain's next group.
+   bool reports_backlog(uint64_t chain_code) const override {
+      const chain_knobs knobs = knobs_of(chain_code);
+      return knobs.elected || knobs.next_group_reports;
+   }
    bool is_decided(uint64_t chain_code) const override { return knobs_of(chain_code).decided; }
    fc::microseconds minimum_duration(uint64_t chain_code) const override {
       return knobs_of(chain_code).chain_minimum;
@@ -101,16 +112,23 @@ public:
    static constexpr fc::microseconds default_delivery_timeout = fc::seconds(2);
    /// The minimum duration of every chain without its own knobs.
    static constexpr fc::microseconds default_minimum_duration = fc::seconds(60);
+   /// What is left of the late-delivery window of every chain without its own knobs while it owes one: longer than
+   /// the delivery timeout, so the timeout bounds the late delivery.
+   static constexpr fc::microseconds default_late_window_remaining = fc::seconds(10);
 
    /// One chain's epoch and election, as the epoch queries answer them.
    struct chain_knobs {
       bool     elected               = true;
       uint32_t epoch                 = 1;
-      bool     owes_late_delivery    = false;   ///< what `late_delivery_open` answers
+      bool     owes_late_delivery    = false;   ///< whether `late_window_left` answers `late_window_remaining`
       bool     decided               = false;
       fc::microseconds chain_minimum = default_minimum_duration;   ///< what `minimum_duration` answers
       /// What `delivery_timeout` answers: the deadline the job hands every outpost call.
       fc::microseconds delivery_timeout = default_delivery_timeout;
+      /// What `late_window_left` answers while `owes_late_delivery`.
+      fc::microseconds late_window_remaining = default_late_window_remaining;
+      /// Whether `reports_backlog` answers true without `elected`: the operator reports for the chain's next group.
+      bool             next_group_reports    = false;
    };
 
    // Knobs callers can set before driving the job under test. They answer for
@@ -120,6 +138,8 @@ public:
    bool             owes_late_delivery    = false;
    bool             decided               = false;
    fc::microseconds chain_minimum         = default_minimum_duration;
+   fc::microseconds late_window_remaining = default_late_window_remaining;
+   bool             next_group_reports    = false;
    /// What `deliver_to_depot` answers once it records the call.
    sysio::push_outcome deliver_outcome = sysio::push_outcome::accepted;
    /// What `report_backlog` answers once it records the call.
@@ -167,7 +187,9 @@ private:
                          .epoch                 = epoch,
                          .owes_late_delivery    = owes_late_delivery,
                          .decided               = decided,
-                         .chain_minimum         = chain_minimum};
+                         .chain_minimum         = chain_minimum,
+                         .late_window_remaining = late_window_remaining,
+                         .next_group_reports    = next_group_reports};
    }
 
    mutable std::mutex _mx;

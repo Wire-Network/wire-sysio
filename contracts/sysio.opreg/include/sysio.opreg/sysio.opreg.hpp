@@ -219,8 +219,8 @@ namespace sysio {
       /// it. Auth = `account`, or `sysio.opreg` (the bootstrap path). Requires a batch operator that is
       /// neither SLASHED nor TERMINATED, an active outpost, and the operator's `sysio.authex` link for
       /// the chain's kind. A LEFT or EVICTED operator rejoins only once it holds no seat in that chain's
-      /// schedule window nor in its `previous_group`, whose books the next advance closes; rejoining restarts
-      /// the chain's miss rails.
+      /// schedule window nor in its `previous_group`, whose books are still open; rejoining restarts the
+      /// chain's miss rails.
       [[sysio::action]]
       void joinchain(name account, sysio::slug_name chain_code);
 

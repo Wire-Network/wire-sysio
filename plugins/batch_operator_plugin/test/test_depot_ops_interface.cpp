@@ -59,7 +59,8 @@ BOOST_AUTO_TEST_CASE(defaults) {
    mock_depot_ops d;
    BOOST_CHECK_EQUAL(d.is_elected(0), true);
    BOOST_CHECK_EQUAL(d.current_epoch(0), 1u);
-   BOOST_CHECK_EQUAL(d.late_delivery_open(0), false);
+   BOOST_CHECK(d.late_window_left(0) == fc::microseconds());
+   BOOST_CHECK_EQUAL(d.reports_backlog(0), true);
    BOOST_CHECK_EQUAL(d.is_decided(0), false);
    BOOST_CHECK(d.minimum_duration(0) == mock_depot_ops::default_minimum_duration);
    BOOST_CHECK(d.delivery_timeout(0) == mock_depot_ops::default_delivery_timeout);
@@ -82,25 +83,29 @@ BOOST_AUTO_TEST_CASE(epoch_queries_answer_per_chain) {
    constexpr uint64_t own_chain     = 2;
    constexpr uint64_t default_chain = 3;
    constexpr uint32_t own_epoch     = 9;
-   const fc::microseconds own_minimum = fc::seconds(30);
+   const fc::microseconds own_minimum     = fc::seconds(30);
+   const fc::microseconds own_window_left = fc::seconds(3);
    mock_depot_ops d;
    d.chains[own_chain] = mock_depot_ops::chain_knobs{.elected               = false,
                                                      .epoch                 = own_epoch,
                                                      .owes_late_delivery    = true,
                                                      .decided               = true,
-                                                     .chain_minimum         = own_minimum};
+                                                     .chain_minimum         = own_minimum,
+                                                     .late_window_remaining = own_window_left,
+                                                     .next_group_reports    = true};
 
    BOOST_CHECK_EQUAL(d.current_epoch(own_chain), own_epoch);
    BOOST_CHECK_EQUAL(d.is_elected(own_chain), false);
-   BOOST_CHECK_EQUAL(d.late_delivery_open(own_chain), true);
+   BOOST_CHECK(d.late_window_left(own_chain) == own_window_left);
+   BOOST_CHECK_EQUAL(d.reports_backlog(own_chain), true);
    BOOST_CHECK_EQUAL(d.is_decided(own_chain), true);
    BOOST_CHECK(d.minimum_duration(own_chain) == own_minimum);
    BOOST_CHECK_EQUAL(d.current_epoch(default_chain), d.epoch);
    BOOST_CHECK_EQUAL(d.is_elected(default_chain), d.elected);
-   BOOST_CHECK_EQUAL(d.late_delivery_open(default_chain), d.owes_late_delivery);
+   BOOST_CHECK(d.late_window_left(default_chain) == fc::microseconds());
 
-   const std::vector<uint64_t> expected{own_chain,     own_chain,     own_chain,    own_chain,
-                                        own_chain,     default_chain, default_chain, default_chain};
+   const std::vector<uint64_t> expected{own_chain, own_chain,     own_chain,     own_chain,    own_chain,
+                                        own_chain, default_chain, default_chain, default_chain};
    BOOST_CHECK(d.epoch_queries == expected);
 }
 
@@ -127,12 +132,14 @@ BOOST_AUTO_TEST_CASE(outbound_envelope_record_round_trip) {
 BOOST_AUTO_TEST_CASE(deliver_to_depot_records_payload) {
    mock_depot_ops d;
    std::vector<char> payload{'h', 'i'};
-   BOOST_CHECK(d.deliver_to_depot(/*chain_code=*/2, payload) == sysio::push_outcome::accepted);
+   const fc::microseconds timeout = fc::seconds(4);
+   BOOST_CHECK(d.deliver_to_depot(/*chain_code=*/2, payload, timeout) == sysio::push_outcome::accepted);
    d.deliver_outcome = sysio::push_outcome::refused;
-   BOOST_CHECK(d.deliver_to_depot(/*chain_code=*/2, payload) == sysio::push_outcome::refused);
+   BOOST_CHECK(d.deliver_to_depot(/*chain_code=*/2, payload, timeout) == sysio::push_outcome::refused);
    BOOST_REQUIRE_EQUAL(d.deliver_calls.size(), 2u);
    BOOST_CHECK_EQUAL(d.deliver_calls[0].chain_code, 2u);
    BOOST_CHECK(d.deliver_calls[0].raw_messages == payload);
+   BOOST_CHECK(d.deliver_calls[0].timeout == timeout);
 }
 
 /// A backlog report and the post-delivery `chkcons` request are recorded with what they named.

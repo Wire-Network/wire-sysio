@@ -1083,9 +1083,9 @@ private:
    /// program never asks for.
    std::optional<outpost_solana_client_detail::liq_pool_info> syndicated_liq_pool();
 
-   /// The outpost's per-epoch crank: liqsol-core's permissionless
-   /// `report_liq_yield`, submitted once per epoch from the outbound relay job
-   /// after this operator's delivery lands. PostLaunch only (read off
+   /// The outpost's crank: liqsol-core's permissionless `report_liq_yield`,
+   /// submitted from the outbound relay job after its delivery call, at most
+   /// once per chain minimum while this operator is elected. PostLaunch only (read off
    /// `GlobalState` first, so a refused tx is never paid for); a program without
    /// the instruction has no syndicated pool and cranks nothing.
    void crank_outpost(uint32_t epoch_index, fc::microseconds deadline) override;

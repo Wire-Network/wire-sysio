@@ -47,11 +47,13 @@ constexpr auto kExecutionFailure = "execution failed";
 constexpr auto kCompletionQueryFailure = "depot query failed";
 constexpr auto kRepeatedPolls = 100u;
 
-/// Exercise ordinary cron ticks with one envelope pending until depot completion.
+/// Exercise ordinary cron ticks with one envelope pending until depot completion. The job reads the fixture's clock,
+/// which moves only when a case moves it.
 struct outbound_retry_fixture {
    std::shared_ptr<mock_outpost_client> client = make_client(CHAIN_KIND_SVM, kSolanaChainCode, kSolanaChainId);
    mock_depot_ops depot;
-   outpost_opp_job job{client, depot};
+   fc::time_point now = fc::time_point::now();
+   outpost_opp_job job{client, depot, [this] { return now; }};
 
    /// Keep a single envelope pending until a test supplies completion evidence.
    outbound_retry_fixture() {
@@ -79,6 +81,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_skips_when_not_elected) {
    job.run_outbound();
 
    BOOST_CHECK(client->outbound_calls.empty());
+   BOOST_CHECK(client->crank_calls.empty());
    BOOST_CHECK(depot.read_pending_calls.empty());
    BOOST_CHECK(depot.emitted_events.empty());
 }
@@ -172,28 +175,17 @@ BOOST_FIXTURE_TEST_CASE(run_outbound_calls_the_client_every_tick_until_the_depot
    job.run_outbound();
    BOOST_REQUIRE_EQUAL(client->outbound_calls.size(), kRepeatedPolls + 1);
    BOOST_CHECK_EQUAL(client->outbound_calls.back().epoch_index, kTestEpoch + 1);
-   // One crank per epoch.
-   BOOST_CHECK_EQUAL(client->crank_calls.size(), 2u);
+   // One crank: no chain minimum has passed.
+   BOOST_CHECK_EQUAL(client->crank_calls.size(), 1u);
 }
 
-// The outpost's per-epoch cranks ride the first outbound call of an epoch that
-// returns: once per epoch, with the delivery's own deadline.
-BOOST_AUTO_TEST_CASE(run_outbound_cranks_the_outpost_once_per_epoch_after_delivery) {
-   auto client = make_client(CHAIN_KIND_SVM, 1, 0);
-   mock_depot_ops depot;
-   depot.epoch = 5;
-
-   outbound_envelope_record rec;
-   rec.raw_envelope = {'x'};
-   depot.pending_response = [rec](uint64_t, uint32_t) -> std::optional<outbound_envelope_record> {
-      return rec;
-   };
-
-   outpost_opp_job job(client, depot);
+// The outpost's crank follows the outbound call, with the delivery's own deadline, at most once per chain minimum:
+// neither a repeat call nor a new epoch cranks again before the minimum has passed, and the next call after it does.
+BOOST_FIXTURE_TEST_CASE(run_outbound_cranks_the_outpost_at_most_once_per_chain_minimum, outbound_retry_fixture) {
    job.run_outbound();
    BOOST_REQUIRE_EQUAL(client->outbound_calls.size(), 1u);
    BOOST_REQUIRE_EQUAL(client->crank_calls.size(), 1u);
-   BOOST_CHECK_EQUAL(client->crank_calls[0].epoch_index, 5u);
+   BOOST_CHECK_EQUAL(client->crank_calls[0].epoch_index, kTestEpoch);
    BOOST_CHECK(client->crank_calls[0].deadline == kDeadline);
 
    // Same epoch: the client is called again, awaiting its peers, but the crank is not.
@@ -201,54 +193,68 @@ BOOST_AUTO_TEST_CASE(run_outbound_cranks_the_outpost_once_per_epoch_after_delive
    BOOST_CHECK_EQUAL(client->outbound_calls.size(), 2u);
    BOOST_CHECK_EQUAL(client->crank_calls.size(), 1u);
 
-   depot.epoch = 6;
+   // A new epoch within the minimum: delivered, not cranked.
+   depot.epoch = kTestEpoch + 1;
+   now += depot.chain_minimum - fc::microseconds(1);
    job.run_outbound();
-   BOOST_CHECK_EQUAL(client->crank_calls.size(), 2u);
-   BOOST_CHECK_EQUAL(client->crank_calls[1].epoch_index, 6u);
+   BOOST_CHECK_EQUAL(client->outbound_calls.size(), 3u);
+   BOOST_CHECK_EQUAL(client->crank_calls.size(), 1u);
+
+   now += fc::microseconds(1);
+   job.run_outbound();
+   BOOST_REQUIRE_EQUAL(client->crank_calls.size(), 2u);
+   BOOST_CHECK_EQUAL(client->crank_calls[1].epoch_index, kTestEpoch + 1);
 }
 
-// A failed delivery cranks nothing: the crank belongs to a call that returned.
-BOOST_AUTO_TEST_CASE(run_outbound_does_not_crank_when_delivery_fails) {
-   auto client = make_client(CHAIN_KIND_SVM, 1, 0);
-   mock_depot_ops depot;
-   depot.epoch = 5;
-
-   outbound_envelope_record rec;
-   rec.raw_envelope = {'x'};
-   depot.pending_response = [rec](uint64_t, uint32_t) -> std::optional<outbound_envelope_record> {
-      return rec;
+// On an idle chain the epoch never moves and, once the depot records the operator's delivery, nothing is delivered;
+// what the outpost accrues after one crank is still queued by the next, a chain minimum later, and no sooner.
+BOOST_FIXTURE_TEST_CASE(run_outbound_cranks_an_idle_chain_again_a_chain_minimum_later, outbound_retry_fixture) {
+   constexpr fc::microseconds poll = fc::seconds(1);
+   uint32_t accrued = 1;
+   uint32_t queued  = 0;
+   client->crank_response = [&](const auto&) {
+      queued += accrued;
+      accrued = 0;
    };
-   client->deliver_response = [](const auto&) -> std::string { FC_THROW("rpc down"); };
-
-   outpost_opp_job job(client, depot);
+   const fc::time_point first = now;
    job.run_outbound();
+   BOOST_CHECK_EQUAL(queued, 1u);
+
+   depot.has_delivered_response = [](uint64_t, uint32_t) { return true; };
+   accrued = 2;   // after the first crank
+   for (now += poll; now < first + depot.chain_minimum; now += poll) job.run_outbound();
+   BOOST_CHECK_EQUAL(queued, 1u);
+   BOOST_CHECK_EQUAL(client->crank_calls.size(), 1u);
+
+   now = first + depot.chain_minimum;
+   job.run_outbound();
+   BOOST_CHECK_EQUAL(queued, 3u);
+   BOOST_REQUIRE_EQUAL(client->crank_calls.size(), 2u);
+   BOOST_CHECK_EQUAL(client->crank_calls[1].epoch_index, kTestEpoch);
    BOOST_CHECK_EQUAL(client->outbound_calls.size(), 1u);
-   BOOST_CHECK(client->crank_calls.empty());
 }
 
-// A failed crank is logged and retried by the next epoch's delivery; repeat calls in the same epoch never crank again.
-BOOST_AUTO_TEST_CASE(run_outbound_crank_failure_is_not_retried_in_the_same_epoch) {
-   auto client = make_client(CHAIN_KIND_SVM, 1, 0);
-   mock_depot_ops depot;
-   depot.epoch = 5;
-
-   outbound_envelope_record rec;
-   rec.raw_envelope = {'x'};
-   depot.pending_response = [rec](uint64_t, uint32_t) -> std::optional<outbound_envelope_record> {
-      return rec;
-   };
-   client->crank_response = [](const auto&) { FC_THROW("crank refused"); };
-
-   outpost_opp_job job(client, depot);
+// The crank is paced by time, not by the delivery: a failed delivery cranks all the same.
+BOOST_FIXTURE_TEST_CASE(run_outbound_cranks_after_a_failed_delivery, outbound_retry_fixture) {
+   client->deliver_response = [](const auto&) -> std::string { FC_THROW("rpc down"); };
    job.run_outbound();
    BOOST_CHECK_EQUAL(client->outbound_calls.size(), 1u);
    BOOST_CHECK_EQUAL(client->crank_calls.size(), 1u);
+}
 
+// A failed crank is logged and spends the chain minimum: the next one comes a chain minimum later.
+BOOST_FIXTURE_TEST_CASE(run_outbound_crank_failure_waits_a_chain_minimum, outbound_retry_fixture) {
+   client->crank_response = [](const auto&) { FC_THROW("crank refused"); };
+   BOOST_CHECK_NO_THROW(job.run_outbound());
+   BOOST_CHECK_EQUAL(client->outbound_calls.size(), 1u);
+   BOOST_CHECK_EQUAL(client->crank_calls.size(), 1u);
+
+   now += depot.chain_minimum - fc::microseconds(1);
    job.run_outbound();
    BOOST_CHECK_EQUAL(client->outbound_calls.size(), 2u);
    BOOST_CHECK_EQUAL(client->crank_calls.size(), 1u);
 
-   depot.epoch = 6;
+   now += fc::microseconds(1);
    job.run_outbound();
    BOOST_CHECK_EQUAL(client->crank_calls.size(), 2u);
 }
@@ -271,7 +277,6 @@ BOOST_AUTO_TEST_CASE(run_outbound_swallows_exceptions_and_retries_next_tick) {
    // Visibility fix: emit fires BEFORE delivery, so a failed attempt still
    // lands a debug event with the attempted bytes.
    BOOST_CHECK_EQUAL(depot.emitted_events.size(), 1u);
-   BOOST_CHECK(client->crank_calls.empty());
 
    client->deliver_response = [](const auto&) { return std::string{"recovered"}; };
    job.run_outbound();
@@ -279,13 +284,13 @@ BOOST_AUTO_TEST_CASE(run_outbound_swallows_exceptions_and_retries_next_tick) {
    // Two emits total: one for the failed attempt, one for the recovered retry.
    // Same epoch + same envelope ⇒ same hash, so the sink dedupes on disk.
    BOOST_REQUIRE_EQUAL(depot.emitted_events.size(), 2u);
+   // One crank, after the first call: no chain minimum has passed since.
    BOOST_CHECK_EQUAL(client->crank_calls.size(), 1u);
 }
 
-/// An incomplete delivery is neither a failure nor a handled epoch: the job
-/// does not crank, and the next tick delivers again; the crank rides the first
-/// call that returns.
-BOOST_AUTO_TEST_CASE(run_outbound_retries_an_incomplete_delivery_next_tick_without_cranking) {
+/// An incomplete delivery is neither a failure nor a handled epoch: the next
+/// tick delivers again. The crank follows the first call, paced by time.
+BOOST_AUTO_TEST_CASE(run_outbound_retries_an_incomplete_delivery_next_tick) {
    auto client = make_client(CHAIN_KIND_EVM, 0, 31337);
    mock_depot_ops depot;
    depot.epoch = 5;
@@ -301,7 +306,7 @@ BOOST_AUTO_TEST_CASE(run_outbound_retries_an_incomplete_delivery_next_tick_witho
    outpost_opp_job job(client, depot);
    BOOST_CHECK_NO_THROW(job.run_outbound());
    BOOST_CHECK_EQUAL(client->outbound_calls.size(), 1u);
-   BOOST_CHECK_EQUAL(client->crank_calls.size(), 0u);
+   BOOST_CHECK_EQUAL(client->crank_calls.size(), 1u);
 
    client->deliver_response = [](const auto&) { return std::string{"0xfinished"}; };
    job.run_outbound();
@@ -729,7 +734,7 @@ BOOST_FIXTURE_TEST_CASE(run_inbound_reads_the_outpost_for_a_late_delivery_it_kep
    BOOST_CHECK(other.depot.deliver_calls.empty());
 }
 
-/// The previous epoch is delivered late only while the depot takes it (`late_delivery_open`: a member of its group,
+/// The previous epoch is delivered late only while the depot takes it (`late_window_left`: a member of its group,
 /// within the chain's late-delivery window), and only while the depot holds no delivery of its: once the window
 /// closes, nothing is read or delivered for it.
 BOOST_FIXTURE_TEST_CASE(run_inbound_delivers_late_only_within_the_window_without_a_row, late_delivery_fixture) {
@@ -746,9 +751,9 @@ BOOST_FIXTURE_TEST_CASE(run_inbound_delivers_late_only_within_the_window_without
    BOOST_CHECK(client->inbound_calls.empty());
 }
 
-/// Elected on the new epoch and a member of the previous group, the operator delivers both: the current epoch first,
-/// then the previous one late.
-BOOST_FIXTURE_TEST_CASE(run_inbound_delivers_the_current_epoch_and_the_previous_one_late, late_delivery_fixture) {
+/// Elected on the new epoch and a member of the previous group, the operator delivers both: the previous epoch late
+/// first, then the current one.
+BOOST_FIXTURE_TEST_CASE(run_inbound_delivers_the_previous_epoch_late_and_the_current_one, late_delivery_fixture) {
    depot.deliver_outcome = push_outcome::unconfirmed;
    job.run_inbound();   // read and kept while current, but not delivered
    BOOST_REQUIRE_EQUAL(depot.deliver_calls.size(), 1u);
@@ -758,10 +763,58 @@ BOOST_FIXTURE_TEST_CASE(run_inbound_delivers_the_current_epoch_and_the_previous_
    emitted_next          = true;
    job.run_inbound();
    BOOST_REQUIRE_EQUAL(depot.deliver_calls.size(), 3u);
-   BOOST_CHECK(depot.deliver_calls[1].raw_messages == next);
-   BOOST_CHECK(depot.deliver_calls[2].raw_messages == previous);
+   BOOST_CHECK(depot.deliver_calls[1].raw_messages == previous);
+   BOOST_CHECK(depot.deliver_calls[2].raw_messages == next);
    // After the current-epoch delivery only, not after the late one.
    BOOST_CHECK_EQUAL(depot.chkcons_if_due_calls.size(), 1u);
+}
+
+/// The late delivery goes before the current epoch's: a current-epoch outpost read slow enough to outlast the
+/// late-delivery window no longer costs the operator its late delivery. Each push takes its own bound: the late one
+/// what is left of the window, at most a delivery timeout, and the current one a delivery timeout.
+BOOST_FIXTURE_TEST_CASE(run_inbound_delivers_late_before_a_slow_current_epoch_read, late_delivery_fixture) {
+   depot.deliver_outcome = push_outcome::unconfirmed;
+   job.run_inbound();   // read and kept while current, but not delivered
+   advance();
+   depot.elected         = true;
+   depot.deliver_outcome = push_outcome::accepted;
+   emitted_next          = true;
+   // The current epoch's read returns only once the late-delivery window has closed.
+   client->inbound_response = [this](const auto& call) {
+      if (call.epoch_index != kTestEpoch + 1) return std::vector<char>{};
+      depot.owes_late_delivery = false;
+      return next;
+   };
+   job.run_inbound();
+   BOOST_REQUIRE_EQUAL(depot.deliver_calls.size(), 3u);
+   BOOST_CHECK(depot.deliver_calls[1].raw_messages == previous);
+   BOOST_CHECK(depot.deliver_calls[1].timeout == kDeadline);
+   BOOST_CHECK(depot.deliver_calls[2].raw_messages == next);
+   BOOST_CHECK(depot.deliver_calls[2].timeout == kDeadline);
+   BOOST_CHECK(inbound_reads() == (std::vector<uint32_t>{kTestEpoch, kTestEpoch + 1}));
+}
+
+/// With less of the late-delivery window left than a delivery timeout, the window bounds the late delivery's outpost
+/// read and depot push; with more left, the delivery timeout does.
+BOOST_FIXTURE_TEST_CASE(run_inbound_bounds_a_late_delivery_by_what_is_left_of_its_window, late_delivery_fixture) {
+   const fc::microseconds short_window = fc::microseconds(kDeadline.count() / 2);
+   advance();
+   depot.late_window_remaining = short_window;
+   job.run_inbound();   // nothing kept: the outpost is read for the previous epoch
+   BOOST_REQUIRE_EQUAL(depot.deliver_calls.size(), 1u);
+   BOOST_CHECK(depot.deliver_calls[0].raw_messages == previous);
+   BOOST_CHECK(depot.deliver_calls[0].timeout == short_window);
+   BOOST_REQUIRE_EQUAL(client->inbound_calls.size(), 1u);
+   BOOST_CHECK(client->inbound_calls[0].deadline == short_window);
+
+   late_delivery_fixture roomy;
+   roomy.advance();
+   roomy.depot.late_window_remaining = kDeadline + kDeadline;
+   roomy.job.run_inbound();
+   BOOST_REQUIRE_EQUAL(roomy.depot.deliver_calls.size(), 1u);
+   BOOST_CHECK(roomy.depot.deliver_calls[0].timeout == kDeadline);
+   BOOST_REQUIRE_EQUAL(roomy.client->inbound_calls.size(), 1u);
+   BOOST_CHECK(roomy.client->inbound_calls[0].deadline == kDeadline);
 }
 
 /// Kept bytes the depot refused for a late delivery are not offered again: the next cycle reads the outpost afresh.
@@ -929,6 +982,23 @@ BOOST_FIXTURE_TEST_CASE(run_backlog_needs_the_current_epochs_emit_and_a_backlog,
    job.run_backlog();
    BOOST_CHECK_EQUAL(client->backlog_calls.size(), 4u);
    BOOST_CHECK(depot.report_calls.empty());
+}
+
+/// A member of the chain's next group, not elected, reports the backlog the same way while the depot lets it
+/// (`reports_backlog`), and not otherwise; its outbound job stays idle.
+BOOST_FIXTURE_TEST_CASE(run_backlog_reports_for_the_next_group, backlog_fixture) {
+   depot.elected = false;
+   job.run_backlog();
+   BOOST_CHECK(client->backlog_calls.empty());
+
+   depot.next_group_reports = true;
+   job.run_backlog();
+   BOOST_REQUIRE_EQUAL(depot.report_calls.size(), 1u);
+   BOOST_CHECK_EQUAL(depot.report_calls[0].epoch_index, kTestEpoch);
+   BOOST_CHECK_EQUAL(depot.report_calls[0].pending_count, pending);
+   job.run_outbound();
+   BOOST_CHECK(client->outbound_calls.empty());
+   BOOST_CHECK(client->crank_calls.empty());
 }
 
 /// A refused report, or a failed read, leaves the epoch unreported: a cycle past the read pace tries again.
