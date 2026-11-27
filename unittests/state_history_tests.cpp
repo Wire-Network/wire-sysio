@@ -1,11 +1,13 @@
 #include <sysio/state_history/serialization.hpp>
 #include <sysio/chain/authorization_manager.hpp>
+#include <boost/mpl/list.hpp>
 #include <boost/test/unit_test.hpp>
 #include <contracts.hpp>
 #include <test_contracts.hpp>
 #include <sysio/state_history/abi.hpp>
 #include <sysio/state_history/create_deltas.hpp>
 #include <sysio/state_history/log_catalog.hpp>
+#include <sysio/state_history/request_validation.hpp>
 #include <sysio/state_history/status_request_queue.hpp>
 #include <sysio/state_history/trace_converter.hpp>
 #include <sysio/testing/tester.hpp>
@@ -20,6 +22,8 @@
 
 #include <boost/iostreams/device/back_inserter.hpp>
 #include <boost/iostreams/copy.hpp>
+
+#include <string_view>
 
 using namespace sysio::chain;
 using namespace sysio::testing;
@@ -68,6 +72,29 @@ std::vector<table_delta> create_deltas(const chain::controller& control, bool fu
 }
 
 BOOST_AUTO_TEST_SUITE(test_state_history)
+
+using blocks_request_versions =
+      boost::mpl::list<sysio::state_history::get_blocks_request_v0, sysio::state_history::get_blocks_request_v1>;
+
+/// Verifies both blocks request versions accept the limit and reject one extra position.
+BOOST_AUTO_TEST_CASE_TEMPLATE(block_request_have_positions_limit, Request, blocks_request_versions)
+{
+   using namespace sysio::state_history;
+   constexpr std::size_t expected_max_have_positions = 4096;
+   state_request request{std::in_place_type<Request>};
+   auto& positions = std::get<Request>(request).have_positions;
+
+   BOOST_CHECK_NO_THROW(validate_have_positions(request));
+   positions.emplace_back();
+   BOOST_CHECK_NO_THROW(validate_have_positions(request));
+
+   positions.resize(expected_max_have_positions);
+   BOOST_CHECK_NO_THROW(validate_have_positions(request));
+   positions.emplace_back();
+   BOOST_CHECK_EXCEPTION(validate_have_positions(request), std::runtime_error, [](const std::runtime_error& error) {
+      return std::string_view(error.what()) == have_positions_limit_exceeded;
+   });
+}
 
 /// Verifies SHiP status requests are bounded, drained by version count, and reusable after drain.
 BOOST_AUTO_TEST_CASE(status_request_queue_is_bounded)

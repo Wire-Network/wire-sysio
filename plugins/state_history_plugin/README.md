@@ -108,6 +108,9 @@ the server's id for that block number, `start_block_num` is pulled back to that 
 if a block is applied whose number is lower than the current cursor (a fork being applied over already-sent
 blocks), the cursor rewinds to it.
 
+**Resume position limit.** Both blocks request versions accept up to 4,096 `have_positions` entries.
+SHiP closes the session if the list exceeds this limit, before dispatching the request to the application thread.
+
 **Status request limit.** Pending status requests are counted per session and capped at 1024
 (`max_status_request_queue_depth`). A client that exceeds it has its session failed with
 `state history status request queue limit exceeded`.

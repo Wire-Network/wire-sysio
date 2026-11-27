@@ -1,5 +1,6 @@
 #pragma once
 #include <sysio/state_history/log.hpp>
+#include <sysio/state_history/request_validation.hpp>
 #include <sysio/state_history/serialization.hpp>
 #include <sysio/state_history/status_request_queue.hpp>
 #include <sysio/state_history/types.hpp>
@@ -147,6 +148,7 @@ private:
             boost::beast::flat_buffer b;
             co_await stream.async_read(b);
             const state_request req = fc::raw::unpack<std::remove_const_t<decltype(req)>>(static_cast<const char*>(b.cdata().data()), b.size());
+            validate_have_positions(req);
 
             co_await boost::asio::co_spawn(app().get_io_context(), [&]() -> boost::asio::awaitable<void> {
                /**
