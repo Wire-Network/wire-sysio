@@ -97,9 +97,9 @@ the server's response carries `Server: state_history/<nodeop version>`.
    `*_begin_block` / `*_end_block` come from each log's block range, and are zero for a log that is not enabled.
 
 **Flow control.** `max_messages_in_flight` on the blocks request is a credit counter. Each block result the
-server sends consumes one credit; `get_blocks_ack_request_v0.num_messages` adds that many back. With zero
-credits the write loop sends nothing and sleeps. Status responses are not credited and are written before the
-block in the same pass.
+server sends consumes one credit. `get_blocks_ack_request_v0.num_messages` adds that many back, up to the
+maximum `uint32_t` balance. With zero credits the write loop pauses block results. Status responses are not
+credited and are written before the block in the same pass.
 
 **Cursor and forks.** The server streams from `start_block_num` towards `end_block_num`, advancing one block per
 result and never past the head block -- or past the last irreversible block when `irreversible_only` is set. The
