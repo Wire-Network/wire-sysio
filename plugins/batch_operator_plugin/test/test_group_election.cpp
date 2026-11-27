@@ -413,7 +413,7 @@ BOOST_AUTO_TEST_CASE(chkcons_follows_an_own_delivery_once_the_chain_is_due) try 
    chain_epoch_view genesis = fast;
    genesis.epoch_index = 0;
    BOOST_CHECK(!pushes_chkcons_after_delivery(genesis, fast.due_at));
-   const chain_epoch_view& idle = decode_both().views.at(slow_chain.value);
+   const chain_epoch_view idle = decode_both().views.at(slow_chain.value);
    BOOST_CHECK(!pushes_chkcons_after_delivery(idle, idle.epoch_start + fc::days(30)));
 } FC_LOG_AND_RETHROW();
 
