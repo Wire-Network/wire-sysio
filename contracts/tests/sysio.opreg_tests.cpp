@@ -262,6 +262,26 @@ constexpr uint64_t kMinWindowMsAtDefaults =
 /// the wall-clock gap between a resident operator's consecutive records.
 constexpr uint64_t kDutyRotationMs = uint64_t{kWindowBoundGroups} * kWindowBoundEpochDurationSec * 1000;
 
+/// Records the consecutive rail needs at the production threshold. As the percent-rail sample minimum it
+/// leaves the consecutive rail the binding bound on the window.
+constexpr uint32_t kConsecutiveRunDuties = kDefaultMaxConsecutiveMisses + 1;
+
+/// Smallest `terminate_window_ms` the percent-rail sample bound accepts at
+/// kWindowBoundEpochDurationSec with the production sample minimum: 20 duty
+/// rotations of 3 epochs x 360 s each, in ms.
+constexpr uint64_t kMinPctWindowMsAtDefaults = uint64_t{kDefaultMinPctSamples} * kDutyRotationMs;
+
+/// Longest epoch at which the production 24 h window holds the production sample minimum with
+/// kWindowBoundGroups groups: a duty every 72 minutes, 20 of them in the window.
+constexpr uint32_t kPctBoundEpochDurationSec = 1440;
+
+/// An hourly epoch: with kWindowBoundGroups groups a resident operator is on duty every three hours,
+/// so the 24 h window holds 8 duties.
+constexpr uint32_t kHourlyEpochDurationSec = 3600;
+
+/// Duties the 24 h window holds at kHourlyEpochDurationSec with kWindowBoundGroups groups.
+constexpr uint32_t kHourlyDutiesPerWindow = 8;
+
 /// Mirrors opreg's MAX_DELLOG_PRUNE_PER_WRITE (the contract header is not
 /// includable from native test code).
 constexpr uint32_t kDellogPrunePerWrite = 4;
@@ -1240,14 +1260,14 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_window_narrower_than_consecutive_run, 
       error("assertion failure with message: terminate_window_ms must span at least "
             "terminate_max_consecutive_misses + 1 duty rotations"),
       setconfig(kDefaultPruneDelayMs,
-                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kDefaultMinPctSamples,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kConsecutiveRunDuties,
                 kMinWindowMsAtDefaults - 1)
    );
 
    // The exact span boundary is the smallest accepted window.
    BOOST_REQUIRE_EQUAL(success(),
       setconfig(kDefaultPruneDelayMs,
-                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kDefaultMinPctSamples,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kConsecutiveRunDuties,
                 kMinWindowMsAtDefaults));
 } FC_LOG_AND_RETHROW() }
 
@@ -1264,12 +1284,24 @@ BOOST_FIXTURE_TEST_CASE(setconfig_window_spans_every_chains_schedule, sysio_opre
       error("assertion failure with message: terminate_window_ms must span at least "
             "terminate_max_consecutive_misses + 1 duty rotations"),
       setconfig(kDefaultPruneDelayMs,
-                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kDefaultMinPctSamples,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kConsecutiveRunDuties,
                 kMinWindowMsAtDefaults));
    BOOST_REQUIRE_EQUAL(success(),
       setconfig(kDefaultPruneDelayMs,
-                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kDefaultMinPctSamples,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kConsecutiveRunDuties,
                 2 * kMinWindowMsAtDefaults));
+
+   // The sample minimum is checked against every chain's schedule the same way.
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: terminate_window_ms must span at least "
+            "terminate_min_pct_samples duty rotations"),
+      setconfig(kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kDefaultMinPctSamples,
+                kMinPctWindowMsAtDefaults));
+   BOOST_REQUIRE_EQUAL(success(),
+      setconfig(kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kDefaultMinPctSamples,
+                2 * kMinPctWindowMsAtDefaults));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(setconfig_window_unchecked_before_epoch_config, sysio_opreg_tester) { try {
@@ -1287,7 +1319,7 @@ BOOST_FIXTURE_TEST_CASE(epoch_setconfig_rejects_duration_that_vacates_stored_win
    produce_blocks();
    BOOST_REQUIRE_EQUAL(success(),
       setconfig(kDefaultPruneDelayMs,
-                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kDefaultMinPctSamples,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kConsecutiveRunDuties,
                 kMinWindowMsAtDefaults));
    produce_blocks();
 
@@ -1311,6 +1343,62 @@ BOOST_FIXTURE_TEST_CASE(epoch_setconfig_rejects_duration_that_vacates_stored_win
    BOOST_REQUIRE_EQUAL(success(), set_epoch_config(kWindowBoundEpochDurationSec / 2));
 } FC_LOG_AND_RETHROW() }
 
+/// The percent rail applies once a member's tally holds `terminate_min_pct_samples` duties, so the window
+/// must hold that many duty rotations of every chain's schedule.
+BOOST_FIXTURE_TEST_CASE(setconfig_rejects_window_short_of_pct_samples, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), set_epoch_config(kWindowBoundEpochDurationSec));
+   produce_blocks();
+
+   // One millisecond short of 20 duty rotations: the consecutive run fits, the sample minimum does not.
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: terminate_window_ms must span at least "
+            "terminate_min_pct_samples duty rotations"),
+      setconfig(kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kDefaultMinPctSamples,
+                kMinPctWindowMsAtDefaults - 1));
+
+   // The exact boundary is the smallest accepted window.
+   BOOST_REQUIRE_EQUAL(success(),
+      setconfig(kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kDefaultMinPctSamples,
+                kMinPctWindowMsAtDefaults));
+} FC_LOG_AND_RETHROW() }
+
+/// An hourly three-group schedule puts a resident operator on duty every three hours: the 24 h window holds
+/// 8 duties, so it accepts a sample minimum of 8 and refuses 9 and the production 20.
+BOOST_FIXTURE_TEST_CASE(setconfig_bounds_pct_samples_by_the_duties_in_the_window, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), set_epoch_config(kHourlyEpochDurationSec));
+   produce_blocks();
+
+   const action_result short_of_samples = error("assertion failure with message: terminate_window_ms must span "
+                                                "at least terminate_min_pct_samples duty rotations");
+   BOOST_REQUIRE_EQUAL(short_of_samples, setconfig());
+   BOOST_REQUIRE_EQUAL(short_of_samples,
+      setconfig(kDefaultPruneDelayMs, kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h,
+                kHourlyDutiesPerWindow + 1, kTerminateWindowMs));
+   BOOST_REQUIRE_EQUAL(success(),
+      setconfig(kDefaultPruneDelayMs, kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h,
+                kHourlyDutiesPerWindow, kTerminateWindowMs));
+} FC_LOG_AND_RETHROW() }
+
+/// sysio.epoch::setconfig mirrors the sample bound against the stored opreg config: a duration or group count
+/// that leaves the window holding fewer duties than the sample minimum is refused.
+BOOST_FIXTURE_TEST_CASE(epoch_setconfig_rejects_schedule_short_of_stored_pct_samples, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setconfig());   // 24 h window, 20 samples
+   produce_blocks();
+
+   const action_result short_of_samples = error("assertion failure with message: epoch schedule would leave "
+                                                "sysio.opreg's terminate_window_ms narrower than the percent-rail "
+                                                "sample minimum");
+   // A duty every 72 minutes fills the window with exactly 20; one second longer holds 19.
+   BOOST_REQUIRE_EQUAL(success(), set_epoch_config(kPctBoundEpochDurationSec));
+   BOOST_REQUIRE_EQUAL(short_of_samples, set_epoch_config(kPctBoundEpochDurationSec + 1));
+   // A fourth group stretches the duty rotation the same way.
+   BOOST_REQUIRE_EQUAL(short_of_samples, set_epoch_config(kPctBoundEpochDurationSec, kWindowBoundGroups + 1));
+   // The hourly schedule holds 8.
+   BOOST_REQUIRE_EQUAL(short_of_samples, set_epoch_config(kHourlyEpochDurationSec));
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(termcheck_evicts_at_duty_rotation_cadence, sysio_opreg_tester) { try {
    // Delivery records accrue only on duty epochs: with a 3-group schedule a
    // resident operator is recorded once per 3-epoch rotation, so a
@@ -1324,7 +1412,7 @@ BOOST_FIXTURE_TEST_CASE(termcheck_evicts_at_duty_rotation_cadence, sysio_opreg_t
    activate_batch_operator("batchop.a"_n,
                            kDefaultMaxConsecutiveMisses,
                            kMaxAcceptedPctMisses24h,
-                           kDefaultMinPctSamples,
+                           kConsecutiveRunDuties,
                            kMinWindowMsAtDefaults + kDutyRotationMs);
 
    // Duty epoch 1: a delivered record anchors the window and keeps the

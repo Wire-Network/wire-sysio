@@ -82,6 +82,13 @@ constexpr std::string_view genesis_not_active_outpost_msg =
 constexpr std::string_view genesis_without_schedule_msg =
    "a chain's genesis advance requires its schedule window: run schbatchgps for the chain first";
 
+/// Messages of the `check`s `setconfig` raises.
+constexpr std::string_view batch_op_groups_below_floor_msg = "batch_op_groups must be >= MIN_BATCH_OP_GROUPS (2)";
+constexpr std::string_view schedule_vacates_consecutive_run_msg =
+   "epoch schedule would leave sysio.opreg's terminate_window_ms narrower than the consecutive-miss run";
+constexpr std::string_view schedule_vacates_pct_samples_msg =
+   "epoch schedule would leave sysio.opreg's terminate_window_ms narrower than the percent-rail sample minimum";
+
 // System-owned rows are billed to the sysio RAM pool rather than to this contract account (the
 // privileged-contract model sysio.token uses): the contract account stays finite at its code+abi
 // size while table growth draws from sysio's pool. Permitted because the contract is privileged.
@@ -298,7 +305,7 @@ void epoch::setconfig(sysio::slug_name chain_code,
    check(epoch_duration_sec <= MAX_EPOCH_DURATION_SEC,
          "epoch_duration_sec exceeds 30-day ceiling");
    check(operators_per_epoch > 0, "operators_per_epoch must be positive");
-   check(batch_op_groups > 0, "batch_op_groups must be positive");
+   check(batch_op_groups >= MIN_BATCH_OP_GROUPS, batch_op_groups_below_floor_msg);
    check(batch_op_groups <= MAX_BATCH_OP_GROUPS,
          "batch_op_groups exceeds the outpost group ceiling (8)");
    // Widen the product to uint64 so a large operators_per_epoch cannot wrap the
@@ -337,23 +344,22 @@ void epoch::setconfig(sysio::slug_name chain_code,
       }
    }
 
-   // sysio.opreg's consecutive-miss termination rail requires its rolling
-   // window to span the full miss run of DUTY epochs at the CURRENT schedule
-   // (see opreg::min_terminate_window_ms; a resident operator is on duty once
-   // per `batch_op_groups`-epoch rotation). Raising the duration or the group
+   // sysio.opreg's rolling window must hold the consecutive rail's run and the
+   // percent rail's sample minimum of DUTY epochs at the CURRENT schedule (see
+   // opreg::duties_in_window; a resident operator is on duty once per
+   // `batch_op_groups`-epoch rotation). Raising the duration or the group
    // count can silently vacate a previously valid window, so re-validate the
    // stored opreg config against this chain's new schedule; opreg::setconfig
    // performs the same check against every chain's stored schedule, so no
-   // ordering of the two setters can accept a vacuous pair (SEC-28 residual).
+   // ordering of the two setters can accept a vacuous pair.
    {
       opreg::opconfig_t op_cfg_tbl(OPREG_ACCOUNT);
       if (op_cfg_tbl.exists()) {
-         const auto op_cfg = op_cfg_tbl.get();
-         check(op_cfg.terminate_window_ms >=
-                  opreg::min_terminate_window_ms(op_cfg.terminate_max_consecutive_misses,
-                                                 epoch_duration_sec,
-                                                 batch_op_groups),
-               "epoch schedule would leave sysio.opreg's terminate_window_ms narrower than the consecutive-miss run");
+         const opreg::op_config op_cfg = op_cfg_tbl.get();
+         const uint64_t duties =
+            opreg::duties_in_window(op_cfg.terminate_window_ms, epoch_duration_sec, batch_op_groups);
+         check(duties >= uint64_t{op_cfg.terminate_max_consecutive_misses} + 1, schedule_vacates_consecutive_run_msg);
+         check(duties >= op_cfg.terminate_min_pct_samples, schedule_vacates_pct_samples_msg);
       }
    }
 
@@ -776,8 +782,9 @@ void epoch::finishadv(sysio::slug_name chain_code, uint32_t epoch_index) {
       // and `% 0` is an `i32.rem_u` trap that would abort `finishadv` and halt
       // epoch advancement chain-wide.
       //
-      // Falling back to the cursor covers the single-group case: the same
-      // operators serve every epoch, so current IS next.
+      // `setconfig` requires at least `MIN_BATCH_OP_GROUPS` (2) groups, so a
+      // seated window always has a group after the cursor; only an empty
+      // schedule falls back to the cursor, and it publishes nothing (below).
       //
       // The cursor is pinned to 0 by every write to it, and the fallback is
       // only correct BECAUSE of that -- with a non-zero cursor it would return

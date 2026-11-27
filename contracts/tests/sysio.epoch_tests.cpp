@@ -247,6 +247,17 @@ BOOST_FIXTURE_TEST_CASE(setconfig_validates_total, sysio_epoch_tester) { try {
    );
 } FC_LOG_AND_RETHROW() }
 
+BOOST_FIXTURE_TEST_CASE(setconfig_rejects_fewer_than_two_batch_op_groups, sysio_epoch_tester) { try {
+   // Each envelope announces the next epoch's group, so the group the slide appends must sit behind
+   // another: two groups is the smallest window.
+   const action_result below_floor =
+      error("assertion failure with message: batch_op_groups must be >= MIN_BATCH_OP_GROUPS (2)");
+   BOOST_REQUIRE_EQUAL(below_floor, setconfig(360, 7, 7, 1));
+   BOOST_REQUIRE_EQUAL(below_floor, setconfig(360, 7, 0, 0));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(360, 7, 14, 2));
+   BOOST_REQUIRE_EQUAL(2u, get_epoch_config()["batch_op_groups"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(setconfig_rejects_excess_batch_op_groups, sysio_epoch_tester) { try {
    // Solana seats at most 8 groups. minimum_active must equal
    // operators_per_epoch * batch_op_groups, so 1 * 8 == 8 here.
@@ -270,16 +281,16 @@ BOOST_FIXTURE_TEST_CASE(setconfig_total_check_survives_uint32_wrap, sysio_epoch_
 BOOST_FIXTURE_TEST_CASE(setconfig_rejects_oversized_operators_per_epoch, sysio_epoch_tester) { try {
    // Group size drives advance()'s per-epoch inline fanout and vector reserves,
    // and Ethereum is sized for 7 per group, so it carries a bound independent of
-   // the product equality: a window of UINT32_MAX operators in one group is
-   // internally consistent (UINT32_MAX * 1 == UINT32_MAX) yet must be rejected.
-   BOOST_REQUIRE_EQUAL(success(), setconfig(360, 7, 7, 1));
+   // the product equality: a window of two groups of 0x7FFF'FFFF operators is
+   // internally consistent (0x7FFF'FFFF * 2 == 0xFFFF'FFFE) yet must be rejected.
+   BOOST_REQUIRE_EQUAL(success(), setconfig(360, 7, 14, 2));
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: operators_per_epoch exceeds the outpost group-size ceiling (7)"),
-      setconfig(360, 8, 8, 1)
+      setconfig(360, 8, 16, 2)
    );
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: operators_per_epoch exceeds the outpost group-size ceiling (7)"),
-      setconfig(360, 0xFFFF'FFFFu, 0xFFFF'FFFFu, 1)
+      setconfig(360, 0x7FFF'FFFFu, 0xFFFF'FFFEu, 2)
    );
 } FC_LOG_AND_RETHROW() }
 

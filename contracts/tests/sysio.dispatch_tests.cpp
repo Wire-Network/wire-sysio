@@ -323,6 +323,10 @@ public:
    static constexpr auto CHAINS_ACCOUNT = "sysio.chains"_n;
    static constexpr auto ROA_ACCOUNT    = "sysio.roa"_n;
    static constexpr auto BATCHOP        = "batchop.a"_n;
+   /// The bootstrapped batch operator seated in the outpost's second group.
+   static constexpr auto BATCHOP_NEXT   = "batchop.next"_n;
+   /// Groups in the outpost's schedule window, one operator each: `sysio.epoch`'s floor.
+   static constexpr uint32_t SCHEDULE_GROUPS = 2;
    static constexpr auto UWRIT_OP       = "uwrit.alice"_n;
    /// Node-owner claim target, deliberately absent until depot dispatch.
    static constexpr auto CLAIM_ACCOUNT  = "claimacct"_n;
@@ -336,7 +340,7 @@ public:
       create_accounts({
          MSGCH_ACCOUNT, OPREG_ACCOUNT, EPOCH_ACCOUNT,
          CHALG_ACCOUNT, TOKEN_ACCOUNT, CHAINS_ACCOUNT,
-         DCLAIM_ACCOUNT, BATCHOP, UWRIT_OP
+         DCLAIM_ACCOUNT, BATCHOP, BATCHOP_NEXT, UWRIT_OP
       });
       deploy(MSGCH_ACCOUNT,  contracts::msgch_wasm(),   contracts::msgch_abi(),   msgch_abi);
       deploy(OPREG_ACCOUNT,  contracts::opreg_wasm(),   contracts::opreg_abi(),   opreg_abi);
@@ -438,7 +442,7 @@ public:
    // "ETHEREUM" so the source it binds against (msgch's NODE_OWNER_SRC_CHAIN) is the scheduled outpost
    // and reaches consensus; the non-EVM drop case passes an SVM "SOLANA" so its delivery also reaches
    // consensus and the drop is exercised at the source binding, not merely the consensus gate. The
-   // outpost is registered before `schbatchgps`, so the batch op is scheduled for it. The chain is
+   // outpost is registered before `schbatchgps`, so the batch ops are scheduled for it. The chain is
    // left at epoch 0, inside the bootstrap window: `start_dispatch_chain` runs its genesis once the
    // test's own bootstrap-window registrations are done.
    void bootstrap_for_dispatch(const std::string& outpost_code = "ETH",
@@ -450,8 +454,8 @@ public:
             ("chain_code",                          outpost_code)
             ("epoch_duration_sec",                  60)
             ("operators_per_epoch",                 1)
-            ("batch_operator_minimum_active",       1)
-            ("batch_op_groups",                     1)
+            ("batch_operator_minimum_active",       SCHEDULE_GROUPS)
+            ("batch_op_groups",                     SCHEDULE_GROUPS)
             ("epoch_retention_envelope_log_count",  200)));
       if (with_economy) {
          BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "seteconomy"_n, mvo()
@@ -460,11 +464,13 @@ public:
 
       BOOST_REQUIRE_EQUAL(success(), opreg_setconfig());
 
-      BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
-         "regoperator"_n, mvo()
-            ("account",          BATCHOP.to_string())
-            ("type",             OperatorType::OPERATOR_TYPE_BATCH)
-            ("is_bootstrapped",  true)));
+      for (const name op : {BATCHOP, BATCHOP_NEXT}) {
+         BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
+            "regoperator"_n, mvo()
+               ("account",          op.to_string())
+               ("type",             OperatorType::OPERATOR_TYPE_BATCH)
+               ("is_bootstrapped",  true)));
+      }
 
       BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
          "regoperator"_n, mvo()
@@ -484,7 +490,7 @@ public:
             ("description",       std::string{})
             ("outpost", sysio_system::test_support::no_outpost_mvo())));
 
-      sysio_system::test_support::served_chains::serve(*this, {BATCHOP}, {{outpost_code, outpost_kind}});
+      sysio_system::test_support::served_chains::serve(*this, {BATCHOP, BATCHOP_NEXT}, {{outpost_code, outpost_kind}});
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
          "schbatchgps"_n, mvo()("chain_code", outpost_code)));
 
@@ -505,17 +511,33 @@ public:
       BOOST_REQUIRE_EQUAL(1u, current_epoch());
    }
 
+   /// Outpost `chain_code`'s on-duty batch operator: the one member of its window's current group (BATCHOP at
+   /// epochs 1, 3, 5, ..., BATCHOP_NEXT at epochs 2, 4, 6, ...).
+   name duty_operator(uint64_t chain_code) {
+      const auto data = get_row_by_id(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, chain_code);
+      BOOST_REQUIRE(!data.empty());
+      const fc::variant   state = epoch_abi.binary_to_variant("epoch_state", data, fixture_abi_yield_function());
+      const fc::variants& group =
+         state["batch_op_groups"].get_array().at(state["current_batch_op_group"].as<uint32_t>()).get_array();
+      BOOST_REQUIRE_EQUAL(1u, group.size());
+      return group.front().as<name>();
+   }
+
+   /// Deliver `data` to outpost `chain_code` as its on-duty batch operator.
    action_result deliver(uint64_t chain_code, const std::vector<char>& data) {
-      return push(MSGCH_ACCOUNT, msgch_abi, BATCHOP, "deliver"_n, mvo()
-         ("batch_op_name", BATCHOP.to_string())
+      const name op = duty_operator(chain_code);
+      return push(MSGCH_ACCOUNT, msgch_abi, op, "deliver"_n, mvo()
+         ("batch_op_name", op.to_string())
          ("chain_code",    chain_code)
          ("data",          data));
    }
 
+   /// `deliver`, returning the trace.
    transaction_trace_ptr deliver_trace(uint64_t chain_code,
                                        const std::vector<char>& data) {
-      return push_trace(MSGCH_ACCOUNT, msgch_abi, BATCHOP, "deliver"_n, mvo()
-         ("batch_op_name", BATCHOP.to_string())
+      const name op = duty_operator(chain_code);
+      return push_trace(MSGCH_ACCOUNT, msgch_abi, op, "deliver"_n, mvo()
+         ("batch_op_name", op.to_string())
          ("chain_code",    chain_code)
          ("data",          data));
    }
@@ -999,12 +1021,14 @@ BOOST_FIXTURE_TEST_CASE(dispatch_existing_node_owner_name_rejects_without_blocki
    create_accounts({CLAIM_ACCOUNT});
    constexpr auto fresh = "freshclaim"_n;
    const auto victim_key = get_public_key(CLAIM_ACCOUNT, "active");
-   // Bootstrap linked the underwriter (row 0) and the batch operator it schedules (row 1).
-   const auto operator_link = get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 0);
-   const auto batch_link    = get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 1);
+   // Bootstrap linked the underwriter (row 0) and the two batch operators it schedules (rows 1 and 2).
+   const auto operator_link   = get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 0);
+   const auto batch_link      = get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 1);
+   const auto next_batch_link = get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 2);
    BOOST_REQUIRE(!operator_link.empty());
    BOOST_REQUIRE(!batch_link.empty());
-   BOOST_REQUIRE(get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 2).empty());
+   BOOST_REQUIRE(!next_batch_link.empty());
+   BOOST_REQUIRE(get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 3).empty());
    const auto eth_pub = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
    const auto eth_address = fc::crypto::ethereum::address_to_bytes(eth_pub);
    const std::vector<char> native_address(eth_address.begin(), eth_address.end());
@@ -1030,10 +1054,11 @@ BOOST_FIXTURE_TEST_CASE(dispatch_existing_node_owner_name_rejects_without_blocki
    // Preserve the bootstrap links and add only the fresh owner's link.
    BOOST_CHECK(get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 0) == operator_link);
    BOOST_CHECK(get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 1) == batch_link);
-   const auto linked = get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 2);
+   BOOST_CHECK(get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 2) == next_batch_link);
+   const auto linked = get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 3);
    BOOST_REQUIRE(!linked.empty());
    BOOST_CHECK_EQUAL(authex_abi.binary_to_variant("links_s", linked, fixture_abi_yield_function())["username"].as<name>(), fresh);
-   BOOST_CHECK(get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 3).empty());
+   BOOST_CHECK(get_row_by_id(AUTHEX_ACCOUNT, AUTHEX_ACCOUNT, "links"_n, 4).empty());
    BOOST_REQUIRE(!get_nodeowner(fresh).is_null());
    BOOST_CHECK_EQUAL(get_nodeownerreg(fresh)["status"].as<uint64_t>(), audit::status_confirmed);
    BOOST_CHECK_EQUAL(get_dclaim_row("pclaims"_n, "pending_claim", fresh.to_uint64_t())["balance"].as<asset>().get_amount(), 4321);
@@ -1524,7 +1549,8 @@ BOOST_FIXTURE_TEST_CASE(bootstrap_requires_every_active_outpost_scheduled, sysio
    enable_epoch_advancement();
    BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "setconfig"_n, mvo()
       ("chain_code", base_chain)("epoch_duration_sec", 60)("operators_per_epoch", 1)
-      ("batch_operator_minimum_active", 1)("batch_op_groups", 1)("epoch_retention_envelope_log_count", 200)));
+      ("batch_operator_minimum_active", SCHEDULE_GROUPS)("batch_op_groups", SCHEDULE_GROUPS)
+      ("epoch_retention_envelope_log_count", 200)));
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
       ("kind", ChainKind::CHAIN_KIND_EVM)("code", base_chain)("external_chain_id", 8453)
       ("name", std::string("base-test"))("description", std::string{})
@@ -1536,8 +1562,10 @@ BOOST_FIXTURE_TEST_CASE(bootstrap_requires_every_active_outpost_scheduled, sysio
    BOOST_REQUIRE(get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "netgenesis"_n, "netgenesis"_n).empty());
    BOOST_REQUIRE_EQUAL(0u, current_epoch());
 
-   // BATCHOP already holds the EVM link ETH needed.
-   BOOST_REQUIRE_EQUAL(success(), sysio_system::test_support::served_chains::join(*this, BATCHOP, base_chain));
+   // Both operators already hold the EVM link ETH needed.
+   for (const name op : {BATCHOP, BATCHOP_NEXT}) {
+      BOOST_REQUIRE_EQUAL(success(), sysio_system::test_support::served_chains::join(*this, op, base_chain));
+   }
    BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "schbatchgps"_n,
                                        mvo()("chain_code", base_chain)));
    BOOST_REQUIRE_EQUAL(success(), push(MSGCH_ACCOUNT, msgch_abi, MSGCH_ACCOUNT, "bootstrap"_n, mvo()));

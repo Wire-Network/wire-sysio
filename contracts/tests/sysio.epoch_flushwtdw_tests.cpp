@@ -44,6 +44,10 @@ public:
    static constexpr auto AUTHEX_ACCOUNT = "sysio.authex"_n;
    static constexpr auto DCLAIM_ACCOUNT = "sysio.dclaim"_n;
    static constexpr auto BATCHOP        = "batchop.a"_n;
+   /// The bootstrapped batch operator seated in each chain's second group.
+   static constexpr auto BATCHOP_B      = "batchop.b"_n;
+   /// Groups in each chain's schedule window, one operator each: `sysio.epoch`'s floor.
+   static constexpr uint32_t SCHEDULE_GROUPS = 2;
    static constexpr auto UWRIT_OP       = "uwrit.alice"_n;
    static constexpr auto UWRIT_OP_B     = "uwrit.bob"_n;
    /// `sysio.opreg::WITHDRAW_WAIT_ECONOMIC_EPOCHS`: economic epochs between a request and its release.
@@ -89,7 +93,7 @@ public:
       // throws `account_name_exists_exception`.
       create_accounts({
          TOKEN_ACCOUNT, EPOCH_ACCOUNT, OPREG_ACCOUNT, MSGCH_ACCOUNT,
-         CHALG_ACCOUNT, CHAINS_ACCOUNT, BATCHOP, UWRIT_OP,
+         CHALG_ACCOUNT, CHAINS_ACCOUNT, BATCHOP, BATCHOP_B, UWRIT_OP,
          UWRIT_OP_B, UWRIT_OP_C, BATCHOP_ETH, BATCHOP_SOL, BATCHOP_BOTH,
          DCLAIM_ACCOUNT, "sysio.gov"_n, "sysio.ops"_n
       });
@@ -223,9 +227,10 @@ public:
    static constexpr outpost SOL_OUTPOST{SOL_CHAIN, ChainKind::CHAIN_KIND_SVM};
    static constexpr outpost ETH_OUTPOST{ETH_CHAIN, ChainKind::CHAIN_KIND_EVM};
 
-   /// One-shot bootstrap: each chain's epoch config + opreg config + a bootstrapped
-   /// batch op + a pending underwriter + sysio.chains rows. The economic grid starts now and its first epoch is
-   /// opened; given `economic_start`, the grid starts there and no economic epoch is opened.
+   /// One-shot bootstrap: each chain's epoch config (two one-operator groups) + opreg config + two
+   /// bootstrapped batch ops + a pending underwriter + sysio.chains rows. The economic grid starts now and
+   /// its first epoch is opened; given `economic_start`, the grid starts there and no economic epoch is
+   /// opened.
    void bootstrap_for_flushwtdw(std::optional<fc::time_point_sec> economic_start = std::nullopt) {
       for (const std::string_view chain : CHAINS) {
          BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
@@ -233,8 +238,8 @@ public:
                ("chain_code",                          chain)
                ("epoch_duration_sec",                  EPOCH_DURATION_SEC)
                ("operators_per_epoch",                 1)
-               ("batch_operator_minimum_active",       1)
-               ("batch_op_groups",                     1)
+               ("batch_operator_minimum_active",       SCHEDULE_GROUPS)
+               ("batch_op_groups",                     SCHEDULE_GROUPS)
                ("epoch_retention_envelope_log_count",  200)));
       }
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "seteconomy"_n, mvo()
@@ -259,11 +264,13 @@ public:
             ("req_batchop_collat",               fc::variants{})
             ("req_uw_collat",                    fc::variants{})));
 
-      BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
-         "regoperator"_n, mvo()
-            ("account",          BATCHOP.to_string())
-            ("type",             OperatorType::OPERATOR_TYPE_BATCH)
-            ("is_bootstrapped",  true)));
+      for (const name op : {BATCHOP, BATCHOP_B}) {
+         BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
+            "regoperator"_n, mvo()
+               ("account",          op.to_string())
+               ("type",             OperatorType::OPERATOR_TYPE_BATCH)
+               ("is_bootstrapped",  true)));
+      }
 
       BOOST_REQUIRE_EQUAL(success(), regunderwriter(UWRIT_OP));
 
@@ -286,7 +293,7 @@ public:
             ("description",       std::string{})
             ("outpost", sysio_system::test_support::no_outpost_mvo())));
 
-      sysio_system::test_support::served_chains::serve(*this, {BATCHOP}, {SOL_OUTPOST, ETH_OUTPOST});
+      sysio_system::test_support::served_chains::serve(*this, {BATCHOP, BATCHOP_B}, {SOL_OUTPOST, ETH_OUTPOST});
 
       // Each chain's schedule window, then its genesis advance (sysio.epoch's authority stands in for msgch's).
       for (const std::string_view chain : CHAINS) {
@@ -845,7 +852,7 @@ BOOST_FIXTURE_TEST_CASE(a_left_member_waits_on_the_chain_only_while_seated, sysi
       ("req_uw_collat",                    fc::variants{})));
    register_serving_batch_operator(BATCHOP_BOTH, {SOL_OUTPOST, ETH_OUTPOST}, OPERATOR_BOND);
    BOOST_REQUIRE(get_operator(BATCHOP_BOTH)["status"].as<OperatorStatus>() == OperatorStatus::OPERATOR_STATUS_ACTIVE);
-   // The slide seats a non-bootstrapped operator first: SOL's next group is BATCHOP_BOTH alone.
+   // The slide seats a non-bootstrapped operator first: SOL's new tail group is BATCHOP_BOTH alone.
    close_epochs(SOL_CHAIN, 1);
    BOOST_REQUIRE(seated(BATCHOP_BOTH, SOL_CHAIN));
    BOOST_REQUIRE_EQUAL(success(),
@@ -860,9 +867,9 @@ BOOST_FIXTURE_TEST_CASE(a_left_member_waits_on_the_chain_only_while_seated, sysi
    BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, BATCHOP_BOTH, "cancelwtdw"_n,
                                        mvo()("account", BATCHOP_BOTH)("request_id", 1)));
 
-   // SOL's window slides past its seat and a LEFT member gets no new one: a request now waits on ETH alone,
-   // and is released while SOL stands still.
-   close_epochs(SOL_CHAIN, 1);
+   // SOL's window slides past its seat, the tail one epoch and its duty the next, and a LEFT member gets
+   // no new one: a request now waits on ETH alone, and is released while SOL stands still.
+   close_epochs(SOL_CHAIN, SCHEDULE_GROUPS);
    BOOST_REQUIRE(!seated(BATCHOP_BOTH, SOL_CHAIN));
    BOOST_REQUIRE_EQUAL(success(), withdraw(BATCHOP_BOTH, "WIRE", "WIRE", OPERATOR_WITHDRAWAL));
    BOOST_REQUIRE(waits_from_now({ETH_CHAIN}) == consensus_waits(2));
@@ -910,8 +917,8 @@ BOOST_FIXTURE_TEST_CASE(a_chain_started_after_the_request_is_not_waited_on, sysi
       ("chain_code",                          LATE_CHAIN)
       ("epoch_duration_sec",                  EPOCH_DURATION_SEC)
       ("operators_per_epoch",                 1)
-      ("batch_operator_minimum_active",       1)
-      ("batch_op_groups",                     1)
+      ("batch_operator_minimum_active",       SCHEDULE_GROUPS)
+      ("batch_op_groups",                     SCHEDULE_GROUPS)
       ("epoch_retention_envelope_log_count",  200)));
 
    BOOST_REQUIRE_EQUAL(success(), fund_and_bond(UWRIT_OP, "WIRE", "WIRE", OPERATOR_BOND));
@@ -921,8 +928,10 @@ BOOST_FIXTURE_TEST_CASE(a_chain_started_after_the_request_is_not_waited_on, sysi
    BOOST_REQUIRE(waits_from_now({SOL_CHAIN, ETH_CHAIN}) == consensus_waits(BEFORE_START));
    BOOST_REQUIRE(waits_from_now({ETH_CHAIN}) == consensus_waits(SERVING_BEFORE));
 
-   // Start the late chain: the bootstrapped batch operator (already linked for EVM) serves it.
-   BOOST_REQUIRE_EQUAL(success(), sysio_system::test_support::served_chains::join(*this, BATCHOP, LATE_CHAIN));
+   // Start the late chain: the bootstrapped batch operators (already linked for EVM) serve it.
+   for (const name op : {BATCHOP, BATCHOP_B}) {
+      BOOST_REQUIRE_EQUAL(success(), sysio_system::test_support::served_chains::join(*this, op, LATE_CHAIN));
+   }
    BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "schbatchgps"_n,
                                        mvo()("chain_code", LATE_CHAIN)));
    BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "advance"_n,

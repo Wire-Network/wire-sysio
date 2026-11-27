@@ -25,7 +25,10 @@ namespace sysio {
       // -----------------------------------------------------------------------
 
       /// Set outpost `chain_code`'s consensus epoch configuration (privileged). Each outpost chain runs
-      /// its own consensus epoch: counter, pacing, schedule window and roster.
+      /// its own consensus epoch: counter, pacing, schedule window and roster. The window holds
+      /// `MIN_BATCH_OP_GROUPS` (2) to `MAX_BATCH_OP_GROUPS` (8) groups. Refused when the schedule would
+      /// leave `sysio.opreg`'s stored `terminate_window_ms` too short for either miss rail
+      /// (`opreg::duties_in_window`).
       [[sysio::action]]
       void setconfig(sysio::slug_name chain_code,
                      uint32_t epoch_duration_sec,
@@ -320,6 +323,11 @@ namespace sysio {
       /// Ceiling bounds the slot arithmetic and stops a multi-year economic epoch.
       static constexpr uint32_t MIN_ECONOMIC_EPOCH_DURATION_SEC = 60;
       static constexpr uint32_t MAX_ECONOMIC_EPOCH_DURATION_SEC = 30u * 24u * 60u * 60u;
+
+      /// Lower bound on the number of batch-operator groups. Each envelope announces the group on duty in
+      /// the next epoch, so the group the slide appends must sit behind another to reach the outposts
+      /// before its duty starts.
+      static constexpr uint32_t MIN_BATCH_OP_GROUPS = 2;
 
       /// Upper bound on the number of batch-operator groups: Solana's operator registry seats at most
       /// `MAX_OPERATOR_GROUPS` (8), and a window an outpost cannot seat stalls that outpost.

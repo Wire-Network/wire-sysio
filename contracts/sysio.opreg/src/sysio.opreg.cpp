@@ -90,6 +90,12 @@ constexpr std::string_view still_seated_on_chain_msg =
    "operator still holds a seat in this chain's schedule: it may rejoin once its seats have closed";
 constexpr std::string_view not_serving_msg              = "operator does not serve this chain";
 
+/// Messages of the `check`s `setconfig` raises for a window too short for a miss rail at a chain's schedule.
+constexpr std::string_view window_short_of_consecutive_run_msg =
+   "terminate_window_ms must span at least terminate_max_consecutive_misses + 1 duty rotations";
+constexpr std::string_view window_short_of_pct_samples_msg =
+   "terminate_window_ms must span at least terminate_min_pct_samples duty rotations";
+
 /// Action identifiers owned by sysio.system and invoked by an eviction or a new registration.
 namespace system_actions {
 constexpr name FORFEIT_DUTY = "forfeitduty"_n;
@@ -310,23 +316,19 @@ void opreg::setconfig(uint64_t terminate_prune_delay_ms,
          "terminate_min_pct_samples must be in [1, 100]");
    check(terminate_window_ms > 0, "terminate_window_ms must be positive");
 
-   // SEC-28 residual: delivery records accrue only on duty epochs -- one per
-   // `batch_op_groups`-epoch rotation for a resident operator -- so a rolling
-   // window narrower than the full consecutive-miss run of duty epochs makes
-   // the consecutive rail structurally vacuous (records age out and are
-   // pruned before `termcheck` can observe the run) and leaves only the
-   // hair-trigger percent rail. Validate against every outpost chain's live
-   // epoch schedule. Bootstrap installs opreg config before sysio.epoch is
-   // configured, so a chain without an epochcfg row is not checked here;
-   // sysio.epoch::setconfig performs the mirror validation, so no ordering of
-   // the two setters can accept a vacuous pair.
+   // Delivery records accrue only on duty epochs -- one per `batch_op_groups`-epoch
+   // rotation for a resident operator -- so the rolling window must hold the
+   // consecutive rail's run and the percent rail's sample minimum at every
+   // outpost chain's live epoch schedule (see duties_in_window). Bootstrap
+   // installs opreg config before sysio.epoch is configured, so a chain without
+   // an epochcfg row is not checked here; sysio.epoch::setconfig performs the
+   // mirror validation, so no ordering of the two setters can accept a vacuous pair.
    {
       sysio::epoch::epochcfg_t epoch_cfgs(EPOCH_ACCOUNT);
       for (auto it = epoch_cfgs.begin(); it != epoch_cfgs.end(); ++it) {
-         check(terminate_window_ms >= min_terminate_window_ms(terminate_max_consecutive_misses,
-                                                              it->epoch_duration_sec,
-                                                              it->batch_op_groups),
-               "terminate_window_ms must span at least terminate_max_consecutive_misses + 1 duty rotations");
+         const uint64_t duties = duties_in_window(terminate_window_ms, it->epoch_duration_sec, it->batch_op_groups);
+         check(duties >= uint64_t{terminate_max_consecutive_misses} + 1, window_short_of_consecutive_run_msg);
+         check(duties >= terminate_min_pct_samples, window_short_of_pct_samples_msg);
       }
    }
 

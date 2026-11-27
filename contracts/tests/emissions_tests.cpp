@@ -5412,7 +5412,7 @@ BOOST_FIXTURE_TEST_CASE( cadence_drop_midperiod_does_not_multiply_batch_payout,
    BOOST_REQUIRE_EQUAL( success(),
       register_operator( BATCH_OP, OperatorType::OPERATOR_TYPE_BATCH, /*is_bootstrapped*/true ) );
    BOOST_REQUIRE_EQUAL( success(), init_epoch_state(60, /*operators_per_epoch*/1,
-                                                    /*batch_op_groups_count*/1) );
+                                                    /*batch_op_groups_count*/2) );
    produce_blocks(1);
 
    setup_producers(1);
@@ -5894,7 +5894,7 @@ BOOST_FIXTURE_TEST_CASE( claimnodedis_reserves_outstanding_epoch_pay, sysio_emis
    BOOST_REQUIRE_EQUAL( success(),
       register_operator( BATCH_OP, OperatorType::OPERATOR_TYPE_BATCH, /*is_bootstrapped*/true ) );
    BOOST_REQUIRE_EQUAL( success(), init_epoch_state(60, /*operators_per_epoch*/1,
-                                                    /*batch_op_groups_count*/1) );
+                                                    /*batch_op_groups_count*/2) );
    produce_blocks(1);
    setup_producers(1);
    wait_for_producer_schedule();

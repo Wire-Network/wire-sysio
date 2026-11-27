@@ -103,6 +103,10 @@ public:
    static constexpr auto AUTHEX_ACCOUNT = "sysio.authex"_n;
    static constexpr auto DCLAIM_ACCOUNT = "sysio.dclaim"_n;
    static constexpr auto BATCHOP        = "batchop.a"_n;
+   /// The bootstrapped batch operator seated in ETH's second group; sorts after the tests' own operators.
+   static constexpr auto BATCHOP_NEXT   = "batchop.next"_n;
+   /// Groups in the ETH schedule window, one operator each: `sysio.epoch`'s floor.
+   static constexpr uint32_t SCHEDULE_GROUPS = 2;
    static constexpr uint64_t ROA_NETWORK_GEN = 0;
 
    /// @param defer_emission_config When true, skip `setup_emission_config()` during construction
@@ -114,7 +118,7 @@ public:
 
       create_accounts({
          CHALG_ACCOUNT, EPOCH_ACCOUNT, MSGCH_ACCOUNT, OPREG_ACCOUNT,
-         CHAINS_ACCOUNT, DCLAIM_ACCOUNT, BATCHOP, "sysio.token"_n
+         CHAINS_ACCOUNT, DCLAIM_ACCOUNT, BATCHOP, BATCHOP_NEXT, "sysio.token"_n
       });
       // Tier-1 voter accounts (node owners) and a Tier-2 account (ineligible voter). Created without
       // a roa policy.
@@ -194,15 +198,15 @@ public:
          *this, contract, ser, signer, action_name, data);
    }
 
-   // ── OPP stack bootstrap: one batch op, one outpost, started at its epoch 1 ────
+   // ── OPP stack bootstrap: two one-operator groups, BATCHOP on duty, one outpost, started at its epoch 1 ──
 
    void bootstrap_opp_stack() {
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "setconfig"_n, mvo()
          ("chain_code", ETH_CHAIN_CODE)
          ("epoch_duration_sec", 60)
          ("operators_per_epoch", 1)
-         ("batch_operator_minimum_active", 1)
-         ("batch_op_groups", 1)
+         ("batch_operator_minimum_active", SCHEDULE_GROUPS)
+         ("batch_op_groups", SCHEDULE_GROUPS)
          ("epoch_retention_envelope_log_count", 200)));
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "seteconomy"_n, mvo()
          ("epoch_duration_sec", 60)("start_time", fc::time_point_sec(control->head().block_time()))));
@@ -214,16 +218,18 @@ public:
          ("req_prod_collat", fc::variants{})("req_batchop_collat", fc::variants{})
          ("req_uw_collat", fc::variants{})));
 
-      BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n, mvo()
-         ("account", BATCHOP.to_string())("type", OperatorType::OPERATOR_TYPE_BATCH)
-         ("is_bootstrapped", true)));
+      for (const name op : {BATCHOP, BATCHOP_NEXT}) {
+         BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n, mvo()
+            ("account", op.to_string())("type", OperatorType::OPERATOR_TYPE_BATCH)
+            ("is_bootstrapped", true)));
+      }
 
       BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
          ("kind", ChainKind::CHAIN_KIND_EVM)("code", "ETH")
          ("external_chain_id", 31337)("name", std::string("ethereum-test"))("description", std::string{})
          ("outpost", sysio_system::test_support::no_outpost_mvo())));
 
-      serve_eth({BATCHOP});
+      serve_eth({BATCHOP, BATCHOP_NEXT});
       BOOST_REQUIRE_EQUAL(success(), schbatchgps());
       BOOST_REQUIRE_EQUAL(success(), genesis_advance());
       produce_blocks();
@@ -360,6 +366,17 @@ public:
       const auto& groups = v["batch_op_groups"].get_array();
       if (cur >= groups.size()) return members;
       for (const auto& m : groups[cur].get_array()) members.push_back(m.as<name>());
+      return members;
+   }
+
+   /// Members of every group of ETH's schedule window.
+   std::vector<name> window_members() {
+      std::vector<name> members;
+      const auto v = epoch_state(eth_code());
+      if (v.is_null()) return members;
+      for (const auto& group : v["batch_op_groups"].get_array()) {
+         for (const auto& m : group.get_array()) members.push_back(m.as<name>());
+      }
       return members;
    }
 
@@ -1035,9 +1052,12 @@ BOOST_FIXTURE_TEST_CASE(chkdispute_unpauses_only_the_disputed_chain, sysio_dispu
                                        mvo()("code", BASE_CHAIN_CODE)));
    BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "setconfig"_n, mvo()
       ("chain_code", BASE_CHAIN_CODE)("epoch_duration_sec", 60)("operators_per_epoch", 1)
-      ("batch_operator_minimum_active", 1)("batch_op_groups", 1)("epoch_retention_envelope_log_count", 200)));
-   // batchop.a already holds the EVM link the ETH outpost needed.
-   BOOST_REQUIRE_EQUAL(success(), sysio_system::test_support::served_chains::join(*this, BATCHOP, BASE_CHAIN_CODE));
+      ("batch_operator_minimum_active", SCHEDULE_GROUPS)("batch_op_groups", SCHEDULE_GROUPS)
+      ("epoch_retention_envelope_log_count", 200)));
+   // Both operators already hold the EVM link the ETH outpost needed.
+   for (const name op : {BATCHOP, BATCHOP_NEXT}) {
+      BOOST_REQUIRE_EQUAL(success(), sysio_system::test_support::served_chains::join(*this, op, BASE_CHAIN_CODE));
+   }
    BOOST_REQUIRE_EQUAL(success(), schbatchgps(BASE_CHAIN_CODE));
    BOOST_REQUIRE_EQUAL(success(), genesis_advance(BASE_CHAIN_CODE));
    produce_blocks();
@@ -1102,15 +1122,11 @@ BOOST_FIXTURE_TEST_CASE(slashed_op_excluded_from_scheduling_no_double_slash, sys
    BOOST_REQUIRE_EQUAL(success(), regop(BATCHOP_B));
    serve_eth({BATCHOP_B});
 
-   // Single 2-member group; with a and b the only ACTIVE batch ops, both are placed.
-   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "setconfig"_n, mvo()
-      ("chain_code", ETH_CHAIN_CODE)
-      ("epoch_duration_sec", 60)("operators_per_epoch", 2)("batch_operator_minimum_active", 2)
-      ("batch_op_groups", 1)("epoch_retention_envelope_log_count", 200)));
+   // Two one-member groups, filled by account order: a and b are placed, BATCHOP_NEXT is not.
    BOOST_REQUIRE_EQUAL(success(), schbatchgps());
-   auto g0 = current_group();
-   BOOST_REQUIRE(group_contains(g0, BATCHOP));
-   BOOST_REQUIRE(group_contains(g0, BATCHOP_B));
+   const std::vector<name> w0 = window_members();
+   BOOST_REQUIRE(group_contains(w0, BATCHOP));
+   BOOST_REQUIRE(group_contains(w0, BATCHOP_B));
 
    // Slash batchop.b as sysio.epoch (the widened auth path).
    BOOST_REQUIRE_EQUAL(success(), slashop(BATCHOP_B));
@@ -1120,15 +1136,15 @@ BOOST_FIXTURE_TEST_CASE(slashed_op_excluded_from_scheduling_no_double_slash, sys
    BOOST_REQUIRE_EQUAL(success(), slashop(BATCHOP_B));
    BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_SLASHED", operator_status(BATCHOP_B));
 
-   // Bring c online so two ACTIVE ops remain, then re-schedule: the filter keeps the live ops
-   // (a, c) and drops the slashed one (b).
+   // Bring c online, then re-schedule: the filter keeps the live ops (a, c) and drops the slashed
+   // one (b).
    BOOST_REQUIRE_EQUAL(success(), regop(BATCHOP_C));
    serve_eth({BATCHOP_C});
    BOOST_REQUIRE_EQUAL(success(), schbatchgps());
-   auto g1 = current_group();
-   BOOST_REQUIRE(!group_contains(g1, BATCHOP_B));   // slashed -> never re-enters a group
-   BOOST_REQUIRE(group_contains(g1, BATCHOP));
-   BOOST_REQUIRE(group_contains(g1, BATCHOP_C));
+   const std::vector<name> w1 = window_members();
+   BOOST_REQUIRE(!group_contains(w1, BATCHOP_B));   // slashed -> never re-enters a group
+   BOOST_REQUIRE(group_contains(w1, BATCHOP));
+   BOOST_REQUIRE(group_contains(w1, BATCHOP_C));
 } FC_LOG_AND_RETHROW() }
 
 // Regression: after consensus, the winning delivery rows have raw_data cleared and the inbound
@@ -1215,8 +1231,8 @@ BOOST_FIXTURE_TEST_CASE(deliver_rejects_decollateralized_unknown_group_member, s
    BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_ACTIVE", operator_status(BATCHOP_B));
    serve_eth({BATCHOP_B});
 
-   // Schedule it into the single-slot group (non-bootstrapped sorts ahead of the
-   // bootstrapped default op, so batchop.b takes the slot).
+   // Schedule it into the group on duty (non-bootstrapped sorts ahead of the
+   // bootstrapped default ops, so batchop.b takes the front slot).
    BOOST_REQUIRE_EQUAL(success(), schbatchgps());
    BOOST_REQUIRE(group_contains(current_group(), BATCHOP_B));
    const uint32_t epoch = current_epoch();

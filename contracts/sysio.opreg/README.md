@@ -35,7 +35,7 @@ the collateral each has bonded, and the outpost chains each batch operator serve
 
 | Action | Auth | Description |
 |--------|------|-------------|
-| `setconfig` | `sysio.opreg` | Set the eviction rails, the prune delay and the per-role minimum bonds. `terminate_window_ms` must span `terminate_max_consecutive_misses + 1` duty rotations of every chain's epoch schedule |
+| `setconfig` | `sysio.opreg` | Set the eviction rails, the prune delay and the per-role minimum bonds. `terminate_window_ms` must span `terminate_max_consecutive_misses + 1` and `terminate_min_pct_samples` duty rotations (`epoch_duration_sec * batch_op_groups`) of every chain's epoch schedule |
 | `regoperator` | the account, or `sysio.opreg` | Register an operator. Only `sysio.opreg` registers a bootstrapped one. An account registering itself needs a `sysio.authex` link for every active outpost, except a batch operator, whose links `joinchain` checks. A terminated account registers again once its balances are drained and no schedule seats it; the new registration serves no chain and forfeits the account's unsettled batch duty from the earlier one |
 | `joinchain` | the operator, or `sysio.opreg` | Serve one active outpost: see below |
 | `leavechain` | the operator | Stop serving one outpost: see below |

@@ -125,30 +125,29 @@ namespace sysio {
                     DEFAULT_TERMINATE_MIN_PCT_SAMPLES <= MAX_TERMINATE_MIN_PCT_SAMPLES,
                     "production default percent-rail sample must lie inside the accepted bounds");
 
-      /// Minimum accepted `terminate_window_ms` for a given consecutive-miss
-      /// threshold and one outpost chain's epoch schedule. Delivery records
+      /// Delivery records of a resident operator that a `window_ms` rolling
+      /// window holds on one outpost chain's epoch schedule. Delivery records
       /// accrue one per DUTY epoch: `sysio.epoch::advance` records each member
       /// of the chain's expiring group once. The schedule is a
       /// sliding window of `batch_op_groups` groups, so a resident operator's
-      /// duty interval is `batch_op_groups` epochs. The rolling window must
-      /// span the full terminating run (`consecutive_misses + 1` records,
-      /// `consecutive_misses` duty intervals end to end) plus one duty interval
-      /// of boundary slack, or records age out (and are pruned) before
-      /// `termcheck` can observe the run, leaving the consecutive rail
-      /// structurally vacuous. Operators
+      /// duty interval is `batch_op_groups` epochs. N records span N - 1 duty
+      /// intervals end to end; the window spans one more interval of boundary
+      /// slack, or records age out (and are pruned) before `termcheck` counts
+      /// them. The consecutive rail needs `terminate_max_consecutive_misses + 1`
+      /// records and the percent rail `terminate_min_pct_samples`; a window
+      /// holding fewer leaves that rail structurally vacuous. Operators
       /// benched by a surplus roster accrue no records while benched, so no
       /// finite window observes them; the bound governs resident operators,
       /// whose duty interval the sliding schedule pins at `batch_op_groups`
       /// epochs. Enforced from both `opreg::setconfig` (against every chain's
       /// stored epoch config) and `sysio.epoch::setconfig` (against the stored
       /// opreg config) so no ordering of the two setters can accept a vacuous pair.
-      /// Inputs are pre-bounded by those setters (misses <= 5, duration <= 30
-      /// days, groups <= 255), so the product cannot overflow uint64.
-      static constexpr uint64_t min_terminate_window_ms(uint32_t consecutive_misses,
-                                                        uint32_t epoch_duration_sec,
-                                                        uint32_t batch_op_groups) {
-         constexpr uint64_t ms_per_sec = 1000;
-         return (uint64_t{consecutive_misses} + 1) * batch_op_groups * epoch_duration_sec * ms_per_sec;
+      /// Inputs are pre-bounded by `sysio.epoch::setconfig` (duration 10 s .. 30
+      /// days, groups 2 .. 8), so the interval is positive and cannot overflow.
+      static uint64_t duties_in_window(uint64_t window_ms, uint32_t epoch_duration_sec, uint32_t batch_op_groups) {
+         constexpr int64_t         us_per_ms     = 1000;
+         const sysio::microseconds duty_interval = sysio::seconds(int64_t{epoch_duration_sec} * batch_op_groups);
+         return window_ms / static_cast<uint64_t>(duty_interval.count() / us_per_ms);
       }
 
       /// Bounded sweep sizes for delivery-log rows that have aged out of the
@@ -197,7 +196,10 @@ namespace sysio {
       /// `terminate_min_pct_samples`, `terminate_window_ms`) drive `termcheck`;
       /// tests can dial them down (e.g. `terminate_max_consecutive_misses=2`,
       /// `terminate_window_ms=60_000`) to make the miss → eviction path
-      /// observable inside a flow-test's timeout budget.
+      /// observable inside a flow-test's timeout budget. Refused unless the
+      /// window holds `terminate_max_consecutive_misses + 1` and
+      /// `terminate_min_pct_samples` duty rotations of every configured chain's
+      /// schedule (`duties_in_window`).
       ///
       /// The three `req_*_collat` vectors are the per-role eligibility
       /// requirements: each entry is a `(chain, token_kind, min_bond)`
