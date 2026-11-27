@@ -813,11 +813,12 @@ namespace sysiosystem {
          /**
           * Credit `duty_seconds` seat-seconds to each of `members`, the batch-operator group that
           * served consensus epoch `epoch_index` of outpost chain `chain_code`, on the member's row for
-          * that chain; `duty_seconds` is that epoch's scheduled length. Every chain's duty accrues to
-          * the one pay period open when it is recorded. A member whose sysio.opreg membership of the
-          * chain is EVICTED is credited nothing. A member still holding seat-seconds of the settling
-          * period on the chain is settled first. A zero `duty_seconds` credits nothing. Called inline
-          * by sysio.epoch::advance; never throws. Auth: require_auth("sysio.epoch").
+          * that chain; `duty_seconds` is the chain's minimum duration as configured when the epoch's books
+          * close, however long the epoch ran. Every chain's duty accrues to the one pay period open when it
+          * is recorded. A member whose sysio.opreg membership of the chain is EVICTED is credited nothing. A
+          * member still holding seat-seconds of the settling period on the chain is settled first. A zero
+          * `duty_seconds` credits nothing. Called inline by sysio.epoch::advance when the epoch after
+          * `epoch_index` closes; never throws. Auth: require_auth("sysio.epoch").
           */
          [[sysio::action]]
          void rcrdduty(sysio::slug_name chain_code, uint32_t epoch_index, std::vector<sysio::name> members,

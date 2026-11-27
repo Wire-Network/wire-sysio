@@ -4,6 +4,20 @@
     "types": [],
     "structs": [
         {
+            "name": "notetraffic",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "since",
+                    "type": "time_point"
+                }
+            ]
+        },
+        {
             "name": "setindex",
             "base": "",
             "fields": [
@@ -19,6 +33,11 @@
         }
     ],
     "actions": [
+        {
+            "name": "notetraffic",
+            "type": "notetraffic",
+            "ricardian_contract": ""
+        },
         {
             "name": "setindex",
             "type": "setindex",

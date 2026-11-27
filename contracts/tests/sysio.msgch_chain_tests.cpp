@@ -37,7 +37,9 @@
 #include <magic_enum/magic_enum.hpp>
 
 #include <algorithm>
+#include <cstring>
 #include <functional>
+#include <limits>
 #include <map>
 #include <optional>
 #include <set>
@@ -89,6 +91,8 @@ namespace opreg_actions {
 constexpr name SET_CONFIG        = "setconfig"_n;
 constexpr name RECORD_DELIVERY   = "recorddel"_n;
 constexpr name TERMINATION_CHECK = "termcheck"_n;
+constexpr name SLASH             = "slash"_n;
+constexpr name TERMINATE         = "terminate"_n;
 } // namespace opreg_actions
 
 /// sysio.opreg ABI field identifiers used by the WNS-16 fixture.
@@ -103,6 +107,7 @@ constexpr const char* CHAIN_CODE     = "chain_code";
 constexpr const char* ACCOUNT        = "account";
 constexpr const char* EPOCH          = "epoch";
 constexpr const char* DELIVERED      = "delivered";
+constexpr const char* REASON         = "reason";
 } // namespace opreg_fields
 
 /// sysio.opreg tables read by delivery-log assertions.
@@ -127,6 +132,9 @@ constexpr std::string_view ROTATION_DELIVERY_PAYLOAD = "rotation-duty";
 /// Reason passed to the privileged `sysio.opreg::terminate` that removes a still-seated operator.
 constexpr std::string_view SEATED_TERMINATION_REASON = "removed while seated";
 
+/// Reason passed to `sysio.opreg::slash` when a test takes a member out of the eligible set mid-epoch.
+constexpr std::string_view SLASH_REASON = "eligible set shrinks mid-epoch";
+
 /// `joinchain`'s refusal for a chain that is not an active outpost.
 constexpr const char* NOT_ACTIVE_OUTPOST_JOIN_ERROR = "assertion failure with message: chain is not an active outpost";
 /// `sysio.epoch::advance`'s refusals of a chain's genesis.
@@ -139,6 +147,58 @@ constexpr const char* GENESIS_WITHOUT_SCHEDULE_ERROR =
 constexpr const char* STILL_SEATED_JOIN_ERROR =
    "assertion failure with message: operator still holds a seat in this chain's schedule: it may rejoin once its "
    "seats have closed";
+
+/// `deliver`'s refusal of a delivery to a decided epoch that differs from the accepted envelope.
+constexpr const char* DECIDED_EPOCH_DIFFERING_DELIVERY_ERROR =
+   "assertion failure with message: deliver: the epoch has reached consensus and the envelope differs from the "
+   "accepted one";
+
+/// `deliver`'s refusal of a late delivery that is not the previous epoch's accepted envelope.
+constexpr const char* LATE_DELIVERY_DIFFERING_ERROR =
+   "assertion failure with message: deliver: late delivery differs from the previous epoch's accepted envelope";
+
+/// `deliver`'s refusal of a late delivery once the chain's late-delivery window has closed.
+constexpr const char* LATE_DELIVERY_AFTER_WINDOW_ERROR =
+   "assertion failure with message: deliver: the late-delivery window for the previous epoch has closed";
+
+/// `deliver`'s refusal of a late delivery from outside the group that served the previous epoch.
+constexpr const char* LATE_DELIVERER_NOT_IN_PREVIOUS_GROUP_ERROR =
+   "assertion failure with message: deliver: a late delivery must come from the group that served the previous "
+   "epoch";
+
+/// `deliver`'s refusal of a current-epoch delivery from outside the group on duty, and `reportqueue`'s of a report.
+constexpr const char* DELIVERER_NOT_IN_ACTIVE_GROUP_ERROR =
+   "assertion failure with message: caller is not in the active batch operator group";
+
+/// `deliver`'s refusal of a deliverer seated in neither the chain's current group nor its previous one.
+constexpr const char* DELIVERER_NOT_IN_GROUP_ERROR =
+   "assertion failure with message: deliver: caller is in neither the chain's current batch operator group nor "
+   "its previous one";
+
+/// Mirror of the `sysio.opreg` status reason sysio.msgch gives the slash of a non-canonical delivery: the
+/// prefix, the chain code, the epoch separator, then the chain's epoch index.
+constexpr std::string_view NON_CANONICAL_DELIVERY_REASON_PREFIX = "non-canonical OPP envelope delivery, chain ";
+constexpr std::string_view NON_CANONICAL_DELIVERY_REASON_EPOCH  = " epoch ";
+
+/// `reportqueue`'s refusals, as the contract raises them.
+constexpr const char* REPORT_NOT_ACTIVE_OUTPOST = "reportqueue: chain is not an active outpost";
+constexpr const char* REPORT_BEFORE_GENESIS =
+   "reportqueue: the chain's epoch has not started; backlogs are reported from its epoch 1";
+/// Prefix of the epoch-mismatch refusal: the report's epoch, then " current=" and the chain's current epoch.
+constexpr const char* REPORT_EPOCH_MISMATCH = "reportqueue: report is not for the chain's current epoch: report=";
+constexpr const char* REPORT_UNDECIDED_EPOCH =
+   "reportqueue: the chain's current epoch has not reached consensus; its backlog is reported once it has";
+constexpr const char* REPORT_WITHOUT_BACKLOG =
+   "reportqueue: pending_count must be positive; an empty queue is not reported";
+constexpr const char* REPORTER_NOT_ELIGIBLE =
+   "reportqueue: reporter is not ACTIVE in sysio.opreg, or does not serve this chain or was evicted from it";
+
+/// Queued messages the backlog reports of the tests carry.
+constexpr uint32_t REPORTED_PENDING_COUNT = 3;
+
+/// `deliver`'s refusal for a member that is no longer ACTIVE.
+constexpr const char* NOT_ACTIVE_DELIVERY_ERROR =
+   "assertion failure with message: delivering operator is not ACTIVE in sysio.opreg";
 
 /// `deliver`'s refusal for a member evicted from the chain.
 constexpr const char* EVICTED_DELIVERY_ERROR =
@@ -163,9 +223,16 @@ constexpr const char* REQUIRED_UNDERWRITER_COLLATERAL  = "req_uw_collat";
 
 /// sysio.msgch action identifiers used by the WNS-16 fixture.
 namespace msgch_actions {
-constexpr name CHECK_CONSENSUS = "chkcons"_n;
-constexpr name BOOT_CHAIN      = "bootchain"_n;
+constexpr name CHECK_CONSENSUS    = "chkcons"_n;
+constexpr name BOOT_CHAIN         = "bootchain"_n;
+constexpr name DELIVER            = "deliver"_n;
+constexpr name EVALUATE_CONSENSUS = "evalcons"_n;
+constexpr name QUEUE_OUT          = "queueout"_n;
+constexpr name REPORT_QUEUE       = "reportqueue"_n;
 } // namespace msgch_actions
+
+/// Most attestations one outbound envelope carries: a mirror of `sysio.msgch::MAX_ENVELOPE_ATTESTATIONS`.
+constexpr uint32_t MAX_ENVELOPE_ATTESTATIONS = 64;
 
 /// sysio.epoch action identifiers the per-chain epoch fixtures push.
 namespace epoch_actions {
@@ -174,13 +241,25 @@ constexpr name SCHEDULE      = "schbatchgps"_n;
 constexpr name ADVANCE       = "advance"_n;
 constexpr name FINISH_ADVANCE = "finishadv"_n;
 constexpr name TICK_ECONOMY  = "tickeconomy"_n;
+constexpr name NOTE_TRAFFIC  = "notetraffic"_n;
+constexpr name RESEND_ROSTER = "resendroster"_n;
+constexpr name PAUSE         = "pause"_n;
+constexpr name UNPAUSE       = "unpause"_n;
 } // namespace epoch_actions
+
+/// `sysio.epoch::advance`'s refusal while a chain is paused.
+constexpr const char* EPOCH_PAUSED_ERROR = "epoch advancement is paused";
+
+/// `sysio.epoch::advance`'s refusal, under its own authority, of an active outpost's undecided epoch.
+constexpr const char* GOVERNANCE_ADVANCE_UNDECIDED_ERROR =
+   "governance cannot advance an active outpost whose current epoch has not reached consensus";
 
 /// sysio.msgch table identifiers used by the WNS-16 fixture.
 namespace msgch_tables {
 constexpr name ATTESTATIONS       = "attestations"_n;
 constexpr name ENVELOPES          = "envelopes"_n;
 constexpr name OUTBOUND_ENVELOPES = "outenvelopes"_n;
+constexpr name QUEUE_REPORTS      = "qreports"_n;
 } // namespace msgch_tables
 
 /// sysio.msgch secondary-index identifiers used by the envelopes retention tests.
@@ -193,6 +272,7 @@ namespace msgch_abi_types {
 constexpr const char* ATTESTATION_ENTRY = "attestation_entry";
 constexpr const char* ENVELOPE_ENTRY    = "envelope_entry";
 constexpr const char* OUTBOUND_ENVELOPE = "outbound_envelope";
+constexpr const char* QUEUE_REPORT_ENTRY = "queue_report_entry";
 } // namespace msgch_abi_types
 
 /// sysio.msgch ABI field identifiers used by the WNS-16 fixture.
@@ -206,6 +286,17 @@ constexpr const char* WINNING_CHECKSUM = "winning_checksum";
 constexpr const char* CHECKSUM         = "checksum";
 constexpr const char* CONSENSUS_REACHED = "consensus_reached";
 constexpr const char* STATUS            = "status";
+constexpr const char* DATA              = "data";
+constexpr const char* RECEIVED_AT       = "received_at";
+constexpr const char* PREVIOUS_EPOCH_INDEX      = "previous_epoch_index";
+constexpr const char* PREVIOUS_WINNING_CHECKSUM = "previous_winning_checksum";
+constexpr const char* READY_TIMESTAMP           = "ready_timestamp";
+constexpr const char* ATTEST_TYPE               = "attest_type";
+constexpr const char* BATCH_OP                  = "batch_op";
+constexpr const char* ACCOUNT                   = "account";
+constexpr const char* PENDING_COUNT             = "pending_count";
+constexpr const char* OLDEST_PENDING_MS         = "oldest_pending_ms";
+constexpr const char* OLDEST_PENDING_AT         = "oldest_pending_at";
 } // namespace msgch_fields
 
 /// sysio.chalg table identifiers used by the split-consensus regressions.
@@ -215,14 +306,23 @@ constexpr name DISPUTES = "disputes"_n;
 
 /// sysio.chalg action identifiers used by the two-version split regressions.
 namespace chalg_actions {
-constexpr name CHECK_DISPUTE = "chkdispute"_n;
-constexpr name VOTE_DISPUTE  = "votedispute"_n;
+constexpr name CHECK_DISPUTE  = "chkdispute"_n;
+constexpr name VOTE_DISPUTE   = "votedispute"_n;
+constexpr name OPEN_DISPUTE   = "opendispute"_n;
+constexpr name SLASH_OPERATOR = "slashop"_n;
 } // namespace chalg_actions
 
 /// sysio.chalg ABI type identifiers used by the split-consensus regressions.
 namespace chalg_abi_types {
-constexpr const char* DISPUTE_ENTRY = "dispute_entry";
+constexpr const char* DISPUTE_ENTRY  = "dispute_entry";
+constexpr const char* SLASH_OPERATOR = "slashop";
 } // namespace chalg_abi_types
+
+/// sysio.chalg `slashop` ABI field identifiers.
+namespace chalg_slash_fields {
+constexpr const char* OPERATOR_ACCOUNT = "operator_acct";
+constexpr const char* REASON           = "reason";
+} // namespace chalg_slash_fields
 
 /// sysio.chalg ABI field identifiers used by the split-consensus regressions.
 namespace chalg_fields {
@@ -246,6 +346,17 @@ namespace chains_actions {
 constexpr name ACTIVATE_CHAIN = "activchain"_n;
 } // namespace chains_actions
 
+/// sysio.chains table, ABI type and field identifiers of the chain row a test sets inactive.
+namespace chains_tables {
+constexpr name CHAINS = "chains"_n;
+} // namespace chains_tables
+namespace chains_abi_types {
+constexpr const char* CHAIN_ROW = "chain_row";
+} // namespace chains_abi_types
+namespace chains_fields {
+constexpr const char* ACTIVE = "active";
+} // namespace chains_fields
+
 /// sysio.epoch ABI field identifiers used by the WNS-16 fixture.
 namespace epoch_fields {
 constexpr const char* BATCH_OP_GROUPS        = "batch_op_groups";
@@ -253,15 +364,26 @@ constexpr const char* CURRENT_BATCH_OP_GROUP = "current_batch_op_group";
 constexpr const char* IS_PAUSED              = "is_paused";
 constexpr const char* CHAIN_CODE             = "chain_code";
 constexpr const char* CURRENT_EPOCH_INDEX    = "current_epoch_index";
-constexpr const char* NEXT_EPOCH_START       = "next_epoch_start";
 constexpr const char* CURRENT_EPOCH_START    = "current_epoch_start";
+constexpr const char* TRAFFIC_SINCE          = "traffic_since";
+constexpr const char* DUE_AT                 = "due_at";
+constexpr const char* EPOCH_DURATION_SEC     = "epoch_duration_sec";
+constexpr const char* TRAFFIC_WAIT_SEC       = "traffic_wait_sec";
+constexpr const char* LATE_WINDOW_SEC        = "late_window_sec";
 constexpr const char* EPOCH_INDEX            = "epoch_index";
+constexpr const char* PREVIOUS_GROUP         = "previous_group";
 } // namespace epoch_fields
 
 /// sysio.epoch tables the per-chain epoch fixtures read.
 namespace epoch_tables {
-constexpr name EPOCH_STATE = "epochstate"_n;
+constexpr name EPOCH_STATE  = "epochstate"_n;
+constexpr name EPOCH_CONFIG = "epochcfg"_n;
 } // namespace epoch_tables
+
+/// sysio.epoch ABI type names of those rows.
+namespace epoch_abi_types {
+constexpr const char* EPOCH_CONFIG = "epoch_config";
+} // namespace epoch_abi_types
 
 /// sysio.roa action identifiers used by the empty-electorate retry regression.
 namespace roa_actions {
@@ -338,11 +460,17 @@ public:
    static constexpr auto BATCHOP_D      = "batchop.d"_n;
    static constexpr auto BATCHOP_E      = "batchop.e"_n;
    static constexpr auto BATCHOP_F      = "batchop.f"_n;
+   static constexpr auto BATCHOP_G      = "batchop.g"_n;
+   static constexpr auto BATCHOP_H      = "batchop.h"_n;
+   static constexpr auto BATCHOP_I      = "batchop.i"_n;
+   static constexpr auto BATCHOP_J      = "batchop.j"_n;
+   static constexpr auto BATCHOP_K      = "batchop.k"_n;
 
    static constexpr uint32_t EPOCH_DURATION_SEC = 60;
    static constexpr uint32_t ONE_TO_ONE_TIE_GROUP_SIZE = 2;
    static constexpr uint32_t THREE_TO_THREE_TIE_GROUP_SIZE = 6;
    static constexpr uint32_t INCOMPLETE_TWO_WAY_SPLIT_GROUP_SIZE = 3;
+   static constexpr uint32_t MAXIMUM_GROUP_SIZE = 7; ///< The outpost group-size ceiling: a strict majority is 4.
    static constexpr uint64_t FIRST_DISPUTE_ID = 1;
    static constexpr uint64_t SECOND_DISPUTE_ID = 2;
    static constexpr auto TIER_ONE_OWNER = "tierone"_n;
@@ -372,13 +500,20 @@ public:
    /// Percent-rail sample that applies the rail from the first duty epoch.
    static constexpr uint32_t PERCENT_RAIL_FROM_FIRST_DUTY = 1;
 
-   /// Exact minimum window the span bound accepts for the rotation schedule: (misses + 1) duty
-   /// rotations.
-   static constexpr uint64_t ROTATION_WINDOW_MS =
-      (uint64_t{ROTATION_MAX_CONSECUTIVE_MISSES} + 1) * ROTATION_GROUPS * EPOCH_DURATION_SEC * MS_PER_SEC;
+   /// One duty rotation of the rotation schedule: a window this narrow keeps only a member's latest record.
+   static constexpr uint64_t ROTATION_DUTY_MS = uint64_t{ROTATION_GROUPS} * EPOCH_DURATION_SEC * MS_PER_SEC;
+
+   /// A window of (misses + 1) duty rotations: a run evicting on the rotation fixture's threshold has its
+   /// delivered anchor on the window's edge at the evicting miss.
+   static constexpr uint64_t ROTATION_WINDOW_MS = (uint64_t{ROTATION_MAX_CONSECUTIVE_MISSES} + 1) * ROTATION_DUTY_MS;
 
    /// Outposts the rotation fixture registers.
    enum class rotation_outposts { none, eth, eth_and_sol };
+
+   /// Disjoint-group fixture schedule: the production shape of disjoint groups, three of three, so a member of
+   /// the previous epoch's group sits in no current group.
+   static constexpr uint32_t DISJOINT_GROUPS     = 3;
+   static constexpr uint32_t DISJOINT_GROUP_SIZE = 3; ///< Operators seated in each disjoint group.
 
    /// Construct an OPP integration fixture, optionally with an activated ROA that has no
    /// registered node owners to exercise the msgch electorate preflight.
@@ -393,7 +528,7 @@ public:
       create_accounts({
          TOKEN_ACCOUNT, EPOCH_ACCOUNT, OPREG_ACCOUNT, MSGCH_ACCOUNT,
          CHALG_ACCOUNT, CHAINS_ACCOUNT,
-         BATCHOP, BATCHOP_B, BATCHOP_C, BATCHOP_D, BATCHOP_E, BATCHOP_F,
+         BATCHOP, BATCHOP_B, BATCHOP_C, BATCHOP_D, BATCHOP_E, BATCHOP_F, BATCHOP_G,
          DCLAIM_ACCOUNT, "sysio.gov"_n, "sysio.ops"_n
       }, false, true, !empty_roa);
       produce_blocks(2);
@@ -496,19 +631,19 @@ public:
             ("pay_cadence_epochs",     uint16_t(1))));
    }
 
-   /// Configure one test cohort of up to six batch operators, the ETH/SOL outpost rows, each chain's
-   /// one-group schedule, and each chain's genesis advance. The configurable cohort supports even split
-   /// regressions. SOL's epoch lasts `sol_duration_sec`.
+   /// Configure one test cohort of up to seven batch operators (the outpost group-size ceiling), the
+   /// ETH/SOL outpost rows, each chain's one-group schedule, and each chain's genesis advance. The
+   /// configurable cohort supports split regressions. SOL's epoch lasts `sol_duration_sec`.
    void bootstrap(uint32_t n_batch_ops = 1, bool batchop_is_bootstrapped = true,
                   uint32_t sol_duration_sec = EPOCH_DURATION_SEC) {
       // Both outposts run the same schedule, so their epochs advance in step unless a test drives
       // them apart.
       epoch_chains = {ETH_CHAIN_CODE, SOL_CHAIN_CODE};
       for (const std::string_view chain : epoch_chains) {
-         // Sizes the SCHEDULE, not the consensus threshold: evalcons derives its thresholds
-         // from the live eligible group (msgch's `eligible_batch_operators`), so tests that
-         // shrink the eligible set below this value still reach consensus. The epoch contract
-         // enforces minimum_active == operators_per_epoch * batch_op_groups.
+         // Sizes the schedule: a group seats up to this many members, and consensus needs a strict
+         // majority of the seats the group on duty holds, counting only its eligible members'
+         // deliveries (msgch's `duty_group_of`). The epoch contract enforces
+         // minimum_active == operators_per_epoch * batch_op_groups.
          set_epoch_config(chain, chain == SOL_CHAIN_CODE ? sol_duration_sec : EPOCH_DURATION_SEC, n_batch_ops, 1);
       }
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "seteconomy"_n, mvo()
@@ -536,7 +671,7 @@ public:
             ("req_uw_collat",                    fc::variants{})));
 
       const std::vector<name> available_batch_ops{
-         BATCHOP, BATCHOP_B, BATCHOP_C, BATCHOP_D, BATCHOP_E, BATCHOP_F};
+         BATCHOP, BATCHOP_B, BATCHOP_C, BATCHOP_D, BATCHOP_E, BATCHOP_F, BATCHOP_G};
       BOOST_REQUIRE(n_batch_ops > 0 && n_batch_ops <= available_batch_ops.size());
       std::vector<name> batch_ops(available_batch_ops.begin(),
                                   available_batch_ops.begin() + n_batch_ops);
@@ -574,6 +709,8 @@ public:
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::SET_CONFIG, mvo()
          (epoch_fields::CHAIN_CODE,             chain)
          ("epoch_duration_sec",                 duration_sec)
+         ("traffic_wait_sec",                   0)
+         ("late_window_sec",                    0)
          ("operators_per_epoch",                operators_per_group)
          ("batch_operator_minimum_active",      operators_per_group * groups)
          ("batch_op_groups",                    groups)
@@ -606,11 +743,9 @@ public:
       sysio_system::test_support::served_chains::serve(*this, ops, outposts);
    }
 
-   /// Cross the boundary and advance every configured chain's epoch, as sysio.msgch's chkcons would.
+   /// Make every configured chain due (`elapse_epoch_boundary`) and advance its epoch, as sysio.msgch's chkcons would.
    uint32_t advance_one_epoch() {
-      for (uint32_t i = 0; i < EPOCH_DURATION_SEC * 2 + 1; ++i) {
-         produce_block();
-      }
+      elapse_epoch_boundary();
       for (const std::string_view chain : epoch_chains) {
          BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, MSGCH_ACCOUNT, epoch_actions::ADVANCE,
                                              mvo()(epoch_fields::CHAIN_CODE, chain)));
@@ -647,13 +782,52 @@ public:
                                          mvo()(roa_fields::OWNER, owner.to_string())(roa_fields::TIER, tier_one)));
    }
 
-   /// Let the consensus boundary elapse WITHOUT advancing the epoch: evalcons' fallback
-   /// (majority) path opens once `epoch_duration_sec` has passed since the epoch started,
-   /// while `deliver`'s epoch gate keeps accepting envelopes for the still-current epoch.
+   /// Record traffic on every configured chain since its epoch start (`mark_chain_traffic`), then let
+   /// `EPOCH_DURATION_SEC` elapse WITHOUT advancing the epoch: a chain of that minimum is then due, so
+   /// `chkcons` advances its decided epoch, while `deliver`'s epoch gate keeps accepting envelopes for the
+   /// still-current epoch.
    void elapse_epoch_boundary() {
+      mark_chain_traffic();
       for (uint32_t i = 0; i < EPOCH_DURATION_SEC * 2 + 1; ++i) {
          produce_block();
       }
+   }
+
+   /// Record traffic on every configured chain since its current epoch started (`epoch_state::mark_traffic`), as an
+   /// outbound attestation queued for it would: each chain is then due one minimum after its epoch start.
+   void mark_chain_traffic() {
+      for (const std::string_view chain : epoch_chains) {
+         sysio_system::test_support::epoch_state::mark_traffic(*this, epoch_abi, chain);
+      }
+   }
+
+   /// `chain_code`'s minimum duration, its `epochcfg` `epoch_duration_sec`.
+   fc::microseconds minimum_duration(uint64_t chain_code = ETH_OUTPOST_ID) {
+      return fc::seconds(epoch_config(chain_code)[epoch_fields::EPOCH_DURATION_SEC].as<uint32_t>());
+   }
+
+   /// `chain_code`'s traffic wait, its `epochcfg` `traffic_wait_sec`.
+   fc::microseconds traffic_wait(uint64_t chain_code = ETH_OUTPOST_ID) {
+      return fc::seconds(epoch_config(chain_code)[epoch_fields::TRAFFIC_WAIT_SEC].as<uint32_t>());
+   }
+
+   /// `chain_code`'s late-delivery window, its `epochcfg` `late_window_sec`.
+   fc::microseconds late_window(uint64_t chain_code = ETH_OUTPOST_ID) {
+      return fc::seconds(epoch_config(chain_code)[epoch_fields::LATE_WINDOW_SEC].as<uint32_t>());
+   }
+
+   /// When `chain_code` is due for traffic of its current epoch that began at `since`: the later of its epoch start
+   /// plus its minimum and `since` plus its traffic wait.
+   fc::time_point due_for(fc::time_point since, uint64_t chain_code = ETH_OUTPOST_ID) {
+      const fc::time_point start = read_epoch_state(chain_code)[epoch_fields::CURRENT_EPOCH_START].as<fc::time_point>();
+      return std::max(start + minimum_duration(chain_code), since + traffic_wait(chain_code));
+   }
+
+   /// `chain_code`'s `epochcfg` row.
+   fc::variant epoch_config(uint64_t chain_code) {
+      const auto data = get_row_by_id(EPOCH_ACCOUNT, EPOCH_ACCOUNT, epoch_tables::EPOCH_CONFIG, chain_code);
+      BOOST_REQUIRE(!data.empty());
+      return epoch_abi.binary_to_variant(epoch_abi_types::EPOCH_CONFIG, data, fixture_abi_yield_function());
    }
 
    action_result queueout(uint64_t chain_code, uint32_t attest_type,
@@ -662,6 +836,40 @@ public:
          ("chain_code",   chain_code)
          ("attest_type",  attest_type)
          ("data",         std::move(data)));
+   }
+
+   /// `queueout` of a `type` row of `fill` bytes for `chain_code` on `contract` (sysio.msgch, or another account
+   /// running its code), under that account's own authority, returning the trace.
+   transaction_trace_ptr queueout_trace(uint64_t chain_code, opp::types::AttestationType type, char fill,
+                                        name contract = MSGCH_ACCOUNT) {
+      return sysio_system::test_support::push_contract_action_trace(
+         *this, contract, msgch_abi, contract, msgch_actions::QUEUE_OUT,
+         mvo()(msgch_fields::CHAIN_CODE, chain_code)(msgch_fields::ATTEST_TYPE, type)
+              (msgch_fields::DATA, std::vector<char>(8, fill)));
+   }
+
+   /// How many times `trace` notified sysio.epoch of a `queueout` of `contract`.
+   static uint32_t queueout_notifications(const transaction_trace_ptr& trace, name contract = MSGCH_ACCOUNT) {
+      BOOST_REQUIRE(trace);
+      uint32_t n = 0;
+      for (const auto& at : trace->action_traces) {
+         if (at.receiver == EPOCH_ACCOUNT && at.act.account == contract && at.act.name == msgch_actions::QUEUE_OUT) ++n;
+      }
+      return n;
+   }
+
+   /// The ready time of `chain_code`'s oldest READY general-lane attestation (`ready_timestamp`, in seconds).
+   fc::time_point oldest_ready_general(uint64_t chain_code) {
+      uint64_t oldest = std::numeric_limits<uint64_t>::max();
+      for (const auto& row : table_rows(MSGCH_ACCOUNT, msgch_tables::ATTESTATIONS, msgch_abi,
+                                        msgch_abi_types::ATTESTATION_ENTRY)) {
+         if (row[msgch_fields::CHAIN_CODE].as_uint64() != chain_code ||
+             row[msgch_fields::STATUS].as<opp::types::AttestationStatus>() !=
+                opp::types::AttestationStatus::ATTESTATION_STATUS_READY) continue;
+         oldest = std::min(oldest, row[msgch_fields::READY_TIMESTAMP].as<uint64_t>());
+      }
+      BOOST_REQUIRE_NE(oldest, std::numeric_limits<uint64_t>::max());
+      return fc::time_point(fc::seconds(static_cast<int64_t>(oldest)));
    }
 
    action_result buildenv(uint64_t chain_code) {
@@ -779,8 +987,8 @@ public:
          fixture_abi_yield_function());
    }
 
-   /// Assert that the full `chkcons -> evalcons -> opendispute` route recorded the exact split as
-   /// dispute `dispute_id` on `chain_code`.
+   /// Assert that the `evalcons -> opendispute` route, reached through `deliver` or `chkcons`, recorded the
+   /// exact split as dispute `dispute_id` on `chain_code`.
    void assert_open_tie_dispute(uint32_t expected_epoch,
                                 const std::vector<fc::sha256>& expected_checksums,
                                 const std::vector<uint32_t>& expected_operator_counts,
@@ -915,7 +1123,7 @@ public:
    }
 
    /// Every operator in `ops` delivers the same chained envelope to both outposts, so each outpost
-   /// reaches unanimous consensus for the current epoch; `tip` moves to the delivered envelope.
+   /// reaches consensus for the current epoch; `tip` moves to the delivered envelope.
    void deliver_unanimous_epoch(const std::vector<name>& ops, std::string_view payload,
                                 inbound_stream_tip& tip) {
       const auto envelope = encode_chained_delivery(payload, tip);
@@ -940,7 +1148,7 @@ public:
       tip = next_stream_tip(envelope);
    }
 
-   /// Cross the epoch boundary and advance through the production `chkcons -> advance` route.
+   /// Make the chain due and advance through the production `chkcons -> advance` route.
    void close_epoch() {
       const uint32_t epoch = current_epoch();
       elapse_epoch_boundary();
@@ -1294,19 +1502,53 @@ public:
       return false;
    }
 
-   /// True while `account` holds a seat in any group of any configured chain's schedule window.
+   /// The epochs whose groups in `chain_code`'s schedule window seat `account`, in window order: the window holds
+   /// the current epoch's group, then the next epochs' in turn.
+   std::vector<uint32_t> seated_epochs(name account, uint64_t chain_code) {
+      std::vector<uint32_t> epochs;
+      // Held in a local: a range-for over a member of the temporary would read freed memory.
+      const auto state = read_epoch_state(chain_code);
+      if (state.is_null()) return epochs;
+      const uint32_t      current = state[epoch_fields::CURRENT_EPOCH_INDEX].as<uint32_t>();
+      const fc::variants& groups  = state[epoch_fields::BATCH_OP_GROUPS].get_array();
+      for (size_t g = 0; g < groups.size(); ++g) {
+         for (const auto& member : groups[g].get_array()) {
+            if (member.as_string() == account.to_string()) epochs.push_back(current + static_cast<uint32_t>(g));
+         }
+      }
+      return epochs;
+   }
+
+   /// `chain_code`'s `previous_group`: the group that served the epoch before its current one.
+   std::vector<name> previous_group(uint64_t chain_code = ETH_OUTPOST_ID) {
+      const auto state = read_epoch_state(chain_code);
+      BOOST_REQUIRE(!state.is_null());
+      return state[epoch_fields::PREVIOUS_GROUP].as<std::vector<name>>();
+   }
+
+   /// The epoch whose books `chain_code`'s latest advance closed: the one before the epoch that advance closed, or 0
+   /// before the chain's third epoch.
+   uint32_t booked_epoch(uint64_t chain_code = ETH_OUTPOST_ID) {
+      const uint32_t current = current_epoch(chain_code);
+      return current > 2 ? current - 2 : 0;
+   }
+
+   /// True while `account` holds a seat in any configured chain's schedule, as `regoperator` reads it: in a group
+   /// of its window, or in its `previous_group`, whose books the chain's next advance closes.
    bool holds_schedule_seat(name account) {
       for (const std::string_view chain : epoch_chains) {
-         if (seated_on(account, fc::slug_name{chain}.value)) return true;
+         const uint64_t          chain_code = fc::slug_name{chain}.value;
+         const std::vector<name> previous   = previous_group(chain_code);
+         if (seated_on(account, chain_code) ||
+             std::find(previous.begin(), previous.end(), account) != previous.end()) return true;
       }
       return false;
    }
 
-   /// Advance exactly one epoch, landing the advance at the fixed-cadence next_epoch_start. Because
-   /// next_epoch_start is a fixed cadence (advance sets current_epoch_start = prior next_epoch_start,
-   /// never `now`) and recorddel stamps at one-second granularity, running the advance in the second
-   /// of next_epoch_start spaces every epoch's records exactly epoch_duration apart -- the exact-span
-   /// timing the SEC-28 window bound is defined against, with no block-granularity drift.
+   /// Advance exactly one epoch, landing the advance at the chain's `due_at`. Traffic recorded since the epoch
+   /// start makes the chain due exactly one minimum after it, and the advance opens the next epoch at that
+   /// instant, so every epoch's records are spaced exactly epoch_duration apart -- the exact-span timing the
+   /// rotation tests pin the window's edge against, with no block-granularity drift.
    uint32_t advance_to_next_epoch() {
       advance_to_next_epoch_traces();
       return current_epoch();
@@ -1315,11 +1557,12 @@ public:
    /// `advance_to_next_epoch`, returning each configured chain's `advance` trace, in `epoch_chains`
    /// order, so a test can inspect its inline actions. The chains share one cadence.
    std::vector<transaction_trace_ptr> advance_to_next_epoch_traces() {
-      auto st = read_epoch_state(fc::slug_name{epoch_chains.front()}.value);
+      mark_chain_traffic();
+      const fc::variant st = read_epoch_state(fc::slug_name{epoch_chains.front()}.value);
       BOOST_REQUIRE(!st.is_null());
-      auto next  = st[epoch_fields::NEXT_EPOCH_START].as<fc::time_point>();
-      auto delta = next - control->head().block_time();
-      if (delta.count() > 0) produce_block(delta);
+      const fc::time_point due = st[epoch_fields::DUE_AT].as<fc::time_point>();
+      BOOST_REQUIRE(due != fc::time_point());
+      if (due > control->pending_block_time()) open_block_at(due);
       std::vector<transaction_trace_ptr> traces;
       for (const std::string_view chain : epoch_chains) {
          traces.push_back(sysio_system::test_support::push_contract_action_trace(
@@ -1328,6 +1571,69 @@ public:
       }
       produce_blocks();
       return traces;
+   }
+
+   /// Push `advance` for `chain_code` under sysio.epoch's own authority, the governance path.
+   action_result governance_advance(uint64_t chain_code = ETH_OUTPOST_ID) {
+      return push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::ADVANCE,
+                  mvo()(epoch_fields::CHAIN_CODE, fc::slug_name{chain_code}.to_string()));
+   }
+
+   /// Make `chain_code` due and advance it under `authority`, returning the advance's trace. sysio.msgch's stands in
+   /// for `chkcons`, with or without a decision on the chain's current epoch; sysio.epoch's own, the governance path,
+   /// needs that epoch decided unless the chain is no longer an active outpost. An epoch's books close at the advance
+   /// after it, so a test runs this to record the epoch the chain's previous advance closed.
+   transaction_trace_ptr advance_trace(uint64_t chain_code, name authority) {
+      const uint32_t epoch = current_epoch(chain_code);
+      elapse_epoch_boundary();
+      const transaction_trace_ptr trace = sysio_system::test_support::push_contract_action_trace(
+         *this, EPOCH_ACCOUNT, epoch_abi, authority, epoch_actions::ADVANCE,
+         mvo()(epoch_fields::CHAIN_CODE, fc::slug_name{chain_code}.to_string()));
+      produce_blocks();
+      BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch(chain_code));
+      return trace;
+   }
+
+   /// `advance_trace` under sysio.epoch's own authority, the governance path.
+   transaction_trace_ptr governance_advance_trace(uint64_t chain_code = ETH_OUTPOST_ID) {
+      return advance_trace(chain_code, EPOCH_ACCOUNT);
+   }
+
+   /// One `sysio.chalg::slashop` a transaction ran: the operator it slashed, the reason it gave, and whether
+   /// it carried exactly sysio.msgch's active authority.
+   struct slashop_record {
+      name        operator_account;
+      std::string reason;
+      bool        authorized_by_msgch = false;
+   };
+
+   /// Every `sysio.chalg::slashop` `trace` ran, inline actions included, in execution order.
+   std::vector<slashop_record> slashops(const transaction_trace_ptr& trace) {
+      BOOST_REQUIRE(trace);
+      const std::vector<permission_level> msgch_active{{MSGCH_ACCOUNT, config::active_name}};
+      std::vector<slashop_record> records;
+      for (const auto& at : trace->action_traces) {
+         if (at.receiver != CHALG_ACCOUNT || at.act.account != CHALG_ACCOUNT ||
+             at.act.name != chalg_actions::SLASH_OPERATOR) continue;
+         const fc::variant data = chalg_abi.binary_to_variant(chalg_abi_types::SLASH_OPERATOR, at.act.data,
+                                                               fixture_abi_yield_function());
+         records.push_back({.operator_account    = name(data[chalg_slash_fields::OPERATOR_ACCOUNT].as_string()),
+                            .reason              = data[chalg_slash_fields::REASON].as_string(),
+                            .authorized_by_msgch = at.act.authorization == msgch_active});
+      }
+      return records;
+   }
+
+   /// The reason sysio.msgch gives the slash of a delivery to `chain_code`'s epoch `epoch_index` that differs
+   /// from the epoch's winner.
+   static std::string non_canonical_delivery_reason(std::string_view chain_code, uint32_t epoch_index) {
+      return std::string(NON_CANONICAL_DELIVERY_REASON_PREFIX) + std::string(chain_code) +
+             std::string(NON_CANONICAL_DELIVERY_REASON_EPOCH) + std::to_string(epoch_index);
+   }
+
+   /// `account`'s sysio.opreg status.
+   opp::types::OperatorStatus operator_status(name account) {
+      return get_operator(account)[opreg_fields::STATUS].as<opp::types::OperatorStatus>();
    }
 
    /// How many times `account` executed its `action` in `trace`, inline actions included.
@@ -1384,6 +1690,63 @@ public:
    action_result check_consensus(uint64_t chain_code, name signer = MSGCH_ACCOUNT) {
       return push(MSGCH_ACCOUNT, msgch_abi, signer, msgch_actions::CHECK_CONSENSUS,
                   mvo()(msgch_fields::CHAIN_CODE, chain_code));
+   }
+
+   /// `check_consensus`, returning the transaction's trace so a test can inspect what ran inline in it.
+   transaction_trace_ptr check_consensus_trace(uint64_t chain_code, name signer) {
+      return sysio_system::test_support::push_contract_action_trace(
+         *this, MSGCH_ACCOUNT, msgch_abi, signer, msgch_actions::CHECK_CONSENSUS,
+         mvo()(msgch_fields::CHAIN_CODE, chain_code));
+   }
+
+   /// `deliver_as`, returning the transaction's trace so a test can inspect what ran inline in it.
+   transaction_trace_ptr deliver_trace(name op, uint64_t chain_code, const std::vector<char>& data) {
+      return sysio_system::test_support::push_contract_action_trace(
+         *this, MSGCH_ACCOUNT, msgch_abi, op, msgch_actions::DELIVER,
+         mvo()(msgch_fields::BATCH_OP_NAME, op.to_string())(msgch_fields::CHAIN_CODE, chain_code)
+              (msgch_fields::DATA, data));
+   }
+
+   /// `chain_code`'s `outpcons` row records `winner` as the accepted winner of `epoch_index`, its current epoch.
+   void require_outpcons_winner(uint64_t chain_code, uint32_t epoch_index, const fc::sha256& winner) {
+      const fc::variant consensus = get_outpcons(chain_code);
+      BOOST_REQUIRE(!consensus.is_null());
+      BOOST_REQUIRE_EQUAL(epoch_index, consensus[msgch_fields::EPOCH_INDEX].as<uint32_t>());
+      BOOST_REQUIRE_EQUAL(winner.str(), consensus[msgch_fields::WINNING_CHECKSUM].as_string());
+   }
+
+   /// Whether `chain_code`'s `outpcons` row records an accepted winner for `epoch_index`.
+   bool epoch_decided(uint64_t chain_code, uint32_t epoch_index) {
+      const fc::variant consensus = get_outpcons(chain_code);
+      return !consensus.is_null() && consensus[msgch_fields::EPOCH_INDEX].as<uint32_t>() == epoch_index;
+   }
+
+   /// Whether the pending block still precedes `chain_code`'s minimum epoch end, its epoch start plus its minimum
+   /// duration, before which the chain cannot be due.
+   bool before_epoch_boundary(uint64_t chain_code = ETH_OUTPOST_ID) {
+      return control->pending_block_time() <
+             read_epoch_state(chain_code)[epoch_fields::CURRENT_EPOCH_START].as<fc::time_point>() +
+                minimum_duration(chain_code);
+   }
+
+   /// Land the pending transactions, then produce blocks so the pending block opens at `target`, a later
+   /// multiple of the block interval.
+   void open_block_at(fc::time_point target) {
+      produce_blocks();
+      const fc::microseconds block_interval = fc::milliseconds(config::block_interval_ms);
+      if (control->pending_block_time() != target) {
+         const fc::microseconds skip = target - block_interval - control->head().block_time();
+         BOOST_REQUIRE_GE(skip.count(), block_interval.count());
+         produce_block(skip);
+      }
+      BOOST_REQUIRE(control->pending_block_time() == target);
+   }
+
+   /// Slash `account` through sysio.opreg, as sysio.chalg does: it leaves the eligible set mid-epoch.
+   void slash_operator(name account) {
+      BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, CHALG_ACCOUNT, opreg_actions::SLASH,
+         mvo()(opreg_fields::ACCOUNT, account.to_string())(opreg_fields::REASON, std::string(SLASH_REASON))));
+      produce_blocks();
    }
 
    /// Fund the operator's native WIRE balance and deposit its bond through sysio.opreg.
@@ -1478,20 +1841,26 @@ public:
 
    /// Walk the rotation through advance() until BATCHOP is evicted from every outpost in `outposts`. On
    /// its first duty epoch BATCHOP delivers to each of them (the anchor that keeps the percent rail below
-   /// its ceiling) and never again. Each chain counts its own rows, so every chain evicts it at the same
-   /// duty: the first whose misses exceed the threshold, with the anchor still inside the window. Its
-   /// global status, and so its bond, is untouched.
-   void walk_rotation_to_consecutive_eviction(const std::vector<uint64_t>& outposts) {
+   /// its ceiling) and never again. Each duty epoch's books close at the advance after it. Each chain counts
+   /// its own rows, so every chain evicts it at the same duty: the first whose misses exceed the threshold,
+   /// with the anchor still inside the window when `anchor_in_window` and long erased otherwise. Its global
+   /// status, and so its bond, is untouched.
+   void walk_rotation_to_consecutive_eviction(const std::vector<uint64_t>& outposts, bool anchor_in_window = true) {
       // The anchor, then enough missed duties to exceed the threshold.
       const uint32_t evicting_duty = 1 + ROTATION_MAX_CONSECUTIVE_MISSES + 1;
       std::map<uint64_t, inbound_stream_tip> tips;
+      // BATCHOP's duty epochs whose books are still open, each with whether it delivered.
+      std::map<uint32_t, bool> open_duties;
       uint32_t batchop_duties = 0;
       bool     evicted        = false;
       for (uint32_t step = 0; step < ROTATION_GROUPS * (evicting_duty + 2) && !evicted; ++step) {
          const uint32_t duty_epoch = current_epoch();
          const bool     on_duty    = duty_member() == BATCHOP;
          const bool     anchor     = on_duty && batchop_duties == 0;
-         if (on_duty) ++batchop_duties;
+         if (on_duty) {
+            ++batchop_duties;
+            open_duties[duty_epoch] = anchor;
+         }
          if (anchor) {
             for (const uint64_t outpost : outposts) {
                auto&      tip      = tips[outpost];
@@ -1505,13 +1874,14 @@ public:
          }
          advance_to_next_epoch();
 
-         if (on_duty) {
-            // One record per chain for the duty epoch.
+         // One record per chain for the duty epoch whose books this advance closed.
+         if (const auto duty = open_duties.find(booked_epoch()); duty != open_duties.end()) {
             for (const uint64_t outpost : outposts) {
-               const auto rows = dellog_rows(BATCHOP, duty_epoch, outpost);
+               const auto rows = dellog_rows(BATCHOP, duty->first, outpost);
                BOOST_REQUIRE_EQUAL(1u, rows.size());
-               BOOST_REQUIRE_EQUAL(anchor, rows.front()[opreg_fields::DELIVERED].as<bool>());
+               BOOST_REQUIRE_EQUAL(duty->second, rows.front()[opreg_fields::DELIVERED].as<bool>());
             }
+            open_duties.erase(duty);
          }
 
          BOOST_REQUIRE(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE ==
@@ -1524,21 +1894,215 @@ public:
                const auto row = membership(BATCHOP, outpost);
                BOOST_REQUIRE_EQUAL(std::string(served_status::evicted), row[opreg_fields::STATUS].as_string());
                BOOST_REQUIRE_EQUAL(CONSECUTIVE_MISS_EVICTION_REASON, row[opreg_fields::STATUS_REASON].as_string());
-               // The evicting chain's close slid BATCHOP's group out and did not seat it again.
-               BOOST_REQUIRE(!seated_on(BATCHOP, outpost));
-               BOOST_REQUIRE(!require_roster_is_window(outpost).count(BATCHOP.to_string()));
             }
-            // The delivered anchor rows must survive the evicting advance's prune. With one outpost
-            // the anchor sits exactly on the window edge at this miss, which pins the exact boundary:
-            // an off-by-one in the span or the prune bound would erase it.
-            BOOST_REQUIRE_EQUAL(outposts.size(), delivered_dellog_count(BATCHOP));
+            // At ROTATION_WINDOW_MS the delivered anchor rows must survive the evicting advance's prune.
+            // With one outpost the anchor sits exactly on the window edge at this miss, which pins the
+            // exact boundary: an off-by-one in the prune bound would erase it. A narrower window erased
+            // them long before, and the run still evicts.
+            BOOST_REQUIRE_EQUAL(anchor_in_window ? outposts.size() : 0u, delivered_dellog_count(BATCHOP));
          } else {
-            // Still serving: BATCHOP must not be evicted before its evicting duty.
+            // Still serving: BATCHOP must not be evicted before the advance that closes its evicting duty's books.
             BOOST_REQUIRE_EQUAL(std::string(served_status::serving), status);
-            BOOST_REQUIRE_LT(batchop_duties, evicting_duty);
+            BOOST_REQUIRE(batchop_duties < evicting_duty || !open_duties.empty());
          }
       }
       BOOST_REQUIRE(evicted);
+      require_evicted_seat_slides_out(BATCHOP, outposts);
+   }
+
+   /// `account` was just evicted from every chain of `outposts` by the advance that closed its duty epoch's
+   /// books. The slide out of that duty epoch already re-seated it, in the window's last group: it keeps that one
+   /// seat, the epoch after the current one, until the seat slides out, and no group drawn after the eviction
+   /// seats it. The roster then leaves it out.
+   void require_evicted_seat_slides_out(name account, const std::vector<uint64_t>& outposts) {
+      for (const uint64_t outpost : outposts) {
+         BOOST_REQUIRE(seated_epochs(account, outpost) == std::vector<uint32_t>{current_epoch(outpost) + 1});
+      }
+      advance_to_next_epoch();
+      for (const uint64_t outpost : outposts) {
+         BOOST_REQUIRE(seated_epochs(account, outpost) == std::vector<uint32_t>{current_epoch(outpost)});
+      }
+      advance_to_next_epoch();
+      for (const uint64_t outpost : outposts) {
+         BOOST_REQUIRE(!seated_on(account, outpost));
+         BOOST_REQUIRE(!require_roster_is_window(outpost).count(account.to_string()));
+         BOOST_REQUIRE_EQUAL(std::string(served_status::evicted), membership_status(account, outpost));
+      }
+   }
+
+   /// bootstrap() variant with the production shape: ETH alone, `DISJOINT_GROUPS` disjoint groups of
+   /// `DISJOINT_GROUP_SIZE`, every member bootstrapped except BATCHOP when `batchop_is_bootstrapped` is false,
+   /// which bonds the one-unit WIRE minimum and, sorted first, sits in epoch 1's group. Runs ETH's genesis
+   /// advance and returns its window, epoch 1's group first.
+   std::vector<std::vector<name>> bootstrap_disjoint_groups(bool batchop_is_bootstrapped = true) {
+      epoch_chains = {ETH_CHAIN_CODE};
+      set_epoch_config(ETH_CHAIN_CODE, EPOCH_DURATION_SEC, DISJOINT_GROUP_SIZE, DISJOINT_GROUPS);
+      BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "seteconomy"_n, mvo()
+         ("epoch_duration_sec", EPOCH_DURATION_SEC)("start_time", fc::time_point_sec(control->head().block_time()))));
+      BOOST_REQUIRE_EQUAL(success(), setemitcfg_defaults());
+      BOOST_REQUIRE_EQUAL(success(), push(SYSIO_ACCOUNT, sysio_abi, SYSIO_ACCOUNT, "initt5"_n, mvo()));
+      set_termination_thresholds(ROTATION_MAX_CONSECUTIVE_MISSES, DEFAULT_MAX_PERCENT_MISSES);
+
+      create_accounts({BATCHOP_H, BATCHOP_I});
+      const std::vector<name> batch_ops{BATCHOP,   BATCHOP_B, BATCHOP_C, BATCHOP_D, BATCHOP_E,
+                                        BATCHOP_F, BATCHOP_G, BATCHOP_H, BATCHOP_I};
+      for (const name op : batch_ops) {
+         BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n, mvo()
+            ("account", op.to_string())("type", opp::types::OperatorType::OPERATOR_TYPE_BATCH)
+            ("is_bootstrapped", op == BATCHOP ? batchop_is_bootstrapped : true)));
+      }
+      register_chain(opp::types::ChainKind::CHAIN_KIND_EVM, ETH_CHAIN_CODE, ETH_EXTERNAL_CHAIN_ID);
+      if (!batchop_is_bootstrapped) {
+         BOOST_REQUIRE_EQUAL(success(), fund_and_bond(BATCHOP, BATCH_OPERATOR_MINIMUM_COLLATERAL));
+      }
+      serve_chains(batch_ops, epoch_chains);
+      BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::SCHEDULE,
+                                          mvo()(epoch_fields::CHAIN_CODE, ETH_CHAIN_CODE)));
+      BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::ADVANCE,
+                                          mvo()(epoch_fields::CHAIN_CODE, ETH_CHAIN_CODE)));
+      produce_blocks();
+      BOOST_REQUIRE_EQUAL(1u, current_epoch());
+      const auto window = read_epoch_state()[epoch_fields::BATCH_OP_GROUPS].as<std::vector<std::vector<name>>>();
+      BOOST_REQUIRE_EQUAL(DISJOINT_GROUPS, window.size());
+      for (const auto& group : window) BOOST_REQUIRE_EQUAL(DISJOINT_GROUP_SIZE, group.size());
+      return window;
+   }
+
+   /// `members`, sorted.
+   static std::vector<name> sorted(std::vector<name> members) {
+      std::sort(members.begin(), members.end());
+      return members;
+   }
+
+   /// Each of `members` delivers `envelope` to ETH.
+   void deliver_all(const std::vector<name>& members, const std::vector<char>& envelope) {
+      for (const name member : members) BOOST_REQUIRE_EQUAL(success(), deliver_as(member, ETH_OUTPOST_ID, envelope));
+      produce_blocks();
+   }
+
+   /// Make ETH due and push `chkcons`, which advances its decided epoch.
+   void advance_decided_epoch() {
+      const uint32_t epoch = current_epoch();
+      elapse_epoch_boundary();
+      BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID));
+      produce_blocks();
+      BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
+   }
+
+   /// `account`'s one `dellog` row for ETH's epoch `epoch_index` records `delivered`.
+   void require_booked(name account, uint32_t epoch_index, bool delivered) {
+      const std::vector<fc::variant> rows = dellog_rows(account, epoch_index, ETH_OUTPOST_ID);
+      BOOST_REQUIRE_EQUAL(1u, rows.size());
+      BOOST_REQUIRE_EQUAL(delivered, rows.front()[opreg_fields::DELIVERED].as<bool>());
+   }
+
+   /// Set `chain_code`'s `sysio.chains::chains` row active or not, as no action does once it is active, so a
+   /// test can run a chain that stops being an active outpost.
+   void set_chain_active(uint64_t chain_code, bool active) {
+      const auto data = get_row_by_id(CHAINS_ACCOUNT, CHAINS_ACCOUNT, chains_tables::CHAINS, chain_code);
+      BOOST_REQUIRE(!data.empty());
+      fc::mutable_variant_object row(
+         chains_abi.binary_to_variant(chains_abi_types::CHAIN_ROW, data, fixture_abi_yield_function()).get_object());
+      row(chains_fields::ACTIVE, active);
+      sysio_system::test_support::write_kv_row(
+         *this, CHAINS_ACCOUNT, chains_tables::CHAINS, chain_code,
+         chains_abi.variant_to_binary(chains_abi_types::CHAIN_ROW, row, fixture_abi_yield_function()));
+   }
+
+   // -- Outbound backlog reports --
+
+   /// `t` in milliseconds since the Unix epoch, the unit of `reportqueue`'s `oldest_pending_ms`.
+   static uint64_t to_ms(fc::time_point t) {
+      return static_cast<uint64_t>(t.time_since_epoch().count() / fc::milliseconds(1).count());
+   }
+
+   /// `reportqueue`'s arguments: `op` reports `chain_code`'s backlog in `epoch_index`.
+   static fc::variant_object report_queue_args(name op, uint64_t chain_code, uint32_t epoch_index,
+                                               uint32_t pending_count, uint64_t oldest_pending_ms) {
+      return mvo()(msgch_fields::BATCH_OP, op.to_string())(msgch_fields::CHAIN_CODE, chain_code)
+                  (msgch_fields::EPOCH_INDEX, epoch_index)(msgch_fields::PENDING_COUNT, pending_count)
+                  (msgch_fields::OLDEST_PENDING_MS, oldest_pending_ms);
+   }
+
+   /// Push `reportqueue` for `op`, signed by `signer` (`op` itself when empty).
+   action_result report_queue(name op, uint64_t chain_code, uint32_t epoch_index, uint32_t pending_count,
+                              uint64_t oldest_pending_ms, name signer = name{}) {
+      return push(MSGCH_ACCOUNT, msgch_abi, signer == name{} ? op : signer, msgch_actions::REPORT_QUEUE,
+                  report_queue_args(op, chain_code, epoch_index, pending_count, oldest_pending_ms));
+   }
+
+   /// `op` reports `REPORTED_PENDING_COUNT` messages pending on `chain_code`'s outpost since `oldest_pending_at`, in
+   /// the chain's current epoch; returns the transaction's trace.
+   transaction_trace_ptr report_backlog(name op, fc::time_point oldest_pending_at,
+                                        uint64_t chain_code = ETH_OUTPOST_ID) {
+      return sysio_system::test_support::push_contract_action_trace(
+         *this, MSGCH_ACCOUNT, msgch_abi, op, msgch_actions::REPORT_QUEUE,
+         report_queue_args(op, chain_code, current_epoch(chain_code), REPORTED_PENDING_COUNT,
+                           to_ms(oldest_pending_at)));
+   }
+
+   /// How many `sysio.epoch::notetraffic` `trace` ran.
+   static uint32_t note_traffic_count(const transaction_trace_ptr& trace) {
+      return action_count(trace, EPOCH_ACCOUNT, epoch_actions::NOTE_TRAFFIC);
+   }
+
+   /// `account`'s `qreports` row for `chain_code`; null when it has none. The key is (chain, account), the
+   /// `[scope][id]` layout `get_row_by_id` reads.
+   fc::variant queue_report(name account, uint64_t chain_code = ETH_OUTPOST_ID) {
+      const std::vector<char> data =
+         get_row_by_id(MSGCH_ACCOUNT, name{chain_code}, msgch_tables::QUEUE_REPORTS, account.to_uint64_t());
+      return data.empty() ? fc::variant()
+                          : msgch_abi.binary_to_variant(msgch_abi_types::QUEUE_REPORT_ENTRY, data,
+                                                        fixture_abi_yield_function());
+   }
+
+   /// The accounts of `chain_code`'s `qreports` rows, in key order.
+   std::vector<name> queue_reporters(uint64_t chain_code = ETH_OUTPOST_ID) {
+      std::vector<name> reporters;
+      for (const auto& row : table_rows(MSGCH_ACCOUNT, msgch_tables::QUEUE_REPORTS, msgch_abi,
+                                        msgch_abi_types::QUEUE_REPORT_ENTRY)) {
+         if (row[msgch_fields::CHAIN_CODE].as_uint64() == chain_code) {
+            reporters.emplace_back(row[msgch_fields::ACCOUNT].as_string());
+         }
+      }
+      return reporters;
+   }
+
+   /// `account`'s `qreports` row for `chain_code` records `epoch_index`, `pending_count` and `oldest_pending_at`.
+   void require_queue_report(name account, uint32_t epoch_index, uint32_t pending_count,
+                             fc::time_point oldest_pending_at, uint64_t chain_code = ETH_OUTPOST_ID) {
+      const fc::variant row = queue_report(account, chain_code);
+      BOOST_REQUIRE(!row.is_null());
+      BOOST_REQUIRE_EQUAL(chain_code, row[msgch_fields::CHAIN_CODE].as_uint64());
+      BOOST_REQUIRE_EQUAL(account.to_string(), row[msgch_fields::ACCOUNT].as_string());
+      BOOST_REQUIRE_EQUAL(epoch_index, row[msgch_fields::EPOCH_INDEX].as<uint32_t>());
+      BOOST_REQUIRE_EQUAL(pending_count, row[msgch_fields::PENDING_COUNT].as<uint32_t>());
+      BOOST_REQUIRE(oldest_pending_at == row[msgch_fields::OLDEST_PENDING_AT].as<fc::time_point>());
+   }
+
+   /// `chain_code`'s `traffic_since`; zero while it has no traffic.
+   fc::time_point traffic_since(uint64_t chain_code = ETH_OUTPOST_ID) {
+      return read_epoch_state(chain_code)[epoch_fields::TRAFFIC_SINCE].as<fc::time_point>();
+   }
+
+   /// `chain_code`'s `due_at`; zero while it is idle.
+   fc::time_point due_at(uint64_t chain_code = ETH_OUTPOST_ID) {
+      return read_epoch_state(chain_code)[epoch_fields::DUE_AT].as<fc::time_point>();
+   }
+
+   /// When `chain_code`'s current epoch started.
+   fc::time_point epoch_start(uint64_t chain_code = ETH_OUTPOST_ID) {
+      return read_epoch_state(chain_code)[epoch_fields::CURRENT_EPOCH_START].as<fc::time_point>();
+   }
+
+   /// `chain_code`'s group on duty.
+   std::vector<name> current_group(uint64_t chain_code = ETH_OUTPOST_ID) {
+      const fc::variant                    state  = read_epoch_state(chain_code);
+      const std::vector<std::vector<name>> groups =
+         state[epoch_fields::BATCH_OP_GROUPS].as<std::vector<std::vector<name>>>();
+      const uint32_t                       cursor = state[epoch_fields::CURRENT_BATCH_OP_GROUP].as<uint32_t>();
+      BOOST_REQUIRE_LT(cursor, groups.size());
+      return groups[cursor];
    }
 
    abi_serializer sysio_abi, token_abi, epoch_abi, opreg_abi, msgch_abi, chalg_abi, chains_abi, roa_abi,
@@ -2244,11 +2808,11 @@ BOOST_FIXTURE_TEST_CASE(inbound_bootstrap_accepts_unverifiable_prev, sysio_msgch
 /// Late confirmation: once an epoch's winner is accepted, the per-stream tip advances to the
 /// winner's own digest, so the winner no longer "continues" the chain it just extended. The
 /// remaining operators of the group still deliver the exact accepted bytes (`sysio.epoch::advance`
-/// classifies every operator's delivery as canonical or slashable), and `deliver` must record --
-/// not chain-break-revert -- them. A three-operator group reaches majority consensus at the second
-/// post-boundary delivery; the third operator's byte-identical delivery is the late confirmation.
-/// A DIVERGENT post-acceptance delivery still reverts (fail closed): post-acceptance divergence
-/// cannot open a dispute, so nothing legitimate is lost by rejecting it at ingress.
+/// records every member's delivery), and `deliver` must record -- not chain-break-revert -- them. A
+/// three-operator group reaches majority consensus at the second delivery; the third operator's
+/// byte-identical delivery is the late confirmation.
+/// A DIVERGENT post-acceptance delivery reverts (fail closed): the acceptance already judged every
+/// recorded delivery, so a decided epoch takes only the winner's bytes.
 BOOST_FIXTURE_TEST_CASE(late_confirmation_after_consensus_recorded, sysio_msgch_chain_tester) { try {
    bootstrap(/*n_batch_ops=*/3);
 
@@ -2256,7 +2820,7 @@ BOOST_FIXTURE_TEST_CASE(late_confirmation_after_consensus_recorded, sysio_msgch_
    auto winner = encode_delivery(epoch, "late-confirm");
    const auto winner_digest = oracle::epoch_digest(decode_envelope(winner));
 
-   // First delivery: group of three, boundary not elapsed -- no consensus yet.
+   // First delivery: one of a group of three is no majority -- no consensus yet.
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, winner));
    produce_blocks();
    {
@@ -2268,9 +2832,8 @@ BOOST_FIXTURE_TEST_CASE(late_confirmation_after_consensus_recorded, sysio_msgch_
       BOOST_REQUIRE(row[msgch_fields::RAW_DATA].as<std::vector<char>>() == winner);
    }
 
-   // Second delivery after the boundary: majority (2 of 3) tips consensus and advances the tip
-   // to the winner's own digest.
-   elapse_epoch_boundary();
+   // Second delivery: the majority (2 of 3) tips consensus and advances the tip to the winner's own
+   // digest.
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, winner));
    produce_blocks();
    {
@@ -2282,12 +2845,10 @@ BOOST_FIXTURE_TEST_CASE(late_confirmation_after_consensus_recorded, sysio_msgch_
    }
 
    // A post-acceptance DIVERGENT envelope is not a late confirmation: its bytes differ from the
-   // recorded winner, so it validates against the advanced tip and reverts as a chain break.
+   // recorded winner, so the decided epoch refuses it.
    auto divergent = encode_delivery(epoch, "late-diverge");
-   BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: delivered envelope failed inbound-chain or "
-            "semantic-header validation"),
-      deliver_as(BATCHOP_C, ETH_OUTPOST_ID, divergent));
+   BOOST_REQUIRE_EQUAL(error(DECIDED_EPOCH_DIFFERING_DELIVERY_ERROR),
+                       deliver_as(BATCHOP_C, ETH_OUTPOST_ID, divergent));
    produce_blocks();
 
    // The third operator's byte-identical delivery IS a late confirmation: recorded, not reverted.
@@ -2301,7 +2862,7 @@ BOOST_FIXTURE_TEST_CASE(late_confirmation_after_consensus_recorded, sysio_msgch_
       error("assertion failure with message: operator already delivered for this outpost+epoch"),
       deliver_as(BATCHOP_C, ETH_OUTPOST_ID, winner));
 
-   // The confirmation row keeps only what advance() classifies: its checksum matches the winner,
+   // The confirmation row keeps only metadata: its checksum matches the winner,
    // and the bytes, which duplicate the already-applied winner, are not stored.
    {
       auto row = find_inbound_delivery(ETH_OUTPOST_ID, epoch, BATCHOP_C);
@@ -2325,9 +2886,10 @@ BOOST_FIXTURE_TEST_CASE(late_confirmation_after_consensus_recorded, sysio_msgch_
 /// WNS-16: a non-canonical delivery must be slashed before its historical
 /// miss window can evict it. The fixture builds its historical anchor and
 /// misses through real `chkcons -> advance` transitions, then lowers the
-/// consecutive-miss threshold before the divergent epoch. Pre-fix, `termcheck`
-/// marked BATCHOP TERMINATED before `slashop` rejected that state and rolled
-/// the entire epoch back.
+/// consecutive-miss threshold before the divergent epoch. The acceptance of the
+/// epoch's winner slashes BATCHOP, before the next advance's `termcheck` evaluates
+/// the rails on the last missed epoch, and the advance after it, which closes the
+/// divergent epoch's books, still records its delivery.
 BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_msgch_chain_tester) { try {
    constexpr uint32_t kBatchOperatorCount                  = 3;
    constexpr uint32_t kExpectedInitialEpoch                = 1;
@@ -2341,6 +2903,7 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_
    constexpr const char* kHistoricalMissPayload            = "history-miss";
    constexpr const char* kCanonicalPayload                 = "canonical";
    constexpr const char* kNonCanonicalPayload              = "non-canonical";
+   constexpr const char* kFollowingPayload                 = "following";
    constexpr uint32_t kExpectedSlashActionsPerOutpost      = 0;
    constexpr uint32_t kEpochAdvanceCount                   = 1;
    constexpr uint32_t kOutpostCount                        = 2;
@@ -2399,7 +2962,7 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_
    }
 
    // The accumulated real misses now breach a rail. A non-canonical delivery is still recorded
-   // as delivered, so only slash-first ordering prevents termcheck from blocking this advance.
+   // as delivered; the slash at acceptance precedes the close's termcheck.
    set_termination_thresholds(kTerminatingMaxConsecutiveMisses, kPermissiveMaxPercentMisses);
 
    const uint32_t epoch = current_epoch();
@@ -2409,16 +2972,18 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_
    const auto divergent_checksum = fc::sha256::hash(divergent.data(), divergent.size());
    BOOST_REQUIRE_NE(canonical_checksum, divergent_checksum);
 
-   // Stage the split deliveries for both outposts before the boundary. BATCHOP
-   // is non-canonical everywhere, and `advance` deduplicates it before invoking
-   // slashop. BATCHOP_B/C establish canonical consensus after the boundary.
+   // Stage the split deliveries for both outposts. BATCHOP is non-canonical everywhere; BATCHOP_B/C
+   // establish canonical consensus, and ETH's acceptance slashes BATCHOP. SOL's acceptance slashes it
+   // again, without effect.
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP,   ETH_OUTPOST_ID, divergent));
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP,   SOL_OUTPOST_ID, divergent));
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, canonical));
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, SOL_OUTPOST_ID, canonical));
-   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(BATCHOP));
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, canonical));
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED, operator_status(BATCHOP));
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, SOL_OUTPOST_ID, canonical));
+   elapse_epoch_boundary();
    {
       auto eth_consensus = get_outpcons(ETH_OUTPOST_ID);
       BOOST_REQUIRE(!eth_consensus.is_null());
@@ -2451,15 +3016,34 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_
    BOOST_REQUIRE_EQUAL(kExpectedSlashActionsPerOutpost,
                        slash_action_count(BATCHOP, SOL_OUTPOST_ID));
    BOOST_REQUIRE_EQUAL(epoch + kEpochAdvanceCount, current_epoch());
-   BOOST_REQUIRE_EQUAL(kExpectedDeliveredLogCount, delivered_dellog_count(BATCHOP));
+   // That advance closed the last missed epoch's books: the slashed BATCHOP was not evaluated.
+   for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID})
+      BOOST_REQUIRE_EQUAL(std::string(served_status::serving), membership_status(BATCHOP, chain));
    // The slide reseated the group without BATCHOP, so the roster no longer lists it.
    for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID})
       BOOST_REQUIRE(!require_roster_is_window(chain).count(BATCHOP.to_string()));
+
+   // The divergent epoch's books close at the next advance, which records its delivery.
+   const uint32_t following_epoch = current_epoch();
+   const auto     following       = encode_chained_delivery(kFollowingPayload, next_stream_tip(canonical));
+   for (const name member : {BATCHOP_B, BATCHOP_C}) {
+      for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID})
+         BOOST_REQUIRE_EQUAL(success(), deliver_as(member, chain, following));
+   }
+   elapse_epoch_boundary();
+   advance_via_consensus();
+   BOOST_REQUIRE_EQUAL(following_epoch + kEpochAdvanceCount, current_epoch());
+   BOOST_REQUIRE_EQUAL(kExpectedDeliveredLogCount, delivered_dellog_count(BATCHOP));
+   for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
+      const auto rows = dellog_rows(BATCHOP, epoch, chain);
+      BOOST_REQUIRE_EQUAL(1u, rows.size());
+      BOOST_REQUIRE(rows.front()[opreg_fields::DELIVERED].as<bool>());
+   }
 } FC_LOG_AND_RETHROW() }
 
-/// WNS-70: a member that delivered a non-canonical envelope and was terminated before the epoch
-/// closed leaves its delivery row behind. `advance` still queues it for a slash, which must not
-/// roll the epoch advance back.
+/// WNS-70: a member that delivered a non-canonical envelope and was terminated before the epoch's
+/// winner was accepted leaves its delivery row behind. The acceptance still sends a slash for it,
+/// which must not roll the accepting delivery back, and the close still advances.
 BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_then_termination_still_advances, sysio_msgch_chain_tester) { try {
    constexpr uint32_t    kBatchOperatorCount  = 3;
    constexpr uint32_t    kEpochAdvanceCount   = 1;
@@ -2480,9 +3064,14 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_then_termination_still_advances, s
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, SOL_OUTPOST_ID, canonical));
    BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "terminate"_n,
       mvo()("account", BATCHOP.to_string())("reason", kTerminationReason)));
+   for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
+      const transaction_trace_ptr trace = deliver_trace(BATCHOP_C, chain, canonical);
+      const std::vector<slashop_record> slashed = slashops(trace);
+      BOOST_REQUIRE_EQUAL(1u, slashed.size());
+      BOOST_REQUIRE_EQUAL(BATCHOP, slashed.front().operator_account);
+   }
+   produce_blocks();
    elapse_epoch_boundary();
-   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, canonical));
-   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, SOL_OUTPOST_ID, canonical));
    for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
       auto consensus = get_outpcons(chain);
       BOOST_REQUIRE(!consensus.is_null());
@@ -2498,8 +3087,8 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_then_termination_still_advances, s
                        get_operator(BATCHOP)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
 } FC_LOG_AND_RETHROW() }
 
-/// Each chain's advance() writes exactly one delivery-log row per expiring-group member for that
-/// chain's epoch, marked delivered when the member reached that chain.
+/// Each chain's advance() writes exactly one delivery-log row per member of the group that served the epoch
+/// whose books it closes, the one before the epoch it closes, marked delivered when the member reached that chain.
 BOOST_FIXTURE_TEST_CASE(advance_records_one_row_per_member_per_chain_epoch, sysio_msgch_chain_tester) { try {
    constexpr uint32_t    kBatchOperatorCount = 3;
    constexpr const char* kPayload            = "one-row-per-member";
@@ -2514,6 +3103,9 @@ BOOST_FIXTURE_TEST_CASE(advance_records_one_row_per_member_per_chain_epoch, sysi
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, SOL_OUTPOST_ID, envelope));
    produce_blocks();
    BOOST_REQUIRE_EQUAL(epoch + 1, advance_one_epoch());
+   // The epoch's books are still open after its own close.
+   for (const name member : {BATCHOP, BATCHOP_B, BATCHOP_C}) BOOST_REQUIRE(dellog_rows(member, epoch).empty());
+   BOOST_REQUIRE_EQUAL(epoch + 2, advance_one_epoch());
 
    // Delivered on ETH, then on SOL.
    const std::vector<uint64_t> chains{ETH_OUTPOST_ID, SOL_OUTPOST_ID};
@@ -2531,7 +3123,9 @@ BOOST_FIXTURE_TEST_CASE(advance_records_one_row_per_member_per_chain_epoch, sysi
 
 /// A chain starts only as an active outpost with a seated window: while it is not an active outpost its
 /// operators cannot serve it and its genesis advance is refused, and once registered it still waits for
-/// its schedule. Started, its next advance records and checks the expiring member.
+/// its schedule. Started, its genesis and its first advance record nothing, their `previous_group` empty;
+/// the first advance keeps epoch 1's group as `previous_group`, and the advance after it records and checks
+/// that member.
 BOOST_FIXTURE_TEST_CASE(a_chain_starts_only_as_an_active_outpost_with_a_window, sysio_msgch_chain_tester) { try {
    BOOST_REQUIRE(bootstrap_rotation(ROTATION_WINDOW_MS, /*batchop_is_bootstrapped=*/false,
                                     rotation_outposts::none).empty());
@@ -2555,10 +3149,17 @@ BOOST_FIXTURE_TEST_CASE(a_chain_starts_only_as_an_active_outpost_with_a_window, 
    BOOST_REQUIRE_EQUAL(success(), genesis());
    produce_blocks();
    BOOST_REQUIRE_EQUAL(1u, current_epoch());
+   BOOST_REQUIRE(previous_group().empty());
 
    const name     expiring_member = duty_member();
    const uint32_t expiring_epoch  = current_epoch();
-   const auto     trace           = advance_to_next_epoch_traces().front();
+   const auto     first           = advance_to_next_epoch_traces().front();
+   BOOST_REQUIRE_EQUAL(0u, action_count(first, OPREG_ACCOUNT, opreg_actions::RECORD_DELIVERY));
+   BOOST_REQUIRE_EQUAL(0u, action_count(first, OPREG_ACCOUNT, opreg_actions::TERMINATION_CHECK));
+   BOOST_REQUIRE(dellog_rows(expiring_member).empty());
+   BOOST_REQUIRE(previous_group() == std::vector<name>{expiring_member});
+
+   const auto trace = advance_to_next_epoch_traces().front();
    BOOST_REQUIRE_EQUAL(ROTATION_OPERATORS_PER_GROUP,
                        action_count(trace, OPREG_ACCOUNT, opreg_actions::RECORD_DELIVERY));
    BOOST_REQUIRE_EQUAL(ROTATION_OPERATORS_PER_GROUP,
@@ -2569,9 +3170,8 @@ BOOST_FIXTURE_TEST_CASE(a_chain_starts_only_as_an_active_outpost_with_a_window, 
 } FC_LOG_AND_RETHROW() }
 
 // SEC-28 (huang review): evict on the CONSECUTIVE-miss rail through the REAL rotation -- a
-// materialized three-group schedule driven by advance() with one outpost, at exactly the minimum
-// window the span bound accepts. A resident operator is on duty once per three-epoch rotation, and
-// the window spans exactly (max_consecutive_misses + 1) rotations, so the delivered anchor that
+// materialized three-group schedule driven by advance() with one outpost. A resident operator is on
+// duty once per three-epoch rotation, and the window spans exactly (max_consecutive_misses + 1) rotations, so the delivered anchor that
 // keeps the percent rail below its ceiling sits exactly on the window edge at the evicting miss.
 // Eviction alone does NOT pin that edge: the six miss rows fire the consecutive rail whether or
 // not the anchor is pruned, and termcheck prefers the consecutive reason over percent. So the test
@@ -2594,6 +3194,13 @@ BOOST_FIXTURE_TEST_CASE(evict_at_duty_rotation_via_advance_with_two_outposts, sy
    walk_rotation_to_consecutive_eviction(outposts);
 } FC_LOG_AND_RETHROW() }
 
+/// A window of one rotation keeps only a member's latest record, yet the consecutive rail counts every missed
+/// duty epoch since the last delivery: the same rotation evicts BATCHOP at the same duty, its delivered anchor
+/// long erased.
+BOOST_FIXTURE_TEST_CASE(evict_a_run_whose_rows_aged_out_via_advance, sysio_msgch_chain_tester) { try {
+   walk_rotation_to_consecutive_eviction(bootstrap_rotation(ROTATION_DUTY_MS), /*anchor_in_window=*/false);
+} FC_LOG_AND_RETHROW() }
+
 /// Delivering to one of two active outposts is a delivery on the chain reached and a miss on the other,
 /// each recorded by that chain's own close in that chain's own log. After a first duty delivered to both
 /// (the anchor that keeps each chain's percent rail below its ceiling), alternating the chain reached
@@ -2603,12 +3210,13 @@ BOOST_FIXTURE_TEST_CASE(partial_delivery_is_a_miss_on_the_chain_left_out, sysio_
    const auto outposts = bootstrap_rotation(ROTATION_WINDOW_MS, /*batchop_is_bootstrapped=*/false,
                                             rotation_outposts::eth_and_sol);
    std::map<uint64_t, inbound_stream_tip> tips;
+   // BATCHOP's duty epochs whose books are still open, each with the chains it reached.
+   std::map<uint32_t, std::vector<size_t>> open_duties;
    uint32_t duties = 0;
-   while (duties < kDuties) {
-      const uint32_t      duty_epoch = current_epoch();
-      const bool          on_duty    = duty_member() == BATCHOP;
-      std::vector<size_t> reached;
-      if (on_duty) {
+   while (duties < kDuties || !open_duties.empty()) {
+      const uint32_t duty_epoch = current_epoch();
+      if (duties < kDuties && duty_member() == BATCHOP) {
+         std::vector<size_t> reached;
          if (duties == 0) {
             for (size_t chain = 0; chain < outposts.size(); ++chain) reached.push_back(chain);
          } else {
@@ -2621,17 +3229,19 @@ BOOST_FIXTURE_TEST_CASE(partial_delivery_is_a_miss_on_the_chain_left_out, sysio_
             BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, outposts[chain], envelope));
             tip = next_stream_tip(envelope);
          }
+         open_duties[duty_epoch] = reached;
          produce_blocks();
       }
       advance_to_next_epoch();
-      if (on_duty) {
-         // One row per chain: delivered only on the chains reached.
+      // One row per chain for the duty epoch whose books this advance closed: delivered only on the chains reached.
+      if (const auto duty = open_duties.find(booked_epoch()); duty != open_duties.end()) {
          for (size_t chain = 0; chain < outposts.size(); ++chain) {
-            const auto rows = dellog_rows(BATCHOP, duty_epoch, outposts[chain]);
+            const auto rows = dellog_rows(BATCHOP, duty->first, outposts[chain]);
             BOOST_REQUIRE_EQUAL(1u, rows.size());
-            const bool was_reached = std::find(reached.begin(), reached.end(), chain) != reached.end();
+            const bool was_reached = std::find(duty->second.begin(), duty->second.end(), chain) != duty->second.end();
             BOOST_REQUIRE_EQUAL(was_reached, rows.front()[opreg_fields::DELIVERED].as<bool>());
          }
+         open_duties.erase(duty);
       }
       for (const uint64_t outpost : outposts) {
          BOOST_REQUIRE_EQUAL(std::string(served_status::serving), membership_status(BATCHOP, outpost));
@@ -2668,7 +3278,7 @@ BOOST_FIXTURE_TEST_CASE(short_group_after_slash_still_reaches_consensus, sysio_m
       deliver_as(BATCHOP_C, ETH_OUTPOST_ID, envelope));
    produce_blocks();
 
-   // Both surviving members deliver identical bytes: unanimity over the ELIGIBLE group.
+   // Both surviving members deliver identical bytes: the strict majority of the ELIGIBLE group of two.
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, envelope));
    produce_blocks();
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, envelope));
@@ -2681,97 +3291,972 @@ BOOST_FIXTURE_TEST_CASE(short_group_after_slash_still_reaches_consensus, sysio_m
    BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), digest.str());
 } FC_LOG_AND_RETHROW() }
 
-// WNS-15(b) / WNS-21 (WIRE-346 / WIRE-354): a majority that forms BEFORE the epoch boundary must
-// still be finalized once the boundary passes.
-//
-// `evalcons` runs only as an inline of `deliver`, and `deliver` rejects a second delivery from the
-// same operator, so before the fix nothing on chain could re-examine a pre-boundary majority once
-// the time gate opened -- the epoch stalled permanently even though the votes were already cast and
-// unanimous among those who voted. `chkcons` (permissionless, cranked every tick) now re-drives
-// `evalcons` for every outpost still lacking a current-epoch consensus row.
-//
-// Note the re-drive lands as an inline AFTER chkcons returns, so the row appears on the following
-// block -- this test asserts exactly that ordering rather than same-transaction settlement.
-BOOST_FIXTURE_TEST_CASE(pre_boundary_majority_finalized_by_chkcons_crank, sysio_msgch_chain_tester) { try {
-   bootstrap(/*n_batch_ops=*/3);
+/// The first strict majority decides the chain's current epoch in the delivering transaction, before the
+/// chain's boundary and with no crank. Advancing the decided epoch still waits for the boundary.
+BOOST_FIXTURE_TEST_CASE(majority_decides_before_the_boundary_in_the_delivering_transaction,
+                        sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kGroupSize = 3;
+   bootstrap(kGroupSize);
 
-   const uint32_t epoch = current_epoch();
-   auto envelope = encode_delivery(epoch, "pre-boundary-majority");
-   const auto digest = oracle::epoch_digest(decode_envelope(envelope));
+   const uint32_t          epoch    = current_epoch();
+   const std::vector<char> envelope = encode_delivery(epoch, "majority-before-boundary");
+   const fc::sha256        checksum = fc::sha256::hash(envelope.data(), envelope.size());
 
-   // Two of three agree, all BEFORE the boundary. The unanimous path needs all three, and the
-   // majority path is time-gated, so no consensus is recorded yet.
+   // One of three is no majority.
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, envelope));
    produce_blocks();
-   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, envelope));
+   BOOST_REQUIRE(!epoch_decided(ETH_OUTPOST_ID, epoch));
+
+   // Two of three is: the second delivery's own transaction evaluates and accepts the winner.
+   const transaction_trace_ptr trace = deliver_trace(BATCHOP_B, ETH_OUTPOST_ID, envelope);
+   BOOST_REQUIRE_EQUAL(1u, action_count(trace, MSGCH_ACCOUNT, msgch_actions::EVALUATE_CONSENSUS));
+   BOOST_REQUIRE(before_epoch_boundary());
+   BOOST_REQUIRE(epoch_decided(ETH_OUTPOST_ID, epoch));
+   BOOST_REQUIRE_EQUAL(get_outpcons(ETH_OUTPOST_ID)[msgch_fields::WINNING_CHECKSUM].as_string(), checksum.str());
+   BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, epoch), 1u);
    produce_blocks();
-   {
-      auto opc = get_outpcons(ETH_OUTPOST_ID);
-      BOOST_REQUIRE(opc.is_null() || !opc["consensus_reached"].as<bool>());
-   }
 
-   // The boundary passes with NO further delivery -- the third operator never shows up, and the two
-   // that did are barred from delivering again. This is the stall state.
-   elapse_epoch_boundary();
-
-   // The permissionless crank re-drives evalcons for the outposts still awaiting consensus.
+   // The decided epoch advances only once the chain's boundary has passed.
    BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP));
    produce_blocks();
-
-   auto opc = get_outpcons(ETH_OUTPOST_ID);
-   BOOST_REQUIRE(!opc.is_null());
-   BOOST_REQUIRE_EQUAL(opc["consensus_reached"].as<bool>(), true);
-   BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), epoch);
-   BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), digest.str());
+   BOOST_REQUIRE_EQUAL(epoch, current_epoch());
+   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
 } FC_LOG_AND_RETHROW() }
 
-/// A 1–1 split leaves no strict majority. The deliveries deliberately land before the epoch
-/// boundary, so only the permissionless `chkcons` crank can re-drive evalcons and open the dispute.
-BOOST_FIXTURE_TEST_CASE(chkcons_opens_dispute_for_one_to_one_tie, sysio_msgch_chain_tester) { try {
+/// Once the epoch is decided, a delivery that differs from the accepted bytes is refused, a stale one and one
+/// that continues the advanced inbound tip alike, before the chain's boundary as after it. The member that
+/// sent it is not slashed: the advance that closes the epoch's books records a miss for it.
+BOOST_FIXTURE_TEST_CASE(divergent_delivery_after_the_decision_is_refused_and_missed, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kGroupSize = 3;
+   bootstrap(kGroupSize);
+
+   const uint32_t          epoch     = current_epoch();
+   const std::vector<char> winner    = encode_delivery(epoch, "decided-first");
+   const std::vector<char> divergent = encode_delivery(epoch, "decided-divergent");
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, winner));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, winner));
+   produce_blocks();
+   BOOST_REQUIRE(epoch_decided(ETH_OUTPOST_ID, epoch));
+
+   // An envelope chained from the accepted winner passes the inbound-chain validation; the decided epoch
+   // refuses it all the same.
+   const std::vector<char> continuing = encode_delivery(epoch, "decided-continuing",
+                                                        next_stream_tip(winner).envelope_digest,
+                                                        next_stream_tip(winner).message_id);
+
+   BOOST_REQUIRE(before_epoch_boundary());
+   for (const std::vector<char>* refused : {&divergent, &continuing}) {
+      BOOST_REQUIRE_EQUAL(error(DECIDED_EPOCH_DIFFERING_DELIVERY_ERROR),
+                          deliver_as(BATCHOP_C, ETH_OUTPOST_ID, *refused));
+      produce_blocks();
+   }
+   BOOST_REQUIRE(find_inbound_delivery(ETH_OUTPOST_ID, epoch, BATCHOP_C).is_null());
+
+   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(error(DECIDED_EPOCH_DIFFERING_DELIVERY_ERROR),
+                       deliver_as(BATCHOP_C, ETH_OUTPOST_ID, continuing));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
+   advance_trace(ETH_OUTPOST_ID, MSGCH_ACCOUNT);
+
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE,
+                       get_operator(BATCHOP_C)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
+   const std::vector<fc::variant> missed = dellog_rows(BATCHOP_C, epoch, ETH_OUTPOST_ID);
+   BOOST_REQUIRE_EQUAL(1u, missed.size());
+   BOOST_REQUIRE(!missed.front()[opreg_fields::DELIVERED].as<bool>());
+   for (const name deliverer : {BATCHOP, BATCHOP_B}) {
+      const std::vector<fc::variant> delivered = dellog_rows(deliverer, epoch, ETH_OUTPOST_ID);
+      BOOST_REQUIRE_EQUAL(1u, delivered.size());
+      BOOST_REQUIRE(delivered.front()[opreg_fields::DELIVERED].as<bool>());
+   }
+} FC_LOG_AND_RETHROW() }
+
+/// A late delivery, for the chain's previous epoch, of that epoch's accepted bytes from a member of the group that
+/// served it is recorded during the next epoch: metadata only, with no `evalcons` (so no second dispatch), no slash
+/// and no effect on the current epoch. The current epoch's acceptance shifts the previous winner into `outpcons`'s
+/// previous fields, the previous epoch's rows survive every delivery of the current epoch, and the advance that
+/// closes the previous epoch's books records the late member as delivered. A delivery for an epoch older than the
+/// previous one is refused.
+BOOST_FIXTURE_TEST_CASE(late_identical_delivery_is_recorded_at_the_following_advance, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kGroupSize = 3;
+   bootstrap(kGroupSize);   // one group of three: epoch 1's group serves epoch 2 too
+
+   const uint32_t          epoch           = current_epoch();
+   const std::vector<char> winner          = encode_delivery(epoch, "late-winner");
+   const fc::sha256        winner_checksum = fc::sha256::hash(winner.data(), winner.size());
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, winner));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, winner));
+   produce_blocks();
+   BOOST_REQUIRE(epoch_decided(ETH_OUTPOST_ID, epoch));
+   {
+      const fc::variant consensus = get_outpcons(ETH_OUTPOST_ID);
+      BOOST_REQUIRE_EQUAL(0u, consensus[msgch_fields::PREVIOUS_EPOCH_INDEX].as<uint32_t>());
+      BOOST_REQUIRE_EQUAL(fc::sha256().str(), consensus[msgch_fields::PREVIOUS_WINNING_CHECKSUM].as_string());
+   }
+   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
+   {
+      std::vector<name> previous = previous_group();
+      std::sort(previous.begin(), previous.end());
+      BOOST_REQUIRE(previous == (std::vector<name>{BATCHOP, BATCHOP_B, BATCHOP_C}));
+   }
+
+   // BATCHOP_C's late delivery of epoch 1's winner, while ETH sits in epoch 2.
+   const transaction_trace_ptr late = deliver_trace(BATCHOP_C, ETH_OUTPOST_ID, winner);
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(0u, action_count(late, MSGCH_ACCOUNT, msgch_actions::EVALUATE_CONSENSUS));
+   BOOST_REQUIRE(slashops(late).empty());
+   {
+      const fc::variant row = find_inbound_delivery(ETH_OUTPOST_ID, epoch, BATCHOP_C);
+      BOOST_REQUIRE(!row.is_null());
+      BOOST_REQUIRE_EQUAL(winner_checksum.str(), row[msgch_fields::CHECKSUM].as_string());
+      BOOST_REQUIRE(row[msgch_fields::RAW_DATA].as<std::vector<char>>().empty());
+   }
+   require_outpcons_winner(ETH_OUTPOST_ID, epoch, winner_checksum);
+   BOOST_REQUIRE(!epoch_decided(ETH_OUTPOST_ID, epoch + 1));
+   BOOST_REQUIRE(dellog_rows(BATCHOP_C, epoch, ETH_OUTPOST_ID).empty());
+   BOOST_REQUIRE_EQUAL(error("assertion failure with message: operator already delivered for this outpost+epoch"),
+                       deliver_as(BATCHOP_C, ETH_OUTPOST_ID, winner));
+
+   // Epoch 2 decides. Its deliveries prune only older epochs, and its acceptance shifts epoch 1's winner.
+   const std::vector<char> second          = encode_chained_delivery("late-second", next_stream_tip(winner));
+   const fc::sha256        second_checksum = fc::sha256::hash(second.data(), second.size());
+   for (const name member : {BATCHOP, BATCHOP_B, BATCHOP_C}) {
+      BOOST_REQUIRE_EQUAL(success(), deliver_as(member, ETH_OUTPOST_ID, second));
+   }
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(kGroupSize, envelope_rows_for(ETH_OUTPOST_ID, epoch));
+   require_outpcons_winner(ETH_OUTPOST_ID, epoch + 1, second_checksum);
+   {
+      const fc::variant consensus = get_outpcons(ETH_OUTPOST_ID);
+      BOOST_REQUIRE_EQUAL(epoch, consensus[msgch_fields::PREVIOUS_EPOCH_INDEX].as<uint32_t>());
+      BOOST_REQUIRE_EQUAL(winner_checksum.str(), consensus[msgch_fields::PREVIOUS_WINNING_CHECKSUM].as_string());
+   }
+
+   // The advance from epoch 2 closes epoch 1's books: every member delivered, BATCHOP_C late.
+   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(epoch + 2, current_epoch());
+   for (const name member : {BATCHOP, BATCHOP_B, BATCHOP_C}) {
+      const std::vector<fc::variant> rows = dellog_rows(member, epoch, ETH_OUTPOST_ID);
+      BOOST_REQUIRE_EQUAL(1u, rows.size());
+      BOOST_REQUIRE(rows.front()[opreg_fields::DELIVERED].as<bool>());
+      BOOST_REQUIRE_EQUAL(uint64_t{EPOCH_DURATION_SEC}, batch_duty_seat_seconds(member, ETH_OUTPOST_ID));
+   }
+
+   // Epoch 1 is now two epochs old: its winner is refused, and the first delivery of epoch 3 prunes its rows.
+   BOOST_REQUIRE_EQUAL(error("assertion failure with message: envelope epoch_index mismatch: envelope=" +
+                             std::to_string(epoch) + " current=" + std::to_string(epoch + 2)),
+                       deliver_as(BATCHOP_C, ETH_OUTPOST_ID, winner));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID,
+                                             encode_chained_delivery("late-third", next_stream_tip(second))));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(0u, envelope_rows_for(ETH_OUTPOST_ID, epoch));
+   BOOST_REQUIRE_EQUAL(kGroupSize, envelope_rows_for(ETH_OUTPOST_ID, epoch + 1));
+} FC_LOG_AND_RETHROW() }
+
+/// A late delivery that differs from the previous epoch's accepted envelope is refused, a stale one and one that
+/// continues the advanced inbound tip alike, and the member is not slashed: the advance that closes that epoch's
+/// books records its miss.
+BOOST_FIXTURE_TEST_CASE(late_divergent_delivery_is_refused_and_missed, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kGroupSize = 3;
+   bootstrap(kGroupSize);
+
+   const uint32_t          epoch  = current_epoch();
+   const std::vector<char> winner = encode_delivery(epoch, "late-refused-winner");
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, winner));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, winner));
+   produce_blocks();
+   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
+
+   const std::vector<char> divergent  = encode_delivery(epoch, "late-refused-divergent");
+   const std::vector<char> continuing = encode_delivery(epoch, "late-refused-continuing",
+                                                        next_stream_tip(winner).envelope_digest,
+                                                        next_stream_tip(winner).message_id);
+   for (const std::vector<char>* refused : {&divergent, &continuing}) {
+      BOOST_REQUIRE_EQUAL(error(LATE_DELIVERY_DIFFERING_ERROR), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, *refused));
+      produce_blocks();
+   }
+   BOOST_REQUIRE(find_inbound_delivery(ETH_OUTPOST_ID, epoch, BATCHOP_C).is_null());
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(BATCHOP_C));
+
+   advance_trace(ETH_OUTPOST_ID, MSGCH_ACCOUNT);
+   const std::vector<fc::variant> missed = dellog_rows(BATCHOP_C, epoch, ETH_OUTPOST_ID);
+   BOOST_REQUIRE_EQUAL(1u, missed.size());
+   BOOST_REQUIRE(!missed.front()[opreg_fields::DELIVERED].as<bool>());
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(BATCHOP_C));
+} FC_LOG_AND_RETHROW() }
+
+/// A late delivery is admitted only from the group that served the previous epoch, and a current-epoch delivery
+/// only from the group on duty: with single-member groups the three are disjoint, so the current member's late
+/// delivery, the previous member's current-epoch delivery and the next member's delivery of either are refused. A
+/// previous epoch with no accepted winner, which the fixture advances undecided, takes no late delivery, and its books
+/// record the miss.
+BOOST_FIXTURE_TEST_CASE(late_delivery_comes_only_from_the_previous_group, sysio_msgch_chain_tester) { try {
+   bootstrap_rotation(ROTATION_WINDOW_MS, /*batchop_is_bootstrapped=*/true);
+
+   // Epoch 1: its one member decides it.
+   const uint32_t          epoch  = current_epoch();
+   const name              first  = duty_member();
+   const std::vector<char> winner = encode_delivery(epoch, "previous-group-winner");
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(first, ETH_OUTPOST_ID, winner));
+   produce_blocks();
+   BOOST_REQUIRE(epoch_decided(ETH_OUTPOST_ID, epoch));
+   advance_to_next_epoch();
+   BOOST_REQUIRE(previous_group() == std::vector<name>{first});
+
+   const name second = duty_member();
+   name       third;
+   for (const name member : {BATCHOP, BATCHOP_B, BATCHOP_C}) {
+      if (member != first && member != second) third = member;
+   }
+   BOOST_REQUIRE(seated_on(third, ETH_OUTPOST_ID));
+   const std::vector<char> current = encode_chained_delivery("previous-group-current", next_stream_tip(winner));
+
+   BOOST_REQUIRE_EQUAL(error(LATE_DELIVERER_NOT_IN_PREVIOUS_GROUP_ERROR), deliver_as(second, ETH_OUTPOST_ID, winner));
+   BOOST_REQUIRE_EQUAL(error(DELIVERER_NOT_IN_ACTIVE_GROUP_ERROR), deliver_as(first, ETH_OUTPOST_ID, current));
+   for (const std::vector<char>* envelope : {&winner, &current}) {
+      BOOST_REQUIRE_EQUAL(error(DELIVERER_NOT_IN_GROUP_ERROR), deliver_as(third, ETH_OUTPOST_ID, *envelope));
+   }
+   BOOST_REQUIRE_EQUAL(error("assertion failure with message: operator already delivered for this outpost+epoch"),
+                       deliver_as(first, ETH_OUTPOST_ID, winner));
+   produce_blocks();
+   BOOST_REQUIRE(find_inbound_delivery(ETH_OUTPOST_ID, epoch, second).is_null());
+   BOOST_REQUIRE(find_inbound_delivery(ETH_OUTPOST_ID, epoch, third).is_null());
+
+   // Epoch 2 is left undecided and advanced all the same: its member's late delivery has no winner to repeat.
+   const uint32_t undecided = current_epoch();
+   advance_to_next_epoch();
+   BOOST_REQUIRE(previous_group() == std::vector<name>{second});
+   BOOST_REQUIRE(!epoch_decided(ETH_OUTPOST_ID, undecided));
+   BOOST_REQUIRE_EQUAL(error(LATE_DELIVERY_DIFFERING_ERROR), deliver_as(second, ETH_OUTPOST_ID, current));
+   produce_blocks();
+
+   // The advance closing epoch 2's books records its member's miss.
+   advance_to_next_epoch();
+   const std::vector<fc::variant> missed = dellog_rows(second, undecided, ETH_OUTPOST_ID);
+   BOOST_REQUIRE_EQUAL(1u, missed.size());
+   BOOST_REQUIRE(!missed.front()[opreg_fields::DELIVERED].as<bool>());
+} FC_LOG_AND_RETHROW() }
+
+/// With the production layout of disjoint groups a member of the previous epoch's group sits in no current group:
+/// it delivers only late, for the epoch it served, and the advance that closes that epoch's books records it as
+/// delivered and credits its seat. Neither group delivers for the other's epoch.
+BOOST_FIXTURE_TEST_CASE(disjoint_previous_group_member_delivers_only_late, sysio_msgch_chain_tester) { try {
+   const std::vector<std::vector<name>> window = bootstrap_disjoint_groups();
+   const std::vector<name>&             first  = window[0];
+   const std::vector<name>&             second = window[1];
+   const name                           late   = first[2];
+   const uint32_t                       epoch  = current_epoch();
+   const std::vector<char>              winner = encode_delivery(epoch, "disjoint-winner");
+   deliver_all({first[0], first[1]}, winner);
+   BOOST_REQUIRE(epoch_decided(ETH_OUTPOST_ID, epoch));
+   advance_decided_epoch();
+   BOOST_REQUIRE(sorted(previous_group()) == sorted(first));
+
+   const std::vector<char> current = encode_chained_delivery("disjoint-current", next_stream_tip(winner));
+   BOOST_REQUIRE_EQUAL(error(DELIVERER_NOT_IN_ACTIVE_GROUP_ERROR), deliver_as(late, ETH_OUTPOST_ID, current));
+   BOOST_REQUIRE_EQUAL(error(LATE_DELIVERER_NOT_IN_PREVIOUS_GROUP_ERROR),
+                       deliver_as(second[0], ETH_OUTPOST_ID, winner));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(late, ETH_OUTPOST_ID, winner));
+   deliver_all({second[0], second[1]}, current);
+   BOOST_REQUIRE(epoch_decided(ETH_OUTPOST_ID, epoch + 1));
+   advance_decided_epoch();
+
+   for (const name member : first) {
+      require_booked(member, epoch, true);
+      BOOST_REQUIRE_EQUAL(uint64_t{EPOCH_DURATION_SEC}, batch_duty_seat_seconds(member, ETH_OUTPOST_ID));
+   }
+   for (const name member : second) BOOST_REQUIRE(dellog_rows(member, epoch + 1, ETH_OUTPOST_ID).empty());
+} FC_LOG_AND_RETHROW() }
+
+/// A late delivery counts only within the chain's late-delivery window, `late_window_sec` (by default half the
+/// minimum) from the next epoch's start: one block before it closes a member's late delivery is taken, and from its
+/// close another member's is refused, so the advance that closes the epoch's books records that member's miss.
+BOOST_FIXTURE_TEST_CASE(a_late_delivery_counts_only_within_its_window, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t     kGroupSize     = 5;
+   const fc::microseconds block_interval = fc::milliseconds(config::block_interval_ms);
+   bootstrap(kGroupSize);
+   BOOST_REQUIRE(late_window() == fc::seconds(EPOCH_DURATION_SEC / 2));
+   const uint32_t          epoch  = current_epoch();
+   const std::vector<char> winner = encode_delivery(epoch, "windowed-winner");
+   deliver_all({BATCHOP, BATCHOP_B, BATCHOP_C}, winner);
+   advance_decided_epoch();
+
+   const fc::time_point closes = epoch_start() + late_window();
+   open_block_at(closes - block_interval);
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_D, ETH_OUTPOST_ID, winner));
+   open_block_at(closes);
+   BOOST_REQUIRE_EQUAL(error(LATE_DELIVERY_AFTER_WINDOW_ERROR), deliver_as(BATCHOP_E, ETH_OUTPOST_ID, winner));
+   BOOST_REQUIRE(find_inbound_delivery(ETH_OUTPOST_ID, epoch, BATCHOP_E).is_null());
+
+   const std::vector<char> current = encode_chained_delivery("windowed-next", next_stream_tip(winner));
+   deliver_all({BATCHOP, BATCHOP_B, BATCHOP_C}, current);
+   advance_decided_epoch();
+   for (const name member : {BATCHOP, BATCHOP_B, BATCHOP_C, BATCHOP_D}) require_booked(member, epoch, true);
+   require_booked(BATCHOP_E, epoch, false);
+} FC_LOG_AND_RETHROW() }
+
+/// A previous epoch decided by dispute resolution takes a late delivery of the voted winner from the member that
+/// stayed silent through the dispute, and refuses a losing version; the advance after the next records it as
+/// delivered. Four versions of five leave the silent member unable to lift any to three, so the fourth delivery
+/// opens the dispute.
+BOOST_FIXTURE_TEST_CASE(late_delivery_repeats_a_winner_resolved_by_dispute, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kGroupSize = 5;
+   bootstrap(kGroupSize);
+   const name              late   = BATCHOP_E;
+   const std::vector<name> losers{BATCHOP_B, BATCHOP_C, BATCHOP_D};
+   const uint32_t          epoch  = current_epoch();
+   const std::vector<char> voted  = encode_delivery(epoch, "dispute-voted");
+   const fc::sha256        voted_checksum = fc::sha256::hash(voted.data(), voted.size());
+   std::vector<std::vector<char>> lost;
+   for (const name loser : losers) lost.push_back(encode_delivery(epoch, "dispute-lost-" + loser.to_string()));
+
+   deliver_all({BATCHOP}, voted);
+   for (size_t i = 0; i < losers.size(); ++i) deliver_all({losers[i]}, lost[i]);
+   BOOST_REQUIRE(epoch_is_paused());
+   resolve_tie_dispute(epoch, voted_checksum);
+   produce_blocks();
+   for (const name loser : losers) {
+      BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED, operator_status(loser));
+   }
+   advance_decided_epoch();
+
+   BOOST_REQUIRE_EQUAL(error(LATE_DELIVERY_DIFFERING_ERROR), deliver_as(late, ETH_OUTPOST_ID, lost.front()));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(late, ETH_OUTPOST_ID, voted));
+   // The next group is drawn from the members left ACTIVE.
+   const std::vector<char> current = encode_chained_delivery("dispute-next", next_stream_tip(voted));
+   deliver_all({BATCHOP, late}, current);
+   advance_decided_epoch();
+   for (const name member : {BATCHOP, BATCHOP_B, BATCHOP_C, BATCHOP_D, late}) require_booked(member, epoch, true);
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(late));
+} FC_LOG_AND_RETHROW() }
+
+/// A late delivery lands while a dispute pauses the current epoch: it is recorded without any evaluation, the
+/// dispute stays as it is, and once the resolution lets the chain advance the previous epoch's books record it.
+BOOST_FIXTURE_TEST_CASE(late_delivery_lands_while_the_current_epoch_is_disputed, sysio_msgch_chain_tester) { try {
+   const std::vector<std::vector<name>> window = bootstrap_disjoint_groups();
+   const std::vector<name>&             first  = window[0];
+   const std::vector<name>&             second = window[1];
+   const name                           late   = first[2];
+   const uint32_t                       epoch  = current_epoch();
+   const std::vector<char>              winner = encode_delivery(epoch, "paused-winner");
+   deliver_all({first[0], first[1]}, winner);
+   advance_decided_epoch();
+
+   // Three versions of three members: no version can win, and the third delivery opens the dispute.
+   const inbound_stream_tip tip = next_stream_tip(winner);
+   std::vector<std::vector<char>> versions;
+   for (const std::string payload : {"paused-a", "paused-b", "paused-c"}) {
+      versions.push_back(encode_chained_delivery(payload, tip));
+   }
+   for (size_t i = 0; i < versions.size(); ++i) deliver_all({second[i]}, versions[i]);
+   BOOST_REQUIRE(epoch_is_paused());
+   BOOST_REQUIRE(!get_dispute(FIRST_DISPUTE_ID).is_null());
+
+   const transaction_trace_ptr trace = deliver_trace(late, ETH_OUTPOST_ID, winner);
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(0u, action_count(trace, MSGCH_ACCOUNT, msgch_actions::EVALUATE_CONSENSUS));
+   BOOST_REQUIRE_EQUAL(0u, action_count(trace, CHALG_ACCOUNT, chalg_actions::OPEN_DISPUTE));
+   BOOST_REQUIRE(!find_inbound_delivery(ETH_OUTPOST_ID, epoch, late).is_null());
+   BOOST_REQUIRE(epoch_is_paused());
+   BOOST_REQUIRE(get_dispute(SECOND_DISPUTE_ID).is_null());
+
+   resolve_tie_dispute(epoch + 1, fc::sha256::hash(versions[0].data(), versions[0].size()));
+   produce_blocks();
+   advance_decided_epoch();
+   for (const name member : first) require_booked(member, epoch, true);
+} FC_LOG_AND_RETHROW() }
+
+/// A member of the previous group that has stopped being ACTIVE since its seat, UNKNOWN after a withdrawal below the
+/// minimum or SLASHED, is refused its late delivery, and the advance that closes its epoch's books records a miss.
+BOOST_FIXTURE_TEST_CASE(previous_group_member_no_longer_active_is_refused_and_missed, sysio_msgch_chain_tester) { try {
+   const std::vector<std::vector<name>> window = bootstrap_disjoint_groups(/*batchop_is_bootstrapped=*/false);
+   const std::vector<name>&             first  = window[0];
+   BOOST_REQUIRE(std::find(first.begin(), first.end(), BATCHOP) != first.end());
+   std::vector<name> first_others;
+   for (const name member : first) {
+      if (member != BATCHOP) first_others.push_back(member);
+   }
+
+   // Epoch 1: BATCHOP is silent, then withdraws below the minimum and turns UNKNOWN.
+   const uint32_t          epoch  = current_epoch();
+   const std::vector<char> winner = encode_delivery(epoch, "inactive-winner");
+   deliver_all(first_others, winner);
+   advance_decided_epoch();
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, BATCHOP, "withdraw"_n, mvo()
+      ("account", BATCHOP)("token_code", WIRE_CHAIN_CODE)("amount", BATCH_OPERATOR_MINIMUM_COLLATERAL)));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_UNKNOWN, operator_status(BATCHOP));
+   BOOST_REQUIRE_EQUAL(error(NOT_ACTIVE_DELIVERY_ERROR), deliver_as(BATCHOP, ETH_OUTPOST_ID, winner));
+
+   // Epoch 2: its last member is silent, then slashed.
+   const name              slashed = window[1][2];
+   const std::vector<char> second  = encode_chained_delivery("inactive-second", next_stream_tip(winner));
+   deliver_all({window[1][0], window[1][1]}, second);
+   advance_decided_epoch();
+   require_booked(BATCHOP, epoch, false);
+   slash_operator(slashed);
+   BOOST_REQUIRE_EQUAL(error(NOT_ACTIVE_DELIVERY_ERROR), deliver_as(slashed, ETH_OUTPOST_ID, second));
+
+   const std::vector<char> third = encode_chained_delivery("inactive-third", next_stream_tip(second));
+   deliver_all({window[2][0], window[2][1]}, third);
+   advance_decided_epoch();
+   require_booked(slashed, epoch + 1, false);
+} FC_LOG_AND_RETHROW() }
+
+/// A `schbatchgps` rebuild of the window keeps `previous_group`: the previous epoch's late delivery is still
+/// admitted and its books are still closed for the group that served it.
+BOOST_FIXTURE_TEST_CASE(previous_group_survives_a_schedule_rebuild, sysio_msgch_chain_tester) { try {
+   const std::vector<std::vector<name>> window = bootstrap_disjoint_groups();
+   const std::vector<name>&             first  = window[0];
+   const name                           late   = first[2];
+   const uint32_t                       epoch  = current_epoch();
+   const std::vector<char>              winner = encode_delivery(epoch, "rebuild-winner");
+   deliver_all({first[0], first[1]}, winner);
+   advance_decided_epoch();
+   const std::vector<name> previous = previous_group();
+
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::SCHEDULE,
+                                       mvo()(epoch_fields::CHAIN_CODE, ETH_CHAIN_CODE)));
+   produce_blocks();
+   BOOST_REQUIRE(previous_group() == previous);
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(late, ETH_OUTPOST_ID, winner));
+
+   const auto rebuilt = read_epoch_state()[epoch_fields::BATCH_OP_GROUPS].as<std::vector<std::vector<name>>>();
+   std::vector<name> deliverers;
+   for (const name member : rebuilt.front()) {
+      if (member != late && deliverers.size() < 2) deliverers.push_back(member);
+   }
+   deliver_all(deliverers, encode_chained_delivery("rebuild-next", next_stream_tip(winner)));
+   advance_decided_epoch();
+   for (const name member : first) require_booked(member, epoch, true);
+} FC_LOG_AND_RETHROW() }
+
+/// An epoch the chain closed as an active outpost keeps its books though the chain is no longer one at the
+/// (governance) advance that closes them, and its seats are credited; an epoch the chain closed while not an active
+/// outpost keeps none.
+BOOST_FIXTURE_TEST_CASE(books_of_an_active_epoch_survive_the_chain_turning_inactive, sysio_msgch_chain_tester) { try {
+   const std::vector<std::vector<name>> window = bootstrap_disjoint_groups();
+   const std::vector<name>&             first  = window[0];
+   const uint32_t                       epoch  = current_epoch();
+   deliver_all(first, encode_delivery(epoch, "inactive-chain"));
+   advance_decided_epoch();
+   BOOST_REQUIRE(sorted(previous_group()) == sorted(first));
+
+   set_chain_active(ETH_OUTPOST_ID, false);
+   produce_blocks();
+   const transaction_trace_ptr booked = governance_advance_trace(ETH_OUTPOST_ID);
+   BOOST_REQUIRE_EQUAL(DISJOINT_GROUP_SIZE, action_count(booked, OPREG_ACCOUNT, opreg_actions::RECORD_DELIVERY));
+   for (const name member : first) {
+      require_booked(member, epoch, true);
+      BOOST_REQUIRE_EQUAL(uint64_t{EPOCH_DURATION_SEC}, batch_duty_seat_seconds(member, ETH_OUTPOST_ID));
+   }
+   BOOST_REQUIRE(previous_group().empty());
+
+   const transaction_trace_ptr unbooked = governance_advance_trace(ETH_OUTPOST_ID);
+   BOOST_REQUIRE_EQUAL(0u, action_count(unbooked, OPREG_ACCOUNT, opreg_actions::RECORD_DELIVERY));
+   for (const name member : window[1]) BOOST_REQUIRE(dellog_rows(member, epoch + 1, ETH_OUTPOST_ID).empty());
+} FC_LOG_AND_RETHROW() }
+
+/// The delivery that gives a version its strict majority slashes, in its own transaction and under sysio.msgch's
+/// authority, every member whose delivery differs from it: two minority versions of a group of five here. The
+/// members that delivered the winner are never slashed, neither the close nor the advance that closes the epoch's
+/// books slashes anyone, and that advance records each slashed member as delivered.
+BOOST_FIXTURE_TEST_CASE(divergent_minority_is_slashed_in_the_tipping_delivery, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kGroupSize = 5;
+   bootstrap(kGroupSize);
+
+   const uint32_t          epoch    = current_epoch();
+   const std::vector<char> winner   = encode_delivery(epoch, "tipping-winner");
+   const std::vector<char> second   = encode_delivery(epoch, "tipping-second");
+   const std::vector<char> third    = encode_delivery(epoch, "tipping-third");
+   const std::vector<name> minority{BATCHOP_D, BATCHOP_E};
+   const std::vector<name> majority{BATCHOP, BATCHOP_B, BATCHOP_C};
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_D, ETH_OUTPOST_ID, second));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_E, ETH_OUTPOST_ID, third));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, winner));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, winner));
+   produce_blocks();
+   BOOST_REQUIRE(!epoch_decided(ETH_OUTPOST_ID, epoch));
+   for (const name member : minority) {
+      BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(member));
+   }
+
+   const transaction_trace_ptr tipping = deliver_trace(BATCHOP_C, ETH_OUTPOST_ID, winner);
+   const std::vector<slashop_record> slashed = slashops(tipping);
+   BOOST_REQUIRE_EQUAL(minority.size(), slashed.size());
+   for (size_t i = 0; i < slashed.size(); ++i) {
+      BOOST_REQUIRE_EQUAL(minority[i], slashed[i].operator_account);
+      BOOST_REQUIRE_EQUAL(non_canonical_delivery_reason(ETH_CHAIN_CODE, epoch), slashed[i].reason);
+      BOOST_REQUIRE(slashed[i].authorized_by_msgch);
+   }
+   BOOST_REQUIRE_EQUAL(minority.size(), action_count(tipping, OPREG_ACCOUNT, opreg_actions::SLASH));
+   produce_blocks();
+   BOOST_REQUIRE(epoch_decided(ETH_OUTPOST_ID, epoch));
+   for (const name member : minority) {
+      BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED, operator_status(member));
+   }
+   for (const name member : majority) {
+      BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(member));
+   }
+
+   elapse_epoch_boundary();
+   const transaction_trace_ptr close = check_consensus_trace(ETH_OUTPOST_ID, BATCHOP);
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
+   BOOST_REQUIRE_EQUAL(1u, action_count(close, EPOCH_ACCOUNT, epoch_actions::ADVANCE));
+   BOOST_REQUIRE(slashops(close).empty());
+   BOOST_REQUIRE_EQUAL(0u, action_count(close, OPREG_ACCOUNT, opreg_actions::SLASH));
+   for (const name member : majority) {
+      BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(member));
+   }
+   const transaction_trace_ptr booked = advance_trace(ETH_OUTPOST_ID, MSGCH_ACCOUNT);
+   BOOST_REQUIRE(slashops(booked).empty());
+   BOOST_REQUIRE_EQUAL(0u, action_count(booked, OPREG_ACCOUNT, opreg_actions::SLASH));
+   for (const std::vector<name>* members : {&minority, &majority}) {
+      for (const name member : *members) {
+         const std::vector<fc::variant> rows = dellog_rows(member, epoch, ETH_OUTPOST_ID);
+         BOOST_REQUIRE_EQUAL(1u, rows.size());
+         BOOST_REQUIRE(rows.front()[opreg_fields::DELIVERED].as<bool>());
+      }
+   }
+} FC_LOG_AND_RETHROW() }
+
+/// A dispute's resolution slashes its losers in the `chkdispute` transaction, before the epoch advances: every
+/// member whose delivery differs from the voted winner, including one that delivered after the dispute opened.
+/// Four versions in a group of five leave no version able to win, so the fourth delivery opens the dispute; the
+/// fifth member then delivers a losing version. The winner's deliverer is never slashed, and the close slashes
+/// no one.
+BOOST_FIXTURE_TEST_CASE(dispute_losers_are_slashed_at_resolution, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kGroupSize = 5;
+   bootstrap(kGroupSize);
+
+   const uint32_t          epoch   = current_epoch();
+   const std::vector<char> winner  = encode_delivery(epoch, "resolution-winner");
+   const std::vector<char> second  = encode_delivery(epoch, "resolution-second");
+   const std::vector<char> third   = encode_delivery(epoch, "resolution-third");
+   const std::vector<char> fourth  = encode_delivery(epoch, "resolution-fourth");
+   const fc::sha256        winner_checksum = fc::sha256::hash(winner.data(), winner.size());
+   const std::vector<name> losers{BATCHOP_B, BATCHOP_C, BATCHOP_D, BATCHOP_E};
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, winner));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, second));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, third));
+   produce_blocks();
+   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
+   const transaction_trace_ptr opening = deliver_trace(BATCHOP_D, ETH_OUTPOST_ID, fourth);
+   BOOST_REQUIRE_EQUAL(1u, action_count(opening, CHALG_ACCOUNT, chalg_actions::OPEN_DISPUTE));
+   BOOST_REQUIRE(slashops(opening).empty());
+   produce_blocks();
+   BOOST_REQUIRE(epoch_is_paused());
+
+   // E delivers a losing version while the dispute is open: recorded, and judged at the resolution.
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_E, ETH_OUTPOST_ID, second));
+   produce_blocks();
+   BOOST_REQUIRE(!find_inbound_delivery(ETH_OUTPOST_ID, epoch, BATCHOP_E).is_null());
+   for (const name member : losers) {
+      BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(member));
+   }
+
+   BOOST_REQUIRE_EQUAL(success(), vote_dispute(FIRST_DISPUTE_ID, winner_checksum));
+   const transaction_trace_ptr resolution = sysio_system::test_support::push_contract_action_trace(
+      *this, CHALG_ACCOUNT, chalg_abi, BATCHOP, chalg_actions::CHECK_DISPUTE,
+      mvo()(chalg_vote_fields::DISPUTE_ID, FIRST_DISPUTE_ID));
+   const std::vector<slashop_record> slashed = slashops(resolution);
+   BOOST_REQUIRE_EQUAL(losers.size(), slashed.size());
+   for (size_t i = 0; i < slashed.size(); ++i) {
+      BOOST_REQUIRE_EQUAL(losers[i], slashed[i].operator_account);
+      BOOST_REQUIRE_EQUAL(non_canonical_delivery_reason(ETH_CHAIN_CODE, epoch), slashed[i].reason);
+      BOOST_REQUIRE(slashed[i].authorized_by_msgch);
+   }
+   produce_blocks();
+   BOOST_REQUIRE(epoch_decided(ETH_OUTPOST_ID, epoch));
+   BOOST_REQUIRE(!epoch_is_paused());
+   BOOST_REQUIRE_EQUAL(epoch, current_epoch());
+   for (const name member : losers) {
+      BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED, operator_status(member));
+   }
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(BATCHOP));
+
+   elapse_epoch_boundary();
+   const transaction_trace_ptr close = check_consensus_trace(ETH_OUTPOST_ID, BATCHOP);
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
+   BOOST_REQUIRE(slashops(close).empty());
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(BATCHOP));
+} FC_LOG_AND_RETHROW() }
+
+/// Once a dispute's resolution has accepted the winner, the epoch takes only the winner's bytes: the member that
+/// stayed silent through the dispute has a delivery of the winner recorded, and a differing one refused.
+BOOST_FIXTURE_TEST_CASE(delivery_after_resolution_takes_only_the_winner, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kGroupSize = 5;
+   bootstrap(kGroupSize);
+
+   const uint32_t          epoch           = current_epoch();
+   const std::vector<char> winner          = encode_delivery(epoch, "resolved-winner");
+   const std::vector<char> second          = encode_delivery(epoch, "resolved-second");
+   const std::vector<char> third           = encode_delivery(epoch, "resolved-third");
+   const std::vector<char> fourth          = encode_delivery(epoch, "resolved-fourth");
+   const fc::sha256        winner_checksum = fc::sha256::hash(winner.data(), winner.size());
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, winner));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, second));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, third));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_D, ETH_OUTPOST_ID, fourth));
+   produce_blocks();
+   BOOST_REQUIRE(epoch_is_paused());
+   resolve_tie_dispute(epoch, winner_checksum);
+   produce_blocks();
+   BOOST_REQUIRE(epoch_decided(ETH_OUTPOST_ID, epoch));
+
+   BOOST_REQUIRE_EQUAL(error(DECIDED_EPOCH_DIFFERING_DELIVERY_ERROR), deliver_as(BATCHOP_E, ETH_OUTPOST_ID, second));
+   produce_blocks();
+   BOOST_REQUIRE(find_inbound_delivery(ETH_OUTPOST_ID, epoch, BATCHOP_E).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_E, ETH_OUTPOST_ID, winner));
+   produce_blocks();
+   const fc::variant row = find_inbound_delivery(ETH_OUTPOST_ID, epoch, BATCHOP_E);
+   BOOST_REQUIRE(!row.is_null());
+   BOOST_REQUIRE_EQUAL(row[msgch_fields::CHECKSUM].as_string(), winner_checksum.str());
+   BOOST_REQUIRE(row[msgch_fields::RAW_DATA].as<std::vector<char>>().empty());
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(BATCHOP_E));
+   BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, epoch), 1u);
+} FC_LOG_AND_RETHROW() }
+
+/// A governance advance (sysio.epoch's own authority) of a decided epoch slashes no one: the acceptance already
+/// slashed the member whose delivery differs from the winner. The next advance, which closes the epoch's books,
+/// slashes no one either and records it as delivered.
+BOOST_FIXTURE_TEST_CASE(governance_advance_of_a_decided_epoch_slashes_nothing, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kGroupSize = 3;
+   bootstrap(kGroupSize);
+
+   const uint32_t          epoch     = current_epoch();
+   const std::vector<char> winner    = encode_delivery(epoch, "governance-winner");
+   const std::vector<char> divergent = encode_delivery(epoch, "governance-divergent");
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, divergent));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, winner));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, winner));
+   produce_blocks();
+   BOOST_REQUIRE(epoch_decided(ETH_OUTPOST_ID, epoch));
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED, operator_status(BATCHOP_C));
+
+   elapse_epoch_boundary();
+   const transaction_trace_ptr close = sysio_system::test_support::push_contract_action_trace(
+      *this, EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::ADVANCE,
+      mvo()(epoch_fields::CHAIN_CODE, ETH_CHAIN_CODE));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
+   BOOST_REQUIRE(slashops(close).empty());
+   BOOST_REQUIRE_EQUAL(0u, action_count(close, OPREG_ACCOUNT, opreg_actions::SLASH));
+   for (const name member : {BATCHOP, BATCHOP_B}) {
+      BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(member));
+   }
+   BOOST_REQUIRE(dellog_rows(BATCHOP_C, epoch, ETH_OUTPOST_ID).empty());
+
+   const transaction_trace_ptr booked = advance_trace(ETH_OUTPOST_ID, MSGCH_ACCOUNT);
+   BOOST_REQUIRE(slashops(booked).empty());
+   BOOST_REQUIRE_EQUAL(0u, action_count(booked, OPREG_ACCOUNT, opreg_actions::SLASH));
+   const std::vector<fc::variant> rows = dellog_rows(BATCHOP_C, epoch, ETH_OUTPOST_ID);
+   BOOST_REQUIRE_EQUAL(1u, rows.size());
+   BOOST_REQUIRE(rows.front()[opreg_fields::DELIVERED].as<bool>());
+} FC_LOG_AND_RETHROW() }
+
+/// Governance cannot advance an active outpost whose current epoch has not reached consensus, even once the chain is
+/// due: the outpost's next envelope chains to that epoch's winner. It advances the epoch once it is decided, and a
+/// chain that is no longer an active outpost undecided.
+BOOST_FIXTURE_TEST_CASE(governance_advance_refuses_an_active_outposts_undecided_epoch, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kGroupSize = 3;
+   bootstrap(kGroupSize);
+
+   const uint32_t epoch = current_epoch();
+   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(GOVERNANCE_ADVANCE_UNDECIDED_ERROR), governance_advance());
+   BOOST_REQUIRE_EQUAL(epoch, current_epoch());
+
+   deliver_all({BATCHOP, BATCHOP_B}, encode_delivery(epoch, "governance-decided"));
+   BOOST_REQUIRE(epoch_decided(ETH_OUTPOST_ID, epoch));
+   governance_advance_trace(ETH_OUTPOST_ID);
+   BOOST_REQUIRE(!epoch_decided(ETH_OUTPOST_ID, epoch + 1));
+
+   set_chain_active(ETH_OUTPOST_ID, false);
+   produce_blocks();
+   governance_advance_trace(ETH_OUTPOST_ID);
+   BOOST_REQUIRE_EQUAL(epoch + 2, current_epoch());
+} FC_LOG_AND_RETHROW() }
+
+/// Recovery of a split held open by a silent member. Of three seats, two deliver different versions and the third is
+/// silent, so either version can still win: the re-tally opens no dispute and governance cannot advance the epoch.
+/// Once governance terminates the silent member, the chkcons re-tally finds that no version can win and opens the
+/// dispute; its resolution decides the epoch, slashes the loser and records the chain's traffic, and the chain
+/// advances to its next group.
+BOOST_FIXTURE_TEST_CASE(split_held_open_by_a_silent_member_recovers_by_termination_and_retally,
+                        sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kGroupSize = 3;
+   bootstrap(kGroupSize);
+
+   const uint32_t          epoch         = current_epoch();
+   const std::vector<char> winner        = encode_delivery(epoch, "silent-member-winner");
+   const std::vector<char> loser         = encode_delivery(epoch, "silent-member-loser");
+   const fc::sha256        winner_digest = fc::sha256::hash(winner.data(), winner.size());
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, winner));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, loser));
+   elapse_epoch_boundary();
+   const transaction_trace_ptr waiting = check_consensus_trace(ETH_OUTPOST_ID, BATCHOP);
+   BOOST_REQUIRE_EQUAL(0u, action_count(waiting, CHALG_ACCOUNT, chalg_actions::OPEN_DISPUTE));
+   produce_blocks();
+   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(GOVERNANCE_ADVANCE_UNDECIDED_ERROR), governance_advance());
+
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, opreg_actions::TERMINATE,
+      mvo()(opreg_fields::ACCOUNT, BATCHOP_C.to_string())(opreg_fields::REASON, std::string("silent member"))));
+   produce_blocks();
+   const transaction_trace_ptr retally = check_consensus_trace(ETH_OUTPOST_ID, BATCHOP);
+   BOOST_REQUIRE_EQUAL(1u, action_count(retally, CHALG_ACCOUNT, chalg_actions::OPEN_DISPUTE));
+   produce_blocks();
+   assert_open_tie_dispute(epoch, {winner_digest, fc::sha256::hash(loser.data(), loser.size())},
+                           {ONE_OPERATOR_PER_TIED_VERSION, ONE_OPERATOR_PER_TIED_VERSION});
+   BOOST_REQUIRE(epoch_is_paused());
+
+   resolve_tie_dispute(epoch, winner_digest);
+   BOOST_REQUIRE(!epoch_is_paused());
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED, operator_status(BATCHOP_B));
+   advance_decided_epoch();
+} FC_LOG_AND_RETHROW() }
+
+/// The depot side of recovering a group that can no longer reach its seat majority; the outposts also need an upgrade
+/// that installs the reseated window. Of three seats, one member delivers and the other two are slashed: one delivery
+/// can never reach two of three, and one version leaves nothing to dispute, so the re-tally neither decides nor
+/// disputes and governance cannot advance the epoch. Once two replacements serve the chain, a `schbatchgps` reseat
+/// puts a group on duty that leaves out the slashed members; its deliveries of the outpost's envelope decide the
+/// epoch, and the chain advances.
+BOOST_FIXTURE_TEST_CASE(reseat_decides_an_epoch_below_the_seat_majority_on_the_depot, sysio_msgch_chain_tester) { try {
+   const std::vector<std::vector<name>> window   = bootstrap_disjoint_groups();
+   const std::vector<name>&             first    = window[0];
+   const uint32_t                       epoch    = current_epoch();
+   const std::vector<char>              envelope = encode_delivery(epoch, "reseat-envelope");
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(first[0], ETH_OUTPOST_ID, envelope));
+   produce_blocks();
+   slash_operator(first[1]);
+   slash_operator(first[2]);
+
+   const transaction_trace_ptr retally = check_consensus_trace(ETH_OUTPOST_ID, first[0]);
+   BOOST_REQUIRE_EQUAL(1u, action_count(retally, MSGCH_ACCOUNT, msgch_actions::EVALUATE_CONSENSUS));
+   BOOST_REQUIRE_EQUAL(0u, action_count(retally, CHALG_ACCOUNT, chalg_actions::OPEN_DISPUTE));
+   produce_blocks();
+   BOOST_REQUIRE(!epoch_decided(ETH_OUTPOST_ID, epoch));
+   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
+   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(GOVERNANCE_ADVANCE_UNDECIDED_ERROR), governance_advance());
+
+   // The reseat seats `batch_operator_minimum_active` ACTIVE operators serving the chain: the replacements make up
+   // for the slashed members.
+   const std::vector<name> replacements{BATCHOP_J, BATCHOP_K};
+   create_accounts(replacements);
+   for (const name op : replacements) {
+      BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n, mvo()
+         ("account", op.to_string())("type", opp::types::OperatorType::OPERATOR_TYPE_BATCH)("is_bootstrapped", true)));
+   }
+   serve_chains(replacements, epoch_chains);
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::SCHEDULE,
+                                       mvo()(epoch_fields::CHAIN_CODE, ETH_CHAIN_CODE)));
+   produce_blocks();
+
+   const std::vector<name> on_duty = current_group();
+   std::vector<name>       deliverers;
+   for (const name member : on_duty) {
+      BOOST_REQUIRE(member != first[1] && member != first[2]);
+      if (member != first[0]) deliverers.push_back(member);
+   }
+   deliver_all(deliverers, envelope);
+   require_outpcons_winner(ETH_OUTPOST_ID, epoch, fc::sha256::hash(envelope.data(), envelope.size()));
+   advance_decided_epoch();
+} FC_LOG_AND_RETHROW() }
+
+/// A slashed member keeps its seat, so it never lowers the number of deliveries a majority needs. Two of four is no
+/// majority, and stays none once a silent member is slashed: the chkcons re-tally leaves the epoch undecided, with no
+/// dispute while the last eligible member can still give the version its third, and that member's delivery decides it.
+BOOST_FIXTURE_TEST_CASE(slashed_seat_still_counts_toward_the_majority, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kGroupSize = 4;
+   bootstrap(kGroupSize);
+
+   const uint32_t          epoch    = current_epoch();
+   const std::vector<char> envelope = encode_delivery(epoch, "slashed-seat");
+   const fc::sha256        checksum = fc::sha256::hash(envelope.data(), envelope.size());
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, envelope));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, envelope));
+   produce_blocks();
+   BOOST_REQUIRE(!epoch_decided(ETH_OUTPOST_ID, epoch));
+
+   slash_operator(BATCHOP_D);
+   const transaction_trace_ptr trace = check_consensus_trace(ETH_OUTPOST_ID, BATCHOP);
+   BOOST_REQUIRE_EQUAL(1u, action_count(trace, MSGCH_ACCOUNT, msgch_actions::EVALUATE_CONSENSUS));
+   BOOST_REQUIRE_EQUAL(0u, action_count(trace, CHALG_ACCOUNT, chalg_actions::OPEN_DISPUTE));
+   produce_blocks();
+   BOOST_REQUIRE(!epoch_decided(ETH_OUTPOST_ID, epoch));
+   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, envelope));
+   produce_blocks();
+   BOOST_REQUIRE(epoch_decided(ETH_OUTPOST_ID, epoch));
+   BOOST_REQUIRE_EQUAL(get_outpcons(ETH_OUTPOST_ID)[msgch_fields::WINNING_CHECKSUM].as_string(), checksum.str());
+} FC_LOG_AND_RETHROW() }
+
+/// The eligible set shrinks with no new delivery. A 2-2 split of five can still be decided by the silent
+/// member; once that member is slashed, no version can reach three, the majority the five seats still need. The
+/// chkcons re-tally opens the dispute in its own transaction, before the chain's boundary.
+BOOST_FIXTURE_TEST_CASE(eligibility_shrink_opens_a_dispute_on_the_chkcons_retally, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kGroupSize             = 5;
+   constexpr uint32_t kOperatorsPerVersion   = 2;
+   bootstrap(kGroupSize);
+
+   const uint32_t          epoch = current_epoch();
+   const std::vector<char> left  = encode_delivery(epoch, "shrink-left");
+   const std::vector<char> right = encode_delivery(epoch, "shrink-right");
+
+   for (const name op : {BATCHOP, BATCHOP_B}) BOOST_REQUIRE_EQUAL(success(), deliver_as(op, ETH_OUTPOST_ID, left));
+   for (const name op : {BATCHOP_C, BATCHOP_D}) BOOST_REQUIRE_EQUAL(success(), deliver_as(op, ETH_OUTPOST_ID, right));
+   produce_blocks();
+   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
+   BOOST_REQUIRE(!epoch_is_paused());
+
+   slash_operator(BATCHOP_E);
+   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
+
+   const transaction_trace_ptr trace = check_consensus_trace(ETH_OUTPOST_ID, BATCHOP);
+   BOOST_REQUIRE_EQUAL(1u, action_count(trace, CHALG_ACCOUNT, chalg_actions::OPEN_DISPUTE));
+   BOOST_REQUIRE(before_epoch_boundary());
+   produce_blocks();
+   assert_open_tie_dispute(epoch,
+                           {fc::sha256::hash(left.data(), left.size()), fc::sha256::hash(right.data(), right.size())},
+                           {kOperatorsPerVersion, kOperatorsPerVersion});
+   BOOST_REQUIRE(epoch_is_paused());
+   BOOST_REQUIRE(!epoch_decided(ETH_OUTPOST_ID, epoch));
+} FC_LOG_AND_RETHROW() }
+
+/// The chkcons re-tally also decides an epoch once a member is eligible again. Of five seats, X and Y deliver A and Z
+/// delivers B. Y withdraws below its collateral minimum and turns UNKNOWN, so W's A gives A two of the three eligible
+/// deliveries a majority of the seats needs, while the silent fifth member can still give it the third. Y cancels its
+/// withdrawal and is ACTIVE again with no new delivery: the re-tally decides A in the chkcons transaction and slashes Z
+/// there.
+BOOST_FIXTURE_TEST_CASE(member_active_again_decides_the_epoch_on_the_chkcons_retally, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kGroupSize        = 5;
+   constexpr uint64_t kWithdrawRequest  = 1;
+   bootstrap(kGroupSize, /*batchop_is_bootstrapped=*/false);
+   // BATCHOP alone carries a collateral minimum, so it is the member that withdraws below it.
+   const name x = BATCHOP_B;
+   const name y = BATCHOP;
+   const name z = BATCHOP_C;
+   const name w = BATCHOP_D;
+
+   const uint32_t          epoch    = current_epoch();
+   const std::vector<char> accepted = encode_delivery(epoch, "regained-a");
+   const std::vector<char> other    = encode_delivery(epoch, "regained-b");
+   for (const name op : {x, y}) BOOST_REQUIRE_EQUAL(success(), deliver_as(op, ETH_OUTPOST_ID, accepted));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(z, ETH_OUTPOST_ID, other));
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, y, "withdraw"_n, mvo()
+      ("account", y)("token_code", WIRE_CHAIN_CODE)("amount", BATCH_OPERATOR_MINIMUM_COLLATERAL)));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_UNKNOWN, operator_status(y));
+
+   // Two eligible deliveries of A out of the three needed, and a silent member that can still give it the third.
+   const transaction_trace_ptr second = deliver_trace(w, ETH_OUTPOST_ID, accepted);
+   BOOST_REQUIRE_EQUAL(0u, action_count(second, CHALG_ACCOUNT, chalg_actions::OPEN_DISPUTE));
+   BOOST_REQUIRE(slashops(second).empty());
+   produce_blocks();
+   BOOST_REQUIRE(!epoch_decided(ETH_OUTPOST_ID, epoch));
+   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, y, "cancelwtdw"_n,
+                                       mvo()("account", y)("request_id", kWithdrawRequest)));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(y));
+   BOOST_REQUIRE(!epoch_decided(ETH_OUTPOST_ID, epoch));
+
+   const transaction_trace_ptr retally = check_consensus_trace(ETH_OUTPOST_ID, x);
+   BOOST_REQUIRE_EQUAL(1u, action_count(retally, MSGCH_ACCOUNT, msgch_actions::EVALUATE_CONSENSUS));
+   const std::vector<slashop_record> slashed = slashops(retally);
+   BOOST_REQUIRE_EQUAL(1u, slashed.size());
+   BOOST_REQUIRE_EQUAL(z, slashed.front().operator_account);
+   BOOST_REQUIRE_EQUAL(non_canonical_delivery_reason(ETH_CHAIN_CODE, epoch), slashed.front().reason);
+   BOOST_REQUIRE(slashed.front().authorized_by_msgch);
+   produce_blocks();
+   require_outpcons_winner(ETH_OUTPOST_ID, epoch, fc::sha256::hash(accepted.data(), accepted.size()));
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED, operator_status(z));
+   for (const name member : {x, y, w}) {
+      BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(member));
+   }
+} FC_LOG_AND_RETHROW() }
+
+/// A 1-1 split of a group of two leaves no version able to win. The second delivery's own transaction
+/// opens the dispute, before the chain's boundary and with no crank.
+BOOST_FIXTURE_TEST_CASE(one_to_one_tie_opens_a_dispute_on_its_terminal_delivery, sysio_msgch_chain_tester) { try {
    bootstrap(ONE_TO_ONE_TIE_GROUP_SIZE);
 
    const uint32_t epoch = current_epoch();
    const auto left = encode_delivery(epoch, std::string(ONE_TO_ONE_LEFT_PAYLOAD));
    const auto right = encode_delivery(epoch, std::string(ONE_TO_ONE_RIGHT_PAYLOAD));
 
+   // The silent member can still make the delivered version a majority.
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, left));
-   produce_blocks();
-   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, right));
    produce_blocks();
    BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
 
-   elapse_epoch_boundary();
-   advance_via_consensus();
+   const transaction_trace_ptr trace = deliver_trace(BATCHOP_B, ETH_OUTPOST_ID, right);
+   BOOST_REQUIRE_EQUAL(1u, action_count(trace, CHALG_ACCOUNT, chalg_actions::OPEN_DISPUTE));
+   BOOST_REQUIRE(before_epoch_boundary());
+   produce_blocks();
 
    assert_open_tie_dispute(epoch,
                            {fc::sha256::hash(left.data(), left.size()),
                             fc::sha256::hash(right.data(), right.size())},
                            {ONE_OPERATOR_PER_TIED_VERSION, ONE_OPERATOR_PER_TIED_VERSION});
+   BOOST_REQUIRE(epoch_is_paused());
    resolve_tie_dispute(epoch, fc::sha256::hash(left.data(), left.size()));
 } FC_LOG_AND_RETHROW() }
 
-/// The same `chkcons` route must preserve the full candidate tallies for a larger even 3–3 split.
-BOOST_FIXTURE_TEST_CASE(chkcons_opens_dispute_for_three_to_three_tie, sysio_msgch_chain_tester) { try {
+/// The same rule for a larger even 3-3 split, with the full candidate tallies: the dispute opens on the
+/// sixth delivery, the first after which neither version can reach four of six.
+BOOST_FIXTURE_TEST_CASE(three_to_three_tie_opens_a_dispute_on_its_terminal_delivery, sysio_msgch_chain_tester) { try {
    bootstrap(THREE_TO_THREE_TIE_GROUP_SIZE);
 
    const uint32_t epoch = current_epoch();
    const auto left = encode_delivery(epoch, std::string(THREE_TO_THREE_LEFT_PAYLOAD));
    const auto right = encode_delivery(epoch, std::string(THREE_TO_THREE_RIGHT_PAYLOAD));
    const std::vector<name> left_operators{BATCHOP, BATCHOP_B, BATCHOP_C};
-   const std::vector<name> right_operators{BATCHOP_D, BATCHOP_E, BATCHOP_F};
+   const std::vector<name> waiting_right_operators{BATCHOP_D, BATCHOP_E};
 
    for (const auto& operator_name : left_operators) {
       BOOST_REQUIRE_EQUAL(success(), deliver_as(operator_name, ETH_OUTPOST_ID, left));
       produce_blocks();
    }
-   for (const auto& operator_name : right_operators) {
+   // 3-1 and 3-2: a silent member can still give the left version its fourth.
+   for (const auto& operator_name : waiting_right_operators) {
       BOOST_REQUIRE_EQUAL(success(), deliver_as(operator_name, ETH_OUTPOST_ID, right));
       produce_blocks();
+      BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
    }
-   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
 
-   elapse_epoch_boundary();
-   advance_via_consensus();
+   const transaction_trace_ptr trace = deliver_trace(BATCHOP_F, ETH_OUTPOST_ID, right);
+   BOOST_REQUIRE_EQUAL(1u, action_count(trace, CHALG_ACCOUNT, chalg_actions::OPEN_DISPUTE));
+   produce_blocks();
 
    assert_open_tie_dispute(epoch,
                            {fc::sha256::hash(left.data(), left.size()),
@@ -2780,8 +4265,225 @@ BOOST_FIXTURE_TEST_CASE(chkcons_opens_dispute_for_three_to_three_tie, sysio_msgc
    resolve_tie_dispute(epoch, fc::sha256::hash(left.data(), left.size()));
 } FC_LOG_AND_RETHROW() }
 
-/// A 1-1 split with one silent eligible operator is not terminal. `chkcons` must leave it
-/// undecided and unpaused so the final delivery can establish a strict majority without a vote.
+/// A group of seven needs four. 3-2 with two silent waits, and so does 3-3 with one silent (the last
+/// member can still give either version its fourth), through the chkcons re-tally as well. The seventh
+/// member's third version leaves 3-3-1 with none silent: its delivery opens the dispute.
+BOOST_FIXTURE_TEST_CASE(split_of_seven_disputes_only_once_no_version_can_reach_four, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kLeadingVersionCount = 3;
+   constexpr uint32_t kThirdVersionCount   = 1;
+   bootstrap(MAXIMUM_GROUP_SIZE);
+
+   const uint32_t          epoch  = current_epoch();
+   const std::vector<char> first  = encode_delivery(epoch, "seven-first");
+   const std::vector<char> second = encode_delivery(epoch, "seven-second");
+   const std::vector<char> third  = encode_delivery(epoch, "seven-third");
+
+   for (const name op : {BATCHOP, BATCHOP_B, BATCHOP_C}) {
+      BOOST_REQUIRE_EQUAL(success(), deliver_as(op, ETH_OUTPOST_ID, first));
+   }
+   for (const name op : {BATCHOP_D, BATCHOP_E}) BOOST_REQUIRE_EQUAL(success(), deliver_as(op, ETH_OUTPOST_ID, second));
+   produce_blocks();
+   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
+   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP));
+   produce_blocks();
+   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_F, ETH_OUTPOST_ID, second));
+   produce_blocks();
+   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
+   BOOST_REQUIRE(!epoch_is_paused());
+   BOOST_REQUIRE(!epoch_decided(ETH_OUTPOST_ID, epoch));
+
+   const transaction_trace_ptr trace = deliver_trace(BATCHOP_G, ETH_OUTPOST_ID, third);
+   BOOST_REQUIRE_EQUAL(1u, action_count(trace, CHALG_ACCOUNT, chalg_actions::OPEN_DISPUTE));
+   produce_blocks();
+   assert_open_tie_dispute(epoch,
+                           {fc::sha256::hash(first.data(), first.size()),
+                            fc::sha256::hash(second.data(), second.size()),
+                            fc::sha256::hash(third.data(), third.size())},
+                           {kLeadingVersionCount, kLeadingVersionCount, kThirdVersionCount});
+   BOOST_REQUIRE(epoch_is_paused());
+} FC_LOG_AND_RETHROW() }
+
+/// A 2-2-2 split of seven opens the dispute while a member is still silent: its one delivery would leave
+/// every version at three, short of four. When that member then delivers, its row is recorded with its
+/// bytes and the open dispute is left as it was.
+BOOST_FIXTURE_TEST_CASE(three_way_split_of_seven_disputes_with_a_member_still_silent, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kOperatorsPerVersion = 2;
+   bootstrap(MAXIMUM_GROUP_SIZE);
+
+   const uint32_t          epoch  = current_epoch();
+   const std::vector<char> first  = encode_delivery(epoch, "three-way-first");
+   const std::vector<char> second = encode_delivery(epoch, "three-way-second");
+   const std::vector<char> third  = encode_delivery(epoch, "three-way-third");
+
+   for (const name op : {BATCHOP, BATCHOP_B}) BOOST_REQUIRE_EQUAL(success(), deliver_as(op, ETH_OUTPOST_ID, first));
+   for (const name op : {BATCHOP_C, BATCHOP_D}) BOOST_REQUIRE_EQUAL(success(), deliver_as(op, ETH_OUTPOST_ID, second));
+   // 2-2-1 with two silent: either silent pair can still give a version its fourth.
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_E, ETH_OUTPOST_ID, third));
+   produce_blocks();
+   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
+
+   const transaction_trace_ptr trace = deliver_trace(BATCHOP_F, ETH_OUTPOST_ID, third);
+   BOOST_REQUIRE_EQUAL(1u, action_count(trace, CHALG_ACCOUNT, chalg_actions::OPEN_DISPUTE));
+   produce_blocks();
+   assert_open_tie_dispute(epoch,
+                           {fc::sha256::hash(first.data(), first.size()),
+                            fc::sha256::hash(second.data(), second.size()),
+                            fc::sha256::hash(third.data(), third.size())},
+                           {kOperatorsPerVersion, kOperatorsPerVersion, kOperatorsPerVersion});
+   BOOST_REQUIRE(epoch_is_paused());
+   BOOST_REQUIRE(find_inbound_delivery(ETH_OUTPOST_ID, epoch, BATCHOP_G).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_G, ETH_OUTPOST_ID, first));
+   produce_blocks();
+   const fc::variant late_row = find_inbound_delivery(ETH_OUTPOST_ID, epoch, BATCHOP_G);
+   BOOST_REQUIRE(!late_row.is_null());
+   BOOST_REQUIRE(late_row[msgch_fields::RAW_DATA].as<std::vector<char>>() == first);
+   assert_open_tie_dispute(epoch,
+                           {fc::sha256::hash(first.data(), first.size()),
+                            fc::sha256::hash(second.data(), second.size()),
+                            fc::sha256::hash(third.data(), third.size())},
+                           {kOperatorsPerVersion, kOperatorsPerVersion, kOperatorsPerVersion});
+   BOOST_REQUIRE(get_dispute(SECOND_DISPUTE_ID).is_null());
+   BOOST_REQUIRE(epoch_is_paused());
+   BOOST_REQUIRE(!epoch_decided(ETH_OUTPOST_ID, epoch));
+} FC_LOG_AND_RETHROW() }
+
+/// A group of four needs three. On ETH 1-1-1 with one silent opens the dispute on the third delivery: the
+/// last member can lift no version above two. On SOL 2-1 with one silent waits, and the last member's
+/// delivery of the leading version decides it.
+BOOST_FIXTURE_TEST_CASE(four_member_split_disputes_one_one_one_and_waits_on_two_one, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kGroupSize = 4;
+   bootstrap(kGroupSize);
+
+   const uint32_t          epoch  = current_epoch();
+   const std::vector<char> first  = encode_delivery(epoch, "four-first");
+   const std::vector<char> second = encode_delivery(epoch, "four-second");
+   const std::vector<char> third  = encode_delivery(epoch, "four-third");
+
+   // ETH: 1-1 with two silent waits; 1-1-1 with one silent disputes.
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, first));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, second));
+   produce_blocks();
+   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
+   const transaction_trace_ptr trace = deliver_trace(BATCHOP_C, ETH_OUTPOST_ID, third);
+   BOOST_REQUIRE_EQUAL(1u, action_count(trace, CHALG_ACCOUNT, chalg_actions::OPEN_DISPUTE));
+   produce_blocks();
+   assert_open_tie_dispute(epoch,
+                           {fc::sha256::hash(first.data(), first.size()),
+                            fc::sha256::hash(second.data(), second.size()),
+                            fc::sha256::hash(third.data(), third.size())},
+                           {ONE_OPERATOR_PER_TIED_VERSION, ONE_OPERATOR_PER_TIED_VERSION,
+                            ONE_OPERATOR_PER_TIED_VERSION});
+   BOOST_REQUIRE(epoch_is_paused(ETH_OUTPOST_ID));
+
+   // SOL: 2-1 with one silent waits, through the chkcons re-tally as well.
+   for (const name op : {BATCHOP, BATCHOP_B}) BOOST_REQUIRE_EQUAL(success(), deliver_as(op, SOL_OUTPOST_ID, first));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, SOL_OUTPOST_ID, second));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), check_consensus(SOL_OUTPOST_ID, BATCHOP));
+   produce_blocks();
+   BOOST_REQUIRE(get_dispute(SECOND_DISPUTE_ID).is_null());
+   BOOST_REQUIRE(!epoch_is_paused(SOL_OUTPOST_ID));
+   BOOST_REQUIRE(!epoch_decided(SOL_OUTPOST_ID, epoch));
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_D, SOL_OUTPOST_ID, first));
+   produce_blocks();
+   BOOST_REQUIRE(epoch_decided(SOL_OUTPOST_ID, epoch));
+   BOOST_REQUIRE_EQUAL(get_outpcons(SOL_OUTPOST_ID)[msgch_fields::WINNING_CHECKSUM].as_string(),
+                       fc::sha256::hash(first.data(), first.size()).str());
+   BOOST_REQUIRE(get_dispute(SECOND_DISPUTE_ID).is_null());
+} FC_LOG_AND_RETHROW() }
+
+/// Exactly half is no majority: three matching deliveries of a group of six do not decide the epoch, on
+/// delivery or on the chkcons re-tally. The fourth does.
+BOOST_FIXTURE_TEST_CASE(half_of_an_even_group_does_not_decide, sysio_msgch_chain_tester) { try {
+   bootstrap(THREE_TO_THREE_TIE_GROUP_SIZE);
+
+   const uint32_t          epoch    = current_epoch();
+   const std::vector<char> envelope = encode_delivery(epoch, "half-of-six");
+
+   for (const name op : {BATCHOP, BATCHOP_B, BATCHOP_C}) {
+      BOOST_REQUIRE_EQUAL(success(), deliver_as(op, ETH_OUTPOST_ID, envelope));
+   }
+   produce_blocks();
+   BOOST_REQUIRE(!epoch_decided(ETH_OUTPOST_ID, epoch));
+   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP));
+   produce_blocks();
+   BOOST_REQUIRE(!epoch_decided(ETH_OUTPOST_ID, epoch));
+   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_D, ETH_OUTPOST_ID, envelope));
+   produce_blocks();
+   BOOST_REQUIRE(epoch_decided(ETH_OUTPOST_ID, epoch));
+} FC_LOG_AND_RETHROW() }
+
+/// A member that delivers and then leaves the eligible set is not a dispute candidate. In a group of
+/// three, A delivers v1 and is slashed; B's v2 and C's v3 then split the two members left, and the dispute
+/// lists v2 and v3 only.
+BOOST_FIXTURE_TEST_CASE(ineligible_delivery_is_not_a_dispute_candidate, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kGroupSize = 3;
+   bootstrap(kGroupSize);
+
+   const uint32_t          epoch  = current_epoch();
+   const std::vector<char> first  = encode_delivery(epoch, "ineligible-first");
+   const std::vector<char> second = encode_delivery(epoch, "ineligible-second");
+   const std::vector<char> third  = encode_delivery(epoch, "ineligible-third");
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, first));
+   produce_blocks();
+   slash_operator(BATCHOP);
+
+   // B's v2 against C still silent: C can still make it a majority of two.
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, second));
+   produce_blocks();
+   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
+
+   const transaction_trace_ptr trace = deliver_trace(BATCHOP_C, ETH_OUTPOST_ID, third);
+   BOOST_REQUIRE_EQUAL(1u, action_count(trace, CHALG_ACCOUNT, chalg_actions::OPEN_DISPUTE));
+   produce_blocks();
+   assert_open_tie_dispute(epoch,
+                           {fc::sha256::hash(second.data(), second.size()),
+                            fc::sha256::hash(third.data(), third.size())},
+                           {ONE_OPERATOR_PER_TIED_VERSION, ONE_OPERATOR_PER_TIED_VERSION});
+   BOOST_REQUIRE(!find_inbound_delivery(ETH_OUTPOST_ID, epoch, BATCHOP).is_null());
+} FC_LOG_AND_RETHROW() }
+
+/// A split that a silent member can still decide waits for that member, however long it stays silent. 3-2-1 of
+/// seven, with one member silent, can still reach four: the chkcons re-tally many minimums later opens no dispute
+/// and leaves the epoch undecided and unpaused, and the silent member's delivery of the leading version decides it.
+BOOST_FIXTURE_TEST_CASE(split_kept_open_by_a_silent_member_waits_for_its_delivery, sysio_msgch_chain_tester) { try {
+   constexpr int64_t kMinimumsSilent = 10;
+   bootstrap(MAXIMUM_GROUP_SIZE);
+
+   const uint32_t          epoch  = current_epoch();
+   const std::vector<char> first  = encode_delivery(epoch, "silent-first");
+   const std::vector<char> second = encode_delivery(epoch, "silent-second");
+   const std::vector<char> third  = encode_delivery(epoch, "silent-third");
+   for (const name op : {BATCHOP, BATCHOP_B, BATCHOP_C}) {
+      BOOST_REQUIRE_EQUAL(success(), deliver_as(op, ETH_OUTPOST_ID, first));
+   }
+   for (const name op : {BATCHOP_D, BATCHOP_E}) BOOST_REQUIRE_EQUAL(success(), deliver_as(op, ETH_OUTPOST_ID, second));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_F, ETH_OUTPOST_ID, third));
+
+   open_block_at(control->head().block_time() + fc::seconds(kMinimumsSilent * EPOCH_DURATION_SEC));
+   const transaction_trace_ptr trace = check_consensus_trace(ETH_OUTPOST_ID, BATCHOP);
+   BOOST_REQUIRE_EQUAL(1u, action_count(trace, MSGCH_ACCOUNT, msgch_actions::EVALUATE_CONSENSUS));
+   BOOST_REQUIRE_EQUAL(0u, action_count(trace, CHALG_ACCOUNT, chalg_actions::OPEN_DISPUTE));
+   produce_blocks();
+   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
+   BOOST_REQUIRE(!epoch_is_paused());
+   BOOST_REQUIRE(!epoch_decided(ETH_OUTPOST_ID, epoch));
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_G, ETH_OUTPOST_ID, first));
+   produce_blocks();
+   BOOST_REQUIRE(epoch_decided(ETH_OUTPOST_ID, epoch));
+   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
+} FC_LOG_AND_RETHROW() }
+
+/// A 1-1 split with one silent eligible operator is not terminal. The chkcons re-tally leaves it
+/// undecided and unpaused, so the final delivery establishes a strict majority without a vote.
 BOOST_FIXTURE_TEST_CASE(chkcons_waits_for_incomplete_two_way_split,
                         sysio_msgch_chain_tester) { try {
    bootstrap(INCOMPLETE_TWO_WAY_SPLIT_GROUP_SIZE);
@@ -2796,7 +4498,6 @@ BOOST_FIXTURE_TEST_CASE(chkcons_waits_for_incomplete_two_way_split,
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, right));
    produce_blocks();
 
-   elapse_epoch_boundary();
    advance_via_consensus();
 
    BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
@@ -2814,8 +4515,35 @@ BOOST_FIXTURE_TEST_CASE(chkcons_waits_for_incomplete_two_way_split,
    BOOST_REQUIRE_EQUAL(opc[msgch_fields::WINNING_CHECKSUM].as_string(), left_checksum.str());
 } FC_LOG_AND_RETHROW() }
 
-/// A terminal tie with no Tier-1 electorate must soft-decline through `chkcons`, leaving the epoch
-/// unpaused and retryable. Once a Tier-1 owner registers, the same crank opens the dispute.
+/// `evalcons` evaluates only the chain's current epoch, whose group is the one on duty. Two of four deliver an
+/// earlier epoch, then the two silent members are slashed, so the advance seats the two who delivered: their
+/// deliveries would hold a majority of the current group, and are never accepted.
+BOOST_FIXTURE_TEST_CASE(evalcons_ignores_an_epoch_that_is_not_current, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kGroupSize = 4;
+   bootstrap(kGroupSize);
+
+   const uint32_t          earlier_epoch = current_epoch();
+   const std::vector<char> envelope      = encode_delivery(earlier_epoch, "earlier-epoch");
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, envelope));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, envelope));
+   produce_blocks();
+   slash_operator(BATCHOP_C);
+   slash_operator(BATCHOP_D);
+   BOOST_REQUIRE_EQUAL(earlier_epoch + 1, advance_one_epoch());
+   const auto window = read_epoch_state()[epoch_fields::BATCH_OP_GROUPS].as<std::vector<std::vector<name>>>();
+   BOOST_REQUIRE(sorted(window.front()) == sorted({BATCHOP, BATCHOP_B}));
+
+   BOOST_REQUIRE_EQUAL(success(), push(MSGCH_ACCOUNT, msgch_abi, MSGCH_ACCOUNT, msgch_actions::EVALUATE_CONSENSUS,
+                                       mvo()(msgch_fields::CHAIN_CODE, ETH_OUTPOST_ID)
+                                            (msgch_fields::EPOCH_INDEX, earlier_epoch)));
+   produce_blocks();
+   BOOST_REQUIRE(get_outpcons(ETH_OUTPOST_ID).is_null());
+   BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, earlier_epoch), 0u);
+} FC_LOG_AND_RETHROW() }
+
+/// A terminal tie with no Tier-1 electorate must soft-decline, on its terminal delivery and on the
+/// `chkcons` re-tally, leaving the epoch unpaused and retryable. Once a Tier-1 owner registers, the same
+/// crank opens the dispute.
 struct sysio_msgch_empty_roa_tester : sysio_msgch_chain_tester {
    sysio_msgch_empty_roa_tester() : sysio_msgch_chain_tester(/*empty_roa=*/true) {}
 };
@@ -2831,9 +4559,8 @@ BOOST_FIXTURE_TEST_CASE(chkcons_retries_terminal_tie_after_tier_one_registration
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, left));
    produce_blocks();
 
-   // The terminal conflicting delivery arrives after the boundary. The msgch preflight must
+   // The terminal conflicting delivery leaves no version able to win. The msgch preflight must
    // soft-decline instead of reverting this delivery or pausing the epoch.
-   elapse_epoch_boundary();
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, right));
    produce_blocks();
 
@@ -2851,12 +4578,12 @@ BOOST_FIXTURE_TEST_CASE(chkcons_retries_terminal_tie_after_tier_one_registration
                            {ONE_OPERATOR_PER_TIED_VERSION, ONE_OPERATOR_PER_TIED_VERSION});
 } FC_LOG_AND_RETHROW() }
 
-/// An epoch that reached consensus is decided. When the chain's group then changes mid-epoch so that
-/// the deliveries of the new group split one to one, the epoch opens no dispute, keeps its recorded
-/// winner, and its close slashes only the delivery that differs from that winner.
+/// An epoch that reached consensus is decided. Its acceptance slashes the member whose delivery differs from
+/// the winner, in the delivery that tips it. When the chain's group then changes mid-epoch, the epoch opens no
+/// dispute and keeps its recorded winner, and its close slashes no one.
 BOOST_FIXTURE_TEST_CASE(decided_epoch_opens_no_dispute_after_its_group_changes, sysio_msgch_chain_tester) { try {
    constexpr uint32_t         kOriginalGroupSize = 3;
-   constexpr uint32_t         kRebuiltGroupSize  = 2;
+   constexpr uint32_t         kRebuiltGroupSize  = 1;
    constexpr uint32_t         kGroups            = 1;
    constexpr std::string_view kWinnerPayload     = "decided-winner";
    constexpr std::string_view kDivergentPayload  = "decided-divergent";
@@ -2868,15 +4595,13 @@ BOOST_FIXTURE_TEST_CASE(decided_epoch_opens_no_dispute_after_its_group_changes, 
    const std::vector<char> divergent       = encode_delivery(epoch, std::string(kDivergentPayload));
    const fc::sha256        winner_checksum = fc::sha256::hash(winner.data(), winner.size());
 
-   // Group {A, B, C}: A and B deliver the winner and C a divergent envelope, all before the boundary.
-   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, winner));
-   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, winner));
+   // Group {A, B, C}: C delivers a divergent envelope, then A and B the winner. B's delivery records the
+   // two-of-three majority and slashes C. C delivers first because a divergent envelope after the
+   // acceptance is refused.
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, divergent));
-   produce_blocks();
-
-   // Past the boundary the crank records the two-of-three majority.
-   elapse_epoch_boundary();
-   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, winner));
+   BOOST_REQUIRE(!epoch_decided(ETH_OUTPOST_ID, epoch));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, winner));
    produce_blocks();
    {
       const fc::variant consensus = get_outpcons(ETH_OUTPOST_ID);
@@ -2885,8 +4610,10 @@ BOOST_FIXTURE_TEST_CASE(decided_epoch_opens_no_dispute_after_its_group_changes, 
       BOOST_REQUIRE_EQUAL(consensus[msgch_fields::WINNING_CHECKSUM].as_string(), winner_checksum.str());
    }
    BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, epoch), 1u);
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED, operator_status(BATCHOP_C));
 
-   // The group is rebuilt mid-epoch: A and B leave the chain, D joins it, and the schedule seats {C, D}.
+   // The group is rebuilt mid-epoch: A and B leave the chain, D joins it, and the schedule seats {D}; the
+   // slashed C is no longer schedulable.
    BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n,
       mvo()("account", BATCHOP_D.to_string())("type", opp::types::OPERATOR_TYPE_BATCH)("is_bootstrapped", true)));
    serve_chains({BATCHOP_D}, {ETH_CHAIN_CODE});
@@ -2897,11 +4624,10 @@ BOOST_FIXTURE_TEST_CASE(decided_epoch_opens_no_dispute_after_its_group_changes, 
                                        mvo()(epoch_fields::CHAIN_CODE, ETH_CHAIN_CODE)));
    produce_blocks();
    BOOST_REQUIRE_EQUAL(epoch, current_epoch());
-   for (const name seated : {BATCHOP_C, BATCHOP_D}) BOOST_REQUIRE(seated_on(seated, ETH_OUTPOST_ID));
-   for (const name unseated : {BATCHOP, BATCHOP_B}) BOOST_REQUIRE(!seated_on(unseated, ETH_OUTPOST_ID));
+   BOOST_REQUIRE(seated_on(BATCHOP_D, ETH_OUTPOST_ID));
+   for (const name unseated : {BATCHOP, BATCHOP_B, BATCHOP_C}) BOOST_REQUIRE(!seated_on(unseated, ETH_OUTPOST_ID));
 
-   // D confirms the recorded winner. Over the rebuilt group the epoch's deliveries now split one to one
-   // (C divergent, D the winner), yet the decided epoch opens no dispute, stays unpaused, and keeps its
+   // D confirms the recorded winner. The decided epoch opens no dispute, stays unpaused, and keeps its
    // winner, dispatched once.
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_D, ETH_OUTPOST_ID, winner));
    produce_blocks();
@@ -2915,15 +4641,58 @@ BOOST_FIXTURE_TEST_CASE(decided_epoch_opens_no_dispute_after_its_group_changes, 
    }
    BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, epoch), 1u);
 
-   // The close slashes C, whose delivery differs from the recorded winner, and no one else.
-   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP_D));
+   // The close, past the chain's boundary, slashes no one; the members that delivered the winner stay ACTIVE.
+   elapse_epoch_boundary();
+   const transaction_trace_ptr close = check_consensus_trace(ETH_OUTPOST_ID, BATCHOP_D);
    produce_blocks();
    BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
-   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED,
-                       get_operator(BATCHOP_C)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
+   BOOST_REQUIRE(slashops(close).empty());
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED, operator_status(BATCHOP_C));
    for (const name canonical : {BATCHOP, BATCHOP_B, BATCHOP_D}) {
-      BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE,
-                          get_operator(canonical)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
+      BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(canonical));
+   }
+} FC_LOG_AND_RETHROW() }
+
+/// A member that delivered a divergent envelope and is then seated out of the chain's group by a mid-epoch
+/// rebuild, while staying ACTIVE, is still slashed when the new group decides the epoch: the acceptance judges
+/// every recorded delivery, not only the eligible ones.
+BOOST_FIXTURE_TEST_CASE(divergent_deliverer_seated_out_mid_epoch_is_slashed_at_acceptance,
+                        sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kOriginalGroupSize = 3;
+   constexpr uint32_t kRebuiltGroupSize  = 2;
+   constexpr uint32_t kGroups            = 1;
+   bootstrap(kOriginalGroupSize);
+
+   const uint32_t          epoch     = current_epoch();
+   const std::vector<char> winner    = encode_delivery(epoch, "rebuilt-winner");
+   const std::vector<char> divergent = encode_delivery(epoch, "rebuilt-divergent");
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, divergent));
+   produce_blocks();
+
+   // The rebuild keeps the first two of the three ACTIVE serving operators: C leaves the group and stays ACTIVE.
+   set_epoch_config(ETH_CHAIN_CODE, EPOCH_DURATION_SEC, kRebuiltGroupSize, kGroups);
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::SCHEDULE,
+                                       mvo()(epoch_fields::CHAIN_CODE, ETH_CHAIN_CODE)));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(epoch, current_epoch());
+   BOOST_REQUIRE(!seated_on(BATCHOP_C, ETH_OUTPOST_ID));
+   for (const name seated : {BATCHOP, BATCHOP_B}) BOOST_REQUIRE(seated_on(seated, ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(BATCHOP_C));
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, winner));
+   produce_blocks();
+   BOOST_REQUIRE(!epoch_decided(ETH_OUTPOST_ID, epoch));
+
+   const transaction_trace_ptr tipping = deliver_trace(BATCHOP_B, ETH_OUTPOST_ID, winner);
+   const std::vector<slashop_record> slashed = slashops(tipping);
+   BOOST_REQUIRE_EQUAL(1u, slashed.size());
+   BOOST_REQUIRE_EQUAL(BATCHOP_C, slashed.front().operator_account);
+   produce_blocks();
+   BOOST_REQUIRE(epoch_decided(ETH_OUTPOST_ID, epoch));
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED, operator_status(BATCHOP_C));
+   for (const name member : {BATCHOP, BATCHOP_B}) {
+      BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(member));
    }
 } FC_LOG_AND_RETHROW() }
 
@@ -2932,10 +4701,10 @@ BOOST_FIXTURE_TEST_CASE(decided_epoch_opens_no_dispute_after_its_group_changes, 
 // slashed operator's pre-slash vote carry a threshold it is no longer part of:
 //
 //   A delivers X -> A is slashed -> B delivers X
-//   group_size == 2 (B, C), counts[X] == total == 2  ->  Option A accepts,
+//   group_size == 2 (B, C), counts[X] == 2 (A's row included)  ->  a strict majority of two,
 //
 // finalizing on A+B even though C -- one of the two currently-ACTIVE members -- never delivered.
-// That is a strictly smaller quorum than the live group, so it must not resolve until C speaks.
+// Counted over the eligible set, X holds one of two, so it must not resolve until C speaks.
 BOOST_FIXTURE_TEST_CASE(slash_after_delivery_does_not_count_toward_consensus, sysio_msgch_chain_tester) { try {
    bootstrap(/*n_batch_ops=*/3);
 
@@ -2950,8 +4719,8 @@ BOOST_FIXTURE_TEST_CASE(slash_after_delivery_does_not_count_toward_consensus, sy
       mvo()("account", BATCHOP.to_string())("reason", "WNS-15 slash-after-delivery regression")));
    produce_blocks();
 
-   // B delivers. Eligible set is {B, C}; only B has delivered among them, so one of two is not a
-   // majority and A's stale row must not make up the difference.
+   // B delivers. Eligible set is {B, C}; only B has delivered among them, so one delivery counts toward the two
+   // that three seats need, and A's stale row must not make up the difference.
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, envelope));
    produce_blocks();
    {
@@ -2959,8 +4728,7 @@ BOOST_FIXTURE_TEST_CASE(slash_after_delivery_does_not_count_toward_consensus, sy
       BOOST_REQUIRE(opc.is_null() || !opc["consensus_reached"].as<bool>());
    }
 
-   // Past the boundary the answer must still be no: A is not part of the group being counted.
-   elapse_epoch_boundary();
+   // The chkcons re-tally must still say no: A is not part of the group being counted.
    BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP_B));
    produce_blocks();
    {
@@ -2968,7 +4736,7 @@ BOOST_FIXTURE_TEST_CASE(slash_after_delivery_does_not_count_toward_consensus, sy
       BOOST_REQUIRE(opc.is_null() || !opc["consensus_reached"].as<bool>());
    }
 
-   // C delivers: now both eligible members agree and consensus is legitimate.
+   // C delivers: two eligible members agree, a majority of the three seats, and consensus is legitimate.
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, envelope));
    produce_blocks();
 
@@ -3098,8 +4866,10 @@ BOOST_FIXTURE_TEST_CASE(advance_withholds_batch_operator_groups_when_next_group_
       "starved window never withheld BATCH_OPERATOR_GROUPS -- an empty active group was published");
 } FC_LOG_AND_RETHROW() }
 
-/// An operator each chain evicts in the same epoch drops out of both outposts' rosters
-/// and out of normal tail selection, while its global status stays ACTIVE.
+/// An operator each chain evicts at the same advance drops out of both outposts' rosters
+/// and out of normal tail selection, while its global status stays ACTIVE. The epoch it missed is
+/// judged at the advance after its own, which with one group also slides out the seat the first
+/// advance re-drew for it.
 BOOST_FIXTURE_TEST_CASE(advance_roster_excludes_same_epoch_eviction,
                         sysio_msgch_chain_tester) { try {
    bootstrap(/*n_batch_ops=*/3, /*batchop_is_bootstrapped=*/false);
@@ -3111,6 +4881,10 @@ BOOST_FIXTURE_TEST_CASE(advance_roster_excludes_same_epoch_eviction,
    set_termination_thresholds(ROTATION_MAX_CONSECUTIVE_MISSES, DEFAULT_MAX_PERCENT_MISSES,
                               PERCENT_RAIL_FROM_FIRST_DUTY);
    produce_blocks();
+   advance_to_next_epoch();
+   for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
+      BOOST_REQUIRE_EQUAL(std::string(served_status::serving), membership_status(BATCHOP, chain));
+   }
    advance_to_next_epoch();
    BOOST_REQUIRE(get_operator(BATCHOP)["status"].as<opp::types::OperatorStatus>() ==
                  opp::types::OPERATOR_STATUS_ACTIVE);
@@ -3135,7 +4909,8 @@ BOOST_FIXTURE_TEST_CASE(advance_roster_excludes_same_epoch_eviction,
 
 /// `terminate` leaves the operator's later seats in place. A registration made before they close would
 /// take the miss the next one records, and with that one row in its sample the miss rate would
-/// terminate it again, so `regoperator` refuses the account until its last seat has closed.
+/// terminate it again, so `regoperator` refuses the account until its last seat has closed: until the
+/// advance after that seat's slide out of the window, which closes its epoch's books.
 BOOST_FIXTURE_TEST_CASE(regoperator_refuses_account_still_seated, sysio_msgch_chain_tester) { try {
    const auto outposts = bootstrap_rotation(ROTATION_WINDOW_MS);
 
@@ -3162,15 +4937,17 @@ BOOST_FIXTURE_TEST_CASE(regoperator_refuses_account_still_seated, sysio_msgch_ch
          ("is_bootstrapped", false));
    };
 
-   // Refused on every epoch the leftover seat is still in the window, its own duty epoch included.
+   // Refused on every epoch the leftover seat is still in the window, its own duty epoch included, and on the
+   // epoch after it, whose advance closes that seat's books.
    uint32_t leftover_duty_epoch = 0;
-   for (uint32_t step = 0; step < ROTATION_GROUPS && holds_schedule_seat(BATCHOP); ++step) {
+   for (uint32_t step = 0; step < ROTATION_GROUPS + 1 && holds_schedule_seat(BATCHOP); ++step) {
       BOOST_REQUIRE_EQUAL(error(STILL_SEATED_REGISTRATION_ERROR), register_again());
       if (duty_member() == BATCHOP) leftover_duty_epoch = current_epoch();
       advance_to_next_epoch();
    }
    BOOST_REQUIRE(!holds_schedule_seat(BATCHOP));
    BOOST_REQUIRE_GT(leftover_duty_epoch, 0u);
+   BOOST_REQUIRE_EQUAL(leftover_duty_epoch, booked_epoch());
 
    // The closed seat recorded its miss against the terminated registration, which termcheck left alone.
    const auto leftover_rows = dellog_rows(BATCHOP, leftover_duty_epoch);
@@ -3212,7 +4989,7 @@ BOOST_FIXTURE_TEST_CASE(leaving_a_chain_stops_new_seats_there_only, sysio_msgch_
 } FC_LOG_AND_RETHROW() }
 
 /// A member that left a chain still owes the seats it holds there: `deliver` accepts it, its delivery
-/// counts toward consensus, and the close records it as delivered.
+/// counts toward consensus, and the advance that closes the seat's books records it as delivered.
 BOOST_FIXTURE_TEST_CASE(a_member_that_left_delivers_its_remaining_seat, sysio_msgch_chain_tester) { try {
    bootstrap_rotation(ROTATION_WINDOW_MS, /*batchop_is_bootstrapped=*/true);
    BOOST_REQUIRE_EQUAL(BATCHOP, duty_member());
@@ -3225,13 +5002,15 @@ BOOST_FIXTURE_TEST_CASE(a_member_that_left_delivers_its_remaining_seat, sysio_ms
    BOOST_REQUIRE_EQUAL(duty_epoch, get_outpcons(ETH_OUTPOST_ID)[msgch_fields::EPOCH_INDEX].as<uint32_t>());
 
    advance_to_next_epoch();
+   advance_to_next_epoch();
+   BOOST_REQUIRE_EQUAL(duty_epoch, booked_epoch());
    const auto rows = dellog_rows(BATCHOP, duty_epoch);
    BOOST_REQUIRE_EQUAL(1u, rows.size());
    BOOST_REQUIRE(rows.front()[opreg_fields::DELIVERED].as<bool>());
 } FC_LOG_AND_RETHROW() }
 
-/// An operator that left a chain rejoins it only once its seats there have closed; after the rejoin
-/// the slide seats it there again.
+/// An operator that left a chain rejoins it only once its seats there have closed, the books of its last one
+/// included; after the rejoin the slide seats it there again.
 BOOST_FIXTURE_TEST_CASE(rejoining_a_chain_waits_for_its_seats_to_close, sysio_msgch_chain_tester) { try {
    bootstrap_rotation(ROTATION_WINDOW_MS, /*batchop_is_bootstrapped=*/true);
    BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n,
@@ -3243,9 +5022,15 @@ BOOST_FIXTURE_TEST_CASE(rejoining_a_chain_waits_for_its_seats_to_close, sysio_ms
    BOOST_REQUIRE_EQUAL(error(STILL_SEATED_JOIN_ERROR), served::join(*this, BATCHOP, ETH_CHAIN_CODE, BATCHOP));
    produce_blocks();
 
-   // The leaver's only seat closes; the spare takes the new tail.
+   // The leaver's only seat slides out of the window; the spare takes the new tail. The seat's books are
+   // still open, so the rejoin waits for the advance that closes them.
    advance_to_next_epoch();
    BOOST_REQUIRE(!seated_on(BATCHOP, ETH_OUTPOST_ID));
+   BOOST_REQUIRE(previous_group() == std::vector<name>{BATCHOP});
+   BOOST_REQUIRE_EQUAL(error(STILL_SEATED_JOIN_ERROR), served::join(*this, BATCHOP, ETH_CHAIN_CODE, BATCHOP));
+   produce_blocks();
+   advance_to_next_epoch();
+   BOOST_REQUIRE_EQUAL(1u, dellog_rows(BATCHOP).size());
    BOOST_REQUIRE_EQUAL(success(), served::join(*this, BATCHOP, ETH_CHAIN_CODE, BATCHOP));
    produce_blocks();
 
@@ -3254,8 +5039,8 @@ BOOST_FIXTURE_TEST_CASE(rejoining_a_chain_waits_for_its_seats_to_close, sysio_ms
 } FC_LOG_AND_RETHROW() }
 
 /// A breach on one chain evicts the operator from that chain only: ETH, where it stops delivering,
-/// evicts it and seats a spare in its place, while SOL, where it keeps delivering, keeps seating it.
-/// Its global status, and so its bond, is untouched.
+/// evicts it and, once the seat drawn before the eviction slides out, seats a spare in its place, while
+/// SOL, where it keeps delivering, keeps seating it. Its global status, and so its bond, is untouched.
 BOOST_FIXTURE_TEST_CASE(eviction_on_one_chain_keeps_the_operator_on_the_other, sysio_msgch_chain_tester) { try {
    // The anchor on both chains, then misses on ETH alone until the consecutive rail fires.
    constexpr uint32_t kEvictingDuty = 1 + ROTATION_MAX_CONSECUTIVE_MISSES + 1;
@@ -3295,17 +5080,19 @@ BOOST_FIXTURE_TEST_CASE(eviction_on_one_chain_keeps_the_operator_on_the_other, s
    BOOST_REQUIRE(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE ==
                  get_operator(BATCHOP)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
 
-   // ETH's slide seated the spare in the evicted member's place; SOL seated the member again.
-   BOOST_REQUIRE(!seated_on(BATCHOP, ETH_OUTPOST_ID));
+   // ETH keeps the seat drawn for the member before its eviction until it slides out, then seats the spare in
+   // its place; SOL seats the member again.
+   require_evicted_seat_slides_out(BATCHOP, {ETH_OUTPOST_ID});
    BOOST_REQUIRE(seated_on(BATCHOP_D, ETH_OUTPOST_ID));
    BOOST_REQUIRE(seated_on(BATCHOP, SOL_OUTPOST_ID));
    BOOST_REQUIRE(!seated_on(BATCHOP_D, SOL_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(std::string(served_status::serving), membership_status(BATCHOP, SOL_OUTPOST_ID));
 } FC_LOG_AND_RETHROW() }
 
-/// An eviction forfeits the operator's unsettled duty on that chain alone. The close that evicts BATCHOP from ETH
-/// erases its ETH duty and credits it nothing for the breaching seat, while the period keeps the forfeited
-/// seat-seconds and its SOL duty keeps accruing. The payout then pays BATCHOP its SOL share alone, and the
-/// forfeited ETH share stays in the treasury.
+/// An eviction forfeits the operator's unsettled duty on that chain alone. The advance that closes the books of
+/// BATCHOP's breaching seat evicts it from ETH, erases its ETH duty and credits it nothing for that seat, while the
+/// period keeps the forfeited seat-seconds and its SOL duty keeps accruing. The payout then pays BATCHOP its SOL
+/// share alone, and the forfeited ETH share stays in the treasury.
 BOOST_FIXTURE_TEST_CASE(eviction_forfeits_the_chain_duty_while_the_other_chain_pays, sysio_msgch_chain_tester) { try {
    // The anchor on both chains, then misses on ETH alone until the consecutive rail fires.
    constexpr uint32_t kEvictingDuty = 1 + ROTATION_MAX_CONSECUTIVE_MISSES + 1;
@@ -3335,8 +5122,10 @@ BOOST_FIXTURE_TEST_CASE(eviction_forfeits_the_chain_duty_while_the_other_chain_p
       if (duties < kEvictingDuty) advance_to_next_epoch();
    }
    BOOST_REQUIRE_EQUAL(kEvictingDuty, duties);
+   // The breaching seat's own close leaves its books open.
+   advance_to_next_epoch();
 
-   // Before the evicting close BATCHOP holds one seat of duty per earlier duty on each chain.
+   // Before the evicting advance BATCHOP holds one seat of duty per earlier duty on each chain.
    const uint64_t forfeited_seat_seconds = uint64_t{kEvictingDuty - 1} * EPOCH_DURATION_SEC;
    BOOST_REQUIRE_EQUAL(std::string(served_status::serving), membership_status(BATCHOP, ETH_OUTPOST_ID));
    for (const uint64_t chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
@@ -3344,7 +5133,7 @@ BOOST_FIXTURE_TEST_CASE(eviction_forfeits_the_chain_duty_while_the_other_chain_p
    }
    const uint64_t open_before = duty_state()[system_fields::OPEN_SEAT_SECONDS].as<uint64_t>();
 
-   // The evicting close forfeits the ETH duty and credits only the SOL seat; the period total keeps the forfeit.
+   // The evicting advance forfeits the ETH duty and credits only the SOL seat; the period total keeps the forfeit.
    advance_to_next_epoch();
    BOOST_REQUIRE_EQUAL(std::string(served_status::evicted), membership_status(BATCHOP, ETH_OUTPOST_ID));
    BOOST_REQUIRE_EQUAL(std::string(served_status::serving), membership_status(BATCHOP, SOL_OUTPOST_ID));
@@ -3390,10 +5179,10 @@ BOOST_FIXTURE_TEST_CASE(eviction_forfeits_the_chain_duty_while_the_other_chain_p
 
 /// An eviction that lands while the member still holds its seat (here an out-of-band `termcheck` as
 /// sysio.epoch, mid-epoch): `deliver` refuses it on that chain, the chain's consensus leaves it out, and
-/// its close records the miss without evaluating it again. The eviction forfeits its unsettled duty on that
-/// chain and the seat's close credits it none. It rejoins once that seat has closed, and the rejoin restarts
-/// the rails, the misses that evicted it no longer counting, and its duty on the chain, credited afresh from
-/// its first seat after the rejoin.
+/// the advances that close its open epochs' books record their misses without evaluating it again. The
+/// eviction forfeits its unsettled duty on that chain and those advances credit it none there. It rejoins
+/// once its last seat's books have closed, and the rejoin restarts the rails, the misses that evicted it no
+/// longer counting, and its duty on the chain, credited afresh from its first seat after the rejoin.
 BOOST_FIXTURE_TEST_CASE(evicted_member_delivers_nothing_until_it_rejoins_with_fresh_rails,
                         sysio_msgch_chain_tester) { try {
    constexpr uint32_t kPermissiveMaxConsecutiveMisses = 5;
@@ -3415,10 +5204,15 @@ BOOST_FIXTURE_TEST_CASE(evicted_member_delivers_nothing_until_it_rejoins_with_fr
       produce_blocks();
       tip = next_stream_tip(envelope);
    };
+   const std::vector<name> everyone{BATCHOP, BATCHOP_B, BATCHOP_C};
+   const std::vector<name> others{BATCHOP_B, BATCHOP_C};
 
-   // Epoch 1 delivered everywhere; epoch 2 missed everywhere. Both closes credit every seat on each chain.
-   deliver_epoch({BATCHOP, BATCHOP_B, BATCHOP_C}, {BATCHOP, BATCHOP_B, BATCHOP_C}, "anchor");
+   // Epoch 1 delivered everywhere; epoch 2 missed everywhere; epoch 3 delivered everywhere but by BATCHOP on ETH.
+   // By epoch 4 the advances have closed the books of epochs 1 and 2, crediting every seat of both on each chain.
+   deliver_epoch(everyone, everyone, "anchor");
    advance_one_epoch();
+   advance_one_epoch();
+   deliver_epoch(others, everyone, "missed-on-eth");
    advance_one_epoch();
    BOOST_REQUIRE_EQUAL(std::string(served_status::serving), membership_status(BATCHOP, ETH_OUTPOST_ID));
    for (const uint64_t outpost : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
@@ -3426,8 +5220,9 @@ BOOST_FIXTURE_TEST_CASE(evicted_member_delivers_nothing_until_it_rejoins_with_fr
    }
    const uint64_t open_before_eviction = duty_state()[system_fields::OPEN_SEAT_SECONDS].as<uint64_t>();
 
-   // Epoch 3, BATCHOP seated: evict it from ETH alone.
+   // Epoch 4, BATCHOP seated: evict it from ETH alone on its sample of epochs 1 and 2.
    const uint32_t evicted_epoch = current_epoch();
+   const uint32_t missed_epoch  = evicted_epoch - 1;
    set_termination_thresholds(kPermissiveMaxConsecutiveMisses, kHalfSampleMaxPercentMisses,
                               PERCENT_RAIL_FROM_FIRST_DUTY);
    BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, EPOCH_ACCOUNT, opreg_actions::TERMINATION_CHECK,
@@ -3447,15 +5242,16 @@ BOOST_FIXTURE_TEST_CASE(evicted_member_delivers_nothing_until_it_rejoins_with_fr
    BOOST_REQUIRE_EQUAL(error(STILL_SEATED_JOIN_ERROR),
                        sysio_system::test_support::served_chains::join(*this, BATCHOP, ETH_CHAIN_CODE, BATCHOP));
    produce_blocks();
-   // The two members left reach unanimity over ETH's eligible set; SOL still counts BATCHOP.
-   deliver_epoch({BATCHOP_B, BATCHOP_C}, {BATCHOP, BATCHOP_B, BATCHOP_C}, "after-eviction");
+   // The two members left are a strict majority of ETH's eligible set; SOL still counts BATCHOP.
+   deliver_epoch(others, everyone, "after-eviction");
    for (const uint64_t outpost : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
       BOOST_REQUIRE_EQUAL(evicted_epoch, get_outpcons(outpost)[msgch_fields::EPOCH_INDEX].as<uint32_t>());
    }
 
-   // The close records the miss and leaves the eviction as it was; the slide drops BATCHOP from ETH.
+   // The advance that closes epoch 3's books records the miss and leaves the eviction as it was; its slide
+   // drops BATCHOP from ETH's window.
    advance_one_epoch();
-   const auto missed = dellog_rows(BATCHOP, evicted_epoch, ETH_OUTPOST_ID);
+   const auto missed = dellog_rows(BATCHOP, missed_epoch, ETH_OUTPOST_ID);
    BOOST_REQUIRE_EQUAL(1u, missed.size());
    BOOST_REQUIRE(!missed.front()[opreg_fields::DELIVERED].as<bool>());
    const auto still_evicted = membership(BATCHOP, ETH_OUTPOST_ID);
@@ -3465,25 +5261,38 @@ BOOST_FIXTURE_TEST_CASE(evicted_member_delivers_nothing_until_it_rejoins_with_fr
    BOOST_REQUIRE_EQUAL(evicted["updated_at_ms"].as_uint64(), still_evicted["updated_at_ms"].as_uint64());
    BOOST_REQUIRE_EQUAL(std::string(served_status::serving), membership_status(BATCHOP, SOL_OUTPOST_ID));
    BOOST_REQUIRE(!seated_on(BATCHOP, ETH_OUTPOST_ID));
-   // The seat it still held earned nothing on ETH; SOL credited its seat as before. The two other members
-   // earned their ETH seats and all three their SOL seats.
+   // The seat it held earned nothing on ETH; SOL credited its seat as before. The two other members earned
+   // their ETH seats and all three their SOL seats.
    BOOST_REQUIRE_EQUAL(0u, batch_duty_seat_seconds(BATCHOP, ETH_OUTPOST_ID));
    BOOST_REQUIRE_EQUAL(uint64_t{3 * EPOCH_DURATION_SEC}, batch_duty_seat_seconds(BATCHOP, SOL_OUTPOST_ID));
    BOOST_REQUIRE_EQUAL(open_before_eviction + uint64_t{(2 + 3) * EPOCH_DURATION_SEC},
                        duty_state()[system_fields::OPEN_SEAT_SECONDS].as<uint64_t>());
 
+   // The evicted epoch's books are still open, so the rejoin waits for the advance that closes them, which
+   // records that miss too and credits it nothing on ETH.
+   BOOST_REQUIRE_EQUAL(error(STILL_SEATED_JOIN_ERROR),
+                       sysio_system::test_support::served_chains::join(*this, BATCHOP, ETH_CHAIN_CODE, BATCHOP));
+   produce_blocks();
+   advance_one_epoch();
+   const auto missed_evicted = dellog_rows(BATCHOP, evicted_epoch, ETH_OUTPOST_ID);
+   BOOST_REQUIRE_EQUAL(1u, missed_evicted.size());
+   BOOST_REQUIRE(!missed_evicted.front()[opreg_fields::DELIVERED].as<bool>());
+   BOOST_REQUIRE_EQUAL(0u, batch_duty_seat_seconds(BATCHOP, ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(uint64_t{4 * EPOCH_DURATION_SEC}, batch_duty_seat_seconds(BATCHOP, SOL_OUTPOST_ID));
+
    // Rejoined, BATCHOP is seated again from the next slide.
    BOOST_REQUIRE_EQUAL(success(),
                        sysio_system::test_support::served_chains::join(*this, BATCHOP, ETH_CHAIN_CODE, BATCHOP));
-   deliver_epoch({BATCHOP_B, BATCHOP_C}, {BATCHOP, BATCHOP_B, BATCHOP_C}, "rejoined");
+   deliver_epoch(others, everyone, "rejoined");
    advance_one_epoch();
    BOOST_REQUIRE(seated_on(BATCHOP, ETH_OUTPOST_ID));
-   BOOST_REQUIRE_EQUAL(0u, batch_duty_seat_seconds(BATCHOP, ETH_OUTPOST_ID));   // that epoch did not seat it
+   BOOST_REQUIRE_EQUAL(0u, batch_duty_seat_seconds(BATCHOP, ETH_OUTPOST_ID));   // no epoch since seated it
 
    // Its first duty since the rejoin is delivered. Counted with the misses that evicted it the sample
-   // would be 50% again; counted from the rejoin it is clean.
+   // would be 50% again; counted from the rejoin it is clean. Its books close at the advance after the next.
    const uint32_t rejoined_duty = current_epoch();
-   deliver_epoch({BATCHOP, BATCHOP_B, BATCHOP_C}, {BATCHOP, BATCHOP_B, BATCHOP_C}, "first-duty-after-rejoin");
+   deliver_epoch(everyone, everyone, "first-duty-after-rejoin");
+   advance_one_epoch();
    advance_one_epoch();
    const auto delivered = dellog_rows(BATCHOP, rejoined_duty, ETH_OUTPOST_ID);
    BOOST_REQUIRE_EQUAL(1u, delivered.size());
@@ -3494,8 +5303,9 @@ BOOST_FIXTURE_TEST_CASE(evicted_member_delivers_nothing_until_it_rejoins_with_fr
 } FC_LOG_AND_RETHROW() }
 
 /// A terminated operator that registers again forfeits its earlier registration's duty on every chain. BATCHOP
-/// serves ETH and SOL and is terminated while still seated; its last seat's close credits that registration
-/// more duty. Once no window seats it, it registers again, bonds and is ACTIVE before the pay period settles.
+/// serves ETH and SOL and is terminated while still seated; the advance that closes its last seat's books credits
+/// that registration more duty. Once no schedule seats it, it registers again, bonds and is ACTIVE before the pay
+/// period settles.
 /// `regoperator` erases its duty on both chains while the period keeps the seat-seconds, so the payout pays it
 /// only for the seats it serves after rejoining, and the earlier registration's share stays in the treasury.
 BOOST_FIXTURE_TEST_CASE(registering_again_forfeits_the_earlier_registrations_duty, sysio_msgch_chain_tester) { try {
@@ -3510,8 +5320,11 @@ BOOST_FIXTURE_TEST_CASE(registering_again_forfeits_the_earlier_registrations_dut
       mvo()("account", BATCHOP.to_string())("reason", std::string(SEATED_TERMINATION_REASON))));
    produce_blocks(); // land it before the advance's epoch-length jump expires it
 
-   // Its remaining seats close, still crediting the terminated registration.
-   for (uint32_t step = 0; step < ROTATION_GROUPS && holds_schedule_seat(BATCHOP); ++step) advance_to_next_epoch();
+   // Its remaining seats close, still crediting the terminated registration: the last one at the advance after
+   // its slide out of the window.
+   for (uint32_t step = 0; step < ROTATION_GROUPS + 1 && holds_schedule_seat(BATCHOP); ++step) {
+      advance_to_next_epoch();
+   }
    BOOST_REQUIRE(!holds_schedule_seat(BATCHOP));
    std::map<uint64_t, uint64_t> earlier_duty;
    for (const uint64_t chain : chains) {
@@ -3778,8 +5591,8 @@ BOOST_FIXTURE_TEST_CASE(outpost_activated_later_starts_its_own_epoch_one, sysio_
       return push(MSGCH_ACCOUNT, msgch_abi, signer, msgch_actions::BOOT_CHAIN,
                   mvo()(msgch_fields::CHAIN_CODE, SOL_OUTPOST_ID));
    };
-   // A window wide enough for SOL's longer schedule: opreg's window must span every chain's run.
-   bootstrap_rotation(2 * ROTATION_WINDOW_MS, /*batchop_is_bootstrapped=*/true);
+   // SOL's longer schedule is set later against the stored opreg window, which constrains no schedule.
+   bootstrap_rotation(ROTATION_WINDOW_MS, /*batchop_is_bootstrapped=*/true);
    register_chain(opp::types::ChainKind::CHAIN_KIND_SVM, SOL_CHAIN_CODE, SOL_EXTERNAL_CHAIN_ID);
    produce_blocks();
    advance_to_next_epoch();
@@ -3990,8 +5803,8 @@ BOOST_FIXTURE_TEST_CASE(envelope_prune_is_per_outpost, sysio_msgch_chain_tester)
 
 /// Dispute resolution still works once the prune is live. Two clean epochs run first, so the
 /// disputed epoch's deliveries prune the oldest epoch; ETH then splits 1-1, a Tier-1 vote resolves
-/// it from the retained rows (`opendispute` pauses the epoch, so they stay current), and `advance`
-/// slashes the losing deliverer.
+/// it from the retained rows (`opendispute` pauses the epoch, so they stay current), and the
+/// resolution slashes the losing deliverer before the epoch advances.
 BOOST_FIXTURE_TEST_CASE(dispute_resolves_while_envelopes_are_pruned, sysio_msgch_chain_tester) { try {
    const std::vector<name> ops{BATCHOP, BATCHOP_B};
    bootstrap(ONE_TO_ONE_TIE_GROUP_SIZE);
@@ -4022,29 +5835,31 @@ BOOST_FIXTURE_TEST_CASE(dispute_resolves_while_envelopes_are_pruned, sysio_msgch
    BOOST_REQUIRE(epoch_is_paused());
 
    resolve_tie_dispute(epoch, left_checksum);
+   BOOST_REQUIRE_EQUAL(epoch, current_epoch());
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED, operator_status(BATCHOP_B));
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(BATCHOP));
    advance_via_consensus();
    BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
-   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED,
-                       get_operator(BATCHOP_B)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
-   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE,
-                       get_operator(BATCHOP)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(BATCHOP));
 } FC_LOG_AND_RETHROW() }
 
 // ---------------------------------------------------------------------------
 //  Per-chain consensus epochs: each outpost chain runs its own counter, pacing and dispute pause.
 // ---------------------------------------------------------------------------
 
-/// Two chains with different durations advance on their own boundaries, and a chain that stops reaching
-/// consensus holds only itself. Each chain's outbound envelope and BATCH_OPERATOR_GROUPS carry that
-/// chain's own epoch index and duration.
+/// Two chains with different minimum durations advance once each is due, and a chain that stops reaching
+/// consensus holds only itself. Traffic since an epoch's start makes it due one chain minimum later. Each chain's
+/// outbound envelope and BATCH_OPERATOR_GROUPS carry that chain's own epoch index and duration.
 BOOST_FIXTURE_TEST_CASE(chains_advance_independently_at_their_own_pace, sysio_msgch_chain_tester) { try {
    constexpr uint32_t kBatchOperatorCount = 3;
    constexpr uint32_t kSolDurationSec     = 2 * EPOCH_DURATION_SEC;
    constexpr uint32_t kStalledEthEpochs   = 3;
    const std::vector<name> ops{BATCHOP, BATCHOP_B, BATCHOP_C};
+   // Seconds from `chain_code`'s epoch start to when traffic since that start makes it due.
    const auto epoch_length_sec = [&](uint64_t chain_code) {
+      sysio_system::test_support::epoch_state::mark_traffic(*this, epoch_abi, fc::slug_name{chain_code}.to_string());
       const auto state = read_epoch_state(chain_code);
-      return static_cast<uint32_t>((state[epoch_fields::NEXT_EPOCH_START].as<fc::time_point>() -
+      return static_cast<uint32_t>((state[epoch_fields::DUE_AT].as<fc::time_point>() -
                                     state[epoch_fields::CURRENT_EPOCH_START].as<fc::time_point>()).to_seconds());
    };
    const auto require_stamped = [&](uint64_t chain_code, uint32_t duration_sec) {
@@ -4065,7 +5880,7 @@ BOOST_FIXTURE_TEST_CASE(chains_advance_independently_at_their_own_pace, sysio_ms
    require_stamped(ETH_OUTPOST_ID, EPOCH_DURATION_SEC);
    require_stamped(SOL_OUTPOST_ID, kSolDurationSec);
 
-   // Both reach consensus; only ETH's boundary has passed, so only ETH advances.
+   // Both reach consensus; only ETH is due, so only ETH advances.
    std::map<uint64_t, inbound_stream_tip> tips;
    deliver_chain_unanimous(ops, ETH_OUTPOST_ID, "eth-1", tips);
    deliver_chain_unanimous(ops, SOL_OUTPOST_ID, "sol-1", tips);
@@ -4075,7 +5890,7 @@ BOOST_FIXTURE_TEST_CASE(chains_advance_independently_at_their_own_pace, sysio_ms
    BOOST_REQUIRE_EQUAL(1u, current_epoch(SOL_OUTPOST_ID));
    require_stamped(ETH_OUTPOST_ID, EPOCH_DURATION_SEC);
 
-   // SOL's longer epoch closes on its own boundary.
+   // SOL's longer epoch closes once SOL is due.
    deliver_chain_unanimous(ops, ETH_OUTPOST_ID, "eth-2", tips);
    elapse_epoch_boundary();
    advance_via_consensus();
@@ -4103,9 +5918,10 @@ BOOST_FIXTURE_TEST_CASE(chains_advance_independently_at_their_own_pace, sysio_ms
                                  sol_tip.message_id)));
 } FC_LOG_AND_RETHROW() }
 
-/// Each chain's epoch close credits its group with that epoch's own scheduled length in seat-seconds, on each
-/// member's row for that chain: a seat on the slower chain counts for its longer epoch.
-BOOST_FIXTURE_TEST_CASE(epoch_close_credits_the_chain_epoch_length_as_seat_seconds, sysio_msgch_chain_tester) { try {
+/// Each chain's advance credits the group of the epoch whose books it closes with that chain's minimum duration in
+/// seat-seconds, on each member's row for that chain: a seat on the chain with the longer minimum counts for more. A
+/// chain's first advance, like its genesis, credits nothing.
+BOOST_FIXTURE_TEST_CASE(epoch_close_credits_the_chain_minimum_as_seat_seconds, sysio_msgch_chain_tester) { try {
    constexpr uint32_t kSolDurationSec = 2 * EPOCH_DURATION_SEC;
    const std::vector<name> ops{BATCHOP};
    bootstrap(1, /*batchop_is_bootstrapped=*/true, kSolDurationSec);
@@ -4113,7 +5929,7 @@ BOOST_FIXTURE_TEST_CASE(epoch_close_credits_the_chain_epoch_length_as_seat_secon
       BOOST_REQUIRE_EQUAL(0u, batch_duty_seat_seconds(BATCHOP, chain));   // a genesis advance records no duty
    }
 
-   // Only ETH's boundary has passed: its 60 s epoch is credited.
+   // Only ETH is due; its first advance credits nothing.
    std::map<uint64_t, inbound_stream_tip> tips;
    deliver_chain_unanimous(ops, ETH_OUTPOST_ID, "eth-1", tips);
    deliver_chain_unanimous(ops, SOL_OUTPOST_ID, "sol-1", tips);
@@ -4121,18 +5937,38 @@ BOOST_FIXTURE_TEST_CASE(epoch_close_credits_the_chain_epoch_length_as_seat_secon
    advance_via_consensus();
    BOOST_REQUIRE_EQUAL(2u, current_epoch(ETH_OUTPOST_ID));
    BOOST_REQUIRE_EQUAL(1u, current_epoch(SOL_OUTPOST_ID));
-   BOOST_REQUIRE_EQUAL(uint64_t{EPOCH_DURATION_SEC}, batch_duty_seat_seconds(BATCHOP, ETH_OUTPOST_ID));
-   BOOST_REQUIRE_EQUAL(0u, batch_duty_seat_seconds(BATCHOP, SOL_OUTPOST_ID));
+   for (const uint64_t chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
+      BOOST_REQUIRE_EQUAL(0u, batch_duty_seat_seconds(BATCHOP, chain));
+   }
 
-   // ETH's second epoch and SOL's 120 s epoch close together.
+   // ETH's second advance credits its 60 s epoch 1; SOL's first advance credits nothing.
    deliver_chain_unanimous(ops, ETH_OUTPOST_ID, "eth-2", tips);
    elapse_epoch_boundary();
    advance_via_consensus();
    BOOST_REQUIRE_EQUAL(3u, current_epoch(ETH_OUTPOST_ID));
    BOOST_REQUIRE_EQUAL(2u, current_epoch(SOL_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(uint64_t{EPOCH_DURATION_SEC}, batch_duty_seat_seconds(BATCHOP, ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(0u, batch_duty_seat_seconds(BATCHOP, SOL_OUTPOST_ID));
+
+   // ETH alone advances again.
+   deliver_chain_unanimous(ops, ETH_OUTPOST_ID, "eth-3", tips);
+   deliver_chain_unanimous(ops, SOL_OUTPOST_ID, "sol-2", tips);
+   elapse_epoch_boundary();
+   advance_via_consensus();
+   BOOST_REQUIRE_EQUAL(4u, current_epoch(ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(2u, current_epoch(SOL_OUTPOST_ID));
    BOOST_REQUIRE_EQUAL(uint64_t{2 * EPOCH_DURATION_SEC}, batch_duty_seat_seconds(BATCHOP, ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(0u, batch_duty_seat_seconds(BATCHOP, SOL_OUTPOST_ID));
+
+   // ETH's fourth advance and SOL's second close the books of ETH's epoch 3 and SOL's 120 s epoch 1 together.
+   deliver_chain_unanimous(ops, ETH_OUTPOST_ID, "eth-4", tips);
+   elapse_epoch_boundary();
+   advance_via_consensus();
+   BOOST_REQUIRE_EQUAL(5u, current_epoch(ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(3u, current_epoch(SOL_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(uint64_t{3 * EPOCH_DURATION_SEC}, batch_duty_seat_seconds(BATCHOP, ETH_OUTPOST_ID));
    BOOST_REQUIRE_EQUAL(uint64_t{kSolDurationSec}, batch_duty_seat_seconds(BATCHOP, SOL_OUTPOST_ID));
-   BOOST_REQUIRE_EQUAL(uint64_t{2 * EPOCH_DURATION_SEC + kSolDurationSec},
+   BOOST_REQUIRE_EQUAL(uint64_t{3 * EPOCH_DURATION_SEC + kSolDurationSec},
                        duty_state()[system_fields::OPEN_SEAT_SECONDS].as<uint64_t>());
 } FC_LOG_AND_RETHROW() }
 
@@ -4195,17 +6031,18 @@ BOOST_FIXTURE_TEST_CASE(dispute_on_one_chain_does_not_hold_the_other, sysio_msgc
    BOOST_REQUIRE_EQUAL(epoch, current_epoch(ETH_OUTPOST_ID));
    BOOST_REQUIRE_EQUAL(sol_epoch, current_epoch(SOL_OUTPOST_ID));
 
-   // Resolve the later SOL dispute first: SOL resumes and advances, ETH stays paused.
+   // Resolve the later SOL dispute first: its resolution slashes SOL's losing deliverer, SOL resumes and
+   // advances, ETH stays paused.
    resolve_tie_dispute(sol_epoch, sol_left_checksum, SOL_OUTPOST_ID, SECOND_DISPUTE_ID);
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED, operator_status(BATCHOP_B));
    BOOST_REQUIRE(!epoch_is_paused(SOL_OUTPOST_ID));
    BOOST_REQUIRE(epoch_is_paused(ETH_OUTPOST_ID));
    advance_via_consensus();
    BOOST_REQUIRE_EQUAL(epoch, current_epoch(ETH_OUTPOST_ID));
    BOOST_REQUIRE_EQUAL(sol_epoch + 1, current_epoch(SOL_OUTPOST_ID));
-   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED,
-                       get_operator(BATCHOP_B)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED, operator_status(BATCHOP_B));
 
-   // Resolve the ETH dispute: ETH resumes and advances; its own slash of the already-slashed
+   // Resolve the ETH dispute: ETH resumes and advances; its resolution's slash of the already-slashed
    // deliverer is a no-op.
    resolve_tie_dispute(epoch, left_checksum);
    BOOST_REQUIRE(!epoch_is_paused(ETH_OUTPOST_ID));
@@ -4216,11 +6053,768 @@ BOOST_FIXTURE_TEST_CASE(dispute_on_one_chain_does_not_hold_the_other, sysio_msgc
                        get_operator(BATCHOP_B)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
 } FC_LOG_AND_RETHROW() }
 
+// ---------------------------------------------------------------------------
+//  Depot-paced advance: a decided chain advances only once its traffic makes it due.
+// ---------------------------------------------------------------------------
+
+/// A decided epoch on an idle chain stays current: neither `chkcons` nor governance's `advance` moves it, however
+/// long it waits.
+BOOST_FIXTURE_TEST_CASE(an_idle_decided_chain_never_advances, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kIdleMinimums = 5;
+   bootstrap();
+   const uint32_t epoch = current_epoch();
+   std::map<uint64_t, inbound_stream_tip> tips;
+   deliver_chain_unanimous({BATCHOP}, ETH_OUTPOST_ID, "idle-decided", tips);
+   BOOST_REQUIRE(epoch_decided(ETH_OUTPOST_ID, epoch));
+
+   produce_blocks(kIdleMinimums * EPOCH_DURATION_SEC * 2);
+   const transaction_trace_ptr crank = check_consensus_trace(ETH_OUTPOST_ID, BATCHOP);
+   BOOST_REQUIRE_EQUAL(0u, action_count(crank, EPOCH_ACCOUNT, epoch_actions::ADVANCE));
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::ADVANCE,
+                                       mvo()(epoch_fields::CHAIN_CODE, ETH_CHAIN_CODE)));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(epoch, current_epoch());
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::DUE_AT].as<fc::time_point>() == fc::time_point());
+} FC_LOG_AND_RETHROW() }
+
+/// The first general-lane attestation queued to an empty outbound queue notifies sysio.epoch, which records the chain's
+/// traffic at that moment, so the chain is due one minimum later; a further row and a schedule-lane row notify nothing.
+/// `chkcons` advances the decided epoch only once it is due, and the advance that ships the rows leaves the chain idle.
+BOOST_FIXTURE_TEST_CASE(queueout_records_traffic_when_the_general_queue_fills, sysio_msgch_chain_tester) { try {
+   const fc::microseconds block_interval = fc::milliseconds(config::block_interval_ms);
+   bootstrap();
+   const uint32_t epoch = current_epoch();
+   std::map<uint64_t, inbound_stream_tip> tips;
+   deliver_chain_unanimous({BATCHOP}, ETH_OUTPOST_ID, "queued-traffic", tips);
+   produce_blocks(10);
+   const auto queue_trace = [&](opp::types::AttestationType type, char fill) {
+      return queueout_trace(ETH_OUTPOST_ID, type, fill);
+   };
+
+   const transaction_trace_ptr schedule = queue_trace(opp::types::ATTESTATION_TYPE_OPERATORS, 's');
+   BOOST_REQUIRE_EQUAL(0u, queueout_notifications(schedule));
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::DUE_AT].as<fc::time_point>() == fc::time_point());
+
+   const fc::time_point        queued_at = control->pending_block_time();
+   const transaction_trace_ptr first     = queue_trace(opp::types::ATTESTATION_TYPE_OPERATOR_ACTION, 'a');
+   BOOST_REQUIRE_EQUAL(1u, queueout_notifications(first));
+   BOOST_REQUIRE_EQUAL(0u, action_count(first, EPOCH_ACCOUNT, epoch_actions::NOTE_TRAFFIC));
+   const fc::time_point due = due_for(queued_at);
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::TRAFFIC_SINCE].as<fc::time_point>() == queued_at);
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::DUE_AT].as<fc::time_point>() == due);
+   produce_blocks();
+   const transaction_trace_ptr second = queue_trace(opp::types::ATTESTATION_TYPE_OPERATOR_ACTION, 'b');
+   BOOST_REQUIRE_EQUAL(0u, queueout_notifications(second));
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::TRAFFIC_SINCE].as<fc::time_point>() == queued_at);
+   BOOST_REQUIRE(read_epoch_state(SOL_OUTPOST_ID)[epoch_fields::DUE_AT].as<fc::time_point>() == fc::time_point());
+
+   open_block_at(due - block_interval);
+   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP));
+   BOOST_REQUIRE_EQUAL(epoch, current_epoch());
+   open_block_at(due);
+   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::CURRENT_EPOCH_START].as<fc::time_point>() == due);
+   BOOST_REQUIRE_EQUAL(0u, attestation_status_count(ETH_OUTPOST_ID, opp::types::ATTESTATION_STATUS_READY));
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::TRAFFIC_SINCE].as<fc::time_point>() == fc::time_point());
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::DUE_AT].as<fc::time_point>() == fc::time_point());
+} FC_LOG_AND_RETHROW() }
+
+/// General-lane rows an envelope leaves behind are traffic since the oldest of them became ready: the advance that
+/// built it cleared the chain's traffic and its `buildenv` records it again, so the chain is due one minimum after its
+/// new epoch starts. The advance that ships the rest leaves the chain idle.
+BOOST_FIXTURE_TEST_CASE(a_backlog_left_by_buildenv_records_traffic, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kEarlyRows = MAX_ENVELOPE_ATTESTATIONS;
+   constexpr uint32_t kLateRows  = 4;
+   bootstrap();
+   std::map<uint64_t, inbound_stream_tip> tips;
+   deliver_chain_unanimous({BATCHOP}, ETH_OUTPOST_ID, "backlog-1", tips);
+   const auto queue_general = [&](uint32_t first, uint32_t count) {
+      for (uint32_t i = first; i < first + count; ++i) {
+         std::vector<char> data(sizeof(i));
+         std::memcpy(data.data(), &i, sizeof(i));
+         BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID, opp::types::ATTESTATION_TYPE_OPERATOR_ACTION, data));
+      }
+      produce_blocks();
+   };
+   queue_general(0, kEarlyRows);
+   produce_blocks(4);
+   queue_general(kEarlyRows, kLateRows);
+
+   advance_decided_epoch();
+   const fc::variant state = read_epoch_state();
+   const fc::time_point start = state[epoch_fields::CURRENT_EPOCH_START].as<fc::time_point>();
+   // The schedule lane rides first, so more than the late rows stay behind, the oldest from the early batch.
+   BOOST_REQUIRE_GT(attestation_status_count(ETH_OUTPOST_ID, opp::types::ATTESTATION_STATUS_READY), kLateRows);
+   const fc::time_point since = oldest_ready_general(ETH_OUTPOST_ID);
+   BOOST_REQUIRE(since < start);
+   BOOST_REQUIRE(state[epoch_fields::TRAFFIC_SINCE].as<fc::time_point>() == since);
+   BOOST_REQUIRE(state[epoch_fields::DUE_AT].as<fc::time_point>() == start + minimum_duration());
+
+   // The next advance ships the rest and leaves the chain idle.
+   deliver_chain_unanimous({BATCHOP}, ETH_OUTPOST_ID, "backlog-2", tips);
+   open_block_at(start + minimum_duration());
+   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(0u, attestation_status_count(ETH_OUTPOST_ID, opp::types::ATTESTATION_STATUS_READY));
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::TRAFFIC_SINCE].as<fc::time_point>() == fc::time_point());
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::DUE_AT].as<fc::time_point>() == fc::time_point());
+} FC_LOG_AND_RETHROW() }
+
+/// A governance advance of a chain that is not an active outpost builds no envelope, so the chain's queued general-lane
+/// rows stay queued and record its traffic again, since the oldest became ready. Active again, the chain is due and
+/// its next advance ships them.
+BOOST_FIXTURE_TEST_CASE(an_inactive_chains_queued_rows_stay_its_traffic, sysio_msgch_chain_tester) { try {
+   bootstrap();
+   std::map<uint64_t, inbound_stream_tip> tips;
+   deliver_chain_unanimous({BATCHOP}, ETH_OUTPOST_ID, "inactive-1", tips);
+   BOOST_REQUIRE_EQUAL(1u, queueout_notifications(
+                              queueout_trace(ETH_OUTPOST_ID, opp::types::ATTESTATION_TYPE_OPERATOR_ACTION, 'q')));
+   produce_blocks();
+   const fc::time_point queued_at = oldest_ready_general(ETH_OUTPOST_ID);
+
+   set_chain_active(ETH_OUTPOST_ID, false);
+   governance_advance_trace(ETH_OUTPOST_ID);
+   const fc::variant    state = read_epoch_state();
+   const fc::time_point start = state[epoch_fields::CURRENT_EPOCH_START].as<fc::time_point>();
+   BOOST_REQUIRE_EQUAL(1u, attestation_status_count(ETH_OUTPOST_ID, opp::types::ATTESTATION_STATUS_READY));
+   BOOST_REQUIRE(state[epoch_fields::TRAFFIC_SINCE].as<fc::time_point>() == queued_at);
+   BOOST_REQUIRE(state[epoch_fields::DUE_AT].as<fc::time_point>() == start + minimum_duration());
+
+   set_chain_active(ETH_OUTPOST_ID, true);
+   deliver_chain_unanimous({BATCHOP}, ETH_OUTPOST_ID, "inactive-2", tips);
+   open_block_at(start + minimum_duration());
+   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(3u, current_epoch());
+   BOOST_REQUIRE_EQUAL(0u, attestation_status_count(ETH_OUTPOST_ID, opp::types::ATTESTATION_STATUS_READY));
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::DUE_AT].as<fc::time_point>() == fc::time_point());
+} FC_LOG_AND_RETHROW() }
+
+/// sysio.epoch records traffic only from sysio.msgch's own `queueout`: the same code running on another account
+/// notifies sysio.epoch of its `queueout`, which changes nothing.
+BOOST_FIXTURE_TEST_CASE(a_foreign_queueout_notification_records_no_traffic, sysio_msgch_chain_tester) { try {
+   constexpr name kForeignQueue = "fake.msgch"_n;
+   bootstrap();
+   create_accounts({kForeignQueue});
+   abi_serializer foreign_abi;
+   deploy(kForeignQueue, contracts::msgch_wasm(), contracts::msgch_abi(), foreign_abi);
+   produce_blocks();
+
+   const transaction_trace_ptr foreign =
+      queueout_trace(ETH_OUTPOST_ID, opp::types::ATTESTATION_TYPE_OPERATOR_ACTION, 'f', kForeignQueue);
+   BOOST_REQUIRE_EQUAL(1u, queueout_notifications(foreign, kForeignQueue));
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::TRAFFIC_SINCE].as<fc::time_point>() == fc::time_point());
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::DUE_AT].as<fc::time_point>() == fc::time_point());
+   BOOST_REQUIRE_EQUAL(0u, attestation_status_count(ETH_OUTPOST_ID, opp::types::ATTESTATION_STATUS_READY));
+} FC_LOG_AND_RETHROW() }
+
+/// sysio.msgch's `queueout` notification records nothing before the chain's genesis advance.
+BOOST_FIXTURE_TEST_CASE(a_queueout_before_genesis_records_no_traffic, sysio_msgch_chain_tester) { try {
+   set_epoch_config(ETH_CHAIN_CODE, EPOCH_DURATION_SEC, 1, 1);
+   register_chain(opp::types::ChainKind::CHAIN_KIND_EVM, ETH_CHAIN_CODE, ETH_EXTERNAL_CHAIN_ID);
+   sysio_system::test_support::epoch_state::seat_window(*this, epoch_abi, ETH_CHAIN_CODE, {{BATCHOP}});
+   produce_blocks();
+
+   const transaction_trace_ptr trace =
+      queueout_trace(ETH_OUTPOST_ID, opp::types::ATTESTATION_TYPE_OPERATOR_ACTION, 'g');
+   BOOST_REQUIRE_EQUAL(1u, queueout_notifications(trace));
+   const fc::variant state = read_epoch_state();
+   BOOST_REQUIRE_EQUAL(0u, state[epoch_fields::CURRENT_EPOCH_INDEX].as<uint32_t>());
+   BOOST_REQUIRE(state[epoch_fields::TRAFFIC_SINCE].as<fc::time_point>() == fc::time_point());
+   BOOST_REQUIRE(state[epoch_fields::DUE_AT].as<fc::time_point>() == fc::time_point());
+} FC_LOG_AND_RETHROW() }
+
+/// sysio.msgch's `queueout` notification records a paused chain's traffic, but the chain does not advance until it
+/// resumes, though it is due.
+BOOST_FIXTURE_TEST_CASE(a_queueout_on_a_paused_chain_records_traffic_that_waits, sysio_msgch_chain_tester) { try {
+   bootstrap();
+   const uint32_t epoch = current_epoch();
+   std::map<uint64_t, inbound_stream_tip> tips;
+   deliver_chain_unanimous({BATCHOP}, ETH_OUTPOST_ID, "paused-traffic", tips);
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, CHALG_ACCOUNT, epoch_actions::PAUSE,
+                                       mvo()(epoch_fields::CHAIN_CODE, ETH_CHAIN_CODE)));
+   produce_blocks();
+
+   const fc::time_point queued_at = control->pending_block_time();
+   BOOST_REQUIRE_EQUAL(1u, queueout_notifications(
+                              queueout_trace(ETH_OUTPOST_ID, opp::types::ATTESTATION_TYPE_OPERATOR_ACTION, 'p')));
+   const fc::time_point due = due_for(queued_at);
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::TRAFFIC_SINCE].as<fc::time_point>() == queued_at);
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::DUE_AT].as<fc::time_point>() == due);
+
+   open_block_at(due);
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(EPOCH_PAUSED_ERROR),
+                       push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::ADVANCE,
+                            mvo()(epoch_fields::CHAIN_CODE, ETH_CHAIN_CODE)));
+   BOOST_REQUIRE_EQUAL(epoch, current_epoch());
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::DUE_AT].as<fc::time_point>() == due);
+
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, CHALG_ACCOUNT, epoch_actions::UNPAUSE,
+                                       mvo()(epoch_fields::CHAIN_CODE, ETH_CHAIN_CODE)));
+   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
+} FC_LOG_AND_RETHROW() }
+
+/// `resendroster` records traffic at now on the chain it resends to, so a decided chain idle past its minimum becomes
+/// due its traffic wait later and its next envelope carries the roster; the other chain stays idle.
+BOOST_FIXTURE_TEST_CASE(resendroster_makes_an_idle_chain_due, sysio_msgch_chain_tester) { try {
+   constexpr int64_t kIdleSec = 10;
+   bootstrap();
+   const uint32_t epoch = current_epoch();
+   std::map<uint64_t, inbound_stream_tip> tips;
+   deliver_chain_unanimous({BATCHOP}, ETH_OUTPOST_ID, "resend-roster", tips);
+   open_block_at(epoch_start() + minimum_duration() + fc::seconds(kIdleSec));
+
+   const fc::time_point resent_at = control->pending_block_time();
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::RESEND_ROSTER,
+                                       mvo()("code", ETH_CHAIN_CODE)));
+   const fc::time_point due = resent_at + traffic_wait();
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::TRAFFIC_SINCE].as<fc::time_point>() == resent_at);
+   BOOST_REQUIRE(read_epoch_state()[epoch_fields::DUE_AT].as<fc::time_point>() == due);
+   BOOST_REQUIRE(read_epoch_state(SOL_OUTPOST_ID)[epoch_fields::DUE_AT].as<fc::time_point>() == fc::time_point());
+
+   open_block_at(due);
+   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
+   BOOST_REQUIRE(tip_carries_roster(ETH_OUTPOST_ID));
+} FC_LOG_AND_RETHROW() }
+
+/// The advance that closes an epoch's books credits each member one chain minimum of seat-seconds, however long the
+/// epoch ran: an epoch held idle for several minimums before its traffic earns no more than one that ran the minimum.
+BOOST_FIXTURE_TEST_CASE(duty_credits_the_chain_minimum_however_long_the_epoch_ran, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kIdleMinimums = 5;
+   bootstrap();
+   std::map<uint64_t, inbound_stream_tip> tips;
+
+   // Epoch 1 runs idle for several minimums before traffic makes it due.
+   const fc::time_point first_start = read_epoch_state()[epoch_fields::CURRENT_EPOCH_START].as<fc::time_point>();
+   deliver_chain_unanimous({BATCHOP}, ETH_OUTPOST_ID, "long-1", tips);
+   produce_blocks(kIdleMinimums * EPOCH_DURATION_SEC * 2);
+   advance_decided_epoch();
+   const fc::time_point second_start = read_epoch_state()[epoch_fields::CURRENT_EPOCH_START].as<fc::time_point>();
+   BOOST_REQUIRE_GT((second_start - first_start).to_seconds(), int64_t{kIdleMinimums * EPOCH_DURATION_SEC});
+   BOOST_REQUIRE_EQUAL(0u, batch_duty_seat_seconds(BATCHOP, ETH_OUTPOST_ID));
+
+   // Epoch 2's advance closes epoch 1's books with one minimum, then epoch 3's closes epoch 2's with another.
+   deliver_chain_unanimous({BATCHOP}, ETH_OUTPOST_ID, "long-2", tips);
+   advance_decided_epoch();
+   BOOST_REQUIRE_EQUAL(uint64_t{EPOCH_DURATION_SEC}, batch_duty_seat_seconds(BATCHOP, ETH_OUTPOST_ID));
+   deliver_chain_unanimous({BATCHOP}, ETH_OUTPOST_ID, "long-3", tips);
+   advance_decided_epoch();
+   BOOST_REQUIRE_EQUAL(uint64_t{2 * EPOCH_DURATION_SEC}, batch_duty_seat_seconds(BATCHOP, ETH_OUTPOST_ID));
+} FC_LOG_AND_RETHROW() }
+
 /// `chkcons` evaluates one chain and refuses a chain that is not an active outpost.
 BOOST_FIXTURE_TEST_CASE(chkcons_refuses_a_chain_that_is_not_an_active_outpost, sysio_msgch_chain_tester) { try {
    bootstrap();
    BOOST_REQUIRE_EQUAL(error("assertion failure with message: chkcons: chain is not an active outpost"),
                        check_consensus(fc::slug_name{"BASE"}.value));
+} FC_LOG_AND_RETHROW() }
+
+// ---------------------------------------------------------------------------
+//  Outbound backlog reports: a strict majority of a chain's eligible group reporting a backlog on its outpost, in a
+//  decided epoch, is traffic since the majority-th earliest reported time.
+// ---------------------------------------------------------------------------
+
+/// A report waits for its epoch's decision: refused while the epoch has no delivery and while it has only a minority,
+/// accepted once the majority's envelope is accepted.
+BOOST_FIXTURE_TEST_CASE(a_backlog_report_waits_for_the_epochs_decision, sysio_msgch_chain_tester) { try {
+   bootstrap(/*n_batch_ops=*/3);
+   const uint32_t          epoch    = current_epoch();
+   const uint64_t          since_ms = to_ms(epoch_start());
+   const std::vector<char> envelope = encode_delivery(epoch, std::string("decided-before-report"));
+   const auto              report   = [&] {
+      return report_queue(BATCHOP, ETH_OUTPOST_ID, epoch, REPORTED_PENDING_COUNT, since_ms);
+   };
+
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(REPORT_UNDECIDED_EPOCH), report());
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, envelope));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(REPORT_UNDECIDED_EPOCH), report());
+   BOOST_REQUIRE(queue_reporters().empty());
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, envelope));
+   produce_blocks();
+   BOOST_REQUIRE(epoch_decided(ETH_OUTPOST_ID, epoch));
+   BOOST_REQUIRE_EQUAL(success(), report());
+   require_queue_report(BATCHOP, epoch, REPORTED_PENDING_COUNT, epoch_start());
+} FC_LOG_AND_RETHROW() }
+
+/// A report from a minority of the eligible group records no traffic, and a member that reports again replaces its row
+/// instead of counting twice.
+BOOST_FIXTURE_TEST_CASE(a_minority_backlog_report_records_no_traffic, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kRepeatPendingCount = REPORTED_PENDING_COUNT + 4;
+   bootstrap(/*n_batch_ops=*/3);
+   const uint32_t       epoch = current_epoch();
+   const fc::time_point first = epoch_start() + fc::seconds(1);
+   const fc::time_point again = epoch_start() + fc::seconds(2);
+   std::map<uint64_t, inbound_stream_tip> tips;
+   deliver_chain_unanimous({BATCHOP, BATCHOP_B, BATCHOP_C}, ETH_OUTPOST_ID, "minority-report", tips);
+   produce_blocks(10);
+
+   BOOST_REQUIRE_EQUAL(0u, note_traffic_count(report_backlog(BATCHOP, first)));
+   require_queue_report(BATCHOP, epoch, REPORTED_PENDING_COUNT, first);
+   BOOST_REQUIRE(traffic_since() == fc::time_point());
+   BOOST_REQUIRE(due_at() == fc::time_point());
+
+   BOOST_REQUIRE_EQUAL(success(), report_queue(BATCHOP, ETH_OUTPOST_ID, epoch, kRepeatPendingCount, to_ms(again)));
+   require_queue_report(BATCHOP, epoch, kRepeatPendingCount, again);
+   BOOST_REQUIRE(queue_reporters() == std::vector<name>{BATCHOP});
+   BOOST_REQUIRE(traffic_since() == fc::time_point());
+   BOOST_REQUIRE(due_at() == fc::time_point());
+   BOOST_REQUIRE(due_at(SOL_OUTPOST_ID) == fc::time_point());
+} FC_LOG_AND_RETHROW() }
+
+/// A lying minority that reports an earlier backlog never moves the chain's traffic earlier than the other members
+/// report: of five eligible members, two report early and the honest third makes the third-earliest time its own.
+/// Each report runs the tally again: an honest member's later report leaves the traffic as it was, and so does a liar's
+/// still earlier one.
+BOOST_FIXTURE_TEST_CASE(a_lying_minority_never_moves_reported_traffic_earlier, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kGroupSize = 5; // a strict majority is three
+   bootstrap(kGroupSize);
+   const fc::time_point early   = epoch_start() + fc::seconds(2);
+   const fc::time_point earlier = epoch_start() + fc::seconds(1);
+   const fc::time_point honest  = epoch_start() + fc::seconds(12);
+   const fc::time_point later   = honest + fc::seconds(2);
+   std::map<uint64_t, inbound_stream_tip> tips;
+   deliver_chain_unanimous({BATCHOP, BATCHOP_B, BATCHOP_C, BATCHOP_D, BATCHOP_E}, ETH_OUTPOST_ID, "lying-minority",
+                           tips);
+   produce_blocks(40);
+
+   for (const name liar : {BATCHOP, BATCHOP_B}) {
+      BOOST_REQUIRE_EQUAL(0u, note_traffic_count(report_backlog(liar, early)));
+   }
+   BOOST_REQUIRE(traffic_since() == fc::time_point());
+   for (const name member : {BATCHOP_C, BATCHOP_D}) {
+      BOOST_REQUIRE_EQUAL(1u, note_traffic_count(report_backlog(member, honest)));
+      BOOST_REQUIRE(traffic_since() == honest);
+      BOOST_REQUIRE(due_at() == due_for(honest));
+   }
+
+   // {early, early, honest, later}: the third earliest is still the honest time.
+   BOOST_REQUIRE_EQUAL(1u, note_traffic_count(report_backlog(BATCHOP_C, later)));
+   require_queue_report(BATCHOP_C, current_epoch(), REPORTED_PENDING_COUNT, later);
+   BOOST_REQUIRE(traffic_since() == honest);
+   // {earlier, early, honest, later}: so is it after a liar's earlier report.
+   BOOST_REQUIRE_EQUAL(1u, note_traffic_count(report_backlog(BATCHOP, earlier)));
+   require_queue_report(BATCHOP, current_epoch(), REPORTED_PENDING_COUNT, earlier);
+   BOOST_REQUIRE(traffic_since() == honest);
+   BOOST_REQUIRE(due_at() == due_for(honest));
+} FC_LOG_AND_RETHROW() }
+
+/// The chain's traffic is the majority-th earliest of its eligible group's reported times, moving earlier as more
+/// members report: of five eligible members, the third earliest. `chkcons` then advances the decided epoch at the
+/// `due_at` the reports set and not before.
+BOOST_FIXTURE_TEST_CASE(the_majority_th_earliest_report_makes_the_chain_due, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t     kGroupSize     = 5; // a strict majority is three
+   const fc::microseconds block_interval = fc::milliseconds(config::block_interval_ms);
+   bootstrap(kGroupSize);
+   const uint32_t       epoch = current_epoch();
+   const fc::time_point start = epoch_start();
+   const auto           at    = [&](int64_t sec) { return start + fc::seconds(sec); };
+   std::map<uint64_t, inbound_stream_tip> tips;
+   deliver_chain_unanimous({BATCHOP, BATCHOP_B, BATCHOP_C, BATCHOP_D, BATCHOP_E}, ETH_OUTPOST_ID, "reported-traffic",
+                           tips);
+   produce_blocks(30);
+
+   // Two reports are a minority; a third makes a majority of {5, 7, 9}, whose third earliest is 9.
+   BOOST_REQUIRE_EQUAL(0u, note_traffic_count(report_backlog(BATCHOP, at(9))));
+   BOOST_REQUIRE_EQUAL(0u, note_traffic_count(report_backlog(BATCHOP_B, at(5))));
+   BOOST_REQUIRE(traffic_since() == fc::time_point());
+   BOOST_REQUIRE_EQUAL(1u, note_traffic_count(report_backlog(BATCHOP_C, at(7))));
+   BOOST_REQUIRE(traffic_since() == at(9));
+   // {3, 5, 7, 9}: 7. Then {3, 4, 5, 7, 9}: 5.
+   report_backlog(BATCHOP_D, at(3));
+   BOOST_REQUIRE(traffic_since() == at(7));
+   report_backlog(BATCHOP_E, at(4));
+   BOOST_REQUIRE(traffic_since() == at(5));
+   const fc::time_point due = due_for(at(5));
+   BOOST_REQUIRE(due_at() == due);
+
+   open_block_at(due - block_interval);
+   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP));
+   BOOST_REQUIRE_EQUAL(epoch, current_epoch());
+   open_block_at(due);
+   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
+   BOOST_REQUIRE(epoch_start() == due);
+   BOOST_REQUIRE(traffic_since() == fc::time_point());
+   BOOST_REQUIRE(due_at() == fc::time_point());
+} FC_LOG_AND_RETHROW() }
+
+/// A reported time later than now, the largest value included, counts as now, and so does a zero time.
+BOOST_FIXTURE_TEST_CASE(a_backlog_report_from_the_future_or_without_a_time_counts_as_now,
+                        sysio_msgch_chain_tester) { try {
+   bootstrap(/*n_batch_ops=*/3);
+   const uint32_t epoch = current_epoch();
+   std::map<uint64_t, inbound_stream_tip> tips;
+   deliver_chain_unanimous({BATCHOP, BATCHOP_B, BATCHOP_C}, ETH_OUTPOST_ID, "report-at-now", tips);
+   produce_blocks(4);
+
+   const fc::time_point first_at = control->pending_block_time();
+   BOOST_REQUIRE_EQUAL(success(), report_queue(BATCHOP, ETH_OUTPOST_ID, epoch, REPORTED_PENDING_COUNT,
+                                               std::numeric_limits<uint64_t>::max()));
+   require_queue_report(BATCHOP, epoch, REPORTED_PENDING_COUNT, first_at);
+   produce_blocks();
+
+   const fc::time_point second_at = control->pending_block_time();
+   BOOST_REQUIRE_EQUAL(success(), report_queue(BATCHOP_B, ETH_OUTPOST_ID, epoch, REPORTED_PENDING_COUNT, 0));
+   require_queue_report(BATCHOP_B, epoch, REPORTED_PENDING_COUNT, second_at);
+   BOOST_REQUIRE(traffic_since() == second_at);
+   BOOST_REQUIRE(due_at() == due_for(second_at));
+} FC_LOG_AND_RETHROW() }
+
+/// A report of an earlier epoch never counts: after the advance, one member's report is a minority though another
+/// member reported in the previous epoch, and the walk erases that earlier report.
+BOOST_FIXTURE_TEST_CASE(a_backlog_report_of_an_earlier_epoch_never_counts, sysio_msgch_chain_tester) { try {
+   bootstrap(/*n_batch_ops=*/3);
+   const std::vector<name> group{BATCHOP, BATCHOP_B, BATCHOP_C};
+   const uint32_t          epoch       = current_epoch();
+   const fc::time_point    first_start = epoch_start();
+   std::map<uint64_t, inbound_stream_tip> tips;
+   deliver_chain_unanimous(group, ETH_OUTPOST_ID, "earlier-report-1", tips);
+   BOOST_REQUIRE_EQUAL(0u, note_traffic_count(report_backlog(BATCHOP, first_start)));
+   advance_decided_epoch();
+   require_queue_report(BATCHOP, epoch, REPORTED_PENDING_COUNT, first_start);
+   BOOST_REQUIRE(traffic_since() == fc::time_point());
+
+   deliver_chain_unanimous(group, ETH_OUTPOST_ID, "earlier-report-2", tips);
+   const fc::time_point start = epoch_start();
+   BOOST_REQUIRE_EQUAL(0u, note_traffic_count(report_backlog(BATCHOP_B, start)));
+   BOOST_REQUIRE(traffic_since() == fc::time_point());
+   BOOST_REQUIRE(queue_report(BATCHOP).is_null());
+   BOOST_REQUIRE(queue_reporters() == std::vector<name>{BATCHOP_B});
+
+   BOOST_REQUIRE_EQUAL(1u, note_traffic_count(report_backlog(BATCHOP_C, start)));
+   BOOST_REQUIRE(traffic_since() == start);
+   BOOST_REQUIRE(due_at() == start + minimum_duration());
+   BOOST_REQUIRE(queue_reporters() == (std::vector<name>{BATCHOP_B, BATCHOP_C}));
+} FC_LOG_AND_RETHROW() }
+
+/// A reporter that leaves the eligible set drops out of the tally: once the first reporter is slashed, the second's
+/// report is one of the two members left, a minority until the third reports. The slashed member's row stays, ignored,
+/// and it cannot report again.
+BOOST_FIXTURE_TEST_CASE(a_slashed_reporter_drops_out_of_the_tally, sysio_msgch_chain_tester) { try {
+   bootstrap(/*n_batch_ops=*/3);
+   const uint32_t       epoch      = current_epoch();
+   const fc::time_point start      = epoch_start();
+   const fc::time_point slashed_at = start + fc::seconds(1);
+   const fc::time_point second     = start + fc::seconds(5);
+   std::map<uint64_t, inbound_stream_tip> tips;
+   deliver_chain_unanimous({BATCHOP, BATCHOP_B, BATCHOP_C}, ETH_OUTPOST_ID, "slashed-reporter", tips);
+   produce_blocks(20);
+
+   BOOST_REQUIRE_EQUAL(0u, note_traffic_count(report_backlog(BATCHOP, slashed_at)));
+   slash_operator(BATCHOP);
+   BOOST_REQUIRE_EQUAL(0u, note_traffic_count(report_backlog(BATCHOP_B, second)));
+   BOOST_REQUIRE(traffic_since() == fc::time_point());
+   BOOST_REQUIRE_EQUAL(1u, note_traffic_count(report_backlog(BATCHOP_C, start + fc::seconds(4))));
+   BOOST_REQUIRE(traffic_since() == second);
+   BOOST_REQUIRE(due_at() == due_for(second));
+   require_queue_report(BATCHOP, epoch, REPORTED_PENDING_COUNT, slashed_at);
+
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(REPORTER_NOT_ELIGIBLE),
+                       report_queue(BATCHOP, ETH_OUTPOST_ID, epoch, REPORTED_PENDING_COUNT, to_ms(start)));
+} FC_LOG_AND_RETHROW() }
+
+/// A slashed member keeps its seat, so the reports need a strict majority of every seat: two reports of five are a
+/// minority, and stay one, repeated or not, once two silent members are slashed. The last eligible member's report
+/// makes three and records the traffic since the third earliest time.
+BOOST_FIXTURE_TEST_CASE(slashed_seats_still_count_toward_the_reports_majority, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kGroupSize = 5; // a strict majority is three, whatever the members' status
+   bootstrap(kGroupSize);
+   const fc::time_point start = epoch_start();
+   const fc::time_point third = start + fc::seconds(4);
+   std::map<uint64_t, inbound_stream_tip> tips;
+   deliver_chain_unanimous({BATCHOP, BATCHOP_B, BATCHOP_C, BATCHOP_D, BATCHOP_E}, ETH_OUTPOST_ID, "slashed-seats",
+                           tips);
+   produce_blocks(20);
+
+   BOOST_REQUIRE_EQUAL(0u, note_traffic_count(report_backlog(BATCHOP, start + fc::seconds(2))));
+   BOOST_REQUIRE_EQUAL(0u, note_traffic_count(report_backlog(BATCHOP_B, start + fc::seconds(3))));
+   for (const name silent : {BATCHOP_C, BATCHOP_D}) slash_operator(silent);
+   BOOST_REQUIRE_EQUAL(0u, note_traffic_count(report_backlog(BATCHOP, start + fc::seconds(1))));
+   BOOST_REQUIRE(traffic_since() == fc::time_point());
+
+   BOOST_REQUIRE_EQUAL(1u, note_traffic_count(report_backlog(BATCHOP_E, third)));
+   BOOST_REQUIRE(traffic_since() == third);
+   BOOST_REQUIRE(due_at() == due_for(third));
+} FC_LOG_AND_RETHROW() }
+
+/// A decided epoch takes reports, and a paused chain records their traffic but does not advance until it resumes.
+BOOST_FIXTURE_TEST_CASE(a_paused_chain_records_reported_traffic_but_holds, sysio_msgch_chain_tester) { try {
+   bootstrap(/*n_batch_ops=*/3);
+   const uint32_t epoch = current_epoch();
+   std::map<uint64_t, inbound_stream_tip> tips;
+   deliver_chain_unanimous({BATCHOP, BATCHOP_B, BATCHOP_C}, ETH_OUTPOST_ID, "paused-report", tips);
+   BOOST_REQUIRE(epoch_decided(ETH_OUTPOST_ID, epoch));
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, CHALG_ACCOUNT, epoch_actions::PAUSE,
+                                       mvo()(epoch_fields::CHAIN_CODE, ETH_CHAIN_CODE)));
+   produce_blocks();
+
+   const fc::time_point backlog_since = control->head().block_time();
+   for (const name member : {BATCHOP, BATCHOP_B}) report_backlog(member, backlog_since);
+   const fc::time_point due = due_for(backlog_since);
+   BOOST_REQUIRE(traffic_since() == backlog_since);
+   BOOST_REQUIRE(due_at() == due);
+
+   open_block_at(due);
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(EPOCH_PAUSED_ERROR),
+                       push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::ADVANCE,
+                            mvo()(epoch_fields::CHAIN_CODE, ETH_CHAIN_CODE)));
+   BOOST_REQUIRE_EQUAL(epoch, current_epoch());
+   BOOST_REQUIRE(due_at() == due);
+
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, CHALG_ACCOUNT, epoch_actions::UNPAUSE,
+                                       mvo()(epoch_fields::CHAIN_CODE, ETH_CHAIN_CODE)));
+   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
+} FC_LOG_AND_RETHROW() }
+
+/// A disputed epoch is undecided, so its reports are refused while the dispute is open. Once the vote resolves it, the
+/// members left eligible report, but every seat still counts toward the majority: a dispute opens only when no
+/// version can reach it, so the winners left cannot either, and their reports record no traffic. The resolution
+/// records the chain's traffic itself, so the chain is due and `chkcons` advances it at that time.
+BOOST_FIXTURE_TEST_CASE(a_backlog_report_waits_out_a_dispute, sysio_msgch_chain_tester) { try {
+   const fc::microseconds block_interval = fc::milliseconds(config::block_interval_ms);
+   const std::vector<name> winners{BATCHOP, BATCHOP_B};
+   const std::vector<name> losers{BATCHOP_C, BATCHOP_D};
+   bootstrap(/*n_batch_ops=*/5);
+   const uint32_t          epoch = current_epoch();
+   const std::vector<char> left  = encode_delivery(epoch, std::string("disputed-left"));
+   const std::vector<char> right = encode_delivery(epoch, std::string("disputed-right"));
+   const std::vector<char> third = encode_delivery(epoch, std::string("disputed-third"));
+
+   // Two, two and one of five: no version can reach three, so the fifth delivery opens the dispute.
+   for (const name member : winners) BOOST_REQUIRE_EQUAL(success(), deliver_as(member, ETH_OUTPOST_ID, left));
+   for (const name member : losers) BOOST_REQUIRE_EQUAL(success(), deliver_as(member, ETH_OUTPOST_ID, right));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_E, ETH_OUTPOST_ID, third));
+   produce_blocks();
+   const fc::sha256 left_checksum = fc::sha256::hash(left.data(), left.size());
+   assert_open_tie_dispute(epoch,
+                           {left_checksum, fc::sha256::hash(right.data(), right.size()),
+                            fc::sha256::hash(third.data(), third.size())},
+                           {static_cast<uint32_t>(winners.size()), static_cast<uint32_t>(losers.size()),
+                            ONE_OPERATOR_PER_TIED_VERSION});
+   BOOST_REQUIRE(epoch_is_paused());
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(REPORT_UNDECIDED_EPOCH),
+                       report_queue(BATCHOP, ETH_OUTPOST_ID, epoch, REPORTED_PENDING_COUNT, to_ms(epoch_start())));
+
+   // The resolution slashes the three that delivered another version and records the chain's traffic. The slashed
+   // members' seats still count, so the two winners' reports are taken but record no traffic.
+   const fc::time_point resolved_at = control->pending_block_time();
+   resolve_tie_dispute(epoch, left_checksum);
+   BOOST_REQUIRE(!epoch_is_paused());
+   BOOST_REQUIRE(traffic_since() == resolved_at);
+   for (const name member : winners) {
+      BOOST_REQUIRE_EQUAL(0u, note_traffic_count(report_backlog(member, resolved_at)));
+      require_queue_report(member, epoch, REPORTED_PENDING_COUNT, resolved_at);
+   }
+   const fc::time_point due = due_for(resolved_at);
+   BOOST_REQUIRE(due_at() == due);
+
+   open_block_at(due - block_interval);
+   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP));
+   BOOST_REQUIRE_EQUAL(epoch, current_epoch());
+   open_block_at(due);
+   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
+} FC_LOG_AND_RETHROW() }
+
+/// A dispute's resolution records the chain's traffic at its time, so with no other traffic the chain is due and
+/// `chkcons` advances it to its next group. Here the vote resolves after the chain's minimum has passed.
+BOOST_FIXTURE_TEST_CASE(a_dispute_resolution_makes_the_chain_due, sysio_msgch_chain_tester) { try {
+   constexpr int64_t      kLateSec       = 10;
+   const fc::microseconds block_interval = fc::milliseconds(config::block_interval_ms);
+   bootstrap(ONE_TO_ONE_TIE_GROUP_SIZE);
+   const uint32_t          epoch = current_epoch();
+   const std::vector<char> left  = encode_delivery(epoch, std::string("resolved-left"));
+   const std::vector<char> right = encode_delivery(epoch, std::string("resolved-right"));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, left));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, right));
+   produce_blocks();
+   BOOST_REQUIRE(epoch_is_paused());
+   BOOST_REQUIRE(traffic_since() == fc::time_point());
+
+   open_block_at(epoch_start() + minimum_duration() + fc::seconds(kLateSec));
+   const fc::time_point resolved_at = control->pending_block_time();
+   resolve_tie_dispute(epoch, fc::sha256::hash(left.data(), left.size()));
+   BOOST_REQUIRE(!epoch_is_paused());
+   BOOST_REQUIRE(traffic_since() == resolved_at);
+   const fc::time_point due = due_for(resolved_at);
+   BOOST_REQUIRE(due_at() == due);
+
+   open_block_at(due - block_interval);
+   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP));
+   BOOST_REQUIRE_EQUAL(epoch, current_epoch());
+   open_block_at(due);
+   BOOST_REQUIRE_EQUAL(success(), check_consensus(ETH_OUTPOST_ID, BATCHOP));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
+} FC_LOG_AND_RETHROW() }
+
+/// A report is refused for any epoch but the chain's current one, without a pending message, and without its
+/// reporter's signature, and nothing is stored; a report of the current epoch is accepted.
+BOOST_FIXTURE_TEST_CASE(a_backlog_report_needs_the_current_epoch_and_a_backlog, sysio_msgch_chain_tester) { try {
+   bootstrap(/*n_batch_ops=*/3);
+   const uint32_t epoch = advance_one_epoch();
+   BOOST_REQUIRE_GT(epoch, 1u);
+   std::map<uint64_t, inbound_stream_tip> tips;
+   deliver_chain_unanimous({BATCHOP, BATCHOP_B, BATCHOP_C}, ETH_OUTPOST_ID, "current-epoch-report", tips);
+   const uint64_t since_ms = to_ms(epoch_start());
+   const auto     mismatch = [&](uint32_t reported) {
+      return wasm_assert_msg(std::string(REPORT_EPOCH_MISMATCH) + std::to_string(reported) +
+                             " current=" + std::to_string(epoch));
+   };
+
+   for (const uint32_t other : {epoch - 1, epoch + 1}) {
+      BOOST_REQUIRE_EQUAL(mismatch(other),
+                          report_queue(BATCHOP, ETH_OUTPOST_ID, other, REPORTED_PENDING_COUNT, since_ms));
+   }
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(REPORT_WITHOUT_BACKLOG),
+                       report_queue(BATCHOP, ETH_OUTPOST_ID, epoch, 0, since_ms));
+   BOOST_REQUIRE_EQUAL(error("missing authority of " + BATCHOP.to_string()),
+                       report_queue(BATCHOP, ETH_OUTPOST_ID, epoch, REPORTED_PENDING_COUNT, since_ms, BATCHOP_B));
+   BOOST_REQUIRE(queue_reporters().empty());
+
+   BOOST_REQUIRE_EQUAL(success(), report_queue(BATCHOP, ETH_OUTPOST_ID, epoch, REPORTED_PENDING_COUNT, since_ms));
+   require_queue_report(BATCHOP, epoch, REPORTED_PENDING_COUNT, epoch_start());
+} FC_LOG_AND_RETHROW() }
+
+/// A report is refused for a chain that is not an active outpost, and for an outpost before its genesis advance.
+BOOST_FIXTURE_TEST_CASE(a_backlog_report_needs_an_active_outpost_past_its_genesis, sysio_msgch_chain_tester) { try {
+   set_epoch_config(ETH_CHAIN_CODE, EPOCH_DURATION_SEC, 1, 1);
+   register_chain(opp::types::ChainKind::CHAIN_KIND_EVM, ETH_CHAIN_CODE, ETH_EXTERNAL_CHAIN_ID);
+   sysio_system::test_support::epoch_state::seat_window(*this, epoch_abi, ETH_CHAIN_CODE, {{BATCHOP}});
+   produce_blocks();
+   const uint64_t since_ms = to_ms(control->head().block_time());
+
+   BOOST_REQUIRE_EQUAL(0u, current_epoch());
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(REPORT_BEFORE_GENESIS),
+                       report_queue(BATCHOP, ETH_OUTPOST_ID, 0, REPORTED_PENDING_COUNT, since_ms));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(REPORT_NOT_ACTIVE_OUTPOST),
+                       report_queue(BATCHOP, fc::slug_name{"BASE"}.value, 1, REPORTED_PENDING_COUNT, since_ms));
+   BOOST_REQUIRE(queue_reporters().empty());
+} FC_LOG_AND_RETHROW() }
+
+/// Only a member of the chain's group on duty reports its backlog. A member of a later group of the chain's window, a
+/// member of another chain's group on duty, an account that is no batch operator and, after the advance, a member of
+/// the group that served the previous epoch only are refused; the other chain's member reports there, and the new
+/// group on duty reports here. One chain's report walks only its own rows.
+BOOST_FIXTURE_TEST_CASE(a_backlog_report_comes_only_from_the_group_on_duty, sysio_msgch_chain_tester) { try {
+   constexpr name kStranger = "stranger"_n;
+   // Registered inside the bootstrap window, SOL is active at once; it starts after ETH, with ETH's last group as its
+   // only one.
+   register_chain(opp::types::ChainKind::CHAIN_KIND_SVM, SOL_CHAIN_CODE, SOL_EXTERNAL_CHAIN_ID);
+   const std::vector<std::vector<name>> window    = bootstrap_disjoint_groups();
+   const std::vector<name>&             sol_group = window[2];
+   serve_chains(sol_group, {SOL_CHAIN_CODE});
+   set_epoch_config(SOL_CHAIN_CODE, EPOCH_DURATION_SEC, DISJOINT_GROUP_SIZE, 1);
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::SCHEDULE,
+                                       mvo()(epoch_fields::CHAIN_CODE, SOL_CHAIN_CODE)));
+   BOOST_REQUIRE_EQUAL(success(), push(MSGCH_ACCOUNT, msgch_abi, MSGCH_ACCOUNT, msgch_actions::BOOT_CHAIN,
+                                       mvo()(msgch_fields::CHAIN_CODE, SOL_OUTPOST_ID)));
+   create_accounts({kStranger});
+   produce_blocks();
+   BOOST_REQUIRE(sorted(current_group(SOL_OUTPOST_ID)) == sorted(sol_group));
+   BOOST_REQUIRE(current_group() == window[0]);
+   std::map<uint64_t, inbound_stream_tip> tips;
+   deliver_chain_unanimous(window[0], ETH_OUTPOST_ID, "on-duty-eth-1", tips);
+   deliver_chain_unanimous(sol_group, SOL_OUTPOST_ID, "on-duty-sol-1", tips);
+
+   const uint32_t epoch    = current_epoch();
+   const uint64_t since_ms = to_ms(epoch_start());
+   const auto     report   = [&](name member, uint32_t reported_epoch) {
+      return report_queue(member, ETH_OUTPOST_ID, reported_epoch, REPORTED_PENDING_COUNT, since_ms);
+   };
+   for (const name outsider : {window[1][0], sol_group[0], kStranger}) {
+      BOOST_REQUIRE_EQUAL(error(DELIVERER_NOT_IN_ACTIVE_GROUP_ERROR), report(outsider, epoch));
+   }
+   BOOST_REQUIRE_EQUAL(success(), report_queue(sol_group[0], SOL_OUTPOST_ID, current_epoch(SOL_OUTPOST_ID),
+                                               REPORTED_PENDING_COUNT, to_ms(epoch_start(SOL_OUTPOST_ID))));
+   BOOST_REQUIRE(queue_reporters().empty());
+   BOOST_REQUIRE(queue_reporters(SOL_OUTPOST_ID) == std::vector<name>{sol_group[0]});
+
+   governance_advance_trace(ETH_OUTPOST_ID);
+   BOOST_REQUIRE(previous_group() == window[0]);
+   BOOST_REQUIRE(current_group() == window[1]);
+   deliver_chain_unanimous(window[1], ETH_OUTPOST_ID, "on-duty-eth-2", tips);
+   BOOST_REQUIRE_EQUAL(error(DELIVERER_NOT_IN_ACTIVE_GROUP_ERROR), report(window[0][0], epoch + 1));
+   BOOST_REQUIRE_EQUAL(success(), report(window[1][0], epoch + 1));
+   BOOST_REQUIRE(queue_reporters() == std::vector<name>{window[1][0]});
+   BOOST_REQUIRE(queue_reporters(SOL_OUTPOST_ID) == std::vector<name>{sol_group[0]});
+} FC_LOG_AND_RETHROW() }
+
+/// A member of the group on duty reports only while it is ACTIVE: one UNKNOWN after a withdrawal below its minimum and
+/// one SLASHED are refused, while an ACTIVE member reports.
+BOOST_FIXTURE_TEST_CASE(a_backlog_report_needs_an_active_reporter, sysio_msgch_chain_tester) { try {
+   const std::vector<std::vector<name>> window = bootstrap_disjoint_groups(/*batchop_is_bootstrapped=*/false);
+   const std::vector<name>&             group  = window[0];
+   BOOST_REQUIRE(current_group() == group);
+   BOOST_REQUIRE(std::find(group.begin(), group.end(), BATCHOP) != group.end());
+   std::vector<name> others;
+   for (const name member : group) {
+      if (member != BATCHOP) others.push_back(member);
+   }
+   std::map<uint64_t, inbound_stream_tip> tips;
+   deliver_chain_unanimous(group, ETH_OUTPOST_ID, "active-reporter", tips);
+
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, BATCHOP, "withdraw"_n, mvo()
+      ("account", BATCHOP)("token_code", WIRE_CHAIN_CODE)("amount", BATCH_OPERATOR_MINIMUM_COLLATERAL)));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_UNKNOWN, operator_status(BATCHOP));
+   slash_operator(others[0]);
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED, operator_status(others[0]));
+
+   const uint32_t epoch    = current_epoch();
+   const uint64_t since_ms = to_ms(epoch_start());
+   for (const name inactive : {BATCHOP, others[0]}) {
+      BOOST_REQUIRE_EQUAL(wasm_assert_msg(REPORTER_NOT_ELIGIBLE),
+                          report_queue(inactive, ETH_OUTPOST_ID, epoch, REPORTED_PENDING_COUNT, since_ms));
+   }
+   BOOST_REQUIRE_EQUAL(success(), report_queue(others[1], ETH_OUTPOST_ID, epoch, REPORTED_PENDING_COUNT, since_ms));
+   BOOST_REQUIRE(queue_reporters() == std::vector<name>{others[1]});
+} FC_LOG_AND_RETHROW() }
+
+/// A member evicted from the chain cannot report from the seat a group drawn before its eviction still gives it,
+/// though it stays ACTIVE. The group's two other members are then its whole eligible set, so they decide the epoch and
+/// their reports make the chain's traffic.
+BOOST_FIXTURE_TEST_CASE(an_evicted_member_cannot_report_from_its_remaining_seat, sysio_msgch_chain_tester) { try {
+   // Epoch 1's group, drawn again at the first slide, serves again at epoch 4.
+   constexpr uint32_t kSeatEpoch = 4;
+   bootstrap_disjoint_groups(/*batchop_is_bootstrapped=*/false);
+   // With the percent rail applying from the first duty, BATCHOP's silent epoch 1 evicts it when the advance from
+   // epoch 2 closes that epoch's books.
+   set_termination_thresholds(ROTATION_MAX_CONSECUTIVE_MISSES, DEFAULT_MAX_PERCENT_MISSES,
+                              PERCENT_RAIL_FROM_FIRST_DUTY);
+   while (current_epoch() < kSeatEpoch) advance_trace(ETH_OUTPOST_ID, MSGCH_ACCOUNT);
+   BOOST_REQUIRE_EQUAL(std::string(served_status::evicted), membership_status(BATCHOP, ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, operator_status(BATCHOP));
+   const std::vector<name> group = current_group();
+   BOOST_REQUIRE(std::find(group.begin(), group.end(), BATCHOP) != group.end());
+   std::vector<name> others;
+   for (const name member : group) {
+      if (member != BATCHOP) others.push_back(member);
+   }
+   std::map<uint64_t, inbound_stream_tip> tips;
+   deliver_chain_unanimous(others, ETH_OUTPOST_ID, "evicted-seat", tips);
+
+   const uint32_t       epoch = current_epoch();
+   const fc::time_point start = epoch_start();
+   BOOST_REQUIRE(epoch_decided(ETH_OUTPOST_ID, epoch));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(REPORTER_NOT_ELIGIBLE),
+                       report_queue(BATCHOP, ETH_OUTPOST_ID, epoch, REPORTED_PENDING_COUNT, to_ms(start)));
+   for (const name member : others) report_backlog(member, start);
+   BOOST_REQUIRE(traffic_since() == start);
+   BOOST_REQUIRE(due_at() == start + minimum_duration());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

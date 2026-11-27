@@ -27,7 +27,7 @@ Envelope (one per outpost per epoch, per direction)
 
 ### Key Concepts
 
-- **Epochs**: Time-bounded intervals managed by `sysio.epoch` — each outpost chain runs its own consensus epoch, with its own counter, duration (10 s .. 30 days, default 360 s) and batch-operator schedule. Each epoch of a chain has one group of the batch operators serving that chain on duty as relayers.
+- **Epochs**: Managed by `sysio.epoch` — each outpost chain runs its own consensus epoch, with its own counter, minimum duration (10 s .. 30 days, default 360 s) and batch-operator schedule. A chain advances only once its current epoch is decided and it has traffic, no sooner than its minimum after the epoch's start; an idle chain does not advance. Each epoch of a chain has one group of the batch operators serving that chain on duty as relayers.
 - **Economic epochs**: A separate wall-clock grid on `sysio.epoch` that drives emissions, withdrawal maturity and producer pay. It never waits on outpost consensus.
 - **Envelopes**: Epoch-level containers. Each envelope carries the epoch index and timestamp, its route endpoints, and `previous_envelope_hash` — the digest of the previous envelope on the same (depot, outpost) stream — so each direction forms a hash chain. An envelope is capped at 32,768 bytes on every chain.
 - **Messages**: Individual cross-chain payloads containing a header (message ID, sequence, checksum, encoding flags) and a payload (an array of attestation entries).
@@ -51,14 +51,14 @@ This allows a single unified message format across all supported chains.
 1. A user action on an external chain (e.g. syndicating liqETH into the Ethereum `SyndicationPool`) queues a protobuf-encoded attestation in the outpost's outbound buffer, which the outpost seals into its envelope for the epoch.
 2. Every batch operator in the outpost's active group independently reads that envelope through its chain-specific client plugin (`outpost_ethereum_client_plugin`, `outpost_solana_client_plugin`).
 3. Each operator delivers the envelope to Wire's `sysio.msgch` contract via the `deliver()` action.
-4. `sysio.msgch` evaluates consensus: every eligible operator delivering an identical envelope is accepted immediately; otherwise a strict majority is accepted once the chain's epoch boundary has passed. A split with no strict majority opens a `sysio.chalg` dispute.
+4. `sysio.msgch` evaluates consensus: the first strict majority of the group's seats delivering an identical envelope decides the epoch, at any time. A split opens a `sysio.chalg` dispute once no delivered version can still reach a majority.
 5. Attestations are extracted, validated, and routed to the appropriate system contract handlers.
 
 ### Outbound (Wire → External Chain)
 
 1. System contracts queue attestations for a target outpost via `sysio.msgch::queueout()`. Once an outpost has 512 non-roster attestations waiting, `queueout` refuses another.
-2. When the outpost's epoch advances, `buildenv()` packs the outpost's `READY` attestations, rosters first, into a protobuf-encoded outbound envelope of at most 32,768 bytes and 64 attestations; the rest stays queued for the next epoch.
-3. Batch operators read the outbound envelope and submit it to the target chain's Outpost — chunked on both chains (`OPPInbound.epochIn` on Ethereum, `epoch_in` on Solana).
+2. A queued attestation is traffic for the outpost's chain, which advances once it is due; `buildenv()` then packs the outpost's `READY` attestations, rosters first, into a protobuf-encoded outbound envelope of at most 32,768 bytes and 64 attestations; the rest stays queued for the next epoch.
+3. Batch operators read the outbound envelope and submit it to the target chain's Outpost — whole to `OPPInbound.epochIn` on Ethereum, chunked to `epoch_in` on Solana.
 4. The Outpost verifies the envelope chain and group consensus, then routes attestations to their registered handlers. An unhandled type is skipped, never reverted.
 
 ---
@@ -137,9 +137,10 @@ On Solana the outpost lives in the `liqsol-core` program (`instructions/opp/`), 
 
 ## Consensus & Security
 
-- **Group consensus**: An envelope is accepted when every eligible operator in the chain's active group delivers it identically, or by strict majority once the chain's epoch boundary has passed.
+- **Group consensus**: An envelope is accepted on the first strict majority of the seats of the chain's active group, at any time in the epoch. Only the deliveries of operators eligible to deliver count, and every seat counts toward the majority, as on both outposts: a slashed or inactive operator never lowers the number needed.
 - **Envelope hash chains**: Each envelope carries the digest of its predecessor on the same stream, and messages carry sequence numbers, so envelopes and messages cannot be reordered or replayed.
-- **Disputes**: A post-boundary split with no strict majority opens a `sysio.chalg` dispute that pauses that chain's epoch until Tier-1 node owners vote a canonical envelope; other chains keep advancing. Operators that delivered a non-canonical envelope are slashed.
+- **Disputes**: A split opens a `sysio.chalg` dispute once no delivered version can still reach a strict majority; a split a silent operator can still decide waits for it, or for governance. The dispute pauses that chain's epoch until Tier-1 node owners vote a canonical envelope; other chains keep advancing.
+- **Slashing**: Operators that delivered a non-canonical envelope are slashed when the epoch's winner is accepted, by consensus or by the vote; silence is never slashed.
 - **Bonded syndication**: Syndicated value is released on the depot only after `sysio.bond` underwriters bond the syndication statement; anyone may challenge it during the challenge window.
 - **Emergency stop**: `sysio.andon` freezes depot fund egress; outposts pause independently (`SyndicationPool` pause on Ethereum, `frozen` on Solana).
 

@@ -1345,6 +1345,8 @@ public:
       auto r = push_epoch_action(EPOCH, "setconfig"_n, mvo()
          ("chain_code", EPOCH_CHAIN)
          ("epoch_duration_sec", epoch_duration_sec)
+         ("traffic_wait_sec", 0)
+         ("late_window_sec", 0)
          ("operators_per_epoch", operators_per_epoch)
          ("batch_operator_minimum_active", operators_per_epoch * batch_op_groups_count)
          ("batch_op_groups", batch_op_groups_count)
@@ -1450,8 +1452,7 @@ public:
    /// boundary with produce_blocks before every call after the first.
    action_result advance_epoch_state(account_name signer = EPOCH) {
       if (consensus_epoch_index() == 0) {
-         sysio_system::test_support::epoch_state::start_network(*this, epoch_abi_ser, EPOCH_CHAIN,
-                                                                consensus_epoch_duration_sec());
+         sysio_system::test_support::epoch_state::start_network(*this, epoch_abi_ser, EPOCH_CHAIN);
       }
       if (economic_epoch_index() == 0 && !economic_start_pinned) {
          auto r = push_seteconomy(economic_duration_sec(), tpsec(head_secs()));
@@ -1506,14 +1507,6 @@ public:
    /// fixture starts the network by writing the state the genesis leaves (`epoch_state::start_network`), and its
    /// consensus epoch never closes, so it owes no deliveries.
    static constexpr std::string_view EPOCH_CHAIN = "ETH";
-
-   /// `EPOCH_CHAIN`'s configured consensus epoch length, in seconds.
-   uint32_t consensus_epoch_duration_sec() {
-      const auto data = get_row_by_id(EPOCH, EPOCH, "epochcfg"_n, fc::slug_name{EPOCH_CHAIN}.value);
-      BOOST_REQUIRE(!data.empty());
-      return epoch_abi_ser.binary_to_variant("epoch_config", data, fixture_abi_yield_function())
-         ["epoch_duration_sec"].as<uint32_t>();
-   }
 
    fc::variant get_epoch_state_row() {
       auto data = get_row_by_id(EPOCH, EPOCH, "epochstate"_n, fc::slug_name{EPOCH_CHAIN}.value);
@@ -4161,8 +4154,7 @@ BOOST_FIXTURE_TEST_CASE( an_on_time_start_spends_nothing_on_its_first_tick_and_p
    const uint32_t start = head_secs() + T_EPOCH_SECS / 2;
    BOOST_REQUIRE_EQUAL( success(), seteconomy(T_EPOCH_SECS, tpsec(start)) );
    BOOST_REQUIRE_EQUAL( success(), initt5(config::system_account_name) );
-   sysio_system::test_support::epoch_state::start_network(*this, epoch_abi_ser, EPOCH_CHAIN,
-                                                          consensus_epoch_duration_sec());   // network genesis
+   sysio_system::test_support::epoch_state::start_network(*this, epoch_abi_ser, EPOCH_CHAIN);   // network genesis
    BOOST_REQUIRE_EQUAL( success(), rcrdduty(1, { batch_op }) );
    while (head_secs() < start) produce_blocks(1);
 
@@ -5212,8 +5204,8 @@ BOOST_FIXTURE_TEST_CASE( park_across_a_payout_defers_the_blocks_to_the_return, s
 // `delayed_epoch_processes_only_once` removed: tested the cranker-era
 // idempotency guard ("emissions already caught up to sysio.epoch"). Under the
 // gate-based model, every successful advance pays exactly once -- there is no
-// idempotency to test. Wall-clock gating in advance() (next_epoch_start) is
-// covered by other tests that drive multiple advances within one trx flow.
+// idempotency to test. advance()'s due gate (due_at) is covered by the
+// sysio.epoch and sysio.msgch suites.
 
 BOOST_FIXTURE_TEST_CASE( multi_epoch_cumulative_accounting, sysio_emissions_tester ) try {
    // Run 3 epochs and verify total_distributed equals sum of per-epoch effective distributions

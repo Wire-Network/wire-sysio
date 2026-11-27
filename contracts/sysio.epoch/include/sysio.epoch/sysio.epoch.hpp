@@ -25,24 +25,67 @@ namespace sysio {
       // -----------------------------------------------------------------------
 
       /// Set outpost `chain_code`'s consensus epoch configuration (privileged). Each outpost chain runs
-      /// its own consensus epoch: counter, pacing, schedule window and roster.
+      /// its own consensus epoch: counter, pacing, schedule window and roster. `epoch_duration_sec` is the
+      /// chain's minimum time between two of its epochs. `traffic_wait_sec` is how long the chain waits after
+      /// its traffic begins before it is due, and `late_window_sec` how long after an epoch starts
+      /// `sysio.msgch::deliver` takes a late delivery of the previous one; each is at most `epoch_duration_sec`,
+      /// and zero sets its default, half the minimum (`default_share_of_minimum`). While the chain has traffic
+      /// pending, its `due_at` is recomputed with the new values.
       [[sysio::action]]
       void setconfig(sysio::slug_name chain_code,
                      uint32_t epoch_duration_sec,
+                     uint32_t traffic_wait_sec,
+                     uint32_t late_window_sec,
                      uint32_t operators_per_epoch,
                      uint32_t batch_operator_minimum_active,
                      uint32_t batch_op_groups,
                      uint32_t epoch_retention_envelope_log_count);
 
-      /// Close outpost `chain_code`'s current consensus epoch once its duration has elapsed. Auth:
-      /// sysio.msgch (`bootstrap` / `bootchain` for the genesis advance, `chkcons` afterwards) or
+      /// Close outpost `chain_code`'s current consensus epoch and open the next one at the current time.
+      /// Auth: sysio.msgch (`bootstrap` / `bootchain` for the genesis advance, `chkcons` afterwards) or
       /// sysio.epoch. The genesis advance (epoch 0 -> 1) requires the chain to be an active outpost with
-      /// its schedule window seated (`schbatchgps`). The first genesis advance of any chain is the
-      /// network genesis.
+      /// its schedule window seated (`schbatchgps`) and needs no traffic. The first genesis advance of any
+      /// chain is the network genesis.
+      ///
+      /// After its genesis a chain advances only once it is due (`advance_due`): it has traffic
+      /// (`notetraffic`, `resendroster`), its minimum duration has passed since its epoch start, and its
+      /// `traffic_wait_sec` has passed since that traffic began. Otherwise, under either authority, the action
+      /// returns without effect. The
+      /// advance clears the chain's traffic; outbound rows its envelope leaves behind mark it again.
+      ///
+      /// Under sysio.epoch's own authority, the governance path, an active outpost past its genesis advances only
+      /// once its current epoch has reached consensus (`sysio.msgch::outpcons`): the outpost's next envelope chains
+      /// to that epoch's winner. A chain that is not an active outpost owes no envelope and is not refused.
+      ///
+      /// An epoch's books close one advance later, so its late deliveries count: `advance(N -> N+1)`
+      /// records each `previous_group` member's delivery of epoch N-1 (`sysio.opreg::recorddel`), runs its
+      /// `termcheck`, and then credits the group's duty for N-1 (`sysio.system::rcrdduty`: per member, the chain
+      /// minimum configured when those books close, however long the epoch ran), whether or not the chain is
+      /// still an active outpost.
+      /// Nothing is recorded while `previous_group` is empty: the genesis advance, the advance from epoch 1,
+      /// and the advance after one the chain closed while not an active outpost.
       [[sysio::action]]
       void advance(sysio::slug_name chain_code);
 
+      /// Record traffic for outpost `chain_code` that began at `since`: `traffic_since` becomes the earlier of
+      /// its current value and `since`, and `due_at` becomes the later of `current_epoch_start` plus the chain's
+      /// minimum duration and `traffic_since` plus its `traffic_wait_sec`. A `since` that is zero or later than
+      /// now counts as now. No effect before the chain's genesis advance. A paused chain records traffic but does
+      /// not advance until it resumes. Auth: sysio.msgch (`buildenv`, `reportqueue` once a strict majority of
+      /// the seats of the chain's group report an outbound backlog on the outpost, and `resolvedisp`).
+      [[sysio::action]]
+      void notetraffic(sysio::slug_name chain_code, sysio::time_point since);
+
+      /// Record traffic for outpost `chain_code` at now, as `notetraffic` does, on sysio.msgch's notification that
+      /// `queueout` took the chain's general-lane outbound queue from empty to non-empty. A schedule-lane
+      /// `attest_type` is ignored, as is a `queueout` of any other contract.
+      [[sysio::on_notify("sysio.msgch::queueout")]]
+      void onqueueout(uint64_t chain_code, sysio::opp::types::AttestationType attest_type, std::vector<char> data);
+
       /// Internal continuation of `advance(chain_code)` after its epoch-close operator mutations execute.
+      /// Stores the window's expiring front group as `previous_group` (empty when the chain is not an active
+      /// outpost), then slides the window. A chain that is not an active outpost builds no envelope, so its
+      /// queued general-lane rows record its traffic again, since the oldest became ready.
       [[sysio::action]]
       void finishadv(sysio::slug_name chain_code, uint32_t epoch_index);
 
@@ -81,7 +124,9 @@ namespace sysio {
       void unpause(sysio::slug_name chain_code);
 
       /// Forget the roster last queued to outpost `code`, so the next advance queues the roster to it
-      /// again: the recovery for an outpost that lost the roster it held. Auth: sysio.epoch.
+      /// again: the recovery for an outpost that lost the roster it held. It also records traffic at now
+      /// (as `notetraffic` does), so the chain is due one minimum duration later at the latest. Auth:
+      /// sysio.epoch.
       [[sysio::action]]
       void resendroster(sysio::slug_name code);
 
@@ -99,7 +144,17 @@ namespace sysio {
       /// One outpost chain's consensus epoch configuration, set by `setconfig`.
       struct [[sysio::table("epochcfg")]] epoch_config {
          uint64_t    chain_code = 0;
+         /// The chain's minimum time between two of its epochs: an epoch closes no sooner than this long after
+         /// its start.
          uint32_t    epoch_duration_sec = 360;   // 6 minutes
+         /// How long the chain waits after its traffic begins before it is due, so traffic arriving together
+         /// ships together: an epoch closes no sooner than this long after its first traffic. At most
+         /// `epoch_duration_sec`.
+         uint32_t    traffic_wait_sec = 180;     // half the minimum
+         /// How long after an epoch starts `sysio.msgch::deliver` takes a late delivery of the previous epoch from a
+         /// member of its group; a later one is refused, and the advance that closes that epoch's books records the
+         /// member's miss. At most `epoch_duration_sec`.
+         uint32_t    late_window_sec = 180;      // half the minimum
          uint32_t    operators_per_epoch = 7;
          uint32_t    batch_operator_minimum_active = 21;
          uint32_t    batch_op_groups = 3;          // rotation groups (21 / 7)
@@ -112,7 +167,7 @@ namespace sysio {
          uint32_t    epoch_retention_envelope_log_count = 200;
 
          SYSLIB_SERIALIZE(epoch_config,
-            (chain_code)(epoch_duration_sec)(operators_per_epoch)
+            (chain_code)(epoch_duration_sec)(traffic_wait_sec)(late_window_sec)(operators_per_epoch)
             (batch_operator_minimum_active)(batch_op_groups)
             (epoch_retention_envelope_log_count))
       };
@@ -123,15 +178,25 @@ namespace sysio {
       struct [[sysio::table("epochstate")]] epoch_state {
          uint64_t                          chain_code = 0;
          uint32_t                          current_epoch_index = 0;
+         /// When the current epoch opened: the time of the advance that opened it.
          time_point                        current_epoch_start{};
-         time_point                        next_epoch_start{};
+         /// When the chain's pending traffic began (`notetraffic`); zero while it has none. Cleared by each
+         /// advance.
+         time_point                        traffic_since{};
+         /// When the chain may next advance: the later of `current_epoch_start` plus the chain's minimum duration and
+         /// `traffic_since` plus its `traffic_wait_sec`; zero while the chain is idle. Cleared by each advance.
+         time_point                        due_at{};
          uint8_t                           current_batch_op_group = 0; // 0, 1, or 2
          std::vector<std::vector<name>>    batch_op_groups;           // 3 groups of 7
          bool                              is_paused = false;
+         /// The group that served epoch `current_epoch_index - 1`, whose books the next `advance` closes.
+         /// `finishadv` stores the window's front group here before the slide erases it; empty before
+         /// epoch 2 and after an epoch the chain closed while not an active outpost.
+         std::vector<name>                 previous_group;
 
          SYSLIB_SERIALIZE(epoch_state,
-            (chain_code)(current_epoch_index)(current_epoch_start)(next_epoch_start)
-            (current_batch_op_group)(batch_op_groups)(is_paused))
+            (chain_code)(current_epoch_index)(current_epoch_start)(traffic_since)(due_at)
+            (current_batch_op_group)(batch_op_groups)(is_paused)(previous_group))
       };
 
       using epochstate_t = sysio::kv::table<"epochstate"_n, chain_key, epoch_state>;
@@ -219,6 +284,15 @@ namespace sysio {
 
       using rostersent_t = sysio::kv::table<"rostersent"_n, chain_key, roster_sent>;
 
+      /// Message of the `check`s that refuse a chain with no consensus epoch state.
+      static constexpr std::string_view EPOCH_STATE_NOT_INITIALIZED = "epoch state not initialized";
+
+      /// Message of the `check`s that refuse a chain with no consensus epoch configuration.
+      static constexpr std::string_view EPOCH_CONFIG_NOT_INITIALIZED = "epoch config not initialized";
+
+      /// Message of the `check`s that refuse a caller outside the chain's group on duty.
+      static constexpr std::string_view NOT_IN_ACTIVE_GROUP = "caller is not in the active batch operator group";
+
       // Well-known accounts
       static constexpr name CHALG_ACCOUNT  = "sysio.chalg"_n;
       static constexpr name MSGCH_ACCOUNT  = "sysio.msgch"_n;
@@ -249,6 +323,26 @@ namespace sysio {
       static uint32_t current_epoch_index(uint64_t chain_code) {
          const std::optional<epoch_state> state = epoch_state_of(chain_code);
          return state ? state->current_epoch_index : 0;
+      }
+
+      /// Whether `account` sits in `state`'s group on duty (`current_batch_op_group`); false when that cursor is out
+      /// of range. Never throws.
+      static bool in_current_group(const epoch_state& state, name account) {
+         if (state.current_batch_op_group >= state.batch_op_groups.size()) return false;
+         const std::vector<name>& group = state.batch_op_groups[state.current_batch_op_group];
+         return std::find(group.begin(), group.end(), account) != group.end();
+      }
+
+      /// Whether `account` sits in `state.previous_group`, the group that served the previous epoch. Never throws.
+      static bool in_previous_group(const epoch_state& state, name account) {
+         return std::find(state.previous_group.begin(), state.previous_group.end(), account) !=
+                state.previous_group.end();
+      }
+
+      /// Whether a chain past its genesis, in `state`, is due its next advance at `now`: it has traffic and its
+      /// `due_at` has passed. An idle chain is never due. Never throws.
+      static bool advance_due(const epoch_state& state, time_point now) {
+         return state.due_at != time_point{} && now >= state.due_at;
       }
 
       /// One outpost chain's current consensus epoch index.
@@ -314,6 +408,17 @@ namespace sysio {
       static constexpr uint32_t MIN_EPOCH_DURATION_SEC = 10;
       static constexpr uint32_t MAX_EPOCH_DURATION_SEC = 30u * 24u * 60u * 60u;
 
+      /// Parts of a chain's minimum duration that make the default of a per-chain wait set as zero: half of it.
+      static constexpr uint32_t DEFAULT_SHARE_OF_MINIMUM_DIVISOR = 2;
+      /// Least default of a per-chain wait set as zero.
+      static constexpr uint32_t MIN_DEFAULT_SHARE_OF_MINIMUM_SEC = 1;
+
+      /// The default of a per-chain wait `setconfig` takes as zero, for a chain of minimum `epoch_duration_sec`:
+      /// half of it, at least `MIN_DEFAULT_SHARE_OF_MINIMUM_SEC`.
+      static constexpr uint32_t default_share_of_minimum(uint32_t epoch_duration_sec) {
+         return std::max(MIN_DEFAULT_SHARE_OF_MINIMUM_SEC, epoch_duration_sec / DEFAULT_SHARE_OF_MINIMUM_DIVISOR);
+      }
+
       /// Bounds on the economic `epoch_duration_sec`. Floor is a typo-guard: below it a pay period
       /// holds fewer block slots than one producer rotation, so the per-block pay in
       /// sysio.system::payepoch degenerates to a handful of slots per producer, masking misconfig.
@@ -327,7 +432,7 @@ namespace sysio {
 
       /// Upper bound on `operators_per_epoch` (the size of one schedule group): Ethereum's OPPInbound is
       /// sized and tested for `OPERATORS_PER_GROUP` (7), under Solana's `MAX_GROUP_MEMBERS` (16). Each
-      /// member of the expiring group also costs two inline actions in `advance` (opreg::recorddel +
+      /// member of the previous group also costs two inline actions in `advance` (opreg::recorddel +
       /// opreg::termcheck) and a payclaims credit in sysio.system::payepoch.
       static constexpr uint32_t MAX_OPERATORS_PER_EPOCH = 7;
 
@@ -345,24 +450,5 @@ namespace sysio {
       using OperatorType   = sysio::opp::types::OperatorType;
       using OperatorStatus = sysio::opp::types::OperatorStatus;
    };
-
-   /// Asserts the caller signed the transaction and is a member of outpost `chain_code`'s current
-   /// resident batch-operator group. This is a group-membership check only: the
-   /// group is a snapshot from the last schedule, so current operator eligibility
-   /// (sysio.opreg ACTIVE status) must be enforced separately at the delivery
-   /// call site (see msgch::deliver).
-   inline void is_batch_operator_active(const name& batch_op_name, uint64_t chain_code) {
-      require_auth(batch_op_name);
-      const std::optional<epoch::epoch_state> state = epoch::epoch_state_of(chain_code);
-      check(state.has_value(), "epoch state not initialized");
-
-      const uint8_t cur_group = state->current_batch_op_group;
-      check(cur_group < state->batch_op_groups.size(), "active group index out of range");
-      const std::vector<name>& active_members = state->batch_op_groups[cur_group];
-      check(
-         std::find(active_members.begin(), active_members.end(), batch_op_name) != active_members.end(),
-         "caller is not in the active batch operator group"
-      );
-   }
 
 } // namespace sysio

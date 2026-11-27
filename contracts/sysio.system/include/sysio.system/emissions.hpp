@@ -299,13 +299,14 @@ inline int64_t spendable_wire(int64_t balance, const pay_claim_total& claims, co
 }
 
 // ---------------------------------------------------------------------------
-// Batch-operator duty, in seat-seconds. Each consensus epoch close of an outpost chain credits every
-// member of the group that served it with that epoch's scheduled length in seconds (rcrdduty), on the
-// member's row for that chain; each payepoch closes the open pay period and splits its one batch pool
-// pro rata to those seat-seconds over every chain. An eviction from a chain forfeits the operator's
-// unsettled duty there (forfeitduty), and a new registration of the account forfeits its duty on every
-// chain. Settlement walks `batchduty` in bounded steps, so the number of operators that served in a
-// period bounds no single transaction.
+// Batch-operator duty, in seat-seconds. Each consensus epoch of an outpost chain credits every member of
+// the group that served it with the chain's minimum duration in seconds, as configured when its books
+// close, however long the epoch ran (rcrdduty), on the member's row for that chain, when the following
+// epoch closes; each payepoch closes the open pay period and splits its one batch pool pro rata to those
+// seat-seconds over every chain. An eviction from a chain forfeits the operator's unsettled duty there
+// (forfeitduty), and a new registration of the account forfeits its duty on every chain. Settlement walks
+// `batchduty` in bounded steps, so the number of operators that served in a period bounds no single
+// transaction.
 // ---------------------------------------------------------------------------
 
 struct batch_duty_key {

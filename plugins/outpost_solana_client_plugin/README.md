@@ -8,6 +8,7 @@ The `outpost_solana_client_plugin` provides Solana JSON-RPC client integration f
 - [Class Diagrams](#class-diagrams)
 - [Inbound Dispatch Manifests](#inbound-dispatch-manifests)
 - [Outpost Cranks](#outpost-cranks)
+- [Outbound Backlog](#outbound-backlog)
 - [Envelope Chunk and Delivery Tally Cleanup](#envelope-chunk-and-delivery-tally-cleanup)
 - [Client Architecture](#client-architecture)
 - [solana_client (RPC Client)](#solana_client-rpc-client)
@@ -474,8 +475,19 @@ than on the first drain.
 ### Solana Transaction Budgets
 
 Data chunk uploads confirm at `processed`; the terminal `epoch_in` waits for
-`confirmed`. The job retries after the depot epoch boundary until this operator's
-inbound reply, read at `finalized`, is recorded by the depot.
+`confirmed`. The job calls every tick until this operator's inbound reply, read at
+`finalized`, is recorded by the depot. A delivery the outpost already recorded under
+this relay (its key among `EpochDeliveries.deliveries`, read at `processed`) is not
+sent again: the outpost tips on the delivery that completes a strict majority, so only
+the rest of the group can settle it. When that epoch has tipped the call drains its
+dispatch instead. The read gets the settled check's short budget, and a failed or
+timed-out read is not known recorded, so the delivery goes out.
+Epoch 1 is the exception: until it tips, a recorded delivery re-sends its terminal
+call at most once per 10 s (`RESEEDABLE_RESEND_INTERVAL`, the shortest chain minimum
+`sysio.epoch` accepts), because an `opp_bootstrap` reseed can replace the group under
+the open tally and leave the kept members' recorded deliveries a majority of the new
+group, which tips only on a terminal call. The batch-operator role boot-checks that
+`EpochDeliveries` declares `deliveries` as records carrying an `operator` pubkey.
 
 Envelope data chunks stay bare so the full 668-byte chunk remains within Solana's
 1,232-byte packet limit. The separate zero-data terminal `epoch_in` call and every
@@ -514,6 +526,17 @@ every account of the instruction (`report_liq_yield_overrides`),
 signs with the operator's Solana key, and skips on a program that does not declare the
 instruction. A failed crank is logged by the job and retried with the next epoch's
 delivery.
+
+## Outbound Backlog
+
+`read_outbound_backlog` reads `OutboundMessageBuffer` and `LatestOutboundEnvelope` in one
+`getMultipleAccounts` at `confirmed` with a header-only `dataSlice`, so the count and the
+latest emitted epoch come from one bank. It reports `attestation_count`, read at its fixed
+offset of the `repr(C)` buffer, as the pending count and `LatestOutboundEnvelope.epoch_index`
+as the latest emitted epoch. Boot decodes an `OutboundMessageBuffer` probe through the loaded
+IDL and refuses one whose `attestation_count` is not a u16 at that offset. The buffer does not date its backlog, so the age is reported as
+zero, which the depot counts as the report's time. Each account must be present, owned by
+the program and carry its IDL discriminator.
 
 ---
 

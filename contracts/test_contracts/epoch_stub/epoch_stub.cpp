@@ -26,4 +26,12 @@ public:
          state.set(get_self(), key, current);
       }
    }
+
+   /// Accept the traffic sysio.msgch records for a chain (`sysio.epoch::notetraffic`), as the real contract does, so
+   /// `queueout` and `buildenv` run against the stub. The stub's chains never advance, so it records nothing.
+   /// Auth=sysio.msgch.
+   [[sysio::action]] void notetraffic([[maybe_unused]] sysio::slug_name chain_code,
+                                      [[maybe_unused]] sysio::time_point since) {
+      require_auth(sysio::epoch::MSGCH_ACCOUNT);
+   }
 };

@@ -119,33 +119,80 @@ namespace sysio {
       /// same convention when queueing `queueout` / `buildenv` for its outpost.
       /// The envelope must be for the chain's current epoch, from a member of
       /// the chain's active group. Refused until the chain's genesis advance has
-      /// opened its epoch 1.
+      /// opened its epoch 1, and, once the epoch has reached consensus, unless it
+      /// is byte-identical to the accepted envelope.
+      ///
+      /// A late delivery, for the chain's previous epoch, is admitted only from a
+      /// member of the group that served it (`sysio.epoch` `previous_group`),
+      /// only within the chain's late-delivery window (`epochcfg.late_window_sec`
+      /// from the current epoch's start), and only byte-identical to that epoch's
+      /// accepted envelope (`winner_of`). It is stored without its bytes and never
+      /// runs `evalcons`; the advance that closes the previous epoch's books
+      /// records it as delivered, and a member refused one records a miss. Any
+      /// older epoch is refused.
       [[sysio::action]]
       void deliver(name batch_op_name, uint64_t chain_code, std::vector<char> data);
 
-      /// Evaluate consensus on inbound envelopes for an outpost+epoch.
-      /// Called inline from deliver and chkcons. On consensus: unpacks envelope,
-      /// stores messages + attestations, records per-outpost consensus.
+      /// Evaluate consensus on inbound envelopes for an outpost's current epoch.
+      /// Called inline from deliver and chkcons. The first strict majority of the
+      /// seats of the chain's group on duty (`count * 2 > seats`), counting only the
+      /// deliveries of members eligible to deliver (ACTIVE and not EVICTED from the
+      /// chain), decides the epoch, at any time: a slashed, evicted or inactive
+      /// member keeps its seat, so it never lowers the number needed. It unpacks the
+      /// envelope, stores messages + attestations, records per-outpost consensus,
+      /// and slashes through `sysio.chalg::slashop` every operator whose delivery
+      /// for the epoch differs from the winner. Without one, with at least two
+      /// delivered versions, a `sysio.chalg` dispute opens once no version can still
+      /// reach a majority with the eligible members still silent. A split that a
+      /// silent member can still decide waits for its delivery, or for governance.
       ///
       /// `chain_code` is the originating chain's slug_name value
       /// (see `deliver` for the convention). No effect before the chain's
-      /// genesis advance, nor for an epoch that already reached consensus or
-      /// has a dispute: a decided epoch's later deliveries only feed the slash
-      /// classification at its close.
+      /// genesis advance, for an epoch that is not the chain's current one, nor
+      /// for an epoch that already reached consensus or has a dispute. Once an
+      /// epoch is decided, `deliver` records a later delivery of the accepted
+      /// bytes as delivered and refuses a differing one, in that epoch and, as a
+      /// late delivery, in the next.
       [[sysio::action]]
       void evalcons(uint64_t chain_code, uint32_t epoch_index);
 
-      /// Check whether outpost `chain_code` reached consensus for its current epoch AND its
-      /// next_epoch_start has passed; if so, advance that chain's epoch. Permissionless crank, called
-      /// by the batch operator after the chain's time window elapses. No effect before the chain's
-      /// genesis advance, which only `bootstrap` / `bootchain` run.
+      /// Permissionless crank for outpost `chain_code`'s current epoch, held while a dispute is open
+      /// on it. An undecided epoch is re-tallied (`evalcons` inline, at any time), since its eligible
+      /// members can change with no new delivery. A decided epoch
+      /// advances once the chain is due (`sysio.epoch` `advance_due`: it has traffic, its minimum duration
+      /// has passed since its epoch start, and its traffic wait since that traffic began); an idle chain stays in
+      /// its decided epoch. No effect before the chain's genesis advance, which only `bootstrap` /
+      /// `bootchain` run.
       [[sysio::action]]
       void chkcons(uint64_t chain_code);
+
+      /// Batch operator `batch_op` reports outpost `chain_code`'s outbound backlog in the chain's current epoch
+      /// `epoch_index`: `pending_count` messages queued on the outpost, pending since `oldest_pending_ms`
+      /// (milliseconds since the Unix epoch; zero, or a time later than now, counts as now). Ethereum reports its
+      /// oldest queued message; Solana does not date its backlog and reports zero. The epoch must be decided: its
+      /// accepted envelope proves the outpost emitted it, so no message that left in that emit counts as a backlog.
+      ///
+      /// The report replaces the operator's `qreports` row for the chain, erases the chain's rows of earlier epochs
+      /// and runs the tally. Once eligible members as many as a strict majority of the seats of the chain's group
+      /// on duty (the majority `evalcons` needs) have reported in the current epoch, it records the chain's traffic
+      /// since the majority-th earliest of their times (`sysio.epoch::notetraffic`), so a minority neither makes
+      /// the chain due nor moves its traffic earlier than the other members report.
+      ///
+      /// Auth: `batch_op`, a member of the chain's group on duty, ACTIVE in sysio.opreg and a member of the chain
+      /// that is not EVICTED. Refused for a chain that is not an active outpost or has not run its genesis advance,
+      /// for any other epoch, for an undecided epoch (a disputed one included), and with a zero `pending_count`. A
+      /// paused chain records the traffic but does not advance until it resumes.
+      [[sysio::action]]
+      void reportqueue(name batch_op, uint64_t chain_code, uint32_t epoch_index, uint32_t pending_count,
+                       uint64_t oldest_pending_ms);
 
       /// Dispatch the winning envelope of a resolved OPP dispute. Called inline by
       /// `sysio.chalg::chkdispute` once the Tier-1 vote selects a canonical checksum. Locates the
       /// winning envelope's raw bytes among this (outpost, epoch)'s deliveries and runs the shared
-      /// consensus path (store + dispatch attestations, audit log, record the winner on `outpcons`).
+      /// consensus path (store + dispatch attestations, audit log, record the winner on `outpcons`,
+      /// slash every operator whose delivery differs from the winner, one delivered after the
+      /// dispute opened included), then records the chain's traffic at the resolution
+      /// (`sysio.epoch::notetraffic`), so the chain becomes due and advances to its next group.
       [[sysio::action]]
       void resolvedisp(uint64_t chain_code, uint32_t epoch_index, checksum256 winning_checksum);
 
@@ -153,7 +200,8 @@ namespace sysio {
       /// Writes to the attestations table with status READY. Rejects `data` larger than
       /// MAX_ATTESTATION_DATA_BYTES (MAX_GENERAL_ATTESTATION_DATA_BYTES for a general-lane row), so every
       /// READY row ships, and a general-lane row once the outpost already holds MAX_QUEUED_ATTESTATIONS
-      /// of them.
+      /// of them. A general-lane row that finds the outpost's queue empty notifies sysio.epoch, which records
+      /// the chain's traffic at now (`sysio.epoch::onqueueout`).
       ///
       /// `chain_code` is the destination outpost's chain slug_name value
       /// (uint64). Called by sibling system contracts that need to send
@@ -185,7 +233,9 @@ namespace sysio {
       /// receiving outpost can reject an envelope a misconfigured relay
       /// delivered to the wrong same-kind chain.
       /// When the envelope carries DESYNDICATE_LIQ attestations, sends one inline
-      /// `sysio.synd::retsent` with the envelope's epoch and their request ids.
+      /// `sysio.synd::retsent` with the envelope's epoch and their request ids. When general-lane rows
+      /// stay READY after the build, records traffic for the chain since the oldest of them became ready
+      /// (`sysio.epoch::notetraffic`).
       [[sysio::action]]
       void buildenv(uint64_t chain_code);
 
@@ -204,8 +254,9 @@ namespace sysio {
       /// Consensus is evaluated by comparing checksums across operators.
       ///
       /// Working state, not an audit trail (that is `envlog`). `deliver` prunes rows older than the
-      /// current and previous epoch (`INBOUND_ENVELOPE_RETENTION_EPOCHS` in `src/sysio.msgch.cpp`);
-      /// every on-chain reader only touches the current epoch.
+      /// current and previous epoch (`INBOUND_ENVELOPE_RETENTION_EPOCHS` in `src/sysio.msgch.cpp`).
+      /// Consensus reads the current epoch's rows; `sysio.epoch::advance` reads the previous epoch's,
+      /// late deliveries included, when it closes that epoch's books.
       struct [[sysio::table("envelopes")]] envelope_entry {
          uint64_t                  id;
          uint64_t                  chain_code;
@@ -214,7 +265,8 @@ namespace sysio {
          opp::types::ChainKind     chain_kind;
          checksum256               checksum;        ///< sha256 of the delivered bytes
          /// The delivered bytes. Cleared on the rows present when the epoch's winner is accepted and
-         /// never stored for a late confirmation of it; the retention prune bounds any others.
+         /// never stored for a later delivery of it, in the epoch or the next; the retention prune
+         /// bounds any others.
          std::vector<char>         raw_data;
          time_point                received_at{};
 
@@ -337,10 +389,11 @@ namespace sysio {
       /// One row per outpost. Rows reused (not erased) to avoid RAM churn.
       ///
       /// `winning_checksum` is the winning delivery checksum (sha256 of the raw delivered bytes)
-      /// for `epoch_index`, recorded when consensus is reached (majority/unanimous path) or when
-      /// a Tier-1 dispute vote resolves (via `resolvedisp`). `sysio.epoch::advance` reads it to
-      /// classify each operator's delivery: a matching checksum is a hit, a non-matching delivered
-      /// checksum is slashed. Zero until a winner exists for the current epoch.
+      /// for `epoch_index`, recorded when consensus is reached (strict-majority path) or when
+      /// a Tier-1 dispute vote resolves (via `resolvedisp`). The acceptance that records it slashes
+      /// every operator whose delivery for the epoch has another checksum, and `deliver` then refuses
+      /// any delivery for the epoch but the winner's bytes. Zero until a winner exists for the current
+      /// epoch.
       ///
       /// `envelope_digest` is the inbound ENVELOPE chain tip: the canonical epoch digest (keccak256
       /// over the canonical field-complete encoding with `envelope_hash` blanked; see
@@ -357,6 +410,14 @@ namespace sysio {
       /// correctly envelope-chained successor could replay an earlier valid `Message` verbatim and
       /// re-dispatch its attestations. Zero until the first message from this outpost is accepted
       /// (which may lag `envelope_digest` if the first accepted envelopes are empty-message acks).
+      ///
+      /// `previous_epoch_index` / `previous_winning_checksum` are the epoch and winner the row held
+      /// before its latest acceptance: each acceptance shifts `epoch_index` / `winning_checksum` into
+      /// them. `deliver` admits a late delivery only byte-identical to that winner. Zero until the
+      /// second acceptance.
+      ///
+      /// The previous fields follow every older one, so a reader built against the shorter row still
+      /// decodes the fields it knows.
       struct [[sysio::table("outpcons")]] outpost_consensus_entry {
          uint64_t    chain_code;
          uint32_t    epoch_index;
@@ -364,24 +425,54 @@ namespace sysio {
          checksum256 winning_checksum;
          checksum256 envelope_digest;
          checksum256 message_tip;
+         uint32_t    previous_epoch_index;
+         checksum256 previous_winning_checksum;
 
          SYSLIB_SERIALIZE(outpost_consensus_entry,
             (chain_code)(epoch_index)(consensus_reached)(winning_checksum)(envelope_digest)
-            (message_tip))
+            (message_tip)(previous_epoch_index)(previous_winning_checksum))
       };
 
       using outpost_consensus_t =
          sysio::kv::table<"outpcons"_n, outpost_consensus_key, outpost_consensus_entry>;
 
       /// Outpost `chain_code`'s `outpcons` row on `msgch_account` when it records the accepted winner of
-      /// `epoch_index`, else nullopt: `epoch_index` is written only on acceptance and never cleared, so
-      /// a row for another epoch records no winner for this one. Never throws.
+      /// `epoch_index` as its current epoch, else nullopt: `epoch_index` is written only on acceptance and
+      /// never cleared, so a row for another epoch records no winner for this one. The current epoch is
+      /// decided exactly when this holds for it. Never throws.
       static std::optional<outpost_consensus_entry> consensus_for_epoch(name msgch_account, uint64_t chain_code,
                                                                         uint32_t epoch_index) {
          std::optional<outpost_consensus_entry> consensus =
             outpost_consensus_t(msgch_account).try_get(outpost_consensus_key{chain_code});
          if (consensus && consensus->epoch_index != epoch_index) consensus.reset();
          return consensus;
+      }
+
+      /// The accepted winning checksum of outpost `chain_code`'s epoch `epoch_index` on `msgch_account`'s
+      /// `outpcons` row: its current winner when the row's `epoch_index` is `epoch_index`, its previous
+      /// winner when its `previous_epoch_index` is, else nullopt. Epoch 0 never has a winner. Never throws.
+      static std::optional<checksum256> winner_of(name msgch_account, uint64_t chain_code, uint32_t epoch_index) {
+         if (epoch_index == 0) return std::nullopt;
+         const std::optional<outpost_consensus_entry> consensus =
+            outpost_consensus_t(msgch_account).try_get(outpost_consensus_key{chain_code});
+         if (!consensus) return std::nullopt;
+         if (consensus->epoch_index == epoch_index) return consensus->winning_checksum;
+         if (consensus->previous_epoch_index == epoch_index) return consensus->previous_winning_checksum;
+         return std::nullopt;
+      }
+
+      /// When the oldest general-lane READY attestation queued for outpost `chain_code` on `msgch_account` became
+      /// ready (its `ready_timestamp`), or nullopt while none is queued. Never throws.
+      static std::optional<time_point> oldest_ready_general(name msgch_account, uint64_t chain_code) {
+         attestations_t atts(msgch_account);
+         auto           by_queue = atts.get_index<"byqueue"_n>();
+         const auto     row      = by_queue.lower_bound(
+            queue_key(chain_code, opp::types::AttestationStatus::ATTESTATION_STATUS_READY, queue_lane::general));
+         if (row == by_queue.end() || row->chain_code != chain_code ||
+             row->status != opp::types::AttestationStatus::ATTESTATION_STATUS_READY ||
+             lane_of(row->type) != queue_lane::general)
+            return std::nullopt;
+         return time_point{seconds(static_cast<int64_t>(row->ready_timestamp))};
       }
 
       /// Per-outpost outbound queue primary key.
@@ -400,6 +491,30 @@ namespace sysio {
       };
 
       using outqueue_t = sysio::kv::table<"outqueue"_n, outbound_queue_key, outbound_queue_entry>;
+
+      /// Key of `qreports`: the outpost first, so one outpost's reports are one contiguous range.
+      struct queue_report_key {
+         uint64_t chain_code;
+         name     account;
+         SYSLIB_SERIALIZE(queue_report_key, (chain_code)(account))
+      };
+
+      /// A batch operator's latest outbound backlog report for an outpost (`reportqueue`). The tally counts the
+      /// outpost's rows of its current epoch from the eligible members of its group on duty. Each report erases the
+      /// outpost's rows of earlier epochs, so an outpost holds its current epoch's rows and, until its next report,
+      /// its last reported epoch's: one per reporting member of the group on duty, or of a group that a governance
+      /// `schbatchgps` replaced mid-epoch, which the tally ignores.
+      struct [[sysio::table("qreports")]] queue_report_entry {
+         uint64_t   chain_code;
+         name       account;
+         uint32_t   epoch_index;       ///< the outpost's epoch the report was made in
+         uint32_t   pending_count;     ///< messages queued on the outpost
+         time_point oldest_pending_at; ///< the reported start of the backlog; the report's time when zero or later
+
+         SYSLIB_SERIALIZE(queue_report_entry, (chain_code)(account)(epoch_index)(pending_count)(oldest_pending_at))
+      };
+
+      using qreports_t = sysio::kv::table<"qreports"_n, queue_report_key, queue_report_entry>;
 
       /// Singleton holding the monotonic next-attestation-id counter.
       ///

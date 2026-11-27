@@ -382,6 +382,14 @@
                 {
                     "name": "message_tip",
                     "type": "checksum256"
+                },
+                {
+                    "name": "previous_epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "previous_winning_checksum",
+                    "type": "checksum256"
                 }
             ]
         },
@@ -392,6 +400,46 @@
                 {
                     "name": "chain_code",
                     "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "queue_report_entry",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                },
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "pending_count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "oldest_pending_at",
+                    "type": "time_point"
+                }
+            ]
+        },
+        {
+            "name": "queue_report_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                },
+                {
+                    "name": "account",
+                    "type": "name"
                 }
             ]
         },
@@ -410,6 +458,32 @@
                 {
                     "name": "data",
                     "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "reportqueue",
+            "base": "",
+            "fields": [
+                {
+                    "name": "batch_op",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "pending_count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "oldest_pending_ms",
+                    "type": "uint64"
                 }
             ]
         },
@@ -476,6 +550,11 @@
         {
             "name": "queueout",
             "type": "queueout",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "reportqueue",
+            "type": "reportqueue",
             "ricardian_contract": ""
         },
         {
@@ -598,6 +677,14 @@
             "key_names": ["chain_code"],
             "key_types": ["uint64"],
             "table_id": 52512
+        },
+        {
+            "name": "qreports",
+            "type": "queue_report_entry",
+            "index_type": "i64",
+            "key_names": ["chain_code","account"],
+            "key_types": ["uint64","name"],
+            "table_id": 28512
         }
     ],
     "ricardian_clauses": [],

@@ -79,8 +79,8 @@ namespace {
    /// discovered at startup — keeps `epoch_tick` viable so a cold-sync node
    /// that finds outposts later still responds.
    constexpr std::size_t MIN_CRON_THREADS = 5;
-   /// Inbound plus outbound cron entries for each relayed outpost.
-   constexpr std::size_t OPP_CRON_JOBS_PER_OUTPOST = 2;
+   /// Inbound, outbound and backlog cron entries for each relayed outpost.
+   constexpr std::size_t OPP_CRON_JOBS_PER_OUTPOST = 3;
    /// The plugin-wide epoch polling cron entry.
    constexpr std::size_t EPOCH_TICK_CRON_JOBS = 1;
    /// The depot cranks' polling cron entry (disputes, economic clock, yield).
@@ -126,10 +126,10 @@ namespace {
    // renamed to something else.
 
    namespace msgch {
-      constexpr auto account             = "sysio.msgch";
+      constexpr auto account             = batch_operator_detail::consensus::account;
       constexpr auto table_envelopes     = "envelopes";
       constexpr auto table_outenvelopes  = "outenvelopes";
-      constexpr auto table_outpcons      = "outpcons";
+      constexpr auto table_outpcons      = batch_operator_detail::consensus::table_outpcons;
       constexpr auto action_deliver      = "deliver";
       constexpr auto action_chkcons      = "chkcons";
       /// Field names on `envelope_entry` / `outbound_envelope` rows.
@@ -179,6 +179,7 @@ namespace {
    constexpr std::array RELAY_ACTIONS{
       pushed_action{msgch::account, msgch::action_deliver},
       pushed_action{msgch::account, msgch::action_chkcons},
+      pushed_action{batch_operator_detail::backlog::account, batch_operator_detail::backlog::action_reportqueue},
       pushed_action{chalg::account, chalg::action_chkdispute},
       pushed_action{batch_operator_detail::economy::account, batch_operator_detail::economy::action_tickeconomy},
       pushed_action{batch_operator_detail::swap::account, batch_operator_detail::swap::action_tickyield},
@@ -355,6 +356,9 @@ struct batch_operator_plugin::impl {
    /// When the epoch tick next reads the chains. Its cron entry fires every `epoch_tick_step`; the read waits for the
    /// shortest poll interval of the relayed chains (`batch_operator_detail::epoch_tick_interval`).
    fc::time_point                      next_epoch_read;
+   /// When this operator last pushed a re-tally `chkcons` for each chain (`batch_operator_detail::chkcons_reason`).
+   /// Touched only by the epoch tick.
+   batch_operator_detail::retally_pushes retallied;
 
    // Operator awareness — set by `poll_own_status()` from sysio.opreg::operators.
    /// Whether `chkcons`, the depot cranks and the kick crank push: false once the operator is SLASHED or TERMINATED.
@@ -382,10 +386,11 @@ struct batch_operator_plugin::impl {
    /// removes as the relayed chain set changes, and the underwriter's poll. Stopped at plugin_shutdown.
    sysio::services::cron_service_ptr cron_svc;
    std::vector<cron_service::job_id_t> cron_job_ids;
-   /// Cron job IDs for a scheduled outpost relay pair, and the chain's poll interval they run at.
+   /// Cron job IDs for a scheduled outpost relay job's three directions, and the chain's poll interval they run at.
    struct scheduled_opp_job_ids {
       cron_service::job_id_t outbound = 0;
       cron_service::job_id_t inbound  = 0;
+      cron_service::job_id_t backlog  = 0;
       fc::microseconds       interval;
    };
    std::map<uint64_t, scheduled_opp_job_ids> scheduled_opp_jobs;
@@ -450,15 +455,41 @@ struct batch_operator_plugin::impl {
          return _impl.has_delivered_envelope(chain_code, epoch_index);
       }
 
-      void deliver_to_depot(uint64_t chain_code,
-                            const std::vector<char>& raw_messages) override {
-         _impl.push_action(
+      push_outcome deliver_to_depot(uint64_t chain_code,
+                                    const std::vector<char>& raw_messages) override {
+         return _impl.push_action(
             msgch::account, msgch::action_deliver, *_impl.relay_signer,
             fc::mutable_variant_object()
                (msgch::field::batch_op_name, _impl.operator_account.to_string())
                (msgch::field::chain_code,    chain_code)
                (msgch::field::data,          raw_messages),
             _impl.delivery_timeout_of(chain_code));
+      }
+
+      void push_chkcons_if_due(uint64_t chain_code) override {
+         const std::optional<batch_operator_detail::chain_epoch_view> view = _impl.chain_epoch_of(chain_code);
+         if (!view || !batch_operator_detail::pushes_chkcons_after_delivery(*view, fc::time_point::now())) return;
+         _impl.push_chkcons(chain_code);
+      }
+
+      bool has_reported_backlog(uint64_t chain_code, uint32_t epoch_index) override {
+         return _impl.has_reported_backlog(chain_code, epoch_index);
+      }
+
+      bool report_backlog(uint64_t chain_code, uint32_t epoch_index, uint32_t pending_count,
+                          uint64_t oldest_pending_ms) override {
+         namespace backlog = batch_operator_detail::backlog;
+         // A refusal is an expected race with the chain's epoch state, read a poll earlier: the epoch moved on, or
+         // its group changed.
+         return _impl.push_action(backlog::account, backlog::action_reportqueue, *_impl.relay_signer,
+                                  fc::mutable_variant_object()
+                                     (backlog::field::batch_op,          _impl.operator_account.to_string())
+                                     (backlog::field::chain_code,        chain_code)
+                                     (backlog::field::epoch_index,       epoch_index)
+                                     (backlog::field::pending_count,     pending_count)
+                                     (backlog::field::oldest_pending_ms, oldest_pending_ms),
+                                  _impl.delivery_timeout_of(chain_code), nullptr,
+                                  batch_operator_detail::refusal_log::info) == push_outcome::accepted;
       }
 
       void emit_debug_envelope(sysio::opp::debugging::DebugEnvelopeEvent event) override {
@@ -471,10 +502,6 @@ struct batch_operator_plugin::impl {
       }
 
       // Each query reads the chain's last-read view; a chain without one answers false or 0.
-      bool within_epoch_window(uint64_t chain_code) const override {
-         const std::optional<batch_operator_detail::chain_epoch_view> view = _impl.chain_epoch_of(chain_code);
-         return view && batch_operator_detail::within_epoch_window(*view, fc::time_point::now());
-      }
       bool is_elected(uint64_t chain_code) const override {
          const std::optional<batch_operator_detail::chain_epoch_view> view = _impl.chain_epoch_of(chain_code);
          return view && view->election.is_elected;
@@ -483,9 +510,17 @@ struct batch_operator_plugin::impl {
          const std::optional<batch_operator_detail::chain_epoch_view> view = _impl.chain_epoch_of(chain_code);
          return view ? view->epoch_index : 0;
       }
-      bool is_epoch_boundary_past(uint64_t chain_code) const override {
+      bool late_delivery_open(uint64_t chain_code) const override {
          const std::optional<batch_operator_detail::chain_epoch_view> view = _impl.chain_epoch_of(chain_code);
-         return view && batch_operator_detail::is_epoch_boundary_past(*view, fc::time_point::now());
+         return view && batch_operator_detail::late_delivery_open(*view, fc::time_point::now());
+      }
+      bool is_decided(uint64_t chain_code) const override {
+         const std::optional<batch_operator_detail::chain_epoch_view> view = _impl.chain_epoch_of(chain_code);
+         return view && view->decided;
+      }
+      fc::microseconds minimum_duration(uint64_t chain_code) const override {
+         const std::optional<batch_operator_detail::chain_epoch_view> view = _impl.chain_epoch_of(chain_code);
+         return view ? view->epoch_duration : fc::microseconds();
       }
       fc::microseconds delivery_timeout(uint64_t chain_code) const override {
          return _impl.delivery_timeout_of(chain_code);
@@ -581,6 +616,27 @@ struct batch_operator_plugin::impl {
       }
    }
 
+   /// Whether this operator's `sysio.msgch::qreports` row for outpost `chain_code` was made in epoch `epoch_index`,
+   /// by an exact lookup of the row. False when the read failed: a report made again is only a re-tally.
+   bool has_reported_backlog(uint64_t chain_code, uint32_t epoch_index) {
+      namespace backlog = batch_operator_detail::backlog;
+      sysio::chain_apis::read_only::get_table_rows_params p;
+      p.code        = chain::name(backlog::account);
+      p.scope       = backlog::account;
+      p.table       = backlog::table_qreports;
+      p.find        = batch_operator_detail::queue_report_find_bound(chain_code, operator_account);
+      p.limit       = EXACT_LOOKUP_LIMIT;
+      p.values_only = true;
+      const std::optional<sysio::chain_apis::read_only::get_table_rows_result> rows = read_table_checked(std::move(p));
+      if (!rows) return false;
+      try {
+         return batch_operator_detail::reported_in_epoch(rows->rows, chain_code, operator_account, epoch_index);
+      } catch (const fc::exception& e) {
+         wlog("batch_operator: a qreports row did not decode: {}", e.top_message());
+         return false;
+      }
+   }
+
    // -----------------------------------------------------------------------
    //  Epoch state polling
    // -----------------------------------------------------------------------
@@ -594,8 +650,9 @@ struct batch_operator_plugin::impl {
     *
     * A chain's genesis advance (epoch 0 -> 1) is not a batch operator's: `sysio.msgch::bootstrap` and `bootchain`
     * run it under msgch's own authority. From epoch 1 on the elected group TRIGGERS each advance with `chkcons`,
-    * which sends the inline `sysio.epoch::advance` (again under msgch's authority) once the chain's consensus and its
-    * time gate are met; an operator never authorizes an advance directly.
+    * which sends the inline `sysio.epoch::advance` (again under msgch's authority) once the chain's epoch is decided
+    * and the chain is due (`due_at`), and any operator serving the chain does once it has stayed due past the
+    * liveness grace; an operator never authorizes an advance directly.
     */
    void poll_epoch_state() {
       if (shutting_down || !enabled) return;
@@ -612,23 +669,39 @@ struct batch_operator_plugin::impl {
       push_chkcons();
    }
 
-   /// Push `sysio.msgch::chkcons` for every relayed chain this operator is elected on whose epoch boundary has passed:
-   /// `chkcons` advances a chain only then, so an earlier push has no effect. The action is permissionless, but a push
-   /// from every batch operator would waste transaction slots, so only the elected group pushes it. A failed push is
-   /// logged and the next chain is still pushed.
+   /// Push `sysio.msgch::chkcons` for every relayed chain `batch_operator_detail::chkcons_chains` names: as an
+   /// elected operator, for a decided epoch once the chain is due (`chkcons` advances it) and for an epoch undecided
+   /// past the chain minimum, at most once per minimum (`chkcons` re-tallies it); as any ACTIVE operator serving the
+   /// chain, for a decided epoch that has stayed due past the liveness grace, which its elected group has not
+   /// advanced. A decided epoch on an idle chain needs nothing. The action is permissionless, but a push from every
+   /// batch operator every poll would waste transaction slots. A failed push is logged and the next chain is still
+   /// pushed.
    void push_chkcons() {
-      for (const uint64_t chain_code :
-           batch_operator_detail::chkcons_chains(chain_epochs, relayed, fc::time_point::now())) {
-         const std::string code = fc::slug_name{chain_code}.to_string();
-         try {
-            push_action(msgch::account, msgch::action_chkcons, *relay_signer,
-                        fc::mutable_variant_object()(msgch::field::chain_code, chain_code),
-                        delivery_timeout_of(chain_code));
-         } catch (const fc::exception& e) {
-            dlog("batch_operator: chkcons({}): {}", code, e.to_string());
-         } catch (const std::exception& e) {
-            dlog("batch_operator: chkcons({}): {}", code, e.what());
+      using batch_operator_detail::chkcons_reason;
+      const fc::time_point                                   now = fc::time_point::now();
+      const std::vector<batch_operator_detail::chkcons_push> pushes =
+         batch_operator_detail::chkcons_chains(chain_epochs, relayed, now, retallied, status_delivers);
+      batch_operator_detail::record_retallies(retallied, pushes, now);
+      for (const batch_operator_detail::chkcons_push& push : pushes) {
+         if (push.reason == chkcons_reason::liveness) {
+            wlog("batch_operator: chain {} has stayed due past the liveness grace without advancing; pushing "
+                 "chkcons as an operator serving it",
+                 fc::slug_name{push.chain_code}.to_string());
          }
+         push_chkcons(push.chain_code);
+      }
+   }
+
+   /// Push `sysio.msgch::chkcons` for `chain_code`, under the chain's delivery timeout. A failed push is logged.
+   void push_chkcons(uint64_t chain_code) {
+      try {
+         push_action(msgch::account, msgch::action_chkcons, *relay_signer,
+                     fc::mutable_variant_object()(msgch::field::chain_code, chain_code),
+                     delivery_timeout_of(chain_code));
+      } catch (const fc::exception& e) {
+         dlog("batch_operator: chkcons({}): {}", fc::slug_name{chain_code}.to_string(), e.to_string());
+      } catch (const std::exception& e) {
+         dlog("batch_operator: chkcons({}): {}", fc::slug_name{chain_code}.to_string(), e.what());
       }
    }
 
@@ -769,9 +842,9 @@ struct batch_operator_plugin::impl {
          try {
             // A later index cannot open before this one, so a refused or timed-out push ends the
             // catch-up; the next poll re-reads the clock.
-            if (!push_action(economy::account, economy::action_tickeconomy, *relay_signer,
-                             fc::mutable_variant_object()(economy::field::epoch_index, epoch_index),
-                             DEPOT_CALL_TIMEOUT)) {
+            if (push_action(economy::account, economy::action_tickeconomy, *relay_signer,
+                            fc::mutable_variant_object()(economy::field::epoch_index, epoch_index),
+                            DEPOT_CALL_TIMEOUT) != push_outcome::accepted) {
                break;
             }
          } catch (const fc::exception& e) {
@@ -1064,16 +1137,20 @@ struct batch_operator_plugin::impl {
       }
    }
 
-   /// Every chain's consensus epoch from all `epochstate` and `epochcfg` rows, or nullopt when either table could not
-   /// be read. A row that does not decode is logged and left out.
+   /// Every chain's consensus epoch from all `epochstate` and `epochcfg` rows, and whether its current epoch is decided
+   /// from all `sysio.msgch::outpcons` rows, or nullopt when any of the three tables could not be read. A row that does
+   /// not decode is logged and left out.
    std::optional<batch_operator_detail::chain_epochs> read_chain_epochs() {
       const std::optional<fc::variants> states =
          read_all_rows(epoch::account, epoch::account, epoch::table_epochstate);
       if (!states) return std::nullopt;
       const std::optional<fc::variants> configs = read_all_rows(epoch::account, epoch::account, epoch::table_epochcfg);
       if (!configs) return std::nullopt;
-      batch_operator_detail::decoded_chain_epochs decoded =
-         batch_operator_detail::decode_chain_epochs(*states, *configs, operator_account, epoch_poll);
+      const std::optional<fc::variants> consensus_rows =
+         read_all_rows(msgch::account, msgch::account, msgch::table_outpcons);
+      if (!consensus_rows) return std::nullopt;
+      batch_operator_detail::decoded_chain_epochs decoded = batch_operator_detail::decode_chain_epochs(
+         *states, *configs, *consensus_rows, operator_account, epoch_poll);
       for (const std::string& why : decoded.skipped) {
          wlog("batch_operator: chain epoch left out: {}", why);
       }
@@ -1389,16 +1466,18 @@ struct batch_operator_plugin::impl {
                          cron_job_ids.end());
    }
 
-   /// Cancel the inbound/outbound cron entries for one outpost, if they exist.
+   /// Cancel the outbound, inbound and backlog cron entries for one outpost, if they exist.
    void cancel_scheduled_opp_job(uint64_t chain_code) {
       auto sched_it = scheduled_opp_jobs.find(chain_code);
       if (sched_it == scheduled_opp_jobs.end()) return;
       if (cron_svc) {
          cron_svc->cancel(sched_it->second.outbound);
          cron_svc->cancel(sched_it->second.inbound);
+         cron_svc->cancel(sched_it->second.backlog);
       }
       forget_cron_job_id(sched_it->second.outbound);
       forget_cron_job_id(sched_it->second.inbound);
+      forget_cron_job_id(sched_it->second.backlog);
       scheduled_opp_jobs.erase(sched_it);
    }
 
@@ -1439,8 +1518,8 @@ struct batch_operator_plugin::impl {
       return id;
    }
 
-   /// Schedule inbound and outbound cron jobs for a single relayed outpost, every `interval`. A pair already
-   /// scheduled at another interval (the chain's epoch duration changed) is rescheduled; the job's own mutex
+   /// Schedule the outbound, inbound and backlog cron jobs for a single relayed outpost, every `interval`. Jobs
+   /// already scheduled at another interval (the chain's epoch duration changed) are rescheduled; the job's own mutex
    /// serializes a run of the old entries with one of the new.
    void schedule_opp_job(uint64_t chain_code, const std::shared_ptr<sysio::outpost_opp_job>& job,
                          fc::microseconds interval) {
@@ -1453,9 +1532,12 @@ struct batch_operator_plugin::impl {
          chain_code, job, "outbound", &sysio::outpost_opp_job::run_outbound, interval);
       const cron_service::job_id_t inbound_id = schedule_opp_job_direction(
          chain_code, job, "inbound", &sysio::outpost_opp_job::run_inbound, interval);
+      const cron_service::job_id_t backlog_id = schedule_opp_job_direction(
+         chain_code, job, "backlog", &sysio::outpost_opp_job::run_backlog, interval);
       scheduled_opp_jobs.emplace(chain_code, scheduled_opp_job_ids{
          .outbound = outbound_id,
          .inbound  = inbound_id,
+         .backlog  = backlog_id,
          .interval = interval,
       });
    }
@@ -1641,7 +1723,8 @@ struct batch_operator_plugin::impl {
                           std::optional<fc::time_point_sec>* submitted_until = nullptr) {
       if (shutting_down) return false;
       try {
-         return push_action(contract, action, *underwriter_signer, data, DEPOT_CALL_TIMEOUT, submitted_until);
+         return push_action(contract, action, *underwriter_signer, data, DEPOT_CALL_TIMEOUT, submitted_until) ==
+                push_outcome::accepted;
       } catch (const fc::exception& e) {
          wlog("batch_operator: underwriter {}::{}: {}", contract, action, e.to_string());
       } catch (const std::exception& e) {
@@ -2107,13 +2190,13 @@ struct batch_operator_plugin::impl {
    /// Resolves ABIs: call on the main thread.
    void submit(const std::shared_ptr<batch_operator_detail::async_action_completion>& completion,
                const std::string& contract, const std::string& action_name, const fc::variant& packed_var,
-               fc::microseconds timeout) {
+               fc::microseconds timeout, batch_operator_detail::refusal_log refusal) {
       try {
          std::shared_ptr<read_write> rw =
             std::make_shared<read_write>(chain_plug->get_read_write_api(timeout));
          rw->push_transaction(
             packed_var.get_object(),
-            batch_operator_detail::create_push_action_callback(rw, completion, contract, action_name));
+            batch_operator_detail::create_push_action_callback(rw, completion, contract, action_name, refusal));
       } catch (const fc::exception& e) {
          completion->complete([&] { elog(batch_operator_detail::push_action_log::failure, contract, action_name,
                                          e.to_string()); });
@@ -2136,21 +2219,23 @@ struct batch_operator_plugin::impl {
       }
    }
 
-   /// Build, sign and submit a depot action, declaring `by.auth` and signed by `by.provider`. True when the node
-   /// accepted the transaction within `timeout`; a refusal is logged by the push callback.
+   /// Build, sign and submit a depot action, declaring `by.auth` and signed by `by.provider`. Accepted when the node
+   /// accepted the transaction within `timeout`, refused when the contract refused it, otherwise unconfirmed; a refusal
+   /// or failure is logged by the push callback, at `refusal`'s level.
    ///
    /// Called from cron threads, which may not read chain state: the build runs in a read window and the submission
    /// on the main thread, while the signature, possibly a remote signer, stays here. The waits do not cancel
    /// anything: each posted task owns what it uses, so returning on a timeout is safe. `submitted_until`, when
    /// supplied, records the exact signed expiration before submission and remains set on a callback timeout.
-   bool push_action(const std::string& contract,
-                    const std::string& action_name,
-                    const signer& by,
-                    const fc::variant_object& data,
-                    fc::microseconds timeout,
-                    std::optional<fc::time_point_sec>* submitted_until = nullptr) {
+   push_outcome push_action(const std::string& contract,
+                            const std::string& action_name,
+                            const signer& by,
+                            const fc::variant_object& data,
+                            fc::microseconds timeout,
+                            std::optional<fc::time_point_sec>* submitted_until = nullptr,
+                            batch_operator_detail::refusal_log refusal = batch_operator_detail::refusal_log::error) {
       if (submitted_until) submitted_until->reset();
-      if (shutting_down) return false;
+      if (shutting_down) return push_outcome::unconfirmed;
       const fc::time_point deadline = fc::time_point::now() + timeout;
       const bool           on_main  = std::this_thread::get_id() == app().executor().get_main_thread_id();
 
@@ -2173,11 +2258,11 @@ struct batch_operator_plugin::impl {
          if (!ready_by(built_future, deadline)) {
             if (shutting_down) wlog("batch_operator: push {}::{} abandoned on shutdown", contract, action_name);
             else elog("batch_operator: push {}::{} timed out before signing", contract, action_name);
-            return false;
+            return push_outcome::unconfirmed;
          }
          trx = built_future.get();
       }
-      if (!trx) return false;
+      if (!trx) return push_outcome::unconfirmed;
       trx->trx.signatures.push_back(by.provider->sign(trx->digest));
       const fc::time_point_sec expiration = trx->trx.expiration;
 
@@ -2190,18 +2275,19 @@ struct batch_operator_plugin::impl {
       std::future<void> future = completion->get_future();
       if (submitted_until) *submitted_until = expiration;
       if (on_main) {
-         submit(completion, contract, action_name, packed_var, timeout);
+         submit(completion, contract, action_name, packed_var, timeout, refusal);
       } else {
          app().executor().post(appbase::priority::medium, appbase::exec_queue::read_write,
-                               [this, completion, contract, action_name, packed_var = std::move(packed_var),
-                                timeout] { submit(completion, contract, action_name, packed_var, timeout); });
+                               [this, completion, contract, action_name, packed_var = std::move(packed_var), timeout,
+                                refusal] { submit(completion, contract, action_name, packed_var, timeout, refusal); });
       }
       if (!ready_by(future, deadline)) {
          if (shutting_down) wlog("batch_operator: push {}::{} abandoned on shutdown", contract, action_name);
          else elog("batch_operator: push {}::{} timed out", contract, action_name);
-         return false;
+         return push_outcome::unconfirmed;
       }
-      return completion->succeeded();
+      if (completion->succeeded()) return push_outcome::accepted;
+      return completion->refused_by_contract() ? push_outcome::refused : push_outcome::unconfirmed;
    }
 
    // -----------------------------------------------------------------------

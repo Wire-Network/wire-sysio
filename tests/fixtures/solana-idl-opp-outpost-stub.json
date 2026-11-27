@@ -472,6 +472,19 @@
         66,
         63
       ]
+    },
+    {
+      "name": "OutboundMessageBuffer",
+      "discriminator": [
+        133,
+        145,
+        100,
+        61,
+        28,
+        106,
+        209,
+        197
+      ]
     }
   ],
   "types": [
@@ -855,6 +868,84 @@
           {
             "name": "operator",
             "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AttestationDesc",
+      "serialization": "bytemuck",
+      "repr": {
+        "kind": "c"
+      },
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "offset",
+            "type": "u32"
+          },
+          {
+            "name": "len",
+            "type": "u32"
+          },
+          {
+            "name": "attestation_type",
+            "type": "i32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "OutboundMessageBuffer",
+      "serialization": "bytemuck",
+      "repr": {
+        "kind": "c"
+      },
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "next_swap_id",
+            "type": "u64"
+          },
+          {
+            "name": "used_data_bytes",
+            "type": "u32"
+          },
+          {
+            "name": "attestation_count",
+            "type": "u16"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "version",
+            "type": "u8"
+          },
+          {
+            "name": "descriptors",
+            "type": {
+              "array": [
+                {
+                  "defined": {
+                    "name": "AttestationDesc"
+                  }
+                },
+                128
+              ]
+            }
+          },
+          {
+            "name": "data",
+            "type": {
+              "array": [
+                "u8",
+                8192
+              ]
+            }
           }
         ]
       }

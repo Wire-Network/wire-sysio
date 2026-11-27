@@ -47,11 +47,15 @@ namespace sysio {
       /// Economic epochs between a withdrawal request and its release: the wall-clock wait.
       static constexpr uint32_t WITHDRAW_WAIT_ECONOMIC_EPOCHS = 2;
 
-      /// Consensus epochs each waited-on chain must also close after the request before release (see
-      /// `withdraw_request::consensus_waits`). Non-canonical deliverers are slashed when their chain's
-      /// epoch closes, and a dispute pause stops that chain's index, so this guard keeps a deliverer's
-      /// collateral in place until its deliveries have been judged, however far the economic clock
-      /// runs ahead.
+      /// Consensus epochs each waited-on chain closes after the request before release (see
+      /// `withdraw_request::consensus_waits`), unless the chain's current epoch is decided first: its
+      /// winner accepted and no dispute open on it. Non-canonical deliverers are slashed when their
+      /// epoch's winner is accepted, `chkcons` advances a chain only once its current epoch is decided,
+      /// and a dispute pause stops that chain's index. So a chain at the request's index + this has
+      /// judged every delivery to the epochs before its current one; a decided current epoch has also
+      /// judged its own. Governance `advance`s an undecided epoch, judging none, only on a chain that is no
+      /// longer an active outpost. This guard keeps a deliverer's collateral in place until one of the two
+      /// holds, however far the economic clock runs ahead.
       static constexpr uint32_t WITHDRAW_WAIT_EPOCHS = 2;
 
       /// Per-(operator, chain, token) cap on pending collateral withdrawals
@@ -125,32 +129,6 @@ namespace sysio {
                     DEFAULT_TERMINATE_MIN_PCT_SAMPLES <= MAX_TERMINATE_MIN_PCT_SAMPLES,
                     "production default percent-rail sample must lie inside the accepted bounds");
 
-      /// Minimum accepted `terminate_window_ms` for a given consecutive-miss
-      /// threshold and one outpost chain's epoch schedule. Delivery records
-      /// accrue one per DUTY epoch: `sysio.epoch::advance` records each member
-      /// of the chain's expiring group once. The schedule is a
-      /// sliding window of `batch_op_groups` groups, so a resident operator's
-      /// duty interval is `batch_op_groups` epochs. The rolling window must
-      /// span the full terminating run (`consecutive_misses + 1` records,
-      /// `consecutive_misses` duty intervals end to end) plus one duty interval
-      /// of boundary slack, or records age out (and are pruned) before
-      /// `termcheck` can observe the run, leaving the consecutive rail
-      /// structurally vacuous. Operators
-      /// benched by a surplus roster accrue no records while benched, so no
-      /// finite window observes them; the bound governs resident operators,
-      /// whose duty interval the sliding schedule pins at `batch_op_groups`
-      /// epochs. Enforced from both `opreg::setconfig` (against every chain's
-      /// stored epoch config) and `sysio.epoch::setconfig` (against the stored
-      /// opreg config) so no ordering of the two setters can accept a vacuous pair.
-      /// Inputs are pre-bounded by those setters (misses <= 5, duration <= 30
-      /// days, groups <= 255), so the product cannot overflow uint64.
-      static constexpr uint64_t min_terminate_window_ms(uint32_t consecutive_misses,
-                                                        uint32_t epoch_duration_sec,
-                                                        uint32_t batch_op_groups) {
-         constexpr uint64_t ms_per_sec = 1000;
-         return (uint64_t{consecutive_misses} + 1) * batch_op_groups * epoch_duration_sec * ms_per_sec;
-      }
-
       /// Bounded sweep sizes for delivery-log rows that have aged out of the
       /// rolling termination window. The write-path cap only has to outpace
       /// insertion (each `recorddel` adds one row); the `prune` cap clears
@@ -159,7 +137,8 @@ namespace sysio {
       static constexpr uint32_t MAX_DELLOG_PRUNE_PER_CRANK = 64;
 
       /// Aged-out rows of its own member that `termcheck` erases before reading the member's tally. The on-write
-      /// sweep normally leaves none; while one is left the rails wait, so they never count a row past the window.
+      /// sweep normally leaves none; while one is left the percent rail waits, so its rate never counts a row past
+      /// the window.
       static constexpr uint32_t MAX_DELLOG_PRUNE_PER_CHECK = 16;
 
       static constexpr uint32_t MAX_OPERATOR_PRUNE_PER_CRANK = 20;
@@ -225,7 +204,8 @@ namespace sysio {
                      std::vector<chain_min_bond> req_uw_collat);
 
       /// Register a new operator. A terminated account registers again only once its balances are
-      /// drained and it holds no seat in the batch-operator schedule; the new registration serves no
+      /// drained and it holds no seat in the batch-operator schedule, a seat whose epoch's books are still
+      /// open (`sysio.epoch` `previous_group`) included; the new registration serves no
       /// chain, and the account forfeits the unsettled batch duty it still holds from an earlier
       /// registration (`sysio.system::forfeitduty` for each such chain). An operator registering itself
       /// needs a `sysio.authex` link for every active outpost, except a batch operator, whose links
@@ -239,7 +219,8 @@ namespace sysio {
       /// it. Auth = `account`, or `sysio.opreg` (the bootstrap path). Requires a batch operator that is
       /// neither SLASHED nor TERMINATED, an active outpost, and the operator's `sysio.authex` link for
       /// the chain's kind. A LEFT or EVICTED operator rejoins only once it holds no seat in that chain's
-      /// schedule window; rejoining restarts the chain's miss rails.
+      /// schedule window nor in its `previous_group`, whose books the next advance closes; rejoining restarts
+      /// the chain's miss rails.
       [[sysio::action]]
       void joinchain(name account, sysio::slug_name chain_code);
 
@@ -281,7 +262,8 @@ namespace sysio {
 
       /// Internal: release matured rows from `wtdwqueue`. Called inline from `sysio.epoch::tickeconomy`
       /// each economic epoch with the current economic index. A row is matured once its economic wait
-      /// has passed and each chain in its `consensus_waits` has reached the row's index for it. The walk
+      /// has passed and each chain in its `consensus_waits` has reached the row's index for it or has its
+      /// current epoch decided (see `WITHDRAW_WAIT_EPOCHS`). The walk
       /// runs in request order from where the last flush stopped and ends at the first row whose
       /// economic wait has not passed; it skips a row still held by a consensus wait, and stops after
       /// `MAX_WTDW_FLUSH_PER_EPOCH` released rows or `MAX_WTDW_HELD_SKIPS_PER_FLUSH` skipped ones.
@@ -312,21 +294,22 @@ namespace sysio {
 
       /// Record a batch operator's result for one duty epoch of outpost `chain_code` in the rolling
       /// buffer and count it in the operator's duty tally on the chain. Called inline from
-      /// `sysio.epoch::advance(chain_code)` once per expiring-group member, whatever its status at the
-      /// close; `delivered` only if it delivered to that chain. Each write also prunes up to
+      /// `sysio.epoch::advance(chain_code)`, which closes the books of the epoch before the closing one, once
+      /// per member of the group that served it, whatever its status then; `delivered` only if it delivered
+      /// to that chain, in that epoch or late in the next. Each write also prunes up to
       /// `MAX_DELLOG_PRUNE_PER_WRITE` rows, of any chain, that have aged out of the window, taking each out
       /// of its membership's tally, so no dedicated crank is needed.
       [[sysio::action]]
       void recorddel(name account, sysio::slug_name chain_code, uint32_t epoch, bool delivered);
 
-      /// Evict the operator from outpost `chain_code` when its rolling buffer on that chain holds more
-      /// than `terminate_max_consecutive_misses` consecutive misses, or, once it holds at least
-      /// `terminate_min_pct_samples` duty epochs, a whole-percent miss rate (rounded down) above
-      /// `terminate_max_pct_misses_24h`. Both rails read the membership's duty tally: the chain's duty
-      /// epochs recorded since the operator's latest join of the chain and within the window, the
-      /// consecutive rail counting the misses since the last delivery; a return to ACTIVE resets neither.
-      /// The check first erases up to `MAX_DELLOG_PRUNE_PER_CHECK` of the member's own rows that aged out
-      /// of the window, and while one is left the rails wait for a later check. The membership becomes EVICTED
+      /// Evict the operator from outpost `chain_code` when it has missed more than
+      /// `terminate_max_consecutive_misses` duty epochs of that chain in a row since its last delivery,
+      /// whatever their age, or, once the window holds at least `terminate_min_pct_samples` of its duty
+      /// epochs, when their whole-percent miss rate (rounded down) is above `terminate_max_pct_misses_24h`.
+      /// Both rails read the membership's duty tally of the duty epochs recorded since the operator's
+      /// latest join of the chain; a return to ACTIVE resets neither. The check first erases up to
+      /// `MAX_DELLOG_PRUNE_PER_CHECK` of the member's own rows that aged out of the window, and while one is
+      /// left the percent rail waits for a later check. The membership becomes EVICTED
       /// with the rail's reason, and the operator forfeits its unsettled batch duty on the chain
       /// (`sysio.system::forfeitduty`, once `initt5` has run); its status, bond, other chains and
       /// their duty are untouched. ACTIVE and UNKNOWN operators are both evaluated; bootstrapped
@@ -497,14 +480,15 @@ namespace sysio {
          SYSLIB_SERIALIZE(served_chain_key, (chain_code)(account))
       };
 
-      /// Running totals of one membership's duty epochs in the rolling window, which `termcheck` reads
-      /// whatever the size of the log: the membership's `dellog` rows from `first_log_id` on that the
-      /// retention sweeps have not erased. `recorddel` adds each row; the sweeps drop them oldest first.
+      /// Running totals of one membership's duty epochs, which `termcheck` reads whatever the size of the
+      /// log. `duties` and `misses` count the membership's `dellog` rows from `first_log_id` on that the
+      /// retention sweeps have not erased; `miss_run` counts the missed duty epochs since the latest
+      /// delivery, erased or not. `recorddel` adds each row; the sweeps drop them oldest first.
       struct duty_tally {
          uint64_t first_log_id = 0;   ///< the first `dellog` id allocated after the latest join
          uint64_t duties       = 0;   ///< duty epochs counted
          uint64_t misses       = 0;   ///< counted duty epochs missed
-         uint64_t miss_run     = 0;   ///< misses since the last counted delivery
+         uint64_t miss_run     = 0;   ///< duty epochs missed since the latest delivery, whatever their age
 
          /// Whether `dellog` row `log_id` counts toward the tally: one recorded since the latest join.
          bool counts(uint64_t log_id) const { return log_id >= first_log_id; }
@@ -520,12 +504,12 @@ namespace sysio {
             }
          }
 
-         /// Drop the oldest counted duty epoch, erased by a sweep. The run keeps only the duties left.
+         /// Drop the oldest counted duty epoch, erased by a sweep. `miss_run` keeps it: the consecutive rail
+         /// counts missed duty epochs whatever their age.
          void drop_oldest(bool delivered) {
             if (duties == 0) return;
             --duties;
             if (!delivered && misses > 0) --misses;
-            miss_run = std::min(miss_run, duties);
          }
 
          SYSLIB_SERIALIZE(duty_tally, (first_log_id)(duties)(misses)(miss_run))
@@ -597,7 +581,7 @@ namespace sysio {
 
       /// Pending-withdraw row keyed by sequential `request_id`. Drained by
       /// `flushwtdw` once `eligible_at_economic_epoch <= economic_epoch` and every chain in
-      /// `consensus_waits` has reached its `eligible_at_epoch`. Subtracted by `available()` so the
+      /// `consensus_waits` has passed its wait. Subtracted by `available()` so the
       /// queued amount can't be double-used.
       struct withdraw_key {
          uint64_t request_id;
@@ -605,8 +589,9 @@ namespace sysio {
          SYSLIB_SERIALIZE(withdraw_key, (request_id))
       };
 
-      /// One outpost chain a withdrawal waits on: released only once the chain's consensus epoch index
-      /// has reached `eligible_at_epoch`, its index at the request + WITHDRAW_WAIT_EPOCHS.
+      /// One outpost chain a withdrawal waits on: passed once the chain's consensus epoch index has
+      /// reached `eligible_at_epoch`, its index at the request + WITHDRAW_WAIT_EPOCHS, or once the chain's
+      /// current epoch is decided (its winner accepted, no dispute open on it).
       struct consensus_wait {
          sysio::slug_name chain_code;
          uint32_t         eligible_at_epoch = 0;

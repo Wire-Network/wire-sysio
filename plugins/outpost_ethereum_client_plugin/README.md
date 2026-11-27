@@ -117,7 +117,7 @@ confirmations — OPP writes are consensus-critical and must not silently drop.
 
 | Wrapper | Contract | Members |
 |---|---|---|
-| `opp_contract_client` | `OPP.sol` | `emitOutboundEnvelope(uint32)` (recovery-only write; no in-tree steady-state caller), `getLatestOutboundEnvelope()` view |
+| `opp_contract_client` | `OPP.sol` | `emitOutboundEnvelope(uint32)` (recovery-only write; no in-tree steady-state caller), `getLatestOutboundEnvelope()`, `outboundEnvelopes(uint32)` (bound only when the loaded ABI declares it) and `pendingOutbound()` views; `outpost_ethereum_client` refuses an ABI set without `pendingOutbound()` at construction |
 | `opp_inbound_contract_client` | `OPPInbound.sol` | `epochIn(uint32,bytes)` (funded per call, returns the confirmed receipt), `nextEpochIndex()`, `dispatchSpill(uint32)`, `epochDeliveries(uint32,address)`, `pendingEpochHash()`, `pendingConsensusForDigest(bytes32)` and `attestationHandlers(uint16)` views |
 | `syndication_pool_contract_client` | `SyndicationPool.sol` (Wire-Network/wire-ethereum#207) | `realizeYield()` |
 
@@ -154,8 +154,7 @@ From those reads the relay decides, per `outpost_ethereum_client_detail::decide_
 | Tipped and unfinished, and this relay's recorded digest IS `pendingEpochHash` | Continue: re-send the envelope (after checking its `keccak256` is the settled digest) |
 | Tipped and unfinished on a digest this relay did not deliver, or delivered a minority of | Nothing to send; its deliverers carry the continuation |
 | Untipped, nothing recorded for this relay | Deliver |
-| Untipped, this relay recorded, and `pendingConsensusForDigest(own digest)` says the boundary has elapsed and a strict majority agrees | Re-deliver, so the outpost re-runs its path-2 tip |
-| Untipped, this relay recorded, otherwise | Nothing to send until more of the group delivers |
+| Untipped, this relay recorded | Nothing to send until more of the group delivers: the outpost tips on the delivery that completes a strict majority; the tick logs `pendingConsensusForDigest(own digest)` at debug, and a failed read of it only drops the tally from that line |
 
 **Each call is funded to what it has left to carry** (`delivery_gas_budget`): a fixed cost, a per-byte cost,
 an allowance per attestation the cursor says is still to dispatch, and the emit — doubled for each call this
@@ -188,8 +187,8 @@ relay's digest) first reads the outpost again at the read confirmation's block. 
 epoch closed or tipped, or this relay's delivery recorded, the tick ends in
 `outpost_delivery_incomplete_exception` and the next tick checks again, sending nothing while the head still
 shows the delivery. A delivery that a reorg removes before it is that deep is seen missing at the head on a
-later tick and delivered again. After the epoch boundary, the job keeps retrying
-until this operator's inbound reply is recorded by the depot.
+later tick and delivered again. The job calls every tick until the depot records this operator's inbound
+reply; a recorded delivery sends nothing, so those calls cost only the reads.
 
 ### In-flight transactions
 
@@ -249,9 +248,11 @@ delivery then goes out at the next nonce from the outpost's state.
 
 ### Inbound reads
 
-`read_inbound_envelope` makes one `getLatestOutboundEnvelope` view call, and `read_emitted_envelope_digest`
-(the underwriter's check) one `outboundEnvelopes(epoch)` call, at the client's **read confirmation**, never
-at the head. WIRE consensus on inbound is committed forward against this read, so an operator that read a
+`read_inbound_envelope` makes one `getLatestOutboundEnvelope` view call, `read_emitted_envelope_digest`
+(the underwriter's check) one `outboundEnvelopes(epoch)` call, and `read_outbound_backlog` one
+`pendingOutbound()` call (the latest epoch the outpost emitted for, its queued message count and its oldest
+queued message's timestamp in milliseconds, zero while the queue is empty), each at the client's **read
+confirmation**, never at the head. WIRE consensus on inbound is committed forward against this read, so an operator that read a
 slot a reorg then removes could reach WIRE-side consensus on it. The decoded result's epoch is compared with
 the requested one and a mismatch returns an empty vector at debug level, since observing the preceding epoch
 is normal until the `epochIn` that emits this one overwrites the slot.
@@ -273,7 +274,8 @@ warning level when it starts and at info level when it ends.
 **Each operator chooses its own read confirmation, and bears the consequences.** Consensus is what the group's
 majority delivers. An operator reading weaker than its group delivers first, and across a reorg deeper than
 its setting can deliver an envelope the chain no longer holds and be slashed for it. One reading stronger
-delivers after the group has reached consensus, so its delivery is a no-op recorded as a miss each epoch; and
+delivers after the group has reached consensus: its delivery is recorded while the depot still takes it, in
+the epoch or within the chain's late-delivery window, and is a miss after that; and
 across a reorg deeper than the group's setting, the group's envelope is the canonical one and it is the
 minority. Reading as the group does is the setting that avoids both.
 
@@ -411,9 +413,8 @@ Per-client runtime lines are prefixed with the SPI label `outpost_ethereum_clien
 - `epochIn delivered|continued epoch=... bytes=... gas=... block=... tx=... — recorded=... tipped=...
   dispatched=... finalized=...` for each confirmed call, summarising the `OPPInbound` events in its receipt.
 - `skipping epoch=... delivery — the outpost has already finalized it`, `tipped on a digest this relay did
-  not deliver`, `delivery already recorded; consensus not tipped`, `re-delivering to run the boundary tip`
-  and `not delivered — the outpost is still on epoch ...` for each decision that sends nothing (or
-  re-sends).
+  not deliver`, `delivery already recorded; consensus not tipped (agreeing=... group=...)` and `not
+  delivered — the outpost is still on epoch ...` for each decision that sends nothing.
 - `refused at ... gas (...); retrying at the ceiling` at warning level for a gas refusal below the ceiling,
   and `cannot advance past attestation N at the ceiling` at error level — once per cursor position — when
   no funding carries the attestation there; `still open after N calls in one tick` at warning level when
@@ -447,7 +448,7 @@ independent clients and cancellation), signature-provider rejection cases, contr
 ABI encoding, the
 delivery decision table, settlement and receipt classification, the gas budget and ceilings, and every
 delivery path — one call, tip-and-spill continued in the same tick, resume from a tipped cursor, minority
-and never-delivered digests, consensus retry gated on the outpost's own majority view, pinned-block reads,
+and never-delivered digests, a recorded untipped delivery that sends nothing, pinned-block reads,
 escalation after a call that advanced nothing and the stall report at the ceiling, revert classification,
 outpost behind, the per-tick bound, epoch advanced, deadline abandonment, and the empty and over-cap
 rejections — the read confirmation (each tag, the depth, the finalized block when fresher, the finality-lag
@@ -464,7 +465,9 @@ replacement that beats a signing the read backend does not show, a cancel at the
 cap when the market asks for more, a journaled call outbid when something
 else holds its nonce, the check before every send, the replacement and outbid fees and the per-transaction
 caps, and the network hash
-of a signed transaction against foundry's vectors — and the outpost crank: idle without the pool ABI or a registered handler, binding the
+of a signed transaction against foundry's vectors — the outbound backlog read (`pendingOutbound()` at the read
+confirmation: a queued and an empty backlog, a malformed or missing result, an ABI without the view) — and the
+outpost crank: idle without the pool ABI or a registered handler, binding the
 registered pool and re-binding on a change, the pool's own three refusals, unrecognised reverts and protocol
 errors, and deadline abandonment.
 `outpost_ethereum_transaction_policy_tests` covers the expenditure-policy boundary: that a rejection happens

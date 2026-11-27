@@ -2224,6 +2224,11 @@ BOOST_AUTO_TEST_CASE(epoch_deliveries_shape_rejects_drifted_declarations) try {
    cases.push_back({"dispatched_count declared u64",
                     {{"consensus_reached", bool_t},
                      {"dispatched_count", prim(idl::primitive_type::u64)}}});
+   cases.push_back({"deliveries dropped", {{"consensus_reached", bool_t}, {"dispatched_count", u32_t}}});
+   cases.push_back({"deliveries declared bytes",
+                    {{"deliveries", prim(idl::primitive_type::bytes)},
+                     {"consensus_reached", bool_t},
+                     {"dispatched_count", u32_t}}});
 
    for (const auto& c : cases) {
       BOOST_TEST_CONTEXT(c.name) {
@@ -2241,6 +2246,82 @@ BOOST_AUTO_TEST_CASE(epoch_deliveries_shape_rejects_drifted_declarations) try {
    BOOST_CHECK_THROW(assert_epoch_deliveries_shape(named_account_program("EpochDeliveries", {}, false)),
                      fc::assert_exception);
 } FC_LOG_AND_RETHROW();
+namespace {
+
+/// An `EpochDeliveries` row as the loaded IDL renders it, with one recorded delivery per key of `deliverers`.
+fc::variant_object epoch_deliveries_row(const std::vector<solana_public_key>& deliverers, bool consensus_reached,
+                                        uint32_t dispatched_count) {
+   fc::variants deliveries;
+   for (const solana_public_key& deliverer : deliverers) {
+      deliveries.emplace_back(fc::mutable_variant_object()("operator", deliverer.to_string(fc::yield_function_t{}))(
+         "envelope_hash", fc::variants(32, fc::variant(0))));
+   }
+   return fc::mutable_variant_object()("bump", 1)("epoch_index", 9)("deliveries", std::move(deliveries))(
+      "consensus_reached", consensus_reached)("dispatched_count", dispatched_count);
+}
+
+} // anonymous namespace
+
+/// The progress read finds this relay among the recorded deliverers, and reads consensus and the cursor beside it;
+/// a row without a field it needs is a failed read.
+BOOST_AUTO_TEST_CASE(epoch_dispatch_progress_finds_this_relays_delivery) try {
+   using sysio::outpost_solana_client_detail::decode_epoch_dispatch_progress;
+   const solana_public_key self  = measurement_pubkey(7);
+   const solana_public_key peer  = measurement_pubkey(8);
+   const solana_public_key other = measurement_pubkey(9);
+
+   const auto recorded = decode_epoch_dispatch_progress(epoch_deliveries_row({peer, self}, true, 4), self);
+   BOOST_CHECK(recorded.delivered_by_self);
+   BOOST_CHECK(recorded.consensus_reached);
+   BOOST_CHECK_EQUAL(recorded.dispatched_count, 4u);
+
+   const auto peers_only = decode_epoch_dispatch_progress(epoch_deliveries_row({peer, other}, false, 0), self);
+   BOOST_CHECK(!peers_only.delivered_by_self);
+   BOOST_CHECK(!peers_only.consensus_reached);
+   BOOST_CHECK(!decode_epoch_dispatch_progress(epoch_deliveries_row({}, false, 0), self).delivered_by_self);
+
+   for (const auto* dropped : {"deliveries", "consensus_reached", "dispatched_count"}) {
+      BOOST_TEST_CONTEXT("without " << dropped) {
+         fc::mutable_variant_object row(epoch_deliveries_row({self}, false, 0));
+         row.erase(dropped);
+         BOOST_CHECK_THROW(decode_epoch_dispatch_progress(row, self), fc::exception);
+      }
+   }
+} FC_LOG_AND_RETHROW();
+
+/// A delivery is sent until the outpost records it under this relay; a recorded one only for the reseedable epoch
+/// while it has not tipped, where a reseeded group's recorded majority tips only on a re-sent terminal, and at most
+/// once per `RESEEDABLE_RESEND_INTERVAL`.
+BOOST_AUTO_TEST_CASE(a_recorded_delivery_is_sent_again_only_for_an_untipped_reseedable_epoch) try {
+   using sysio::outpost_solana_client_detail::epoch_dispatch_progress;
+   using sysio::outpost_solana_client_detail::sends_delivery;
+   using sysio::outpost_solana_client_detail::RESEEDABLE_EPOCH;
+   using sysio::outpost_solana_client_detail::RESEEDABLE_RESEND_INTERVAL;
+   constexpr uint32_t later_epoch = RESEEDABLE_EPOCH + 1;
+   const epoch_dispatch_progress fresh{};
+   const epoch_dispatch_progress tipped_by_peers{.consensus_reached = true, .dispatched_count = 2};
+   const epoch_dispatch_progress recorded{.delivered_by_self = true};
+   const epoch_dispatch_progress recorded_tipped{.consensus_reached = true, .delivered_by_self = true};
+   const fc::time_point          now = fc::time_point::now();
+   const fc::time_point          never_resent;
+   const fc::time_point          just_resent = now - RESEEDABLE_RESEND_INTERVAL + fc::milliseconds(1);
+
+   for (const uint32_t epoch : {RESEEDABLE_EPOCH, later_epoch}) {
+      BOOST_TEST_CONTEXT("epoch " << epoch) {
+         for (const fc::time_point last_resend : {never_resent, just_resent}) {
+            BOOST_CHECK(sends_delivery(epoch, fresh, now, last_resend));
+            BOOST_CHECK(sends_delivery(epoch, tipped_by_peers, now, last_resend));
+            BOOST_CHECK(!sends_delivery(epoch, recorded_tipped, now, last_resend));
+         }
+      }
+   }
+   BOOST_CHECK(sends_delivery(RESEEDABLE_EPOCH, recorded, now, never_resent));
+   BOOST_CHECK(!sends_delivery(later_epoch, recorded, now, never_resent));
+   // Re-sent within the interval: held until it has passed.
+   BOOST_CHECK(!sends_delivery(RESEEDABLE_EPOCH, recorded, now, just_resent));
+   BOOST_CHECK(sends_delivery(RESEEDABLE_EPOCH, recorded, just_resent + RESEEDABLE_RESEND_INTERVAL, just_resent));
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_CASE(distribution_state_shape_accepts_a_pubkey_mint_and_rejects_drift) try {
    using sysio::outpost_solana_client_detail::assert_distribution_state_shape;
 
@@ -4199,6 +4280,166 @@ BOOST_AUTO_TEST_CASE(chunk_reap_gates_reject_wrong_account_count) try {
    BOOST_CHECK_THROW(reap_detail::decode_envelope_chunk_reap_gates(client, accounts), fc::exception);
 } FC_LOG_AND_RETHROW();
 
+namespace {
+
+/// The outbound backlog's two accounts as the program lays them out, and the values the tests read back.
+namespace backlog_fixture {
+   constexpr auto buffer_name  = "OutboundMessageBuffer";
+   constexpr auto latest_name  = "LatestOutboundEnvelope";
+   constexpr auto count_field  = "attestation_count";
+   constexpr uint32_t emitted_epoch     = 17;
+   constexpr uint16_t queued            = 3;
+   /// The buffer's unused `next_swap_id`, nonzero so a read that took it for an age would show.
+   constexpr uint64_t next_swap_id      = 1'800'000'123;
+   constexpr uint32_t used_data_bytes   = 211;
+   constexpr uint8_t  bump              = 0xFE;
+   constexpr uint8_t  version           = 1;
+   constexpr size_t   account_count     = 2;
+   /// The shared RPC slice: the buffer's count ends at byte 22, the latest epoch at byte 13.
+   constexpr size_t   header_bytes      = 22;
+   /// Where the buffer's count and the latest epoch end: a header one byte shorter truncates the field.
+   constexpr std::array<size_t, account_count> field_ends = {22, 13};
+   constexpr std::array<const char*, account_count> account_names = {buffer_name, latest_name};
+   constexpr uint32_t foreign_program_seed = 43;
+   /// A descriptor's bytes (`AttestationDesc`: offset u32, len u32, attestation_type i32).
+   constexpr size_t descriptor_bytes = 12;
+}
+
+/// An `OutboundMessageBuffer` header as the program lays it out: discriminator, `next_swap_id` u64,
+/// `used_data_bytes` u32, `attestation_count` u16, bump, version, then one zeroed descriptor of the tail.
+std::vector<uint8_t> outbound_buffer_header(uint16_t count) {
+   using namespace backlog_fixture;
+   borsh::encoder enc;
+   const auto disc = idl::compute_account_discriminator(buffer_name);
+   enc.write_fixed_bytes(disc.data(), disc.size());
+   enc.write_u64(next_swap_id);
+   enc.write_u32(used_data_bytes);
+   enc.write_u16(count);
+   enc.write_u8(bump);
+   enc.write_u8(version);
+   const std::array<uint8_t, descriptor_bytes> descriptor{};
+   enc.write_fixed_bytes(descriptor.data(), descriptor.size());
+   return enc.data();
+}
+
+/// Both backlog accounts, the buffer holding `count` attestations.
+std::vector<std::optional<account_info>> backlog_accounts(uint16_t count = backlog_fixture::queued) {
+   const std::array<uint8_t, 32> hash{};
+   return {program_owned(outbound_buffer_header(count)),
+           program_owned(integrated_latest_account(backlog_fixture::emitted_epoch, {}, hash))};
+}
+
+} // anonymous namespace
+
+/// A queued buffer reports its count and the latest emitted epoch, each from its own account and offset, and no age:
+/// the buffer does not date its backlog, and the depot counts a zero age as the report's time.
+BOOST_AUTO_TEST_CASE(outbound_backlog_decodes_a_queued_buffer) try {
+   auto client = resume_program_client();
+   const sysio::outbound_backlog backlog = reap_detail::decode_outbound_backlog(client, backlog_accounts());
+   BOOST_CHECK_EQUAL(backlog.outbound_epoch, backlog_fixture::emitted_epoch);
+   BOOST_CHECK_EQUAL(backlog.pending_count, backlog_fixture::queued);
+   BOOST_CHECK_EQUAL(backlog.oldest_pending_ms, 0u);
+
+   // The RPC's header-only slice decodes the same.
+   auto sliced = backlog_accounts();
+   for (auto& info : sliced) info->data.resize(std::min(info->data.size(), backlog_fixture::header_bytes));
+   const sysio::outbound_backlog from_slice = reap_detail::decode_outbound_backlog(client, sliced);
+   BOOST_CHECK_EQUAL(from_slice.outbound_epoch, backlog.outbound_epoch);
+   BOOST_CHECK_EQUAL(from_slice.pending_count, backlog.pending_count);
+   BOOST_CHECK_EQUAL(from_slice.oldest_pending_ms, 0u);
+} FC_LOG_AND_RETHROW();
+
+/// An empty buffer reports no backlog, with the latest emitted epoch.
+BOOST_AUTO_TEST_CASE(outbound_backlog_of_an_empty_buffer_is_empty) try {
+   auto client = resume_program_client();
+   const sysio::outbound_backlog backlog = reap_detail::decode_outbound_backlog(client, backlog_accounts(0));
+   BOOST_CHECK_EQUAL(backlog.pending_count, 0u);
+   BOOST_CHECK_EQUAL(backlog.oldest_pending_ms, 0u);
+   BOOST_CHECK_EQUAL(backlog.outbound_epoch, backlog_fixture::emitted_epoch);
+} FC_LOG_AND_RETHROW();
+
+/// The boot probe accepts the deployed declaration and refuses, naming the account, one whose `attestation_count` is not
+/// the u16 at byte 20 the backlog read takes: moved by a narrower field before it, moved ahead, widened, or missing.
+BOOST_AUTO_TEST_CASE(outbound_backlog_count_offset_is_checked_at_boot) try {
+   auto client = resume_program_client();
+   BOOST_CHECK_NO_THROW(reap_detail::assert_outbound_backlog_shape(client));
+
+   const auto with_fields = [](const std::function<void(std::vector<idl::field>&)>& edit) {
+      auto prog = load_idl_fixture(opp_outpost_idl_fixture);
+      auto type = std::ranges::find_if(prog.types, [](const idl::type_def& t) {
+         return t.name == backlog_fixture::buffer_name;
+      });
+      BOOST_REQUIRE(type != prog.types.end());
+      BOOST_REQUIRE(type->struct_fields.has_value());
+      edit(*type->struct_fields);
+      return prog;
+   };
+   const auto count_of = [](std::vector<idl::field>& fields) {
+      auto field = std::ranges::find_if(fields, [](const idl::field& f) {
+         return f.name == backlog_fixture::count_field;
+      });
+      BOOST_REQUIRE(field != fields.end());
+      return field;
+   };
+   const auto refused = [](idl::program prog) {
+      auto changed = resume_program_client(std::move(prog));
+      BOOST_CHECK_EXCEPTION(reap_detail::assert_outbound_backlog_shape(changed), fc::exception,
+                            [](const fc::exception& e) { return gate_error_names(e, backlog_fixture::buffer_name); });
+   };
+   const idl::idl_type u32 = idl::idl_type::make_primitive(idl::primitive_type::u32);
+   refused(with_fields([&](std::vector<idl::field>& fields) { fields.front().type = u32; }));
+   refused(with_fields([&](std::vector<idl::field>& fields) { std::iter_swap(fields.begin(), count_of(fields)); }));
+   refused(with_fields([&](std::vector<idl::field>& fields) { count_of(fields)->type = u32; }));
+   refused(with_fields([&](std::vector<idl::field>& fields) { count_of(fields)->name = "pending"; }));
+
+   auto without = load_idl_fixture(opp_outpost_idl_fixture);
+   std::erase_if(without.accounts, [](const idl::account& a) { return a.name == backlog_fixture::buffer_name; });
+   refused(std::move(without));
+} FC_LOG_AND_RETHROW();
+
+/// Each account must be present, non-empty, the program's, carrying its discriminator and its whole field; the
+/// diagnostic names the account that is not.
+BOOST_AUTO_TEST_CASE(outbound_backlog_refuses_invalid_accounts) try {
+   auto client = resume_program_client();
+   const auto names = [](size_t i) {
+      return [i](const fc::exception& e) { return gate_error_names(e, backlog_fixture::account_names[i]); };
+   };
+   for (size_t i = 0; i < backlog_fixture::account_count; ++i) {
+      BOOST_TEST_CONTEXT("account " << backlog_fixture::account_names[i]) {
+         auto absent = backlog_accounts();
+         absent[i] = std::nullopt;
+         BOOST_CHECK_EXCEPTION(reap_detail::decode_outbound_backlog(client, absent), fc::exception, names(i));
+
+         auto empty = backlog_accounts();
+         empty[i]->data.clear();
+         BOOST_CHECK_EXCEPTION(reap_detail::decode_outbound_backlog(client, empty), fc::exception, names(i));
+
+         auto foreign = backlog_accounts();
+         foreign[i]->owner = measurement_pubkey(backlog_fixture::foreign_program_seed);
+         BOOST_CHECK_EXCEPTION(reap_detail::decode_outbound_backlog(client, foreign), fc::exception, names(i));
+
+         auto unknown = backlog_accounts();
+         unknown[i]->data.front() ^= 1;
+         BOOST_CHECK_EXCEPTION(reap_detail::decode_outbound_backlog(client, unknown), fc::exception, names(i));
+
+         auto short_data = backlog_accounts();
+         short_data[i]->data.resize(backlog_fixture::field_ends[i] - 1);
+         BOOST_CHECK_EXCEPTION(reap_detail::decode_outbound_backlog(client, short_data), fc::exception, names(i));
+      }
+   }
+   // The two accounts swapped: neither carries the other's discriminator.
+   auto swapped = backlog_accounts();
+   std::swap(swapped[0], swapped[1]);
+   BOOST_CHECK_THROW(reap_detail::decode_outbound_backlog(client, swapped), fc::exception);
+   // A short or long RPC result is not the ordered pair the decoder requires.
+   auto accounts = backlog_accounts();
+   accounts.pop_back();
+   BOOST_CHECK_THROW(reap_detail::decode_outbound_backlog(client, accounts), fc::exception);
+   accounts = backlog_accounts();
+   accounts.push_back(std::nullopt);
+   BOOST_CHECK_THROW(reap_detail::decode_outbound_backlog(client, accounts), fc::exception);
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_CASE(chunk_buffer_discovery_filters_on_discriminator_and_operator) try {
    const auto me    = measurement_pubkey(7);
    const auto disc  = idl::compute_account_discriminator(std::string{envelope_chunks_name});
@@ -4451,6 +4692,9 @@ struct chunk_member_client : sysio::outpost_solana_client {
       return tallies;
    }
 
+   /// Nothing is recorded for the epoch yet, so a delivery past the settled check goes on to its upload.
+   reap_detail::epoch_dispatch_progress read_epoch_dispatch_progress(uint32_t) override { return {}; }
+
    /// Observe the exact account, commitment and scoped deadline used to reconcile cleanup errors.
    std::optional<account_info> read_envelope_chunk_buffer(
       const solana_public_key& address, commitment_t commitment) override {
@@ -4466,14 +4710,14 @@ struct chunk_member_client : sysio::outpost_solana_client {
    bool allow_upload = false;
 
    /// Exercise the real gate reader and decoder, asserting the ordered RPC arguments.
-   std::vector<std::optional<account_info>> read_chunk_reap_accounts(
+   std::vector<std::optional<account_info>> read_multiple_accounts(
       const std::vector<solana_public_key>& accounts, commitment_t commitment,
       const std::optional<data_slice>& slice) override {
       ++gate_reads;
       BOOST_REQUIRE(slice);
       BOOST_CHECK_EQUAL(slice->offset, 0u);
       BOOST_CHECK_EQUAL(slice->length, reap_gate_fixture::header_bytes);
-      if (use_rpc_reads) return outpost_solana_client::read_chunk_reap_accounts(accounts, commitment, slice);
+      if (use_rpc_reads) return outpost_solana_client::read_multiple_accounts(accounts, commitment, slice);
       const auto expected = resume_program_client();
       BOOST_REQUIRE_EQUAL(accounts.size(), reap_gate_fixture::account_count);
       BOOST_CHECK(accounts[0] == expected.config_pda);
@@ -4580,6 +4824,9 @@ struct chunk_visibility_client : sysio::outpost_solana_client {
    /// No older buffers or tallies need cleanup in these delivery scenarios.
    std::vector<reap_detail::reapable_account> read_own_envelope_chunk_buffers() override { return {}; }
    std::vector<reap_detail::reapable_account> read_own_epoch_deliveries() override { return {}; }
+
+   /// Nothing is recorded for the epoch yet, so the delivery goes out; the scripted RPC covers its upload alone.
+   reap_detail::epoch_dispatch_progress read_epoch_dispatch_progress(uint32_t) override { return {}; }
 
    /// Preserve the real HTTP boundary and observe that every visibility read shares the delivery scope.
    std::optional<account_info> read_envelope_chunk_buffer(const solana_public_key& address,
@@ -5483,6 +5730,181 @@ BOOST_AUTO_TEST_CASE(chunk_sweep_deadline_stop_backoff_logs_warning) try {
          BOOST_CHECK_EQUAL(std::count(warning.begin(), warning.end(), '\n'), 2);
       }
    }
+} FC_LOG_AND_RETHROW();
+
+namespace {
+
+/// The real `read_outbound_backlog` member over a scripted `getMultipleAccounts`, recording what it asked for.
+struct backlog_member_client : sysio::outpost_solana_client {
+   explicit backlog_member_client(sysio::solana_client_entry_ptr entry)
+      : outpost_solana_client(std::move(entry), resume_program_id, {load_idl_fixture(opp_outpost_idl_fixture)},
+                              1, 1, sysio::solana_outpost_role::batch_operator) {}
+
+   std::vector<solana_public_key>           requested;
+   std::optional<commitment_t>              commitment;
+   std::optional<data_slice>                slice;
+   std::vector<std::optional<account_info>> response = backlog_accounts();
+   uint32_t                                 reads = 0;
+
+   std::vector<std::optional<account_info>> read_multiple_accounts(
+      const std::vector<solana_public_key>& accounts, commitment_t read_commitment,
+      const std::optional<data_slice>& read_slice) override {
+      ++reads;
+      requested  = accounts;
+      commitment = read_commitment;
+      slice      = read_slice;
+      return response;
+   }
+};
+
+} // anonymous namespace
+
+/// One `getMultipleAccounts` at `confirmed` reads the buffer and the latest outbound envelope, header-only.
+BOOST_FIXTURE_TEST_CASE(read_outbound_backlog_reads_both_accounts_at_confirmed, chunk_member_fixture) try {
+   backlog_member_client client(entry);
+   const sysio::outbound_backlog backlog = client.read_outbound_backlog(fc::seconds(5));
+   BOOST_CHECK_EQUAL(backlog.outbound_epoch, backlog_fixture::emitted_epoch);
+   BOOST_CHECK_EQUAL(backlog.pending_count, backlog_fixture::queued);
+   BOOST_CHECK_EQUAL(backlog.oldest_pending_ms, 0u);
+
+   const auto expected = resume_program_client();
+   BOOST_CHECK_EQUAL(client.reads, 1u);
+   BOOST_REQUIRE_EQUAL(client.requested.size(), backlog_fixture::account_count);
+   BOOST_CHECK(client.requested[0] == expected.outbound_message_buffer_pda);
+   BOOST_CHECK(client.requested[1] == expected.latest_outbound_envelope_pda);
+   BOOST_REQUIRE(client.commitment);
+   BOOST_CHECK(*client.commitment == commitment_t::confirmed);
+   BOOST_REQUIRE(client.slice);
+   BOOST_CHECK_EQUAL(client.slice->offset, 0u);
+   BOOST_CHECK_EQUAL(client.slice->length, backlog_fixture::header_bytes);
+
+   // A malformed account propagates rather than reading as an empty backlog.
+   client.response[0] = std::nullopt;
+   BOOST_CHECK_THROW(client.read_outbound_backlog(fc::seconds(5)), fc::exception);
+   // An expired deadline reads nothing.
+   const uint32_t reads = client.reads;
+   BOOST_CHECK_THROW(client.read_outbound_backlog(fc::microseconds(0)), fc::timeout_exception);
+   BOOST_CHECK_EQUAL(client.reads, reads);
+} FC_LOG_AND_RETHROW();
+
+namespace {
+
+/// The real `deliver_outbound_envelope` up to its upload, over a scripted delivery record and settlement cursor. The
+/// upload's first read, `read_first_unstaged_chunk`, throws (`chunk_member_client`), so a delivery that goes out shows
+/// as that throw and one counted resume read.
+struct recorded_delivery_client : chunk_member_client {
+   using chunk_member_client::chunk_member_client;
+
+   /// What the delivery record read answers; nullopt throws, standing in for a failed read.
+   std::optional<reap_detail::epoch_dispatch_progress> progress;
+   /// The first record read times out instead of answering.
+   bool                                                progress_timeout = false;
+   uint32_t                                            progress_reads = 0;
+   /// The scoped deadline the first record read ran under.
+   std::optional<fc::time_point>                       progress_deadline;
+   /// The outpost's settlement cursor: the epoch it accepts next.
+   uint32_t                                            next_epoch = 0;
+
+   reap_detail::epoch_dispatch_progress read_epoch_dispatch_progress(uint32_t) override {
+      if (++progress_reads == 1) {
+         progress_deadline = fc::task::current_deadline();
+         if (progress_timeout) FC_THROW_EXCEPTION(fc::timeout_exception, "scripted EpochDeliveries read timeout");
+      }
+      if (!progress) FC_THROW("scripted EpochDeliveries read failure");
+      return *progress;
+   }
+   reap_detail::envelope_chunk_reap_gates read_envelope_chunk_reap_gates() override {
+      return {.next_epoch_index = next_epoch, .latest_outbound_epoch = next_epoch - 1};
+   }
+};
+
+} // anonymous namespace
+
+/// A delivery the outpost recorded under this relay sends nothing, outside the reseedable epoch's paced re-send, and
+/// drains a tipped epoch; one it has not, or whose record cannot be read in time, goes out.
+BOOST_FIXTURE_TEST_CASE(deliver_sends_nothing_for_a_recorded_delivery, chunk_member_fixture) try {
+   using reap_detail::RESEEDABLE_EPOCH;
+   constexpr uint32_t epoch = RESEEDABLE_EPOCH + 4;
+   const std::vector<char> envelope{'e', 'n', 'v'};
+   const auto deliver = [&](recorded_delivery_client& client, uint32_t at_epoch) {
+      return client.deliver_outbound_envelope(at_epoch, envelope, fc::seconds(5));
+   };
+
+   // Recorded and untipped: awaits its peers without touching its upload.
+   recorded_delivery_client recorded(entry);
+   recorded.next_epoch = epoch;
+   recorded.progress   = reap_detail::epoch_dispatch_progress{.delivered_by_self = true};
+   BOOST_CHECK(deliver(recorded, epoch).empty());
+   BOOST_CHECK_EQUAL(recorded.progress_reads, 1u);
+   BOOST_CHECK_EQUAL(recorded.resume_reads, 0u);
+
+   // Not recorded: the upload starts.
+   recorded_delivery_client fresh(entry);
+   fresh.next_epoch = epoch;
+   fresh.progress   = reap_detail::epoch_dispatch_progress{};
+   BOOST_CHECK_THROW(deliver(fresh, epoch), std::runtime_error);
+   BOOST_CHECK_EQUAL(fresh.resume_reads, 1u);
+
+   // An unreadable record is not known recorded: the upload starts.
+   recorded_delivery_client unreadable(entry);
+   unreadable.next_epoch = epoch;
+   BOOST_CHECK_THROW(deliver(unreadable, epoch), std::runtime_error);
+   BOOST_CHECK_EQUAL(unreadable.progress_reads, 1u);
+   BOOST_CHECK_EQUAL(unreadable.resume_reads, 1u);
+
+   // The record read runs under the settled check's short budget, not the delivery's, and one that runs out of it
+   // is not known recorded: the upload starts.
+   recorded_delivery_client stalled(entry);
+   stalled.next_epoch       = epoch;
+   stalled.progress         = reap_detail::epoch_dispatch_progress{.delivered_by_self = true};
+   stalled.progress_timeout = true;
+   const fc::time_point before_stalled = fc::time_point::now();
+   BOOST_CHECK_THROW(stalled.deliver_outbound_envelope(epoch, envelope, fc::minutes(1)), std::runtime_error);
+   BOOST_REQUIRE(stalled.progress_deadline);
+   BOOST_CHECK(*stalled.progress_deadline <=
+               fc::time_point::now() + reap_detail::ENVELOPE_CHUNK_SETTLED_CHECK_BUDGET);
+   BOOST_CHECK(*stalled.progress_deadline < before_stalled + fc::minutes(1));
+   BOOST_CHECK_EQUAL(stalled.resume_reads, 1u);
+
+   // The reseedable epoch, recorded and untipped: the terminal goes out again, then not again within the interval.
+   recorded_delivery_client reseeded(entry);
+   reseeded.next_epoch = RESEEDABLE_EPOCH;
+   reseeded.progress   = reap_detail::epoch_dispatch_progress{.delivered_by_self = true};
+   BOOST_CHECK_THROW(deliver(reseeded, RESEEDABLE_EPOCH), std::runtime_error);
+   BOOST_CHECK_EQUAL(reseeded.resume_reads, 1u);
+   BOOST_CHECK(deliver(reseeded, RESEEDABLE_EPOCH).empty());
+   BOOST_CHECK_EQUAL(reseeded.progress_reads, 2u);
+   BOOST_CHECK_EQUAL(reseeded.resume_reads, 1u);
+
+   // Recorded and tipped: nothing is uploaded, the epoch's dispatch is drained, and the envelope is kept so the
+   // inbound read drains it again. One attestation with no effect accounts, already dispatched, drains with reads
+   // alone: the drain's gate and its round each read the record once.
+   const std::vector<char> decodable = envelope_with_entries({sysio::opp::AttestationEntry{}});
+   recorded_delivery_client tipped(entry);
+   tipped.next_epoch = epoch;
+   tipped.progress   = reap_detail::epoch_dispatch_progress{
+        .consensus_reached = true, .dispatched_count = 1, .delivered_by_self = true};
+   tipped.inbound    = decodable;
+   BOOST_CHECK(tipped.deliver_outbound_envelope(epoch, decodable, fc::seconds(5)).empty());
+   BOOST_CHECK_EQUAL(tipped.resume_reads, 0u);
+   BOOST_CHECK_EQUAL(tipped.progress_reads, 3u);
+   BOOST_CHECK(tipped.read_inbound_envelope(epoch, fc::seconds(5)) == decodable);
+   BOOST_CHECK_EQUAL(tipped.progress_reads, 5u);
+   // Without the kept envelope the inbound read drains nothing.
+   recorded_delivery_client unkept(entry);
+   unkept.next_epoch = epoch;
+   unkept.progress   = tipped.progress;
+   unkept.inbound    = decodable;
+   BOOST_CHECK(unkept.read_inbound_envelope(epoch, fc::seconds(5)) == decodable);
+   BOOST_CHECK_EQUAL(unkept.progress_reads, 0u);
+
+   // A settled epoch reads no delivery record at all.
+   recorded_delivery_client settled(entry);
+   settled.next_epoch = epoch + 1;
+   settled.progress   = reap_detail::epoch_dispatch_progress{};
+   BOOST_CHECK(deliver(settled, epoch).empty());
+   BOOST_CHECK_EQUAL(settled.progress_reads, 0u);
+   BOOST_CHECK_EQUAL(settled.resume_reads, 0u);
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_SUITE_END()

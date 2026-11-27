@@ -6,6 +6,7 @@
 #include <future>
 #include <memory>
 #include <string>
+#include <sysio/chain/exceptions.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <utility>
 #include <variant>
@@ -15,7 +16,21 @@ namespace sysio::batch_operator_detail {
 namespace push_action_log {
 inline constexpr auto success = "batch_operator: pushed {}::{} ok";
 inline constexpr auto failure = "batch_operator: push {}::{} failed: {}";
+inline constexpr auto refused = "batch_operator: push {}::{} refused: {}";
 } // namespace push_action_log
+
+/// How a push's refusal is logged: as an error, or at info for an action whose refusal is an expected race with
+/// chain state the relay read a poll earlier.
+enum class refusal_log {
+   error,
+   info
+};
+
+/// Whether `error` is the contract refusing a transaction: one of its checks failed.
+inline bool is_contract_refusal(const fc::exception& error) {
+   return error.code() == chain::sysio_assert_message_exception::code_value ||
+          error.code() == chain::sysio_assert_code_exception::code_value;
+}
 
 /// Owns completion notification for an asynchronous batch-operator action.
 ///
@@ -30,6 +45,10 @@ public:
 
    /// Whether the push completed and the transaction succeeded. Read after the future is ready.
    bool succeeded() const { return success.load(std::memory_order_acquire); }
+
+   /// Whether the push completed with the contract refusing the transaction (`is_contract_refusal`). Read after the
+   /// future is ready.
+   bool refused_by_contract() const { return refused.load(std::memory_order_acquire); }
 
    /// Invokes `on_complete` once, suppresses callback exceptions, and signals
    /// the waiter without allowing duplicate asynchronous completions to throw.
@@ -63,8 +82,12 @@ public:
       FailureHandler&& on_failure) {
       // `complete` runs this before returning, so the references cannot outlive what they name.
       return complete([this, &result, &on_success, &on_failure] {
+         const auto fail = [this, &on_failure](const fc::exception_ptr& error) {
+            refused.store(error && is_contract_refusal(*error), std::memory_order_release);
+            on_failure(error);
+         };
          if (const auto* error = std::get_if<fc::exception_ptr>(&result)) {
-            on_failure(*error);
+            fail(*error);
          } else if (std::holds_alternative<chain_apis::read_write::push_transaction_results>(result)) {
             success.store(true, std::memory_order_release);
             on_success();
@@ -73,7 +96,7 @@ public:
                chain::t_or_exception<chain_apis::read_write::push_transaction_results>()>>(result);
             const auto deferred_result = deferred();
             if (const auto* error = std::get_if<fc::exception_ptr>(&deferred_result)) {
-               on_failure(*error);
+               fail(*error);
             } else {
                success.store(true, std::memory_order_release);
                on_success();
@@ -85,19 +108,23 @@ public:
 private:
    std::atomic<bool> completed{false};
    std::atomic<bool> success{false};
+   std::atomic<bool> refused{false};
    std::promise<void> done;
 };
 
-/// Creates the transaction callback while retaining its API through deferred completion.
+/// Creates the transaction callback while retaining its API through deferred completion. A refusal is logged at
+/// `refusal`'s level.
 inline chain::plugin_interface::next_function<chain_apis::read_write::push_transaction_results>
 create_push_action_callback(std::shared_ptr<void> api_lifetime,
       std::shared_ptr<async_action_completion> completion,
       std::string contract,
-      std::string action_name) {
+      std::string action_name,
+      refusal_log refusal = refusal_log::error) {
    return [api_lifetime = std::move(api_lifetime),
            completion = std::move(completion),
            contract = std::move(contract),
-           action_name = std::move(action_name)](const auto& result) {
+           action_name = std::move(action_name),
+           refusal](const auto& result) {
       // `read_write::push_transaction` retains a raw `this` in its own callback.
       (void)api_lifetime;
       completion->complete_push_result(
@@ -105,8 +132,12 @@ create_push_action_callback(std::shared_ptr<void> api_lifetime,
          [&contract, &action_name] {
             ilog(push_action_log::success, contract, action_name);
          },
-         [&contract, &action_name](const fc::exception_ptr& error) {
-            elog(push_action_log::failure, contract, action_name, error->to_string());
+         [&contract, &action_name, refusal](const fc::exception_ptr& error) {
+            if (refusal == refusal_log::info) {
+               ilog(push_action_log::refused, contract, action_name, error->to_string());
+            } else {
+               elog(push_action_log::failure, contract, action_name, error->to_string());
+            }
          });
    };
 }

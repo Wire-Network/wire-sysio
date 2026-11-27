@@ -27,8 +27,11 @@
 #include <sysio/opp/depot/opreg_status.hpp>
 #include <sysio/services/cron_service.hpp>
 
+#include <fc/log/logger.hpp>
 #include <fc/slug_name.hpp>
 #include <fc/variant_object.hpp>
+
+#include <spdlog/sinks/ostream_sink.h>
 
 using namespace std::literals;
 
@@ -36,6 +39,7 @@ namespace {
 constexpr auto immediate_wait = 0ms;
 constexpr auto simulated_push_failure = "simulated push failure";
 constexpr auto simulated_deferred_push_failure = "simulated deferred push failure";
+constexpr auto simulated_contract_refusal = "simulated contract refusal";
 constexpr auto callback_failure_message = "callback failure";
 constexpr uint32_t expected_error_log_count = 1;
 
@@ -293,6 +297,43 @@ BOOST_AUTO_TEST_CASE(async_action_completion_handles_deferred_push_failure) try 
    BOOST_CHECK(done.wait_for(immediate_wait) == std::future_status::ready);
 } FC_LOG_AND_RETHROW();
 
+/// A failed push is the contract's refusal only when one of its checks failed, immediately or deferred; any other
+/// failure, and a success, is not.
+BOOST_AUTO_TEST_CASE(async_action_completion_tells_a_contract_refusal) try {
+   using push_result = sysio::chain::next_function_variant<sysio::chain_apis::read_write::push_transaction_results>;
+   using deferred_t  = sysio::chain::t_or_exception<sysio::chain_apis::read_write::push_transaction_results>;
+   const auto error_of = [](const auto& raise) {
+      try {
+         raise();
+      } catch (const fc::exception& error) {
+         return error.dynamic_copy_exception();
+      }
+      return fc::exception_ptr{};
+   };
+   const fc::exception_ptr assert_message = error_of([] {
+      FC_THROW_EXCEPTION(sysio::chain::sysio_assert_message_exception, simulated_contract_refusal);
+   });
+   const fc::exception_ptr assert_code = error_of([] {
+      FC_THROW_EXCEPTION(sysio::chain::sysio_assert_code_exception, simulated_contract_refusal);
+   });
+   const fc::exception_ptr other = error_of([] { FC_THROW_EXCEPTION(fc::assert_exception, simulated_push_failure); });
+   const auto refused = [](const push_result& result) {
+      sysio::batch_operator_detail::async_action_completion completion;
+      completion.complete_push_result(result, [] {}, [](const fc::exception_ptr&) {});
+      return completion.refused_by_contract();
+   };
+   const auto deferred = [](const fc::exception_ptr& error) {
+      return push_result{std::function<deferred_t()>{[error] { return deferred_t{error}; }}};
+   };
+
+   BOOST_CHECK(refused(push_result{assert_message}));
+   BOOST_CHECK(refused(push_result{assert_code}));
+   BOOST_CHECK(refused(deferred(assert_message)));
+   BOOST_CHECK(!refused(push_result{other}));
+   BOOST_CHECK(!refused(deferred(other)));
+   BOOST_CHECK(!refused(push_result{sysio::chain_apis::read_write::push_transaction_results{}}));
+} FC_LOG_AND_RETHROW();
+
 /// Callback-side exceptions are contained and still release the waiting relay job.
 BOOST_AUTO_TEST_CASE(async_action_completion_contains_callback_exceptions) {
    sysio::batch_operator_detail::async_action_completion completion;
@@ -339,6 +380,60 @@ BOOST_AUTO_TEST_CASE(push_action_callback_retains_api_after_timeout) {
    BOOST_CHECK(api_lifetime.expired());
    BOOST_CHECK(api_destroyed);
 }
+
+namespace {
+
+/// Capture error-level log lines while preserving the process-wide logger on every test exit path.
+struct error_log_capture {
+   std::ostringstream               output;
+   fc::log_level                    saved_level = fc::logger::default_logger().get_log_level();
+   std::unique_ptr<spdlog::logger>  saved_agent;
+
+   error_log_capture() {
+      auto sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(output);
+      sink->set_pattern("%v");
+      auto agent = std::make_unique<spdlog::logger>("push-refusal-test", sink);
+      agent->set_level(spdlog::level::err);
+      auto& logger = fc::logger::default_logger();
+      saved_agent = std::move(logger.get_agent_logger());
+      logger.update_agent_logger(std::move(agent));
+      logger.set_log_level(fc::log_level::error);
+   }
+
+   ~error_log_capture() {
+      auto& logger = fc::logger::default_logger();
+      logger.update_agent_logger(std::move(saved_agent));
+      logger.set_log_level(saved_level);
+   }
+};
+
+} // namespace
+
+/// A refusal is logged as an error by default, and below it for a push whose refusal is an expected race; either
+/// way the push completes unsucceeded.
+BOOST_AUTO_TEST_CASE(push_refusal_is_logged_at_the_level_the_push_asks_for) try {
+   using push_result = sysio::chain::next_function_variant<sysio::chain_apis::read_write::push_transaction_results>;
+   using sysio::batch_operator_detail::refusal_log;
+   fc::exception_ptr push_error;
+   try {
+      FC_THROW_EXCEPTION(fc::assert_exception, simulated_push_failure);
+   } catch (const fc::exception& error) {
+      push_error = error.dynamic_copy_exception();
+   }
+   for (const refusal_log refusal : {refusal_log::error, refusal_log::info}) {
+      error_log_capture capture;
+      auto completion = std::make_shared<sysio::batch_operator_detail::async_action_completion>();
+      auto done       = completion->get_future();
+      auto callback   = sysio::batch_operator_detail::create_push_action_callback(
+         std::shared_ptr<void>{}, completion, callback_lifetime_action::contract, callback_lifetime_action::name,
+         refusal);
+      callback(push_result{push_error});
+      BOOST_CHECK(done.wait_for(immediate_wait) == std::future_status::ready);
+      BOOST_CHECK(!completion->succeeded());
+      const bool logged_as_error = capture.output.str().find(simulated_push_failure) != std::string::npos;
+      BOOST_CHECK_EQUAL(logged_as_error, refusal == refusal_log::error);
+   }
+} FC_LOG_AND_RETHROW();
 
 /// Regression coverage for SEC-7: the private cron service must support adding
 /// and cancelling per-outpost jobs after startup, which is how refreshed active
@@ -520,8 +615,8 @@ BOOST_AUTO_TEST_CASE(serving_and_seated_left_members_relay) try {
    }
 } FC_LOG_AND_RETHROW();
 
-/// The relayed chains: SERVING (seated or not), LEFT while seated in that chain's own window; not LEFT without a
-/// seat, EVICTED though seated, or a chain with no membership.
+/// The relayed chains: SERVING (seated or not), LEFT while seated in that chain's own window or previous group; not
+/// LEFT without a seat, EVICTED though seated, or a chain with no membership.
 BOOST_AUTO_TEST_CASE(relayed_chains_follow_membership_and_seats) try {
    const chain_memberships memberships{{serving_chain.value, chain_service_status::SERVING},
                                        {left_seated_chain.value, chain_service_status::LEFT},
@@ -538,6 +633,9 @@ BOOST_AUTO_TEST_CASE(relayed_chains_follow_membership_and_seats) try {
    // Its seat on another chain does not keep a LEFT member on this one.
    const chain_memberships left_only{{left_free_chain.value, chain_service_status::LEFT}};
    BOOST_CHECK(relayed_chains(left_only, views).empty());
+   // A LEFT member whose last seat slid into the previous group still relays, to deliver that epoch late.
+   views.at(left_free_chain.value).in_previous_group = true;
+   BOOST_CHECK(relayed_chains(left_only, views) == std::set<uint64_t>{left_free_chain.value});
 } FC_LOG_AND_RETHROW();
 
 /// The own-status lookup is an exact read of the operator's `operators` row, keyed by its account's value.

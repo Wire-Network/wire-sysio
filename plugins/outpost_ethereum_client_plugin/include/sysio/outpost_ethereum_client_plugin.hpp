@@ -149,6 +149,12 @@ struct opp_contract_client : ethereum_contract_client {
    /// View `outboundEnvelopes(uint32)`. Empty when the loaded ABI does not declare it, so an older ABI still
    /// serves the relay, which never reads it.
    ethereum_contract_call_fn<fc::variant, uint32_t> outbound_envelopes;
+   /// The `pendingOutbound()` view's name: `(uint32 latestOutboundEpoch_, uint256 queuedMessageCount_,
+   /// uint64 oldestQueuedTimestampMs)`, the outpost's outbound backlog and the latest epoch it emitted for.
+   static constexpr auto view_pending_outbound = "pendingOutbound";
+   /// View `pendingOutbound()`. Empty when the loaded ABI does not declare it; `outpost_ethereum_client` refuses
+   /// such an ABI set at construction.
+   ethereum_contract_call_fn<fc::variant> pending_outbound;
 
    opp_contract_client(const ethereum_client_ptr& client,
                        const address_compat_type& contract_address,
@@ -158,7 +164,9 @@ struct opp_contract_client : ethereum_contract_client {
       , get_latest_outbound_envelope(create_call<fc::variant>(get_abi("getLatestOutboundEnvelope")))
       , outbound_envelopes(has_abi(view_outbound_envelopes)
                               ? create_call<fc::variant, uint32_t>(get_abi(view_outbound_envelopes))
-                              : ethereum_contract_call_fn<fc::variant, uint32_t>{}) {}
+                              : ethereum_contract_call_fn<fc::variant, uint32_t>{})
+      , pending_outbound(has_abi(view_pending_outbound) ? create_call<fc::variant>(get_abi(view_pending_outbound))
+                                                        : ethereum_contract_call_fn<fc::variant>{}) {}
 };
 
 /// EIP-7825's per-transaction gas cap (2^24) — the most any single `epochIn`
@@ -397,10 +405,9 @@ struct opp_inbound_contract_client : ethereum_contract_client {
    /// the outpost is processing.
    ethereum_contract_call_fn<fc::variant> pending_epoch_hash;
    /// `pendingConsensusForDigest(bytes32 digest)` view — how close the current
-   /// epoch is to tipping on `digest`: `(nextEpoch, agreeing, groupSize,
-   /// currentEpochStartedAtTs, epochDurationSec_)`. The relay reads it before a
-   /// consensus retry, so a re-delivery is sent only when the contract's own
-   /// path-2 predicate would fire. The digest rides as `0x`-hex.
+   /// epoch is to tipping on `digest`: `(nextEpoch, agreeing, groupSize)`. The
+   /// relay reads it to report how far a recorded, untipped epoch is from its
+   /// strict majority. The digest rides as `0x`-hex.
    ethereum_contract_call_fn<fc::variant, std::string> pending_consensus_for_digest;
    /// `attestationHandlers(uint16 attestationType)` view — the outpost's own
    /// inbound routing table: the `IOPPReceiver` registered for one attestation

@@ -93,7 +93,8 @@ inline chain_memberships decode_memberships(const fc::variants& rows, chain::nam
 }
 
 /// Whether this operator relays a chain it holds `status` on: SERVING, or LEFT while it still holds a seat in the
-/// chain's window, which it still delivers. An EVICTED member's deliveries are refused, so it does not relay.
+/// chain's window or sat in its previous group, which it still delivers. An EVICTED member's deliveries are refused,
+/// so it does not relay.
 inline bool relays_chain(chain_service_status status, bool seated) {
    switch (status) {
       case chain_service_status::SERVING: return true;
@@ -103,13 +104,14 @@ inline bool relays_chain(chain_service_status status, bool seated) {
    return false;
 }
 
-/// The chains this operator relays: each membership `relays_chain` accepts, seated per that chain's view (a chain
-/// without one seats nobody).
+/// The chains this operator relays: each membership `relays_chain` accepts, seated per that chain's view, in its
+/// window or its previous group (a chain without a view seats nobody).
 inline std::set<uint64_t> relayed_chains(const chain_memberships& memberships, const chain_epochs& views) {
    std::set<uint64_t> relayed;
    for (const auto& [chain_code, status] : memberships) {
       const auto view   = views.find(chain_code);
-      const bool seated = view != views.end() && view->second.election.my_group != GROUP_NONE;
+      const bool seated = view != views.end() &&
+                          (view->second.election.my_group != GROUP_NONE || view->second.in_previous_group);
       if (relays_chain(status, seated)) relayed.insert(chain_code);
    }
    return relayed;

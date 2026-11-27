@@ -30,6 +30,23 @@ namespace sysio {
 inline constexpr size_t OPP_MAX_ENVELOPE_BYTES = 32'768;
 
 /**
+ * @brief What an outpost has queued for WIRE and not yet emitted, read at one block or slot.
+ *
+ * The relay reports it to the depot (`sysio.msgch::reportqueue`) as the chain's outbound traffic, once the outpost has
+ * emitted the envelope of the depot's current epoch.
+ */
+struct outbound_backlog {
+   /// The latest WIRE epoch the outpost emitted an outbound envelope for; 0 before its first emit.
+   uint32_t outbound_epoch    = 0;
+   /// Messages (Ethereum) or attestations (Solana) queued for the next emit.
+   uint32_t pending_count     = 0;
+   /// When the backlog began, in milliseconds since the Unix epoch; 0 while nothing is queued, or when the outpost does
+   /// not date it, which the depot counts as the report's time. Ethereum reports its oldest queued message; Solana
+   /// reports 0.
+   uint64_t oldest_pending_ms = 0;
+};
+
+/**
  * @brief Chain-agnostic facade for OPP delivery on a single external outpost.
  *
  * This is the SPI (Service Provider Interface) between `batch_operator_plugin`
@@ -105,10 +122,12 @@ public:
     *                        remote chain for this call.
     * @return Chain-native transaction id / signature suitable for logs, or
     *         EMPTY when the relay found nothing to send (the outpost had already
-    *         settled it, or it settled on another relay's envelope). Neither a
-    *         signature nor an empty return permanently marks the job complete:
-    *         after the epoch boundary it retries each cron tick until inbound
-    *         delivery establishes completion.
+    *         settled it, it settled on another relay's envelope, or this relay's
+    *         delivery is already recorded and awaits the rest of the group).
+    *         Neither a signature nor an empty return marks the job complete: it
+    *         calls again each cron tick until the depot records this operator's
+    *         inbound delivery of the epoch, so a recorded delivery must send
+    *         nothing.
     * @throws chain::outpost_delivery_incomplete_exception when the epoch is
     *         left open for THIS relay to finish on a later tick; the job does
     *         not mark it handled.
@@ -125,8 +144,9 @@ public:
     * Filters by `epoch_index` internally. Ethereum and Solana each expose a
     * single latest-outbound storage slot, so a poll may still observe the
     * preceding epoch until the delivery that emits this one overwrites it.
-    * Delivering that stale envelope to `sysio.msgch::deliver` trips an
-    * `envelope epoch_index mismatch` assertion.
+    * `sysio.msgch::deliver` takes that stale envelope only as a late delivery of
+    * the preceding epoch's accepted envelope from the group that served it,
+    * within the chain's late window, and refuses it otherwise.
     *
     * @param epoch_index  Only envelopes whose `epoch_index` field matches this
     *                     value are returned; all others are silently dropped.
@@ -152,6 +172,16 @@ public:
     */
    virtual std::optional<fc::sha256> read_emitted_envelope_digest(uint32_t         epoch_index,
                                                                   fc::microseconds deadline) = 0;
+
+   /**
+    * @brief The outpost's outbound backlog and the latest epoch it emitted for, from ONE read at one block or slot,
+    *        so the count, its age and the epoch cannot disagree. Read at `confirmed` on Solana and at the client's
+    *        read confirmation on Ethereum.
+    *
+    * @param deadline  Upper bound on the total time spent talking to the remote chain for this call.
+    * @throws fc::exception on RPC failure, deadline expiry, or an outpost account or view that does not decode.
+    */
+   virtual outbound_backlog read_outbound_backlog(fc::microseconds deadline) = 0;
 
    /**
     * @brief OUTPOST CRANKS — drive the outpost's permissionless per-epoch

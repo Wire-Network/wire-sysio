@@ -45,7 +45,9 @@ public:
       deploy(SYSIO_ACCOUNT, contracts::system_wasm(), contracts::system_abi(), system_ser, true);
       deploy(EPOCH, contracts::epoch_wasm(), contracts::epoch_abi(), epoch_ser, true);
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH, epoch_ser, EPOCH, "setconfig"_n, mvo()("chain_code", EPOCH_CHAIN)
-         ("epoch_duration_sec", EPOCH_DURATION_SEC)("operators_per_epoch", 7)("batch_operator_minimum_active", 21)
+         ("epoch_duration_sec", EPOCH_DURATION_SEC)("traffic_wait_sec", 0)("late_window_sec", 0)
+         ("operators_per_epoch", 7)
+         ("batch_operator_minimum_active", 21)
          ("batch_op_groups", 3)("epoch_retention_envelope_log_count", 1000)));
       BOOST_REQUIRE_EQUAL(success(), configure_economy(unanchored_start()));
       const auto emission = mvo()

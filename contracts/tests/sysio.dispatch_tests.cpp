@@ -449,6 +449,8 @@ public:
          "setconfig"_n, mvo()
             ("chain_code",                          outpost_code)
             ("epoch_duration_sec",                  60)
+            ("traffic_wait_sec",                    0)
+            ("late_window_sec",                     0)
             ("operators_per_epoch",                 1)
             ("batch_operator_minimum_active",       1)
             ("batch_op_groups",                     1)
@@ -529,8 +531,11 @@ public:
       return v["current_epoch_index"].as<uint32_t>();
    }
 
-   /// Permissionless consensus-and-time crank that triggers the scheduled outpost's sysio.epoch::advance.
+   /// Record traffic on the scheduled outpost since its epoch start (`epoch_state::mark_traffic`), then push the
+   /// permissionless `chkcons` crank, which advances its decided epoch once that traffic makes it due.
    action_result chkcons() {
+      sysio_system::test_support::epoch_state::mark_traffic(*this, epoch_abi,
+                                                            fc::slug_name{dispatch_chain}.to_string());
       return push(MSGCH_ACCOUNT, msgch_abi, BATCHOP, "chkcons"_n, mvo()("chain_code", dispatch_chain));
    }
 
@@ -1435,7 +1440,7 @@ BOOST_FIXTURE_TEST_CASE(chkcons_advances_without_a_treasury, sysio_dispatch_test
    start_dispatch_chain();
    const uint32_t epoch0 = current_epoch();
 
-   // operators_per_epoch == 1, so a single delivery is Option-A unanimous consensus; apply_consensus
+   // operators_per_epoch == 1, so a single delivery is a strict majority of the group; apply_consensus
    // records the outpcons row for ETH at epoch0.
    auto operator_payload = encode_operator_action(
       sysio::opp::attestations::OperatorAction::ACTION_TYPE_DEPOSIT_REQUEST,
@@ -1523,7 +1528,8 @@ BOOST_FIXTURE_TEST_CASE(bootstrap_requires_every_active_outpost_scheduled, sysio
    setup_wire_token();
    enable_epoch_advancement();
    BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "setconfig"_n, mvo()
-      ("chain_code", base_chain)("epoch_duration_sec", 60)("operators_per_epoch", 1)
+      ("chain_code", base_chain)("epoch_duration_sec", 60)("traffic_wait_sec", 0)("late_window_sec", 0)
+      ("operators_per_epoch", 1)
       ("batch_operator_minimum_active", 1)("batch_op_groups", 1)("epoch_retention_envelope_log_count", 200)));
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
       ("kind", ChainKind::CHAIN_KIND_EVM)("code", base_chain)("external_chain_id", 8453)
@@ -1644,7 +1650,7 @@ BOOST_FIXTURE_TEST_CASE(forged_delivery_does_not_strand_chkcons, sysio_dispatch_
       deliver(eth_code, forged));
    produce_blocks();
 
-   // The valid delivery (operators_per_epoch == 1 => Option-A unanimous) reaches consensus normally.
+   // The valid delivery (operators_per_epoch == 1 => a strict majority) reaches consensus normally.
    BOOST_REQUIRE_EQUAL(success(), deliver(eth_code, valid));
    produce_blocks();
 

@@ -28,6 +28,15 @@ struct outbound_envelope_record {
 };
 
 /**
+ * @brief How a push of a depot action ended.
+ */
+enum class push_outcome {
+   accepted,   ///< the node accepted the transaction
+   refused,    ///< the contract refused it: one of its checks failed
+   unconfirmed ///< no answer from the contract: the push timed out, was never made, or failed otherwise
+};
+
+/**
  * @brief WIRE-side orchestration contract consumed by `outpost_opp_job`.
  *
  * Every method here reads or writes WIRE chain state — they belong to
@@ -52,31 +61,52 @@ struct depot_ops {
    /**
     * Ask `sysio.msgch::envelopes` whether we already pushed a
     * `sysio.msgch::deliver` for this outpost in this epoch. Used to guard the
-    * inbound path so a retrying cron job does not double-deliver.
+    * inbound path so a retrying cron job does not double-deliver, and as the
+    * outbound path's completion evidence.
     */
    virtual bool has_delivered_envelope(uint64_t chain_code, uint32_t epoch_index) = 0;
 
    /**
     * Push `sysio.msgch::deliver` with the concatenated inbound envelope bytes.
     * Synchronous — blocks on the action's future for at most the chain's
-    * delivery timeout.
+    * delivery timeout. `push_outcome::refused` only when `sysio.msgch` refused
+    * the delivery; a timeout or a push that could not be built is
+    * `push_outcome::unconfirmed`. A refusal or failure is logged by the push.
     */
-   virtual void deliver_to_depot(uint64_t                 chain_code,
-                                 const std::vector<char>& raw_messages) = 0;
+   virtual push_outcome deliver_to_depot(uint64_t                 chain_code,
+                                         const std::vector<char>& raw_messages) = 0;
+
+   /**
+    * Push `sysio.msgch::chkcons` for outpost `chain_code` when its last-read
+    * epoch state shows it due (`batch_operator_detail::pushes_chkcons_after_delivery`).
+    * Called right after this operator's own delivery of the chain's current
+    * epoch lands, which may have decided it, so a due chain advances without
+    * waiting for the next epoch tick.
+    */
+   virtual void push_chkcons_if_due(uint64_t chain_code) = 0;
+
+   /**
+    * Whether this operator already reported outpost `chain_code`'s outbound
+    * backlog in epoch `epoch_index`: its `sysio.msgch::qreports` row for the
+    * chain was made in that epoch. False when the read failed.
+    */
+   virtual bool has_reported_backlog(uint64_t chain_code, uint32_t epoch_index) = 0;
+
+   /**
+    * Push `sysio.msgch::reportqueue` for outpost `chain_code`'s epoch
+    * `epoch_index`: `pending_count` messages queued on the outpost since
+    * `oldest_pending_ms` (milliseconds since the Unix epoch; zero for unknown).
+    * True when the depot accepted it. A refusal is expected when the chain
+    * moved on since the epoch state was read, and is logged at info.
+    */
+   virtual bool report_backlog(uint64_t chain_code, uint32_t epoch_index, uint32_t pending_count,
+                               uint64_t oldest_pending_ms) = 0;
 
    /**
     * Fire the batch-operator debug-envelope signal with the given event.
     * A no-op when no slots are connected, so the job never has to check.
     */
    virtual void emit_debug_envelope(sysio::opp::debugging::DebugEnvelopeEvent event) = 0;
-
-   /**
-    * True when the current wall-clock time is in the safe operating window of
-    * outpost `chain_code`'s current epoch (far enough from both edges, by that
-    * chain's own edge buffer). The inbound and outbound jobs gate themselves on
-    * this. False while the chain's epoch state has not been read.
-    */
-   virtual bool within_epoch_window(uint64_t chain_code) const = 0;
 
    /**
     * True when this batch operator is elected to drive OPP deliveries for
@@ -96,22 +126,28 @@ struct depot_ops {
    virtual uint32_t current_epoch(uint64_t chain_code) const = 0;
 
    /**
-    * True when wall-clock has advanced past the depot's `next_epoch_start` for
-    * outpost `chain_code`'s currently-cached epoch. Used by the outpost cranker
-    * to decide when a consensus-retry re-delivery is warranted on a stuck
-    * path-2 fallback case: once the WIRE depot's boundary has elapsed, the
-    * outpost-side boundary (same `epoch_duration_sec`) is also definitively
-    * past, so a re-delivery from an already-delivered operator can re-trigger
-    * the outpost's consensus evaluation and tip path-2 fallback. Without this
-    * gate the cranker would have to either re-deliver every tick (gas waste)
-    * or never re-deliver (chain stalls when initial deliveries fall short of
-    * unanimous). Mirrors the WIRE-side `sysio.msgch::chkcons` "time gate
-    * passed" check.
-    *
-    * Returns false when the chain's cache is empty (pre-bootstrap) or when the
-    * boundary has not yet elapsed for its current epoch.
+    * True while this operator sat in the group that served outpost
+    * `chain_code`'s previous epoch (`epochstate.previous_group`) and the
+    * chain's late-delivery window (`epochcfg.late_window_sec` from its current
+    * epoch's start) is still open, so the depot still accepts its late
+    * delivery of that epoch. False while the chain's epoch state has not been
+    * read.
     */
-   virtual bool is_epoch_boundary_past(uint64_t chain_code) const = 0;
+   virtual bool late_delivery_open(uint64_t chain_code) const = 0;
+
+   /**
+    * True when outpost `chain_code`'s current epoch has its accepted winner
+    * (`sysio.msgch::outpcons` records it). False while the chain's epoch state
+    * has not been read.
+    */
+   virtual bool is_decided(uint64_t chain_code) const = 0;
+
+   /**
+    * Outpost `chain_code`'s minimum duration between two epochs
+    * (`epochcfg.epoch_duration_sec`), or zero while its epoch state has not
+    * been read.
+    */
+   virtual fc::microseconds minimum_duration(uint64_t chain_code) const = 0;
 
    /**
     * How long each call to outpost `chain_code`, and its push of

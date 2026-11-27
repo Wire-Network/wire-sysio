@@ -418,16 +418,23 @@ inline constexpr auto state_table   = "epochstate"_n;
 inline constexpr auto state_type    = "epoch_state";
 inline constexpr auto genesis_table = "netgenesis"_n;
 inline constexpr auto genesis_type  = "network_genesis";
+/// sysio.msgch, the one account that records a chain's traffic.
+inline constexpr auto msgch_account = "sysio.msgch"_n;
+/// `sysio.epoch::notetraffic`, through which sysio.msgch records a chain's traffic.
+inline constexpr auto note_traffic_action = "notetraffic"_n;
 
-/// Field names of an `epochstate` / `netgenesis` row.
+/// Field names of an `epochstate` / `netgenesis` row, and of the `notetraffic` arguments.
 namespace field {
 inline constexpr auto chain_code             = "chain_code";
 inline constexpr auto current_epoch_index    = "current_epoch_index";
 inline constexpr auto current_epoch_start    = "current_epoch_start";
-inline constexpr auto next_epoch_start       = "next_epoch_start";
+inline constexpr auto traffic_since          = "traffic_since";
+inline constexpr auto due_at                 = "due_at";
+inline constexpr auto since                  = "since";
 inline constexpr auto current_batch_op_group = "current_batch_op_group";
 inline constexpr auto batch_op_groups        = "batch_op_groups";
 inline constexpr auto is_paused              = "is_paused";
+inline constexpr auto previous_group         = "previous_group";
 inline constexpr auto genesis_at             = "genesis_at";
 } // namespace field
 
@@ -444,10 +451,12 @@ fc::mutable_variant_object state_of(Tester& tester, const abi_serializer& epoch_
       (field::chain_code, chain_code)
       (field::current_epoch_index, 0u)
       (field::current_epoch_start, fc::time_point())
-      (field::next_epoch_start, fc::time_point())
+      (field::traffic_since, fc::time_point())
+      (field::due_at, fc::time_point())
       (field::current_batch_op_group, 0u)
       (field::batch_op_groups, std::vector<std::vector<name>>{})
-      (field::is_paused, false);
+      (field::is_paused, false)
+      (field::previous_group, std::vector<name>{});
 }
 
 /// Store `state` as its chain's `epochstate` row.
@@ -468,20 +477,34 @@ void seat_window(Tester& tester, const abi_serializer& epoch_abi, std::string_vi
 }
 
 /// Leave the state a network genesis leaves, for a fixture that runs no outpost (a genesis advance needs an active
-/// outpost with a seated window): `chain` at its epoch 1 from the head block, `epoch_duration_sec` long, and the
-/// `netgenesis` marker.
+/// outpost with a seated window): `chain` at its epoch 1 from the head block, idle, and the `netgenesis` marker.
 template <typename Tester>
-void start_network(Tester& tester, const abi_serializer& epoch_abi, std::string_view chain,
-                   uint32_t epoch_duration_sec) {
+void start_network(Tester& tester, const abi_serializer& epoch_abi, std::string_view chain) {
    const fc::time_point       now   = tester.control->head().block_time();
    fc::mutable_variant_object state = state_of(tester, epoch_abi, chain);
    state(field::current_epoch_index, 1u)
         (field::current_epoch_start, now)
-        (field::next_epoch_start, now + fc::seconds(epoch_duration_sec));
+        (field::traffic_since, fc::time_point())
+        (field::due_at, fc::time_point());
    write_state(tester, epoch_abi, state);
    write_kv_row(tester, epoch_account, genesis_table, genesis_table.to_uint64_t(),
                 epoch_abi.variant_to_binary(genesis_type, fc::mutable_variant_object()(field::genesis_at, now),
                                             Tester::fixture_abi_yield_function()));
+}
+
+/// Record traffic on `chain` since its current epoch started, through `sysio.epoch::notetraffic` pushed as sysio.msgch,
+/// as an outbound attestation queued for the chain would. The chain is then due its epoch start plus its minimum
+/// duration, so a fixture that advances on that cadence keeps advancing. Pushes nothing before the chain's genesis
+/// advance, or when traffic since the epoch start is already recorded.
+template <typename Tester>
+void mark_traffic(Tester& tester, const abi_serializer& epoch_abi, std::string_view chain) {
+   const fc::mutable_variant_object state = state_of(tester, epoch_abi, chain);
+   if (state[field::current_epoch_index].as<uint32_t>() == 0) return;
+   const fc::time_point start         = state[field::current_epoch_start].as<fc::time_point>();
+   const fc::time_point traffic_since = state[field::traffic_since].as<fc::time_point>();
+   if (traffic_since != fc::time_point() && traffic_since <= start) return;
+   tester.push_action(epoch_account, note_traffic_action, msgch_account,
+                      fc::mutable_variant_object()(field::chain_code, chain)(field::since, start));
 }
 
 } // namespace epoch_state

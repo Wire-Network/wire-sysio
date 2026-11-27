@@ -1,5 +1,7 @@
 #include <sysio.opreg/sysio.opreg.hpp>
 #include <sysio.epoch/sysio.epoch.hpp>
+#include <sysio.msgch/sysio.msgch.hpp>
+#include <sysio.chalg/sysio.chalg.hpp>
 #include <sysio.chains/sysio.chains.hpp>
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio.liq/sysio.liq.hpp>
@@ -232,13 +234,25 @@ bool window_seats(const sysio::epoch::epoch_state& state, name account) {
    return false;
 }
 
-/// True while `account` holds a seat in any outpost chain's batch-operator schedule window.
-bool holds_schedule_seat(name account) {
+/// True while one chain's schedule `state` holds a seat of `account` whose books are open: one in its window, or
+/// one in `previous_group`, the group of the epoch whose books the chain's next advance closes.
+bool open_seat_on(const sysio::epoch::epoch_state& state, name account) {
+   return window_seats(state, account) || sysio::epoch::in_previous_group(state, account);
+}
+
+/// True while `account` holds a seat whose books are open on any outpost chain (see `open_seat_on`).
+bool holds_open_seat(name account) {
    sysio::epoch::epochstate_t states(opreg::EPOCH_ACCOUNT);
    for (auto it = states.begin(); it != states.end(); ++it) {
-      if (window_seats(*it, account)) return true;
+      if (open_seat_on(*it, account)) return true;
    }
    return false;
+}
+
+/// True while `account` holds a seat whose books are open on outpost `chain_code` (see `open_seat_on`).
+bool holds_open_seat(name account, sysio::slug_name chain_code) {
+   const std::optional<sysio::epoch::epoch_state> state = sysio::epoch::epoch_state_of(chain_code.value);
+   return state && open_seat_on(*state, account);
 }
 
 /// True while `account` holds a seat in outpost `chain_code`'s batch-operator schedule window.
@@ -309,26 +323,6 @@ void opreg::setconfig(uint64_t terminate_prune_delay_ms,
          terminate_min_pct_samples <= MAX_TERMINATE_MIN_PCT_SAMPLES,
          "terminate_min_pct_samples must be in [1, 100]");
    check(terminate_window_ms > 0, "terminate_window_ms must be positive");
-
-   // SEC-28 residual: delivery records accrue only on duty epochs -- one per
-   // `batch_op_groups`-epoch rotation for a resident operator -- so a rolling
-   // window narrower than the full consecutive-miss run of duty epochs makes
-   // the consecutive rail structurally vacuous (records age out and are
-   // pruned before `termcheck` can observe the run) and leaves only the
-   // hair-trigger percent rail. Validate against every outpost chain's live
-   // epoch schedule. Bootstrap installs opreg config before sysio.epoch is
-   // configured, so a chain without an epochcfg row is not checked here;
-   // sysio.epoch::setconfig performs the mirror validation, so no ordering of
-   // the two setters can accept a vacuous pair.
-   {
-      sysio::epoch::epochcfg_t epoch_cfgs(EPOCH_ACCOUNT);
-      for (auto it = epoch_cfgs.begin(); it != epoch_cfgs.end(); ++it) {
-         check(terminate_window_ms >= min_terminate_window_ms(terminate_max_consecutive_misses,
-                                                              it->epoch_duration_sec,
-                                                              it->batch_op_groups),
-               "terminate_window_ms must span at least terminate_max_consecutive_misses + 1 duty rotations");
-      }
-   }
 
    require_canonical_codes(req_prod_collat,    "req_prod_collat");
    require_canonical_codes(req_batchop_collat, "req_batchop_collat");
@@ -418,8 +412,8 @@ void opreg::regoperator(name account,
 
    // A seat left from an earlier registration would close against this one and record a miss for
    // a duty it never received. `terminate` leaves the operator's later seats in place until the
-   // window slides past them.
-   check(!holds_schedule_seat(account), still_seated_msg);
+   // advance that closes their books.
+   check(!holds_open_seat(account), still_seated_msg);
 
    // An operator registering itself needs an authex link for every active outpost (the depot
    // self-row and pre-active rows carry no expectation). A batch operator is checked per chain at
@@ -483,7 +477,7 @@ void opreg::joinchain(name account, sysio::slug_name chain_code) {
    const std::optional<served_chain> existing = members.try_get(key);
    if (existing) {
       check(existing->status != chain_service_status::SERVING, already_serving_msg);
-      check(!holds_schedule_seat(account, chain_code), still_seated_on_chain_msg);
+      check(!holds_open_seat(account, chain_code), still_seated_on_chain_msg);
    }
 
    // A join starts new rails: rows recorded before it belong to an earlier membership.
@@ -980,6 +974,7 @@ std::vector<opreg::consensus_wait> consensus_waits_for(const opreg::operator_ent
       auto                by_account = members.get_index<"byaccount"_n>();
       for (auto it = by_account.lower_bound(op.account.value);
            it != by_account.end() && it->account == op.account; ++it) {
+         // Only window seats count: a seat in `previous_group` is of an epoch already judged.
          if (it->status != opreg::chain_service_status::SERVING &&
              !holds_schedule_seat(op.account, it->chain_code)) continue;
          const uint32_t epoch_index = sysio::epoch::current_epoch_index(it->chain_code.value);
@@ -1000,17 +995,42 @@ std::vector<opreg::consensus_wait> consensus_waits_for(const opreg::operator_ent
    return waits;
 }
 
-/// True once every chain `request` waits on has reached its consensus guard. `started` holds the
-/// started chains' current indexes (`sysio::epoch::started_chain_epochs`); a waited-on chain always
-/// started before the request.
-bool consensus_waits_passed(const opreg::withdraw_request&                    request,
-                            const std::vector<sysio::epoch::chain_epoch_index>& started) {
+/// One started outpost chain as the withdrawal consensus guard reads it.
+struct chain_consensus_standing {
+   uint64_t chain_code  = 0;
+   uint32_t epoch_index = 0;       ///< the chain's current consensus epoch index
+   bool     decided     = false;   ///< the current epoch has an accepted winner and no open dispute
+};
+
+/// Every outpost chain whose consensus epoch has started, with its current index and whether that epoch is
+/// decided, in chain-code order. Never throws.
+std::vector<chain_consensus_standing> started_chain_standings() {
+   std::vector<chain_consensus_standing> standings;
+   for (const sysio::epoch::chain_epoch_index& chain : sysio::epoch::started_chain_epochs()) {
+      const bool accepted =
+         msgch::consensus_for_epoch(opreg::MSGCH_ACCOUNT, chain.chain_code, chain.epoch_index).has_value();
+      standings.push_back(chain_consensus_standing{
+         .chain_code  = chain.chain_code,
+         .epoch_index = chain.epoch_index,
+         .decided     = accepted && !chalg::has_open_dispute(opreg::CHALG_ACCOUNT, chain.chain_code,
+                                                             chain.epoch_index),
+      });
+   }
+   return standings;
+}
+
+/// True once every chain `request` waits on has passed its consensus wait: the chain's index has reached the
+/// wait's `eligible_at_epoch`, or its current epoch is decided. `started` holds every started chain's standing
+/// (`started_chain_standings`); a waited-on chain always started before the request.
+bool consensus_waits_passed(const opreg::withdraw_request&               request,
+                            const std::vector<chain_consensus_standing>& started) {
    for (const opreg::consensus_wait& wait : request.consensus_waits) {
       const auto chain = std::find_if(started.begin(), started.end(),
-                                      [&](const sysio::epoch::chain_epoch_index& c) {
+                                      [&](const chain_consensus_standing& c) {
                                          return c.chain_code == wait.chain_code.value;
                                       });
-      if (chain == started.end() || chain->epoch_index < wait.eligible_at_epoch) return false;
+      if (chain == started.end()) return false;
+      if (chain->epoch_index < wait.eligible_at_epoch && !chain->decided) return false;
    }
    return true;
 }
@@ -1316,7 +1336,7 @@ void opreg::flushwtdw(uint32_t economic_epoch) {
    // MAX_WTDW_HELD_SKIPS_PER_FLUSH, inside the CPU deadline it shares with the rest of the economic
    // tick; the next flush resumes at the row this one stopped on. `flushed` is counted before the
    // per-row `continue` branches, so it counts every released attempt.
-   std::optional<std::vector<sysio::epoch::chain_epoch_index>> started;   // read at the first matured row
+   std::optional<std::vector<chain_consensus_standing>> started;   // read at the first matured row
    uint64_t resume_id = 0;
    uint32_t flushed   = 0;
    uint32_t skipped   = 0;
@@ -1326,7 +1346,7 @@ void opreg::flushwtdw(uint32_t economic_epoch) {
          resume_id = it->request_id;
          break;
       }
-      if (!started) started = sysio::epoch::started_chain_epochs();
+      if (!started) started = started_chain_standings();
       if (!consensus_waits_passed(*it, *started)) {
          if (skipped == MAX_WTDW_HELD_SKIPS_PER_FLUSH) {
             resume_id = it->request_id;
@@ -1488,8 +1508,9 @@ void opreg::slash(name account, std::string reason) {
 
    operators_t ops(get_self());
    auto op_pk = operator_key{account.value};
-   // Nothing is left to slash on a pruned, slashed or terminated operator. Reached inline from
-   // `sysio.epoch::advance`, so this returns rather than aborting the epoch advance.
+   // Nothing is left to slash on a pruned, slashed or terminated operator. Reached inline from the
+   // acceptance of an epoch's winner in `sysio.msgch`, so this returns rather than aborting the delivery
+   // or dispute resolution that accepted it.
    if (!ops.contains(op_pk)) return;
    auto op = ops.get(op_pk);
    if (op.has_terminal_status()) return;
@@ -1741,8 +1762,8 @@ void opreg::termcheck(name account, sysio::slug_name chain_code) {
    auto op_pk = operator_key{account.value};
    if (!ops.contains(op_pk)) return;
    auto op = ops.get(op_pk);
-   // UNKNOWN is evaluated too. This runs only when the operator's own duty epoch closes, and an
-   // operator that withdraws before each close and cancels after it is UNKNOWN every time.
+   // UNKNOWN is evaluated too. This runs only when the books of the operator's own duty epoch close, and
+   // an operator that withdraws before each of those advances and cancels after it is UNKNOWN every time.
    if (op.has_terminal_status()) return;
    // Bootstrapped operators are the genesis / chain-of-trust seed set and
    // are NEVER subject to rolling-window eviction — see
@@ -1771,8 +1792,9 @@ void opreg::termcheck(name account, sysio::slug_name chain_code) {
    // Both rails read the tally of the latest join; a new registration joins afresh, so rows of an earlier
    // registration or membership never count. A return to ACTIVE resets neither rail, so a cancelled
    // withdrawal cannot clear the misses recorded while the operator was UNKNOWN. The member's aged rows
-   // the on-write sweep has not reached are erased first; while one is left the tally reaches past the
-   // window and the rails wait.
+   // the on-write sweep has not reached are erased first; while one is left the tally's duties reach past
+   // the window and the percent rail waits. The consecutive run counts missed duty epochs whatever their
+   // age, so it never waits.
    const uint64_t now_ms        = current_time_ms();
    duty_tally&    tally         = membership->tally;
    const uint64_t duties_before = tally.duties;
@@ -1781,7 +1803,7 @@ void opreg::termcheck(name account, sysio::slug_name chain_code) {
 
    // termcheck follows every recorddel, so the run since the last delivery breaches at the duty that
    // makes it too long. The percent rail waits for a minimum sample, so an early miss cannot evict alone.
-   const bool exceeds_consecutive = drained && tally.miss_run > cfg.terminate_max_consecutive_misses;
+   const bool exceeds_consecutive = tally.miss_run > cfg.terminate_max_consecutive_misses;
    const bool exceeds_percent     = drained && tally.duties > 0 && tally.duties >= cfg.terminate_min_pct_samples &&
                                     tally.misses * PERCENT_SCALE / tally.duties > cfg.terminate_max_pct_misses_24h;
    if (exceeds_consecutive || exceeds_percent) {

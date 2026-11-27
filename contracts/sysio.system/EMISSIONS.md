@@ -22,11 +22,13 @@ consensus. Each outpost chain's OPP consensus epoch only feeds batch-operator du
 - Every economic epoch then calls `settleduty`, one bounded step of any open
   settlement.
 
-Separately, every consensus epoch close of an outpost chain (`sysio.epoch::advance`)
-calls `rcrdduty`, crediting each member of the group that served it with the
-epoch's scheduled length in seat-seconds. Both clocks skip the duty actions
-until `initt5` has run: nothing can be paid before then, and consensus must not
-depend on `sysio.system`.
+Separately, every consensus epoch advance of an outpost chain (`sysio.epoch::advance`)
+calls `rcrdduty` for the epoch before the closing one, crediting each member of the
+group that served it with the chain minimum (`epochcfg.epoch_duration_sec`)
+configured when its books close, in seat-seconds, however long the epoch ran: an
+epoch's duty is credited when the following epoch closes. Both clocks skip the
+duty actions until `initt5` has run: nothing can be paid before then, and
+consensus must not depend on `sysio.system`.
 
 A start time in the past makes the clock catch up, one epoch per tick, through
 the elapsed grid, and so does a cluster whose first tick runs more than one
@@ -156,14 +158,18 @@ block. Batch operators are paid from emission only, so `producer_bps` /
 
 ### Batch-operator duty
 
-Batch-op pay follows **seat-seconds**. Each consensus epoch close of an outpost
-chain credits every member of the group that served it with that epoch's
-scheduled length in seconds (`rcrdduty`, a `batchduty` row per operator and
-chain), so a seat on a 120 s epoch earns twice a seat on a 60 s one. Every
-chain's duty accrues to the one open pay period. Each `payepoch` that spends
-closes that period and splits its batch pool pro rata to the period's
-seat-seconds: an operator's share is `batch_pool * seat_seconds / period_seat_seconds`.
-Only opreg-ACTIVE batch operators are credited, at settlement time; the share of an
+Batch-op pay follows **seat-seconds**. Each consensus epoch of an outpost chain
+credits every member of the group that served it with that chain's minimum
+duration (`epochcfg.epoch_duration_sec`) as configured when the epoch's books
+close, in seconds, however long the epoch ran (`rcrdduty`, a `batchduty` row per
+operator and chain): pay follows epochs served, so a seat on a chain with a 120 s
+minimum earns twice a seat on a 60 s one, and an idle or stretched epoch earns no
+more. The credit is made when the following epoch closes, the advance that closes
+the epoch's books after its late deliveries. Every chain's duty accrues to the one
+open pay period. Each `payepoch` that spends closes that period and splits its
+batch pool pro rata to the period's seat-seconds: an operator's share is
+`batch_pool * seat_seconds / period_seat_seconds`. Only opreg-ACTIVE batch
+operators are credited, at settlement time; the share of an
 operator slashed or terminated since stays in the treasury, as do
 integer-division remainders and the whole pool of a period with no duty.
 
@@ -182,7 +188,8 @@ which erases the operator's row for that chain, whether it belongs to the open
 or the settling period, and leaves the period's seat-seconds as they were: no
 operator is credited the share, so it stays in the treasury when the settlement
 completes. `rcrdduty` credits an `EVICTED` member nothing on the chain, including
-the seat whose close evicted it, until it rejoins. Its other chains keep paying.
+the seat whose books' close evicted it (`termcheck` runs before `rcrdduty` in the
+same advance), until it rejoins. Its other chains keep paying.
 Slashing and governance `terminate` still forfeit every chain's unsettled duty,
 since settlement pays only ACTIVE operators. A terminated account that registers
 again could be ACTIVE before that duty settles, so `sysio.opreg::regoperator`
@@ -406,7 +413,7 @@ period_emission
 | `claimpay` | the claiming account | Claim epoch pay credited by `payepoch` (producer / standby / batch-operator share) |
 | `accrueepoch` | `sysio.epoch` | Accrue the curve share and the block slots of the economic epoch its tick closes (`closed_epoch_duration_sec`) |
 | `payepoch` | `sysio.epoch` | Distribute the period's compute / capex / governance (credits `payclaims`; pushes only the category buckets) and open its batch-duty settlement; waits while an earlier settlement is open; spends nothing unless `spend` (the economic clock had caught up before its tick) |
-| `rcrdduty` | `sysio.epoch` | Credit the epoch's scheduled length in seat-seconds to each member of the group that served a consensus epoch of one chain, except a member evicted from it, in the pay period open when it is recorded |
+| `rcrdduty` | `sysio.epoch` | Credit the chain minimum duration configured at the books' close, in seat-seconds, to each member of the group that served a consensus epoch of one chain, except a member evicted from it, when the following epoch closes, in the pay period open when it is recorded |
 | `forfeitduty` | `sysio.opreg` | Erase an operator's unsettled seat-seconds on one chain, leaving the period totals as they were: on its eviction from the chain, and on each chain when the account registers again |
 | `settleduty` | `sysio.epoch` | One bounded step of the open batch-duty settlement |
 | `viewnodedist` | read-only | Preview a node owner's claimable amount |

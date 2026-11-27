@@ -129,6 +129,14 @@
                     "type": "uint32"
                 },
                 {
+                    "name": "traffic_wait_sec",
+                    "type": "uint32"
+                },
+                {
+                    "name": "late_window_sec",
+                    "type": "uint32"
+                },
+                {
                     "name": "operators_per_epoch",
                     "type": "uint32"
                 },
@@ -163,7 +171,11 @@
                     "type": "time_point"
                 },
                 {
-                    "name": "next_epoch_start",
+                    "name": "traffic_since",
+                    "type": "time_point"
+                },
+                {
+                    "name": "due_at",
                     "type": "time_point"
                 },
                 {
@@ -177,6 +189,10 @@
                 {
                     "name": "is_paused",
                     "type": "bool"
+                },
+                {
+                    "name": "previous_group",
+                    "type": "name[]"
                 }
             ]
         },
@@ -200,6 +216,20 @@
             "fields": [
                 {
                     "name": "genesis_at",
+                    "type": "time_point"
+                }
+            ]
+        },
+        {
+            "name": "notetraffic",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "since",
                     "type": "time_point"
                 }
             ]
@@ -258,6 +288,14 @@
                 },
                 {
                     "name": "epoch_duration_sec",
+                    "type": "uint32"
+                },
+                {
+                    "name": "traffic_wait_sec",
+                    "type": "uint32"
+                },
+                {
+                    "name": "late_window_sec",
                     "type": "uint32"
                 },
                 {
@@ -322,6 +360,11 @@
         {
             "name": "finishadv",
             "type": "finishadv",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "notetraffic",
+            "type": "notetraffic",
             "ricardian_contract": ""
         },
         {

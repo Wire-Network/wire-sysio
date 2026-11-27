@@ -26,9 +26,9 @@ namespace sysio {
       /// the per-row record on `dispute_entry::candidates`.
       struct dispute_candidate {
          checksum256       checksum;   ///< sha256 of the candidate envelope bytes
-         /// Batch operators that delivered this checksum. Audit / off-chain only — the on-chain
-         /// slash path classifies via `outpcons.winning_checksum` vs each delivered checksum in
-         /// `sysio.epoch::advance`, not this list; it is never read back on chain.
+         /// Batch operators that delivered this checksum when the dispute opened. Audit / off-chain
+         /// only: the winner's acceptance in `sysio.msgch` slashes by comparing each recorded delivery's
+         /// checksum with the winner, not by this list, which is never read back on chain.
          std::vector<name> operators;
 
          SYSLIB_SERIALIZE(dispute_candidate, (checksum)(operators))
@@ -38,8 +38,9 @@ namespace sysio {
       //  Actions
       // -----------------------------------------------------------------------
 
-      /// Execute a slash on an operator. Auth: sysio.chalg (dispute resolution) or sysio.epoch
-      /// (the single-path slash of non-canonical OPP envelope deliverers at epoch close).
+      /// Execute a slash on an operator. Auth: sysio.chalg or sysio.msgch, which slashes every
+      /// non-canonical OPP envelope deliverer of an epoch when it accepts the epoch's winner, by
+      /// consensus or by dispute resolution.
       [[sysio::action]]
       void slashop(name operator_acct, std::string reason);
 
@@ -47,10 +48,9 @@ namespace sysio {
       //  OPP envelope dispute vote (Tier-1 node-owner resolution)
       // -----------------------------------------------------------------------
 
-      /// Open an OPP envelope dispute. Called inline by `sysio.msgch::evalcons` for a terminal
-      /// two-version tie or a post-boundary multi-version no-majority split. msgch owns the
-      /// consensus boundary, terminality, strict-majority, and electorate-preflight checks because
-      /// it alone has the live eligible group and delivery tally.
+      /// Open an OPP envelope dispute. Called inline by `sysio.msgch::evalcons` once no delivered
+      /// version can still reach a strict majority of the group's seats. msgch owns that check and
+      /// the electorate preflight because it alone has the live group and delivery tally.
       /// Records the candidate checksums, snapshots the Tier-1 electorate (the Tier-1
       /// rows of `sysio.roa::nodeowners` for the current network generation) together with its
       /// quorum, and pauses the disputed chain's epoch advancement until a Tier-1 node-owner vote
@@ -74,7 +74,8 @@ namespace sysio {
       /// electorate of N owners and fixed quorum Q = floor(N/2)+1. When the threshold is met
       /// (fast path: a checksum reaches Q any time; after the 24h deadline: quorum of cast votes
       /// AND a strict majority of cast votes), record the winning checksum, dispatch it via
-      /// `sysio.msgch::resolvedisp`, and unpause the disputed chain's epoch.
+      /// `sysio.msgch::resolvedisp`, and unpause the disputed chain's epoch. The winner's acceptance
+      /// in `resolvedisp` slashes the losers.
       [[sysio::action]]
       void chkdispute(uint64_t dispute_id);
 
@@ -89,13 +90,13 @@ namespace sysio {
          SYSLIB_SERIALIZE(dispute_key, (id))
       };
 
-      /// OPP envelope dispute. Opened for an eligible post-boundary no-majority split with at least
-      /// two versions for one (outpost, epoch): exactly two versions require every eligible operator
-      /// to deliver, while a three-or-more-version split may open at the boundary. Resolved by a
-      /// Tier-1 node-owner vote on the canonical checksum. The row is retained after resolution as
-      /// the audit record (and as the guard that prevents re-opening the same (outpost, epoch)
-      /// dispute). A chain holds at most one OPEN dispute: opening one pauses the chain's epoch, and
-      /// deliveries bind to the chain's current epoch.
+      /// OPP envelope dispute. Opened for one (outpost, epoch) once no delivered version can still
+      /// reach a strict majority of the group's seats with the eligible operators still silent (so
+      /// at least two versions). Resolved by a Tier-1 node-owner vote on the
+      /// canonical checksum. The row is retained after resolution as the audit record (and as the
+      /// guard that prevents re-opening the same (outpost, epoch) dispute). A chain holds at most one
+      /// OPEN dispute: opening one pauses the chain's epoch, and deliveries bind to the chain's current
+      /// epoch.
       struct [[sysio::table("disputes")]] dispute_entry {
          uint64_t                       id;
          uint64_t                       chain_code;        ///< outpost slug_name value
@@ -128,6 +129,15 @@ namespace sysio {
          sysio::kv::index<"byoutepoch"_n,
             sysio::const_mem_fun<dispute_entry, uint128_t, &dispute_entry::by_outpost_epoch>>
       >;
+
+      /// Whether `chalg_account` holds an OPEN dispute for outpost `chain_code`'s epoch `epoch_index`. Never throws.
+      static bool has_open_dispute(name chalg_account, uint64_t chain_code, uint32_t epoch_index) {
+         disputes_t disputes(chalg_account);
+         auto       by_outpost_epoch = disputes.get_index<"byoutepoch"_n>();
+         const auto dispute          = by_outpost_epoch.find(opp::outpost_epoch_key(chain_code, epoch_index));
+         return dispute != by_outpost_epoch.end() &&
+                dispute->status == opp::types::DisputeStatus::DISPUTE_STATUS_OPEN;
+      }
 
       /// Dispute-vote primary key (the voting Tier-1 owner). The vote table is scoped by
       /// `dispute_id`, so the owner alone is unique within a dispute.
