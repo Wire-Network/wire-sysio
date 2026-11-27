@@ -21,6 +21,7 @@
 
 #include <boost/iostreams/device/back_inserter.hpp>
 #include <boost/iostreams/copy.hpp>
+
 #include <limits>
 
 using namespace sysio::chain;
