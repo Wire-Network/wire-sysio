@@ -24,6 +24,9 @@ namespace sysiosystem {
 
    static constexpr uint64_t newaccount_ram = 1144; // to cover creation and small amount for variation in authorizations
 
+   /// Move `bytes` of RAM quota from `from` to `to`; asserts that `from` holds that much.
+   void transfer_ram( const name& from, const name& to, uint64_t bytes );
+
    /**
     * A weighted permission.
     *

@@ -693,17 +693,19 @@ public:
       try {
          chain::controller& chain = chain_plug->chain();
 
-         auto snap_account_name = chain::name(_snapshot_provider_account);
+         const auto producer_name = chain::name(_snapshot_provider_account);
+         const auto vote_permission = chain::name(snapshot_attest::permission_snapshot);
 
-         // Build the votesnaphash action
+         // Build the votesnaphash action, signed by the producer's snapshot permission so the producer's
+         // other keys stay off this node.
          chain::action vote_action;
          vote_action.account = chain::config::system_account_name;
          vote_action.name = chain::name(snapshot_attest::action_votesnaphash);
-         vote_action.authorization = {{snap_account_name, chain::config::active_name}};
+         vote_action.authorization = {{producer_name, vote_permission}};
          // Parameter order must match votesnaphash(name, checksum256, checksum256) in snapshot_attest.hpp.
          // root_hash is fc::crypto::blake3 (32 bytes) which is binary-compatible with checksum256.
          vote_action.data = fc::raw::pack(
-            std::make_tuple(snap_account_name, si.head_block_id, si.root_hash));
+            std::make_tuple(producer_name, si.head_block_id, si.root_hash));
 
          // Build the transaction
          chain::signed_transaction trx;
@@ -712,7 +714,7 @@ public:
             chain.head().block_time() + fc::seconds(_snapshot_vote_expiration_seconds));
          trx.set_reference_block(chain.head().id());
 
-         // Determine the required signing keys for the snapshot provider account's active authority
+         // Determine the required signing keys for the producer's snapshot permission
          auto& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
          auto wire_sig_providers = sig_plug.query_providers(
             std::nullopt, std::nullopt, chain::crypto::chain_key_type_wire);
@@ -727,13 +729,13 @@ public:
             }
          }
 
-         // Use authorization_manager to find which keys satisfy snap_account@active
+         // Use authorization_manager to find which keys satisfy <producer>@snapshot
          auto required_keys = chain.get_authorization_manager().get_required_keys(
             trx, candidate_keys);
 
          if (required_keys.empty()) {
-            elog("Snapshot provider: no signing key available for {}@active votesnaphash transaction",
-                 _snapshot_provider_account);
+            elog("Snapshot provider: no signing key available for {}@{} votesnaphash transaction",
+                 _snapshot_provider_account, snapshot_attest::permission_snapshot);
             return;
          }
 
@@ -1547,7 +1549,7 @@ void producer_plugin::set_program_options(
          ("snapshots-dir", bpo::value<std::filesystem::path>()->default_value("snapshots"),
           "the location of the snapshots directory (absolute path or relative to application data dir)")
          ("snapshot-provider-account", bpo::value<std::string>()->default_value(""),
-          "Account name used to sign and submit votesnaphash transactions. When set, enables snapshot provider mode. Cannot be used alongside producer-name.")
+          "Producer account to vote snapshot hashes for; votesnaphash is signed with its snapshot permission. When set, enables snapshot provider mode. Cannot be used alongside producer-name.")
          ("read-only-threads", bpo::value<uint32_t>(),
          ("Number of worker threads in read-only execution thread pool. Defaults to "s +
           std::to_string(producer_plugin_impl::_ro_default_threads_nonproducer) +

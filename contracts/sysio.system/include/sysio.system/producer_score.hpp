@@ -135,8 +135,7 @@ namespace sysiosystem {
        * Snapshot-service factor: how much of the configured attestation target the producer met in
        * the current pay period.
        *
-       * Scored on ATTESTATIONS, not on registration. A `snapprovs` row is free to create; actually
-       * voting a snapshot hash that reaches quorum is not. The counter is maintained by
+       * Scored on ATTESTATIONS: only votes on a snapshot hash that reaches quorum count. The counter is maintained by
        * `snapshot_attest::votesnaphash` and reset on the same `payepoch` cadence as the block
        * counters, which supplies the trailing window with no extra machinery.
        *

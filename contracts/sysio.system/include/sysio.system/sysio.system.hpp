@@ -81,6 +81,11 @@ namespace sysiosystem {
    /// reaches is neither paid nor reset, exactly like an unpayable one, so its blocks carry to the
    /// next payout rather than being lost.
    static constexpr uint32_t max_rank_walk_rows     = 500;
+   /// RAM moved from sysio's pool to a collateral-backed producer when `regproducer` first creates its row.
+   /// The chain bills an account's permissions and action links to the account, and `newaccount_ram` leaves
+   /// room for none; this covers the claim, snapshot and operations keys producers typically add. Granted once:
+   /// producer rows are never erased. A multiple of `newaccount_ram`, so it is exact at every sysio.roa byte price.
+   static constexpr uint64_t regproducer_ram        = 4 * newaccount_ram;
 
    static constexpr uint32_t seconds_per_year      = 52 * 7 * 24 * 3600;
    static constexpr uint32_t seconds_per_day       = 24 * 3600;

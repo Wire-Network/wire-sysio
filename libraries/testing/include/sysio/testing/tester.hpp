@@ -209,6 +209,7 @@ namespace sysio::testing {
          static constexpr fc::microseconds default_skip_time = fc::milliseconds(config::block_interval_ms);
 
          static constexpr uint64_t newaccount_ram = 1144; // Should match sysio.system native newaccount_ram
+         static constexpr uint64_t regproducer_ram = 4 * newaccount_ram; // Should match sysio.system regproducer_ram
          static constexpr uint64_t bytes_per_unit = 104;
          static_assert( newaccount_ram % bytes_per_unit == 0, "newaccount_ram must be a multiple of bytes_per_unit");
          static constexpr auto NODE_DADDY = "nodedaddy"_n;

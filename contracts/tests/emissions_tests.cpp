@@ -6116,6 +6116,22 @@ struct producer_score_tester : public producer_eligibility_tester {
       return info["unpaid_blocks"].as<uint32_t>();
    }
 
+   /// The RAM quota `account` holds; -1 is unlimited.
+   int64_t ram_quota_of(account_name account) {
+      int64_t ram = 0, net = 0, cpu = 0;
+      control->get_resource_limits_manager().get_account_limits(account, ram, net, cpu);
+      return ram;
+   }
+
+   /// Create `producer` as an ACTIVE, collateral-backed PRODUCER operator, stopping short of `regproducer`.
+   void setup_collateralized_operator(account_name producer) {
+      BOOST_REQUIRE_EQUAL(success(), set_single_pair_collateral());
+      create_producer_accounts({producer});
+      BOOST_REQUIRE_EQUAL(success(), register_operator(producer, OperatorType::OPERATOR_TYPE_PRODUCER, false));
+      BOOST_REQUIRE_EQUAL(success(), credit_collateral(producer, base_min_bond));
+      produce_blocks(1);
+   }
+
    /// Register `count` producers as NON-bootstrapped operators, each bonded at `deposit` on the
    /// single required pair, with an active finalizer key.
    ///
@@ -6169,24 +6185,18 @@ struct producer_score_tester : public producer_eligibility_tester {
       return id;
    }
 
-   /// Credit `producer` one snapshot attestation that reaches quorum, voted by `snap_account`.
+   /// Credit `producer` one snapshot attestation that reaches quorum, voted by the producer itself.
    ///
-   /// With `min_providers` at 1 the provider's vote attests a fresh height on its own, and the
-   /// first-K credit lands on its producer.
-   void credit_snapshot_attestation(account_name producer, account_name snap_account) {
-      if (!control->db().find<account_object, by_name>(snap_account)) {
-         create_accounts({snap_account}, false, false, false, true);
-         produce_blocks(1);
-      }
-      BOOST_REQUIRE_EQUAL(success(), push_system_action(producer, "regsnapprov"_n, mvo()
-         ("producer", producer)("snap_account", snap_account)));
+   /// With `min_providers` at 1 the producer's vote attests a fresh height on its own, and the
+   /// first-K credit lands on it.
+   void credit_snapshot_attestation(account_name producer) {
       BOOST_REQUIRE_EQUAL(success(), push_system_action(config::system_account_name, "setsnpcfg"_n, mvo()
          ("min_providers", uint32_t{1})("block_spacing", snapshot_test_spacing)));
       // Past the next attestable height, so this vote is above any record already attested.
       produce_blocks(snapshot_test_spacing);
       const uint32_t height = control->head().block_num() / snapshot_test_spacing * snapshot_test_spacing;
-      BOOST_REQUIRE_EQUAL(success(), push_system_action(snap_account, "votesnaphash"_n, mvo()
-         ("snap_account", snap_account)
+      BOOST_REQUIRE_EQUAL(success(), push_system_action(producer, "votesnaphash"_n, mvo()
+         ("producer", producer)
          ("block_id", snapshot_block_id(height))
          ("snapshot_hash", fc::sha256::hash(std::to_string(height)))));
    }
@@ -6548,8 +6558,8 @@ BOOST_FIXTURE_TEST_CASE( snapshot_credit_scales_with_the_collateral_multiple, pr
    BOOST_REQUIRE_EQUAL( expected_composite(one_x, seniority_quantum_sec), composite_of(rank_score_of(names[0])) );
    BOOST_REQUIRE_EQUAL( expected_composite(2 * one_x, seniority_quantum_sec), composite_of(rank_score_of(names[1])) );
 
-   credit_snapshot_attestation(names[0], "snapprova"_n);
-   credit_snapshot_attestation(names[1], "snapprovb"_n);
+   credit_snapshot_attestation(names[0]);
+   credit_snapshot_attestation(names[1]);
    BOOST_REQUIRE_EQUAL( expected_composite(one_x, 2 * seniority_quantum_sec), composite_of(rank_score_of(names[0])) );
    BOOST_REQUIRE_EQUAL( expected_composite(2 * one_x, 2 * seniority_quantum_sec),
                         composite_of(rank_score_of(names[1])) );
@@ -6591,7 +6601,7 @@ BOOST_FIXTURE_TEST_CASE( collateral_is_minimum_across_required_pairs, producer_s
 // ship at weight 0 without disturbing any existing ordering.
 BOOST_FIXTURE_TEST_CASE( zero_weight_removes_factor_influence, producer_score_tester ) try {
    auto names = setup_collateralized_producers(3);
-   credit_snapshot_attestation(names[2], "snapprovc"_n);
+   credit_snapshot_attestation(names[2]);
    BOOST_REQUIRE_LT( rank_score_of(names[2]), rank_score_of(names[0]) );
 
    BOOST_REQUIRE_EQUAL( success(), set_score_config(/*snapshot_weight=*/0) );
@@ -6764,6 +6774,82 @@ BOOST_FIXTURE_TEST_CASE( demotion_fires_at_threshold_and_outweighs_collateral, p
    // Demotion does NOT touch the block count: the producer is paid for the blocks it made at the
    // first payepoch after regproducer brings it back into the pay walk.
    BOOST_REQUIRE_GT( unpaid_blocks_of(target), 0u );
+} FC_LOG_AND_RETHROW()
+
+// A collateral-backed producer's first registration moves `regproducer_ram` out of sysio's pool, and
+// only the first: producer rows are never erased, so parking and returning finds the row.
+BOOST_FIXTURE_TEST_CASE( regproducer_grants_ram_once_to_a_collateralized_producer, producer_score_tester ) try {
+   const account_name producer = producer_names(1).front();
+   setup_collateralized_operator(producer);
+
+   const int64_t producer_before = ram_quota_of(producer);
+   const int64_t pool_before     = ram_quota_of(config::system_account_name);
+   BOOST_REQUIRE_GE( producer_before, 0 );
+   BOOST_REQUIRE_GE( pool_before, 0 );
+   const int64_t grant = static_cast<int64_t>(regproducer_ram);
+
+   BOOST_REQUIRE_EQUAL( success(), push_regproducer(producer) );
+   BOOST_REQUIRE_EQUAL( producer_before + grant, ram_quota_of(producer) );
+   BOOST_REQUIRE_EQUAL( pool_before - grant, ram_quota_of(config::system_account_name) );
+
+   BOOST_REQUIRE_EQUAL( success(), push_system_action(producer, "unregprod"_n, mvo()("producer", producer)) );
+   BOOST_REQUIRE_EQUAL( success(), push_regproducer(producer) );
+   BOOST_REQUIRE_EQUAL( producer_before + grant, ram_quota_of(producer) );
+   BOOST_REQUIRE_EQUAL( pool_before - grant, ram_quota_of(config::system_account_name) );
+} FC_LOG_AND_RETHROW()
+
+// The grant exists because the seed account RAM cannot hold even one linked permission; with it, a producer
+// starting from exactly `newaccount_ram` can add a snapshot-vote key and a claim key.
+BOOST_FIXTURE_TEST_CASE( regproducer_grant_covers_snapshot_and_claim_permissions, producer_score_tester ) try {
+   const account_name producer = producer_names(1).front();
+   setup_collateralized_operator(producer);
+   BOOST_REQUIRE_EQUAL( success(), push_system_action(config::system_account_name, "setacctram"_n, mvo()
+      ("account", producer)("ram_bytes", static_cast<int64_t>(newaccount_ram))) );
+
+   const permission_name snapshot_permission = "snapshot"_n;
+   const permission_name claim_permission    = "claim"_n;
+   BOOST_REQUIRE_EXCEPTION( set_authority(producer, snapshot_permission,
+                                          authority(get_public_key(producer, snapshot_permission.to_string())),
+                                          config::active_name),
+                            ram_usage_exceeded, [](const auto&) { return true; } );
+
+   BOOST_REQUIRE_EQUAL( success(), push_regproducer(producer) );
+   set_authority(producer, snapshot_permission, authority(get_public_key(producer, snapshot_permission.to_string())),
+                 config::active_name);
+   link_authority(producer, config::system_account_name, snapshot_permission, "votesnaphash"_n);
+   set_authority(producer, claim_permission, authority(get_public_key(producer, claim_permission.to_string())),
+                 config::active_name);
+   link_authority(producer, config::system_account_name, claim_permission, "claimpay"_n);
+   link_authority(producer, OPREG, claim_permission, "claimremit"_n);
+   produce_blocks(1);
+   BOOST_REQUIRE_LE( control->get_resource_limits_manager().get_account_ram_usage(producer), ram_quota_of(producer) );
+} FC_LOG_AND_RETHROW()
+
+// Bootstrapped producers keep a single owner/active key, so their registration moves no RAM.
+BOOST_FIXTURE_TEST_CASE( regproducer_grants_no_ram_to_a_bootstrapped_producer, producer_score_tester ) try {
+   const account_name producer = producer_names(1).front();
+   create_producer_accounts({producer});
+   BOOST_REQUIRE_EQUAL( success(), register_operator(producer, OperatorType::OPERATOR_TYPE_PRODUCER, true) );
+
+   const int64_t producer_before = ram_quota_of(producer);
+   const int64_t pool_before     = ram_quota_of(config::system_account_name);
+   BOOST_REQUIRE_EQUAL( success(), push_regproducer(producer) );
+   BOOST_REQUIRE_EQUAL( producer_before, ram_quota_of(producer) );
+   BOOST_REQUIRE_EQUAL( pool_before, ram_quota_of(config::system_account_name) );
+} FC_LOG_AND_RETHROW()
+
+// An account with unlimited RAM needs no grant, and adding to its -1 limit would make it finite.
+BOOST_FIXTURE_TEST_CASE( regproducer_grants_no_ram_to_an_unlimited_account, producer_score_tester ) try {
+   const account_name producer = producer_names(1).front();
+   setup_collateralized_operator(producer);
+   constexpr int64_t unlimited = -1;
+   BOOST_REQUIRE_EQUAL( success(), push_system_action(config::system_account_name, "setalimits"_n, mvo()
+      ("account", producer)("ram_bytes", unlimited)("net_weight", unlimited)("cpu_weight", unlimited)) );
+
+   const int64_t pool_before = ram_quota_of(config::system_account_name);
+   BOOST_REQUIRE_EQUAL( success(), push_regproducer(producer) );
+   BOOST_REQUIRE_EQUAL( unlimited, ram_quota_of(producer) );
+   BOOST_REQUIRE_EQUAL( pool_before, ram_quota_of(config::system_account_name) );
 } FC_LOG_AND_RETHROW()
 
 // `regproducer` costs a signature and may be repeated, so pardoning a producer that still holds a
@@ -7595,12 +7681,12 @@ BOOST_FIXTURE_TEST_CASE( snapshot_credit_breaks_seniority_ties_but_not_more_seni
    // The newcomer returns with no seniority. Full credit brings it level with the veterans, who stay
    // ahead on registration order.
    BOOST_REQUIRE_EQUAL( success(), push_regproducer(newcomer) );
-   credit_snapshot_attestation(newcomer, "snapprovf"_n);
+   credit_snapshot_attestation(newcomer);
    BOOST_REQUIRE_EQUAL( veteran_composite, composite_of(rank_score_of(newcomer)) );
    BOOST_REQUIRE_EQUAL( names.size(), producer_rank_position(newcomer) );
 
    // Among equal veterans, full credit moves the second registration ahead of the first.
-   credit_snapshot_attestation(names[1], "snapprovb"_n);
+   credit_snapshot_attestation(names[1]);
    const uint64_t credited = expected_composite(one_x, seniority_quantum_sec + snapshot_weight + default_base_sec);
    BOOST_REQUIRE_EQUAL( credited, composite_of(rank_score_of(names[1])) );
    BOOST_REQUIRE_EQUAL( 1u, producer_rank_position(names[1]) );

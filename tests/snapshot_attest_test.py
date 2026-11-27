@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""Exercise provider registration and the scheduled-height attestation boundary."""
+"""Exercise producer snapshot voting and the scheduled-height attestation boundary."""
 
 import json
 import signal
@@ -13,7 +13,7 @@ from TestHarness.TestHelper import AppArgs
 #
 #  Tests on-chain snapshot attestation via sysio.system contract.
 #  This test validates the snapshot serving pipeline:
-#  - Snapshot provider registration and account rotation
+#  - Snapshot votes cast by ranked producers, with no separate registration
 #  - Manual snapshot creation
 #  - Rejection of votes outside the configured block-height cadence
 #
@@ -102,19 +102,8 @@ try:
     wallet = walletMgr.create('attestwallet')
     cluster.populateWallet(2, wallet)
 
-    Print("Create test accounts for snapshot providers")
-    cluster.createAccounts(cluster.sysioAccount, stakedDeposit=0)
-
-    snapProv1 = cluster.accounts[0]
-    snapProv2 = cluster.accounts[1]
-
-    Print(f"Snapshot provider accounts: {snapProv1.name}, {snapProv2.name}")
-
-    Print("Wait for account creation to be irreversible")
-    assert node0.waitForLibToAdvance(timeout=30), "LIB did not advance after account creation"
-
     # ---------------------------------------------------------------
-    # Register producers in system contract and set ranks
+    # Rank the producers: a producer in the top 30 votes snapshot hashes
     # ---------------------------------------------------------------
     producerA = "defproducera"
     producerB = "defproducerb"
@@ -149,7 +138,7 @@ try:
     assert node0.waitForTransactionsInBlock(regProducerTransIds, timeout=60), \
         "regproducer transactions did not make it into a block before regfinkey"
 
-    # Snapshot-provider eligibility is POSITION in the score-ordered producer index, not a rank
+    # Snapshot voting eligibility is POSITION in the score-ordered producer index, not a rank
     # governance assigns. A producer holds a position only when it is schedulable, which requires
     # an active finalizer key on top of the opreg operator row the bootstrap already created.
     finKeyTransIds = []
@@ -167,49 +156,17 @@ try:
         assert success, f"Failed to register finalizer key for {name}: {trans}"
         finKeyTransIds.append(node0.getTransId(trans))
 
-    # regsnapprov walks the producer index for its eligibility check, so wait for those
+    # votesnaphash walks the producer index for its rank check, so wait for those
     # registrations specifically rather than a generic head advance.
     assert node0.waitForTransactionsInBlock(finKeyTransIds, timeout=60), \
-        "regfinkey transactions did not make it into a block before regsnapprov"
-
-    # ---------------------------------------------------------------
-    # Register snapshot providers
-    # ---------------------------------------------------------------
-    regSnapProvTransIds = []
-    Print(f"Register snapshot provider {snapProv1.name} for {producerA}")
-    success, trans = node0.pushMessage("sysio", "regsnapprov",
-        json.dumps({"producer": producerA, "snap_account": snapProv1.name}),
-        f"--permission {producerA}@active")
-    assert success, f"Failed to register snapshot provider: {trans}"
-    regSnapProvTransIds.append(node0.getTransId(trans))
-
-    Print(f"Register snapshot provider {snapProv2.name} for {producerB}")
-    success, trans = node0.pushMessage("sysio", "regsnapprov",
-        json.dumps({"producer": producerB, "snap_account": snapProv2.name}),
-        f"--permission {producerB}@active")
-    assert success, f"Failed to register snapshot provider: {trans}"
-    regSnapProvTransIds.append(node0.getTransId(trans))
+        "regfinkey transactions did not make it into a block before voting"
 
     # ---------------------------------------------------------------
     # Set attestation config: fixed K=1 and a small block-height cadence.
     # This confirms governance configuration independently of the cadence rejection below.
     # ---------------------------------------------------------------
     Print("Set snapshot attestation config")
-    setCfgTransId = setSnapshotCadence(node0, snapshotAttestationBlockSpacing)
-
-    # ---------------------------------------------------------------
-    # Verify provider registration via table query
-    # ---------------------------------------------------------------
-    # Ensure both provider registrations and the attestation config are applied
-    # in a block before proceeding. The exact-count assertion below depends on
-    # those transactions being visible in table state.
-    assert node0.waitForTransactionsInBlock(regSnapProvTransIds + [setCfgTransId], timeout=60), \
-        "regsnapprov/setsnpcfg transactions did not make it into a block"
-    Print("Verify snapshot providers registered")
-    providers = node0.getTableRows("sysio", "sysio", "snapprovs")
-    assert providers is not None, "Failed to read snapprovs table"
-    assert len(providers) == 2, f"Expected 2 providers, got {len(providers)}"
-    Print(f"Registered providers: {providers}")
+    setSnapshotCadence(node0, snapshotAttestationBlockSpacing)
 
     # ---------------------------------------------------------------
     # Test 1: Manual snapshots cannot enter the scheduled attestation tally
@@ -240,11 +197,11 @@ try:
 
     success, trans = node0.pushMessage("sysio", "votesnaphash",
         json.dumps({
-            "snap_account": snapProv1.name,
+            "producer": producerA,
             "block_id": snapBlockId,
             "snapshot_hash": snapRootHash
         }),
-        f"--permission {snapProv1.name}@active",
+        f"--permission {producerA}@active",
         silentErrors=True)
     assert not success, f"Unscheduled manual snapshot vote unexpectedly succeeded: {trans}"
     assert "snapshot block is not a scheduled attestation height" in str(trans), \
@@ -257,36 +214,13 @@ try:
 
     Print("Test 1 PASSED: Manual snapshot stays outside the scheduled attestation tally")
 
-    # ---------------------------------------------------------------
-    # Test 2: Rotate a producer's snapshot provider account
-    # ---------------------------------------------------------------
-    Print("=== Test 2: Provider account rotation ===")
-
-    Print(f"Rotate {producerB} snapshot provider from {snapProv2.name} to {producerB}")
-    success, trans = node0.pushMessage("sysio", "regsnapprov",
-        json.dumps({"producer": producerB, "snap_account": producerB}),
-        f"--permission {producerB}@active")
-    assert success, f"Failed to rotate provider account: {trans}"
-    rotateSnapProvTransId = node0.getTransId(trans)
-
-    assert node0.waitForTransactionsInBlock([rotateSnapProvTransId], timeout=60), \
-        "provider rotation transaction did not make it into a block before table check"
-
-    providers = node0.getTableRows("sysio", "sysio", "snapprovs")
-    assert len(providers) == 2, f"Expected 2 providers after rotation, got {len(providers)}"
-    providerAccounts = {provider["value"]["snap_account"] for provider in providers}
-    assert providerAccounts == {snapProv1.name, producerB}, \
-        f"Unexpected providers after rotation: {providerAccounts}"
-
-    Print("Test 2 PASSED: Provider account rotation replaces the old mapping")
-
     # Node 0 captured an absent snapconfig at genesis startup. A subsequently attested
     # local snapshot must be discoverable without restarting it, even after cadence changes.
     setSnapshotCadence(node0, snapBlockNum)
     success, trans = node0.pushMessage("sysio", "votesnaphash",
-        json.dumps({"snap_account": snapProv1.name, "block_id": snapBlockId,
+        json.dumps({"producer": producerA, "block_id": snapBlockId,
                     "snapshot_hash": snapRootHash}),
-        f"--permission {snapProv1.name}@active")
+        f"--permission {producerA}@active")
     assert success, f"Failed to attest the local snapshot: {trans}"
     assert node0.waitForTransFinalization(node0.getTransId(trans), timeout=60)
     latest = node0.processUrllibRequest("snapshot", "latest")
@@ -294,9 +228,9 @@ try:
         f"Genesis-started serving node hid the attested snapshot: {latest}"
 
     # ---------------------------------------------------------------
-    # Test 3: Provider and API cadence is fixed at startup until a restart.
+    # Test 2: Provider and API cadence is fixed at startup until a restart.
     # ---------------------------------------------------------------
-    Print("=== Test 3: Startup-only provider cadence and restart ===")
+    Print("=== Test 2: Startup-only provider cadence and restart ===")
     providerNode = cluster.getNode(2)
     configuredTransId = setSnapshotCadence(node0, providerTestBlockSpacing)
     latest = node0.processUrllibRequest("snapshot", "latest")
@@ -316,7 +250,7 @@ try:
     assert manualRequestId == 0, "Manual-first regression did not start with request ID 0"
     providerNode.kill(signal.SIGTERM)
     assert providerNode.relaunch(
-        chainArg=f"--snapshot-provider-account {snapProv1.name} --plugin sysio::snapshot_api_plugin"), \
+        chainArg=f"--snapshot-provider-account {producerA} --plugin sysio::snapshot_api_plugin"), \
         "Provider failed to start after snapshot configuration"
     schedule = providerSchedule(providerNode)
     assert schedule["block_spacing"] == providerTestBlockSpacing
@@ -351,12 +285,12 @@ try:
     assert providerSchedule(providerNode)["snapshot_request_id"] == schedule["snapshot_request_id"], \
         "Unchanged restart did not reuse the automatic request"
     assert len(snapshotRequests(providerNode)) == 2, "Unchanged restart duplicated a request"
-    Print("Test 3 PASSED: Provider cadence changes on restart and scheduled files enter the catalog")
+    Print("Test 2 PASSED: Provider cadence changes on restart and scheduled files enter the catalog")
 
     # ---------------------------------------------------------------
-    # Test 4: Every positive uint32 cadence permits startup without overflowing its schedule.
+    # Test 3: Every positive uint32 cadence permits startup without overflowing its schedule.
     # ---------------------------------------------------------------
-    Print("=== Test 4: Unrepresentable recurring cadences leave automatic scheduling disabled ===")
+    Print("=== Test 3: Unrepresentable recurring cadences leave automatic scheduling disabled ===")
     for blockSpacing in [largestRecurringBlockSpacing, largestRecurringBlockSpacing + 1]:
         changedTransId = setSnapshotCadence(node0, blockSpacing)
         assert providerNode.waitForTransFinalization(changedTransId, timeout=60)
@@ -374,7 +308,7 @@ try:
         assert schedule["start_block_num"] == blockSpacing
         assert schedule["block_spacing"] == blockSpacing
         assert schedule["end_block_num"] == manualSnapshotHeight
-    Print("Test 4 PASSED: Large cadences preserve manual requests without one-shot fallback")
+    Print("Test 3 PASSED: Large cadences preserve manual requests without one-shot fallback")
 
     # ---------------------------------------------------------------
     Print("All snapshot attestation tests PASSED")

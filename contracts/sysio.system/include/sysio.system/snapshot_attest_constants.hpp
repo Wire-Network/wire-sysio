@@ -45,8 +45,8 @@ inline constexpr uint64_t disagreement_error_code = 9001;
 /// Name of the provider vote action.
 inline constexpr auto action_votesnaphash = "votesnaphash";
 
-/// Name of the provider-registration action.
-inline constexpr auto action_regsnapprov = "regsnapprov";
+/// Producer permission a provider node signs `votesnaphash` with; the producer links it to that action.
+inline constexpr auto permission_snapshot = "snapshot";
 
 /// Name of the snapshot-attestation configuration action.
 inline constexpr auto action_setsnapcfg = "setsnpcfg";
@@ -95,11 +95,8 @@ inline constexpr auto min_providers = "min_providers";
 /// Governance-configurable distance between eligible snapshot-attestation heights.
 inline constexpr auto block_spacing = "block_spacing";
 
-/// Producer account associated with a snapshot provider.
+/// Producer casting a snapshot vote.
 inline constexpr auto producer = "producer";
-
-/// Snapshot-provider account authorized to submit a vote.
-inline constexpr auto snap_account = "snap_account";
 
 /// Chain block that included the final attestation record.
 inline constexpr auto attested_at_block = "attested_at_block";

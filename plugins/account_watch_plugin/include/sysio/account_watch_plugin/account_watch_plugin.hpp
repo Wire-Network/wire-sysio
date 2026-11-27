@@ -21,8 +21,7 @@ namespace sysio {
 /// config.ini excerpt:
 ///   plugin = sysio::account_watch_plugin
 ///   account-watch-include = prod.a,*::*
-///   account-watch-include = snap.a,*::*
-///   account-watch-exclude = snap.a@active,sysio::votesnaphash
+///   account-watch-exclude = prod.a@snapshot,sysio::votesnaphash
 class account_watch_plugin : public appbase::plugin<account_watch_plugin> {
 public:
    APPBASE_PLUGIN_REQUIRES((chain_plugin))

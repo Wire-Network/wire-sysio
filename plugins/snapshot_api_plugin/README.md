@@ -80,7 +80,7 @@ is loaded — node-global endpoints are reachable on every listener by design.
 
 ## Full Provider Setup
 
-A snapshot provider generates snapshots, attests to them on-chain, and serves them to the network. This requires a registered producer with a delegated snapshot provider account.
+A snapshot provider generates snapshots, attests to them on-chain, and serves them to the network. This requires a producer holding one of the top 30 rank positions, and a provider node holding the key of that producer's `snapshot` permission.
 
 ### 1. Register as a producer
 
@@ -96,7 +96,7 @@ clio push action sysio regproducer \
   '{"producer": "myproducer1", "producer_key": "SYS6...", "url": "", "location": 0}' \
   -p myproducer1@active
 
-# Register a finalizer key. Snapshot-provider eligibility requires the producer to hold one of
+# Register a finalizer key. Snapshot voting requires the producer to hold one of
 # the top 30 rank POSITIONS, and rank is position in the score-ordered producer index among
 # schedulable producers -- an ACTIVE OPERATOR_TYPE_PRODUCER operator in sysio.opreg carrying an
 # active finalizer key. There is no action that assigns a rank.
@@ -105,27 +105,26 @@ clio push action sysio regfinkey \
   -p myproducer1@active
 ```
 
-### 2. Register a snapshot provider account
+### 2. Give the node a snapshot key
 
-Each producer delegates a separate account to act as its snapshot provider. This account signs the attestation votes:
-
-```bash
-# Create the provider account (if it doesn't exist)
-clio create account sysio mysnapprov1 SYS6...
-
-# Register the provider account under the producer
-clio push action sysio regsnapprov \
-  '{"producer": "myproducer1", "snap_account": "mysnapprov1"}' \
-  -p myproducer1@active
-```
-
-To rotate the signing account later, call the same action with the replacement account:
+There is no snapshot registration: a producer in the top 30 votes whenever its provider node does. The provider node
+votes as the producer. Give it the key of a `snapshot` permission linked to `votesnaphash` and nothing else, so the
+producer's other keys never reach that node:
 
 ```bash
-clio push action sysio regsnapprov \
-  '{"producer": "myproducer1", "snap_account": "mysnapprov2"}' \
-  -p myproducer1@active
+# A permission whose key the provider node holds, able to sign snapshot votes and nothing else
+clio set account permission myproducer1 snapshot SYS6... active -p myproducer1@active
+clio set action permission myproducer1 sysio votesnaphash snapshot -p myproducer1@active
 ```
+
+To rotate or revoke that key later, update the permission; no contract call is needed:
+
+```bash
+clio set account permission myproducer1 snapshot SYS7... active -p myproducer1@active
+```
+
+The permission and its link are billed to the producer's own RAM, which the grant from its first `regproducer`
+covers.
 
 ### 3. Configure attestation quorum and cadence (network-wide)
 
@@ -150,8 +149,10 @@ clio push action sysio setsnpcfg \
 For production, enable snapshot provider mode in `config.ini`:
 
 ```ini
-snapshot-provider-account = mysnapprov1
+snapshot-provider-account = myproducer1
 ```
+
+and give the node the private key of `myproducer1@snapshot` through its signature provider.
 
 Provider mode schedules at exact multiples of its startup `block_spacing`, using 25,000 when no row exists.
 For `block_spacing = 25000`, those are 25,000, 50,000, 75,000, and so on. Startup reuses the exact automatic
@@ -170,13 +171,13 @@ only as a protocol reference; its block ID must name an exact multiple of the co
 
 ```bash
 clio push action sysio votesnaphash \
-  '{"snap_account": "mysnapprov1", "block_id": "0000c350...", "snapshot_hash": "abcdef12..."}' \
-  -p mysnapprov1@active
+  '{"producer": "myproducer1", "block_id": "0000c350...", "snapshot_hash": "abcdef12..."}' \
+  -p myproducer1@snapshot
 ```
 
 The `votesnaphash` action accumulates producer identities in the `snapvotes` table. Every tuple uses the current fixed K;
-registration count does not change it. Configuration changes apply to pending heights, while provider-account rotation
-does not retract accepted votes. Once K is met, the system contract moves the entry to `snaprecords` and purges pending
+the number of ranked producers does not change it. Configuration changes apply to pending heights, and neither key
+rotation nor a producer leaving the top 30 retracts accepted votes. Once K is met, the system contract moves the entry to `snaprecords` and purges pending
 votes through that height.
 
 Auto-fetching nodes require compatible table schemas, nonzero K and an eligible height in the loaded

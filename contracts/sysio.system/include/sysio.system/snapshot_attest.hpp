@@ -16,10 +16,10 @@ namespace sysiosystem {
 using sysio::checksum256;
 using sysio::name;
 
-/// Maximum producer rank eligible to register a snapshot provider.
+/// Producers ranked at or above this position may vote snapshot hashes.
 static constexpr uint32_t max_snap_provider_rank = 30;
 
-/// Maximum number of producer-to-snapshot-account delegations retained at once.
+/// Most producers that can vote at once: one per eligible rank position.
 static constexpr uint32_t max_snap_providers = max_snap_provider_rank;
 
 /// Error code for disagreement with an already-attested snapshot record.
@@ -27,8 +27,6 @@ static constexpr uint64_t snap_hash_disagreement_error = snapshot_attestation::d
 
 /** Secondary-index identifiers used by the snapshot-attestation tables. */
 namespace snapshot_index {
-/// Lookup snapshot-provider mappings by their delegating producer.
-static constexpr auto by_producer = "byproducer"_n;
 /// Scan pending snapshot tuples by their scheduled block height.
 static constexpr auto by_block_num = "byblocknum"_n;
 } // namespace snapshot_index
@@ -49,34 +47,6 @@ struct [[sysio::table("snapconfig"), sysio::contract("sysio.system")]] snap_conf
 using snap_config_singleton = sysio::kv::global<"snapconfig"_n, snap_config>;
 
 // -------------------------------------------------------------------------------------------------
-// Registered snapshot providers
-// -------------------------------------------------------------------------------------------------
-/** Provider-account primary key for snapshot registrations. */
-struct snap_provider_key_t {
-   /// Raw snapshot-provider account value.
-   uint64_t snap_account;
-   SYSLIB_SERIALIZE(snap_provider_key_t, (snap_account))
-};
-
-/** One producer-to-snapshot-account delegation, billed to sysio; the table holds at most max_snap_providers. */
-struct [[sysio::table("snapprovs"), sysio::contract("sysio.system")]] snap_provider {
-   /// Account authorized to submit snapshot votes.
-   name snap_account;
-   /// Delegating producer, which was eligible when it entered the provider set but need not be now.
-   name producer;
-
-   /** Return the producer secondary-index key. */
-   uint64_t by_producer() const { return producer.value; }
-
-   SYSLIB_SERIALIZE(snap_provider, (snap_account)(producer))
-};
-
-using snap_providers_table = sysio::kv::table<
-   "snapprovs"_n, snap_provider_key_t, snap_provider,
-   sysio::kv::index<snapshot_index::by_producer,
-                    sysio::const_mem_fun<snap_provider, uint64_t, &snap_provider::by_producer>>>;
-
-// -------------------------------------------------------------------------------------------------
 // Pending snapshot votes (before quorum is reached)
 // -------------------------------------------------------------------------------------------------
 /** Auto-incrementing primary key for pending snapshot tuples. */
@@ -91,7 +61,7 @@ struct snap_vote_key_t {
 /**
  * One pending snapshot tuple and its monotonic producer voters, billed to sysio. Rows exist only for the
  * last snapshot_attestation::max_pending_vote_heights scheduled heights. A producer votes once per height, so a
- * height holds at most one row per distinct producer that held a delegation while it was open.
+ * height holds at most one row per distinct producer that could vote while it was open.
  */
 struct [[sysio::table("snapvotes"), sysio::contract("sysio.system")]] snap_vote {
    /// Pending tuple identifier.
@@ -102,7 +72,7 @@ struct [[sysio::table("snapvotes"), sysio::contract("sysio.system")]] snap_vote 
    checksum256        block_id;
    /// Deterministic snapshot root hash.
    checksum256        snapshot_hash;
-   /// Delegating producer identities, rather than rotatable snapshot-account identities.
+   /// Producers that voted this tuple.
    std::vector<name>  voters;
 
    /** Return the block-height secondary-index key. */
@@ -152,36 +122,11 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
       : sysio::contract(s, code, ds) {}
 
    /**
-    * Register a snapshot provider account delegated by a producer.
+    * Submit a producer's snapshot hash vote for a scheduled snapshot height.
     *
-    * A producer that currently holds no mapping must be active and hold a rank position <=
-    * max_snap_provider_rank. That walk tests `is_schedulable`, so operator-registry status and an
-    * active finalizer key are both consulted through it, and a rejection names which of the three
-    * conditions failed. When such a gated registration finds the table full, mappings whose
-    * producers would now fail the gate are pruned before the capacity limit is enforced; a
-    * producer evicted that way holds no mapping, so registering again is gated.
-    *
-    * A producer that already holds a mapping rotates it to the new snapshot account without retracting votes
-    * already recorded under the producer identity, and rotation is deliberately NOT eligibility-gated. `delsnapprov`
-    * does not replace it: leaving is one-way, since registering again is gated, so an ineligible producer that
-    * rotates keeps a delegation it can still serve from and carry back into eligibility.
-    */
-   [[sysio::action]]
-   void regsnapprov(name producer, name snap_account);
-
-   /**
-    * Retire the caller's snapshot-provider delegation, freeing its registration slot.
-    *
-    * Not eligibility-gated, for the reason rotation is not: a producer that has become ineligible
-    * is exactly the one that needs to stop, and the capacity prune is out of reach below
-    * max_snap_providers. Votes already accepted are keyed by producer identity and are not
-    * retracted, and the producer keeps the attestation credit it earned in the open pay period.
-    */
-   [[sysio::action]]
-   void delsnapprov(name producer);
-
-   /**
-    * Submit a snapshot hash vote from a registered provider for a scheduled snapshot height.
+    * Any producer holding one of the first max_snap_provider_rank positions among schedulable producers may vote.
+    * A provider node normally signs with the producer's snapshot_attestation::permission_snapshot permission,
+    * linked to this action only.
     *
     * Votes aggregate per (block_num, block_id, snapshot_hash) and finalize when the current fixed
     * min_providers value is reached. Votes are monotonic, producer equivocation is rejected per
@@ -195,13 +140,12 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
     * votes, retries included; each accepted vote purges rows below that window. A matching or
     * disagreeing vote on a final record is answered as above at any height.
     *
-    * Every vote, including a no-op vote on a final tuple, requires a registered snap_account. A new
-    * vote, or a retry while the tuple is pending, also requires live operator standing: an ACTIVE
-    * PRODUCER in sysio.opreg that clears the live collateral minimum, bootstrapped exempt. Votes
-    * accepted earlier keep counting.
+    * Every vote, including a no-op vote on a final tuple, requires that rank. A new vote, or a retry
+    * while the tuple is pending, also requires the producer's bond to clear the live collateral
+    * minimum, bootstrapped exempt. Votes accepted earlier keep counting.
     */
    [[sysio::action]]
-   void votesnaphash(name snap_account, checksum256 block_id, checksum256 snapshot_hash);
+   void votesnaphash(name producer, checksum256 block_id, checksum256 snapshot_hash);
 
    /**
     * Update snapshot attestation configuration. Requires contract authority.

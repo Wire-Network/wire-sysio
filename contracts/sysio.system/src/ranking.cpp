@@ -20,6 +20,21 @@ namespace sysiosystem {
 
    namespace {
       constexpr size_t max_producer_authority_keys = 5;
+
+      /// Grant `regproducer_ram` from `self`'s pool to a producer registering its first row.
+      ///
+      /// Bootstrapped producers keep a single owner/active key and get none. Neither does an account with
+      /// unlimited RAM: adding to its -1 limit would turn it into a small finite quota.
+      void grant_regproducer_ram( const name& self, const name& producer ) {
+         const auto op = find_active_operator( producer, sysio::opp::types::OperatorType::OPERATOR_TYPE_PRODUCER );
+         if( !op || op->is_bootstrapped ) return;
+
+         int64_t ram_bytes = 0, net_weight = 0, cpu_weight = 0;
+         get_resource_limits( producer, ram_bytes, net_weight, cpu_weight );
+         if( ram_bytes < 0 ) return;
+
+         transfer_ram( self, producer, regproducer_ram );
+      }
    }
 
    using sysio::const_mem_fun;
@@ -101,6 +116,9 @@ namespace sysiosystem {
             info.is_demoted                = false;
             info.consecutive_missed_rounds = 0;
          });
+
+      // Producer rows are never erased, so only the first registration reaches this.
+      if( !existing ) grant_regproducer_ram( get_self(), producer );
 
       // The clear above changes the producer's tier, and a new registration order moves its key,
       // so the sort key is stale until rescored.

@@ -19,11 +19,8 @@ using namespace sysio::testing;
 using mvo = fc::mutable_variant_object;
 namespace snapshot_attestation = sysiosystem::snapshot_attestation;
 
-/// Producer registered for the shared snapshot-attestation tests.
+/// Producer voting as the snapshot provider in the shared snapshot-attestation tests.
 inline constexpr auto producer_account = "producer1"_n;
-
-/// Provider registered for the shared snapshot-attestation tests.
-inline constexpr auto snapshot_provider_account = "snapprov1"_n;
 
 /// One-provider fixed K used by tests that finalize with one vote.
 inline constexpr uint32_t single_provider_minimum = 1;
@@ -45,14 +42,14 @@ inline fc::sha256 to_contract_snapshot_hash(const fc::crypto::blake3& snapshot_r
 /**
  * Real-contract fixture for scheduled snapshot-attestation and bootstrap tests.
  *
- * The fixture deploys the current token and system contracts, registers one producer/provider
- * pair, and stops immediately before the first configured test-cadence height.
+ * The fixture deploys the current token and system contracts, makes one producer schedulable so it
+ * can vote, and stops immediately before the first configured test-cadence height.
  */
 class snapshot_attest_fixture : public sysio_system::sysio_system_tester {
 public:
-   /** Deploy and initialize the contracts and provider mapping used by each test. */
+   /** Deploy and initialize the contracts and the voting producer used by each test. */
    snapshot_attest_fixture() {
-      create_accounts({producer_account, snapshot_provider_account});
+      create_accounts({producer_account});
       produce_blocks();
 
       // Snapshot-provider eligibility is POSITION in the score-ordered producer index, not a rank
@@ -77,14 +74,6 @@ public:
       set_node_finalizers(std::vector<name>{producer_account});
       produce_blocks();
 
-      BOOST_REQUIRE_EQUAL(
-         success(),
-         push_action(
-            producer_account, action_name{snapshot_attestation::action_regsnapprov},
-            mvo()(snapshot_attestation::field::producer, producer_account)
-               (snapshot_attestation::field::snap_account, snapshot_provider_account)));
-      produce_blocks();
-
       BOOST_REQUIRE_LT(control->head().block_num(), test_block_spacing);
       const uint32_t block_before_first_snapshot = test_block_spacing - preceding_block_offset;
       if (control->head().block_num() < block_before_first_snapshot) {
@@ -92,12 +81,12 @@ public:
       }
    }
 
-   /** Submit one provider snapshot-hash vote. */
-   void vote_snapshot(const account_name& snap_account, const block_id_type& block_id,
+   /** Submit one producer's snapshot-hash vote. */
+   void vote_snapshot(const account_name& producer, const block_id_type& block_id,
                       const fc::sha256& snapshot_hash) {
       const auto result = push_action(
-         snap_account, action_name{snapshot_attestation::action_votesnaphash},
-         mvo()(snapshot_attestation::field::snap_account, snap_account)
+         producer, action_name{snapshot_attestation::action_votesnaphash},
+         mvo()(snapshot_attestation::field::producer, producer)
             (snapshot_attestation::field::block_id, block_id)
             (snapshot_attestation::field::snapshot_hash, snapshot_hash));
       BOOST_REQUIRE_EQUAL(success(), result);
