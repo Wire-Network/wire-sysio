@@ -1,5 +1,6 @@
 #pragma once
 #include <sysio/state_history/log.hpp>
+#include <sysio/state_history/request_validation.hpp>
 #include <sysio/state_history/send_credits.hpp>
 #include <sysio/state_history/serialization.hpp>
 #include <sysio/state_history/status_request_queue.hpp>
@@ -13,6 +14,8 @@
 #include <boost/asio/local/stream_protocol.hpp>
 #include <boost/asio/error.hpp>
 #include <boost/beast/websocket.hpp>
+
+#include <chrono>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -39,6 +42,9 @@ requires std::is_same_v<SocketType, boost::asio::ip::tcp::socket> || std::is_sam
 class session final : public session_base {
    using coro_throwing_stream = boost::asio::use_awaitable_t<>::as_default_on_t<boost::beast::websocket::stream<SocketType>>;
    using coro_nonthrowing_steadytimer = boost::asio::as_tuple_t<boost::asio::use_awaitable_t<>>::as_default_on_t<boost::asio::steady_timer>;
+
+   /// Bound the time to drain any pending write and complete the policy close handshake.
+   static constexpr std::chrono::seconds policy_close_timeout{5};
 
 public:
    session(SocketType&& s, chain::controller& controller,
@@ -125,6 +131,22 @@ private:
 
       drop_exceptions([this](){ stream.next_layer().close(); });
       drop_exceptions([this](){ awake_if_idle();             });
+      if(rejection_timeout)
+         drop_exceptions([this](){ rejection_timeout->cancel(); });
+   }
+
+   /// Stop reading requests and let the writer send the policy close frame without overlapping data writes.
+   boost::asio::awaitable<void> reject_oversized_resume_request() {
+      // The writer closes the transport on exit and can only cancel the timer while it is still running.
+      if(!stream.next_layer().is_open())
+         co_return;
+
+      if(has_logged_exception.test_and_set() == false)
+         fc_ilog(logger, "state history connection from {} failed: {}", remote_endpoint_string, have_positions_limit_exceeded);
+      rejection_timeout.emplace(strand);
+      rejection_timeout->expires_after(policy_close_timeout);
+      awake_if_idle();
+      co_await rejection_timeout->async_wait();
    }
 
    boost::asio::awaitable<void> read_loop() {
@@ -148,6 +170,10 @@ private:
             boost::beast::flat_buffer b;
             co_await stream.async_read(b);
             const state_request req = fc::raw::unpack<std::remove_const_t<decltype(req)>>(static_cast<const char*>(b.cdata().data()), b.size());
+            if(!have_positions_within_limit(req)) {
+               co_await reject_oversized_resume_request();
+               break;
+            }
 
             co_await boost::asio::co_spawn(app().get_io_context(), [&]() -> boost::asio::awaitable<void> {
                /**
@@ -239,6 +265,13 @@ private:
             if(!stream.is_open())
                break;
 
+            if(rejection_timeout) {
+               const boost::beast::string_view reason{have_positions_limit_exceeded.data(),
+                                                      have_positions_limit_exceeded.size()};
+               co_await stream.async_close({boost::beast::websocket::close_code::policy_error, reason});
+               break;
+            }
+
             pending_status_request_counts status_requests;
             std::optional<block_package>  block_to_send;
 
@@ -285,6 +318,9 @@ private:
                co_return;
             }, boost::asio::use_awaitable);
 
+            if(rejection_timeout)
+               continue;
+
             //if there is nothing to send, go to sleep
             if(status_requests.empty() && !block_to_send) {
                co_await wake_timer.async_wait();
@@ -322,6 +358,8 @@ private:
    SocketType::executor_type         strand;
    coro_throwing_stream              stream;
    coro_nonthrowing_steadytimer      wake_timer;
+   /// Engaged when the reader has rejected a request and the writer owns the closing handshake.
+   std::optional<coro_nonthrowing_steadytimer> rejection_timeout;
    unsigned                          coros_running = 0;
    std::atomic_flag                  has_logged_exception;  //left as atomic_flag for useful test_and_set() interface
 
