@@ -10,7 +10,7 @@ This directory adds the **external-signer** half: real MetaMask in a browser,
 signing a real trx that gets pushed to nodeop.
 
 The automated path drives `clio`'s own EM tooling (`clio create key --em`,
-`clio convert em_sign` / `em_recover`), which is libfc's own crypto -- the exact
+`clio sign em_digest` / `em_digest_recover`), which is libfc's own crypto -- the exact
 code nodeop runs to validate these signatures. There is **no Python crypto
 dependency**: the only thing this harness needs is the `clio` binary the build
 already produces. clio's EM path is pinned byte-for-byte against the
@@ -35,8 +35,8 @@ No node or Python deps -- just clio:
 cd $BUILD_DIR
 eval "$(bin/clio create key --em --to-console | sed 's/Private key: /PRIV=/;s/Public key: /PUB=/')"
 DIGEST=$(printf 'wire metamask sanity' | sha256sum | cut -d' ' -f1)   # any 32-byte sha256
-SIG=$(bin/clio convert em_sign "$DIGEST" --private-key "$PRIV" | sed 's/Signature: //')
-bin/clio convert em_recover "$SIG" "$DIGEST"   # -> Public key: $PUB
+SIG=$(bin/clio sign em_digest "$DIGEST" --private-key "$PRIV" | sed 's/Signature: //')
+bin/clio sign em_digest_recover "$SIG" "$DIGEST"   # -> Public key: $PUB
 ```
 
 The recovered `PUB_EM_` equals the generated one when the EIP-191 envelope, the
@@ -66,7 +66,7 @@ The script:
 5. **Round 1 - HTTP path:** builds an unsigned `sysio.token::transfer
    mmtest11 -> defproducera` via `clio push action -s -d --return-packed -j`,
    computes `sig_digest = sha256(chain_id || packed_trx || zero_32)`, signs
-   via `clio convert em_sign`, and `POST`s the packed_transaction directly to
+   via `clio sign em_digest`, and `POST`s the packed_transaction directly to
    `/v1/chain/send_transaction2`.
 6. **Round 2 - clio path:** builds a second unsigned transfer (different
    memo so the trx id is unique), computes its digest, signs, and pushes via
@@ -96,7 +96,7 @@ Windows side) serve it instead, e.g. from `tests/metamask/`:
 4. Print the trx `sig_digest`. Paste that into the HTML page's "Digest to sign"
    field, click "Sign with Metamask", copy the `SIG_EM_` value.
 5. Paste the `SIG_EM_` back into the script. It is recovered offline via
-   `clio convert em_recover` and checked against the registered `PUB_EM_`
+   `clio sign em_digest_recover` and checked against the registered `PUB_EM_`
    before being sent; a stale or wrong-digest signature is rejected locally and
    re-prompted.
 6. Push, check execution. Repeated for Round 2 (different digest).
@@ -130,7 +130,7 @@ Windows side) serve it instead, e.g. from `tests/metamask/`:
   authentication to succeed and visibly mutates state (balance change). The
   same path works for any action; swap the body of `push_metamask_trx.py` if
   you need to exercise something else.
-- `--sim-private-key` and `clio convert em_private_key/em_sign --private-key`
+- `--sim-private-key` and `clio convert em_private_key --private-key` / `clio sign em_digest --private-key`
   put a secret on the command line, which is visible in `ps` and shell history.
   These are test/throwaway keys, so it does not matter here; for real keys omit
   the option and enter it at clio's interactive prompt instead.

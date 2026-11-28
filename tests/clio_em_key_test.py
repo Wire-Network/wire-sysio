@@ -5,7 +5,7 @@
 Exercises, with no running node:
 
   * ``clio create key --em``  -> PVT_EM_/PUB_EM_ keypair, round-tripped through
-    ``clio convert em_private_key`` / ``em_sign`` / ``em_recover``.
+    ``clio convert em_private_key`` / ``clio sign em_digest`` / ``em_digest_recover``.
   * ``clio create key --sol`` -> PVT_ED_/PUB_ED_ (Solana ed25519) keypair.
   * A frozen known-answer vector proving libfc's EM path is byte-for-byte
     identical to the Ethereum ecosystem reference (eth_account / MetaMask
@@ -119,9 +119,9 @@ def test_create_key_em_roundtrip():
     assert clio("convert", "em_private_key", "--private-key", priv, "--to-console")["Public key"] == pub
 
     # sign an arbitrary digest with it, then recover -> must yield the same PUB_EM_
-    sig = clio("convert", "em_sign", KAT_DIGEST, "--private-key", priv)["Signature"]
+    sig = clio("sign", "em_digest", KAT_DIGEST, "--private-key", priv)["Signature"]
     assert sig.startswith("SIG_EM_"), sig
-    assert clio("convert", "em_recover", sig, KAT_DIGEST)["Public key"] == pub
+    assert clio("sign", "em_digest_recover", sig, KAT_DIGEST)["Public key"] == pub
 
     # two fresh keys must differ (sanity that generation is not fixed)
     assert clio("create", "key", "--em", "--to-console")["Private key"] != priv
@@ -166,8 +166,8 @@ def test_known_answer_vector():
     """libfc's EM path is byte-for-byte identical to eth_account / MetaMask.
 
     Both the raw-Ethereum-secret import path and the PVT_EM_ path must derive
-    the reference public key; em_sign must reproduce the reference signature
-    (RFC-6979 deterministic, so this is exact); em_recover must invert it.
+    the reference public key; em_digest must reproduce the reference signature
+    (RFC-6979 deterministic, so this is exact); em_digest_recover must invert it.
     """
     # raw Ethereum secret import -> reference PUB_EM_
     assert clio("convert", "em_private_key", "--private-key", KAT_ETH_SECRET,
@@ -177,13 +177,13 @@ def test_known_answer_vector():
                 "--to-console")["Public key"] == KAT_PUB_EM
 
     # signature is deterministic and must match the reference, from either key form
-    assert clio("convert", "em_sign", KAT_DIGEST, "--private-key", KAT_ETH_SECRET)["Signature"] == KAT_SIG_EM
-    assert clio("convert", "em_sign", KAT_DIGEST, "--private-key", KAT_PVT_EM)["Signature"] == KAT_SIG_EM
+    assert clio("sign", "em_digest", KAT_DIGEST, "--private-key", KAT_ETH_SECRET)["Signature"] == KAT_SIG_EM
+    assert clio("sign", "em_digest", KAT_DIGEST, "--private-key", KAT_PVT_EM)["Signature"] == KAT_SIG_EM
     # 0x-prefixed digest is accepted and equivalent
-    assert clio("convert", "em_sign", "0x" + KAT_DIGEST, "--private-key", KAT_PVT_EM)["Signature"] == KAT_SIG_EM
+    assert clio("sign", "em_digest", "0x" + KAT_DIGEST, "--private-key", KAT_PVT_EM)["Signature"] == KAT_SIG_EM
 
     # recover the reference signature back to the reference public key
-    assert clio("convert", "em_recover", KAT_SIG_EM, KAT_DIGEST)["Public key"] == KAT_PUB_EM
+    assert clio("sign", "em_digest_recover", KAT_SIG_EM, KAT_DIGEST)["Public key"] == KAT_PUB_EM
 
 
 def test_recover_is_digest_bound():
@@ -195,7 +195,7 @@ def test_recover_is_digest_bound():
     This is precisely what lets the metamask harness reject a stale or
     wrong-digest paste offline instead of as an opaque unsatisfied_authorization.
     """
-    recovered = clio("convert", "em_recover", KAT_SIG_EM, KAT_WRONG_DIGEST)["Public key"]
+    recovered = clio("sign", "em_digest_recover", KAT_SIG_EM, KAT_WRONG_DIGEST)["Public key"]
     assert recovered.startswith("PUB_EM_"), recovered
     assert recovered != KAT_PUB_EM, "recovery is not digest-bound: wrong digest recovered the reference key"
 
@@ -221,9 +221,9 @@ def test_error_handling():
     assert "PVT_EM_" not in res.stdout, res.stdout
 
     # malformed crypto inputs throw in libfc -> non-zero
-    clio("convert", "em_sign", "deadbeef", "--private-key", KAT_PVT_EM, expect_fail=True)  # 8 hex != 64
-    clio("convert", "em_sign", "z" * 64, "--private-key", KAT_PVT_EM, expect_fail=True)    # 64 chars, not hex
-    clio("convert", "em_recover", "SIG_EM_0xdeadbeef", KAT_DIGEST, expect_fail=True)       # malformed sig
+    clio("sign", "em_digest", "deadbeef", "--private-key", KAT_PVT_EM, expect_fail=True)   # 8 hex != 64
+    clio("sign", "em_digest", "z" * 64, "--private-key", KAT_PVT_EM, expect_fail=True)     # 64 chars, not hex
+    clio("sign", "em_digest_recover", "SIG_EM_0xdeadbeef", KAT_DIGEST, expect_fail=True)   # malformed sig
 
 
 def test_eth_to_k1():

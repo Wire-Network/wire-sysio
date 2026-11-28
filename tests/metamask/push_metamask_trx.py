@@ -18,14 +18,14 @@ What this exercises:
     6. Signing has two modes:
          --simulate : clio's own EM tooling drives the signing automatically
                       (`clio create key --em` for the identity,
-                      `clio convert em_sign` for the signature). This is what
+                      `clio sign em_digest` for the signature). This is what
                       the `metamask_trx_signing_test` ctest runs, so CI needs
                       no browser and no Python eth stack -- the only dependency
                       is the clio binary the build already produces.
          (default)  : print the digest and wait for the user to paste the
                       SIG_EM_... value from metamask-sign.html (real MetaMask).
                       Every pasted signature is recovered offline via
-                      `clio convert em_recover` and checked against the EM key
+                      `clio sign em_digest_recover` and checked against the EM key
                       registered on the account before anything reaches the
                       chain, so a stale or wrong paste is rejected locally with
                       a clear message instead of as an opaque
@@ -111,7 +111,7 @@ def _run_clio(node, *args, capture_json=True):
 
 
 def _clio_offline(*args, expect_fail=False) -> dict[str, str] | None:
-    """Run clio for an offline subcommand (create key / convert em_*); no node.
+    """Run clio for an offline subcommand (create key / convert em_private_key / sign em_*); no node.
 
     These subcommands print `Label: value` lines and never touch a wallet or
     nodeop, so they take no node args. Returns the parsed lines as a dict, or
@@ -195,7 +195,7 @@ def _create_em_key(simulate: bool,
 def _verify_sig_locally(digest_hex: str, sig_em: str,
                         expected_wire_pub: str) -> tuple[int, str]:
     """Offline pre-flight before pushing: recover the signer pubkey from
-    (digest, sig) via `clio convert em_recover` -- the SAME libfc EIP-191 path
+    (digest, sig) via `clio sign em_digest_recover` -- the SAME libfc EIP-191 path
     nodeop applies -- and confirm it matches the EM key registered on the
     account.
 
@@ -204,7 +204,7 @@ def _verify_sig_locally(digest_hex: str, sig_em: str,
     digest signed). `detail` carries the recovered-vs-expected text so a bad
     paste is diagnosable HERE instead of as an opaque unsatisfied_authorization.
     """
-    r = _clio_offline("convert", "em_recover", sig_em, digest_hex, expect_fail=True)
+    r = _clio_offline("sign", "em_digest_recover", sig_em, digest_hex, expect_fail=True)
     if r is None or "Public key" not in r:
         return 1, "clio could not recover a public key from the pasted signature"
     recovered = r["Public key"]
@@ -226,9 +226,9 @@ def _sign_with_metamask(simulate: bool, sim_priv_em: str | None,
     """
     if simulate:
         assert sim_priv_em, "simulator mode requires the simulator's PVT_EM_ key"
-        # clio convert em_sign applies the same EIP-191 envelope nodeop recovers
+        # clio sign em_digest applies the same EIP-191 envelope nodeop recovers
         # with; pinned byte-for-byte to MetaMask by the clio_em_key_test ctest.
-        return _clio_offline("convert", "em_sign", digest_hex,
+        return _clio_offline("sign", "em_digest", digest_hex,
                              "--private-key", sim_priv_em)["Signature"]
 
     Print("\n" + "=" * 72)

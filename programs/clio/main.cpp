@@ -74,8 +74,14 @@ Options:
 #include <tuple>
 #include <unordered_map>
 #include <utility>
+#include <fc/crypto/elliptic_ed.hpp>
+#include <fc/crypto/elliptic_em.hpp>
+#include <fc/crypto/ethereum/ethereum_utils.hpp>
 #include <fc/crypto/hex.hpp>
 #include <fc/crypto/keccak256.hpp>
+#include <magic_enum/magic_enum.hpp>
+#include <sysio/opp/depot/authex_link.hpp>
+#include <sysio/opp/types/types.pb.h>
 #include <fc/variant.hpp>
 #include <fc/io/datastream.hpp>
 #include <fc/io/json.hpp>
@@ -1196,6 +1202,8 @@ void ensure_kiod_running(CLI::App* app) {
         return;
     if (app->get_subcommand("create")->got_subcommand("key")) // create key does not require wallet
        return;
+    if (!app->get_subcommand("sign")->get_subcommands().empty()) // sign em_digest etc. take their key, not the wallet's
+       return;
     if (app->get_subcommand("multisig")->got_subcommand("review")) // multisig review does not require wallet
        return;
     if (auto* subapp = app->get_subcommand("system")) {
@@ -1637,6 +1645,238 @@ struct activate_subcommand {
          auto accountPermissions = get_account_permissions(permissions);
          send_actions({chain::action{accountPermissions, name(account_str), name(action),
                                      variant_to_bin( name(account_str), name(action), action_args_var ) }}, signing_keys_opt.get_keys());
+      });
+   }
+};
+
+// ——— External wallet keys ———
+// An Ethereum (EM) or Solana (ED) key is held by an external wallet. The commands below take the key the way the
+// wallet exports it and sign exactly what that wallet signs, so a script can act for the wallet without a browser.
+
+/// `--private-key` help for a command that takes an EM key.
+constexpr std::string_view em_private_key_help =
+   "PVT_EM_... or a raw 0x Ethereum hex secret. Omit to enter it at the prompt; passing it here exposes the secret in "
+   "ps/shell history";
+/// `--private-key` help for a command that takes an ED key.
+constexpr std::string_view ed_private_key_help =
+   "PVT_ED_... or the base58 Solana secret key. Omit to enter it at the prompt; passing it here exposes the secret in "
+   "ps/shell history";
+/// `--private-key` help for a command that takes an EM or an ED key.
+constexpr std::string_view external_private_key_help =
+   "PVT_EM_..., a raw 0x Ethereum hex secret, or PVT_ED_ followed by the base58 Solana secret key. Omit to enter it "
+   "at the prompt; passing it here exposes the secret in ps/shell history";
+
+/// Number of hex characters in a sha256 digest.
+constexpr std::size_t sha256_hex_length = 2 * sizeof(fc::sha256);
+
+/// `text`, or the private key typed at a hidden prompt when `text` is empty. The prompt goes to stderr, so stdout
+/// carries only the command's output.
+std::string private_key_text_or_prompt(std::string text) {
+   if (text.empty()) {
+      std::cerr << localized("private key: ");
+      fc::set_console_echo(false);
+      std::getline(std::cin, text, '\n');
+      fc::set_console_echo(true);
+      std::cerr << std::endl;
+   }
+   return text;
+}
+
+/// `text` parsed as a private key of `type` (`unknown`: the type its PVT_ prefix names). Any failure becomes a bare
+/// "Invalid private key", as for `wallet import`: fc's decoders can quote their input (the base58 decoder quotes all
+/// of it), and clio prints the exception, so a mistyped secret would otherwise reach the terminal or a log.
+fc::crypto::private_key parse_private_key(const std::string& text, fc::crypto::private_key::key_type type) {
+   try {
+      return fc::crypto::private_key::from_string(text, type);
+   } catch (...) {
+      SYS_THROW(private_key_type_exception, "Invalid private key");
+   }
+}
+
+/// Whether `text` parses as a private key of any type. It never throws, so nothing reports the text.
+bool is_private_key(const std::string& text) {
+   try {
+      fc::crypto::private_key::from_string(text);
+      return true;
+   } catch (...) {
+      return false;
+   }
+}
+
+/// An external wallet key whose type its text names (PVT_EM_... or PVT_ED_...), or else the raw hex secret of an
+/// Ethereum key. Other Wire key types parse too; a caller that needs an EM or ED key refuses them.
+fc::crypto::private_key parse_external_private_key(const std::string& text) {
+   const std::string_view wire_private_prefix = fc::crypto::constants::private_key_base_prefix;
+   return parse_private_key(text, text.starts_with(wire_private_prefix) ? fc::crypto::private_key::key_type::unknown
+                                                                        : fc::crypto::private_key::key_type::em);
+}
+
+/// A 32-byte sha256 digest given as 64 hex characters, with an optional 0x prefix.
+fc::sha256 parse_sha256_hex(std::string text) {
+   if (text.rfind("0x", 0) == 0 || text.rfind("0X", 0) == 0)
+      text = text.substr(2);
+   SYSC_ASSERT(text.size() == sha256_hex_length, "ERROR: digest must be a 32-byte sha256 (64 hex chars, 0x optional)");
+   return fc::sha256(text);
+}
+
+/// The head block time of the node, in milliseconds since the Unix epoch.
+uint64_t head_block_time_ms() {
+   return get_info().head_block_time.time_since_epoch().count() / fc::milliseconds(1).count();
+}
+
+/// `sign em_digest`: sign a 32-byte sha256 digest with an EM key the way nodeop checks an EM transaction signature.
+struct sign_em_digest_subcommand {
+   string digest_hex;
+   string private_key_text;
+
+   explicit sign_em_digest_subcommand(CLI::App* sign_cmd) {
+      auto cmd = sign_cmd->add_subcommand(
+         "em_digest",
+         localized("Sign a 32-byte sha256 digest with an EM key (EIP-191 personal_sign), printing SIG_EM_"));
+      cmd->add_option("digest", digest_hex, localized("32-byte sha256 digest, 64 hex chars (0x optional)"))->required();
+      cmd->add_option("--private-key", private_key_text, localized(em_private_key_help.data()))->expected(0, 1);
+      cmd->callback([this] {
+         const auto digest = parse_sha256_hex(digest_hex);
+         const auto key = parse_private_key(private_key_text_or_prompt(private_key_text),
+                                            fc::crypto::private_key::key_type::em);
+         // private_key::sign dispatches to em::sign_sha256, which wraps the digest in the EIP-191 personal_sign
+         // envelope before secp256k1 -- identical to what MetaMask produces and to what nodeop recovers. Emit the
+         // prefixed SIG_EM_ form, which is what `clio push transaction --signature` and send_transaction2 expect.
+         std::cout << localized("Signature: ${sig}", ("sig", key.sign(digest).to_string({}, true))) << std::endl;
+      });
+   }
+};
+
+/// `sign em_digest_recover`: the PUB_EM_ key that made an `em_digest` signature over a digest.
+struct sign_em_digest_recover_subcommand {
+   string signature_text;
+   string digest_hex;
+
+   explicit sign_em_digest_recover_subcommand(CLI::App* sign_cmd) {
+      auto cmd = sign_cmd->add_subcommand(
+         "em_digest_recover", localized("Recover the PUB_EM_ from a SIG_EM_ over a 32-byte sha256 digest (EIP-191)"));
+      cmd->add_option("signature", signature_text, localized("SIG_EM_... signature to recover from"))->required();
+      cmd->add_option("digest", digest_hex, localized("32-byte sha256 digest, 64 hex chars (0x optional)"))->required();
+      cmd->callback([this] {
+         const auto sig = fc::crypto::signature::from_string(signature_text, fc::crypto::signature::sig_type::em);
+         const auto digest = parse_sha256_hex(digest_hex);
+         // public_key::recover dispatches to em::recover, which applies the same EIP-191 envelope before recovery.
+         // Emit the prefixed PUB_EM_ form so it compares directly against a key registered in an account's authority.
+         const auto pub = fc::crypto::public_key::recover(sig, digest);
+         std::cout << localized("Public key: ${key}", ("key", pub.to_string({}, true))) << std::endl;
+      });
+   }
+};
+
+/// How one key type's wallet signs a text message, for its `sign <key type>_message` command.
+struct wallet_message_scheme {
+   fc::crypto::private_key::key_type key_type;         ///< The one key type the command takes.
+   std::string_view                  command;          ///< The `sign` subcommand.
+   std::string_view                  description;      ///< Its help line.
+   std::string_view                  private_key_help; ///< Its `--private-key` help.
+};
+
+/// An Ethereum wallet's message signature: EIP-191 personal_sign over the message bytes (MetaMask personal_sign,
+/// ethers signMessage).
+constexpr wallet_message_scheme em_wallet_message{
+   fc::crypto::private_key::key_type::em, "em_message",
+   "Sign a text message with an EM key as an Ethereum wallet does (EIP-191 personal_sign over the UTF-8 bytes), "
+   "printing JSON",
+   em_private_key_help};
+
+/// A Solana wallet's message signature: ed25519 over the raw message bytes (signMessage).
+constexpr wallet_message_scheme ed_wallet_message{
+   fc::crypto::private_key::key_type::ed, "ed_message",
+   "Sign a text message with an ED key as a Solana wallet does (ed25519 over the UTF-8 bytes, signMessage), "
+   "printing JSON",
+   ed_private_key_help};
+
+/// Sign `message` as `key`'s wallet signs a message: EIP-191 personal_sign over the bytes for an EM key, ed25519
+/// over the raw bytes for an ED key. Nothing is hashed with sha256 first: the wallet signs the message itself.
+///
+/// @throws fc::invalid_arg_exception for any other key type.
+fc::crypto::signature sign_wallet_message(const fc::crypto::private_key& key, std::span<const uint8_t> message) {
+   using key_type = fc::crypto::private_key::key_type;
+   switch (key.type()) {
+      case key_type::em:
+         return fc::crypto::signature(fc::crypto::signature::storage_type(
+            key.get<fc::em::private_key_shim>().sign_keccak256(fc::crypto::ethereum::hash_user_message(message))));
+      case key_type::ed:
+         return fc::crypto::signature(fc::crypto::signature::storage_type(
+            key.get<fc::crypto::ed::private_key_shim>().sign_raw(message.data(), message.size())));
+      default:
+         FC_THROW_EXCEPTION(fc::invalid_arg_exception, "no wallet message signature for a {} key",
+                            std::string{magic_enum::enum_name(key.type())});
+   }
+}
+
+/// `sign em_message` / `sign ed_message`: sign text as one key type's wallet signs a message, for off-chain checks
+/// such as an account API that sponsors an account only for a request the funding wallet signed.
+struct sign_wallet_message_subcommand {
+   string message;
+   string private_key_text;
+
+   sign_wallet_message_subcommand(CLI::App* sign_cmd, const wallet_message_scheme& scheme) {
+      auto cmd = sign_cmd->add_subcommand(std::string{scheme.command}, localized(scheme.description.data()));
+      cmd->add_option("--message", message, localized("The exact text to sign, as UTF-8"))->required();
+      cmd->add_option("--private-key", private_key_text, localized(scheme.private_key_help.data()))->expected(0, 1);
+      cmd->callback([this, key_type = scheme.key_type] {
+         const auto key = parse_private_key(private_key_text_or_prompt(private_key_text), key_type);
+         const std::span<const uint8_t> bytes{reinterpret_cast<const uint8_t*>(message.data()), message.size()};
+         fc::mutable_variant_object out;
+         out("pub_key", key.get_public_key().to_string({}, true))
+            ("sig", sign_wallet_message(key, bytes).to_string({}, true))
+            ("message", message);
+         std::cout << fc::json::to_pretty_string(out) << std::endl;
+      });
+   }
+};
+
+/// sysio.authex identifiers clio sends.
+namespace authex {
+constexpr auto account           = "sysio.authex"_n;
+constexpr auto action_createlink = "createlink"_n;
+} // namespace authex
+
+/// `system createlink`: link an Ethereum or Solana key to an account. createlink accepts a link only with that key's
+/// signature over `<public key>|<account>|<chain kind>|<nonce>|createlink auth`; this signs it the way the key's
+/// wallet would (MetaMask personal_sign for EM, Solana signMessage for ED), through the host helper the contract
+/// tests share, and sends createlink authorized by the account.
+struct createlink_subcommand {
+   string   account_str;
+   string   private_key_text;
+   uint64_t nonce = 0;
+
+   explicit createlink_subcommand(CLI::App* system_cmd) {
+      auto cmd = system_cmd->add_subcommand(
+         "createlink", localized("Link an Ethereum or Solana key to an account: sign the sysio.authex::createlink "
+                                 "proof with the key and send createlink"));
+      cmd->add_option("account", account_str, localized("The account to link the key to"))->required();
+      cmd->add_option("--private-key", private_key_text, localized(external_private_key_help.data()))->expected(0, 1);
+      auto nonce_opt = cmd->add_option(
+         "--nonce", nonce,
+         localized("Milliseconds since the Unix epoch, signed into the proof; createlink accepts it at most 10 minutes "
+                   "before the block that runs it (default: the head block time)"));
+      add_standard_transaction_options_plus_signing(cmd, "account@active");
+      cmd->callback([this, nonce_opt] {
+         namespace authex_link = sysio::opp::depot::authex_link;
+         const name account(account_str);
+         SYSC_ASSERT(account.to_string() == account_str, "ERROR: ${account} is not a valid account name",
+                     ("account", account_str));
+         const auto key = parse_external_private_key(private_key_text_or_prompt(private_key_text));
+         const auto pub = key.get_public_key();
+         // createlink pairs only EM with EVM and ED with SVM: any other key type is refused here, before sending.
+         const auto chain_kind = authex_link::chain_kind_for(pub);
+         const uint64_t proof_nonce = nonce_opt->count() > 0 ? nonce : head_block_time_ms();
+         const auto args = fc::mutable_variant_object()
+            ("chain_kind", sysio::opp::types::ChainKind_Name(chain_kind))
+            ("account", account)
+            ("sig", authex_link::sign(key, account.to_string(), chain_kind, proof_nonce).to_string({}, true))
+            ("pub_key", pub.to_string({}, true))
+            ("nonce", proof_nonce);
+         const auto permissions = get_account_permissions(tx_permission, {account, config::active_name});
+         send_actions({create_action(permissions, authex::account, authex::action_createlink, args)},
+                      signing_keys_opt.get_keys());
       });
    }
 };
@@ -2225,32 +2465,12 @@ int main( int argc, char** argv ) {
       std::cout << localized("Public key: ${key}", ("key", pubk.to_string({}, true) ) ) << std::endl;
    });
 
-   // EM (Ethereum-style secp256k1) key utilities. These let an external Ethereum signer (MetaMask personal_sign)
-   // interoperate with Wire offline: import a raw Ethereum secret as a Wire PVT_EM_ key, and sign/recover a Wire
-   // transaction sig_digest exactly as nodeop validates it, using libfc's own em path (the same code the chain runs).
-
-   /// Parse a Wire PVT_EM_ string or a raw 0x-prefixed Ethereum hex secret into a unified em private key.
-   /// One helper, used by every em_* subcommand below.
-   auto parse_em_private_key = [](const std::string& s) -> fc::crypto::private_key {
-      if (s.rfind("PVT_EM_", 0) == 0)
-         return fc::crypto::private_key::from_string(s, fc::crypto::private_key::key_type::em);
-      // Raw Ethereum form (what MetaMask / eth tooling exports): 0x<64hex> or 64hex.
-      auto em_priv = fc::em::private_key::from_native_string(s);
-      return fc::crypto::private_key::regenerate<fc::em::private_key_shim>(em_priv.get_secret());
-   };
-
-   /// Parse a 32-byte sha256 digest given as 64 hex chars (optional 0x prefix).
-   auto parse_sha256_hex = [](std::string s) -> fc::sha256 {
-      if (s.rfind("0x", 0) == 0 || s.rfind("0X", 0) == 0)
-         s = s.substr(2);
-      SYSC_ASSERT(s.size() == 64, "ERROR: digest must be a 32-byte sha256 (64 hex chars, 0x optional)");
-      return fc::sha256(s);
-   };
-
+   // EM (Ethereum-style secp256k1) key import: a raw Ethereum secret (what MetaMask exports) as a Wire PVT_EM_ key,
+   // through libfc's own em path, the same code the chain runs. Signing with an external wallet's key is under `sign`.
    string em_private_key;
    auto em_private_key_cmd = convert_cmd->add_subcommand("em_private_key", localized("Convert a raw Ethereum secret (or PVT_EM_) to Wire PVT_EM_/PUB_EM_ key forms"));
-   em_private_key_cmd->add_option("--private-key", em_private_key, localized("PVT_EM_... or a raw 0x Ethereum hex secret. Omit to enter it at the prompt; "
-                                                "passing it here exposes the secret in ps/shell history"))->expected(0, 1);
+   em_private_key_cmd->add_option("--private-key", em_private_key, localized(em_private_key_help.data()))
+      ->expected(0, 1);
    em_private_key_cmd->add_option("-f,--file", key_file, localized("Name of file to write private/public key output to. (Must be set, unless \"--to-console\" is passed"));
    em_private_key_cmd->add_flag("--to-console", print_console, localized("Print private/public keys to console."));
    em_private_key_cmd->callback([&] {
@@ -2258,14 +2478,8 @@ int main( int argc, char** argv ) {
          std::cerr << "ERROR: Either indicate a file using \"--file\" or pass \"--to-console\"" << std::endl;
          return;
       }
-      if (em_private_key.empty()) {
-         std::cout << localized("private key: ");
-         fc::set_console_echo(false);
-         std::getline(std::cin, em_private_key, '\n');
-         fc::set_console_echo(true);
-         std::cout << std::endl;
-      }
-      auto privk = parse_em_private_key(em_private_key);
+      const auto privk = parse_private_key(private_key_text_or_prompt(em_private_key),
+                                           fc::crypto::private_key::key_type::em);
       auto pubk  = privk.get_public_key();
       if (print_console) {
          std::cout << localized("Private key: ${key}", ("key", privk.to_string({}, true)) ) << std::endl;
@@ -2275,42 +2489,6 @@ int main( int argc, char** argv ) {
          fc::write_secure_file(key_file, localized("Private key: ${key}", ("key", privk.to_string({}, true))) + "\n" +
                                             localized("Public key: ${key}", ("key", pubk.to_string({}, true))) + "\n");
       }
-   });
-
-   string em_sign_digest;
-   string em_sign_priv;
-   auto em_sign_cmd = convert_cmd->add_subcommand("em_sign", localized("Sign a 32-byte sha256 digest with an EM key (EIP-191 personal_sign), printing SIG_EM_"));
-   em_sign_cmd->add_option("digest", em_sign_digest, localized("32-byte sha256 digest, 64 hex chars (0x optional)"))->required();
-   em_sign_cmd->add_option("--private-key", em_sign_priv, localized("PVT_EM_... or a raw 0x Ethereum hex secret. Omit to enter it at the prompt; "
-                                                "passing it here exposes the secret in ps/shell history"))->expected(0, 1);
-   em_sign_cmd->callback([&] {
-      if (em_sign_priv.empty()) {
-         std::cout << localized("private key: ");
-         fc::set_console_echo(false);
-         std::getline(std::cin, em_sign_priv, '\n');
-         fc::set_console_echo(true);
-         std::cout << std::endl;
-      }
-      auto privk  = parse_em_private_key(em_sign_priv);
-      auto digest = parse_sha256_hex(em_sign_digest);
-      // private_key::sign dispatches to em::sign_sha256, which wraps the digest in the EIP-191 personal_sign
-      // envelope before secp256k1 -- identical to what MetaMask produces and to what nodeop recovers. Emit the
-      // prefixed SIG_EM_ form, which is what `clio push transaction --signature` and send_transaction2 expect.
-      std::cout << localized("Signature: ${sig}", ("sig", privk.sign(digest).to_string({}, true)) ) << std::endl;
-   });
-
-   string em_recover_sig;
-   string em_recover_digest;
-   auto em_recover_cmd = convert_cmd->add_subcommand("em_recover", localized("Recover the PUB_EM_ from a SIG_EM_ over a 32-byte sha256 digest (EIP-191)"));
-   em_recover_cmd->add_option("signature", em_recover_sig, localized("SIG_EM_... signature to recover from"))->required();
-   em_recover_cmd->add_option("digest", em_recover_digest, localized("32-byte sha256 digest, 64 hex chars (0x optional)"))->required();
-   em_recover_cmd->callback([&] {
-      auto sig    = fc::crypto::signature::from_string(em_recover_sig, fc::crypto::signature::sig_type::em);
-      auto digest = parse_sha256_hex(em_recover_digest);
-      // public_key::recover dispatches to em::recover, which applies the same EIP-191 envelope before recovery.
-      // Emit the prefixed PUB_EM_ form so it compares directly against a key registered in an account's authority.
-      auto pubk = fc::crypto::public_key::recover(sig, digest);
-      std::cout << localized("Public key: ${key}", ("key", pubk.to_string({}, true)) ) << std::endl;
    });
 
    // ——— Ethereum keypair -> Wire K1 ———
@@ -3371,15 +3549,25 @@ int main( int argc, char** argv ) {
    bool push_trx = false;
 
    auto sign_cmd = app.add_subcommand("sign", localized("Sign a transaction"));
+   // Not required(): the em_* / ed_* subcommands below sign other payloads. CLI11 would demand a required positional
+   // for them too, and would even take a subcommand's name as the transaction.
    sign_cmd->add_option("transaction", trx_json_to_sign,
-                                  localized("The JSON string or filename defining the transaction to sign"))->required()->capture_default_str();
+                                  localized("The JSON string or filename defining the transaction to sign"))->capture_default_str();
    sign_cmd->add_option("-k,--private-key", str_private_key, localized("The private key that will be used to sign the transaction"))->expected(0, 1);
    sign_cmd->add_option("--public-key", str_public_key, localized("Ask ${exec} to sign with the corresponding private key of the given public key", ("exec", key_store_executable_name)));
    sign_cmd->add_option("-c,--chain-id", str_chain_id, localized("The chain id that will be used to sign the transaction"));
    sign_cmd->add_flag("-p,--push-transaction", push_trx, localized("Push transaction after signing"));
 
    sign_cmd->callback([&] {
-
+      // CLI11 runs this callback after a subcommand's own; a subcommand signs something other than a transaction.
+      if (!sign_cmd->get_subcommands().empty())
+         return;
+      // An optional `transaction` lets `-k` take the next argument even when it is the transaction (`sign -k <trx>`,
+      // key typed at the prompt). CLI11 leaves that argument to a required positional, so restore that reading, unless
+      // the value is a key: then the transaction is missing, and the key must not be parsed (and printed) as one.
+      if (trx_json_to_sign.empty() && !str_private_key.empty() && !is_private_key(str_private_key))
+         std::swap(trx_json_to_sign, str_private_key);
+      SYSC_ASSERT( !trx_json_to_sign.empty(), "ERROR: transaction is required" );
       SYSC_ASSERT( str_private_key.empty() || str_public_key.empty(), "ERROR: Either -k/--private-key or --public-key or none of them can be set" );
       fc::variant trx_var = json_from_file_or_string(trx_json_to_sign);
 
@@ -3447,6 +3635,14 @@ int main( int argc, char** argv ) {
          }
       }
    });
+
+   // Signatures by an external wallet's key: `sign <key type>_<payload>`, so each scheme stays unambiguous as more key
+   // types are added.
+   sign_cmd->require_subcommand(0, 1);
+   auto signEmDigest = sign_em_digest_subcommand(sign_cmd);
+   auto signEmDigestRecover = sign_em_digest_recover_subcommand(sign_cmd);
+   auto signEmMessage = sign_wallet_message_subcommand(sign_cmd, em_wallet_message);
+   auto signEdMessage = sign_wallet_message_subcommand(sign_cmd, ed_wallet_message);
 
    // Push subcommand
    auto push_cmd = app.add_subcommand("push", localized("Push arbitrary transactions to the blockchain"));
@@ -4030,6 +4226,8 @@ int main( int argc, char** argv ) {
    auto claimRewards = claimrewards_subcommand(system);
 
    auto activate = activate_subcommand(system);
+
+   auto createLink = createlink_subcommand(system);
 
    // System-contract code/abi deployment routed through sysio.roa: the privileged roa contract
    // performs the inline setcode/setabi, makes the target privileged, and gifts the exact RAM out of

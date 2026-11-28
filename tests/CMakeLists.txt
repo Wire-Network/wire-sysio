@@ -45,6 +45,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/metamask/push_metamask_trx.py     ${C
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/metamask/metamask-sign.html       ${CMAKE_CURRENT_BINARY_DIR}/metamask/metamask-sign.html       COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/metamask/README.md                ${CMAKE_CURRENT_BINARY_DIR}/metamask/README.md                COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clio_em_key_test.py ${CMAKE_CURRENT_BINARY_DIR}/clio_em_key_test.py COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clio_system_createlink_test.py ${CMAKE_CURRENT_BINARY_DIR}/clio_system_createlink_test.py COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clio_sign_message_test.py ${CMAKE_CURRENT_BINARY_DIR}/clio_sign_message_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/solana_idl_stub_consistency_test.py ${CMAKE_CURRENT_BINARY_DIR}/solana_idl_stub_consistency_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sample-cluster-map.json ${CMAKE_CURRENT_BINARY_DIR}/sample-cluster-map.json COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/restart-scenarios-test.py ${CMAKE_CURRENT_BINARY_DIR}/restart-scenarios-test.py COPYONLY)
@@ -319,6 +321,7 @@ add_np_test(NAME producer_rank_test COMMAND tests/producer_rank_test.py -v)
 
 add_p_test(NAME sysio_util_bls_test COMMAND tests/sysio_util_bls_test.py)
 add_p_test(NAME clio_em_key_test COMMAND tests/clio_em_key_test.py)
+add_p_test(NAME clio_sign_message_test COMMAND tests/clio_sign_message_test.py)
 add_p_test(NAME sysio_util_snapshot_info_test COMMAND tests/sysio_util_snapshot_info_test.py)
 
 # Fast, cluster-free check that the hand-maintained Solana OPP outpost IDL stub
@@ -350,6 +353,7 @@ add_lr_test(NAME nodeop_repeat_transaction_lr_test COMMAND tests/nodeop_high_tra
 add_np_test(NAME light_validation_sync_test COMMAND tests/light_validation_sync_test.py -v)
 add_np_test(NAME proto_abi_test COMMAND tests/proto_abi_test.py -v)
 add_np_test(NAME nodeownreg_test COMMAND tests/nodeownreg_test.py -v)
+add_np_test(NAME clio_system_createlink_test COMMAND tests/clio_system_createlink_test.py -v)
 add_np_test(NAME clio_set_syscode_test COMMAND tests/clio_set_syscode_test.py -v)
 add_np_test(NAME interrupt_trx_test COMMAND tests/interrupt_trx_test.py -v)
 
