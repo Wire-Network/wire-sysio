@@ -36,6 +36,8 @@ int main(int argc, char* argv[]) {
    bool fetch_traces = false;
    bool fetch_deltas = false;
    bool fetch_finality_data = false;
+   bool request_v0 = false;
+   uint32_t have_positions_count = 0;
 
    cli.add_options()
       ("help,h", bpo::bool_switch(&help)->default_value(false), "Print this help message and exit.")
@@ -48,6 +50,8 @@ int main(int argc, char* argv[]) {
       ("fetch-traces", bpo::bool_switch(&fetch_traces)->default_value(fetch_traces), "Fetch traces")
       ("fetch-deltas", bpo::bool_switch(&fetch_deltas)->default_value(fetch_deltas), "Fetch deltas")
       ("fetch-finality-data", bpo::bool_switch(&fetch_finality_data)->default_value(fetch_finality_data), "Fetch finality data")
+      ("request-v0", bpo::bool_switch(&request_v0), "Use a v0 blocks request")
+      ("have-positions", bpo::value<uint32_t>(&have_positions_count), "Number of test positions at the requested start block")
       ;
    bpo::variables_map varmap;
    bpo::store(bpo::parse_command_line(argc, argv, cli), varmap);
@@ -117,17 +121,24 @@ int main(int argc, char* argv[]) {
       //};
 
       stream.binary(true);
-      const sysio::chain::bytes get_status_bytes = abi.variant_to_binary("request",
-         fc::variants{"get_blocks_request_v1", mvo()("start_block_num", start_block_num)
-                                                    ("end_block_num", std::to_string(end_block_num + 1)) // SHiP is (start-end] exclusive
-                                                    ("max_messages_in_flight",std::to_string(std::numeric_limits<u_int32_t>::max()))
-                                                    ("have_positions", fc::variants{})
-                                                    ("irreversible_only", irreversible_only)
-                                                    ("fetch_block", fetch_block)
-                                                    ("fetch_traces", fetch_traces)
-                                                    ("fetch_deltas", fetch_deltas)
-                                                    ("fetch_finality_data", fetch_finality_data)}, null_yield_function);
-      stream.write(boost::asio::buffer(get_status_bytes));
+      const auto request_name = request_v0 ? "get_blocks_request_v0" : "get_blocks_request_v1";
+      const auto result_name = request_v0 ? "get_blocks_result_v0" : "get_blocks_result_v1";
+      /// Positions at the starting block exercise request admission without causing history lookups.
+      const fc::variant test_position(mvo()("block_num", start_block_num)("block_id", sysio::chain::block_id_type{}.str()));
+      const fc::variants have_positions(have_positions_count, test_position);
+      mvo request;
+      request("start_block_num", start_block_num)
+             ("end_block_num", std::to_string(end_block_num + 1)) // SHiP is (start-end] exclusive
+             ("max_messages_in_flight", std::to_string(std::numeric_limits<uint32_t>::max()))
+             ("have_positions", have_positions)
+             ("irreversible_only", irreversible_only)
+             ("fetch_block", fetch_block)
+             ("fetch_traces", fetch_traces)
+             ("fetch_deltas", fetch_deltas);
+      if(!request_v0)
+         request("fetch_finality_data", fetch_finality_data);
+      const auto request_bytes = abi.variant_to_binary("request", fc::variants{request_name, request}, null_yield_function);
+      stream.write(boost::asio::buffer(request_bytes));
       stream.read_message_max(0);
 
       // Each block_num can have multiple block_ids since forks are possible
@@ -143,7 +154,7 @@ int main(int argc, char* argv[]) {
 
          FC_ASSERT(result.is_array(),                                                        "result should have been an array (variant) but it's not");
          FC_ASSERT(result.size() == 2,                                                       "result was an array but did not contain 2 items like a variant should");
-         FC_ASSERT(result[0ul] == "get_blocks_result_v1",                                    "result type doesn't look like get_blocks_result_v1");
+         FC_ASSERT(result[0ul] == result_name, "expected {} result", result_name);
          const fc::variant_object& resultobj = result[1ul].get_object();
          FC_ASSERT(resultobj.contains("head"),                                               "cannot find 'head' in result");
          FC_ASSERT(resultobj["head"].is_object(),                                            "'head' is not an object");
@@ -159,7 +170,7 @@ int main(int argc, char* argv[]) {
          } else {
            std::cout << "," << std::endl;
          }
-         std::cout << "{ \"get_blocks_result_v1\":" << fc::json::to_pretty_string(resultobj) << std::endl << "}" << std::endl;
+         std::cout << "{ \"" << result_name << "\":" << fc::json::to_pretty_string(resultobj) << std::endl << "}" << std::endl;
 
          // validate after streaming, so that invalid entry is included in the output
          uint32_t this_block_num = 0;
@@ -206,6 +217,13 @@ int main(int argc, char* argv[]) {
       }
 
       std::cout << "]" << std::endl;
+   }
+   catch(const boost::system::system_error& e) {
+      if(e.code() == boost::beast::websocket::error::closed)
+         std::cerr << "WebSocket closed: " << stream.reason().code << ' ' << stream.reason().reason << std::endl;
+      else
+         std::cerr << "Caught exception: " << e.what() << std::endl;
+      return 1;
    }
    catch(std::exception& e) {
       std::cerr << "Caught exception: " << e.what() << std::endl;

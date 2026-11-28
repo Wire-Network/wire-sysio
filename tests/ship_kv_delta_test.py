@@ -4,6 +4,7 @@ import json
 import os
 import shutil
 import signal
+import subprocess
 import sys
 import time
 
@@ -49,6 +50,30 @@ apiNodeNum = 1
 shipNodeNum = 2
 totalNodes = 3
 
+def check_resume_position_limit(ship_address, block_num):
+    """Check that both wire versions stream at the cap and report a policy close above it."""
+    limit = 4096
+    timeout_seconds = 15
+    rejection = "WebSocket closed: 1008 state history have_positions limit exceeded"
+    for version in (0, 1):
+        command = ["tests/ship_streamer", "--socket-address", ship_address,
+                   "--start-block-num", str(block_num), "--end-block-num", str(block_num)]
+        if version == 0:
+            command.append("--request-v0")
+
+        accepted = subprocess.run([*command, "--have-positions", str(limit)],
+                                  capture_output=True, text=True, timeout=timeout_seconds)
+        assert accepted.returncode == 0, f"SHiP v{version} rejected {limit} positions: {accepted.stderr}"
+        result, = json.loads(accepted.stdout)
+        assert result[f"get_blocks_result_v{version}"]["this_block"]["block_num"] == block_num
+
+        rejected = subprocess.run([*command, "--have-positions", str(limit + 1)],
+                                  capture_output=True, text=True, timeout=timeout_seconds)
+        assert rejected.returncode == 1 and rejected.stderr.strip() == rejection, (
+            f"SHiP v{version} did not report the expected policy close: {rejected.stderr}"
+        )
+
+
 try:
     TestHelper.printSystemInfo("BEGIN")
     cluster.setWalletMgr(walletMgr)
@@ -82,6 +107,7 @@ try:
     # Record block number before contract deployment
     startBlockNum = shipNode.getBlockNum()
     Print(f"Start block: {startBlockNum}")
+    check_resume_position_limit(shipAddr, startBlockNum)
 
     # Create accounts using dev key (already in wallet)
     kvmapAccount = Account("kvmap")

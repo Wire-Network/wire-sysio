@@ -25,7 +25,6 @@
 #include <boost/iostreams/copy.hpp>
 
 #include <limits>
-#include <string_view>
 
 using namespace sysio::chain;
 using namespace sysio::testing;
@@ -86,16 +85,14 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(block_request_have_positions_limit, Request, block
    state_request request{std::in_place_type<Request>};
    auto& positions = std::get<Request>(request).have_positions;
 
-   BOOST_CHECK_NO_THROW(validate_have_positions(request));
+   BOOST_CHECK(have_positions_within_limit(request));
    positions.emplace_back();
-   BOOST_CHECK_NO_THROW(validate_have_positions(request));
+   BOOST_CHECK(have_positions_within_limit(request));
 
    positions.resize(expected_max_have_positions);
-   BOOST_CHECK_NO_THROW(validate_have_positions(request));
+   BOOST_CHECK(have_positions_within_limit(request));
    positions.emplace_back();
-   BOOST_CHECK_EXCEPTION(validate_have_positions(request), std::runtime_error, [](const std::runtime_error& error) {
-      return std::string_view(error.what()) == have_positions_limit_exceeded;
-   });
+   BOOST_CHECK(!have_positions_within_limit(request));
 }
 
 /// Verifies that SHiP acknowledgment grants add credits and saturate at the counter limit.
