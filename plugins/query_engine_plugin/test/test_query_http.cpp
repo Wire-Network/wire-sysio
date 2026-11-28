@@ -1,6 +1,7 @@
 #include "query_fixture.hpp"
 #include "query_schema.hpp"
 
+#include <fc/scoped_exit.hpp>
 #include <sysio/chain/app.hpp>
 #include <sysio/chain_api_plugin/chain_api_plugin.hpp>
 #include <sysio/producer_plugin/producer_plugin.hpp>
@@ -29,6 +30,8 @@ constexpr auto all_rows_sql = "SELECT beneficiary, COUNT(*) AS records, SUM(amou
                               "'sample' GROUP BY beneficiary ORDER BY total DESC";
 constexpr auto selected_sql = "SELECT * FROM sample.positions WHERE key.id = 1";
 constexpr auto table_route = "/v1/chain/get_table_rows";
+constexpr auto chain_read_route = "/v1/chain/get_block_info";
+constexpr auto expect_continue = "100-continue";
 constexpr int http_version = 11;
 constexpr uint32_t default_read_threads = 2;
 constexpr auto write_window_option = "read-only-write-window-time-us";
@@ -55,6 +58,7 @@ struct http_application {
    bool http_enabled = false;
    bool has_listener = false;
    std::atomic<uint64_t> query_requests{0}, denied_table_requests{0};
+   std::atomic<uint64_t> chain_read_requests{0};
 
    /// Enablement is supplied via the public --plugin option, never a test route.
    chain::exit_code::exit_code initialize(bool enabled, uint32_t read_threads = default_read_threads,
@@ -116,6 +120,8 @@ struct http_application {
          app().get_plugin<http_plugin>().register_update_metrics([this](http_plugin::metrics request) {
             if (request.target == constants::endpoint)
                ++query_requests;
+            if (request.target == chain_read_route)
+               ++chain_read_requests;
             if (request.target == table_route) {
                ++denied_table_requests;
                throw std::runtime_error("Table HTTP route denied by query integration test");
@@ -210,8 +216,12 @@ struct http_application {
       result.get();
    }
 
-   /// Every response from the production route is validated in its actual wire encoding.
-   http::response<http::string_body> request(std::string body, const char* route = constants::endpoint) {
+   /// Choose whether to send the request body.
+   enum class request_write { full, header_only };
+
+   /// Send a production request and read its first reply. Header-only mode leaves the body unsent.
+   http::response<http::string_body> request(std::string body, const char* route = constants::endpoint,
+                                            request_write write = request_write::full) {
       boost::asio::io_context io;
       boost::beast::basic_stream<boost::asio::local::stream_protocol> stream(io);
       http::request<http::string_body> request{http::verb::post, route, http_version};
@@ -219,6 +229,9 @@ struct http_application {
       request.set(http::field::content_type, "application/json");
       request.body() = std::move(body);
       request.prepare_payload();
+      if (write == request_write::header_only)
+         request.set(http::field::expect, expect_continue);
+      http::request_serializer<http::string_body> serializer{request};
       boost::beast::flat_buffer buffer;
       http::response<http::string_body> response;
       boost::system::error_code failure;
@@ -229,14 +242,18 @@ struct http_application {
                                  failure = error;
                                  return;
                               }
-                              http::async_write(stream, request, [&](boost::system::error_code error, size_t) {
+                              const auto read_reply = [&](boost::system::error_code error, size_t) {
                                  if (error) {
                                     failure = error;
                                     return;
                                  }
                                  http::async_read(stream, buffer, response,
                                                   [&](boost::system::error_code error, size_t) { failure = error; });
-                              });
+                              };
+                              if (write == request_write::header_only)
+                                 http::async_write_header(stream, serializer, read_reply);
+                              else
+                                 http::async_write(stream, serializer, read_reply);
                            });
       io.run();
       if (failure)
@@ -716,6 +733,72 @@ BOOST_AUTO_TEST_CASE(query_http_admission_while_chain_queue_is_blocked) {
       BOOST_REQUIRE(requests[i].wait_for(test_wait) == std::future_status::ready);
       BOOST_CHECK(fc::json::from_string(requests[i].get().body()).get_object().contains("result"));
    }
+}
+
+/// A queued chain read holds HTTP body capacity on the query listener until its work can run.
+BOOST_AUTO_TEST_CASE(query_and_chain_read_share_http_body_budget) {
+   constexpr auto byte_limit_option = "--http-max-bytes-in-flight-mb=1";
+   constexpr size_t byte_limit = 1024 * 1024;
+   constexpr size_t response_headroom = 8 * 1024;
+   constexpr size_t chain_body_size = byte_limit - response_headroom;
+   constexpr size_t query_body_size = 2 * response_headroom;
+
+   chain_fixture fixture;
+   http_application server;
+   BOOST_REQUIRE(server.initialize(true, default_read_threads, {byte_limit_option}) == chain::exit_code::SUCCESS);
+   server.start();
+   server.sync(fixture);
+
+   const auto& plugin = app().get_plugin<http_plugin>();
+   const auto block_num = fixture.control->head().block_num();
+   const chain_apis::read_only::get_block_info_params params{.block_num = block_num};
+   std::string chain_body = fc::json::to_string(params, fc::time_point::maximum());
+   chain_body.resize(chain_body_size, ' ');
+   std::string query_body = request_body(selected_sql);
+   query_body.resize(query_body_size, ' ');
+
+   auto entered = std::make_shared<std::promise<void>>();
+   auto reached = entered->get_future();
+   std::promise<void> resume;
+   const auto release = resume.get_future().share();
+   std::future<http::response<http::string_body>> chain_response;
+   auto unblock = fc::make_scoped_exit([&] { resume.set_value(); });
+   auto blocked = server.post_write([entered, release] {
+      entered->set_value();
+      if (release.wait_for(test_wait) != std::future_status::ready)
+         throw std::runtime_error("Admission barrier was not released");
+   });
+   BOOST_REQUIRE(reached.wait_for(test_wait) == std::future_status::ready);
+   chain_response = std::async(std::launch::async, [&] { return server.request(chain_body, chain_read_route); });
+
+   const auto wait_for = [](auto ready) {
+      const auto deadline = query_budget::clock::now() + test_wait;
+      while (!ready() && query_budget::clock::now() < deadline)
+         std::this_thread::yield();
+      return ready();
+   };
+   // Wait for the chain read to be dispatched with its body still counted against the budget.
+   BOOST_REQUIRE(wait_for([&] {
+      return server.chain_read_requests.load() == 1 && plugin.bytes_in_flight() == chain_body_size;
+   }));
+   const auto refused = server.request(query_body, constants::endpoint, http_application::request_write::header_only);
+   BOOST_CHECK(refused.result() == http::status::service_unavailable);
+   BOOST_CHECK(refused.body().find("Too many bytes in flight") != std::string::npos);
+   BOOST_CHECK_EQUAL(server.query_requests.load(), 0);
+
+   resume.set_value();
+   unblock.cancel();
+   BOOST_REQUIRE(blocked.wait_for(test_wait) == std::future_status::ready);
+   blocked.get();
+   BOOST_REQUIRE(chain_response.wait_for(test_wait) == std::future_status::ready);
+   BOOST_CHECK(chain_response.get().result() == http::status::ok);
+   BOOST_REQUIRE(wait_for([&] { return plugin.bytes_in_flight() == 0; }));
+
+   const auto query = server.request(query_body);
+   BOOST_REQUIRE(query.result() == http::status::ok);
+   BOOST_CHECK(fc::json::from_string(query.body()).get_object().contains(response_field::result));
+   BOOST_CHECK_EQUAL(server.query_requests.load(), 1);
+   BOOST_CHECK(wait_for([&] { return plugin.bytes_in_flight() == 0; }));
 }
 
 /// A real executor excludes block application between pages, for one and for several read threads.
