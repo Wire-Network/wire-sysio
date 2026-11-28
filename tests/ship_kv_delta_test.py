@@ -14,15 +14,15 @@ from TestHarness.TestHelper import AppArgs
 ###############################################################
 # ship_kv_delta_test
 #
-# Verifies that KV table data (all tables use table_id-based storage)
-# flows correctly through the SHiP delta pipeline as contract_row_kv.
+# Verifies the SHiP resume-position limit and the KV delta pipeline.
 #
 # Topology: 1 producer, 1 API node, 1 SHiP node.
 # Transactions are sent to the API node (has transaction-retry).
 #
 # 1. Starts cluster with state_history_plugin
-# 2. Deploys both a KV contract and a multi_index contract
-# 3. Pushes actions to both
+# 2. Checks that v0 and v1 stream at the resume limit and return a
+#    WebSocket policy close for one extra position
+# 3. Deploys a KV contract and a multi_index contract and pushes actions to both
 # 4. Runs ship_streamer with --fetch-deltas
 # 5. Verifies "contract_row_kv" delta table name appears in the
 #    SHiP binary output (all KV data emits as contract_row_kv)

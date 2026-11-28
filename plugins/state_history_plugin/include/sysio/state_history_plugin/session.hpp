@@ -137,6 +137,10 @@ private:
 
    /// Stop reading requests and let the writer send the policy close frame without overlapping data writes.
    boost::asio::awaitable<void> reject_oversized_resume_request() {
+      // The writer closes the transport on exit and can only cancel the timer while it is still running.
+      if(!stream.next_layer().is_open())
+         co_return;
+
       if(has_logged_exception.test_and_set() == false)
          fc_ilog(logger, "state history connection from {} failed: {}", remote_endpoint_string, have_positions_limit_exceeded);
       rejection_timeout.emplace(strand);

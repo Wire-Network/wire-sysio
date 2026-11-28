@@ -121,9 +121,9 @@ int main(int argc, char* argv[]) {
       //};
 
       stream.binary(true);
-      const auto request_name = request_v0 ? "get_blocks_request_v0" : "get_blocks_request_v1";
-      const auto result_name = request_v0 ? "get_blocks_result_v0" : "get_blocks_result_v1";
-      /// Positions at the starting block exercise request admission without causing history lookups.
+      const char* const request_name = request_v0 ? "get_blocks_request_v0" : "get_blocks_request_v1";
+      const char* const result_name = request_v0 ? "get_blocks_result_v0" : "get_blocks_result_v1";
+      // Positions at the starting block exercise request admission without causing history lookups.
       const fc::variant test_position(mvo()("block_num", start_block_num)("block_id", sysio::chain::block_id_type{}.str()));
       const fc::variants have_positions(have_positions_count, test_position);
       mvo request;
