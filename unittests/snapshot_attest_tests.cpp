@@ -19,7 +19,7 @@ using namespace chain;
 
 using snapshot_attest_test_support::snapshot_attest_fixture;
 using snapshot_attest_test_support::single_provider_minimum;
-using snapshot_attest_test_support::snapshot_provider_account;
+using snapshot_attest_test_support::producer_account;
 using snapshot_attest_test_support::to_contract_snapshot_hash;
 
 namespace {
@@ -57,7 +57,7 @@ BOOST_FIXTURE_TEST_CASE(snapshot_hash_matches_attestation, snapshot_attest_fixtu
 
    // Submit attestation vote — K=1, so this creates the attested record.
    produce_block(); // need a new block so we can push actions
-   vote_snapshot(snapshot_provider_account, block_id, hash_as_sha256);
+   vote_snapshot(producer_account, block_id, hash_as_sha256);
    produce_blocks();
 
    // Read the attested record from chain state
@@ -119,7 +119,7 @@ BOOST_FIXTURE_TEST_CASE(snapshot_hash_mismatch_detected, snapshot_attest_fixture
    std::memset(wrong_hash.data(), invalid_snapshot_hash_fill, wrong_hash.data_size());
 
    produce_block();
-   vote_snapshot(snapshot_provider_account, block_id, wrong_hash);
+   vote_snapshot(producer_account, block_id, wrong_hash);
    produce_blocks();
 
    // Read on-chain record
@@ -183,7 +183,7 @@ BOOST_FIXTURE_TEST_CASE(attestation_survives_snapshot_load, snapshot_attest_fixt
 
    // Submit attestation for that snapshot
    produce_block();
-   vote_snapshot(snapshot_provider_account, pre_snap_block_id, hash_as_sha256);
+   vote_snapshot(producer_account, pre_snap_block_id, hash_as_sha256);
    produce_blocks(2);
 
    // Verify attestation exists

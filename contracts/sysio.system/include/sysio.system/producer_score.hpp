@@ -119,24 +119,31 @@ namespace sysiosystem {
        * this is tested rather than when opreg next touches the row.
        *
        * @param producer the producer account.
+       * @param cfg      the live sysio.opreg configuration, read once by a caller testing many producers.
+       * @return true iff the producer is an ACTIVE producer operator that meets the live minimum.
+       */
+      inline bool has_live_producer_standing(const sysio::name& producer, const sysio::opreg::op_config& cfg) {
+         const auto op = find_active_operator(
+            producer, sysio::opp::types::OperatorType::OPERATOR_TYPE_PRODUCER);
+         return op && meets_live_producer_minimum(*op, collateral_factor(*op, cfg));
+      }
+
+      /**
+       * `has_live_producer_standing` under the live sysio.opreg configuration, read here.
+       *
+       * @param producer the producer account.
        * @return true iff the producer is an ACTIVE producer operator that meets the live minimum.
        */
       inline bool has_live_producer_standing(const sysio::name& producer) {
-         const auto op = find_active_operator(
-            producer, sysio::opp::types::OperatorType::OPERATOR_TYPE_PRODUCER);
-         if (!op) return false;
-
          sysio::opreg::opconfig_t cfg_tbl(opreg_refs::account);
-         const auto cfg = cfg_tbl.get_or_default(sysio::opreg::op_config{});
-         return meets_live_producer_minimum(*op, collateral_factor(*op, cfg));
+         return has_live_producer_standing(producer, cfg_tbl.get_or_default(sysio::opreg::op_config{}));
       }
 
       /**
        * Snapshot-service factor: how much of the configured attestation target the producer met in
        * the current pay period.
        *
-       * Scored on ATTESTATIONS, not on registration. A `snapprovs` row is free to create; actually
-       * voting a snapshot hash that reaches quorum is not. The counter is maintained by
+       * Scored on ATTESTATIONS: only votes on a snapshot hash that reaches quorum count. The counter is maintained by
        * `snapshot_attest::votesnaphash` and reset on the same `payepoch` cadence as the block
        * counters, which supplies the trailing window with no extra machinery.
        *
@@ -159,8 +166,8 @@ namespace sysiosystem {
        * short of the finalizer-key requirement. A producer scheduled through `setprods` -- the
        * bootstrap window, and every harness that publishes schedules directly -- produces blocks
        * and needs the BP gossip mesh whether or not it has registered a finalizer key yet; hiding
-       * it from `getpeerkeys` cuts a live block producer out of that mesh. Ranking, pay and
-       * snapshot-provider eligibility walk `is_schedulable` below.
+       * it from `getpeerkeys` cuts a live block producer out of that mesh. Ranking and pay walk
+       * `is_schedulable` below, and snapshot voting `is_schedulable_at_live_minimum`.
        *
        * @param producer the producer row under consideration.
        * @return true iff the producer is a live PRODUCER operator.
@@ -188,7 +195,7 @@ namespace sysiosystem {
       }
 
       /**
-       * The ONE schedulable predicate ranking, pay and snapshot eligibility walk.
+       * The ONE schedulable predicate ranking and pay walk.
        *
        * @param producer   the producer row under consideration.
        * @param finalizers the sysio.system finalizers table.
@@ -196,6 +203,24 @@ namespace sysiosystem {
        */
       inline bool is_schedulable(const producer_info& producer, finalizers_table& finalizers) {
          return is_eligible_operator(producer) && active_finalizer(producer.owner, finalizers).has_value();
+      }
+
+      /**
+       * `is_schedulable` with the operator's bond measured against the live collateral minimum, the predicate the
+       * snapshot vote walk counts positions with.
+       *
+       * `sysio.opreg::setconfig` re-evaluates no stored status, and the rescore sweep it opens converges over later
+       * schedule rebuilds, so a walk that must see a raised minimum at once measures the bond itself.
+       *
+       * @param producer   the producer row under consideration.
+       * @param finalizers the sysio.system finalizers table.
+       * @param cfg        the live sysio.opreg configuration.
+       * @return true iff the producer is schedulable and meets the live producer minimum.
+       */
+      inline bool is_schedulable_at_live_minimum(const producer_info& producer, finalizers_table& finalizers,
+                                                 const sysio::opreg::op_config& cfg) {
+         return producer.active() && has_live_producer_standing(producer.owner, cfg)
+             && active_finalizer(producer.owner, finalizers).has_value();
       }
 
       /**

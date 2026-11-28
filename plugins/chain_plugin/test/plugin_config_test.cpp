@@ -599,7 +599,7 @@ BOOST_FIXTURE_TEST_CASE(
       snapshot_attest_test_support::to_contract_snapshot_hash(snapshot_root_hash);
 
    produce_block();
-   vote_snapshot(snapshot_attest_test_support::snapshot_provider_account,
+   vote_snapshot(snapshot_attest_test_support::producer_account,
                  snapshot_block_id, contract_hash);
    const auto attestation_block_num = produce_block()->block_num();
    // Retained blocks can change cadence after the snapshot: classify the loaded height
@@ -682,7 +682,7 @@ BOOST_AUTO_TEST_CASE(chain_plugin_bounds_unfinalized_snapshot_attestation_wait) 
 
          // A real vote for the honest tuple cannot repair the forged final record.
          source.produce_block();
-         source.vote_snapshot(snapshot_attest_test_support::snapshot_provider_account,
+         source.vote_snapshot(snapshot_attest_test_support::producer_account,
                               snapshot_block_id, contract_hash);
          source.produce_block();
          BOOST_REQUIRE(source.get_row_by_id(

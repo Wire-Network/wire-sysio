@@ -90,6 +90,12 @@ reordered on its own.
 Your first registration also takes a **registration order** from a chain-wide counter, which breaks
 ties between equal scores. Registering again, or parking and returning, keeps it.
 
+It also moves 4,576 bytes of RAM from the system pool to your account. Permissions and their action
+links are billed to your own account, and a new account's RAM has room for none, so this is what pays
+for the keys producers usually add: a claim key for `claimpay` and `claimremit`, the snapshot key a
+provider node votes with, an operations key, extra `owner`/`active` keys. Producer rows are never
+erased, so the grant comes once per account; genesis producers, which keep a single key, receive none.
+
 Creating a producer row, or reactivating one parked with `unregprod`, succeeds only after
 `sysio.opreg` reports your account as an `ACTIVE` producer that meets the live minimums. Calling
 `regproducer` or `regproducer2` before admission cannot create or reactivate the row. Genesis
@@ -219,11 +225,12 @@ Three further factors, relay, API and benchmark service, exist in the configurat
 They stay at zero until the chain can observe them; a self-declared factor would only be a source
 of free points.
 
-Snapshot service is optional. If you want it, register a snapshot provider account with
-`regsnapprov` and vote snapshot hashes with `votesnaphash`; `delsnapprov` retires the delegation
-again and frees the registration slot it held. Those rows are billed to `sysio`, so neither account
-needs RAM for them. Only votes that reach quorum are
-credited, so registering alone earns nothing. The credit is a rating of the CURRENT pay period and
+Snapshot service is optional. While you hold one of the top 30 rank positions you can vote snapshot
+hashes, with no registration: give your provider node the key of a `snapshot` permission linked to
+`votesnaphash`, and it votes for you. Vote rows are billed to `sysio`; the permission and its link
+come out of the RAM your first registration granted (see
+[snapshot attestation](snapshot-attestation.md)). Only votes that reach quorum are
+credited, so running a provider node alone earns nothing. The credit is a rating of the CURRENT pay period and
 is stamped with it, so it expires at the period boundary rather than being consumed when you leave:
 attestations you earned this period still count if you park and come back inside it, and none of
 them survive into the next one. Blocks already counted toward your pay behave the opposite way,

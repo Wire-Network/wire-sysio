@@ -7,9 +7,9 @@ snapshot of chain state and sync forward from there. Replaying is slow; loading 
 is fast but raises a trust question -- how does the joining node know the snapshot it loaded
 is the real chain state and not a corrupted or tampered copy?
 
-Wire answers this with *on-chain snapshot attestation*. A set of registered snapshot
-providers independently generate a snapshot at the same block height, compute a
-deterministic hash of it, and record their agreement on-chain. Once a quorum of providers
+Wire answers this with *on-chain snapshot attestation*. Snapshot provider nodes run for the
+top-ranked producers independently generate a snapshot at the same block height, compute a
+deterministic hash of it, and record their agreement on-chain. Once a quorum of producers
 vote for the same hash at a given block, that hash becomes an attested record in
 system-contract state. Any node that auto-fetches a snapshot can then verify its block ID and
 hash against the attested record after it has synced past the snapshot's block.
@@ -28,7 +28,7 @@ provider over HTTP) builds on this foundation and is documented separately with 
 ## Goals
 
 - Let a new node bootstrap quickly from a snapshot instead of replaying all blocks.
-- Establish snapshot authenticity through agreement of a quorum of registered providers,
+- Establish snapshot authenticity through agreement of a quorum of top-ranked producers,
   recorded on-chain.
 - Keep snapshot generation deterministic, so every honest provider produces an identical
   file and identical root hash for the same block.
@@ -41,7 +41,7 @@ provider over HTTP) builds on this foundation and is documented separately with 
 
 ```
   provider A  --\
-  provider B  ---+--> votesnaphash(snap_account, block_id, hash) --> [ sysio.system ]
+  provider B  ---+--> votesnaphash(producer, block_id, hash) ------> [ sysio.system ]
   provider C  --/                                                        snapvotes
                                                                             |
                                               quorum reached  ------------> snaprecords (attested)
@@ -94,10 +94,8 @@ documented in `docs/snapshot-benchmarks.md`.
 ### Why an on-chain voting contract
 
 Attestation is implemented as a small voting contract rather than a BLS aggregate-signature
-and P2P vote-gossip layer. Its trust assumption is a quorum of durable provider registrations
-whose producers were schedulable when they entered the provider set. Rotation is ungated
-afterwards, so a live mapping does not imply its producer is schedulable now. The contract
-approach:
+and P2P vote-gossip layer. Its trust assumption is a quorum of producers that each held one of the
+top 30 rank positions when it voted. The contract approach:
 
 - adds no new P2P message types or off-chain vote accumulation,
 - needs no BLS key sharing between a producer and its snapshot node,
@@ -118,9 +116,7 @@ Files:
 
 | Action | Authority | Description |
 |--------|-----------|-------------|
-| `regsnapprov(producer, snap_account)` | `producer` | Create or rotate the producer's snapshot-provider delegation. |
-| `delsnapprov(producer)` | `producer` | Retire the producer's delegation, freeing its registration slot. |
-| `votesnaphash(snap_account, block_id, snapshot_hash)` | `snap_account` | Submit a hash vote for the block named by `block_id`. |
+| `votesnaphash(producer, block_id, snapshot_hash)` | `producer`, normally its `snapshot` permission | Submit a hash vote for the block named by `block_id`. |
 | `setsnpcfg(min_providers, block_spacing)` | `sysio` | Set quorum K and the positive block-height cadence. |
 | `getsnaphash(block_num)` | read-only | Return the attested record for a block, if any. |
 
@@ -131,70 +127,74 @@ Storage uses the KV table API (`sysio::kv::table` / `sysio::kv::global`).
 | Table | Key | Contents | Secondary index |
 |-------|-----|----------|-----------------|
 | `snapconfig` | singleton | `{ min_providers, block_spacing }` | -- |
-| `snapprovs` | `snap_account` | `{ snap_account, producer }` | `byproducer` |
 | `snapvotes` | auto-increment `id` | `{ id, block_num, block_id, snapshot_hash, voters[] }` | `byblocknum` |
 | `snaprecords` | `block_num` | `{ block_num, block_id, snapshot_hash, attested_at_block }` | -- |
 
-### Registration
+### Who can vote
 
-A producer calls `regsnapprov` to designate a separate `snap_account` as its snapshot
-provider. A producer that currently holds no mapping must be registered (via `regproducer`),
-active, and ranked at or below `max_snap_provider_rank` (30). Rank is position in a walk that tests
-`is_schedulable`, so two conditions ride along with it: an ACTIVE `OPERATOR_TYPE_PRODUCER` row in
-sysio.opreg, and an active finalizer key. A producer missing either is absent from the ranked list,
-so the rejection re-tests the two non-rank conditions to report the one that actually applied --
-rank is what remains once both are excluded, not the answer given to all three.
-The gate keys on the ABSENCE OF A CURRENT MAPPING rather than on never having registered: a
-producer whose row was evicted by the capacity prune is gated again when it re-registers, while a
-producer that still holds one replaces it ungated, for the reason below.
-Of these conditions only operator standing is rechecked while voting: `votesnaphash` rejects a new
-vote whose producer is no longer an ACTIVE `OPERATOR_TYPE_PRODUCER` row in sysio.opreg (a slash, a
-termination, or a withdrawal below the minimum) or whose bond no longer clears the live
-`req_prod_collat`, bootstrapped operators exempt. `sysio.opreg::setconfig` re-evaluates no stored
-status, so a raised minimum takes effect at the producer's next vote. Rank, activity and the
-finalizer key are not rechecked, so ordinary producer churn cannot interrupt a delegation.
+Any producer holding one of the first `max_snap_provider_rank` (30) positions can vote; there is no
+registration. Rank is position in the producer rank index, counting only producers with an active
+producer row, an ACTIVE `OPERATOR_TYPE_PRODUCER` row in sysio.opreg whose bond clears the live
+`req_prod_collat` (bootstrapped operators exempt), and an active finalizer key. Every vote reads the
+rank live, so a producer that parks, loses its operator standing or finalizer key, or falls past
+position 30 stops voting at once, and the producer that moves up into the band starts.
 
-The registration table is capped at 30. Normal producer lifecycle actions do no attestation work.
-Only when a gated registration encounters a full table does `regsnapprov` lazily remove every
-mapping whose producer would now fail that gate, print each eviction, then reapply the cap. Rank is
-only one way to fail it: a producer that has no `producers` row, has gone inactive, lost its ACTIVE
-`OPERATOR_TYPE_PRODUCER` row in sysio.opreg, or lost its active finalizer key is evicted the same as
-one ranked outside the top 30. All uniqueness checks run before pruning, so a doomed registration
-cannot mutate unrelated mappings. Pending votes are never retracted by this cleanup.
-Delegating to a separate account decouples authority: the producer's keys never have to live on
-the snapshot node -- only the snap_account's key does.
+The bond is measured during the walk because `sysio.opreg::setconfig` re-evaluates no stored status,
+and the rescore sweep it opens reaches the ranking only over later schedule rebuilds. A producer that
+a raised minimum leaves short gives up its position at once, to the producer below it.
 
-Calling `regsnapprov` again with the same pair is idempotent. Calling it with a new snap_account
-atomically replaces that producer's old mapping. Votes store producer identities, so rotating the
-signing account neither retracts an accepted vote nor allows the producer to vote twice.
+Votes are keyed by producer identity, so a producer leaving the band retracts nothing already
+accepted, and the attestation credit earned in the open pay period stays until the period boundary
+rolls it off.
 
-`delsnapprov` retires a mapping outright, freeing its slot without waiting for the capacity prune.
-It is not eligibility-gated either, and for the same reason rotation is not: the producer that most
-needs to stop is the one that has become ineligible. Votes are keyed by producer identity, so
-leaving retracts nothing already accepted, and the attestation credit earned in the open pay period
-stays until the period boundary rolls it off.
+#### The snapshot permission
 
-Rotation is not eligibility-gated either, and retiring does not make it redundant: leaving is
-one-way, because re-registering is gated. A producer that has gone inactive, lost its operator or
-finalizer standing, or fallen outside the rank band can therefore rotate to a safe `snap_account`
-and keep a delegation it can carry back into eligibility, where deleting would oblige it to regain
-eligibility first. Rotation erases that producer's `byproducer` row and emplaces
-the replacement under the new `snap_account`, leaving the row count and the producer's single vote
-unchanged -- it grants nothing a gated registration would. A producer holding no `byproducer` row
-is still refused one while ineligible, whether or not it held one before.
+The provider node votes as the producer. So that the producer's other keys never have to live on
+that node, the producer gives it the key of a `snapshot` permission linked to `votesnaphash` and
+nothing else:
+
+```bash
+clio set account permission myproducer1 snapshot <provider_node_public_key> active -p myproducer1@active
+clio set action permission myproducer1 sysio votesnaphash snapshot -p myproducer1@active
+```
+
+That key can sign snapshot votes and nothing else: it cannot transfer funds, claim pay, or park the
+producer, and it cannot link any other action, which still requires `active`. Rotating it is a native
+`updateauth` on the permission and needs no contract call. Votes store producer identities, so a vote
+signed by `active` and a retry signed by `snapshot` are the same voter.
+
+Rotation alone does not revoke a compromised key. Native authorization lets the `snapshot` permission
+manage itself: it can create permissions under itself and move the `votesnaphash` link onto one of
+them, since it satisfies the current link. A delegate created that way keeps voting after the
+`snapshot` key changes. To revoke the key fully, with `active`:
+
+```bash
+# list the permissions under snapshot and the action each one is linked to
+clio get account myproducer1
+# move the vote link back onto snapshot, then delete each permission under it, deepest first
+clio set action permission myproducer1 sysio votesnaphash snapshot -p myproducer1@active
+clio set account permission myproducer1 <delegate> null -p myproducer1@active
+# then replace the key
+clio set account permission myproducer1 snapshot <new_public_key> active -p myproducer1@active
+```
+
+The permission and its link are billed to the producer's own RAM (432 bytes for one fixed-size key).
+A collateral-backed producer receives `regproducer_ram` (4,576 bytes) from sysio's pool the first time
+`regproducer` creates its producer row, which covers this and the other permissions producers typically
+add. Producer rows are never erased, so the grant reaches each account once.
 
 ### Voting and quorum
 
-After computing a snapshot, a provider calls `votesnaphash(snap_account, block_id,
-snapshot_hash)`. The contract checks that `snap_account` is a registered provider whose producer is
-still an ACTIVE `OPERATOR_TYPE_PRODUCER` in sysio.opreg that clears the live collateral minimum
-(bootstrapped producers exempt), derives `block_num` from `block_id`, and accumulates the vote.
+After computing a snapshot, a provider calls `votesnaphash(producer, block_id, snapshot_hash)`.
+The contract checks that `producer` holds a top-30 rank position, counted among producers that clear
+the live collateral minimum (bootstrapped producers exempt), derives `block_num` from
+`block_id`, and accumulates the vote.
 
 `min_providers` is the governance-set fixed K: every tuple finalizes after K distinct producer
 votes. Its stored default is zero, which disables voting until governance chooses the launch value.
-K does not scale with the number of registered mappings; governance explicitly owns that security
+K does not scale with the number of producers that vote; governance explicitly owns that security
 and liveness tradeoff. Configuration changes apply to pending heights, and retrying an existing
-vote, from a producer that still has operator standing, finalizes its tuple if a newly lowered K is
+vote, from a producer that can still vote, finalizes its tuple if a newly lowered K is
 already met.
 
 `block_spacing` is the positive block-height distance between eligible snapshots, defaulting to
@@ -210,12 +210,10 @@ Operators must restart provider and serving nodes after a change so they adopt t
 snapshot bootstrap checks the loaded height against its own pre-replay configuration. The post-replay
 value is then cached for the running node. Already-attested records remain discoverable after cadence changes.
 
-A producer may retry a pending tuple idempotently while it keeps its operator standing (a vote from a
-registered provider on a finalized tuple is a no-op while its height remains eligible under the current
-cadence; any other account is rejected), and may vote at
-multiple scheduled heights, but cannot submit two
-different tuples at one height. Registration and producer-status churn never removes an accepted
-vote.
+A producer may retry a pending tuple idempotently while it can still vote (a vote from a top-30
+producer on a finalized tuple is a no-op while its height remains eligible under the current cadence;
+any other account is rejected), and may vote at multiple scheduled heights, but cannot submit two
+different tuples at one height. Producer churn never removes an accepted vote.
 
 Only positive exact multiples of the configured `block_spacing` are accepted. This bounds the
 height space to the provider schedule and rejects manual/on-demand snapshots before they can create
@@ -229,16 +227,15 @@ pending rows. Scheduling remains based on block number, never elapsed time or bl
 - When a tuple reaches quorum, the contract writes a `snap_record` to `snaprecords` and
   purges pending votes through that block height. Only compact attested records are retained,
   keeping RAM use negligible over time.
-- Provider, vote and record rows are billed to `sysio`. Only the last `max_pending_vote_heights` (2)
+- Vote and record rows are billed to `sysio`. Only the last `max_pending_vote_heights` (2)
   scheduled heights at or below the current block take votes, so the vote table stays bounded when
   quorum never forms: an older height is rejected ("snapshot block is older than the pending vote
   window") and the next accepted vote purges its rows. Two periods are at least four times the
   verification grace, so a vote that lands in time for verifiers is never refused.
 - A producer votes once per height, so an open height holds at most one row per distinct producer
-  that held a delegation while it was open. Delegation churn can push a height past
-  `max_snap_providers` rows only by bringing in further collateral-backed producers ranked within
-  `max_snap_provider_rank`, and those rows are purged with the rest of the height once it leaves
-  the window.
+  that ranked in the top 30 while it was open. Rank churn can push a height past
+  `max_snap_providers` rows only by bringing further producers into the top 30, and those rows are
+  purged with the rest of the height once it leaves the window.
 - Once a newer height is attested, a purged unfinished historical height cannot be reopened.
   The latest retained `snaprecords` row acts as the monotonic finalized-height watermark.
 - After a block is attested, any later vote carrying a different block ID or hash for that height
@@ -253,10 +250,11 @@ The attested record is queryable by external clients and explorers via `get_tabl
 A snapshot provider is a syncing node -- not a producer and not a finalizer -- enabled with:
 
 ```ini
-snapshot-provider-account = <snap_account>
+snapshot-producer-name = <producer>
 ```
 
-When this option is set, `nodeop`:
+The node holds only the key of the producer's `snapshot` permission (see "The snapshot permission"
+above). When this option is set, `nodeop`:
 
 1. Uses the startup `snapconfig.block_spacing` (25,000 if no row exists) to schedule snapshots at
    exact multiples. Startup removes provider-owned automatic requests with a stale schedule shape,
@@ -269,16 +267,16 @@ When this option is set, `nodeop`:
    BLAKE3 root hash and automatically builds, signs, and submits a `votesnaphash` transaction.
    Unscheduled manual/on-demand snapshots are retained locally but skipped by the vote callback.
    The transaction is authorized by
-   `snap_account@active`; the signing key is resolved through the signature provider manager,
-   so only the snap_account's key needs to be present on this node.
+   `<producer>@snapshot`; the signing key is resolved through the signature provider manager,
+   so only that permission's key needs to be present on this node.
 3. If a submitted vote is rejected with error code 9001 (hash disagreement), logs a fatal
    error and shuts the node down -- the node's snapshot disagreed with the attested record
    and must not be trusted.
 
-Role exclusivity is enforced at startup: `snapshot-provider-account` cannot be combined with
+Role exclusivity is enforced at startup: `snapshot-producer-name` cannot be combined with
 `producer-name`.
 
-This auto-vote path is specific to `snapshot-provider-account` mode and to scheduled heights.
+This auto-vote path is specific to `snapshot-producer-name` mode and to scheduled heights.
 The contract independently enforces the same cadence, so a monitoring script cannot attest a
 manual snapshot at an arbitrary height.
 
@@ -344,20 +342,22 @@ acquire a fresh snapshot from a trusted source before restarting.
 
 ```
   [ Producer node ]                       [ Snapshot provider node ]
-    producer-name = <account>               snapshot-provider-account = <snap_account>
-    (no snapshot-provider-account)          (no producer-name)
+    producer-name = <account>               snapshot-producer-name = <account>
+    (no snapshot-producer-name)             (no producer-name)
 ```
 
-The producer registers the provider account once with `regsnapprov`. The provider node syncs
-the chain, generates snapshots on the configured schedule, votes via `votesnaphash`, and may also
-serve snapshots over HTTP. No keys are shared between the two nodes.
+A producer in the top 30 needs no registration: it gives the provider node the key of its
+`snapshot` permission. The provider node syncs the chain, generates snapshots on the configured
+schedule, votes via `votesnaphash`, and may also serve snapshots over HTTP. The producer's block-signing,
+finalizer and account keys stay off the provider node.
 
 A minimal operator flow:
 
 ```bash
-# producer delegates a provider account (producer must be ranked <= 30)
-clio push action sysio regsnapprov \
-  '{"producer":"myproducer1","snap_account":"mysnapprov1"}' -p myproducer1@active
+# a permission whose key the provider node holds, able to sign votes and nothing else
+# (its votes count while the producer holds a top-30 rank position)
+clio set account permission myproducer1 snapshot <provider_node_public_key> active -p myproducer1@active
+clio set action permission myproducer1 sysio votesnaphash snapshot -p myproducer1@active
 
 # initialize the network-wide cadence and fixed K (sysio authority)
 clio push action sysio setsnpcfg \
@@ -365,21 +365,20 @@ clio push action sysio setsnpcfg \
 
 # a vote (auto-submitted in snapshot-provider mode; shown here for reference)
 clio push action sysio votesnaphash \
-  '{"snap_account":"mysnapprov1","block_id":"<block_id>","snapshot_hash":"<root_hash>"}' \
-  -p mysnapprov1@active
+  '{"producer":"myproducer1","block_id":"<block_id>","snapshot_hash":"<root_hash>"}' \
+  -p myproducer1@snapshot
 ```
 
 ## Trust and security model
 
-- Trust reduces to: a quorum of durable provider registrations honestly computed the snapshot
-  hash. Each producer was schedulable and within the top 30 rank positions when it entered the
-  provider set. Rank and the finalizer key are checked on admission, not on each mapping row:
-  rotation replaces the `snap_account` ungated. A vote is also accepted only while its producer's
-  sysio.opreg row is an ACTIVE PRODUCER whose bond clears the live collateral minimum
-  (bootstrapped producers exempt), so a bond
-  withdrawn to fund another account stops the first account's mapping from voting again, and a
-  minimum raised by governance applies to every provider's next vote. Votes accepted earlier keep
-  counting toward K.
+- Trust reduces to: a quorum of producers, each holding a top-30 rank position when it voted,
+  honestly computed the snapshot hash. Rank is read on every vote and counts only producers whose
+  bond clears the live collateral minimum (bootstrapped producers exempt), so a producer that parks,
+  loses its operator standing or finalizer key, falls short of a raised minimum, or falls past
+  position 30 stops voting at once. Votes accepted earlier keep counting toward K.
+- A compromised snapshot key can vote for its producer, and nothing else. It can also delegate that
+  vote to a permission it creates, so revoking it means restoring the vote link and deleting those
+  permissions, not only rotating the key (see "The snapshot permission").
 - Determinism is what makes a quorum meaningful: if honest providers could compute different
   hashes for the same block, votes would never converge. The fixed snapshot format and
   canonical section ordering remove that ambiguity.
@@ -392,11 +391,12 @@ clio push action sysio votesnaphash \
 
 ## Testing
 
-- Contract tests (`contracts/tests/sysio.snapshot_attest_tests.cpp`) cover registration, rotation
-  and `delsnapprov` retirement, rejections that name the failed eligibility condition,
-  side-effect-free uniqueness failures, traceable lazy full-table pruning, fixed-K configuration,
-  positive mutable cadence, adjacent-height rejection, per-vote operator-standing rejection
-  including a raised collateral minimum, monotonic votes across churn and heights,
+- Contract tests (`contracts/tests/sysio.snapshot_attest_tests.cpp`) cover voting by any top-30
+  producer and the live rank band, rejection of non-producers and parked producers, votes signed by
+  the linked `snapshot` permission (unlinked, out-of-scope, rotated-key and delegated-key revocation
+  cases included), fixed-K configuration, positive mutable cadence, adjacent-height rejection, per-vote
+  rank and raised-collateral-minimum rejection, the band moving past a producer a raised minimum
+  leaves short before the rescore sweep runs, monotonic votes across churn and heights,
   equivocation/disagreement rejection, finalization purging, and the `getsnaphash` query.
 - Unit tests (`unittests/snapshot_attest_tests.cpp`) cover snapshot round-trip hash
   stability, a full chain whose snapshot hash matches its on-chain record, mismatch
@@ -406,8 +406,9 @@ clio push action sysio votesnaphash \
   and terminal tuple verification. Chain-plugin tests additionally cover direct startup KV reads,
   replayed governance changes, deliberate replay termination, disabled configuration, endpoint-to-file
   block identity, and the trusted manual-snapshot bypass.
-- The wall-clock integration test (`tests/snapshot_attest_test.py`) covers provider lifecycle
-  actions, startup cadence, provider restart/reuse and manual-request preservation, and proves an
+- The wall-clock integration test (`tests/snapshot_attest_test.py`) covers a ranked producer
+  attesting a local snapshot, a provider node voting a scheduled snapshot with only the producer's
+  linked `snapshot` key until it reaches `snaprecords`, startup cadence, provider restart/reuse and manual-request preservation, and proves an
   on-demand snapshot is rejected outside its configured cadence. C++
   fixtures configure a 250-block cadence to cover fixed-K voting, attestation-record persistence,
   snapshot round trips, and strict auto-fetch verification without manufacturing 25,000 blocks.

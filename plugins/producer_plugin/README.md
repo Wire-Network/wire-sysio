@@ -19,7 +19,7 @@ plugin_initialize
   |  apply greylist accounts and limit, subjective-billing exclusions
   |  init the implicit production-pause vote tracker
   |  point the snapshot scheduler at snapshots-dir
-  |  snapshot-provider-account: register the snapshot-finalized vote callback
+  |  snapshot-producer-name: register the snapshot-finalized vote callback
   |
 plugin_startup
   |  connect controller signals: accepted_block, accepted_block_header,
@@ -77,8 +77,8 @@ irreversible.
 creation, scheduling, and a finalization callback that `snapshot_api_plugin` uses to keep its serving catalog
 current.
 
-Setting `snapshot-provider-account` turns on **provider mode**, which cannot be combined with
-`producer-name`. Provider mode uses the on-chain `snapconfig.block_spacing` read once by `chain_plugin`
+Setting `snapshot-producer-name` to a producer account turns on **provider mode**, which cannot be
+combined with `producer-name`. Provider mode uses the on-chain `snapconfig.block_spacing` read once by `chain_plugin`
 at startup (25,000 when the row is absent), schedules snapshots at exact multiples, and submits a
 `votesnaphash` attestation when an eligible snapshot finalizes. Contract voting still requires a configured
 nonzero quorum. Configure small test intervals before starting providers, or restart them afterward.
@@ -95,11 +95,11 @@ Block heights end at `UINT32_MAX`. A cadence above `UINT32_MAX / 2` cannot form 
 so startup removes provider-owned automatic requests, logs the reason, and schedules nothing.
 Manual requests are preserved. This does not cap or alter the on-chain cadence.
 
-Provider mode needs a signing key of its own. The attestation is signed in-process from the `wire` signature
-providers that carry a local private key, and at least one of them must satisfy the configured account's
-`active` authority. Without one, every attestation is skipped with `Snapshot provider: no signing key
-available for <account>@active votesnaphash transaction` — snapshots are still written, but nothing is
-attested.
+Provider mode needs a signing key of its own. The attestation is signed in-process as `<account>@snapshot`
+from the `wire` signature providers that carry a local private key, and at least one of them must satisfy that
+permission, which the producer links to `votesnaphash` (see `docs/snapshot-attestation.md`). Without one, every
+attestation is skipped with `Snapshot provider: no signing key available for <account>@snapshot votesnaphash
+transaction` — snapshots are still written, but nothing is attested.
 
 A rejected attestation is not always survivable. If `votesnaphash` fails with error code 9001 — this node's
 snapshot hash disagrees with the record already attested on chain — the plugin logs `FATAL: Snapshot hash
@@ -157,11 +157,11 @@ snapshots-dir = snapshots
 ```
 
 A snapshot provider — note that provider mode and `producer-name` are mutually exclusive, and that the
-account's `active` authority has to be satisfied by one of the configured `wire` keys:
+producer's `snapshot` permission has to be satisfied by one of the configured `wire` keys:
 
 ```ini
-snapshot-provider-account = <your-account>
-signature-provider = <key-name>,wire,wire,<your-public-key>,KEY:<your-private-key>
+snapshot-producer-name = <your-account>
+signature-provider = <key-name>,wire,wire,<snapshot-public-key>,KEY:<snapshot-private-key>
 snapshots-dir = snapshots
 ```
 
@@ -174,8 +174,8 @@ nodeop --producer-name <your-account> \
        --max-transaction-time 499 \
        --production-pause-vote-timeout-ms 6000
 
-nodeop --snapshot-provider-account <your-account> \
-       --signature-provider <key-name>,wire,wire,<your-public-key>,KEY:<your-private-key> \
+nodeop --snapshot-producer-name <your-account> \
+       --signature-provider <key-name>,wire,wire,<snapshot-public-key>,KEY:<snapshot-private-key> \
        --snapshots-dir snapshots
 
 nodeop --pause-on-startup   # -x; start with production paused
@@ -235,7 +235,7 @@ for `enable-stale-production`, and `-x` for `pause-on-startup`.
 | Option | Default | Meaning |
 |---|---|---|
 | `snapshots-dir` | `snapshots` | Location of the snapshots directory. A relative path resolves against the data dir and is created if it does not exist; an absolute path must already exist, or startup fails with `No such directory '<path>'`. |
-| `snapshot-provider-account` | empty | Account used to sign and submit `votesnaphash` transactions. Setting it enables snapshot provider mode. Cannot be used alongside `producer-name`. |
+| `snapshot-producer-name` | empty | Producer account to vote snapshot hashes for; `votesnaphash` is signed with its `snapshot` permission. Setting it enables snapshot provider mode. Cannot be used alongside `producer-name`. |
 
 ## HTTP API
 
@@ -280,7 +280,7 @@ Lines an operator should recognize:
 - Startup assertion failures name the conflicting option directly: a node cannot have `producer-name`
   configured with `validation-mode` other than `full`, with neither API nor P2P transactions accepted, or with
   `read-mode = irreversible`; finalizers cannot be configured in `read-mode = irreversible`; and
-  `snapshot-provider-account cannot be used alongside producer-name`.
+  `snapshot-producer-name cannot be used alongside producer-name`.
 - Shutdown: `exit shutdown` at debug level.
 
 ## Tests

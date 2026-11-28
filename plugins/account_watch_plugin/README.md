@@ -13,14 +13,12 @@ command line, and is fixed at startup.
 
 ## Enabling the plugin
 
-A producer, watching its producer account and its snapshot provider account, with the snapshot provider's routine
-attestation excluded:
+A producer, watching its account, with the routine snapshot votes its provider node signs excluded:
 
 ```ini
 plugin = sysio::account_watch_plugin
 account-watch-include = prod.a,*::*
-account-watch-include = snap.a,*::*
-account-watch-exclude = snap.a@active,sysio::votesnaphash
+account-watch-exclude = prod.a@snapshot,sysio::votesnaphash
 ```
 
 An account holder watching everything their account signs:
@@ -67,14 +65,14 @@ rule without `@<permission>` matches every permission. There are no partial wild
 | `prod.a,*::*` | every action prod.a authorizes, with any permission |
 | `prod.a@owner,*::*` | every use of prod.a's owner permission |
 | `*,sysio::setcode` | every setcode, whoever authorizes it |
-| `snap.a@active,sysio::votesnaphash` | snap.a's attestations, as an exclude |
+| `prod.a@snapshot,sysio::votesnaphash` | prod.a's snapshot votes, as an exclude |
 
 - **Authorizations, not receivers.** Include and exclude rules match only an action's declared authorizations. A
   transfer to a watched account notifies it but does not match its include rule: anyone could send one. Receiver rules
   cover that case.
 - **Excludes are per authorization.** An exclude removes only the authorization it matches. With the exclude above,
-  `snap.a@active` sending `votesnaphash` is silent, but the same action co-signed by `prod.a@active` is reported, and
-  so is `snap.a@owner` sending it.
+  `prod.a@snapshot` sending `votesnaphash` is silent, but the same action is reported when `prod.a@active` signs it,
+  alone or beside the snapshot key.
 - **An explicit payer counts only alone.** An `<actor>@sysio.payer` entry beside a real authorization of the same
   actor only names who pays, so it is skipped and the real one is matched: a payer entry never reports an action an
   exclude has silenced. A payer entry with no such partner, which only a privileged contract's inline action can

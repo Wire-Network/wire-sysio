@@ -3,7 +3,6 @@
 #include <sysio.system/snapshot_attest.hpp>
 #include <sysio.system/block_utils.hpp>
 
-#include <sysio/print.hpp>
 #include <sysio/sysio.hpp>
 
 #include <algorithm>
@@ -14,16 +13,7 @@ namespace sysiosystem {
 
 namespace {
 
-constexpr char producer_not_registered_error[] = "producer is not registered";
-constexpr char producer_not_active_error[] = "producer is not active";
 constexpr char producer_rank_too_high_error[] = "producer rank exceeds maximum for snapshot providers";
-constexpr char producer_not_operator_error[] = "producer is not an active PRODUCER operator";
-constexpr char producer_no_live_standing_error[] = "producer does not meet the live PRODUCER operator requirements";
-constexpr char producer_no_finalizer_key_error[] = "producer has no active finalizer key";
-constexpr char provider_not_registered_error[] = "snap_account is not a registered snapshot provider";
-constexpr char provider_already_registered_error[] = "snap_account is already registered as a provider";
-constexpr char provider_capacity_error[] = "maximum registered snapshot providers reached";
-constexpr char producer_has_no_provider_error[] = "producer has no registered snapshot provider";
 constexpr char vote_equivocation_error[] = "producer already voted a different snapshot tuple for this height";
 constexpr char snapshot_config_unset_error[] = "snapshot attestation configuration has not been set";
 constexpr char invalid_block_id_error[] = "invalid block_id";
@@ -32,122 +22,41 @@ constexpr char historical_block_id_error[] = "snapshot block is older than lates
 constexpr char stale_block_id_error[] = "snapshot block is older than the pending vote window";
 constexpr char future_block_id_error[] = "snapshot block cannot be in the future";
 constexpr char min_providers_range_error[] = "min_providers must be at least 1";
-constexpr char min_providers_capacity_error[] = "min_providers exceeds the maximum registrable providers";
+constexpr char min_providers_capacity_error[] = "min_providers exceeds the number of producers that can vote";
 constexpr char block_spacing_range_error[] = "block_spacing must be greater than 0";
 constexpr char snapshot_record_not_found_error[] = "no attested snapshot record for this block number";
-constexpr char stale_provider_prune_log_prefix[] = "regsnapprov: pruned stale mapping for producer ";
-constexpr char stale_provider_prune_log_infix[] = " and snapshot provider ";
-constexpr char log_line_ending[] = "\n";
 
 /// Stale vote rows one vote may erase: a full window, so a steady cadence clears its backlog in one call while
 /// rows a cadence change strands drain over later votes.
 constexpr uint32_t max_stale_vote_purge_rows = max_snap_providers * snapshot_attestation::max_pending_vote_heights;
 
-/// Classifies the producer-table state gating a producer that currently holds no mapping.
-enum class snapshot_producer_eligibility {
-   eligible,
-   inactive,
-   not_active_operator,
-   no_active_finalizer,
-   rank_exceeds_maximum,
-};
-
-/// The assert message for a rejecting state, or nullptr when the producer is eligible.
+/// Whether `producer` holds one of the first max_snap_provider_rank positions among producers that can vote.
 ///
-/// Exhaustive over the enum rather than defaulted, so a state added later is a compiler diagnostic
-/// instead of a silent fall-through to the rank message.
-constexpr const char* snapshot_eligibility_error(snapshot_producer_eligibility eligibility) {
-   switch (eligibility) {
-      case snapshot_producer_eligibility::inactive:             return producer_not_active_error;
-      case snapshot_producer_eligibility::not_active_operator:  return producer_not_operator_error;
-      case snapshot_producer_eligibility::no_active_finalizer:  return producer_no_finalizer_key_error;
-      case snapshot_producer_eligibility::rank_exceeds_maximum: return producer_rank_too_high_error;
-      case snapshot_producer_eligibility::eligible:             break;
-   }
-   return nullptr;
-}
+/// Rank is POSITION in the "prodrank" index, so this walks the index, counting only rows that pass
+/// `is_schedulable_at_live_minimum`: an active producer row, an ACTIVE PRODUCER operator whose bond clears the live
+/// collateral minimum (bootstrapped exempt), and an active finalizer key. Counting matches, rather than taking the
+/// first N entries, stops rows whose standing lapsed from crowding out eligible producers while their cached rank
+/// keys converge, including through the rescore sweep a raised minimum opens. Returns as soon as the producer is found.
+bool is_ranked_snapshot_producer(name self, name producer) {
+   producers_table          producers(self);
+   finalizers_table         finalizers(self);
+   sysio::opreg::opconfig_t opreg_cfg_tbl(opreg_refs::account);
+   const auto               opreg_cfg = opreg_cfg_tbl.get_or_default(sysio::opreg::op_config{});
 
-/// The producers holding rank positions 1..max_snap_provider_rank, in rank order.
-///
-/// `rank` is no longer a stored field -- it is POSITION in the "prodrank" index among schedulable
-/// producers. So the rank gate is a bounded walk of at most `max_snap_provider_rank` schedulable
-/// entries, testing membership, rather than a point read. Counting matches (rather than taking
-/// the first N index entries) stops historical rows whose live standing has lapsed from crowding
-/// eligible producers out while their cached rank keys converge.
-///
-/// Computed ONCE per ACTION -- `regsnapprov` walks it on the gated path and threads the result
-/// through both the eligibility check and the capacity prune -- then tested for membership rather
-/// than re-walked per producer, which would make the prune's max_snap_providers entries quadratic.
-std::vector<name> snapshot_ranked_producers(name self) {
-   producers_table  producers(self);
-   finalizers_table finalizers(self);
-
-   std::vector<name> ranked;
-   ranked.reserve(max_snap_provider_rank);
-
-   // Bounded on ROWS EXAMINED, not just on matches. `rank_score` is a CACHE while `is_schedulable`
-   // is evaluated LIVE, so healthy-tier rows that no longer qualify are skipped by `continue` and
-   // would otherwise cost an unbounded scan -- at a cross-contract sysio.opreg read plus a
-   // finalizer read apiece. That matters more here than on the other walks: this one is reached
-   // from `regsnapprov`, a user-signed write, so an unbounded scan turns into a transaction that
-   // cannot fit its CPU budget and `regsnapprov` stops working for everyone.
+   // Bounded on ROWS EXAMINED, not just on positions. `rank_score` is a CACHE while eligibility is evaluated LIVE, so
+   // rows that no longer qualify are skipped and would otherwise cost an unbounded scan, at a cross-contract
+   // sysio.opreg read plus a finalizer read apiece.
+   uint32_t position = 0;
    uint32_t examined = 0;
-   auto idx = producers.get_index<"prodrank"_n>();
-   for (auto i = idx.cbegin(); i != idx.cend() && ranked.size() < max_snap_provider_rank; ++i) {
+   auto     idx      = producers.get_index<"prodrank"_n>();
+   for (auto i = idx.cbegin(); i != idx.cend() && position < max_snap_provider_rank; ++i) {
       if (producer_rank::tier_of(i->rank_score) == producer_tier::demoted) break;
       if (++examined > max_rank_walk_rows) break;
-      if (!producer_rank::is_schedulable(*i, finalizers)) continue;
-      ranked.push_back(i->owner);
+      if (!producer_rank::is_schedulable_at_live_minimum(*i, finalizers, opreg_cfg)) continue;
+      if (i->owner == producer) return true;
+      ++position;
    }
-   return ranked;
-}
-
-/// Whether the producer qualifies to hold a mapping, by membership in `ranked` alone.
-///
-/// The PRUNE's predicate: it runs per retained row and only needs the verdict, so it stays free of
-/// the per-producer reads that naming a reason costs.
-bool is_snapshot_producer_eligible(const producer_info& producer, const std::vector<name>& ranked) {
-   return producer.active() && std::find(ranked.begin(), ranked.end(), producer.owner) != ranked.end();
-}
-
-/// Returns the producer-table eligibility required to acquire a mapping the producer lacks.
-///
-/// Absence from `ranked` does not say WHY: `snapshot_ranked_producers` drops a producer for missing
-/// operator standing or a missing finalizer key exactly as readily as for rank. So the two non-rank
-/// causes are re-tested here, through the same predicates the walk used, and rank is what remains
-/// once both are excluded. Those two reads are why this is the REGISTRANT's path only -- it runs
-/// once, for one producer, on a path that is already rejecting.
-snapshot_producer_eligibility get_snapshot_producer_eligibility(const producer_info& producer,
-                                                               const std::vector<name>& ranked,
-                                                               finalizers_table& finalizers) {
-   if (is_snapshot_producer_eligible(producer, ranked)) {
-      return snapshot_producer_eligibility::eligible;
-   }
-   if (!producer.active()) {
-      return snapshot_producer_eligibility::inactive;
-   }
-   if (!producer_rank::is_eligible_operator(producer)) {
-      return snapshot_producer_eligibility::not_active_operator;
-   }
-   if (!producer_rank::active_finalizer(producer.owner, finalizers).has_value()) {
-      return snapshot_producer_eligibility::no_active_finalizer;
-   }
-   return snapshot_producer_eligibility::rank_exceeds_maximum;
-}
-
-/// Requires the producer's current table state to permit acquiring a mapping it lacks.
-///
-/// Not applied to a rotation -- see `regsnapprov`. Takes `ranked` rather than walking for it:
-/// `regsnapprov` also needs the list for the capacity prune, and this walk is the expensive part
-/// of that user-signed action.
-void require_snapshot_producer_eligibility(name self, name producer, const std::vector<name>& ranked) {
-   producers_table  producers(self);
-   finalizers_table finalizers(self);
-   const auto prod_itr = producers.require_find(producer_key_t{producer.value}, producer_not_registered_error);
-   const auto eligibility = get_snapshot_producer_eligibility(*prod_itr, ranked, finalizers);
-   if (const auto* error = snapshot_eligibility_error(eligibility)) {
-      check(false, error);
-   }
+   return false;
 }
 
 /// Credit every producer whose vote contributed to a quorum-reaching snapshot record.
@@ -172,38 +81,6 @@ void credit_snapshot_attestations(name self, const std::vector<name>& voters) {
       // The credit moved the snapshot factor, so the stored sort key is stale until rescored.
       // Without this the factor would reach the index only on the next unrelated rescore.
       producer_rank::rescore(self, producers, voter);
-   }
-}
-
-/// Counts provider mappings for the bounded registration-capacity check.
-uint32_t count_snapshot_providers(const snap_providers_table& providers) {
-   uint32_t provider_count = 0;
-   for (auto provider_itr = providers.begin(); provider_itr != providers.end(); ++provider_itr) {
-      ++provider_count;
-   }
-   return provider_count;
-}
-
-/// Removes stale mappings only when capacity would otherwise reject a new registration.
-void prune_stale_snapshot_providers_if_full(name self, snap_providers_table& providers,
-                                            const std::vector<name>& ranked) {
-   if (count_snapshot_providers(providers) < max_snap_providers) {
-      return;
-   }
-
-   producers_table   producers(self);
-   auto              provider_itr = providers.begin();
-   while (provider_itr != providers.end()) {
-      const auto producer_itr = producers.try_get(producer_key_t{provider_itr->producer.value});
-      if (!producer_itr || !is_snapshot_producer_eligible(*producer_itr, ranked)) {
-         const name stale_producer = provider_itr->producer;
-         const name stale_snap_account = provider_itr->snap_account;
-         provider_itr = providers.erase(std::move(provider_itr));
-         sysio::print(stale_provider_prune_log_prefix, stale_producer,
-                      stale_provider_prune_log_infix, stale_snap_account, log_line_ending);
-      } else {
-         ++provider_itr;
-      }
    }
 }
 
@@ -256,62 +133,8 @@ void finalize_snapshot_vote(name self, uint32_t block_num, const checksum256& bl
 } // namespace
 
 // -------------------------------------------------------------------------------------------------
-void snapshot_attest::regsnapprov(name producer, name snap_account) {
+void snapshot_attest::votesnaphash(name producer, checksum256 block_id, checksum256 snapshot_hash) {
    require_auth(producer);
-
-   snap_providers_table providers(get_self());
-   const auto provider_itr = providers.find(snap_provider_key_t{snap_account.value});
-   if (provider_itr != providers.end()) {
-      check(provider_itr->producer == producer, provider_already_registered_error);
-      return;
-   }
-
-   auto by_producer = providers.get_index<snapshot_index::by_producer>();
-   auto producer_itr = by_producer.find(producer.value);
-   if (producer_itr != by_producer.end()) {
-      // ROTATION is deliberately UN-gated, and `delsnapprov` does not subsume it: leaving is
-      // one-way, because re-registering IS gated. So an ineligible producer that rotates keeps a
-      // delegation it can still serve from and can carry back into eligibility, where one that
-      // deleted would have to regain eligibility first. Both paths exist so that a compromised
-      // snap_account is revocable either way. The erase keeps both the row count and this
-      // producer's single vote unchanged, so an ineligible rotation grants nothing a gated
-      // registration would.
-      by_producer.erase(std::move(producer_itr));
-   } else {
-      // NO CURRENT ROW -- gated, and gated BEFORE the prune so a rejected registration never
-      // erases another producer's mapping. A producer the prune evicted lands here too, so the
-      // gate is re-applied to it. The walk is bounded but expensive, so the prune shares it.
-      const auto ranked = snapshot_ranked_producers(get_self());
-      require_snapshot_producer_eligibility(get_self(), producer, ranked);
-      prune_stale_snapshot_providers_if_full(get_self(), providers, ranked);
-   }
-   check(count_snapshot_providers(providers) < max_snap_providers, provider_capacity_error);
-
-   // Contract-paid: the table is capped at max_snap_providers and gated on rank, so no spam path.
-   providers.emplace(get_self(), snap_provider_key_t{snap_account.value}, [&](auto& row) {
-      row.snap_account = snap_account;
-      row.producer     = producer;
-   });
-}
-
-// -------------------------------------------------------------------------------------------------
-void snapshot_attest::delsnapprov(name producer) {
-   require_auth(producer);
-
-   snap_providers_table providers(get_self());
-   auto by_producer = providers.get_index<snapshot_index::by_producer>();
-   auto producer_itr = by_producer.require_find(producer.value, producer_has_no_provider_error);
-   by_producer.erase(std::move(producer_itr));
-
-   // No rescore, unlike every other mutation in this contract: `snapshot_attestations` is a
-   // PRODUCER-row counter on the payepoch cadence, and none of the score's inputs are the mapping.
-   // A producer keeps the credit it already earned this period and the counter rolls off on its own.
-   // Pending votes are keyed by producer, so leaving retracts nothing already accepted.
-}
-
-// -------------------------------------------------------------------------------------------------
-void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, checksum256 snapshot_hash) {
-   require_auth(snap_account);
 
    const uint32_t block_num = block_info::block_height_from_id(block_id);
    check(block_num > 0, invalid_block_id_error);
@@ -326,15 +149,12 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
 
    snap_records_table records(get_self());
    const snap_record_key_t record_key{static_cast<uint64_t>(block_num)};
-   // Matched before the provider check: a provider node shuts down on snap_hash_disagreement_error, so a
-   // mismatch is reported whether or not the account still holds a mapping.
+   // Matched before the rank check: a provider node shuts down on snap_hash_disagreement_error, so a
+   // mismatch is reported whether or not the producer can still vote.
    const bool already_final = matches_final_snapshot_record(records, record_key, block_id, snapshot_hash);
 
-   // Checked before the already-final return, so only a registered provider's late vote succeeds.
-   snap_providers_table providers(get_self());
-   const auto provider_itr = providers.find(snap_provider_key_t{snap_account.value});
-   check(provider_itr != providers.end(), provider_not_registered_error);
-   // A late vote cannot count toward a quorum, so it skips the standing check below.
+   // Checked before the already-final return, so only a top-ranked producer's late vote succeeds.
+   check(is_ranked_snapshot_producer(get_self(), producer), producer_rank_too_high_error);
    if (already_final) {
       return;
    }
@@ -345,12 +165,6 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
    // sysio pays for vote rows, so heights older than the window are closed: that bounds what a withheld quorum leaves.
    const uint64_t pending_floor = snapshot_attestation::pending_vote_floor(current_block, config.block_spacing);
    check(block_num >= pending_floor, stale_block_id_error);
-
-   const name producer = provider_itr->producer;
-   // Each vote re-checks the producer's live operator standing: ACTIVE in sysio.opreg and clear of the live
-   // collateral minimum, bootstrapped exempt. A slash, a termination or a withdrawal below the minimum ends it, and a
-   // raised minimum takes effect at the next vote. Rank, parking and the finalizer key stay registration-time conditions.
-   check(producer_rank::has_live_producer_standing(producer), producer_no_live_standing_error);
 
    snap_votes_table votes(get_self());
    purge_stale_snapshot_votes(votes, pending_floor);

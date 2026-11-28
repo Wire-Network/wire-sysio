@@ -681,7 +681,7 @@ public:
 
    /** Build, sign, and asynchronously submit one finalized snapshot vote. */
    void submit_snapshot_vote(const snapshot_scheduler::snapshot_information& si) {
-      if (_snapshot_provider_account.empty()) return;
+      if (_snapshot_producer_name.empty()) return;
 
       if (!snapshot_attest::is_scheduled_block(
              si.head_block_num, chain_plug->get_snapshot_attestation_config().block_spacing)) {
@@ -693,17 +693,19 @@ public:
       try {
          chain::controller& chain = chain_plug->chain();
 
-         auto snap_account_name = chain::name(_snapshot_provider_account);
+         const auto producer_name = chain::name(_snapshot_producer_name);
+         const auto vote_permission = chain::name(snapshot_attest::permission_snapshot);
 
-         // Build the votesnaphash action
+         // Build the votesnaphash action, signed by the producer's snapshot permission so the producer's
+         // other keys stay off this node.
          chain::action vote_action;
          vote_action.account = chain::config::system_account_name;
          vote_action.name = chain::name(snapshot_attest::action_votesnaphash);
-         vote_action.authorization = {{snap_account_name, chain::config::active_name}};
+         vote_action.authorization = {{producer_name, vote_permission}};
          // Parameter order must match votesnaphash(name, checksum256, checksum256) in snapshot_attest.hpp.
          // root_hash is fc::crypto::blake3 (32 bytes) which is binary-compatible with checksum256.
          vote_action.data = fc::raw::pack(
-            std::make_tuple(snap_account_name, si.head_block_id, si.root_hash));
+            std::make_tuple(producer_name, si.head_block_id, si.root_hash));
 
          // Build the transaction
          chain::signed_transaction trx;
@@ -712,7 +714,7 @@ public:
             chain.head().block_time() + fc::seconds(_snapshot_vote_expiration_seconds));
          trx.set_reference_block(chain.head().id());
 
-         // Determine the required signing keys for the snapshot provider account's active authority
+         // Determine the required signing keys for the producer's snapshot permission
          auto& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
          auto wire_sig_providers = sig_plug.query_providers(
             std::nullopt, std::nullopt, chain::crypto::chain_key_type_wire);
@@ -727,13 +729,13 @@ public:
             }
          }
 
-         // Use authorization_manager to find which keys satisfy snap_account@active
+         // Use authorization_manager to find which keys satisfy <producer>@snapshot
          auto required_keys = chain.get_authorization_manager().get_required_keys(
             trx, candidate_keys);
 
          if (required_keys.empty()) {
-            elog("Snapshot provider: no signing key available for {}@active votesnaphash transaction",
-                 _snapshot_provider_account);
+            elog("Snapshot provider: no signing key available for {}@{} votesnaphash transaction",
+                 _snapshot_producer_name, snapshot_attest::permission_snapshot);
             return;
          }
 
@@ -895,7 +897,7 @@ public:
    snapshot_scheduler _snapshot_scheduler;
 
    // snapshot provider configuration
-   std::string _snapshot_provider_account;
+   std::string _snapshot_producer_name;
    /// Lifetime of an automatically submitted provider vote transaction.
    static constexpr uint32_t _snapshot_vote_expiration_seconds = 30;
    /// Description persisted with the automatic provider schedule.
@@ -1546,8 +1548,8 @@ void producer_plugin::set_program_options(
           "Disable subjective CPU billing for API transactions")
          ("snapshots-dir", bpo::value<std::filesystem::path>()->default_value("snapshots"),
           "the location of the snapshots directory (absolute path or relative to application data dir)")
-         ("snapshot-provider-account", bpo::value<std::string>()->default_value(""),
-          "Account name used to sign and submit votesnaphash transactions. When set, enables snapshot provider mode. Cannot be used alongside producer-name.")
+         ("snapshot-producer-name", bpo::value<std::string>()->default_value(""),
+          "Producer account to vote snapshot hashes for; votesnaphash is signed with its snapshot permission. When set, enables snapshot provider mode. Cannot be used alongside producer-name.")
          ("read-only-threads", bpo::value<uint32_t>(),
          ("Number of worker threads in read-only execution thread pool. Defaults to "s +
           std::to_string(producer_plugin_impl::_ro_default_threads_nonproducer) +
@@ -1805,10 +1807,10 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
    _snapshot_scheduler.set_snapshots_path(_snapshots_dir);
 
    // Snapshot provider configuration
-   _snapshot_provider_account = options.at("snapshot-provider-account").as<std::string>();
-   if (!_snapshot_provider_account.empty()) {
+   _snapshot_producer_name = options.at("snapshot-producer-name").as<std::string>();
+   if (!_snapshot_producer_name.empty()) {
       SYS_ASSERT(!is_configured_producer(), plugin_config_exception,
-                 "snapshot-provider-account cannot be used alongside producer-name");
+                 "snapshot-producer-name cannot be used alongside producer-name");
 
       _snapshot_scheduler.add_snapshot_finalized_callback(
          [this](const snapshot_scheduler::snapshot_information& si) {
@@ -1871,7 +1873,7 @@ void producer_plugin_impl::plugin_startup() {
       // on_start_block(height) snapshots the current head at height - 1, so start_block_num equal
       // to block_spacing snapshots exact head-height multiples:
       // blocks S, 2S, 3S, ...
-      if (!_snapshot_provider_account.empty()) {
+      if (!_snapshot_producer_name.empty()) {
          const auto block_spacing = chain_plug->get_snapshot_attestation_config().block_spacing;
          constexpr auto maximum_block_num = std::numeric_limits<uint32_t>::max();
          const bool schedulable = block_spacing <= maximum_block_num - block_spacing;

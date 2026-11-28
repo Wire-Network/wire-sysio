@@ -59,7 +59,7 @@ if("native-module" IN_LIST SYSIO_WASM_RUNTIMES AND BUILD_SYSTEM_CONTRACTS)
       EXTRA_DISPATCH "sysiosystem::peer_keys:regpeerkey,delpeerkey,getpeerkeys"
                      "sysiosystem::trx_priority:addtrxp,deltrxp"
                      "sysiosystem::subjective_exempt:addsubjex,delsubjex"
-                     "sysiosystem::snapshot_attest:regsnapprov,delsnapprov,votesnaphash,setsnpcfg,getsnaphash"
+                     "sysiosystem::snapshot_attest:votesnaphash,setsnpcfg,getsnaphash"
    )
 
    target_link_libraries(sysio.system_native
