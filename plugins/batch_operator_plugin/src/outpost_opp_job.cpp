@@ -211,4 +211,16 @@ void outpost_opp_job::run_inbound() {
    }
 }
 
+void outpost_opp_job::run_follow() {
+   // No election or epoch-window gate: whoever is elected for an epoch must
+   // already hold what the outpost emitted toward it.
+   try {
+      _client->follow_outpost(_outpost_deadline);
+   } catch (const fc::exception& e) {
+      wlog("outpost_opp_job[{}]: following the outpost failed: {}", _client->to_string(), e.to_detail_string());
+   } catch (const std::exception& e) {
+      wlog("outpost_opp_job[{}]: following the outpost failed: {}", _client->to_string(), e.what());
+   }
+}
+
 } // namespace sysio

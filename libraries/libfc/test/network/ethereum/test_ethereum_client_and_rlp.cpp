@@ -617,6 +617,53 @@ BOOST_AUTO_TEST_CASE(abi_decode_dynamic_uint_array) try {
 }
 FC_LOG_AND_RETHROW();
 
+/** An event decodes what its log's data holds: indexed parameters ride in topics and are left out, and the
+ *  parameters read by name, a lone one included. */
+BOOST_AUTO_TEST_CASE(event_decode_skips_indexed_parameters_and_names_a_lone_one) try {
+   constexpr std::string_view message_event_json =
+      R"({"type":"event","name":"OutboundMessage","inputs":[)"
+      R"({"name":"messageIndex","type":"uint64","indexed":true},)"
+      R"({"name":"chainHash","type":"bytes32","indexed":false},)"
+      R"({"name":"message","type":"bytes","indexed":false}]})";
+   constexpr std::string_view envelope_event_json =
+      R"({"type":"event","name":"OPPEnvelope","inputs":[{"name":"data","type":"bytes","indexed":false}]})";
+   constexpr std::string_view chain_hash = "1111111111111111111111111111111111111111111111111111111111111111";
+   constexpr std::string_view payload    = "abcd";
+   /// The head of a log whose data is (bytes32, bytes): the hash, then the bytes' offset past both head words.
+   constexpr std::string_view message_offset_word =
+      "0000000000000000000000000000000000000000000000000000000000000040";
+   /// The head of a log whose data is a lone bytes: its offset past the one head word.
+   constexpr std::string_view lone_offset_word =
+      "0000000000000000000000000000000000000000000000000000000000000020";
+   constexpr std::string_view payload_tail =
+      "0000000000000000000000000000000000000000000000000000000000000002"
+      "abcd000000000000000000000000000000000000000000000000000000000000";
+
+   const auto message_event = eth::abi::parse_contract(fc::json::from_string(std::string(message_event_json)));
+   BOOST_REQUIRE_EQUAL(message_event.inputs.size(), 3u);
+   BOOST_CHECK(message_event.inputs[0].indexed);
+   BOOST_CHECK(!message_event.inputs[1].indexed);
+   BOOST_CHECK(!message_event.inputs[2].indexed);
+
+   eth::ethereum_event_data message_log;
+   message_log.event_abi = message_event;
+   message_log.data =
+      hex_to_bytes(std::string(chain_hash) + std::string(message_offset_word) + std::string(payload_tail));
+   const auto message = message_log.decode<fc::variant_object>();
+   BOOST_REQUIRE(message.has_value());
+   BOOST_CHECK(!message->contains("messageIndex"));
+   BOOST_CHECK_EQUAL((*message)["chainHash"].as_string(), "0x" + std::string(chain_hash));
+   BOOST_CHECK_EQUAL((*message)["message"].as_string(), "0x" + std::string(payload));
+
+   eth::ethereum_event_data envelope_log;
+   envelope_log.event_abi = eth::abi::parse_contract(fc::json::from_string(std::string(envelope_event_json)));
+   envelope_log.data      = hex_to_bytes(std::string(lone_offset_word) + std::string(payload_tail));
+   const auto envelope    = envelope_log.decode<fc::variant_object>();
+   BOOST_REQUIRE(envelope.has_value());
+   BOOST_CHECK_EQUAL((*envelope)["data"].as_string(), "0x" + std::string(payload));
+}
+FC_LOG_AND_RETHROW();
+
 // BOOST_AUTO_TEST_CASE(can_encode_call_sig) try {
 //    auto encoded_call_sig = contract_invoke_encode(test_tx_01_sig, test_tx_01_sig_params);
 //    BOOST_CHECK(encoded_call_sig == test_tx_01_sig_encoded);

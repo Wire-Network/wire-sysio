@@ -109,11 +109,24 @@ public:
       crank_response(call);
    }
 
+   /// follow_outpost response — scripted per call; the default follows nothing.
+   std::function<void(fc::microseconds)> follow_response = [](fc::microseconds) {};
+
+   void follow_outpost(fc::microseconds deadline) override {
+      {
+         std::lock_guard<std::mutex> lock(_mx);
+         follow_deadlines.push_back(deadline);
+      }
+      follow_response(deadline);
+   }
+
    std::vector<outbound_call> outbound_calls;
    std::vector<inbound_call>  inbound_calls;
    std::vector<inbound_call>  emitted_digest_calls;
 
    std::vector<crank_call>    crank_calls;
+   /// The deadline of every follow_outpost call, in order.
+   std::vector<fc::microseconds> follow_deadlines;
    std::vector<uint8_t>       caller_address;
 
 private:

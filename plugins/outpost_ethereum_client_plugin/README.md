@@ -117,8 +117,8 @@ confirmations — OPP writes are consensus-critical and must not silently drop.
 
 | Wrapper | Contract | Members |
 |---|---|---|
-| `opp_contract_client` | `OPP.sol` | `emitOutboundEnvelope(uint32)` (recovery-only write; no in-tree steady-state caller), `getLatestOutboundEnvelope()` view |
-| `opp_inbound_contract_client` | `OPPInbound.sol` | `epochIn(uint32,bytes)` (funded per call, returns the confirmed receipt), `nextEpochIndex()`, `dispatchSpill(uint32)`, `epochDeliveries(uint32,address)`, `pendingEpochHash()`, `pendingConsensusForDigest(bytes32)` and `attestationHandlers(uint16)` views |
+| `opp_contract_client` | `OPP.sol` | `publishOutboundEnvelope(uint32,bytes[])` (permissionless), `getFinalizedOutbound(uint32)`, `latestOutboundEpoch()`, `publishedOutboundCursor()` and `outboundEnvelopes(uint32)` views; the `OutboundMessage` and `OPPEnvelope` events |
+| `opp_inbound_contract_client` | `OPPInbound.sol` | `epochIn(uint32,bytes)` (funded per call, returns the confirmed receipt), `nextEpochIndex()`, `dispatchSpill(uint32)`, `epochDeliveries(uint32,address)`, `pendingEpochHash()` and `attestationHandlers(uint16)` views |
 | `syndication_pool_contract_client` | `SyndicationPool.sol` (Wire-Network/wire-ethereum#207) | `realizeYield()` |
 
 ### Outbound delivery
@@ -151,11 +151,13 @@ From those reads the relay decides, per `outpost_ethereum_client_detail::decide_
 |---|---|
 | `nextEpochIndex > epoch`, or the spill cursor reports `finalized` | Nothing to send; an EMPTY tx id marks the epoch handled, once the read confirmation shows it too |
 | `nextEpochIndex < epoch` | The outpost is behind: `outpost_delivery_incomplete_exception`, retried next tick |
-| Tipped and unfinished, and this relay's recorded digest IS `pendingEpochHash` | Continue: re-send the envelope (after checking its `keccak256` is the settled digest) |
-| Tipped and unfinished on a digest this relay did not deliver, or delivered a minority of | Nothing to send; its deliverers carry the continuation |
+| Tipped and unfinished, and this relay's recorded digest IS `pendingEpochHash`, or this relay never delivered (a late member of the group) | Continue: re-send the envelope (after checking its `keccak256` is the settled digest) |
+| Tipped and unfinished on a digest other than the one this relay delivered | Nothing to send; its deliverers carry the continuation |
 | Untipped, nothing recorded for this relay | Deliver |
-| Untipped, this relay recorded, and `pendingConsensusForDigest(own digest)` says the boundary has elapsed and a strict majority agrees | Re-deliver, so the outpost re-runs its path-2 tip |
-| Untipped, this relay recorded, otherwise | Nothing to send until more of the group delivers |
+| Untipped, this relay recorded | Nothing to send until more of the group delivers: the outpost tips on the delivery that brings a strict majority to one digest |
+
+The outpost keeps no time: its consensus is a count, so nothing here reads when an epoch began or how long the
+depot's epochs last.
 
 **Each call is funded to what it has left to carry** (`delivery_gas_budget`): a fixed cost, a per-byte cost,
 an allowance per attestation the cursor says is still to dispatch, and the emit — doubled for each call this
@@ -249,12 +251,44 @@ delivery then goes out at the next nonce from the outpost's state.
 
 ### Inbound reads
 
-`read_inbound_envelope` makes one `getLatestOutboundEnvelope` view call, and `read_emitted_envelope_digest`
-(the underwriter's check) one `outboundEnvelopes(epoch)` call, at the client's **read confirmation**, never
-at the head. WIRE consensus on inbound is committed forward against this read, so an operator that read a
-slot a reorg then removes could reach WIRE-side consensus on it. The decoded result's epoch is compared with
-the requested one and a mismatch returns an empty vector at debug level, since observing the preceding epoch
-is normal until the `epochIn` that emits this one overwrites the slot.
+OPP stores no outbound payload. Each message is emitted whole as an `OutboundMessage(messageIndex, chainHash,
+message)` event and folded into a hash chain (`h_n = keccak256(h_{n-1} || keccak256(message_n))`); the
+outpost's consensus tip closes an epoch's envelope at a point on that chain (`getFinalizedOutbound(epoch)`:
+end hash, message end, timestamp, the block of the envelope's first message, and the block it was published
+in); anyone publishes it with `publishOutboundEnvelope(epoch, messages)`, which re-chains the list, refuses any
+other, and emits the assembled envelope as `OPPEnvelope(data)`.
+
+**Following.** `follow_outpost` runs on its own cron job every `batch-outpost-follow-ms` (4 s by default, a third
+of a slot), whether or not the operator is elected. It reads the `OutboundMessage` logs from a block cursor to the
+head, in ranges of at most 1,000 blocks, into a cache that checks every message against the chain hash its own
+event carries: no block is skipped whatever the spacing, which bounds only how stale the cache may be. The cache
+starts from the outpost's state at the head: the published cursor, and the block of the first message after it
+(the first unpublished finalized envelope, early-closed envelope or open envelope that holds one), so a restart
+rescans exactly the pending messages. A message that does not follow from what the cache holds (a reorg, or a
+node that skipped a log) clears it, and the next follow starts again.
+
+**Publishing.** The relay whose `epochIn` finalized the epoch publishes the envelope that call closed, once the
+finalization is as deep as the read confirmation, i.e. once `getFinalizedOutbound(epoch)` there is the record the
+call's receipt reported. The envelope is fixed then, and no reorg inside the window can turn the publication into
+a revert. The call's tick only notes it, and follows the messages the call emitted from its receipt; the job calls
+again every tick until the depot holds the envelope, and the first tick that finds the finalization settled
+publishes it from the cache (or the logs from the envelope's first-message block). A finalization that settles
+elsewhere than the call put it (a reorg undid the call) is dropped, and the read path publishes the settled one.
+Publications go through the signer's journal (`submission_purpose::publish`) like `epochIn`, so they are repriced,
+replaced and settled the same way; one that fails is left to the read path and never fails the delivery.
+
+**Reading.** `read_inbound_envelope` reads `getFinalizedOutbound(epoch)` at the client's **read confirmation**,
+never at the head. That record fixes the envelope: its end on the chain, its message count and its timestamp,
+and the header's previous-envelope hash is fixed by the earlier epochs. Every publication of the epoch carries the
+same bytes, so once the finalization is settled the publication need not be: a settled one is read from the
+`OPPEnvelope` logs of the recorded block, and one at the head is read from its block and delivered once it matches
+the settled record (epoch, timestamp, and exactly the messages that chain from the previous epoch's settled end to
+this one's). While the epoch is finalized but unpublished at the head, the read publishes it, and any unpublished
+epoch before it first, from the cache (or, missing it, the `OutboundMessage` logs from the envelope's first-message
+block), re-chained against the finalized end before anything is paid for; it publishes nothing while a delivery
+holds the signer. `read_emitted_envelope_digest` (the underwriter's check) reads `outboundEnvelopes(epoch)` at the
+read confirmation. WIRE consensus on inbound is committed forward against these reads, so an operator that read a
+finalization a reorg then removes could reach WIRE-side consensus on it.
 
 The read confirmation is one of:
 
@@ -410,10 +444,15 @@ Per-client runtime lines are prefixed with the SPI label `outpost_ethereum_clien
 
 - `epochIn delivered|continued epoch=... bytes=... gas=... block=... tx=... — recorded=... tipped=...
   dispatched=... finalized=...` for each confirmed call, summarising the `OPPInbound` events in its receipt.
-- `skipping epoch=... delivery — the outpost has already finalized it`, `tipped on a digest this relay did
-  not deliver`, `delivery already recorded; consensus not tipped`, `re-delivering to run the boundary tip`
-  and `not delivered — the outpost is still on epoch ...` for each decision that sends nothing (or
-  re-sends).
+- `skipping epoch=... delivery — the outpost has already finalized it`, `tipped on digest ... but this relay
+  delivered ...`, `delivery recorded; consensus not yet tipped` and `not delivered — the outpost is still on
+  epoch ...` for each decision that sends nothing.
+- `publishing outbound epoch ... (... messages)` and `published outbound epoch ... in block ...` for each
+  publication sent, and at warning level a finalized epoch whose messages are not in hand or do not chain to the
+  finalized end, a publication after a finalizing call that failed, and a head publication that does not match
+  the settled record.
+- `following outbound messages from message ... reading from block ...` when the cache starts, and at warning
+  level `outbound message ... does not follow the messages held` when it starts again.
 - `refused at ... gas (...); retrying at the ceiling` at warning level for a gas refusal below the ceiling,
   and `cannot advance past attestation N at the ceiling` at error level — once per cursor position — when
   no funding carries the attestation there; `still open after N calls in one tick` at warning level when
@@ -446,8 +485,9 @@ discovery (configured, deferred, malformed, out-of-range, prolonged refusal, act
 independent clients and cancellation), signature-provider rejection cases, contract-client construction and
 ABI encoding, the
 delivery decision table, settlement and receipt classification, the gas budget and ceilings, and every
-delivery path — one call, tip-and-spill continued in the same tick, resume from a tipped cursor, minority
-and never-delivered digests, consensus retry gated on the outpost's own majority view, pinned-block reads,
+delivery path — one call, tip-and-spill continued in the same tick, resume from a tipped cursor, a minority
+digest left to its deliverers, a late member continuing with the agreed bytes, a recorded delivery awaiting
+peers, pinned-block reads,
 escalation after a call that advanced nothing and the stall report at the ceiling, revert classification,
 outpost behind, the per-tick bound, epoch advanced, deadline abandonment, and the empty and over-cap
 rejections — the read confirmation (each tag, the depth, the finalized block when fresher, the finality-lag

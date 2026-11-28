@@ -14,6 +14,9 @@
 #include <fc/network/json_rpc/json_rpc_client.hpp>
 #include <fc/task/retry.hpp>
 
+#include <algorithm>
+#include <iterator>
+
 namespace fc::network::ethereum {
 using namespace fc::crypto;
 using namespace fc::crypto::ethereum;
@@ -208,7 +211,11 @@ struct ethereum_event_data {
    /**
     * @brief Decodes the non-indexed event parameters into the requested type
     *
-    * Special handling for fc::variant and fc::variant_object: returns the ABI-decoded
+    * Indexed parameters are carried in `topics`, not in `data`, and are left out. The parameters
+    * decode as one object keyed by name, a lone named parameter included; unnamed parameters
+    * decode positionally, as `contract_decode_data` returns them.
+    *
+    * Special handling for fc::variant and fc::variant_object: returns that decoded
     * result directly. For other types, decodes to fc::variant first, then converts
     * via fc::from_variant<T>.
     *
@@ -882,15 +889,21 @@ std::expected<T, fc::ethereum_abi_decode_exception> ethereum_event_data::decode(
       FC_ASSERT(event_abi.has_value(), "No event ABI available for decoding");
       FC_ASSERT(!data.empty(), "No event data to decode");
 
-      // Build a temporary function ABI with the event inputs as outputs
-      // so contract_decode_data can decode the non-indexed parameters
+      // Build a temporary function ABI with the event's non-indexed inputs as outputs, so
+      // contract_decode_data decodes exactly what the log's data holds.
       abi::contract decode_abi;
       decode_abi.name = event_abi->name;
       decode_abi.type = abi::invoke_target_type::function;
-      decode_abi.outputs = event_abi->inputs;
+      std::ranges::copy_if(event_abi->inputs, std::back_inserter(decode_abi.outputs),
+                           [](const abi::component_type& input) { return !input.indexed; });
+      FC_ASSERT(!decode_abi.outputs.empty(), "Event {} has no non-indexed parameters to decode", event_abi->name);
 
       auto data_hex = fc::to_hex(data, true);
       auto decoded = contract_decode_data(decode_abi, data_hex);
+      // contract_decode_data returns a lone output bare; an event's parameters read by name.
+      if (decode_abi.outputs.size() == 1 && !decode_abi.outputs.front().name.empty()) {
+         decoded = fc::mutable_variant_object(decode_abi.outputs.front().name, std::move(decoded));
+      }
 
       if constexpr (std::is_same_v<std::decay_t<T>, fc::variant>) {
          return decoded;

@@ -16,15 +16,17 @@ namespace sysio {
  * Holds an `outpost_client_ptr` (the chain-specific SPI, owned by
  * `outpost_client_plugin`) and a reference to a `depot_ops` (the WIRE-side
  * contract, owned by `batch_operator_plugin`). The batch operator plugin
- * constructs one per registered outpost at startup and schedules two cron
+ * constructs one per registered outpost at startup and schedules three cron
  * jobs against it:
  *
- *   - `outpost_opp_outbound_<id>` calls `run_outbound()` every cycle.
- *   - `outpost_opp_inbound_<id>`  calls `run_inbound()`  every cycle.
+ *   - `outpost_opp_outbound_<id>` calls `run_outbound()` every epoch poll.
+ *   - `outpost_opp_inbound_<id>`  calls `run_inbound()`  every epoch poll.
+ *   - `outpost_opp_follow_<id>`   calls `run_follow()`   every follow poll.
  *
- * Both jobs can fire on different cron worker threads; the internal
- * `_state_mx` serializes mutable state access between them. `one_at_a_time`
- * on each cron job prevents a single job from re-entering itself.
+ * The jobs can fire on different cron worker threads; the internal
+ * `_state_mx` serializes the outbound and inbound jobs' state access.
+ * `run_follow` touches no job state, so a long delivery never holds it back.
+ * `one_at_a_time` on each cron job prevents a single job from re-entering itself.
  *
  * The `outpost_deadline` passed to every `outpost_client` RPC call is the
  * per-call deadline, not the cycle deadline. Concrete clients are required
@@ -51,6 +53,10 @@ public:
    /// delivered. Skips when already delivered for this epoch or when the
    /// epoch window is closed.
    void run_inbound();
+
+   /// Keep the client up with what the outpost emits (`outpost_client::follow_outpost`), elected or not.
+   /// A failure is logged and the next follow poll tries again.
+   void run_follow();
 
    /// For logging / job labels.
    const outpost_client& client() const { return *_client; }

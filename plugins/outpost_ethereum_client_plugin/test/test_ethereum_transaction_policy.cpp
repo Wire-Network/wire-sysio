@@ -1,6 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include "startup_rpc_server.hpp"
 
+#include <fc-test/build_info.hpp>
 #include <fc-test/execution_api_strictness.hpp>
 
 #include <gsl-lite/gsl-lite.hpp>
@@ -38,6 +39,8 @@ namespace {
 
 const std::string fake_rpc_url = startup_test::unused_url();
 constexpr std::string_view contract_address = "5FbDB2315678afecb367f032d93F642f64180aa3";
+/// The OPP ABI the relay binds, as wire-ethereum compiles it: `opp_contract_client` resolves its whole surface.
+constexpr std::string_view opp_abi_fixture_file = "ethereum-abi-opp-current.json";
 /// A hash the recording node reports when told to misreport one.
 constexpr std::string_view transaction_hash =
    "0x1111111111111111111111111111111111111111111111111111111111111111";
@@ -108,16 +111,6 @@ ethabi::contract epoch_deliveries_function(std::string name) {
       .type = ethabi::invoke_target_type::function,
       .inputs = {ethabi::component_type{"epochIndex", ethabi::data_type::uint32},
                  ethabi::component_type{"operator_", ethabi::data_type::address}},
-      .outputs = {},
-   };
-}
-
-/** Build the `pendingConsensusForDigest(bytes32)` view ABI. */
-ethabi::contract bytes32_argument_function(std::string name) {
-   return ethabi::contract{
-      .name = std::move(name),
-      .type = ethabi::invoke_target_type::function,
-      .inputs = {ethabi::component_type{"digest", ethabi::data_type::bytes32}},
       .outputs = {},
    };
 }
@@ -626,7 +619,7 @@ BOOST_AUTO_TEST_CASE(epoch_in_waits_for_its_receipt_until_the_given_deadline) {
       std::string(contract_address),
       {whole_envelope_epoch_in_function("epochIn"), no_argument_function("nextEpochIndex"),
        uint32_argument_function("dispatchSpill"), epoch_deliveries_function("epochDeliveries"),
-       no_argument_function("pendingEpochHash"), bytes32_argument_function("pendingConsensusForDigest"),
+       no_argument_function("pendingEpochHash"),
        uint16_argument_function("attestationHandlers")},
    };
    uint32_t                   epoch_index = 1;
@@ -726,7 +719,7 @@ BOOST_AUTO_TEST_CASE(epoch_in_keeps_a_first_send_the_node_refused) {
       std::string(contract_address),
       {whole_envelope_epoch_in_function("epochIn"), no_argument_function("nextEpochIndex"),
        uint32_argument_function("dispatchSpill"), epoch_deliveries_function("epochDeliveries"),
-       no_argument_function("pendingEpochHash"), bytes32_argument_function("pendingConsensusForDigest"),
+       no_argument_function("pendingEpochHash"),
        uint16_argument_function("attestationHandlers")},
    };
    uint32_t                   epoch_index = 1;
@@ -775,7 +768,7 @@ BOOST_AUTO_TEST_CASE(all_typed_write_wrappers_share_the_policy_enforced_path) {
       std::string(contract_address),
       {whole_envelope_epoch_in_function("epochIn"), no_argument_function("nextEpochIndex"),
        uint32_argument_function("dispatchSpill"), epoch_deliveries_function("epochDeliveries"),
-       no_argument_function("pendingEpochHash"), bytes32_argument_function("pendingConsensusForDigest"),
+       no_argument_function("pendingEpochHash"),
        uint16_argument_function("attestationHandlers")},
    };
    // OPPInbound's one write wrapper: a budget above the policy ceiling (999
@@ -799,10 +792,14 @@ BOOST_AUTO_TEST_CASE(all_typed_write_wrappers_share_the_policy_enforced_path) {
    sysio::opp_contract_client opp{
       client,
       std::string(contract_address),
-      {uint32_argument_function("emitOutboundEnvelope"), no_argument_function("getLatestOutboundEnvelope")},
+      fc::network::ethereum::abi::parse_contracts(fc::test::get_test_fixtures_path() / opp_abi_fixture_file),
    };
-   uint32_t epoch = 1;
-   expect_policy_rejection([&] { opp.emit_outbound_envelope(epoch); });
+   // OPP's journaled write: refused before signing, so nothing is left to journal.
+   uint32_t                   epoch    = 1;
+   fc::variants               messages{fc::variant(std::string("01"))};
+   sysio::ethereum_submission publication;
+   expect_policy_rejection([&] { opp.publish_outbound_envelope(epoch, messages, deadline, publication); });
+   BOOST_CHECK(publication.attempts.empty());
 
    sysio::syndication_pool_contract_client pool{
       client,
