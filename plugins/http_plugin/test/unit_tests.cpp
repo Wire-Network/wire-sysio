@@ -17,9 +17,12 @@
 #define BOOST_TEST_MODULE http_plugin unit tests
 #include <boost/test/included/unit_test.hpp>
 
+#include <algorithm>
 #include <array>
+#include <barrier>
 #include <deque>
 #include <iostream>
+#include <limits>
 #include <mutex>
 #include <sstream>
 #include <thread>
@@ -1375,10 +1378,78 @@ struct body_size_client {
 };
 } // namespace
 
+/// Concurrent reservations share one limit and released bytes can be claimed again.
+BOOST_AUTO_TEST_CASE(request_body_reservations_share_a_byte_budget) {
+   constexpr size_t body_size = 256;
+   constexpr size_t available_slots = 4;
+   fc::logger logger{"http_reservation_test"};
+   http_plugin_state state{logger};
+   state.max_bytes_in_flight = available_slots * body_size;
+
+   constexpr size_t contention_rounds = 1'000;
+   constexpr size_t contender_count = 2 * available_slots;
+   std::barrier round(contender_count + 1);
+   std::array<bool, contender_count> accepted{};
+   std::array<std::future<void>, contender_count> workers;
+   std::promise<bool> start;
+   const auto ready = start.get_future().share();
+   auto abort_start = fc::make_scoped_exit([&] { start.set_value(false); });
+   for (size_t contender = 0; contender < contender_count; ++contender) {
+      workers[contender] = std::async(std::launch::async, [&, contender, ready] {
+         if (!ready.get())
+            return;
+         for (size_t i = 0; i < contention_rounds; ++i) {
+            round.arrive_and_wait();
+            try {
+               accepted[contender] = state.try_reserve_request_body(body_size).empty();
+            } catch (...) {
+               accepted[contender] = false;
+               round.arrive_and_drop();
+               throw;
+            }
+            round.arrive_and_wait();
+         }
+      });
+   }
+   start.set_value(true);
+   abort_start.cancel();
+
+   // Keep every successful reservation until the round ends, then restore the empty budget.
+   size_t failed_rounds = 0;
+   for (size_t i = 0; i < contention_rounds; ++i) {
+      round.arrive_and_wait();
+      round.arrive_and_wait();
+      const size_t granted = std::count(accepted.begin(), accepted.end(), true);
+      const size_t reserved = state.bytes_in_flight();
+      if (granted != available_slots || reserved != state.max_bytes_in_flight)
+         ++failed_rounds;
+      state.release_bytes_in_flight(reserved);
+   }
+   for (auto& worker : workers)
+      worker.get();
+   BOOST_CHECK_EQUAL(failed_rounds, 0u);
+
+   BOOST_REQUIRE(state.try_reserve_request_body(state.max_bytes_in_flight).empty());
+   BOOST_CHECK(!state.try_reserve_request_body(1).empty());
+
+   state.release_bytes_in_flight(body_size);
+   BOOST_CHECK(state.try_reserve_request_body(body_size).empty());
+
+   // Response accounting may put the shared counter above the limit.
+   state.account_response_bytes(body_size);
+   BOOST_CHECK(!state.try_reserve_request_body(1).empty());
+   BOOST_CHECK_EQUAL(state.bytes_in_flight(), state.max_bytes_in_flight + body_size);
+
+   state.max_bytes_in_flight = std::numeric_limits<size_t>::max(); // unlimited
+   BOOST_CHECK(state.try_reserve_request_body(body_size).empty());
+   BOOST_CHECK_EQUAL(state.bytes_in_flight(), (available_slots + 2) * body_size);
+   BOOST_CHECK(!state.try_reserve_request_body(std::numeric_limits<size_t>::max()).empty());
+}
+
 /// A request body is reserved against bytes_in_flight from the moment its header is read, so the budget bounds bodies
 /// that are still arriving. A body that does not fit is refused with a 503 before any of it is read, in place of the
-/// 100 Continue a client may have asked for; a chunked body reserves max-body-size; the reservation ends when the body
-/// reaches its handler or the connection drops.
+/// 100 Continue a client may have asked for. The reservation stays counted through dispatch, where a chunked
+/// request keeps only the bytes it used, and ends when the queued handler finishes or the connection drops mid-read.
 BOOST_FIXTURE_TEST_CASE(request_body_reserved_while_read, http_plugin_test_fixture) {
    constexpr size_t body_size = 2 * 1024 * 1024; // the default max-body-size
    constexpr auto   budget = "--http-max-bytes-in-flight-mb=5"; // room for two such bodies, not three
@@ -1388,6 +1459,10 @@ BOOST_FIXTURE_TEST_CASE(request_body_reserved_while_read, http_plugin_test_fixtu
    http_plugin* plugin = init({"--plugin=sysio::http_plugin", server_address.c_str(), budget});
    BOOST_REQUIRE(plugin);
    body_size_client::add_route(*plugin);
+   const auto bytes_at_dispatch = std::make_shared<std::atomic<size_t>>(0);
+   plugin->register_update_metrics([plugin, bytes_at_dispatch](http_plugin::metrics) {
+      bytes_at_dispatch->store(plugin->bytes_in_flight());
+   });
 
    net::io_context ctx;
    const body_size_client client{ctx, endpoint, test_http_port(request_body_read_index)};
@@ -1428,24 +1503,26 @@ BOOST_FIXTURE_TEST_CASE(request_body_reserved_while_read, http_plugin_test_fixtu
    const auto completed = body_size_client::read_response(first);
    BOOST_CHECK(completed.result() == http::status::ok);
    BOOST_CHECK_EQUAL(completed.body(), std::to_string(body_size));
+   // Both bodies still count when the completed request is dispatched.
+   BOOST_CHECK_EQUAL(bytes_at_dispatch->load(), 2 * body_size);
    BOOST_REQUIRE(in_flight_becomes(body_size));
 
-   // A chunked body reserves max-body-size, its most, since its length is unknown until it ends.
+   // A chunked body on the same connection reserves max-body-size while being read, then keeps only the decoded size.
    constexpr std::string_view chunk_data = "chunk";
    const std::string chunked_body = "5\r\n" + std::string(chunk_data) + "\r\n0\r\n\r\n";
-   auto chunked = client.connect();
-   net::write(chunked, net::buffer(client.header("Transfer-Encoding: chunked\r\n")));
+   net::write(first, net::buffer(client.header("Transfer-Encoding: chunked\r\n")));
    BOOST_REQUIRE(in_flight_becomes(2 * body_size));
-   net::write(chunked, net::buffer(chunked_body));
-   const auto chunked_response = body_size_client::read_response(chunked);
+   net::write(first, net::buffer(chunked_body));
+   const auto chunked_response = body_size_client::read_response(first);
    BOOST_CHECK(chunked_response.result() == http::status::ok);
    BOOST_CHECK_EQUAL(chunked_response.body(), std::to_string(chunk_data.size()));
+   BOOST_CHECK_EQUAL(bytes_at_dispatch->load(), body_size + chunk_data.size());
    BOOST_REQUIRE(in_flight_becomes(body_size));
 
    // A client that drops mid-body leaves no reservation behind.
    second.close();
    BOOST_CHECK(in_flight_becomes(0));
-   for (auto* socket : {&first, &third, &expecting, &chunked})
+   for (auto* socket : {&first, &third, &expecting})
       socket->close();
    BOOST_CHECK(wait_until([&] { return plugin->requests_in_flight() == 0; }));
 }
@@ -1638,6 +1715,7 @@ bool refused_by_budget(const http::response<http::string_body>& response) {
 /// whatever bytes are in flight when it is ready, from an app-thread or an http-thread handler, and its bytes are
 /// counted until it is written. Its request is counted from intake until it is answered. The budget still refuses new
 /// requests on intake, those without a body included, and a budgeted response that does not fit still gets a 503.
+/// A request already admitted at header time can finish reading and reach its handler even if the budget is full.
 BOOST_FIXTURE_TEST_CASE(always_sent_response_delivered_over_budget, http_plugin_test_fixture) {
    constexpr size_t budget_bytes = 1024 * 1024;
    constexpr auto budget = "--http-max-bytes-in-flight-mb=1";
@@ -1712,14 +1790,23 @@ BOOST_FIXTURE_TEST_CASE(always_sent_response_delivered_over_budget, http_plugin_
    BOOST_REQUIRE(in_flight_becomes(0));
 
    // An answer larger than the whole budget is sent too, and holds its bytes until the client reads it. It is far
-   // larger than a unix socket's send buffer, so its write cannot finish before then; meanwhile requests are refused
-   // on intake, with or without a body.
+   // larger than a unix socket's send buffer, so its write cannot finish before then.
    const fc::variant large_result(std::string(4 * budget_bytes, 'x'));
    const std::string large_json = fc::json::to_string(large_result, fc::time_point::maximum());
    auto [large_socket, large_answer] = submit(app_thread_route);
    BOOST_REQUIRE(in_flight_becomes(request_body.size()));
+   auto admitted_socket = client.connect();
+   unix_socket_client::post_header_only(admitted_socket, http_thread_route, request_body.size());
+   BOOST_REQUIRE(in_flight_becomes(2 * request_body.size()));
    large_answer(magic_enum::enum_integer(http::status::accepted), large_result);
+   BOOST_REQUIRE(in_flight_becomes(large_json.size() + request_body.size()));
+
+   // The request already admitted at its header still reaches its handler and gets its always-sent answer.
+   net::write(admitted_socket, net::buffer(request_body));
+   answer_delivered(admitted_socket, parked.take());
    BOOST_REQUIRE(in_flight_becomes(large_json.size()));
+
+   // Requests arriving while the large write is pending are still refused on intake, including empty ones.
    for (const char* route : {app_thread_route, http_thread_route})
       for (const std::string& body : {request_body, std::string()})
          BOOST_CHECK_MESSAGE(refused_on_intake(route, body), route << " with a " << body.size() << " byte body");
@@ -1730,7 +1817,7 @@ BOOST_FIXTURE_TEST_CASE(always_sent_response_delivered_over_budget, http_plugin_
    BOOST_CHECK(in_flight_becomes(0));
 
    for (unix_socket_client::socket_type* socket :
-        {&app_thread_socket, &http_thread_socket, &budgeted_socket, &large_socket})
+        {&app_thread_socket, &http_thread_socket, &budgeted_socket, &large_socket, &admitted_socket})
       socket->close();
    BOOST_CHECK(wait_until([&] { return plugin->requests_in_flight() == 0; }));
 }

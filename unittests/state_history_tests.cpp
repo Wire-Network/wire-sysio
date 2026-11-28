@@ -8,6 +8,7 @@
 #include <sysio/state_history/create_deltas.hpp>
 #include <sysio/state_history/log_catalog.hpp>
 #include <sysio/state_history/request_validation.hpp>
+#include <sysio/state_history/send_credits.hpp>
 #include <sysio/state_history/status_request_queue.hpp>
 #include <sysio/state_history/trace_converter.hpp>
 #include <sysio/testing/tester.hpp>
@@ -23,6 +24,7 @@
 #include <boost/iostreams/device/back_inserter.hpp>
 #include <boost/iostreams/copy.hpp>
 
+#include <limits>
 #include <string_view>
 
 using namespace sysio::chain;
@@ -94,6 +96,24 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(block_request_have_positions_limit, Request, block
    BOOST_CHECK_EXCEPTION(validate_have_positions(request), std::runtime_error, [](const std::runtime_error& error) {
       return std::string_view(error.what()) == have_positions_limit_exceeded;
    });
+}
+
+/// Verifies that SHiP acknowledgment grants add credits and saturate at the counter limit.
+BOOST_AUTO_TEST_CASE(send_credits_saturate_on_overflow)
+{
+   using sysio::state_history::add_send_credits;
+   constexpr uint32_t no_grant = 0;
+   constexpr uint32_t balance = 10;
+   constexpr uint32_t grant = 3;
+   constexpr uint32_t extra_credit = 1;
+   constexpr auto max_credits = std::numeric_limits<uint32_t>::max();
+   constexpr auto near_limit = max_credits - grant;
+
+   BOOST_CHECK_EQUAL(add_send_credits(balance, no_grant), balance);
+   BOOST_CHECK_EQUAL(add_send_credits(balance, grant), balance + grant);
+   BOOST_CHECK_EQUAL(add_send_credits(near_limit, grant), max_credits);
+   BOOST_CHECK_EQUAL(add_send_credits(near_limit, grant + extra_credit), max_credits);
+   BOOST_CHECK_EQUAL(add_send_credits(max_credits, grant), max_credits);
 }
 
 /// Verifies SHiP status requests are bounded, drained by version count, and reusable after drain.

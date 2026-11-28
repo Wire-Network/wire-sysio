@@ -1,6 +1,7 @@
 #pragma once
 #include <sysio/state_history/log.hpp>
 #include <sysio/state_history/request_validation.hpp>
+#include <sysio/state_history/send_credits.hpp>
 #include <sysio/state_history/serialization.hpp>
 #include <sysio/state_history/status_request_queue.hpp>
 #include <sysio/state_history/types.hpp>
@@ -177,7 +178,7 @@ private:
                      current_blocks_request.have_positions.clear();
                   },
                   [&](const get_blocks_ack_request_v0& gbar0) {
-                     send_credits += gbar0.num_messages;
+                     send_credits = add_send_credits(send_credits, gbar0.num_messages);
                   }
                }, req);
                co_return;
