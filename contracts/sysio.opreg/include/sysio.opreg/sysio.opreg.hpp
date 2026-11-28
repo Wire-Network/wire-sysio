@@ -175,7 +175,8 @@ namespace sysio {
       /// `setconfig` with the on-chain `current_time_ms()`, so the
       /// caller's clock isn't trusted for staleness comparisons. Within
       /// each vector, every `(chain, token_kind)` pair must be unique;
-      /// duplicates fail the action.
+      /// duplicates fail the action. Every chain, token, and chain/token binding
+      /// must already be registered; these records need not be active yet.
       [[sysio::action]]
       void setconfig(uint64_t terminate_prune_delay_ms,
                      uint32_t terminate_max_consecutive_misses,

@@ -63,6 +63,7 @@ namespace sysio {
       [[sysio::action]]
       void activtoken(sysio::slug_name code);
 
+      /// Register a binding only after both parent rows exist; they may still be inactive.
       [[sysio::action]]
       void regctok(sysio::slug_name   chain_code,
                    sysio::slug_name   token_code,

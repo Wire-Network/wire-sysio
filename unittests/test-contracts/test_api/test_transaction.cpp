@@ -226,4 +226,3 @@ void test_transaction::assert_false_error_handler( const sysio::transaction& dtr
    sysio_assert( dtrx.actions[0].authorization[0].actor == "testapi"_n, "action's authorization has wrong actor" );
    sysio_assert( dtrx.actions[0].authorization[0].permission == "active"_n, "action's authorization has wrong permission" );
 }
-

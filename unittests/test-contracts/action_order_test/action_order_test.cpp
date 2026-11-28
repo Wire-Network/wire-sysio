@@ -74,4 +74,3 @@ void action_order_test::nestedcall(name obs, name inlt) {
    auto inline_act = make_unauthed_wrapper<notifyme_action>(inlt);
    inline_act.send(obs);
 }
-
