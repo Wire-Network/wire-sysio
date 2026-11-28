@@ -124,7 +124,8 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
    /**
     * Submit a producer's snapshot hash vote for a scheduled snapshot height.
     *
-    * Any producer holding one of the first max_snap_provider_rank positions among schedulable producers may vote.
+    * Any producer holding one of the first max_snap_provider_rank positions among schedulable producers whose bond
+    * clears the live collateral minimum (bootstrapped exempt) may vote.
     * A provider node normally signs with the producer's snapshot_attestation::permission_snapshot permission,
     * linked to this action only.
     *
@@ -140,9 +141,8 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
     * votes, retries included; each accepted vote purges rows below that window. A matching or
     * disagreeing vote on a final record is answered as above at any height.
     *
-    * Every vote, including a no-op vote on a final tuple, requires that rank. A new vote, or a retry
-    * while the tuple is pending, also requires the producer's bond to clear the live collateral
-    * minimum, bootstrapped exempt. Votes accepted earlier keep counting.
+    * Every vote, including a no-op vote on a final tuple, requires that position, read live. Votes
+    * accepted earlier keep counting.
     */
    [[sysio::action]]
    void votesnaphash(name producer, checksum256 block_id, checksum256 snapshot_hash);
@@ -155,7 +155,7 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
     *
     * No attestation is permitted until this action stores a nonzero min_providers. Governance is
     * responsible for choosing K with the desired security and liveness tradeoff. K changes apply to
-    * pending heights; an exact vote retry, from a producer that still has operator standing,
+    * pending heights; an exact vote retry, from a producer that can still vote,
     * finalizes a tuple that already meets a newly lowered K. Cadence may change at any time;
     * operators restart nodes to adopt it. Small intervals increase snapshot overhead and shorten
     * verification grace; production should use much larger values. Grace is capped at 12,500 blocks.

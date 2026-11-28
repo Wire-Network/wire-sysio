@@ -117,11 +117,11 @@ getsnaphash(block_num)                    // read-only — returns attested reco
 | `snaprecords` | `block_num` | `{ block_num, block_id, snapshot_hash, attested_at_block }` |
 
 **Who can vote:**
-- Any producer holding one of the first 30 positions among schedulable producers can vote; there is no registration. Rank is position in a walk that tests `is_schedulable`, so an active producer row, an ACTIVE `OPERATOR_TYPE_PRODUCER` row in sysio.opreg and an active finalizer key are all required. The rank is read on every vote.
-- The provider node signs as `producer@snapshot`, a permission linked to `votesnaphash` only. Rotating or revoking that key is a native `updateauth` and needs no contract call. The permission is billed to the producer's RAM, covered by the `regproducer_ram` a collateral-backed producer receives on its first `regproducer`.
+- Any producer holding one of the first 30 positions can vote; there is no registration. Rank is position in a walk that tests `is_schedulable_at_live_minimum`, so an active producer row, an ACTIVE `OPERATOR_TYPE_PRODUCER` row in sysio.opreg whose bond clears the live collateral minimum (bootstrapped exempt) and an active finalizer key are all required. The rank is read on every vote, so a raised minimum moves the band at once rather than when the rescore sweep arrives.
+- The provider node signs as `producer@snapshot`, a permission linked to `votesnaphash` only. Rotating that key is a native `updateauth` and needs no contract call. Revoking a compromised key also means moving the vote link back onto `snapshot` and deleting any permission created under it, since the `snapshot` permission can create those and relink the vote to them. The permission is billed to the producer's RAM, covered by the `regproducer_ram` a collateral-backed producer receives on its first `regproducer`.
 **Voting:**
 - The contract accepts only positive block heights divisible by configured `block_spacing`, matching the automatic provider schedule; manual/on-demand heights are rejected. The cadence is based on block number, never elapsed slots or time.
-- Votes accumulate per `(block_num, block_id, snapshot_hash)` tuple. A producer can vote at multiple scheduled heights but cannot equivocate at one height, and exact retries of a pending tuple are idempotent while the producer can still vote (a retry of a finalized tuple is a no-op while its height remains eligible under the current cadence). Rank does not see a raised collateral minimum, so a vote that can still count also requires the producer's bond to clear the live minimum (bootstrapped operators exempt), and a raised minimum applies at the next vote.
+- Votes accumulate per `(block_num, block_id, snapshot_hash)` tuple. A producer can vote at multiple scheduled heights but cannot equivocate at one height, and exact retries of a pending tuple are idempotent while the producer can still vote (a retry of a finalized tuple is a no-op while its height remains eligible under the current cadence). A raised collateral minimum applies at the next vote.
 - Producer and configuration churn never retracts an accepted vote.
 **Attestation threshold:**
 - `min_providers` is the fixed governance-set K required for every tuple.
@@ -146,15 +146,15 @@ A snapshot provider is a syncing node (not a producer, not a finalizer) that:
 **Config:**
 
 ```ini
-snapshot-provider-account = <account>    # enables snapshot provider mode + hash voting
+snapshot-producer-name = <account>    # enables snapshot provider mode + hash voting
 ```
 
-When `snapshot-provider-account` is set:
+When `snapshot-producer-name` is set:
 - Startup creates or reuses the exact automatic request shape for its cached `block_spacing` (25,000 if no row exists), removing provider-owned requests with different spacing or bounds. An interval above half the uint32 height range cannot repeat, so it logs a diagnostic and leaves automatic scheduling disabled. Manual requests are preserved; there is no per-irreversible-block cadence refresh.
 - On each finalized scheduled snapshot, a `votesnaphash` transaction is automatically submitted; unscheduled manual snapshots are not voted.
 - If the contract returns a disagreement error (hash mismatch with attested record), the node logs a fatal error and shuts down.
 
-Role exclusivity is enforced at startup: `snapshot-provider-account` cannot be used alongside `producer-name`.
+Role exclusivity is enforced at startup: `snapshot-producer-name` cannot be used alongside `producer-name`.
 
 ### Snapshot Verification on Load
 
@@ -323,8 +323,8 @@ The auto-fetched snapshot must contain a valid system ABI with compatible physic
 
 ```
 [Producer Node]                    [Snapshot Provider Node]
-  producer-name = <account>          snapshot-provider-account = <account>
-  (no snapshot-provider-account)     (no producer-name)
+  producer-name = <account>          snapshot-producer-name = <account>
+  (no snapshot-producer-name)        (no producer-name)
 ```
 
 A producer in the top 30 needs no registration: it gives the snapshot provider node its `snapshot` permission key. The snapshot provider node syncs the chain, automatically generates snapshots at the configured cadence, votes on hashes via `votesnaphash`, and optionally serves snapshots over HTTP. The producer's other keys stay off that node.

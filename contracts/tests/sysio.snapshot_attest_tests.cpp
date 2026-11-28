@@ -182,10 +182,11 @@ public:
    /// The producer minimum `register_bonded_producer_operators` installs, and the bond each bonded producer posts.
    static constexpr uint64_t producer_min_bond = 1'000'000;
 
-   /// Replace sysio.opreg's producer collateral requirement with `min_bond` on the one required pair.
+   /// Push sysio.opreg's `setconfig` with `min_bond` on the one required producer pair, without producing a block.
    ///
-   /// `setconfig` re-evaluates no operator, so a status earned under the previous minimum stays stored.
-   void set_producer_min_bond(uint64_t min_bond) {
+   /// `setconfig` re-evaluates no operator, so a status earned under the previous minimum stays stored, and the
+   /// rescore sweep it opens has not run until a later block drains it.
+   void push_producer_min_bond(uint64_t min_bond) {
       base_tester::push_action("sysio.opreg"_n, "setconfig"_n, "sysio.opreg"_n, mvo()
          ("terminate_prune_delay_ms",         uint64_t{600'000})
          ("terminate_max_consecutive_misses", uint32_t{5})
@@ -198,6 +199,11 @@ public:
             ("config_timestamp_ms", uint64_t{0}))})
          ("req_batchop_collat",               fc::variants{})
          ("req_uw_collat",                    fc::variants{}));
+   }
+
+   /// `push_producer_min_bond`, then produce the block that commits it.
+   void set_producer_min_bond(uint64_t min_bond) {
+      push_producer_min_bond(min_bond);
       produce_block();
    }
 
@@ -558,6 +564,47 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_follows_the_live_rank_band, snapshot_rank_b
    BOOST_REQUIRE(!getsnaphash(block_num).is_null());
 } FC_LOG_AND_RETHROW() }
 
+/// The rank band with a producer bonded at exactly the minimum in place of the last band producer. The bonded producer
+/// sorts ahead of the bootstrapped tier, and the last band producer still sits at position 31.
+struct snapshot_bonded_rank_band_tester : public snapshot_attest_tester {
+   static constexpr account_name bonded_producer = "bondedprod"_n;
+
+   snapshot_bonded_rank_band_tester()
+      : snapshot_attest_tester(band_producers(), /*cadence_periods*/ 1, {bonded_producer}) {}
+
+   static std::vector<account_name> band_producers() {
+      auto band = snapshot_rank_band_tester::band_producers();
+      band.pop_back();
+      return band;
+   }
+};
+
+/// A raised collateral minimum moves the band at once: a producer it leaves short gives up its position before the
+/// rescore sweep reaches it, so the producer at position 31 can vote in the same block as the raise.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_band_skips_a_producer_below_a_raised_minimum,
+                        snapshot_bonded_rank_band_tester) { try {
+   const auto band = band_producers();
+   BOOST_REQUIRE_EQUAL(max_snapshot_providers + 1, fixture_producers().size() + band.size() + 1);
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1));
+
+   const auto block_num     = vote_block_num();
+   const auto block_id      = make_block_id(block_num);
+   const auto snapshot_hash = make_snap_hash(5);
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("producer rank exceeds maximum for snapshot providers"),
+                        votesnaphash(band.back(), block_id, snapshot_hash));
+
+   // The raise and the votes share one block, so neither opreg nor the sweep has moved the short producer.
+   const auto cached_rank_score = get_producer_info(bonded_producer)["rank_score"].as<uint64_t>();
+   push_producer_min_bond(producer_min_bond * 2);
+   BOOST_REQUIRE_EQUAL(cached_rank_score, get_producer_info(bonded_producer)["rank_score"].as<uint64_t>());
+   BOOST_REQUIRE_EQUAL(sysio::opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, opreg_status(bonded_producer));
+
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("producer rank exceeds maximum for snapshot providers"),
+                        votesnaphash(bonded_producer, block_id, snapshot_hash));
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash(band.back(), block_id, snapshot_hash));
+   BOOST_REQUIRE(!getsnaphash(block_num).is_null());
+} FC_LOG_AND_RETHROW() }
+
 // ---------------------------------------------------------------------------
 // snapshot permission tests
 // ---------------------------------------------------------------------------
@@ -625,6 +672,55 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_follows_a_rotated_snapshot_key, snapshot_vo
    BOOST_REQUIRE_EQUAL(success(), votesnaphash_signed_as("producer1"_n, snapshot_permission, new_key, block_id,
                                                          snapshot_hash));
    BOOST_REQUIRE(!getsnaphash(block_num).is_null());
+} FC_LOG_AND_RETHROW() }
+
+/// A snapshot key can delegate: native authorization lets it add a permission under itself and move the vote link onto
+/// it, so rotating the snapshot key alone leaves the delegate voting. Moving the link back to `snapshot` and deleting
+/// the delegate, both with `active`, revokes it.
+BOOST_FIXTURE_TEST_CASE(snapshot_revocation_covers_delegated_access, snapshot_voting_tester) { try {
+   const permission_name delegate_permission{"snapdelegate"};
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2));
+   const auto snapshot_key = get_private_key("producer1"_n, snapshot_permission.to_string());
+   const auto delegate_key = get_private_key("producer1"_n, delegate_permission.to_string());
+   link_snapshot_permission("producer1"_n, snapshot_key.get_public_key());
+
+   // With the snapshot key alone: a permission under snapshot, and the vote link moved onto it.
+   BOOST_REQUIRE_EQUAL(success(), push_signed_as("producer1"_n, snapshot_permission, snapshot_key, "updateauth"_n, mvo()
+      ("account", "producer1")
+      ("permission", delegate_permission)
+      ("parent", snapshot_permission)
+      ("auth", authority(delegate_key.get_public_key()))));
+   BOOST_REQUIRE_EQUAL(success(), push_signed_as("producer1"_n, snapshot_permission, snapshot_key, "linkauth"_n, mvo()
+      ("account", "producer1")
+      ("code", config::system_account_name)
+      ("type", "votesnaphash")
+      ("requirement", delegate_permission)));
+
+   // Rotating the snapshot key does not reach the delegate.
+   const auto rotated_key = get_private_key("producer1"_n, "rotated");
+   const vector<permission_level> active_auth{{"producer1"_n, config::active_name}};
+   const vector<private_key_type> active_keys{get_private_key("producer1"_n, "active")};
+   set_authority("producer1"_n, snapshot_permission, authority(rotated_key.get_public_key()), config::active_name,
+                 active_auth, active_keys);
+   produce_block();
+
+   const auto block_num     = vote_block_num();
+   const auto block_id      = make_block_id(block_num);
+   const auto snapshot_hash = make_snap_hash(144);
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash_signed_as("producer1"_n, delegate_permission, delegate_key, block_id,
+                                                         snapshot_hash));
+
+   // Full revocation, with active: the vote link back on snapshot, then the delegate deleted.
+   link_authority("producer1"_n, config::system_account_name, snapshot_permission, "votesnaphash"_n);
+   delete_authority("producer1"_n, delegate_permission, active_auth, active_keys);
+   produce_block();
+
+   const auto revoked = votesnaphash_signed_as("producer1"_n, delegate_permission, delegate_key, block_id,
+                                               snapshot_hash);
+   BOOST_REQUIRE_MESSAGE(revoked.find("non-existent permission") != std::string::npos, revoked);
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash_signed_as("producer1"_n, snapshot_permission, rotated_key, block_id,
+                                                         snapshot_hash));
+   BOOST_REQUIRE_EQUAL(1u, snapshot_vote_count());
 } FC_LOG_AND_RETHROW() }
 
 /// One producer cannot vote in another's name.
@@ -977,9 +1073,9 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_final_tuple_accepts_late_producer_vote, sna
    BOOST_REQUIRE_EQUAL(0u, get_producer_info("producer2"_n)["snapshot_attestations"].as<uint32_t>());
 } FC_LOG_AND_RETHROW() }
 
-/// Standing gates only a vote that can count toward a quorum, so a ranked producer whose bond fell below a raised
-/// collateral minimum may still vote a final tuple.
-BOOST_FIXTURE_TEST_CASE(votesnaphash_final_tuple_skips_standing_check, snapshot_bonded_voting_tester) { try {
+/// A producer whose bond fell below a raised collateral minimum is out of the band for late votes too, though a
+/// mismatch with the record is still reported to it as a disagreement.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_final_tuple_requires_live_standing, snapshot_bonded_voting_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1));
    set_producer_min_bond(producer_min_bond * 2);
 
@@ -989,8 +1085,10 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_final_tuple_skips_standing_check, snapshot_
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("producer1"_n, block_id, snapshot_hash));
    BOOST_REQUIRE(!getsnaphash(block_num).is_null());
 
-   BOOST_REQUIRE_EQUAL(success(), votesnaphash(bonded_producer, block_id, snapshot_hash));
-   BOOST_REQUIRE_EQUAL(0u, snapshot_vote_count());
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("producer rank exceeds maximum for snapshot providers"),
+                        votesnaphash(bonded_producer, block_id, snapshot_hash));
+   // snap_hash_disagreement_error = 9001 (defined in snapshot_attest.hpp)
+   BOOST_REQUIRE_EQUAL(wasm_assert_code(9001), votesnaphash(bonded_producer, block_id, make_snap_hash(110)));
 } FC_LOG_AND_RETHROW() }
 
 /// Voting is disabled until governance explicitly chooses a nonzero fixed K.
@@ -1189,8 +1287,8 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_keeps_votes_cast_before_operator_lost_stand
 } FC_LOG_AND_RETHROW() }
 
 /// A raised collateral minimum reaches the vote gate without any sweep. `sysio.opreg::setconfig` re-evaluates no
-/// stored status, so a producer left short by the raise is still ACTIVE in opreg; the gate measures its bond against
-/// the live requirement instead. Bootstrapped producers are exempt, and restoring the bond restores the vote.
+/// stored status, so a producer left short by the raise is still ACTIVE in opreg; the rank walk measures its bond
+/// against the live requirement instead. Bootstrapped producers are exempt, and restoring the bond restores the vote.
 BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_producer_below_raised_collateral_minimum,
                         snapshot_bonded_voting_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2));
@@ -1201,7 +1299,7 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_producer_below_raised_collateral_mi
    const auto block_num     = vote_block_num();
    const auto block_id      = make_block_id(block_num);
    const auto snapshot_hash = make_snap_hash(87);
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg("producer does not meet the live PRODUCER operator requirements"),
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("producer rank exceeds maximum for snapshot providers"),
                        votesnaphash(bonded_producer, block_id, snapshot_hash));
    BOOST_REQUIRE_EQUAL(0u, snapshot_vote_count());
 

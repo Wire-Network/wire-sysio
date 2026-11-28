@@ -5,7 +5,7 @@
 import json
 import signal
 
-from TestHarness import Cluster, TestHelper, Utils, WalletMgr
+from TestHarness import Cluster, TestHelper, Utils, WalletMgr, createAccountKeys
 from TestHarness.TestHelper import AppArgs
 
 ###############################################################
@@ -16,9 +16,10 @@ from TestHarness.TestHelper import AppArgs
 #  - Snapshot votes cast by ranked producers, with no separate registration
 #  - Manual snapshot creation
 #  - Rejection of votes outside the configured block-height cadence
+#  - A provider node holding only the producer's snapshot key attesting a scheduled snapshot
 #
-#  Successful fixed-K formation and attestation-record persistence use controlled
-#  scheduled heights in the C++ contract and unit test suites.
+#  Fixed-K formation with several voters uses controlled scheduled heights in the C++
+#  contract and unit test suites.
 #
 #  Cluster layout:
 #    Node 0: producer (defproducera) — takes snapshots, pushes actions
@@ -248,9 +249,26 @@ try:
     assert manual is not None, "Manual snapshot schedule failed"
     manualRequestId = manual["payload"]["snapshot_request_id"]
     assert manualRequestId == 0, "Manual-first regression did not start with request ID 0"
+
+    # The provider votes as producerA@snapshot, holding that permission's key and no other.
+    snapshotKey = createAccountKeys(1)[0]
+    # One at a time: linkauth needs the permission updateauth creates to be in a block first.
+    for action, data in [
+        ("updateauth", {"account": producerA, "permission": "snapshot", "parent": "active",
+                        "auth": {"threshold": 1, "keys": [{"key": snapshotKey.ownerPublicKey, "weight": 1}],
+                                 "accounts": []}}),
+        ("linkauth", {"account": producerA, "code": "sysio", "type": "votesnaphash", "requirement": "snapshot"})]:
+        success, trans = node0.pushMessage("sysio", action, json.dumps(data), f"--permission {producerA}@active")
+        assert success, f"Failed to push {action}: {trans}"
+        assert node0.waitForTransactionsInBlock([node0.getTransId(trans)], timeout=60), \
+            f"{action} transaction did not make it into a block"
+    snapshotSignatureProvider = (f"wire-{snapshotKey.ownerPublicKey},wire,wire,"
+                                 f"{snapshotKey.ownerPublicKey},KEY:{snapshotKey.ownerPrivateKey}")
+
     providerNode.kill(signal.SIGTERM)
     assert providerNode.relaunch(
-        chainArg=f"--snapshot-provider-account {producerA} --plugin sysio::snapshot_api_plugin"), \
+        chainArg=f"--snapshot-producer-name {producerA} --plugin sysio::snapshot_api_plugin "
+                 f"--signature-provider {snapshotSignatureProvider}"), \
         "Provider failed to start after snapshot configuration"
     schedule = providerSchedule(providerNode)
     assert schedule["block_spacing"] == providerTestBlockSpacing
@@ -263,6 +281,19 @@ try:
         lambda: providerNode.processUrllibRequest("snapshot", "by_block",
             payload={"block_num": snapshotHeight}, silentErrors=True) is not None,
         timeout=90), "Provider did not finalize its scheduled snapshot"
+    snapshotFile = providerNode.processUrllibRequest("snapshot", "by_block",
+        payload={"block_num": snapshotHeight})["payload"]
+
+    # The automatic vote, signed with the snapshot key alone, attests exactly that file.
+    def attestedRecord():
+        """Return the snaprecords row at the provider's scheduled height, or None."""
+        records = node0.getTableRows("sysio", "sysio", "snaprecords")
+        return next((r["value"] for r in records or [] if r["value"]["block_num"] == snapshotHeight), None)
+    assert Utils.waitForBool(lambda: attestedRecord() is not None, timeout=60), \
+        f"Provider's automatic vote did not attest block {snapshotHeight}"
+    record = attestedRecord()
+    assert record["block_id"] == snapshotFile["block_id"] and record["snapshot_hash"] == snapshotFile["root_hash"], \
+        f"Attested record {record} does not match the provider's snapshot {snapshotFile}"
 
     changedTransId = setSnapshotCadence(node0, updatedProviderBlockSpacing)
     assert providerNode.waitForTransFinalization(changedTransId, timeout=60)
@@ -285,7 +316,7 @@ try:
     assert providerSchedule(providerNode)["snapshot_request_id"] == schedule["snapshot_request_id"], \
         "Unchanged restart did not reuse the automatic request"
     assert len(snapshotRequests(providerNode)) == 2, "Unchanged restart duplicated a request"
-    Print("Test 2 PASSED: Provider cadence changes on restart and scheduled files enter the catalog")
+    Print("Test 2 PASSED: Provider cadence changes on restart, and its scheduled snapshot is attested")
 
     # ---------------------------------------------------------------
     # Test 3: Every positive uint32 cadence permits startup without overflowing its schedule.

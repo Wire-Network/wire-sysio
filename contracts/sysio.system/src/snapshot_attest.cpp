@@ -14,7 +14,6 @@ namespace sysiosystem {
 namespace {
 
 constexpr char producer_rank_too_high_error[] = "producer rank exceeds maximum for snapshot providers";
-constexpr char producer_no_live_standing_error[] = "producer does not meet the live PRODUCER operator requirements";
 constexpr char vote_equivocation_error[] = "producer already voted a different snapshot tuple for this height";
 constexpr char snapshot_config_unset_error[] = "snapshot attestation configuration has not been set";
 constexpr char invalid_block_id_error[] = "invalid block_id";
@@ -31,18 +30,21 @@ constexpr char snapshot_record_not_found_error[] = "no attested snapshot record 
 /// rows a cadence change strands drain over later votes.
 constexpr uint32_t max_stale_vote_purge_rows = max_snap_providers * snapshot_attestation::max_pending_vote_heights;
 
-/// Whether `producer` holds one of the first max_snap_provider_rank positions among schedulable producers.
+/// Whether `producer` holds one of the first max_snap_provider_rank positions among producers that can vote.
 ///
-/// Rank is POSITION in the "prodrank" index among schedulable producers, so this walks the index, counting only
-/// schedulable rows: an active producer row, an ACTIVE PRODUCER operator and an active finalizer key. Counting
-/// matches, rather than taking the first N entries, stops rows whose live standing lapsed from crowding out eligible
-/// producers while their cached rank keys converge. Returns as soon as the producer is found.
+/// Rank is POSITION in the "prodrank" index, so this walks the index, counting only rows that pass
+/// `is_schedulable_at_live_minimum`: an active producer row, an ACTIVE PRODUCER operator whose bond clears the live
+/// collateral minimum (bootstrapped exempt), and an active finalizer key. Counting matches, rather than taking the
+/// first N entries, stops rows whose standing lapsed from crowding out eligible producers while their cached rank
+/// keys converge, including through the rescore sweep a raised minimum opens. Returns as soon as the producer is found.
 bool is_ranked_snapshot_producer(name self, name producer) {
-   producers_table  producers(self);
-   finalizers_table finalizers(self);
+   producers_table          producers(self);
+   finalizers_table         finalizers(self);
+   sysio::opreg::opconfig_t opreg_cfg_tbl(opreg_refs::account);
+   const auto               opreg_cfg = opreg_cfg_tbl.get_or_default(sysio::opreg::op_config{});
 
-   // Bounded on ROWS EXAMINED, not just on positions. `rank_score` is a CACHE while `is_schedulable` is evaluated
-   // LIVE, so rows that no longer qualify are skipped and would otherwise cost an unbounded scan, at a cross-contract
+   // Bounded on ROWS EXAMINED, not just on positions. `rank_score` is a CACHE while eligibility is evaluated LIVE, so
+   // rows that no longer qualify are skipped and would otherwise cost an unbounded scan, at a cross-contract
    // sysio.opreg read plus a finalizer read apiece.
    uint32_t position = 0;
    uint32_t examined = 0;
@@ -50,7 +52,7 @@ bool is_ranked_snapshot_producer(name self, name producer) {
    for (auto i = idx.cbegin(); i != idx.cend() && position < max_snap_provider_rank; ++i) {
       if (producer_rank::tier_of(i->rank_score) == producer_tier::demoted) break;
       if (++examined > max_rank_walk_rows) break;
-      if (!producer_rank::is_schedulable(*i, finalizers)) continue;
+      if (!producer_rank::is_schedulable_at_live_minimum(*i, finalizers, opreg_cfg)) continue;
       if (i->owner == producer) return true;
       ++position;
    }
@@ -153,7 +155,6 @@ void snapshot_attest::votesnaphash(name producer, checksum256 block_id, checksum
 
    // Checked before the already-final return, so only a top-ranked producer's late vote succeeds.
    check(is_ranked_snapshot_producer(get_self(), producer), producer_rank_too_high_error);
-   // A late vote cannot count toward a quorum, so it skips the standing check below.
    if (already_final) {
       return;
    }
@@ -164,10 +165,6 @@ void snapshot_attest::votesnaphash(name producer, checksum256 block_id, checksum
    // sysio pays for vote rows, so heights older than the window are closed: that bounds what a withheld quorum leaves.
    const uint64_t pending_floor = snapshot_attestation::pending_vote_floor(current_block, config.block_spacing);
    check(block_num >= pending_floor, stale_block_id_error);
-
-   // Rank does not see a raised collateral minimum, because sysio.opreg::setconfig re-evaluates no stored status, so
-   // each counting vote also measures the bond against the live minimum, bootstrapped exempt.
-   check(producer_rank::has_live_producer_standing(producer), producer_no_live_standing_error);
 
    snap_votes_table votes(get_self());
    purge_stale_snapshot_votes(votes, pending_floor);

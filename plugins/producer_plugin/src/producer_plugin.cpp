@@ -681,7 +681,7 @@ public:
 
    /** Build, sign, and asynchronously submit one finalized snapshot vote. */
    void submit_snapshot_vote(const snapshot_scheduler::snapshot_information& si) {
-      if (_snapshot_provider_account.empty()) return;
+      if (_snapshot_producer_name.empty()) return;
 
       if (!snapshot_attest::is_scheduled_block(
              si.head_block_num, chain_plug->get_snapshot_attestation_config().block_spacing)) {
@@ -693,7 +693,7 @@ public:
       try {
          chain::controller& chain = chain_plug->chain();
 
-         const auto producer_name = chain::name(_snapshot_provider_account);
+         const auto producer_name = chain::name(_snapshot_producer_name);
          const auto vote_permission = chain::name(snapshot_attest::permission_snapshot);
 
          // Build the votesnaphash action, signed by the producer's snapshot permission so the producer's
@@ -735,7 +735,7 @@ public:
 
          if (required_keys.empty()) {
             elog("Snapshot provider: no signing key available for {}@{} votesnaphash transaction",
-                 _snapshot_provider_account, snapshot_attest::permission_snapshot);
+                 _snapshot_producer_name, snapshot_attest::permission_snapshot);
             return;
          }
 
@@ -897,7 +897,7 @@ public:
    snapshot_scheduler _snapshot_scheduler;
 
    // snapshot provider configuration
-   std::string _snapshot_provider_account;
+   std::string _snapshot_producer_name;
    /// Lifetime of an automatically submitted provider vote transaction.
    static constexpr uint32_t _snapshot_vote_expiration_seconds = 30;
    /// Description persisted with the automatic provider schedule.
@@ -1548,7 +1548,7 @@ void producer_plugin::set_program_options(
           "Disable subjective CPU billing for API transactions")
          ("snapshots-dir", bpo::value<std::filesystem::path>()->default_value("snapshots"),
           "the location of the snapshots directory (absolute path or relative to application data dir)")
-         ("snapshot-provider-account", bpo::value<std::string>()->default_value(""),
+         ("snapshot-producer-name", bpo::value<std::string>()->default_value(""),
           "Producer account to vote snapshot hashes for; votesnaphash is signed with its snapshot permission. When set, enables snapshot provider mode. Cannot be used alongside producer-name.")
          ("read-only-threads", bpo::value<uint32_t>(),
          ("Number of worker threads in read-only execution thread pool. Defaults to "s +
@@ -1807,10 +1807,10 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
    _snapshot_scheduler.set_snapshots_path(_snapshots_dir);
 
    // Snapshot provider configuration
-   _snapshot_provider_account = options.at("snapshot-provider-account").as<std::string>();
-   if (!_snapshot_provider_account.empty()) {
+   _snapshot_producer_name = options.at("snapshot-producer-name").as<std::string>();
+   if (!_snapshot_producer_name.empty()) {
       SYS_ASSERT(!is_configured_producer(), plugin_config_exception,
-                 "snapshot-provider-account cannot be used alongside producer-name");
+                 "snapshot-producer-name cannot be used alongside producer-name");
 
       _snapshot_scheduler.add_snapshot_finalized_callback(
          [this](const snapshot_scheduler::snapshot_information& si) {
@@ -1873,7 +1873,7 @@ void producer_plugin_impl::plugin_startup() {
       // on_start_block(height) snapshots the current head at height - 1, so start_block_num equal
       // to block_spacing snapshots exact head-height multiples:
       // blocks S, 2S, 3S, ...
-      if (!_snapshot_provider_account.empty()) {
+      if (!_snapshot_producer_name.empty()) {
          const auto block_spacing = chain_plug->get_snapshot_attestation_config().block_spacing;
          constexpr auto maximum_block_num = std::numeric_limits<uint32_t>::max();
          const bool schedulable = block_spacing <= maximum_block_num - block_spacing;

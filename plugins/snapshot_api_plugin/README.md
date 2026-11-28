@@ -117,11 +117,15 @@ clio set account permission myproducer1 snapshot SYS6... active -p myproducer1@a
 clio set action permission myproducer1 sysio votesnaphash snapshot -p myproducer1@active
 ```
 
-To rotate or revoke that key later, update the permission; no contract call is needed:
+To rotate that key later, update the permission; no contract call is needed:
 
 ```bash
 clio set account permission myproducer1 snapshot SYS7... active -p myproducer1@active
 ```
+
+Rotation alone does not revoke a compromised key: the `snapshot` permission can create permissions under itself and
+move the `votesnaphash` link onto one of them. Revoking it also restores the link and deletes those permissions, as
+described under "The snapshot permission" in [snapshot attestation](../../docs/snapshot-attestation.md).
 
 The permission and its link are billed to the producer's own RAM, which the grant from its first `regproducer`
 covers.
@@ -149,7 +153,7 @@ clio push action sysio setsnpcfg \
 For production, enable snapshot provider mode in `config.ini`:
 
 ```ini
-snapshot-provider-account = myproducer1
+snapshot-producer-name = myproducer1
 ```
 
 and give the node the private key of `myproducer1@snapshot` through its signature provider.
