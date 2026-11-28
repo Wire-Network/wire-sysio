@@ -1693,6 +1693,16 @@ fc::crypto::private_key parse_private_key(const std::string& text, fc::crypto::p
    }
 }
 
+/// Whether `text` parses as a private key of any type. It never throws, so nothing reports the text.
+bool is_private_key(const std::string& text) {
+   try {
+      fc::crypto::private_key::from_string(text);
+      return true;
+   } catch (...) {
+      return false;
+   }
+}
+
 /// An external wallet key whose type its text names (PVT_EM_... or PVT_ED_...), or else the raw hex secret of an
 /// Ethereum key. Other Wire key types parse too; a caller that needs an EM or ED key refuses them.
 fc::crypto::private_key parse_external_private_key(const std::string& text) {
@@ -3539,7 +3549,8 @@ int main( int argc, char** argv ) {
    bool push_trx = false;
 
    auto sign_cmd = app.add_subcommand("sign", localized("Sign a transaction"));
-   // Not required(): the em_* / ed_* subcommands below sign other payloads, and CLI11 would demand it for them too.
+   // Not required(): the em_* / ed_* subcommands below sign other payloads. CLI11 would demand a required positional
+   // for them too, and would even take a subcommand's name as the transaction.
    sign_cmd->add_option("transaction", trx_json_to_sign,
                                   localized("The JSON string or filename defining the transaction to sign"))->capture_default_str();
    sign_cmd->add_option("-k,--private-key", str_private_key, localized("The private key that will be used to sign the transaction"))->expected(0, 1);
@@ -3551,6 +3562,11 @@ int main( int argc, char** argv ) {
       // CLI11 runs this callback after a subcommand's own; a subcommand signs something other than a transaction.
       if (!sign_cmd->get_subcommands().empty())
          return;
+      // An optional `transaction` lets `-k` take the next argument even when it is the transaction (`sign -k <trx>`,
+      // key typed at the prompt). CLI11 leaves that argument to a required positional, so restore that reading, unless
+      // the value is a key: then the transaction is missing, and the key must not be parsed (and printed) as one.
+      if (trx_json_to_sign.empty() && !str_private_key.empty() && !is_private_key(str_private_key))
+         std::swap(trx_json_to_sign, str_private_key);
       SYSC_ASSERT( !trx_json_to_sign.empty(), "ERROR: transaction is required" );
       SYSC_ASSERT( str_private_key.empty() || str_public_key.empty(), "ERROR: Either -k/--private-key or --public-key or none of them can be set" );
       fc::variant trx_var = json_from_file_or_string(trx_json_to_sign);

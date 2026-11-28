@@ -19,7 +19,8 @@ Exercises, with no running node:
     stderr, by default or with ``-v``.
   * The commands sign with the key they are given, so they never start the wallet daemon (kiod), also without
     ``--no-auto-kiod``.
-  * ``clio sign <transaction>`` without a subcommand still signs the transaction, and refuses to run without one.
+  * ``clio sign <transaction>`` without a subcommand still signs the transaction, also as ``sign -k <transaction>`` with
+    the key at the prompt, and refuses to run without one, without printing the key it was given.
 
 Vectors (regenerate only deliberately, from the reference implementations):
     message "Wire sign_message test\\nline two: café"
@@ -190,9 +191,15 @@ def test_sign_transaction_still_works():
     signed = json.loads(res.stdout)
     assert len(signed["signatures"]) == 1 and signed["signatures"][0].startswith("SIG_K1_"), signed
 
+    # `-k` with no value right before the transaction: the key comes from the prompt, the argument is the transaction.
+    res = run_clio("sign", "-c", CHAIN_ID, "-k", json.dumps(UNSIGNED_TRANSACTION), stdin=K1_PRIVATE + "\n")
+    assert res.returncode == 0, "clio sign -k <trx> failed: stderr: %s\nstdout: %s" % (res.stderr, res.stdout)
+    assert json.loads(res.stdout)["signatures"] == signed["signatures"], res.stdout
+
     res = run_clio("sign", "-k", K1_PRIVATE, "-c", CHAIN_ID)
     assert res.returncode != 0, res.stdout
     assert "transaction is required" in res.stderr, res.stderr
+    assert K1_PRIVATE[len("PVT_K1_"):] not in res.stdout + res.stderr, "clio sign printed the key"
 
 
 try:
