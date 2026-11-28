@@ -265,9 +265,10 @@ BOOST_FIXTURE_TEST_CASE(budget_shortfall_then_refund, kicker_tester) {
    BOOST_CHECK_EQUAL(0, pool()["shortfall_amount"].as_uint64());
 }
 
-/// Reserve the next pay epoch as well as pending and claims; the old guard would strand advance.
+/// Reserve the next pay epoch as well as pending and claims; the old guard would hold the payout.
 BOOST_FIXTURE_TEST_CASE(reserve_guard_and_emissions_gate, kicker_tester) {
    wait(86'400);
+   BOOST_REQUIRE_EQUAL(success(), reach_the_grid());
    constexpr uint64_t pending = 100 * UNIT, claims = 50 * UNIT, ceiling = 5 * UNIT, available = UNIT;
    auto cfg = mvo(treasury("emitcfg"_n, "emission_config").get_object());
    cfg("t5_distributable", 125'000'000 * UNIT + pending + ceiling);
@@ -281,9 +282,10 @@ BOOST_FIXTURE_TEST_CASE(reserve_guard_and_emissions_gate, kicker_tester) {
    // The old reserve allows this entire available gift, leaving less than the next emission.
    BOOST_REQUIRE_LT(gift, ceiling + available);
    BOOST_REQUIRE_GT(gift, available);
-   // Independent control applies the old permitted transfer and observes the fatal readiness block.
+   // Independent control applies the old permitted transfer and observes the first pay epoch that spends held.
    kicker_tester old;
    old.wait(86'400);
+   BOOST_REQUIRE_EQUAL(old.success(), old.reach_the_grid());
    auto old_cfg = mvo(old.treasury("emitcfg"_n, "emission_config").get_object());
    old_cfg("t5_distributable", 125'000'000 * UNIT + pending + ceiling);
    old.write_global("emitcfg"_n, "emission_config", old_cfg);
@@ -292,12 +294,9 @@ BOOST_FIXTURE_TEST_CASE(reserve_guard_and_emissions_gate, kicker_tester) {
    const auto old_balance = old.wire_balance(SYSIO_ACCOUNT);
    BOOST_REQUIRE_EQUAL(old.success(), old.transfer_wire(SYSIO_ACCOUNT, "carol"_n,
       old_balance - pending - claims - ceiling - available + old_gift));
-   BOOST_REQUIRE_EQUAL(old.success(), old.push(EPOCH, old.epoch_ser, EPOCH, "advance"_n, mvo()));
-   const auto blocked = old.decode(old.epoch_ser, "epoch_state",
-      old.get_row_by_id(EPOCH, EPOCH, "epochstate"_n, "epochstate"_n.value));
-   BOOST_CHECK(blocked.is_null());
+   BOOST_REQUIRE_EQUAL(old.success(), old.open_first_spending_pay_epoch());
    const auto log = old.decode(old.epoch_ser, "blocklog_entry",
-      old.get_row_by_id(EPOCH, EPOCH, "blocklog"_n, 1));
+      old.get_row_by_id(EPOCH, EPOCH, "blocklog"_n, FIRST_SPENDING_EPOCH));
    EmissionsBlockReason reason;
    BOOST_REQUIRE(EmissionsBlockReason_Parse(log["reason"].as_string(), &reason));
    BOOST_CHECK_EQUAL(EMISSIONS_BLOCK_REASON_BALANCE_INSUFFICIENT, reason);
@@ -308,10 +307,8 @@ BOOST_FIXTURE_TEST_CASE(reserve_guard_and_emissions_gate, kicker_tester) {
    BOOST_CHECK_EQUAL(2 * pending + claims + ceiling, wire_balance(SYSIO_ACCOUNT));
    BOOST_CHECK_EQUAL(static_cast<uint64_t>(wide(span) * available / gift),
       (kick_clock() - base).count());
-   BOOST_REQUIRE_EQUAL(success(), push(EPOCH, epoch_ser, EPOCH, "advance"_n, mvo()));
-   const auto epoch = decode(epoch_ser, "epoch_state",
-      get_row_by_id(EPOCH, EPOCH, "epochstate"_n, "epochstate"_n.value));
-   BOOST_CHECK_EQUAL(1, epoch["current_epoch_index"].as_uint64());
+   BOOST_REQUIRE_EQUAL(success(), open_first_spending_pay_epoch());
+   BOOST_CHECK(get_row_by_id(EPOCH, EPOCH, "blocklog"_n, FIRST_SPENDING_EPOCH).empty());
    BOOST_CHECK_EQUAL(0, treasury("t5state"_n, "t5_state")["pending_emission_amount"].as_int64());
 }
 

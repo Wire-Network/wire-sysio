@@ -25,6 +25,8 @@ class kicker_tester : public sysio_liq_tester {
 public:
    static constexpr auto KICKER = "sysio.kicker"_n;
    static constexpr auto EPOCH = "sysio.epoch"_n;
+   /// Both clocks' epoch length: the consensus epoch and the economic grid.
+   static constexpr uint32_t EPOCH_DURATION_SEC = 60;
    static constexpr uint64_t seed = 75'000 * UNIT;
    static constexpr uint64_t holder = 25'000 * UNIT;
    static constexpr uint64_t budget = 1'000'000 * UNIT;
@@ -39,8 +41,9 @@ public:
       deploy(SYSIO_ACCOUNT, contracts::system_wasm(), contracts::system_abi(), system_ser, true);
       deploy(EPOCH, contracts::epoch_wasm(), contracts::epoch_abi(), epoch_ser, true);
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH, epoch_ser, EPOCH, "setconfig"_n, mvo()
-         ("epoch_duration_sec", 60)("operators_per_epoch", 7)("batch_operator_minimum_active", 21)
+         ("epoch_duration_sec", EPOCH_DURATION_SEC)("operators_per_epoch", 7)("batch_operator_minimum_active", 21)
          ("batch_op_groups", 3)("epoch_retention_envelope_log_count", 1000)));
+      BOOST_REQUIRE_EQUAL(success(), configure_economy(unanchored_start()));
       const auto emission = mvo()
          ("t1_allocation", 0)("t2_allocation", 0)("t3_allocation", 0)
          ("t1_duration", 1)("t2_duration", 1)("t3_duration", 1)("min_claimable", 0)
@@ -53,7 +56,7 @@ public:
       BOOST_REQUIRE_EQUAL(success(), push(SYSIO_ACCOUNT, system_ser, SYSIO_ACCOUNT, "setemitcfg"_n,
                                           mvo()("cfg", emission)));
       BOOST_REQUIRE_EQUAL(success(), push(SYSIO_ACCOUNT, system_ser, SYSIO_ACCOUNT, "initt5"_n,
-                                          mvo()("start_time", time_point_sec(control->pending_block_time()))));
+                                          mvo()));
       BOOST_REQUIRE_EQUAL(success(), configure(budget));
       BOOST_REQUIRE_EQUAL(success(), add());
    }
@@ -222,6 +225,39 @@ public:
       state("pending_emission_amount", pending);
       write_global("t5state"_n, "t5_state", state);
       write_global("payclaimtot"_n, "pay_claim_total", mvo()("outstanding", claims));
+   }
+   /// How far ahead the fixture starts the economic grid, so no boundary passes before the first tick anchors it.
+   static constexpr uint32_t UNANCHORED_ECONOMIC_START_SEC = 10u * 365u * 24u * 60u * 60u;
+   /// A grid start no fixture wait reaches.
+   fc::time_point_sec unanchored_start() {
+      return fc::time_point_sec(control->head().block_time() + fc::seconds(UNANCHORED_ECONOMIC_START_SEC));
+   }
+   /// Configure the economic clock to start its grid at `start`.
+   action_result configure_economy(fc::time_point_sec start) {
+      return push(EPOCH, epoch_ser, EPOCH, "seteconomy"_n, mvo()
+         ("epoch_duration_sec", EPOCH_DURATION_SEC)("start_time", start));
+   }
+   /// How far ahead of the head block reach_the_grid leaves the boundary after the first tick.
+   static constexpr uint32_t REACHING_TICK_MARGIN_SEC = 5;
+   /// The economic epoch open_first_spending_pay_epoch opens.
+   static constexpr uint32_t FIRST_SPENDING_EPOCH = 2;
+   /// Open consensus genesis and tick economic epoch 1 on a grid started one epoch, less REACHING_TICK_MARGIN_SEC,
+   /// before now. That tick reaches the grid, so its payout spends nothing; then cross the next boundary, so the next
+   /// tick runs on time and is the clock's first payout that spends.
+   action_result reach_the_grid() {
+      if (auto result = push(EPOCH, epoch_ser, EPOCH, "advance"_n, mvo()); result != success()) return result;
+      const fc::time_point start = control->head().block_time() + fc::seconds(REACHING_TICK_MARGIN_SEC)
+                                 - fc::seconds(EPOCH_DURATION_SEC);
+      if (auto result = configure_economy(fc::time_point_sec(start)); result != success()) return result;
+      if (auto result = push(EPOCH, epoch_ser, EPOCH, "tickeconomy"_n, mvo()("epoch_index", 1)); result != success())
+         return result;
+      wait(REACHING_TICK_MARGIN_SEC);
+      return success();
+   }
+   /// Tick the first pay epoch that spends, after reach_the_grid. With `pay_cadence_epochs == 1` the emissions gate
+   /// either pays the period or records why it held it.
+   action_result open_first_spending_pay_epoch() {
+      return push(EPOCH, epoch_ser, EPOCH, "tickeconomy"_n, mvo()("epoch_index", FIRST_SPENDING_EPOCH));
    }
 };
 } // namespace kicker_test_support

@@ -189,7 +189,7 @@ public:
          *this, contract, ser, signer, action_name, data);
    }
 
-   // ── OPP stack bootstrap: one batch op, one outpost, advance to epoch 1 ────
+   // ── OPP stack bootstrap: one batch op, one outpost, left at epoch 0 ────
 
    void bootstrap_opp_stack() {
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "setconfig"_n, mvo()
@@ -198,6 +198,8 @@ public:
          ("batch_operator_minimum_active", 1)
          ("batch_op_groups", 1)
          ("epoch_retention_envelope_log_count", 200)));
+      BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "seteconomy"_n, mvo()
+         ("epoch_duration_sec", 60)("start_time", fc::time_point_sec(control->head().block_time()))));
 
       BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "setconfig"_n, mvo()
          ("terminate_prune_delay_ms", 600000)("terminate_max_consecutive_misses", 5)
@@ -215,7 +217,6 @@ public:
          ("outpost", sysio_system::test_support::no_outpost_mvo())));
 
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "schbatchgps"_n, mvo()));
-      BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "advance"_n, mvo()));
       produce_blocks();
    }
 
@@ -393,7 +394,7 @@ public:
 
    action_result flushwtdw(uint32_t up_to_epoch) {
       return push(OPREG_ACCOUNT, opreg_abi, EPOCH_ACCOUNT, "flushwtdw"_n, mvo()
-         ("current_epoch", up_to_epoch));
+         ("economic_epoch", up_to_epoch)("consensus_epoch", up_to_epoch));
    }
 
    action_result terminate(name account) {

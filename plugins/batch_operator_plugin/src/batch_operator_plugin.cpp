@@ -20,6 +20,7 @@
 #include <thread>
 
 #include "async_action_completion.hpp"
+#include "economic_clock.hpp"
 #include "group_election.hpp"
 #include "role_config.hpp"
 #include "synd_crank.hpp"
@@ -177,6 +178,7 @@ namespace {
       pushed_action{msgch::account, msgch::action_deliver},
       pushed_action{msgch::account, msgch::action_chkcons},
       pushed_action{chalg::account, chalg::action_chkdispute},
+      pushed_action{batch_operator_detail::economy::account, batch_operator_detail::economy::action_tickeconomy},
       pushed_action{batch_operator_detail::swap::account, batch_operator_detail::swap::action_tickyield},
       pushed_action{batch_operator_detail::liq::account, batch_operator_detail::liq::action_queueyield},
    };
@@ -602,6 +604,12 @@ struct batch_operator_plugin::impl {
          crank_open_disputes();
       } FC_LOG_AND_DROP();
 
+      // Open every due economic epoch. Not gated on `is_elected` either — see
+      // crank_economic_clock.
+      try {
+         crank_economic_clock();
+      } FC_LOG_AND_DROP();
+
       // Sell queued yield and queue reported yield. Not gated on `is_elected`
       // either — see crank_yield. Idle until both contracts are deployed.
       refresh_yield_contract_presence();
@@ -664,6 +672,72 @@ struct batch_operator_plugin::impl {
             // Expected-transient: the dispute resolved between the scan and the push, or
             // another operator's crank won the race.
             dlog("batch_operator: chkdispute({}): {}", dispute_id, e.to_string());
+         }
+      }
+   }
+
+   /**
+    * Crank `sysio.epoch::tickeconomy` for every economic epoch whose grid boundary has passed, oldest
+    * first, at most `economy::ticks_per_poll` per poll (a start time in the past, or a stall, catches
+    * up over successive polls).
+    *
+    * Not gated on `is_elected`: the economic clock never waits on consensus, and a dispute pause
+    * suspends the election while the clock must keep running. Every ACTIVE operator pushes the due
+    * epochs; the contract opens each one once and refuses the rest, so a redundant push costs only
+    * its refusal. Nothing is pushed before the consensus genesis advance, which the contract requires.
+    * The consensus index is read here rather than taken from `current_epoch`, which the election poll
+    * does not record while consensus is paused. The catch-up stops at the first push that is refused
+    * or times out, so one poll waits on at most one failed tick.
+    */
+   void crank_economic_clock() {
+      using namespace batch_operator_detail;
+      sysio::chain_apis::read_only::get_table_rows_params consensus;
+      consensus.code        = chain::name(epoch::account);
+      consensus.scope       = epoch::account;
+      consensus.table       = epoch::table_epochstate;
+      consensus.limit       = SINGLETON_ROW_LIMIT;
+      consensus.values_only = true;
+      const auto consensus_rows = read_table_checked(std::move(consensus));
+      if (!consensus_rows || consensus_rows->rows.empty() || !consensus_rows->rows.front().is_object()) return;
+      const uint32_t consensus_epoch_index = static_cast<uint32_t>(
+         consensus_rows->rows.front().get_object()[epoch::field::current_epoch_index].as_uint64());
+
+      sysio::chain_apis::read_only::get_table_rows_params config;
+      config.code        = chain::name(economy::account);
+      config.scope       = economy::account;
+      config.table       = economy::table_economycfg;
+      config.limit       = SINGLETON_ROW_LIMIT;
+      config.values_only = true;
+      const auto config_rows = read_table_checked(std::move(config));
+      if (!config_rows || config_rows->rows.empty() || !config_rows->rows.front().is_object()) return;
+
+      sysio::chain_apis::read_only::get_table_rows_params state;
+      state.code        = chain::name(economy::account);
+      state.scope       = economy::account;
+      state.table       = economy::table_economystate;
+      state.limit       = SINGLETON_ROW_LIMIT;
+      state.values_only = true;
+      const auto state_rows = read_table_checked(std::move(state));
+      if (!state_rows) return;   // a failed read is not "no ticks yet"
+      const bool has_state = !state_rows->rows.empty() && state_rows->rows.front().is_object();
+
+      const auto clock = decode_economic_clock(
+         config_rows->rows.front().get_object(), has_state ? &state_rows->rows.front().get_object() : nullptr);
+      if (!clock) return;
+
+      for (const uint32_t epoch_index :
+           economic_epochs_due(*clock, consensus_epoch_index, fc::time_point::now(), economy::ticks_per_poll)) {
+         try {
+            // A later index cannot open before this one, so a refused or timed-out push ends the
+            // catch-up; the next poll re-reads the clock.
+            if (!push_action(economy::account, economy::action_tickeconomy, *relay_signer,
+                             fc::mutable_variant_object()(economy::field::epoch_index, epoch_index))) {
+               break;
+            }
+         } catch (const fc::exception& e) {
+            // Expected-transient: another operator opened the epoch first.
+            dlog("batch_operator: tickeconomy({}): {}", epoch_index, e.to_string());
+            break;
          }
       }
    }

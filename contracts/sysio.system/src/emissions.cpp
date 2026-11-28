@@ -17,6 +17,7 @@
 #include <sysio.epoch/sysio.epoch.hpp>
 
 #include <algorithm>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -50,6 +51,9 @@ constexpr int64_t  MS_PER_SECOND          = 1000;
 // Basis-point denominator for all category / sub-split ratios.
 constexpr int64_t  BPS_DENOMINATOR        = 10000;
 
+// Duty units each member of the on-duty group earns for one consensus epoch served.
+constexpr uint32_t DUTY_UNITS_PER_EPOCH   = 1;
+
 constexpr sysio::name GOVERNANCE_ACCOUNT         = "sysio.gov"_n;
 // Capex ("capital expenditure") bucket lives on sysio.ops -- operational spend.
 constexpr sysio::name CAPEX_OPERATIONS_ACCOUNT   = "sysio.ops"_n;
@@ -72,6 +76,7 @@ using sysio::asset;
 using sysio::current_time_point;
 using sysio::name;
 using sysio::time_point_sec;
+using sysio::opp::safe::add_sat;
 using sysio::opp::types::OperatorType;
 
 // ---------------------------------------------------------------------------
@@ -215,19 +220,106 @@ emission_config get_emit_cfg(name self) {
    return cfgtbl.get();
 }
 
-// Canonical epoch duration lives on sysio.epoch::epochcfg. Both payepoch
-// (the producer pay period's slot count) and viewepoch (seconds_until_next) read it
-// here cross-contract so the value cannot drift from what advance() uses.
-uint32_t get_epoch_duration_sec() {
-   sysio::epoch::epochcfg_t cfg_tbl(epoch_refs::account);
-   sysio::check(cfg_tbl.exists(), "sysio.epoch config not initialized");
-   return cfg_tbl.get().epoch_duration_sec;
+// The economic clock's configuration lives on sysio.epoch::economycfg. initt5 (start time and the seed
+// share) and viewepoch (the next share and seconds_until_next) read it here cross-contract so the values
+// cannot drift from what tickeconomy uses.
+sysio::epoch::economic_config get_economic_config() {
+   sysio::epoch::economycfg_t cfg_tbl(epoch_refs::account);
+   sysio::check(cfg_tbl.exists(), "sysio.epoch economic clock not configured");
+   return cfg_tbl.get();
 }
 
-// Same value for callers that may not throw -- see accrueepoch.
-uint32_t epoch_duration_sec_or_zero() {
-   sysio::epoch::epochcfg_t cfg_tbl(epoch_refs::account);
-   return cfg_tbl.exists() ? cfg_tbl.get().epoch_duration_sec : 0;
+// Block slots one economic epoch of `epoch_duration_sec` holds: the producer pay divisor's unit.
+uint64_t nominal_slots_of(uint32_t epoch_duration_sec) {
+   return static_cast<uint64_t>(epoch_duration_sec) * static_cast<uint64_t>(MS_PER_SECOND)
+      / static_cast<uint64_t>(sysio::block_timestamp::block_interval_ms);
+}
+
+// ---------------------------------------------------------------------------
+// Batch-duty settlement
+// ---------------------------------------------------------------------------
+
+// Pay `row`'s units of the settling period at that period's rate -- its pool over its units -- when
+// its operator is still an ACTIVE batch operator, and erase the row. An inactive operator's share
+// stays in the treasury. Returns the amount credited. Never throws.
+int64_t settle_duty_row(name self, duty_state& duty, batchduty_t& rows, const batch_duty& row) {
+   int64_t pay = 0;
+   if (duty.settling_units > 0 && is_op_active(row.account_name, OperatorType::OPERATOR_TYPE_BATCH)) {
+      pay = static_cast<int64_t>(
+         static_cast<__int128>(duty.settling_pool) * row.units / duty.settling_units);
+   }
+   credit_pay(self, row.account_name, pay, memo::batch_op_reward);
+   duty.settling_paid += pay;
+   rows.erase(batch_duty_key{row.account_name.value});
+   return pay;
+}
+
+// Close the settlement: release what it did not credit back to the T5 budget and finish its
+// epochlog row. Never throws.
+void finish_settlement(name self, duty_state& duty, t5_state& state) {
+   state.unsettled_batch_emission = 0;
+
+   epochlog_t log(self);
+   const epochlog_key key{duty.settling_epoch_index};
+   if (log.contains(key)) {
+      log.modify(self, key, [&](auto& row) {
+         row.batch_emission_retained = duty.settling_pool - duty.settling_paid;
+         row.batch_settled           = true;
+      });
+   }
+
+   duty.settling_period      = 0;
+   duty.settling_pool        = 0;
+   duty.settling_units       = 0;
+   duty.settling_paid        = 0;
+   duty.settling_epoch_index = 0;
+   duty.settle_cursor        = 0;
+}
+
+// One bounded settlement step: walk the settling period's `batchduty` rows (the `byperiod` index) from
+// the cursor, paying at most MAX_DUTY_SETTLEMENT_ROWS of them; passing the period's last row finishes
+// the settlement. Credited amounts move from unsettled to distributed. Returns the rows paid. A no-op
+// when no settlement is open. Never throws.
+uint32_t step_settlement(name self, duty_state& duty, t5_state& state) {
+   if (!duty.settling()) return 0;
+
+   // Snapshot the step's rows and the cursor first, then settle: settling erases rows, and the walk
+   // must not hold an iterator across those erasures.
+   batchduty_t rows(self);
+   auto by_period = rows.get_index<"byperiod"_n>();
+   std::vector<batch_duty> due;
+   due.reserve(MAX_DUTY_SETTLEMENT_ROWS);
+   auto it = by_period.lower_bound(duty_period_key(duty.settling_period, duty.settle_cursor));
+   for (; it != by_period.end() && it->period == duty.settling_period && due.size() < MAX_DUTY_SETTLEMENT_ROWS;
+        ++it) {
+      due.push_back(*it);
+   }
+   const bool walked_to_end = it == by_period.end() || it->period != duty.settling_period;
+   if (!walked_to_end) duty.settle_cursor = it->account_name.value;
+
+   for (const auto& row : due) {
+      const int64_t paid = settle_duty_row(self, duty, rows, row);
+      state.unsettled_batch_emission -= paid;
+      state.total_distributed        += paid;
+   }
+
+   if (walked_to_end) finish_settlement(self, duty, state);
+   return static_cast<uint32_t>(due.size());
+}
+
+// Erase up to `budget` `batchduty` rows of periods that closed without a settlement (duty but no batch
+// pool), so no later settlement walks past them. Periods settle one at a time and in order, so every row
+// older than the settling period, or than the open period when none is settling, is one. Never throws.
+void prune_obsolete_duty(name self, const duty_state& duty, uint32_t budget) {
+   const uint32_t live_from = duty.settling() ? duty.settling_period : duty.open_period;
+   batchduty_t rows(self);
+   auto by_period = rows.get_index<"byperiod"_n>();
+   std::vector<uint64_t> obsolete;
+   for (auto it = by_period.lower_bound(duty_period_key(0, 0));
+        it != by_period.end() && it->period < live_from && obsolete.size() < budget; ++it) {
+      obsolete.push_back(it->account_name.value);
+   }
+   for (const uint64_t account : obsolete) rows.erase(batch_duty_key{account});
 }
 
 } // anonymous namespace
@@ -285,24 +377,20 @@ void system_contract::setemitcfg(const emissions::emission_config& cfg) {
    sysio::check(cfg.epoch_log_retention_count > 0,
                  "epoch_log_retention_count must be positive");
 
-   // Pay cadence (number of epochs accumulated per payepoch firing). Zero
-   // would divide-by-zero in the period share-by-rounds math. This upper bound
-   // caps retained history; the joint check after epochcfg is loaded separately
-   // caps expensive per-recipient payout work.
+   // Pay cadence (number of economic epochs accumulated per payepoch firing).
    sysio::check(cfg.pay_cadence_epochs > 0,
                  "pay_cadence_epochs must be positive");
    sysio::check(cfg.pay_cadence_epochs <= emissions::MAX_PAY_CADENCE_EPOCHS,
-                 "pay_cadence_epochs exceeds batch roster history safety cap");
+                 "pay_cadence_epochs exceeds the pay-period cap");
 
-   // Single read of sysio.epoch::epochcfg shared by the round-to-zero guards
+   // Single read of sysio.epoch::economycfg shared by the round-to-zero guards
    // (which need epoch_secs to scale annual values) and the post-init guard
    // (which compares per-epoch floor against remaining distributable).
-   sysio::epoch::epochcfg_t epoch_cfg_tbl(epoch_refs::account);
-   const bool epoch_configured = epoch_cfg_tbl.exists();
-   const auto epoch_cfg = epoch_configured
-      ? epoch_cfg_tbl.get()
-      : sysio::epoch::epoch_config{};
-   const uint32_t epoch_secs = epoch_cfg.epoch_duration_sec;
+   sysio::epoch::economycfg_t economy_cfg_tbl(epoch_refs::account);
+   const bool epoch_configured = economy_cfg_tbl.exists();
+   const sysio::epoch::economic_config economy =
+      epoch_configured ? economy_cfg_tbl.get() : sysio::epoch::economic_config{};
+   const uint32_t epoch_secs = epoch_configured ? economy.epoch_duration_sec : 0;
 
    // Single read of t5_state shared by the period-accrual bound (which needs
    // the already-accrued pending amount) and the post-init brick guards below.
@@ -310,18 +398,13 @@ void system_contract::setemitcfg(const emissions::emission_config& cfg) {
    const bool t5_initialized = t5s.exists();
    const t5_state t5now      = t5_initialized ? t5s.get() : t5_state{};
 
-   // If sysio.epoch is configured, sanity-check that each nonzero annual
-   // value scales to a non-zero per-epoch share at the canonical
+   // If the economic clock is configured, sanity-check that each nonzero annual
+   // value scales to a non-zero per-epoch share at the canonical economic
    // epoch_duration_sec. Without this guard, a tiny annual value can round
    // down to 0 in scale_annual_to_epoch, the gate sees emission_amount = 0,
-   // and emissions silently disable. Skipped pre-bootstrap (sysio.epoch not
+   // and emissions silently disable. Skipped pre-bootstrap (economic clock not
    // yet configured); the same check fires on the next setemitcfg call.
    if (epoch_configured) {
-      sysio::check(
-         emissions::batch_payout_work_fits(cfg.pay_cadence_epochs,
-                                            epoch_cfg.operators_per_epoch),
-         "pay_cadence_epochs x operators_per_epoch exceeds the batch payout credit safety cap (100)");
-
       if (cfg.annual_initial_emission > 0) {
          sysio::check(emissions::scale_annual_to_epoch(cfg.annual_initial_emission, epoch_secs) > 0,
                        "annual_initial_emission per-epoch share rounds to 0 at current epoch_duration_sec");
@@ -339,19 +422,24 @@ void system_contract::setemitcfg(const emissions::emission_config& cfg) {
       // full cadence of ceiling-rate epochs must fit in the asset range.
       // Without this, pending_emission_amount can saturate at asset::max_amount
       // mid-period (see saturating_accrue), after which the pay-epoch readiness
-      // gate demands a balance no treasury can hold and epoch advancement
-      // blocks permanently. sysio.epoch::setconfig enforces the same bound when
-      // epoch_duration_sec changes.
+      // gate demands a balance no treasury can hold and every payout blocks
+      // permanently. Each tick accrues the epoch it closes, so the bound takes the
+      // longest one a tick can still close. sysio.epoch::seteconomy enforces the
+      // same bound when the economic epoch_duration_sec changes.
+      const sysio::epoch::economic_state economy_state =
+         sysio::epoch::economystate_t(epoch_refs::account).get_or_default(sysio::epoch::economic_state{});
       sysio::check(
-         emissions::period_accrual_fits_asset_range(cfg, epoch_secs, t5now.pending_emission_amount),
+         emissions::period_accrual_fits_asset_range(
+            cfg, sysio::epoch::epoch::longest_accruing_epoch_sec(economy, economy_state),
+            t5now.pending_emission_amount),
          "per-epoch emission ceiling x pay_cadence_epochs exceeds the asset range at current epoch_duration_sec");
    }
 
    // If t5_state already exists, prevent config changes that would brick future emissions. Post-init, the budget must
    // still cover what has been paid out AND what the open pay period has accrued (it is owed at the boundary), and the
-   // per-epoch floor (derived from annual_min_emission and the canonical epoch_duration_sec) can't exceed what is left
-   // uncommitted. initt5 requires sysio.epoch to be configured, so t5_initialized implies epoch_configured and
-   // epoch_secs is safe to use directly.
+   // per-epoch floor (derived from annual_min_emission and the canonical economic epoch_duration_sec) can't exceed
+   // what is left uncommitted. initt5 requires the economic clock to be configured, so t5_initialized implies
+   // epoch_configured and epoch_secs is safe to use directly.
    if (t5_initialized) {
       const int64_t remaining = emissions::net_headroom(cfg, t5now);
       sysio::check(remaining >= 0,
@@ -464,26 +552,23 @@ void system_contract::claimnodedis(const sysio::name& account_name) {
    const auto info = compute_node_claim(emission, row, cfg.min_claimable);
    sysio::check(info.can_claim, "claim amount below minimum threshold");
 
-   // Node-owner vesting draws on the SAME `sysio` WIRE balance that backs unclaimed epoch pay, so
-   // it must respect the same reserve the epoch readiness gate holds. `payclaims`
-   // rows are already owed: paying them out is a promise this contract has made and cannot revoke,
-   // whereas this withdrawal is a claim on the free remainder.
-   //
-   // Without the reserve the two overdraw each other. Credit 60 of epoch pay against a 100
-   // balance, let a vested owner withdraw 50, and only 50 backs the 60 owed -- the later
-   // `claimpay` cannot pay out, and `payepoch` stays balance-blocked from then on. That exposure
-   // is new: before payouts became claimable, epoch pay had already left the treasury by the time
-   // this ran, so there was nothing outstanding for it to spend into.
+   // Node-owner vesting draws on the SAME `sysio` WIRE balance that backs owed epoch pay -- `payclaims`
+   // credited and not yet pulled, and batch emission still settling -- so it spends only what the
+   // epoch readiness gate also treats as spendable. Those amounts are promises this contract has
+   // made; this withdrawal is a claim on the free remainder. Without the reserve the two overdraw
+   // each other: a later `claimpay` or settlement step could not pay out, and `payepoch` would stay
+   // balance-blocked.
    //
    // Rejecting rather than capping keeps `claimed` exactly in step with what was transferred; the
    // claim stays fully available and succeeds once claims are pulled or emissions refill the
    // treasury. `claimnodedis` is user-initiated, so the throw reaches the caller who asked.
    payclaimtot_t nd_tot_tbl(get_self());
-   const int64_t nd_outstanding =
-      static_cast<int64_t>(nd_tot_tbl.get_or_default(pay_claim_total{}).outstanding);
-   const int64_t nd_spendable = get_wire_balance(get_self()) - nd_outstanding;
+   t5state_t     nd_t5_tbl(get_self());
+   const int64_t nd_spendable = emissions::spendable_wire(get_wire_balance(get_self()),
+                                                          nd_tot_tbl.get_or_default(pay_claim_total{}),
+                                                          nd_t5_tbl.get_or_default(t5_state{}));
    sysio::check(info.claimable.amount <= nd_spendable,
-                "treasury balance is reserved against unclaimed epoch pay; try again later");
+                "treasury balance is reserved against owed epoch pay; try again later");
 
    nodedist.modify(same_payer, pk, [&](auto& mrow) {
       mrow.claimed += info.claimable;
@@ -546,49 +631,46 @@ emissions::node_claim_result system_contract::viewnodedist(const sysio::name& ac
 // T5 treasury emissions
 // ===========================================================================
 
-void system_contract::initt5(const sysio::time_point_sec& start_time) {
+void system_contract::initt5() {
    require_auth(get_self());
 
-   const auto cfg = get_emit_cfg(get_self());
+   const auto cfg     = get_emit_cfg(get_self());
+   const auto economy = get_economic_config();
 
    t5state_t t5s(get_self());
    sysio::check(!t5s.exists(), "t5 state already initialized");
 
-   // last_epoch_emission seeds the decay chain. Stored as the per-epoch share
-   // of annual_initial_emission scaled by the canonical epoch_duration_sec on
-   // sysio.epoch, so subsequent compute_epoch_emission calls operate on a
-   // value already in per-epoch units.
+   // last_epoch_emission seeds the decay chain: the per-epoch share of
+   // annual_initial_emission over one epoch of the configured duration, which
+   // last_epoch_duration_sec records so a later share rescales it to its own epoch.
    const int64_t initial_per_epoch =
-      emissions::scale_annual_to_epoch(cfg.annual_initial_emission, get_epoch_duration_sec());
+      emissions::scale_annual_to_epoch(cfg.annual_initial_emission, economy.epoch_duration_sec);
 
    t5s.set(t5_state{
-      .start_time          = start_time,
-      .epoch_count         = 0,
-      .last_epoch_index    = 0,
-      .last_epoch_time     = start_time,
-      .last_epoch_emission = initial_per_epoch,
-      .total_distributed   = 0,
+      .start_time              = economy.start_time,
+      .epoch_count             = 0,
+      .last_epoch_index        = 0,
+      .last_epoch_time         = economy.start_time,
+      .last_epoch_emission     = initial_per_epoch,
+      .last_epoch_duration_sec = economy.epoch_duration_sec,
+      .total_distributed       = 0,
    }, get_self());
 }
 
-// accrueepoch - record this epoch's per-epoch emission share onto t5state.
-// Called inline by sysio.epoch::advance on EVERY successful epoch advance
-// (both pay and non-pay). On non-pay epochs this is the only emission-side
-// inline action; on pay-epochs accrueepoch runs first (FIFO) and payepoch
-// follows, reading the state this action just wrote.
+// accrueepoch - record economic epoch `epoch_index`'s emission share onto t5state.
+// Called inline by sysio.epoch::tickeconomy whenever the readiness gate lets the
+// epoch accrue (pay or non-pay). On a pay epoch accrueepoch runs first (FIFO) and
+// payepoch follows, reading the state this action just wrote.
 //
 // Updates:
-//   - pending_emission_amount += per_epoch_emission   (drained on pay-epoch)
-//   - batch_group_epochs[batch_group_index] += 1      (drained on pay-epoch)
+//   - pending_emission_amount += per_epoch_emission   (drained on the pay epoch)
+//   - pending_nominal_slots   += the closed epoch's slots (drained on the pay epoch)
 //   - last_epoch_emission = per_epoch_emission        (decay continuity; kept on a zero share)
+//   - last_epoch_duration_sec = the closed epoch's length (with last_epoch_emission)
 //   - last_epoch_index = epoch_index                  (replay guard)
 //   - last_epoch_time = now
-//
-// Treasury / balance gating is the gate's responsibility upstream; the
-// idempotency check (epoch_index > last_epoch_index) prevents replay.
-void system_contract::accrueepoch(uint32_t epoch_index,
-                                  uint8_t  batch_group_index,
-                                  int64_t  per_epoch_emission) {
+void system_contract::accrueepoch(uint32_t epoch_index, int64_t per_epoch_emission,
+                                  uint32_t closed_epoch_duration_sec) {
    require_auth(epoch_refs::account);
 
    // Defense in depth. Zero is a valid share: the gate passes one to an open pay period with emission pending once the
@@ -601,111 +683,120 @@ void system_contract::accrueepoch(uint32_t epoch_index,
 
    sysio::check(epoch_index > state.last_epoch_index, "accrueepoch epoch already accrued");
 
-   // Saturating accumulate (shared helper in emissions.hpp). accrueepoch runs
-   // as an inline action from sysio.epoch::advance, so this must never throw --
-   // a throw would abort epoch advancement chain-wide. The readiness gate
+   // Saturating accumulate (shared helper in emissions.hpp). The readiness gate
    // precomputed the identical saturated total as period_emission and payepoch
    // asserts equality against it, so the three sites cannot diverge. The
-   // period-accrual bound enforced by setemitcfg / sysio.epoch::setconfig keeps
+   // period-accrual bound enforced by setemitcfg / sysio.epoch::seteconomy keeps
    // any accepted configuration from actually reaching the clamp; saturating
    // here is defense-in-depth behind those boundary checks.
    state.pending_emission_amount =
       saturating_accrue(state.pending_emission_amount, per_epoch_emission);
 
-   // The divisor accrues with the pool, at the duration in force for THIS epoch. Computing it at
-   // payout from the current duration would apply today's value to epochs that ran under a
-   // different one, mis-sizing the divisor for any period spanning a duration change.
-   // Read WITHOUT asserting the epoch config exists: this action is inline from
-   // sysio.epoch::advance and must not throw. A 0 duration accrues no slots and payout falls
-   // through to the produced-block divisor.
-   state.pending_nominal_slots += static_cast<uint64_t>(epoch_duration_sec_or_zero())
-      * static_cast<uint64_t>(MS_PER_SECOND)
-      / static_cast<uint64_t>(sysio::block_timestamp::block_interval_ms);
-
-   // Lazy-grow batch_group_epochs to fit batch_group_index. Pre-pay-cadence
-   // chains see length 0 and grow on first epoch under the new schema.
-   if (batch_group_index >= state.batch_group_epochs.size()) {
-      state.batch_group_epochs.resize(batch_group_index + 1, 0);
-   }
-   state.batch_group_epochs[batch_group_index] += 1;
+   // The divisor counts the slots of the epoch this tick closes. Summed over a period's ticks it spans the period's own
+   // boundaries, whatever duration is set when each tick runs.
+   state.pending_nominal_slots += nominal_slots_of(closed_epoch_duration_sec);
 
    const auto now = time_point_sec{current_time_point()};
    state.last_epoch_index    = epoch_index;
    state.last_epoch_time     = now;
    // A zero share keeps the last positive share as the decay base; storing 0 would restart the curve at the per-epoch
    // minimum, or at nothing when that minimum is 0. Near the end of the budget the last positive share may itself be
-   // clamped to the remainder.
-   if (per_epoch_emission > 0) state.last_epoch_emission = per_epoch_emission;
+   // clamped to the remainder. The base keeps the length of the epoch it accrued for.
+   if (per_epoch_emission > 0) {
+      state.last_epoch_emission     = per_epoch_emission;
+      state.last_epoch_duration_sec = closed_epoch_duration_sec;
+   }
 
    t5s.set(state, get_self());
 }
 
-// rcrdbatch - retain the exact roster that accrued this epoch. The schedule
-// mutates before advance queues its inline actions, so a current position is
-// not a stable identity for an earlier epoch.
-void system_contract::rcrdbatch(uint32_t epoch_index, std::vector<sysio::name> members) {
+// rcrdduty - credit one duty unit to each member of the group that served
+// consensus epoch `epoch_index`, in the pay period open when it is recorded.
+// Runs inline from sysio.epoch::advance, so it never throws: a member holding
+// units of the settling period is settled at that period's rate before its new
+// unit opens a row in the open period.
+void system_contract::rcrdduty(uint32_t /*epoch_index*/, std::vector<sysio::name> members) {
    require_auth(epoch_refs::account);
 
+   dutystate_t duty_tbl(get_self());
+   auto duty = duty_tbl.get_or_default(duty_state{});
    t5state_t t5s(get_self());
-   sysio::check(t5s.exists(), "t5 state not initialized");
-   const auto state = t5s.get();
-   sysio::check(epoch_index == state.last_epoch_index,
-                "rcrdbatch must run after accrueepoch for the same epoch_index");
+   // A settlement only exists once payepoch has run, which requires t5state.
+   std::optional<t5_state> state = t5s.exists() ? std::optional<t5_state>{t5s.get()} : std::nullopt;
 
-   // The scheduler supplies canonical order today. Sorting here keeps the
-   // table identity stable even if a future scheduler changes that detail.
-   std::sort(members.begin(), members.end());
-
-   batchepochs_t history(get_self());
-   const batch_epoch_key key{epoch_index};
-   sysio::check(!history.contains(key), "batch roster already recorded for epoch");
-
-   // Never let an old stored cadence make this mandatory inline action throw.
-   // Normal advances pay at most every MAX_PAY_CADENCE_EPOCHS, but the exact
-   // oldest key probe also heals a pre-bound configuration without
-   // deserializing every historical roster on each advance.
-   if (epoch_index > emissions::MAX_PAY_CADENCE_EPOCHS) {
-      const batch_epoch_key oldest_retained{
-         static_cast<uint32_t>(epoch_index - emissions::MAX_PAY_CADENCE_EPOCHS)};
-      if (history.contains(oldest_retained)) {
-         history.erase(oldest_retained);
+   batchduty_t rows(get_self());
+   for (const auto& member : members) {
+      std::optional<batch_duty> row = rows.try_get(batch_duty_key{member.value});
+      if (row && row->period != duty.open_period) {
+         // Units from a closed period wait only for the settling one; pay them out first. A row of a period that
+         // closed without a settlement is dropped.
+         if (duty.settling() && row->period == duty.settling_period && state) {
+            const int64_t paid = settle_duty_row(get_self(), duty, rows, *row);
+            state->unsettled_batch_emission -= paid;
+            state->total_distributed        += paid;
+         } else {
+            rows.erase(batch_duty_key{member.value});
+         }
+         row.reset();
       }
+
+      batch_duty updated = row.value_or(batch_duty{.account_name = member, .period = duty.open_period});
+      updated.units = add_sat(updated.units, DUTY_UNITS_PER_EPOCH);
+      rows.set(get_self(), batch_duty_key{member.value}, updated);
+      duty.open_units += DUTY_UNITS_PER_EPOCH;
    }
 
-   history.emplace(get_self(), key, batch_epoch{
-      .sysio_epoch_index = epoch_index,
-      .members           = members,
-   });
+   duty_tbl.set(duty, get_self());
+   if (state) t5s.set(*state, get_self());
 }
 
-// payepoch - pay the compute, capex, and governance shares of accumulated
-// emissions for the pay period ending at `epoch_index`. Called inline by
-// sysio.epoch::advance on a pay-epoch (period boundary defined by
-// emit_cfg.pay_cadence_epochs) after its readiness gate has verified that:
+// settleduty - one bounded step of the open batch-duty settlement, then pruning of obsolete duty rows
+// with the rest of the step's budget. Inline from sysio.epoch::tickeconomy every economic epoch.
+void system_contract::settleduty() {
+   require_auth(epoch_refs::account);
+
+   dutystate_t duty_tbl(get_self());
+   if (!duty_tbl.exists()) return;
+   auto duty = duty_tbl.get();
+   if (!duty.settling()) {
+      prune_obsolete_duty(get_self(), duty, MAX_DUTY_SETTLEMENT_ROWS);
+      return;
+   }
+
+   t5state_t t5s(get_self());
+   if (!t5s.exists()) return;
+   auto state = t5s.get();
+
+   const uint32_t paid_rows = step_settlement(get_self(), duty, state);
+   prune_obsolete_duty(get_self(), duty, MAX_DUTY_SETTLEMENT_ROWS - paid_rows);
+
+   duty_tbl.set(duty, get_self());
+   t5s.set(state, get_self());
+}
+
+// payepoch - pay the compute, capex, and governance shares of the emissions
+// accrued over the pay period ending at economic epoch `epoch_index`. Called
+// inline by sysio.epoch::tickeconomy on a pay epoch after its readiness gate
+// has verified that:
 //   - emitcfg exists
 //   - t5state exists
 //   - the gross headroom is positive and period_emission is too (this epoch's share may be 0 once earlier epochs
 //     of the period have accrued, if they committed the rest of the budget or the curve has dropped to zero)
-//   - sysio's WIRE balance >= period_emission (pending + this epoch's share)
+//   - sysio's spendable WIRE balance >= period_emission (pending + this epoch's share), when it spends
 //
 // The unallocated remainder (period_emission - compute - capex - governance)
 // stays in sysio's balance. LIQ yield draws no treasury bonus.
 //
-// The batch-operator slice is weighted by the immutable historical-roster
-// active-epoch count. Allocated is not paid: only ELIGIBLE shares go out, and any
-// skipped amount stays in this treasury. The audit row records retained batch
-// emission and whether roster history was complete.
+// The batch-operator slice opens a duty settlement: it is split pro rata to the
+// period's duty units (rcrdduty) and credited in bounded steps. Only ACTIVE
+// batch operators are paid; any skipped amount stays in the treasury and is
+// recorded on the epochlog row when the settlement completes.
 //
 // Single-trx semantics guarantee gate conditions hold through this call;
 // payepoch trusts the gate-computed period_emission and does not recompute.
 // Strict sysio::check throws inside payepoch flag true bugs (arithmetic
 // invariants, BPS sums).
-//
-// Slashed / terminated batch-op group members are skipped via opreg filter;
-// their slice remains in the treasury.
-void system_contract::payepoch(uint32_t epoch_index,
-                               std::vector<std::vector<sysio::name>>,
-                               int64_t period_emission) {
+void system_contract::payepoch(uint32_t epoch_index, int64_t period_emission, bool spend) {
    require_auth(epoch_refs::account);
 
    // Defense in depth. Single-trx semantics make these conditions gate-guaranteed in normal operation; firing
@@ -716,7 +807,7 @@ void system_contract::payepoch(uint32_t epoch_index,
 
    // Gate guaranteed t5state exists; load directly. accrueepoch ran first
    // (FIFO inline order) and already merged this epoch into pending +
-   // batch_group_epochs + last_epoch_*; trust that state.
+   // last_epoch_*; trust that state.
    t5state_t t5s(get_self());
    auto state = t5s.get();
 
@@ -725,104 +816,42 @@ void system_contract::payepoch(uint32_t epoch_index,
    sysio::check(period_emission == state.pending_emission_amount,
                 "payepoch period_emission must equal accrued pending_emission_amount");
 
+   // ----- The previous period's batch settlement must be done first -----
+   // Each period's duty settles at that period's own rate, so two cannot settle at once. Step the open
+   // one; if it is still not done, the payout waits with the period still pending, and the next economic
+   // epoch's gate offers it again.
+   dutystate_t duty_tbl(get_self());
+   auto duty = duty_tbl.get_or_default(duty_state{});
+   if (duty.settling()) {
+      step_settlement(get_self(), duty, state);
+      if (duty.settling()) {
+         sysio::print("payepoch: batch duty settlement still open; payout waits\n");
+         duty_tbl.set(duty, get_self());
+         t5s.set(state, get_self());
+         return;
+      }
+   }
+
+   // Without `spend` (the economic clock had not caught up before this tick) the payout spends nothing and leaves the
+   // duty period open: the period stays in the treasury, and the blocks and duty counted meanwhile carry to the first
+   // payout that spends.
+   const int64_t spent_emission = spend ? period_emission : 0;
+
    // ----- Category splits -----
    // payepoch transfers compute + capex + governance only. The implicit
    // remainder (period_emission - compute - capex - governance) stays
    // in sysio's balance. Sum-to-10000 BPS means no unallocated remainder.
-   const int64_t compute_amount    = split_bps(period_emission, cfg.compute_bps);
-   const int64_t capex_amount      = split_bps(period_emission, cfg.capex_bps);
-   const int64_t governance_amount = split_bps(period_emission, cfg.governance_bps);
+   const int64_t compute_amount    = split_bps(spent_emission, cfg.compute_bps);
+   const int64_t capex_amount      = split_bps(spent_emission, cfg.capex_bps);
+   const int64_t governance_amount = split_bps(spent_emission, cfg.governance_bps);
 
    const int64_t producer_pool = split_bps(compute_amount, cfg.producer_bps);
    const int64_t batch_pool    = compute_amount - producer_pool;
-
-   // ----- The period's ACTUAL length, in accrued epochs -----
-   // BOTH distributions below normalize by this, and NEITHER may use
-   // cfg.pay_cadence_epochs for it. accrueepoch increments one batch_group_epochs
-   // slot per epoch unconditionally, while setemitcfg may change
-   // pay_cadence_epochs at any time (taking effect on the next advance), so the
-   // configured cadence and the epochs this period actually spans can disagree --
-   // lowering 3->1 after one accrual leaves the counters summing to 2 against a
-   // configured 1. Deriving the divisor from the counters themselves keeps both
-   // normalizations correct whatever the config did mid-period.
-   //
-   // Sum in int64: each counter is a uint32 epoch tally and the vector is sized
-   // from a scheduler-bounded group list, so the total cannot approach the int64 range. Zero is
-   // impossible in practice (payepoch asserts accrueepoch ran for this same
-   // epoch_index, and accrueepoch always increments a slot) but is guarded at
-   // each use, because a zero divisor would abort the whole advance chain.
-   int64_t accrued_epochs = 0;
-   for (const uint32_t group_epoch_count : state.batch_group_epochs) {
-      accrued_epochs += group_epoch_count;
-   }
-
-   // Preserve roster identity separately from the legacy positional counters.
-   // advance() slides its schedule before queueing this action, so a counter at
-   // position g cannot identify the roster that was active in a prior epoch.
-   struct recorded_batch_group {
-      std::vector<sysio::name> members;
-      uint32_t                 active_epochs = 0;
-   };
-
-   batchepochs_t batch_history(get_self());
-   std::vector<recorded_batch_group> recorded_batch_groups;
-   bool batch_history_complete = accrued_epochs > 0;
-   int64_t recorded_epochs = 0;
-   uint32_t batch_payout_credits = 0;
-   uint64_t expected_epoch_index = state.period_start_epoch;
-
-   for (auto it = batch_history.begin(); it != batch_history.end(); ++it) {
-      // A stale/corrupted table must not make the mandatory payepoch inline
-      // action abort. Bound deserialization to the configured safety window,
-      // retain the batch slice, and clear the table below so the next period
-      // starts from a fresh immutable roster history.
-      if (recorded_epochs == emissions::MAX_PAY_CADENCE_EPOCHS) {
-         batch_history_complete = false;
-         break;
-      }
-      ++recorded_epochs;
-
-      // A clean activation may initialize T5 after sysio.epoch has already
-      // advanced. In that first period, the earliest recorded roster defines
-      // the start rather than an obsolete literal epoch-one assumption.
-      if (expected_epoch_index == 0) {
-         expected_epoch_index = it->sysio_epoch_index;
-      }
-      if (static_cast<uint64_t>(it->sysio_epoch_index) != expected_epoch_index) {
-         batch_history_complete = false;
-      }
-      ++expected_epoch_index;
-
-      auto group_it = std::find_if(
-         recorded_batch_groups.begin(), recorded_batch_groups.end(),
-         [&](const auto& group) { return group.members == it->members; });
-      if (group_it == recorded_batch_groups.end()) {
-         const uint64_t credits_with_group =
-            static_cast<uint64_t>(batch_payout_credits) + it->members.size();
-         if (credits_with_group > emissions::MAX_BATCH_PAYOUT_CREDITS) {
-            batch_history_complete = false;
-         } else {
-            batch_payout_credits = static_cast<uint32_t>(credits_with_group);
-            recorded_batch_groups.push_back(recorded_batch_group{
-               .members       = it->members,
-               .active_epochs = 1,
-            });
-         }
-      } else {
-         group_it->active_epochs += 1;
-      }
-   }
-
-   batch_history_complete =
-      batch_history_complete
-      && recorded_epochs == accrued_epochs
-      && expected_epoch_index == static_cast<uint64_t>(epoch_index) + 1;
 
    // "paid" here means DISTRIBUTED -- credited to `payclaims` for producers / standbys /
    // batch operators, transferred for the category buckets. Both leave the treasury's
    // spendable position, which is what these counters feed.
    int64_t actual_paid = 0; // emission actually distributed (counts toward total_distributed)
-   int64_t batch_emission_paid = 0;
 
    // =======================================================================
    // Producer + standby pay.
@@ -832,8 +861,9 @@ void system_contract::payepoch(uint32_t epoch_index,
    // block `onblock` counted for it: every block it made, at most one round per rotation. A missed
    // block is never counted, so its pay stays in the treasury: it does not flow to the producers
    // that did show up, because the rate does not depend on who did. The divisor is the period's
-   // nominal slot count, raised to the blocks counted when a period runs long (an epoch can extend
-   // while a batch operator delivers), so the slice is never exceeded.
+   // nominal slot count, raised to the blocks counted when they exceed it (carried blocks, or blocks a
+   // late tick counts past the boundary), so the slice is never exceeded. A block counts toward the
+   // period open when `onblock` records it.
    //
    // Standbys (positions 22..cfg.standby_end_rank) draw a retainer from the standby slice
    // (cfg.standby_bps of the pool). Each POSITION holds a fixed share, decaying linearly from
@@ -857,21 +887,10 @@ void system_contract::payepoch(uint32_t epoch_index,
       const int64_t standby_pool = split_bps(producer_pool, cfg.standby_bps);
       const int64_t active_pool  = producer_pool - standby_pool;
 
-      // Nominal block slots in the period: the configured epoch duration (canonical on
-      // sysio.epoch) times the epochs the period ACTUALLY accrued -- never
-      // cfg.pay_cadence_epochs, which a mid-period change makes disagree with the accrual --
-      // at one slot per block interval. uint64: a 30-day epoch times a large cadence overflows
-      // uint32.
-      // Accumulated by `accrueepoch` at each epoch's OWN duration -- every epoch of the period
-      // including this one, exactly as `pending_emission_amount` is (the equality check above
-      // pins that). The fallback is the zero-accrual case, not a compatibility path.
-      const uint64_t this_epoch_slots =
-         static_cast<uint64_t>(get_epoch_duration_sec())
-         * static_cast<uint64_t>(MS_PER_SECOND)
-         / static_cast<uint64_t>(sysio::block_timestamp::block_interval_ms);
-      const uint64_t nominal_slots = state.pending_nominal_slots > 0
-         ? state.pending_nominal_slots
-         : this_epoch_slots * static_cast<uint64_t>(accrued_epochs > 0 ? accrued_epochs : 1);
+      // Nominal block slots in the period, accumulated by `accrueepoch` over the ticks that built the pool, each
+      // adding the slots of the epoch it closed: from the previous pay epoch's boundary to this one's (the first tick
+      // counts one epoch for the stretch before the grid's start).
+      const uint64_t nominal_slots = state.pending_nominal_slots;
 
       // Standby position weights run N at position 22 down to 1 at standby_end_rank; their sum
       // is the divisor, so a position's share is the same whether or not it is filled.
@@ -942,8 +961,8 @@ void system_contract::payepoch(uint32_t epoch_index,
          }
       }
 
-      // `nominal_slots` is the period's entitlement; `produced_blocks` raises it when a period ran
-      // long, so no producer's rate exceeds its slice.
+      // `nominal_slots` is the period's entitlement; `produced_blocks` raises it when carried blocks
+      // or a late tick's blocks exceed it, so no producer's rate exceeds its slice.
       //
       // Carried blocks are NOT subtracted back out. A row whose pay rounds to zero keeps its blocks
       // (that promise is what makes the model forfeiture-free) and they are counted again in the
@@ -1000,62 +1019,24 @@ void system_contract::payepoch(uint32_t epoch_index,
    }
 
    // =======================================================================
-   // Batch-op pay. Each historical roster receives a slice weighted by its
-   // actual active epochs over the period. The legacy counters still supply the
-   // actual period length, rather than cfg.pay_cadence_epochs: configuration can
-   // change between accruals. Complete immutable history is required for a
-   // batch payout. History is bounded by MAX_PAY_CADENCE_EPOCHS and recipient
-   // credits by MAX_BATCH_PAYOUT_CREDITS. Incomplete or over-budget history
-   // takes the non-halting retention path below, so it cannot abort advance.
+   // Batch-op pay. The period's duty units split the batch pool: open a
+   // settlement for the period now closing and take its first step. A period
+   // with no duty leaves the whole pool in the treasury. A payout that does
+   // not spend leaves the duty period open.
    // =======================================================================
-   auto pay_batch_group = [&](const std::vector<sysio::name>& group,
-                              uint32_t active_epochs) {
-      if (group.empty() || active_epochs == 0) return;
-
-      // Period-weighted slices for this group, divided evenly among members.
-      // Emission and fee are weighted identically by active-epoch count.
-      const int64_t members = static_cast<int64_t>(group.size());
-      const int64_t group_pool = static_cast<int64_t>(
-         static_cast<__int128>(batch_pool) * active_epochs / accrued_epochs);
-      const int64_t per_member     = group_pool / members;
-
-      for (const auto& m : group) {
-         if (!is_op_active(m, OperatorType::OPERATOR_TYPE_BATCH)) continue;
-         credit_pay(get_self(), m, per_member, memo::batch_op_reward);
-         actual_paid += per_member;
-         batch_emission_paid += per_member;
-      }
-   };
-
-   if (batch_history_complete) {
-      for (const auto& group : recorded_batch_groups) {
-         pay_batch_group(group.members, group.active_epochs);
-      }
-   } else if (accrued_epochs > 0) {
-      // Do not guess a roster during a mixed-version upgrade or an incomplete
-      // first period: retain its batch emission in the treasury and let the
-      // next period establish complete history.
-      sysio::print("batch roster history incomplete; retaining batch emission\n");
+   const bool batch_has_duty = duty.open_units > 0 && batch_pool > 0;
+   if (batch_has_duty) {
+      duty.settling_period      = duty.open_period;
+      duty.settling_pool        = batch_pool;
+      duty.settling_units       = duty.open_units;
+      duty.settling_paid        = 0;
+      duty.settling_epoch_index = epoch_index;
+      duty.settle_cursor        = 0;
+      state.unsettled_batch_emission = batch_pool;
    }
-
-   const int64_t batch_emission_retained = batch_pool - batch_emission_paid;
-
-   // A pay period is the history lifetime. Clear only after an actual accrued
-   // period: on the defensive zero-accrual path the history is preserved rather
-   // than silently discarding roster identity without a batch payout. Keep the
-   // cleanup bounded so an overlong legacy/corrupt table cannot exhaust the
-   // mandatory epoch-advance transaction. Since normal operation adds at most
-   // MAX_PAY_CADENCE_EPOCHS rows per period and this removes twice that many,
-   // stale history drains monotonically while rewards remain on the audited
-   // incomplete-history recovery path.
-   if (accrued_epochs > 0) {
-      uint32_t cleaned = 0;
-      for (auto it = batch_history.begin();
-           it != batch_history.end()
-              && cleaned < emissions::MAX_BATCH_HISTORY_CLEANUP_ROWS;
-           ++cleaned) {
-         it = batch_history.erase(it);
-      }
+   if (spend) {
+      duty.open_period += 1;
+      duty.open_units   = 0;
    }
 
    // =======================================================================
@@ -1065,7 +1046,7 @@ void system_contract::payepoch(uint32_t epoch_index,
    // PUSHED, not credited -- the deliberate exception to this contract's pull rule.
    //
    // The pull model exists because a payout to an account the protocol does not control lets that
-   // account's transfer-notify handler abort `advance`. These two are protocol-owned holding
+   // account's transfer-notify handler abort `tickeconomy`. These two are protocol-owned holding
    // accounts: they carry no code, so there is no handler to run, and only governance can ever put
    // code there. The threat the credit path defends against does not exist for them.
    //
@@ -1075,7 +1056,7 @@ void system_contract::payepoch(uint32_t epoch_index,
    // (`is_sysio_account`), so they cannot pay for a transaction. They also
    // have no contract of their own to emit the claim inline. Their pay would accrue in
    // `payclaims` forever while `payclaimtot` reserved the backing WIRE against treasury withdrawals and the
-   // epoch readiness gate -- a permanent, growing reservation of WIRE nobody can move.
+   // emissions readiness gate -- a permanent, growing reservation of WIRE nobody can move.
    //
    // This is a standing constraint on the two accounts, not a reason to revisit this call: any
    // contract ever deployed on `sysio.ops` or `sysio.gov` MUST NOT assert (or burn CPU) in an
@@ -1098,29 +1079,34 @@ void system_contract::payepoch(uint32_t epoch_index,
    // Drain accumulator + advance period boundary.
    state.pending_emission_amount = 0;
    state.pending_nominal_slots   = 0;
-   std::fill(state.batch_group_epochs.begin(), state.batch_group_epochs.end(), 0);
    state.period_start_epoch = epoch_index + 1;
-
-   t5s.set(state, get_self());
 
    // Audit log: records the AUTHORIZED period emission + the three category
    // amounts for the period that just paid. (Producer / batch-op sub-distribution is
    // implicit. Those shares are CREDITED to `payclaims` rather than transferred, so a
    // recipient no longer appears as its own transfer trace -- per-recipient attribution
    // comes from the `payclaims` row deltas, and the eventual `claimpay`.) One row per
-   // pay-epoch; non-pay-epochs have no audit-log row.
+   // pay epoch. The batch settlement fills in what it retained when it completes.
    epochlog_t epoch_table(get_self());
    epoch_table.emplace(get_self(), epochlog_key{epoch_index}, epoch_log{
-      .sysio_epoch_index = epoch_index,
-      .epoch_count       = state.epoch_count,
-      .timestamp         = state.last_epoch_time,
-      .total_emission    = period_emission,
-      .compute_amount    = compute_amount,
-      .capex_amount      = capex_amount,
-      .governance_amount = governance_amount,
-      .batch_history_complete  = batch_history_complete,
-      .batch_emission_retained = batch_emission_retained,
+      .economic_epoch_index    = epoch_index,
+      .epoch_count             = state.epoch_count,
+      .timestamp               = state.last_epoch_time,
+      .total_emission          = period_emission,
+      .compute_amount          = compute_amount,
+      .capex_amount            = capex_amount,
+      .governance_amount       = governance_amount,
+      .batch_emission          = batch_pool,
+      .batch_emission_retained = batch_has_duty ? 0 : batch_pool,
+      .batch_settled           = !batch_has_duty,
    });
+
+   // The first settlement step runs after the row exists, so a settlement that completes in this
+   // step records its retained amount on it.
+   step_settlement(get_self(), duty, state);
+
+   duty_tbl.set(duty, get_self());
+   t5s.set(state, get_self());
 
    // Head-first prune of the audit log past its retention cap. Rows are added
    // monotonically (one per successful payepoch), and epoch_count is the
@@ -1146,17 +1132,19 @@ emissions::epoch_info_result system_contract::viewepoch() {
    t5state_t t5s(get_self());
    sysio::check(t5s.exists(), "t5 state not initialized");
 
-   const auto state = t5s.get();
-   const auto now   = time_point_sec{current_time_point()};
+   const auto state   = t5s.get();
+   const auto economy = get_economic_config();
 
-   const uint32_t epoch_duration_sec = get_epoch_duration_sec();
+   // The next economic boundary: the clock's own next_epoch_start once it has ticked, else its start.
+   sysio::epoch::economystate_t economy_state_tbl(epoch_refs::account);
+   const auto economy_state = economy_state_tbl.get_or_default(sysio::epoch::economic_state{});
+   const uint64_t next_epoch_time = economy_state.current_epoch_index > 0
+      ? economy_state.next_epoch_start.sec_since_epoch()
+      : economy.start_time.sec_since_epoch();
 
-   uint32_t secs_until = 0;
-   const uint64_t next_epoch_time =
-      static_cast<uint64_t>(state.last_epoch_time.sec_since_epoch()) + epoch_duration_sec;
-   if (now.sec_since_epoch() < next_epoch_time) {
-      secs_until = static_cast<uint32_t>(next_epoch_time - now.sec_since_epoch());
-   }
+   const uint64_t now_sec = time_point_sec{current_time_point()}.sec_since_epoch();
+   const uint32_t secs_until =
+      now_sec < next_epoch_time ? static_cast<uint32_t>(next_epoch_time - now_sec) : 0;
 
    return emissions::epoch_info_result{
       .epoch_count         = state.epoch_count,
@@ -1165,7 +1153,8 @@ emissions::epoch_info_result system_contract::viewepoch() {
       .last_epoch_emission = state.last_epoch_emission,
       .total_distributed   = state.total_distributed,
       .treasury_remaining  = std::max<int64_t>(emissions::net_headroom(cfg, state), 0),
-      .next_emission_est   = emissions::compute_epoch_emission(cfg, epoch_duration_sec, state),
+      .next_emission_est   = emissions::compute_epoch_emission(
+         cfg, sysio::epoch::epoch::closing_epoch_duration_sec(economy, economy_state), state),
       .seconds_until_next  = secs_until,
    };
 }
