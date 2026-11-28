@@ -49,9 +49,10 @@ namespace sysio {
       // -----------------------------------------------------------------------
 
       /// Open an OPP envelope dispute. Called inline by `sysio.msgch::evalcons` for a terminal
-      /// two-version tie or a post-boundary multi-version no-majority split. msgch owns the
-      /// consensus boundary, terminality, strict-majority, and electorate-preflight checks because
-      /// it alone has the live eligible group and delivery tally.
+      /// two-version split or a post-boundary multi-version split with no version at the consensus
+      /// threshold. msgch owns the consensus boundary, terminality, threshold, and
+      /// electorate-preflight checks because it alone has the seated group, its ACTIVE members and
+      /// the delivery tally.
       /// Records the candidate checksums, snapshots the Tier-1 electorate (the Tier-1
       /// rows of `sysio.roa::nodeowners` for the current network generation) together with its
       /// quorum, and pauses epoch advancement until a Tier-1 node-owner vote resolves the

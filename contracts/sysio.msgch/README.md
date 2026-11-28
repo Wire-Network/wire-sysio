@@ -6,9 +6,11 @@ Inbound/outbound OPP message chain management and consensus tracking contract.
 
 - Accepts inbound OPP envelopes delivered by the batch operators of the active group, one delivery per
   operator per outpost per epoch (`MAX_ENVELOPE_BYTES` = 32,768; larger deliveries are rejected)
-- Evaluates consensus per (outpost, epoch): every eligible operator delivers an identical envelope
-  (fast path), or a strict majority of the group agrees once the epoch boundary has passed. A
-  post-boundary split with no strict majority opens a `sysio.chalg` dispute
+- Evaluates consensus per (outpost, epoch). An envelope needs matching deliveries from a strict
+  majority of the group as seated; only members that are `ACTIVE` in `sysio.opreg` count, and a
+  member that is not does not lower that threshold. It is accepted at once when every `ACTIVE`
+  member delivered it, otherwise once the epoch boundary has passed. A post-boundary split with no
+  version at the threshold opens a `sysio.chalg` dispute
 - Validates the per-outpost envelope chain and message sequence, stores the accepted messages and
   attestations, and routes each attestation to its depot handler
 - Queues outbound attestations and packs them into one OPP envelope per outpost per epoch, schedule

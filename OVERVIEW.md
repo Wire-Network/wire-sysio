@@ -50,7 +50,7 @@ This allows a single unified message format across all supported chains.
 1. A user action on an external chain (e.g. syndicating liqETH into the Ethereum `SyndicationPool`) queues a protobuf-encoded attestation in the outpost's outbound buffer, which the outpost seals into its envelope for the epoch.
 2. Every batch operator in the active group independently reads that envelope through its chain-specific client plugin (`outpost_ethereum_client_plugin`, `outpost_solana_client_plugin`).
 3. Each operator delivers the envelope to Wire's `sysio.msgch` contract via the `deliver()` action.
-4. `sysio.msgch` evaluates consensus: every eligible operator delivering an identical envelope is accepted immediately; otherwise a strict majority is accepted once the epoch boundary has passed. A split with no strict majority opens a `sysio.chalg` dispute.
+4. `sysio.msgch` evaluates consensus against a strict majority of the group as seated, counting only `ACTIVE` members: an envelope that every `ACTIVE` member delivered identically is accepted immediately when they reach that threshold; otherwise a version is accepted once it reaches the threshold and the epoch boundary has passed. A split with no version at the threshold opens a `sysio.chalg` dispute.
 5. Attestations are extracted, validated, and routed to the appropriate system contract handlers.
 
 ### Outbound (Wire → External Chain)
@@ -136,9 +136,9 @@ On Solana the outpost lives in the `liqsol-core` program (`instructions/opp/`), 
 
 ## Consensus & Security
 
-- **Group consensus**: An envelope is accepted when every eligible operator in the active group delivers it identically, or by strict majority once the epoch boundary has passed.
+- **Group consensus**: An envelope needs matching deliveries from a strict majority of the active group as seated; members that are not `ACTIVE` do not count and do not lower that threshold. It is accepted at once when every `ACTIVE` member delivers it identically, otherwise once the epoch boundary has passed. `advance` seats only full groups and waits when too few batch operators are `ACTIVE` to fill one.
 - **Envelope hash chains**: Each envelope carries the digest of its predecessor on the same stream, and messages carry sequence numbers, so envelopes and messages cannot be reordered or replayed.
-- **Disputes**: A post-boundary split with no strict majority opens a `sysio.chalg` dispute that pauses the epoch until Tier-1 node owners vote a canonical envelope. Operators that delivered a non-canonical envelope are slashed.
+- **Disputes**: A post-boundary split with no version at the threshold opens a `sysio.chalg` dispute that pauses the epoch until Tier-1 node owners vote a canonical envelope. Operators that delivered a non-canonical envelope are slashed.
 - **Bonded syndication**: Syndicated value is released on the depot only after `sysio.bond` underwriters bond the syndication statement; anyone may challenge it during the challenge window.
 - **Emergency stop**: `sysio.andon` freezes depot fund egress; outposts pause independently (`SyndicationPool` pause on Ethereum, `frozen` on Solana).
 
