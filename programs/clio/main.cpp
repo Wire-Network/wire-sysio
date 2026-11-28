@@ -1202,6 +1202,8 @@ void ensure_kiod_running(CLI::App* app) {
         return;
     if (app->get_subcommand("create")->got_subcommand("key")) // create key does not require wallet
        return;
+    if (!app->get_subcommand("sign")->get_subcommands().empty()) // sign em_digest etc. take their key, not the wallet's
+       return;
     if (app->get_subcommand("multisig")->got_subcommand("review")) // multisig review does not require wallet
        return;
     if (auto* subapp = app->get_subcommand("system")) {
@@ -1680,13 +1682,23 @@ std::string private_key_text_or_prompt(std::string text) {
    return text;
 }
 
+/// `text` parsed as a private key of `type` (`unknown`: the type its PVT_ prefix names). Any failure becomes a bare
+/// "Invalid private key", as for `wallet import`: fc's decoders can quote their input (the base58 decoder quotes all
+/// of it), and clio prints the exception, so a mistyped secret would otherwise reach the terminal or a log.
+fc::crypto::private_key parse_private_key(const std::string& text, fc::crypto::private_key::key_type type) {
+   try {
+      return fc::crypto::private_key::from_string(text, type);
+   } catch (...) {
+      SYS_THROW(private_key_type_exception, "Invalid private key");
+   }
+}
+
 /// An external wallet key whose type its text names (PVT_EM_... or PVT_ED_...), or else the raw hex secret of an
 /// Ethereum key. Other Wire key types parse too; a caller that needs an EM or ED key refuses them.
 fc::crypto::private_key parse_external_private_key(const std::string& text) {
    const std::string_view wire_private_prefix = fc::crypto::constants::private_key_base_prefix;
-   return text.starts_with(wire_private_prefix)
-             ? fc::crypto::private_key::from_string(text)
-             : fc::crypto::private_key::from_string(text, fc::crypto::private_key::key_type::em);
+   return parse_private_key(text, text.starts_with(wire_private_prefix) ? fc::crypto::private_key::key_type::unknown
+                                                                        : fc::crypto::private_key::key_type::em);
 }
 
 /// A 32-byte sha256 digest given as 64 hex characters, with an optional 0x prefix.
@@ -1715,8 +1727,8 @@ struct sign_em_digest_subcommand {
       cmd->add_option("--private-key", private_key_text, localized(em_private_key_help.data()))->expected(0, 1);
       cmd->callback([this] {
          const auto digest = parse_sha256_hex(digest_hex);
-         const auto key = fc::crypto::private_key::from_string(private_key_text_or_prompt(private_key_text),
-                                                               fc::crypto::private_key::key_type::em);
+         const auto key = parse_private_key(private_key_text_or_prompt(private_key_text),
+                                            fc::crypto::private_key::key_type::em);
          // private_key::sign dispatches to em::sign_sha256, which wraps the digest in the EIP-191 personal_sign
          // envelope before secp256k1 -- identical to what MetaMask produces and to what nodeop recovers. Emit the
          // prefixed SIG_EM_ form, which is what `clio push transaction --signature` and send_transaction2 expect.
@@ -1799,7 +1811,7 @@ struct sign_wallet_message_subcommand {
       cmd->add_option("--message", message, localized("The exact text to sign, as UTF-8"))->required();
       cmd->add_option("--private-key", private_key_text, localized(scheme.private_key_help.data()))->expected(0, 1);
       cmd->callback([this, key_type = scheme.key_type] {
-         const auto key = fc::crypto::private_key::from_string(private_key_text_or_prompt(private_key_text), key_type);
+         const auto key = parse_private_key(private_key_text_or_prompt(private_key_text), key_type);
          const std::span<const uint8_t> bytes{reinterpret_cast<const uint8_t*>(message.data()), message.size()};
          fc::mutable_variant_object out;
          out("pub_key", key.get_public_key().to_string({}, true))
@@ -2456,8 +2468,8 @@ int main( int argc, char** argv ) {
          std::cerr << "ERROR: Either indicate a file using \"--file\" or pass \"--to-console\"" << std::endl;
          return;
       }
-      const auto privk = fc::crypto::private_key::from_string(private_key_text_or_prompt(em_private_key),
-                                                             fc::crypto::private_key::key_type::em);
+      const auto privk = parse_private_key(private_key_text_or_prompt(em_private_key),
+                                           fc::crypto::private_key::key_type::em);
       auto pubk  = privk.get_public_key();
       if (print_console) {
          std::cout << localized("Private key: ${key}", ("key", privk.to_string({}, true)) ) << std::endl;

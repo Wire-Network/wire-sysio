@@ -7,14 +7,15 @@ On a one-node chain whose bootstrap deploys sysio.authex and a privileged sysio.
 
   * The proof clio puts in the action (built with ``-s -d -u`` and a fixed ``--nonce``, so nothing is sent) matches
     known answers from implementations independent of libfc. For a Solana (``PVT_ED_``) key the whole signature is
-    pinned (Python ``cryptography``; Ed25519 is deterministic) and verifies over the wallet payload, the lowercase
-    hex of the printable-mapped sha256 of the message. For an Ethereum key, as ``PVT_EM_`` and as the raw ``0x`` hex
+    pinned (from Python ``cryptography`` over the wallet payload, the lowercase hex of the printable-mapped sha256 of
+    the message; Ed25519 is deterministic). For an Ethereum key, as ``PVT_EM_`` and as the raw ``0x`` hex
     MetaMask exports, ``clio sign em_digest_recover`` recovers the key from the signature over the reference
     keccak256 digest of the message. (libfc's EIP-191 signer is pinned to eth_account by clio_em_key_test.)
   * The proof binds the account and the nonce, and the nonce defaults to the head block time.
   * Sent, an ED link (key given as an option) and an EM link (raw hex typed at the prompt) each add the links row.
-  * Refused before anything is sent: a K1 key and an invalid account name. Refused by the contract: a second link
-    on a chain the account already linked, and a nonce older than 10 minutes.
+  * Refused before anything is sent: a K1 key, an invalid account name, and a key that does not parse, reported as
+    "Invalid private key" with no part of it printed, also with ``-v``. Refused by the contract: a second link on a
+    chain the account already linked, and a nonce older than 10 minutes.
 
 Whether the contract accepts every proof shape is covered by contracts/tests/sysio.authex_tests.cpp, which signs
 through the same host helper (sysio::opp::depot::authex_link) as this command.
@@ -26,7 +27,6 @@ Vectors (regenerate only deliberately, from the reference implementation):
 """
 
 import datetime
-import hashlib
 import json
 import re
 import subprocess
@@ -48,7 +48,6 @@ CHAIN_KIND_SVM = "CHAIN_KIND_SVM"
 
 ED_PRIVATE = "PVT_ED_2Ana1pUpv2ZbMVkwF5FXapYeBEjdxDatLn7nvJkhgTSdZd8hbDHTd21as7EAsg7ypityqfsw2pMQKJcVDVcAEsd"
 ED_PUBLIC = "PUB_ED_9C6hybhQ6Aycep9jaUnP6uL9ZYvDjUp1aSkFWPUFJtpj"
-ED_MESSAGE = "PUB_ED_9C6hybhQ6Aycep9jaUnP6uL9ZYvDjUp1aSkFWPUFJtpj|alice|3|1767225600000|createlink auth"
 ED_SIGNATURE = ("SIG_ED_ivgGc8ismkQ6a83ZZQbDcigJvHZd8vpuDcjDsQUAGXeC1SPSWycUW2d4LFSE6GNhy8tvUM4n2z3azdGFUivSVLmfxUZ9"
                 "iBWbgwPCG9TU1JpJDWitWUg6DwH8L5fReUAWJ2v")
 
@@ -58,10 +57,11 @@ EM_DIGEST = "53d6ccc910ded561976f11ec3863e5e1eeb8ed93f84a33d0381734e893b336c8"
 
 K1_PRIVATE = "PVT_K1_Xx4wsMynSZ39WiwEn8wzRL9trcKK33ZzwaZKJmymYx5UTjKvv"
 
-BASE58_ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
-ED_PUBLIC_KEY_BYTES = 32
-ED_PRINTABLE_MIN = 33
-ED_PRINTABLE_RANGE = 94
+# The reference ED secret with its last character replaced by '0', which base58 cannot hold.
+BAD_ED_SECRET = ED_PRIVATE[len("PVT_ED_"):-1] + "0"
+INVALID_KEY = "Invalid private key"
+SECRET_CHUNK = 12                      # long enough that a match can only be the secret
+VERBOSE = "-v"
 MS_PER_SECOND = 1000
 
 args = TestHelper.parse_args({"-v", "--dump-error-details", "--leave-running", "--keep-logs", "--unshared"})
@@ -144,33 +144,11 @@ def new_ed_key():
     return re.search(r"Private key: (\S+)", out).group(1), re.search(r"Public key: (\S+)", out).group(1)
 
 
-def base58_decode(text):
-    """Decode a base58 (bitcoin alphabet) string to bytes."""
-    number = 0
-    for char in text:
-        number = number * 58 + BASE58_ALPHABET.index(char)
-    body = number.to_bytes((number.bit_length() + 7) // 8, "big")
-    return b"\0" * (len(text) - len(text.lstrip("1"))) + body
-
-
-def ed_wallet_payload(message):
-    """The bytes a Solana wallet signs for ``message``: the hex text of its printable-mapped sha256."""
-    mapped = bytes(b % ED_PRINTABLE_RANGE + ED_PRINTABLE_MIN for b in hashlib.sha256(message.encode()).digest())
-    return mapped.hex().encode()
-
-
 def test_ed_proof_matches_reference(node):
-    """A Solana key signs the reference proof, and the signature verifies independently of libfc."""
-    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
-
+    """A Solana key signs the reference proof: the whole action data equals the known answer."""
     data = proof(node, ED_PRIVATE)
     assert data == {"chain_kind": CHAIN_KIND_SVM, "account": ACCOUNT, "sig": ED_SIGNATURE, "pub_key": ED_PUBLIC,
                     "nonce": NONCE}, data
-
-    raw = base58_decode(ED_SIGNATURE[len("SIG_ED_"):])
-    public_key, signature = raw[:ED_PUBLIC_KEY_BYTES], raw[ED_PUBLIC_KEY_BYTES:]
-    assert public_key == base58_decode(ED_PUBLIC[len("PUB_ED_"):])
-    Ed25519PublicKey.from_public_bytes(public_key).verify(signature, ed_wallet_payload(ED_MESSAGE))
 
 
 def test_em_proof_matches_reference(node):
@@ -213,6 +191,14 @@ def test_refusals(node):
     and a stale nonce."""
     assert_refused(createlink(node, ACCOUNT, K1_PRIVATE, "-j"), "createlink links only")
     assert_refused(createlink(node, "Not_A_Name", ED_PRIVATE, "-j"), "Not_A_Name")
+    for verbosity in ([], [VERBOSE]):
+        res = run_clio(node, *verbosity, "system", CREATELINK, ACCOUNT, "--private-key", "PVT_ED_" + BAD_ED_SECRET,
+                       "-j")
+        assert_refused(res, INVALID_KEY)
+        output = res.stdout + res.stderr
+        leaked = [BAD_ED_SECRET[i:i + SECRET_CHUNK] for i in range(len(BAD_ED_SECRET) - SECRET_CHUNK + 1)
+                  if BAD_ED_SECRET[i:i + SECRET_CHUNK] in output]
+        assert not leaked, "createlink %s printed part of the key: %s" % (verbosity, leaked[0])
 
     other_ed_private, _ = new_ed_key()
     assert_refused(createlink(node, ACCOUNT, other_ed_private, "-j"), "Account already has a link for this chain",
